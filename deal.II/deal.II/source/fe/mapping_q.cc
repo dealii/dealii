@@ -442,11 +442,18 @@ MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loq
     }
   else
     {
-				   // not precomputed, then do so now
+				       // not precomputed, then do so now
       if (dim==2)
 	compute_laplace_vector(loqvs);
-      else
-	Assert(false, ExcNotImplemented());
+      
+				       // for dim==3 don't throw an
+				       // ExcNotImplemented here to
+				       // allow the creating of that
+				       // MappingQ<3> object. But an
+				       // ExcLaplaceVectorNotSet
+				       // assertion is thrown when the
+				       // apply_laplace_vector
+				       // function is called.
     }
 
 				   // the sum of weights of the points
@@ -986,6 +993,16 @@ MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell
 					   // separately
 	  if (lines_at_boundary>0)
 	    {
+					       // call of function
+					       // apply_laplace_vector
+					       // increases size of b
+					       // about 1. There
+					       // resize b for the
+					       // case the mentioned
+					       // function was already
+					       // called.
+	      b.resize(4*degree);
+	      
 					       // b is of size
 					       // 4*degree, make sure
 					       // that this is the
