@@ -49,15 +49,6 @@ Use the C++ standard string classes instead of the libg++ String
   class.
 
 
-Invent a FEFaceValues class representing the restriction of a FE to
-  the face of a cell. Use this mechanism for the calculation of
-  dirichlet bc and for contour integrals, either around the domain
-  or around a cell. Remove the FE::face_ansatz_points function.
-
-
-Let the FE objects take DoF-iterators rather than Tria-iterators.
-
-
 Check usage of vectors: functions should assume that the objects have
   the right size already.
 
@@ -73,11 +64,15 @@ Update DoFHandler::distribute_cell_to_dof_vector for higher order
   on the vertices).
 
 
+Remove FiniteElementData<>::operator == and let it be generated
+  implicitely.
+
+Look at the fill_fe_values functions for possible optimizations.
+
+
 
 
 DEAL:
-why do loops in dFMatrix run backwards?
-
 Let an empty dfmatrix assume it has dimensions zero rather than one!
 
 Is dvector::operator= (double) really useful or does it make more
