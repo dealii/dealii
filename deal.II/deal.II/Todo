@@ -1,3 +1,10 @@
+Remove the comment signs in the monitor_* functions in tria.cc
+  as early as possible. These were inserted, since at home the
+  program did some strange things in the reserve_memory
+  functions (allocated more memory than told), such that the
+  memory checks failed.
+
+
 Rewrite code like
       int flagged_cells = 0;
       for (; cell!=endc; ++cell)
