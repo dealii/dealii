@@ -41,28 +41,43 @@ kdoc.library-files = base.kdoc         \
                      numerics.kdoc
 endif
 
-kdoc: $(kdoc.library-files)
+kdoc: kdoc-installed $(kdoc.library-files)
 
-base.kdoc: $(kdoc.base)
+
+# check whether kdoc is already installed. if not, then try to do so
+kdoc-installed:
+	@if test ! -d $(kdocdir) ; then  \
+	    echo "========================================" ; \
+	    echo "Trying to install kdoc first" ;  \
+	    echo "========================================" ; \
+	    cd $(kdocdir:kdoc/bin=kdoc) ;    \
+	    $(MAKE) install ;  \
+	    echo "========================================" ; \
+	    echo "Done" ;  \
+	    echo "========================================" ; \
+        fi
+
+base.kdoc: kdoc-installed $(kdoc.base)
 	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	$^
+	$(^:kdoc-installed=)
 
-lac.kdoc: $(kdoc.lac)
+lac.kdoc: kdoc-installed $(kdoc.lac)
 	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base $^
+	-l base $(^:kdoc-installed=)
 
-grid.kdoc: $(kdoc.grid)
+grid.kdoc: kdoc-installed $(kdoc.grid)
 	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base $^
+	-l base $(^:kdoc-installed=)
 
-dof.kdoc: $(kdoc.dof)
+dof.kdoc: kdoc-installed $(kdoc.dof)
 	$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac -lgrid $^
+	-l base -llac -lgrid $(^:kdoc-installed=)
 
-numerics.kdoc: $(kdoc.numerics)
+numerics.kdoc: kdoc-installed $(kdoc.numerics)
 	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac -lgrid -ldof $^
+	-l base -llac -lgrid -ldof $(^:kdoc-installed=)
 
-multigrid.kdoc: $(kdoc.multigrid)
+multigrid.kdoc: kdoc-installed $(kdoc.multigrid)
 	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) \
-	-l base -llac -lgrid -ldof -lnumerics $^
+	-l base -llac -lgrid -ldof -lnumerics $(^:kdoc-installed=)
+
