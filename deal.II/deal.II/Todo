@@ -39,11 +39,6 @@ implement ProblemBase::distribute_cell_to_dof_vector
 Remove gcc2.8 workaround with DoFSubstructAccessor
 
 
-Replace verbatim implementation of setw(int) in parameter-handler.cc
-  when a reasonable (linkable) library implementation is available
-  again.
-
- 
 Use the C++ standard string classes instead of the libg++ String
   class.
 
@@ -56,18 +51,23 @@ Invent a FEFaceValues class representing the restriction of a FE to
 
 Let the FE objects take DoF-iterators rather than Tria-iterators.
 
+
 Check usage of vectors: functions should assume that the objects have
   the right size already.
 
-Set dirichlet bc to the solution vector after solving (setting it
-  beforehand is not enough, the search directions for CG contain
-  components in the directions of these nodes, even if they are not
-  coupled to the other dofs. Strange.)
 
-Update DataIO for ucd i/o of boundary flags and material values.
-Update DataIO for ucd i/o of boundary flags and material values.
+Update DataIO for ucd i/o of boundary flags and material values:
+  is it correct if for the number of elements I give the number
+  of cells + number of faces with boundary id .neq. 0 ? Or must
+  I give the number of cells?
 
 
+Update DoFHandler::distribute_cell_to_dof_vector for higher order
+  elements (it can presently only handle elements with the only dofs
+  on the vertices).
+
+
+Use auto_ptr when available for the DataOut::boundary_faces function.
 
 
 
