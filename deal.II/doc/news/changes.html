@@ -73,8 +73,9 @@ inconvenience this causes.
   <li> <p>
        New: The configuration script can now enable special optimizations for
        x86-like processors if called with the <code>--with-cpu=...</code> option.
-       This can decrease computation time by up to 30% on certain systems. 
-       See the documentation for details.
+       This can decrease computation time by up to 30% on certain systems.
+       The configuration flag has already existed for PowerPC64 processors, but
+       was not documented. Documentation has been added.
        <br>
        (Ralf B. Schulz, 2005/03/10)
        </p>
@@ -82,7 +83,9 @@ inconvenience this causes.
   <li> <p>
        Fixed: When compiling shared libraries on CygWin systems, warnings
        considering the <code>-fPIC</code> option were issued by the compiler.
-       This is now fixed.
+       This is now fixed.       
+       Also, configure now issues a message at the end that you should include
+       the DLL-path in your <code>.bash_profile</code> file on these systems.
        <br>
        (Ralf B. Schulz, 2005/03/10)
        </p>
