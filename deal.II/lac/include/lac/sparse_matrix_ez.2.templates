@@ -10,8 +10,6 @@
 //    further information on this license.
 //
 //----------------------------  sparse_matrix_ez.2.templates  ---------------------------
-#ifndef __deal2__sparse_matrix_ez_2_templates
-#define __deal2__sparse_matrix_ez_2_templates
 
 
 // File copied from sparse_matrix.2.templates and modified
@@ -65,4 +63,3 @@ template void SparseMatrixEZ<TYPEMAT>::precondition_Jacobi<TYPE2> (Vector<TYPE2>
 								   const Vector<TYPE2> &,
 								   const TYPEMAT) const;
 
-#endif // __deal2__sparse_matrix_ez_2_templates

@@ -11,9 +11,6 @@
 //
 //----------------------------  sparse_matrix.2.templates  ---------------------------
 
-#ifndef __deal2__sparse_matrix_2_templates
-#define __deal2__sparse_matrix_2_templates
-
 
 // Driver file for SparseMatrix functions with two types.
 
@@ -79,5 +76,3 @@ template void SparseMatrix<TYPEMAT>::SSOR_step<TYPE2> (Vector<TYPE2> &,
 						       const Vector<TYPE2> &, 
 						       const TYPEMAT) const;
 
-
-#endif // __deal2__sparse_matrix_2_templates
