@@ -748,6 +748,33 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Changed: The cell argument to <code
+       class="member">Mapping::transform_unit_to_real_cell</code> (and its
+       reverse function) is now passed by reference, rather than by value, for
+       efficiency reasons.
+       <br>
+       (WB 2003/04/06)
+       </p>
+
+  <li> <p>
+       New: The <code
+       class="member">GridGenerator::subdivided_hyper_cube</code> generated a
+       hypercube as coarse grid that is subdivided a given number of times.
+       <br>
+       (WB 2003/04/05)
+       </p>
+
+  <li> <p>
+       New: The <code class="member">DataOut_DoFData::merge_patches</code>
+       function allows to merge the patches of two objects, so as to create one
+       output file from several DoF handlers. This is useful if one uses a
+       domain decomposition algorithm where each block of the domain is
+       represented by one DoF handler.
+       <br>
+       (WB 2003/04/05)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="class">DataOutStack</code> class had a problem
        when there were as many degrees of freedom as there were cells (i.e. if
        we were using DG0 elements). This should now be fixed.
