@@ -182,6 +182,10 @@ class MappingCartesian : public Mapping<dim>
 				      * Exception
 				      */
     DeclException0 (ExcInvalidData);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcAccessToUninitializedField);
 
   protected:
 				     /** 

@@ -444,7 +444,7 @@ MappingCartesian<dim>::transform_covariant (Tensor<1,dim>       *begin,
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
   
 				   // simply scale by inverse Jacobian
 				   // (which is diagonal here)
@@ -469,7 +469,7 @@ MappingCartesian<dim>::transform_covariant (Tensor<2,dim>       *begin,
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
   
 				   // simply scale by inverse Jacobian
 				   // (which is diagonal here)
@@ -499,7 +499,7 @@ MappingCartesian<dim>::transform_contravariant (Tensor<1,dim>       *begin,
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
 
 				   // simply scale by Jacobian
 				   // (which is diagonal here)
@@ -528,7 +528,7 @@ MappingCartesian<dim>::transform_contravariant (Tensor<2,dim>       *begin,
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
 
 				   // simply scale by Jacobian
 				   // (which is diagonal here)
