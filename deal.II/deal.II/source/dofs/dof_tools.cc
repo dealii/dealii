@@ -1680,7 +1680,7 @@ count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
   dofs_per_component.resize (n_components);
-  fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
+  std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
   
 				   // If the empty vector was given as
 				   // default argument, set up this
