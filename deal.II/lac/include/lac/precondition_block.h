@@ -293,7 +293,6 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     DeclException0 (ExcDiagonalsNotStored);
    
-  protected:
 				     /**
 				      * Access to the inverse diagonal
 				      * blocks.
@@ -306,6 +305,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     const FullMatrix<inverse_type>& diagonal (unsigned int i) const;
     
+  protected:
 				     /**
 				      * Size of the blocks. Each
 				      * diagonal block is assumed to
@@ -449,16 +449,6 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 	    unsigned int a_block;
 
 					     /**
-					      * Current block for extracting data.
-					      *
-					      * This is either
-					      * @p{a_block} or zero,
-					      * depending on
-					      * @p{same_diagonal}.
-					      */
-	    unsigned int u_block;
-
-					     /**
 					      * Iterator inside block.
 					      */
 	    typename FullMatrix<inverse_type>::const_iterator b_iterator;
@@ -573,6 +563,10 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      * Make function public.
 				      */
     PreconditionBlock<MATRIX, inverse_type>::n_blocks;
+				     /**
+				      * Make function accessible to iterator.
+				      */
+    PreconditionBlock<MATRIX, inverse_type>::inverse;
     
 				     /**
 				      * Execute block Jacobi
@@ -651,6 +645,9 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     void do_vmult (Vector<number2>&,
 		   const Vector<number2>&,
 		   bool adding) const;
+
+    friend class Accessor;
+    friend class const_iterator;
 };
 
 
@@ -970,10 +967,8 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
 
   const unsigned int r = row % bs;
 
-  u_block = (matrix->same_diagonal()) ? 0 : a_block;
-
-  b_iterator = matrix->inverse(u_block).begin(r);
-  b_end = matrix->inverse(u_block).end();
+  b_iterator = matrix->inverse(a_block).begin(r);
+  b_end = matrix->inverse(a_block).end();
 
   Assert (a_block < matrix->n_blocks(),
 	  ExcIndexRange(a_block, 0, matrix->n_blocks()));
@@ -1037,8 +1032,6 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator++ ()
   if (accessor.b_iterator == accessor.b_end)
     {
       ++accessor.a_block;
-      if (!accessor.matrix->same_diagonal())
-	++accessor.u_block;
       
       if (accessor.a_block < accessor.matrix->n_blocks())
 	{
