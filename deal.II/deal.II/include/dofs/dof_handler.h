@@ -1170,6 +1170,118 @@ template <> unsigned int DoFHandler<2>::max_couplings_between_dofs () const;
 template <> unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const;
 template <> unsigned int DoFHandler<3>::max_couplings_between_dofs () const;
 
+template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::begin_raw (const unsigned int level) const;
+template <> DoFHandler<1>::cell_iterator DoFHandler<1>::begin (const unsigned int level) const;
+template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::begin_active (const unsigned int level) const;
+template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::end () const;
+template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::last_raw () const;
+template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::last_raw (const unsigned int level) const;
+template <> DoFHandler<1>::cell_iterator DoFHandler<1>::last () const;
+template <> DoFHandler<1>::cell_iterator DoFHandler<1>::last (const unsigned int level) const;
+template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::last_active () const;
+template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::last_active (const unsigned int level) const;
+template <> DoFDimensionInfo<1>::raw_face_iterator DoFHandler<1>::begin_raw_face (const unsigned int) const;
+template <> DoFDimensionInfo<1>::face_iterator DoFHandler<1>::begin_face (const unsigned int) const;
+template <> DoFDimensionInfo<1>::active_face_iterator DoFHandler<1>::begin_active_face (const unsigned int) const;
+template <> DoFDimensionInfo<1>::raw_face_iterator DoFHandler<1>::end_face () const;
+template <> DoFDimensionInfo<1>::raw_face_iterator DoFHandler<1>::last_raw_face () const;
+template <> DoFDimensionInfo<1>::raw_face_iterator DoFHandler<1>::last_raw_face (const unsigned int) const;
+template <> DoFDimensionInfo<1>::face_iterator DoFHandler<1>::last_face () const;
+template <> DoFDimensionInfo<1>::face_iterator DoFHandler<1>::last_face (const unsigned int) const;
+template <> DoFDimensionInfo<1>::active_face_iterator DoFHandler<1>::last_active_face () const;
+template <> DoFDimensionInfo<1>::active_face_iterator DoFHandler<1>::last_active_face (const unsigned int) const;
+template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::begin_raw_quad (const unsigned int) const;
+template <> DoFHandler<1>::quad_iterator DoFHandler<1>::begin_quad (const unsigned int) const;
+template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::begin_active_quad (const unsigned int) const;
+template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::end_quad () const;
+template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::last_raw_quad (const unsigned int) const;
+template <> DoFHandler<1>::quad_iterator DoFHandler<1>::last_quad (const unsigned int) const;
+template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::last_active_quad (const unsigned int) const;
+template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::last_raw_quad () const;
+template <> DoFHandler<1>::quad_iterator DoFHandler<1>::last_quad () const;
+template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::last_active_quad () const;
+template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::begin_raw_hex (const unsigned int) const;
+template <> DoFHandler<1>::hex_iterator DoFHandler<1>::begin_hex (const unsigned int) const;
+template <> DoFHandler<1>::active_hex_iterator DoFHandler<1>::begin_active_hex (const unsigned int) const;
+template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::end_hex () const;
+template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::last_raw_hex (const unsigned int) const;
+template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::last_raw_hex () const;
+template <> DoFHandler<1>::hex_iterator DoFHandler<1>::last_hex (const unsigned int) const;
+template <> DoFHandler<1>::hex_iterator DoFHandler<1>::last_hex () const;
+template <> DoFHandler<1>::active_hex_iterator DoFHandler<1>::last_active_hex (const unsigned int) const;
+template <> DoFHandler<1>::active_hex_iterator DoFHandler<1>::last_active_hex () const;
+template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::begin_raw (const unsigned int level) const;
+template <> DoFHandler<2>::cell_iterator DoFHandler<2>::begin (const unsigned int level) const;
+template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::begin_active (const unsigned int level) const;
+template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::end () const;
+template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::last_raw () const;
+template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::last_raw (const unsigned int level) const;
+template <> DoFHandler<2>::cell_iterator DoFHandler<2>::last () const;
+template <> DoFHandler<2>::cell_iterator DoFHandler<2>::last (const unsigned int level) const;
+template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::last_active () const;
+template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::last_active (const unsigned int level) const;
+template <> DoFDimensionInfo<2>::raw_face_iterator DoFHandler<2>::begin_raw_face (const unsigned int level) const;
+template <> DoFDimensionInfo<2>::face_iterator DoFHandler<2>::begin_face (const unsigned int level) const;
+template <> DoFDimensionInfo<2>::active_face_iterator DoFHandler<2>::begin_active_face (const unsigned int level) const;
+template <> DoFDimensionInfo<2>::raw_face_iterator DoFHandler<2>::end_face () const;
+template <> DoFDimensionInfo<2>::raw_face_iterator DoFHandler<2>::last_raw_face () const;
+template <> DoFDimensionInfo<2>::raw_face_iterator DoFHandler<2>::last_raw_face (const unsigned int level) const;
+template <> DoFDimensionInfo<2>::face_iterator DoFHandler<2>::last_face () const;
+template <> DoFDimensionInfo<2>::face_iterator DoFHandler<2>::last_face (const unsigned int level) const;
+template <> DoFDimensionInfo<2>::active_face_iterator DoFHandler<2>::last_active_face () const;
+template <> DoFDimensionInfo<2>::active_face_iterator DoFHandler<2>::last_active_face (const unsigned int level) const;
+template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::begin_raw_hex (const unsigned int) const;
+template <> DoFHandler<2>::hex_iterator DoFHandler<2>::begin_hex (const unsigned int) const;
+template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::begin_active_hex (const unsigned int) const;
+template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::end_hex () const;
+template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::last_raw_hex (const unsigned int) const;
+template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::last_raw_hex () const;
+template <> DoFHandler<2>::hex_iterator DoFHandler<2>::last_hex (const unsigned int) const;
+template <> DoFHandler<2>::hex_iterator DoFHandler<2>::last_hex () const;
+template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::last_active_hex (const unsigned int) const;
+template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::last_active_hex () const;
+template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::begin_raw (const unsigned int level) const;
+template <> DoFHandler<3>::cell_iterator DoFHandler<3>::begin (const unsigned int level) const;
+template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::begin_active (const unsigned int level) const;
+template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::end () const;
+template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::last_raw () const;
+template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::last_raw (const unsigned int level) const;
+template <> DoFHandler<3>::cell_iterator DoFHandler<3>::last () const;
+template <> DoFHandler<3>::cell_iterator DoFHandler<3>::last (const unsigned int level) const;
+template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::last_active () const;
+template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::last_active (const unsigned int level) const;
+template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::begin_raw_face (const unsigned int level) const;
+template <> DoFHandler<3>::face_iterator DoFHandler<3>::begin_face (const unsigned int level) const;
+template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::begin_active_face (const unsigned int level) const;
+template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::end_face () const;
+template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::last_raw_face () const;
+template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::last_raw_face (const unsigned int level) const;
+template <> DoFHandler<3>::face_iterator DoFHandler<3>::last_face () const;
+template <> DoFHandler<3>::face_iterator DoFHandler<3>::last_face (const unsigned int level) const;
+template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face () const;
+template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face (const unsigned int level) const;
+
+template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
+
+template <>
+unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
+template <>
+unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
+template <>
+unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
+						     unsigned int          next_free_dof);
+template <>
+unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
+						     unsigned int          next_free_dof);
+template <>
+unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
+						     unsigned int          next_free_dof);
+template <> void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
+template <> void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
+template <> void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
+template <> void DoFHandler<1>::reserve_space ();
+template <> void DoFHandler<2>::reserve_space ();
+template <> void DoFHandler<3>::reserve_space ();
 
 /* ----------------------- Inline functions ---------------------------------- */
 
