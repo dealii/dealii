@@ -20,8 +20,9 @@ template <int dim> class Quadrature;
 
 
 /**
-  This class offers a multitude of arrays and other fields which are used by
-   the derived classes #FEValues# and #FEFaceValues#. In principle, it is the
+   This class offers a multitude of arrays and other fields which are used by
+   the derived classes #FEValues#, #FEFaceValues# and #FESubfaceValues#.
+   In principle, it is the
    back end of the front end for the unification of a certain finite element
    and a quadrature formula which evaluates certain aspects of the finite
    element at quadrature points.
@@ -55,6 +56,28 @@ template <int dim> class Quadrature;
    function values. This is done through the #selected_dataset# variable. See
    the derived classes and the #get_values# function for the exact usage of
    this variable.
+
+
+   {\bf Definitions}
+
+   The Jacobian matrix is defined to be
+   $$ J_{ij} = {d\xi_i \over dx_j} $$
+   where the $\xi_i$ are the coordinates on the unit cell and the $x_i$ are
+   the coordinates on the real cell.
+   This is the form needed to compute the gradient on the real cell from
+   the gradient on the unit cell. If we want to transform the area element
+   $dx dy$ from the real to the unit cell, we have to take the determinant of
+   the inverse matrix, which is the reciprocal value of the determinant of the
+   matrix defined above.
+
+   The Jacobi matrix is always that of the transformation of unit to real cell.
+   This applies also to the case where the derived class handles faces or
+   subfaces, in which case also the transformation of unit to real cell is
+   needed. However, the Jacobi matrix of the full transformation is always
+   needed if we want to get the values of the gradients, which need to be
+   transformed with the full Jacobi matrix, while we only need the
+   transformation from unit to real face to compute the determinant of the
+   Jacobi matrix to get the scaling of the surface element $do$.
 
    
    {\bf Member functions}
@@ -100,7 +123,19 @@ template <int dim> class Quadrature;
      See the docs for the derived classes for more information.
   \end{itemize}
 
-   @author Wolfgang Bangerth, 1998
+
+  {\bf Implementational issues}
+
+  The #FEValues# object keeps track of those fields which really need to
+  be computed, since the computation of the gradients of the ansatz functions
+  and of other values on each real cell can be quite an expensive thing
+  if it is not needed. The
+  object knows about which fields are needed by the #UpdateFlags# object
+  passed through the constructor. In debug mode, the accessor functions, which
+  return values from the different fields, check whether the required field
+  was initialized, thus avoiding use of unitialized data.
+  
+  @author Wolfgang Bangerth, 1998
 */
 template <int dim>
 class FEValuesBase {
@@ -323,6 +358,10 @@ class FEValuesBase {
 				      * Exception
 				      */
     DeclException0 (ExcNotImplemented);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidUpdateFlag);
     
   protected:
 				     /**
@@ -446,6 +485,7 @@ class FEValuesBase {
 
 
 
+
 /**
   Represent a finite element evaluated with a specific quadrature rule on
   a cell.
@@ -462,24 +502,6 @@ class FEValuesBase {
   quadrature points on the real and on the unit cell, the weights of the
   quadrature points, the Jacobian matrices of the mapping from the unit to
   the real cell at the quadrature points and so on.
-
-  The Jacobian matrix is defined to be
-  $$ J_{ij} = {d\xi_i \over dx_j} $$
-  where the $\xi_i$ are the coordinates on the unit cell and the $x_i$ are
-  the coordinates on the real cell.
-  This is the form needed to compute the gradient on the real cell from
-  the gradient on the unit cell. If we want to transform the area element
-  $dx dy$ from the real to the unit cell, we have to take the determinant of
-  the inverse matrix, which is the reciprocal value of the determinant of the
-  matrix defined above.
-
-  The #FEValues# object keeps track of those fields which really need to
-  be computed, since the computation of the gradients of the ansatz functions
-  on each real cell can be quite an expensive thing if it is not needed. The
-  object knows about which fields are needed by the #UpdateFlags# object
-  passed through the constructor. In debug mode, the accessor functions, which
-  return values from the different fields, check whether the required field
-  was initialized, thus avoiding use of unitialized data.
 
   @author Wolfgang Bangerth, 1998  
   */
@@ -547,21 +569,179 @@ class FEValues : public FEValuesBase<dim> {
 				      * construction and contains the quadrature
 				      * points on the reference element.
 				      */
-    vector<Point<dim> >  unit_quadrature_points;
-    
+    vector<Point<dim> >  unit_quadrature_points;    
 };
 
+
+
+
+
+/**
+   This class provides for the data elements needed for the restriction of
+   finite elements to faces or subfaces. It does no real computations, apart
+   from initialization of the fields with the right size. It more or
+   less is only a base class to the #FEFaceValues# and #FESubfaceValues#
+   classes which do the real computations. See there for descriptions of
+   what is really going on.
+
+   Since many of the concepts are the same whether we restrict a finite element
+   to a face or a subface (i.e. the child of the face of a cell), we describe
+   those common concepts here, rather than in the derived classes.
+
+
+   {\bf Technical issues}
+
+   The unit face is defined to be the tensor product of the interval $[0,1]$
+   in the present number of dimensions minus one. In part of the literature,
+   the convention is used that the unit cell/face be the tensor product of the
+   interval $[-1,1]$, which is to distinguished properly. A subface is the
+   child of a face; they are numbered in the way laid down in the
+   #Triangulation# class.
+
+   Just like in the #FEValues# class, function values and gradients on the unit
+   face or subface are evaluated at the quadrature points only once, and stored
+   by the common base class. Being a tensor of rank zero, the function values
+   remain the same when we want them at the quadrature points on the real cell,
+   while we get the gradients (a tensor of rank one) by multiplication with the
+   Jacobi matrix of the transformation, which we need to compute for each cell
+   and each quadrature point.
+
+   However, while in the #FEValues# class the quadrature points are always the
+   same, here we deal with more than one (sub)face. We therefore store the values
+   and gradients of the ansatz functions on the unit cell in an array with as
+   many elements as there are (sub)faces on a cell. The same applies for the
+   quadrature points on the (sub)faces: for each (sub)face we store the position
+   on the cell. This way we still need to evaluate unit gradients and function
+   values only once and only recompute the gradients on the real (sub)face by
+   multiplication of the unit gradients on the presently selected (sub)face
+   with the Jacobi matrix.
+
+   
+   When the #reinit# function of a derived class is called, only those
+   gradients, quadrature points etc are transformed to the real cell which
+   belong to the selected face or subface. The number of the selected face
+   or subface is stored in the #selected_dataset# variable of the base class
+   such that the #shape_value# function can return the shape function's
+   values on the (sub)face which was last selected by a call to the #reinit#
+   function.
+
+   In addition to the complications described above, we need two different
+   Jacobi matrices and determinants in this context: one for the transformation
+   of the unit cell to the real cell (this Jacobi matrix is needed to
+   compute the restriction of the real gradient to the given face) and one
+   for the transformation of the unit face to the real face or subface
+   (needed to compute the weight factors for integration along faces). These two
+   concepts have to be carefully separated.
+
+   Finally, we will often need the outward normal to a cell at the quadrature
+   points. While this could in principle be easily done using the Jacobi
+   matrices at the quadrature points and the normal vectors to the unit cell
+   (also easily derived, since they have an appealingly simple form for the unit
+   cell ;-), it is more efficiently done by the finite element class itself.
+   For example for (bi-, tri-)linear mappings the normal vector is readily
+   available without complicated matrix-vector-multiplications.
+     
+   @author Wolfgang Bangerth, 1998
+*/
+template <int dim>
+class FEFaceValuesBase : public FEValuesBase<dim> {
+  public:
+				     /**
+				      * Constructor. Call the constructor of
+				      * the base class and set up the arrays
+				      * of this class with the right sizes.
+				      * Actually filling these arrays is a
+				      * duty of the derived class's
+				      * constructors.
+				      *
+				      * #n_faces_or_subfaces# is the number
+				      * of faces or subfaces that this object
+				      * is to store. The actual number depends
+				      * on the derived class, for
+				      * #FEFaceValues# it is #2*dim#, while for
+				      * the #FESubfaceValues# class it is
+				      * #2*dim*(1<<(dim-1))#, i.e. the number
+				      * of faces times the number of subfaces
+				      * per face.
+				      */
+    FEFaceValuesBase (const unsigned int n_q_points,
+		      const unsigned int n_ansatz_points,
+		      const unsigned int n_dofs,
+		      const unsigned int n_faces_or_subfaces,
+		      const UpdateFlags update_flags);
+
+    				     /**
+				      * Return the outward normal vector to
+				      * the cell at the #i#th quadrature
+				      * point. The length of the vector
+				      * is normalized to one.
+				      */
+    const Point<dim> & normal_vector (const unsigned int i) const;
+    
+				     /**
+				      * Return the list of outward normal
+				      * vectors to the cell at the
+				      * quadrature points.
+				      */
+    const vector<Point<dim> > & get_normal_vectors () const;
+
+  protected:
+				     /**
+				      * Store the gradients of the shape
+				      * functions at the quadrature points on
+				      * the unit cell.
+				      * This field is set up upon construction
+				      * of the object and contains the gradients
+				      * on the reference element.
+				      *
+				      * There is one element for each face or
+				      * subface, with indices like that:
+				      * #unit_shape_gradients[face][dof][q_point]#
+				      */
+    vector<vector<vector<Point<dim> > > > unit_shape_gradients;
+
+    				     /**
+				      * Array of quadrature points on the
+				      * unit face. This is a copy of the
+				      * alike field of the quadrature formula
+				      * passed upon construction.
+				      */
+    vector<Point<dim-1> > unit_face_quadrature_points;
+    
+				     /**
+				      * Array of quadrature points in the unit
+				      * cell. This array is set up upon
+				      * construction and contains the quadrature
+				      * points on the reference element.
+				      *
+				      * There is one element for each face or
+				      * subface. The points are computed from
+				      * those on the unit face, but are stored
+				      * as coordinates on the unit cell.
+				      */
+    vector<vector<Point<dim> > > unit_quadrature_points;
+    
+				     /**
+				      * List of values denoting the determinant
+				      * of the transformation from the unit face
+				      * to the real face or subface. Needed to
+				      * actually compute the JxW values.
+				      */
+    vector<double>       face_jacobi_determinants;
+
+				     /**
+				      * List of outward normal vectors at the
+				      * quadrature points. This field is filled
+				      * in by the finite element class.
+				      */
+    vector<Point<dim> >  normal_vectors;
+};
 
 
 
 /**
   Represent a finite element evaluated with a specific quadrature rule on
   the face of a cell.
-
-  The unit face is defined to be the tensor product of the interval $[0,1]$
-  in the present number of dimensions minus one. In part of the literature,
-  the convention is used that the unit cell be the tensor product of the
-  interval $[-1,1]$, which is to distinguished properly.
 
   This class is very similar to the #FEValues# class; see there for more
   documentation. It is, however, a bit more involved: since we want to
@@ -577,50 +757,11 @@ class FEValues : public FEValuesBase<dim> {
   to real cell mappings of higher than first order, thus applying curved
   boundaries, we need to know an object describing the boundary of the
   domain.
-
-
-  {\bf Technical issues}
-
-  Just like in the #FEValues# class, function values and gradients on the unit
-  cell are evaluated at the quadrature points only once, in the constructor.
-  Being a tensor of rank zero, the function values remain the same when we
-  want them at the quadrature points on the real cell, while we get the
-  gradients (a tensor of rank one) by multiplication with the Jacobi matrix
-  of the transformation, which we need to compute for each cell and each
-  quadrature point.
-
-  However, while in the #FEValues# class the quadrature points are always the
-  same, here we deal with more than one face. We therefore store the values
-  and gradients of the ansatz functions on the unit cell in an array with as
-  many elements as there are faces on a cell. The same applies for the
-  quadrature points on the faces: for each face we store the position on the
-  cell. This way we still need to evaluate unit gradients and function values
-  only once.
-
-  When the reinit function is called, only those gradients, quadrature points
-  etc are transformed to the real cell which belong to the selected face. The
-  number of the selected face is stored such that the #shape_value# function
-  can return the shape function's values on the face which was last selected
-  by a call to the #reinit# function.
-
-  In addition to the complications described above, we need two different
-  Jacobi matrices and determinant in this context: one for the transformation
-  of the unit cell to the real cell (this Jacobi matrix is needed to
-  compute the restriction of the real gradient to the given face) and one
-  for the transformation of the unit face to the real face (needed to
-  compute the weight factors for integration along faces). These two
-  concepts have to be carefully separated.
-
-  Finally, we will often need the outward normal to a cell at the quadrature
-  points. While this could in principle be easily done using the Jacobi
-  matrices at the quadrature points and the normal vectors to the unit cell
-  (also easily derived, since they have an appealingly easy form for the unit
-  cell ;-), it is more efficiently done by the finite element class itself.
-  For example for (bi-, tri-)linear mappings the normal vector is readily
-  available without complicated matrix-vector-multiplications.
+     
+  @author Wolfgang Bangerth, 1998
   */
 template <int dim>
-class FEFaceValues : public FEValuesBase<dim> {
+class FEFaceValues : public FEFaceValuesBase<dim> {
   public:
 				     /**
 				      * Constructor. Fill all arrays with the
@@ -642,21 +783,6 @@ class FEFaceValues : public FEValuesBase<dim> {
 		  const Quadrature<dim-1> &,
 		  const UpdateFlags);
 
-				     /**
-				      * Return the outward normal vector to
-				      * the cell at the #i#th quadrature
-				      * point. The length of the vector
-				      * is normalized to one.
-				      */
-    const Point<dim> & normal_vector (const unsigned int i) const;
-    
-				     /**
-				      * Return the list of outward normal
-				      * vectors to the cell at the
-				      * quadrature points.
-				      */
-    const vector<Point<dim> > & get_normal_vectors () const;
-    
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the face with
@@ -680,56 +806,147 @@ class FEFaceValues : public FEValuesBase<dim> {
 		 const unsigned int                    face_no,
 		 const FiniteElement<dim>             &fe,
 		 const Boundary<dim>                  &boundary);
+};
 
-  private:
+
+
+
+/**
+  Represent a finite element evaluated with a specific quadrature rule on
+  the child of the face of a cell.
+
+  This class is very similar to the #FEFaceValues# class; see there for
+  more documentation. It serves the computation of interface integrals
+  where the cells on both sides of the face have different refinement
+  levels. This is useful for example when we want to integrate the jump
+  of the gradient of the finite element solution along the boundary of
+  a cell to estimate the error. Now, this is not so much of a problem
+  if all neighbors of the cell have the same refinement level, then we
+  will use the #FEFaceValues# class, but it gets trickier if one of the
+  cells is more refined than the other.
+
+  To this end, there seem to be two ways which may be applicable:
+  \begin{itemize}
+  \item Prolong the coarser cell to the finer refinement level: we could
+    compute the prolongation of the finite element functions to the
+    child cells and consider the subface a face of one of the child cells.
+    This approach seems clear and rather simple to implement, however it
+    has two major drawbacks: first, the finite element space on the
+    refined (child) cells may not be included in the space of the unrefined
+    cell, in which case the prolongation would alter information and thus
+    make computations worthless in the worst case. The second reason is
+    a practical one, namely that by refining the cell virtually, we would
+    end up with child cells which do not exist in real and can thus not be
+    represented in terms of iterators. This would mean that we had to change
+    the whole interface to the #FE*Values# classes to accept cell corner
+    points by value, etc, instead of relying on appropriate iterators. This
+    seems to be clumsy and not very suitable to maintain an orthogonal
+    programming style. Apart from that, we already have iterators, why
+    shouldn't we use them?
+    
+  \item Use 'different' quadrature formulae: this second approach is the
+    way we chose here. The idea is to evaluate the finite element ansatz
+    functions on the two cells restricted to the face in question separately,
+    by restricting the ansatz functions on the less refined cell to its
+    face and the functions on the more refined cell to its face as well,
+    the second face being a child to the first one. Now, if we would use
+    the same quadrature formula for both restrictions, we would end up with
+    the same number of quadrature points, but at different locations since
+    they were evaluated on faces of different size. We therefore use the
+    original quadrature formula for the refined cell and a modified one for
+    the coarse cell, the latter being modified in such a way that the
+    locations of the quadrature points match each other.
+
+    An example may shed more light onto this: assume we are in two dimension,
+    we have a cell of which we want to evaluate a finite element function on
+    face zero, and neighbor zero is refined (then so is face zero). The
+    quadrature formula shall be the Simpson rule with quadrature points
+    $0$, $0.5$ and $1$. The present cell shall be the unit cell, without
+    loss of generality. Then the face in question is the line $(0,0)$ to
+    $(1,0)$, subdivided into two subfaces. We will then compute the
+    restriction of the present cell to the common subface $(0,0)$ to
+    $(0.5,5)$ by using a modified quadrature formulae with quadrature
+    points $(0,0)$, $(0.25,0)$ and $(0.5,0)$ (coordinates on the cell)
+    which is not symmetric as was the original quadrature rule for a line.
+    This modified quadrature rule is computed by projection onto the subface
+    using the #QProjector<dim>::project_to_subface()# function. The neighboring
+    cell, being refined once more than the present is evaluated with the
+    quadrature formula projected to the common face, but using the original
+    quadrature formula. This way, the locations of the quadrature points
+    on both sides of the common face match each other.
+  \end{itemize}
+
+  For a use of this mechanism, take a look of the code in the error
+  estimation hierarchy, since there often the jump of a finite element
+  function's gradient across cell boundaries is computed.
+
+
+  {\bf Other implementational subjects}
+
+  It does not seem useful to ask for the off-points of the ansatz functions
+  (name #ansatz_points# in the #FEValuesBase# class) for subfaces. These are
+  therefore not supported for this class and should throw an error if
+  accessed. Specifying #update_ansatz_points# for the #UpdateFlags# in the
+  constructor is disallowed.
+
+  The values of the ansatz functions on the subfaces are stored as an array
+  of matrices, each matrix representing the values of the ansatz functions at
+  the quadrature points at one subface. The ordering is as follows: the values
+  of the ansatz functions at face #face#, subface #subface# are stored in
+  #shape_values[face*(1<<(dim-1))+subface]#. The same order applies for the
+  quadrature points on the unit cell, which are stored in the
+  #unit_quadrature_points# array. Note that #1<<(dim-1)# is the number of
+  subfaces per face.
+  
+  @author Wolfgang Bangerth, 1998
+  */
+template <int dim>
+class FESubfaceValues : public FEFaceValuesBase<dim> {
+  public:
 				     /**
-				      * Store the gradients of the shape
-				      * functions at the quadrature points on
-				      * the unit cell.
-				      * This field is set up upon construction
-				      * of the object and contains the gradients
-				      * on the reference element.
+				      * Constructor. Fill all arrays with the
+				      * values of the shape functions of the
+				      * specified finite element using the
+				      * quadrature points of the given
+				      * quadrature rule for the face, which
+				      * has a dimension one less than the
+				      * cell.
 				      *
-				      * There is one element for each face.
+				      * This function actually only fills
+				      * the fields related to the unit face,
+				      * the fields related to a real face (like
+				      * gradients, true quadrature points, etc.)
+				      * need to be initialized using the
+				      * #reinit# function.
 				      */
-    vector<vector<Point<dim> > >   unit_shape_gradients[2*dim];
-    
+    FESubfaceValues (const FiniteElement<dim> &,
+		     const Quadrature<dim-1> &,
+		     const UpdateFlags);
 
 				     /**
-				      * Array of quadrature points on the
-				      * unit face. This is a copy of the
-				      * alike field of the quadrature formula
-				      * passed upon construction.
-				      */
-    vector<Point<dim-1> > unit_quadrature_points;
-    
-				     /**
-				      * Array of quadrature points in the unit
-				      * cell. This array is set up upon
-				      * construction and contains the quadrature
-				      * points on the reference element.
+				      * Reinitialize the gradients, Jacobi
+				      * determinants, etc for the face with
+				      * number #face_no# of #cell#
+				      * and the given finite element.
 				      *
-				      * There is one element for each face. The
-				      * points are computed from those on the
-				      * unit face, but are stored as coordinates
-				      * on the unit cell.
+				      * The constructor needs a boundary object
+				      * passed, since this class needs to know
+				      * how to handle faces which are located
+				      * on the boundary of the domain. In that
+				      * case, faces may be curved and the
+				      * calculation of quadrature points,
+				      * gradients and the like may need
+				      * additional effort, depending on the
+				      * mapping from the unit to the real cell
+				      * (linear mappings use straight boundary
+				      * segments, but higher order elements
+				      * may use other ways.)
 				      */
-    vector<Point<dim> >  global_unit_quadrature_points[2*dim];
-    
-				     /**
-				      * List of values denoting the determinant
-				      * of the transformation from the unit face
-				      * to the real face. Needed to actually
-				      * compute the JxW values.
-				      */
-    vector<double>       face_jacobi_determinants;
-
-				     /**
-				      * List of outward normal vectors at the
-				      * quadrature points. This field is filled
-				      * in by the finite element class.
-				      */
-    vector<Point<dim> >  normal_vectors;
+    void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
+		 const unsigned int                    face_no,
+		 const unsigned int                    subface_no,
+		 const FiniteElement<dim>             &fe,
+		 const Boundary<dim>                  &boundary);
 };
 
 
@@ -792,13 +1009,13 @@ FEValuesBase<dim>::get_JxW_values () const {
 
 
 
-/*------------------------ Inline functions: FEFaceValues ------------------------*/
+/*------------------------ Inline functions: FEFaceValuesBase --------------------*/
 
 
 template <int dim>
 inline
 const vector<Point<dim> > &
-FEFaceValues<dim>::get_normal_vectors () const {
+FEFaceValuesBase<dim>::get_normal_vectors () const {
   Assert (update_flags & update_normal_vectors, ExcAccessToUninitializedField());
   return normal_vectors;
 };

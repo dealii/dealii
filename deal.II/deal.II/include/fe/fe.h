@@ -591,7 +591,22 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      vector<Point<dim> > &normal_vectors,
 				      const bool           compute_normal_vectors,
 				      const Boundary<dim> &boundary) const;
-    
+
+    virtual void fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
+					 const unsigned int           face_no,
+					 const unsigned int           subface_no,
+					 const vector<Point<dim-1> > &unit_points,
+					 const vector<Point<dim> >   &global_unit_points,
+					 vector<dFMatrix>    &jacobians,
+					 const bool           compute_jacobians,
+					 vector<Point<dim> > &q_points,
+					 const bool           compute_q_points,
+					 vector<double>      &face_jacobi_determinants,
+					 const bool           compute_face_jacobians,
+					 vector<Point<dim> > &normal_vectors,
+					 const bool           compute_normal_vectors,
+					 const Boundary<dim> &boundary) const;
+
 				     /**
 				      * This function produces a subset of
 				      * the information provided by the
