@@ -17,6 +17,7 @@
 #include <numerics/matrices.h>
 #include <lac/vector.h>
 #include <lac/sparsematrix.h>
+#include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 
@@ -203,8 +204,12 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   PrimitiveVectorMemory<Vector<double> >   memory;
   SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
+  PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
+    prec(mass_matrix,
+	 &SparseMatrix<double>::template precondition_SSOR<double>,
+	 1.2);
 				   // solve
-  cg.solve (mass_matrix, vec, tmp);
+  cg.solve (mass_matrix, vec, tmp, prec);
   
 				   // distribute solution
   constraints.distribute (vec);
@@ -410,8 +415,12 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   PrimitiveVectorMemory<Vector<double> >   memory;
   SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
+  PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
+    prec(mass_matrix,
+	 &SparseMatrix<double>::template precondition_SSOR<double>,
+	 1.2);
 				   // solve
-  cg.solve (mass_matrix, boundary_projection, rhs);
+  cg.solve (mass_matrix, boundary_projection, rhs, prec);
 
 				   // fill in boundary values
   for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)

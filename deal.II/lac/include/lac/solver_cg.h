@@ -1,8 +1,8 @@
-/*----------------------------   solver_pcg.h     ---------------------------*/
+/*----------------------------   solver_cg.h     ---------------------------*/
 /*      $Id$                 */
-#ifndef __solver_pcg_H
-#define __solver_pcg_H
-/*----------------------------   solver_pcg.h     ---------------------------*/
+#ifndef __solver_cg_H
+#define __solver_cg_H
+/*----------------------------   solver_cg.h     ---------------------------*/
 
 
 
@@ -17,14 +17,14 @@
  * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
-class SolverPCG : public Solver<Matrix,Vector>
+class SolverCG : public Solver<Matrix,Vector>
 {
   public:
 
 				     /**
 				      * Constructor.
 				      */
-    SolverPCG (SolverControl &cn, VectorMemory<Vector> &mem) :
+    SolverCG (SolverControl &cn, VectorMemory<Vector> &mem) :
 		    Solver<Matrix,Vector>(cn,mem) {};
 
 				     /**
@@ -71,7 +71,7 @@ class SolverPCG : public Solver<Matrix,Vector>
  
 
 template<class Matrix, class Vector>
-double SolverPCG<Matrix,Vector>::criterion()
+double SolverCG<Matrix,Vector>::criterion()
 {
   return sqrt(res2);
 };
@@ -81,12 +81,14 @@ double SolverPCG<Matrix,Vector>::criterion()
 template<class Matrix, class Vector>
 template<class Preconditioner>
 Solver<Matrix,Vector>::ReturnState 
-SolverPCG<Matrix,Vector>::solve (const Matrix &A,
+SolverCG<Matrix,Vector>::solve (const Matrix &A,
 				 Vector       &x,
 				 const Vector &b,
 				 const Preconditioner& precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
+
+  deallog.push("cg");
   
 				   // Memory allocation
   Vr  = memory.alloc();
@@ -172,7 +174,7 @@ SolverPCG<Matrix,Vector>::solve (const Matrix &A,
 
 
 
-/*----------------------------   solver_pcg.h     ---------------------------*/
-/* end of #ifndef __solver_pcg_H */
+/*----------------------------   solver_cg.h     ---------------------------*/
+/* end of #ifndef __solver_cg_H */
 #endif
-/*----------------------------   solver_pcg.h     ---------------------------*/
+/*----------------------------   solver_cg.h     ---------------------------*/

@@ -19,7 +19,8 @@
  * @author Ralf Hartmann
  */
 template<class Matrix, class Vector>
-class SolverRichardson : public Solver<Matrix, Vector> {
+class SolverRichardson : public Solver<Matrix, Vector>
+{
   public:
 				     /**
 				      * Constructor.

@@ -9,8 +9,8 @@
 #include <lac/vector.h>
 #include <lac/vector_memory.h>
 #include <lac/solver_control.h>
-#include <lac/solver_pcg.h>
-#include <lac/solver_pgmres.h>
+#include <lac/solver_cg.h>
+#include <lac/solver_gmres.h>
 #include <lac/solver_bicgstab.h>
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
@@ -22,7 +22,7 @@ main()
 {
   PrimitiveVectorMemory<VECTOR > mem;
   SolverControl control(100, 1.e-5, true);
-  SolverPCG<MATRIX, VECTOR > cg(control, mem);
+  SolverCG<MATRIX, VECTOR > cg(control, mem);
   SolverGMRES<MATRIX, VECTOR > gmres(control, mem,20);
   SolverBicgstab<MATRIX, VECTOR > bicgstab(control, mem);
   SolverRichardson<MATRIX, VECTOR > rich(control, mem);

@@ -505,11 +505,6 @@ template double SparseMatrix<float>::residual (Vector<double> &,
 					       const Vector<double> &,
 					       const Vector<double> &) const;
 
-template void SparseMatrix<float>::precondition (Vector<float> &,
-						 const Vector<float> &) const;
-template void SparseMatrix<float>::precondition (Vector<double> &,
-						 const Vector<double> &) const;
-
 template void SparseMatrix<float>::precondition_SSOR (Vector<float> &,
 						      const Vector<float> &,
 						      float) const;
@@ -567,11 +562,6 @@ template double SparseMatrix<double>::residual (Vector<float> &,
 template double SparseMatrix<double>::residual (Vector<double> &,
 						const Vector<double> &,
 						const Vector<double> &) const;
-
-template void SparseMatrix<double>::precondition (Vector<float> &,
-						  const Vector<float> &) const;
-template void SparseMatrix<double>::precondition (Vector<double> &,
-						  const Vector<double> &) const;
 
 template void SparseMatrix<double>::precondition_SSOR (Vector<float> &,
 						       const Vector<float> &,

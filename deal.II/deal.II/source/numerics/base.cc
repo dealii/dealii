@@ -13,6 +13,7 @@
 #include <fe/fe.h>
 #include <base/quadrature.h>
 #include <lac/vector.h>
+#include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 
@@ -140,8 +141,13 @@ void ProblemBase<dim>::solve () {
   PrimitiveVectorMemory<Vector<double> >   memory;
   SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
+  PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
+    prec(system_matrix,
+	 &SparseMatrix<double>::template precondition_SSOR<double>,
+	 1.2);
+
 				   // solve
-  cg.solve (system_matrix, solution, right_hand_side);
+  cg.solve (system_matrix, solution, right_hand_side, prec);
 				   // distribute solution
   constraints.distribute (solution);
 };
