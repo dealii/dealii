@@ -392,9 +392,11 @@ template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
                         MGLevelObject<BlockVector<number> >& v,
-                        std::vector<bool> selected,
-			std::vector<unsigned int> target_component)
+                        const std::vector<bool> &sel,
+			const std::vector<unsigned int> &target_comp)
 {
+  std::vector<bool> selected=sel;
+  std::vector<unsigned int> target_component=target_comp;
   const unsigned int ncomp = mg_dof.get_fe().n_components();
   
 				   // If the selected and
@@ -403,8 +405,9 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 				   // values.
 				   //
 				   // Since we already made copies
-				   // when this function was called,
-				   // we use the arguments directly.
+				   // directly after this function was
+				   // called, we use the arguments
+				   // directly.
   if (target_component.size() == 0)
     {
       target_component.resize(ncomp);
@@ -456,10 +459,10 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 
 template<int dim, typename number>
 void
-MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
-                        MGLevelObject<Vector<number> >& v,
-                        const std::vector<bool>& selected,
-			const std::vector<unsigned int>& target_component)
+MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
+                        MGLevelObject<Vector<number> > &v,
+                        const std::vector<bool> &selected,
+			const std::vector<unsigned int> &target_component)
 {
   Assert (selected.size() == target_component.size(),
 	  ExcDimensionMismatch(selected.size(), target_component.size()));
@@ -595,13 +598,13 @@ template void MGTools::reinit_vector<deal_II_dimension> (
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<BlockVector<double> >&,
-  const std::vector<bool>,
-  const std::vector<unsigned int>);
+  const std::vector<bool> &,
+  const std::vector<unsigned int> &);
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<BlockVector<float> >&,
-  const std::vector<bool>,
-  const std::vector<unsigned int>);
+  const std::vector<bool> &,
+  const std::vector<unsigned int> &);
 
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
