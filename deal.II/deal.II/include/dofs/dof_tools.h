@@ -870,6 +870,44 @@ class DoFTools
 				      * Exception
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
+
+  private:
+				     /**
+				      * This is a helper function that
+				      * is used in the computation of
+				      * integrid constraints. See the
+				      * function for a thorough
+				      * description of how it works.
+				      */
+    template <int dim>
+    static void
+    compute_intergrid_weights (const DoFHandler<dim>              &coarse_grid,
+			       const unsigned int                  coarse_component,
+			       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+			       const vector<Vector<double> >      &parameter_dofs,
+			       const vector<int>                  &weight_mapping,
+			       FullMatrix<double>                 &weights);
+
+				     /**
+				      * This is a function that is
+				      * called by the previous one and
+				      * that operates on a range of
+				      * cells only. It is used to
+				      * split up the whole range of
+				      * cells into chunks which are
+				      * then worked on in parallel, if
+				      * multithreading is available.
+				      */
+    template <int dim>
+    static void
+    compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
+				 const unsigned int                  coarse_component,
+				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				 const vector<Vector<double> >      &parameter_dofs,
+				 const vector<int>                  &weight_mapping,
+				 FullMatrix<double>                 &weights,
+				 const typename DoFHandler<dim>::active_cell_iterator &begin,
+				 const typename DoFHandler<dim>::active_cell_iterator &end);
 };
 
 
