@@ -242,6 +242,9 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   vector<unsigned int> dofs_on_other_cell(total_dofs);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
+
+  (const_cast<Triangulation<dim>& > (dof.get_tria())).clear_user_flags();
+  
   for (; cell!=endc; ++cell)
     {
       cell->get_dof_indices (dofs_on_this_cell);
@@ -256,23 +259,59 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  if (! cell->at_boundary(face) )
+	  DoFHandler<dim>::face_iterator cell_face = cell->face(face);
+	  if (cell_face->user_flag_set ())
+	    continue;
+
+	  if (! cell->at_boundary (face) )
 	    {
-	      DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(face);
-	      neighbor->get_dof_indices (dofs_on_other_cell);
-					       // only add one direction
-					       // The other is taken care of
-					       // by neighbor.
-	      for (unsigned int i=0; i<total_dofs; ++i)
+	      DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+					       // Refinement edges are taken care of
+					       // by coarser cells
+	      if (neighbor->level() < cell->level())
+		continue;
+
+	      unsigned int neighbor_face = cell->neighbor_of_neighbor(face);
+
+	      if (neighbor->has_children())
 		{
-		  for (unsigned int j=0; j<total_dofs; ++j)
+		  for (unsigned int sub_nr = 0;
+		       sub_nr != GeometryInfo<dim>::subfaces_per_face;
+		       ++sub_nr)
 		    {
-		      sparsity.add (dofs_on_this_cell[i],
-				    dofs_on_other_cell[j]);
+		      DoFHandler<dim>::cell_iterator sub_neighbor
+			= neighbor->
+			child(GeometryInfo<dim>::child_cell_on_face(neighbor_face, sub_nr));
+
+		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
+		      for (unsigned int i=0; i<total_dofs; ++i)
+			{
+			  for (unsigned int j=0; j<total_dofs; ++j)
+			    {
+			      sparsity.add (dofs_on_this_cell[i],
+					    dofs_on_other_cell[j]);
+			      sparsity.add (dofs_on_other_cell[i],
+					    dofs_on_this_cell[j]);
+			    }
+			}
+		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
+		} else {
+		  neighbor->get_dof_indices (dofs_on_other_cell);
+		  for (unsigned int i=0; i<total_dofs; ++i)
+		    {
+		      for (unsigned int j=0; j<total_dofs; ++j)
+			{
+			  sparsity.add (dofs_on_this_cell[i],
+					dofs_on_other_cell[j]);
+			  sparsity.add (dofs_on_other_cell[i],
+					dofs_on_this_cell[j]);
+			}
+		    }
+		  neighbor->face(neighbor_face)->set_user_flag (); 
 		}
-	    }
-	} 
+	    } 
+	}
     }
 }
 
