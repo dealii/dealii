@@ -120,8 +120,8 @@ class LaplaceProblem
 				     // and the numbering of the
 				     // degrees of freedom...
     Triangulation<2>     triangulation;
-    DoFHandler<2>        dof_handler;
     FEQ1<2>              fe;
+    DoFHandler<2>        dof_handler;
 
 				     // ...variables for the sparsity
 				     // pattern and values of the
