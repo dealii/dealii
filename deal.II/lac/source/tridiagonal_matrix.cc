@@ -141,5 +141,5 @@ TridiagonalMatrix<number>::
 
 */
 
-template TridiagonalMatrix<float>;
-template TridiagonalMatrix<double>;
+template class TridiagonalMatrix<float>;
+template class TridiagonalMatrix<double>;
