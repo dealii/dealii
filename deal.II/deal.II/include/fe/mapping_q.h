@@ -51,7 +51,7 @@ class MappingQ : public MappingQ1<dim>
 				     /**
 				      * Destructor.
 				      */
-    ~MappingQ ();
+    virtual ~MappingQ ();
 
 				     /**
 				      * Implementation of the interface in
