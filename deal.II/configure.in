@@ -23,7 +23,7 @@ dnl clearing the cache
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
-dnl Versionnumbers
+dnl Version numbers
 
 DEAL_II_VERSION="`cat Version`"
 AC_REVISION($Revision$)
