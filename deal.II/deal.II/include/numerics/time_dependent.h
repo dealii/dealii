@@ -241,7 +241,15 @@ class TimeDependent
 					  */
 	const unsigned int look_back;
     };
-    
+
+				     /**
+				      * Enum offering the different directions
+				      * in which a loop executed by
+				      * #do_loop# may be run.
+				      */
+    enum Direction {
+	  forward, backward
+    };
 
 				     /**
 				      * Constructor.
@@ -360,7 +368,7 @@ class TimeDependent
 				      * consists of a call to
 				      * #  do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
 				      *	   mem_fun(&TimeStepBase::solve_primal_problem),
-				      *	   timestepping_data_primal);#.
+				      *	   timestepping_data_primal, forward);#.
 				      *
 				      * Note also, that the given class from which
 				      * the two functions are taken needs not
@@ -387,9 +395,10 @@ class TimeDependent
 				      * be called for.
 				      */
     template <typename InitFunctionObject, typename LoopFunctionObject>
-    void do_loop (InitFunctionObject init_function,
-		  LoopFunctionObject loop_function,
-		  const TimeSteppingData &timestepping_data);
+    void do_loop (InitFunctionObject      init_function,
+		  LoopFunctionObject      loop_function,
+		  const TimeSteppingData &timestepping_data,
+		  const Direction         direction);
     
 		  
 				     /**
@@ -473,23 +482,56 @@ class TimeDependent
 
 
 template <typename InitFunctionObject, typename LoopFunctionObject>
-void TimeDependent::do_loop (InitFunctionObject init_function,
-			     LoopFunctionObject loop_function,
-			     const TimeSteppingData &timestepping_data)
+void TimeDependent::do_loop (InitFunctionObject      init_function,
+			     LoopFunctionObject      loop_function,
+			     const TimeSteppingData &timestepping_data,
+			     const Direction         direction)
 {
+				   // the following functions looks quite
+				   // disrupted due to the recurring switches
+				   // for forward and backward running loops.
+				   //
+				   // I chose to switch at every place where
+				   // it is needed, since it is so easy
+				   // to overlook something when you change
+				   // some code at one place when it needs
+				   // to be changed at a second place, here
+				   // for the other direction, also.
+  
   const unsigned int n_timesteps = timesteps.size();
 
 				   // initialize the time steps for
-				   // a round of primal problems
+				   // a round of this loop
   for (unsigned int step=0; step<n_timesteps; ++step)
-    init_function (static_cast<typename InitFunctionObject::argument_type>(timesteps[step]));
+    switch (direction)
+      {
+	case forward:
+	      init_function (static_cast<typename InitFunctionObject::argument_type>
+			     (timesteps[step]));
+	      break;
+	case backward:
+	      init_function (static_cast<typename InitFunctionObject::argument_type>
+			     (timesteps[n_timesteps-step]));
+	      break;
+      };
+  
 
 				   // wake up the first few time levels
   for (int step=-timestepping_data.look_ahead; step<0; ++step)
     for (int look_ahead=0;
 	 look_ahead<=static_cast<int>(timestepping_data.look_ahead); ++look_ahead)
-      if (step+look_ahead >= 0)
-	timesteps[step+look_ahead]->wake_up(look_ahead);
+      switch (direction)
+	{
+	  case forward:
+		if (step+look_ahead >= 0)
+		  timesteps[step+look_ahead]->wake_up(look_ahead);
+		break;
+	  case backward:
+		if (n_timesteps-(step+look_ahead) < n_timesteps)
+		  timesteps[n_timesteps-(step+look_ahead)]->wake_up(look_ahead);
+		break;
+	};
+  
   
   for (unsigned int step=0; step<n_timesteps; ++step)
     {
@@ -497,17 +539,46 @@ void TimeDependent::do_loop (InitFunctionObject init_function,
 				       // timesteps ahead as necessary
       for (unsigned int look_ahead=0;
 	   look_ahead<=timestepping_data.look_ahead; ++look_ahead)
-	if (step+look_ahead < n_timesteps)
-	  timesteps[step+look_ahead]->wake_up(look_ahead);
+	switch (direction)
+	  {
+	    case forward:
+		  if (step+look_ahead < n_timesteps)
+		    timesteps[step+look_ahead]->wake_up(look_ahead);
+		  break;
+	    case backward:
+		  if (n_timesteps-(step+look_ahead) >= 0)
+		    timesteps[n_timesteps-(step+look_ahead)]->wake_up(look_ahead);
+		  break;
+	  };
+      
       
 				       // actually do the work
-      loop_function (static_cast<typename LoopFunctionObject::argument_type>(timesteps[step]));
+      switch (direction)
+	{
+	  case forward:
+		loop_function (static_cast<typename LoopFunctionObject::argument_type>
+			       (timesteps[step]));
+		break;
+	  case backward:
+		loop_function (static_cast<typename LoopFunctionObject::argument_type>
+			       (timesteps[n_timesteps-step]));
+		break;
+	};
       
 				       // let the timesteps behind sleep
       for (unsigned int look_back=0;
 	   look_back<=timestepping_data.look_back; ++look_back)
-	if (step>=look_back)
-	  timesteps[step-look_back]->sleep(look_back);
+	switch (direction)
+	  {
+	    case forward:
+		  if (step>=look_back)
+		    timesteps[step-look_back]->sleep(look_back);
+		  break;
+	    case backward:
+		  if (n_timesteps-(step-look_back) < n_timesteps)
+		    timesteps[n_timesteps-(step-look_back)]->sleep(look_back);
+		  break;
+	  };
     };
 
 				   // make the last few timesteps sleep
@@ -515,8 +586,21 @@ void TimeDependent::do_loop (InitFunctionObject init_function,
        step<static_cast<int>(n_timesteps+timestepping_data.look_back); ++step)
     for (int look_back=0;
 	 look_back<=static_cast<int>(timestepping_data.look_back); ++look_back)
-      if ((step-look_back>=0) && (step-look_back<static_cast<int>(n_timesteps)))
-	timesteps[step-look_back]->sleep(look_back);
+      switch (direction)
+	{
+	  case forward:
+		if ((step-look_back >= 0)
+		    &&
+		    (step-look_back < static_cast<int>(n_timesteps)))
+		  timesteps[step-look_back]->sleep(look_back);
+		break;
+	  case backward:
+		if ((n_timesteps-(step-look_back) < n_timesteps)
+		    &&
+		    (n_timesteps-(step-look_back) >= 0))
+		  timesteps[n_timesteps-(step-look_back)]->sleep(look_back);
+		break;
+	};
 };
 
 
