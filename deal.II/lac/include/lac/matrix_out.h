@@ -161,7 +161,7 @@ class MatrixOut : public DataOutInterface<2,2>
     template <class Matrix>
     void build_patches (const Matrix      &matrix,
 			const std::string &name,
-			const Options     &options = Options());
+			const Options      options = Options());
     
   private:
     
