@@ -2690,25 +2690,26 @@ echo "${ECHO_T}C++ compiler is Sun Forte compiler" >&6
                   GXX_VERSION=sun_forte
                 else
 
-  	            	          is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
-  	          if test "x$is_kai_cc" != "x" ; then
-  	            echo "$as_me:$LINENO: result: C++ compiler is KAI C++" >&5
-echo "${ECHO_T}C++ compiler is KAI C++" >&6
-  	            GXX_VERSION=kai_cc
+  	            	          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+  	          if test "x$is_pgcc" != "x" ; then
+  	            echo "$as_me:$LINENO: result: C++ compiler is Portland Group C++" >&5
+echo "${ECHO_T}C++ compiler is Portland Group C++" >&6
+  	            GXX_VERSION=portland_group
   	          else
 
-  	              	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-  	            if test "x$is_pgcc" != "x" ; then
-  	              echo "$as_me:$LINENO: result: C++ compiler is Portland Group C++" >&5
-echo "${ECHO_T}C++ compiler is Portland Group C++" >&6
-  	              GXX_VERSION=portland_group
+  	              	            is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
+  	            if test "x$is_aCC" != "x" ; then
+  	              echo "$as_me:$LINENO: result: C++ compiler is HP aCC" >&5
+echo "${ECHO_T}C++ compiler is HP aCC" >&6
+  	              GXX_VERSION=hp_aCC
   	            else
 
-  	                	              is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
-  	              if test "x$is_aCC" != "x" ; then
-  	                echo "$as_me:$LINENO: result: C++ compiler is HP aCC" >&5
-echo "${ECHO_T}C++ compiler is HP aCC" >&6
-  	                GXX_VERSION=hp_aCC
+  	              		      	              	 	      	              	                                                                                  	              is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
+  	              is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
+  	              if test "x$is_kai_cc" != "x" ; then
+  	                echo "$as_me:$LINENO: result: C++ compiler is KAI C++" >&5
+echo "${ECHO_T}C++ compiler is KAI C++" >&6
+  	                GXX_VERSION=kai_cc
   	              else
 
                                                 { { echo "$as_me:$LINENO: error: Unrecognized compiler" >&5
