@@ -537,13 +537,20 @@ namespace PETScWrappers
                                             * 30, i.e. do a restart every 30
                                             * iterations.
                                             */
-          AdditionalData (const unsigned int restart_parameter = 30);
+          AdditionalData (const unsigned int restart_parameter = 30,
+			  const bool right_preconditioning = false);
 	
                                            /**
                                             * Maximum number of
                                             * tmp vectors.
                                             */
           unsigned int restart_parameter;
+
+					   /**
+					    * Flag for right
+					    * preconditioning.
+					    */
+	  bool right_preconditioning;
       };
 	
                                        /**
@@ -580,7 +587,7 @@ namespace PETScWrappers
                                         */
       SolverGMRES (SolverControl        &cn,
                    const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                   const AdditionalData &data = AdditionalData(30));
+                   const AdditionalData &data = AdditionalData(30,false));
 
     protected:
                                        /**

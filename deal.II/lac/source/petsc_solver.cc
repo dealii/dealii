@@ -363,9 +363,11 @@ namespace PETScWrappers
 /* ---------------------- SolverGMRES ------------------------ */
 
   SolverGMRES::AdditionalData::
-  AdditionalData (const unsigned int restart_parameter)
+  AdditionalData (const unsigned int restart_parameter,
+		  const bool right_preconditioning)
                   :
-                  restart_parameter (restart_parameter)
+                  restart_parameter (restart_parameter),
+		  right_preconditioning (right_preconditioning)
   {}
 
   
@@ -418,6 +420,14 @@ namespace PETScWrappers
 
     ierr = (*fun_ptr)(ksp,additional_data.restart_parameter);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+				     // Set preconditioning side to
+				     // right
+    if (additional_data.right_preconditioning)
+      {
+	ierr = KSPSetPreconditionerSide(ksp, PC_RIGHT);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
   }
   
 
