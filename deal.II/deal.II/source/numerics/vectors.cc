@@ -23,6 +23,7 @@
 
 #include <numeric>
 #include <algorithm>
+#include <bvector.h>
 #include <cmath>
 
 
@@ -1102,7 +1103,21 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
     };
 };
 
+template<int dim>
+void
+VectorTools<dim>::subtract_mean_value(Vector<double>& v, const
+				      bit_vector& p_select)
+{
+  unsigned int n = v.size();
+  Assert(n == p_select.size(), ExcDimensionMismatch(n, p_select.size()));
 
+  double s = 0;
+  for (unsigned int i=0;i<n;++i)
+    if (p_select[i]) s += v(i);
+
+  for (unsigned int i=0;i<n;++i)
+    if (p_select[i]) v(i) -= s;  
+}
 
 // explicit instantiations
 template VectorTools<deal_II_dimension>;

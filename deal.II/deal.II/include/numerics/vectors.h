@@ -11,7 +11,7 @@
 #include <basic/forward-declarations.h>
 #include <map>
 
-
+#include <bvector.h>
 
 /**
  *  Denote which norm/integral is to be computed. The following possibilities
@@ -468,7 +468,26 @@ class VectorTools //<dim>
  				      Vector<float>            &difference,
  				      const Quadrature<dim>    &q,
  				      const NormType           &norm,
-				      const Function<dim>      *weight=0);
+				      const Function<dim> *weight=0);
+
+				     /**
+				      * Mean-value filter for Stokes.
+				      * The pressure in Stokes'
+				      * equations is determined up to a
+				      * constant only. This function
+				      * allows to subtract the mean
+				      * value of the pressure. It is
+				      * usually called in a
+				      * preconditioner and generates
+				      * updates with mean value zero.
+				      *
+				      * Apart from the vector #v# to
+				      * operate on, this function takes
+				      * a bit vector. This has a true
+				      * entry for every pressure component.
+				      */
+    static void subtract_mean_value(Vector<double>& v, const
+				    bit_vector& p_select);
     
 
 				     /**
