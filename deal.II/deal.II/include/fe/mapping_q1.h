@@ -17,6 +17,7 @@
 #include <cmath>
 #include <fe/mapping.h>
 
+
 /**
  * Mapping of general quadrilateral/hexahedra by d-linear shape
  * functions.
@@ -36,72 +37,30 @@ template <int dim>
 class MappingQ1 : public Mapping<dim>
 {
   public:
-//TODO: why make the following functions public? they are only helpful for fevalues and maybe the finite elements?
 				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
-    get_data (const UpdateFlags,
-	      const Quadrature<dim>& quadrature) const;
-
+    virtual Point<dim> transform_unit_to_real_cell (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p) const;
+    
 				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
+				      * Transforms the point @p{p} on
+				      * the real cell to the point
+				      * @p{p_unit} on the unit cell
+				      * @p{cell} and returns @p{p_unit}.
+				      *
+				      * Uses Newton iteration and the
+				      * @p{transform_unit_to_real_cell}
+				      * function.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
-    get_face_data (const UpdateFlags flags,
-		   const Quadrature<dim-1>& quadrature) const;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual Mapping<dim>::InternalDataBase*
-    get_subface_data (const UpdateFlags flags,
-		      const Quadrature<dim-1>& quadrature) const;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>& quadrature,
-		    Mapping<dim>::InternalDataBase &mapping_data,
-		    std::vector<Point<dim> >        &quadrature_points,
-		    std::vector<double>             &JxW_values) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			 const unsigned int face_no,
-			 const Quadrature<dim-1>& quadrature,
-			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 std::vector<Point<dim> >        &quadrature_points,
-			 std::vector<double>             &JxW_values,
-			 std::vector<Tensor<1,dim> >        &boundary_form,
-			 std::vector<Point<dim> >        &normal_vectors) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int face_no,
-			    const unsigned int sub_no,
-			    const Quadrature<dim-1>& quadrature,
-			    typename Mapping<dim>::InternalDataBase &mapping_data,
-			    std::vector<Point<dim> >        &quadrature_points,
-			    std::vector<double>             &JxW_values,
-			    std::vector<Tensor<1,dim> >        &boundary_form,
-			    std::vector<Point<dim> >        &normal_vectors) const ;
-
-
+    virtual Point<dim> transform_real_to_unit_cell (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p) const;
+    
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
@@ -142,31 +101,6 @@ class MappingQ1 : public Mapping<dim>
 			     const Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
     
-				     /**
-				      * Transforms the point @p{p} on
-				      * the unit cell to the point
-				      * @p{p_real} on the real cell
-				      * @p{cell} and returns @p{p_real}.
-				      */
-//TODO: document meaning of mdata argument    
-    virtual Point<dim> transform_unit_to_real_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p,
-      const typename Mapping<dim>::InternalDataBase *const mdata=0) const;
-
-				     /**
-				      * Transforms the point @p{p} on
-				      * the real cell to the point
-				      * @p{p_unit} on the unit cell
-				      * @p{cell} and returns @p{p_unit}.
-				      *
-				      * Uses Newton iteration and the
-				      * @p{transform_unit_to_real_cell}
-				      * function.
-				      */
-    virtual Point<dim> transform_real_to_unit_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p) const;
     
 				     /**
 				      * Implementation of the interface in
@@ -179,13 +113,49 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags) const;
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidData);
 
   protected:
+    
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+		    const Quadrature<dim>& quadrature,
+		    Mapping<dim>::InternalDataBase &mapping_data,
+		    std::vector<Point<dim> >        &quadrature_points,
+		    std::vector<double>             &JxW_values) const ;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+			 const unsigned int face_no,
+			 const Quadrature<dim-1>& quadrature,
+			 typename Mapping<dim>::InternalDataBase &mapping_data,
+			 std::vector<Point<dim> >        &quadrature_points,
+			 std::vector<double>             &JxW_values,
+			 std::vector<Tensor<1,dim> >        &boundary_form,
+			 std::vector<Point<dim> >        &normal_vectors) const ;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+			    const unsigned int face_no,
+			    const unsigned int sub_no,
+			    const Quadrature<dim-1>& quadrature,
+			    typename Mapping<dim>::InternalDataBase &mapping_data,
+			    std::vector<Point<dim> >        &quadrature_points,
+			    std::vector<double>             &JxW_values,
+			    std::vector<Tensor<1,dim> >        &boundary_form,
+			    std::vector<Point<dim> >        &normal_vectors) const ;
+    
     				     /**
 				      * Implementation of the
 				      * covariant transformation.
@@ -341,6 +311,34 @@ class MappingQ1 : public Mapping<dim>
     };
     
 				     /**
+				      * Compute shape values and/or
+				      * derivatives.
+				      *
+				      * Calles either the
+				      * @p{compute_shapes_virtual} of
+				      * this class or that of the
+				      * derived class, depending on
+				      * whether
+				      * @p{data.is_mapping_q1_data}
+				      * equals @p{true} or @p{false}.
+				      */
+    void compute_shapes (const std::vector<Point<dim> > &unit_points,
+			 InternalData &data) const;
+
+				     /**
+				      * Do the computations for the
+				      * @p{get_data} functions. Here,
+				      * the data vectors of
+				      * @p{InternalData} are
+				      * reinitialized to proper size
+				      * and shape values are computed.
+				      */
+    void compute_data (const UpdateFlags flags,
+		       const Quadrature<dim>& quadrature,
+		       const unsigned int n_orig_q_points,
+		       InternalData& data) const;
+
+				     /**
 				      * Do the computations for the
 				      * @p{get_face_data}
 				      * functions. Here, the data
@@ -356,40 +354,6 @@ class MappingQ1 : public Mapping<dim>
 			    const Quadrature<dim> &quadrature,
 			    const unsigned int n_orig_q_points,
 			    InternalData &data) const;
-    
-				     /**
-				      * Mapping between tensor product
-				      * ordering and real ordering of
-				      * the vertices.
-				      */
-    static const unsigned int vertex_mapping[1<<dim];
-    
-				     /**
-				      * Compute shape values and/or
-				      * derivatives.
-				      *
-				      * Calles either the
-				      * @p{compute_shapes_virtual} of
-				      * this class or that of the
-				      * derived class, depending on
-				      * whether
-				      * @p{data.is_mapping_q1_data}
-				      * equals @p{true} or @p{false}.
-				      */
-    void compute_shapes (const std::vector<Point<dim> > &unit_points,
-			 InternalData &data) const;
-    
-				     /**
-				      * Do the computations for the @p{get_data}
-				      * functions. Here, the data
-				      * vectors of @p{InternalData} are
-				      * reinitialized to proper size and
-				      * shape values are computed.
-				      */
-    void compute_data (const UpdateFlags flags,
-		       const Quadrature<dim>& quadrature,
-		       const unsigned int n_orig_q_points,
-		       InternalData& data) const;
     
 				     /**
 				      * Do the computation for the
@@ -416,14 +380,101 @@ class MappingQ1 : public Mapping<dim>
 			    std::vector<double>         &JxW_values,
 			    std::vector<Tensor<1,dim> > &boundary_form,
 			    std::vector<Point<dim> > &normal_vectors) const;
-
+    
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
 				      */
     virtual void compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
 					 InternalData &data) const;
+
+				     /**
+				      * Mapping between tensor product
+				      * ordering and real ordering of
+				      * the vertices.
+				      */
+    static const unsigned int vertex_mapping[1<<dim];
+    
+
   private:
+				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
+				      *
+				      * This function is called by
+				      * @p{transform_unit_to_real_cell}
+				      * and multiply (through the
+				      * Newton iteration) by
+				      * @p{transform_real_to_unit_cell}.
+				      *
+				      * Takes a reference to an
+				      * @p{InternalData} that must
+				      * already include the shape
+				      * values at point @p{p} and the
+				      * mapping support points of the
+				      * cell.
+				      *
+				      * This additional
+				      * @p{InternalData} argument
+				      * avoids multiple computations
+				      * of the shape values at point
+				      * @p{p} and especially multiple
+				      * computations of the mapping
+				      * support points.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell_internal (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p,
+      const InternalData &m_data) const;
+
+				     /**
+				      * Returns an @p{InternalData}
+				      * whose data vectors are resized
+				      * corresponding to the
+				      * @p{update_flags} and a
+				      * one-point
+				      * quadrature. Furthermore the
+				      * @p{InternalData} stores the
+				      * mapping support points of the
+				      * given @p{cell}.
+				      *
+				      * This function is called by
+				      * @p{transform_unit_to_real_cell}
+				      * and by
+				      * @p{transform_real_to_unit_cell}.
+				      * The resulting @p{InternalData}
+				      * is given to the
+				      * @p{transform_unit_to_real_internal}
+				      * function.
+				      */
+    InternalData* get_cell_data(const typename Triangulation<dim>::cell_iterator cell,
+				const UpdateFlags update_flags) const;
+    
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual Mapping<dim>::InternalDataBase*
+    get_data (const UpdateFlags,
+	      const Quadrature<dim>& quadrature) const;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual Mapping<dim>::InternalDataBase*
+    get_face_data (const UpdateFlags flags,
+		   const Quadrature<dim-1>& quadrature) const;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual Mapping<dim>::InternalDataBase*
+    get_subface_data (const UpdateFlags flags,
+		      const Quadrature<dim-1>& quadrature) const;
 
 				     /**
 				      * Computes the support points of
