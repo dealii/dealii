@@ -23,7 +23,6 @@
 #include <fe/fe_q.h>
 #include <fe/fe_values.h>
 
-static std::vector<bool> dummy(1,false);
 
 // Embedding matrices (produced by tests/fe/embedding with postprocessing
 
@@ -42,21 +41,22 @@ static std::vector<bool> dummy(1,false);
 
 template <int dim>
 FE_Q<dim>::FE_Q (unsigned int degree)
-  :
-  FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1), dummy),
-			degree(degree),
-			renumber(dofs_per_cell, 0),
-			face_renumber(dofs_per_face, 0),
-			polynomials(degree+1),
-			poly(0)
+		:
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
+				    std::vector<bool> (1,false)),
+		degree(degree),
+		renumber(dofs_per_cell, 0),
+		face_renumber(dofs_per_face, 0),
+		polynomials(degree+1),
+		poly(0)
 {
   std::vector<SmartPointer<Polynomial<double> > > v(degree+1);
   for (unsigned int i=0;i<=degree;++i)
     {
-      LagrangeEquidistant p(degree, i);
-      polynomials[i] = p;
+      polynomials[i] = LagrangeEquidistant(degree,i);
       v[i] = &(polynomials[i]);
-    }
+    };
+  
   poly = new TensorProductPolynomials<dim> (v);
   build_renumbering (*this, degree, renumber);
 
@@ -593,7 +593,10 @@ FE_Q<dim>::FE_Q (unsigned int degree)
 template <int dim>
 FE_Q<dim>::~FE_Q ()
 {
+				   // delete poly member and set it to
+				   // zero to prevent accidental use
   delete poly;
+  poly = 0;
 }
 
 
@@ -1109,6 +1112,7 @@ FE_Q<dim>::fill_fe_subface_values (const Mapping<dim> &mapping,
 }
 
 
+
 template <int dim>
 unsigned int
 FE_Q<dim>::memory_consumption () const
@@ -1116,6 +1120,16 @@ FE_Q<dim>::memory_consumption () const
   Assert (false, ExcNotImplemented ());
   return 0;
 }
+
+
+
+template <int dim>
+unsigned int
+FE_Q<dim>::get_degree () const
+{
+  return degree;
+};
+
 
 
 template FE_Q<deal_II_dimension>;
