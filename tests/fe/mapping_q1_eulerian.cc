@@ -32,7 +32,7 @@ show_values(FiniteElement<dim>& fe,
 				   // shift one point of the cell
 				   // somehow
   if (dim > 1)
-    tr.begin_active()->vertex(2)(dim-1) += 1./sqrt(2.);
+    tr.begin_active()->vertex(2)(dim-1) += 1./std::sqrt(2.);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 

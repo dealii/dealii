@@ -427,8 +427,8 @@ int main ()
       const double accuracy = (i==1 ? 1e-6 : 1e-12);
       
       for (unsigned int j=0; j<solutions[0].size(); ++j)
-	if ( fabs(solutions[i][j] - solutions[0][j]) >
-	     accuracy*fabs(solutions[i][j] + solutions[0][j]))
+	if ( std::fabs(solutions[i][j] - solutions[0][j]) >
+	     accuracy*std::fabs(solutions[i][j] + solutions[0][j]))
 	  {
 	    deallog << "Discrepancy: i=" << i << ", j=" << j
 		    << ", sol[i][j]=" << solutions[i][j]
