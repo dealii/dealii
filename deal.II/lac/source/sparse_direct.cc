@@ -22,27 +22,24 @@
 #include <list>
 #include <typeinfo>
 
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <unistd.h>
+
+#ifndef DEAL_II_USE_DIRECT_ERRNO_H
+#  include <errno.h>
+#else
+#  include </usr/include/errno.h>
+#endif
+#include <sys/errno.h>
+
 
 // if we know that at least one of the HSL functions are there,
 // include the respective include file. Otherwise save some CPU cycles
 // in the compiler
-//
-// also, we don't need all the other headers if the respective hsl
-// routines aren't used
 #if defined(HAVE_HSL_MA27) || defined(HAVE_HSL_MA47)
 #  include <hsl/hsl.h>
-
-#  include <sys/wait.h>
-#  include <sys/types.h>
-#  include <signal.h>
-#  include <unistd.h>
-
-#  ifndef DEAL_II_USE_DIRECT_ERRNO_H
-#    include <errno.h>
-#  else
-#    include </usr/include/errno.h>
-#  endif
-#  include <sys/errno.h>
 #endif
 
 // include UMFPACK file.
