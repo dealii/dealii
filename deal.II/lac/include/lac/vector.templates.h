@@ -240,7 +240,7 @@ Number Vector<Number>::l2_norm () const
 
 
 template <typename Number>
-Number Vector<Number>::lp_norm (double p) const
+Number Vector<Number>::lp_norm (const Number p) const
 {
   Assert (dim!=0, ExcEmptyVector());
 

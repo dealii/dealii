@@ -253,7 +253,7 @@ class Vector
 				      * powers of the absolute values
 				      * of the elements.
 				      */
-    Number lp_norm (double p) const;
+    Number lp_norm (const Number p) const;
 
 				     /**
 				      * Maximum absolute value of the
