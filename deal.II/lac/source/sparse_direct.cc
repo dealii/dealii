@@ -363,8 +363,9 @@ struct SparseDirectMA27::DetachedModeData
         unsigned int count = 0;
         while (count < sizeof(T)*N)
           {
-                                             // repeat writing until syscall is
-                                             // not interrupted
+                                             // repeat writing until
+                                             // syscall is not
+                                             // interrupted
             int ret;
             do
               ret = write (server_client_pipe[1],
