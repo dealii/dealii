@@ -8,12 +8,6 @@
 #include <vector.h>
 
 
-extern TriaIterator<1,DoFCellAccessor<1> > __dummy257; //do this to calm down gcc2.7,
-extern TriaIterator<2,DoFCellAccessor<2> > __dummy258; //wait for gcc2.8
-extern TriaIterator<1,DoFLineAccessor<1,CellAccessor<1> > > __dummy259;
-extern TriaIterator<2,DoFQuadAccessor<2,QuadAccessor<2> > > __dummy260;
-extern TriaIterator<2,DoFQuadAccessor<2,CellAccessor<2> > > __dummy261;
-
 
 
 
@@ -278,9 +272,6 @@ DoFCellAccessor<1>::dof_indices (vector<int> &dof_indices) const {
 
 
 
-// do this to calm down gcc2.7; wait for gcc2.8
-extern TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > > __dummya;
-
 
 void
 DoFCellAccessor<2>::dof_indices (vector<int> &dof_indices) const {
@@ -296,6 +287,9 @@ DoFCellAccessor<2>::dof_indices (vector<int> &dof_indices) const {
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
       dof_indices.push_back (this->line(line)->dof_index(d));
 };
+
+
+
 
 
 // explicit instantiations

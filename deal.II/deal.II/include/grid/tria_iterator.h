@@ -539,9 +539,6 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 
 
 
-extern TriaIterator<1,LineAccessor<1> > __dummy3;  // to calm down gcc2.7
-extern TriaIterator<2,LineAccessor<2> > __dummy4;  // to calm down gcc2.7
-extern TriaIterator<2,QuadAccessor<2> > __dummy5;  // to calm down gcc2.7
 
 
 

@@ -11,41 +11,6 @@
 #include <algo.h>
 
 
-extern TriaRawIterator<1,LineAccessor<1> > _dummy112;
-extern TriaRawIterator<2,LineAccessor<2> > _dummy113;
-extern TriaIterator<1,LineAccessor<1> > _dummy114;
-extern TriaIterator<2,LineAccessor<2> > _dummy115;
-extern TriaActiveIterator<1,LineAccessor<1> > _dummy116;
-extern TriaActiveIterator<2,LineAccessor<2> > _dummy117;
-
-extern TriaRawIterator<2,QuadAccessor<2> > _dummy118;
-extern TriaIterator<2,QuadAccessor<2> > _dummy119;
-extern TriaActiveIterator<2,QuadAccessor<2> > _dummy120;
-
-extern TriaRawIterator<1,CellAccessor<1> > _dummy121;
-extern TriaRawIterator<2,CellAccessor<2> > _dummy122;
-extern TriaIterator<1,CellAccessor<1> > _dummy123;
-extern TriaIterator<2,CellAccessor<2> > _dummy124;
-extern TriaActiveIterator<1,CellAccessor<1> > _dummy125;
-extern TriaActiveIterator<2,CellAccessor<2> > _dummy126;
-
-extern DoFCellAccessor<1>                   _dummy127; //do this to calm down gcc2.7
-extern TriaRawIterator<1,DoFCellAccessor<1> >     _dummy128; //wait for gcc2.8
-extern TriaIterator<1,DoFCellAccessor<1> >        _dummy129;
-extern TriaActiveIterator<1,DoFCellAccessor<1> >  _dummy130;
-
-extern DoFCellAccessor<2>                   _dummy131; //do this to calm down gcc2.7
-extern TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >     _dummy132; //wait for gcc2.8
-extern TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >        _dummy133;
-extern TriaActiveIterator<2,DoFLineAccessor<2,LineAccessor<2> > >  _dummy134;
-extern TriaRawIterator<2,DoFCellAccessor<2> >     _dummy135; //wait for gcc2.8
-extern TriaIterator<2,DoFCellAccessor<2> >         _dummy136;
-extern TriaActiveIterator<2,DoFCellAccessor<2> >  _dummy137;
-
-extern Triangulation<1> _dummy138;
-extern Triangulation<2> _dummy139;
-
-
 
 template <int dim>
 DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :

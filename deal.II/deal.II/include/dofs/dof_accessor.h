@@ -260,11 +260,6 @@ class DoFQuadAccessor :  public BaseClass, public DoFAccessor<dim> {
 
 
 
-extern DoFLineAccessor<1,LineAccessor<1> > __dummy215; // for gcc2.7
-extern DoFLineAccessor<1,CellAccessor<1> > __dummy216;
-extern DoFLineAccessor<2,LineAccessor<2> > __dummy217;
-extern DoFQuadAccessor<2,QuadAccessor<2> > __dummy218;
-extern DoFQuadAccessor<2,CellAccessor<2> > __dummy219;
 
 
 
@@ -394,8 +389,6 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 
 
 
-extern DoFCellAccessor<1> __dummy17;   //do this to calm down gcc2.7.. wait for gcc2.8
-extern DoFCellAccessor<2> __dummy18;
 
 
 

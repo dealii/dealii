@@ -11,11 +11,6 @@
 #include <time.h>
 
 
-extern TriaActiveIterator<1,DoFCellAccessor<1> > __dummy566; // wait for gcc2.8
-extern TriaActiveIterator<2,DoFCellAccessor<2> > __dummy567;
-
-
-
 
 
 

@@ -15,9 +15,6 @@
 
 
 
-extern TriaActiveIterator<1,CellAccessor<1> > __dummy1233; // for gcc2.7
-extern TriaActiveIterator<2,CellAccessor<2> > __dummy1234;
-
 
 
 template <int dim>

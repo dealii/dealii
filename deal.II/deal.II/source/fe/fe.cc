@@ -5,8 +5,6 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 
-extern TriaIterator<1,CellAccessor<1> > __dummy2687; // for gcc2.8
-
 
 
 /*------------------------------- FEValues -------------------------------*/

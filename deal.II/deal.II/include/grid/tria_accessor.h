@@ -257,8 +257,6 @@ class TriaAccessor {
 
 
 
-extern TriaAccessor<1> __dummy1; // to calm down gcc2.7
-extern TriaAccessor<2> __dummy2; // to calm down gcc2.7
 
 
 

@@ -547,7 +547,7 @@ QGauss8<1>::QGauss8 () :
 QMidpoint<1>::QMidpoint () :
 		Quadrature<1>(1)
 {
-  quadrature_points[0] = 0.5;
+  quadrature_points[0] = Point<1>(0.5);
   weights[0] = 1.0;
 };
 

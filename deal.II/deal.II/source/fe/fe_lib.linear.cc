@@ -4,9 +4,6 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 
-extern TriaIterator<1,CellAccessor<1> > __dummy2687; // for gcc2.8
-extern TriaIterator<2,CellAccessor<2> > __dummy2688; // for gcc2.8
-
 
 FELinear<1>::FELinear () :
 		FiniteElement<1> (1, 0)

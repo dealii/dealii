@@ -1001,8 +1001,6 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 };
 
 
-extern DoFHandler<1> __dummy10123;  // do this to calm down gcc2.7; wait for gcc2.8
-extern DoFHandler<2> __dummy10124;
 
 
 

@@ -8,9 +8,6 @@
 #include <lac/dvector.h>
 
 
-extern TriaIterator<1,CellAccessor<1> > __dummy127; // do this to calm down gcc2.7,
-extern TriaIterator<2,CellAccessor<2> > __dummy128; // wait for gcc2.8
-
 
 template <int dim>
 Equation<dim>::Equation (const unsigned int n_equations) :
