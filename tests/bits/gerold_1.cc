@@ -77,7 +77,7 @@ template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (1),
 		dof_handler (triangulation)
-{};
+{}
 
 
 template <int dim>
@@ -99,7 +99,7 @@ void LaplaceProblem<dim>::run ()
 
   grid_in.read_ucd(input_file);
   deallog << "ucd data file readin exe" << std::endl;
-};
+}
 
 
 int main () 
@@ -138,4 +138,4 @@ int main ()
     };
   
   return 0;
-};
+}
