@@ -624,6 +624,9 @@ class FE_Q : public FiniteElement<dim>
 				      * chosen to weigh the simplicity
 				      * aspect a little more than
 				      * proper design.
+				      *
+				      * This function is called from
+				      * the constructor.
 				      */
     static
     std::vector<unsigned int>
@@ -633,11 +636,33 @@ class FE_Q : public FiniteElement<dim>
 				     /**
 				      * This is an analogon to the
 				      * previous function, but working
-				      * on faces.
+				      * on faces. Called from the
+				      * constructor.
 				      */
     static
     std::vector<unsigned int>
     face_lexicographic_to_hierarchic_numbering (const unsigned int degree);
+
+				     /**
+				      * Initialize the hanging node
+				      * constraints matrices. Called
+				      * from the constructor.
+				      */
+    void initialize_constraints ();
+
+				     /**
+				      * Initialize the embedding
+				      * matrices. Called from the
+				      * constructor.
+				      */
+    void initialize_embedding ();
+
+				     /**
+				      * Initialize the restriction
+				      * matrices. Called from the
+				      * constructor.
+				      */
+    void initialize_restriction ();
 
 				     /**
 				      * Initialize the

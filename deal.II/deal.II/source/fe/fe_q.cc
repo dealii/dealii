@@ -51,18 +51,470 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 		face_renumber(face_lexicographic_to_hierarchic_numbering (degree)),
 		polynomial_space(Polynomials::LagrangeEquidistant::generate_complete_basis(degree))
 {
+  
+				   // copy constraint and embedding
+				   // matrices if they are
+				   // defined. otherwise leave them at
+				   // invalid size
+  initialize_constraints ();
+  initialize_embedding ();
+  initialize_restriction ();
+
+				   // finally fill in support points
+				   // on cell and face
+  initialize_unit_support_points ();
+  initialize_unit_face_support_points ();
+}
+
+
+
+template <int dim>
+FiniteElement<dim> *
+FE_Q<dim>::clone() const
+{
+  return new FE_Q<dim>(degree);
+}
+
+
+
+template <int dim>
+double
+FE_Q<dim>::shape_value (const unsigned int i,
+			const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  return polynomial_space.compute_value(renumber_inverse[i], p);
+}
+
+
+template <int dim>
+double
+FE_Q<dim>::shape_value_component (const unsigned int i,
+				  const Point<dim> &p,
+				  const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_value(renumber_inverse[i], p);
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+FE_Q<dim>::shape_grad (const unsigned int i,
+		       const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  return polynomial_space.compute_grad(renumber_inverse[i], p);
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+FE_Q<dim>::shape_grad_component (const unsigned int i,
+				 const Point<dim> &p,
+				 const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_grad(renumber_inverse[i], p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FE_Q<dim>::shape_grad_grad (const unsigned int i,
+			    const Point<dim> &p) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+FE_Q<dim>::shape_grad_grad_component (const unsigned int i,
+				      const Point<dim> &p,
+				      const unsigned int component) const
+{
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
+  Assert (component == 0, ExcIndexRange (component, 0, 1));
+  return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
+}
+
+
+//----------------------------------------------------------------------
+// Auxiliary functions
+//----------------------------------------------------------------------
+
+
+
+template <int dim>
+void FE_Q<dim>::initialize_unit_support_points ()
+{
+				   // number of points: (degree+1)^dim
+  unsigned int n = degree+1;
+  for (unsigned int i=1; i<dim; ++i)
+    n *= degree+1;
+  
+  this->unit_support_points.resize(n);
+  
+  const double step = 1./degree;
+  Point<dim> p;
+  
+  unsigned int k=0;
+  for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=degree; ++ix)
+	{
+	  p(0) = ix * step;
+	  if (dim>1)
+	    p(1) = iy * step;
+	  if (dim>2)
+	    p(2) = iz * step;
+	  
+	  this->unit_support_points[renumber[k++]] = p;
+	};
+}
+
+
+#if deal_II_dimension == 1
+
+template <>
+void FE_Q<1>::initialize_unit_face_support_points ()
+{
+				   // no faces in 1d, so nothing to do
+}
+
+#endif
+
+
+template <int dim>
+void FE_Q<dim>::initialize_unit_face_support_points ()
+{
+  const unsigned int codim = dim-1;
+  
+				   // number of points: (degree+1)^codim
+  unsigned int n = degree+1;
+  for (unsigned int i=1; i<codim; ++i)
+    n *= degree+1;
+  
+  this->unit_face_support_points.resize(n);
+  
+  const double step = 1./degree;
+  Point<codim> p;
+  
+  unsigned int k=0;
+  for (unsigned int iz=0; iz <= ((codim>2) ? degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((codim>1) ? degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=degree; ++ix)
+	{
+	  p(0) = ix * step;
+	  if (codim>1)
+	    p(1) = iy * step;
+	  if (codim>2)
+	    p(2) = iz * step;
+	  
+	  this->unit_face_support_points[face_renumber[k++]] = p;
+	};
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+FE_Q<dim>::get_dpo_vector(const unsigned int deg)
+{
+  std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(1));
+  for (unsigned int i=1; i<dpo.size(); ++i)
+    dpo[i]=dpo[i-1]*(deg-1);
+  return dpo;
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
+						  const unsigned int            degree)
+{
+  std::vector<unsigned int> renumber (fe_data.dofs_per_cell);
+  
+  const unsigned int n = degree+1;
+
+
+  if (degree == 0)
+    {
+      Assert ((fe_data.dofs_per_vertex == 0) &&
+	      ((fe_data.dofs_per_line == 0) || (dim == 1)) &&
+	      ((fe_data.dofs_per_quad == 0) || (dim == 2)) &&
+	      ((fe_data.dofs_per_hex == 0)  || (dim == 3)),
+	      ExcInternalError());
+      renumber[0] = 0;
+    };
+
+  if (degree > 0)
+    {
+      Assert (fe_data.dofs_per_vertex == 1, ExcInternalError());
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	{
+	  unsigned int index = 0;
+					   // Find indices of vertices.
+					   // Unfortunately, somebody
+					   // switched the upper corner
+					   // points of a quad. The same
+					   // person decided to find a very
+					   // creative numbering of the
+					   // vertices of a hexahedron.
+					   // Therefore, this looks quite
+					   // sophisticated.
+					   //
+					   // NB: This same person
+					   // claims to have had good
+					   // reasons then, but seems to
+					   // have forgotten about
+					   // them. At least, the
+					   // numbering was discussed
+					   // with the complaining
+					   // person back then when all
+					   // began :-)
+	  switch (dim)
+	    {
+	      case 1:
+	    {
+	      const unsigned int values[GeometryInfo<1>::vertices_per_cell]
+		= { 0, degree };
+	      index = values[i];
+	      break;
+	    };
+	     
+	      case 2:
+	    {
+	      const unsigned int values[GeometryInfo<2>::vertices_per_cell]
+		= { 0, degree, n*degree+degree, n*degree };
+	      index = values[i];
+	      break;
+	    };
+	     
+	      case 3:
+	    {
+	      const unsigned int values[GeometryInfo<3>::vertices_per_cell]
+		= { 0, degree,
+		    n*n*degree + degree, n*n*degree,
+		    n*degree, n*degree+degree,
+		    n*n*degree + n*degree+degree, n*n*degree + n*degree};
+	      index = values[i];
+	      break;
+	    };
+	     
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
+
+	  Assert (index<renumber.size(), ExcInternalError());
+	  renumber[index] = i;
+	}
+    };
+  
+				   // for degree 2 and higher: Lines,
+				   // quads, hexes etc also carry
+				   // degrees of freedom
+  if (degree > 1)
+    {
+      Assert (fe_data.dofs_per_line == degree-1, ExcInternalError());
+      Assert ((fe_data.dofs_per_quad == (degree-1)*(degree-1)) ||
+	      (dim < 2), ExcInternalError());
+      Assert ((fe_data.dofs_per_hex == (degree-1)*(degree-1)*(degree-1)) ||
+	      (dim < 3), ExcInternalError());
+	    
+      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::lines_per_cell); ++i)
+	{
+	  unsigned int index = fe_data.first_line_index + i*fe_data.dofs_per_line;
+	  unsigned int incr = 0;
+	  unsigned int tensorstart = 0;
+					   // This again looks quite
+					   // strange because of the odd
+					   // numbering scheme.
+	  switch (i+100*dim)
+	    {
+					       // lines in x-direction
+	      case 100:
+	      case 200: case 202:
+	      case 300: case 302: case 304: case 306:
+		incr = 1;
+		break;
+						 // lines in y-direction
+	      case 201: case 203:
+	      case 308: case 309: case 310: case 311:
+		incr = n;
+		break;
+						 // lines in z-direction
+	      case 301: case 303: case 305: case 307:
+		incr = n*n;
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
+	  switch (i+100*dim)
+	    {
+					       // x=y=z=0
+	      case 100:
+	      case 200: case 203:
+	      case 300: case 303: case 308:
+		tensorstart = 0;
+		break;
+						 // x=1 y=z=0
+	      case 201:
+	      case 301: case 309:
+		tensorstart = degree;
+		break;
+						 // y=1 x=z=0
+	      case 202:
+	      case 304: case 307:
+		tensorstart = n*degree;
+		break;
+						 // x=z=1 y=0
+	      case 310:
+		tensorstart = n*n*degree+degree;
+		break;
+						 // z=1 x=y=0
+	      case 302: case 311:
+		tensorstart = n*n*degree;
+		break;
+						 // x=y=1 z=0
+	      case 305:
+		tensorstart = n*degree+degree;
+		break;
+						 // y=z=1 x=0
+	      case 306:
+		tensorstart = n*n*n-n;
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());	      
+	    }
+	  
+	  for (unsigned int jx = 1; jx<degree ;++jx)
+	    {
+	      unsigned int tensorindex = tensorstart + jx * incr;
+	      Assert (tensorindex<renumber.size(), ExcInternalError());
+	      renumber[tensorindex] = index++;
+	    }
+	}
+
+      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::quads_per_cell); ++i)
+	{
+	  unsigned int index = fe_data.first_quad_index+i*fe_data.dofs_per_quad;
+	  unsigned int tensorstart = 0;
+	  unsigned int incx = 0;
+	  unsigned int incy = 0;
+	  switch (i)
+	    {
+	      case 0:
+		tensorstart = 0; incx = 1;
+		if (dim==2)
+		  incy = n;
+		else
+		  incy = n*n;
+		break;
+	      case 1:
+		tensorstart = n*degree; incx = 1; incy = n*n;
+		break;
+	      case 2:
+		tensorstart = 0; incx = 1; incy = n;
+		break;
+	      case 3:
+		tensorstart = degree; incx = n; incy = n*n;
+		break;
+	      case 4:
+		tensorstart = n*n*degree; incx = 1; incy = n;
+		break;
+	      case 5:
+		tensorstart = 0; incx = n; incy = n*n;
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());	      
+	    }
+	  
+	  for (unsigned int jy = 1; jy<degree; jy++)
+	    for (unsigned int jx = 1; jx<degree ;++jx)
+	      {
+		unsigned int tensorindex = tensorstart
+					   + jx * incx + jy * incy;
+		Assert (tensorindex<renumber.size(), ExcInternalError());
+		renumber[tensorindex] = index++;
+	      }
+	}
+
+      if (GeometryInfo<dim>::hexes_per_cell > 0)
+	for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::hexes_per_cell); ++i)
+	  {
+	    unsigned int index = fe_data.first_hex_index;
+	    
+	    for (unsigned int jz = 1; jz<degree; jz++)
+	      for (unsigned int jy = 1; jy<degree; jy++)
+		for (unsigned int jx = 1; jx<degree; jx++)
+		  {
+		    const unsigned int tensorindex = jx + jy*n + jz*n*n;
+		    Assert (tensorindex<renumber.size(), ExcInternalError());
+		    renumber[tensorindex]=index++;
+		  }  
+	  } 
+    }
+
+  return renumber;
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
+{
+  const FiniteElementData<dim-1> fe_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
+  return FE_Q<dim-1>::lexicographic_to_hierarchic_numbering (fe_data, degree); 
+}
+
+
+#if (deal_II_dimension == 1)
+
+template <>
+std::vector<unsigned int>
+FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
+{
+  return std::vector<unsigned int>();
+}
+
+#endif
+
+
+
+template <int dim>
+void
+FE_Q<dim>::initialize_constraints ()
+{  
 				   // copy constraint matrices if they
 				   // are defined. otherwise leave them
 				   // at invalid size
-  if ((dim>1) && (degree<Matrices::n_constraint_matrices+1))
+  if ((dim > 1) && (degree < Matrices::n_constraint_matrices+1))
     {
       this->interface_constraints.
         TableBase<2,double>::reinit (this->interface_constraints_size());
       this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
     };
+}
 
-				   // next copy over embedding
-				   // matrices if they are defined
+
+
+template <int dim>
+void
+FE_Q<dim>::initialize_embedding ()
+{
+				   // copy over embedding matrices if
+				   // they are defined
   if ((degree < Matrices::n_embedding_matrices+1) &&
       (Matrices::embedding[degree-1][0] != 0))
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
@@ -71,7 +523,15 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
                                       this->dofs_per_cell);
         this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
       };
+}
 
+
+
+template <int dim>
+void
+FE_Q<dim>::initialize_restriction ()
+{
+  
 				   // then fill restriction
 				   // matrices. they are hardcoded for
 				   // the first few elements. in
@@ -625,436 +1085,8 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
       default:
             Assert (false, ExcNotImplemented());
     }
-
-				   // finally fill in support points
-				   // on cell and face
-  initialize_unit_support_points ();
-  initialize_unit_face_support_points ();
 }
 
-
-
-template <int dim>
-FiniteElement<dim> *
-FE_Q<dim>::clone() const
-{
-  return new FE_Q<dim>(degree);
-}
-
-
-
-template <int dim>
-double
-FE_Q<dim>::shape_value (const unsigned int i,
-			const Point<dim> &p) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return polynomial_space.compute_value(renumber_inverse[i], p);
-}
-
-
-template <int dim>
-double
-FE_Q<dim>::shape_value_component (const unsigned int i,
-				  const Point<dim> &p,
-				  const unsigned int component) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_value(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-FE_Q<dim>::shape_grad (const unsigned int i,
-		       const Point<dim> &p) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return polynomial_space.compute_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-FE_Q<dim>::shape_grad_component (const unsigned int i,
-				 const Point<dim> &p,
-				 const unsigned int component) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<2,dim>
-FE_Q<dim>::shape_grad_grad (const unsigned int i,
-			    const Point<dim> &p) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<2,dim>
-FE_Q<dim>::shape_grad_grad_component (const unsigned int i,
-				      const Point<dim> &p,
-				      const unsigned int component) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
-}
-
-
-//----------------------------------------------------------------------
-// Auxiliary functions
-//----------------------------------------------------------------------
-
-
-
-template <int dim>
-void FE_Q<dim>::initialize_unit_support_points ()
-{
-				   // number of points: (degree+1)^dim
-  unsigned int n = degree+1;
-  for (unsigned int i=1; i<dim; ++i)
-    n *= degree+1;
-  
-  this->unit_support_points.resize(n);
-  
-  const double step = 1./degree;
-  Point<dim> p;
-  
-  unsigned int k=0;
-  for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0; ix<=degree; ++ix)
-	{
-	  p(0) = ix * step;
-	  if (dim>1)
-	    p(1) = iy * step;
-	  if (dim>2)
-	    p(2) = iz * step;
-	  
-	  this->unit_support_points[renumber[k++]] = p;
-	};
-}
-
-
-#if deal_II_dimension == 1
-
-template <>
-void FE_Q<1>::initialize_unit_face_support_points ()
-{
-				   // no faces in 1d, so nothing to do
-}
-
-#endif
-
-
-template <int dim>
-void FE_Q<dim>::initialize_unit_face_support_points ()
-{
-  const unsigned int codim = dim-1;
-  
-				   // number of points: (degree+1)^codim
-  unsigned int n = degree+1;
-  for (unsigned int i=1; i<codim; ++i)
-    n *= degree+1;
-  
-  this->unit_face_support_points.resize(n);
-  
-  const double step = 1./degree;
-  Point<codim> p;
-  
-  unsigned int k=0;
-  for (unsigned int iz=0; iz <= ((codim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0; iy <= ((codim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0; ix<=degree; ++ix)
-	{
-	  p(0) = ix * step;
-	  if (codim>1)
-	    p(1) = iy * step;
-	  if (codim>2)
-	    p(2) = iz * step;
-	  
-	  this->unit_face_support_points[face_renumber[k++]] = p;
-	};
-}
-
-
-
-template <int dim>
-std::vector<unsigned int>
-FE_Q<dim>::get_dpo_vector(const unsigned int deg)
-{
-  std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(1));
-  for (unsigned int i=1; i<dpo.size(); ++i)
-    dpo[i]=dpo[i-1]*(deg-1);
-  return dpo;
-}
-
-
-
-template <int dim>
-std::vector<unsigned int>
-FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-						  const unsigned int            degree)
-{
-  std::vector<unsigned int> renumber (fe_data.dofs_per_cell);
-  
-  const unsigned int n = degree+1;
-
-
-  if (degree == 0)
-    {
-      Assert ((fe_data.dofs_per_vertex == 0) &&
-	      ((fe_data.dofs_per_line == 0) || (dim == 1)) &&
-	      ((fe_data.dofs_per_quad == 0) || (dim == 2)) &&
-	      ((fe_data.dofs_per_hex == 0)  || (dim == 3)),
-	      ExcInternalError());
-      renumber[0] = 0;
-    };
-
-  if (degree > 0)
-    {
-      Assert (fe_data.dofs_per_vertex == 1, ExcInternalError());
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	{
-	  unsigned int index = 0;
-					   // Find indices of vertices.
-					   // Unfortunately, somebody
-					   // switched the upper corner
-					   // points of a quad. The same
-					   // person decided to find a very
-					   // creative numbering of the
-					   // vertices of a hexahedron.
-					   // Therefore, this looks quite
-					   // sophisticated.
-					   //
-					   // NB: This same person
-					   // claims to have had good
-					   // reasons then, but seems to
-					   // have forgotten about
-					   // them. At least, the
-					   // numbering was discussed
-					   // with the complaining
-					   // person back then when all
-					   // began :-)
-	  switch (dim)
-	    {
-	      case 1:
-	    {
-	      const unsigned int values[GeometryInfo<1>::vertices_per_cell]
-		= { 0, degree };
-	      index = values[i];
-	      break;
-	    };
-	     
-	      case 2:
-	    {
-	      const unsigned int values[GeometryInfo<2>::vertices_per_cell]
-		= { 0, degree, n*degree+degree, n*degree };
-	      index = values[i];
-	      break;
-	    };
-	     
-	      case 3:
-	    {
-	      const unsigned int values[GeometryInfo<3>::vertices_per_cell]
-		= { 0, degree,
-		    n*n*degree + degree, n*n*degree,
-		    n*degree, n*degree+degree,
-		    n*n*degree + n*degree+degree, n*n*degree + n*degree};
-	      index = values[i];
-	      break;
-	    };
-	     
-	      default:
-		Assert(false, ExcNotImplemented());
-	    }
-
-	  Assert (index<renumber.size(), ExcInternalError());
-	  renumber[index] = i;
-	}
-    };
-  
-				   // for degree 2 and higher: Lines,
-				   // quads, hexes etc also carry
-				   // degrees of freedom
-  if (degree > 1)
-    {
-      Assert (fe_data.dofs_per_line == degree-1, ExcInternalError());
-      Assert ((fe_data.dofs_per_quad == (degree-1)*(degree-1)) ||
-	      (dim < 2), ExcInternalError());
-      Assert ((fe_data.dofs_per_hex == (degree-1)*(degree-1)*(degree-1)) ||
-	      (dim < 3), ExcInternalError());
-	    
-      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::lines_per_cell); ++i)
-	{
-	  unsigned int index = fe_data.first_line_index + i*fe_data.dofs_per_line;
-	  unsigned int incr = 0;
-	  unsigned int tensorstart = 0;
-					   // This again looks quite
-					   // strange because of the odd
-					   // numbering scheme.
-	  switch (i+100*dim)
-	    {
-					       // lines in x-direction
-	      case 100:
-	      case 200: case 202:
-	      case 300: case 302: case 304: case 306:
-		incr = 1;
-		break;
-						 // lines in y-direction
-	      case 201: case 203:
-	      case 308: case 309: case 310: case 311:
-		incr = n;
-		break;
-						 // lines in z-direction
-	      case 301: case 303: case 305: case 307:
-		incr = n*n;
-		break;
-	      default:
-		Assert(false, ExcNotImplemented());
-	    }
-	  switch (i+100*dim)
-	    {
-					       // x=y=z=0
-	      case 100:
-	      case 200: case 203:
-	      case 300: case 303: case 308:
-		tensorstart = 0;
-		break;
-						 // x=1 y=z=0
-	      case 201:
-	      case 301: case 309:
-		tensorstart = degree;
-		break;
-						 // y=1 x=z=0
-	      case 202:
-	      case 304: case 307:
-		tensorstart = n*degree;
-		break;
-						 // x=z=1 y=0
-	      case 310:
-		tensorstart = n*n*degree+degree;
-		break;
-						 // z=1 x=y=0
-	      case 302: case 311:
-		tensorstart = n*n*degree;
-		break;
-						 // x=y=1 z=0
-	      case 305:
-		tensorstart = n*degree+degree;
-		break;
-						 // y=z=1 x=0
-	      case 306:
-		tensorstart = n*n*n-n;
-		break;
-	      default:
-		Assert(false, ExcNotImplemented());	      
-	    }
-	  
-	  for (unsigned int jx = 1; jx<degree ;++jx)
-	    {
-	      unsigned int tensorindex = tensorstart + jx * incr;
-	      Assert (tensorindex<renumber.size(), ExcInternalError());
-	      renumber[tensorindex] = index++;
-	    }
-	}
-
-      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::quads_per_cell); ++i)
-	{
-	  unsigned int index = fe_data.first_quad_index+i*fe_data.dofs_per_quad;
-	  unsigned int tensorstart = 0;
-	  unsigned int incx = 0;
-	  unsigned int incy = 0;
-	  switch (i)
-	    {
-	      case 0:
-		tensorstart = 0; incx = 1;
-		if (dim==2)
-		  incy = n;
-		else
-		  incy = n*n;
-		break;
-	      case 1:
-		tensorstart = n*degree; incx = 1; incy = n*n;
-		break;
-	      case 2:
-		tensorstart = 0; incx = 1; incy = n;
-		break;
-	      case 3:
-		tensorstart = degree; incx = n; incy = n*n;
-		break;
-	      case 4:
-		tensorstart = n*n*degree; incx = 1; incy = n;
-		break;
-	      case 5:
-		tensorstart = 0; incx = n; incy = n*n;
-		break;
-	      default:
-		Assert(false, ExcNotImplemented());	      
-	    }
-	  
-	  for (unsigned int jy = 1; jy<degree; jy++)
-	    for (unsigned int jx = 1; jx<degree ;++jx)
-	      {
-		unsigned int tensorindex = tensorstart
-					   + jx * incx + jy * incy;
-		Assert (tensorindex<renumber.size(), ExcInternalError());
-		renumber[tensorindex] = index++;
-	      }
-	}
-
-      if (GeometryInfo<dim>::hexes_per_cell > 0)
-	for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::hexes_per_cell); ++i)
-	  {
-	    unsigned int index = fe_data.first_hex_index;
-	    
-	    for (unsigned int jz = 1; jz<degree; jz++)
-	      for (unsigned int jy = 1; jy<degree; jy++)
-		for (unsigned int jx = 1; jx<degree; jx++)
-		  {
-		    const unsigned int tensorindex = jx + jy*n + jz*n*n;
-		    Assert (tensorindex<renumber.size(), ExcInternalError());
-		    renumber[tensorindex]=index++;
-		  }  
-	  } 
-    }
-
-  return renumber;
-}
-
-
-
-template <int dim>
-std::vector<unsigned int>
-FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
-{
-  const FiniteElementData<dim-1> fe_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
-  return FE_Q<dim-1>::lexicographic_to_hierarchic_numbering (fe_data, degree); 
-}
-
-
-#if (deal_II_dimension == 1)
-
-template <>
-std::vector<unsigned int>
-FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
-{
-  return std::vector<unsigned int>();
-}
-
-#endif
 
 
 template <int dim>
