@@ -60,9 +60,6 @@ I suppose the [mg_]get_dof_values really belongs to the
   [MG]CellAccessor. Correct this some time.
 
 
-FeValues: add flexibility for update flags
-
-
 No support points for non-Lagrangian elements? Check for Langrange in
 interpolation?
 
