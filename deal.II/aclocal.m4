@@ -2746,11 +2746,11 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG3, dnl
   CXXFLAGS="$CXXFLAGSG"
   case "$GXX_VERSION" in
     gcc*)
-	CXXFLAGS="$CXXFLAGS -Werror"
+	CXXFLAGS="$CXXFLAGSG -Werror"
 	;;
 
     MIPSpro*)
-	CXXFLAGS="$CXXFLAGS -diag_error 1174"
+	CXXFLAGS="$CXXFLAGSG -diag_error 1174"
 	;;
   esac
 
