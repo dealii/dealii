@@ -174,10 +174,10 @@ void test(const Triangulation<dim> &tria,
   
   data_out.build_patches (2);
   data_out.write_gnuplot(deallog.get_file_stream());
-  std::ofstream file2(file2_name.c_str());
-  file2.setf(std::ios::showpoint | std::ios::left);
-  data_out.write_gnuplot(file2);
-  file2.close();
+//  std::ofstream file2(file2_name.c_str());
+//  file2.setf(std::ios::showpoint | std::ios::left);
+//  data_out.write_gnuplot(file2);
+//  file2.close();
 };
 
 

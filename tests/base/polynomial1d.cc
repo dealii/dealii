@@ -50,7 +50,11 @@ int main ()
   deallog << "Legendre" << std::endl;
   
   for (unsigned int i=0;i<12;++i)
-    p.push_back (Legendre<double>(i));
+    {
+      p.push_back (Legendre<double>(i));
+      p[i].print(cout);
+    }
+  
   
   for (unsigned int i=0;i<p.size();++i)
     for (unsigned int j=0;j<=i;++j)

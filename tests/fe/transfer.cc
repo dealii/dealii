@@ -35,7 +35,9 @@
 
 char fname[50];
 
-#define TEST(l,el, deg) { el fe(deg); print_matrix(of, tr, l, fe, #el); }
+#define TEST(dim, l, el, deg) { el<dim> fe(deg); \
+  of << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
+  print_matrix(of, tr ## dim, l, fe, #el); }
 
 template<int dim>
 inline void
@@ -56,7 +58,6 @@ print_matrix(std::ostream& of,
   Vector<double> in(n_fine);
   Vector<double> out(n_coarse);
 
-  of << name << std::endl;
   for (unsigned int i=0;i<n_fine;++i)
     {
       in = 0.;
@@ -72,23 +73,43 @@ print_matrix(std::ostream& of,
 int
 main()
 {
-  Triangulation<2> tr;
+  Triangulation<2> tr2;
 
-  GridGenerator::hyper_cube(tr, -1., 1.);
-  tr.refine_global(2);
+  GridGenerator::hyper_cube(tr2, -1., 1.);
+  tr2.refine_global(2);
 
-  std::ofstream of("show_transfer.output");
+  Triangulation<3> tr3;
+
+  GridGenerator::hyper_cube(tr3, -1., 1.);
+  tr3.refine_global(3);
+
+  std::ofstream of("transfer.output");
   
-  TEST(1, FE_Q<2>, 1);
-  TEST(1, FE_Q<2>, 2);
-  TEST(1, FE_Q<2>, 3);
-//  TEST(1, FE_Q<2>, 4);
+  TEST(2, 1, FE_Q, 1);
+  TEST(2, 1, FE_Q, 2);
+  TEST(2, 1, FE_Q, 3);
+//  TEST(2, 1, FE_Q, 4);
 
-  TEST(1, FE_DGQ<2>, 0);
-  TEST(1, FE_DGQ<2>, 1);
-  TEST(1, FE_DGQ<2>, 2);
-  TEST(1, FE_DGQ<2>, 3);
-  TEST(1, FE_DGQ<2>, 4);
+  TEST(2, 1, FE_DGQ, 0);
+  TEST(2, 1, FE_DGQ, 1);
+  TEST(2, 1, FE_DGQ, 2);
+  TEST(2, 1, FE_DGQ, 3);
+  TEST(2, 1, FE_DGQ, 4);
+
+  TEST(2, 1, FE_DGP, 0);
+  TEST(2, 1, FE_DGP, 1);
+  TEST(2, 1, FE_DGP, 2);
+  TEST(2, 1, FE_DGP, 3);
+  TEST(2, 1, FE_DGP, 4);
+  TEST(2, 1, FE_DGP, 5);
+  TEST(2, 1, FE_DGP, 6);
+
+  TEST(3, 1, FE_DGP, 0);
+  TEST(3, 1, FE_DGP, 1);
+  TEST(3, 1, FE_DGP, 2);
+  TEST(3, 1, FE_DGP, 3);
+  TEST(3, 1, FE_DGP, 4);
 
   return 0;
 }
+

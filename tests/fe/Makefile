@@ -33,11 +33,11 @@ mapping_q1_eulerian.exe : mapping_q1_eulerian.go $(libraries)
 non_primitive_1.exe     : non_primitive_1.go     $(libraries)
 numbering.exe           : numbering.go           $(libraries)
 shapes.exe              : shapes.go              $(libraries)
-show_transfer.exe	: show_transfer.go	 $(libraries)
+transfer.exe		: transfer.go		 $(libraries)
 
 tests = derivatives fe_data_test fe_traits fe_tools_test mapping \
         mapping_c1 shapes numbering mapping_q1_eulerian \
-        show_transfer internals \
+        transfer internals \
         non_primitive_1
 
 ############################################################
