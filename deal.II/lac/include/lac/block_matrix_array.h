@@ -24,10 +24,8 @@
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
-#  define STRINGSTREAM std::ostringstream
 #else
 #  include <strstream>
-#  define STRINGSTREAM std::ostrstream
 #endif
 
 //TODO:[GK] Obtain aux vector from VectorMemory
@@ -131,7 +129,7 @@ class BlockMatrixArray : public Subscriptor
 				      * Print the block structure as a
 				      * LaTeX-array.
 				      */
-    void print_latex (ostream& out) const;
+    void print_latex (std::ostream& out) const;
     
   protected:
 				     /**
@@ -507,14 +505,14 @@ BlockMatrixArray<MATRIX>::n_block_cols () const
 template <class MATRIX>
 inline
 void
-BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
+BlockMatrixArray<MATRIX>::print_latex (std::ostream& out) const
 {
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')
       << "}" << std::endl;
 
   Table<2,std::string> array(n_block_rows(), n_block_cols());
-  typedef map<const MATRIX*, std::string> NameMap;
+  typedef std::map<const MATRIX*, std::string> NameMap;
   NameMap matrix_names;
   
   typename std::vector<Entry>::const_iterator m = entries.begin();
@@ -527,21 +525,39 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
 	{
 	  std::pair<typename NameMap::iterator, bool> x =
 	    matrix_names.insert(
-	      std::pair<const MATRIX*, std::string> (m->matrix, std::string("M")));
-	  STRINGSTREAM stream;
+	      std::pair<const MATRIX*, std::string> (m->matrix,
+                                                     std::string("M")));
+#ifdef HAVE_STD_STRINGSTREAM
+          std::ostringstream stream;
+#else
+          std::ostrstream stream;
+#endif
+
 	  stream << matrix_number++;
-	  stream << std::ends;
+
+#ifndef HAVE_STD_STRINGSTREAM
+          stream << std::ends;
+#endif
 	  x.first->second += stream.str();
 	}
 
-      STRINGSTREAM stream;
+#ifdef HAVE_STD_STRINGSTREAM
+          std::ostringstream stream;
+#else
+          std::ostrstream stream;
+#endif
+
       if (m->prefix != 1.)
 	stream << " " << m->prefix << 'x';
       stream << matrix_names.find(m->matrix)->second;
       stream << '(' << m->matrix << ')';
       if (m->transpose)
 	stream << "^T";
+
+#ifndef HAVE_STD_STRINGSTREAM
       stream << std::ends;
+#endif
+      
       array(m->row, m->col) += stream.str();
     }
   for (unsigned int i=0;i<n_block_rows();++i)
