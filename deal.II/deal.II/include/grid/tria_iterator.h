@@ -238,6 +238,15 @@ template <int dim, typename Accessor>
 class TriaRawIterator : public bidirectional_iterator<Accessor,int>{
   public:
 				     /**
+				      * Declare the type of the Accessor for
+				      * use in the outside world. This way other
+				      * functions can use the Accessor's type
+				      * without knowledge of how the exact
+				      * implementation actually is.
+				      */
+    typedef Accessor AccessorType;
+    
+				     /**
 				      *  Empty constructor. Such an object
 				      *  is not usable!
 				      */
