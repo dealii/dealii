@@ -208,9 +208,11 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
 #ifdef DEAL_II_USE_MT
   const unsigned int stride = timesteps.size() / n_threads;
   Threads::ThreadManager thread_manager;
+  void (TimeDependent::*p) (unsigned int, unsigned int)
+    = &TimeDependent::end_sweep;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate (&TimeDependent::end_sweep)
+		    Threads::encapsulate (p)
 		    .collect_args (this, i*stride,
 				   (i == n_threads-1 ?
 				    timesteps.size() :
