@@ -624,14 +624,13 @@ double dFMatrix::matrix_scalar_product (const dVector &u, const dVector &v) cons
 
 
 
-void dFMatrix::print (FILE* f, const char* format) const
+void dFMatrix::print (ostream& s, int w, int p) const
 {
-  if (!format) format = " %5.2f";
   unsigned int i,j;
   for (i=0;i<m();i++)
     {
-      for (j=0;j<n();j++) fprintf(f, format, el(i,j));
-      fprintf(f, "\n");
+      for (j=0;j<n();j++) s << setw(w) << setprecision(p) << el(i,j);
+      s << endl;
     }
 }
 

@@ -400,7 +400,7 @@ class dFMatrix
 				     /**
 				      * Output of the matrix in user-defined format.
 				      */
-    void print (FILE* fp, const char* format = 0) const;
+    void print (ostream& s, int width=5, int precision=2) const;
 
 				     /**
 				      * Print the matrix in the usual format,
