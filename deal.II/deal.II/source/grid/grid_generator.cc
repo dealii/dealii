@@ -656,32 +656,32 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
 				   // altogether
   Assert(false, ExcNotImplemented());
   
-  const double a = 1./(1+std::sqrt(3)); // equilibrate cell sizes at transition
-				        // from the inner part to the radial
-				        // cells
+  const double a = 1./(1+std::sqrt(3.0)); // equilibrate cell sizes at transition
+				          // from the inner part to the radial
+				          // cells
   const unsigned int n_vertices = 16;
   const Point<3> vertices[n_vertices]
     = {
 				     // first the vertices of the inner
 				     // cell
-      p+Point<3>(-1,-1,-1)*(radius/sqrt(3)*a),
-      p+Point<3>(+1,-1,-1)*(radius/sqrt(3)*a),
-      p+Point<3>(+1,+1,-1)*(radius/sqrt(3)*a),
-      p+Point<3>(-1,+1,-1)*(radius/sqrt(3)*a),
-      p+Point<3>(-1,-1,+1)*(radius/sqrt(3)*a),
-      p+Point<3>(+1,-1,+1)*(radius/sqrt(3)*a),
-      p+Point<3>(+1,+1,+1)*(radius/sqrt(3)*a),
-      p+Point<3>(-1,+1,+1)*(radius/sqrt(3)*a),
+      p+Point<3>(-1,-1,-1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(+1,-1,-1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(+1,-1,+1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(+1,+1,+1)*(radius/std::sqrt(3.0)*a),
+      p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0)*a),
 				       // now the eight vertices at
 				       // the outer sphere
-      p+Point<3>(-1,-1,-1)*(radius/sqrt(3)),
-      p+Point<3>(+1,-1,-1)*(radius/sqrt(3)),
-      p+Point<3>(+1,+1,-1)*(radius/sqrt(3)),
-      p+Point<3>(-1,+1,-1)*(radius/sqrt(3)),
-      p+Point<3>(-1,-1,+1)*(radius/sqrt(3)),
-      p+Point<3>(+1,-1,+1)*(radius/sqrt(3)),
-      p+Point<3>(+1,+1,+1)*(radius/sqrt(3)),
-      p+Point<3>(-1,+1,+1)*(radius/sqrt(3))
+      p+Point<3>(-1,-1,-1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(+1,-1,-1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(+1,-1,+1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(+1,+1,+1)*(radius/std::sqrt(3.0)),
+      p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0))
       };
 
 				   // one needs to draw the seven cubes to
