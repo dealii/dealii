@@ -296,7 +296,7 @@ SparsityPattern::reinit (const unsigned int m,
 				   // set the rowstart array 
   rowstart[0] = 0;
   for (unsigned int i=1; i<=rows; ++i)
-    rowstart[i] = rowstart[i-1]+row_lengths[i-1];
+    rowstart[i] = rowstart[i-1]+min(row_lengths[i-1],n);
   Assert (rowstart[rows]==vec_len, ExcInternalError());
 
 				   // preset the column numbers by a
