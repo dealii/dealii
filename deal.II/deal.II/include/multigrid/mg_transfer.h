@@ -249,8 +249,20 @@ class MGTransferBlockBase
 				      */
     DeclException0(ExcMatricesNotBuilt);
 
+#ifdef DEAL_PREFER_MATRIX_EZ
+  protected:
+  
+				     /**
+				      * The actual prolongation matrix.
+				      * column indices belong to the
+				      * dof indices of the mother cell,
+				      * i.e. the coarse level.
+				      * while row indices belong to the
+				      * child cell, i.e. the fine level.
+				      */
+    std::vector<BlockSparseMatrixEZ<double> > prolongation_matrices;
+#else
   private:
-
     std::vector<BlockSparsityPattern>   prolongation_sparsities;
 
   protected:
@@ -264,6 +276,7 @@ class MGTransferBlockBase
 				      * child cell, i.e. the fine level.
 				      */
     std::vector<BlockSparseMatrix<double> > prolongation_matrices;
+#endif
 };
 
 

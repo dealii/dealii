@@ -11,6 +11,7 @@
 //
 //-----------------------------------------------------------------------
 
+#include <base/logstream.h>
 
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
@@ -167,9 +168,6 @@ void MGTransferBlockBase::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
   std::vector<bool> select) 
 {
-  prolongation_matrices.clear();
-  prolongation_sparsities.clear();
-
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;  
@@ -185,7 +183,11 @@ void MGTransferBlockBase::build_matrices (
   
 				   // reset the size of the array of
 				   // matrices
+  prolongation_matrices.clear();
+#ifndef DEAL_PREFER_MATRIX_EZ
+  prolongation_sparsities.clear();
   prolongation_sparsities.resize (n_levels-1);
+#endif
   prolongation_matrices.resize (n_levels-1);
 
 				   // two fields which will store the
@@ -211,6 +213,26 @@ void MGTransferBlockBase::build_matrices (
 				       // is necessary. this, is the
 				       // number of degrees of freedom
 				       // per cell
+#ifdef DEAL_PREFER_MATRIX_EZ
+//TODO:[GK] Optimize here: 
+// this allocates too much memory, since the cell matrices contain
+// many zeroes. If SparseMatrixEZ::reinit can handle a vector of
+// row-lengths, this should be used here to specify the length of
+// every single row.
+
+      prolongation_matrices[level].reinit (n_components, n_components);
+      for (unsigned int i=0;i<n_components;++i)
+	for (unsigned int j=0;j<n_components;++j)
+	  if (i==j)
+	    prolongation_matrices[level].block(i,j).reinit(
+	      sizes[level+1][i],
+	      sizes[level][j], dofs_per_cell, 0);
+	  else
+	    prolongation_matrices[level].block(i,j).reinit(
+	      sizes[level+1][i],
+	      sizes[level][j], 0);
+      prolongation_matrices[level].collect_sizes();
+#else
       prolongation_sparsities[level].reinit (n_components, n_components);
       for (unsigned int i=0;i<n_components;++i)
 	for (unsigned int j=0;j<n_components;++j)
@@ -264,7 +286,7 @@ void MGTransferBlockBase::build_matrices (
       prolongation_sparsities[level].compress ();
 
       prolongation_matrices[level].reinit (prolongation_sparsities[level]);
-
+#endif
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -325,7 +347,19 @@ void MGTransferBlockBase::build_matrices (
       component_start[i] = k;
       k += t;
     }
-  
+#if defined(DEAL_PREFER_MATRIX_EZ) && 1 == 0
+  deallog.push("Transfer");
+  for (unsigned int level=0;level<n_levels-1; ++level)
+    for (unsigned int i=0;i<n_components;++i)
+      for (unsigned int j=0;j<n_components;++j)
+	{
+	  deallog << "level " << level
+		  << " block " << i << ' ' << j << std::endl;
+	  
+	  prolongation_matrices[level].block(i,j).print_statistics(deallog,true);
+	}
+  deallog.pop();
+#endif  
 }
 
 
