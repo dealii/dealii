@@ -17,9 +17,15 @@
 
 namespace GridOutFlags
 {
-  DX::DX (const bool write_faces,
+  DX::DX (const bool write_cells,
+	  const bool write_faces,
+	  const bool write_diameter,
+	  const bool write_measure,
 	  const bool write_all_faces) :
+    write_cells (write_cells),
     write_faces (write_faces),
+    write_diameter (write_diameter),
+    write_measure (write_measure),
     write_all_faces (write_all_faces)
   {};
 

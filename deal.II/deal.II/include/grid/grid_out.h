@@ -40,21 +40,38 @@ namespace GridOutFlags
   struct DX
   {
 				     /**
-				      * Write faces instead of
-				      * cells. Defaults to false.
+				      * Write cells.
+				      */
+    bool write_cells;
+      
+				     /**
+				      * Write faces.
 				      */
     bool write_faces;
+
+				     /**
+				      * Write field with diameters.
+				      */
+    bool write_diameter;
+
+				     /**
+				      * Write field with area/volume.
+				      */
+    bool write_measure;      
+				      
 				     /**
 				      * Write all faces, including
-				      * interior faces. Default is to
-				      * write boundary faces only.
+				      * interior faces.
 				      */
     bool write_all_faces;
     
 				     /**
 				      * Constructor.
 				      */
-    DX (const bool write_faces = false,
+    DX (const bool write_cells = true,
+	const bool write_faces = false,
+	const bool write_diameter = false,
+	const bool write_measure = false,
 	const bool write_all_faces = false);  
   };			   
     
@@ -714,10 +731,10 @@ class GridOut
     DeclException0 (ExcInvalidState);
 
   private:
-				   /**
-				    * Flags for OpenDX output.
-				    */
-  GridOutFlags::DX dx_flags;
+				     /**
+				      * Flags for OpenDX output.
+				      */
+    GridOutFlags::DX dx_flags;
   
 				     /**
 				      * Flags for UCD output. Can be

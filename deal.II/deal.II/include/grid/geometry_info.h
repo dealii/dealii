@@ -127,6 +127,28 @@ struct GeometryInfo<1>
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
+
+				     /**
+				      * Rearrange verices for OpenDX
+				      * output.  For a cell being
+				      * written in OpenDX format, each
+				      * entry in this field contains
+				      * the number of a vertex in
+				      * @p{deal.II} that corresponds
+				      * to the DX numbering at this
+				      * location.
+				      *
+				      * Typical example: write a cell
+				      * and arrange the vertices, such
+				      * that OpenDX understands them.
+				      *
+				      * \begin{verbatim}
+				      * for (i=0; i< n_vertices; ++i)
+				      *   out << cell->vertex(dx_to_deal[i]);
+				      * \end{verbatim}
+				      */
+    static const unsigned int dx_to_deal[vertices_per_cell];
+
 				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of
@@ -356,6 +378,27 @@ struct GeometryInfo<2>
     static const unsigned int opposite_face[faces_per_cell];
     
 				     /**
+				      * Rearrange verices for OpenDX
+				      * output.  For a cell being
+				      * written in OpenDX format, each
+				      * entry in this field contains
+				      * the number of a vertex in
+				      * @p{deal.II} that corresponds
+				      * to the DX numbering at this
+				      * location.
+				      *
+				      * Typical example: write a cell
+				      * and arrange the vertices, such
+				      * that OpenDX understands them.
+				      *
+				      * \begin{verbatim}
+				      * for (i=0; i< n_vertices; ++i)
+				      *   out << cell->vertex(dx_to_deal[i]);
+				      * \end{verbatim}
+				      */
+    static const unsigned int dx_to_deal[vertices_per_cell];
+
+				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of
 				      * the mother cell.
@@ -493,6 +536,27 @@ struct GeometryInfo<3>
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
+				     /**
+				      * Rearrange verices for OpenDX
+				      * output.  For a cell being
+				      * written in OpenDX format, each
+				      * entry in this field contains
+				      * the number of a vertex in
+				      * @p{deal.II} that corresponds
+				      * to the DX numbering at this
+				      * location.
+				      *
+				      * Typical example: write a cell
+				      * and arrange the vertices, such
+				      * that OpenDX understands them.
+				      *
+				      * \begin{verbatim}
+				      * for (i=0; i< n_vertices; ++i)
+				      *   out << cell->vertex(dx_to_deal[i]);
+				      * \end{verbatim}
+				      */
+    static const unsigned int dx_to_deal[vertices_per_cell];
+
 				     /**
 				      * This field store which child cells
 				      * are adjacent to a certain face of

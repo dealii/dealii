@@ -27,14 +27,232 @@
 #include <cmath>
 
 
+#if deal_II_dimension == 1
+
+
 template <int dim>
-void GridOut::write_dx (const Triangulation<dim> &/*tria*/,
+void GridOut::write_dx (const Triangulation<dim> &,
+			std::ostream             &)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#else
+
+
+template <int dim>
+void GridOut::write_dx (const Triangulation<dim> &tria,
 			std::ostream             &out) 
 {
-  Assert(false, ExcNotImplemented());
+//  Assert(false, ExcNotImplemented());
   AssertThrow (out, ExcIO());
-};
+				   // Copied and adapted from write_ucd
+  const std::vector<Point<dim> > &vertices    = tria.get_vertices();
+  const std::vector<bool>        &vertex_used = tria.get_used_vertices();
+  
+  const unsigned int n_vertices = tria.n_used_vertices();
 
+  typename Triangulation<dim>::active_cell_iterator       cell;
+  const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
+
+  
+				   // write the vertices
+  out << "object \"vertices\" class array type float rank 1 shape " << dim
+      << " items " << n_vertices << " data follows"
+      << std::endl;
+  
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    if (vertex_used[i])
+      {
+	out << '\t' << vertices[i] << std::endl;
+      };
+  
+				   // write cells or faces
+  const bool write_cells = dx_flags.write_cells;
+  const bool write_faces = (dim>1) ? dx_flags.write_faces : false;
+  
+  const unsigned int n_cells = tria.n_active_cells();
+  const unsigned int n_faces = tria.n_active_cells()
+			       * GeometryInfo<dim>::faces_per_cell;
+
+  const unsigned int n_vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
+  const unsigned int n_vertices_per_face = GeometryInfo<dim>::vertices_per_face;
+  
+  if (write_cells)
+    {
+      out << "object \"cells\" class array type int rank 1 shape "
+	  << n_vertices_per_cell
+	  << " items " << n_cells << " data follows" << std::endl;
+      
+      for (cell = tria.begin_active(); cell != endc; ++cell)
+	{
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	    out << '\t' << cell->vertex_index(GeometryInfo<dim>::dx_to_deal[v]);
+	  out << std::endl;
+	}
+      out << "attribute \"element type\" string \"";
+      if (dim==1) out << "lines";
+      if (dim==2) out << "quads";
+      if (dim==3) out << "cubes";
+      out << "\"" << std::endl
+	  << "attribute \"ref\" string \"positions\"" << std::endl << std::endl;
+
+				       // Additional cell information
+      
+      out << "object \"material\" class array type int rank 0 items "
+	  << n_cells << " data follows" << std::endl;
+      for (cell = tria.begin_active(); cell != endc; ++cell)
+	out << ' ' << (unsigned int)cell->material_id();
+      out  << std::endl
+	   << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+      
+      out << "object \"level\" class array type int rank 0 items "
+	  << n_cells << " data follows" << std::endl;
+      for (cell = tria.begin_active(); cell != endc; ++cell)
+	out << ' ' << cell->level();
+      out  << std::endl
+	   << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+      
+      if (dx_flags.write_measure)
+	{
+	  out << "object \"measure\" class array type float rank 0 items "
+	      << n_cells << " data follows" << std::endl;
+	  for (cell = tria.begin_active(); cell != endc; ++cell)
+	    out << '\t' << cell->measure();
+	  out  << std::endl
+	       << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	}
+      
+      if (dx_flags.write_diameter)
+	{
+	  out << "object \"diameter\" class array type float rank 0 items "
+	      << n_cells << " data follows" << std::endl;
+	  for (cell = tria.begin_active(); cell != endc; ++cell)
+	    out << '\t' << cell->diameter();
+	  out  << std::endl
+	       << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	}
+    }
+  
+  if (write_faces)
+    {
+      out << "object \"faces\" class array type int rank 1 shape "
+	  << n_vertices_per_face
+	  << " items " << n_faces << " data follows"
+	  << std::endl;
+
+      for (cell = tria.begin_active(); cell != endc; ++cell)
+	{
+	  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+	    {
+	      typename Triangulation<dim>::face_iterator face = cell->face(f);
+	      
+	      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+		out << '\t' << face->vertex_index(GeometryInfo<dim-1>::dx_to_deal[v]);
+	      out << std::endl;
+	    }
+	}
+      out << "attribute \"element type\" string \"";
+      if (dim==2) out << "lines";
+      if (dim==3) out << "quads";
+      out << "\"" << std::endl
+	  << "attribute \"ref\" string \"positions\"" << std::endl << std::endl;
+      
+
+				       // Additional face information
+      
+      out << "object \"boundary\" class array type int rank 0 items "
+	  << n_faces << " data follows" << std::endl;
+      for (cell = tria.begin_active(); cell != endc; ++cell)
+	{
+					   // Little trick to get -1
+					   // for the interior
+	  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+	    out << ' ' << (int)(signed char)cell->face(f)->boundary_indicator();
+	  out << std::endl;
+	}
+      out << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+      
+      if (dx_flags.write_measure)
+	{
+	  out << "object \"face measure\" class array type float rank 0 items "
+	      << n_faces << " data follows" << std::endl;
+	  for (cell = tria.begin_active(); cell != endc; ++cell)
+	    {
+	      for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+		out << ' ' << cell->face(f)->measure();
+	      out << std::endl;
+	    }
+	  out << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	}
+
+      if (dx_flags.write_diameter)
+	{
+	  out << "object \"face diameter\" class array type float rank 0 items "
+	      << n_faces << " data follows" << std::endl;
+	  for (cell = tria.begin_active(); cell != endc; ++cell)
+	    {
+	      for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+		out << ' ' << cell->face(f)->diameter();
+	      out << std::endl;
+	    }
+	  out << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	}
+
+    }
+  
+
+				   // Write additional face information
+  
+  if (write_faces)
+    {
+      
+    }
+  else
+    {
+     }
+
+				   // The wrapper
+  out << "object \"deal data\" class field" << std::endl
+      << "component \"positions\" value \"vertices\"" << std::endl
+      << "component \"connections\" value \"cells\"" << std::endl;
+
+  if (write_cells)
+    {
+      out << "object \"cell data\" class field" << std::endl
+	  << "component \"positions\" value \"vertices\"" << std::endl
+	  << "component \"connections\" value \"cells\"" << std::endl;
+      out << "component \"material\" value \"material\"" << std::endl;
+      out << "component \"level\" value \"level\"" << std::endl;
+      if (dx_flags.write_measure)
+	out << "component \"measure\" value \"measure\"" << std::endl;
+      if (dx_flags.write_diameter)
+	out << "component \"diameter\" value \"diameter\"" << std::endl;
+    }
+
+  if (write_faces)
+    {
+      out << "object \"face data\" class field" << std::endl
+	  << "component \"positions\" value \"vertices\"" << std::endl
+	  << "component \"connections\" value \"faces\"" << std::endl;
+      out << "component \"boundary\" value \"boundary\"" << std::endl;
+      if (dx_flags.write_measure)
+	out << "component \"measure\" value \"face measure\"" << std::endl;
+      if (dx_flags.write_diameter)
+	out << "component \"diameter\" value \"face diameter\"" << std::endl;
+    }
+  
+  out << std::endl
+      << "object \"grid data\" class group" << std::endl;
+    if (write_cells)
+      out << "member \"cells\" value \"cell data\"" << std::endl;
+    if (write_faces)
+      out << "member \"faces\" value \"face data\"" << std::endl;
+  out << "end" << std::endl;  
+}
+
+
+#endif
 
 
 template <int dim>

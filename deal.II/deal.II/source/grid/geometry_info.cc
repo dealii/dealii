@@ -66,6 +66,19 @@ const unsigned int GeometryInfo<3>::opposite_face[GeometryInfo<3>::faces_per_cel
 
 
 
+const unsigned int GeometryInfo<1>::dx_to_deal[GeometryInfo<1>::vertices_per_cell]
+= { 0, 1};
+
+
+const unsigned int GeometryInfo<2>::dx_to_deal[GeometryInfo<2>::vertices_per_cell]
+= { 0, 3, 1, 2};
+
+
+const unsigned int GeometryInfo<3>::dx_to_deal[GeometryInfo<3>::vertices_per_cell]
+= { 0, 3, 4, 7, 1, 2, 5, 6};
+
+
+
 
 
 unsigned int
