@@ -173,18 +173,6 @@ class FESystem : public FiniteElement<dim>
     virtual unsigned int memory_consumption () const;
     
 				     /**
-				      * Compute flags for initial
-				      * update only.
-				      */
-    virtual UpdateFlags update_once (UpdateFlags flags) const;
-  
-				     /**
-				      * Compute flags for update on
-				      * each cell.
-				      */
-    virtual UpdateFlags update_each (UpdateFlags flags) const;
-
-				     /**
 				      * Return the support points of
 				      * the trial functions on the
 				      * unit cell.
@@ -223,6 +211,18 @@ class FESystem : public FiniteElement<dim>
     virtual void get_unit_face_support_points (typename std::vector<Point<dim-1> > &) const;    
   
   protected:
+				     /**
+				      * Compute flags for initial
+				      * update only.
+				      */
+    virtual UpdateFlags update_once (UpdateFlags flags) const;
+  
+				     /**
+				      * Compute flags for update on
+				      * each cell.
+				      */
+    virtual UpdateFlags update_each (UpdateFlags flags) const;
+
 				     /**
 				      * @p{clone} function instead of
 				      * a copy constructor.
