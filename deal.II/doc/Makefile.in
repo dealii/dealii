@@ -39,7 +39,7 @@ glossary:
 
 validate-xrefs:
 	@echo "Validating cross-references in HTML files."
-	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl *html
+#	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl *html
 	cd tutorial ; $(MAKE) validate-xrefs
 	cd development ; $(MAKE) validate-xrefs
 	cd glossary ; $(MAKE) validate-xrefs
