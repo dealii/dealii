@@ -176,7 +176,12 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 					   // columns are sorted within each
 					   // row correctly, but excluding
 					   // the main diagonal entry
-	  bool left_of_diagonal = true;
+	  const int global_index_ki = sparsity(*col_ptr,row);
+
+	  if (global_index_ki != -1)
+	    diag_element(row) -= global_entry(global_index_ik) *
+				 global_entry(global_index_ki);
+
 	  for (const unsigned int * j = col_ptr+1;
 	       j<&column_numbers[rowstart_indices[row+1]];
 	       ++j)
@@ -191,26 +196,6 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 					       // row linearly. I just didn't
 					       // have the time to figure out
 					       // the details.
-	      
-					       // check whether we have just
-					       // traversed the diagonal
-					       //
-					       // note that j should never point
-					       // to the diagonal itself!
-	      if (left_of_diagonal && (*j > row))
-		{
-		  Assert (*j != row, ExcInternalError());
-		  
-		  left_of_diagonal = false;
-						   // a[i,i] -= a[i,k]*a[k,i]
-		  const int global_index_ki = sparsity(*col_ptr,row);
-
-		  if (global_index_ki != -1)
-		    diag_element(row) -= global_entry(global_index_ik) *
-					 global_entry(global_index_ki);
-		  
-		};
-	      
        	      const int global_index_ij = j - &column_numbers[0],
 			global_index_kj = sparsity(*col_ptr,*j);
 	      if ((global_index_ij != -1) &&
@@ -220,6 +205,12 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 	    };
 	};
     };
+
+				   // Here the very last diagonal
+				   // element still has to be inverted
+				   // because the for-loop doesn't do
+				   // it...
+ diag_element(m()-1)=1./diag_element(m()-1);
 
 /*
   OLD CODE, rather crude first implementation with an algorithm taken

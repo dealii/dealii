@@ -164,16 +164,20 @@ class SparseILU : protected SparseMatrix<number>
     void reinit (const SparsityPattern &sparsity);
 
 				     /**
-				      * Perform the incomplete LU factorization
-				      * of the given matrix.
+				      * Perform the incomplete LU
+				      * factorization of the given
+				      * matrix.
 				      *
-				      * Note that the sparsity structures of
-				      * the decomposition and the matrix passed
-				      * to this function need not be equal,
-				      * but that the pattern used by this
-				      * matrix needs to contain all elements
-				      * used by the matrix to be decomposed.
-				      * Fill-in is thus allowed.
+				      * Note that the sparsity
+				      * structures of the
+				      * decomposition and the matrix
+				      * passed to this function need
+				      * not be equal, but that the
+				      * pattern used by this matrix
+				      * needs to contain all elements
+				      * used by the matrix to be
+				      * decomposed.  Fill-in is thus
+				      * allowed.
 				      */
     template <typename somenumber>
     void decompose (const SparseMatrix<somenumber> &matrix,
@@ -189,7 +193,9 @@ class SparseILU : protected SparseMatrix<number>
 			      const Vector<somenumber> &src) const;
 
 				     /**
-				      * Same as @p{apply_decomposition}, format for LAC.
+				      * Same as
+				      * @p{apply_decomposition},
+				      * format for LAC.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,

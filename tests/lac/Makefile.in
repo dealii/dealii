@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000 by the deal.II authors
+# Copyright (C) 2000, 2001 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -134,6 +134,22 @@ solver-o-files = $(solver-cc-files:.cc=.o)
 endif
 
 solver.testcase: $(solver-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+
+############################################################
+
+
+sparse_ilu-cc-files = sparse_ilu.cc testmatrix.cc
+
+ifeq ($(debug-mode),on)
+sparse_ilu-o-files = $(sparse_ilu-cc-files:.cc=.go)
+else
+sparse_ilu-o-files = $(sparse_ilu-cc-files:.cc=.o)
+endif
+
+sparse_ilu.testcase: $(sparse_ilu-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
