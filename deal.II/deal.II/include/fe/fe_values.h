@@ -40,18 +40,19 @@
 
 template <int dim> class Quadrature;
 
+//TODO: Add access to mapping values to FEValuesBase
 
 /*!@addtogroup febase */
 /*@{*/
 
 /**
- * Contains all data vectors for @p FEValues.
- * This class has been extracted from @p FEValuesBase to be handed
- * over to the fill functions of @p Mapping and
- * @p FiniteElement.
+ * Contains all data vectors for FEValues.
+ * This class has been extracted from FEValuesBase to be handed
+ * over to the fill functions of Mapping and
+ * FiniteElement.
  *
  * @note All data fields are public, but this is not
- * critical, because access to this object is private in @p FEValues.
+ * critical, because access to this object is private in FEValues.
  *
  * @author Guido Kanschat, 2000
  */
@@ -92,14 +93,14 @@ class FEValuesData
 				      * shape function number equals
 				      * the row number. Otherwise, use
 				      * the
-				      * @p shape_function_to_row_table
+				      * #shape_function_to_row_table
 				      * array to get at the first row
 				      * that belongs to this
 				      * particular shape function, and
 				      * navigate among all the rows
 				      * for this shape function using
 				      * the
-				      * @p FiniteElement::get_nonzero_components
+				      * FiniteElement::get_nonzero_components()
 				      * function which tells us which
 				      * components are non-zero and
 				      * thus have a row in the array
@@ -111,7 +112,7 @@ class FEValuesData
 				      * Storage type for
 				      * gradients. The layout of data
 				      * is the same as for the
-				      * ShapeVector data type.
+				      * #ShapeVector data type.
 				      */
     typedef std::vector<std::vector<Tensor<1,dim> > > GradientVector;
 
@@ -155,7 +156,7 @@ class FEValuesData
 				      * times the Jacobi determinant
 				      * at the quadrature points. This
 				      * function is reset each time
-				      * @p reinit is called. The
+				      * reinit() is called. The
 				      * Jacobi determinant is actually
 				      * the reciprocal value of the
 				      * Jacobi matrices stored in this
@@ -167,7 +168,7 @@ class FEValuesData
 
 				     /**
 				      * Array of quadrature points. This array
-				      * is set up upon calling @p reinit and
+				      * is set up upon calling reinit() and
 				      * contains the quadrature points on the
 				      * real element, rather than on the
 				      * reference element.
@@ -191,8 +192,9 @@ class FEValuesData
 				     /**
 				      * Indicate the first row which a
 				      * given shape function occupies
-				      * in the @p ShapeVector,
-				      * @p ShapeGradient, etc
+				      * in the #shape_values,
+				      * #shape_gradients and
+				      * #shape_2nd_derivatives
 				      * arrays. If all shape functions
 				      * are primitive, then this is
 				      * the identity mapping. If, on
@@ -211,7 +213,7 @@ class FEValuesData
 				      * follows: we allocate one row
 				      * for each non-zero component as
 				      * indicated by the
-				      * <tt>FiniteElement::get_nonzero_components()</tt>
+				      * FiniteElement::get_nonzero_components()
 				      * function, and the rows are in
 				      * ascending order exactly those
 				      * non-zero components.
@@ -221,7 +223,7 @@ class FEValuesData
                                      /**
 				      * Original update flags handed
 				      * to the constructor of
-				      * @p FEValues.
+				      * FEValues.
 				      */
     UpdateFlags          update_flags;
 };
@@ -230,21 +232,22 @@ class FEValuesData
 /**
  * @brief Common features of <tt>FEValues*</tt> classes.
  *
- * <tt>FEValues*</tt> objects are programming interfaces to finite element
- * and mapping classes on the one hand side, to cells and quadrature
- * rules on the other side. The reason for their existence is possible
- * optimization. Depending on the type of finite element and mapping,
- * some values can be computed once on the unit cell. Others must be
- * computed on each cell, but maybe computation of several values at
- * the same time offers ways for optimization. Since this interlay may
- * be complex and depends on the actual finite element, it cannot be
- * left to the applications programmer.
+ * FEValues, FEFaceValues and FESubfaceValues objects are programming
+ * interfaces to finite element and mapping classes on the one hand
+ * side, to cells and quadrature rules on the other side. The reason
+ * for their existence is possible optimization. Depending on the type
+ * of finite element and mapping, some values can be computed once on
+ * the unit cell. Others must be computed on each cell, but maybe
+ * computation of several values at the same time offers ways for
+ * optimization. Since this interlay may be complex and depends on the
+ * actual finite element, it cannot be left to the applications
+ * programmer.
  *
- * <tt>FEValues*</tt> provides only data handling: computations are left to
- * objects of type Mapping and FiniteElement. These
- * provide functions <tt>get_*_data</tt> and <tt>fill_*_values</tt> which are
- * called by the constructor and <tt>reinit</tt> functions of
- * <tt>FEValues*</tt>, respectively.
+ * FEValues, FEFaceValues and FESubfaceValues provide only data
+ * handling: computations are left to objects of type Mapping and
+ * FiniteElement. These provide functions <tt>get_*_data</tt> and
+ * <tt>fill_*_values</tt> which are called by the constructor and
+ * <tt>reinit</tt> functions of <tt>FEValues*</tt>, respectively.
  *
  * @sect3{FEValuesBaseGeneral General usage}
  *
@@ -500,6 +503,72 @@ class FEValuesBase : protected FEValuesData<dim>
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
 			      std::vector<Vector<number> > &values) const;
+
+				     /**
+				      * Generate function values from
+				      * an arbitrary vector.
+				      * 
+				      * This function offers the
+				      * possibility to extract
+				      * function values in quadrature
+				      * points from vectors not
+				      * corresponding to a whole
+				      * discretization.
+				      *
+				      * You may want to use this
+				      * function, if you want to
+				      * access just a single block
+				      * from a BlockVector, if you
+				      * have a multi-level vector or
+				      * if you already have a local
+				      * representation of your finite
+				      * element data.
+				      */
+    template <class InputVector, typename number>
+    void get_function_values (const InputVector& fe_function,
+			      const std::vector<unsigned int>& indices,
+			      std::vector<number>& values) const;
+
+				     /**
+				      * Generate vector function
+				      * values from an arbitrary
+				      * vector.
+				      *
+				      * This function offers the
+				      * possibility to extract
+				      * function values in quadrature
+				      * points from vectors not
+				      * corresponding to a whole
+				      * discretization.
+				      *
+				      * The length of the vector
+				      * <tt>indices</tt> may even be a
+				      * multiple of the number of dofs
+				      * per cell. Then, the vectors in
+				      * <tt>value</tt> should allow
+				      * for the same multiple of the
+				      * components of the finite
+				      * element.
+				      *
+				      * You may want to use this
+				      * function, if you want to
+				      * access just a single block
+				      * from a BlockVector, if you
+				      * have a multi-level vector or
+				      * if you already have a local
+				      * representation of your finite
+				      * element data.
+				      *
+				      * Since this function allows for
+				      * fairly general combinations of
+				      * argument sizes, be aware that
+				      * the checks on the arguments
+				      * may not detect errors.
+				      */
+    template <class InputVector, typename number>
+    void get_function_values (const InputVector& fe_function,
+			      const std::vector<unsigned int>& indices,
+			      std::vector<Vector<number> >& values) const;
 
     				     /**
 				      * Compute the gradient of the

@@ -22,6 +22,9 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
+#include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
 #include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <fe/fe.h>
@@ -364,8 +367,9 @@ FEValuesBase<dim>::~FEValuesBase ()
 
 template <int dim>
 template <class InputVector, typename number>
-void FEValuesBase<dim>::get_function_values (const InputVector            &fe_function,
-					     std::vector<number> &values) const
+void FEValuesBase<dim>::get_function_values (
+  const InputVector            &fe_function,
+  std::vector<number> &values) const
 {
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe->n_components() == 1,
@@ -399,16 +403,64 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
 
 template <int dim>
 template <class InputVector, typename number>
-void FEValuesBase<dim>::get_function_values (const InputVector                     &fe_function,
-					     std::vector<Vector<number> > &values) const
+void FEValuesBase<dim>::get_function_values (
+  const InputVector& fe_function,
+  const std::vector<unsigned int>& indices,
+  std::vector<number> &values) const
 {
-  Assert (n_quadrature_points == values.size(),
+  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+				   // This function fills a single
+				   // component only
+  Assert (fe->n_components() == 1,
+	  ExcWrongNoOfComponents());
+				   // One index for each dof
+  Assert (indices.size() == dofs_per_cell,
+	  ExcDimensionMismatch(indices.size(), dofs_per_cell));
+				   // This vector has one entry for
+				   // each quadrature point
+  Assert (values.size() == n_quadrature_points,
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+  
+				   // initialize with zero
+  std::fill_n (values.begin(), n_quadrature_points, 0);
+  
+				   // add up contributions of trial
+				   // functions. note that here we
+				   // deal with scalar finite
+				   // elements, so no need to check
+				   // for non-primitivity of shape
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+      values[point] += (fe_function(indices[shape_func]) *
+			this->shape_value(shape_func, point));
+}
+
+
+
+template <int dim>
+template <class InputVector, typename number>
+void FEValuesBase<dim>::get_function_values (
+  const InputVector&            fe_function,
+  std::vector<Vector<number> >& values) const
+{
+//TODO: Find out how to do this assertion.  
+				   // This vector must correspond to a
+				   // complete discretization
+//  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+//	  ExcWrongVectorSize(fe_function.size(),
+//			     present_cell->get_dof_handler().n_dofs()));
+				   // One entry per quadrature point
+  Assert (values.size() == n_quadrature_points,
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
+				   // Assert that we can write all
+				   // components into the result
+				   // vectors
   for (unsigned i=0;i<values.size();++i)
     Assert (values[i].size() == n_components, ExcWrongNoOfComponents());
-
+  
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
@@ -437,6 +489,71 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
 	for (unsigned int c=0; c<n_components; ++c)
 	  values[point](c) += (dof_values(shape_func) *
 			       shape_value_component(shape_func, point, c));
+}
+
+
+
+template <int dim>
+template <class InputVector, typename number>
+void FEValuesBase<dim>::get_function_values (
+  const InputVector& fe_function,
+  const std::vector<unsigned int>& indices,
+  std::vector<Vector<number> >& values) const
+{
+				   // One value per quadrature point
+  Assert (n_quadrature_points == values.size(),
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+  
+  const unsigned int n_components = fe->n_components();
+  
+				   // Size of indices must be a
+				   // multiple of dofs_per_cell such
+				   // that an integer number of
+				   // function values is generated in
+				   // each point.
+  Assert (indices.size() % dofs_per_cell == 0,
+	  ExcNotMultiple(indices.size(), dofs_per_cell));
+
+				   // The number of components of the
+				   // result may be a multiple of the
+				   // number of components of the
+				   // finite element
+  const unsigned int result_components = indices.size() / dofs_per_cell;
+  
+  for (unsigned i=0;i<values.size();++i)
+    Assert (values[i].size() == result_components,
+	    ExcDimensionMismatch(values[i].size(), result_components));
+
+				   // If the result has more
+				   // components than the finite
+				   // element, we need this number for
+				   // loops filling all components
+  const unsigned int component_multiple = result_components / n_components;
+  
+  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+    
+				   // initialize with zero
+  for (unsigned i=0;i<values.size();++i)
+    std::fill_n (values[i].begin(), values[i].size(), 0);
+
+				   // add up contributions of trial
+				   // functions. now check whether the
+				   // shape function is primitive or
+				   // not. if it is, then set its only
+				   // non-zero component, otherwise
+				   // loop over components
+  for (unsigned int mc = 0; mc < component_multiple; ++mc)
+    for (unsigned int point=0; point<n_quadrature_points; ++point)
+      for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+	if (fe->is_primitive(shape_func))
+	  values[point](fe->system_to_component_index(shape_func).first
+			+mc * n_components)
+	    += (fe_function(indices[shape_func+mc*dofs_per_cell])
+		* shape_value(shape_func, point));
+	else
+	  for (unsigned int c=0; c<n_components; ++c)
+	    values[point](c) += (fe_function(indices[shape_func]) *
+				 shape_value_component(shape_func, point, c));
 }
 
 
@@ -827,9 +944,12 @@ FEValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell)
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
-	  typename FEValuesBase<dim>::ExcFEDontMatch());
+
+//TODO: This was documented out ith the repository. Why?
+  
+//  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
+//	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
+//	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
@@ -1020,9 +1140,9 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-	  typename FEValuesBase<dim>::ExcFEDontMatch());
+//   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
+// 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+// 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
@@ -1194,9 +1314,9 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-	  typename FEValuesBase<dim>::ExcFEDontMatch());
+//   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
+// 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+// 	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
@@ -1338,194 +1458,27 @@ template class FESubfaceValues<deal_II_dimension>;
 
 //-----------------------------------------------------------------------------
 
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<Vector<double> >
-(const Vector<double>&,
- std::vector<double>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<Vector<float> >
-(const Vector<float>&,
- std::vector<double>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<Vector<float> >
-(const Vector<float>&,
- std::vector<float>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<BlockVector<double> >
-(const BlockVector<double>&,
- std::vector<double>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<BlockVector<float> >
-(const BlockVector<float>&,
- std::vector<double>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<BlockVector<float> >
-(const BlockVector<float>&,
- std::vector<float>&) const;
+// Instantiations are in a different file using the macro IN for the vector type.
+// This way, we avoid code reduplication
+
+#define IN Vector<double>
+#include "fe_values.instance.h"
+#undef IN
+
+#define IN BlockVector<double>
+#include "fe_values.instance.h"
+#undef IN
+
+#define IN Vector<float>
+#include "fe_values.instance.h"
+#undef IN
+
+#define IN BlockVector<float>
+#include "fe_values.instance.h"
+#undef IN
 
 #ifdef DEAL_II_USE_PETSC
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<double>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<float>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<double>&) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<float>&) const;
-#endif
-
-//-----------------------------------------------------------------------------
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<Vector<double> >
-(const Vector<double> &,
- std::vector<Vector<double> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<Vector<float> >
-(const Vector<float> &,
- std::vector<Vector<double> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<Vector<float> >
-(const Vector<float> &,
- std::vector<Vector<float> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<BlockVector<double> >
-(const BlockVector<double> &,
- std::vector<Vector<double> >     &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<BlockVector<float> >
-(const BlockVector<float> &,
- std::vector<Vector<double> >     &) const;
-
-#ifdef DEAL_II_USE_PETSC
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<Vector<double> >     &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<Vector<double> >     &) const;
-#endif
-
-//-----------------------------------------------------------------------------
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<Vector<double> >
-(const Vector<double> &,
- std::vector<Tensor<1,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<Vector<float> >
-(const Vector<float> &,
- std::vector<Tensor<1,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<BlockVector<double> >
-(const BlockVector<double> &,
- std::vector<Tensor<1,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<BlockVector<float> >
-(const BlockVector<float> &,
- std::vector<Tensor<1,deal_II_dimension> > &) const;
-
-#ifdef DEAL_II_USE_PETSC
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<Tensor<1,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<Tensor<1,deal_II_dimension> > &) const;
-#endif
-
-//-----------------------------------------------------------------------------
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<Vector<double> >
-(const Vector<double> &,
- std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<Vector<float> >
-(const Vector<float> &,
- std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<BlockVector<double> >
-(const BlockVector<double> &,
- std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<BlockVector<float> >
-(const BlockVector<float> &,
- std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
-
-#ifdef DEAL_II_USE_PETSC
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
-#endif
-
-//-----------------------------------------------------------------------------
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<Vector<double> >
-(const Vector<double> &,
- std::vector<Tensor<2,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<Vector<float> >
-(const Vector<float> &,
- std::vector<Tensor<2,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<BlockVector<double> >
-(const BlockVector<double> &,
- std::vector<Tensor<2,deal_II_dimension> > &) const;
-
-#ifdef DEAL_II_USE_PETSC
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<Tensor<2,deal_II_dimension> > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<Tensor<2,deal_II_dimension> > &) const;
-#endif
-
-//-----------------------------------------------------------------------------
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<Vector<double> >
-(const Vector<double> &,
- std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<Vector<float> >
-(const Vector<float> &,
- std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<BlockVector<double> >
-(const BlockVector<double> &,
- std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
-
-#ifdef DEAL_II_USE_PETSC
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::Vector>
-(const PETScWrappers::Vector &,
- std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
-
-template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::BlockVector>
-(const PETScWrappers::BlockVector &,
- std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
+#define IN PETScWrappers::Vector
+#include "fe_values.instance.h"
+#undef IN
 #endif
