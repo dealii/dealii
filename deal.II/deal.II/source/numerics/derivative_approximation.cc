@@ -260,6 +260,7 @@ approximate_gradient (const DoFHandler<dim> &dof_handler,
 		      Vector<float>         &derivative_norm,
 		      const unsigned int     component)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   approximate_derivative<Gradient<dim>,dim> (mapping,
 					     dof_handler,
@@ -294,6 +295,7 @@ approximate_second_derivative (const DoFHandler<dim> &dof_handler,
 			       Vector<float>         &derivative_norm,
 			       const unsigned int     component)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   approximate_derivative<SecondDerivative<dim>,dim> (mapping,
 						     dof_handler,
