@@ -453,8 +453,8 @@ class SparseVanka
  * first blocking strategy and the degrees of freedom were not
  * numbered by component. Using the second strategy does not much
  * change the numbers of iterations (at most by one in each step) and
- * they also do not much change when the degrees of freedom are sorted
- * by component.
+ * they also do not change when the degrees of freedom are sorted
+ * by component, while the first strategy significantly deteriorated.
  *
  * @author Wolfgang Bangerth, 2000
  */
