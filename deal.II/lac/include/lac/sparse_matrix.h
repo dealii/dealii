@@ -83,19 +83,31 @@ class SparseMatrix : public Subscriptor
     SparseMatrix (const SparseMatrix &);
 
 				     /**
-				      * Constructor. Takes the given matrix
-				      * sparsity structure to represent the
-				      * sparsity pattern of this matrix. You
-				      * can change the sparsity pattern later
-				      * on by calling the @p{reinit} function.
+				      * Constructor. Takes the given
+				      * matrix sparsity structure to
+				      * represent the sparsity pattern
+				      * of this matrix. You can change
+				      * the sparsity pattern later on
+				      * by calling the @p{reinit}
+				      * function.
 				      *
-				      * You have to make sure that the lifetime
-				      * of the sparsity structure is at least
-				      * as long as that of this matrix or as
-				      * long as @p{reinit} is not called with a
-				      * new sparsity structure.
+				      * You have to make sure that the
+				      * lifetime of the sparsity
+				      * structure is at least as long
+				      * as that of this matrix or as
+				      * long as @p{reinit} is not
+				      * called with a new sparsity
+				      * structure.
+				      *
+				      * The constructor is marked
+				      * explicit so as to disallow
+				      * that someone passes a sparsity
+				      * pattern in place of a sparse
+				      * matrix to some function, where
+				      * an empty matrix would be
+				      * generated then.
 				      */
-    SparseMatrix (const SparsityPattern &sparsity);
+    explicit SparseMatrix (const SparsityPattern &sparsity);
     
 				     /**
 				      * Destructor. Free all memory, but do not
