@@ -55,12 +55,12 @@ class PoissonEquation :  public Equation<dim> {
 template <int dim>
 class PoissonProblem : public ProblemBase<dim> {
   public:
-    PoissonProblem ();
+    PoissonProblem (unsigned int order);
 
     void clear ();
     void create_new ();
-    void run (unsigned int level);
-    void print_history () const;
+    int run (unsigned int level);
+    void print_history (string filename) const;
     
   protected:
     Triangulation<dim> *tria;
@@ -71,6 +71,8 @@ class PoissonProblem : public ProblemBase<dim> {
 
     vector<double> l1_error, l2_error, linfty_error, h1_seminorm_error, h1_error;
     vector<int>    n_dofs;
+
+    unsigned int        order;
 };
 
 
@@ -79,7 +81,7 @@ class PoissonProblem : public ProblemBase<dim> {
 
 /**
   Right hand side constructed such that the exact solution is
-  $x(1-x)$ in 1d, $x(1-x)*y(1-y)$ in 2d, etc.
+  $sin(2 pi x) + sin(2 pi y)$
   */
 template <int dim>
 class RHSPoly : public Function<dim> {
@@ -112,18 +114,28 @@ class Solution : public Function<dim> {
 
 
 double RHSPoly<2>::operator () (const Point<2> &p) const {
-  return 2*(p(0)*(1-p(0)) + p(1)*(1-p(1)));
+  const double x = p(0),
+	       y = p(1);
+  const double pi= 3.1415926536;
+  return 4*pi*pi*(sin(2*pi*x)+sin(2*pi*y));
 };
 
 
 
 double Solution<2>::operator () (const Point<2> &p) const {
-  return p(0)*(1-p(0))*p(1)*(1-p(1));
+  const double x = p(0),
+	       y = p(1);
+  const double pi= 3.1415926536;
+  return sin(2*pi*x)+sin(2*pi*y);
 };
 
 
 Point<2> Solution<2>::gradient (const Point<2> &p) const {
-  return Point<2> ((1-2*p(0))*p(1)*(1-p(1)), (1-2*p(1))*p(0)*(1-p(0)));
+  const double x = p(0),
+	       y = p(1);
+  const double pi= 3.1415926536;
+  return Point<2> (2*pi*cos(2*pi*x),
+		   2*pi*cos(2*pi*y));
 };
 
   
@@ -175,8 +187,9 @@ void PoissonEquation<dim>::assemble (dVector             &,
 
 
 template <int dim>
-PoissonProblem<dim>::PoissonProblem () :
-		tria(0), dof(0), rhs(0), boundary_values(0) {};
+PoissonProblem<dim>::PoissonProblem (unsigned int order) :
+		tria(0), dof(0), rhs(0),
+		boundary_values(0), order(order) {};
 
 
 
@@ -223,30 +236,59 @@ void PoissonProblem<dim>::create_new () {
 
 
 
-#include <basic/timer.h>
-
 template <int dim>
-void PoissonProblem<dim>::run (const unsigned int level) {
+int PoissonProblem<dim>::run (const unsigned int level) {
   create_new ();
   
   cout << "Refinement level = " << level
+       << ", using elements of order " << order
        << endl;
   
   cout << "    Making grid... ";
-  tria->create_hypercube ();
+  tria->create_hyper_ball ();
+  HyperBallBoundary<dim> boundary_description;
+  tria->set_boundary (&boundary_description);
+  tria->begin_active()->set_refine_flag();
+  (++(++(tria->begin_active())))->set_refine_flag();
+  tria->execute_refinement ();
   tria->refine_global (level);
   cout << tria->n_active_cells() << " active cells." << endl;
 
   rhs             = new RHSPoly<dim>();
-  boundary_values = new ZeroFunction<dim> ();
+  boundary_values = new Solution<dim> ();
   
-  
-  FELinear<dim>                   fe;
-  PoissonEquation<dim>            equation (*rhs);
-  QGauss3<dim>                    quadrature;
+
+  FiniteElement<dim>   *fe;
+  PoissonEquation<dim>  equation (*rhs);
+  Quadrature<dim>      *quadrature;
+  Quadrature<dim-1>    *boundary_quadrature;
+  switch (order) {
+    case 1:
+	  fe         = new FELinear<dim>();
+	  quadrature = new QGauss3<dim>();
+	  boundary_quadrature = new QGauss2<dim-1>();
+	  break;
+    case 2:
+	  fe         = new FEQuadraticSub<dim>();
+	  quadrature = new QGauss4<dim>();
+	  boundary_quadrature = new QGauss3<dim-1>();
+	  break;
+    case 3:
+	  fe         = new FECubicSub<dim>();
+	  quadrature = new QGauss5<dim>();
+	  boundary_quadrature = new QGauss4<dim-1>();
+	  break;
+    case 4:
+	  fe         = new FEQuarticSub<dim>();
+	  quadrature = new QGauss6<dim>();
+	  boundary_quadrature = new QGauss5<dim-1>();
+	  break;
+    default:
+	  return 100000;
+  };
   
   cout << "    Distributing dofs... "; 
-  dof->distribute_dofs (fe);
+  dof->distribute_dofs (*fe);
   cout << dof->n_dofs() << " degrees of freedom." << endl;
   n_dofs.push_back (dof->n_dofs());
 
@@ -256,7 +298,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   
   ProblemBase<dim>::FunctionMap dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
-  assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
+  assemble (equation, *quadrature, *fe, update_flags, dirichlet_bc);
 
   cout << "    Solving..." << endl;
   solve ();
@@ -264,13 +306,12 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   Solution<dim> sol;
   dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
   dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
-  QGauss3<dim>  q;
   
   cout << "    Calculating L1 error... ";
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  l1_error_per_cell,
-					  q, fe, L1_norm);
+					  *quadrature, *fe, L1_norm);
   cout << l1_error_per_cell.l1_norm() << endl;
   l1_error.push_back (l1_error_per_cell.l1_norm());
 
@@ -278,7 +319,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  l2_error_per_cell,
-					  q, fe, L2_norm);
+					  *quadrature, *fe, L2_norm);
   cout << l2_error_per_cell.l2_norm() << endl;
   l2_error.push_back (l2_error_per_cell.l2_norm());
 
@@ -286,7 +327,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  linfty_error_per_cell,
-					  q, fe, Linfty_norm);
+					  *quadrature, *fe, Linfty_norm);
   cout << linfty_error_per_cell.linfty_norm() << endl;
   linfty_error.push_back (linfty_error_per_cell.linfty_norm());
   
@@ -294,7 +335,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  h1_seminorm_error_per_cell,
-					  q, fe, H1_seminorm);
+					  *quadrature, *fe, H1_seminorm);
   cout << h1_seminorm_error_per_cell.l2_norm() << endl;
   h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
 
@@ -302,45 +343,72 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  h1_error_per_cell,
-					  q, fe, H1_norm);
+					  *quadrature, *fe, H1_norm);
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 
-  if (level<=5) 
+  if (dof->n_dofs()<=5000) 
     {
       dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
       dVector h1_seminorm_error_per_dof, h1_error_per_dof;
       dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-      dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell, h1_seminorm_error_per_dof);
+      dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
+					  linfty_error_per_dof);
+      dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell,
+					  h1_seminorm_error_per_dof);
       dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
 
-      string filename = "gnuplot.";
+      dVector projected_solution;
+      ConstraintMatrix constraints;
+      constraints.close ();
+      VectorTools<dim>::project (*dof, constraints, *fe,
+				 StraightBoundary<dim>(), *quadrature, 
+				 sol, projected_solution, false,
+				 *boundary_quadrature);
+      cout << "    Calculating L2 error of projected solution... ";
+      VectorTools<dim>::integrate_difference (*dof_handler,
+					      projected_solution, sol,
+					      l2_error_per_cell,
+					      *quadrature, *fe, L2_norm);
+      cout << l2_error_per_cell.l2_norm() << endl;
+
+
+      string filename;
+      filename = ('0'+order);
+      filename += ".";
       filename += ('0'+level);
+      filename += ".ucd";
       cout << "    Writing error plots to <" << filename << ">..." << endl;
       
       DataOut<dim> out;
-      ofstream gnuplot(filename.c_str());
+      ofstream o(filename.c_str());
       fill_data (out);
+      out.add_data_vector (projected_solution, "projected u");
       out.add_data_vector (l1_error_per_dof, "L1-Error");
       out.add_data_vector (l2_error_per_dof, "L2-Error");
       out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
       out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
       out.add_data_vector (h1_error_per_dof, "H1-Error");
-      out.write_gnuplot (gnuplot);
-      gnuplot.close ();
+      out.write_ucd (o);
+      o.close ();
     }
   else
     cout << "    Not writing error as grid." << endl;
   
   cout << endl;
+
+  delete fe;
+  delete quadrature;
+  delete boundary_quadrature;
+  
+  return dof->n_dofs();
 };
 
 
 template <int dim>
-void PoissonProblem<dim>::print_history () const {
-  ofstream out("gnuplot.history");
+void PoissonProblem<dim>::print_history (string filename) const {
+  ofstream out(filename.c_str());
   out << "# n_dofs    l1_error l2_error linfty_error h1_seminorm_error h1_error"
       << endl;
   for (unsigned int i=0; i<n_dofs.size(); ++i)
@@ -372,25 +440,54 @@ void PoissonProblem<dim>::print_history () const {
   average_h1_semi /= (l1_error.size()-1);
   average_h1 /= (l1_error.size()-1);
 
+  cout << "==========================================================\n";
   cout << "Average error reduction rates for h->h/2:" << endl;
   cout << "    L1 error         : " << 1./average_l1 << endl
        << "    L2 error         : " << 1./average_l2 << endl
        << "    Linfty error     : " << 1./average_linfty << endl
        << "    H1 seminorm error: " << 1./average_h1_semi << endl
        << "    H1 error         : " << 1./average_h1 << endl;
+  cout << "==========================================================\n";
+  cout << "==========================================================\n";
 };
 
 
 
 
 int main () {
-  PoissonProblem<2> problem;
+  for (unsigned int order=1; order<5; ++order) 
+    {
+      PoissonProblem<2> problem (order);
+      
+      unsigned int level=0;
+      unsigned int n_dofs;
+      do
+	n_dofs = problem.run (level++);
+      while (n_dofs<25000);
 
-  for (unsigned int level=1; level<8; ++level)
-    problem.run (level);
-
-  cout << endl << "Printing convergence history to <gnuplot.history>..." << endl;
-  problem.print_history ();
-
+      string filename;
+      switch (order) 
+	{
+	  case 1:
+		filename = "linear";
+		break;
+	  case 2:
+		filename = "quadratic";
+		break;
+	  case 3:
+		filename = "cubic";
+		break;
+	  case 4:
+		filename = "quartic";
+		break;
+	};
+      filename += ".history";
+      
+      cout << endl << "Printing convergence history to <"
+	   << filename << ">..." << endl;
+      problem.print_history (filename);
+      cout << endl << endl << endl;
+    };
+  
   return 0;
 };
