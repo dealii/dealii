@@ -156,7 +156,7 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
 				       Vector<float>        &error,
 				       const vector<bool>   &component_mask_,
 				       const Function<1>    *coefficient,
-				       unsigned int)
+				       const unsigned int)
 {
   const unsigned int n_components = dof.get_fe().n_components();
 
