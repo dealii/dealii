@@ -1108,7 +1108,7 @@ void DataOut<2>::write_epsgrid (ostream &out) const {
 
 
 template <>
-void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
+void DataOut<2>::write_eps (ostream &out, const eps_output_data &EOD) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
 
   {
@@ -1135,22 +1135,19 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
 				    // Make output values local by
 				    // copying them to a multiset.
 				    // Perform the necessary turn.
-   DoFHandler<2>::active_cell_iterator cell;
    DoFHandler<2>::active_cell_iterator endc = dofs->end();
-   unsigned i;
    unsigned cell_index=0;
-   eps_cell_data cd;
-   bool cell_data_p;
    multiset<DataOut<2>::eps_cell_data> cells;
    multiset<DataOut<2>::eps_cell_data> cells2;
-   typename multiset<DataOut<2>::eps_cell_data>::iterator c;
    
-   cell_data_p = ((cell_data.size())>0) && (EOD.cell_type == EOD.Vector);
+   bool cell_data_p = ((cell_data.size())>0) && (EOD.cell_type == EOD.Vector);
 
-   for(cell=dofs->begin_active(); cell!=endc; ++cell,++cell_index)
+   for(DoFHandler<2>::active_cell_iterator cell=dofs->begin_active();
+       cell!=endc; ++cell, ++cell_index)
      {
+       eps_cell_data cd;
        cd.vertices.resize(4);
-       for (i=0; i<4; i++)
+       for (unsigned int i=0; i<4; i++)
 	 {
 	   (cd.vertices[i]).x=cell->vertex(i)(0);
 	   (cd.vertices[i]).y=cell->vertex(i)(1);
@@ -1168,9 +1165,8 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
 	       
 	 };
        if (EOD.height_type==EOD.Vector)
-	 {
-	   cd.turn(EOD.azimuth,EOD.elevation);
-	 };
+	 cd.turn(EOD.azimuth,EOD.elevation);
+
        if (cell_data_p)
 	 cd.red=(*cell_data[EOD.cell_vector].data)(cell_index);
        cells.insert(cd);
@@ -1189,9 +1185,10 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
    float cell_vector_min=cells.begin()->red; 
    float cell_vector_max=cell_vector_min;
 
-   for(c=cells.begin();c!=cells.end();c++,cell_index++)
+   for(typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells.begin();
+       c!=cells.end(); ++c, ++cell_index)
      {
-       for (i=0; i<4; i++)
+       for (unsigned int i=0; i<4; i++)
 	 {
 	   xvv=c->vertices[i].x;
 	   xmin=(xmin < xvv ? xmin : xvv);
@@ -1219,9 +1216,9 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
        double light_norm, normal_norm;
        float color;
 
-       for (c=cells.begin();c!=cells.end();c++)
+       for (typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells.begin();c!=cells.end();c++)
 	 {
-	   cd = (*c);
+	   eps_cell_data cd(*c);
 
 	   spann1[0]=spann2[0]=cd.vertices[0].x;
 	   spann1[1]=spann2[1]=cd.vertices[0].y;
@@ -1271,61 +1268,61 @@ void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
    cells.clear();
 
 
-   for (c=cells2.begin();c!=cells2.end();c++)
+   for (typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells2.begin();
+	c!=cells2.end(); ++c)
      {
-       cd= (*c);
-       for (i=0;i<4;i++)
+       eps_cell_data cd (*c);
+       for (unsigned int i=0; i<4; i++)
 	 {
 	   cd.vertices[i].x=(cd.vertices[i].x-xmin)*scale;
 	   cd.vertices[i].y=(cd.vertices[i].y-ymin)*scale;
 	 };
+
        if (cell_data_p)
-	 {
-	   EOD.color(cd.red,cell_vector_max,cell_vector_min,cd.red,cd.green,cd.blue);
-	 };
+	 EOD.color(cd.red,cell_vector_max,cell_vector_min,cd.red,cd.green,cd.blue);
+
        cells.insert(cd);
      };
 
 
 				    //  Now we are ready to output...
-
    cell_data_p = cell_data_p || (EOD.cell_type==EOD.Shaded);
 
-  for (c=cells.begin();c!=cells.end();c++)
-    {
-      if (cell_data_p)
-	{
-	  out << c->red << " " << c->green << " " << c->blue << " setrgbcolor "
-	      << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
-	      << c->vertices[1].x << " " << c->vertices[1].y << " lineto "
-	      << c->vertices[2].x << " " << c->vertices[2].y << " lineto "
-	      << c->vertices[3].x << " " << c->vertices[3].y << " lineto "
-	      << " closepath fill" << endl;
-	};
+   for (typename multiset<DataOut<2>::eps_cell_data>::iterator c=cells.begin();
+	c!=cells.end(); ++c)
+     {
+       if (cell_data_p)
+	 {
+	   out << c->red << " " << c->green << " " << c->blue << " setrgbcolor "
+	       << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
+	       << c->vertices[1].x << " " << c->vertices[1].y << " lineto "
+	       << c->vertices[2].x << " " << c->vertices[2].y << " lineto "
+	       << c->vertices[3].x << " " << c->vertices[3].y << " lineto "
+	       << " closepath fill" << endl;
+	 };
 
-      if (EOD.cell_boundary_type == EOD.Black || 
-	  EOD.cell_boundary_type == EOD.White) 
-	{
-	  switch (EOD.cell_boundary_type)
-	    {
-	      case EOD.Black: 
-		    out << "0";
-		    break;
-	      case EOD.White:
-		    out << "1";
-		    break;
-	      default:
-		    break;
-	    };
-	  out << " setgray " 
-	      << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
-	      << c->vertices[1].x << " " << c->vertices[1].y << " lineto "
-	      << c->vertices[2].x << " " << c->vertices[2].y << " lineto "
-	      << c->vertices[3].x << " " << c->vertices[3].y << " lineto closepath stroke" << endl;
-	};
-    };
-  out << "showpage" << endl;     
-
+       if (EOD.cell_boundary_type == EOD.Black || 
+	   EOD.cell_boundary_type == EOD.White) 
+	 {
+	   switch (EOD.cell_boundary_type)
+	     {
+	       case EOD.Black: 
+		     out << "0";
+		     break;
+	       case EOD.White:
+		     out << "1";
+		     break;
+	       default:
+		     break;
+	     };
+	   out << " setgray " 
+	       << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
+	       << c->vertices[1].x << " " << c->vertices[1].y << " lineto "
+	       << c->vertices[2].x << " " << c->vertices[2].y << " lineto "
+	       << c->vertices[3].x << " " << c->vertices[3].y << " lineto closepath stroke" << endl;
+	 };
+     };
+   out << "showpage" << endl;
 };
 
 #endif
@@ -1350,9 +1347,6 @@ void DataOut<3>::write_eps (ostream &/*out*/) const {
 template <int dim>
 void DataOut<dim>::write (ostream &out,
 			  const OutputFormat output_format) const {
-
-  eps_output_data EOD;
-  
   switch (output_format) 
     {
     case ucd:
@@ -1368,7 +1362,7 @@ void DataOut<dim>::write (ostream &out,
       write_povray_mesh (out);
       break;
     case eps:
-      write_eps(out,EOD);
+      write_eps(out);
       break;
     case epsgrid:
       write_epsgrid(out);
@@ -1385,20 +1379,23 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format)
 {
   switch (output_format) 
     {
-    case ucd:
-      return ".inp";
-    case gnuplot: 
-    case gnuplot_draft: 
-      return ".gnuplot";
-    case povray_mesh: 
-      return ".pov";
-    case eps: 
-      return ".eps";
-    case epsgrid: 
-      return ".eps";
-    default: 
-      Assert (false, ExcNotImplemented()); 
-      return "";
+      case ucd:
+	    return ".inp";
+	    
+      case gnuplot: 
+      case gnuplot_draft: 
+	    return ".gnuplot";
+	    
+      case povray_mesh: 
+	    return ".pov";
+	    
+      case eps: 
+      case epsgrid: 
+	    return ".eps";
+	    
+      default: 
+	    Assert (false, ExcNotImplemented()); 
+	    return "";
     };
 };
   

@@ -448,8 +448,12 @@ class DataOut {
 				    * Encapsulated postscript format.
 				    * Further data vectors
 				    * as well as cell data is ignored.
+				    *
+				    * If no special output data is given, a
+				    * default constructed object is used.
 				    */
-    void write_eps (ostream &out, const eps_output_data EOD) const;
+    void write_eps (ostream &out,
+		    const eps_output_data &EOD = eps_output_data()) const;
 
 				   /**
 				    * Write grid in Encapsulated
