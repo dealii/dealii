@@ -1741,7 +1741,7 @@ void Triangulation<dim>::refine (const dVector &criteria,
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (criteria(index) > threshold)
+    if (criteria(index) >= threshold)
       cell->set_refine_flag();
 };
 
@@ -1753,15 +1753,18 @@ void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
 				   // correct number of cells is
 				   // checked in #refine#
   Assert ((fraction>0) && (fraction<=1), ExcInvalidParameterValue());
+
+				   // refine at least one cell
+  const refine_cells = max(static_cast<int>(fraction*criteria.size()),
+			   1);
   
-  dVector tmp(criteria);
+  dVector tmp(criteria);  
   nth_element (tmp.begin(),
-	       tmp.begin()+static_cast<int>(fraction*tmp.size()),
+	       tmp.begin()+refine_cells,
 	       tmp.end(),
 	       greater<double>());
 
-  refine (criteria, *(tmp.begin() +
-		      static_cast<int>(fraction*tmp.size())));
+  refine (criteria, *(tmp.begin() + refine_cells));
 };
 
 
