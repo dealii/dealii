@@ -436,10 +436,12 @@ class TimeDependent
 
 				     /**
 				      * Add a timestep at any position. The
-				      * position may be zero (at the start)
-				      * through #N# (at the end), where
-				      * #N# is the number of timesteps
-				      * stored in this object previously.
+				      * position is a pointer to an existing
+				      * time step object, or a null pointer
+				      * denoting the end of the timestep
+				      * sequence. If #position# is non-null,
+				      * the new time step will be inserted
+				      * before the respective element.
 				      *
 				      * Note that by giving an object
 				      * to this function, the
@@ -447,12 +449,6 @@ class TimeDependent
 				      * ownership of the object; it will
 				      * therefore also take care of
 				      * deletion of the objects its manages.
-				      * This mechanism usually will result
-				      * in a set-up loop like this
-				      * \begin{verbatim}
-				      * for (i=0; i<N; ++i)
-				      *   manager.add_timestep(new MyTimeStep());
-				      * \end{verbatim}
 				      *
 				      * There is another function,
 				      * #add_timestep#, which inserts a
@@ -470,12 +466,19 @@ class TimeDependent
 				      * one can always use the timestep numbers
 				      * that were used in the previous sweep.
 				      */
-    void insert_timestep (TimeStepBase      *new_timestep,
-			  const unsigned int position);
+    void insert_timestep (const TimeStepBase *position,
+			  TimeStepBase       *new_timestep);
 
 				     /**
 				      * Just like #insert_timestep#, but
 				      * insert at the end.
+				      *
+				      * This mechanism usually will result
+				      * in a set-up loop like this
+				      * \begin{verbatim}
+				      * for (i=0; i<N; ++i)
+				      *   manager.add_timestep(new MyTimeStep());
+				      * \end{verbatim}
 				      */
     void add_timestep (TimeStepBase *new_timestep);
 
@@ -630,10 +633,7 @@ class TimeDependent
 				     /**
 				      * Exception.
 				      */
-    DeclException2 (ExcInvalidPosition,
-		    int, int,
-		    << "Can\'t insert time step at position " << arg1
-                    << " since there only " << arg2 << " positions at all.");
+    DeclException0 (ExcInvalidPosition);
     
   protected:
 				     /**

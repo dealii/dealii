@@ -43,11 +43,11 @@ TimeDependent::~TimeDependent ()
 
 
 void
-TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
-				const unsigned int position) 
+TimeDependent::insert_timestep (const TimeStepBase *position,
+				TimeStepBase       *new_timestep) 
 {
-  Assert (position<=timesteps.size(),
-	  ExcInvalidPosition(position, timesteps.size()));
+  Assert (find(timesteps.begin(), timesteps.end(), position) != timesteps.end(),
+	  ExcInvalidPosition());
 
 				   // lock this timestep from deletion
   new_timestep->subscribe();
@@ -55,7 +55,7 @@ TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
 				   // first insert the new time step
 				   // into the doubly linked list
 				   // of timesteps
-  if (position == timesteps.size())
+  if (position == 0)
     {
 				       // at the end
       new_timestep->set_next_timestep (0);
@@ -68,7 +68,7 @@ TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
 	new_timestep->set_previous_timestep (0);
     }
   else
-    if (position == 0)
+    if (position == timesteps[0])
       {
 					 // at the beginning
 	new_timestep->set_previous_timestep (0);
@@ -83,14 +83,20 @@ TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
     else
       {
 					 // inner time step
-	timesteps[position-1]->set_next_timestep (new_timestep);
-	new_timestep->set_next_timestep (timesteps[position]);
-	timesteps[position]->set_previous_timestep (new_timestep);
+	vector<TimeStepBase*>::iterator insert_position
+	  = find(timesteps.begin(), timesteps.end(), position);
+	
+	(*(insert_position-1))->set_next_timestep (new_timestep);
+	new_timestep->set_next_timestep (*insert_position);
+	(*insert_position)->set_previous_timestep (new_timestep);
       };
 
 				   // finally enter it into the
 				   // array
-  timesteps.insert (&timesteps[position], new_timestep);
+  timesteps.insert ((position == 0 ?
+		     timesteps.end() :
+		     find(timesteps.begin(), timesteps.end(), position)),
+		    new_timestep);
 };
 
 
@@ -98,7 +104,7 @@ TimeDependent::insert_timestep (TimeStepBase      *new_timestep,
 void
 TimeDependent::add_timestep (TimeStepBase *new_timestep)
 {
-  insert_timestep (new_timestep, timesteps.size());
+  insert_timestep (0, new_timestep);
 };
 
 
@@ -106,7 +112,7 @@ TimeDependent::add_timestep (TimeStepBase *new_timestep)
 void TimeDependent::delete_timestep (const unsigned int position)
 {
   Assert (position<timesteps.size(),
-	  ExcInvalidPosition(position, timesteps.size()));
+	  ExcInvalidPosition());
 
   timesteps[position]->unsubscribe();
   delete timesteps[position];
