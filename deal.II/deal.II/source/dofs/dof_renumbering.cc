@@ -1209,7 +1209,7 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
         }
 
                                    // we should have numbered all dofs
-  Assert (next_free_index = n_dofs, ExcInternalError());
+  Assert (next_free_index == n_dofs, ExcInternalError());
   Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
                      deal_II_numbers::invalid_unsigned_int)
           == new_dof_indices.end(),
