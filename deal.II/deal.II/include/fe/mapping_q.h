@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,6 +57,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     ~MappingQ ();
 
+//TODO: why make the following functions public? they are only helpful for fevalues and maybe the finite elements?
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
@@ -178,7 +179,7 @@ class MappingQ : public MappingQ1<dim>
 					 /**
 					  * Constructor.
 					  */
-	InternalData(unsigned int n_shape_functions);
+	InternalData (const unsigned int n_shape_functions);
 	
 					 /**
 					  * Unit normal vectors. Used
@@ -292,11 +293,18 @@ class MappingQ : public MappingQ1<dim>
 
 				     /**
 				      * Takes a
-				      * @p{set_laplace_on_hex(quad)_vector}
+				      * @p{laplace_on_hex(quad)_vector}
 				      * and applies it to the vector
 				      * @p{a} to compute the inner
-				      * support points. They are
-				      * appended to the vector @p{a}.
+				      * support points as a linear
+				      * combination of the exterior
+				      * points.
+				      *
+				      * The vector @p{a} initially
+				      * containts the locations of the
+				      * @p{n_outer} points, the
+				      * @p{n_inner} computed inner
+				      * points are appended.
 				      */
     void apply_laplace_vector(const std::vector<std::vector<double> > &lvs,
 			      std::vector<Point<dim> > &a) const;
@@ -319,9 +327,9 @@ class MappingQ : public MappingQ1<dim>
 				      * solution of a Laplace equation
 				      * with the position of the outer
 				      * support points as boundary
-				      * values. The outer support
-				      * points are all support points
-				      * except of the inner ones.
+				      * values, in order to make the
+				      * transformation as smooth as
+				      * possible.
 				      */
     void compute_support_points_laplace(
       const typename Triangulation<dim>::cell_iterator &cell,
@@ -340,31 +348,59 @@ class MappingQ : public MappingQ1<dim>
       std::vector<Point<dim> > &a) const;
     
 				     /**
-				      * For @p{dim=2,3}. Adds (appends) the
-				      * support points of all lines to
-				      * the vector a.
+				      * For @p{dim=2,3}. Append
+				      * (appends) the support points
+				      * of all shape functions located
+				      * on bounding lines to the
+				      * vector @p{a}. Points located
+				      * on the line but on vertices
+				      * are not included.
 				      *
 				      * Needed by the
 				      * @p{compute_support_points_simple(laplace)}
 				      * functions. For @p{dim=1} this
 				      * function is empty.
+				      *
+				      * This function is made virtual
+				      * in order to allow derived
+				      * classes to choose shape
+				      * function support points
+				      * differently than the present
+				      * class, which chooses the
+				      * points as interpolation points
+				      * on the boundary.
 				      */
-    void add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
-				  std::vector<Point<dim> > &a) const;
+    virtual void
+    add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
+			     std::vector<Point<dim> > &a) const;
 
 				     /**
-				      * For @p{dim=3}. Adds (appends) the
-				      * support points of all faces (quads in 3d) to
-				      * the vector a.
+				      * For @p{dim=3}. Append the
+				      * support points of all shape
+				      * functions located on bounding
+				      * faces (quads in 3d) to the
+				      * vector @p{a}. Points located
+				      * on the line but on vertices
+				      * are not included.
 				      *
 				      * Needed by the
 				      * @p{compute_support_points_laplace}
-				      * function. For @p{dim=1} and 2 this
-				      * function is empty.
+				      * function. For @p{dim=1} and 2
+				      * this function is empty.
+				      *
+				      * This function is made virtual
+				      * in order to allow derived
+				      * classes to choose shape
+				      * function support points
+				      * differently than the present
+				      * class, which chooses the
+				      * points as interpolation points
+				      * on the boundary.
 				      */
 //TODO: rename function to add_quad_support_points, to unify notation    
-    void add_face_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-				 std::vector<Point<dim> > &a) const;
+    virtual void
+    add_face_support_points(const typename Triangulation<dim>::cell_iterator &cell,
+			    std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * For @p{dim=2} and 3. Simple
@@ -375,6 +411,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Needed by the
 				      * @p{compute_support_points_simple}
 				      */
+//TODO: remove this function altogether?    
     void fill_quad_support_points_simple (const Triangulation<dim>::cell_iterator &cell,
 					  std::vector<Point<dim> > &a) const;
     
@@ -445,7 +482,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Number of the Qp tensor
 				      * product shape functions.
 				      */
-    unsigned int n_shape_functions;
+    const unsigned int n_shape_functions;
 
 				     /**
 				      * Mapping from lexicographic to

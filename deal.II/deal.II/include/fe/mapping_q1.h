@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,7 @@ template <int dim>
 class MappingQ1 : public Mapping<dim>
 {
   public:
+//TODO: why make the following functions public? they are only helpful for fevalues and maybe the finite elements?
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
@@ -213,9 +214,10 @@ class MappingQ1 : public Mapping<dim>
     {
       public:
 					 /**
-					  * Constructor.
+					  * Constructor. Pass the
+					  * number of shape functions.
 					  */
-	InternalData(unsigned int n_shape_functions);
+	InternalData(const unsigned int n_shape_functions);
 
 					 /**
 					  * Shape function at quadrature
@@ -224,31 +226,31 @@ class MappingQ1 : public Mapping<dim>
 					  * vertices must be reordered
 					  * to obtain transformation.
 					  */
-	double shape (unsigned int qpoint,
-		      unsigned int shape_nr) const;
+	double shape (const unsigned int qpoint,
+		      const unsigned int shape_nr) const;
 	
 					 /**
 					  * Shape function at quadrature
 					  * point. See above.
 					  */
-	double &shape (unsigned int qpoint,
-		       unsigned int shape_nr);
+	double &shape (const unsigned int qpoint,
+		       const unsigned int shape_nr);
 	
 					 /**
 					  * Gradient of shape function
 					  * in quadrature point. See
 					  * above.
 					  */
-	Tensor<1,dim> derivative (unsigned int qpoint,
-				  unsigned int shape_nr) const;
+	Tensor<1,dim> derivative (const unsigned int qpoint,
+				  const unsigned int shape_nr) const;
 
 					 /**
 					  * Gradient of shape function
 					  * in quadrature point. See
 					  * above.
 					  */
-	Tensor<1,dim> &derivative (unsigned int qpoint,
-				   unsigned int shape_nr);
+	Tensor<1,dim> &derivative (const unsigned int qpoint,
+				   const unsigned int shape_nr);
 	
 					 /**
 					  * Values of shape
@@ -300,11 +302,6 @@ class MappingQ1 : public Mapping<dim>
         std::vector<std::vector<Tensor<1,dim> > > aux;
 
 					 /**
-					  * Number of shape functions.
-					  */
-	unsigned int n_shape_functions;
-
-					 /**
 					  * Stores the support points of
 					  * the mapping shape functions on
 					  * the @p{cell_of_current_support_points}.
@@ -316,7 +313,7 @@ class MappingQ1 : public Mapping<dim>
 					  * @p{mapping_support_points} are
 					  * stored.
 					  */
-	DoFHandler<dim>::cell_iterator cell_of_current_support_points;
+	typename DoFHandler<dim>::cell_iterator cell_of_current_support_points;
 	
 					 /**
 					  * Default value of this flag
@@ -326,6 +323,21 @@ class MappingQ1 : public Mapping<dim>
 					  * @p{false}.
 					  */
 	bool is_mapping_q1_data;
+
+					 /**
+					  * Number of shape
+					  * functions. If this is a Q1
+					  * mapping, then it is simply
+					  * the number of vertices per
+					  * cell. However, since also
+					  * derived classes use this
+					  * class (e.g. the
+					  * @ref{Mapping_Q} class),
+					  * the number of shape
+					  * functions may also be
+					  * different.
+					  */
+	unsigned int n_shape_functions;
     };
     
 				     /**
@@ -424,9 +436,11 @@ class MappingQ1 : public Mapping<dim>
       std::vector<Point<dim> > &a) const;
 
 				     /**
-				      *Number of shape functions
+				      * Number of shape functions. Is
+				      * simply the number of vertices
+				      * per cell for the Q1 mapping.
 				      */
-    static const unsigned int n_shape_functions = 1 << dim;
+    static const unsigned int n_shape_functions = GeometryInfo<dim>::vertices_per_cell;
 };
 
 

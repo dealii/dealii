@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,6 +51,7 @@ class Mapping : public Subscriptor
 				    * Class for internal data of finite
 				    * element and mapping objects.
 				    */
+//TODO: can we make the following class protected?    
     class InternalDataBase: public Subscriptor
     {
       public:
@@ -111,7 +112,8 @@ class Mapping : public Subscriptor
 				      * Virtual destructor.
 				      */
     virtual ~Mapping ();
-    
+
+//TODO: why make the following functions public? they are only helpful for fevalues and maybe the finite elements?
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
@@ -246,7 +248,7 @@ class Mapping : public Subscriptor
     virtual void transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 					  const std::vector<Tensor<1,dim> > &src,
 					  const InternalDataBase& internal,
-				      const unsigned int src_offset) const = 0;
+					  const unsigned int src_offset) const = 0;
     
 				     /**
 				      * Tranform a field of covariant vectors.

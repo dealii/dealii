@@ -26,17 +26,22 @@
 
 
 
+template <int dim>
+const unsigned int MappingQ1<dim>::n_shape_functions;
+
+
+
 template<int dim>
-MappingQ1<dim>::InternalData::InternalData (unsigned int n_shape_functions):
-		n_shape_functions(n_shape_functions),
-		is_mapping_q1_data(true)
+MappingQ1<dim>::InternalData::InternalData (const unsigned int n_shape_functions):
+		is_mapping_q1_data(true),
+		n_shape_functions (n_shape_functions)
 {}
 
 
 template<int dim> inline
 double
-MappingQ1<dim>::InternalData::shape (unsigned int qpoint,
-				     unsigned int shape_nr) const
+MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
+				     const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
 	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0, shape_values.size()));
@@ -300,10 +305,10 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 
 template <int dim>
 void
-MappingQ1<dim>::compute_data (const UpdateFlags update_flags,
-			      const Quadrature<dim>& q,
-			      const unsigned int n_original_q_points,
-			      InternalData& data) const
+MappingQ1<dim>::compute_data (const UpdateFlags      update_flags,
+			      const Quadrature<dim> &q,
+			      const unsigned int     n_original_q_points,
+			      InternalData          &data) const
 {
   const unsigned int npts = q.n_quadrature_points;
 
@@ -313,8 +318,6 @@ MappingQ1<dim>::compute_data (const UpdateFlags update_flags,
 
   const UpdateFlags flags(data.update_flags);
   
-  //  cerr << "Data: " << hex << flags << dec << endl;
-
   if (flags & update_transformation_values)
     data.shape_values.resize(data.n_shape_functions * npts);
 
@@ -411,8 +414,8 @@ MappingQ1<dim>::compute_face_data (UpdateFlags update_flags,
 
 template <int dim>
 Mapping<dim>::InternalDataBase*
-MappingQ1<dim>::get_face_data (const UpdateFlags update_flags,
-			       const Quadrature<dim-1>& quadrature) const
+MappingQ1<dim>::get_face_data (const UpdateFlags        update_flags,
+			       const Quadrature<dim-1> &quadrature) const
 {
   InternalData* data = new InternalData(n_shape_functions);
   QProjector<dim> q (quadrature, false);
@@ -1022,7 +1025,7 @@ MappingQ1<dim>::covariant_transformation (std::vector<tensor_>       &dst,
   typename std::vector<tensor_>::const_iterator vec = src.begin() + src_offset;
   typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.covariant.begin();
   typename std::vector<tensor_>::iterator result = dst.begin();
-  typename std::vector<tensor_>::const_iterator end = dst.end();
+  const typename std::vector<tensor_>::const_iterator end = dst.end();
   
   while (result!=end)
     {
