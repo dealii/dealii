@@ -141,7 +141,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
     present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
-  std::fill_n (values.begin(), n_quadrature_points, 0);
+  fill_n (values.begin(), n_quadrature_points, 0);
 
 				   // add up contributions of trial
 				   // functions
@@ -265,7 +265,7 @@ get_function_grads (const InputVector                    &fe_function,
     present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
-  std::fill_n (gradients.begin(), n_quadrature_points, Tensor<1,dim>());
+  fill_n (gradients.begin(), n_quadrature_points, Tensor<1,dim>());
 
 				   // add up contributions of trial
 				   // functions
@@ -306,7 +306,7 @@ get_function_grads (const InputVector                                           
 
 				   // initialize with zero
   for (unsigned i=0;i<gradients.size();++i)
-    std::fill_n (gradients[i].begin(), gradients[i].size(), Tensor<1,dim>());
+    fill_n (gradients[i].begin(), gradients[i].size(), Tensor<1,dim>());
 
 				   // add up contributions of trial
 				   // functions
@@ -387,7 +387,7 @@ get_function_2nd_derivatives (const InputVector                                 
 
 				   // initialize with zero
   for (unsigned i=0;i<second_derivs.size();++i)
-    std::fill_n (second_derivs[i].begin(), second_derivs[i].size(), Tensor<2,dim>());
+    fill_n (second_derivs[i].begin(), second_derivs[i].size(), Tensor<2,dim>());
 
 				   // add up contributions of trial
 				   // functions

@@ -679,8 +679,8 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 			  | update_JxW_values))
 	for (unsigned int i=0;i<boundary_forms.size();++i)
 	  {
-	    double f = std::sqrt(contract(boundary_forms[i],
-					  boundary_forms[i]));
+	    double f = sqrt(contract(boundary_forms[i],
+				     boundary_forms[i]));
 	    if (update_flags & update_JxW_values)
 	      {
 		JxW_values[i] = f * weights[i];
