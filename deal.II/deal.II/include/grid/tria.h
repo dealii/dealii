@@ -1015,7 +1015,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     It prohibits the coarsening of a cell if 'most of the neighbors' will
  *     be refined after the step.
  *
- * @item @p{patch_level_1}:
+ *   @item @p{patch_level_1}:
  *     Ensures patch level 1. As result the triangulation consists of
  *     patches, i.e. of cells that are refined once. It follows that
  *     if at least one of the children of a cell is or will be refined
@@ -2526,7 +2526,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /*---------------------------------------*/
 
 				     /**
-				      *  @name Quad iterator functions*/
+				      *  @name Quad iterator functions
+				      */
     				     /*@{
 				      */
     				     /**
@@ -2632,7 +2633,8 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /*---------------------------------------*/
 
 				     /**
-				      *  @name Hex iterator functions*/
+				      *  @name Hex iterator functions
+				      */
     				     /*@{
 				      */
     				     /**
