@@ -1,36 +1,60 @@
 /* $Id$ */
 
-				 // The first few (many?) include
-				 // files have already been used in
-				 // the previous example, so we will
-				 // not explain their meaning here
-				 // again.
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_lib.lagrange.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
+				 // Again, the first few include files
+				 // are already known, so we won't
+				 // comment on them:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
+#include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
-
+#include <grid/tria.h>
+#include <dofs/dof_handler.h>
+#include <grid/grid_generator.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_values.h>
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
 #include <numerics/data_out.h>
+
+				 // This one is new. We want to read a
+				 // triangulation from disk, and the
+				 // class which does this is declared
+				 // in the following file:
+#include <grid/grid_in.h>
+
+				 // We will use a circular domain, and
+				 // the object describing the boundary
+				 // of it comes from this file:
+#include <grid/tria_boundary_lib.h>
+
+				 // This is C++ ...
 #include <fstream>
+				 // ... and this is too. We will
+				 // convert integers to strings using
+				 // the classes inside this file:
+#include <strstream>
 
-#include <base/logstream.h>
 
 
+				 // The main class is mostly as in the
+				 // previous example. The most visible
+				 // change is that the function
+				 // ``make_grid_and_dofs'' has been
+				 // removed, since making of the grid
+				 // is now done in the ``run''
+				 // function and the rest of its
+				 // functionality now is in
+				 // ``setup_system''. Apart from this,
+				 // everything is as before.
 template <int dim>
 class LaplaceProblem 
 {
@@ -39,11 +63,10 @@ class LaplaceProblem
     void run ();
     
   private:
-    void make_grid_and_dofs (const unsigned int refinement);
+    void setup_system ();
     void assemble_system ();
     void solve ();
-    void output_results ();
-    void clear ();
+    void output_results (const unsigned int cycle);
 
     Triangulation<dim>   triangulation;
     FEQ1<dim>            fe;
@@ -57,12 +80,31 @@ class LaplaceProblem
 };
 
 
+
+				 // In this example, we want to use a
+				 // variable coefficient in the
+				 // elliptic operator. Of course, the
+				 // suitable object is a Function, as
+				 // we have used it for the right hand
+				 // side and boundary values in the
+				 // last example. We will use it
+				 // again, but we implement another
+				 // function ``value_list'' which
+				 // takes a list of points and returns
+				 // the values of the function at
+				 // these points as a list. The reason
+				 // why such a function is reasonable
+				 // although we can get all the
+				 // information from the ``value''
+				 // function as well will be explained
+				 // below when assembling the matrix.
 template <int dim>
 class Coefficient : public Function<dim> 
 {
   public:
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
+    
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values,
 			     const unsigned int         component = 0) const;
@@ -70,40 +112,149 @@ class Coefficient : public Function<dim>
 
 
 
+				 // This is the implementation of the
+				 // coefficient function for a single
+				 // point. We let it return 20 if the
+				 // distance to the point of origin is
+				 // less than 0.5, and 1 otherwise:
 template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
 				const unsigned int) const 
 {
   if (p.square() < 0.5*0.5)
-    return 10;
+    return 20;
   else
     return 1;
 };
 
 
 
+				 // And this is the function that
+				 // returns the value of the
+				 // coefficient at a whole list of
+				 // points at once. Of course, the
+				 // values are the same as if we would
+				 // ask the ``value'' function.
 template <int dim>
 void Coefficient<dim>::value_list (const vector<Point<dim> > &points,
 				   vector<double>            &values,
 				   const unsigned int component) const 
 {
+				   // Use n_q_points as an
+				   // abbreviation for the number of
+				   // points for which function values
+				   // are requested:
   const unsigned int n_points = points.size();
-  
+
+				   // Now, of course the size of the
+				   // output array (``values'') must
+				   // be the same as that of the input
+				   // array (``points''), and we could
+				   // simply assume that. However, in
+				   // practice more than 90 per cent
+				   // of programming errors are
+				   // invalid function parameters such
+				   // as invalid array sizes, etc, so
+				   // we should try to make sure that
+				   // the parameters are valid. For
+				   // this, the Assert macro is a good
+				   // means, since it asserts that the
+				   // condition which is given as
+				   // first argument is valid, and if
+				   // not throws an exception (its
+				   // second argument) which will
+				   // usually terminate the program
+				   // giving information where the
+				   // error occured and what the
+				   // reason was. This generally
+				   // reduces the time to find
+				   // programming errors dramatically
+				   // and we have found assertions an
+				   // invaluable means to program
+				   // fast.
+				   //
+				   // On the other hand, all these
+				   // checks (there are more than 2000
+				   // of them in the library) should
+				   // not slow down the program too
+				   // much, which is why the Assert
+				   // macro is only used in debug mode
+				   // and expands to nothing if in
+				   // optimized mode. Therefore, while
+				   // you test your program and debug
+				   // it, the assertions will tell you
+				   // where the problems are, and once
+				   // your program is stable you can
+				   // switch off debugging and the
+				   // program will run without the
+				   // assertions and at maximum speed.
+				   //
+				   // Here, as has been said above, we
+				   // would like to make sure that the
+				   // size of the two arrays is equal,
+				   // and if not throw an
+				   // exception. Since the following
+				   // test is rather frequent for the
+				   // classes derived from
+				   // ``Function'', that class
+				   // declares an exception
+				   // ``ExcVectorHasWrongSize'' which
+				   // takes the sizes of two vectors
+				   // and prints some output in case
+				   // the condition is violated:
   Assert (values.size() == n_points, 
 	  ExcVectorHasWrongSize (values.size(), n_points));
+				   // Since examples are not very good
+				   // if they do not demonstrate their
+				   // point, we will show how to
+				   // trigger this exception at the
+				   // end of the main program, and
+				   // what output results from this
+				   // (see the ``Results'' section of
+				   // this example program). You will
+				   // certainly notice that the output
+				   // is quite well suited to quickly
+				   // find what the problem is and
+				   // what parameters are expected. An
+				   // additional plus is that if the
+				   // program is run inside a
+				   // debugger, it will stop at the
+				   // point where the exception is
+				   // triggered, so you can go up the
+				   // call stack to immediately find
+				   // the place where the the array
+				   // with the wrong size was set up.
   
+				   // While we're at it, we can do
+				   // another check: the coefficient
+				   // is a scalar, but the Function
+				   // class also represents
+				   // vector-valued function. A scalar
+				   // function must therefore be
+				   // considered as a vector-valued
+				   // function with only one
+				   // component, so the only valid
+				   // component for which a user might
+				   // ask is zero (we always count
+				   // from zero). The following
+				   // assertion checks this. (The
+				   // ``1'' is denotes the number of
+				   // components that this function
+				   // has.)
   Assert (component == 0, 
 	  ExcWrongComponent (component, 1));
   
   for (unsigned int i=0; i<n_points; ++i)
-    if (points[i].square() < 0.5*0.5)
-      values[i] = 10;
-    else
-      values[i] = 1;
+    {
+      if (points[i].square() < 0.5*0.5)
+	values[i] = 20;
+      else
+	values[i] = 1;
+    };
 };
 
 
-
+				 // This function is as before.
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
 		dof_handler (triangulation)
@@ -111,19 +262,14 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 
+				 // This is the function
+				 // ``make_grid_and_dofs'' from the
+				 // previous example, minus the
+				 // generation of the grid. Everything
+				 // else is unchanged.
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs (const unsigned int refinement)
+void LaplaceProblem<dim>::setup_system ()
 {
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (refinement);
-  
-  cout << "   Number of active cells: "
-       << triangulation.n_active_cells()
-       << endl
-       << "   Total number of cells: "
-       << triangulation.n_cells()
-       << endl;
-
   dof_handler.distribute_dofs (fe);
 
   cout << "   Number of degrees of freedom: "
@@ -197,7 +343,14 @@ void LaplaceProblem<dim>::assemble_system ()
 
   vector<int>        local_dof_indices (dofs_per_cell);
 
-				   // ...
+				   // Below, we will ask the
+				   // Coefficient class to compute the
+				   // values of the coefficient at all
+				   // quadrature points on one cell at
+				   // once. For this, we need some
+				   // space to store the values in,
+				   // which we use the following
+				   // variable for:
   vector<double>     coefficient_values (n_q_points);
 
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
@@ -418,6 +571,12 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 
+				 // The solution process again looks
+				 // mostly like in the previous
+				 // examples. However, we will now use
+				 // a preconditioned conjugate
+				 // gradient algorithm. It is not very
+				 // difficult to make this change:
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
@@ -425,12 +584,39 @@ void LaplaceProblem<dim>::solve ()
   PrimitiveVectorMemory<> vector_memory;
   SolverCG<>              cg (solver_control, vector_memory);
 
-				   // ...
+				   // The only thing we have to alter
+				   // is that we need an object which
+				   // will act as a preconditioner. We
+				   // will use SSOR (symmetric
+				   // successive overrelaxation), with
+				   // a relaxation factor of 1.2. For
+				   // this purpose, the SparseMatrix
+				   // class has a function which does
+				   // one SSOR step, and we need to
+				   // package the address of this
+				   // function together with the
+				   // matrix on which it should act
+				   // (which is the matrix to be
+				   // inverted) and the relaxation
+				   // factor into one object. This can
+				   // be done like this:
   PreconditionRelaxation<>
     preconditioner(system_matrix,
 		   &SparseMatrix<double>::template precondition_SSOR<double>,
 		   1.2);
+				   // The default template parameters
+				   // of the PreconditionRelaxation
+				   // class are the matrix and the
+				   // vector type, which default to
+				   // the types used in this program.
 
+				   // Calling the solver now looks
+				   // mostly like in the example
+				   // before, but where there was an
+				   // object of type
+				   // PreconditionIdentity before,
+				   // there now is the newly generated
+				   // preconditioner object.
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
@@ -441,8 +627,15 @@ void LaplaceProblem<dim>::solve ()
 
 
 
+				 // Writing output to a file is mostly
+				 // the same as for the previous
+				 // example, but here we will show how
+				 // to modify some output options and
+				 // how to construct a different
+				 // filename for each refinement
+				 // cycle.
 template <int dim>
-void LaplaceProblem<dim>::output_results () 
+void LaplaceProblem<dim>::output_results (const unsigned int cycle)
 {
   DataOut<dim> data_out;
 
@@ -451,24 +644,110 @@ void LaplaceProblem<dim>::output_results ()
 
   data_out.build_patches ();
 
-  ofstream output (dim == 2 ?
-		   "solution-2d.gmv" :
-		   "solution-3d.gmv");
-				   // ...
-  data_out.write_gnuplot (output);
-};
+				   // For this example, we would like
+				   // to write the output directly to
+				   // a file in Encapsulated
+				   // Postscript (EPS) format. The
+				   // library supports this, but
+				   // things may be a bit more
+				   // difficult sometimes, since EPS
+				   // is a printing format, unlike
+				   // most other supported formats
+				   // which serve as input for
+				   // graphical tools. Therefore, you
+				   // can't scale or rotate the image
+				   // after it has been written to
+				   // disk, and you have to decide
+				   // about the viewpoint or the
+				   // scaling in advance.
+				   //
+				   // The defaults in the library are
+				   // usually quite reasonable, and
+				   // regarding viewpoint and scaling
+				   // they coincide with the defaults
+				   // of Gnuplot. However, since this
+				   // is a tutorial, we will
+				   // demonstrate how to change
+				   // them. For this, we first have to
+				   // generate an object describing
+				   // the flags for EPS output:
+  DataOutBase::EpsFlags eps_flags;
+				   // They are initialized with the
+				   // default values, so we only have
+				   // to change those that we don't
+				   // like. For example, we would like
+				   // to scale the z-axis differently
+				   // (stretch each data point in
+				   // z-direction by a factor of four):
+  eps_flags.z_scaling = 4;
+				   // Then we would also like to alter
+				   // the viewpoint from which we look
+				   // at the solution surface. The
+				   // default is at an angle of 60
+				   // degrees down from the vertical
+				   // axis, and 30 degrees rotated
+				   // against it in mathematical
+				   // positive sense. We raise our
+				   // viewpoint a bit and look more
+				   // along the y-axis:
+  eps_flags.azimut_angle = 40;
+  eps_flags.turn_angle   = 10;
+				   // That shall suffice. There are
+				   // more flags, for example whether
+				   // to draw the mesh lines, which
+				   // data vectors to use for
+				   // colorization of the interior of
+				   // the cells, and so on. You may
+				   // want to take a look at the
+				   // documentation of the EpsFlags
+				   // structure to get an overview of
+				   // what is possible.
+				   //
+				   // The only thing still to be done,
+				   // is to tell the output object to
+				   // use these flags:
+  data_out.set_flags (eps_flags);
+				   // The above way to modify flags
+				   // requires recompilation each time
+				   // we would like to use different
+				   // flags. This is inconvenient, and
+				   // we will see more advanced ways
+				   // in following examples where the
+				   // output flags are determined at
+				   // run time using an input file.
 
-
-
-template <int dim>
-void LaplaceProblem<dim>::clear () 
-{
-  system_rhs.reinit (0);
-  solution.reinit (0);
-  system_matrix.reinit ();
-  sparsity_pattern.reinit (0, 0, 0);
-  dof_handler.clear ();
-  triangulation.clear ();
+				   // Finally, we need the filename to
+				   // which the results is to be
+				   // written. We would like to have
+				   // it of the form
+				   // ``solution-N.eps'', where N is
+				   // the number of refinement
+				   // cycle. Thus, we have to convert
+				   // an integer to a part of a
+				   // string; this can be done using
+				   // the ``sprintf'' function, but in
+				   // C++ there is a more elegant way:
+				   // write everything into a special
+				   // stream (just like writing into a
+				   // file or to the screen) and
+				   // retrieve that as a string. This
+				   // applies the usual conversions
+				   // from integer to strings, and one
+				   // could as well give stream
+				   // modifiers such as ``setf'',
+				   // ``setprecision'', and so on.
+  ostrstream filename;
+  filename << "solution-"
+	   << cycle
+	   << ".eps";
+				   // We can get whatever we wrote to
+				   // the stream using the ``str()''
+				   // function. Use that as filename
+				   // for the output stream:
+  ofstream output (filename.str());
+				   // And then write the data to the
+				   // file.
+  data_out.write_eps (output);
 };
 
 
@@ -476,29 +755,175 @@ void LaplaceProblem<dim>::clear ()
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  cout << "Solving problem in " << dim << " space dimensions." << endl;
-  
-  for (unsigned int refinement=0; refinement<7; ++refinement)
+  for (unsigned int cycle=0; cycle<6; ++cycle)
     {
-      cout << "Refinement step: " << refinement << endl;
-      
-      make_grid_and_dofs(refinement);
+      cout << "Cycle " << cycle << ':' << endl;
+
+				       // If this is the first round,
+				       // then we have no grid yet,
+				       // and we will create it
+				       // here. In previous examples,
+				       // we have already used some of
+				       // the functions from the
+				       // GridGenerator class. Here we
+				       // would like to read a grid
+				       // from a file where the cells
+				       // are stored and which may
+				       // originate from someone else,
+				       // or may be the product of a
+				       // mesh generator tool.
+				       //
+				       // In order to read a grid from
+				       // a file, we generate an
+				       // object of data type GridIn
+				       // and associate the
+				       // triangulation to it (i.e. we
+				       // tell it to fill our
+				       // triangulation object when we
+				       // ask it to read the
+				       // file). Then we open the
+				       // respective file and fill the
+				       // triangulation with it:
+      if (cycle == 0)
+	{
+	  GridIn<dim> grid_in;
+	  grid_in.attach_triangulation (triangulation);
+
+					   // We would now like to
+					   // read the file. However,
+					   // the input file is only
+					   // for a two-dimensional
+					   // triangulation, while
+					   // this function is a
+					   // template for arbitrary
+					   // dimension. Since this is
+					   // only a demonstration
+					   // program, we will not use
+					   // different input files
+					   // for the different
+					   // dimensions, but rather
+					   // kill the whole program
+					   // if we are not in 2D:
+	  Assert (dim==2, ExcInternalError());
+					   // ExcInternalError is a
+					   // globally defined
+					   // exception, which may be
+					   // thrown whenever
+					   // something is terribly
+					   // wrong. Usually, one
+					   // would like to use more
+					   // specific exceptions, and
+					   // particular in this case
+					   // one would of course try
+					   // to do something else if
+					   // ``dim'' is not equal to
+					   // two, e.g. create a grid
+					   // using library
+					   // functions. Aborting a
+					   // program is usually not a
+					   // good idea and assertions
+					   // should really only be
+					   // used for exceptional
+					   // cases which should not
+					   // occur, but might due to
+					   // stupidity of the
+					   // programmer, user, or
+					   // someone else. The
+					   // situation above is not a
+					   // very clever use of
+					   // Assert, but again: this
+					   // is a tutorial and it
+					   // might be worth to show
+					   // what not to do, after
+					   // all.
+	  
+	  ifstream input_file("circle-grid.inp");
+	  grid_in.read_ucd (input_file);
+
+					   // The grid in the file
+					   // describes a
+					   // circle. Therefore we
+					   // have to use a boundary
+					   // object which tells the
+					   // triangulation where to
+					   // put new points on the
+					   // boundary when the grid
+					   // is refined. This works
+					   // in the same way as in
+					   // the first example. Note
+					   // that the
+					   // HyperBallBoundary
+					   // constructor takes two
+					   // parameters, the center
+					   // of the ball and the
+					   // radius, but that their
+					   // default (the origin and
+					   // 1.0) are the ones which
+					   // we would like to use
+					   // here.
+	  static const HyperBallBoundary<dim> boundary;
+	  triangulation.set_boundary (0, boundary);
+	}
+				       // If this is not the first
+				       // cycle, then simply refine
+				       // the grid once globally.
+      else
+	triangulation.refine_global (1);
+
+				       // Write some output and do all
+				       // the things that we have
+				       // already seen in the previous
+				       // examples.
+      cout << "   Number of active cells: "
+	   << triangulation.n_active_cells()
+	   << endl
+	   << "   Total number of cells: "
+	   << triangulation.n_cells()
+	   << endl;
+
+      setup_system ();
       assemble_system ();
       solve ();
-      output_results ();
-
-      clear ();
+      output_results (cycle);
     };
 };
 
     
 
+				 // The main function looks mostly
+				 // like the one in the previous
+				 // example, so we won't comment on it
+				 // further.
 int main () 
 {
   deallog.depth_console (0);
 
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
+
+				   // Finally, we have promised to
+				   // trigger an exception in the
+				   // Coefficient class. For this, we
+				   // have to call its ``value_list''
+				   // function with two arrays of
+				   // different size (the number in
+				   // parentheses behind the name of
+				   // the object). We have commented
+				   // out these lines in order to
+				   // allow the program to exit
+				   // gracefully in normal situations
+				   // (we use the program in
+				   // day-to-day testing of changes to
+				   // the library as well), so you
+				   // will only get the exception by
+				   // un-commenting the following
+				   // lines.
+/*  
+  Coefficient<2>    coefficient;
+  vector<Point<2> > points (2);
+  vector<double>    coefficient_values (1);
+  coefficient.value_list (points, coefficient_values);
+*/
   
   return 0;
 };
