@@ -365,6 +365,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: The algorithm to generate neighbor information for patches from
+       cells in <code class="member">DataOut::build_patches</code> was rather
+       inefficient, tripling the time for patch generation when support for
+       neighbor information was added. Furthermore, the algorithm was at least
+       O(N log N), where the rest was all O(N), making this particularly
+       problematic when the data set was already large. This should now be back
+       to the previous level, by using a more efficient algorithm.
+       <br>
+       (WB 2002/10/10)
+       </p>
+
+  <li> <p> 
        Changed (internals): Previously, the finite element base class
        initialized the restriction, prolongation, and face constraints matrices
        to their correct size. Derived classes had to fill these classes, and
