@@ -979,8 +979,12 @@ namespace Patterns
  *           
  *                                        // get parameters into the program
  *       std::cout << std::endl << std::endl
- *            << "Getting parameters:" << std::endl;
+ *                 << "Getting parameters:" << std::endl;
  *       p.get_parameters (prm);
+ *
+ *                                        // now run the program with these
+ *                                        // input parameters
+ *       p.do_something ();
  *     };
  *   @end{verbatim}
  *
