@@ -326,7 +326,7 @@ namespace internal
   
 				       //Assigns the correct sides to
 				       //each quads
-      transform(inquads.begin(),inquads.end(), back_inserter(mquads),
+      transform(inquads.begin(),inquads.end(), std::back_inserter(mquads),
 		std::bind2nd(MQuad::MakeQuad(),sides) );
   
 				       // Assign the quads to their sides also.
