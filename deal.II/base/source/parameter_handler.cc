@@ -590,8 +590,18 @@ void ParameterHandler::print_parameters_section (ostream           &out,
       switch (style) 
 	{
 	  case Text:
+						 // write end of subsection. one
+						 // blank line after each subsection
 		out << setw(indent_level*2) << ""
-		    << "end" << endl;
+		    << "end" << endl
+		    << endl;
+
+						 // if this is a toplevel
+						 // subsection, then have two
+						 // newlines
+		if (indent_level == 0)
+		  out << endl;
+		
 		break;
 	  case LaTeX:
 		out << "\\end{itemize}"
