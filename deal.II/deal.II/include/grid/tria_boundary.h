@@ -87,8 +87,8 @@ class StraightBoundary : public Boundary<dim> {
     the point in the middle of the old points onto the ball. The middle is
     defined as the arithmetic mean of the points. 
 
-    The center of the ball and its radius have to be given upon construction of
-    an object of this type.
+    The center of the ball and its radius may be given upon construction of
+    an object of this type. They default to the origin and a radius of 1.0.
 
     This class is derived from #StraightBoundary# rather than from
     #Boundary#, which would seem natural, since this way we can use the
@@ -100,7 +100,7 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 				     /**
 				      * Constructor
 				      */
-    HyperBallBoundary (const Point<dim> p, const double radius) :
+    HyperBallBoundary (const Point<dim> p=Point<dim>(), const double radius=1.0) :
 		    center(p), radius(radius) {};
 
 				     /**
