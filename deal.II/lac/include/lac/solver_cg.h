@@ -167,6 +167,9 @@ class SolverCG : public Solver<VECTOR>
 				      * Additional parameters.
 				      */
     AdditionalData additional_data;
+
+  private:
+    void cleanup();
 };
 
 /*@}*/
@@ -202,6 +205,19 @@ SolverCG<VECTOR>::criterion()
 
 template<class VECTOR>
 void
+SolverCG<VECTOR>::cleanup()
+{
+  this->memory.free(Vr);
+  this->memory.free(Vp);
+  this->memory.free(Vz);
+  this->memory.free(VAp);
+  deallog.pop();
+}
+
+
+
+template<class VECTOR>
+void
 SolverCG<VECTOR>::print_vectors(const unsigned int,
 				const VECTOR&,
 				const VECTOR&,
@@ -227,93 +243,88 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   Vp  = this->memory.alloc();
   Vz  = this->memory.alloc();
   VAp = this->memory.alloc();
-				   // define some aliases for simpler access
-  VECTOR& g  = *Vr; 
-  VECTOR& h  = *Vp; 
-  VECTOR& d  = *Vz; 
-  VECTOR& Ad = *VAp;
-				   // resize the vectors, but do not set
-				   // the values since they'd be overwritten
-				   // soon anyway.
-  g.reinit(x, true);
-  h.reinit(x, true);
-  d.reinit(x, true);
-  Ad.reinit(x, true);
-				   // Implementation taken from the DEAL
-				   // library
-  int  it=0;
-  double res,gh,alpha,beta;
 
-				   // compute residual. if vector is
-				   // zero, then short-circuit the
-				   // full computation
-  if (!x.all_zero())
+  try {
+				     // define some aliases for simpler access
+    VECTOR& g  = *Vr; 
+    VECTOR& h  = *Vp; 
+    VECTOR& d  = *Vz; 
+    VECTOR& Ad = *VAp;
+				     // resize the vectors, but do not set
+				     // the values since they'd be overwritten
+				     // soon anyway.
+    g.reinit(x, true);
+    h.reinit(x, true);
+    d.reinit(x, true);
+    Ad.reinit(x, true);
+				     // Implementation taken from the DEAL
+				     // library
+    int  it=0;
+    double res,gh,alpha,beta;
+    
+				     // compute residual. if vector is
+				     // zero, then short-circuit the
+				     // full computation
+    if (!x.all_zero())
+      {
+	A.vmult(g,x);
+	g.sadd(-1.,1.,b);
+      }
+    else
+      g = b;
+    res = g.l2_norm();
+    
+    conv = this->control().check(0,res);
+    if (conv) 
+      {
+	cleanup();
+	return;
+      }
+    
+    g.scale(-1.);
+    precondition.vmult(h,g);
+    
+    d.equ(-1.,h);
+    
+    gh = g*h;
+    
+    while (conv == SolverControl::iterate)
+      {
+	it++;
+	A.vmult(Ad,d);
+	
+	alpha = d*Ad;
+	alpha = gh/alpha;
+	
+	g.add(alpha,Ad);
+	x.add(alpha,d );
+	res = g.l2_norm();
+	
+	print_vectors(it, x, g, d);
+	
+	conv = this->control().check(it,res);
+	if (conv)
+	  break;
+	
+	precondition.vmult(h,g);
+	
+	beta = gh;
+	gh   = g*h;
+	beta = gh/beta;
+	
+	if (additional_data.log_coefficients)
+	  deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
+	
+	d.sadd(beta,-1.,h);
+      }
+  }
+  catch (...)
     {
-      A.vmult(g,x);
-      g.sadd(-1.,1.,b);
+      cleanup();
+      throw;
     }
-  else
-    g = b;
-  res = g.l2_norm();
-  
-  conv = this->control().check(0,res);
-  if (conv) 
-    {
-      this->memory.free(Vr);
-      this->memory.free(Vp);
-      this->memory.free(Vz);
-      this->memory.free(VAp);
-      deallog.pop();
-      return;
-    };
-  
-  g.scale(-1.);
-  precondition.vmult(h,g);
- 
-  d.equ(-1.,h);
- 
-  gh = g*h;
- 
-  while (conv == SolverControl::iterate)
-    {
-      it++;
-      A.vmult(Ad,d);
-      
-      alpha = d*Ad;
-      alpha = gh/alpha;
-      
-      g.add(alpha,Ad);
-      x.add(alpha,d );
-      res = g.l2_norm();
-
-      print_vectors(it, x, g, d);
-      
-      conv = this->control().check(it,res);
-      if (conv)
-	break;
-      
-      precondition.vmult(h,g);
-      
-      beta = gh;
-      gh   = g*h;
-      beta = gh/beta;
-      
-      if (additional_data.log_coefficients)
-	deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
-      
-      d.sadd(beta,-1.,h);
-    };
-
-
 				   // Deallocate Memory
-  this->memory.free(Vr);
-  this->memory.free(Vp);
-  this->memory.free(Vz);
-  this->memory.free(VAp);
- 
-				   // Output
-  deallog.pop();
- 
+  cleanup();
 				   // in case of failure: throw
 				   // exception
   if (this->control().last_check() != SolverControl::success)

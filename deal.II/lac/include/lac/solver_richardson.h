@@ -231,17 +231,16 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 	  print_vectors(iter,x,r,d);
 	}
     }
-  catch (const ExceptionBase& e)
+  catch (...)
     {
       this->memory.free(Vr);
       this->memory.free(Vd);
       deallog.pop();
-      throw e;
+      throw;
     }
 				   // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
-
   deallog.pop();
 
 				   // in case of failure: throw
@@ -289,18 +288,17 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 	  print_vectors(iter,x,r,d);
 	}
     }
-  catch (const ExceptionBase& e)
+  catch (...)
     {
       this->memory.free(Vr);
       this->memory.free(Vd);
       deallog.pop();
-      throw e;
+      throw;
     }
   
 				   // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
-
   deallog.pop();
 				   // in case of failure: throw
 				   // exception
