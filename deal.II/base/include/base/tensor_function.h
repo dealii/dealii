@@ -24,24 +24,29 @@
 
 
 /**
- *  This class is a model for a tensor valued function.
- *  It returns the value
- *  at a given point through the @p{operator ()} member functions,
- *  which are virtual. It also has a function to return a whole list of
- *  values at different points to reduce the overhead of the virtual function
- *  calls; this function is preset to successively call the function returning
- *  one value at a time.
+ *  This class is a model for a tensor valued function. The interface
+ *  of the class is mostly the same as that for the @ref{Function}
+ *  class, with the exception that it does not support vector-valued
+ *  functions with several components, but that the return type is
+ *  always tensor-valued. The returned values of the evaluation of
+ *  objects of this type are always whole tensors, while for the
+ *  @p{Function} class, one can ask for a specific component only, or
+ *  use the @p{vector_value} function, which however does not return
+ *  the value, but rather writes it into the address provided by its
+ *  second argument. The reason for the different behaviour of the
+ *  classes is that in the case if tensor valued functions, the size
+ *  of the argument is known to the compiler a priori, such that the
+ *  correct amount of memory can be allocated on the stack for the
+ *  return value; on the other hand, for the vector valued functions,
+ *  the size is not known to the compiler, so memory has to be
+ *  allocated on the heap, resulting in relatively expensive copy
+ *  operations. One can therefore consider this class a specialization
+ *  of the @p{Function} class for which the size is known. An
+ *  additional benefit is that tensors of arbitrary rank can be
+ *  returned, not only vectors, as for them the size can be determined
+ *  similarly simply.
  *
- *  There are other functions return the gradient of the function at one or
- *  several points. You only have to overload those functions you need; the
- *  functions returning several values at a time will call those returning
- *  only one value, while those ones will throw an exception when called but
- *  not overloaded.
- *
- *  Usually, efficiency of your program increases if you overload the
- *  complex virtual functions, too.
- *
- *  @author Guido Kanschat, 1999
+ *  @author Guido Kanschat, 1999 
  */
 template <int rank, int dim>
 class TensorFunction : public FunctionTime,
@@ -49,15 +54,20 @@ class TensorFunction : public FunctionTime,
 {
   public:
 				     /**
-				      * Constructor. May take an initial vakue
-				      * for the time variable, which defaults
-				      * to zero.
+				      * Constructor. May take an
+				      * initial value for the time
+				      * variable, which defaults to
+				      * zero.  
 				      */
     TensorFunction (const double initial_time = 0.0);
     
 				     /**
 				      * Virtual destructor; absolutely
-				      * necessary in this case.
+				      * necessary in this case, as
+				      * classes are usually not used
+				      * by their true type, but rather
+				      * through pointers to this base
+				      * class.  
 				      */
     virtual ~TensorFunction ();
     
@@ -68,12 +78,12 @@ class TensorFunction : public FunctionTime,
     virtual Tensor<rank, dim> value (const Point<dim> &p) const;
 
 				     /**
-				      * Set @p{values} to the point values
-				      * of the function at the @p{points}.
-				      * It is assumed that @p{values}
-				      * already has the right size, i.e.
-				      * the same size as the @p{points}
-				      * array.
+				      * Set @p{values} to the point
+				      * values of the function at the
+				      * @p{points}.  It is assumed
+				      * that @p{values} already has
+				      * the right size, i.e.  the same
+				      * size as the @p{points} array.  
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<Tensor<rank,dim> > &values) const;
@@ -85,11 +95,12 @@ class TensorFunction : public FunctionTime,
     virtual Tensor<rank+1,dim> gradient (const Point<dim> &p) const;
 
 				     /**
-				      * Set @p{gradients} to the gradients of
-				      * the function at the @p{points}.
-				      * It is assumed that @p{values} 
-				      * already has the right size, i.e.
-				      * the same size as the @p{points} array.
+				      * Set @p{gradients} to the
+				      * gradients of the function at
+				      * the @p{points}.  It is assumed
+				      * that @p{values} already has
+				      * the right size, i.e.  the same
+				      * size as the @p{points} array.  
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<rank+1,dim> > &gradients) const;
