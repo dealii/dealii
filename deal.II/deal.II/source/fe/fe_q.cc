@@ -728,91 +728,92 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 			      std::vector<unsigned int>    &renumber)
 {
   const unsigned int n = degree+1;
-  
+
+
+  if (degree == 0)
+    {
+      Assert ((fe_data.dofs_per_vertex == 0) &&
+	      ((fe_data.dofs_per_line == 0) || (dim == 1)) &&
+	      ((fe_data.dofs_per_quad == 0) || (dim == 2)) &&
+	      ((fe_data.dofs_per_hex == 0)  || (dim == 3)),
+	      ExcInternalError());
+      renumber[0] = 0;
+    };
+
   if (degree > 0)
-    for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
-      {
-	unsigned int index = 0;
-					 // Find indices of vertices.
-					 // Unfortunately, somebody
-					 // switched the upper corner
-					 // points of a quad. The same
-					 // person decided to find a very
-					 // creative numbering of the
-					 // vertices of a hexahedron.
-					 // Therefore, this looks quite
-					 // sophisticated.
-					 //
-					 // NB: This same person
-					 // claims to have had good
-					 // reasons then, but seems to
-					 // have forgotten about
-					 // them. At least, the
-					 // numbering was discussed
-					 // with the complaining
-					 // person back then when all
-					 // began :-)
-	switch (dim)
-	  {
-	    case 1:
-		  if (i==1)
-		    index += degree;
-		  break;
-	    case 2:
-		  switch (i)
-		    {
-		      case 1:
-			    index += degree;
-			    break;
-		      case 3:
-			    index += n*degree;
-			    break;
-		      case 2:
-			    index += n*degree+degree;
-			    break;
-		    }
-		  break;
-	    case 3:
-		  switch (i)
-		    {
-		      case 1:
-			    index += degree;
-			    break;
-		      case 4:
-			    index += n*degree;
-			    break;
-		      case 5:
-			    index += n*degree+degree;
-			    break;
-		      case 3:
-			    index += n*n*degree;
-			    break;
-		      case 2:
-			    index += n*n*degree + degree;
-			    break;
-		      case 7:
-			    index += n*n*degree + n*degree;
-			    break;
-		      case 6:
-			    index += n*n*degree + n*degree+degree;
-			    break;
-		    }
-		  break;
-		  
-	    default:
-		  Assert(false, ExcNotImplemented());
-	  }
+    {
+      Assert (fe_data.dofs_per_vertex == 1, ExcInternalError());
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	{
+	  unsigned int index = 0;
+					   // Find indices of vertices.
+					   // Unfortunately, somebody
+					   // switched the upper corner
+					   // points of a quad. The same
+					   // person decided to find a very
+					   // creative numbering of the
+					   // vertices of a hexahedron.
+					   // Therefore, this looks quite
+					   // sophisticated.
+					   //
+					   // NB: This same person
+					   // claims to have had good
+					   // reasons then, but seems to
+					   // have forgotten about
+					   // them. At least, the
+					   // numbering was discussed
+					   // with the complaining
+					   // person back then when all
+					   // began :-)
+	  switch (dim)
+	    {
+	      case 1:
+	      {
+		const unsigned int values[GeometryInfo<1>::vertices_per_cell]
+		  = { 0, degree };
+		index = values[i];
+		break;
+	      };
+	     
+	      case 2:
+	      {
+		const unsigned int values[GeometryInfo<2>::vertices_per_cell]
+		  = { 0, degree, n*degree+degree, n*degree };
+		index = values[i];
+		break;
+	      };
+	     
+	      case 3:
+	      {
+		const unsigned int values[GeometryInfo<3>::vertices_per_cell]
+		  = { 0, degree,
+		      n*n*degree + degree, n*n*degree,
+		      n*degree, n*degree+degree,
+		      n*n*degree + n*degree+degree, n*n*degree + n*degree};
+		index = values[i];
+		break;
+	      };
+	     
+	      default:
+		    Assert(false, ExcNotImplemented());
+	    }
 	
-	renumber[index] = i;
-      }
-  else
-				     // degree == 0
-    renumber[0] = 0;
+	  renumber[index] = i;
+	}
+    };
   
-				   // Lines and higher
+				   // for degree 2 and higher: Lines,
+				   // quads, hexes etc also carry
+				   // degrees of freedom
   if (degree > 1)
     {
-      for (int i=0;i< (int) GeometryInfo<dim>::lines_per_cell;++i)
+      Assert (fe_data.dofs_per_line == degree-1, ExcInternalError());
+      Assert ((fe_data.dofs_per_quad == (degree-1)*(degree-1)) ||
+	      (dim < 2), ExcInternalError());
+      Assert ((fe_data.dofs_per_hex == (degree-1)*(degree-1)*(degree-1)) ||
+	      (dim < 3), ExcInternalError());
+	    
+      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::lines_per_cell); ++i)
 	{
 	  unsigned int index = fe_data.first_line_index + i*fe_data.dofs_per_line;
 	  unsigned int incr = 0;
@@ -885,7 +886,7 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 	    }
 	}
 
-      for (int i=0;i< (int) GeometryInfo<dim>::quads_per_cell;++i)
+      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::quads_per_cell); ++i)
 	{
 	  unsigned int index = fe_data.first_quad_index+i*fe_data.dofs_per_quad;
 	  unsigned int tensorstart = 0;
@@ -923,15 +924,15 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 	    for (unsigned int jx = 1; jx<degree ;++jx)
 	      {
 		unsigned int tensorindex = tensorstart
-		  + jx * incx + jy * incy;
+					   + jx * incx + jy * incy;
 		renumber[tensorindex] = index++;
 	      }
 	}
 
-      for (int i=0;i< (int) GeometryInfo<dim>::hexes_per_cell;++i)
+      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::hexes_per_cell); ++i)
 	{
 	  unsigned int index = fe_data.first_hex_index;
-
+	  
 	  for (unsigned int jz = 1; jz<degree; jz++)
 	    for (unsigned int jy = 1; jy<degree; jy++)
 	      for (unsigned int jx = 1; jx<degree; jx++)
@@ -939,8 +940,7 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 		  const unsigned int tensorindex = jx + jy*n + jz*n*n;
 		  renumber[tensorindex]=index++;
 		}  
-	}
-      
+	} 
     }
 }
 
@@ -948,8 +948,8 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 
 template <int dim>
 void
-FE_Q<dim>::build_face_renumbering (const unsigned int              degree,
-				   std::vector<unsigned int>      &numbering)
+FE_Q<dim>::build_face_renumbering (const unsigned int         degree,
+				   std::vector<unsigned int> &numbering)
 {
   FiniteElementData<dim-1> fe_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
   FE_Q<dim-1>::build_renumbering (fe_data, degree, numbering); 
