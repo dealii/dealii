@@ -791,7 +791,8 @@ class ConstraintMatrix : public Subscriptor
 		    int, int, double, double,
 		    << "The entry for the indices " << arg1 << " and "
 		    << arg2 << " already exists, but the values "
-		    << arg3 << " (old) and " << arg4 << " (new) differ.");
+		    << arg3 << " (old) and " << arg4 << " (new) differ "
+                    << "by " << (arg4-arg3) << ".");
 				     /**
 				      * Exception
 				      */
