@@ -195,11 +195,33 @@ class TableHandler
 				     /**
 				      * Change the order of columns and
 				      * supercolumns in the table.
+				      *
+				      * #new_order# includes the keys and
+				      * superkeys of the columns and
+				      * supercolumns in the order the user like to.
+				      * If a superkey is included the keys
+				      * of the subcolumns need not to be additionally
+				      * mentioned in this vector.
+				      * The order of subcolumns within a supercolumn
+				      * is not changeable and keeps the order
+				      * in which
+				      * the columns are added to the supercolumn.
+				      *
+				      * This function may also be used to break
+				      * big tables with to many columns into smaller
+				      * ones. Call this function with
+				      * the first e.g. five columns and then #write_*#.
+				      * Afterwards call this function with the 
+				      * next e.g. five columns and again #write_*#,
+				      * and so on.
 				      */
     void set_column_order (const vector<string> &new_order);
     
 				     /**
-				      * Sets the output format of a column.
+				      * Sets the #precision# e.g. double or float
+				      * variables are written with. #precision# is
+				      * the same as in calling
+				      * #out << setprecision(precision)#.
 				      */
     void set_precision (const string &key,
 			const unsigned int precision);
@@ -225,10 +247,13 @@ class TableHandler
 
 				     /**
 				      * Sets the tex output format of a column.
-				      * e.g. #c#, #r#, #l#, or #p{3cm}#.
+				      * e.g. #c#, #r#, #l#, or #p{3cm}#. The
+				      * default is #c#. Also if this function
+				      * is not called for a column, the default
+				      * is preset to be #c#.
 				      */
     void set_tex_format (const string &key,
-			 const string &format);
+			 const string &format="c");
 
 				     /**
 				      * Write table as formatted text, e.g.
@@ -268,7 +293,7 @@ class TableHandler
     DeclException4 (ExcWrongNumberOfDataEntries,
 		    string, int, string, int,
 		    << "Column <" << arg1 << "> has got " << arg2
-		    << "rows, but Column <" << arg3 << "> has got " << arg4 << ".");
+		    << " rows, but Column <" << arg3 << "> has got " << arg4 << ".");
 
     				     /**
 				      * Exception
@@ -361,12 +386,14 @@ class TableHandler
     void get_selected_columns (vector<string> &sel_columns) const;
     
 				     /**
-				      * Builtin function, that checks if
-				      * the number of rows is equal in every
-				      * row. This function is e.g. called before
+				      * Builtin function, that gives the 
+				      * number of rows in the table and
+				      * that checks if the number of rows 
+				      * is equal in every
+				      * column. This function is e.g. called before
 				      * writing output.
 				      */
-    unsigned int check_n_rows() const;
+    unsigned int n_rows() const;
 
 				     /**
 				      * Stores the column and 

@@ -219,8 +219,8 @@ void TableHandler::write_text(ostream &out) const
     }
   out << endl;
 
-  const unsigned int n_rows=check_n_rows();
-  for (unsigned int i=0; i<n_rows; ++i)
+  const unsigned int nrows=n_rows();
+  for (unsigned int i=0; i<nrows; ++i)
     {
       const unsigned int n_cols=sel_columns.size();
       
@@ -321,8 +321,8 @@ void TableHandler::write_tex(ofstream &out) const
   out << "\\\\ \\hline" << endl;
 
 				   // write the n rows
-  const unsigned int n_rows=check_n_rows();
-  for (unsigned int i=0; i<n_rows; ++i)
+  const unsigned int nrows=n_rows();
+  for (unsigned int i=0; i<nrows; ++i)
     {
       const unsigned int n_cols=sel_columns.size();
       
@@ -355,7 +355,7 @@ void TableHandler::write_tex(ofstream &out) const
 }
 
 
-unsigned int TableHandler::check_n_rows() const
+unsigned int TableHandler::n_rows() const
 {
   map<string, Column>::const_iterator col_iter=columns.begin();
   unsigned int n=col_iter->second.entries.size();
@@ -388,9 +388,9 @@ void TableHandler::get_selected_columns(vector<string> &sel_columns) const
 	  const unsigned int n_subcolumns=super_iter->second.size();
 	  for (unsigned int j=0; j<n_subcolumns; ++j)
 	    {
-	      const string sub_key=super_iter->second[j];
-	      Assert(columns.count(sub_key), ExcInternalError());
-	      sel_columns.push_back(super_iter->second[j]);
+	      const string subkey=super_iter->second[j];
+	      Assert(columns.count(subkey), ExcInternalError());
+	      sel_columns.push_back(subkey);
 	    }
 	}
       else
@@ -400,6 +400,7 @@ void TableHandler::get_selected_columns(vector<string> &sel_columns) const
 	  sel_columns.push_back(key);
 	}
     }
+  cout << endl;
 }
 
 
