@@ -175,12 +175,13 @@ class RHS {
 
 
 
-
+template <>
 double Solution<2>::GaussShape::operator () (const Point<2> &p) const {
   return p(0)*p(1)*exp(-40*p.square());
 };
 
 
+template <>
 Tensor<1,2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
   return Point<2> ((1-80.*p(0)*p(0))*p(1)*exp(-40*p.square()),
 		   (1-80.*p(1)*p(1))*p(0)*exp(-40*p.square()));
@@ -188,11 +189,13 @@ Tensor<1,2> Solution<2>::GaussShape::gradient (const Point<2> &p) const {
 
 
 
+template <>
 double Solution<2>::Singular::operator () (const Point<2> &p) const {
   return pow(p.square(), 1./3.);
 };
 
 
+template <>
 Tensor<1,2> Solution<2>::Singular::gradient (const Point<2> &p) const {
   return 2./3.*pow(p.square(), -2./3.) * p;
 };
@@ -205,18 +208,22 @@ inline double theta(const double x) {
 };
 
 
+
+template <>
 double Solution<2>::Kink::operator () (const Point<2> &p) const {
   const double s = p(1)-p(0)*p(0);
   return (1+4*theta(s))*s;
 };
 
 
+template <>
 Tensor<1,2> Solution<2>::Kink::gradient (const Point<2> &p) const {
   const double s = p(1)-p(0)*p(0);
   return (1+4*theta(s))*Point<2>(-2*p(0),1);
 };
 
 
+template <>
 double Solution<2>::Kink::Coefficient::operator () (const Point<2> &p) const {
   const double s = p(1)-p(0)*p(0);
   return 1./(1.+4.*theta(s));
@@ -224,16 +231,19 @@ double Solution<2>::Kink::Coefficient::operator () (const Point<2> &p) const {
 
 
 
+template <>
 double RHS<2>::GaussShape::operator () (const Point<2> &p) const {
   return (480.-6400.*p.square())*p(0)*p(1)*exp(-40.*p.square());
 };
 
 
+template <>
 double RHS<2>::Singular::operator () (const Point<2> &p) const {
   return -4./9. * pow(p.square(), -2./3.);
 };
 
 
+template <>
 double RHS<2>::Kink::operator () (const Point<2> &) const {
   return 2;
 };
@@ -245,7 +255,7 @@ double RHS<2>::Kink::operator () (const Point<2> &) const {
 
 
 
-
+template <>
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,
@@ -312,7 +322,12 @@ void PoissonProblem<dim>::clear () {
   if (solution_function != 0) { delete solution_function; solution_function = 0; };
   if (coefficient != 0)       { delete coefficient;       coefficient = 0;       };
   if (boundary != 0)          { delete boundary;          boundary = 0;          };
-  
+
+  				   // make it known to the underlying
+				   // ProblemBase that tria and dof
+				   // are already deleted
+  set_tria_and_dof (tria, dof);
+
   l2_error.clear ();
   linfty_error.clear ();
   h1_error.clear ();
