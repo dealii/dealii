@@ -2,7 +2,7 @@
 //    volume_2.cc,v 1.1 2003/10/19 22:29:39 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,7 +93,7 @@ void check (const Triangulation<dim> &tria,
             }
     }
 
-  Assert (std::fabs(v1-v2)/v1 < 1e-4, ExcInternalError());
+  Assert (std::fabs(v1-v2)/v1 < 4e-4, ExcInternalError());
   deallog << " face integration: "
           << v1 / dim
           << std::endl;
