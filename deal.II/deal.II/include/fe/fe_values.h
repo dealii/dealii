@@ -303,20 +303,35 @@ class FEValuesBase
 				      *
 				      * The function assumes that the
 				      * #values# object already has the
-				      * right size. 
+				      * right size.
+				      *
+				      * The actual data type of the
+				      * input vector may be either a
+				      * #Vector<double>#,
+				      * #Vector<float>#, or
+				      * #BlockVector<double,...>#.
 				      */
-    void get_function_values (const Vector<double> &fe_function,
-			      vector<double>       &values) const;
+    template <class InputVector>
+    void get_function_values (const InputVector &fe_function,
+			      vector<double>    &values) const;
 
 				     /**
-				      * Access to vector valued finite element functions.
+				      * Access to vector valued finite
+				      * element functions.
 				      *
 				      * This function does the same as
 				      * the other #get_function_values#,
 				      * but applied to multi-component
 				      * elements.
+				      *
+				      * The actual data type of the
+				      * input vector may be either a
+				      * #Vector<double>#,
+				      * #Vector<float>#, or
+				      * #BlockVector<double,...>#.
 				      */
-    void get_function_values (const Vector<double>    &fe_function,
+    template <class InputVector>
+    void get_function_values (const InputVector       &fe_function,
 			      vector<Vector<double> > &values) const;
 
     				     /**
@@ -357,8 +372,15 @@ class FEValuesBase
 				      * The function assumes that the
 				      * #gradients# object already has the
 				      * right size.
+				      *
+				      * The actual data type of the
+				      * input vector may be either a
+				      * #Vector<double>#,
+				      * #Vector<float>#, or
+				      * #BlockVector<double,...>#.
 				      */
-    void get_function_grads (const Vector<double>   &fe_function,
+    template <class InputVector>
+    void get_function_grads (const InputVector      &fe_function,
 			     vector<Tensor<1,dim> > &gradients) const;
 
 				     /**
@@ -379,8 +401,15 @@ class FEValuesBase
 				      * the other #get_function_values#,
 				      * but applied to multi-component
 				      * elements.
+				      *
+				      * The actual data type of the
+				      * input vector may be either a
+				      * #Vector<double>#,
+				      * #Vector<float>#, or
+				      * #BlockVector<double,...>#.
 				      */
-    void get_function_grads (const Vector<double>   &fe_function,
+    template <class InputVector>
+    void get_function_grads (const InputVector               &fe_function,
 			     vector<vector<Tensor<1,dim> > > &gradients) const;
 
     				     /**
@@ -426,8 +455,15 @@ class FEValuesBase
 				      * The function assumes that the
 				      * #second_derivatives# object already has
 				      * the right size.
+				      *
+				      * The actual data type of the
+				      * input vector may be either a
+				      * #Vector<double>#,
+				      * #Vector<float>#, or
+				      * #BlockVector<double,...>#.
 				      */
-    void get_function_2nd_derivatives (const Vector<double>   &fe_function,
+    template <class InputVector>
+    void get_function_2nd_derivatives (const InputVector      &fe_function,
 				       vector<Tensor<2,dim> > &second_derivatives) const;
 
 				     /**

@@ -69,8 +69,8 @@ void FEQ1Mapping<1>::compute_jacobian_gradients (const DoFHandler<1>::cell_itera
 
 template <>
 void FEQ1Mapping<2>::compute_jacobian_matrices (const DoFHandler<2>::cell_iterator &cell,
-						    const vector<Point<2> > &unit_points,
-						    vector<Tensor<2,2> >    &jacobians) 
+						const vector<Point<2> > &unit_points,
+						vector<Tensor<2,2> >    &jacobians) 
 {
   const unsigned int dim = 2;
   

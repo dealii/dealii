@@ -21,6 +21,7 @@
 #include <fe/fe.h>
 
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 
 #include <vector>
@@ -117,10 +118,10 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 template <int dim>
-template <typename number>
+template <class InputVector, typename number>
 void
-DoFObjectAccessor<1,dim>::get_dof_values (const Vector<number> &values,
-					  Vector<number>       &local_values) const
+DoFObjectAccessor<1,dim>::get_dof_values (const InputVector &values,
+					  Vector<number>    &local_values) const
 {
   Assert (dim==1, ExcInternalError());
   
@@ -147,10 +148,11 @@ DoFObjectAccessor<1,dim>::get_dof_values (const Vector<number> &values,
 
 
 template <int dim>
-template <typename number>
+template <class OutputVector, typename number>
 void
 DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
-					  Vector<number>       &values) const {
+					  OutputVector         &values) const
+{
   Assert (dim==1, ExcInternalError());
   
   Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
@@ -269,10 +271,10 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 template <int dim>
-template <typename number>
+template <class InputVector, typename number>
 void
-DoFObjectAccessor<2,dim>::get_dof_values (const Vector<number> &values,
-					  Vector<number>       &local_values) const
+DoFObjectAccessor<2,dim>::get_dof_values (const InputVector &values,
+					  Vector<number>    &local_values) const
 {
   Assert (dim==2, ExcInternalError());
   
@@ -303,10 +305,10 @@ DoFObjectAccessor<2,dim>::get_dof_values (const Vector<number> &values,
 
 
 template <int dim>
-template <typename number>
+template <class OutputVector, typename number>
 void
 DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
-					  Vector<number>       &values) const
+					  OutputVector         &values) const
 {
   Assert (dim==2, ExcInternalError());
   
@@ -432,10 +434,10 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 template <int dim>
-template <typename number>
+template <class InputVector, typename number>
 void
-DoFObjectAccessor<3,dim>::get_dof_values (const Vector<number> &values,
-					  Vector<number>       &local_values) const
+DoFObjectAccessor<3,dim>::get_dof_values (const InputVector &values,
+					  Vector<number>    &local_values) const
 {
   Assert (dim==3, ExcInternalError());
 
@@ -470,10 +472,10 @@ DoFObjectAccessor<3,dim>::get_dof_values (const Vector<number> &values,
 
 
 template <int dim>
-template <typename number>
+template <class OutputVector, typename number>
 void
 DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
-					  Vector<number>       &values) const
+					  OutputVector         &values) const
 {
   Assert (dim==3, ExcInternalError());
 
@@ -548,10 +550,10 @@ DoFCellAccessor<3>::face (const unsigned int i) const
 
 
 template <int dim>
-template <typename number>
+template <class InputVector, typename number>
 void
-DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
-						   Vector<number>       &interpolated_values) const
+DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
+						   Vector<number>    &interpolated_values) const
 {
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
   
@@ -610,10 +612,10 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
 
 
 template <int dim>
-template <typename number>
+template <class OutputVector, typename number>
 void
 DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &local_values,
-						       Vector<number>       &values) const
+						       OutputVector         &values) const
 {
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
   
@@ -645,63 +647,109 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 };
 
 
+
+// --------------------------------------------------------------------------
 // explicit instantiations
 
 
 // for double
 template
 void
-DoFObjectAccessor<1,deal_II_dimension>::
-get_dof_values (const Vector<double> &,
-		Vector<double>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values (const Vector<double> &,
+							Vector<double>       &) const;
 
 template
 void
-DoFObjectAccessor<1,deal_II_dimension>::
-set_dof_values (const Vector<double> &,
-		Vector<double>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values (const Vector<double> &,
+							Vector<double>       &) const;
 
 
 // for float
 template
 void
-DoFObjectAccessor<1,deal_II_dimension>::
-get_dof_values (const Vector<float> &,
-		Vector<float>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values (const Vector<float> &,
+							Vector<float>       &) const;
 
 template
 void
-DoFObjectAccessor<1,deal_II_dimension>::
-set_dof_values (const Vector<float> &,
-		Vector<float>       &) const;
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values (const Vector<float> &,
+							Vector<float>       &) const;
+
+
+// for block vector 2
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values (const BlockVector<2,double> &,
+							Vector<float>       &) const;
+
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values (const Vector<double>  &,
+							BlockVector<2,double> &) const;
+
+
+// for block vector 3
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values (const BlockVector<3,double> &,
+							Vector<float>       &) const;
+
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values (const Vector<double>  &,
+							BlockVector<3,double> &) const;
+
+
+
 
 
 #if deal_II_dimension >= 2
 // for double
 template
 void
-DoFObjectAccessor<2,deal_II_dimension>::
-get_dof_values (const Vector<double> &,
-		Vector<double>       &) const;
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values (const Vector<double> &,
+							Vector<double>       &) const;
 
 template
 void
-DoFObjectAccessor<2,deal_II_dimension>::
-set_dof_values (const Vector<double> &,
-		Vector<double>       &) const;
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values (const Vector<double> &,
+							Vector<double>       &) const;
 
 // for float
 template
 void
-DoFObjectAccessor<2,deal_II_dimension>::
-get_dof_values (const Vector<float> &,
-		Vector<float>       &) const;
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values (const Vector<float> &,
+							Vector<float>       &) const;
 
 template
 void
-DoFObjectAccessor<2,deal_II_dimension>::
-set_dof_values (const Vector<float> &,
-		Vector<float>       &) const;
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values (const Vector<float> &,
+							Vector<float>       &) const;
+
+
+// for block vector 2
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values (const BlockVector<2,double> &,
+							Vector<float>       &) const;
+
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values (const Vector<double>  &,
+							BlockVector<2,double> &) const;
+
+
+// for block vector 3
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values (const BlockVector<3,double> &,
+							Vector<float>       &) const;
+
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values (const Vector<double>  &,
+							BlockVector<3,double> &) const;
+
 
 #endif
 
@@ -710,30 +758,52 @@ set_dof_values (const Vector<float> &,
 // for double
 template
 void
-DoFObjectAccessor<3,deal_II_dimension>::
-get_dof_values (const Vector<double> &,
-		Vector<double>       &) const;
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values (const Vector<double> &,
+							Vector<double>       &) const;
 
 template
 void
-DoFObjectAccessor<3,deal_II_dimension>::
-set_dof_values (const Vector<double> &,
-		Vector<double>       &) const;
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<double> &,
+							Vector<double>       &) const;
 
 // for float
 template
 void
-DoFObjectAccessor<3,deal_II_dimension>::
-get_dof_values (const Vector<float> &,
-		Vector<float>       &) const;
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values (const Vector<float> &,
+							Vector<float>       &) const;
 
 template
 void
-DoFObjectAccessor<3,deal_II_dimension>::
-set_dof_values (const Vector<float> &,
-		Vector<float>       &) const;
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<float> &,
+							Vector<float>       &) const;
+
+
+
+// for block vector 2
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values (const BlockVector<2,double> &,
+							Vector<float>       &) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<double>  &,
+							BlockVector<2,double> &) const;
+
+
+// for block vector 3
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values (const BlockVector<3,double> &,
+							Vector<float>       &) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values (const Vector<double>  &,
+							BlockVector<3,double> &) const;
+
+
 
 #endif
+
 
 
 template
@@ -760,6 +830,19 @@ void
 DoFCellAccessor<deal_II_dimension>::
 set_dof_values_by_interpolation(const Vector<float> &,
 				Vector<float>       &) const;
+
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values (const BlockVector<2,double> &,
+			     Vector<double>       &) const;
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation(const Vector<double> &,
+				BlockVector<3,double> &) const;
 
 
 #if deal_II_dimension == 1

@@ -300,12 +300,23 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * The vector has to have the
 				      * right size before being passed
 				      * to this function. This
-				      * function is only callable for active
-				      * cells.
+				      * function is only callable for
+				      * active cells.
+				      *
+				      * The input vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
-    void get_dof_values (const Vector<number> &values,
-			 Vector<number>       &local_values) const;
+    template <class InputVector, typename number>
+    void get_dof_values (const InputVector &values,
+			 Vector<number>    &local_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -329,10 +340,21 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * The vector has to have the
 				      * right size before being passed
 				      * to this function.
+				      *
+				      * The output vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
+    template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
-			 Vector<number>       &values) const;
+			 OutputVector         &values) const;
 
     				     /**
 				      *  Pointer to the #i#th line
@@ -531,10 +553,21 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * has the right size beforehand. This
 				      * function is only callable for active
 				      * cells.
+				      *
+				      * The input vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
-    void get_dof_values (const Vector<number> &values,
-			 Vector<number>       &local_values) const;
+    template <class InputVector, typename number>
+    void get_dof_values (const InputVector &values,
+			 Vector<number>    &local_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -557,10 +590,21 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      *
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
+				      *
+				      * The output vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
+    template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
-			 Vector<number>       &values) const;
+			 OutputVector         &values) const;
 
 				     /**
 				      * Return the #i#th child as a DoF line
@@ -698,10 +742,21 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * has the right size beforehand. This
 				      * function is only callable for active
 				      * cells.
+				      *
+				      * The input vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
-    void get_dof_values (const Vector<number> &values,
-			 Vector<number>       &local_values) const;
+    template <class InputVector, typename number>
+    void get_dof_values (const InputVector &values,
+			 Vector<number>    &local_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -724,10 +779,21 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      *
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
+				      *
+				      * The output vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
+    template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
-			 Vector<number>       &values) const;
+			 OutputVector         &values) const;
 
     				     /**
 				      *  Return a pointer to the #i#th line
@@ -873,10 +939,21 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * has the right size beforehand. This
 				      * function is only callable for active
 				      * cells.
+				      *
+				      * The input vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
-    void get_dof_values (const Vector<number> &values,
-			 Vector<number>       &local_values) const;
+    template <class InputVector, typename number>
+    void get_dof_values (const InputVector &values,
+			 Vector<number>    &local_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -899,10 +976,21 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      *
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
+				      *
+				      * The output vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
+    template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
-			 Vector<number>       &values) const;
+			 OutputVector         &values) const;
 
     				     /**
 				      *  Return a pointer to the #i#th line
@@ -1074,9 +1162,9 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * cells by the finite element
 				      * objects.
 				      */
-    template <typename number>
-    void get_interpolated_dof_values (const Vector<number> &values,
-				      Vector<number>       &interpolated_values) const;
+    template <class InputVector, typename number>
+    void get_interpolated_dof_values (const InputVector &values,
+				      Vector<number>    &interpolated_values) const;
 
 				     /**
 				      * This, again, is the counterpart to
@@ -1139,10 +1227,21 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * presently only provided for
 				      * cells by the finite element
 				      * objects.
+				      *
+				      * The output vector may be either
+				      * a #Vector<float>#,
+				      * #Vector<double>#, or a
+				      * #BlockVector<...,double>#. It
+				      * is in the responsibility of
+				      * the caller to assure that the
+				      * types of the numbers stored in
+				      * input and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
-    template <typename number>
+    template <class OutputVector, typename number>
     void set_dof_values_by_interpolation (const Vector<number> &local_values,
-					  Vector<number>       &values) const;
+					  OutputVector         &values) const;
     
     				     /**
 				      *  Exception
