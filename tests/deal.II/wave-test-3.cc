@@ -6560,7 +6560,7 @@ void TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (ostream &
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::StatisticData::write (ostream &out) const
 {
-  out << estimated_error;
+  out << estimated_error*100000;
 };
 
 
@@ -6968,7 +6968,7 @@ template <int dim>
 void TimeStep_Postprocess<dim>::StatisticData::write (ostream &out) const
 {
   for (unsigned int i=0; i<evaluation_results.size(); ++i)
-    out << evaluation_results[i] << ' ';
+    out << evaluation_results[i]*100000 << ' ';
 };
 
 
