@@ -1,4 +1,8 @@
 ############################################################
+$compiler_table{"gcc295"} = "gcc 2.95";
+$compiler_table{"gcc30"} = "gcc 3.0";
+$compiler_table{"icc50"} = "Intel ICC 5.0";
+
 # first read in list of test results
 while (<>)
 {
@@ -11,17 +15,30 @@ while (<>)
 
 	$total_testcases{$date}++;
 
+	# first extract from the data an alternative text, so that if you hover
+	# over the image with the mouse you'll see a text describing which
+	# compiler was used, which date and time.
+	$system = $name;   $system =~ s/\+.*//g;
+	$compiler = $name; $compiler =~ s/.*\+//g;
+	$alt = "System=$system; Compiler=$compiler_table{$compiler}; Date=$date; Time=$time";
+
 	if ($result eq '+') {
 	    $results{$date}{$name} 
-	    = '<img src="pictures/ok.gif" size="1">';
+	    = "<img src=\"pictures/ok.gif\" size=\"1\" alt=\"$alt\">";
 	}
 	else
 	{
-	    # TODO: the result is actually the name of a file with logs
-	    # in it. Use that and cross-link to that file so that
-	    # one can see what has gone wrong
+	    # $result contains the minus to indicate failure, but then also filename
+	    # in which the logs are stored of that failed build. Cross-link with
+	    # the red cross symbol to a copy of that file. For this, get filename only
+	    $result =~ s/^- //;
+	    $result =~ s#.*/##g;
 	    $results{$date}{$name}
-	    = '<img src="pictures/fail.gif" size="1">';
+	    = '<a href="build-reports/' . 
+	      $result . 
+	      '" target="_top"><img src="pictures/fail.gif" size="1"' . 
+	      " alt=\"$alt\"" .
+	      '></a>';
 	    $failed_testcases{$date}++;
 	};
     }
@@ -235,9 +252,6 @@ foreach $name (sort keys %testcase) {
     $test_system   =~ s/\+.*//;
     $test_compiler = $name;
     $test_compiler =~ s/.*\+//g;
-    $compiler_table{"gcc295"} = "gcc 2.95";
-    $compiler_table{"gcc30"} = "gcc 3.0";
-    $compiler_table{"icc50"} = "Intel ICC 5.0";
     if (defined $compiler_table{$test_compiler} ) {
 	$test_compiler = $compiler_table{$test_compiler};
     }
