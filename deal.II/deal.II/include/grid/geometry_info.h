@@ -29,7 +29,7 @@
  *
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
+template <int dimension>
 struct GeometryInfo
 {
 				     /**
@@ -78,7 +78,7 @@ struct GeometryInfo
 				     /**
 				      * Number of lines of a cell.
 				      */
-    static const unsigned int lines_per_cell
+    static const unsigned int lines_per_cell;
 
 				     /**
 				      * Number of quadrilaterals of a
