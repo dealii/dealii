@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,34 +31,24 @@ template <typename> class BlockVector;
 
 /**
  * Blocked sparse matrix. The behaviour of objects of this type is
- * almost as for the @p{SparseMatrix<...>} objects, with most of the
+ * almost as for the SparseMatrix objects, with most of the
  * functions being implemented in both classes. The main difference is
  * that the matrix represented by this object is composed of an array
- * of sparse matrices (i.e. of type @p{SparseMatrix<number>}) and all
+ * of sparse matrices (i.e. of type SparseMatrix<number>) and all
  * accesses to the elements of this object are relayed to accesses of
  * the base matrices.
  *
  * In addition to the usual matrix access and linear algebra
- * functions, there are functions @p{block} which allow access to the
+ * functions, there are functions block() which allow access to the
  * different blocks of the matrix. This may, for example, be of help
  * when you want to implement Schur complement methods, or block
  * preconditioners, where each block belongs to a specific component
  * of the equation you are presently discretizing.
  *
- * Note that the number of blocks and rows are implicitly determined
+ * Note that the numbers of blocks and rows are implicitly determined
  * by the sparsity pattern objects used.
  *
- *
- * @sect2{On template instantiations}
- *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
+ * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -114,6 +104,20 @@ class BlockSparseMatrix : public Subscriptor
 					  * Value of this matrix entry.
 					  */
 	number value() const;
+
+					 /**
+					  * Block row of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int block_row() const;
+	
+					 /**
+					  * Block column of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int block_column() const;
 	
       protected:
 					 /**
@@ -129,7 +133,7 @@ class BlockSparseMatrix : public Subscriptor
 					 /**
 					  * Number of block where row lies in.
 					  */
-	unsigned int block_row;
+	unsigned int row_block;
 	
 					 /**
 					  * First row of block.
@@ -139,7 +143,7 @@ class BlockSparseMatrix : public Subscriptor
 					 /**
 					  * Number of block column where column lies in.
 					  */
-	unsigned int block_col;
+	unsigned int col_block;
 	
 					 /**
 					  * First column of block.
@@ -195,7 +199,7 @@ class BlockSparseMatrix : public Subscriptor
 					    */
 	bool operator == (const const_iterator&) const;
 					   /**
-					    * Inverse of @p{==}.
+					    * Inverse of operator==().
 					    */
 	bool operator != (const const_iterator&) const;
 
@@ -227,7 +231,7 @@ class BlockSparseMatrix : public Subscriptor
 				      *
 				      * You have to initialize the
 				      * matrix before usage with
-				      * @p{reinit(BlockSparsityPattern)}. The
+				      * reinit(BlockSparsityPattern). The
 				      * number of blocks per row and
 				      * column are then determined by
 				      * that function.
@@ -240,7 +244,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * represent the sparsity pattern
 				      * of this matrix. You can change
 				      * the sparsity pattern later on
-				      * by calling the @p{reinit}
+				      * by calling the reinit()
 				      * function.
 				      *
 				      * This constructor initializes
@@ -252,7 +256,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * lifetime of the sparsity
 				      * structure is at least as long
 				      * as that of this matrix or as
-				      * long as @p{reinit} is not called
+				      * long as reinit() is not called
 				      * with a new sparsity structure.
 				      */
     BlockSparseMatrix (const BlockSparsityPattern &sparsity);
@@ -277,11 +281,11 @@ class BlockSparseMatrix : public Subscriptor
 				      * Reinitialize the object but
 				      * keep to the sparsity pattern
 				      * previously used.  This may be
-				      * necessary if you @p{reinit}'d
+				      * necessary if you reinitialized
 				      * the sparsity structure and
 				      * want to update the size of the
 				      * matrix. It only calls
-				      * @p{reinit} on the
+				      * SparseMatrix::reinit() on the
 				      * sub-matrices. The size of this
 				      * matrix is unchanged.
 				      *
@@ -302,7 +306,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * reserved.
 				      *
 				      * Basically, this function only
-				      * calls @p{reinit} of the
+				      * calls SparseMatrix::reinit() of the
 				      * sub-matrices with the block
 				      * sparsity patterns of the
 				      * parameter.
@@ -339,7 +343,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * the sparsity pattern it was
 				      * previously tied to.
 				      *
-				      * This calls @p{clear} on all
+				      * This calls SparseMatrix::clear on all
 				      * sub-matrices.
 				      */
     virtual void clear ();
@@ -364,7 +368,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * Return whether the object is
 				      * empty. It is empty if either
 				      * both dimensions are zero or no
-				      * @p{SparsityPattern} is
+				      * BlockSparsityPattern is
 				      * associated.
 				      */
     bool empty () const;
@@ -405,9 +409,9 @@ class BlockSparseMatrix : public Subscriptor
     unsigned int n_actually_nonzero_elements () const;
     
 				     /**
-				      * Set the element @p{(i,j)} to
-				      * @p{value}.  Throws an error if
-				      * the entry does not
+				      * Set the element <tt>(i,j)</tt>
+				      * to <tt>value</tt>. Throws an
+				      * error if the entry does not
 				      * exist. Still, it is allowed to
 				      * store zero values in
 				      * non-existent fields.
@@ -429,8 +433,8 @@ class BlockSparseMatrix : public Subscriptor
     BlockSparseMatrix & operator /= (const number factor);
     
 				     /**
-				      * Add @p{value} to the element
-				      * @p{(i,j)}.  Throws an error if
+				      * Add <tt>value</tt> to the element
+				      * <tt>(i,j)</tt>.  Throws an error if
 				      * the entry does not
 				      * exist. Still, it is allowed to
 				      * store zero values in
@@ -450,7 +454,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * cheaper. Since this operation
 				      * is notheless not for free, we
 				      * do not make it available
-				      * through @p{operator =}, since
+				      * through operator=(), since
 				      * this may lead to unwanted
 				      * usage, e.g. in copy arguments
 				      * to functions, which should
@@ -464,15 +468,15 @@ class BlockSparseMatrix : public Subscriptor
 				      * of this matrix.
 				      *
 				      * The function returns a
-				      * reference to @p{this}.
+				      * reference to <tt>this</tt>.
 				      */
     template <typename somenumber>
     BlockSparseMatrix<number> &
     copy_from (const BlockSparseMatrix<somenumber> &source);
 
 				     /**
-				      * Add @p{matrix} scaled by
-				      * @p{factor} to this matrix. The
+				      * Add <tt>matrix</tt> scaled by
+				      * <tt>factor</tt> to this matrix. The
 				      * function throws an error if
 				      * the sparsity patterns of the
 				      * two involved matrices do not
@@ -506,9 +510,9 @@ class BlockSparseMatrix : public Subscriptor
 
 				     /**
 				      * This function is mostly like
-				      * @p{operator()} in that it
+				      * operator()() in that it
 				      * returns the value of the
-				      * matrix entry @p{(i,j)}. The only
+				      * matrix entry <tt>(i,j)</tt>. The only
 				      * difference is that if this
 				      * entry does not exist in the
 				      * sparsity pattern, then instead
@@ -571,7 +575,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * @p{vmult} but takes the
+				      * vmult() but takes the
 				      * transposed matrix.
 				      */
     template <typename somenumber>
@@ -623,11 +627,13 @@ class BlockSparseMatrix : public Subscriptor
     
 				     /**
 				      * Adding Matrix-vector
-				      * multiplication. Add $M^T*src$
-				      * to $dst$ with $M$ being this
-				      * matrix. This function does the
-				      * same as @p{vmult_add} but takes
-				      * the transposed matrix.
+				      * multiplication. Add
+				      * <i>M<sup>T</sup>src</i> to
+				      * <i>dst</i> with <i>M</i> being
+				      * this matrix. This function
+				      * does the same as vmult_add()
+				      * but takes the transposed
+				      * matrix.
 				      */
     template <typename somenumber>
     void Tvmult_add (BlockVector<somenumber>       &dst,
@@ -635,19 +641,20 @@ class BlockSparseMatrix : public Subscriptor
   
 				     /**
 				      * Return the norm of the vector
-				      * $v$ with respect to the norm
-				      * induced by this matrix,
-				      * i.e. $\left(v,Mv\right)$. This
+				      * <i>v</i> with respect to the
+				      * norm induced by this matrix,
+				      * i.e. <i>v<sup>T</sup>Mv)</i>. This
 				      * is useful, e.g. in the finite
 				      * element context, where the
-				      * $L_2$ norm of a function
-				      * equals the matrix norm with
-				      * respect to the mass matrix of
-				      * the vector representing the
-				      * nodal values of the finite
-				      * element function. Note that
-				      * even though the function's
-				      * name might suggest something
+				      * <i>L<sup>T</sup></i>-norm of a
+				      * function equals the matrix
+				      * norm with respect to the mass
+				      * matrix of the vector
+				      * representing the nodal values
+				      * of the finite element
+				      * function. Note that even
+				      * though the function's name
+				      * might suggest something
 				      * different, for historic
 				      * reasons not the norm but its
 				      * square is returned, as defined
@@ -670,14 +677,9 @@ class BlockSparseMatrix : public Subscriptor
 			   const BlockVector<somenumber> &v) const;
     
 				     /**
-				      * Compute the residual of an
-				      * equation @p{Ax=b}, where the
-				      * residual is defined to be
-				      * @p{r=b-Ax} with @p{x} typically
-				      * being an approximate of the
-				      * true solution of the
-				      * equation. Write the residual
-				      * into @p{dst}.
+				      * Compute the residual
+				      * <i>r=b-Ax</i>. Write the
+				      * residual into <tt>dst</tt>.
 				      */
     template <typename somenumber>
     somenumber residual (BlockVector<somenumber>       &dst,
@@ -688,11 +690,12 @@ class BlockSparseMatrix : public Subscriptor
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the @p{src} vector by the
+				      * the <tt>src</tt> vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * relaxation parameter @p{omega}.
+				      * relaxation parameter
+				      * <tt>omega</tt>.
 				      *
 				      * All diagonal blocks must be
 				      * square matrices for this
@@ -707,11 +710,12 @@ class BlockSparseMatrix : public Subscriptor
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the @p{src} vector by the
+				      * the <tt>src</tt> vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * relaxation parameter @p{omega}.
+				      * relaxation parameter
+				      * <tt>omega</tt>.
 				      *
 				      * All diagonal blocks must be
 				      * square matrices for this
@@ -730,8 +734,46 @@ class BlockSparseMatrix : public Subscriptor
 			      const Vector<somenumber> &src,
 			      const number             omega = 1.) const;
     
-                                     /* Call print functions for 
-				      * the SparseMatrix blocks.
+				     /**
+				      * Print the matrix in the usual
+				      * format, i.e. as a matrix and
+				      * not as a list of nonzero
+				      * elements. For better
+				      * readability, elements not in
+				      * the matrix are displayed as
+				      * empty space, while matrix
+				      * elements which are explicitly
+				      * set to zero are displayed as
+				      * such.
+				      *
+				      * The parameters allow for a
+				      * flexible setting of the output
+				      * format: <tt>precision</tt> and
+				      * <tt>scientific</tt> are used
+				      * to determine the number
+				      * format, where <tt>scientific =
+				      * false</tt> means fixed point
+				      * notation.  A zero entry for
+				      * <tt>width</tt> makes the
+				      * function compute a width, but
+				      * it may be changed to a
+				      * positive value, if output is
+				      * crude.
+				      *
+				      * Additionally, a character for
+				      * an empty value may be
+				      * specified.
+				      *
+				      * Finally, the whole matrix can
+				      * be multiplied with a common
+				      * denominator to produce more
+				      * readable output, even
+				      * integers.
+				      *
+				      * @attention This function may
+				      * produce <b>large</b> amounts
+				      * of output if applied to a
+				      * large matrix!
 				      */
     void print_formatted (std::ostream       &out,
 			  const unsigned int  precision   = 3,
@@ -746,11 +788,11 @@ class BlockSparseMatrix : public Subscriptor
 				      * pattern of this matrix.
 				      *
 				      * Though the return value is
-				      * declared @p{const}, you should
-				      * be aware that it may change if
-				      * you call any nonconstant
-				      * function of objects which
-				      * operate on it.
+				      * declared <tt>const</tt>, you
+				      * should be aware that it may
+				      * change if you call any
+				      * nonconstant function of
+				      * objects which operate on it.
 				      */
     const BlockSparsityPattern &
     get_sparsity_pattern () const;
@@ -768,12 +810,12 @@ class BlockSparseMatrix : public Subscriptor
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry of row @p{r}.
+				      * first entry of row <tt>r</tt>.
 				      */
     const_iterator begin (unsigned int r) const;
 
 				     /**
-				      * Final iterator of row @p{r}.
+				      * Final iterator of row <tt>r</tt>.
 				      */
     const_iterator end (unsigned int r) const;
     
@@ -802,7 +844,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * zero, and is only changed if a
 				      * sparsity pattern is given to
 				      * the constructor or the
-				      * @p{reinit} function.
+				      * reinit() function.
 				      */
     unsigned int rows;
 
@@ -812,7 +854,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * zero, and is only changed if a
 				      * sparsity pattern is given to
 				      * the constructor or the
-				      * @p{reinit} function.
+				      * reinit() function.
 				      */
     unsigned int columns;
     
@@ -850,9 +892,9 @@ Accessor (const BlockSparseMatrix<number> *matrix,
 		:
                 matrix(matrix),
                 base_iterator(matrix->block(0,0).begin()),
-		block_row(0),
+		row_block(0),
 		row_start(0),
-		block_col(0),
+		col_block(0),
 		col_start(0),
 		a_index(0)
 {
@@ -862,14 +904,14 @@ Accessor (const BlockSparseMatrix<number> *matrix,
     {
       std::pair<unsigned int,unsigned int> indices
 	= matrix->sparsity_pattern->get_row_indices().global_to_local(r);
-      block_row = indices.first;
+      row_block = indices.first;
       base_iterator = matrix->block(indices.first, 0).begin(indices.second);
       row_start = matrix->sparsity_pattern
-		  ->get_row_indices().local_to_global(block_row, 0);
+		  ->get_row_indices().local_to_global(row_block, 0);
     }
   else
     {
-      block_row = matrix->n_block_rows();
+      row_block = matrix->n_block_rows();
       base_iterator = matrix->block(0, 0).begin();
     }
 }
@@ -904,6 +946,24 @@ BlockSparseMatrix<number>::Accessor::column() const
 
 template <typename number>
 inline
+unsigned int
+BlockSparseMatrix<number>::Accessor::block_row() const
+{
+  return row_block;
+}
+
+
+template <typename number>
+inline
+unsigned int
+BlockSparseMatrix<number>::Accessor::block_column() const
+{
+  return col_block;
+}
+
+
+template <typename number>
+inline
 number
 BlockSparseMatrix<number>::Accessor::value () const
 {
@@ -931,7 +991,7 @@ inline
 typename BlockSparseMatrix<number>::const_iterator&
 BlockSparseMatrix<number>::const_iterator::operator++ ()
 {
-  Assert (this->block_row<this->matrix->n_block_rows(), ExcIteratorPastEnd());
+  Assert (this->row_block<this->matrix->n_block_rows(), ExcIteratorPastEnd());
 
 				   // Remeber current row inside block
   unsigned int local_row = this->base_iterator->row();
@@ -940,41 +1000,41 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
   ++this->a_index;
 				   // If end of row inside block,
 				   // advance to next block
-  if (this->base_iterator == this->matrix->block(this->block_row, this->block_col).end(local_row))
+  if (this->base_iterator == this->matrix->block(this->row_block, this->col_block).end(local_row))
     {
-      if (this->block_col<this->matrix->n_block_cols()-1)
+      if (this->col_block<this->matrix->n_block_cols()-1)
 	{
 					   // Advance to next block in
 					   // row
-	  ++this->block_col;
+	  ++this->col_block;
 	  this->col_start = this->matrix->sparsity_pattern
-		      ->get_column_indices().local_to_global(this->block_col, 0);
+		      ->get_column_indices().local_to_global(this->col_block, 0);
 	}
       else
 	{
 					   // Advance to first block
 					   // in next row
-	  this->block_col = 0;
+	  this->col_block = 0;
 	  this->col_start = 0;
 	  this->a_index = 0;
 	  ++local_row;
-	  if (local_row>=this->matrix->block(this->block_row,0).m())
+	  if (local_row>=this->matrix->block(this->row_block,0).m())
 	    {
 					       // If final row in
 					       // block, go to next
 					       // block row
 	      local_row = 0;
-	      ++this->block_row;
-	      if (this->block_row < this->matrix->n_block_rows())
+	      ++this->row_block;
+	      if (this->row_block < this->matrix->n_block_rows())
 		this->row_start = this->matrix->sparsity_pattern
-			    ->get_row_indices().local_to_global(this->block_row, 0);
+			    ->get_row_indices().local_to_global(this->row_block, 0);
 	    }
 	}
 				       // Finally, set base_iterator
 				       // to start of row determined
 				       // above
-      if (this->block_row < this->matrix->n_block_rows())
-	this->base_iterator = this->matrix->block(this->block_row, this->block_col).begin(local_row);
+      if (this->row_block < this->matrix->n_block_rows())
+	this->base_iterator = this->matrix->block(this->row_block, this->col_block).begin(local_row);
       else
 					 // Set base_iterator to a
 					 // defined state for
@@ -1026,8 +1086,8 @@ operator == (const const_iterator& i) const
   if (this->matrix != i->matrix)
     return false;
   
-  if (this->block_row == i->block_row
-      && this->block_col == i->block_col
+  if (this->row_block == i->row_block
+      && this->col_block == i->col_block
       && this->base_iterator == i->base_iterator)
     return true;
   return false;
@@ -1052,9 +1112,9 @@ bool
 BlockSparseMatrix<number>::const_iterator::
 operator < (const const_iterator& i) const
 {
-  if (this->block_row<i->block_row)
+  if (this->row_block<i->row_block)
     return true;
-  if (this->block_row == i->block_row)
+  if (this->row_block == i->row_block)
     {
       if (this->base_iterator->row() < i->base_iterator->row())
 	return true;
@@ -1525,9 +1585,9 @@ residual (BlockVector<somenumber>          &dst,
   Assert (x.n_blocks() == columns,
 	  ExcDimensionMismatch(x.n_blocks(), columns));
 				   // in block notation, the residual is
-				   // @p{r_i = b_i - \sum_j A_ij x_j}.
+				   // r_i = b_i - \sum_j A_ij x_j.
 				   // this can be written as
-				   // @p{r_i = b_i - A_i0 x_0 - \sum_{j>0} A_ij x_j}.
+				   // r_i = b_i - A_i0 x_0 - \sum_{j>0} A_ij x_j.
 				   //
 				   // for the first two terms, we can
 				   // call the residual function of
