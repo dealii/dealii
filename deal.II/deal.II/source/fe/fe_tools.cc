@@ -1006,6 +1006,15 @@ void FETools::extrapolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  BlockVector<double> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, Vector<double> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<double> &);
 
 
 template
@@ -1046,6 +1055,15 @@ void FETools::extrapolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  BlockVector<float> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, Vector<float> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<float> &);
 
 
 template
