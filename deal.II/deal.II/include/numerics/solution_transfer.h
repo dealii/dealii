@@ -69,7 +69,8 @@ template <int dim> class DoFHandler;
  * The template argument #number# denotes the data type of the vectors you want
  * to transfer.
  *
- * @author Ralf Hartmann, 1999 */
+ * @author Ralf Hartmann, 1999
+ */
 template<int dim, typename number>
 class SolutionTransfer
 {
