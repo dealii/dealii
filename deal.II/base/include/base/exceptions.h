@@ -735,6 +735,16 @@ namespace StandardExceptions
   DeclException0 (ExcNotInitialized);
 
 				   /**
+				    * This exception is raised if a
+				    * functionality is not possible in
+				    * the given dimension. Mostly used
+				    * to throw function calls in 1d.
+				    */
+  DeclException1 (ExcImpossibleInDim,
+		  int,
+		  << "Impossible in " << arg1 << "d.");
+
+				   /**
 				    * This exception is raised
 				    * whenever the sizes of two
 				    * objects were assumed to be
