@@ -6,8 +6,7 @@ DEAL:no:cg::Convergence step 3
 DEAL:no:Bicgstab::Starting 
 DEAL:no:Bicgstab::Convergence step 3 
 DEAL:no:GMRES::Starting 
-DEAL:no:GMRES::Starting 
-DEAL:no:GMRES::Convergence step 2 
+DEAL:no:GMRES::Convergence step 3 
 DEAL:no:QMRS::Starting 
 DEAL:no:QMRS::Convergence step 3 
 DEAL:ssor:Richardson::Starting 
@@ -17,8 +16,7 @@ DEAL:ssor:cg::Convergence step 5
 DEAL:ssor:Bicgstab::Starting 
 DEAL:ssor:Bicgstab::Convergence step 3 
 DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Convergence step 3 
+DEAL:ssor:GMRES::Convergence step 4 
 DEAL:ssor:QMRS::Starting 
 DEAL:ssor:QMRS::Convergence step 5 
 DEAL:sor:Richardson::Starting 
@@ -28,8 +26,7 @@ DEAL:sor:cg::Failure step 100
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 5 
 DEAL:sor:GMRES::Starting 
-DEAL:sor:GMRES::Starting 
-DEAL:sor:GMRES::Convergence step 4 
+DEAL:sor:GMRES::Convergence step 5 
 DEAL:sor:QMRS::Starting 
 DEAL:sor:QMRS::Failure step 100 
 DEAL::Size 12 Unknowns 121
@@ -39,8 +36,7 @@ DEAL:no:cg::Convergence step 17
 DEAL:no:Bicgstab::Starting 
 DEAL:no:Bicgstab::Convergence step 13 
 DEAL:no:GMRES::Starting 
-DEAL:no:GMRES::Starting 
-DEAL:no:GMRES::Convergence step 16 
+DEAL:no:GMRES::Convergence step 17 
 DEAL:no:QMRS::Starting 
 DEAL:no:QMRS::Convergence step 18 
 DEAL:ssor:Richardson::Starting 
@@ -50,8 +46,7 @@ DEAL:ssor:cg::Convergence step 11
 DEAL:ssor:Bicgstab::Starting 
 DEAL:ssor:Bicgstab::Convergence step 6 
 DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Convergence step 9 
+DEAL:ssor:GMRES::Convergence step 10 
 DEAL:ssor:QMRS::Starting 
 DEAL:ssor:QMRS::Convergence step 12 
 DEAL:sor:Richardson::Starting 
@@ -61,8 +56,7 @@ DEAL:sor:cg::Failure step 100
 DEAL:sor:Bicgstab::Starting 
 DEAL:sor:Bicgstab::Convergence step 19 
 DEAL:sor:GMRES::Starting 
-DEAL:sor:GMRES::Starting 
-DEAL:sor:GMRES::Convergence step 24 
+DEAL:sor:GMRES::Convergence step 25 
 DEAL:sor:QMRS::Starting 
 DEAL:sor:QMRS::Failure step 100 
 DEAL::Size 36 Unknowns 1225
@@ -70,8 +64,7 @@ DEAL::SOR-diff:0.000
 DEAL:no:cg::Starting 
 DEAL:no:cg::Convergence step 59 
 DEAL:no:Bicgstab::Starting 
-DEAL:no:Bicgstab::Convergence step 45 
-DEAL:no:GMRES::Starting 
+DEAL:no:Bicgstab::Convergence step 44 
 DEAL:no:GMRES::Starting 
 DEAL:no:GMRES::Failure step 100 
 DEAL:no:QMRS::Starting 
@@ -83,8 +76,7 @@ DEAL:ssor:cg::Convergence step 27
 DEAL:ssor:Bicgstab::Starting 
 DEAL:ssor:Bicgstab::Convergence step 18 
 DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Starting 
-DEAL:ssor:GMRES::Convergence step 25 
+DEAL:ssor:GMRES::Convergence step 26 
 DEAL:ssor:QMRS::Starting 
 DEAL:ssor:QMRS::Convergence step 28 
 DEAL:sor:Richardson::Starting 
@@ -92,8 +84,7 @@ DEAL:sor:Richardson::Failure step 100
 DEAL:sor:cg::Starting 
 DEAL:sor:cg::Failure step 100 
 DEAL:sor:Bicgstab::Starting 
-DEAL:sor:Bicgstab::Convergence step 59 
-DEAL:sor:GMRES::Starting 
+DEAL:sor:Bicgstab::Convergence step 60 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Failure step 100 
 DEAL:sor:QMRS::Starting 
