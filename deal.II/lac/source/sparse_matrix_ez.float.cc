@@ -1,4 +1,4 @@
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,8 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
 
 #include <base/logstream.h>
 #include <lac/sparse_matrix_ez.templates.h>
@@ -19,14 +20,13 @@
 
 template class SparseMatrixEZ<TYPEMAT>;
 
-#define TYPE2 float
+#define TYPEVEC float
+#include "sparse_matrix_ez_vector.in.h"
+#undef TYPEVEC
 
-#include <lac/sparse_matrix_ez.2.templates>
-
-#undef TYPE2
-#define TYPE2 double
-
-#include <lac/sparse_matrix_ez.2.templates>
+#define TYPEVEC double
+#include "sparse_matrix_ez_vector.in.h"
+#undef TYPEVEC
 
 				 // a prerelease of gcc3.0 fails to
 				 // compile this due to long double
@@ -35,5 +35,4 @@ template class SparseMatrixEZ<TYPEMAT>;
 
 //  #include <lac/sparse_matrix.2.templates>
 
-#undef TYPE2
 #undef TYPEMAT
