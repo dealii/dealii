@@ -19,6 +19,7 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 
+#include <vector>
 
 // forward declarations
 template<typename number> class Vector;
@@ -155,6 +156,29 @@ class FullMatrix : public Subscriptor
     void fill (const FullMatrix<number2> &src,
 	       const unsigned int         i=0,
 	       const unsigned int         j=0);
+    
+
+				     /**
+				      * Fill with permutation of another matrix.
+				      *
+				      * The matrix @p{src} is copied
+				      * into the target. The two
+				      * permutation @p{p_r} and
+				      * @p{p_c} operate in a way, such
+				      * that @{result(i,j) =
+				      * src(p_r[i], p_c[j])}.
+				      *
+				      * The vectors may also be a
+				      * selection from a larger set of
+				      * integers, if the matrix
+				      * @p{src} is bigger. It is also
+				      * possible to duplicate rows or
+				      * columns by this method.
+				      */
+    template<typename number2>
+    void fill_permutation (const FullMatrix<number2> &src,
+	       const std::vector<unsigned int>& p_rows,
+	       const std::vector<unsigned int>& p_cols);
     
 
                                      /**

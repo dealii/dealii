@@ -459,6 +459,24 @@ void FullMatrix<number>::fill (const FullMatrix<number2>& src,
 
 template <typename number>
 template <typename number2>
+void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
+					   const std::vector<unsigned int>& p_rows,
+					   const std::vector<unsigned int>& p_cols)
+{
+  Assert (p_rows.size() == dim_image,
+	  ExcDimensionMismatch (p_rows.size(), dim_image));
+  Assert (p_cols.size() == dim_range,
+	  ExcDimensionMismatch (p_cols.size(), dim_range));
+
+  for (unsigned int i=0;i<dim_image;++i)
+    for (unsigned int j=0;j<dim_range;++j)
+      el(i,j) = src(p_rows[i], p_cols[j]);
+}
+
+
+
+template <typename number>
+template <typename number2>
 void FullMatrix<number>::fill (const number2* entries)
 {
     if (dim_range*dim_image != 0)
