@@ -73,6 +73,13 @@ namespace internals
                                           * Column number of the
                                           * element represented by
                                           * this object.
+                                          *
+                                          * Note that if the underlying
+                                          * sparsity pattern has not yet been
+                                          * compressed, then this function may
+                                          * return @p
+                                          * SparsityPattern::invalid_index for
+                                          * certain elements of the matrix.
                                           */
         unsigned int column() const;
 	
