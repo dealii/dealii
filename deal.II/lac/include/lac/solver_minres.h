@@ -189,11 +189,10 @@ SolverMinRes<Matrix,Vector>::solve (const Matrix &A,
   int j = 1;
   
 
-				   // Start of the solving process
-  
+				   // Start of the solution process
   A.vmult(m[0],x);
   u[1] = b;
-  u[1].add(-1.,m[0]);
+  u[1] -= m[0];
 				   // Precondition is applied.
 				   // The preconditioner has to be
 				   // positiv definite and symmetric
@@ -226,7 +225,7 @@ SolverMinRes<Matrix,Vector>::solve (const Matrix &A,
 	v.reinit(VS,0);
 
       A.vmult(u[2],v);
-      u[2].add(-sqrt(delta[1]/delta[0]),u[0]);
+      u[2].add (-sqrt(delta[1]/delta[0]), u[0]);
 
       gamma = u[2] * v;
       u[2].add (-gamma / sqrt(delta[1]), u[1]);
