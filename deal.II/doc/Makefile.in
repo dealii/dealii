@@ -44,6 +44,8 @@ validate-xrefs:
 
 
 # generate a class index from each of the various include directories
+# note that both include dirs deal.II/include/{dofs,fe} are mapped to
+# API library `dof'
 class_index.html: $(shell echo $D/base/include/base/*.h \
                                $D/lac/include/lac/*.h   \
                                $D/deal.II/include/*/*.h)
@@ -73,7 +75,13 @@ class_index.html: $(shell echo $D/base/include/base/*.h \
 	  if test -d $$dir   -a                                      \
              ! "`echo $$dir | $(PERL) -p -e 's!.*/!!;'`" = CVS; then \
 	    echo "Creating class index for $$dir"     ;              \
-            dirbasename="`echo $$dir | $(PERL) -p -e 's!.*/!!;'`" ; \
+            dirbasename="`echo $$dir | $(PERL) -p -e 's!.*/!!;'`" ;  \
+	    if test $$dirbasename = dofs; then                       \
+	      dirbasename=dof;                                       \
+	    fi;                                                      \
+	    if test $$dirbasename = fe; then                         \
+	      dirbasename=dof;                                       \
+	    fi;                                                      \
 	    echo "<h3><a href=\"auto/kdoc/$$dirbasename/index.html\""\
                  " target=\"body\">"                                 \
                  "$$dirbasename sub-library</a></h3>\n\n" >> $@ ;    \
