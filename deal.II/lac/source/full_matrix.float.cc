@@ -18,6 +18,8 @@
 
 template class FullMatrix<TYPEMAT>;
 
+template FullMatrix<float> & FullMatrix<float>::operator =(const FullMatrix<double>&);
+
 #define TYPEMAT2 float
 
 //template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =<>(const FullMatrix<TYPEMAT2>&);

@@ -19,9 +19,10 @@
 
 template class FullMatrix<TYPEMAT>;
 
+template FullMatrix<double> & FullMatrix<double>::operator =(const FullMatrix<float>&);
+
 #define TYPEMAT2 double
 
-//template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, const unsigned, const unsigned, const unsigned, const unsigned);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
