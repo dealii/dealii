@@ -866,6 +866,11 @@ DoFRenumbering::compute_cell_wise_dg (
   for(cell = cells.begin(); cell != cells.end(); ++cell)
     {
       (*cell)->get_dof_indices(cell_dofs);
+
+				       // Sort here to make sure that
+				       // degrees of freedom inside a
+				       // single cell are in the same
+				       // order after renumbering.
       std::sort(cell_dofs.begin(), cell_dofs.end());
 
       for (unsigned int i=0;i<n_cell_dofs;++i)
