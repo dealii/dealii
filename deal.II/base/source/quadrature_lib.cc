@@ -228,54 +228,6 @@ QGauss7<1>::QGauss7 () :
 };
 
 
-template <>
-QGauss8<1>::QGauss8 () :
-		Quadrature<1> (8)
-{
-				   // points on [-1,1]
-  static const double xpts_normal[] = { -0.960289856497536,
-					-0.796666477413627,
-					-0.525532409916329,
-					-0.183434642495650,
-					+0.183434642495650,
-					+0.525532409916329,
-					+0.796666477413627,
-					+0.960289856497536 };
-				   // weights on [-1,1]
-  static const double wts_normal[]  = { 0.101228536200376,
-					0.222381034453374,
-					0.313706645877887,
-					0.362683783378362,
-					0.362683783378362,
-					0.313706645877887,
-					0.222381034453374,
-					0.101228536200376  };
-
-				   // points and weights on [0,1]
-  static const double xpts[] = { (xpts_normal[0]+1)/2.,
-				 (xpts_normal[1]+1)/2.,
-				 (xpts_normal[2]+1)/2.,
-				 (xpts_normal[3]+1)/2.,
-				 (xpts_normal[4]+1)/2.,
-				 (xpts_normal[5]+1)/2.,
-				 (xpts_normal[6]+1)/2.,
-				 (xpts_normal[7]+1)/2. };
-  static const double wts[]  = { wts_normal[0]/2.,
-				 wts_normal[1]/2.,
-				 wts_normal[2]/2.,
-				 wts_normal[3]/2.,
-				 wts_normal[4]/2.,
-				 wts_normal[5]/2.,
-				 wts_normal[6]/2.,
-				 wts_normal[7]/2. };
-
-  for (unsigned int i=0; i<n_quadrature_points; ++i) 
-    {
-      quadrature_points[i] = Point<1>(xpts[i]);
-      weights[i] = wts[i];
-    };
-};
-
 
 template <>
 QMidpoint<1>::QMidpoint () :
@@ -374,10 +326,6 @@ template <int dim>
 QGauss7<dim>::QGauss7 () :
 		Quadrature<dim> (QGauss7<dim-1>(), QGauss7<1>()){};
 
-template <int dim>
-QGauss8<dim>::QGauss8 () :
-		Quadrature<dim> (QGauss8<dim-1>(), QGauss8<1>()){};
-
 
 template <int dim>
 QMidpoint<dim>::QMidpoint () :
@@ -408,7 +356,6 @@ template class QGauss4<2>;
 template class QGauss5<2>;
 template class QGauss6<2>;
 template class QGauss7<2>;
-template class QGauss8<2>;
 template class QMidpoint<2>;
 template class QTrapez<2>;
 template class QSimpson<2>;
@@ -421,7 +368,6 @@ template class QGauss4<3>;
 template class QGauss5<3>;
 template class QGauss6<3>;
 template class QGauss7<3>;
-template class QGauss8<3>;
 template class QMidpoint<3>;
 template class QTrapez<3>;
 template class QSimpson<3>;

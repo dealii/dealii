@@ -118,26 +118,6 @@ class QGauss7 : public Quadrature<dim>
 
 
 /**
- *  8-Point-Gauss quadrature formula, exact for polynomials of degree 15.
- *  I have not found explicite
- *  representations of the zeros of the Legendre functions of sixth
- *  and higher degree. If anyone finds them, please replace the existing
- *  numbers by these expressions.
- *
- *  Reference: J. E. Akin: "Application and Implementation of Finite
- *  Element Methods"
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas" 
- */
-template <int dim>
-class QGauss8 : public Quadrature<dim>
-{
-  public:
-    QGauss8 ();
-};
-
-
-/**
  * Midpoint quadrature rule, exact for linear polynomials.
  */
 template <int dim>
