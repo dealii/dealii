@@ -58,8 +58,10 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
 				      * dofs_per_vertex),
 		first_face_quad_index((dim==3 ?
-				       first_face_line_index :
-				       first_line_index) +
+				       GeometryInfo<dim-1>::vertices_per_cell
+				       * dofs_per_vertex :
+				       GeometryInfo<dim>::vertices_per_cell
+				       * dofs_per_vertex) +
 				      GeometryInfo<dim-1>::lines_per_cell
 				      * dofs_per_line),
 		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex +
