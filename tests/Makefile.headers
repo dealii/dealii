@@ -13,6 +13,6 @@ include ../Makefile.paths
 include $D/common/Make.global_options
 debug-mode = on
 
-default: tmp.go
+default: tmp.g.$(OBJEXT)
 
 include ../Makefile.rules

@@ -55,7 +55,7 @@ all-headers:
 		for j in $$headers ; do \
 			echo "=====Header======== $$j " ; \
 			echo "#include <$$j>" > tmp.cc ; \
-			if $(MAKE) -s tmp.go ; then : ; else exit 1 ; fi ; \
+			if $(MAKE) -s tmp.g.$(OBJEXT) ; then : ; else exit 1 ; fi ; \
 			rm -f tmp.* ; \
 		done ; \
 		cd .. ; \
@@ -102,3 +102,5 @@ veryclean-bits:
 	veryclean veryclean-base veryclean-lac veryclean-fe veryclean-deal.II veryclean-bits
 
 include Makefile.paths
+include $D/common/Make.global_options
+
