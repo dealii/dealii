@@ -120,7 +120,7 @@
 #undef DEAL_II_USE_DIRECT_ERRNO_H
 
 /* Flag indicating whether the library shall be compiled for multithreaded
-   applications */
+   applications. If so, then it is set to one, otherwise to zero. */
 #undef DEAL_II_USE_MT
 
 /* Defined if multi-threading is to be achieved by using the ACE library */
