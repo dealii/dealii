@@ -110,10 +110,10 @@ class SolverGMRES : public Subscriptor, private Solver<VECTOR>
 				      * Solver method.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState solve (const MATRIX         &A,
-						VECTOR               &x,
-						const VECTOR         &b,
-						const PRECONDITIONER &precondition);
+    void solve (const MATRIX &A,
+		VECTOR       &x,
+		const VECTOR &b,
+		const PRECONDITIONER& precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
 		    int,
@@ -190,11 +190,11 @@ SolverGMRES<VECTOR>::givens_rotation (Vector<double> &h,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState
-SolverGMRES<VECTOR>::solve (const MATRIX         &A,
-			    VECTOR               &x,
-			    const VECTOR         &b,
-			    const PRECONDITIONER &precondition)
+void
+SolverGMRES<VECTOR>::solve (const MATRIX& A,
+				   VECTOR      & x,
+				   const VECTOR& b,
+				   const PRECONDITIONER& precondition)
 {
 				   // this code was written a very
 				   // long time ago by people not
@@ -397,10 +397,10 @@ unsigned int dim = 0;
     memory.free (tmp_vectors[tmp]);
 
   deallog.pop();
-  if (iteration_state)
-    return success;
-  else
-    return exceeded;
+
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 };
 
 

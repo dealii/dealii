@@ -77,7 +77,7 @@ class SolverMinRes : public Subscriptor, private Solver<VECTOR>
 				      * Solver method.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState
+    void
     solve (const MATRIX &A,
 	   VECTOR       &x,
 	   const VECTOR &b,
@@ -351,10 +351,9 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
 				   // Output
   deallog.pop ();
   
-  if (conv == SolverControl::failure)
-    return exceeded;
-  
-  return success;
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 };
 
 

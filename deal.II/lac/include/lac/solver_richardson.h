@@ -79,19 +79,19 @@ class SolverRichardson : public Subscriptor, private Solver<VECTOR>
 				      * Solve $Ax=b$ for $x$.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState solve (const MATRIX &A,
-						VECTOR       &x,
-						const VECTOR &b,
-						const PRECONDITIONER& precondition);
+    void solve (const MATRIX &A,
+		VECTOR       &x,
+		const VECTOR &b,
+		const PRECONDITIONER& precondition);
 
 				     /**
 				      * Solve $A^Tx=b$ for $x$.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState Tsolve (const MATRIX &A,
-						 VECTOR       &x,
-						 const VECTOR &b,
-						 const PRECONDITIONER& precondition);
+    void Tsolve (const MATRIX &A,
+		 VECTOR       &x,
+		 const VECTOR &b,
+		 const PRECONDITIONER& precondition);
 
 				     /**
 				      * Set the damping-coefficient.
@@ -168,7 +168,7 @@ SolverRichardson<VECTOR>::~SolverRichardson()
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState 
+void
 SolverRichardson<VECTOR>::solve (const MATRIX &A,
 				 VECTOR       &x,
 				 const VECTOR &b,
@@ -206,16 +206,15 @@ SolverRichardson<VECTOR>::solve (const MATRIX &A,
 
   deallog.pop();
 				   // Output
-  if (conv == SolverControl::failure)
-    return exceeded;
-  else
-    return success;
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 }
 
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState 
+void
 SolverRichardson<VECTOR>::Tsolve (const MATRIX &A,
 				  VECTOR       &x,
 				  const VECTOR &b,
@@ -253,10 +252,9 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX &A,
 
   deallog.pop();
 				   // Output
-  if (conv == SolverControl::failure)
-    return exceeded;
-  else
-    return success;
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 }
 
 

@@ -128,21 +128,12 @@ class SolverControl;
  * changes and it is still possible in a simple way to give these additional data to
  * the @p{SolverSelector} object for each solver which it may use.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997, 1998, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001
  */
 template <class Vector = ::Vector<double> >
 class Solver
 {
   public:
-				     /**
-				      * Declare possible return values of a
-				      * solver object.
-				      */
-    enum ReturnState {
-	  success=0, exceeded, breakdown
-    };
-
-
 				     /**
 				      * Constructor. Assign a control
 				      * object which stores the required
@@ -162,7 +153,11 @@ class Solver
 				      * Access to control object.
 				      */
     SolverControl& control() const;
-    
+
+    DeclException2(ExcNoConvergence, int, double,
+		   << "Iteration did not converge after " << arg1
+		   << " steps. Final residual " << arg2);
+  
   protected:
 
 				     /**

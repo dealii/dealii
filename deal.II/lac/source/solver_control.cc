@@ -81,6 +81,7 @@ SolverControl::check (const unsigned int step,
       if (_log_result)
 	deallog << "Failure step " << step
 		<< " value " << check_value << std::endl;
+      lcheck = failure;
       return failure;
     }
 
@@ -89,12 +90,20 @@ SolverControl::check (const unsigned int step,
       if (_log_result)
 	deallog << "Convergence step " << step
 		<< " value " << check_value << std::endl;
+      lcheck = success;
       return success;
     }
-  
+  lcheck = iterate;
   return iterate;
 }
 
+
+
+SolverControl::State
+SolverControl::last_check() const
+{
+  return lcheck;
+}
 
 
 double
@@ -181,6 +190,7 @@ ReductionControl::check (const unsigned int step,
       if (_log_result)
 	deallog << "Convergence step " << step
 		<< " value " << check_value << std::endl;
+      lcheck = success;
       return success;
     }
   else

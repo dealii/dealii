@@ -111,10 +111,10 @@ class SolverSelector : public Subscriptor
 				      * 
 				      */
     template<class Matrix, class Preconditioner>
-    typename Solver<Vector>::ReturnState solve(const Matrix &A,
-						      Vector &x,
-						      const Vector &b,
-						      const Preconditioner &precond) const;
+    void solve(const Matrix &A,
+	       Vector &x,
+	       const Vector &b,
+	       const Preconditioner &precond) const;
     
 				     /**
 				      * Set the additional data. For more
@@ -220,7 +220,7 @@ SolverSelector<Vector>::~SolverSelector()
 
 template <class Vector>
 template<class Matrix, class Preconditioner>
-typename Solver<Vector>::ReturnState 
+void
 SolverSelector<Vector>::solve(const Matrix &A,
 			      Vector &x,
 			      const Vector &b,
@@ -230,30 +230,28 @@ SolverSelector<Vector>::solve(const Matrix &A,
     {
       SolverRichardson<Vector> solver(*control,*vector_memory,
 					     richardson_data);
-      return solver.solve(A,x,b,precond);
+      solver.solve(A,x,b,precond);
     }       
   else if (solver_name=="cg")
     {
       SolverCG<Vector> solver(*control,*vector_memory,
 				     cg_data);
-      return solver.solve(A,x,b,precond);
+      solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
       SolverBicgstab<Vector> solver(*control,*vector_memory,
 					   bicgstab_data);
-      return solver.solve(A,x,b,precond);
+      solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
       SolverGMRES<Vector> solver(*control,*vector_memory,
 					gmres_data);
-      return solver.solve(A,x,b,precond);
+      solver.solve(A,x,b,precond);
     }
   else
     Assert(false,ExcSolverDoesNotExist(solver_name));
-
-  return Solver<Vector>::breakdown;
 };
 
 

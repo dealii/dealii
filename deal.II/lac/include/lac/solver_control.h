@@ -154,6 +154,11 @@ class SolverControl : public Subscriptor
 			 const double check_value);
 
 				     /**
+				      * Return the result of the last check operation.
+				      */
+    State last_check() const;
+    
+				     /**
 				      * Return the convergence value of last
 				      * iteration step for which @p{check} was
 				      * called by the solver.
@@ -236,6 +241,11 @@ class SolverControl : public Subscriptor
 				      */
     double       tol;
 
+				     /**
+				      * Result of last check operation.
+				      */
+    State lcheck;
+    
 				     /**
 				      * Last value of the convergence criterion.
 				      */

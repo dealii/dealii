@@ -16,6 +16,7 @@
 
 #include <lac/solver.h>
 #include <lac/solver_control.h>
+#include <base/exceptions.h>
 #include <base/logstream.h>
 #include <base/subscriptor.h>
 #include <cmath>
@@ -87,7 +88,7 @@ class SolverCG : public Subscriptor, private Solver<VECTOR>
 				      * Solver method.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState
+    void
     solve (const MATRIX &A,
 	   VECTOR       &x,
 	   const VECTOR &b,
@@ -187,7 +188,7 @@ SolverCG<VECTOR>::print_vectors(const unsigned int,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState 
+void
 SolverCG<VECTOR>::solve (const MATRIX &A,
 			 VECTOR       &x,
 			 const VECTOR &b,
@@ -231,7 +232,7 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
       memory.free(Vz);
       memory.free(VAp);
       deallog.pop();
-      return success;
+      return;
     };
   
   g.scale(-1.);
@@ -281,10 +282,9 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
 				   // Output
   deallog.pop();
  
-  if (conv == SolverControl::failure)
-    return exceeded;
-  else
-    return success;
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 };
 
 

@@ -109,11 +109,11 @@ class SolverQMRS : public Subscriptor, private Solver<VECTOR>
 				      * Solver method.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState
+    void
     solve (const MATRIX &A,
-		       VECTOR       &x,
-		       const VECTOR &b,
-		       const PRECONDITIONER& precondition);
+	   VECTOR       &x,
+	   const VECTOR &b,
+	   const PRECONDITIONER& precondition);
 
 				     /**
 				      * Interface for derived class.
@@ -175,7 +175,7 @@ class SolverQMRS : public Subscriptor, private Solver<VECTOR>
 				      * The iteration loop itself.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState 
+    bool
     iterate(const MATRIX& A, const PRECONDITIONER& precondition);
 				     /**
 				      * The current iteration step.
@@ -217,7 +217,7 @@ SolverQMRS<VECTOR>::print_vectors(const unsigned int,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState 
+void
 SolverQMRS<VECTOR>::solve (const MATRIX &A,
 			   VECTOR       &x,
 			   const VECTOR &b,
@@ -244,7 +244,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
 
   step = 0;
   
-  typename Solver<VECTOR>::ReturnState state = breakdown;
+  bool state;
 
   do 
     {
@@ -252,7 +252,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
 	deallog << "Restart step " << step << std::endl;
       state = iterate(A, precondition);
     }
-  while (state == breakdown);
+  while (state);
     
   // Deallocate Memory
  
@@ -265,15 +265,17 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
   // Output
 
   deallog.pop();
- 
-  return state;
+
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 };
 
 
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState 
+bool
 SolverQMRS<VECTOR>::iterate(const MATRIX& A,
 			    const PRECONDITIONER& precondition)
 {
@@ -309,7 +311,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
   res = v.l2_norm();
 
   if (control().check(step, res) == SolverControl::success)
-    return success;
+    return false;
 
   p = v;
   
@@ -331,7 +333,7 @@ while (state == SolverControl::iterate)
       
 //TODO:[GK] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
       if (fabs(sigma/rho) < additional_data.breakdown)
-	return breakdown;
+	return true;
 				       // Step 3
       alpha = rho/sigma;
       //deallog << "alpha:" << alpha << std::endl;
@@ -361,13 +363,12 @@ while (state == SolverControl::iterate)
       else
 	res = sqrt((it+1)*tau);
       state = control().check(step,res);
-      if (state == SolverControl::success)
-	return success;
-      else if (state == SolverControl::failure)
-	return exceeded;
+      if ((state == SolverControl::success)
+      || (state == SolverControl::failure))
+	return false;
 				       // Step 6
       if (fabs(rho) < additional_data.breakdown)
-	return breakdown;
+	return true;
 				       // Step 7
       rho_old = rho;
       precondition.vmult(q,v);
@@ -377,7 +378,7 @@ while (state == SolverControl::iterate)
       p.sadd(beta,v);
       precondition.vmult(q,p);
     }
-  return exceeded;
+  return false;
 }
 
 

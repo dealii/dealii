@@ -97,7 +97,7 @@ class SolverBicgstab : public Subscriptor, private Solver<VECTOR>
 				      * Solve primal problem only.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState
+    void
     solve (const MATRIX &A,
 	   VECTOR       &x,
 	   const VECTOR &b,
@@ -212,7 +212,7 @@ class SolverBicgstab : public Subscriptor, private Solver<VECTOR>
 				      * The iteration loop itself.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    typename Solver<VECTOR>::ReturnState 
+    bool
     iterate(const MATRIX& A, const PRECONDITIONER& precondition);
   
 };
@@ -280,7 +280,7 @@ SolverBicgstab<VECTOR>::print_vectors(const unsigned int,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState
+bool
 SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 				const PRECONDITIONER& precondition)
 {
@@ -312,7 +312,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 //TODO:[GK] Find better breakdown criterion
 
       if (fabs(alpha) > 1.e10)
-	return typename Solver<VECTOR>::ReturnState(breakdown);
+	return true;
     
       s.equ(1., r, -alpha, v);
       precondition.vmult(z,s);
@@ -322,18 +322,18 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
       Vx->add(alpha, y, omega, z);
       r.equ(1., s, -omega, t);
 
-      state = control().check(++step, criterion(A, *Vx, *Vb));
+      res = criterion(A, *Vx, *Vb);
+      state = control().check(++step, res);
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
-  if (state == SolverControl::success) return success;
-  return exceeded;
+  return false;
 }
 
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-typename Solver<VECTOR>::ReturnState
+void
 SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 			      VECTOR       &x,
 			      const VECTOR &b,
@@ -354,7 +354,7 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 
   step = 0;
 
-  typename Solver<VECTOR>::ReturnState state = breakdown;
+  bool state;
   
   do 
     {
@@ -363,7 +363,7 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
       if (start(A) == SolverControl::success) break;  
       state = iterate(A, precondition);
     }
-  while (state == breakdown);
+  while (state);
 
   memory.free(Vr);
   memory.free(Vrbar);
@@ -375,7 +375,10 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   memory.free(Vv);
   
   deallog.pop();
-  return state;
+  
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 }
 
 

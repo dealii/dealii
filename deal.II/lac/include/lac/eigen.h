@@ -139,7 +139,7 @@ class EigenPower : private Solver<VECTOR>
 				      * l2-norm.
 				      */
     template <class MATRIX>
-    typename Solver<VECTOR>::ReturnState
+    void
     solve (double       &value,
 	   const MATRIX &A,
 	   VECTOR       &x);
@@ -218,7 +218,7 @@ class EigenInverse : private Solver<VECTOR>
 				      * l2-norm.
 				      */
     template <class MATRIX>
-    typename Solver<VECTOR>::ReturnState
+    void
     solve (double       &value,
 	   const MATRIX &A,
 	   VECTOR       &x);
@@ -301,7 +301,7 @@ EigenPower<VECTOR>::~EigenPower ()
 
 template <class VECTOR>
 template <class MATRIX>
-typename Solver<VECTOR>::ReturnState
+void
 EigenPower<VECTOR>::solve (double       &value,
 			   const MATRIX &A,
 			   VECTOR       &x)
@@ -362,10 +362,9 @@ EigenPower<VECTOR>::solve (double       &value,
 
   deallog.pop();
 				   // Output
-  if (conv == SolverControl::failure)
-    return exceeded;
-  else
-    return success;
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 }
 
 //----------------------------------------------------------------------//
@@ -386,7 +385,7 @@ EigenInverse<VECTOR>::~EigenInverse ()
 
 template <class VECTOR>
 template <class MATRIX>
-typename Solver<VECTOR>::ReturnState
+void
 EigenInverse<VECTOR>::solve (double       &value,
 			     const MATRIX &A,
 			     VECTOR       &x)
@@ -472,10 +471,9 @@ EigenInverse<VECTOR>::solve (double       &value,
   deallog.pop();
 
 				   // Output
-  if (conv == SolverControl::failure)
-    return exceeded;
-  else
-    return success;
+  AssertThrow(control().last_check() == SolverControl::success,
+	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
+							control().last_value()));
 }
 
 #endif

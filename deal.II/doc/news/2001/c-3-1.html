@@ -238,6 +238,14 @@ documentation, etc</a>.
 <h3>lac</h3>
 
 <ol>
+  <li> <p> Changed: Solver functions <code class="member">solve</code>
+       are void now. If the solver has not converged within the
+       maximum number of iterations, it throws an exception of type
+       <code class="class">ExcNoConvergence</code>.
+       <br>
+       (GK 2001/03/29)
+       </p>
+
   <li> <p> 
        New: The functions <code class="class">FullMatrix</code>::<code
        class="member">mmult</code> and <code
