@@ -30,36 +30,38 @@ void sgemv_ (const char* trans, const int* m, const int* n,
 	     const float* x, const int* incx,
 	     const float* b, float* y, const int* incy);
 // Compute eigenvalues and vectors
-void dgeev_ (char* jobvl, char* jobvr,
-	     int* n, double* A, int* lda,
+void dgeev_ (const char* jobvl, const char* jobvr,
+	     const int* n, double* A, const int* lda,
 	     double* lambda_re, double* lambda_im,
-	     double* vl, int* ldvl,
-	     double* vr, int* ldva,
-	     double* work, int* lwork,
+	     double* vl, const int* ldvl,
+	     double* vr, const int* ldva,
+	     double* work, const int* lwork,
 	     int* info);
-void sgeev_ (char* jobvl, char* jobvr,
-	     int* n, float* A, int* lda,
+void sgeev_ (const char* jobvl, const char* jobvr,
+	     const int* n, float* A, const int* lda,
 	     float* lambda_re, float* lambda_im,
-	     float* vl, int* ldvl,
-	     float* vr, int* ldva,
-	     float* work, int* lwork,
+	     float* vl, const int* ldvl,
+	     float* vr, const int* ldva,
+	     float* work, const int* lwork,
 	     int* info);
 // Compute eigenvalues and vectors (expert)
-void dgeevx_ (char* balanc, char* jobvl, char* jobvr, char* sense,
-	      int* n, double* A, int* lda,
+void dgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
+	      const char* sense,
+	      const int* n, double* A, const int* lda,
 	      double* lambda_re, double* lambda_im,
-	      double* vl, int* ldvl,
-	      double* vr, int* ldvr,
+	      double* vl, const int* ldvl,
+	      double* vr, const int* ldvr,
 	      int* ilo, int* ihi,
 	      double* scale, double* abnrm,
 	      double* rconde, double* rcondv,
 	      double* work, int* lwork,
 	      int* iwork, int* info);
-void sgeevx_ (char* balanc, char* jobvl, char* jobvr, char* sense,
-	      int* n, float* A, int* lda,
+void sgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
+	      const char* sense,
+	      const int* n, float* A, const int* lda,
 	      float* lambda_re, float* lambda_im,
-	      float* vl, int* ldvl,
-	      float* vr, int* ldvr,
+	      float* vl, const int* ldvl,
+	      float* vr, const int* ldvr,
 	      int* ilo, int* ihi,
 	      float* scale, float* abnrm,
 	      float* rconde, float* rcondv,
@@ -67,18 +69,18 @@ void sgeevx_ (char* balanc, char* jobvl, char* jobvr, char* sense,
 	      int* iwork, int* info);
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
-	      int* n, int* m, double* A, int* lda,
+	      const int* n, const int* m, double* A, const int* lda,
 	      double* s,
-	      double* u, int* ldu,
-	      double* vt, int* ldvt,
-	      double* work, int* lwork,
+	      double* u, const int* ldu,
+	      double* vt, const int* ldvt,
+	      double* work, const int* lwork,
 	      int* info);
 void sgesvd_ (int* jobu, int* jobvt,
-	      int* n, int* m, float* A, int* lda,
+	      const int* n, const int* m, float* A, const int* lda,
 	      float* s,
-	      float* u, int* ldu,
-	      float* vt, int* ldvt,
-	      float* work, int* lwork,
+	      float* u, const int* ldu,
+	      float* vt, const int* ldvt,
+	      float* work, const int* lwork,
 	      int* info);
 
 }
@@ -100,42 +102,42 @@ gemv (const char* trans, const int* m, const int* n, const float* alpha, const f
 
 
 inline void
-geev (char* jobvl, char* jobvr, int* n, double* A, int* lda, double* lambda_re, double* lambda_im, double* vl, int* ldvl, double* vr, int* ldva, double* work, int* lwork, int* info)
+geev (const char* jobvl, const char* jobvr, const int* n, double* A, const int* lda, double* lambda_re, double* lambda_im, double* vl, const int* ldvl, double* vr, const int* ldva, double* work, const int* lwork, int* info)
 {
   dgeev_ (jobvl,jobvr,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldva,work,lwork,info);
 }
 
 
 inline void
-geev (char* jobvl, char* jobvr, int* n, float* A, int* lda, float* lambda_re, float* lambda_im, float* vl, int* ldvl, float* vr, int* ldva, float* work, int* lwork, int* info)
+geev (const char* jobvl, const char* jobvr, const int* n, float* A, const int* lda, float* lambda_re, float* lambda_im, float* vl, const int* ldvl, float* vr, const int* ldva, float* work, const int* lwork, int* info)
 {
   sgeev_ (jobvl,jobvr,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldva,work,lwork,info);
 }
 
 
 inline void
-geevx (char* balanc, char* jobvl, char* jobvr, char* sense, int* n, double* A, int* lda, double* lambda_re, double* lambda_im, double* vl, int* ldvl, double* vr, int* ldvr, int* ilo, int* ihi, double* scale, double* abnrm, double* rconde, double* rcondv, double* work, int* lwork, int* iwork, int* info)
+geevx (const char* balanc, const char* jobvl, const char* jobvr, const char* sense, const int* n, double* A, const int* lda, double* lambda_re, double* lambda_im, double* vl, const int* ldvl, double* vr, const int* ldvr, int* ilo, int* ihi, double* scale, double* abnrm, double* rconde, double* rcondv, double* work, int* lwork, int* iwork, int* info)
 {
   dgeevx_ (balanc,jobvl,jobvr,sense,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldvr,ilo,ihi,scale,abnrm,rconde,rcondv,work,lwork,iwork,info);
 }
 
 
 inline void
-geevx (char* balanc, char* jobvl, char* jobvr, char* sense, int* n, float* A, int* lda, float* lambda_re, float* lambda_im, float* vl, int* ldvl, float* vr, int* ldvr, int* ilo, int* ihi, float* scale, float* abnrm, float* rconde, float* rcondv, float* work, int* lwork, int* iwork, int* info)
+geevx (const char* balanc, const char* jobvl, const char* jobvr, const char* sense, const int* n, float* A, const int* lda, float* lambda_re, float* lambda_im, float* vl, const int* ldvl, float* vr, const int* ldvr, int* ilo, int* ihi, float* scale, float* abnrm, float* rconde, float* rcondv, float* work, int* lwork, int* iwork, int* info)
 {
   sgeevx_ (balanc,jobvl,jobvr,sense,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldvr,ilo,ihi,scale,abnrm,rconde,rcondv,work,lwork,iwork,info);
 }
 
 
 inline void
-gesvd (int* jobu, int* jobvt, int* n, int* m, double* A, int* lda, double* s, double* u, int* ldu, double* vt, int* ldvt, double* work, int* lwork, int* info)
+gesvd (int* jobu, int* jobvt, const int* n, const int* m, double* A, const int* lda, double* s, double* u, const int* ldu, double* vt, const int* ldvt, double* work, const int* lwork, int* info)
 {
   dgesvd_ (jobu,jobvt,n,m,A,lda,s,u,ldu,vt,ldvt,work,lwork,info);
 }
 
 
 inline void
-gesvd (int* jobu, int* jobvt, int* n, int* m, float* A, int* lda, float* s, float* u, int* ldu, float* vt, int* ldvt, float* work, int* lwork, int* info)
+gesvd (int* jobu, int* jobvt, const int* n, const int* m, float* A, const int* lda, float* s, float* u, const int* ldu, float* vt, const int* ldvt, float* work, const int* lwork, int* info)
 {
   sgesvd_ (jobu,jobvt,n,m,A,lda,s,u,ldu,vt,ldvt,work,lwork,info);
 }

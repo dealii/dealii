@@ -16,6 +16,9 @@
 #include <base/table.h>
 #include <lac/lapack_support.h>
 
+#include <vector>
+#include <complex>
+
 // forward declarations
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
@@ -203,6 +206,65 @@ class LAPACKFullMatrix : public TransposeTable<number>
     void Tvmult_add (Vector<number>       &w,
 		     const Vector<number> &v) const;
 
+				     /**
+				      * Compute eigenvalues of the
+				      * matrix. After this routine has
+				      * been called, eigenvalues can
+				      * be retrieved using the
+				      * eigenvalue() function. The
+				      * matrix itself will be
+				      * LAPACKSupport::unusable after
+				      * this operation.
+				      *
+				      * @note Calls the LAPACK
+				      * function Xgeev.
+				      */
+    void compute_eigenvalues ();
+
+				     /**
+				      * Retrieve eigenvalue after
+				      * compute_eigenvalues() was
+				      * called.
+				      */
+    std::complex<number>
+    eigenvalue (unsigned int i) const;
+    
+  private:
+				     /**
+				      * Since LAPACK operations
+				      * notoriously change the meaning
+				      * of the matrix entries, we
+				      * record the current state after
+				      * the last operation here.
+				      */
+    LAPACKSupport::State state;
+				     /**
+				      * Additional properties of the
+				      * matrix which may help to
+				      * select more efficient LAPACK
+				      * functions.
+				      */
+    LAPACKSupport::Properties properties;
+
+				     /**
+				      * The working array used for
+				      * some LAPACK functions.
+				      */
+    mutable std::vector<number> work;
+				     /**
+				      * Real parts of
+				      * eigenvalues. Filled by
+				      * compute_eigenvalues.
+				      */
+    std::vector<number> wr;
+    
+				     /**
+				      * Imaginary parts of
+				      * eigenvalues. Filled by
+				      * compute_eigenvalues.
+				      */
+    std::vector<number> wi;
+    
 };
 
 
@@ -216,6 +278,8 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX& M)
   for (typename MATRIX::const_iterator entry = M.begin();
        entry != end; ++entry)
     this->el(entry->row(), entry->column()) = entry->value();
+  
+  state = LAPACKSupport::matrix;
 }
 
 
@@ -243,8 +307,22 @@ LAPACKFullMatrix<number>::fill (
 		   dst_offset_j+entry->column()-src_offset_j)
 	    = entry->value();
     }
+  
+  state = LAPACKSupport::matrix;
 }
 
+
+template <typename number>
+std::complex<number>
+LAPACKFullMatrix<number>::eigenvalue (unsigned int i) const
+{
+  Assert (state & LAPACKSupport::eigenvalues, ExcInvalidState());
+  Assert (wr.size() == n_rows(), ExcInternalError());
+  Assert (wi.size() == n_rows(), ExcInternalError());
+  Assert (i<n_rows(), ExcIndexRange(i,0,n_rows()));
+  
+  return std::complex<number>(wr[i], wi[i]);
+}
 
 
 

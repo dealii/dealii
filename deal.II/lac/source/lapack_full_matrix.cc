@@ -17,6 +17,8 @@
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
 
+#include <iostream>
+
 using namespace LAPACKSupport;
 
 template <typename number>
@@ -39,7 +41,9 @@ template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M)
 		:
 		TransposeTable<number> (M)
-{}
+{
+  state = LAPACKSupport::matrix;
+}
 
 
 template <typename number>
@@ -47,6 +51,7 @@ LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number>& M)
 {
   TransposeTable<number>::operator=(M);
+  state = LAPACKSupport::matrix;
   return *this;
 }
 
@@ -61,6 +66,8 @@ LAPACKFullMatrix<number>::operator = (const FullMatrix<number2>& M)
   for (unsigned int i=0;i<this->n_rows();++i)
     for (unsigned int j=0;j<this->n_cols();++j)
       (*this)(i,j) = M(i,j);
+  
+  state = LAPACKSupport::matrix;
   return *this;
 }
 
@@ -72,13 +79,13 @@ LAPACKFullMatrix<number>::operator = (const double d)
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
   
   if (this->n_elements() != 0)
-    std::fill_n (this->val, this->n_elements(), number());
+    std::fill_n (this->val, this->n_elements(), number());  
   
+  state = LAPACKSupport::matrix;
   return *this;
 }
 
-#ifdef HAVE_LIBLAPACK
-
+#ifdef HAVE_LIBBLAS
 
 template <typename number>
 void
@@ -87,6 +94,8 @@ LAPACKFullMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
+  Assert (state == matrix, ExcInvalidState());
+  
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
@@ -103,6 +112,8 @@ LAPACKFullMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
+  Assert (state == matrix, ExcInvalidState());
+  
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
@@ -138,10 +149,52 @@ LAPACKFullMatrix<number>::Tvmult (
 
 #endif
 
-// template <typename number>
-// LAPACKFullMatrix<number>::()
-// {}
+#ifdef HAVE_LIBLAPACK
 
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_eigenvalues()
+{
+  const int nn = this->n_cols();
+  wr.resize(nn);
+  wi.resize(nn);
+  number* values = const_cast<number*> (this->data());
+  
+  int info;
+  int lwork = -1;
+  work.resize(1);
+  geev(&N, &N, &nn, values, &nn,
+       &wr[0], &wi[0],
+       0, &one, 0, &one,
+       &work[0], &lwork, &info);
+				   // geev returns info=0 on
+				   // success. Since we only queried
+				   // the optimal size for work,
+				   // everything else would not be
+				   // acceptable.
+  Assert (info == 0, ExcInternalError());
+
+				   // Allocate working array according
+				   // to suggestion.
+  lwork = (int) (work[0]+.1);
+  work.resize((unsigned int) lwork);
+				   // Finally compute the eigenvalues.
+  geev(&N, &N, &nn, values, &nn,
+       &wr[0], &wi[0],
+       0, &one, 0, &one,
+       &work[0], &lwork, &info);
+				   // Negative return value implies a
+				   // wrong argument. This should be
+				   // internal.
+  Assert (info >=0, ExcInternalError());
+//TODO:[GK] What if the QR method fails?
+  if (info != 0)
+    std::cerr << "LAPACK error in geev" << std::endl;
+
+  state = LAPACKSupport::State(eigenvalues | unusable);
+}
+
+#endif
 
 // template <typename number>
 // LAPACKFullMatrix<number>::()

@@ -25,12 +25,14 @@ namespace LAPACKSupport
  */
   enum State
   {
-					 /// Contents is something useless.
-	unusable,
 					 /// Contents is actually a matrix.
 	matrix,
 					 /// Contents is an LU decomposition.
-	lu
+	lu,
+					 /// Eigenvalue vector is filled
+	eigenvalues,
+					 /// Contents is something useless.
+	unusable = 0x8000
   };
   
   
@@ -54,6 +56,18 @@ namespace LAPACKSupport
 	hessenberg = 8
   };
 
+				   /**
+				    * Character constant.
+				    */
+  extern const char V = 'V';
+				   /**
+				    * Character constant.
+				    */
+  extern const char T = 'T';
+				   /**
+				    * Character constant.
+				    */
+  extern const char N = 'N';
 				   /**
 				    * Integer constant.
 				    */
