@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -166,8 +166,15 @@ class PolynomialSpace
 				      * never checked and therefore
 				      * left to the application.
 				      */
-    unsigned int degree () const;
+    unsigned int degree () const;  
     
+				     /**
+				      * Static function used in the
+				      * constructor to compute the
+				      * number of polynomials.
+				      */
+    static unsigned int compute_n_pols (const unsigned int n);
+
   protected:
     
 				     /**
@@ -208,13 +215,6 @@ class PolynomialSpace
 				      * polynomials.
 				      */
     std::vector<unsigned int> index_map_inverse;
-    
-				     /**
-				      * Static function used in the
-				      * constructor to compute the
-				      * number of polynomials.
-				      */
-    static unsigned int compute_n_pols (const unsigned int n);
 };
 
 /// @if NoDoc

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -193,6 +193,17 @@ class PolynomialsBDM
 				      * the highest polynomial degree.
 				      */
     unsigned int degree () const;
+    
+				     /**
+				      * Return the number of
+				      * polynomials in the space
+				      * <TT>BDM(degree)</tt> without
+				      * requiring to build an object
+				      * of PolynomialsBDM. This is
+				      * required by the FiniteElement
+				      * classes.
+				      */
+    static unsigned int compute_n_pols(unsigned int degree);
     
   private:
 				     /**

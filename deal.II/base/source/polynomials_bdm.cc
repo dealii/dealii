@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@ PolynomialsBDM<dim>::PolynomialsBDM (const unsigned int k)
 		:
 		polynomial_space (Polynomials::Legendre::generate_complete_basis(k)),
 		monomials(1),
-		n_pols(dim * polynomial_space.n()+2),
+		n_pols(compute_n_pols(k)),
 		p_values(polynomial_space.n()),
 		p_grads(polynomial_space.n()),
 		p_grad_grads(polynomial_space.n())
@@ -188,6 +188,14 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 				   // This degree is one larger
   Assert (polynomial_space.degree() <= 2,
 	  ExcNotImplemented());
+}
+
+
+template <int dim>
+unsigned int
+PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
+{
+  return dim*PolynomialSpace<dim>::compute_n_pols(k)+2;
 }
 
 
