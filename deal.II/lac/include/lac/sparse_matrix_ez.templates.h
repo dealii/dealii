@@ -66,8 +66,8 @@ template <typename number>
 void
 SparseMatrixEZ<number>::reinit(const unsigned int n_rows,
 			       const unsigned int n_cols,
-			       const unsigned int default_row_length,
-			       const unsigned int default_increment)
+			       unsigned int default_row_length,
+			       unsigned int default_increment)
 {
   clear();
   if (default_row_length == Entry::invalid)

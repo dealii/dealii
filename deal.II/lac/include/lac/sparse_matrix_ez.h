@@ -393,8 +393,8 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     void reinit (const unsigned int n_rows,
 		 const unsigned int n_columns,
-		 const unsigned int default_row_length = Entry::invalid,
-		 const unsigned int default_increment = Entry::invalid);
+		 unsigned int default_row_length = Entry::invalid,
+		 unsigned int default_increment = Entry::invalid);
 
 				     /**
 				      * Release all memory and return
