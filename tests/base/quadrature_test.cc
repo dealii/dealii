@@ -24,27 +24,27 @@ int main(int,char)
   ofstream logfile("quadrature_test.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  vector<Quadrature<2> *> quadratures(14);
-  quadratures[2]=new QGauss2<2>();
-  quadratures[3]=new QGauss3<2>();
-  quadratures[4]=new QGauss4<2>();
-  quadratures[5]=new QGauss5<2>();
-  quadratures[6]=new QGauss6<2>();
-  quadratures[7]=new QGauss7<2>();
-  quadratures[8]=new QGauss8<2>();
-  quadratures[9] = new QMidpoint<2>();
-  quadratures[10] = new QTrapez<2>();
-  quadratures[11] = new QSimpson<2>();
-  quadratures[12] = new QMilne<2>();
-  quadratures[13] = new QWeddle<2>();
+  vector<Quadrature<2> *> quadratures;
+  quadratures.push_back (new QGauss2<2>());
+  quadratures.push_back (new QGauss3<2>());
+  quadratures.push_back (new QGauss4<2>());
+  quadratures.push_back (new QGauss5<2>());
+  quadratures.push_back (new QGauss6<2>());
+  quadratures.push_back (new QGauss7<2>());
+  quadratures.push_back (new QMidpoint<2>());
+  quadratures.push_back (new QTrapez<2>());
+  quadratures.push_back (new QSimpson<2>());
+  quadratures.push_back (new QMilne<2>());
+  quadratures.push_back (new QWeddle<2>());
   
-  for (unsigned int n=2; n<14; ++n)
+  for (unsigned int n=0; n<quadratures.size(); ++n)
     {
       Quadrature<2> *quadrature=quadratures[n];
       const vector<Point<2> > &points=quadrature->get_points();
       const vector<double> &weights=quadrature->get_weights();
 
-      deallog << "Quadrature no." << n;
+      deallog << "Quadrature no." << n
+	      << " (" << typeid(*quadrature).name() << ")";
       
       unsigned int i=0;
       double quadrature_int=0;
