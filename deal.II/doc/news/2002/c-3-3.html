@@ -241,6 +241,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> Improved: <code class="class">SolverGMRES</code> allocates
+       basis vectors only, when they are needed. Therefore, it is safe
+       now to ask for a basis larger than the expected number of
+       iteration steps. On the other hand, memory allocation failures
+       may occur during the iteration now.
+       <br>
+       (GK 2002/05/24)
+       </p>
+
   <li> <p> 
        New: Function <code
        class="member">SparsityPattern::matrix_position</code> is the
