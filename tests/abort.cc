@@ -26,7 +26,7 @@ namespace  deal_II_exceptions
   {
     extern unsigned int n_treated_exceptions;
   }
-};
+}
 
 extern "C"
 void abort()
