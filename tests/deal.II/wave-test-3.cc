@@ -1,7 +1,6 @@
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
 
-#include <base/logstream.h>
 #include <grid/tria_boundary_lib.h>
 #include <base/parameter_handler.h>
 #include <base/forward_declarations.h>
@@ -3447,7 +3446,7 @@ void TimestepManager<dim>::refine_grids ()
 
   if (parameters.produce_error_statistics)
     {
-      deallog << "    Generating error statistics " << flush;
+      deallog << "    Generating error statistics ";
 
       vector<double> time_values (timesteps.size());
       for (unsigned int i=0; i<timesteps.size(); ++i)
@@ -3533,7 +3532,7 @@ void TimestepManager<dim>::refine_grids ()
 	       (partial_sums.end() - p)/(GeometryInfo<dim>::children_per_cell-1))
 	   << " cells in next sweep."
 	   << endl;
-      deallog << "    Now refining..." << flush;
+      deallog << "    Now refining...";
       do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
 	       bind2nd (mem_fun1 (&TimeStepBase_Wave<dim>::refine_grid),
 			TimeStepBase_Tria<dim>::RefinementData (top_threshold,
@@ -3622,7 +3621,7 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 				   // write statistics
   if (true)
     {
-      deallog << "    Writing statistics for whole sweep." << flush;
+      deallog << "    Writing statistics for whole sweep.";
       
       deallog << "#  Description of fields" << endl
 	   << "#  =====================" << endl
@@ -3651,7 +3650,7 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 				   // write summary
   if (true)
     {
-      deallog << "    Writing summary." << flush;
+      deallog << "    Writing summary.";
       
       sweep_info.write_summary (parameters.eval_list,
 				logfile);
@@ -3669,7 +3668,7 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
   typename DataOutInterface<dim+1>::OutputFormat output_format
     = DataOutInterface<dim+1>::parse_output_format (parameters.output_format);
   
-  deallog << "    Writing stacked time steps" << flush;
+  deallog << "    Writing stacked time steps";
   DataOutBase::EpsFlags eps_flags;
   eps_flags.height_vector = eps_flags.color_vector = 2;
   eps_flags.draw_mesh = false;
@@ -5803,7 +5802,7 @@ void TimeStep_Dual<dim>::do_initial_step () {
        << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs" << flush;
+       << dof_handler->n_dofs() << " dofs";
   
 				   // add up sweep-accumulated data. count
 				   // u and v as separate dofs
@@ -5861,7 +5860,7 @@ void TimeStep_Dual<dim>::do_timestep ()
        << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs" << flush;
+       << dof_handler->n_dofs() << " dofs";
 
 				   // add up sweep-accumulated data. count
 				   // u and v as separate dofs
@@ -6583,7 +6582,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 {
   sweep_info->get_timers().error_estimation.start();
 
-  deallog << "[ee]" << flush;
+  deallog << "[ee]";
   
   if ((parameters.refinement_strategy == WaveParameters<dim>::energy_estimator)
       ||
@@ -7856,8 +7855,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
        << time
        << ", step=" << timestep_no
        << ", sweep=" << sweep_no
-       << ". "
-       << flush;
+       << ". ";
 
   if ((sweep_no < parameters.number_of_sweeps-1) ||
       (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
@@ -7885,7 +7883,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       (((timestep_no % parameters.write_steps_interval) == 0) ||
        (next_timestep == 0)))
     {
-      deallog << "[o]" << flush;
+      deallog << "[o]";
 
       DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (parameters.output_format);
@@ -7958,13 +7956,13 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       
       out.write (logfile, output_format);
 
-      deallog << "." << flush;
+      deallog << ".";
     };
 
   if (parameters.write_stacked_data &&
       (timestep_no % parameters.write_stacked_interval == 0))
     {
-      deallog << "[st]" << flush;
+      deallog << "[st]";
 
       sweep_data->data_out_stack->new_parameter_value (time,
 						       (timestep_no == 0 ?
@@ -8153,7 +8151,7 @@ void TimeStep_Primal<dim>::do_initial_step ()
        << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs" << flush;
+       << dof_handler->n_dofs() << " dofs";
 
 
 				   // add up sweep-accumulated data. count
@@ -8197,7 +8195,7 @@ void TimeStep_Primal<dim>::do_timestep ()
        << ", sweep=" << sweep_no
        << ". "
        << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs" << flush;
+       << dof_handler->n_dofs() << " dofs";
   
 				   // add up sweep-accumulated data. count
 				   // u and v as separate dofs
