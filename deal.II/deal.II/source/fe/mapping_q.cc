@@ -221,7 +221,7 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
 			      const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  QProjector<dim> q (quadrature, false);
+  Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
   compute_face_data (update_flags, q,
 		     quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
@@ -239,7 +239,7 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
 				 const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  QProjector<dim> q (quadrature, true);
+  Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
   compute_face_data (update_flags, q,
 		     quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)

@@ -462,8 +462,10 @@ MappingQ1<dim>::get_face_data (const UpdateFlags        update_flags,
 			       const Quadrature<dim-1> &quadrature) const
 {
   InternalData* data = new InternalData(n_shape_functions);
-  QProjector<dim> q (quadrature, false);
-  compute_face_data (update_flags, q, quadrature.n_quadrature_points, *data);
+  compute_face_data (update_flags,
+		     QProjector<dim>::project_to_all_faces(quadrature),
+		     quadrature.n_quadrature_points,
+		     *data);
 
   return data;
 }
@@ -476,8 +478,10 @@ MappingQ1<dim>::get_subface_data (const UpdateFlags update_flags,
 				  const Quadrature<dim-1>& quadrature) const
 {
   InternalData* data = new InternalData(n_shape_functions);
-  QProjector<dim> q (quadrature, true);
-  compute_face_data (update_flags, q, quadrature.n_quadrature_points, *data);
+  compute_face_data (update_flags,
+		     QProjector<dim>::project_to_all_subfaces(quadrature),
+		     quadrature.n_quadrature_points,
+		     *data);
 
   return data;
 }

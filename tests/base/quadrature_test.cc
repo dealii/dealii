@@ -118,7 +118,9 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 
   for (unsigned int n=0; n<quadratures.size(); ++n)
     {
-      QProjector<dim> quadrature(*quadratures[n], sub);
+      Quadrature<dim> quadrature (sub == false?
+				  QProjector<dim>::project_to_all_faces(*quadratures[n]) :
+				  QProjector<dim>::project_to_all_subfaces(*quadratures[n]));
       const std::vector<Point<dim> > &points=quadrature.get_points();
       const std::vector<double> &weights=quadrature.get_weights();
 

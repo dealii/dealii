@@ -279,7 +279,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 				   // quadrature formula which will be
 				   // used to probe boundary points at
 				   // curved faces
-  QProjector<dim> *q_projector=0;
+  Quadrature<dim> *q_projector=0;
   if (mapping!=0)
     {
       typename std::vector<Point<dim-1> > boundary_points(n_points);
@@ -287,7 +287,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	boundary_points[i](0)= 1.*(i+1)/(n_points+1);
 
       Quadrature<dim-1> quadrature(boundary_points);
-      q_projector = new QProjector<dim> (quadrature, false);
+      q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
     }
   
   for (; cell!=endc; ++cell)
@@ -602,7 +602,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	      boundary_points[i](0) = 1.*(i+1)/(n_points+1);
 	    
 	    Quadrature<dim-1> quadrature (boundary_points);
-	    QProjector<dim> q_projector (quadrature, false);
+	    Quadrature<dim>   q_projector (QProjector<dim>::project_to_all_faces(quadrature));
 
 					     // next loop over all
 					     // boundary faces and

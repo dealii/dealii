@@ -424,8 +424,8 @@ FiniteElement<dim>::get_face_data (const UpdateFlags       flags,
 				   const Mapping<dim>      &mapping,
 				   const Quadrature<dim-1> &quadrature) const
 {
-  QProjector<dim> q(quadrature, false);
-  return get_data (flags, mapping, q);
+  return get_data (flags, mapping,
+		   QProjector<dim>::project_to_all_faces(quadrature));
 }
 
 
@@ -436,8 +436,8 @@ FiniteElement<dim>::get_subface_data (const UpdateFlags        flags,
 				      const Mapping<dim>      &mapping,
 				      const Quadrature<dim-1> &quadrature) const
 {
-  QProjector<dim> q(quadrature, true);
-  return get_data (flags, mapping, q);
+  return get_data (flags, mapping,
+		   QProjector<dim>::project_to_all_subfaces(quadrature));
 }
 
 

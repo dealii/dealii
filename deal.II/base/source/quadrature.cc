@@ -222,27 +222,6 @@ Quadrature<dim>::memory_consumption () const
 
 //----------------------------------------------------------------------//
 
-template <int dim>
-QProjector<dim>::QProjector (const Quadrature<dim-1> &quadrature,
-			     const bool sub)
-  :
-  Quadrature<dim> (quadrature.n_quadrature_points
-		   * GeometryInfo<dim>::faces_per_cell
-		   * (sub ? GeometryInfo<dim>::subfaces_per_face : 1))
-{
-  if (sub)
-    project_to_subfaces (quadrature, quadrature_points);
-  else
-    project_to_faces (quadrature, quadrature_points);
-
-  const unsigned int n = GeometryInfo<dim>::faces_per_cell
-			 * (sub ? GeometryInfo<dim>::subfaces_per_face : 1);
-  unsigned int k=0;
-  for (unsigned int i=0; i<n; ++i)
-    for (unsigned int j=0; j<quadrature.n_quadrature_points; ++j)
-      weights[k++] = quadrature.weight(j);
-}
-
 
 template <>
 void QProjector<1>::project_to_face (const Quadrature<0> &,
@@ -576,49 +555,88 @@ void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 
 
 
-template <int dim>
-void
-QProjector<dim>::project_to_faces (const Quadrature<dim-1>           &quadrature,
-				   typename std::vector<Point<dim> > &q_points)
+template <>
+Quadrature<1>
+QProjector<1>::project_to_all_faces (const Quadrature<0> &)
 {
-  unsigned int npt = quadrature.n_quadrature_points;
-  unsigned int nf = GeometryInfo<dim>::faces_per_cell;
+  Assert (false, ExcImpossibleInDim(1));
+  return Quadrature<1>(0);
+};
+
+
+
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_all_faces (const Quadrature<dim-1> &quadrature)
+{
+  const unsigned int n_points = quadrature.n_quadrature_points,
+		     n_faces  = GeometryInfo<dim>::faces_per_cell;
+
+				   // first fix quadrature points
+  typename std::vector<Point<dim> > q_points (n_points * n_faces);
+  std::vector <Point<dim> > help(n_points);
   
-  q_points.resize (npt*nf);
-  std::vector <Point<dim> > help(npt);
-  
-  unsigned k=0;
-  for (unsigned int i=0;i<nf;++i)
+				   // project to each face and copy
+				   // results
+  for (unsigned int face=0; face<n_faces; ++face)
     {
-      project_to_face(quadrature, i, help);
-      for (unsigned int j=0;j<npt;++j)
-	q_points[k++] = help[j];
+      project_to_face(quadrature, face, help);
+      std::copy (help.begin(), help.end(), q_points.begin()+n_points*face);
     }
+
+				   // next copy over weights
+  typename std::vector<double> weights (n_points * n_faces);
+  for (unsigned int face=0; face<n_faces; ++face)
+    std::copy (quadrature.get_weights().begin(),
+	       quadrature.get_weights().end(),
+	       weights.begin()+n_points*face);
+  
+  return Quadrature<dim>(q_points, weights);
 }
 
 
 
+template <>
+Quadrature<1>
+QProjector<1>::project_to_all_subfaces (const Quadrature<0> &)
+{
+  Assert (false, ExcImpossibleInDim(1));
+  return Quadrature<1>(0);
+};
+
+
 
 template <int dim>
-void
-QProjector<dim>::project_to_subfaces (const Quadrature<dim-1>           &quadrature,
-				      typename std::vector<Point<dim> > &q_points)
+Quadrature<dim>
+QProjector<dim>::project_to_all_subfaces (const Quadrature<dim-1> &quadrature)
 {
-  unsigned int npt = quadrature.n_quadrature_points;
-  unsigned int nf = GeometryInfo<dim>::faces_per_cell;
-  unsigned int nc = GeometryInfo<dim>::subfaces_per_face;
+  const unsigned int n_points          = quadrature.n_quadrature_points,
+		     n_faces           = GeometryInfo<dim>::faces_per_cell,
+		     subfaces_per_face = GeometryInfo<dim>::subfaces_per_face;
   
-  q_points.resize (npt*nf*nc);
-  std::vector <Point<dim> > help(npt);
+				   // first fix quadrature points
+  typename std::vector<Point<dim> > q_points (n_points * n_faces * subfaces_per_face);
+  std::vector <Point<dim> > help(n_points);
   
-  unsigned k=0;
-  for (unsigned int i=0;i<nf;++i)
-    for (unsigned int c=0;c<nc;++c)
+				   // project to each face and copy
+				   // results
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
       {
-	project_to_subface(quadrature, i, c, help);
-	for (unsigned int j=0;j<npt;++j)
-	  q_points[k++] = help[j];
-      }
+	project_to_subface(quadrature, face, subface, help);
+	std::copy (help.begin(), help.end(),
+		   q_points.begin()+n_points*(face*subfaces_per_face+subface));
+      };
+
+				   // next copy over weights
+  typename std::vector<double> weights (n_points * n_faces * subfaces_per_face);
+  for (unsigned int face=0; face<n_faces; ++face)
+    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+      std::copy (quadrature.get_weights().begin(),
+		 quadrature.get_weights().end(),
+		 weights.begin()+n_points*(face*subfaces_per_face+subface));
+  
+  return Quadrature<dim>(q_points, weights);
 }
 
 

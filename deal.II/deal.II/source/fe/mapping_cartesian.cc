@@ -99,8 +99,8 @@ typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_face_data (const UpdateFlags update_flags,
 				      const Quadrature<dim-1>& quadrature) const
 {
-  QProjector<dim> q (quadrature, false);
-  InternalData* data = new InternalData (q);
+  InternalData* data
+    = new InternalData (QProjector<dim>::project_to_all_faces(quadrature));
 
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
@@ -116,8 +116,8 @@ typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_subface_data (const UpdateFlags update_flags,
 					 const Quadrature<dim-1> &quadrature) const
 {
-  QProjector<dim> q (quadrature, true);
-  InternalData* data = new InternalData (q);
+  InternalData* data
+    = new InternalData (QProjector<dim>::project_to_all_subfaces(quadrature));
 
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);

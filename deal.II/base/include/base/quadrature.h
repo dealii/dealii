@@ -276,55 +276,30 @@ class QIterated : public Quadrature<dim>
  *  for a description of the orientation of the different faces.
  */
 template <int dim>
-class QProjector : public Quadrature<dim>
+class QProjector
 {
   public:
-//TODO:[GK] remove this constructor again and return to old state with static-only functions. move this function to something in the finite element classes which is the only place where it is used.    
+    
 				     /**
-				      * Constructor for a quadrature rule on all (sub)faces.
-				      * The quadrature rule
-				      * @p{quadrature} is applied to
-				      * each face or subface, according
-				      * to the @{sub} flag.
-				      *
-				      * The weights of the new rule are
-				      * replications of the original
-				      * weights. This is not a proper
-				      * handling, but it is
-				      * consistent with later use. If
-				      * the (sub)face rule is applied to
-				      * the unity function, the result
-				      * is the number of (sub)faces.
-				      */
-    QProjector (const Quadrature<dim-1>& quadrature,
-		const bool sub);
-
-				     /**
-				      * Compute the quadrature points on the
-				      * cell if the given quadrature formula
-				      * is used on face @p{face_no}. For further
-				      * details, see the general doc for
-				      * this class.
+				      * Compute the quadrature points
+				      * on the cell if the given
+				      * quadrature formula is used on
+				      * face @p{face_no}. For further
+				      * details, see the general doc
+				      * for this class.
 				      */
     static void project_to_face (const Quadrature<dim-1>  &quadrature,
 				 const unsigned int        face_no,
 				 typename std::vector<Point<dim> > &q_points);
 
-				     /**
-				      * Projection to all faces.
-				      * Generate a formula that integrates
-				      * over all faces at the same time.
-				      */
-    static void project_to_faces (const Quadrature<dim-1>  &quadrature,
-				  typename std::vector<Point<dim> > &q_points);
-    
     				     /**
-				      * Compute the quadrature points on the
-				      * cell if the given quadrature formula
-				      * is used on face @p{face_no}, subface
-				      * number @p{subface_no}. For further
-				      * details, see the general doc for
-				      * this class.
+				      * Compute the quadrature points
+				      * on the cell if the given
+				      * quadrature formula is used on
+				      * face @p{face_no}, subface
+				      * number @p{subface_no}. For
+				      * further details, see the
+				      * general doc for this class.
 				      */
     static void project_to_subface (const Quadrature<dim-1>  &quadrature,
 				    const unsigned int        face_no,
@@ -332,14 +307,46 @@ class QProjector : public Quadrature<dim>
 				    typename std::vector<Point<dim> > &q_points);
 
 				     /**
-				      * Projection to all child faces.
-				      * Project to the children of all
-				      * faces at the same time. The
-				      * ordering is first by face,
-				      * then by subface
+				      * Take a face quadrature formula
+				      * and generate a cell quadrature
+				      * formula from it where the
+				      * quadrature points of the given
+				      * argument are projected on all
+				      * faces.
+				      *
+				      * The weights of the new rule
+				      * are replications of the
+				      * original weights. This is not
+				      * a proper handling, in that the
+				      * sum of weights does not equal
+				      * one, but it is consistent with
+				      * the use of this function,
+				      * namely to generate sets of
+				      * face quadrature points on a
+				      * cell, one set of which will
+				      * then be selected at each
+				      * time. This is used in the
+				      * @ref{FEFaceValues} class,
+				      * where we initialize the
+				      * values, derivatives, etc on
+				      * all faces at once, while
+				      * selecting the data of one
+				      * particular face only happens
+				      * later.
 				      */
-    static void project_to_subfaces (const Quadrature<dim-1>  &quadrature,
-				     typename std::vector<Point<dim> > &q_points);
+    static Quadrature<dim>
+    project_to_all_faces (const Quadrature<dim-1> &quadrature);
+
+				     /**
+				      * This function is alike the
+				      * previous one, but projects the
+				      * given face quadrature formula
+				      * to the subfaces of a cell,
+				      * i.e. to the children of the
+				      * faces of the unit cell.
+				      */
+    static Quadrature<dim>
+    project_to_all_subfaces (const Quadrature<dim-1> &quadrature);
 };
 
 
@@ -374,6 +381,11 @@ template <>
 void QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
 				     const unsigned int      face_no,
 				     std::vector<Point<3> > &q_points);
+
+template <>
+Quadrature<1> QProjector<1>::project_to_all_faces (const Quadrature<0> &quadrature);
+
+
 template <>
 void QProjector<1>::project_to_subface (const Quadrature<0> &,
 					const unsigned int,
@@ -389,6 +401,11 @@ void QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 					const unsigned int      face_no,
 					const unsigned int      subface_no,
 					std::vector<Point<3> > &q_points);
+
+template <>
+Quadrature<1> QProjector<1>::project_to_all_subfaces (const Quadrature<0> &quadrature);
+
+
 template <>
 bool
 QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature);
