@@ -215,18 +215,43 @@ void TableHandler::write_text(ostream &out) const
   for (unsigned int j=0; j<column_order.size(); ++j)
     {
       string key=column_order[j];
+      unsigned int column_string_size=0;
+
       const map<string, vector<string> >::const_iterator 
 	super_iter=supercolumns.find(key);
 
-      unsigned int max_string_size=6;
-      if (super_iter!=supercolumns.end())
-	max_string_size+=8*(super_iter->second.size()-1);
+				      
+      if (super_iter!=supercolumns.end())   // if supercolumn
+	{
+	  vector<string>::const_iterator col_key=super_iter->second.begin();
+	  for (;col_key!=super_iter->second.end(); ++col_key)
+	    {
+	      const map<string, Column>::const_iterator
+		col_iter=columns.find(*col_key);
+	      if (col_iter->second.scientific &&
+		  col_iter->second.precision>1)
+		column_string_size+=16;
+	      else
+		column_string_size+=8;
+	    }
+	}
+      else
+	{
+	  const map<string, Column>::const_iterator
+		col_iter=columns.find(key);
+	  if (col_iter->second.scientific &&
+	      col_iter->second.precision>1)
+	    column_string_size=16;
+	  else
+	    column_string_size=8;
+	}
+      column_string_size-=1;
 	
-      if (key.size()>max_string_size)
-	key.erase(max_string_size);
+      if (key.size()>column_string_size)
+	key.erase(column_string_size);
       
       out.setf(ios::left);
-      out << setw(max_string_size)
+      out << setw(column_string_size)
 //	  << setfill('*') 
 	  << key.c_str() << "\t";
     }
