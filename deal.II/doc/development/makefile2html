@@ -1,4 +1,4 @@
-# Copyright (C) 1999, 2000 by the deal.II group
+# Copyright (C) 1999, 2000, 2002 by the deal.II group
 # $Id$
 
 print <<'EOT'
@@ -7,7 +7,7 @@ print <<'EOT'
     <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
     <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
     <title>Makefile fro deal.II</title>
-    <meta name="author" content="deal@iwr.uni-heidelberg.de">
+    <meta name="author" content="the deal.II authors <authors@dealii.org>">
     <meta name="keywords" content="deal.II Makefile"></head>
   <body>
 EOT
