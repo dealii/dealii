@@ -24,7 +24,7 @@
 /**
  * This class provides an interface to the sparse direct solver MA27
  * from the Harwell Subroutine Library. MA27 is a direct solver
- * specialized for sparse indefinite systems of linear equations and
+ * specialized for sparse symmetric indefinite systems of linear equations and
  * uses a modified form of Gauss elimination. It is included in the
  * Harwell Subroutine Library (see
  * @url{http://www.cse.clrc.ac.uk/Activity/HSL}) and is written in
@@ -341,7 +341,7 @@ class SparseDirectMA27
 /**
  * This class provides an interface to the sparse direct solver MA47
  * from the Harwell Subroutine Library. MA47 is a direct solver
- * specialized for sparse indefinite systems of linear equations and
+ * specialized for sparse symmetric indefinite systems of linear equations and
  * uses a frontal elimination method. It is included in the Harwell
  * Subroutine Library (see
  * @url{http://www.cse.clrc.ac.uk/Activity/HSL}) and is written in
