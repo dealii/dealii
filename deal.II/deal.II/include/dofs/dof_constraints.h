@@ -57,11 +57,17 @@ class BlockIndices;
  * degrees of freedom. When building the global system matrix and the right
  * hand sides, you normally build them without taking care of the constraints,
  * purely on a topological base, i.e. by a loop over cells. In order to do
- * actual calculations, you have to 'condense' these matrices: eliminate
- * constrained degrees of freedom and distribute the appropriate values to
- * the unconstrained dofs. This changes the sparsity pattern of the sparse
+ * actual calculations, you have to 'condense' the linear system: eliminate
+ * constrained degrees of freedom and distribute the appropriate values to the
+ * unconstrained dofs. This changes the sparsity pattern of the sparse
  * matrices used in finite element calculations und is thus a quite expensive
- * operation.
+ * operation. The general scheme of things is that you build your system, you
+ * eliminate (condense) away constrained nodes using the condense() functions
+ * of this class, then you solve the remaining system, and finally you compute
+ * the values of constrained nodes from the values of the unconstrained ones
+ * using the distribute() function. Note that the condense() function is
+ * applied to matrix and right hand side of the linear system, while the
+ * distribute() function is applied to the solution vector.
  *
  * Condensation is done in four steps: first the large matrix sparsity pattern
  * is created (e.g. using @ref{DoFHandler}@p{::create_sparsity_pattern}), then the
