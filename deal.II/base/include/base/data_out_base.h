@@ -153,10 +153,10 @@
  * \begin{itemize}
  *
  * \item #BICUBIC_PATCH#
- * A bicubic_patch is a 3-dimensional Bezier patch. It consists of 16 Points
+ * A #bicubic_patch# is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
  * while the other 12 points pull and stretch the patch into shape.
- * One bicubic_patch is generated on each patch. Therefor the number of 
+ * One #bicubic_patch# is generated on each patch. Therefor the number of 
  * subdivisions has to be 3 to provide the patch with 16 points.
  * A bicubic patch is not exact but generates very smooth images.
  *
