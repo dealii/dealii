@@ -583,7 +583,7 @@ namespace StandardExceptions
   DeclException0 (ExcNotImplemented);
   DeclException0 (ExcInternalError);
   DeclException0 (ExcPureFunctionCalled);
-
+  DeclException0 (ExcNotInitialized);
   DeclException2 (ExcDimensionMismatch, int, int,
 		  << "Dimension " << arg1 << " not equal to " << arg2);
   DeclException3 (ExcIndexRange, int, int, int,
