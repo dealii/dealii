@@ -54,22 +54,27 @@ namespace Threads
   };
   
 
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
 					  const char         *,
 					  void               *)
   {
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
     pthread_barrier_init (&barrier, 0, count);
+  };
+
 #else
-				     // calm down warning, then error out
-    (void *)(&count);
+
+  PosixThreadBarrier::PosixThreadBarrier (const unsigned int  ,
+					  const char         *,
+					  void               *)
+  {
     AssertThrow (false,
 		 ExcMessage ("Your local POSIX installation does not support\n"
 			     "POSIX barriers. You will not be able to use\n"
 			     "this class, but the rest of the threading\n"
 			     "functionality is available."));
-#endif
   };
+#endif
 
 
 
