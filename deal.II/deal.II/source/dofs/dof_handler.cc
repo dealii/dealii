@@ -49,7 +49,10 @@ DoFHandler<dim>::DoFHandler (Triangulation<dim> &tria) :
 
 template <int dim>
 DoFHandler<dim>::~DoFHandler ()
-{};
+{
+				   // release allocated memory
+  clear ();
+};
 
 
 #if deal_II_dimension == 1
