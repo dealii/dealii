@@ -121,7 +121,7 @@ class DoFAccessor {
   The same concept is used with #DoFQuadAccessor# classes etc.
   */
 template <int dim, class BaseClass>
-class DoFLineAccessor :  public BaseClass, public DoFAccessor<dim> {
+class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
   public:
 				     /**
 				      * Default constructor, unused thus
@@ -138,8 +138,8 @@ class DoFLineAccessor :  public BaseClass, public DoFAccessor<dim> {
 		     const int           level,
 		     const int           index,
 		     const void         *local_data) :
-		    BaseClass(tria,level,index),
-		    DoFAccessor<dim> ((DoFHandler<dim>*)local_data) {};
+		    DoFAccessor<dim> ((DoFHandler<dim>*)local_data),
+		    BaseClass(tria,level,index) {};
     
 				     /**
 				      * Return the index of the #i#th degree
@@ -206,7 +206,7 @@ class DoFLineAccessor :  public BaseClass, public DoFAccessor<dim> {
   @see DoFLineAccessor
   */
 template <int dim, class BaseClass>
-class DoFQuadAccessor :  public BaseClass, public DoFAccessor<dim> {
+class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
   public:
 				     /**
 				      * Default constructor, unused thus
@@ -223,8 +223,8 @@ class DoFQuadAccessor :  public BaseClass, public DoFAccessor<dim> {
 		     const int           level,
 		     const int           index,
 		     const void         *local_data) :
-		    BaseClass        (tria,level,index),
-		    DoFAccessor<dim> ((DoFHandler<dim>*)local_data) {};
+		    DoFAccessor<dim> ((DoFHandler<dim>*)local_data),
+		    BaseClass        (tria,level,index) {};
     
 				     /**
 				      * Return the index of the #i#th degree
