@@ -1,5 +1,5 @@
 //----------------------------  sparse_mic.templates.h  ---------------------------
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -170,17 +170,18 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
     {
       number temp = this->diag_element(row);
       number temp1 = 0;
-      const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
+      const unsigned int * const
+        first_after_diagonal = this->prebuilt_lower_bound[row];
        
       unsigned int k = 0;
       for (const unsigned int * col=&col_nums[rowstarts[row]+1];
-	   col<first_after_diagonal; ++col, k++)
+	   col<first_after_diagonal; ++col, ++k)
 	temp1 += matrix.global_entry (col-col_nums)/diag[k]*inner_sums[k];
        
+      Assert(temp-temp1 > 0, ExcStrengthenDiagonalTooSmall());
       diag[row] = temp - temp1;
        
       inv_diag[row] = 1.0/diag[row];
-      Assert(diag[row]>0, ExcStrengthenDiagonalTooSmall());
     }
 }
 
