@@ -15,7 +15,7 @@
 #include <fstream>
 
 #include <base/logstream.h>
-#include <base/polynomial.h>
+#include <base/tensor_product_polynomials.h>
 
 
 
@@ -27,6 +27,10 @@ bool equals_delta_ij(double value, unsigned int i, unsigned int j)
   else
     return false;
 }
+
+void Q3_4th_shape_function_values_and_grads_dim2(
+  const Point<2> &point, double &v_exact,
+  Tensor<1,2> &grad_exact, Tensor<2,2> &grad2);
 
 
 
@@ -108,7 +112,79 @@ int main(int, char)
 
       deallog << endl;
     }
+
+
+  deallog << endl << "Test of TensorProductPolynomials:" << endl;
+  deallog << "2D Example:" << endl;
+  unsigned int p=3,
+   n_tensor_pols=(p+1)*(p+1);
+  vector<SmartPointer<Polynomial> > pols;
+  
+  for (unsigned int i=0; i<=p; ++i)
+    pols.push_back(new LagrangeEquidistant(p, i));
+  
+  TensorProductPolynomials<2> tp_pol(pols);
+  vector<double> vs(n_tensor_pols);
+  vector<Tensor<1,2> > grads(n_tensor_pols);
+  vector<Tensor<2,2> > grad_grads(n_tensor_pols);
+
+  double v_exact;
+  Tensor<1,2> grad_exact;
+  Tensor<2,2> grad_grad_exact;
+  
+  double xi=0.35;
+  double eta=0.62;
+  Point<2> point(xi,eta);
+  tp_pol.shape_values_and_grads(point, vs, grads, grad_grads);
+
+				   // 4th shape function of Q3<2> is
+				   // equivalent to its 1st shape
+				   // function in lexicographical
+				   // order.
+  Q3_4th_shape_function_values_and_grads_dim2(point, v_exact, grad_exact, grad_grad_exact);
+
+  unsigned int i=1;
+  deallog << "v_" << i << "=" << vs[i] << endl;
+  deallog << "v_exact=" << v_exact << endl;
+  deallog << "grad_v_" << i << "=" << grads[i] << endl;
+  deallog << "grad_exact=" << grad_exact << endl;
+  for (unsigned int j=0; j<grad_grads[i].dimension; ++j)
+    for (unsigned int k=0; k<grad_grads[i].dimension; ++k)
+      {
+	deallog << "grad_grads_" << i<< "[" << j << "][" << k << "]="
+		<< grad_grads[i][j][k] << endl;
+	deallog << "grad2_exact[" << j << "][" << k << "]="
+		<< grad_grad_exact[j][k] << endl;
+      }
 }
 
 
+
+void Q3_4th_shape_function_values_and_grads_dim2(
+  const Point<2> &point, double &v_exact, Tensor<1,2> &grad_exact, Tensor<2,2> &grad2)
+{
+				   // the following functions
+				   // are taken from fe_lib.cubic.cc
+  const double xi=point(0),
+	      eta=point(1);
+  
+  v_exact=9.0*xi-45.0/2.0*xi*xi+27.0/2.0*xi*xi*xi+(
+    -99.0/2.0*xi+495.0/4.0*xi*xi-297.0/4.0*xi*xi*xi)*eta+(81.0*xi-405.0/2.0*xi*xi+243.0/2.0*xi*xi*xi)*
+		 eta*eta+(-81.0/2.0*xi+405.0/4.0*xi*xi-243.0/4.0*xi*xi*xi)*eta*eta*eta;
+  
+  grad_exact[0]=9.0-45.0*xi+81.0/2.0*xi*xi+(-99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi)*eta+
+		(81.0-405.0*xi+729.0/2.0*xi*xi)*eta*eta+(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta*eta;
+  grad_exact[1]=-99.0/2.0*xi+495.0/4.0*xi*xi-297.0/4.0*xi*xi*xi+2.0*(
+    81.0*xi-405.0/2.0*xi*xi+243.0/2.0*xi*xi*xi)*eta+3.0*(
+      -81.0/2.0*xi+405.0/4.0*xi*xi-243.0/4.0*xi*xi*xi)*eta*eta;
+  
+  grad2[0][0] = -45.0+81.0*xi+(495.0/2.0-891.0/2.0*xi)*eta+(-405.0+729.0*xi)*eta*eta+
+		(405.0/2.0-729.0/2.0*xi)*eta*eta*eta;
+  grad2[0][1] = -99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi+2.0*(81.0-405.0*xi+729.0/2.0*xi*xi)*eta+
+		3.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
+  grad2[1][0] = -99.0/2.0+495.0/2.0*xi-891.0/4.0*xi*xi+2.0*(81.0-405.0*xi+729.0/2.0*xi*xi)*eta+
+		3.0*(-81.0/2.0+405.0/2.0*xi-729.0/4.0*xi*xi)*eta*eta;
+  grad2[1][1] = 162.0*xi-405.0*xi*xi+243.0*xi*xi*xi+6.0*(-81.0/2.0*xi+405.0/4.0*xi*xi-
+							 243.0/4.0*xi*xi*xi)*eta;
+}
 

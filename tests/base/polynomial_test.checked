@@ -71,3 +71,18 @@ DEAL::x=0.700000,    all derivatives: ok
 DEAL::x=0.800000,    all derivatives: ok
 DEAL::x=0.900000,    all derivatives: ok
 DEAL::x=1.00000,    all derivatives: ok
+
+DEAL::Test of TensorProductPolynomials:
+DEAL::2D Example:
+DEAL::v_1=-0.0222483
+DEAL::v_exact=-0.0222483
+DEAL::grad_v_1=0.0409194 0.457688
+DEAL::grad_exact=0.0409194 0.457688
+DEAL::grad_grads_1[0][0]=0.380885
+DEAL::grad2_exact[0][0]=0.380885
+DEAL::grad_grads_1[0][1]=-0.841786
+DEAL::grad2_exact[0][1]=-0.841786
+DEAL::grad_grads_1[1][0]=-0.841786
+DEAL::grad2_exact[1][0]=-0.841786
+DEAL::grad_grads_1[1][1]=1.22543
+DEAL::grad2_exact[1][1]=1.22543
