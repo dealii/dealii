@@ -886,6 +886,10 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 	      CXXFLAGSG="$CXXFLAGSG -mminimal-toc"
 	      CXXFLAGSO="$CXXFLAGSO -mminimal-toc"
 
+	      dnl Also set 64-bit mode for f77 compiler, assuming we use IBM's xlf
+	      F77FLAGSG="$F77FLAGSG -q64"
+	      F77FLAGSO="$F77FLAGSO -q64"
+
 	      dnl When generating 64-bit code, we need to pass respective flags when
 	      dnl linking (also for static libs)
 	      AR="$AR -X 64"
