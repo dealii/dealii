@@ -2464,7 +2464,7 @@ AC_DEFUN(DEAL_II_CHECK_QUAD_DEFINE, dnl
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
     [
-#include <sys/types>
+#include <sys/types.h>
 #if defined(quad)
     no good system;
 #endif
@@ -2472,12 +2472,12 @@ AC_DEFUN(DEAL_II_CHECK_QUAD_DEFINE, dnl
     [
     ],
     [
-      AC_MSG_RESULT(yes, working around)
-      CXXFLAGSG="$CXXFLAGSG -D_POSIX_SOURCE"
-      CXXFLAGSO="$CXXFLAGSO -D_POSIX_SOURCE"
+      AC_MSG_RESULT(no)
     ],
     [
-      AC_MSG_RESULT(no)
+      AC_MSG_RESULT(yes. working around)
+      CXXFLAGSG="$CXXFLAGSG -D_POSIX_SOURCE"
+      CXXFLAGSO="$CXXFLAGSO -D_POSIX_SOURCE"
     ])
 ])
 
