@@ -65,7 +65,7 @@ int main (int argc,char **argv)
 	Assert(n_dofs%n_mpi_processes==0, ExcInternalError());
 	const unsigned int n_local_dofs=n_dofs/n_mpi_processes;
         PETScWrappers::MPI::SparseMatrix
-	  v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, 5);
+	  v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
         test (v2);
       }
       PetscFinalize();
