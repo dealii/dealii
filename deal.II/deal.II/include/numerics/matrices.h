@@ -383,7 +383,14 @@ class MatrixCreator
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcComponentMismatch);
+    DeclException0 (ExcComponentMismatch);    
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcDimensionsDontMatch,
+		    int, int,
+		    << "The dimensions " << arg1 << " and " << arg2
+		    << " don't match.");
 
   private:
 				     /**
@@ -693,14 +700,7 @@ class MatrixTools : public MatrixCreator
 			   BlockVector<double>                 &solution,
 			   BlockVector<double>                 &right_hand_side,
 			   const bool           eliminate_columns = true);
-    
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcDimensionsDontMatch,
-		    int, int,
-		    << "The dimensions " << arg1 << " and " << arg2
-		    << " don't match.");
+
 				     /**
 				      * Exception
 				      */
