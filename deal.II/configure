@@ -7236,15 +7236,15 @@ if test "${with_cpu+set}" = set; then
   withval="$with_cpu"
   withcpu=$withval
 else
-  withcpu=
+  withcpu=""
 fi;
   echo "$as_me:$LINENO: checking for CPU to optimize for" >&5
 echo $ECHO_N "checking for CPU to optimize for... $ECHO_C" >&6
-  case $withcpu in
+  case "$withcpu" in
     PowerPC64)
         echo "$as_me:$LINENO: result: PowerPC64" >&5
 echo "${ECHO_T}PowerPC64" >&6
-	case $GXX_VERSION in
+	case "$GXX_VERSION" in
 	  gcc*)
 	      	      CXXFLAGSG="$CXXFLAGSG -maix64"
 	      CXXFLAGSO="$CXXFLAGSO -maix64 -mpowerpc64 -mcpu=powerpc64 -mtune=powerpc64"
@@ -7258,7 +7258,7 @@ echo "${ECHO_T}PowerPC64" >&6
 	      	      	      AR="$AR -X 64"
 	      LDFLAGS="$LDFLAGS -maix64"
 
-	      	      LIBS="$LIBS -lpthread
+	      	      LIBS="$LIBS -lpthread"
               ;;
         esac
 	;;
@@ -7266,6 +7266,7 @@ echo "${ECHO_T}PowerPC64" >&6
     *)
         echo "$as_me:$LINENO: result: none given or not recognized" >&5
 echo "${ECHO_T}none given or not recognized" >&6
+	;;
   esac
 
 

@@ -873,12 +873,12 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
                           rather than just generating code for this
 		          processor family],
       withcpu=$withval,
-      withcpu=)
+      withcpu="")
   AC_MSG_CHECKING(for CPU to optimize for)
   case "$withcpu" in
     PowerPC64)
         AC_MSG_RESULT(PowerPC64)
-	case $GXX_VERSION in
+	case "$GXX_VERSION" in
 	  gcc*)
 	      dnl Tune for this processor
 	      CXXFLAGSG="$CXXFLAGSG -maix64"
@@ -899,7 +899,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 	      LDFLAGS="$LDFLAGS -maix64"
 
 	      dnl And we must always link with pthreads
-	      LIBS="$LIBS -lpthread
+	      LIBS="$LIBS -lpthread"
               ;;
         esac
 	;;
