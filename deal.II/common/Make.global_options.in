@@ -143,7 +143,8 @@ include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 
 INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
 	  -I$D/contrib/boost/include \
-	  @TECPLOT_INCLUDE_DIR@ @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@
+	  @TECPLOT_INCLUDE_DIR@ @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
+	  -I$D/contrib
 
 # add PETSc and METIS include path if necessary. this rule
 # (and the one further down below to get correct flags) should eventually
