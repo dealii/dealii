@@ -236,6 +236,12 @@ class ProblemBase {
 				      * class for more detail.
 				      */
     typedef map<unsigned char,Function<dim>* > DirichletBC;
+
+				     /**
+				      * Typdedef an iterator which assembles
+				      * matrices and vectors.
+				      */
+    typedef TriaActiveIterator<dim, Assembler<dim> > active_assemble_iterator;
     
 				     /**
 				      * Constructor.

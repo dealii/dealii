@@ -105,10 +105,10 @@ void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
 			   quadrature,
 			   fe,
 			   update_flags);
-  TriaActiveIterator<dim, Assembler<dim> > assembler (tria,
-						      tria->begin_active()->level(),
-						      tria->begin_active()->index(),
-						      &data);
+  active_assemble_iterator assembler (tria,
+				      tria->begin_active()->level(),
+				      tria->begin_active()->index(),
+				      &data);
 				   // loop over all cells, fill matrix and rhs
   do 
     {
