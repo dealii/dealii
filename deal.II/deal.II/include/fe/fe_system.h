@@ -194,13 +194,13 @@ class FESystem : public FiniteElement<dim>
 				      * of finite elements composed
 				      * into this structure.
 				      */
-    virtual unsigned int n_base_elements() const;
+    virtual unsigned int n_base_elements () const;
 
 				     /**
 				      * How often is a composing element used.
 				      *
 				      */
-    unsigned int element_multiplicity(unsigned int index) const;
+    unsigned int element_multiplicity (const unsigned int index) const;
 
 				     /**
 				      * Access to a composing element.
@@ -217,7 +217,7 @@ class FESystem : public FiniteElement<dim>
 				      * by index.
 				      *
 				      */
-    virtual const FiniteElement<dim> & base_element(unsigned int index) const;
+    virtual const FiniteElement<dim> & base_element(const unsigned int index) const;
 
 				     /**
 				      * Determine an estimate for the

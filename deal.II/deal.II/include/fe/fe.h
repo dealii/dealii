@@ -125,14 +125,14 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * update only.
 				      * @see{FEValuesBase}
 				      */
-    virtual UpdateFlags update_once (UpdateFlags flags) const = 0;
+    virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
   
 				     /**
 				      * Compute flags for update on
 				      * each cell.
 				      * @see{FEValuesBase}
 				      */
-    virtual UpdateFlags update_each (UpdateFlags flags) const = 0;
+    virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
   
 				     /**
 				      * @p{clone} function instead of

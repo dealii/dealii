@@ -539,13 +539,13 @@ class FE_Q : public FiniteElement<dim>
 				      * Compute flags for initial
 				      * update only.
 				      */
-    virtual UpdateFlags update_once (UpdateFlags flags) const;
+    virtual UpdateFlags update_once (const UpdateFlags flags) const;
   
 				     /**
 				      * Compute flags for update on
 				      * each cell.
 				      */
-    virtual UpdateFlags update_each (UpdateFlags flags) const;
+    virtual UpdateFlags update_each (const UpdateFlags flags) const;
     
 				     /**
 				      * Degree of the polynomials.

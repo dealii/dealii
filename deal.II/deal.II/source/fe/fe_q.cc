@@ -973,7 +973,7 @@ FE_Q<dim>::update_once (const UpdateFlags flags) const
 
 template <int dim>
 UpdateFlags
-FE_Q<dim>::update_each (UpdateFlags flags) const
+FE_Q<dim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 

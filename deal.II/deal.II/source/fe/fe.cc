@@ -465,7 +465,7 @@ FiniteElement<dim>::memory_consumption () const
 
 template <int dim>
 const FiniteElement<dim>&
-FiniteElement<dim>::base_element(unsigned index) const
+FiniteElement<dim>::base_element(const unsigned index) const
 {
   Assert (index==0, ExcIndexRange(index,0,1));
   return *this;
