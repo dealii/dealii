@@ -39,6 +39,16 @@ implement ProblemBase::distribute_cell_to_dof_vector
 Remove gcc2.8 workaround with DoFSubstructAccessor
 
 
+Replace verbatim implementation of setw(int) in parameter-handler.cc
+  when a reasonable (linkable) library implementation is available
+  again.
+
+ 
+Use the C++ standard string classes instead of the libg++ String
+  class.
+
+
+
 
 
 DEAL:
@@ -51,3 +61,10 @@ Is dvector::operator= (double) really useful or does it make more
 
 
 Give mia::State a much better name, same for Control ! :-]]]
+
+
+Let all the reinit functions in /lac free their memory, if reinit
+  is called with less requirements. Maybe give free all memory
+  if the given dimension is zero. If so, check all deal.II files
+  for use of reinit.
+
