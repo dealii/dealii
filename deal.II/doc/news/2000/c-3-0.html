@@ -470,7 +470,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       New: The <code class="class"> FiniteElement</code> has got two
+       New: The <code class="class">TriaAccessor</code> now has a
+       function <code class="member">point_inside</code> that checks
+       whether a certain point is inside a given cell.
+       <br>
+       (Thomas Richter 2000/10/12)
+       </p>
+
+  <li> <p>
+       New: The <code class="class">FiniteElement</code> has got two
        new functions <code class="member">transform_unit_to_real_cell
        </code> and <code class="member">transform_real_to_unit_cell
        </code>. They allow to transform points from reference (unit)
