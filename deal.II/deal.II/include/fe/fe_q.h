@@ -305,43 +305,6 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-				     /**
-				      * Declare a nested class which
-				      * will hold static definitions
-				      * of various matrices such as
-				      * constraint. All other
-				      * information about this
-				      * particular finite element,
-				      * such as embedding matrices,
-				      * will be computed on-the-fly
-				      * during construction. The
-				      * definition of the various
-				      * static fields are in the files
-				      * <tt>fe_q_[123]d.cc</tt> in the
-				      * source directory.
-				      */
-    struct Matrices
-    {
-					 /**
-					  * As the
-					  * @p embedding_matrices
-					  * field, but for the
-					  * interface constraints. One
-					  * for each element for which
-					  * it has been computed.
-					  */
-	static const double * const constraint_matrices[];
-
-					 /**
-					  * Like
-					  * @p n_embedding_matrices,
-					  * but for the number of
-					  * interface constraint
-					  * matrices.
-					  */
-	static const unsigned int n_constraint_matrices;
-    };
-
   protected:    
 				     /**
 				      * @p clone function instead of
@@ -532,28 +495,5 @@ void FE_Q<2>::initialize_constraints ();
 template <>
 void FE_Q<3>::initialize_constraints ();
 
-
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <>
-const double * const FE_Q<1>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Q<1>::Matrices::n_constraint_matrices;
-
-template <>
-const double * const FE_Q<2>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Q<2>::Matrices::n_constraint_matrices;
-
-template <>
-const double * const FE_Q<3>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Q<3>::Matrices::n_constraint_matrices;
-
-#endif
 
 #endif
