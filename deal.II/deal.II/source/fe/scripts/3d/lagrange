@@ -1,0 +1,248 @@
+# Maple script to compute much of the data needed to implement the
+# family of Lagrange elements in 3d. Expects that the fields denoting
+# position and number of support points, etc are already set. Note that
+# we assume a bilinear mapping from the unit to the real cell.
+#
+# $Id$
+# Author: Wolfgang Bangerth, 1998
+
+  phi_polynom := array(0..n_functions-1):
+  grad_phi_polynom := array(0..n_functions-1,0..2):
+  grad_grad_phi_polynom := array(0..n_functions-1,0..2,0..2):
+  local_mass_matrix := array(0..n_functions-1, 0..n_functions-1):
+  prolongation := array(0..7,0..n_functions-1, 0..n_functions-1):
+  interface_constraints := array(0..n_constraints-1,
+                                 0..n_face_functions-1):
+
+  print ("Computing basis functions"):
+  for i from 0 to n_functions-1 do
+    print (i):
+    values := array(1..n_functions):
+    for j from 1 to n_functions do
+      values[j] := 0:
+    od:  
+    values[i+1] := 1:
+
+    equation_system := {}:
+    for j from 0 to n_functions-1 do
+      poly := subs(xi=support_points[j][1],
+                   eta=support_points[j][2],
+		   zeta=support_points[j][3],
+		   trial_function):
+      if (i=j) then
+        equation_system := equation_system union {poly = 1}:
+      else	
+        equation_system := equation_system union {poly = 0}:
+      fi:	
+    od:
+    
+    phi_polynom[i] := subs(solve(equation_system), trial_function):
+    grad_phi_polynom[i,0] := diff(phi_polynom[i], xi):
+    grad_phi_polynom[i,1] := diff(phi_polynom[i], eta):
+    grad_phi_polynom[i,2] := diff(phi_polynom[i], zeta):
+
+    grad_grad_phi_polynom[i,0,0] := diff(phi_polynom[i], xi, xi):
+    grad_grad_phi_polynom[i,0,1] := diff(phi_polynom[i], xi, eta):
+    grad_grad_phi_polynom[i,0,2] := diff(phi_polynom[i], xi, zeta):
+    grad_grad_phi_polynom[i,1,0] := diff(phi_polynom[i], eta,xi):
+    grad_grad_phi_polynom[i,1,1] := diff(phi_polynom[i], eta,eta):
+    grad_grad_phi_polynom[i,1,2] := diff(phi_polynom[i], eta,zeta):
+    grad_grad_phi_polynom[i,2,0] := diff(phi_polynom[i], zeta,xi):
+    grad_grad_phi_polynom[i,2,1] := diff(phi_polynom[i], zeta,eta):
+    grad_grad_phi_polynom[i,2,2] := diff(phi_polynom[i], zeta,zeta):
+  od:
+
+  phi:= proc(i,x,y,z) subs(xi=x, eta=y, zeta=z, phi_polynom[i]): end:
+
+
+  #points on children: let them be indexed one-based, as are
+  #the support_points
+  points[0] := array(0..n_functions-1, 1..3):
+  points[1] := array(0..n_functions-1, 1..3):
+  points[2] := array(0..n_functions-1, 1..3):
+  points[3] := array(0..n_functions-1, 1..3):
+  points[4] := array(0..n_functions-1, 1..3):
+  points[5] := array(0..n_functions-1, 1..3):
+  points[6] := array(0..n_functions-1, 1..3):
+  points[7] := array(0..n_functions-1, 1..3):
+  for i from 0 to n_functions-1 do
+    points[0][i,1] := support_points[i][1]/2:
+    points[0][i,2] := support_points[i][2]/2:
+    points[0][i,3] := support_points[i][3]/2:
+    
+    points[1][i,1] := support_points[i][1]/2+1/2:
+    points[1][i,2] := support_points[i][2]/2:
+    points[1][i,3] := support_points[i][3]/2:
+
+    points[2][i,1] := support_points[i][1]/2+1/2:
+    points[2][i,2] := support_points[i][2]/2:
+    points[2][i,3] := support_points[i][3]/2+1/2:
+
+    points[3][i,1] := support_points[i][1]/2:
+    points[3][i,2] := support_points[i][2]/2:
+    points[3][i,3] := support_points[i][3]/2+1/2:
+
+    points[4][i,1] := support_points[i][1]/2:
+    points[4][i,2] := support_points[i][2]/2+1/2:
+    points[4][i,3] := support_points[i][3]/2:
+    
+    points[5][i,1] := support_points[i][1]/2+1/2:
+    points[5][i,2] := support_points[i][2]/2+1/2:
+    points[5][i,3] := support_points[i][3]/2:
+
+    points[6][i,1] := support_points[i][1]/2+1/2:
+    points[6][i,2] := support_points[i][2]/2+1/2:
+    points[6][i,3] := support_points[i][3]/2+1/2:
+
+    points[7][i,1] := support_points[i][1]/2:
+    points[7][i,2] := support_points[i][2]/2+1/2:
+    points[7][i,3] := support_points[i][3]/2+1/2:
+  od:  
+
+  print ("Computing prolongation matrices"):
+  for i from 0 to 7 do
+    print ("child", i):
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        prolongation[i,j,k] := phi(k, points[i][j,1], points[i][j,2], points[i][j,3]):
+      od:
+    od:
+  od:
+
+  print ("Computing restriction matrices"):
+  # to get the restriction (interpolation) matrices, evaluate
+  # the basis functions on the child cells at the global
+  # interpolation points
+  child_phi[0] := proc(i, x, y, z)
+                    if ((x>1/2) or (y>1/2) or (z>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y,2*z):
+		    fi:
+		  end: 
+  child_phi[1] := proc(i, x, y, z)
+                    if ((x<1/2) or (y>1/2) or (z>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y, 2*z):
+		    fi:
+		  end: 
+  child_phi[2] := proc(i, x, y, z)
+                    if ((x<1/2) or (y>1/2) or (z<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y, 2*z-1):
+		    fi:
+		  end: 
+  child_phi[3] := proc(i, x, y, z)
+                    if ((x>1/2) or (y>1/2) or (z<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y,2*z-1):
+		    fi:
+		  end: 
+  child_phi[4] := proc(i, x, y, z)
+                    if ((x>1/2) or (y<1/2) or (z>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y-1,2*z):
+		    fi:
+		  end: 
+  child_phi[5] := proc(i, x, y, z)
+                    if ((x<1/2) or (y<1/2) or (z>1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y-1,2*z):
+		    fi:
+		  end: 
+  child_phi[6] := proc(i, x, y, z)
+                    if ((x<1/2) or (y<1/2) or (z<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x-1,2*y-1,2*z-1):
+		    fi:
+		  end: 
+  child_phi[7] := proc(i, x, y, z)
+                    if ((x>1/2) or (y<1/2) or (z<1/2)) then
+		      0:
+		    else
+		      phi(i,2*x,2*y-1,2*z-1):
+		    fi:
+		  end: 
+  restriction := array(0..7,0..n_functions-1, 0..n_functions-1):
+  for child from 0 to 7 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        restriction[child,j,k] := child_phi[child](k,
+	                                           support_points[j][1],
+						   support_points[j][2],
+						   support_points[j][3]):
+      od:
+    od:
+  od:
+
+
+  print ("computing interface constraint matrices"):
+  # compute the interface constraint matrices. these are the values of the
+  # basis functions on the coarse cell's face at the points of the child
+  # cell's basis functions on the child faces
+  #
+  # first compute for each function on the (large) face the polynom
+  # we get this by evaluating the respective global trial function
+  # with y=0
+  face_phi_polynom := array(0..n_face_functions-1):
+  for j from 0 to n_face_functions-1 do
+    face_phi_polynom[j] := proc(xi,eta)
+      subs(dummy=0, phi(constrained_face_function[j],xi,dummy,eta)):
+    end:
+  od:
+
+  for i from 0 to n_constraints-1 do
+    for j from 0 to n_face_functions-1 do
+      interface_constraints[i,j] 
+            := face_phi_polynom[j](constrained_face_support_points[i][0],
+                                   constrained_face_support_points[i][1]):
+    od:
+  od:
+
+                                     
+  # tphi are the basis functions of the linear element. These functions
+  # are used for the computation of the subparametric transformation from
+  # unit cell to real cell.
+  # x and y are arrays holding the x- and y-values of the four vertices
+  # of this cell in real space. same for z
+  #
+  print ("Computing real space support points"):
+  x := array(0..7);
+  y := array(0..7);
+  z := array(0..7):
+  tphi[0] := (1-xi)*(1-eta)*(1-zeta):
+  tphi[1] := xi*(1-eta)*(1-zeta):
+  tphi[2] := xi*(1-eta)*zeta:
+  tphi[3] := (1-xi)*(1-eta)*zeta:
+  tphi[4] := (1-xi)*eta*(1-zeta):
+  tphi[5] := xi*eta*(1-zeta):
+  tphi[6] := xi*eta*zeta:
+  tphi[7] := (1-xi)*eta*zeta:
+  x_real := sum(x[s]*tphi[s], s=0..7):
+  y_real := sum(y[s]*tphi[s], s=0..7):
+  z_real := sum(z[s]*tphi[s], s=0..7):
+
+  real_space_points := array(0..n_functions-1,0..2):
+  for i from 0 to n_functions-1 do
+    real_space_points[i,0] :=
+                   subs(xi=support_points[i][1],
+                        eta=support_points[i][2],
+                        zeta=support_points[i][3],
+                        x_real):
+    real_space_points[i,1] :=
+                   subs(xi=support_points[i][1],
+                        eta=support_points[i][2],
+                        zeta=support_points[i][3],
+                        y_real):
+    real_space_points[i,2] :=
+                   subs(xi=support_points[i][1],
+                        eta=support_points[i][2],
+                        zeta=support_points[i][3],
+                        z_real):
+   od:
