@@ -104,10 +104,10 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 #else
 
 
-template <int dim>
-Point<dim>
-StraightBoundary<dim>::
-get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
+template <>
+Point<3>
+StraightBoundary<3>::
+get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const 
 {
   return (quad->vertex(0) + quad->vertex(1) +
 	  quad->vertex(2) + quad->vertex(3) +
@@ -120,15 +120,15 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 #endif
 
 
-#if deal_II_dimension < 2
+#if deal_II_dimension == 1
 
-template <int dim>
+template <>
 void
-StraightBoundary<dim>::
-get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
-				 std::vector<Point<dim> > &) const
+StraightBoundary<1>::
+get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
+				 std::vector<Point<1> > &) const
 {
-  Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+  Assert(false, Boundary<1>::ExcFunctionNotUseful(1));
 }
 
 
@@ -171,12 +171,14 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 
 #else
 
-template <int dim>
+template <>
 void
-StraightBoundary<dim>::
-get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				 std::vector<Point<dim> > &points) const
+StraightBoundary<3>::
+get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
+				 std::vector<Point<3> > &points) const
 {
+  const unsigned int dim = 3;
+  
   const unsigned int n=points.size(),
 		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
 				   // is n a square number
