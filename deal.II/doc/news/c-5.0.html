@@ -76,20 +76,6 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       New: A class <code class="class">PreconditionLU</code> which
-       provides a wrapper to the complete LU decomposition
-       preconditioner of PETSc. Furthermore a class 
-       <code class="class">SolverPreOnly</code> was implemented. It
-       is a wrapper for the PETSc solver type KSPPREONLY, which
-       only applies the preconditioner. In conjunction with
-       <code class="class">PreconditionLU</code> this provides a
-       simple direct solver, which could be used for small to medium
-       sized problems on a single processor machine.
-       <br> 
-       (Oliver Kayser-Herold 2004/07/27)
-       </p>
-
-  <li> <p>
        New: A class <code class="class">PointerComparison</code> for comparing
        pointers that may or may not be of the same type.
        <br> 
@@ -126,6 +112,20 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: A class <code class="class">PreconditionLU</code> which
+       provides a wrapper to the complete LU decomposition
+       preconditioner of PETSc. Furthermore a class 
+       <code class="class">SolverPreOnly</code> was implemented. It
+       is a wrapper for the PETSc solver type KSPPREONLY, which
+       only applies the preconditioner. In conjunction with
+       <code class="class">PreconditionLU</code> this provides a
+       simple direct solver, which could be used for small to medium
+       sized problems on a single processor machine.
+       <br> 
+       (Oliver Kayser-Herold 2004/07/27)
+       </p>
+
   <li> <p>
        Improved: <code class="member">VectorTools::point_difference</code>
        used to use an algorithm to find the cell the given point is in that
