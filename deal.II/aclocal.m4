@@ -811,7 +811,7 @@ AC_DEFUN(DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS, dnl
    [
 	pthread_t         p;
 	pthread_create (&p, 0, 0, 0);
-	pthread_join (&p, 0);
+	pthread_join (p, 0);
    ],
    [
 	AC_MSG_RESULT(ok)
