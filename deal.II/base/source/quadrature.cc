@@ -55,8 +55,8 @@ Quadrature<dim>::Quadrature (const typename std::vector<Point<dim> >  &points,
 template <int dim>
 Quadrature<dim>::Quadrature (const Point<dim> &point):
 		n_quadrature_points(1),
-		quadrature_points(vector<Point<dim> > (1, point)),
-		weights(vector<double> (1, 1.))
+		quadrature_points(std::vector<Point<dim> > (1, point)),
+		weights(std::vector<double> (1, 1.))
 {}
 
 
