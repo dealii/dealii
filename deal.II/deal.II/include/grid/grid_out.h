@@ -433,8 +433,8 @@ class GridOut
 				      * the extension of the picture,
 				      * of which the default is 300.
 				      *
-				      * The flag @p
-				      * color_lines_on_user_flag#
+				      * The flag 
+				      * #color_lines_on_user_flag#
 				      * allows to draw lines with the
 				      * #user_flag# set to be drawn in
 				      * red. The colors black and red
