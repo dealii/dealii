@@ -454,14 +454,15 @@ void Vector<Number>::scale (const Number factor)
 
 
 template <typename Number>
-void Vector<Number>::scale (const Vector<Number> &s)
+template <typename Number2>
+void Vector<Number>::scale (const Vector<Number2> &s)
 {
   Assert (dim!=0, ExcEmptyVector());
   Assert (dim == s.dim, ExcDimensionMismatch(dim, s.dim));
   
   iterator             ptr  = begin();
-  const_iterator       sptr = s.begin();
   const const_iterator eptr = end();
+  typename Vector<Number2>::const_iterator sptr = s.begin();
   while (ptr!=eptr)
     *ptr++ *= *sptr++;
 }

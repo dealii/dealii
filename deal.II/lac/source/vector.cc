@@ -23,6 +23,8 @@ template void Vector<double>::reinit<double>(const Vector<double>&, const bool);
 template void Vector<double>::reinit<float>(const Vector<float>&, const bool);
 template void Vector<double>::equ<double>(const double, const Vector<double>&);
 template void Vector<double>::equ<float>(const double, const Vector<float>&);
+template void Vector<double>::scale<double>(const Vector<double>&);
+template void Vector<double>::scale<float>(const Vector<float>&);
 
 template class Vector<float>;
 template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
@@ -32,6 +34,8 @@ template void Vector<float>::reinit<double>(const Vector<double>&, const bool);
 template void Vector<float>::reinit<float>(const Vector<float>&, const bool);
 template void Vector<float>::equ<double>(const float, const Vector<double>&);
 template void Vector<float>::equ<float>(const float, const Vector<float>&);
+template void Vector<float>::scale<double>(const Vector<double>&);
+template void Vector<float>::scale<float>(const Vector<float>&);
 
 // see the .h file for why these functions are disabled.
 // template Vector<float>::Vector (const Vector<double>& v);

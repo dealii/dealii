@@ -1107,6 +1107,14 @@ class BlockVector
     BlockVector<Number> & operator *= (const Number factor);
 
 				     /**
+				      * Multiply each element of this
+				      * vector by the corresponding
+				      * element of @p{v}.
+				      */
+    template<typename Number2>
+    void scale (const BlockVector<Number2>& v);
+    
+				     /**
 				      *  U=a*V. Assignment.
 				      */
     template <typename Number2>

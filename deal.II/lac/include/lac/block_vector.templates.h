@@ -445,6 +445,21 @@ void BlockVector<Number>::scale (const Number factor)
 }
 
 
+
+template <typename Number>
+template <typename Number2>
+void BlockVector<Number>::scale (const BlockVector<Number2>& v)
+{
+  Assert (num_blocks == v.num_blocks,
+	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  for (unsigned int i=0;i<num_blocks;++i)
+    {
+      components[i].scale(v.block(i));
+    }
+}
+
+
+
 template <typename Number>
 void BlockVector<Number>::equ (const Number a,
 			       const BlockVector<Number>& v,

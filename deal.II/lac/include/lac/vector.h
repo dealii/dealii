@@ -421,7 +421,8 @@ class Vector
 				      * immediate re-assignment) by a
 				      * diagonal scaling matrix.
 				      */
-    void scale (const Vector<Number> &scaling_factors);
+    template <typename Number2>
+    void scale (const Vector<Number2> &scaling_factors);
     
 				     /**
 				      *  U=a*V. Assignment.

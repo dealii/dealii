@@ -25,6 +25,8 @@ template void BlockVector<double>::equ<double>(const double,
 					       const BlockVector<double>&);
 template void BlockVector<double>::equ<float>(const double,
 					      const BlockVector<float>&);
+template void BlockVector<double>::scale<double>(const BlockVector<double>&);
+template void BlockVector<double>::scale<float>(const BlockVector<float>&);
 
 template class BlockVector<float>;
 template BlockVector<float>& BlockVector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(
@@ -37,6 +39,8 @@ template void BlockVector<float>::equ<double>(const float,
 					      const BlockVector<double>&);
 template void BlockVector<float>::equ<float>(const float,
 					     const BlockVector<float>&);
+template void BlockVector<float>::scale<double>(const BlockVector<double>&);
+template void BlockVector<float>::scale<float>(const BlockVector<float>&);
 
 namespace BlockVectorIterators
 {
