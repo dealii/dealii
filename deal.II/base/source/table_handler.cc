@@ -192,6 +192,15 @@ void TableHandler::set_tex_caption (const std::string &key,
   columns[key].tex_caption=tex_caption;
 }
 
+void TableHandler::set_tex_table_caption (const std::string &table_caption)
+{
+  tex_table_caption=table_caption;
+}
+
+void TableHandler::set_tex_table_label (const std::string &table_label)
+{
+  tex_table_label=table_label;
+}
 
 void TableHandler::set_tex_supercaption (const std::string &superkey,
 					 const std::string &tex_supercaption)
@@ -344,14 +353,15 @@ void TableHandler::write_text(std::ostream &out) const
 }
 
 
-void TableHandler::write_tex (std::ofstream &out) const
+void TableHandler::write_tex (std::ofstream &out, const bool with_header) const
 {
   AssertThrow (out, ExcIO());
+  if (with_header)
+    out << "\\documentclass[10pt]{report}" << std::endl
+	<< "\\usepackage{float}" << std::endl << std::endl << std::endl
+	<< "\\begin{document}" << std::endl;
   
-  out << "\\documentclass[10pt]{report}" << std::endl
-      << "\\usepackage{float}" << std::endl << std::endl << std::endl
-      << "\\begin{document}" << std::endl
-      << "\\begin{table}[H]" << std::endl
+  out << "\\begin{table}[H]" << std::endl
       << "\\begin{center}" << std::endl
       << "\\begin{tabular}{|";
 
@@ -451,13 +461,15 @@ void TableHandler::write_tex (std::ofstream &out) const
       out << "\\\\ \\hline" << std::endl;
     }
 
-  std::string caption="table";
-  
-  out << "\\end{tabular}" << std::endl
-      << "\\end{center}" << std::endl
-//      << "\\caption{"  << caption << "}" << std::endl
-      << "\\end{table}" << std::endl
-      << "\\end{document}" << std::endl;
+  out   << "\\end{tabular}" << std::endl
+	<< "\\end{center}" << std::endl;
+  if(tex_table_caption!="")
+    out << "\\caption{"  << tex_table_caption << "}" << std::endl;
+  if(tex_table_label!="")
+    out << "\\label{"   << tex_table_label << "}" << std::endl;
+  out   << "\\end{table}" << std::endl;
+    if (with_header)
+      out << "\\end{document}" << std::endl;
 }
 
 

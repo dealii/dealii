@@ -278,6 +278,18 @@ class TableHandler
     void set_tex_caption (const std::string &key,
                           const std::string &tex_caption);
 
+                                    /**
+                                      * Sets the tex caption of the entire
+                                      * <tt>table</tt> for tex output. 
+                                      */
+    void set_tex_table_caption (const std::string &table_caption);
+
+                                     /**
+                                      * Sets the label of this
+                                      * <tt>table</tt> for tex output. 
+                                      */
+    void set_tex_table_label (const std::string &table_label);
+
                                      /**
                                       * Sets the caption the the
                                       * supercolumn <tt>superkey</tt> for
@@ -309,9 +321,18 @@ class TableHandler
     void write_text (std::ostream &out) const;
 
                                      /**
-                                      * Write table as a tex file.
+                                      * Write table as a tex file. If
+                                      * with_header is set to false
+                                      * (it is true by default), then
+                                      * no \documentclass{...},
+                                      * \begin{document} and 
+                                      * \end{document} are used. In
+                                      * this way the file can be
+                                      * included into an existing tex
+                                      * file using a command like
+                                      * "\input{table_file}".
                                       */
-    void write_tex (std::ofstream &file) const;
+    void write_tex (std::ofstream &file, const bool with_header=true) const;
 
     				     /** @addtogroup Exceptions
 				      * @{ */
@@ -506,6 +527,16 @@ class TableHandler
                                       * <tt>set_tex_supercaptions(...)</tt>.
                                       */
     std::map<std::string, std::string> tex_supercaptions;
+
+                                     /**
+                                      * The caption of the table itself.
+				      */
+    std::string tex_table_caption;
+                                     /**
+                                      * The label of the table.
+				      */
+    std::string tex_table_label; 
+    
 };
 
 
