@@ -51,15 +51,22 @@ class MGDoFAccessor {
 
 				     /**
 				      * This should be the default constructor.
+				      * We cast away the #const#ness of the
+				      * pointer which clearly is EVIL but
+				      * we can't help without making all
+				      * functions which could somehow use
+				      * iterators (directly or indirectly) make
+				      * non-const, even if they preserve
+				      * constness.
 				      */
-    MGDoFAccessor (MGDoFHandler<dim> *mg_dof_handler) :
-		    mg_dof_handler(mg_dof_handler) {};
+    MGDoFAccessor (const MGDoFHandler<dim> *mg_dof_handler) :
+		    mg_dof_handler(const_cast<MGDoFHandler<dim>*>(mg_dof_handler)) {};
 
 				     /**
 				      * Reset the DoF handler pointer.
 				      */
     void set_mg_dof_handler (MGDoFHandler<dim> *dh) {
-      Assert (dh != 0, ExcInvalidObject());
+      Assert (dh != 0, DoFAccessor<dim>::ExcInvalidObject());
       mg_dof_handler = dh;
     };
 
@@ -133,9 +140,15 @@ class MGDoFAccessor {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename BaseClass>
-class MGDoFLineAccessor :  public MGDoFAccessor<dim>,
-			   public DoFLineAccessor<dim, BaseClass> {
+class MGDoFLineAccessor :  public MGDoFAccessor<dim>, public DoFLineAccessor<dim, BaseClass> {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef MGDoFHandler<dim> AccessorData;
+    
 				     /**
 				      * Default constructor, unused thus
 				      * not implemented.
@@ -150,7 +163,7 @@ class MGDoFLineAccessor :  public MGDoFAccessor<dim>,
     MGDoFLineAccessor (Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
-		       const void         *local_data);
+		       const AccessorData *local_data);
     
 				     /**
 				      * Return the index of the #i#th degree
@@ -223,9 +236,15 @@ class MGDoFLineAccessor :  public MGDoFAccessor<dim>,
  * @see DoFLineAccessor
  */
 template <int dim, typename BaseClass>
-class MGDoFQuadAccessor :  public MGDoFAccessor<dim>,
-			   public DoFQuadAccessor<dim, BaseClass> {
+class MGDoFQuadAccessor :  public MGDoFAccessor<dim>, public DoFQuadAccessor<dim, BaseClass> {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef MGDoFHandler<dim> AccessorData;
+
 				     /**
 				      * Default constructor, unused thus
 				      * not implemented.
@@ -240,7 +259,7 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>,
     MGDoFQuadAccessor (Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
-		       const void         *local_data);
+		       const AccessorData *local_data);
     
 				     /**
 				      * Return the index of the #i#th degree
@@ -307,7 +326,7 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>,
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFQuadAccessor<dim,BaseClass> &a);
+    void copy_from (const MGDoFQuadAccessor<dim,BaseClass> &a);
 };
 
 
@@ -329,8 +348,7 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>,
  * the compiler) happens to use this class.
  */
 template <int dim>
-class MGDoFSubstructAccessor : public MGDoFAccessor<dim>,
-			       public TriaAccessor<dim> {
+class MGDoFSubstructAccessor : public MGDoFLineAccessor<1,CellAccessor<1> > {
   public:
     DoFSubstructAccessor () {
       Assert (false, ExcInternalError());
@@ -351,8 +369,8 @@ class MGDoFSubstructAccessor : public MGDoFAccessor<dim>,
  * with template parameters. This class and #DoFSubstructAccessor<2>#
  * wrap the following names:
  * \begin{verbatim}
- *   DoFSubstructAccessor<1> := DoFLineAccessor<1,CellAccessor<1> >;
- *   DoFSubstructAccessor<2> := DoFQuadAccessor<2,CellAccessor<2> >;
+ *   MGDoFSubstructAccessor<1> := MGDoFLineAccessor<1,CellAccessor<1> >;
+ *   MGDoFSubstructAccessor<2> := MGDoFQuadAccessor<2,CellAccessor<2> >;
  * \end{verbatim}
  * We do this rather complex (and needless, provided C++ the needed constructs!)
  * class hierarchy manipulation, since this way we can declare and implement
@@ -366,13 +384,20 @@ class MGDoFSubstructAccessor : public MGDoFAccessor<dim>,
 template <>
 class MGDoFSubstructAccessor<1> :  public MGDoFLineAccessor<1,CellAccessor<1> > {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef typename MGDoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
+
     				     /**
 				      * Constructor
 				      */
     MGDoFSubstructAccessor (Triangulation<1> *tria,
 			    const int         level,
 			    const int         index,
-			    const void       *local_data) :
+			    const AccessorData *local_data) :
 		    MGDoFLineAccessor<1,CellAccessor<1> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
@@ -393,13 +418,20 @@ class MGDoFSubstructAccessor<1> :  public MGDoFLineAccessor<1,CellAccessor<1> > 
 template <>
 class MGDoFSubstructAccessor<2> : public MGDoFQuadAccessor<2,CellAccessor<2> > {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef MGDoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
+    
     				     /**
 				      * Constructor
 				      */
     MGDoFSubstructAccessor (Triangulation<2> *tria,
 			    const int         level,
 			    const int         index,
-			    const void       *local_data) :
+			    const AccessorData *local_data) :
 		    MGDoFQuadAccessor<2,CellAccessor<2> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
@@ -431,13 +463,20 @@ class MGDoFSubstructAccessor<2> : public MGDoFQuadAccessor<2,CellAccessor<2> > {
 template <int dim>
 class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
   public:
+				     /**
+				      * Declare the data type that this accessor
+				      * class expects to get passed from the
+				      * iterator classes.
+				      */
+    typedef typename MGDoFSubstructAccessor<dim>::AccessorData AccessorData;
+    
     				     /**
 				      * Constructor
 				      */
     MGDoFCellAccessor (Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
-		       const void         *local_data) :
+		       const AccessorData *local_data) :
 		    MGDoFSubstructAccessor<dim> (tria,level,index,local_data) {};
 
 				     /**

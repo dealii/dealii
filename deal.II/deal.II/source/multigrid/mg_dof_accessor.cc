@@ -23,11 +23,9 @@ template <int dim, typename BaseClass>
 MGDoFLineAccessor<dim,BaseClass>::MGDoFLineAccessor (Triangulation<dim> *tria,
 						     const int           level,
 						     const int           index,
-						     const void         *local_data) :
-		MGDoFAccessor<dim> ((MGDoFHandler<dim>*)local_data),
-		DoFLineAccessor(tria,level,index,
-				static_cast<DoFHandler<dim>*>
-				(reinterpret_cast<MGDoFHandler<dim>*>(local_data))) {};
+						     const AccessorData *local_data) :
+		MGDoFAccessor<dim> (local_data),
+		DoFLineAccessor(tria,level,index,local_data) {};
 
 
 
@@ -139,6 +137,15 @@ MGDoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 
 
+template <int dim, typename BaseClass>
+void
+MGDoFLineAccessor<dim,BaseClass>::copy_from (const MGDoFLineAccessor<dim,BaseClass> &a) {
+  DoFLineAccessor::copy_from (a);
+  set_mg_dof_handler (a.mg_dof_handler);
+};
+
+
+
 
 /* ------------------------ MGDoFQuadAccessor --------------------------- */
 
@@ -146,11 +153,9 @@ template <int dim, typename BaseClass>
 MGDoFQuadAccessor<dim,BaseClass>::MGDoFQuadAccessor (Triangulation<dim> *tria,
 						     const int           level,
 						     const int           index,
-						     const void         *local_data) :
-		MGDoFAccessor<dim> ((MGDoFHandler<dim>*)local_data),
-		DoFQuadAccessor(tria,level,index,
-				static_cast<DoFHandler<dim>*>
-				(reinterpret_cast<MGDoFHandler<dim>*>(local_data))) {};
+						     const AccessorData *local_data) :
+		MGDoFAccessor<dim> (local_data),
+		DoFQuadAccessor(tria,level,index,local_data) {};
 
 
 
@@ -278,6 +283,15 @@ MGDoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
+};
+
+
+
+template <int dim, typename BaseClass>
+void
+MGDoFQuadAccessor<dim,BaseClass>::copy_from (const MGDoFQuadAccessor<dim,BaseClass> &a) {
+  DoFQuadAccessor::copy_from (a);
+  set_mg_dof_handler (a.mg_dof_handler);
 };
 
 

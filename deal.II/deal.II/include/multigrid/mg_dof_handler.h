@@ -11,9 +11,78 @@
 
 // forward declarations
 template <int dim, typename BaseClass> class MGDoFLineAccessor;
-template <int dim, typename BaseClass> class MGDoFLineAccessor;
 template <int dim, typename BaseClass> class MGDoFQuadAccessor;
-template <int dim, typename BaseClass> class MGDoFQuadAccessor;
+template <int dim> class MGDoFCellAccessor;
+
+
+
+
+/**
+ * Define some types which differ between the dimensions. This class
+ * is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
+ * 
+ * @see MGDoFDimensionInfo<1>
+ * @see MGDoFDimensionInfo<2>
+ */
+template <int dim>
+class MGDoFDimensionInfo;
+
+
+
+
+
+/**
+ * Define some types for the DoF handling in one dimension.
+ *
+ * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ */
+class MGDoFDimensionInfo<1> {
+  public:
+    typedef TriaRawIterator<1,MGDoFCellAccessor<1> >    raw_line_iterator;
+    typedef TriaIterator<1,MGDoFCellAccessor<1> >       line_iterator;
+    typedef TriaActiveIterator<1,MGDoFCellAccessor<1> > active_line_iterator;
+
+    typedef void * raw_quad_iterator;
+    typedef void * quad_iterator;
+    typedef void * active_quad_iterator;
+
+    typedef raw_line_iterator    raw_cell_iterator;
+    typedef line_iterator        cell_iterator;
+    typedef active_line_iterator active_cell_iterator;
+
+    typedef void * raw_face_iterator;
+    typedef void * face_iterator;
+    typedef void * active_face_iterator;
+};
+
+
+
+
+
+
+/**
+ * Define some types for the DoF handling in two dimensions.
+ *
+ * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ */
+class MGDoFDimensionInfo<2> {
+  public:
+    typedef TriaRawIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > >    raw_line_iterator;
+    typedef TriaIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > >       line_iterator;
+    typedef TriaActiveIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > > active_line_iterator;
+    
+    typedef TriaRawIterator<2,MGDoFCellAccessor<2> >               raw_quad_iterator;
+    typedef TriaIterator<2,MGDoFCellAccessor<2> >                  quad_iterator;
+    typedef TriaActiveIterator<2,MGDoFCellAccessor<2> >            active_quad_iterator;
+
+    typedef raw_quad_iterator    raw_cell_iterator;
+    typedef quad_iterator        cell_iterator;
+    typedef active_quad_iterator active_cell_iterator;
+
+    typedef raw_line_iterator    raw_face_iterator;
+    typedef line_iterator        face_iterator;
+    typedef active_line_iterator active_face_iterator;    
+};
 
 
 
@@ -22,7 +91,26 @@ template <int dim, typename BaseClass> class MGDoFQuadAccessor;
 template <int dim>
 class MGDoFHandler : public DoFHandler<dim> {
   public:
-    				     /**
+				     // insert these definitions for gcc2.8,
+				     // since it can't inherit typedefs (I
+				     // believe it should, but it can't)
+    typedef typename MGDoFDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::line_iterator line_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::active_line_iterator active_line_iterator;
+
+    typedef typename MGDoFDimensionInfo<dim>::raw_quad_iterator raw_quad_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::quad_iterator quad_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::active_quad_iterator active_quad_iterator;
+
+    typedef typename MGDoFDimensionInfo<dim>::raw_cell_iterator raw_cell_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::cell_iterator cell_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::active_cell_iterator active_cell_iterator;
+
+    typedef typename MGDoFDimensionInfo<dim>::raw_face_iterator raw_face_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::face_iterator face_iterator;
+    typedef typename MGDoFDimensionInfo<dim>::active_face_iterator active_face_iterator;
+
+				     /**
 				      * Constructor. Take #tria# as the
 				      * triangulation to work on.
 				      */
@@ -69,6 +157,473 @@ class MGDoFHandler : public DoFHandler<dim> {
 				const vector<int> &starting_points = vector<int>());
 
 
+				     /*--------------------------------------*/
+    
+				     /**
+				      *  @name Cell iterator functions
+				      */
+				     /*@{*/
+				     /**
+				      *  Return iterator to the first cell, used
+				      *  or not, on level #level#. If a level
+				      *  has no cells, a past-the-end iterator
+				      *  is returned.
+				      *
+				      *  This function calls #begin_raw_line#
+				      *  in 1D and #begin_raw_quad# in 2D.
+				      */
+    raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used cell
+				      *  on level #level#.
+				      *
+				      *  This function calls #begin_line#
+				      *  in 1D and #begin_quad# in 2D.
+				      */
+    cell_iterator        begin       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  cell on level #level#.
+				      *
+				      *  This function calls #begin_active_line#
+				      *  in 1D and #begin_active_quad# in 2D.
+				      */
+    active_cell_iterator begin_active(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      *
+				      *  This function calls #end_line#
+				      *  in 1D and #end_quad# in 2D.
+				      */
+    raw_cell_iterator    end () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    cell_iterator        end (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_cell_iterator    end_raw (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_cell_iterator end_active (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last cell, used or not.
+				      *
+				      *  This function calls #last_raw_line#
+				      *  in 1D and #last_raw_quad# in 2D.
+				      */
+    raw_cell_iterator    last_raw () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  cell of the level #level#, used or not.
+				      *
+				      *  This function calls #last_raw_line#
+				      *  in 1D and #last_raw_quad# in 2D.
+				      */
+    raw_cell_iterator    last_raw (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used cell.
+				      *
+				      *  This function calls #last_line#
+				      *  in 1D and #last_quad# in 2D.
+				      */
+    cell_iterator        last () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used cell on level #level#.
+				      *
+				      *  This function calls #last_line#
+				      *  in 1D and #last_quad# in 2D.
+				      */
+    cell_iterator        last (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active cell.
+				      *
+				      *  This function calls #last_active_line#
+				      *  in 1D and #last_active_quad# in 2D.
+				      */
+    active_cell_iterator last_active () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active cell on level #level#.
+				      *
+				      *  This function calls #last_active_line#
+				      *  in 1D and #last_active_quad# in 2D.
+				      */
+    active_cell_iterator last_active (const unsigned int level) const;
+				     //@}
+
+    				     /*---------------------------------------*/
+
+    				     /**
+				      *  @name Face iterator functions
+				      */
+				     /*@{*/
+				     /**
+				      *  Return iterator to the first face, used
+				      *  or not, on level #level#. If a level
+				      *  has no faces, a past-the-end iterator
+				      *  is returned.
+				      *
+				      *  This function calls #begin_raw_line#
+				      *  in 2D and #begin_raw_quad# in 3D.
+				      */
+    raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used face
+				      *  on level #level#.
+				      *
+				      *  This function calls #begin_line#
+				      *  in 2D and #begin_quad# in 3D.
+				      */
+    face_iterator        begin_face       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  face on level #level#.
+				      *
+				      *  This function calls #begin_active_line#
+				      *  in 2D and #begin_active_quad# in 3D.
+				      */
+    active_face_iterator begin_active_face(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      *
+				      *  This function calls #end_line#
+				      *  in 2D and #end_quad# in 3D.
+				      */
+    raw_face_iterator    end_face () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    face_iterator        end_face (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_face_iterator    end_raw_face (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_face_iterator end_active_face (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last face, used or not.
+				      *
+				      *  This function calls #last_raw_line#
+				      *  in 2D and #last_raw_quad# in 3D.
+				      */
+    raw_face_iterator    last_raw_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  face of the level #level#, used or not.
+				      *
+				      *  This function calls #last_raw_line#
+				      *  in 2D and #last_raw_quad# in 3D.
+				      */
+    raw_face_iterator    last_raw_face (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used face.
+				      *
+				      *  This function calls #last_line#
+				      *  in 2D and #last_quad# in 3D.
+				      */
+    face_iterator        last_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used face on level #level#.
+				      *
+				      *  This function calls #last_line#
+				      *  in 2D and #last_quad# in 3D.
+				      */
+    face_iterator        last_face (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active face.
+				      *
+				      *  This function calls #last_active_line#
+				      *  in 2D and #last_active_quad# in 3D.
+				      */
+    active_face_iterator last_active_face () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active face on level #level#.
+				      *
+				      *  This function calls #last_active_line#
+				      *  in 2D and #last_active_quad# in 3D.
+				      */
+    active_face_iterator last_active_face (const unsigned int level) const;
+				     //@}
+
+    
+				     /*---------------------------------------*/
+
+				     /**
+				      *  @name Line iterator functions
+				      */
+				     /*@{*/
+				     /**
+				      *  Return iterator to the first line, used
+				      *  or not, on level #level#. If a level
+				      *  has no lines, a past-the-end iterator
+				      *  is returned.
+				      */
+    raw_line_iterator
+    begin_raw_line   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used line
+				      *  on level #level#.
+				      */
+    line_iterator
+    begin_line       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  line on level #level#.
+				      */
+    active_line_iterator
+    begin_active_line(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      */
+    raw_line_iterator
+    end_line () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    line_iterator        end_line (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_line_iterator    end_raw_line (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_line_iterator end_active_line (const unsigned int level) const;
+
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last line, used or not.
+				      */
+    raw_line_iterator
+    last_raw_line () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  line of the level #level#, used or not.
+
+				      */
+    raw_line_iterator
+    last_raw_line (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used line.
+				      */
+    line_iterator
+    last_line () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used line on level #level#.
+				      */
+    line_iterator
+    last_line (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active line.
+				      */
+    active_line_iterator
+    last_active_line () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active line on level #level#.
+				      */
+    active_line_iterator
+    last_active_line (const unsigned int level) const;
+				     /*@}*/	  
+
+				     /*---------------------------------------*/
+
+				     /**
+				      *  @name Quad iterator functions*/
+    				     /*@{
+				      */
+    				     /**
+				      *  Return iterator to the first quad, used
+				      *  or not, on level #level#. If a level
+				      *  has no quads, a past-the-end iterator
+				      *  is returned.
+				      */
+    raw_quad_iterator
+    begin_raw_quad   (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first used quad
+				      *  on level #level#.
+				      */
+    quad_iterator
+    begin_quad       (const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator to the first active
+				      *  quad on level #level#.
+				      */
+    active_quad_iterator
+    begin_active_quad(const unsigned int level = 0) const;
+
+				     /**
+				      *  Return iterator past the end; this
+				      *  iterator serves for comparisons of
+				      *  iterators with past-the-end or
+				      *  before-the-beginning states.
+				      */
+    raw_quad_iterator
+    end_quad () const;
+
+				     /**
+				      * Return an iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    quad_iterator        end_quad (const unsigned int level) const;
+    
+				     /**
+				      * Return a raw iterator which is the first
+				      * iterator not on level. If #level# is
+				      * the last level, then this returns
+				      * #end()#.
+				      */
+    raw_quad_iterator    end_raw_quad (const unsigned int level) const;
+
+    				     /**
+				      * Return an active iterator which is the
+				      * first iterator not on level. If #level#
+				      * is the last level, then this returns
+				      * #end()#.
+				      */
+    active_quad_iterator end_active_quad (const unsigned int level) const;
+
+
+				     /**
+				      *  Return an iterator pointing to the
+				      *  last quad, used or not.
+				      */
+    raw_quad_iterator
+    last_raw_quad () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  quad of the level #level#, used or not.
+
+				      */
+    raw_quad_iterator
+    last_raw_quad (const unsigned int level) const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used quad.
+				      */
+    quad_iterator
+    last_quad () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  used quad on level #level#.
+				      */
+    quad_iterator
+    last_quad (const unsigned int level) const;
+
+    				     /**
+				      *  Return an iterator pointing to the last
+				      *  active quad.
+				      */
+    active_quad_iterator
+    last_active_quad () const;
+
+				     /**
+				      *  Return an iterator pointing to the last
+				      *  active quad on level #level#.
+				      */
+    active_quad_iterator
+    last_active_quad (const unsigned int level) const;
+				     /*@}*/
+
+				     /*---------------------------------------*/
+    
   private:
 
 				     /** We need for each vertex a list of the
@@ -93,12 +648,23 @@ class MGDoFHandler : public DoFHandler<dim> {
       public:
 	
 					 /**
-					  * Constructor. Allocates memory and
-					  * sets all indices to #-1#.
+					  * Constructor. This one is empty
+					  * because it is difficult to make it
+					  * efficient to use vector<>'s and
+					  * still construct the object using
+					  * the constructor. Use the #init#
+					  * function to really allocate
+					  * memory.
 					  */
-	MGVertexDoFs (const unsigned int coarsest_level,
-		      const unsigned int n_levels,
-		      const unsigned int dofs_per_vertex);
+	MGVertexDoFs ();
+
+					 /**
+					  * Allocate memory and
+					  * set all indices to #-1#.
+					  */
+	void init (const unsigned int coarsest_level,
+		   const unsigned int n_levels,
+		   const unsigned int dofs_per_vertex);
 
 					 /**
 					  * Destructor
@@ -148,6 +714,7 @@ class MGDoFHandler : public DoFHandler<dim> {
 	DeclException0 (ExcNoMemory);
 					 /**
 					  * Exception.
+
 					  */
 	DeclException0 (ExcInvalidIndex);
 					 /**
@@ -157,6 +724,10 @@ class MGDoFHandler : public DoFHandler<dim> {
 			int,
 			<< "The given level number " << arg1 << " is below the "
 			<< "coarsest level this vertex lives on.");
+					 /**
+					  * Exception.
+					  */
+	DeclException0 (ExcInternalError);
 	
       private:
 					 /**
@@ -165,12 +736,12 @@ class MGDoFHandler : public DoFHandler<dim> {
 					  * as an offset when accessing the
 					  * dofs of a specific level.
 					  */
-	const unsigned int coarsest_level;
+	unsigned int coarsest_level;
 
 					 /**
 					  * Array holding the indices.
 					  */
-	int *const         indices;
+	int         *indices;
     };
 
     
@@ -179,6 +750,23 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      * indices for a given triangulation.
 				      */
     void reserve_space ();
+
+				     /**
+				      * Distribute dofs on the given cell,
+				      * with new dofs starting with index
+				      * #next_free_dof#. Return the next
+				      * unused index number. The finite
+				      * element used is the one given to
+				      * #distribute_dofs#, which is copied
+				      * to #selected_fe#.
+				      *
+				      * This function is excluded from the
+				      * #distribute_dofs# function since
+				      * it can not be implemented dimension
+				      * independent.
+				      */
+    unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
+					  unsigned int next_free_dof);
 
     				     /**
 				      * Space to store the DoF numbers for the
