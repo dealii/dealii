@@ -1508,6 +1508,9 @@ void Triangulation<dim>::save_user_flags (ostream &out) const {
   
   if (dim>=3)
     save_user_flags_hex (out);
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
 };
 
 
@@ -1534,6 +1537,62 @@ void Triangulation<dim>::save_user_flags (vector<bool> &v) const {
       save_user_flags_hex (tmp);
       v.insert (v.end(), tmp.begin(), tmp.end());
     };      
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_flags (istream &in)
+{
+  load_user_flags_line (in);
+  
+  if (dim>=2)
+    load_user_flags_quad (in);
+  
+  if (dim>=3)
+    load_user_flags_hex (in);
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_flags (const vector<bool> &v)
+{
+  Assert (v.size() == n_lines()+n_quads()+n_hexs(), ExcInternalError());
+  vector<bool> tmp;
+
+				   // first extract the flags belonging
+				   // to lines
+  Assert (v.size() > n_lines(), ExcInternalError());
+  tmp.insert (tmp.end(),
+	      v.begin(), v.begin()+n_lines());
+				   // and set the lines
+  load_user_flags_line (tmp);
+  tmp.clear ();
+
+  if (dim >= 2)
+    {
+      Assert (v.size() > n_lines()+n_quads(), ExcInternalError());
+      tmp.insert (tmp.end(),
+		  v.begin()+n_lines(), v.begin()+n_lines()+n_quads());
+      load_user_flags_quad (tmp);
+    };
+  
+  if (dim >= 3)
+    {
+      tmp.insert (tmp.end(),
+		  v.begin()+n_lines()+n_quads(), v.begin()+n_lines()+n_quads()+n_hexs());
+      load_user_flags_hex (tmp);
+    };      
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
 };
 
 
