@@ -1224,7 +1224,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
       Assert (next_free_index == n_parameters_on_fine_grid,
 	      ExcInternalError());
     };
-  
+
   
 				   // for each cell on the parameter grid:
 				   // find out which degrees of freedom on the
@@ -1242,7 +1242,6 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 			     coarse_to_fine_grid_map, parameter_dofs,
 			     weight_mapping, weights);
 
-  
 				   // ok, now we have all weights for each
 				   // dof on the fine grid. if in debug
 				   // mode lets see if everything went smooth,
@@ -1389,7 +1388,7 @@ DoFTools::compute_intergrid_weights (const DoFHandler<dim>              &coarse_
     cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
 								 coarse_grid.end(),
 								 multithread_info.n_default_threads);
-  
+
   Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
     Threads::spawn (thread_manager,
@@ -1420,6 +1419,9 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				   // aliases to the finite elements
 				   // used by the dof handlers:
   const FiniteElement<dim> &coarse_fe = coarse_grid.get_fe();    
+
+  const unsigned int coarse_dofs_per_cell_component
+    = coarse_fe.base_element(coarse_fe.component_to_base(coarse_component)).dofs_per_cell;
   
 				   // for each cell on the parameter grid:
 				   // find out which degrees of freedom on the
@@ -1507,7 +1509,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				       // cell and check whether they
 				       // are interesting for us
       for (unsigned int local_parameter_dof=0;
-	   local_parameter_dof<coarse_fe.dofs_per_cell;
+	   local_parameter_dof<coarse_dofs_per_cell_component;
 	   ++local_parameter_dof)
 	if (coarse_fe.system_to_component_index(local_parameter_dof).first
 	    ==
