@@ -1,8 +1,10 @@
-// $Id$
-// Copyright Guido Kanschat, University of Minnesota, 1999
+/*----------------------------   function_lib.h     ---------------------------*/
+/*      $Id$                 */
+/* Copyright Guido Kanschat, University of Minnesota, 1999                     */
+#ifndef __function_lib_H
+#define __function_lib_H
+/*----------------------------   function_lib.h     ---------------------------*/
 
-#ifndef __base__function_lib_h
-#define __base__function_lib_h
 
 #include <base/function.h>
 
@@ -60,4 +62,9 @@ class PillowFunction : Function<dim>
 		   const unsigned int         component = 0) const;
 };
 
+
+
+/*----------------------------   function_lib.h     ---------------------------*/
+/* end of #ifndef __function_lib_H */
 #endif
+/*----------------------------   function_lib.h     ---------------------------*/
