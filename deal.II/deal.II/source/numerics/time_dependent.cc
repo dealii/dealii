@@ -1238,4 +1238,10 @@ RefinementData (const double         _refinement_threshold,
 // explicit instantiations
 template class TimeStepBase_Tria<deal_II_dimension>;
 
+namespace TimeStepBase_Tria_Flags 
+{
+  template class Flags<deal_II_dimension>;
+  template class RefinementFlags<deal_II_dimension>;
+  template class RefinementData<deal_II_dimension>;
+};
 
