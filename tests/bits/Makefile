@@ -25,15 +25,18 @@ default: run-tests
 anna_1.exe              : anna_1.g.$(OBJEXT)              $(libraries)
 anna_2.exe              : anna_2.g.$(OBJEXT)              $(libraries)
 anna_3.exe              : anna_3.g.$(OBJEXT)              $(libraries)
+anna_4.exe              : anna_4.g.$(OBJEXT)              $(libraries)
 anna_5.exe              : anna_5.g.$(OBJEXT)              $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
+unit_support_points.exe : unit_support_points.g.$(OBJEXT) $(libraries)
 
-tests = anna_1 anna_2 anna_3 anna_5 \
+tests = anna_1 anna_2 anna_3 anna_4 anna_5 \
 	gerold_1 \
 	roy_1 \
-        denis_1
+        denis_1 \
+	unit_support_points
 
 ############################################################
 
