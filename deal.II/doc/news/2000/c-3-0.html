@@ -14,8 +14,19 @@
 <ol>
 
   <li> <p>
-       Improved: Dependence on the files <code
-       class="file">forward_declarations.h</code> has been widely
+       Improved: the <code class="program">configure</code> script is
+       now used to select the compiler options. Previously, selection
+       of compiler options was done both in 
+       <code class="program">configure</code> as well as in the global
+       options Makefile 
+       <code class="program">common/Make.global_options</code>.
+       <br>
+       (WB 2000/06/02)
+       </p>
+
+  <li> <p>
+       Improved: Dependence on the files 
+       <code class="file">forward_declarations.h</code> has been widely
        removed to improve compilation time
        <br>
        (GK 2000/05/24)
