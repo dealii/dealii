@@ -67,7 +67,7 @@ class BlockIndices
 				      * of block @p{i} is set to
 				      * @p{n[i]}.
 				      */
-    void reinit (const std::vector<unsigned int> &n);
+    inline void reinit (const std::vector<unsigned int> &n);
     
 				     /**
 				      * Return the block and the
@@ -99,7 +99,7 @@ class BlockIndices
 				      * of the vector space of the
 				      * block vector.
 				      */
-    unsigned int total_size () const;
+    inline unsigned int total_size () const;
 
 				     /**
 				      * Return the size of the @p{i}th
