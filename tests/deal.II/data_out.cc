@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -126,7 +126,7 @@ template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (dim==2 ? 2 : 1);
+  triangulation.refine_global (1);
   for (unsigned int i=0; i<2; ++i)
     {
       triangulation.begin_active()->set_refine_flag ();
@@ -134,7 +134,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
     };
   
   
-  logfile << "   Number of active cells: "
+  deallog << "   Number of active cells: "
 	  << triangulation.n_active_cells()
 	  << endl
 	  << "   Total number of cells: "
@@ -143,7 +143,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
   dof_handler.distribute_dofs (fe);
 
-  logfile << "   Number of degrees of freedom: "
+  deallog << "   Number of degrees of freedom: "
 	  << dof_handler.n_dofs()
 	  << endl;
 
@@ -198,7 +198,7 @@ void LaplaceProblem<2>::output_results () const
       DataOutRotation<dim> data_out;
       data_out.attach_dof_handler (dof_handler);
       data_out.add_data_vector (solution, "solution");
-      data_out.build_patches (10);
+      data_out.build_patches (3);
       data_out.write_gmv (logfile);
       data_out.write_gnuplot (logfile);
       data_out.write_ucd (logfile);
@@ -232,7 +232,7 @@ void LaplaceProblem<3>::output_results () const
       DataOutFaces<dim> data_out;
       data_out.attach_dof_handler (dof_handler);
       data_out.add_data_vector (solution, "solution");
-      data_out.build_patches (10);
+      data_out.build_patches (3);
       data_out.write_gmv (logfile);
       data_out.write_gnuplot (logfile);
       data_out.write_ucd (logfile);

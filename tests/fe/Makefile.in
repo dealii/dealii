@@ -198,16 +198,10 @@ check: fe_data_test.check mapping.check derivatives.check shapes.check
 	@echo Checking results
 	$(MAKE) dodiff
 
-%.check: %.dat
-	@$(PERL) -pi $(normalize) $<
-	@diff $@ed $<
-	@touch $@
-
-dat = $(wildcard *.dat)
-check = $(dat:.dat=.check)
+dat = $(wildcard *.output)
+check = $(dat:.output=.check)
 
 dodiff: $(check)
-	@echo OK
 
 include ../Makefile.rules
 include Makefile.depend

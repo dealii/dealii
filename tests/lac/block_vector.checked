@@ -28,7 +28,7 @@ DEAL:BlockIndices:reinit::1	1	0
 DEAL:BlockIndices:reinit::2	1	1
 DEAL:BlockIndices::Range
 --------------------------------------------------------
-An error occurred in file </home/herakles/kanschat/c/deal.II/lac/include/lac/block_indices.h> in function
+An error occurred in file <block_indices.h> in function
     struct pair<unsigned int,unsigned int> BlockIndices::global_to_local(unsigned int) const
 The violated condition was: 
     i<total_size()
@@ -38,7 +38,7 @@ Additional Information:
 Index 3 is not in [0,3[
 --------------------------------------------------------
 --------------------------------------------------------
-An error occurred in file </home/herakles/kanschat/c/deal.II/lac/include/lac/block_indices.h> in function
+An error occurred in file <block_indices.h> in function
     unsigned int BlockIndices::local_to_global(unsigned int, unsigned int) const
 The violated condition was: 
     index < start_indices[block+1]-start_indices[block]
@@ -48,7 +48,7 @@ Additional Information:
 Index 2 is not in [0,2[
 --------------------------------------------------------
 --------------------------------------------------------
-An error occurred in file </home/herakles/kanschat/c/deal.II/lac/include/lac/block_indices.h> in function
+An error occurred in file <block_indices.h> in function
     unsigned int BlockIndices::local_to_global(unsigned int, unsigned int) const
 The violated condition was: 
     block < n_blocks

@@ -14,7 +14,7 @@ DEAL:Q1:cg::Convergence step 6
 DEAL:Q2::DoFs 25
 DEAL:Q2::Levels: 2
 DEAL:Q2:cg::Starting 
-DEAL:Q2:cg::Convergence step 5 
+DEAL:Q2:cg::Convergence step 6 
 DEAL:Q2::DoFs 81
 DEAL:Q2::Levels: 3
 DEAL:Q2:cg::Starting 

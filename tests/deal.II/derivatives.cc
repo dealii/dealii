@@ -177,7 +177,7 @@ check (const unsigned int level,
 template <int dim>
 void loop ()
 {
-  QGauss<dim> gauss((dim<3) ? 6 : 4);
+  QGauss<dim> gauss((dim<3) ? 5 : 3);
 
   vector<Mapping<dim>*> maps;
 //  maps.push_back (new MappingCartesian<dim>);
@@ -187,20 +187,18 @@ void loop ()
   vector<FiniteElement<dim>*> elements;
   elements.push_back (new FE_Q<dim> (1));
   elements.push_back (new FE_Q<dim> (2));
-  elements.push_back (new FE_Q<dim> (3));
   if (dim<3)
     {
+      elements.push_back (new FE_Q<dim> (3));
       elements.push_back (new FE_Q<dim> (4));
-      elements.push_back (new FE_Q<dim> (5));
     }
   
   elements.push_back (new FE_DGQ<dim> (1));
   elements.push_back (new FE_DGQ<dim> (2));
-  elements.push_back (new FE_DGQ<dim> (3));
   if (dim<3)
     {
+      elements.push_back (new FE_DGQ<dim> (3));
       elements.push_back (new FE_DGQ<dim> (4));
-      elements.push_back (new FE_DGQ<dim> (5));
     }
   
   for (unsigned int m=0;m<maps.size();++m)

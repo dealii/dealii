@@ -19,10 +19,6 @@
 #include <fstream>
 #include <vector>
 
-void abort ()
-{}
-
-
 void test ()
 {
   deallog.push("BlockIndices");

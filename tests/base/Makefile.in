@@ -111,9 +111,9 @@ tensor.testcase: $(tensor-o-files) $(libraries)
 reference-cc-files = reference.cc
 
 ifeq ($(debug-mode),on)
-reference-o-files = $(reference-cc-files:.cc=.go)
+reference-o-files = $(reference-cc-files:.cc=.go) abort.go
 else
-reference-o-files = $(reference-cc-files:.cc=.o)
+reference-o-files = $(reference-cc-files:.cc=.o) abort.o
 endif
 
 reference.testcase: $(reference-o-files) $(libraries)

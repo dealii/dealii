@@ -421,7 +421,7 @@ void mapping_test()
 	      {
 		ostrstream ost(st2, 99);
 		ost << "Mapping" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".dat" << ends;
+		    << mapping_strings[j] << ".output" << ends;
 		deallog << st2 << endl;
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, st2);
 		compute_area(*mapping_ptr[j], fe_q4, cell);
@@ -431,7 +431,7 @@ void mapping_test()
 	      {
 		ostrstream ost(st2, 99);
 		ost << "MappingFace" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".dat" << ends;
+		    << mapping_strings[j] << ".output" << ends;
 		deallog << st2 << endl;	    
 		plot_faces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
@@ -440,7 +440,7 @@ void mapping_test()
 	      {
 		ostrstream ost(st2, 99);
 		ost << "MappingSubface" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".dat" << ends;
+		    << mapping_strings[j] << ".output" << ends;
 		deallog << st2 << endl;	    
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }

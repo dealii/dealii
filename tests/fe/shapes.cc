@@ -40,7 +40,7 @@ plot_shape_functions(Mapping<dim>& mapping,
   FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_values));
   fe.reinit(c);
   
-  sprintf(fname, "Shapes%dd-%s.dat", dim, name);
+  sprintf(fname, "Shapes%dd-%s.output", dim, name);
   ofstream gnuplot(fname);
   gnuplot.setf(ios::fixed);
   gnuplot.precision (2);
@@ -96,7 +96,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
   FESubfaceValues<dim> sub(mapping, finel, q, UpdateFlags(update_values
     | update_q_points));
 
-  sprintf(fname, "ShapesFace%dd-%s.dat", dim, name);
+  sprintf(fname, "ShapesFace%dd-%s.output", dim, name);
   ofstream gnuplot(fname);
   gnuplot.setf(ios::fixed);
   gnuplot.precision (2);

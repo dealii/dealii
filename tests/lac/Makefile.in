@@ -112,9 +112,9 @@ block_matrices.testcase: $(block_matrices-o-files) $(libraries)
 block_vector-cc-files = block_vector.cc
 
 ifeq ($(debug-mode),on)
-block_vector-o-files = $(block_vector-cc-files:.cc=.go)
+block_vector-o-files = $(block_vector-cc-files:.cc=.go) ../base/abort.o
 else
-block_vector-o-files = $(block_vector-cc-files:.cc=.o)
+block_vector-o-files = $(block_vector-cc-files:.cc=.o) ../base/abort.o
 endif
 
 block_vector.testcase: $(block_vector-o-files) $(libraries)

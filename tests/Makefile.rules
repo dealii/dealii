@@ -22,19 +22,21 @@ verbose = off
 
 ifeq ($(verbose),on)
 %.check:%.output
+	@echo '=====Checking======' $< ;
 	@if diff $< $(patsubst %.output,%.checked, $<); then \
-		  echo '=====OK============' $< ; \
+		  echo '=====OK============' $@ ; \
 		  touch $@ ; \
 		else \
-		  echo '+++++Error+++++++++' $< ; \
+		  echo '+++++Error+++++++++' $@ ; \
 		fi
 else
 %.check:%.output
+	@echo '=====Checking======' $< ;
 	@if diff $< $(patsubst %.output,%.checked, $<) > /dev/null ; then \
-		  echo '=====OK============' $< ; \
+		  echo '=====OK============' $@ ; \
 		  touch $@ ; \
 		else \
-		  echo '+++++Error+++++++++' $< '   details with "make verbose=on"'; \
+		  echo '+++++Error+++++++++' $@ '   details with "make verbose=on"'; \
 		fi
 endif
 
