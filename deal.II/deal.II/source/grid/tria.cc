@@ -130,6 +130,8 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
   
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (n_lines() == 0, ExcTriangulationNotEmpty());
+				   // check that no forbidden arrays are used
+  Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
 				   // copy vertices
   vertices = v;
@@ -264,6 +266,8 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (n_lines() == 0, ExcTriangulationNotEmpty());
   Assert (n_quads() == 0, ExcTriangulationNotEmpty());
+				   // check that no forbidden arrays are used
+  Assert (subcelldata.check_consistency(dim), ExcInternalError());
 
 				   // copy vertices
   vertices = v;
