@@ -60,9 +60,26 @@ class MGSmoother :  public Subscriptor
 				      * at the end of your derived function,
 				      * or another function doing similar
 				      * things.
+				      *
+				      * This function is responsible for the
+				      * presmoothing, postsmoothing is done
+				      * by another function, which, however,
+				      * calls this function if not overloaded.
 				      */
-    virtual void smooth (const unsigned int  level,
-			 Vector<float>      &u) const = 0;
+    virtual void pre_smooth (const unsigned int  level,
+			     Vector<float>      &u) const = 0;
+
+				     /**
+				      * Postsmoothing; the same applies as for
+				      * the presmoothing function. If you
+				      * want pre- and postsmoothing to do the
+				      * same operations, you may want to not
+				      * overload this function, since its
+				      * default implementation simply calls
+				      * #pre_smooth#.
+				      */
+    virtual void post_smooth (const unsigned int  level,
+			      Vector<float>      &u) const;
 
 				     /**
 				      * Reset the values of the degrees of
