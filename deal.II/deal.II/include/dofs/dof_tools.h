@@ -3,10 +3,13 @@
 #ifndef __dof_tools_H
 #define __dof_tools_H
 /*----------------------------   dof_tools.h     ---------------------------*/
-// Copyright Guido Kanschat, 1999
+// Copyright Wolfgang Bangerth, Guido Kanschat, and others 1999
 
 
+#include <lac/forward-declarations.h>
 #include <vector>
+
+
 
 // This is part of the original documentation of DoFHandler
 // I tried to put the essential part into the documentation of
