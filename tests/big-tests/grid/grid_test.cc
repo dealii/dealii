@@ -207,8 +207,12 @@ void test (const int test_case) {
       case 2:
       case 3:
       {
-	tria.begin_active()->face(2)->set_boundary_indicator(1);
-	tria.begin_active()->face(4)->set_boundary_indicator(1);
+	if (dim==3)
+	  {
+	    tria.begin_active()->face(2)->set_boundary_indicator(1);
+	    tria.begin_active()->face(4)->set_boundary_indicator(1);
+	  };
+	
 	
 					 // set the boundary function
 	Ball<dim>       ball;
