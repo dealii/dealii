@@ -22,6 +22,7 @@
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
 #include <fe/mapping_q1.h>
+#include <fe/fe_tools.h>
 
 #include <numeric>
 
@@ -118,11 +119,8 @@ MappingQ<dim>::MappingQ (const unsigned int p):
 				   // shape functions of the Qp
 				   // mapping.
   renumber.resize(n_shape_functions,0);
-  std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(1));
-  for (unsigned int i=1; i<dpo.size(); ++i)
-    dpo[i] = dpo[i-1]*(degree-1);
-  FiniteElementData<dim> fe_data(dpo, 1);
-  FE_Q<dim>::build_renumbering (fe_data, p, renumber);
+  FETools::lexicographic_to_hierarchic_numbering (FE_Q<dim>(degree),
+						  renumber);
 
 				   // build laplace_on_quad_vector
   if (degree>1)

@@ -283,22 +283,6 @@ class FE_Q : public FiniteElement<dim>
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim> &p) const;
 
-//TODO:[WB,RH] make get_renumber private or move it some other place    
-				     /**
-				      * Read-only access to the
-				      * renumber vector.
-				      *
-				      * This function shouldn't be
-				      * used, i.e. the users code
-				      * shouldn't rely on the actual
-				      * numbering of the degrees of
-				      * dreedom on each cell. This,
-				      * because this internal
-				      * numbering might change in
-				      * future.
-				      */
-    const std::vector<unsigned int> & get_renumber() const;
-
 				     /**
 				      * Return the polynomial degree
 				      * of this finite element,
@@ -466,56 +450,86 @@ class FE_Q : public FiniteElement<dim>
     static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
     
 				     /**
-				      * Map tensor product data to shape
-				      * function numbering.
+				      * Map tensor product data to
+				      * shape function numbering. This
+				      * function is actually an alike
+				      * replica of the respective
+				      * function in the @ref{FETools}
+				      * class, but is kept for three
+				      * reasons:
 				      *
-				      * The node values are ordered such
-				      * that vertices are first,
-				      * followed by lines,
-				      * quadrilaterals and
-				      * hexahedra. Furthermore, the
-				      * ordering inside each group may
-				      * be confused, too. Therefore,
-				      * this function computes a mapping
-				      * from lexicographic ordering
-				      * (x,y,z) to the shape function
-				      * structure.
+				      * 1. It only operates on a
+				      * @ref{FiniteElementData}
+				      * structure. This is ok in the
+				      * present context, since we can
+				      * control which types of
+				      * arguments it is called with
+				      * because this is a private
+				      * function. However, the
+				      * publicly visible function in
+				      * the @ref{FETools} class needs
+				      * to make sure that the
+				      * @ref{FiniteElementData} object
+				      * it works on actually
+				      * represents a continuous finite
+				      * element, which we found too
+				      * difficult if we do not pass an
+				      * object of type @ref{FE_Q}
+				      * directly.
 				      *
-				      * This function is made
-				      * static. This allows other
-				      * classes (like e.g. @p{MappingQ})
-				      * to call this functions without a
-				      * need to create a
-				      * FiniteElement. This function
-				      * needs some data from the base
-				      * class @p{FiniteElementData} of
-				      * this @p{FE_Q} class. But this
-				      * data cannot be accessed to by a
-				      * static function. Hence this
-				      * function needs an additional
-				      * @p{FiniteElementData} argument.
+				      * 2. If we would call the
+				      * publicly available version of
+				      * this function instead of this
+				      * one, we would have to pass a
+				      * finite element
+				      * object. However, since the
+				      * construction of an entire
+				      * finite element object can be
+				      * costly, we rather chose to
+				      * retain this function.
+				      *
+				      * 3. Third reason is that we
+				      * want to call this function for
+				      * faces as well, by just calling
+				      * this function for the finite
+				      * element of one dimension
+				      * less. If we would call the
+				      * global function instead, this
+				      * would require us to construct
+				      * a second finite element object
+				      * of one dimension less, just to
+				      * call this function. Since that
+				      * function does not make use of
+				      * hanging nodes constraints,
+				      * interpolation and restriction
+				      * matrices, etc, this would have
+				      * been a waste. Furthermore, it
+				      * would have posed problems with
+				      * template instantiations.
+				      *
+				      * To sum up, the existence of
+				      * this function is a compromise
+				      * between simplicity and proper
+				      * library design, where we have
+				      * chosen to weigh the simplicity
+				      * aspect a little more than
+				      * proper design.
 				      */
-    static void build_renumbering (const FiniteElementData<dim> &fe_data,
-				   const unsigned int            degree,
-				   std::vector<unsigned int>    &numbering);
+    static
+    void
+    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
+					   const unsigned int            degree,
+					   std::vector<unsigned int>    &numbering);
 
 				     /**
-				      * Map tensor product data to
-				      * shape function numbering on
-				      * first face.
-				      *
-				      * This function does the same as
-				      * @p{build_renumbering}, only on
-				      * the first face.
-				      *
-				      * It is used to compute the
-				      * order of face support points.
-				      *
-				      * In 1d, this function does
-				      * nothing.
+				      * This is an analogon to the
+				      * previous function, but working
+				      * on faces.
 				      */
-    static void build_face_renumbering (const unsigned int              degree,
-					std::vector<unsigned int>      &numbering);
+    static
+    void
+    face_lexicographic_to_hierarchic_numbering (const unsigned int         degree,
+						std::vector<unsigned int> &numbering);
 
 				     /**
 				      * Initialize the
@@ -605,21 +619,14 @@ class FE_Q : public FiniteElement<dim>
 				      * Allow access from other dimensions.
 				      */
     template <int dim1> friend class FE_Q;
-  
-				     /**
-				      * Allows @p{MappingQ} class to
-				      * access to @p{build_renumbering}
-				      * function.
-				      */
-    friend class MappingQ<dim>;
 };
 
 
 /* -------------- declaration of explicit specializations ------------- */
 
 template <> void FE_Q<1>::initialize_unit_face_support_points ();
-template <> void FE_Q<1>::build_face_renumbering (const unsigned int,
-						  std::vector<unsigned int>&);
+template <> void FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int,
+								      std::vector<unsigned int>&);
 
 template <> 
 const double * const 
@@ -659,17 +666,6 @@ const double * const FE_Q<3>::Matrices::constraint_matrices[];
 
 template <>
 const unsigned int FE_Q<3>::Matrices::n_constraint_matrices;
-
-
-/* ---------------------------- inline functions --------------------- */
-
-template<int dim>
-inline
-const std::vector<unsigned int> &
-FE_Q<dim>::get_renumber() const
-{
-  return renumber;
-}
 
 
 

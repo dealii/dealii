@@ -25,7 +25,6 @@
 
 
 
-//TODO:[RH] move build_renumbering to FiniteElementData class
 
 template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)
@@ -51,8 +50,8 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 				   // do some internal book-keeping on
 				   // cells and faces. if in 1d, the
 				   // face function is empty
-  build_renumbering (*this, degree, renumber);
-  build_face_renumbering (degree, face_renumber);
+  lexicographic_to_hierarchic_numbering (*this, degree, renumber);
+  face_lexicographic_to_hierarchic_numbering (degree, face_renumber);
   
 				   // build inverse of renumbering
 				   // vector
@@ -723,9 +722,9 @@ FE_Q<dim>::get_dpo_vector(const unsigned int deg)
 
 template <int dim>
 void
-FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
-			      const unsigned int            degree,
-			      std::vector<unsigned int>    &renumber)
+FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
+						  const unsigned int            degree,
+						  std::vector<unsigned int>    &renumber)
 {
   const unsigned int n = degree+1;
 
@@ -948,11 +947,11 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 
 template <int dim>
 void
-FE_Q<dim>::build_face_renumbering (const unsigned int         degree,
-				   std::vector<unsigned int> &numbering)
+FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int         degree,
+						       std::vector<unsigned int> &numbering)
 {
   FiniteElementData<dim-1> fe_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
-  FE_Q<dim-1>::build_renumbering (fe_data, degree, numbering); 
+  FE_Q<dim-1>::lexicographic_to_hierarchic_numbering (fe_data, degree, numbering); 
 }
 
 
