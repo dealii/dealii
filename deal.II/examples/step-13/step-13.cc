@@ -686,7 +686,7 @@ namespace Evaluation
     std::ostrstream filename;
 #endif
     filename << output_name_base << "-"
-	     << refinement_cycle
+	     << this->refinement_cycle
 	     << data_out.default_suffix (output_format)
 	     << std::ends;
 #ifdef HAVE_STD_STRINGSTREAM
@@ -1507,21 +1507,21 @@ namespace LaplaceSolver
   PrimalSolver<dim>::
   assemble_rhs (Vector<double> &rhs) const 
   {
-    FEValues<dim> fe_values (*fe, *quadrature, 
+    FEValues<dim> fe_values (*this->fe, *this->quadrature, 
 			     UpdateFlags(update_values    |
 					 update_q_points  |
 					 update_JxW_values));
 
-    const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature->n_quadrature_points;
+    const unsigned int   dofs_per_cell = this->fe->dofs_per_cell;
+    const unsigned int   n_q_points    = this->quadrature->n_quadrature_points;
 
     Vector<double>       cell_rhs (dofs_per_cell);
     std::vector<double>  rhs_values (n_q_points);
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+      cell = this->dof_handler.begin_active(),
+      endc = this->dof_handler.end();
     for (; cell!=endc; ++cell)
       {
 	cell_rhs.clear ();
@@ -1606,7 +1606,7 @@ namespace LaplaceSolver
   void
   RefinementGlobal<dim>::refine_grid ()
   {
-    triangulation->refine_global (1);
+    this->triangulation->refine_global (1);
   };
 
 
@@ -1665,13 +1665,13 @@ namespace LaplaceSolver
   void
   RefinementKelly<dim>::refine_grid ()
   {
-    Vector<float> estimated_error_per_cell (triangulation->n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
+    Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
+    KellyErrorEstimator<dim>::estimate (this->dof_handler,
 					QGauss3<dim-1>(),
 					typename FunctionMap<dim>::type(),
-					solution,
+					this->solution,
 					estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
+    GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error_per_cell,
 						     0.3, 0.03);
     triangulation->execute_coarsening_and_refinement ();
