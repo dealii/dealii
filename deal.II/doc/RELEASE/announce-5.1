@@ -1,0 +1,36 @@
+Version 5.1 of the deal.II object-oriented finite element library has been
+released. It is available from the deal.II home-page at
+
+                   http://www.dealii.org/
+
+Version 5.1 contains a number of improvements over previous versions. In
+particular, it contains a version of the sparse direct solver package UMFPack,
+as well as corresponding interfaces to use it from within deal.II.
+
+In addition to this, the most noteworthy changes are:
+- Vectors and matrices built on top of PETSc objects are now completely
+  integrated. In particular, one can build block vectors and matrices out of
+  them
+- In 3d, Lagrange elements now implement hanging node constraints for all
+  polynomial orders, not only for the first few
+- Several classes have been optimized to use algorithms with a better
+  complexity in terms of memory use or run time
+- Support for DLLs on Microsoft Windows.
+
+A comprehensive list of new features and fixed bugs can be found at
+     http://www.dealii.org/news/5.0.0-vs-5.1.0.html
+
+All main features of the previous versions have been continued and improved:
+- Support for dimension-independent programming
+- Extensive documentation and working example programs
+- Locally refined grids
+- A zoo of different finite elements
+- Fast linear algebra
+- Built-in support for symmetric multi-processing (SMP)
+- Output for a variety of visualization platforms.
+
+deal.II can be downloaded for free and is distributed under an Open
+Source license.
+
+
+Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, the deal.II team
