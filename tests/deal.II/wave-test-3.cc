@@ -2633,7 +2633,7 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	      << "  "
 	      << (*this->u)(cell->face(face)->vertex_dof_index(0,0))
 	      << std::endl
-	      << time
+	      << this->time
 	      << ' '
 	      << cell->face(face)->vertex(1)(0)
 	      << "  "
@@ -3136,7 +3136,7 @@ if (parameters.compare_indicators_globally)
       deallog << "    Now refining...";
       do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
 	       bind2nd (mem_fun (&TimeStepBase_Wave<dim>::refine_grid),
-			TimeStepBase_Tria<dim>::RefinementData (top_threshold,
+			typename TimeStepBase_Tria<dim>::RefinementData (top_threshold,
 								bottom_threshold)),
 	       TimeDependent::TimeSteppingData (0,1),
 	       TimeDependent::forward);
@@ -3191,7 +3191,7 @@ if (parameters.compare_indicators_globally)
 				   (q-partial_sums.begin())*(GeometryInfo<dim>::children_per_cell-1) -
 				   (partial_sums.end() - p)/(GeometryInfo<dim>::children_per_cell-1));
 	  
-	  this_timestep->refine_grid (TimeStepBase_Tria<dim>::RefinementData (top_threshold,
+	  this_timestep->refine_grid (typename TimeStepBase_Tria<dim>::RefinementData (top_threshold,
 									      bottom_threshold));
 
 	  this_timestep->sleep (0);
@@ -4816,14 +4816,14 @@ constraints.clear ();
 
       switch (this->next_action)
 	{
-	  case primal_problem:
-	  case dual_problem:
+	  case TimeStepBase::primal_problem:
+	  case TimeStepBase::dual_problem:
 	  {
-	    Assert (((this->next_action == primal_problem) &&
+	    Assert (((this->next_action == TimeStepBase::primal_problem) &&
 		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_primal())
 		      == this))
 		    ||
-		    ((this->next_action == dual_problem) &&
+		    ((this->next_action == TimeStepBase::dual_problem) &&
 		     (static_cast<const TimeStep_Wave<dim>*>(&get_timestep_dual())
 		      == this)),
 		    ExcInternalError());
@@ -4835,7 +4835,7 @@ constraints.clear ();
 	    break;
 	  };
 	   
-	  case postprocess:
+	  case TimeStepBase::postprocess:
 	  {
 	    this->sweep_info->get_timers().postprocessing.start();
 	    std::ifstream tmp_in(tmp_filename_base(branch_signature()).c_str());
@@ -5027,7 +5027,7 @@ void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
   
   switch (this->next_action)
     {
-      case primal_problem:
+      case TimeStepBase::primal_problem:
 	    Assert (this->previous_timestep != 0, ExcInternalError());
 	    
 	    old_dof_handler = (static_cast<const TimeStepBase_Wave<dim>*>
@@ -5039,7 +5039,7 @@ void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
 	    
 	    break;
 
-      case dual_problem:
+      case TimeStepBase::dual_problem:
 	    Assert (this->next_timestep != 0, ExcInternalError());
 	    
 	    old_dof_handler = (static_cast<const TimeStepBase_Wave<dim>*>
@@ -5103,12 +5103,12 @@ TimeStep_Wave<dim>::compute_energy () {
   
   switch (this->next_action)
     {
-      case primal_problem:
+      case TimeStepBase::primal_problem:
 	    energy.first = 0.5*laplace_matrix.matrix_norm_square (u);
 	    energy.second = 0.5*mass_matrix.matrix_norm_square(v);
 	    break;
 
-      case dual_problem:
+      case TimeStepBase::dual_problem:
 	    energy.first = 0.5*laplace_matrix.matrix_norm_square (v);
 	    energy.second = 0.5*mass_matrix.matrix_norm_square(u);
 	    break;
@@ -5226,7 +5226,7 @@ void TimeStep_Dual<dim>::do_initial_step () {
       UserMatrix system_matrix (this->system_sparsity,
 				this->parameters.preconditioning);
       system_matrix.copy_from (this->mass_matrix);
-      constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
+      this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
       const unsigned int
 	solver_steps1 = solve (system_matrix, this->u, tmp_u_bar),
 	solver_steps2 = solve (system_matrix, this->v, tmp_v_bar);
@@ -5264,7 +5264,7 @@ void TimeStep_Dual<dim>::do_timestep ()
   Vector<double> right_hand_side2 (this->dof_handler->n_dofs());
   
   Vector<double> old_u, old_v;
-  if (parameters.extrapolate_old_solutions)
+  if (this->parameters.extrapolate_old_solutions)
     {
       old_u.reinit (this->dof_handler->n_dofs());
       old_v.reinit (this->dof_handler->n_dofs());
@@ -5274,15 +5274,15 @@ void TimeStep_Dual<dim>::do_timestep ()
     
   assemble_vectors (right_hand_side1, right_hand_side2);
 
-  UserMatrix system_matrix (this->system_sparsity, parameters.preconditioning);
+  UserMatrix system_matrix (this->system_sparsity, this->parameters.preconditioning);
   system_matrix.copy_from (this->mass_matrix);
   system_matrix.add_scaled (time_step * time_step *
 			    this->parameters.theta *
 			    this->parameters.theta,
 			    this->laplace_matrix);
-  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
+  this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
-  if (parameters.extrapolate_old_solutions)
+  if (this->parameters.extrapolate_old_solutions)
     {
       this->v  = old_v;
       this->v.add (time_step, old_u);
@@ -5325,7 +5325,7 @@ void TimeStep_Dual<dim>::do_timestep ()
       this->u -= old_u;
     };
   
-  const unsigned int solver_steps2 = solve (system_matrix, u, right_hand_side2);
+  const unsigned int solver_steps2 = solve (system_matrix, this->u, right_hand_side2);
 
   this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
 							       this->dof_handler->n_dofs(),
@@ -5362,9 +5362,9 @@ void TimeStep_Dual<dim>::wake_up (const unsigned int wakeup_level)
   TimeStep_Wave<dim>::wake_up (wakeup_level);
   
   this->sweep_info->get_timers().dual_problem.start();
-  if ((wakeup_level==0) && (next_action==dual_problem))
+  if ((wakeup_level==0) && (this->next_action==TimeStepBase::dual_problem))
     {
-      Assert (system_sparsity.empty(), ExcInternalError());
+      Assert (this->system_sparsity.empty(), ExcInternalError());
       
       create_matrices ();
     };
@@ -5375,21 +5375,21 @@ void TimeStep_Dual<dim>::wake_up (const unsigned int wakeup_level)
 template <int dim>
 void TimeStep_Dual<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 					   Vector<double> &right_hand_side2) {
-  Assert (next_timestep != 0, ExcInternalError());
+  Assert (this->next_timestep != 0, ExcInternalError());
   
   build_rhs (right_hand_side1, right_hand_side2);
 
   Vector<double> dual1, dual2;
-  parameters.dual_functional->reset (*this);
-  parameters.dual_functional->compute_functionals (dual1, dual2);
+  this->parameters.dual_functional->reset (*this);
+  this->parameters.dual_functional->compute_functionals (dual1, dual2);
 
   const double timestep = get_forward_timestep();
   right_hand_side1.add (timestep, dual2);
-  right_hand_side1.add (parameters.theta * timestep * timestep, dual1);
+  right_hand_side1.add (this->parameters.theta * timestep * timestep, dual1);
 
   right_hand_side2.add (timestep, dual1);
 
-  constraints.condense (right_hand_side1);
+  this->constraints.condense (right_hand_side1);
 }
 
 
@@ -5397,14 +5397,14 @@ template <int dim>
 void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 				    Vector<double> &right_hand_side2) {
   const TimeStep_Dual<dim> &previous_time_level
-    = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
+    = static_cast<const TimeStepBase_Wave<dim>*>(this->next_timestep)->get_timestep_dual();
 
-  Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
+  Assert (previous_time_level.tria->n_cells(0) == this->tria->n_cells(0),
 	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
   typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
 
-  FEValues<dim> fe_values (fe, quadrature,
+  FEValues<dim> fe_values (this->fe, this->quadrature,
 			   UpdateFlags(update_values |
 				       update_gradients |
 				       update_JxW_values |
@@ -5412,10 +5412,10 @@ void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
 
 
 cell_iterator old_cell = previous_time_level.dof_handler->begin(),
-		new_cell = dof_handler->begin(),
-		end_cell = (tria->n_levels() == 1                  ?
-			    static_cast<cell_iterator>(dof_handler->end()) :
-			    dof_handler->begin(1));  
+		new_cell = this->dof_handler->begin(),
+		end_cell = (this->tria->n_levels() == 1                  ?
+			    static_cast<cell_iterator>(this->dof_handler->end()) :
+			    this->dof_handler->begin(1));  
   for (; new_cell!=end_cell; ++new_cell, ++old_cell)
     build_rhs (old_cell, new_cell,
 	       fe_values,
@@ -5446,9 +5446,9 @@ TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &ol
 
 
   const TimeStep_Dual<dim> &previous_time_level
-    = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
+    = static_cast<const TimeStepBase_Wave<dim>*>(this->next_timestep)->get_timestep_dual();
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
   const double time_step = get_forward_timestep();
 
   if (!old_cell->has_children() && !new_cell->has_children()) 
@@ -5457,7 +5457,7 @@ TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &ol
       FullMatrix<double>    cell_matrix (dofs_per_cell, dofs_per_cell);
 
       std::vector<double> density_values(fe_values.n_quadrature_points);
-      parameters.density->value_list (fe_values.get_quadrature_points(),
+      this->parameters.density->value_list (fe_values.get_quadrature_points(),
 				      density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -5484,7 +5484,7 @@ TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &ol
 
       cell_matrix.clear ();
       std::vector<double> stiffness_values(fe_values.n_quadrature_points);
-      parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+      this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					stiffness_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -5498,11 +5498,11 @@ TimeStep_Dual<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &ol
       rhs1 = local_M_v;
       rhs1.add (time_step, local_M_u);
       rhs1.add ((-time_step*time_step*
-		 parameters.theta*
-		 (1-parameters.theta)),
+		 this->parameters.theta*
+		 (1-this->parameters.theta)),
 		local_A_v);
       rhs2 = local_M_u;
-      rhs2.add (-(1-parameters.theta)*
+      rhs2.add (-(1-this->parameters.theta)*
 		time_step,
 		local_A_v);
 
@@ -5562,9 +5562,9 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
   unsigned int level_difference = 1;  
   
   const TimeStep_Dual<dim> &previous_time_level
-    = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
+    = static_cast<const TimeStepBase_Wave<dim>*>(this->next_timestep)->get_timestep_dual();
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
   const double time_step = get_forward_timestep();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -5600,7 +5600,7 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
 
 	  cell_matrix.clear ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
-	  parameters.density->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -5615,7 +5615,7 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
 
 	  cell_matrix.clear ();
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
-	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 						stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -5629,17 +5629,17 @@ TimeStep_Dual<dim>::collect_from_children (const typename DoFHandler<dim>::cell_
 	  child_rhs1 = local_M_v;
 	  child_rhs1.add (time_step, local_M_u);
 	  child_rhs1.add ((-time_step*time_step*
-			   parameters.theta*
-			   (1-parameters.theta)),
+			   this->parameters.theta*
+			   (1-this->parameters.theta)),
 			  local_A_v);
 	  child_rhs2 = local_M_u;
-	  child_rhs2.add (-(1-parameters.theta)*
+	  child_rhs2.add (-(1-this->parameters.theta)*
 			  time_step,
 			  local_A_v);
 	};
       
-      fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
-      fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
+      this->fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
+      this->fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
     };
 
   return level_difference;
@@ -5656,7 +5656,7 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
 					    Vector<double>        &right_hand_side2) {
   unsigned int level_difference = 1;  
   
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
   const double time_step = get_forward_timestep();
 
   FullMatrix<double>    cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -5678,9 +5678,9 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
     {
       const typename DoFHandler<dim>::cell_iterator new_child = new_cell->child(c);
 
-      fe.prolongate(c).vmult (local_old_dof_values_u,
+      this->fe.prolongate(c).vmult (local_old_dof_values_u,
 				   old_dof_values_u);
-      fe.prolongate(c).vmult (local_old_dof_values_v,
+      this->fe.prolongate(c).vmult (local_old_dof_values_v,
 				   old_dof_values_v);
 
       if (new_child->has_children())
@@ -5697,7 +5697,7 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
 	  fe_values.reinit (new_child);
 	  cell_matrix.clear ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
-	  parameters.density->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -5712,7 +5712,7 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
 
 	  cell_matrix.clear ();
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
-	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -5726,11 +5726,11 @@ TimeStep_Dual<dim>::distribute_to_children (const typename DoFHandler<dim>::cell
 	  rhs1 = local_M_v;
 	  rhs1.add (time_step, local_M_u);
 	  rhs1.add ((-time_step*time_step*
-		     parameters.theta*
-		     (1-parameters.theta)),
+		     this->parameters.theta*
+		     (1-this->parameters.theta)),
 		    local_A_v);
 	  rhs2 = local_M_u;
-	  rhs2.add (-(1-parameters.theta)*
+	  rhs2.add (-(1-this->parameters.theta)*
 		    time_step,
 		    local_A_v);
 	  
@@ -5780,14 +5780,14 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 
   deallog << "[ee]";
   
-  if ((parameters.refinement_strategy == WaveParameters<dim>::energy_estimator)
+  if ((this->parameters.refinement_strategy == WaveParameters<dim>::energy_estimator)
       ||
-      (sweep_no < parameters.initial_energy_estimator_sweeps))
+      (this->sweep_no < this->parameters.initial_energy_estimator_sweeps))
     estimate_error_energy (0);
 
   else
     {
-      if (timestep_no != 0)
+      if (this->timestep_no != 0)
 	estimate_error_dual ();
     };
 
@@ -5804,14 +5804,14 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::wake_up (const unsigned int wakeup_level)
 {
-  Assert (next_action==postprocess, ExcInternalError());
+  Assert (this->next_action==TimeStepBase::postprocess, ExcInternalError());
 
   if (wakeup_level==0)
     {
       Assert (estimated_error_per_cell.size()==0,
 	      ExcInternalError());
       
-      estimated_error_per_cell.reinit (tria->n_active_cells());
+      estimated_error_per_cell.reinit (this->tria->n_active_cells());
     };
 }
 
@@ -5819,7 +5819,7 @@ void TimeStep_ErrorEstimation<dim>::wake_up (const unsigned int wakeup_level)
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::sleep (const unsigned int sleep_level)
 {
-  Assert (next_action==postprocess, ExcInternalError());
+  Assert (this->next_action==TimeStepBase::postprocess, ExcInternalError());
 
   if (sleep_level==0)
     {
@@ -5874,10 +5874,10 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 				       target.v),
 				      estimated_error_per_cell,
 				      std::vector<bool>(),
-				      parameters.stiffness);
+				      this->parameters.stiffness);
 
-  if (((previous_timestep == 0) && (which_variables==0)) ||
-      ((next_timestep     == 0) && (which_variables==1)  ))
+  if (((this->previous_timestep == 0) && (which_variables==0)) ||
+      ((this->next_timestep     == 0) && (which_variables==1)  ))
     {
       Vector<float> v_estimator(estimated_error_per_cell.size());
       KellyErrorEstimator<dim>::estimate (*target.dof_handler,
@@ -5888,7 +5888,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 					   target.u),
 					  v_estimator,
 					  std::vector<bool>(),
-					  parameters.density);
+					  this->parameters.density);
       estimated_error_per_cell += v_estimator;
     };
 }
@@ -5896,14 +5896,14 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 
 template <int dim>
 void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
-  CellwiseError cellwise_error (tria->n_active_cells());
+  CellwiseError cellwise_error (this->tria->n_active_cells());
 
   const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
 			     &primal_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
-						   (previous_timestep)->get_timestep_primal();
+						   (this->previous_timestep)->get_timestep_primal();
   const TimeStep_Dual<dim>   &dual_problem     = get_timestep_dual(),
 			     &dual_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
-						 (previous_timestep)->get_timestep_dual();
+						 (this->previous_timestep)->get_timestep_dual();
 
 
   if (true)
@@ -5993,10 +5993,10 @@ TimeStep_ErrorEstimation<dim>::estimate_error_dual (const typename DoFHandler<di
 
 const TimeStep_Primal<dim> &primal_problem     = get_timestep_primal(),
 			     &primal_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
-						   (previous_timestep)->get_timestep_primal();
+						   (this->previous_timestep)->get_timestep_primal();
   const TimeStep_Dual<dim>   &dual_problem     = get_timestep_dual(),
 			     &dual_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
-						 (previous_timestep)->get_timestep_dual();
+						 (this->previous_timestep)->get_timestep_dual();
 
   const FiniteElement<dim> &primal_fe = get_timestep_primal().fe,
 			   &dual_fe   = get_timestep_dual().fe;
@@ -6207,9 +6207,9 @@ TimeStep_ErrorEstimation<dim>::collect_error_from_children (const typename DoFHa
 							    const Vector<double>  &local_Ih_v_bar_old,
 							    FEValues<dim>  &fe_values) const {
   const TimeStep_Primal<dim> &primal_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
-						   (previous_timestep)->get_timestep_primal();
+						   (this->previous_timestep)->get_timestep_primal();
   const TimeStep_Dual<dim>   &dual_problem_old = static_cast<const TimeStepBase_Wave<dim>*>
-						 (previous_timestep)->get_timestep_dual();
+						 (this->previous_timestep)->get_timestep_dual();
   const FiniteElement<dim>   &dual_fe          = dual_problem_old.fe;
   
   ErrorOnCell error_sum;
@@ -6347,10 +6347,10 @@ TimeStep_ErrorEstimation<dim>::error_formula (const typename DoFHandler<dim>::ac
 
 
 std::vector<double> stiffness(fe_values.n_quadrature_points);
-  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 				    stiffness);
   std::vector<Tensor<1,dim> > grad_stiffness(fe_values.n_quadrature_points);
-  parameters.stiffness->gradient_list (fe_values.get_quadrature_points(),
+  this->parameters.stiffness->gradient_list (fe_values.get_quadrature_points(),
 				       grad_stiffness);
 
   FullMatrix<double> mass_matrix (tmp1.size(), tmp1.size());
@@ -6358,7 +6358,7 @@ std::vector<double> stiffness(fe_values.n_quadrature_points);
   
   fe_values.reinit (cell);
   std::vector<double> density_values(fe_values.n_quadrature_points);
-  parameters.density->value_list (fe_values.get_quadrature_points(),
+  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 				  density_values);
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
     for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -6572,7 +6572,7 @@ template <int dim>
 TimeStep<dim>::TimeStep (const double               time,
 			 const WaveParameters<dim> &parameters):
 		TimeStepBase_Wave<dim> (time,
-					TimeStepBase_Tria<dim>::Flags(true, 0, 1),
+					typename TimeStepBase_Tria<dim>::Flags(true, 0, 1),
 					parameters),
 		TimeStep_Primal<dim>(parameters.primal_fe),
 		TimeStep_Dual<dim>  (parameters.dual_fe)
@@ -6588,27 +6588,27 @@ void TimeStep<dim>::wake_up (const unsigned int wakeup_level)
 
   switch (this->next_action)
     {
-      case primal_problem:
+      case TimeStepBase::primal_problem:
 	    TimeStep_Primal<dim>::wake_up (wakeup_level);
 	    break;
 	    
-      case dual_problem:
+      case TimeStepBase::dual_problem:
 	    TimeStep_Dual<dim>::wake_up (wakeup_level);
 	    break;
 	    
-      case postprocess:	    
+      case TimeStepBase::postprocess:	    
 	    TimeStep_Primal<dim>::wake_up (wakeup_level);
 
-	    if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
+	    if ((this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 		&&
-		(sweep_no >= parameters.initial_energy_estimator_sweeps))
+		(this->sweep_no >= this->parameters.initial_energy_estimator_sweeps))
 	      TimeStep_Dual<dim>::wake_up (wakeup_level);
 	    
 	    TimeStep_Postprocess<dim>::wake_up (wakeup_level);
 	    
 	    break;
 
-      case grid_refinement:
+      case TimeStepBase_Tria<dim>::grid_refinement:
 	    break;
 
       default:
@@ -6622,26 +6622,26 @@ void TimeStep<dim>::sleep (const unsigned int sleep_level)
 {  
   switch (this->next_action)
     {
-      case primal_problem:
+      case TimeStepBase::primal_problem:
 	    TimeStep_Primal<dim>::sleep (sleep_level);
 	    break;
 	    
-      case dual_problem:
+      case TimeStepBase::dual_problem:
 	    TimeStep_Dual<dim>::sleep (sleep_level);
 	    break;
 
-      case postprocess:
+      case TimeStepBase::postprocess:
 	    TimeStep_Primal<dim>::sleep (sleep_level);
 	    
-	    if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
+	    if ((this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 		&&
-		(sweep_no >= parameters.initial_energy_estimator_sweeps))
+		(this->sweep_no >= this->parameters.initial_energy_estimator_sweeps))
 	      TimeStep_Dual<dim>::sleep (sleep_level);
 	    
 	    TimeStep_Postprocess<dim>::sleep (sleep_level);
 	    break;
 
-      case grid_refinement:
+      case TimeStepBase_Tria<dim>::grid_refinement:
 	    if (sleep_level == 1)
 	      save_refine_flags ();
 	    break;
@@ -6723,36 +6723,36 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 {
   deallog << "  Postprocessing: time="
        << this->time
-       << ", step=" << timestep_no
-       << ", sweep=" << sweep_no
+       << ", step=" << this->timestep_no
+       << ", sweep=" << this->sweep_no
        << ". ";
 
-  if ((sweep_no < parameters.number_of_sweeps-1) ||
-      (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
+  if ((this->sweep_no < this->parameters.number_of_sweeps-1) ||
+      (this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
     estimate_error ();
 
   this->sweep_info->get_timers().postprocessing.start();
 
   statistic_data.evaluation_results.clear();
-  for (typename std::list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
-       i != parameters.eval_list.end(); ++i)
+  for (typename std::list<EvaluationBase<dim>*>::const_iterator i = this->parameters.eval_list.begin();
+       i != this->parameters.eval_list.end(); ++i)
     {
       (*i)->reset_timelevel (get_timestep_primal());
       statistic_data.evaluation_results.push_back ((*i)->evaluate());
     };
 
-  if (((parameters.write_solution_strategy == WaveParameters<dim>::all_sweeps) ||
-       ((parameters.write_solution_strategy == WaveParameters<dim>::last_sweep_only) &&
-	(sweep_no == parameters.number_of_sweeps-1)))
+  if (((this->parameters.write_solution_strategy == WaveParameters<dim>::all_sweeps) ||
+       ((this->parameters.write_solution_strategy == WaveParameters<dim>::last_sweep_only) &&
+	(this->sweep_no == this->parameters.number_of_sweeps-1)))
       &&
-      (((timestep_no % parameters.write_steps_interval) == 0) ||
-       (next_timestep == 0)))
+      (((this->timestep_no % this->parameters.write_steps_interval) == 0) ||
+       (this->next_timestep == 0)))
     {
       deallog << "[o]";
 
       DataOut<dim> out;
       typename DataOut<dim>::OutputFormat output_format
-	= DataOut<dim>::parse_output_format (parameters.output_format);
+	= DataOut<dim>::parse_output_format (this->parameters.output_format);
       
       out.attach_dof_handler (*get_timestep_primal().dof_handler);
       out.add_data_vector (get_timestep_primal().u, "u");
@@ -6760,14 +6760,14 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 
       Vector<double> u_bar, v_bar;
       
-      if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
+      if ((this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 	  &&
-	  (sweep_no >= parameters.initial_energy_estimator_sweeps))
+	  (this->sweep_no >= this->parameters.initial_energy_estimator_sweeps))
 	{
 	  u_bar.reinit (get_timestep_primal().u.size());
 	  v_bar.reinit (get_timestep_primal().u.size());
 	  
-	  if (parameters.primal_fe == parameters.dual_fe)
+	  if (this->parameters.primal_fe == this->parameters.dual_fe)
 	    {
 	      u_bar = get_timestep_dual().u;
 	      v_bar = get_timestep_dual().v;
@@ -6780,21 +6780,21 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	};
 
       Vector<double> estimated_error;
-      if ((sweep_no<parameters.number_of_sweeps-1) ||
-	  (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
+      if ((this->sweep_no<this->parameters.number_of_sweeps-1) ||
+	  (this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
 	{
-	  if (parameters.write_error_as_cell_data) 
+	  if (this->parameters.write_error_as_cell_data) 
 	    {
-	      estimated_error.reinit (estimated_error_per_cell.size());
-	      std::copy (estimated_error_per_cell.begin(),
-		    estimated_error_per_cell.end(),
+	      estimated_error.reinit (this->estimated_error_per_cell.size());
+	      std::copy (this->estimated_error_per_cell.begin(),
+		    this->estimated_error_per_cell.end(),
 		    estimated_error.begin());
 	    }
 	  else
 	    {
 	      estimated_error.reinit (get_timestep_primal().dof_handler->n_dofs());
 	      DoFTools::distribute_cell_to_dof_vector (*get_timestep_primal().dof_handler,
-						       estimated_error_per_cell,
+						       this->estimated_error_per_cell,
 						       estimated_error);
 	    };
       
@@ -6808,28 +6808,28 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       deallog << ".";
     };
 
-  if (parameters.write_stacked_data &&
-      (timestep_no % parameters.write_stacked_interval == 0))
+  if (this->parameters.write_stacked_data &&
+      (this->timestep_no % this->parameters.write_stacked_interval == 0))
     {
       deallog << "[st]";
 
-      sweep_data->data_out_stack->new_parameter_value (time,
-						       (timestep_no == 0 ?
+      this->sweep_data->data_out_stack->new_parameter_value (this->time,
+						       (this->timestep_no == 0 ?
 							0 :
 							get_backward_timestep() *
-							parameters.write_stacked_interval));
-      sweep_data->data_out_stack->attach_dof_handler (*get_timestep_primal().dof_handler);
-      sweep_data->data_out_stack->add_data_vector (get_timestep_primal().u, "u");
-      sweep_data->data_out_stack->add_data_vector (get_timestep_primal().v, "v");
+							this->parameters.write_stacked_interval));
+      this->sweep_data->data_out_stack->attach_dof_handler (*get_timestep_primal().dof_handler);
+      this->sweep_data->data_out_stack->add_data_vector (get_timestep_primal().u, "u");
+      this->sweep_data->data_out_stack->add_data_vector (get_timestep_primal().v, "v");
 
-      if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
+      if ((this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
 	  &&
-	  (sweep_no >= parameters.initial_energy_estimator_sweeps))
+	  (this->sweep_no >= this->parameters.initial_energy_estimator_sweeps))
 	{
-	  if (parameters.primal_fe == parameters.dual_fe)
+	  if (this->parameters.primal_fe == this->parameters.dual_fe)
 	    {
-	      sweep_data->data_out_stack->add_data_vector (get_timestep_dual().u, "dual_u");
-	      sweep_data->data_out_stack->add_data_vector (get_timestep_dual().v, "dual_v");
+	      this->sweep_data->data_out_stack->add_data_vector (get_timestep_dual().u, "dual_u");
+	      this->sweep_data->data_out_stack->add_data_vector (get_timestep_dual().v, "dual_v");
 	    }
 	  else
 	    {
@@ -6838,17 +6838,17 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	      
 	      interpolate_dual_solution (u_bar, v_bar);
 	      
-	      sweep_data->data_out_stack->add_data_vector (u_bar, "dual_u");
-	      sweep_data->data_out_stack->add_data_vector (v_bar, "dual_v");
+	      this->sweep_data->data_out_stack->add_data_vector (u_bar, "dual_u");
+	      this->sweep_data->data_out_stack->add_data_vector (v_bar, "dual_v");
 	    };
 	};
 
-      if ((sweep_no < parameters.number_of_sweeps-1) ||
-	  (parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
-	sweep_data->data_out_stack->add_data_vector (estimated_error_per_cell, "est_error");
+      if ((this->sweep_no < this->parameters.number_of_sweeps-1) ||
+	  (this->parameters.refinement_strategy == WaveParameters<dim>::dual_estimator))
+	this->sweep_data->data_out_stack->add_data_vector (this->estimated_error_per_cell, "est_error");
 
-      sweep_data->data_out_stack->build_patches ();
-      sweep_data->data_out_stack->finish_parameter_value ();
+      this->sweep_data->data_out_stack->build_patches ();
+      this->sweep_data->data_out_stack->finish_parameter_value ();
     };
 
 
@@ -6963,29 +6963,29 @@ void TimeStep_Primal<dim>::do_initial_step ()
 {
   deallog << "  Primal problem: time="
        << this->time
-       << ", step=" << timestep_no
-       << ", sweep=" << sweep_no
+       << ", step=" << this->timestep_no
+       << ", sweep=" <<this-> sweep_no
        << ". "
-       << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs";
+       << this->tria->n_active_cells() << " cells, "
+       << this->dof_handler->n_dofs() << " dofs";
 
 
-  this->sweep_info->get_data().cells       += tria->n_active_cells();
-  this->sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
+  this->sweep_info->get_data().cells       += this->tria->n_active_cells();
+  this->sweep_info->get_data().primal_dofs += this->dof_handler->n_dofs() * 2;
 
 #if 2 == 1
   VectorTools::interpolate (*dof_handler, *parameters.initial_u, u);
   VectorTools::interpolate (*dof_handler, *parameters.initial_v, v);
 #else
-  VectorTools::project (*dof_handler, constraints,
-			     quadrature, *parameters.initial_u, u,
-			     false, quadrature_face, (dim==2 ? true : false));
-  VectorTools::project (*dof_handler, constraints,
-			     quadrature, *parameters.initial_v, v,
-			     false, quadrature_face, (dim==2 ? true : false));
+  VectorTools::project (*this->dof_handler, this->constraints,
+			     this->quadrature, *this->parameters.initial_u, this->u,
+			     false, this->quadrature_face, (dim==2 ? true : false));
+  VectorTools::project (*this->dof_handler, this->constraints,
+			     this->quadrature, *this->parameters.initial_v, this->v,
+			     false, this->quadrature_face, (dim==2 ? true : false));
 #endif
-  statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
-							       dof_handler->n_dofs(),
+  this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
+							       this->dof_handler->n_dofs(),
 							       0,
 							       0,
 							       std::make_pair (0.0, 0.0));
@@ -6999,26 +6999,26 @@ void TimeStep_Primal<dim>::do_timestep ()
 {
   deallog << "  Primal problem: time="
        << this->time
-       << ", step=" << timestep_no
-       << ", sweep=" << sweep_no
+       << ", step=" << this->timestep_no
+       << ", sweep=" << this->sweep_no
        << ". "
-       << tria->n_active_cells() << " cells, "
-       << dof_handler->n_dofs() << " dofs";
+       << this->tria->n_active_cells() << " cells, "
+       << this->dof_handler->n_dofs() << " dofs";
   
-  this->sweep_info->get_data().cells       += tria->n_active_cells();
-  this->sweep_info->get_data().primal_dofs += dof_handler->n_dofs() * 2;
+  this->sweep_info->get_data().cells       += this->tria->n_active_cells();
+  this->sweep_info->get_data().primal_dofs += this->dof_handler->n_dofs() * 2;
 
 
-const double time_step = get_backward_timestep ();
+  const double time_step = get_backward_timestep ();
   
-  Vector<double> right_hand_side1 (dof_handler->n_dofs());
-  Vector<double> right_hand_side2 (dof_handler->n_dofs());
+  Vector<double> right_hand_side1 (this->dof_handler->n_dofs());
+  Vector<double> right_hand_side2 (this->dof_handler->n_dofs());
 
   Vector<double> old_u, old_v;
-  if (parameters.extrapolate_old_solutions)
+  if (this->parameters.extrapolate_old_solutions)
     {
-      old_u.reinit (dof_handler->n_dofs());
-      old_v.reinit (dof_handler->n_dofs());
+      old_u.reinit (this->dof_handler->n_dofs());
+      old_v.reinit (this->dof_handler->n_dofs());
 
       transfer_old_solutions (old_u, old_v);
     };
@@ -7026,71 +7026,71 @@ const double time_step = get_backward_timestep ();
 
 assemble_vectors (right_hand_side1, right_hand_side2);
 
-  UserMatrix system_matrix (system_sparsity, parameters.preconditioning);
-  system_matrix.copy_from (mass_matrix);
+  UserMatrix system_matrix (this->system_sparsity, this->parameters.preconditioning);
+  system_matrix.copy_from (this->mass_matrix);
   system_matrix.add_scaled (time_step * time_step *
-			    parameters.theta *
-			    parameters.theta,
-			    laplace_matrix);
-  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
+			    this->parameters.theta *
+			    this->parameters.theta,
+			    this->laplace_matrix);
+  this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
-  if (parameters.extrapolate_old_solutions)
+  if (this->parameters.extrapolate_old_solutions)
     {
-      u  = old_u;
-      u.add (time_step, old_v);
+      this->u  = old_u;
+      this->u.add (time_step, old_v);
     };
 
   if (dim!=1) 
     {
-      parameters.boundary_values_u->set_time (time);
-      parameters.boundary_values_v->set_time (time);
+      this->parameters.boundary_values_u->set_time (this->time);
+      this->parameters.boundary_values_v->set_time (this->time);
       
       std::map<unsigned int,double> boundary_value_list;
-      VectorTools::interpolate_boundary_values (*dof_handler, 0,
-						     *(parameters.boundary_values_u),
+      VectorTools::interpolate_boundary_values (*this->dof_handler, 0,
+						     *(this->parameters.boundary_values_u),
 						     boundary_value_list);
       MatrixTools::apply_boundary_values (boundary_value_list,
-					  system_matrix, u,
+					  system_matrix, this->u,
 					  right_hand_side1);
     };
 
-  const unsigned int solver_steps1 = solve (system_matrix, u, right_hand_side1);
+  const unsigned int solver_steps1 = solve (system_matrix, this->u, right_hand_side1);
 		
-  system_matrix.copy_from (mass_matrix);
-  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
+  system_matrix.copy_from (this->mass_matrix);
+  this->constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
   if (true)
     { 
       Vector<double> tmp (right_hand_side2.size());
-      laplace_matrix.vmult (tmp, u);
-      right_hand_side2.add (-parameters.theta*time_step, tmp);
+      this->laplace_matrix.vmult (tmp, this->u);
+      right_hand_side2.add (-this->parameters.theta*time_step, tmp);
     };
-  constraints.condense (right_hand_side2);
+  this->constraints.condense (right_hand_side2);
 
 
   if (dim != 1)
     {
       std::map<unsigned int,double> boundary_value_list;
-      VectorTools::interpolate_boundary_values (*dof_handler, 0,
-						     *(parameters.boundary_values_v),
+      VectorTools::interpolate_boundary_values (*this->dof_handler, 0,
+						     *(this->parameters.boundary_values_v),
 						     boundary_value_list);
       MatrixTools::apply_boundary_values (boundary_value_list,
-					  system_matrix, v,
+					  system_matrix, this->v,
 					  right_hand_side2);
     };
 
 
-if (parameters.extrapolate_old_solutions)
+if (this->parameters.extrapolate_old_solutions)
     {
-      v  = u;
-      v -= old_u;
-      v.scale (2./time_step);
-      v -= old_v;
+      this->v  = this->u;
+      this->v -= old_u;
+      this->v.scale (2./time_step);
+      this->v -= old_v;
     };
 
-  const unsigned int solver_steps2 = solve (system_matrix, v, right_hand_side2);
+  const unsigned int solver_steps2 = solve (system_matrix, this->v, right_hand_side2);
 
-  statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
-							       dof_handler->n_dofs(),
+  this->statistic_data = typename TimeStep_Wave<dim>::StatisticData (this->tria->n_active_cells(),
+							       this->dof_handler->n_dofs(),
 							       solver_steps1,
 							       solver_steps2,
 							       compute_energy ());
@@ -7103,7 +7103,7 @@ template <int dim>
 void TimeStep_Primal<dim>::solve_primal_problem ()
 {
   this->sweep_info->get_timers().primal_problem.start();
-  if (timestep_no == 0)
+  if (this->timestep_no == 0)
     do_initial_step ();
   else
     do_timestep ();
@@ -7124,9 +7124,9 @@ void TimeStep_Primal<dim>::wake_up (const unsigned int wakeup_level)
   TimeStep_Wave<dim>::wake_up (wakeup_level);
   
   this->sweep_info->get_timers().primal_problem.start();
-  if ((wakeup_level==0) && (next_action==primal_problem))
+  if ((wakeup_level==0) && (this->next_action==TimeStepBase::primal_problem))
     {
-      Assert (system_sparsity.empty(), ExcInternalError());
+      Assert (this->system_sparsity.empty(), ExcInternalError());
       
       create_matrices ();
     };
@@ -7137,10 +7137,10 @@ void TimeStep_Primal<dim>::wake_up (const unsigned int wakeup_level)
 template <int dim>
 void TimeStep_Primal<dim>::assemble_vectors (Vector<double> &right_hand_side1,
 					     Vector<double> &right_hand_side2) {
-  Assert (timestep_no>=1, ExcInternalError());
+  Assert (this->timestep_no>=1, ExcInternalError());
   
   build_rhs (right_hand_side1, right_hand_side2);
-  constraints.condense (right_hand_side1);
+  this->constraints.condense (right_hand_side1);
 }
 
 
@@ -7148,14 +7148,14 @@ template <int dim>
 void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
 				      Vector<double> &right_hand_side2) {
   const TimeStep_Primal<dim> &previous_time_level
-    = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
+    = static_cast<const TimeStepBase_Wave<dim>*>(this->previous_timestep)->get_timestep_primal();
 
-  Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
+  Assert (previous_time_level.tria->n_cells(0) == this->tria->n_cells(0),
 	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
   typedef typename DoFHandler<dim>::cell_iterator cell_iterator;
 
-  FEValues<dim> fe_values (fe, quadrature,
+  FEValues<dim> fe_values (this->fe, this->quadrature,
 			   UpdateFlags(update_values |
 				       update_gradients |
 				       update_JxW_values |
@@ -7163,10 +7163,10 @@ void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
 
 
 cell_iterator old_cell = previous_time_level.dof_handler->begin(),
-		new_cell = dof_handler->begin(),
-		end_cell = (tria->n_levels() == 1                  ?
-			    static_cast<cell_iterator>(dof_handler->end()) :
-			    dof_handler->begin(1));  
+		new_cell = this->dof_handler->begin(),
+		end_cell = (this->tria->n_levels() == 1                  ?
+			    static_cast<cell_iterator>(this->dof_handler->end()) :
+			    this->dof_handler->begin(1));  
   for (; new_cell!=end_cell; ++new_cell, ++old_cell)
     build_rhs (old_cell, new_cell,
 	       fe_values,
@@ -7196,9 +7196,9 @@ TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &
 
 
   const TimeStep_Primal<dim> &previous_time_level
-    = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
+    = static_cast<const TimeStepBase_Wave<dim>*>(this->previous_timestep)->get_timestep_primal();
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
   const double time_step = get_backward_timestep();
 
   if (!old_cell->has_children() && !new_cell->has_children()) 
@@ -7207,7 +7207,7 @@ TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &
 
       FullMatrix<double>                    cell_matrix (dofs_per_cell, dofs_per_cell);
       std::vector<double> density_values(fe_values.n_quadrature_points);
-      parameters.density->value_list (fe_values.get_quadrature_points(),
+      this->parameters.density->value_list (fe_values.get_quadrature_points(),
 				      density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -7234,7 +7234,7 @@ TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &
 
       cell_matrix.clear ();
       std::vector<double> stiffness_values(fe_values.n_quadrature_points);
-      parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+      this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -7249,11 +7249,11 @@ TimeStep_Primal<dim>::build_rhs (const typename DoFHandler<dim>::cell_iterator &
 rhs1 = local_M_u;
       rhs1.add (time_step, local_M_v);
       rhs1.add ((-time_step*time_step*
-		 parameters.theta*
-		 (1-parameters.theta)),
+		 this->parameters.theta*
+		 (1-this->parameters.theta)),
 		local_A_u);
       rhs2 = local_M_v;
-      rhs2.add (-(1-parameters.theta)*
+      rhs2.add (-(1-this->parameters.theta)*
 		time_step,
 		local_A_u);
 
@@ -7315,9 +7315,9 @@ TimeStep_Primal<dim>::collect_from_children (const typename DoFHandler<dim>::cel
   unsigned int level_difference = 1;  
   
   const TimeStep_Primal<dim> &previous_time_level
-    = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
+    = static_cast<const TimeStepBase_Wave<dim>*>(this->previous_timestep)->get_timestep_primal();
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = this->fe.dofs_per_cell;
   const double time_step = get_backward_timestep();
 
 
@@ -7354,7 +7354,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
       
 	  cell_matrix.clear ();
 	  std::vector<double> density_values(fe_values.n_quadrature_points);
-	  parameters.density->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -7370,7 +7370,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  cell_matrix.clear ();
 
 	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
-	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
+	  this->parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
@@ -7384,17 +7384,17 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	  child_rhs1 = local_M_u;
 	  child_rhs1.add (time_step, local_M_v);
 	  child_rhs1.add ((-time_step*time_step*
-			   parameters.theta*
-			   (1-parameters.theta)),
+			   this->parameters.theta*
+			   (1-this->parameters.theta)),
 			  local_A_u);
 	  child_rhs2 = local_M_v;
-	  child_rhs2.add (-(1-parameters.theta)*
+	  child_rhs2.add (-(1-this->parameters.theta)*
 			  time_step,
 			  local_A_u);
 	};
       
-      fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
-      fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
+      this->fe.prolongate(c).Tvmult (rhs1, child_rhs1, true);
+      this->fe.prolongate(c).Tvmult (rhs2, child_rhs2, true);
     };
 
   return level_difference;
@@ -7532,27 +7532,27 @@ void UserMatrix::precondition (Vector<double> &dst,
 
 
 
-template <> const FE_Q<2>   FEHelper<2>::fe_linear(1);
-template <> const FE_Q<2>   FEHelper<2>::fe_quadratic_sub(2);
+template <> const FE_Q<2>   FEHelper<2>::fe_linear = FE_Q<2>(1);
+template <> const FE_Q<2>   FEHelper<2>::fe_quadratic_sub = FE_Q<2>(2);
 #if 2 < 3
-template <> const FE_Q<2>   FEHelper<2>::fe_cubic_sub(3);
-template <> const FE_Q<2>   FEHelper<2>::fe_quartic_sub(4);
+template <> const FE_Q<2>   FEHelper<2>::fe_cubic_sub = FE_Q<2>(3);
+template <> const FE_Q<2>   FEHelper<2>::fe_quartic_sub = FE_Q<2>(4);
 #endif
     
-template <> const QGauss2<2> FEHelper<2>::q_gauss_2;
-template <> const QGauss3<2> FEHelper<2>::q_gauss_3;
-template <> const QGauss4<2> FEHelper<2>::q_gauss_4;
-template <> const QGauss5<2> FEHelper<2>::q_gauss_5;
-template <> const QGauss6<2> FEHelper<2>::q_gauss_6;
-template <> const QGauss7<2> FEHelper<2>::q_gauss_7;
+template <> const QGauss2<2> FEHelper<2>::q_gauss_2 = QGauss2<2>();
+template <> const QGauss3<2> FEHelper<2>::q_gauss_3 = QGauss3<2>();
+template <> const QGauss4<2> FEHelper<2>::q_gauss_4 = QGauss4<2>();
+template <> const QGauss5<2> FEHelper<2>::q_gauss_5 = QGauss5<2>();
+template <> const QGauss6<2> FEHelper<2>::q_gauss_6 = QGauss6<2>();
+template <> const QGauss7<2> FEHelper<2>::q_gauss_7 = QGauss7<2>();
 
 #if 2 > 1
-template <> const QGauss2<2-1> FEHelper<2>::q_gauss_2_face;
-template <> const QGauss3<2-1> FEHelper<2>::q_gauss_3_face;
-template <> const QGauss4<2-1> FEHelper<2>::q_gauss_4_face;
-template <> const QGauss5<2-1> FEHelper<2>::q_gauss_5_face;
-template <> const QGauss6<2-1> FEHelper<2>::q_gauss_6_face;
-template <> const QGauss7<2-1> FEHelper<2>::q_gauss_7_face;
+template <> const QGauss2<2-1> FEHelper<2>::q_gauss_2_face = QGauss2<1>();
+template <> const QGauss3<2-1> FEHelper<2>::q_gauss_3_face = QGauss3<1>();
+template <> const QGauss4<2-1> FEHelper<2>::q_gauss_4_face = QGauss4<1>();
+template <> const QGauss5<2-1> FEHelper<2>::q_gauss_5_face = QGauss5<1>();
+template <> const QGauss6<2-1> FEHelper<2>::q_gauss_6_face = QGauss6<1>();
+template <> const QGauss7<2-1> FEHelper<2>::q_gauss_7_face = QGauss7<1>();
 #endif
 
 
