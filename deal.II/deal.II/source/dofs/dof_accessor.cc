@@ -678,7 +678,7 @@ DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 // for Petsc vectors
-#if DEAL_II_USE_PETSC
+#ifdef DEAL_II_USE_PETSC
 template
 void
 DoFObjectAccessor<1,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,double>
@@ -784,7 +784,7 @@ DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 // for Petsc vectors
-#if DEAL_II_USE_PETSC
+#ifdef DEAL_II_USE_PETSC
 template
 void
 DoFObjectAccessor<2,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,double>
@@ -894,7 +894,7 @@ DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 // for Petsc vectors
-#if DEAL_II_USE_PETSC
+#ifdef DEAL_II_USE_PETSC
 template
 void
 DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,double>
@@ -1025,7 +1025,7 @@ set_dof_values_by_interpolation<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 // for Petsc vectors
-#if DEAL_II_USE_PETSC
+#ifdef DEAL_II_USE_PETSC
 template
 void
 DoFCellAccessor<deal_II_dimension>::
