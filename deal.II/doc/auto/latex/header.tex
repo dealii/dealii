@@ -1,5 +1,6 @@
 \documentclass{report}
 \usepackage{a4wide}
+\usepackage{graphicx}
 \usepackage{times}
 %\def\presentlib{}
 \usepackage{docxx}
@@ -13,13 +14,19 @@
 % it for the titlepage
 \sbox{\cxxHeadName}{}
 
+\vspace*{3cm}
+
 \begin{center}
-  {\LARGE \texttt{newdeal} Technical Reference}
+  {\Huge deal.II Technical Reference}
 
-  {\Large Documentation for the \texttt{deal.II}, \texttt{base}, and
-  \texttt{lac} libraries}
+\vspace*{1cm}
 
-  \today
+  {\LARGE Documentation for the \textsf{base},
+  \textsf{lac} and \textsf{deal.II} libraries}
+
+\vspace*{1.5cm}
+
+\includegraphics[width=.8\textwidth]{../../pictures/deal.eps}
 \end{center}
 
 
