@@ -38,15 +38,14 @@
  * The first template parameter denotes the type of number representation in
  * the sparse matrix, the second denotes the type of number representation in
  * which the inverse diagonal block
- * matrices are stored by #invert_diagblocks(const SparseMatrix<number> &A)#.
+ * matrices are stored by #invert_diagblocks()#.
  */
 template<typename number, typename inverse_type>
 class PreconditionBlock: public Subscriptor
 {
   public:
 				     /**
-				      * Constructor. Takes the matrix as
-				      * argument.
+				      * Constructor.
 				      */
     PreconditionBlock();
     
