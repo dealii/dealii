@@ -1,0 +1,9 @@
+set xlabel "Number of degrees of freedom"
+set ylabel "Error"
+set data style linespoints
+set logscale xy
+
+set term postscript eps
+set output "convergence.eps"
+
+plot "gnuplot.history" using 1:2 title "L1 error","gnuplot.history" using 1:3 title "L2 error","gnuplot.history" using 1:4 title "Linfty error","gnuplot.history" using 1:5 title "H1 seminorm error","gnuplot.history" using 1:6 title "H1 error"
