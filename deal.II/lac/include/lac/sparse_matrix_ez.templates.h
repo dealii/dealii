@@ -39,10 +39,10 @@ SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
 
 
 template <typename number>
-SparseMatrixEZ<number>::SparseMatrixEZ(unsigned int n_rows,
-				       unsigned int n_cols,
-				       unsigned int default_row_length,
-				       unsigned int default_increment)
+SparseMatrixEZ<number>::SparseMatrixEZ(const unsigned int n_rows,
+				       const unsigned int n_cols,
+				       const unsigned int default_row_length,
+				       const unsigned int default_increment)
 {
   reinit(n_rows, n_cols, default_row_length, default_increment);
 }

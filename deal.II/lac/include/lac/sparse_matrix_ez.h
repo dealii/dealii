@@ -359,10 +359,10 @@ class SparseMatrixEZ : public Subscriptor
 				      * efficient assembling of the
 				      * matrix.
 				      */
-    explicit SparseMatrixEZ (unsigned int n_rows,
-			     unsigned int n_columns,
-			     unsigned int default_row_length = Entry::invalid,
-			     unsigned int default_increment = Entry::invalid);
+    explicit SparseMatrixEZ (const unsigned int n_rows,
+			     const unsigned int n_columns,
+			     const unsigned int default_row_length = Entry::invalid,
+			     const unsigned int default_increment = Entry::invalid);
     
 				     /**
 				      * Destructor. Free all memory, but do not
