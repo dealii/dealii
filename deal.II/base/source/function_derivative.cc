@@ -56,7 +56,7 @@ FunctionDerivative<dim>::set_formula (DifferenceFormula form)
   formula = form;
 }
 
-//TODO:[GK] Discussion on an efficient implementation of Point additions.
+//TODO:[?] Discussion on an efficient implementation of Point additions.
 
 template <int dim>
 double
@@ -88,7 +88,7 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 using namespace std;
 #endif
 
-//TODO:[GK] Optimize construction of vectors!
+//TODO:[?] Optimize construction of vectors thread-safe
 
 template <int dim>
 void

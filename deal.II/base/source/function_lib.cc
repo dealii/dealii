@@ -847,30 +847,19 @@ LSingularityFunction::laplacian_list (const std::vector<Point<2> > &points,
 }
 
 
-//TODO:[?] Implement derivatives
-
 Tensor<1,2>
 LSingularityFunction::gradient (const Point<2>   &p,
 				const unsigned int) const
 {
-  Assert(false, ExcNotImplemented());
   double x = p(0);
   double y = p(1);
-
-  if ((x>=0) && (y>=0))
-    {
-				       // in this region, the gradient
-				       // does not exist, so return
-				       // infinity
-      static const double infty[2] = { atof("Inf"), atof("Inf") };
-      return Tensor<1,2>(infty);
-    }
-
-//TODO:[GK] this is no reasonable return value  
-//  double phi = atan2(y,-x)+M_PI;
-//  double r2 = x*x+y*y;
-
-  return Tensor<1,2>();
+  double phi = atan2(y,-x)+M_PI;
+  double r43 = pow(x*x+y*y,2./3.);
+  
+  Tensor<1,2> result;
+  result[0] = 2./3.*(sin(2./3.*phi)*x + cos(2./3.*phi)*y)/r43;
+  result[1] = 2./3.*(sin(2./3.*phi)*y - cos(2./3.*phi)*x)/r43;
+  return result;
 }
 
 
@@ -881,7 +870,18 @@ LSingularityFunction::gradient_list (const std::vector<Point<2> > &points,
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
-  Assert(false, ExcNotImplemented());
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<2>& p = points[i];
+      double x = p(0);
+      double y = p(1);
+      double phi = atan2(y,-x)+M_PI;
+      double r43 = pow(x*x+y*y,2./3.);
+
+      gradients[i][0] = 2./3.*(sin(2./3.*phi)*x + cos(2./3.*phi)*y)/r43;
+      gradients[i][1] = 2./3.*(sin(2./3.*phi)*y - cos(2./3.*phi)*x)/r43;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -894,7 +894,7 @@ SlitSingularityFunction::value (const Point<2>   &p,
   double x = p(0);
   double y = p(1);
 
-  double phi = atan2(x,-y)+M_PI;
+  double phi = atan2(x,y)+M_PI;
   double r2 = x*x+y*y;
 
   return pow(r2,.25) * sin(.5*phi);
@@ -914,7 +914,7 @@ SlitSingularityFunction::value_list (const std::vector<Point<2> > &points,
       double x = points[i](0);
       double y = points[i](1);
 
-      double phi = atan2(x,-y)+M_PI;
+      double phi = atan2(x,y)+M_PI;
       double r2 = x*x+y*y;
 
       values[i] = pow(r2,.25) * sin(.5*phi);
@@ -943,14 +943,20 @@ SlitSingularityFunction::laplacian_list (const std::vector<Point<2> > &points,
 }
 
 
-//TODO:[?] Implement derivatives
-
 Tensor<1,2>
-SlitSingularityFunction::gradient (const Point<2>   &/*p*/,
+SlitSingularityFunction::gradient (const Point<2>   &p,
 				   const unsigned int) const
 {
-  Assert(false, ExcNotImplemented());
-  return Tensor<1,2>();
+  double x = p(0);
+  double y = p(1);
+  double phi = atan2(x,y)+M_PI;
+  double r64 = pow(x*x+y*y,3./4.);
+  
+  
+  Tensor<1,2> result;
+  result[0] = 1./2.*(sin(1./2.*phi)*x + cos(1./2.*phi)*y)/r64;
+  result[1] = 1./2.*(sin(1./2.*phi)*y - cos(1./2.*phi)*x)/r64;
+  return result;
 }
 
 
@@ -961,7 +967,18 @@ SlitSingularityFunction::gradient_list (const std::vector<Point<2> > &points,
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
-  Assert(false, ExcNotImplemented());
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<2>& p = points[i];
+      double x = p(0);
+      double y = p(1);
+      double phi = atan2(x,y)+M_PI;
+      double r64 = pow(x*x+y*y,3./4.);
+
+      gradients[i][0] = 1./2.*(sin(1./2.*phi)*x + cos(1./2.*phi)*y)/r64;
+      gradients[i][1] = 1./2.*(sin(1./2.*phi)*y - cos(1./2.*phi)*x)/r64;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
