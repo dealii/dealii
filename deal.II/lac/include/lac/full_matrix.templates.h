@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -83,7 +83,7 @@ FullMatrix<number>::all_zero () const
   Assert (!this->empty(), ExcEmptyMatrix());
   
   const number* p = this->data();
-  const number* const e = this->data() + n_elements();
+  const number* const e = this->data() + this->n_elements();
   while (p!=e)
     if (*p++ != 0.0)
       return false;
