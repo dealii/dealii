@@ -216,11 +216,14 @@ template <int dim> class Triangulation;
  *   earlier than for past-the-end iterators an exception is raised.
  *
  *   @see Triangulation
- *   @see TriaDimensionInfo
+ *   @see TriaDimensionInfo<1>
+ *   @see TriaDimensionInfo<2>
+ *   @see TriaDimensionInfo<3>
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename Accessor>
-class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
+class TriaRawIterator : public bidirectional_iterator<Accessor,int>
+{
   public:
 				     /**
 				      * Declare the type of the Accessor for
