@@ -44,7 +44,7 @@ void gnuplot_output()
        ++refinement, triangulation.refine_global(1))
     {
       std::cout << "Refinement level: " << refinement << std::endl;
-      string filename_base="ball";
+      std::string filename_base="ball";
       filename_base += ('0'+refinement);
       
       for (unsigned int order=1; order<4; ++order)
@@ -52,10 +52,10 @@ void gnuplot_output()
 	  std::cout << "Order = " << order;
 	  
 	  const MappingQ<dim> mapping (order);
-	  string filename=filename_base+"_mapping_q";
+	  std::string filename=filename_base+"_mapping_q";
 	  filename += ('0'+order);
 	  filename += ".dat";
-	  ofstream gnuplot_file(filename.c_str());
+	  std::ofstream gnuplot_file(filename.c_str());
 
 	  std::cout << ".   Writing gnuplot file <"
 		    << filename << ">..." << std::endl;
@@ -137,7 +137,7 @@ void compute_pi_by_perimeter ()
   const QGauss4<dim-1> quadrature;
   for (unsigned int order=1; order<5; ++order)
     {
-      std::cout << "Order = " << order << endl;
+      std::cout << "Order = " << order << std::endl;
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball (triangulation);
   
