@@ -68,7 +68,7 @@ all: grid_test.check dof_test.check data_out.check \
      derivatives.check gradients.check \
      constraints.check mg.check mglocal.check \
      block_matrices.check second_derivatives.check \
-     derivative_approximation.check matrices-check \
+     derivative_approximation.check matrices.check \
      error_estimator.check \
      intergrid_constraints.check intergrid_map.check wave-test-3.check
 
