@@ -26,18 +26,18 @@
 /**
  * Tensor product of given polynomials.
  *
- * Given a vector of @p{n} one-dimensional polynomials @p{P1} to @p{Pn},
- * this class generates @p{n} to the power of @p{dim} polynomials of
- * the form @p{ Qijk(x,y,z) = Pi(x)Pj(y)Pk(z)}. If the base
+ * Given a vector of $n$ one-dimensional polynomials $P_1$ to $P_n$,
+ * this class generates $n$ to the power of @p{dim} polynomials of
+ * the form $Q_{ijk}(x,y,z) = P_i(x)P_j(y)P_k(z)$. If the base
  * polynomials are mutually orthogonal on the interval $[-1,1]$ or
- * $[0,d], then the tensor product polynomials are orthogonal on
+ * $[0,d]$, then the tensor product polynomials are orthogonal on
  * $[-1,1]^d$ or $[0,1]^d$, respectively.
  *
  * Indexing is as follows: the order of dim-dimensional polynomials
  * is x-coordinates running fastest, then y-coordinate, etc. The first
- * few polynomials are thus @p{P1(x)P1(y)}, @p{P2(x)P1(y)},
- * @p{P3(x)P1(y)}, ..., @p{P1(x)P2(y)}, @p{P2(x)P2(y)},
- * @p{P3(x)P2(y)}, ..., and likewise in 3d.
+ * few polynomials are thus $P_1(x)P_1(y), P_2(x)P_1(y),
+ * P_3(x)P_1(y), ..., P_1(x)P_2(y), P_2(x)P_2(y),
+ * P_3(x)P_2(y), ...$ and likewise in 3d.
  * 
  * @author Ralf Hartmann, Guido Kanschat, 2000, Wolfgang Bangerth 2003
  */
@@ -230,7 +230,7 @@ class TensorProductPolynomials
  * x-direction, @p{Py1}, @p{Py2}, ... in y-direction, and so on, this
  * class generates polynomials of the form @p{ Qijk(x,y,z) =
  * Pxi(x)Pyj(y)Pzk(z)}. If the base polynomials are mutually
- * orthogonal on the interval $[-1,1]$ or $[0,d], then the tensor
+ * orthogonal on the interval $[-1,1]$ or $[0,d]$, then the tensor
  * product polynomials are orthogonal on $[-1,1]^d$ or $[0,1]^d$,
  * respectively.
  *
