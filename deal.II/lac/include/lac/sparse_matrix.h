@@ -683,13 +683,19 @@ void SparseMatrix<number>::set (const unsigned int i,
 				const number value)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert ((cols->operator()(i,j) != SparsityPattern::invalid_entry) ||
+				   // it is allowed to set elements of
+				   // the matrix that are not part of
+				   // the sparsity pattern, if the
+				   // value to which we set it is zero
+  const unsigned int index = cols->operator()(i,j);
+  Assert ((index != SparsityPattern::invalid_entry) ||
 	  (value == 0.),
 	  ExcInvalidIndex(i,j));
 
-  if (value != 0.)
-    val[cols->operator()(i,j)] = value;
+  if (index != SparsityPattern::invalid_entry)
+    val[index] = value;
 };
+
 
 
 template <typename number>
@@ -697,13 +703,16 @@ inline
 void SparseMatrix<number>::add (const unsigned int i, const unsigned int j,
 				const number value) {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert ((cols->operator()(i,j) != SparsityPattern::invalid_entry) ||
+
+  const unsigned int index = cols->operator()(i,j);
+  Assert ((index != SparsityPattern::invalid_entry) ||
 	  (value == 0.),
 	  ExcInvalidIndex(i,j));
 
   if (value != 0.)
-    val[cols->operator()(i,j)] += value;
+    val[index] += value;
 };
+
 
 
 template <typename number>
