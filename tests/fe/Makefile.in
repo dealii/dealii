@@ -164,6 +164,20 @@ mapping.testcase: $(mapping-o-files) $(libraries)
 
 ############################################################
 
+mapping_c1-cc-files = mapping_c1.cc
+
+ifeq ($(debug-mode),on)
+mapping_c1-o-files = $(mapping_c1-cc-files:.cc=.go)
+else
+mapping_c1-o-files = $(mapping_c1-cc-files:.cc=.o)
+endif
+
+mapping_c1.testcase: $(mapping_c1-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g -o $@ $^
+
+############################################################
+
 internals-cc-files = internals.cc
 
 ifeq ($(debug-mode),on)
