@@ -22,7 +22,7 @@
 
 
 /**
- * Base class for all 1D polynomials. A pollynomial is represented in
+ * Base class for all 1D polynomials. A polynomial is represented in
  * this class by its coefficients, which are set through the
  * constructor or by derived classes. Evaluation of a polynomial
  * happens through the Horner scheme which provides both numerical
@@ -122,6 +122,8 @@ class Polynomial : public Subscriptor
  * value is 1 at the point @p{x=1/3}, and zero at the point @p{x=0},
  * @p{x=2/3}, and @p{x=1}.
  *
+ * The Lagrange polynomials are implemented up to degree 10.
+ *
  * @author Ralf Hartmann, 2000
  */
 class LagrangeEquidistant: public Polynomial<double>
@@ -171,7 +173,7 @@ class LagrangeEquidistant: public Polynomial<double>
  *
  * @author Guido Kanschat, 2000
  */
-//TODO: test this class. it has never been tested up to now
+//TODO: test this class Legendre, it has never been tested up to now
 template <typename number>
 class Legendre : public Polynomial<number>
 {
