@@ -187,16 +187,6 @@ void GridGenerator::hyper_ball (Triangulation<1> &,
 
 
 
-void
-GridGenerator::cylinder (Triangulation<2> &,
-			 const double,
-			 const double)
-{
-  Assert (false, ExcInternalError());  
-}
-
-
-
 void GridGenerator::cylinder (Triangulation<1> &,
 			      const double,
 			      const double)
