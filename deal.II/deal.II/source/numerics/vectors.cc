@@ -233,8 +233,6 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
   Assert(dofs_of_rep_points.size()==n_rep_points, ExcInternalError());
   Assert(dof_to_rep_index_table.size()==fe.total_dofs, ExcInternalError());
 
-  cout << "n_rep_points=" << n_rep_points << endl;
-
   vector<int>         dofs_on_cell (fe.total_dofs);
   vector<Point<dim> > support_points (fe.total_dofs);
 
