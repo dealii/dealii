@@ -379,7 +379,6 @@ void GridOut::write_xfig (const Triangulation<dim>&,
 
 #else
 
-//TODO:[GK] Write boundary faces
 //TODO:[GK] Obey parameters
 //TODO:[GK] Flip y-axis?
 template <int dim>
@@ -388,8 +387,10 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 			  const Mapping<dim>*       /*mapping*/)
 {
   const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
+  const unsigned int nf = GeometryInfo<dim>::faces_per_cell;
+  const unsigned int nvf = GeometryInfo<dim>::vertices_per_face;
 
-  				   // The following text was copied
+				   // The following text was copied
 				   // from an existing XFig file.
   out << "#FIG 3.2\nLandscape\nCenter\nInches" << std::endl
       << "A4\n100.00\nSingle" << std::endl
@@ -412,9 +413,18 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 					 // with solid black line thickness 1
 	  << " 0 1 0 ";
 					 // Fill color
+      if (xfig_flags.level_color)
+	out << cell->level() + 8;
+      else
+	out << cell->material_id() + 1;
       out << " 6 ";
 				       // Depth, unused, solid fill
-      out << 900-cell->level() << " 0 20 0.0 "
+      out << ' '
+	  << (xfig_flags.level_depth
+	      ? (900-cell->level())
+	      : (900+cell->material_id()))
+	  << " 0 "
+	  << xfig_flags.fill_style << " 0.0 "
 					 // some style parameters
 	  << " 0 0 -1 0 0 "
 					 // number of points
@@ -436,6 +446,49 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 	  out << std::endl;
 	}
 				       // Now write boundary edges
+      if (xfig_flags.draw_boundary)
+	for (unsigned int f=0;f<nf;++f)
+	  {
+	    typename Triangulation<dim>::face_iterator
+	      face = cell->face(f);
+	    const unsigned char bi = face->boundary_indicator();
+	    if (bi != 255)
+	      {
+						 // Code for polyline
+		out << "2 1 "
+						   // with solid line thickness 3
+		    << " 0 3 ";
+		out << (1 + (unsigned int) bi);
+						 // Fill color
+		out << " -1 ";
+						 // Depth, unused, no fill
+		out << (xfig_flags.level_depth
+			? (800-cell->level())
+			: 800+bi)	  
+		    << " 0 -1 0.0 "
+						   // some style parameters
+		    << " 0 0 -1 0 0 "
+						   // number of points
+		    << nvf << std::endl;
+		
+						 // For each point, write scaled
+						 // and shifted coordinates
+						 // multiplied by 1200
+						 // (dots/inch)
+		
+		for (unsigned int k=0;k<nvf;++k)
+		  {
+		    const Point<dim>& p = face->vertex(k % nv);
+		    for (unsigned int d=0;d<dim;++d)
+		      {
+			int val = (int)(1200 * xfig_flags.scaling(d) *
+					(p(d)-xfig_flags.offset(d)));
+			out << '\t' << val;
+		      }
+		    out << std::endl;
+		  } 
+	      }
+	  }
     }
 }
 
