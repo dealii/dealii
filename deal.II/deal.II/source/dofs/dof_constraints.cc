@@ -1243,22 +1243,19 @@ ConstraintMatrix::memory_consumption () const
 
 // explicit instantiations
 //
-// define a list of functions for vectors and matrices, respectively,
-// where the vector/matrix can be replaced using a preprocessor
-// variable VectorType/MatrixType. note that we cannot do so by using
-// a preprocessor function with one arg, since
-// #vector_functions(BlockVector<double>)# is not recognized as one
-// arg, and putting parentheses around the arg yields incorrect
-// syntax...
+// define a list of functions for vectors and matrices, respectively, where
+// the vector/matrix can be replaced using a preprocessor variable
+// VectorType/MatrixType. note that we need a space between "VectorType" and
+// ">" to disambiguate ">>" when VectorType trails in an angle bracket
 
 #define VECTOR_FUNCTIONS(VectorType) \
-  template void ConstraintMatrix::condense<VectorType>(const VectorType &uncondensed,\
+  template void ConstraintMatrix::condense<VectorType >(const VectorType &uncondensed,\
 					               VectorType       &condensed) const;\
-  template void ConstraintMatrix::condense<VectorType>(VectorType &vec) const;\
-  template void ConstraintMatrix::set_zero<VectorType>(VectorType &vec) const;\
-  template void ConstraintMatrix::distribute<VectorType>(const VectorType &condensed,\
+  template void ConstraintMatrix::condense<VectorType >(VectorType &vec) const;\
+  template void ConstraintMatrix::set_zero<VectorType >(VectorType &vec) const;\
+  template void ConstraintMatrix::distribute<VectorType >(const VectorType &condensed,\
 					                 VectorType       &uncondensed) const;\
-  template void ConstraintMatrix::distribute<VectorType>(VectorType &vec) const
+  template void ConstraintMatrix::distribute<VectorType >(VectorType &vec) const
 
 
 VECTOR_FUNCTIONS(Vector<float>);

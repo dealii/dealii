@@ -1155,12 +1155,16 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 // explicit instantiations
 template class KellyErrorEstimator<deal_II_dimension>;
 
-// instantiate the externally visible functions
+// instantiate the externally visible functions. define a list of functions
+// for vectors, where the vector/matrix can be replaced using a preprocessor
+// variable VectorType/MatrixType. note that we need a space between
+// "VectorType" and ">" to disambiguate ">>" when VectorType trails in an
+// angle bracket
 #define INSTANTIATE(InputVector) \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector> (const Mapping<deal_II_dimension>      &,    \
+estimate<InputVector > (const Mapping<deal_II_dimension>      &,    \
           const DoFHandler<deal_II_dimension>   &,    \
           const Quadrature<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
@@ -1173,7 +1177,7 @@ estimate<InputVector> (const Mapping<deal_II_dimension>      &,    \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector> (const DoFHandler<deal_II_dimension>   &,    \
+estimate<InputVector > (const DoFHandler<deal_II_dimension>   &,    \
           const Quadrature<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
@@ -1185,7 +1189,7 @@ estimate<InputVector> (const DoFHandler<deal_II_dimension>   &,    \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector> (const Mapping<deal_II_dimension>          &,    \
+estimate<InputVector > (const Mapping<deal_II_dimension>          &,    \
           const DoFHandler<deal_II_dimension>       &,    \
           const Quadrature<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
@@ -1198,7 +1202,7 @@ estimate<InputVector> (const Mapping<deal_II_dimension>          &,    \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector> (const DoFHandler<deal_II_dimension>       &,    \
+estimate<InputVector > (const DoFHandler<deal_II_dimension>       &,    \
           const Quadrature<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
