@@ -1925,7 +1925,7 @@ inline
 void
 TableBase<N,T>::clear ()
 {
-  Assert (size()[0]*size()[1] != 0,
+  Assert (n_elements() != 0,
           ExcMessage("Trying to fill an empty matrix."));
   std::fill_n (val, n_elements(), T());
 };
