@@ -68,7 +68,8 @@ endif
 all: grid_test.check dof_test.check data_out.check \
      fe_tables.check gradients.check \
      constraints.check mg.check mglocal.check wave-test-3.check \
-     block_matrices.check second_derivatives.check
+     block_matrices.check second_derivatives.check \
+     intergrid_constraints.check intergrid_map.check
 
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)
