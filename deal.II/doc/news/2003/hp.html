@@ -31,6 +31,20 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Changed:
+       Changed <code class="class">FE</code> to
+       <code class="class">FECollection</code> at several places and
+       also changed depending functions accordingly. Modified the
+       <code class="member">reserve_space</code> method of
+       <code class="class">hpDoFHandler</code> to work for 2D
+       DG-problems. In this context the 2D code for
+       <code class"member">pre_refinement_notification</code> was
+       added as well.
+       <br>
+       (Oliver Kayser-Herold 2003/12/11)
+       </p>
+
   <li> <p> 
        Changed: 
        Implemented a couple of small modifications to get a first 1D
@@ -39,16 +53,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <code class="class">RefinementListener</code>s, which allow
        other classes to be informed about Refinements. This is
        needed for the <code class="class">hpDoFHandler</code>, which
-       administrates the <code class"member">active_fe_indices</code>
+       administrates the <code class="member">active_fe_indices</code>
        in the <code class="class">hpDoFLevel</code>s. Once this
        was implemented, the other changes were straightforward. For
        1D, the only thing which had to be changed for hp was the
        <code class="member">reserve_space</code> method.
        Last but not least, for the hp-example the
-       <code class"member">add</code> method was added to the
-       <code class"class">FECollection</code>. It allows the user to
+       <code class="member">add</code> method was added to the
+       <code class="class">FECollection</code>. It allows the user to
        add new <code class="class">FiniteElements</code>s to the
-       the <code class"class">FECollection</code>.
+       the <code class="class">FECollection</code>.
        <br>
        (Oliver Kayser-Herold 2003/06/1)
        </p>
