@@ -900,7 +900,7 @@ namespace LaplaceSolver
   PrimalSolver<dim>::
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
-    return Solver<dim>::postprocess(postprocessor);
+    Solver<dim>::postprocess(postprocessor);
   };
 
 
@@ -2239,7 +2239,7 @@ namespace LaplaceSolver
   DualSolver<dim>::
   postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
   {
-    return Solver<dim>::postprocess(postprocessor);
+    Solver<dim>::postprocess(postprocessor);
   };
   
 
