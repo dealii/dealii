@@ -19,9 +19,14 @@
 #include <cmath>
 
 
+
+/* -------------------------- StraightBoundary --------------------- */
+
+
 template <int dim>
 Boundary<dim>::~Boundary ()
 {};
+
 
 
 template <int dim>
@@ -33,24 +38,41 @@ Boundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_it
 };
 
 
+
 template <int dim>
 void
-Boundary<dim>::get_intermediate_points_on_line (
-  const typename Triangulation<dim>::line_iterator &,
-  std::vector<Point<dim> > &) const
+Boundary<dim>::
+get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
+				 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
 
+
 template <int dim>
 void
-Boundary<dim>::get_intermediate_points_on_quad (
-  const typename Triangulation<dim>::quad_iterator &,
-  std::vector<Point<dim> > &) const
+Boundary<dim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
+				 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
+
+
+
+template <int dim>
+void
+Boundary<dim>::
+get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &,
+			  FaceVertexTangents                               &) const
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+
+/* -------------------------- StraightBoundary --------------------- */
 
 
 template <int dim>
@@ -77,7 +99,8 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 
 template <int dim>
 Point<dim>
-StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
+StraightBoundary<dim>::
+get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
 {
   return (quad->vertex(0) + quad->vertex(1) +
 	  quad->vertex(2) + quad->vertex(3) +
@@ -94,9 +117,9 @@ StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>:
 
 template <int dim>
 void
-StraightBoundary<dim>::get_intermediate_points_on_line (
-  const typename Triangulation<dim>::line_iterator &,
-  typename std::vector<Point<dim> > &) const
+StraightBoundary<dim>::
+get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
+				 typename std::vector<Point<dim> > &) const
 {
   Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
 }
@@ -104,11 +127,12 @@ StraightBoundary<dim>::get_intermediate_points_on_line (
 
 #else
 
+
 template <int dim>
 void
-StraightBoundary<dim>::get_intermediate_points_on_line (
-  const typename Triangulation<dim>::line_iterator &line,
-  typename std::vector<Point<dim> > &points) const
+StraightBoundary<dim>::
+get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
+				 typename std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -131,9 +155,9 @@ StraightBoundary<dim>::get_intermediate_points_on_line (
 
 template <int dim>
 void
-StraightBoundary<dim>::get_intermediate_points_on_quad (
-  const typename Triangulation<dim>::quad_iterator &,
-  typename std::vector<Point<dim> > &) const
+StraightBoundary<dim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
+				 typename std::vector<Point<dim> > &) const
 {
   Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
 }
@@ -142,9 +166,9 @@ StraightBoundary<dim>::get_intermediate_points_on_quad (
 
 template <int dim>
 void
-StraightBoundary<dim>::get_intermediate_points_on_quad (
-  const typename Triangulation<dim>::quad_iterator &quad,
-  typename std::vector<Point<dim> > &points) const
+StraightBoundary<dim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				 typename std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size(),
 		     m=static_cast<unsigned int>(sqrt(n));
@@ -169,6 +193,63 @@ StraightBoundary<dim>::get_intermediate_points_on_quad (
 		       x     * vertices[2]) * y;
     }
 }
+
+#endif
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+StraightBoundary<1>::
+get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
+			  FaceVertexTangents &) const
+{
+  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+};
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+template <>
+void
+StraightBoundary<2>::
+get_tangents_at_vertices (const Triangulation<2>::face_iterator &face,
+			  Boundary<2>::FaceVertexTangents &face_vertex_tangents) const
+{
+  const unsigned int dim=2;
+  const Tensor<1,dim> tangent = face->vertex(1) - face->vertex(0);
+  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
+    face_vertex_tangents.tangents[vertex][0] = tangent;
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+StraightBoundary<3>::
+get_tangents_at_vertices (const Triangulation<3>::face_iterator &face,
+			  Boundary<3>::FaceVertexTangents &face_vertex_tangents) const
+{
+  face_vertex_tangents.tangents[0][0] = face->vertex(1)-face->vertex(0);
+  face_vertex_tangents.tangents[0][1] = face->vertex(3)-face->vertex(0);
+  
+  face_vertex_tangents.tangents[1][0] = face->vertex(0)-face->vertex(1);
+  face_vertex_tangents.tangents[1][1] = face->vertex(2)-face->vertex(1);
+  
+  face_vertex_tangents.tangents[2][0] = face->vertex(1)-face->vertex(2);
+  face_vertex_tangents.tangents[2][1] = face->vertex(3)-face->vertex(2);
+  
+  face_vertex_tangents.tangents[3][0] = face->vertex(0)-face->vertex(3);
+  face_vertex_tangents.tangents[3][1] = face->vertex(2)-face->vertex(3);  
+};
 
 #endif
 

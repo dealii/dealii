@@ -76,6 +76,48 @@ template <int dim>
 class Boundary : public Subscriptor
 {
   public:
+
+				     /**
+				      * Structure keeping information
+				      * about the tangents at the
+				      * vertices of a face of a
+				      * cell. Thus, there are
+				      * @p{GeometryInfo<dim>::vertices_per_face}
+				      * data sets of @p{dim-1} tangent
+				      * vectors each, that define the
+				      * tangent space of the boundary
+				      * at a given vertex. Note that
+				      * the vectors stored in this
+				      * object does not require that
+				      * the tangent vectors actually
+				      * form an orthogonal basis (as
+				      * long as they form a basis,
+				      * i.e. are not degenerate), not
+				      * are they required to be normed
+				      * somehow.
+				      *
+				      * For obvious reasons, this
+				      * class is not useful in 1d.
+				      */
+    struct FaceVertexTangents 
+    {
+					 /**
+					  * Number of tangent vectors
+					  * that define the tangential
+					  * space. The value is equal
+					  * to @p{dim-1}, with a
+					  * non-sensical value for 1d.
+					  */
+	static const unsigned int n_tangents = (dim>1 ? dim-1 : static_cast<unsigned int>(-1));
+
+					 /**
+					  * Array of tangent vectors,
+					  * as described above.
+					  */
+	Tensor<1,dim> tangents[GeometryInfo<dim>::vertices_per_face][n_tangents];
+    };
+    
+	
 				     /**
 				      * Destructor. Does nothing here, but
 				      * needs to be declared to make it
@@ -183,6 +225,43 @@ class Boundary : public Subscriptor
 				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
+				      * Compute a basis of the tangent
+				      * space at each vertex of the
+				      * given face. It is not
+				      * necessary to compute
+				      * derivatives in any particular
+				      * direction at each vertex, as
+				      * long as the returned basis
+				      * actually spans a space of
+				      * dimension @p{dim-1}. Also, it
+				      * is not required that the
+				      * tangent vectors be normed
+				      * somehow.
+				      *
+				      * This function is
+				      * needed to compute data for C1
+				      * mappings. The default
+				      * implementation is to throw an
+				      * error, so you need not
+				      * overload this function in case
+				      * you don not intend to use C1
+				      * mappings.
+				      *
+				      * Note that when computing
+				      * tangents at a vertex where the
+				      * boundary is not
+				      * differentiable, you have to
+				      * make sure that you compute the
+				      * one-sided derivatives,
+				      * i.e. derivatives with respect
+				      * to the given face.
+				      */
+    virtual void
+    get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			      FaceVertexTangents &face_vertex_tangents) const;
+      
+			     
+				     /**
 				      * Exception.
 				      */
     DeclException0 (ExcPureVirtualFunctionCalled);
@@ -210,7 +289,8 @@ class Boundary : public Subscriptor
  *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 template <int dim>
-class StraightBoundary : public Boundary<dim> {
+class StraightBoundary : public Boundary<dim>
+{
   public:
 				     /**
 				      * Let the new point be the arithmetic
@@ -269,6 +349,19 @@ class StraightBoundary : public Boundary<dim> {
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
 				     typename std::vector<Point<dim> > &points) const;
 
+				     /**
+				      * Compute a basis of the tangent
+				      * space at each vertex of the
+				      * given face.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual void
+    get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			      typename Boundary<dim>::FaceVertexTangents &face_vertex_tangents) const;
 };
 
 
