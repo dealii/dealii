@@ -126,28 +126,6 @@ latex/deal_II_technical_reference.tex: latex/base.tex1 latex/lac.tex1 latex/deal
 
 
 #################################################################################
-##  targets for DOC++ generated HTML output    
-#################################################################################
-doc++: doc++/base/index.html doc++/lac/index.html doc++/dealII/index.html
-
-# generate one of the html-output files; this needs the respective
-# include file for DOC++
-#
-# delete the .doc++ files immediately again, since they are no more 
-# used and since this forces make to re-make the .html-file each time
-# we ask for it; the right way to do so would be to use dependencies,
-# but it is hard to compute them from the '%'-sign used in the rule
-doc++/%/index.html: %.doc++
-	cp $^ $(patsubst %/index.html,%,$@)
-	cd $(patsubst %/index.html,%,$@) ; $(PERL) -pi -e 's!: ../!: ../../!g;' $^
-	cd $(patsubst %/index.html,%,$@) ; $(DOCPP) -p -H -u -G -S -a $^
-	cd $(patsubst %/index.html,%,$@) ; rm $^
-	rm $^
-
-
-
-
-#################################################################################
 ##  administrativa
 #################################################################################
 clean:
