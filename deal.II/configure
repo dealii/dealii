@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.43 
+# From configure.in Revision: 1.45 
 
 
 
@@ -27,6 +27,9 @@
 
 
       
+
+
+
 
 
 
@@ -627,7 +630,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:631: checking host system type" >&5
+echo "configure:634: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -648,7 +651,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:652: checking target system type" >&5
+echo "configure:655: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -666,7 +669,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:670: checking build system type" >&5
+echo "configure:673: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -743,7 +746,7 @@ fi
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:747: checking for $ac_word" >&5
+echo "configure:750: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -773,7 +776,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:777: checking for $ac_word" >&5
+echo "configure:780: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -824,7 +827,7 @@ fi
       # Extract the first word of "cl", so it can be a program name with args.
 set dummy cl; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:828: checking for $ac_word" >&5
+echo "configure:831: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -856,7 +859,7 @@ fi
 fi
 
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works""... $ac_c" 1>&6
-echo "configure:860: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
+echo "configure:863: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
 
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -867,12 +870,12 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 cat > conftest.$ac_ext << EOF
 
-#line 871 "configure"
+#line 874 "configure"
 #include "confdefs.h"
 
 main(){return(0);}
 EOF
-if { (eval echo configure:876: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:879: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   ac_cv_prog_cc_works=yes
   # If we can't run a trivial program, we are probably using a cross compiler.
   if (./conftest; exit) 2>/dev/null; then
@@ -898,12 +901,12 @@ if test $ac_cv_prog_cc_works = no; then
   { echo "configure: error: installation or configuration problem: C compiler cannot create executables." 1>&2; exit 1; }
 fi
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler""... $ac_c" 1>&6
-echo "configure:902: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
+echo "configure:905: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
 echo "$ac_t""$ac_cv_prog_cc_cross" 1>&6
 cross_compiling=$ac_cv_prog_cc_cross
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:907: checking whether we are using GNU C" >&5
+echo "configure:910: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -912,7 +915,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:916: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:919: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -931,7 +934,7 @@ ac_test_CFLAGS="${CFLAGS+set}"
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS=
 echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:935: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:938: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -965,7 +968,7 @@ fi
 # Extract the first word of "$CC", so it can be a program name with args.
 set dummy $CC; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:969: checking for $ac_word" >&5
+echo "configure:972: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1005,7 +1008,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1009: checking for $ac_word" >&5
+echo "configure:1012: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1037,7 +1040,7 @@ test -n "$CXX" || CXX="gcc"
 
 
 echo $ac_n "checking whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) works""... $ac_c" 1>&6
-echo "configure:1041: checking whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) works" >&5
+echo "configure:1044: checking whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) works" >&5
 
 ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -1048,12 +1051,12 @@ cross_compiling=$ac_cv_prog_cxx_cross
 
 cat > conftest.$ac_ext << EOF
 
-#line 1052 "configure"
+#line 1055 "configure"
 #include "confdefs.h"
 
 int main(){return(0);}
 EOF
-if { (eval echo configure:1057: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1060: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   ac_cv_prog_cxx_works=yes
   # If we can't run a trivial program, we are probably using a cross compiler.
   if (./conftest; exit) 2>/dev/null; then
@@ -1079,12 +1082,12 @@ if test $ac_cv_prog_cxx_works = no; then
   { echo "configure: error: installation or configuration problem: C++ compiler cannot create executables." 1>&2; exit 1; }
 fi
 echo $ac_n "checking whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) is a cross-compiler""... $ac_c" 1>&6
-echo "configure:1083: checking whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) is a cross-compiler" >&5
+echo "configure:1086: checking whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) is a cross-compiler" >&5
 echo "$ac_t""$ac_cv_prog_cxx_cross" 1>&6
 cross_compiling=$ac_cv_prog_cxx_cross
 
 echo $ac_n "checking whether we are using GNU C++""... $ac_c" 1>&6
-echo "configure:1088: checking whether we are using GNU C++" >&5
+echo "configure:1091: checking whether we are using GNU C++" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gxx'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1093,7 +1096,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CXX-g++} -E conftest.C'; { (eval echo configure:1097: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CXX-g++} -E conftest.C'; { (eval echo configure:1100: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gxx=yes
 else
   ac_cv_prog_gxx=no
@@ -1112,7 +1115,7 @@ ac_test_CXXFLAGS="${CXXFLAGS+set}"
 ac_save_CXXFLAGS="$CXXFLAGS"
 CXXFLAGS=
 echo $ac_n "checking whether ${CXX-g++} accepts -g""... $ac_c" 1>&6
-echo "configure:1116: checking whether ${CXX-g++} accepts -g" >&5
+echo "configure:1119: checking whether ${CXX-g++} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cxx_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1146,7 +1149,7 @@ fi
 # Extract the first word of "$CXX", so it can be a program name with args.
 set dummy $CXX; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1150: checking for $ac_word" >&5
+echo "configure:1153: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_CXX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1178,7 +1181,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-if test $GXX = yes ; then
+if test "$GXX" = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
   case "$GXX_VERSION_STRING" in
@@ -1218,7 +1221,7 @@ fi
 
 
 
-if test $GXX = yes ; then
+if test "$GXX" = yes ; then
   CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
   CXXFLAGSG="$CXXFLAGS -DDEBUG -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
 
@@ -1263,20 +1266,14 @@ fi
 
 
 
-echo $ac_n "checking whether -ggdb works for long symbols""... $ac_c" 1>&6
-echo "configure:1268: checking whether -ggdb works for long symbols" >&5
-case "$target" in
-      alpha*-osf*)
-	CXXFLAGS="-ggdb $CXXFLAGSG"
-        ac_ext=C
-# CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
-ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-cross_compiling=$ac_cv_prog_cxx_cross
-
-	cat > conftest.$ac_ext <<EOF
-#line 1280 "configure"
+if test "$GXX" = yes ; then
+  echo $ac_n "checking whether -ggdb works for long symbols""... $ac_c" 1>&6
+echo "configure:1272: checking whether -ggdb works for long symbols" >&5
+  case "$target" in
+          alpha*-osf*)
+      	  CXXFLAGS="-ggdb $CXXFLAGSG"
+ 	  cat > conftest.$ac_ext <<EOF
+#line 1277 "configure"
 #include "confdefs.h"
 
 #include <string>
@@ -1290,37 +1287,40 @@ bool f(T& t1, const T* t2) {
   map<string,map<string,pair<string,string> > >::const_iterator i1=t2->begin();
   return (i1==i2);
 }
-	  
+	    
 int main() {
 
-		;
-	  
+		  ;
+	    
 ; return 0; }
 EOF
-if { (eval echo configure:1301: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1298: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
-            CXXFLAGSG="-ggdb $CXXFLAGSG"
-	    echo "$ac_t""yes" 1>&6
-	  
+              CXXFLAGSG="-ggdb $CXXFLAGSG"
+	      echo "$ac_t""yes" 1>&6
+	    
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
   
-            CXXFLAGSG="-gstabs $CXXFLAGSG"
-	    echo "$ac_t""no -- using -gstabs" 1>&6
-	  
+              CXXFLAGSG="-gstabs $CXXFLAGSG"
+	      echo "$ac_t""no -- using -gstabs" 1>&6
+	    
 fi
 rm -f conftest*
-	;;
+	  ;;
 
-            *)
-	echo "$ac_t""yes" 1>&6
-        CXXFLAGSG="-ggdb $CXXFLAGSG"
-	;;
-esac
+                    *)
+	  echo "$ac_t""yes" 1>&6
+          CXXFLAGSG="-ggdb $CXXFLAGSG"
+	  ;;
+  esac
 
+else
+    CXXFLAGSG="-g $CXXFLAGSG"
+fi
 
 
 
@@ -1477,7 +1477,7 @@ fi
 fi
 
 if test "x$F77" != "x" ; then
-  F77_VERSION_STRING=`($F77 -v 2>&1)`
+  F77_VERSION_STRING="`($F77 -v 2>&1)`"
   if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
         G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
     case "$G77_VERSION_STRING" in
@@ -1609,7 +1609,7 @@ fi
 
 
 
-if test $enablemultithreading = yes ; then
+if test "$enablemultithreading" = yes ; then
   
   echo $ac_n "checking for platform specific thread flags""... $ac_c" 1>&6
 echo "configure:1616: checking for platform specific thread flags" >&5
@@ -1711,10 +1711,10 @@ else
   withmultithreading=no
 fi
 
-if test $withmultithreading != no ; then
+if test "$withmultithreading" != no ; then
   echo $ac_n "checking for ACE""... $ac_c" 1>&6
 echo "configure:1717: checking for ACE" >&5
-  if test -d $withmultithreading ; then
+  if test -d "$withmultithreading" ; then
     echo "$ac_t""found" 1>&6
   else
     echo "$ac_t""not found" 1>&6
@@ -1731,10 +1731,10 @@ fi
 # Check whether --with-blas or --without-blas was given.
 if test "${with_blas+set}" = set; then
   withval="$with_blas"
-  if test $withval != no ; then
+  if test "$withval" != no ; then
     echo $ac_n "checking for BLAS""... $ac_c" 1>&6
 echo "configure:1737: checking for BLAS" >&5
-    if test -r $withval ; then
+    if test -r "$withval" ; then
       echo "$ac_t""found" 1>&6
     else
       echo "$ac_t""not found" 1>&6
@@ -1794,10 +1794,10 @@ fi
 # Check whether --with-lapack or --without-lapack was given.
 if test "${with_lapack+set}" = set; then
   withval="$with_lapack"
-  if test $withval != no ; then
+  if test "$withval" != no ; then
     echo $ac_n "checking for LAPACK""... $ac_c" 1>&6
 echo "configure:1800: checking for LAPACK" >&5
-    if test -r $withval ; then
+    if test -r "$withval" ; then
       echo "$ac_t""found" 1>&6
     else
       echo "$ac_t""not found" 1>&6
@@ -1879,7 +1879,7 @@ else
     fi
 fi
 
-if test $enablemultigrid = yes ; then
+if test "$enablemultigrid" = yes ; then
    echo "$ac_t""configuring multigrid" 1>&6
    cat >> confdefs.h <<\EOF
 #define ENABLE_MULTIGRID 1

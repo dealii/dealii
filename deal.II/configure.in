@@ -109,7 +109,7 @@ dnl    Find the right C++ compiler. This modifies the following
 dnl    variables: CXX, GXX, CXXFLAGS
 AC_PROG_CXX
 AC_PATH_PROG(CXX,$CXX)
-if test $GXX = yes ; then
+if test "$GXX" = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
   case "$GXX_VERSION_STRING" in
@@ -158,7 +158,7 @@ dnl CXXFLAGSO are the flags for optimized mode
 dnl CXXFLAGSG are the flags for debug mode
 dnl -------------------------------------------------------------
 
-if test $GXX = yes ; then
+if test "$GXX" = yes ; then
   CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
   CXXFLAGSG="$CXXFLAGS -DDEBUG -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
 
@@ -226,14 +226,16 @@ dnl assembler can handle these symbols by a rather perverse function with
 dnl many templates, and if the assembler can't handle them, then use
 dnl -gstabs instead. This reduces debugging possibilities, but no other
 dnl way is known at present.
-AC_MSG_CHECKING(whether -ggdb works for long symbols)
-case "$target" in
-   dnl On Alpha, use the special treatment
-   alpha*-osf*)
-	CXXFLAGS="-ggdb $CXXFLAGSG"
-        AC_LANG_CPLUSPLUS
-	AC_TRY_COMPILE(
-	  [
+dnl
+dnl For all compilers other than gcc, use -g instead and don't check.
+if test "$GXX" = yes ; then
+  AC_MSG_CHECKING(whether -ggdb works for long symbols)
+  case "$target" in
+     dnl On Alpha, use the special treatment
+     alpha*-osf*)
+      	  CXXFLAGS="-ggdb $CXXFLAGSG"
+ 	  AC_TRY_COMPILE(
+ 	    [
 #include <string>
 #include <map>
 
@@ -245,29 +247,33 @@ bool f(T& t1, const T* t2) {
   map<string,map<string,pair<string,string> > >::const_iterator i1=t2->begin();
   return (i1==i2);
 }
-	  ],
-	  [
-		;
-	  ],
-	  [
-            CXXFLAGSG="-ggdb $CXXFLAGSG"
-	    AC_MSG_RESULT(yes)
-	  ],
-	  [
-            CXXFLAGSG="-gstabs $CXXFLAGSG"
-	    AC_MSG_RESULT(no -- using -gstabs)
-	  ])
-	;;
+	    ],
+	    [
+		  ;
+	    ],
+	    [
+              CXXFLAGSG="-ggdb $CXXFLAGSG"
+	      AC_MSG_RESULT(yes)
+	    ],
+	    [
+              CXXFLAGSG="-gstabs $CXXFLAGSG"
+	      AC_MSG_RESULT(no -- using -gstabs)
+	    ])
+	  ;;
 
-   dnl For all other systems assume that -ggdb works (we can't make the test 
-   dnl above the default, as stabs are not the default debugging format on many
-   dnl systems, and we only want to use it where necessary
-   *)
-	AC_MSG_RESULT(yes)
-        CXXFLAGSG="-ggdb $CXXFLAGSG"
-	;;
-esac
+     dnl For all other systems assume that -ggdb works (we can't make the test 
+     dnl above the default, as stabs are not the default debugging format on many
+     dnl systems, and we only want to use it where necessary
+     *)
+	  AC_MSG_RESULT(yes)
+          CXXFLAGSG="-ggdb $CXXFLAGSG"
+	  ;;
+  esac
 
+else
+  dnl Non-gcc compilers use -g instead of -ggdb
+  CXXFLAGSG="-g $CXXFLAGSG"
+fi
 
 
 
@@ -430,7 +436,7 @@ dnl - _REENTRANT is a flag that is used in the standard UNIX
 dnl   headers to make reentrant functions (with suffix _r) declared
 dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
 dnl   error messages with this flag
-if test $enablemultithreading = yes ; then
+if test "$enablemultithreading" = yes ; then
   DEAL_II_GET_THREAD_FLAGS
   DEAL_II_THREAD_CPPFLAGS
 
@@ -448,9 +454,9 @@ AC_ARG_WITH(multithreading,
 [  --with-multithreading=DIR use DIR as path to the ACE library],
     withmultithreading=$withval,
     withmultithreading=no)
-if test $withmultithreading != no ; then
+if test "$withmultithreading" != no ; then
   AC_MSG_CHECKING(for ACE)
-  if test -d $withmultithreading ; then
+  if test -d "$withmultithreading" ; then
     AC_MSG_RESULT(found)
   else
     AC_MSG_RESULT(not found)
@@ -467,9 +473,9 @@ dnl   Consider this part experimental!
 dnl ------------------------------------------------------------
 AC_ARG_WITH(blas,
 [  --with-blas=LIB use the BLAS-library file LIB],
-  if test $withval != no ; then
+  if test "$withval" != no ; then
     AC_MSG_CHECKING(for BLAS)
-    if test -r $withval ; then
+    if test -r "$withval" ; then
       AC_MSG_RESULT(found)
     else
       AC_MSG_RESULT(not found)
@@ -486,9 +492,9 @@ AC_ARG_WITH(blas,
 
 AC_ARG_WITH(lapack,
 [  --with-lapack=LIB use the LAPACK-library file LIB],
-  if test $withval != no ; then
+  if test "$withval" != no ; then
     AC_MSG_CHECKING(for LAPACK)
-    if test -r $withval ; then
+    if test -r "$withval" ; then
       AC_MSG_RESULT(found)
     else
       AC_MSG_RESULT(not found)
@@ -515,7 +521,7 @@ AC_ARG_ENABLE(multigrid,
     else
       enablemultigrid=no ;
     fi)
-if test $enablemultigrid = yes ; then
+if test "$enablemultigrid" = yes ; then
    AC_MSG_RESULT(configuring multigrid)
    AC_DEFINE(ENABLE_MULTIGRID)
 fi
