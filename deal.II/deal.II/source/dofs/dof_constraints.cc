@@ -874,16 +874,18 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 
   const unsigned int n_blocks = sparsity.n_block_rows();
   
-				   // store for each index whether it
-				   // must be distributed or not. If entry
-				   // is -1, no distribution is necessary.
-				   // otherwise, the number states which
-				   // line in the constraint matrix handles
-				   // this index
-  std::vector<int> distribute (sparsity.n_rows(), -1);
+				   // store for each index whether it must be
+				   // distributed or not. If entry is
+				   // deal_II_numbers::invalid_unsigned_int,
+				   // no distribution is necessary.
+				   // otherwise, the number states which line
+				   // in the constraint matrix handles this
+				   // index
+  std::vector<unsigned int> distribute (sparsity.n_rows(),
+                                        deal_II_numbers::invalid_unsigned_int);
   
   for (unsigned int c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = static_cast<signed int>(c);
+    distribute[lines[c].line] = c;
 
   const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
@@ -894,7 +896,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	block_index = index_mapping.global_to_local(row);
       const unsigned int block_row = block_index.first;
       
-      if (distribute[row] == -1)
+      if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
 					 // whether this column must
@@ -921,7 +923,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                   const unsigned int global_col
                     = index_mapping.local_to_global(block_col, entry->column());
                   
-                  if (distribute[global_col] != -1)
+                  if (distribute[global_col] != deal_II_numbers::invalid_unsigned_int)
                                                      // distribute entry at regular
                                                      // row @p{row} and irregular column
                                                      // global_col
@@ -955,7 +957,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                   const unsigned int global_col
                     = index_mapping.local_to_global (block_col, entry->column());
                   
-                  if (distribute[global_col] == -1)
+                  if (distribute[global_col] == deal_II_numbers::invalid_unsigned_int)
                                                      // distribute entry at irregular
                                                      // row @p{row} and regular column
                                                      // global_col.
@@ -998,13 +1000,15 @@ void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
 
   const unsigned int n_blocks = sparsity.n_block_rows();
   
-				   // store for each index whether it
-				   // must be distributed or not. If entry
-				   // is -1, no distribution is necessary.
-				   // otherwise, the number states which
-				   // line in the constraint matrix handles
-				   // this index
-  std::vector<int> distribute (sparsity.n_rows(), -1);
+				   // store for each index whether it must be
+				   // distributed or not. If entry is
+				   // deal_II_numbers::invalid_unsigned_int,
+				   // no distribution is necessary.
+				   // otherwise, the number states which line
+				   // in the constraint matrix handles this
+				   // index
+  std::vector<unsigned int> distribute (sparsity.n_rows(),
+                                        deal_II_numbers::invalid_unsigned_int);
   
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -1019,7 +1023,7 @@ void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
       const unsigned int block_row = block_index.first;
       const unsigned int local_row = block_index.second;
       
-      if (distribute[row] == -1)
+      if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
 					 // regular line. loop over
 					 // all columns and see
 					 // whether this column must
@@ -1056,7 +1060,7 @@ void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
 		    = index_mapping.local_to_global(block_col,
 						    block_sparsity.column_number(local_row,j));
 		    
-		  if (distribute[global_col] != -1)
+		  if (distribute[global_col] != deal_II_numbers::invalid_unsigned_int)
 						     // distribute entry at regular
 						     // row @p{row} and irregular column
 						     // global_col
@@ -1088,7 +1092,7 @@ void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
 		    = index_mapping.local_to_global (block_col,
 						     block_sparsity.column_number(local_row,j));
 		    
-		  if (distribute[global_col] == -1)
+		  if (distribute[global_col] == deal_II_numbers::invalid_unsigned_int)
 						     // distribute entry at irregular
 						     // row @p{row} and regular column
 						     // global_col.
