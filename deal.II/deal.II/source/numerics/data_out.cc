@@ -237,7 +237,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions)
 	    {
 	      const double value = (*cell_data[dataset].data)(cell_number);
 	      for (unsigned int q=0; q<n_q_points; ++q)
-		patch->data(dataset,q) = value;
+		patch->data(dataset+dof_data.size()*n_components,q) = value;
 	    };
 	};
     };
