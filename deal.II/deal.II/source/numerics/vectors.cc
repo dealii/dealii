@@ -71,16 +71,71 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 
 
 
+void VectorTools<1>::project (const DoFHandler<1>    &,
+			      const ConstraintMatrix &,
+			      const FiniteElement<1> &,
+			      const Quadrature<1>    &,
+			      const Quadrature<0>    &,
+			      const Boundary<1>      &,
+			      const Function<1>      &,
+			      const bool              ,
+			      dVector                &) {
+				   // this function should easily be implemented
+				   // using the template below. However some
+				   // changes have to be made since faces don't
+				   // exist in 1D. Maybe integrate the creation of
+				   // zero boundary values into the
+				   // project_boundary_values function?
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
 template <int dim>
 void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
-				  const ConstraintMatrix   &constraints,
-				  const FiniteElement<dim> &fe,
-				  const Quadrature<dim>    &q,
-				  const Boundary<dim>      &boundary,
-				  const Function<dim>      &function,
-				  dVector                  &vec) {
-  vec.reinit (dof.n_dofs());
+				const ConstraintMatrix   &constraints,
+				const FiniteElement<dim> &fe,
+				const Quadrature<dim>    &q,
+				const Quadrature<dim-1>  &q_boundary,
+				const Boundary<dim>      &boundary,
+				const Function<dim>      &function,
+				const bool                has_zero_boundary,
+				dVector                  &vec) {
+  				   // make up boundary values
+  map<int,double> boundary_values;
+
+  if (has_zero_boundary == false) 
+    {
+				       // set up a list of boundary functions for
+				       // the different boundary parts. We want the
+				       // #function# to hold on all parts of the
+				       // boundary
+      FunctionMap boundary_functions;
+      for (unsigned char c=0; c<255; ++c)
+	boundary_functions[c] = &function;
+      project_boundary_values (dof, boundary_functions, fe, q_boundary,
+			       boundary, boundary_values);
+    }
+  else
+				     // no need to project boundary values
+    {
+      DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+					    endf = dof.end_face();
+      vector<int> face_dof_indices (fe.dofs_per_face);
+      for (; face!=endf; ++face)
+	{
+	  face->get_dof_indices (face_dof_indices);
+	  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+					     // enter zero boundary values
+					     // for all boundary nodes
+	    boundary_values[face_dof_indices[i]] = 0.;
+	};
+    };
   
+      
+				   // set up mass matrix and right hand side
+  vec.reinit (dof.n_dofs());
   dSMatrixStruct sparsity(dof.n_dofs(),
 			  dof.n_dofs(),
 			  dof.max_couplings_between_dofs());
@@ -93,9 +148,10 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 					  mass_matrix, function, tmp);
 
   constraints.condense (mass_matrix);
-  constraints.condense (tmp);
+  MatrixTools<dim>::apply_boundary_values (boundary_values,
+					   mass_matrix, vec, tmp);
 
-  int    max_iter  = 4000;
+  int    max_iter  = 1000;
   double tolerance = 1.e-16;
   Control                          control1(max_iter,tolerance);
   PrimitiveVectorMemory<dVector>   memory(tmp.size());
@@ -105,6 +161,103 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   cg (mass_matrix, vec, tmp);
 				   // distribute solution
   constraints.distribute (vec);
+};
+
+
+
+void
+VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
+					     const FunctionMap &,
+					     const FiniteElement<1> &,
+					     const Boundary<1> &,
+					     map<int,double>   &) {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
+template <int dim>
+void
+VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
+					       const FunctionMap     &dirichlet_bc,
+					       const FiniteElement<dim> &fe,
+					       const Boundary<dim>      &boundary,
+					       map<int,double>   &boundary_values) {
+  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+	  ExcInvalidBoundaryIndicator());
+				   // use two face iterators, since we need
+				   // a DoF-iterator for the dof indices, but
+				   // a Tria-iterator for the fe object
+  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+					endf = dof.end_face();
+  
+  FunctionMap::const_iterator function_ptr;
+
+				   // field to store the indices of dofs
+  vector<int>         face_dofs (fe.dofs_per_face);
+  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
+  vector<double>      dof_values (fe.dofs_per_face);
+	
+  for (; face!=endf; ++face)
+    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
+	dirichlet_bc.end()) 
+				       // face is subject to one of the
+				       // bc listed in #dirichlet_bc#
+      {
+					 // get indices, physical location and
+					 // boundary values of dofs on this
+					 // face
+	face->get_dof_indices (face_dofs);
+	fe.get_face_ansatz_points (face, boundary, dof_locations);
+	function_ptr->second->value_list (dof_locations, dof_values);
+
+					 // enter into list
+	for (unsigned int i=0; i<face_dofs.size(); ++i)
+	  boundary_values[face_dofs[i]] = dof_values[i];
+      };
+};
+
+
+
+template <int dim>
+void
+VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
+					   const FunctionMap        &boundary_functions,
+					   const FiniteElement<dim> &fe,
+					   const Quadrature<dim-1>  &q,
+					   const Boundary<dim>      &boundary,
+					   map<int,double>   &boundary_values) {
+  vector<int>    dof_to_boundary_mapping;
+  dof.map_dof_to_boundary_indices (dof_to_boundary_mapping);
+  
+				   // set up sparsity structure
+  dSMatrixStruct sparsity(dof.n_boundary_dofs(boundary_functions),
+			  dof.max_couplings_between_boundary_dofs());
+  dof.make_boundary_sparsity_pattern (boundary_functions, dof_to_boundary_mapping,
+				      sparsity);
+
+				   // note: for three or more dimensions, there
+				   // may be constrained nodes on the boundary
+				   // in this case the boundary mass matrix has
+				   // to be condensed and the solution is to
+				   // be distributed afterwards, which is not
+				   // yet implemented
+  if (dim<3)
+    sparsity.compress();
+  else
+    Assert (false, ExcNotImplemented());
+  
+
+				   // make mass matrix and right hand side
+  dSMatrix       mass_matrix(sparsity);
+  dVector        rhs(sparsity.n_rows());
+  
+
+  MatrixTools<dim>::create_boundary_mass_matrix (dof, fe, q, boundary,
+						 mass_matrix, boundary_functions,
+						 rhs, dof_to_boundary_mapping);
+  
 };
 
 

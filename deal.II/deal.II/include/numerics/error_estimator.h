@@ -153,7 +153,7 @@ class KellyErrorEstimator {
 				      *	for each boundary indicator, which is
 				      *	guaranteed by the #map# data type.
 				      */
-    typedef map<unsigned char,Function<dim>*> FunctionMap;
+    typedef map<unsigned char,const Function<dim>*> FunctionMap;
     
     void estimate_error (const DoFHandler<dim>    &dof,
 			 const Quadrature<dim-1>  &quadrature,

@@ -8,7 +8,7 @@
 
 #include <base/exceptions.h>
 #include <map>
-
+#include <set>
 
 template <int dim> class Triangulation;
 template <int dim> class DoFHandler;
@@ -80,6 +80,31 @@ class dSMatrix;
  * side.
  *
  *
+ * \subsection{Matrices on the boundary}
+ *
+ * The #create_boundary_mass_matrix# creates the matrix with entries
+ * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the union
+ * of boundary parts with indicators contained in a set passed to the
+ * function (i.e. if you want to set up the mass matrix for the parts of
+ * the boundary with indicators zero and 2, you pass the function a set
+ * of #unsigned char#s as parameter #boundary_parts# containing the elements
+ * zero and 2). The $\phi_i$ are the basis functions which have at least
+ * part of their support om $\Gamma$. The mapping between row and column
+ * indices in the mass matrix and the right hand side and the global degree
+ * of freedom numbers of the respective basis functions on the whole domain
+ * is returned as a vector of numbers which has the same size as the dimension
+ * of matrix and right hand side.
+ *
+ * Since in most cases we are not interested in the pure mass matrix on the
+ * boundary, but rather need it to compute the projection of a function to
+ * the boundary, no function is provided to only create the matrix.
+ *
+ * This function needs to get passed a matrix object to hold the resulting sparse
+ * matrix. This object is supposed to be initialized with a suitable sparsity
+ * pattern, which can be created using the
+ * #DoFHandler<>::make_boundary_sparsity_pattern# function.
+ *
+ *
  * \subsection{Right hand sides}
  *
  * In many cases, you will not only want to build the matrix, but also
@@ -102,6 +127,20 @@ class dSMatrix;
 template <int dim>
 class MatrixCreator {
   public:
+				     /**
+				      *	Declare a data type which denotes a
+				      *	mapping between a boundary indicator
+				      *	and the function denoting the boundary
+				      *	values on this part of the boundary.
+				      *	Only one boundary function may be given
+				      *	for each boundary indicator, which is
+				      *	guaranteed by the #map# data type.
+				      *	
+				      *	See the general documentation of this
+				      *	class for more detail.
+				      */
+    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+
 				     /**
 				      * Assemble the mass matrix. If no 
 				      * coefficient is given, it is assumed
@@ -134,6 +173,31 @@ class MatrixCreator {
 				    const Function<dim>      &rhs,
 				    dVector                  &rhs_vector,
 				    const Function<dim>      *a = 0);
+
+				     /**
+				      * Assemble the mass matrix and a right
+				      * hand side vector along the boundary.
+				      * If no 
+				      * coefficient is given, it is assumed
+				      * to be constant one.
+				      *
+				      * The matrix is assumed to already be
+				      * initialized with a suiting sparsity
+				      * pattern (the #DoFHandler# provides an
+				      * appropriate function).
+				      *
+				      * See the general doc of this class
+				      * for more information.
+				      */
+    static void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
+					     const FiniteElement<dim> &fe,
+					     const Quadrature<dim-1>  &q,
+					     const Boundary<dim>      &boundary,
+					     dSMatrix                 &matrix,
+					     const FunctionMap        &rhs,
+					     dVector                  &rhs_vector,
+					     vector<int>              &vec_to_dof_mapping,
+					     const Function<dim>      *a = 0);
 
 				     /**
 				      * Assemble the Laplace matrix. If no 
@@ -184,8 +248,8 @@ class MatrixCreator {
  * The #apply_boundar_values# function inserts boundary conditions of
  * into a system of equations.  To actually do this you have to specify
  * a list of degree of freedom indices along with the value this degree of
- * freedom shall assume. To see how to get such a list, see below in the
- * discussion of the #interpolate_boundary_values# function.
+ * freedom shall assume. To see how to get such a list, see the discussion
+ * of the #VectorTools::interpolate_boundary_values# function.
  *
  * The inclusion into the assemblage process is as follows: when the matrix and
  * vectors are set up, a list of nodes subject to dirichlet bc is made and
@@ -220,7 +284,7 @@ class MatrixCreator {
  * It it not clear whether the deletion of coupling between the boundary degree
  * of freedom and other dofs really forces the corresponding entry in the
  * solution vector to have the right value when using iterative solvers,
- * since their search directions may contains components in the direction
+ * since their search directions may contain components in the direction
  * of the boundary node. For this reason, we perform a very simple line
  * balancing by not setting the main diagonal entry to unity, but rather
  * to the value it had before deleting this line, or to the first nonzero
@@ -238,55 +302,12 @@ class MatrixCreator {
  * the correct value after solving again. This question is an open one as of
  * now and may be answered by future experience.
  *
- *
- * \subsection{Getting a list of boundary values}
- *
- * As discussed above, the #apply_boundary_values# function takes a list
- * of boundary nodes and their values. You can get such a list by interpolation
- * of a boundary function using the #interpolate_boundary_values# function.
- * To use it, you have to
- * specify a list of pairs of boundary indicators (of type #unsigned char#;
- * see the section in the documentation of the \Ref{Triangulation} class for more
- * details) and the according functions denoting the dirichlet boundary values
- * of the nodes on boundary faces with this boundary indicator.
- *
- * Usually, all other boundary conditions, such as inhomogeneous Neumann values
- * or mixed boundary conditions are handled in the weak formulation. No attempt
- * is made to include these into the process of assemblage therefore.
- *
- * Within this function, boundary values are interpolated, i.e. a node is given
- * the point value of the boundary function. In some cases, it may be necessary
- * to use the L2-projection of the boundary function or any other method. For
- * this purpose other functions exist in the #MatrixTools# library (or will
- * exist at least).
- *
- * You should be aware that the boundary function may be evaluated at nodes
- * on the interior of faces. These, however, need not be on the true
- * boundary, but rather are on the approximation of the boundary represented
- * by teh mapping of the unit cell to the real cell. Since this mapping will
- * in most cases not be the exact one at the face, the boundary function is
- * evaluated at points which are not on the boundary and you should make
- * sure that the returned values are reasonable in some sense anyway.
  * 
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class MatrixTools : public MatrixCreator<dim> {
   public:
-				     /**
-				      *	Declare a data type which denotes a
-				      *	mapping between a boundary indicator
-				      *	and the function denoting the boundary
-				      *	values on this part of the boundary.
-				      *	Only one boundary function may be given
-				      *	for each boundary indicator, which is
-				      *	guaranteed by the #map# data type.
-				      *	
-				      *	See the general documentation of this
-				      *	class for more detail.
-				      */
-    typedef map<unsigned char,Function<dim>*> FunctionMap;
-
 				     /**
 				      * Apply dirichlet boundary conditions
 				      * to the system matrix and vectors
@@ -298,27 +319,6 @@ class MatrixTools : public MatrixCreator<dim> {
 				       dVector               &solution,
 				       dVector               &right_hand_side);
 
-				     /**
-				      * Make up the list of node subject
-				      * to Dirichlet boundary conditions
-				      * and the values they are to be
-				      * assigned, by interpolation around
-				      * the boundary.
-				      *
-				      * See the general doc for more
-				      * information.
-				      */
-    static void interpolate_boundary_values (const DoFHandler<dim> &dof,
-					     const FunctionMap     &dirichlet_bc,
-					     const FiniteElement<dim> &fe,
-					     const Boundary<dim> &boundary,
-					     map<int,double>     &boundary_values);
-    
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidBoundaryIndicator);
 				     /**
 				      * Exception
 				      */

@@ -10,6 +10,7 @@
 #include <fe/fe.h>
 #include <lac/dsmatrix.h>
 #include <map>
+#include <set>
 #include <algorithm>
 
 
@@ -625,6 +626,68 @@ unsigned int DoFHandler<dim>::n_dofs () const {
 
 
 
+unsigned int DoFHandler<1>::n_boundary_dofs () const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+
+template <int dim>
+unsigned int DoFHandler<dim>::n_boundary_dofs () const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  
+  set<int> boundary_dofs;
+
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<int> dofs_on_face(dofs_per_face);
+  active_face_iterator face = begin_active_face (),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (face->at_boundary())
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  boundary_dofs.insert(dofs_on_face[i]);
+      };
+  return boundary_dofs.size();
+};    
+
+
+
+unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+  return 0;
+};
+
+
+template <int dim>
+unsigned int DoFHandler<dim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (boundary_indicators.find(255) == boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
+  
+  set<int> boundary_dofs;
+
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<int> dofs_on_face(dofs_per_face);
+  active_face_iterator face = begin_active_face (),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (boundary_indicators.find(face->boundary_indicator()) !=
+	boundary_indicators.end())
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  boundary_dofs.insert(dofs_on_face[i]);
+      };
+  return boundary_dofs.size();
+};    
+
+
+
 template <int dim>
 const Triangulation<dim> & DoFHandler<dim>::get_tria () const {
   return *tria;
@@ -1059,74 +1122,126 @@ void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const
 
 
 
-void DoFHandler<1>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
+template <int dim>
+void DoFHandler<dim>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (sparsity.n_rows() == n_dofs(),
+	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs()));
+  Assert (sparsity.n_cols() == n_dofs(),
+	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs()));
+
+  const unsigned int total_dofs = selected_fe->total_dofs;
+  vector<int> dofs_on_this_cell(total_dofs);
   active_cell_iterator cell = begin_active(),
 		       endc = end();
-
-				   // set up an array which dofs are used
-				   // on a specific cell
-  unsigned int *dofs_on_this_cell = new unsigned int[selected_fe->total_dofs];
-  
   for (; cell!=endc; ++cell) 
     {
-      unsigned int dof_number=0;
-
-				       // fill dof indices on vertices
-      for (unsigned int vertex=0; vertex<2; ++vertex)
-	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
-	  dofs_on_this_cell[dof_number++] = cell->vertex_dof_index (vertex,d);
-
-				       // fill dof indices on line
-      for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
-	dofs_on_this_cell[dof_number++] = cell->dof_index (d);
-
+      cell->get_dof_indices (dofs_on_this_cell);
 				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<selected_fe->total_dofs; ++i)
-	for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
+      for (unsigned int i=0; i<total_dofs; ++i)
+	for (unsigned int j=0; j<total_dofs; ++j)
 	  sparsity.add (dofs_on_this_cell[i],
 			dofs_on_this_cell[j]);
     };
-
-  delete[] dofs_on_this_cell;
 };
 
 
 
-void DoFHandler<2>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
-  active_cell_iterator cell = begin_active(),
-		       endc = end();
-
-				   // set up an array which dofs are used
-				   // on a specific cell
-  unsigned int      *dofs_on_this_cell = new unsigned int[selected_fe->total_dofs];
-
-  
-  for (; cell!=endc; ++cell) 
-    {
-      int dof_number=0;
-
-				       // fill dof indices on vertices
-      for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
-	for (unsigned int d=0; d<selected_fe->dofs_per_vertex; ++d)
-	  dofs_on_this_cell[dof_number++] = cell->vertex_dof_index (vertex,d);
-
-      for (unsigned int line=0; line<GeometryInfo<2>::faces_per_cell; ++line)
-	for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
-	  dofs_on_this_cell[dof_number++] = cell->line(line)->dof_index (d);
-      
-				       // fill dof indices on quad
-      for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
-	dofs_on_this_cell[dof_number++] = cell->dof_index (d);
-
-				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<selected_fe->total_dofs; ++i)
-	for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
-	  sparsity.add (dofs_on_this_cell[i],
-			dofs_on_this_cell[j]);
-    };
-  
-  delete[] dofs_on_this_cell;
+void DoFHandler<1>::make_boundary_sparsity_pattern (const vector<int> &,
+						    dSMatrixStruct &) const {
+    Assert (selected_fe != 0, ExcNoFESelected());
+    Assert (false, ExcInternalError());
 };
+
+
+
+template <int dim>
+void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int> &dof_to_boundary_mapping,
+						      dSMatrixStruct &sparsity) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (dof_to_boundary_mapping.size() == n_dofs(), ExcInternalError());
+  Assert (sparsity.n_rows() == n_boundary_dofs(),
+	  ExcDifferentDimensions (sparsity.n_rows(), n_boundary_dofs()));
+  Assert (sparsity.n_cols() == n_boundary_dofs(),
+	  ExcDifferentDimensions (sparsity.n_cols(), n_boundary_dofs()));
+  Assert (*max_element(dof_to_boundary_mapping.begin(),
+		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
+	  ExcInternalError());
+
+  const unsigned int total_dofs = selected_fe->dofs_per_face;
+  vector<int> dofs_on_this_face(total_dofs);
+  active_face_iterator face = begin_active_face(),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (face->at_boundary())
+      {
+	face->get_dof_indices (dofs_on_this_face);
+
+					 // make sure all dof indices have a
+					 // boundary index
+	Assert (*min_element(dofs_on_this_face.begin(),
+			     dofs_on_this_face.end()) >=0,
+		ExcInternalError());
+	
+					 // make sparsity pattern for this cell
+	for (unsigned int i=0; i<total_dofs; ++i)
+	  for (unsigned int j=0; j<total_dofs; ++j)
+	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
+			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
+      };
+};
+
+
+
+void DoFHandler<1>::make_boundary_sparsity_pattern (const FunctionMap &,
+						    const vector<int> &,
+						    dSMatrixStruct &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcInternalError());
+};
+
+
+
+template <int dim>
+void DoFHandler<dim>::make_boundary_sparsity_pattern (const FunctionMap &boundary_indicators,
+						      const vector<int> &dof_to_boundary_mapping,
+						      dSMatrixStruct &sparsity) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (dof_to_boundary_mapping.size() == n_dofs(), ExcInternalError());
+  Assert (boundary_indicators.find(255) == boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
+  Assert (sparsity.n_rows() == n_boundary_dofs(boundary_indicators),
+	  ExcDifferentDimensions (sparsity.n_rows(), n_boundary_dofs(boundary_indicators)));
+  Assert (sparsity.n_cols() == n_boundary_dofs(boundary_indicators),
+	  ExcDifferentDimensions (sparsity.n_cols(), n_boundary_dofs(boundary_indicators)));
+  Assert (*max_element(dof_to_boundary_mapping.begin(),
+		       dof_to_boundary_mapping.end()) == (signed int)sparsity.n_rows()-1,
+	  ExcInternalError());
+
+  const unsigned int total_dofs = selected_fe->dofs_per_face;
+  vector<int> dofs_on_this_face(total_dofs);
+  active_face_iterator face = begin_active_face(),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (boundary_indicators.find(face->boundary_indicator()) !=
+	boundary_indicators.end())
+      {
+	face->get_dof_indices (dofs_on_this_face);
+
+					 // make sure all dof indices have a
+					 // boundary index
+	Assert (*min_element(dofs_on_this_face.begin(),
+			     dofs_on_this_face.end()) >=0,
+		ExcInternalError());
+					 // make sparsity pattern for this cell
+	for (unsigned int i=0; i<total_dofs; ++i)
+	  for (unsigned int j=0; j<total_dofs; ++j)
+	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
+			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
+      };
+};
+
+
 
 
 
@@ -1406,6 +1521,22 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 
 
 
+unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcInternalError());
+  return 0;
+};
+
+
+
+unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  return 3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line;
+};
+
+
+
+
 unsigned int DoFHandler<1>::max_transfer_entries (const unsigned int max_level_diff) const {
   Assert (max_level_diff<2, ExcOnlyOnelevelTransferImplemented());
   switch (max_level_diff)
@@ -1477,6 +1608,81 @@ void DoFHandler<dim>::distribute_cell_to_dof_vector (const dVector &cell_data,
       Assert (touch_count[i]!=0, ExcInternalError());
       dof_data(i) /=  touch_count[i];
     };
+};
+
+
+
+void DoFHandler<1>::map_dof_to_boundary_indices (vector<int> &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void DoFHandler<dim>::map_dof_to_boundary_indices (vector<int> &mapping) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+
+  mapping.clear ();
+  mapping.insert (mapping.end(), n_dofs(), -1);
+
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<int> dofs_on_face(dofs_per_face);
+  int next_boundary_index = 0;
+  
+  active_face_iterator face = begin_active_face(),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (face->at_boundary()) 
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  if (mapping[dofs_on_face[i]] == -1)
+	    mapping[dofs_on_face[i]] = next_boundary_index++;
+      };
+
+  Assert (static_cast<unsigned int>(next_boundary_index) == n_boundary_dofs(),
+	  ExcInternalError());
+};
+
+
+
+void DoFHandler<1>::map_dof_to_boundary_indices (const FunctionMap &,
+						 vector<int> &) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void DoFHandler<dim>::map_dof_to_boundary_indices (const FunctionMap &boundary_indicators,
+						   vector<int> &mapping) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (boundary_indicators.find(255) == boundary_indicators.end(),
+	  ExcInvalidBoundaryIndicator());
+
+  mapping.clear ();
+  mapping.insert (mapping.end(), n_dofs(), -1);
+
+  const unsigned int dofs_per_face = selected_fe->dofs_per_face;
+  vector<int> dofs_on_face(dofs_per_face);
+  int next_boundary_index = 0;
+  
+  active_face_iterator face = begin_active_face(),
+		       endf = end_face();
+  for (; face!=endf; ++face)
+    if (boundary_indicators.find(face->boundary_indicator()) !=
+	boundary_indicators.end())
+      {
+	face->get_dof_indices (dofs_on_face);
+	for (unsigned int i=0; i<dofs_per_face; ++i)
+	  if (mapping[dofs_on_face[i]] == -1)
+	    mapping[dofs_on_face[i]] = next_boundary_index++;
+      };
+
+  Assert (static_cast<unsigned int>(next_boundary_index) == n_boundary_dofs(),
+	  ExcInternalError());
 };
 
 

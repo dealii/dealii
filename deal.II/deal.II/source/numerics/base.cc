@@ -3,6 +3,7 @@
 #include <numerics/assembler.h>
 #include <numerics/base.h>
 #include <numerics/matrices.h>
+#include <numerics/vectors.h>
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
@@ -118,7 +119,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // apply Dirichlet bc as described
 				   // in the docs
   map<int, double> boundary_value_list;
-  MatrixTools<dim>::interpolate_boundary_values (*dof_handler,
+  VectorTools<dim>::interpolate_boundary_values (*dof_handler,
 						 dirichlet_bc, fe, boundary,
 						 boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,

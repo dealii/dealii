@@ -5,6 +5,7 @@
 /*----------------------------   dof.h     ---------------------------*/
 
 #include <vector>
+#include <map>
 #include <base/exceptions.h>
 
 
@@ -25,8 +26,8 @@ template <int dim, class Accessor> class TriaIterator;
 template <int dim, class Accessor> class TriaActiveIterator;
 
 template <int dim> class Triangulation;
-
 template <int dim> class FiniteElementBase;
+template <int dim> class Function;
 
 class dVector;
 class dSMatrix;
@@ -447,6 +448,17 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     typedef typename DoFDimensionInfo<dim>::face_iterator face_iterator;
     typedef typename DoFDimensionInfo<dim>::active_face_iterator active_face_iterator;
 
+				     /**
+				      *	Declare a data type which denotes a
+				      *	mapping between a boundary indicator
+				      *	and the function denoting the boundary
+				      *	values on this part of the boundary.
+				      *	Only one boundary function may be given
+				      *	for each boundary indicator, which is
+				      *	guaranteed by the #map# data type.
+				      */
+    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+
     
 				     /**
 				      * Constructor. Take #tria# as the
@@ -531,6 +543,57 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     void make_sparsity_pattern (dSMatrixStruct &) const; 
 
+    				     /**
+				      * Write the sparsity structure of the
+				      * matrix composed of the basis functions
+				      * on the boundary into the
+				      * matrix structure. The sparsity
+				      * pattern is not compressed, since if
+				      * you want to call
+				      * #ConstraintMatrix::condense(1)#
+				      * afterwards, new entries have to be
+				      * added. However, if you want to call
+				      * #ConstraintMatrix::condense(1)#, you
+				      * have to compress the matrix yourself,
+				      * using #dSMatrixStruct::compress()#.
+				      *
+				      * Since this function is obviously useless
+				      * in one spatial dimension, it is not
+				      * implemented.
+				      */
+    void make_boundary_sparsity_pattern (const vector<int> &dof_to_boundary_mapping,
+					 dSMatrixStruct &) const; 
+
+				     /**
+				      * Write the sparsity structure of the
+				      * matrix composed of the basis functions
+				      * on the boundary into the
+				      * matrix structure. In contrast to the
+				      * previous function, only those parts
+				      * of the boundary are considered of which
+				      * the boundary indicator is listed in the
+				      * set of numbers passed to this function.
+				      *
+				      * In fact, rather than a #set# of boundary
+				      * indicators, a #map# needs to be passed,
+				      * since most of the functions handling with
+				      * boundary indicators take a mapping of
+				      * boundary indicators and the respective
+				      * boundary functions. The boundary function,
+				      * however, is ignored in this function.
+				      * If you have no functions at hand, but only
+				      * the boundary indicators, set the function
+				      * pointers to null pointers.
+				      *
+				      * Since this function is obviously useless
+				      * in one spatial dimension, it is not
+				      * implemented.
+				      */
+    void make_boundary_sparsity_pattern (const FunctionMap &boundary_indicators,
+					 const vector<int> &dof_to_boundary_mapping,
+					 dSMatrixStruct    &sparsity) const; 
+
+    
 				     /**
 				      * Make up the transfer matrix which
 				      * transforms the data vectors from one
@@ -597,6 +660,17 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     unsigned int max_couplings_between_dofs () const;
 
 				     /**
+				      * Return the number of degrees of freedom
+				      * located on the boundary another dof on
+				      * the boundary can couple with.
+				      *
+				      * The number is the same as for
+				      * #max_coupling_between_dofs# in one
+				      * dimension less.
+				      */
+    unsigned int max_couplings_between_boundary_dofs () const;
+    
+				     /**
 				      * Return the maximum number of entries
 				      * a row in a transfer matrix may contain
 				      * if any two cells of which the dofs are
@@ -625,6 +699,39 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     void distribute_cell_to_dof_vector (const dVector &cell_data,
 					dVector       &dof_data) const;
+
+				     /**
+				      * Create a mapping from degree of freedom
+				      * indices to the index of that degree
+				      * of freedom on the boundary. After this
+				      * operation, #mapping[dof]# gives the
+				      * index of the the degree of freedom with
+				      * global number #dof# in the list of
+				      * degrees of freedom on the boundary.
+				      * If the degree of freedom requested is
+				      * not on the boundary, the value of
+				      * #mapping[dof]# is #-1#. This function is
+				      * mainly used when setting up matrices and
+				      * vectors on the boundary from the ansatz
+				      * functions, which have global numbers,
+				      * while the matrices and vectors use
+				      * numbers of the ansatz functions local
+				      * to the boundary.
+				      *
+				      * Prior content of #mappin# is deleted.
+				      *
+				      * This function is not implemented for
+				      * one dimension.
+				      *
+				      * DOC FIXME: algorithm
+				      */
+    void map_dof_to_boundary_indices (vector<int> &mapping) const;
+
+				     /**
+				      * DOC FIXME: algorithm
+				      */
+    void map_dof_to_boundary_indices (const FunctionMap &boundary_indicators,
+				      vector<int> &mapping) const;
 
 				     /**
 				      *  @name Cell iterator functions
@@ -1002,6 +1109,23 @@ class DoFHandler : public DoFDimensionInfo<dim> {
     unsigned int n_dofs () const;
 
 				     /**
+				      * Return the number of degrees of freedom
+				      * located on the boundary.
+				      */
+    unsigned int n_boundary_dofs () const;
+
+    				     /**
+				      * Return the number of degrees of freedom
+				      * located on those parts of the boundary
+				      * which have a boundary indicator listed
+				      * in the given set. The reason that a
+				      * #map# rather than a #set# is used is the
+				      * same as descibed in the section on the
+				      * #make_boundary_sparsity_pattern# function.
+				      */
+    unsigned int n_boundary_dofs (const FunctionMap &boundary_indicators) const;
+
+				     /**
 				      * Return a constant reference to the
 				      * selected finite element object.
 				      */
@@ -1044,6 +1168,10 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * Exception
 				      */
     DeclException0 (ExcOnlyOnelevelTransferImplemented);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryIndicator);
 				     /**
 				      * Exception
 				      */

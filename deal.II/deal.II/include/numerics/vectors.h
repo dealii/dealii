@@ -7,6 +7,7 @@
 
 
 #include <base/exceptions.h>
+#include <map>
 
 template <int dim> class DoFHandler;
 template <int dim> class Function;
@@ -81,10 +82,69 @@ enum NormType {
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
  *   the projection.
  *
+ *   In order to get proper results, it is necessary to treat boundary
+ *   conditions right. This is done by $L_2$-projection of the trace of the
+ *   given function onto the finite element space restricted to the boundary
+ *   of the domain, then taking this information and using it to eliminate
+ *   the boundary nodes from the mass matrix of the whole domain, using the
+ *   #MatrixTools::apply_boundary_values# function. The projection of the
+ *   trace of the function to the boundary is done with the
+ *   #VectorTools::project_boundary_values# (see below) function. You may
+ *   specify a flag telling the projection that the function has zero boundary
+ *   values, in which case the $L_2$-projection onto the boundary is not
+ *   needed. If it is needed, the #VectorTools::project_boundary_values# is
+ *   called with a map of boundary functions of which all boundary indicators
+ *   from zero to 254 (255 is used for other purposes, see the #Triangulation#
+ *   class documentation) point to the function to be projected. The projection
+ *   to the boundary takes place using a second quadrature formula given to
+ *   the #project# function.
+ *
  *   The solution of the linear system is presently done using a simple CG
  *   method without preconditioning and without multigrid. This is clearly not
  *   too efficient, but sufficient in many cases and simple to implement. This
  *   detail may change in the future.
+ *
+ * \item Interpolation of boundary values:
+ *   The #MatrixTools::apply_boundary_values# function takes a list
+ *   of boundary nodes and their values. You can get such a list by interpolation
+ *   of a boundary function using the #interpolate_boundary_values# function.
+ *   To use it, you have to
+ *   specify a list of pairs of boundary indicators (of type #unsigned char#;
+ *   see the section in the documentation of the \Ref{Triangulation} class for more
+ *   details) and the according functions denoting the dirichlet boundary values
+ *   of the nodes on boundary faces with this boundary indicator.
+ *
+ *   Usually, all other boundary conditions, such as inhomogeneous Neumann values
+ *   or mixed boundary conditions are handled in the weak formulation. No attempt
+ *   is made to include these into the process of assemblage therefore.
+ *
+ *   Within this function, boundary values are interpolated, i.e. a node is given
+ *   the point value of the boundary function. In some cases, it may be necessary
+ *   to use the L2-projection of the boundary function or any other method. For
+ *   this purpose other functions refer to the #VectorTools::project_boundary_values#
+ *   function below.
+ *
+ *   You should be aware that the boundary function may be evaluated at nodes
+ *   on the interior of faces. These, however, need not be on the true
+ *   boundary, but rather are on the approximation of the boundary represented
+ *   by the mapping of the unit cell to the real cell. Since this mapping will
+ *   in most cases not be the exact one at the face, the boundary function is
+ *   evaluated at points which are not on the boundary and you should make
+ *   sure that the returned values are reasonable in some sense anyway.
+ *
+ * \item Projection of boundary values:
+ *   The #project_boundary_values# function acts similar to the
+ *   #interpolate_boundary_values# function, apart from the fact that it does
+ *   not get the nodal values of boundary nodes by interpolation but rather
+ *   through the $L_2$-projection of the trace of the function to the boundary.
+ *
+ *   The projection takes place on all boundary parts with boundary indicators
+ *   listed in the map of boundary functions. These boundary parts may or may
+ *   not be contiguous. For these boundary parts, the mass matrix is assembled
+ *   using the #MatrixTools::create_boundary_mass_matrix# function, as well as
+ *   the appropriate right hand side. Then the resulting system of equations is
+ *   solved using a simple CG method (without preconditioning), which is in most
+ *   cases sufficient for the present purpose.
  *
  * \item Computing errors:
  *   The function #integrate_difference# performs the calculation of the error
@@ -133,7 +193,7 @@ enum NormType {
  *   To get the {\it global} L_1 error, you have to sum up the entries in
  *   #difference#, e.g. using #dVector::l1_norm# function.
  *   For the global L_2 difference, you have to sum up the squares of the
- *   entries and take the root of the sum, e.g. using #dVector::l2_norm.
+ *   entries and take the root of the sum, e.g. using #dVector::l2_norm#.
  *   These two operations represent the
  *   l_1 and l_2 norms of the vectors, but you need not take the absolute
  *   value of each entry, since the cellwise norms are already positive.
@@ -149,6 +209,20 @@ enum NormType {
 template <int dim>
 class VectorTools {
   public:
+				     /**
+				      *	Declare a data type which denotes a
+				      *	mapping between a boundary indicator
+				      *	and the function denoting the boundary
+				      *	values on this part of the boundary.
+				      *	Only one boundary function may be given
+				      *	for each boundary indicator, which is
+				      *	guaranteed by the #map# data type.
+				      *	
+				      *	See the general documentation of this
+				      *	class for more detail.
+				      */
+    typedef map<unsigned char,const Function<dim>*> FunctionMap;
+
 				     /**
 				      * Compute the interpolation of
 				      * #function# at the ansatz points to
@@ -174,10 +248,43 @@ class VectorTools {
 			 const ConstraintMatrix   &constraints,
 			 const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &q,
+			 const Quadrature<dim-1>  &q_boundary,
 			 const Boundary<dim>      &boundary,
 			 const Function<dim>      &function,
+			 const bool                has_zero_boundary,
 			 dVector                  &vec);
 
+				     /**
+				      * Make up the list of node subject
+				      * to Dirichlet boundary conditions
+				      * and the values they are to be
+				      * assigned, by interpolation around
+				      * the boundary.
+				      *
+				      * See the general doc for more
+				      * information.
+				      */
+    static void interpolate_boundary_values (const DoFHandler<dim> &dof,
+					     const FunctionMap     &dirichlet_bc,
+					     const FiniteElement<dim> &fe,
+					     const Boundary<dim> &boundary,
+					     map<int,double>     &boundary_values);
+    
+				     /**
+				      * Project #function# to the boundary
+				      * of the domain, using the given quadrature
+				      * formula for the faces.
+				      *
+				      * See the general documentation of this
+				      * class for further information.
+				      */
+    static void project_boundary_values (const DoFHandler<dim>    &dof,
+					 const FunctionMap        &boundary_functions,
+					 const FiniteElement<dim> &fe,
+					 const Quadrature<dim-1>  &q,
+					 const Boundary<dim>      &boundary,
+					 map<int,double>          &boundary_values);
+    
     				     /**
 				      * Integrate the difference between
 				      * a finite element function and
@@ -205,6 +312,10 @@ class VectorTools {
 				      * Exception
 				      */
     DeclException0 (ExcInvalidFE);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryIndicator);
 };
 
 

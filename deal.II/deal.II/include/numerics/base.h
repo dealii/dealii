@@ -102,7 +102,7 @@ class ProblemBase {
 				      *	See the general documentation of this
 				      *	class for more detail.
 				      */
-    typedef map<unsigned char,Function<dim>*> FunctionMap;
+    typedef map<unsigned char,const Function<dim>*> FunctionMap;
 				     /**
 				      * Typdedef an iterator which assembles
 				      * matrices and vectors.

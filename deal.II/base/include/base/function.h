@@ -75,6 +75,7 @@
  *  Once again the warning: do not use the #time# variable for any other
  *  purpose than the intended one! This will inevitably lead to confusion.
  *
+ *
  *  @author Wolfgang Bangerth, 1998
  */
 template <int dim>

@@ -74,6 +74,20 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 
 
+template <int dim>
+void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
+						      const FiniteElement<dim> &fe,
+						      const Quadrature<dim-1>  &q,
+						      const Boundary<dim>      &boundary,
+						      dSMatrix                 &matrix,
+						      const FunctionMap        &rhs,
+						      dVector                  &rhs_vector,
+						      vector<int>              &vec_to_dof_mapping,
+						      const Function<dim>      *a) {};
+
+
+
+
 
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
@@ -233,59 +247,6 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 
 
 
-
-void
-MatrixTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
-					     const FunctionMap &,
-					     const FiniteElement<1> &,
-					     const Boundary<1> &,
-					     map<int,double>   &) {
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-
-template <int dim>
-void
-MatrixTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
-					       const FunctionMap     &dirichlet_bc,
-					       const FiniteElement<dim> &fe,
-					       const Boundary<dim>      &boundary,
-					       map<int,double>   &boundary_values) {
-  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
-	  ExcInvalidBoundaryIndicator());
-				   // use two face iterators, since we need
-				   // a DoF-iterator for the dof indices, but
-				   // a Tria-iterator for the fe object
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();
-  
-  FunctionMap::const_iterator function_ptr;
-
-				   // field to store the indices of dofs
-  vector<int>         face_dofs (fe.dofs_per_face);
-  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
-  vector<double>      dof_values (fe.dofs_per_face);
-	
-  for (; face!=endf; ++face)
-    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
-	dirichlet_bc.end()) 
-				       // face is subject to one of the
-				       // bc listed in #dirichlet_bc#
-      {
-					 // get indices, physical location and
-					 // boundary values of dofs on this
-					 // face
-	face->get_dof_indices (face_dofs);
-	fe.get_face_ansatz_points (face, boundary, dof_locations);
-	function_ptr->second->value_list (dof_locations, dof_values);
-
-					 // enter into list
-	for (unsigned int i=0; i<face_dofs.size(); ++i)
-	  boundary_values[face_dofs[i]] = dof_values[i];
-      };
-};
 
 
 
