@@ -160,7 +160,8 @@ class BlockMatrixArray : public Subscriptor
 				      * times, it will be listed with
 				      * the same number everytime.
 				      */
-    void print_latex (std::ostream& out) const;
+    template <class STREAM>
+    void print_latex (STREAM& out) const;
     
   protected:
 				     /**
@@ -518,9 +519,10 @@ BlockMatrixArray<MATRIX>::n_block_cols () const
 
 
 template <class MATRIX>
+template <class STREAM>
 inline
 void
-BlockMatrixArray<MATRIX>::print_latex (std::ostream& out) const
+BlockMatrixArray<MATRIX>::print_latex (STREAM& out) const
 {
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')
@@ -547,23 +549,24 @@ BlockMatrixArray<MATRIX>::print_latex (std::ostream& out) const
 #else
           std::ostrstream stream;
 #endif
-
+	  
 	  stream << matrix_number++;
-
+	  
 #ifndef HAVE_STD_STRINGSTREAM
           stream << std::ends;
 #endif
 	  x.first->second += stream.str();
 	}
-
+      
 #ifdef HAVE_STD_STRINGSTREAM
-          std::ostringstream stream;
+      std::ostringstream stream;
 #else
-          std::ostrstream stream;
+      std::ostrstream stream;
 #endif
-
+      if (array(m->row, m->col) != "" && m->prefix >= 0)
+	stream << "+";
       if (m->prefix != 1.)
-	stream << " " << m->prefix << 'x';
+	stream << m->prefix << 'x';
       stream << matrix_names.find(m->matrix)->second;
 //      stream << '(' << m->matrix << ')';
       if (m->transpose)
@@ -572,15 +575,17 @@ BlockMatrixArray<MATRIX>::print_latex (std::ostream& out) const
 #ifndef HAVE_STD_STRINGSTREAM
       stream << std::ends;
 #endif
-      
       array(m->row, m->col) += stream.str();
     }
   for (unsigned int i=0;i<n_block_rows();++i)
     for (unsigned int j=0;j<n_block_cols();++j)
-      out << array(i,j) << '\t'
-	   << ((j==n_block_cols()-1)
-	       ? "\\\\\n"
-	       : "&\t");
+      {
+	out << '\t' << array(i,j);
+	if (j==n_block_cols()-1)
+	  out << "\\\\" << std::endl;
+	else
+	  out << " &";
+      }
   out << "\\end{array}" << std::endl;
 }
 
