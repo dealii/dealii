@@ -5,6 +5,13 @@
 /*----------------------------   mg_smoother.h     ---------------------------*/
 
 
+#include <lac/forward-declarations.h>
+#include <basic/forward-declarations.h>
+#include <base/subscriptor.h>
+#include <vector>
+
+
+
 /**
  * Abstract base class for multigrid smoothers. It declares the interface
  * to smoothers and implements some functionality for setting the values
@@ -14,7 +21,7 @@
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGSmoother :  public Subcriptor 
+class MGSmoother :  public Subscriptor 
 {
   private:
 				     /**
@@ -40,6 +47,11 @@ class MGSmoother :  public Subcriptor
     MGSmoother (const MGDoFHandler<dim> &mg_dof);
 
 				     /**
+				      * Destructor, made virtual.
+				      */
+    virtual ~MGSmoother ();
+    
+				     /**
 				      * Smooth the vector #u# on the given
 				      * level. This function should set the
 				      * interior boundary values of u to zero
@@ -50,7 +62,7 @@ class MGSmoother :  public Subcriptor
 				      * things.
 				      */
     virtual void smooth (const unsigned int  level,
-			 vector<float>      &u) const = 0;
+			 Vector<float>      &u) const = 0;
 
 				     /**
 				      * Reset the values of the degrees of
@@ -59,7 +71,7 @@ class MGSmoother :  public Subcriptor
 				      * data vector #u#.
 				      */
     void set_zero_interior_boundary (const unsigned int  level,
-				     vector<float>      &u) const;
+				     Vector<float>      &u) const;
 
   private:
 				     /**
