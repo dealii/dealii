@@ -618,36 +618,51 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p> Deprecated: The functions <code class="member">Vector::scale</code>
+       and <code class="member">BlockVector::scale</code> are now deprecated
+       and will be removed in a future version. Use <code>operator*=</code> and
+       <code>operator/=</code> instead.
+       <br>
+       (WB 2003/05/31)
+       </p> 
+
+  <li> <p> New: <code class="class">Vector</code> and
+       <code class="class">BlockVector</code> now have <code>operator/=</code>
+       for scaling by a scalar.
+       <br>
+       (WB 2003/05/31)
+       </p> 
 
   <li> <p> New: <code class="class">PointerMatrix</code> now
-  has empty() function, which returns true if the pointer is null; otherwise
-  we call the pointer's empty() function.  This requires the class MATRIX
-  to have an empty() function.
-  <br>
-  (Brian Carnes 2003/05/22)
-  </p>
+       has <code>empty()</code> function, which returns true if the pointer is
+       null; otherwise we call the pointer's <code>empty()</code> function.
+       This requires the class MATRIX to have an <code>empty()</code>
+       function.
+       <br>
+       (Brian Carnes 2003/05/22)
+       </p>
 
   <li> <p> New: <code class="class">SparseLUDecomposition</code> now
-  has empty() function, which calls the inherited <code
-  class="class">SparseMatrix</code> empty() function.
-  <br>
-  (Brian Carnes 2003/05/22)
-  </p>
+       has <code>empty()</code> function, which calls the inherited <code
+       class="class">SparseMatrix</code> <code>empty()</code> function.
+       <br>
+       (Brian Carnes 2003/05/22)
+       </p>
 
   <li> <p> New: <code class="class">PreconditionPSOR</code> implements
-  interface to permuted SOR preconditioner function in <code
-  class="class">SparseMatrix</code>.
-  <br>
-  (GK 2003/05/12)
-  </p>
+       interface to permuted SOR preconditioner function in <code
+       class="class">SparseMatrix</code>.
+       <br>
+       (GK 2003/05/12)
+       </p>
 
   <li> <p> Improved: <code class="class">FullMatrix</code>::<code
-  class="member">fill</code> now copies the largest possible block,
-  whether the destination or source matrix is bigger. Additionally, an
-  offset inside the source matrix may be specified.
-  <br>
-  (GK 2003/03/31)
-  </p>
+       class="member">fill</code> now copies the largest possible block,
+       whether the destination or source matrix is bigger. Additionally, an
+       offset inside the source matrix may be specified.
+       <br>
+       (GK 2003/03/31)
+       </p>
 
   <li> <p>
        New/Changed: The <code class="class">SparseILU</code>, <code
