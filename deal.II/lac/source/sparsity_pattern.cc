@@ -31,6 +31,7 @@ SparsityPattern::SparsityPattern () :
 };
 
 
+
 SparsityPattern::SparsityPattern (const SparsityPattern &s) :
 		Subscriptor(),
 		max_dim(0),
@@ -47,6 +48,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s) :
 };
 
 
+
 SparsityPattern::SparsityPattern (const unsigned int m,
 				  const unsigned int n,
 				  const unsigned int max_per_row) 
@@ -57,6 +59,7 @@ SparsityPattern::SparsityPattern (const unsigned int m,
 {
   reinit (m,n,max_per_row);
 };
+
 
 
 SparsityPattern::SparsityPattern (const unsigned int          m,
@@ -71,6 +74,7 @@ SparsityPattern::SparsityPattern (const unsigned int          m,
 };
 
 
+
 SparsityPattern::SparsityPattern (const unsigned int n,
 				  const unsigned int max_per_row)
 		: max_dim(0),
@@ -82,6 +86,7 @@ SparsityPattern::SparsityPattern (const unsigned int n,
 };
 
 
+
 SparsityPattern::SparsityPattern (const unsigned int          m,
 				  const vector<unsigned int> &row_lengths) 
 		: max_dim(0),
@@ -91,6 +96,7 @@ SparsityPattern::SparsityPattern (const unsigned int          m,
 {
   reinit (m, m, row_lengths);
 };
+
 
 
 SparsityPattern::SparsityPattern (const SparsityPattern &original,
@@ -193,11 +199,13 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 };
 
 
+
 SparsityPattern::~SparsityPattern ()
 {
   if (rowstart != 0)  delete[] rowstart;
   if (colnums != 0)   delete[] colnums;
 }
+
 
 
 SparsityPattern &
@@ -217,6 +225,7 @@ SparsityPattern::operator = (const SparsityPattern &s)
 };
 
 
+
 void
 SparsityPattern::reinit (const unsigned int m,
 			 const unsigned int n,
@@ -227,6 +236,7 @@ SparsityPattern::reinit (const unsigned int m,
   const vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 };
+
 
 
 void
@@ -313,6 +323,7 @@ SparsityPattern::reinit (const unsigned int m,
 
   compressed = false;
 }
+
 
 
 void
@@ -430,8 +441,10 @@ SparsityPattern::compress ()
 };
 
 
+
 bool
-SparsityPattern::empty () const {
+SparsityPattern::empty () const
+{
 				   // let's try to be on the safe side of
 				   // life by using multiple possibilities in
 				   // the check for emptiness... (sorry for
@@ -455,6 +468,7 @@ SparsityPattern::empty () const {
 };
 
 
+
 unsigned int
 SparsityPattern::max_entries_per_row () const 
 {
@@ -474,6 +488,7 @@ SparsityPattern::max_entries_per_row () const
 
   return m;
 };
+
 
 
 unsigned int
@@ -520,6 +535,7 @@ SparsityPattern::operator () (const unsigned int i,
 }
 
 
+
 void
 SparsityPattern::add (const unsigned int i,
 		      const unsigned int j)
@@ -549,6 +565,7 @@ SparsityPattern::add (const unsigned int i,
 }
 
 
+
 void
 SparsityPattern::print_gnuplot (ostream &out) const
 {
@@ -563,10 +580,11 @@ SparsityPattern::print_gnuplot (ostream &out) const
 					 // is x-y, that is we have to
 					 // exchange the order of
 					 // output
-	out << static_cast<signed int>(colnums[j]) << " " << -i << endl;
+	out << colnums[j] << " " << -static_cast<signed int>(i) << endl;
 
   AssertThrow (out, ExcIO());
 }
+
 
 
 unsigned int
