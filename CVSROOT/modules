@@ -24,5 +24,5 @@
 # character to interpose another module into the current module.  This
 # can be useful for creating a module that consists of many directories
 # spread out over the entire source repository.
-newdeal &base &lac
-all -a newdeal projects
+newdeal &base &lac &deal.II &projects
+justdeal &base &lac &deal.II
