@@ -135,15 +135,32 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
       const unsigned int * const
 	original_row_end   = &original.colnums[original.rowstart[row+1]];
 
+				       // find pointers before and
+				       // after extra
+				       // off-diagonals. if at top or
+				       // bottom of matrix, then set
+				       // these pointers such that no
+				       // copying is necessary (see
+				       // the #copy# commands)
       const unsigned int * const
-	original_last_before_side_diagonals = lower_bound (original_row_start,
-							   original_row_end,
-							   row-extra_off_diagonals);
+	original_last_before_side_diagonals
+	= (row > extra_off_diagonals ?
+	   lower_bound (original_row_start,
+			original_row_end,
+			row-extra_off_diagonals) :
+	   original_row_start);
+      
       const unsigned int * const
-	original_first_after_side_diagonals = upper_bound (original_row_start,
-							   original_row_end,
-							   row+extra_off_diagonals);
+	original_first_after_side_diagonals
+	= (row < rows-extra_off_diagonals-1 ?
+	   upper_bound (original_row_start,
+			original_row_end,
+			row+extra_off_diagonals) :
+	   original_row_end);
 
+				       // find first free slot. the
+				       // first slot in each row is
+				       // the diagonal element
       unsigned int * next_free_slot = &colnums[rowstart[row]] + 1;
 
 				       // copy elements before side-diagonals
