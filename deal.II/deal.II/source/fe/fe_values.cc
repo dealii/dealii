@@ -64,7 +64,7 @@ template <int dim>
 void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 					     vector<double> &values) const
 {
-  Assert (fe.n_components == 1,
+  Assert (fe->n_components == 1,
 	  ExcWrongNoOfComponents());
   Assert (selected_dataset<shape_values.size(),
 	  ExcInvalidIndex (selected_dataset, shape_values.size()));
