@@ -76,7 +76,7 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_destroy (&barrier);
 #else
-    abort ();
+    std::abort ();
 #endif
   };
 
@@ -88,7 +88,7 @@ namespace Threads
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
     return pthread_barrier_wait (&barrier);
 #else
-    abort ();
+    std::abort ();
 #endif
   };
   
