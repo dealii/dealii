@@ -388,14 +388,6 @@ class SparseMatrix : public Subscriptor
 				      * square is returned, as defined
 				      * above by the scalar product.
 				      *
-				      * Note the order in which the
-				      * matrix appears. For
-				      * non-symmetric matrices there
-				      * is a difference whether the
-				      * matrix operates on the first
-				      * or on the second operand of
-				      * the scalar product.
-				      *
 				      * Obviously, the matrix needs to
 				      * be square for this operation.
 				      */
