@@ -43,6 +43,24 @@
  * which is a thin line relative to the extension of the picture of 300.
  * 
  *
+ * \subsection{Usage}
+ * Usage is simple: either you use the direct form
+ * \begin{verbatim}
+ *   ofstream output_file("some_filename");
+ *   GridOut::write_gnuplot (tria, output_file);
+ * \end{verbatim}
+ * if you know which format you want to have, or if you want the format to be
+ * a runtime parameter, you can write
+ * \begin{verbatim}
+ *   GridOut::OutputFormat grid_format =
+ *                   GridOut::parse_output_format(get_format_name_from_somewhere());
+ *   ofstream output_file("some_filename" + GridOut::default_suffix(output_format));
+ *   GridOut::write (tria, output_file, output_format);
+ * \end{verbatim}
+ * The function #get_output_format_names()# provides a list of possible names of
+ * output formats in a string that is understandable by the #ParameterHandler# class.
+ *
+ *
  * @author Wolfgang Bangerth, 1999; postscript format based on an implementation by Stefan Nauber, 1999
  */
 class GridOut 
