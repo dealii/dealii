@@ -237,6 +237,7 @@ foreach $name (sort keys %testcase) {
     $test_compiler =~ s/.*\+//g;
     $compiler_table{"gcc295"} = "gcc 2.95";
     $compiler_table{"gcc30"} = "gcc 3.0";
+    $compiler_table{"icc50"} = "Intel ICC 5.0";
     if (defined $compiler_table{$test_compiler} ) {
 	$test_compiler = $compiler_table{$test_compiler};
     }
