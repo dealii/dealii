@@ -375,8 +375,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // probably never see a difference
 				   // although they are totally
 				   // unrelated.
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);

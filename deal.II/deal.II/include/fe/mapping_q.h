@@ -82,7 +82,7 @@ class MappingQ : public MappingQ1<dim>
     virtual void
     transform_covariant (std::vector<Tensor<1,dim> >       &dst,
 			 const std::vector<Tensor<1,dim> > &src,
-			 const Mapping<dim>::InternalDataBase &mapping_data,
+			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
 				     /**
@@ -92,7 +92,7 @@ class MappingQ : public MappingQ1<dim>
     virtual void
     transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 			     const std::vector<Tensor<1,dim> > &src,
-			     const Mapping<dim>::InternalDataBase &mapping_data,
+			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
 				     /**
@@ -102,7 +102,7 @@ class MappingQ : public MappingQ1<dim>
     virtual void
     transform_covariant (std::vector<Point<dim> >       &dst,
 			 const std::vector<Point<dim> > &src,
-			 const Mapping<dim>::InternalDataBase &mapping_data,
+			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
 				     /**
@@ -112,7 +112,7 @@ class MappingQ : public MappingQ1<dim>
     virtual void
     transform_contravariant (std::vector<Point<dim> >       &dst,
 			     const std::vector<Point<dim> > &src,
-			     const Mapping<dim>::InternalDataBase &mapping_data,
+			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
   protected:
@@ -123,7 +123,7 @@ class MappingQ : public MappingQ1<dim>
     virtual void
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase       &mapping_data,
+		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    std::vector<Point<dim> >             &quadrature_points,
 		    std::vector<double>                  &JxW_values) const ;
 
@@ -198,7 +198,7 @@ class MappingQ : public MappingQ1<dim>
 					  * On interior cells
 					  * @p{MappingQ1} is used.
 					  */
-	MappingQ1<dim>::InternalData mapping_q1_data;
+	typename MappingQ1<dim>::InternalData mapping_q1_data;
     };
 
 				     /**
@@ -261,7 +261,8 @@ class MappingQ : public MappingQ1<dim>
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
@@ -269,7 +270,8 @@ class MappingQ : public MappingQ1<dim>
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
@@ -277,16 +279,18 @@ class MappingQ : public MappingQ1<dim>
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
-		       const Quadrature<dim-1>& quadrature) const;
+		      const Quadrature<dim-1>& quadrature) const;
     
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
 				      */
-    virtual void compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-					 MappingQ1<dim>::InternalData &data) const;
+    virtual void
+    compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
+			    typename MappingQ1<dim>::InternalData &data) const;
 
 				     /**
 				      * This function is needed by the
@@ -300,7 +304,8 @@ class MappingQ : public MappingQ1<dim>
 				      * @p{degree>=4} and MappingQ<2>
 				      * this vector is computed.
 				      */
-    void set_laplace_on_quad_vector(std::vector<std::vector<double> > &loqvs) const;
+    void
+    set_laplace_on_quad_vector(std::vector<std::vector<double> > &loqvs) const;
     
 				     /**
 				      * This function is needed by the

@@ -502,8 +502,8 @@ void ElasticProblem<dim>::assemble_system ()
 
 				   // Now we can begin with the loop
 				   // over all cells:
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix.clear ();

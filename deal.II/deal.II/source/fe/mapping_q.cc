@@ -30,7 +30,8 @@ const bool MappingQ<dim>::use_mapping_q_on_all_cells;
 
 
 template<int dim>
-MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions):
+MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
+		:
 		MappingQ1<dim>::InternalData(n_shape_functions),
 		use_mapping_q1_on_current_cell(false),
 		mapping_q1_data(1 << dim)
@@ -145,7 +146,7 @@ MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 template<int dim>
 void
 MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-				       MappingQ1<dim>::InternalData &data) const
+				       typename MappingQ1<dim>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
   std::vector<double> values;
@@ -185,7 +186,7 @@ MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_poin
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingQ<dim>::get_data (const UpdateFlags update_flags,
 			 const Quadrature<dim> &quadrature) const
 {
@@ -201,7 +202,7 @@ MappingQ<dim>::get_data (const UpdateFlags update_flags,
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
 			      const Quadrature<dim-1>& quadrature) const
 {
@@ -219,7 +220,7 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
 				 const Quadrature<dim-1>& quadrature) const
 {
@@ -261,7 +262,7 @@ MappingQ<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &ce
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
-  MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
@@ -313,7 +314,7 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
-  MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
@@ -369,7 +370,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
-  MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
@@ -1099,13 +1100,13 @@ template <int dim>
 void
 MappingQ<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &dst,
 				    const std::vector<Tensor<1,dim> > &src,
-				    const Mapping<dim>::InternalDataBase &mapping_data,
+				    const typename Mapping<dim>::InternalDataBase &mapping_data,
 				    const unsigned int src_offset) const
 {
-  const MappingQ1<dim>::InternalData *q1_data_ptr =
-    dynamic_cast<const MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
+    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data_ptr!=0, ExcInternalError());
-  const MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
+  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
 
   if (q1_data.is_mapping_q1_data)
     covariant_transformation(dst, src, q1_data, src_offset);
@@ -1127,13 +1128,13 @@ template <int dim>
 void
 MappingQ<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
 				    const std::vector<Point<dim> > &src,
-				    const Mapping<dim>::InternalDataBase &mapping_data,
+				    const typename Mapping<dim>::InternalDataBase &mapping_data,
 				    const unsigned int src_offset) const
 {
-  const MappingQ1<dim>::InternalData *q1_data_ptr =
-    dynamic_cast<const MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
+    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data_ptr!=0, ExcInternalError());
-  const MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
+  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
 
   if (q1_data.is_mapping_q1_data)
     covariant_transformation(dst, src, q1_data, src_offset);
@@ -1155,13 +1156,13 @@ template <int dim>
 void
 MappingQ<dim>::transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 					const std::vector<Tensor<1,dim> > &src,
-					const Mapping<dim>::InternalDataBase &mapping_data,
+					const typename Mapping<dim>::InternalDataBase &mapping_data,
 					const unsigned int src_offset) const
 {
-  const MappingQ1<dim>::InternalData *q1_data_ptr =
-    dynamic_cast<const MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
+    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data_ptr!=0, ExcInternalError());
-  const MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
+  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
 
   if (q1_data.is_mapping_q1_data)
     contravariant_transformation(dst, src, q1_data, src_offset);
@@ -1183,13 +1184,13 @@ template <int dim>
 void
 MappingQ<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
 					const std::vector<Point<dim> > &src,
-					const Mapping<dim>::InternalDataBase &mapping_data,
+					const typename Mapping<dim>::InternalDataBase &mapping_data,
 					const unsigned int src_offset) const
 {
-  const MappingQ1<dim>::InternalData *q1_data_ptr =
-    dynamic_cast<const MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
+    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
   Assert(q1_data_ptr!=0, ExcInternalError());
-  const MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
+  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
 
   if (q1_data.is_mapping_q1_data)
     contravariant_transformation(dst, src, q1_data, src_offset);
@@ -1225,7 +1226,7 @@ Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
 					     || cell->has_boundary_lines());
 
-  MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim>::InternalData *p_data=0;
   if (mdata->use_mapping_q1_on_current_cell)
     p_data=&mdata->mapping_q1_data;
   else
@@ -1235,6 +1236,7 @@ Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
   
   return transform_unit_to_real_cell_internal(*p_data);
 }
+
 
 
 template <int dim>
@@ -1264,7 +1266,7 @@ Point<dim> MappingQ<dim>::transform_real_to_unit_cell (
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
 					     || cell->has_boundary_lines());
 
-  MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim>::InternalData *p_data=0;
   if (mdata->use_mapping_q1_on_current_cell)
     p_data=&mdata->mapping_q1_data;
   else

@@ -62,7 +62,7 @@ MappingCartesian<dim>::update_each (const UpdateFlags in) const
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_data (const UpdateFlags      flags,
 				 const Quadrature<dim> &q) const
 {
@@ -72,8 +72,9 @@ MappingCartesian<dim>::get_data (const UpdateFlags      flags,
 }
 
 
+
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_face_data (const UpdateFlags,
 				      const Quadrature<dim-1>& quadrature) const
 {
@@ -85,7 +86,7 @@ MappingCartesian<dim>::get_face_data (const UpdateFlags,
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_subface_data (const UpdateFlags,
 					 const Quadrature<dim-1> &quadrature) const
 {
@@ -413,9 +414,9 @@ MappingCartesian<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator 
 template <int dim>
 void
 MappingCartesian<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-				     const std::vector<Tensor<1,dim> > &src,
-				     const Mapping<dim>::InternalDataBase &mapping_data,
-				     const unsigned int src_offset) const
+					    const std::vector<Tensor<1,dim> > &src,
+					    const typename Mapping<dim>::InternalDataBase &mapping_data,
+					    const unsigned int src_offset) const
 {
   covariant_transformation(dst, src, mapping_data, src_offset);
 }
@@ -424,9 +425,9 @@ MappingCartesian<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &d
 template <int dim>
 void
 MappingCartesian<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
-				     const std::vector<Point<dim> > &src,
-				     const Mapping<dim>::InternalDataBase &mapping_data,
-				     const unsigned int src_offset) const
+					    const std::vector<Point<dim> > &src,
+					    const typename Mapping<dim>::InternalDataBase &mapping_data,
+					    const unsigned int src_offset) const
 {
   covariant_transformation(dst, src, mapping_data, src_offset);
 }
@@ -434,20 +435,21 @@ MappingCartesian<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
 template <int dim>
 void
 MappingCartesian<dim>::transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-					 const std::vector<Tensor<1,dim> > &src,
-					 const Mapping<dim>::InternalDataBase &mapping_data,
-					 const unsigned int src_offset) const
+						const std::vector<Tensor<1,dim> > &src,
+						const typename Mapping<dim>::InternalDataBase &mapping_data,
+						const unsigned int src_offset) const
 {
   contravariant_transformation(dst, src, mapping_data, src_offset);
 }
 
 
+
 template <int dim>
 void
 MappingCartesian<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
-					 const std::vector<Point<dim> > &src,
-					 const Mapping<dim>::InternalDataBase &mapping_data,
-					 const unsigned int src_offset) const
+						const std::vector<Point<dim> > &src,
+						const typename Mapping<dim>::InternalDataBase &mapping_data,
+						const unsigned int src_offset) const
 {
   contravariant_transformation(dst, src, mapping_data, src_offset);
 }
@@ -525,7 +527,7 @@ inline
 void
 MappingCartesian<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
 						     const std::vector<tensor_> &src,
-						     const Mapping<dim>::InternalDataBase &mapping_data,
+						     const typename Mapping<dim>::InternalDataBase &mapping_data,
 						     const unsigned int src_offset) const
 {
   Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
@@ -562,7 +564,7 @@ inline
 void
 MappingCartesian<dim>::covariant_transformation (std::vector<tensor_>       &dst,
 						 const std::vector<tensor_> &src,
-						 const Mapping<dim>::InternalDataBase &mapping_data,
+						 const typename Mapping<dim>::InternalDataBase &mapping_data,
 						 const unsigned int src_offset) const
 {
   Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());

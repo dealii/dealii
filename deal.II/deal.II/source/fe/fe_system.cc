@@ -63,7 +63,8 @@ FESystem<dim>::InternalData::~InternalData()
 
 
 template <int dim>
-inline FiniteElementBase<dim>::InternalDataBase &
+inline
+typename FiniteElementBase<dim>::InternalDataBase &
 FESystem<dim>::
 InternalData::get_fe_data (const unsigned int base_no) const
 {
@@ -78,7 +79,7 @@ template <int dim>
 inline void
 FESystem<dim>::
 InternalData::set_fe_data (const unsigned int base_no,
-			   FiniteElementBase<dim>::InternalDataBase *ptr)
+			   typename FiniteElementBase<dim>::InternalDataBase *ptr)
 {
   Assert(base_no<base_fe_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_datas.size()));
@@ -271,8 +272,9 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 }
 
 
+
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 FESystem<dim>::get_data (UpdateFlags      flags,
 			 const Mapping<dim>    &mapping,
 			 const Quadrature<dim> &quadrature) const
@@ -307,7 +309,7 @@ FESystem<dim>::get_data (UpdateFlags      flags,
       typename Mapping<dim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_data(sub_flags, mapping, quadrature);
 
-      FiniteElementBase<dim>::InternalDataBase *base_fe_data =
+      typename FiniteElementBase<dim>::InternalDataBase *base_fe_data =
 	dynamic_cast<typename FiniteElementBase<dim>::InternalDataBase *>
 	(base_fe_data_base);
       
@@ -448,8 +450,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 					       // Pointer needed to get
 					       // the update flags of the
 					       // base element
-	      Mapping<dim>::InternalDataBase &base_fe_data=
-		fe_data.get_fe_data(base_no);
+	      typename Mapping<dim>::InternalDataBase &
+		base_fe_data = fe_data.get_fe_data(base_no);
 	      
 					       // compute update flags ...
 	      const UpdateFlags base_update_flags(mapping_data.update_flags
@@ -502,8 +504,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
       for (unsigned int base_no=0, comp=0; base_no<n_base_elements(); ++base_no)
 	{
 	  const FiniteElement<dim> &base_fe=base_element(base_no);
-	  FiniteElementBase<dim>::InternalDataBase &base_fe_data=
-	    fe_data.get_fe_data(base_no);
+	  typename FiniteElementBase<dim>::InternalDataBase &
+	    base_fe_data = fe_data.get_fe_data(base_no);
 
 					   // Make sure that in the
 					   // case of fill_fe_values
@@ -577,7 +579,7 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 					       // Pointer needed to get
 					       // the update flags of the
 					       // base element
-	      Mapping<dim>::InternalDataBase &base_fe_data=
+	      typename Mapping<dim>::InternalDataBase &base_fe_data=
 		fe_data.get_fe_data(base_no);
 	      
 					       // compute update flags ...

@@ -359,7 +359,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 //----------------------------------------------------------------------
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
 		       const Mapping<dim>    &mapping,
 		       const Quadrature<dim> &quadrature) const

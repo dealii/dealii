@@ -68,7 +68,7 @@ class MappingQ1 : public Mapping<dim>
     virtual void
     transform_covariant (std::vector<Tensor<1,dim> >       &dst,
 			 const std::vector<Tensor<1,dim> > &src,
-			 const Mapping<dim>::InternalDataBase &mapping_data,
+			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
 				     /**
@@ -78,7 +78,7 @@ class MappingQ1 : public Mapping<dim>
     virtual void
     transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 			     const std::vector<Tensor<1,dim> > &src,
-			     const Mapping<dim>::InternalDataBase &mapping_data,
+			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
 				     /**
@@ -88,7 +88,7 @@ class MappingQ1 : public Mapping<dim>
     virtual void
     transform_covariant (std::vector<Point<dim> >       &dst,
 			 const std::vector<Point<dim> > &src,
-			 const Mapping<dim>::InternalDataBase &mapping_data,
+			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
 				     /**
@@ -98,7 +98,7 @@ class MappingQ1 : public Mapping<dim>
     virtual void
     transform_contravariant (std::vector<Point<dim> >       &dst,
 			     const std::vector<Point<dim> > &src,
-			     const Mapping<dim>::InternalDataBase &mapping_data,
+			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
     
     
@@ -163,7 +163,7 @@ class MappingQ1 : public Mapping<dim>
     template <typename tensor_>
     void covariant_transformation (std::vector<tensor_>       &dst,
 				   const std::vector<tensor_> &src,
-				   const Mapping<dim>::InternalDataBase &mapping_data,
+				   const typename Mapping<dim>::InternalDataBase &mapping_data,
 				   const unsigned int src_offset) const;
     
 				     /**
@@ -173,7 +173,7 @@ class MappingQ1 : public Mapping<dim>
     template <typename tensor_>
     void contravariant_transformation (std::vector<tensor_>       &dst,
 				       const std::vector<tensor_> &src,
-				       const Mapping<dim>::InternalDataBase &mapping_data,
+				       const typename Mapping<dim>::InternalDataBase &mapping_data,
 				       const unsigned int src_offset) const;
 
 				     /** 
@@ -467,7 +467,8 @@ class MappingQ1 : public Mapping<dim>
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
@@ -475,7 +476,8 @@ class MappingQ1 : public Mapping<dim>
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
@@ -483,7 +485,8 @@ class MappingQ1 : public Mapping<dim>
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
 		      const Quadrature<dim-1>& quadrature) const;
 

@@ -54,7 +54,7 @@ ActiveObjectMonitor::~ActiveObjectMonitor ()
 {
   if (registered_objects.size() > 0)
     {
-      for (std::set<const Subscriptor*>::const_iterator i=registered_objects.begin();
+      for (typename std::set<const Subscriptor*>::const_iterator i=registered_objects.begin();
 	   i!=registered_objects.end(); ++i)
 	std::cout << "Object still exists of type "
 		  << typeid(**i).name()

@@ -292,7 +292,8 @@ class FE_Q : public FiniteElement<dim>
 				      * structures and fill in values
 				      * independent of the cell.
 				      */
-    virtual Mapping<dim>::InternalDataBase*
+    virtual
+    typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Mapping<dim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;

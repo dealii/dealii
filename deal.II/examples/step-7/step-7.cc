@@ -821,8 +821,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // from previous examples, so we
 				   // only comment on the things that
 				   // have changed.
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix.clear ();
@@ -1374,8 +1374,8 @@ void LaplaceProblem<dim>::run ()
 					   // all faces on Gamma2,
 					   // irrespective whether
 					   // they are active or not.
-	  Triangulation<dim>::cell_iterator cell = triangulation.begin (),
-					    endc = triangulation.end();
+	  typename Triangulation<dim>::cell_iterator cell = triangulation.begin (),
+						     endc = triangulation.end();
 	  for (; cell!=endc; ++cell)
 	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	      if ((cell->face(face)->center()(0) == -1)

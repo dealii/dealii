@@ -32,7 +32,8 @@ const unsigned int MappingQ1<dim>::n_shape_functions;
 
 
 template<int dim>
-MappingQ1<dim>::InternalData::InternalData (const unsigned int n_shape_functions):
+MappingQ1<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
+		:
 		is_mapping_q1_data(true),
 		n_shape_functions (n_shape_functions)
 {}
@@ -44,44 +45,49 @@ MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 				     const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0, shape_values.size()));
+	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+		       shape_values.size()));
   return shape_values [qpoint*n_shape_functions + shape_nr];
 }
 
 
 
 template<int dim> inline
-double&
-MappingQ1<dim>::InternalData::shape (unsigned int qpoint,
-				     unsigned int shape_nr)
+double &
+MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
+				     const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0, shape_values.size()));
+	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+		       shape_values.size()));
   return shape_values [qpoint*n_shape_functions + shape_nr];
 }
 
 
 template<int dim> inline
 Tensor<1,dim>
-MappingQ1<dim>::InternalData::derivative (unsigned int qpoint,
-					  unsigned int shape_nr) const
+MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
+					  const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+		       shape_derivatives.size()));
   return shape_derivatives [qpoint*n_shape_functions + shape_nr];
 }
 
 
 
 template<int dim> inline
-Tensor<1,dim>&
-MappingQ1<dim>::InternalData::derivative (unsigned int qpoint,
-					  unsigned int shape_nr)
+Tensor<1,dim> &
+MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
+					  const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+		       shape_derivatives.size()));
   return shape_derivatives [qpoint*n_shape_functions + shape_nr];
 }
+
 
 
 template<int dim>
@@ -346,8 +352,9 @@ MappingQ1<dim>::compute_data (const UpdateFlags      update_flags,
 }
 
 
+
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingQ1<dim>::get_data (const UpdateFlags update_flags,
 			  const Quadrature<dim>& q) const
 {
@@ -355,6 +362,7 @@ MappingQ1<dim>::get_data (const UpdateFlags update_flags,
   compute_data (update_flags, q, q.n_quadrature_points, *data);
   return data;
 }
+
 
 
 template <int dim>
@@ -422,7 +430,7 @@ MappingQ1<dim>::compute_face_data (UpdateFlags update_flags,
   
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingQ1<dim>::get_face_data (const UpdateFlags        update_flags,
 			       const Quadrature<dim-1> &quadrature) const
 {
@@ -436,7 +444,7 @@ MappingQ1<dim>::get_face_data (const UpdateFlags        update_flags,
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 MappingQ1<dim>::get_subface_data (const UpdateFlags update_flags,
 				  const Quadrature<dim-1>& quadrature) const
 {
@@ -800,7 +808,7 @@ template <int dim>
 void
 MappingQ1<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &dst,
 				     const std::vector<Tensor<1,dim> > &src,
-				     const Mapping<dim>::InternalDataBase &mapping_data,
+				     const typename Mapping<dim>::InternalDataBase &mapping_data,
 				     const unsigned int src_offset) const
 {
   covariant_transformation(dst, src, mapping_data, src_offset);
@@ -811,7 +819,7 @@ template <int dim>
 void
 MappingQ1<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
 				     const std::vector<Point<dim> > &src,
-				     const Mapping<dim>::InternalDataBase &mapping_data,
+				     const typename Mapping<dim>::InternalDataBase &mapping_data,
 				     const unsigned int src_offset) const
 {
   covariant_transformation(dst, src, mapping_data, src_offset);
@@ -821,7 +829,7 @@ template <int dim>
 void
 MappingQ1<dim>::transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 					 const std::vector<Tensor<1,dim> > &src,
-					 const Mapping<dim>::InternalDataBase &mapping_data,
+					 const typename Mapping<dim>::InternalDataBase &mapping_data,
 					 const unsigned int src_offset) const
 {
   contravariant_transformation(dst, src, mapping_data, src_offset);
@@ -832,7 +840,7 @@ template <int dim>
 void
 MappingQ1<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
 					 const std::vector<Point<dim> > &src,
-					 const Mapping<dim>::InternalDataBase &mapping_data,
+					 const typename Mapping<dim>::InternalDataBase &mapping_data,
 					 const unsigned int src_offset) const
 {
   contravariant_transformation(dst, src, mapping_data, src_offset);
@@ -987,7 +995,7 @@ inline
 void
 MappingQ1<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
 					      const std::vector<tensor_> &src,
-					      const Mapping<dim>::InternalDataBase &mapping_data,
+					      const typename Mapping<dim>::InternalDataBase &mapping_data,
 					      const unsigned int src_offset) const
 {
   Assert(tensor_::dimension==dim && tensor_::rank==1, Mapping<dim>::ExcInvalidData());
@@ -1021,7 +1029,7 @@ inline
 void
 MappingQ1<dim>::covariant_transformation (std::vector<tensor_>       &dst,
 					  const std::vector<tensor_> &src,
-					  const Mapping<dim>::InternalDataBase &mapping_data,
+					  const typename Mapping<dim>::InternalDataBase &mapping_data,
 					  const unsigned int src_offset) const
 {
   Assert(tensor_::dimension==dim && tensor_::rank==1, Mapping<dim>::ExcInvalidData());

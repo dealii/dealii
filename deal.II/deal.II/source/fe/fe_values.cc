@@ -104,14 +104,14 @@ FEValuesBase<dim>::~FEValuesBase ()
 {
   if (fe_data)
     {
-      Mapping<dim>::InternalDataBase *tmp1=fe_data;
+      typename Mapping<dim>::InternalDataBase *tmp1=fe_data;
       fe_data=0;
       delete tmp1;
     }
 
   if (mapping_data)
     {
-      Mapping<dim>::InternalDataBase *tmp1=mapping_data;
+      typename Mapping<dim>::InternalDataBase *tmp1=mapping_data;
       mapping_data=0;
       delete tmp1;
     }

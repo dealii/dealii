@@ -1328,7 +1328,8 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 	double y_min = cells.begin()->vertices[0](1);
 	double y_max = y_min;
 	
-	for (std::multiset<EpsCell2d>::const_iterator cell=cells.begin();
+	for (typename std::multiset<EpsCell2d>::const_iterator
+	       cell=cells.begin();
 	     cell!=cells.end(); ++cell)
 	  for (unsigned int vertex=0; vertex<4; ++vertex)
 	    {
@@ -1410,7 +1411,8 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 					 // note: due to the ordering, we
 					 // traverse the list of cells
 					 // back-to-front
-	for (std::multiset<EpsCell2d>::const_iterator cell=cells.begin();
+	for (typename std::multiset<EpsCell2d>::const_iterator
+	       cell=cells.begin();
 	     cell!=cells.end(); ++cell)
 	  {
 	    if (flags.draw_cells) 

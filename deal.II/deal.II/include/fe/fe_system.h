@@ -210,12 +210,12 @@ class FESystem : public FiniteElement<dim>
 				      * @ref{FiniteElement}.
 				      */
     virtual void
-    fill_fe_values (const Mapping<dim>                   &mapping,
+    fill_fe_values (const Mapping<dim>                      &mapping,
 		    const typename DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>                &quadrature,
-		    Mapping<dim>::InternalDataBase      &mapping_data,
-		    Mapping<dim>::InternalDataBase      &fe_data,
-		    FEValuesData<dim>                    &data) const;
+		    const Quadrature<dim>                   &quadrature,
+		    typename Mapping<dim>::InternalDataBase &mapping_data,
+		    typename Mapping<dim>::InternalDataBase &fe_data,
+		    FEValuesData<dim>                       &data) const;
 
 				     /**
 				      * Implementation of the same

@@ -354,8 +354,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // variable for:
   std::vector<double>     coefficient_values (n_q_points);
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix.clear ();

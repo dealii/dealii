@@ -957,7 +957,7 @@ FE_Q<dim>::update_each (UpdateFlags flags) const
 //----------------------------------------------------------------------
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 FE_Q<dim>::get_data (const UpdateFlags      update_flags,
 		     const Mapping<dim>    &mapping,
 		     const Quadrature<dim> &quadrature) const

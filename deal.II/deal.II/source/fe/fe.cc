@@ -389,7 +389,7 @@ FiniteElement<dim>::~FiniteElement ()
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 FiniteElement<dim>::get_face_data (const UpdateFlags       flags,
 				   const Mapping<dim>      &mapping,
 				   const Quadrature<dim-1> &quadrature) const
@@ -401,7 +401,7 @@ FiniteElement<dim>::get_face_data (const UpdateFlags       flags,
 
 
 template <int dim>
-Mapping<dim>::InternalDataBase*
+typename Mapping<dim>::InternalDataBase *
 FiniteElement<dim>::get_subface_data (const UpdateFlags        flags,
 				      const Mapping<dim>      &mapping,
 				      const Quadrature<dim-1> &quadrature) const

@@ -119,8 +119,8 @@ class AdvectionProblem
 				     // which it shall operate, and
 				     // the one past the last.
     void assemble_system ();
-    void assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
-			 	   const DoFHandler<dim>::active_cell_iterator &end);
+    void assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
+			 	   const typename DoFHandler<dim>::active_cell_iterator &end);
     
 				     // The following functions again
 				     // are as in previous examples,
@@ -768,9 +768,9 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // this. In fact, it does this not
 				   // only for a range of cell
 				   // iterators, but for iterators in
-				   // general, so you could use for
-				   // ``std::vector<T>::iterator'' or usual
-				   // pointers as well.
+				   // general, so you could use it for
+				   // ``std::vector<T>::iterator'' or
+				   // usual pointers as well.
 				   //
 				   // The function returns a vector of
 				   // pairs of iterators, where the
@@ -893,8 +893,8 @@ void AdvectionProblem<dim>::assemble_system ()
 template <int dim>
 void
 AdvectionProblem<dim>::
-assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
-			  const DoFHandler<dim>::active_cell_iterator &end) 
+assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
+			  const typename DoFHandler<dim>::active_cell_iterator &end) 
 {
 				   // First of all, we will need some
 				   // objects that describe boundary
@@ -980,7 +980,7 @@ assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
 
 				   // Then we start the main loop over
 				   // the cells:
-  DoFHandler<dim>::active_cell_iterator cell;
+  typename DoFHandler<dim>::active_cell_iterator cell;
   for (cell=begin; cell!=end; ++cell)
     {
 				       // First clear old contents of

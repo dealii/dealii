@@ -490,8 +490,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // the user of the ``fe_values''
 				   // object, the actual finite
 				   // element type is transparent.
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix.clear ();
