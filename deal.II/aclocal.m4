@@ -1356,33 +1356,47 @@ dnl -------------------------------------------------------------
 dnl Versions of gcc on different platforms use a multitude of flags to
 dnl denote thread safe libraries and the like. They are, for example
 dnl -threads/-pthread/-mthread, sometimes *thread, sometimes *threads. 
-dnl Find out which is the right one on the present platform
+dnl On some other platforms, such as Mac OS X, no flags are necessary
+dnl and none are understood by the compiler.
+dnl
+dnl Find out which flag the right one on the present platform
 dnl
 dnl Usage: DEAL_II_FIND_THREAD_FLAGS
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 [
-  AC_MSG_CHECKING(for platform specific thread flags)
-  AC_LANG(C++)
-  for i in threads mt pthread pthreads mthreads Kthread kthread invalid_last_entry; do
-    CXXFLAGS="$CXXFLAGSG -$i"
-    DEAL_II_TRY_COMPILER_FLAG(
-	[
-	  thread_flag=$i
-	  CXXFLAGSG="$CXXFLAGSG -$i"
-	  CXXFLAGSO="$CXXFLAGSO -$i"
-          LDFLAGS="$LDFLAGS -$i"
-	
-	  dnl The right parameter was found, so exit
-	  break
-   	])
-  done
-  if test "$thread_flag" = invalid_last_entry ; then
-	AC_MSG_RESULT(no flag found!)
-	AC_MSG_ERROR(Could not determine multithreading flag for this platform. Aborting!)
-  fi
-  AC_MSG_RESULT(-$thread_flag)
+  case "$target" in
+    *apple-darwin*)
+	dnl Mac OS X is special in that the compiler generates thread-safe
+	dnl code by default, apparently.
+	;;
+
+    *)
+    	dnl Everything else needs the following setup:
+	AC_MSG_CHECKING(for platform specific thread flags)
+  	AC_LANG(C++)
+  	for i in threads mt pthread pthreads mthreads Kthread kthread invalid_last_entry; do
+    	  CXXFLAGS="$CXXFLAGSG -$i"
+    	  DEAL_II_TRY_COMPILER_FLAG(
+	    [
+	     thread_flag=$i
+	     CXXFLAGSG="$CXXFLAGSG -$i"
+	     CXXFLAGSO="$CXXFLAGSO -$i"
+             LDFLAGS="$LDFLAGS -$i"
+ 	
+	     dnl The right parameter was found, so exit
+	     break
+   	   ])
+  	done
+
+  	if test "$thread_flag" = invalid_last_entry ; then
+	  AC_MSG_RESULT(no flag found!)
+	  AC_MSG_ERROR(Could not determine multithreading flag for this platform. Aborting!)
+  	fi
+  	AC_MSG_RESULT(-$thread_flag)
+	;;
+  esac
 ])
 
 
