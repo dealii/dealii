@@ -233,6 +233,18 @@ class ProblemBase {
 			   DoFHandler<dim>    *dof_handler);
 
 				     /**
+				      * Reset all fields to a state as if we
+				      * were right after calling the
+				      * constructor. This is useful if you
+				      * want to use an object derived from
+				      * this base class for multiple
+				      * successive calculations. In special,
+				      * all aquired memory should be freed
+				      * until it is needed again.
+				      */
+    void clear ();
+    
+				     /**
 				      * Destructor. Declare this only to have
 				      * a virtual destructor, which is safer
 				      * as we have virtual functions.

@@ -49,6 +49,19 @@ void ProblemBase<dim>::set_tria_and_dof (Triangulation<dim> *t,
 
 
 template <int dim>
+void ProblemBase<dim>::clear () {
+  tria        = 0;
+  dof_handler = 0;
+  system_sparsity.reinit (1,1,1);
+  system_matrix.reinit (system_sparsity);
+  right_hand_side.reinit (1);
+  solution.reinit (1);
+  constraints.clear ();
+};
+
+
+
+template <int dim>
 ProblemBase<dim>::~ProblemBase () {};
 
 
