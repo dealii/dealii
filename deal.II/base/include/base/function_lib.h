@@ -795,13 +795,13 @@ namespace Functions
   class CutOffFunctionLinfty : public Function<dim>
   {
     public:
-				     /**
-				      * Constructor. Arguments are the
-				      * center of the ball and its
-				      * radius.
-				      */
-    CutOffFunctionLinfty (const double radius = 1.,
-		      Point<dim> = Point<dim>());
+				       /**
+					* Constructor. Arguments are the
+					* center of the ball and its
+					* radius.
+					*/
+      CutOffFunctionLinfty (const double radius = 1.,
+			    Point<dim> = Point<dim>());
     
 				       /**
 					* Function value at one point.
@@ -816,16 +816,16 @@ namespace Functions
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
-  private:
-				     /**
-				      * Center of the integration ball.
-				      */
-    const Point<dim> center;
+    private:
+				       /**
+					* Center of the integration ball.
+					*/
+      const Point<dim> center;
 
-				     /**
-				      * Radius of the ball.
-				      */
-    const double radius;
+				       /**
+					* Radius of the ball.
+					*/
+      const double radius;
   };
   
   
@@ -840,13 +840,13 @@ namespace Functions
   class CutOffFunctionW1 : public Function<dim>
   {
     public:
-				     /**
-				      * Constructor. Arguments are the
-				      * center of the ball and its
-				      * radius.
-				      */
-    CutOffFunctionW1 (const double radius = 1.,
-		      Point<dim> = Point<dim>());
+				       /**
+					* Constructor. Arguments are the
+					* center of the ball and its
+					* radius.
+					*/
+      CutOffFunctionW1 (const double radius = 1.,
+			Point<dim> = Point<dim>());
     
 				       /**
 					* Function value at one point.
@@ -861,16 +861,16 @@ namespace Functions
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
-  private:
-				     /**
-				      * Center of the integration ball.
-				      */
-    const Point<dim> center;
+    private:
+				       /**
+					* Center of the integration ball.
+					*/
+      const Point<dim> center;
 
-				     /**
-				      * Radius of the ball.
-				      */
-    const double radius;
+				       /**
+					* Radius of the ball.
+					*/
+      const double radius;
   };
   
   
@@ -885,13 +885,13 @@ namespace Functions
   class CutOffFunctionCinfty : public Function<dim>
   {
     public:
-				     /**
-				      * Constructor. Arguments are the
-				      * center of the ball and its
-				      * radius.
-				      */
-    CutOffFunctionCinfty (const double radius = 1.,
-			  Point<dim> = Point<dim>());
+				       /**
+					* Constructor. Arguments are the
+					* center of the ball and its
+					* radius.
+					*/
+      CutOffFunctionCinfty (const double radius = 1.,
+			    Point<dim> = Point<dim>());
     
 				       /**
 					* Function value at one point.
@@ -906,19 +906,17 @@ namespace Functions
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
-  private:
-				     /**
-				      * Center of the integration ball.
-				      */
-    const Point<dim> center;
+    private:
+				       /**
+					* Center of the integration ball.
+					*/
+      const Point<dim> center;
 
-				     /**
-				      * Radius of the ball.
-				      */
-    const double radius;
+				       /**
+					* Radius of the ball.
+					*/
+      const double radius;
   };
-  
-  
   
 };
 
