@@ -184,7 +184,7 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>            &fe_
 	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<gradients.size();++i)
     Assert (gradients[i].size() == fe->n_components,
-	    ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+	    ExcWrongVectorSize(gradients[i].size(), fe->n_components));
 
 				   // get function values of dofs
 				   // on this cell
