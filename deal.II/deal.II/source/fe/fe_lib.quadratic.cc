@@ -138,8 +138,8 @@ FEQuadraticSub<1>::shape_grad(const unsigned int i,
 template <>
 inline
 Point<1>
-FELinear<1>::linear_shape_grad(const unsigned int i,
-			       const Point<1>&) const
+FEQuadraticSub<1>::linear_shape_grad(const unsigned int i,
+				     const Point<1>&) const
 {
   Assert((i<2), ExcInvalidIndex(i));
   switch (i)
@@ -642,6 +642,25 @@ FEQuadraticSub<2>::shape_value (const unsigned int i,
 
 
 template <>
+inline
+double
+FEQuadraticSub<2>::linear_shape_value (const unsigned int i,
+				       const Point<2>& p) const
+{
+  Assert((i<4), ExcInvalidIndex(i));
+  switch (i)
+    {
+    case 0: return (1.-p(0)) * (1.-p(1));
+    case 1: return p(0) * (1.-p(1));
+    case 2: return p(0) * p(1);
+    case 3: return (1.-p(0)) * p(1);
+    }
+  return 0.;
+};
+
+
+
+template <>
 Point<2>
 FEQuadraticSub<2>::shape_grad (const unsigned int i,
 			       const Point<2>    &p) const
@@ -671,6 +690,25 @@ FEQuadraticSub<2>::shape_grad (const unsigned int i,
       case 8: return Point<2>(16*(1-xi)*(1-eta)*eta-16*xi*eta*(1-eta),
 			      16*xi*(1-xi)*(1-eta)-16*(1-xi)*xi*eta);
     };
+  return Point<2> ();
+};
+
+
+
+template <>
+inline
+Point<2>
+FEQuadraticSub<2>::linear_shape_grad (const unsigned int i,
+				      const Point<2>& p) const
+{
+  Assert((i<4), ExcInvalidIndex(i));
+  switch (i)
+    {
+    case 0: return Point<2> (p(1)-1., p(0)-1.);
+    case 1: return Point<2> (1.-p(1), -p(0));
+    case 2: return Point<2> (p(1), p(0));
+    case 3: return Point<2> (-p(1), 1.-p(0));
+    }
   return Point<2> ();
 };
 
@@ -990,7 +1028,7 @@ void FEQuadraticSub<2>::get_face_ansatz_points (const typename DoFHandler<2>::fa
 
   for (unsigned int vertex=0; vertex<2; ++vertex)
     ansatz_points[vertex] = face->vertex(vertex);
-  ansatz_points[2] = (ansatz_points[0] + ansatz_points[1]) / 1;
+  ansatz_points[2] = (ansatz_points[0] + ansatz_points[1]) / 2;
 };
 
 
