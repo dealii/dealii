@@ -511,7 +511,24 @@ double determinant (const Tensor<2,2> &t) {
 	  (t[1][0] * t[0][1]));
 };
 
-    
+
+
+inline
+double determinant (const Tensor<2,3> &t) {
+				   // get this using Maple:
+				   // with(linalg);
+				   // a := matrix(3,3);
+				   // x := det(a);
+				   // readlib(C);
+				   // C(x, optimized);
+  return ( t[0][0]*t[1][1]*t[2][2]
+	   -t[0][0]*t[1][2]*t[2][1]
+	   -t[1][0]*t[0][1]*t[2][2]
+	   +t[1][0]*t[0][2]*t[2][1]
+	   +t[2][0]*t[0][1]*t[1][2]
+	   -t[2][0]*t[0][2]*t[1][1] );
+};
+
     
     
 
