@@ -398,7 +398,7 @@ class MappingQ1 : public Mapping<dim>
 
   private:
 				     /**
-				      * Transforms the point @p{p} on
+				      * Transforms a point @p{p} on
 				      * the unit cell to the point
 				      * @p{p_real} on the real cell
 				      * @p{cell} and returns @p{p_real}.
@@ -416,18 +416,14 @@ class MappingQ1 : public Mapping<dim>
 				      * mapping support points of the
 				      * cell.
 				      *
-				      * This additional
-				      * @p{InternalData} argument
+				      * This @p{InternalData} argument
 				      * avoids multiple computations
 				      * of the shape values at point
 				      * @p{p} and especially multiple
 				      * computations of the mapping
 				      * support points.
 				      */
-    virtual Point<dim> transform_unit_to_real_cell_internal (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p,
-      const InternalData &m_data) const;
+    virtual Point<dim> transform_unit_to_real_cell_internal (const InternalData &m_data) const;
 
 				     /**
 				      * Returns an @p{InternalData}

@@ -846,15 +846,12 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
 
   compute_shapes(std::vector<Point<dim> > (1, p), *mdata);
 
-  return transform_unit_to_real_cell_internal(cell, p, *mdata);
+  return transform_unit_to_real_cell_internal(*mdata);
 }
 
 
-// TODO:  remove obsolete arguments.
 template <int dim>
 Point<dim> MappingQ1<dim>::transform_unit_to_real_cell_internal (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p,
   const InternalData &data) const
 {
   const unsigned int n_mapping_points=data.mapping_support_points.size();
@@ -903,7 +900,7 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
   compute_shapes(std::vector<Point<dim> > (1, p_unit), *mdata);
   
 				   // f(x)
-  Point<dim> p_real(transform_unit_to_real_cell_internal(cell, p_unit, *mdata));
+  Point<dim> p_real(transform_unit_to_real_cell_internal(*mdata));
   Point<dim> f = p_real-p;
 
   const double eps=1e-15*cell->diameter();
@@ -936,7 +933,7 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
       compute_shapes(std::vector<Point<dim> > (1, p_unit), *mdata);
       
 				       // f(x)
-      p_real=transform_unit_to_real_cell_internal(cell, p_unit, *mdata);
+      p_real=transform_unit_to_real_cell_internal(*mdata);
       f = p_real-p;
     }
 
