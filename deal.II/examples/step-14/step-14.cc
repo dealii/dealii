@@ -2647,8 +2647,8 @@ namespace LaplaceSolver
   WeightedResidual<dim>::solve_problem ()
   {
     Threads::ThreadGroup<> threads;
-    threads += Threads::spawn (*this, &WeightedResidual<2>::solve_primal_problem)();
-    threads += Threads::spawn (*this, &WeightedResidual<2>::solve_dual_problem)();
+    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_primal_problem)();
+    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_dual_problem)();
     threads.join_all ();
   }
 
