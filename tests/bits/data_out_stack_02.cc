@@ -11,6 +11,10 @@
 //
 //----------------------------  data_out_stack_02.cc  ---------------------------
 
+// slight variation of data_out_stack_01, but calling add_data_vector with a
+// vector second argument. on most systems this doesn't make a difference, but
+// on some it failed linking in the past due to non-existence of weak symbols
+
 #include "../tests.h"
 #include "data_out_common.cc"
 #include <lac/sparsity_pattern.h>
