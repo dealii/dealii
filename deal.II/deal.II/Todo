@@ -109,3 +109,8 @@ Use unsigned integers for the colnums array in dSMatrixStruct. This
 
 Why are there all these unsafe casts from VectorBase to dVector
   in dvector.cc?
+
+
+Optimize dSMatrixStruct::compress, using standard sort algorithms
+  and only sorting the used range of indices, not those with
+  -1 entries.
