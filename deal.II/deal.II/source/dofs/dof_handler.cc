@@ -652,14 +652,15 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       for (int row=0; row<n_dofs; ++row) 
 	{
 	  int j;
-	  for (j=sparsity.rowstart[row]; j<sparsity.rowstart[row+1]; ++j)
-	    if (sparsity.colnums[j] == -1)
+	  for (j=sparsity.get_rowstart_indices()[row];
+	       j<sparsity.get_rowstart_indices()[row+1]; ++j)
+	    if (sparsity.get_column_numbers()[j] == -1)
 	      break;
 					   // post: coordination is now
 					   // j-rowstart[row]
-	  if (j-sparsity.rowstart[row] < (signed int)min_coordination)
+	  if (j-sparsity.get_rowstart_indices()[row] < (signed int)min_coordination)
 	    {
-	      min_coordination = j-sparsity.rowstart[row];
+	      min_coordination = j-sparsity.get_rowstart_indices()[row];
 	      starting_point   = row;
 	    };
 	};
@@ -689,12 +690,12 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				       // dofs numbered in the last
 				       // round
       for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-	for (int j=sparsity.rowstart[last_round_dofs[i]];
-	     j<sparsity.rowstart[last_round_dofs[i]+1]; ++j)
-	  if (sparsity.colnums[j] == -1)
+	for (int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
+	     j<sparsity.get_rowstart_indices()[last_round_dofs[i]+1]; ++j)
+	  if (sparsity.get_column_numbers()[j] == -1)
 	    break;
 	  else
-	    next_round_dofs.push_back (sparsity.colnums[j]);
+	    next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
       
 				       // sort dof numbers
       sort (next_round_dofs.begin(), next_round_dofs.end());
@@ -729,8 +730,9 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 	   s!=next_round_dofs.end(); ++s) 
 	{
 	  unsigned int coordination = 0;
-	  for (int j=sparsity.rowstart[*s]; j<sparsity.rowstart[*s+1]; ++j)
-	    if (sparsity.colnums[j] == -1)
+	  for (int j=sparsity.get_rowstart_indices()[*s];
+	       j<sparsity.get_rowstart_indices()[*s+1]; ++j)
+	    if (sparsity.get_column_numbers()[j] == -1)
 	      break;
 	    else
 	      ++coordination;
@@ -1227,7 +1229,6 @@ unsigned int DoFHandler<1>::max_couplings_between_dofs () const {
 
 unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
   Assert (selected_fe != 0, ExcNoFESelected());
-  const unsigned int max_adjacent_cells = tria->max_adjacent_cells();
 
 				   // get these numbers by drawing pictures
 				   // and counting...
@@ -1245,20 +1246,32 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const {
 				   //   = total of 17
 				   // count lines -> 28 (don't forget to count
 				   // mother and children separately!)
-  if (max_adjacent_cells == 4)
-    return (17*selected_fe->dofs_per_vertex +
-	    28*selected_fe->dofs_per_line +
-	    8*selected_fe->dofs_per_quad);
-  else
-    if (max_adjacent_cells == 5)
-      return (19*selected_fe->dofs_per_vertex +
-	      27*selected_fe->dofs_per_line +
-	      9*selected_fe->dofs_per_quad);
-    else
-      {
-	Assert (false, ExcNotImplemented());
-	return 0;
-      };
+  switch (tria->max_adjacent_cells())
+    {
+      case 4:
+	    return (17*selected_fe->dofs_per_vertex +
+		    28*selected_fe->dofs_per_line +
+		    8*selected_fe->dofs_per_quad);
+      case 5:
+	    return (19*selected_fe->dofs_per_vertex +
+		    31*selected_fe->dofs_per_line +
+		    9*selected_fe->dofs_per_quad);
+      case 6:
+	    return (25*selected_fe->dofs_per_vertex +
+		    42*selected_fe->dofs_per_line +
+		    12*selected_fe->dofs_per_quad);
+      case 7:
+	    return (27*selected_fe->dofs_per_vertex +
+		    45*selected_fe->dofs_per_line +
+		    13*selected_fe->dofs_per_quad);
+      case 8:
+	    return (33*selected_fe->dofs_per_vertex +
+		    56*selected_fe->dofs_per_line +
+		    16*selected_fe->dofs_per_quad);
+      default:
+	    Assert (false, ExcNotImplemented());
+	    return 0;
+    };
 };
 
 
