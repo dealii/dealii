@@ -1,6 +1,6 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
-# $Id$
+# Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
 # Copyright (C) 2000, 2001, 2002 by the deal.II authors
 ############################################################
 
@@ -35,7 +35,8 @@ numbering.exe           : numbering.go           $(libraries)
 shapes.exe              : shapes.go              $(libraries)
 
 tests = derivatives fe_data_test fe_traits fe_tools_test mapping \
-        mapping_c1 shapes numbering mapping_q1_eulerian internals
+        mapping_c1 shapes numbering mapping_q1_eulerian internals \
+        non_primitive_1
 
 ############################################################
 
