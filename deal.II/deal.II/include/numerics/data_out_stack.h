@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,9 +77,9 @@ template <int dim> class DoFHandler;
  *   solution_names.push_back ("u");
  *   solution_names.push_back ("v");
  *   data_out_stack.declare_data_vector (solution_names,
- *                                       DataOutStack<dim>::dof_data);
+ *                                       DataOutStack<dim>::dof_vector);
  *   data_out_stack.declare_data_vector ("error",
- *                                       DataOutStack<dim>::cell_data);
+ *                                       DataOutStack<dim>::cell_vector);
  *
  *                                  // now do computations
  *   for (double parameter=0; ...)
