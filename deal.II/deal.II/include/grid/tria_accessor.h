@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -599,6 +599,16 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * maximum number of refinement
 				      * in any branch of children of
 				      * this object.
+				      *
+				      * For example, if this object is
+				      * refined, and one of its children is
+				      * refined exactly one more time, then
+				      * <tt>max_refinement_depth</tt> should
+				      * return 2.
+				      *
+				      * If this object is not refined (i.e. it
+				      * is active), then the return value is
+				      * zero.
 				      */
     unsigned int max_refinement_depth () const;    
     
@@ -1064,6 +1074,16 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * is rather the maximum number
 				      * of refinement in any branch of
 				      * children of this object.
+				      *
+				      * For example, if this object is
+				      * refined, and one of its children is
+				      * refined exactly one more time, then
+				      * <tt>max_refinement_depth</tt> should
+				      * return 2.
+				      *
+				      * If this object is not refined (i.e. it
+				      * is active), then the return value is
+				      * zero.
 				      */
     unsigned int max_refinement_depth () const;
     
@@ -1533,6 +1553,16 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * is rather the maximum number
 				      * of refinement in any branch of
 				      * children of this object.
+				      *
+				      * For example, if this object is
+				      * refined, and one of its children is
+				      * refined exactly one more time, then
+				      * <tt>max_refinement_depth</tt> should
+				      * return 2.
+				      *
+				      * If this object is not refined (i.e. it
+				      * is active), then the return value is
+				      * zero.
 				      */
     unsigned int max_refinement_depth () const;
     
@@ -2044,6 +2074,16 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * is rather the maximum number
 				      * of refinement in any branch of
 				      * children of this object.
+				      *
+				      * For example, if this object is
+				      * refined, and one of its children is
+				      * refined exactly one more time, then
+				      * <tt>max_refinement_depth</tt> should
+				      * return 2.
+				      *
+				      * If this object is not refined (i.e. it
+				      * is active), then the return value is
+				      * zero.
 				      */
     unsigned int max_refinement_depth () const;    
     
