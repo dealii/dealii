@@ -2055,15 +2055,10 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      *  @name User flag handling
 				      */
 				     /*@{*/
-				     /**
-				      *  Clear all user pointers.
-				      */
-    void clear_user_pointers () const;
-
     				     /**
 				      *  Clear all user flags.
 				      */
-    void clear_user_flags () const;
+    void clear_user_flags ();
 
 				     /**
 				      *  Save all user flags. See the general
@@ -2164,6 +2159,62 @@ class Triangulation : public TriaDimensionInfo<dim>,
     void load_user_flags_hex (const std::vector<bool> &v);
 				     /*@}*/
 
+				     /**
+				      *  Clear all user pointers.
+				      */
+    void clear_user_pointers ();
+
+				     /**
+				      * Save all user pointers. The
+				      * output vector is resized if
+				      * necessary.
+				      */
+    void save_user_pointers (std::vector<void *> &v) const;
+
+    				     /**
+				      * Read the information stored by
+				      * @p{save_user_pointers}.
+				      */
+    void load_user_pointers (const std::vector<void *> &v);
+
+				     /**
+				      * Save the user pointers on
+				      * lines. The output vector is
+				      * resized if necessary.
+				      */
+    void save_user_pointers_line (std::vector<void *> &v) const;
+
+    				     /**
+				      * Load the user pointers located
+				      * on lines.
+				      */
+    void load_user_pointers_line (const std::vector<void *> &v);
+
+				     /**
+				      * Save the user pointers on
+				      * quads. The output vector is
+				      * resized if necessary.
+				      */
+    void save_user_pointers_quad (std::vector<void *> &v) const;
+
+				     /**
+				      * Load the user pointers located
+				      * on quads.
+				      */
+    void load_user_pointers_quad (const std::vector<void *> &v);
+
+				     /**
+				      * Save the user pointers on
+				      * hexes. The output vector is
+				      * resized if necessary.
+				      */
+    void save_user_pointers_hex (std::vector<void *> &v) const;
+
+				     /**
+				      * Load the user pointers located
+				      * on hexs.
+				      */
+    void load_user_pointers_hex (const std::vector<void *> &v);
 				     /* ------------------------------------ */
     
 				     /**
@@ -3288,12 +3339,12 @@ template <> void Triangulation<3>::create_triangulation (const std::vector<Point
 							 const SubCellData                          &subcelldata);
 template <> void Triangulation<1>::distort_random (const double factor,
 						   const bool   keep_boundary);
-template <> void Triangulation<1>::clear_user_pointers () const;
-template <> void Triangulation<1>::clear_user_flags () const;
-template <> void Triangulation<2>::clear_user_pointers () const;
-template <> void Triangulation<2>::clear_user_flags () const;
-template <> void Triangulation<3>::clear_user_pointers () const;
-template <> void Triangulation<3>::clear_user_flags () const;
+template <> void Triangulation<1>::clear_user_pointers ();
+template <> void Triangulation<1>::clear_user_flags ();
+template <> void Triangulation<2>::clear_user_pointers ();
+template <> void Triangulation<2>::clear_user_flags ();
+template <> void Triangulation<3>::clear_user_pointers ();
+template <> void Triangulation<3>::clear_user_flags ();
 template <> void Triangulation<1>::save_user_flags_quad (std::ostream &) const;
 template <> void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const;
 template <> void Triangulation<1>::load_user_flags_quad (std::istream &);
