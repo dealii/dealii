@@ -401,14 +401,14 @@ void GridIn<dim>::skip_empty_lines (std::istream &in)
 template <int dim>
 void GridIn<dim>::skip_comment_lines (std::istream &in,
 				      const char    comment_start)
-{    
+{
   char c;
-  while (in.get(c), c==comment_start) 
-    {
-      char line[256];
-      in.get (line, 255, '\n'); // ignore rest of line, at most 256 chars
-      in.get (c);         // ignore '\n' at end of line.
-    };
+				   // loop over the following comment
+				   // lines
+  while ((c=in.get()) == comment_start)
+				     // loop over the characters after
+				     // the comment starter
+    while (in.get() != '\n');
   
 				   // put back first character of
 				   // first non-comment line

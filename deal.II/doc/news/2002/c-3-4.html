@@ -163,6 +163,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: the <code class="class">GridIn</code> class had problems
+       when reading in UCD grids with comment lines that contained
+       only the comment sign, but nothing else. This is now fixed.
+       <br>
+       (WB 2002/08/30)
+  </p>
+
+  <li> <p> 
        Improved: <code class="class">VectorTools</code>::<code
        class="member">integrate_difference</code> can compute <i>L<sup>p</sup></i>
        and <i>W<sup>1,p</sup></i> norms for arbitrary <i>p</i>. The function
