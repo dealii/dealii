@@ -247,6 +247,13 @@ class ConstraintMatrix {
     template<typename number>
     void distribute (Vector<number> &vec) const;
     
+				     /**
+				      * Delete hanging nodes in a vector.
+				      * Sets all hanging node values to zero.
+				      */
+    template<typename number>
+    void set_zero (Vector<number> &vec) const;
+
     
 				     /**
 				      * Print the constraint lines. Mainly for

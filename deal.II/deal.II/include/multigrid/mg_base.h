@@ -40,8 +40,8 @@ class MGCoarseGridSolver
 				      * about the matrix is removed to
 				      * that class.
 				      */
-    virtual void operator() (unsigned int level, Vector<float>& dst,
-			     const Vector<float>& src) const = 0;
+    virtual void operator() (unsigned int level, Vector<double>& dst,
+			     const Vector<double>& src) const = 0;
 };
 
 
@@ -74,8 +74,8 @@ class MGSmootherBase
 				      * things.
 				      */
     virtual void smooth (const unsigned int   level,
-			 Vector<float>       &u,
-			 const Vector<float> &rhs) const = 0;
+			 Vector<double>       &u,
+			 const Vector<double> &rhs) const = 0;
 
 };
 
@@ -93,8 +93,8 @@ class MGSmootherIdentity
 				      * This function does nothing.
 				      */
     virtual void smooth (const unsigned int   level,
-			 Vector<float>       &u,
-			 const Vector<float> &rhs) const;
+			 Vector<double>       &u,
+			 const Vector<double> &rhs) const;
 };
 
 /**
@@ -129,8 +129,8 @@ class MGTransferBase
 				      * level.
 				      */
     virtual void prolongate (const unsigned int   to_level,
-			     Vector<float>       &dst,
-			     const Vector<float> &src) const = 0;
+			     Vector<double>       &dst,
+			     const Vector<double> &src) const = 0;
 
 				     /**
 				      * Restrict a vector from level
@@ -146,8 +146,8 @@ class MGTransferBase
 				      * level.
 				      */
     virtual void restrict (const unsigned int   from_level,
-			   Vector<float>       &dst,
-			   const Vector<float> &src) const = 0;
+			   Vector<double>       &dst,
+			   const Vector<double> &src) const = 0;
 };
 
 /**
@@ -175,6 +175,10 @@ class MGVector
 				      * Safe access operator.
 				      */
     const VECTOR& operator[](unsigned int) const;
+				     /**
+				      * Delete all entries.
+				      */
+    void clear();
   private:
 				     /**
 				      * Level of first component.
@@ -245,8 +249,8 @@ class MGCoarseGridLACIteration
 				      * matrix, vectors and
 				      * preconditioner.
 				      */
-    virtual void operator() (unsigned int level, Vector<float>& dst,
-			     const Vector<float>& src) const;
+    virtual void operator() (unsigned int level, Vector<double>& dst,
+			     const Vector<double>& src) const;
   private:
 				     /**
 				      * Reference to the solver.
@@ -303,23 +307,23 @@ class MGBase
 				     /**
 				      * Auxiliary vector, defect.
 				      */
-    MGVector<Vector<float> > d;
+    MGVector<Vector<double> > d;
 
 				     /**
 				      * Auxiliary vector, solution.
 				      */
-    MGVector<Vector<float> > s;
+    MGVector<Vector<double> > s;
+				     /**
+				      * Prolongation and restriction object.
+				      */
+    SmartPointer<const MGTransferBase> transfer;
 
   private:
 				     /**
 				      * Auxiliary vector.
 				      */
-    Vector<float> t;
+    Vector<double> t;
     
-				     /**
-				      * Prolongation and restriction object.
-				      */
-    SmartPointer<const MGTransferBase> transfer;
 				     /**
 				      * Exception.
 				      */
@@ -344,15 +348,15 @@ class MGBase
 		      const MGCoarseGridSolver& cgs);  
 
 				     /**
-				      * Apply residual operator on all
+				      * Apply negative #vmult# on all
 				      * cells of a level.
 				      * This is implemented in a
 				      * derived class.
 				      */
-    virtual void level_residual(unsigned int level,
-			     Vector<float>& dst,
-			     const Vector<float>& src,
-			     const Vector<float>& rhs) = 0;  
+    virtual void level_vmult(unsigned int level,
+			     Vector<double>& dst,
+			     const Vector<double>& src,
+			     const Vector<double>& rhs) = 0;  
 
   
   public:
@@ -450,7 +454,7 @@ MGCoarseGridLACIteration(SOLVER& s, const MATRIX& m, const PRECOND& p)
 template<class SOLVER, class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>::operator()
-(unsigned int, Vector<float>& dst, const Vector<float>& src) const
+(unsigned int, Vector<double>& dst, const Vector<double>& src) const
 {
   solver.solve(matrix, dst, src, precondition);
 }
@@ -485,6 +489,15 @@ MGVector<VECTOR>::operator[](unsigned int i) const
   return vector<VECTOR>::operator[](i-minlevel);
 }
 
+template<class VECTOR>
+void
+MGVector<VECTOR>::clear()
+{
+  vector<VECTOR>::iterator v;
+  for (v = begin(); v != end(); ++v)
+    v->clear();
+  
+}
 
 
 /* ------------------------------------------------------------------- */

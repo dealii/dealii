@@ -22,8 +22,7 @@
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGSmoother
-  :  public MGSmootherBase
+class MGSmoother : public MGSmootherBase
 {
   private:
 				     /**
@@ -82,7 +81,7 @@ class MGSmoother
 				      * function does nothing in this case.
 				      */
     void set_zero_interior_boundary (const unsigned int  level,
-				     Vector<float>      &u) const;
+				     Vector<double>      &u) const;
 				     /**
 				      * Modify the number of smoothing steps.
 				      */
@@ -113,31 +112,45 @@ class MGSmoother
 };
 
 /**
- * Implementation of an SOR smoother.
- *
- * This class is an implementation of a smootin algorithm for multigrid. It
- * knows the actual instance of the multigrid matrix and uses the SOR method of the level
- * matrices.
+ * Implementation of a smoother using matrix builtin relaxation methods.
+ * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGSmootherSOR
-  :
-  public MGSmoother
+template<typename number>
+class MGSmootherRelaxation : public MGSmoother
 {
   public:
+				     /**
+				      * Type of the smoothing
+				      * function of the matrix.
+				      */
+    typedef void
+    (SparseMatrix<number>::* function_ptr)(Vector<double>&, const Vector<double>&,
+					   typename SparseMatrix<number>::value_type) const;
+    
 				     /**
 				      * Constructor.
 				      * The constructor uses an #MGDoFHandler# to initialize
 				      * data structures for interior level boundary handling
-				      * in #MGSmoother#. Furthermore, it takes a pointer to the
-				      * matrices and the number of SOR steps required in each
-				      * smoothing operation.
+				      * in #MGSmoother#.
+				      *
+				      * Furthermore, it takes a pointer to the
+				      * level matrices and their smoothing function.
+				      * This function must perform one relaxation step
+				      * like #SparseMatrix<number>::SOR_step# does. Do not
+				      * use the preconditioning methods because they apply
+				      * a preconditioning matrix to the residual.
+				      *
+				      * The final two parameters are the number of relaxation
+				      * steps and the relaxation parameter.
 				      */
 
     template<int dim>
-    MGSmootherSOR(const MGDoFHandler<dim> &mg_dof,
-		  const MGMatrix<SparseMatrix<float> >& matrix,
-		  unsigned int steps);
+    MGSmootherRelaxation(const MGDoFHandler<dim> &mg_dof,
+			 const MGMatrix<SparseMatrix<number> >& matrix,
+			 function_ptr function,
+			 unsigned int steps,
+			 double omega = 1.);
     
 				     /**
 				      * Implementation of the interface in #MGSmootherBase#.
@@ -145,13 +158,25 @@ class MGSmootherSOR
 				      * and find a way to keep the boundary values.
 				      */
     virtual void smooth (const unsigned int   level,
-			 Vector<float>       &u,
-			 const Vector<float> &rhs) const;
+			 Vector<double>       &u,
+			 const Vector<double> &rhs) const;
   private:
 				     /**
 				      * Pointer to the matrices.
 				      */
-    SmartPointer< const MGMatrix< SparseMatrix<float> > > matrix;
+    SmartPointer< const MGMatrix< SparseMatrix<number> > > matrix;
+				     /**
+				      * Pointer to the relaxation function.
+				      */
+    function_ptr relaxation;
+				     /**
+				      * Relaxation parameter.
+				      */
+    double omega;
+				     /**
+				      * Auxiliary vector.
+				      */
+    mutable Vector<double> h1, h2;
 };
 
 inline

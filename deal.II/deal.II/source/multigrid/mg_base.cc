@@ -63,7 +63,7 @@ MGBase::level_mgstep(unsigned level,
   pre_smooth.smooth(level, s[level], d[level]);
 				   // t = d-As
   t.reinit(s[level].size());
-  level_residual(level, t, s[level], d[level]);
+  level_vmult(level, t, s[level], d[level]);
 
 				   // make t rhs of lower level
   transfer->restrict(level, d[level-1], t);
@@ -100,8 +100,8 @@ MGSmootherBase::~MGSmootherBase()
 
 void
 MGSmootherIdentity::smooth (const unsigned int,
-			    Vector<float>       &,
-			    const Vector<float> &) const
+			    Vector<double>       &,
+			    const Vector<double> &) const
 {}
 
 

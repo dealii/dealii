@@ -332,6 +332,7 @@ template void ConstraintMatrix::condense(SparseMatrix<number> &uncondensed) cons
 template void ConstraintMatrix::condense(const Vector<number> &uncondensed,
 			    Vector<number>       &condensed) const;
 template void ConstraintMatrix::condense(Vector<number> &vec) const;
+template void ConstraintMatrix::set_zero(Vector<number> &vec) const;
 template void ConstraintMatrix::distribute(const Vector<number> &condensed,
 				      Vector<number>       &uncondensed) const;
 template void ConstraintMatrix::distribute(Vector<number> &vec) const;
@@ -345,6 +346,9 @@ template void ConstraintMatrix::condense(SparseMatrix<number> &uncondensed) cons
 template void ConstraintMatrix::condense(const Vector<number> &uncondensed,
 			    Vector<number>       &condensed) const;
 template void ConstraintMatrix::condense(Vector<number> &vec) const;
+template void ConstraintMatrix::set_zero(Vector<number> &vec) const;
 template void ConstraintMatrix::distribute(const Vector<number> &condensed,
 				      Vector<number>       &uncondensed) const;
 template void ConstraintMatrix::distribute(Vector<number> &vec) const;
+
+#undef number

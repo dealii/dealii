@@ -809,14 +809,14 @@ class EpsOutputData{
 				      * used for the height information, within
 				      * the list of DoF data vectors.
 				      */
-    unsigned height_vector;
+    unsigned int height_vector;
 
 				     /**
 				      * Number of the vector which is to be
 				      * used for the cell shading values, within
 				      * the list of cell data vectors.
 				      */
-    unsigned cell_vector;
+    unsigned int cell_vector;
     
                                      /**
 				      * Azimuth of the spectators position.

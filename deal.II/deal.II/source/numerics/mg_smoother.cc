@@ -92,7 +92,7 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
 
 void
 MGSmoother::set_zero_interior_boundary (const unsigned int  level,
-					Vector<float>      &u) const
+					Vector<double>      &u) const
 {
   if (level==0)
     return;
@@ -104,22 +104,7 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
 
 //////////////////////////////////////////////////////////////////////
 
-template<int dim>
-MGSmootherSOR::MGSmootherSOR(const MGDoFHandler<dim> &mg_dof,
-			     const MGMatrix<SparseMatrix<float> >& matrix,
-			     unsigned int steps)
-		:
-		MGSmoother(mg_dof, steps),
-		matrix(&matrix)
-{}
-
-void
-MGSmootherSOR::smooth (const unsigned int   /*level*/,
-		       Vector<float>       &/*u*/,
-		       const Vector<float> &/*rhs*/) const
-{
-
-}
+#include <numerics/mg_smoother.templates.h>
 
 // explicit instantiations
 // don't do the following instantiation in 1d, since there is a specialized
@@ -128,7 +113,18 @@ MGSmootherSOR::smooth (const unsigned int   /*level*/,
 template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&, unsigned int);
 #endif
 
-template MGSmootherSOR::MGSmootherSOR(const MGDoFHandler<deal_II_dimension> &mg_dof,
-				      const MGMatrix<SparseMatrix<float> >& matrix,
-				      unsigned int steps);
+template
+MGSmootherRelaxation<float>
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension> &mg_dof,
+		       const MGMatrix<SparseMatrix<float> >& matrix,
+		       function_ptr relaxation,
+		       unsigned int steps,
+		       double omega);
+template
+MGSmootherRelaxation<double>
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension> &mg_dof,
+		       const MGMatrix<SparseMatrix<double> >& matrix,
+		       function_ptr relaxation,
+		       unsigned int steps,
+		       double omega);
 

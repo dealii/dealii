@@ -29,8 +29,10 @@ class MG
 {
   public:
     MG(const MGDoFHandler<dim>&,
-       const MGMatrix<SparseMatrix<float> >&,
-       const MGTransferBase& transfer);
+       ConstraintMatrix& hanging_nodes,
+       const MGMatrix<SparseMatrix<double> >&,
+       const MGTransferBase& transfer,
+       unsigned int minlevel = 0, unsigned int maxlevel = 10000);
     
 				     /** Transfer from dVector to
 				      * MGVector.
@@ -58,17 +60,18 @@ class MG
     void copy_from_mg(Vector<number>& dst) const;
 
 				     /**
-				      * Residual on a level.
+				      * Negative #vmult# on a level.
+				      * @see MGBase.
 				      */
-    virtual void level_residual(unsigned int,
-				Vector<float> &,
-				const Vector<float> &,
-				const Vector<float> &);
+    virtual void level_vmult(unsigned int,
+				Vector<double> &,
+				const Vector<double> &,
+				const Vector<double> &);
 
 				     /**
 				      * Read-only access to level matrices.
 				      */
-    const SparseMatrix<float>& get_matrix(unsigned int level) const;
+    const SparseMatrix<double>& get_matrix(unsigned int level) const;
 
   private:
 				     /**
@@ -82,7 +85,8 @@ class MG
 				      * the constructor of #MG# and can
 				      * be accessed for assembling.
 				      */
-    SmartPointer<const MGMatrix<SparseMatrix<float> > > matrices;
+    SmartPointer<const MGMatrix<SparseMatrix<double> > > matrices;
+    ConstraintMatrix& hanging_nodes;
 };
 
 
@@ -97,8 +101,16 @@ class MG
  */
 class MGTransferPrebuilt : public MGTransferBase 
 {
+    const MGSmoother& smoother;
   public:
-
+				     /**
+				      * Preliminary constructor
+				      */
+    MGTransferPrebuilt(const MGSmoother& smoother) :
+		    smoother(smoother)
+      {}
+    
+    
 				     /**
 				      * Destructor.
 				      */
@@ -124,8 +136,8 @@ class MGTransferPrebuilt : public MGTransferBase
 				      * level.
 				      */
     virtual void prolongate (const unsigned int   to_level,
-			     Vector<float>       &dst,
-			     const Vector<float> &src) const;
+			     Vector<double>       &dst,
+			     const Vector<double> &src) const;
 
 				     /**
 				      * Restrict a vector from level
@@ -141,8 +153,8 @@ class MGTransferPrebuilt : public MGTransferBase
 				      * level.
 				      */
     virtual void restrict (const unsigned int   from_level,
-			   Vector<float>       &dst,
-			   const Vector<float> &src) const;
+			   Vector<double>       &dst,
+			   const Vector<double> &src) const;
 
   private:
 
@@ -162,7 +174,7 @@ class MGTransferPrebuilt : public MGTransferBase
 
 template<int dim>
 inline
-const SparseMatrix<float>&
+const SparseMatrix<double>&
 MG<dim>::get_matrix(unsigned int level) const
 {
   Assert((level>=minlevel) && (level<maxlevel), ExcIndexRange(level, minlevel, maxlevel));

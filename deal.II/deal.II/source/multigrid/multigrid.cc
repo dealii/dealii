@@ -11,6 +11,8 @@
 #include <numerics/mg_smoother.h>
 #include <lac/vector.h>
 
+extern void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsigned int level,
+			   ostream &out, unsigned int accuracy);
 
 
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
@@ -59,7 +61,8 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				       // cell
       prolongation_sparsities.back().reinit (mg_dof.n_dofs(level+1),
 					     mg_dof.n_dofs(level),
-					     dofs_per_cell);
+// evil hack, must be corrected!!!
+					     dofs_per_cell+1);
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -134,8 +137,8 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 
 
 void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
-				     Vector<float>       &dst,
-				     const Vector<float> &src) const 
+				     Vector<double>       &dst,
+				     const Vector<double> &src) const 
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
@@ -146,13 +149,13 @@ void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
 
 
 void MGTransferPrebuilt::restrict (const unsigned int   from_level,
-				   Vector<float>       &dst,
-				   const Vector<float> &src) const 
+				   Vector<double>       &dst,
+				   const Vector<double> &src) const 
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
-
-  prolongation_matrices[from_level-1].Tvmult (dst, src);
+//  smoother.set_zero_interior_boundary(from_level, src);
+  prolongation_matrices[from_level-1].Tvmult_add (dst, src);
 };
 
 
