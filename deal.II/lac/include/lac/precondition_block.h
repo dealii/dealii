@@ -425,6 +425,10 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				   /**
 				    * Actual implementation of the
 				    * preconditioner.
+				    *
+				    * Depending on @p{adding}, the
+				    * result of preconditioning is
+				    * added to the destination vector.
 				    */
     template <typename number2>
     void do_vmult (Vector<number2>&,
@@ -443,7 +447,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * arbitrarily.
  *
  * See @ref{PreconditionBlock} for requirements on the matrix.
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
+ * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSOR : public virtual Subscriptor,
@@ -502,6 +506,26 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
+				      * Execute block SOR
+				      * preconditioning.
+				      *
+				      * Warning: this function
+				      * performs normal @p{vmult}
+				      * without adding. The reason for
+				      * its existence is that
+				      * @ref{BlockMatrixArray}
+				      * requires the adding version by
+				      * default. On the other hand,
+				      * adding requires an additional
+				      * auxiliary vector, which is not
+				      * desirable.
+				      *
+				      * @see{vmult}.
+				      */
+    template <typename number2>
+    void vmult_add (Vector<number2>&, const Vector<number2>&) const;
+
+				     /**
 				      * Backward application of @ref{vmult}.
 				      *
 				      * In the current implementation,
@@ -517,6 +541,20 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
+
+  private:
+				     /**
+				      * Actual implementation of the
+				      * preconditioning algorithm.
+				      *
+				      * The parameter @p{adding} does
+				      * not have any function, yet.
+				      */
+    template <typename number2>
+    void do_vmult (Vector<number2>&,
+		   const Vector<number2>&,
+		   const bool adding) const;
+
 };
 
 

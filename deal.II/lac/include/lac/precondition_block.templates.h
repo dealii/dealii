@@ -387,8 +387,10 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 
 template <class MATRIX, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &dst,
-						       const Vector<number2> &src) const
+void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
+  Vector<number2>       &dst,
+  const Vector<number2> &src,
+  const bool) const
 {
 				   // introduce the following typedef
 				   // since in the use of exceptions,
@@ -605,6 +607,26 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &d
 	block_start += this->blocksize;
       }
 }
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<MATRIX,inverse_type>
+::vmult (Vector<number2>       &dst,
+	 const Vector<number2> &src) const
+{
+  do_vmult(dst, src, false);
+}
+
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<MATRIX,inverse_type>
+::vmult_add (Vector<number2>       &dst,
+	     const Vector<number2> &src) const
+{
+  do_vmult(dst, src, true);
+}
+
 
 //----------------------------------------------------------------------//
 
