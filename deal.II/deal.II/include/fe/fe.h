@@ -154,8 +154,8 @@ struct FiniteElementData<2> {
 		    dofs_per_face(2*dofs_per_vertex+
 				  dofs_per_line),
 		    total_dofs (4*dofs_per_vertex+
-				4*dofs_per_quad+
-				dofs_per_line) {};
+				4*dofs_per_line+
+				dofs_per_quad) {};
 
 				     /**
 				      * Comparison operator. It is not clear to
