@@ -2421,7 +2421,7 @@ AC_DEFUN(DEAL_II_CHECK_FUNPTR_TEMPLATE_TEMPLATE_BUG, dnl
         return (void*)p;
       }
 
-      template void g<2,X> ();
+      template void* g<2,X> ();
     ],
     [],
     [
