@@ -365,8 +365,6 @@ class FiniteElementBase : public Subscriptor,
 					* are missing.
 					*/
       std::vector<FEValues<dim>*> differences;
-
-
     };
   
 				     /**
