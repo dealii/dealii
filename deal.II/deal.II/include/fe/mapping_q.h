@@ -50,6 +50,30 @@ class MappingQ : public MappingQ1<dim>
 				      * Destructor.
 				      */
     virtual ~MappingQ ();
+    
+				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p) const;
+    
+				     /**
+				      * Transforms the point @p{p} on
+				      * the real cell to the point
+				      * @p{p_unit} on the unit cell
+				      * @p{cell} and returns @p{p_unit}.
+				      *
+				      * Uses Newton iteration and the
+				      * @p{transform_unit_to_real_cell}
+				      * function.
+				      */
+    virtual Point<dim> transform_real_to_unit_cell (
+      const typename Triangulation<dim>::cell_iterator cell,
+      const Point<dim> &p) const;
 
 				     /**
 				      * Implementation of the interface in

@@ -845,15 +845,19 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
   const typename Triangulation<dim>::cell_iterator cell,
   const Point<dim> &p) const
 {
-  				   // Use the get_cell_data function
-				   // to create an InternalData with
-				   // data vectors already of the
-				   // right size and with mapping
-				   // support points set.
-  InternalData *mdata=get_cell_data(cell, update_transformation_values);
+				   // Use the get_data function to
+				   // create an InternalData with data
+				   // vectors of the right size and
+				   // transformation shape values
+				   // already computed at point p.
+  const Quadrature<dim> point_quadrature(p);
+  InternalData *mdata=dynamic_cast<InternalData *> (
+    get_data(update_transformation_values, point_quadrature));
   Assert(mdata!=0, ExcInternalError());
 
-  compute_shapes(std::vector<Point<dim> > (1, p), *mdata);
+				   // compute the mapping support
+				   // points
+  compute_mapping_support_points(cell, mdata->mapping_support_points);
 
   return transform_unit_to_real_cell_internal(*mdata);
 }
@@ -876,40 +880,68 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell_internal (
 }
 
 
-
 template <int dim>
 Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
   const typename Triangulation<dim>::cell_iterator cell,
   const Point<dim> &p) const
 {
-				   // Use the get_cell_data function
-				   // to create an InternalData with
-				   // data vectors already of the
-				   // right size and with mapping
-				   // support points set.
-  InternalData *mdata=get_cell_data(cell,
-				    update_transformation_values
-				    | update_transformation_gradients);
+				   // Let the start value of the
+				   // newton iteration be the center
+				   // of the unit cell
+  Point<dim> p_unit;
+  for (unsigned int i=0; i<dim; ++i)
+    p_unit(i)=0.5;
+
+				   // Use the get_data function to
+				   // create an InternalData with data
+				   // vectors of the right size and
+				   // transformation shape values and
+				   // derivatives already computed at
+				   // point p_unit.
+  const Quadrature<dim> point_quadrature(p_unit);
+  InternalData *mdata=dynamic_cast<InternalData *> (
+    get_data(update_transformation_values | update_transformation_gradients,
+	     point_quadrature));
   Assert(mdata!=0, ExcInternalError());
-  std::vector<Point<dim> > &points=mdata->mapping_support_points;
+
+				   // perform the newton iteration.
+  transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
+  
+  delete mdata;
+  return p_unit;
+}
+
+
+
+template <int dim>
+void MappingQ1<dim>::transform_real_to_unit_cell_internal (
+  const typename Triangulation<dim>::cell_iterator cell,
+  const Point<dim> &p,
+  InternalData &mdata,
+  Point<dim> &p_unit) const
+{
+  const unsigned int n_shapes=mdata.shape_values.size();
+  Assert(n_shapes!=0, ExcInternalError());
+  Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
+  
+  std::vector<Point<dim> > &points=mdata.mapping_support_points;
+  compute_mapping_support_points(cell, points);
+  Assert(points.size()==n_shapes, ExcInternalError());
   
 				   // Newton iteration to solve
 				   // f(x)=p(x)-p=0
 				   // x_{n+1}=x_n-[f'(x)]^{-1}f(x)
   
-				   // Let the start value be the
-				   // center of the unit cell
-				   // (p_unit stands for x)
-  Point<dim> p_unit;
-  for (unsigned int i=0; i<dim; ++i)
-    p_unit(i)=0.5;
+				   // The start value is set to be the
+				   // center of the unit cell.
   
-				   // compute shape values and
-				   // derivatives of the mapping
-  compute_shapes(std::vector<Point<dim> > (1, p_unit), *mdata);
+				   // The shape values and derivatives
+				   // of the mapping at this point are
+				   // previously computed.
+
   
 				   // f(x)
-  Point<dim> p_real(transform_unit_to_real_cell_internal(*mdata));
+  Point<dim> p_real(transform_unit_to_real_cell_internal(mdata));
   Point<dim> f = p_real-p;
 
   const double eps=1e-15*cell->diameter();
@@ -918,9 +950,9 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
     {      
 				       // f'(x)
       Tensor<2,dim> df;
-      for (unsigned int k=0; k<mdata->n_shape_functions; ++k)
+      for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
 	{
-	  const Tensor<1,dim> &grad_transform=mdata->derivative(0,k);
+	  const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
 	  const Point<dim> &point=points[k];
 	  
 	  for (unsigned int i=0; i<dim; ++i)
@@ -939,39 +971,13 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
       p_unit -= d;
 				       // shape values and derivatives
 				       // at new p_unit point
-      compute_shapes(std::vector<Point<dim> > (1, p_unit), *mdata);
+      compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
       
 				       // f(x)
-      p_real=transform_unit_to_real_cell_internal(*mdata);
+      p_real=transform_unit_to_real_cell_internal(mdata);
       f = p_real-p;
     }
-
-  delete mdata;
-  return p_unit;
 }
-
-
-template <int dim>
-MappingQ1<dim>::InternalData*
-MappingQ1<dim>::get_cell_data(const typename Triangulation<dim>::cell_iterator cell,
-			      const UpdateFlags update_flags) const
-{
-  static const Point<dim> dummy_p;
-  static const Quadrature<dim> dummy_quadrature(dummy_p);
-
-  InternalData *mdata=dynamic_cast<InternalData *> (
-    get_data(update_flags, dummy_quadrature));
-  Assert(mdata!=0, ExcInternalError());
-
-				   // compute the mapping support
-				   // points
-  std::vector<Point<dim> > &points=mdata->mapping_support_points;
-  compute_mapping_support_points(cell, points);
-
-  return mdata;
-}
-
-  
 
 
 

@@ -147,7 +147,6 @@ void
 MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
 				       MappingQ1<dim>::InternalData &data) const
 {
-  
   const unsigned int n_points=unit_points.size();
   std::vector<double> values;
   std::vector<Tensor<1,dim> > grads;
@@ -1208,6 +1207,76 @@ MappingQ<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
 }
 
 
+template <int dim>
+Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
+  const typename Triangulation<dim>::cell_iterator cell,
+  const Point<dim> &p) const
+{
+				   // Use the get_data function to
+				   // create an InternalData with data
+				   // vectors of the right size and
+				   // transformation shape values
+				   // already computed at point p.
+  const Quadrature<dim> point_quadrature(p);
+  InternalData *mdata=dynamic_cast<InternalData *> (
+    get_data(update_transformation_values, point_quadrature));
+  Assert(mdata!=0, ExcInternalError());
+  
+  mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
+					     || cell->has_boundary_lines());
 
+  MappingQ1<dim>::InternalData *p_data=0;
+  if (mdata->use_mapping_q1_on_current_cell)
+    p_data=&mdata->mapping_q1_data;
+  else
+    p_data=mdata;
+
+  compute_mapping_support_points(cell, p_data->mapping_support_points);
+  
+  return transform_unit_to_real_cell_internal(*p_data);
+}
+
+
+template <int dim>
+Point<dim> MappingQ<dim>::transform_real_to_unit_cell (
+  const typename Triangulation<dim>::cell_iterator cell,
+  const Point<dim> &p) const
+{
+				   // Let the start value of the
+				   // newton iteration be the center
+				   // of the unit cell
+  Point<dim> p_unit;
+  for (unsigned int i=0; i<dim; ++i)
+    p_unit(i)=0.5;
+
+				   // Use the get_data function to
+				   // create an InternalData with data
+				   // vectors of the right size and
+				   // transformation shape values and
+				   // derivatives already computed at
+				   // point p_unit.
+  const Quadrature<dim> point_quadrature(p_unit);
+  InternalData *mdata=dynamic_cast<InternalData *> (
+    get_data(update_transformation_values | update_transformation_gradients,
+	     point_quadrature));
+  Assert(mdata!=0, ExcInternalError());
+
+  mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
+					     || cell->has_boundary_lines());
+
+  MappingQ1<dim>::InternalData *p_data=0;
+  if (mdata->use_mapping_q1_on_current_cell)
+    p_data=&mdata->mapping_q1_data;
+  else
+    p_data=mdata;
+  
+				   // perform the newton iteration.
+  transform_real_to_unit_cell_internal(cell, p, *p_data, p_unit);
+  
+  delete mdata;
+  return p_unit;
+}
+  
+  
 // explicit instantiation
 template class MappingQ<deal_II_dimension>;

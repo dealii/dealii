@@ -389,15 +389,6 @@ class MappingQ1 : public Mapping<dim>
 					 InternalData &data) const;
 
 				     /**
-				      * Mapping between tensor product
-				      * ordering and real ordering of
-				      * the vertices.
-				      */
-    static const unsigned int vertex_mapping[1<<dim];
-    
-
-  private:
-				     /**
 				      * Transforms a point @p{p} on
 				      * the unit cell to the point
 				      * @p{p_real} on the real cell
@@ -407,7 +398,7 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{transform_unit_to_real_cell}
 				      * and multiply (through the
 				      * Newton iteration) by
-				      * @p{transform_real_to_unit_cell}.
+				      * @p{transform_real_to_unit_cell_internal}.
 				      *
 				      * Takes a reference to an
 				      * @p{InternalData} that must
@@ -423,31 +414,55 @@ class MappingQ1 : public Mapping<dim>
 				      * computations of the mapping
 				      * support points.
 				      */
-    virtual Point<dim> transform_unit_to_real_cell_internal (const InternalData &m_data) const;
-
-				     /**
-				      * Returns an @p{InternalData}
-				      * whose data vectors are resized
-				      * corresponding to the
-				      * @p{update_flags} and a
-				      * one-point
-				      * quadrature. Furthermore the
-				      * @p{InternalData} stores the
-				      * mapping support points of the
-				      * given @p{cell}.
-				      *
-				      * This function is called by
-				      * @p{transform_unit_to_real_cell}
-				      * and by
-				      * @p{transform_real_to_unit_cell}.
-				      * The resulting @p{InternalData}
-				      * is given to the
-				      * @p{transform_unit_to_real_internal}
-				      * function.
-				      */
-    InternalData* get_cell_data(const typename Triangulation<dim>::cell_iterator cell,
-				const UpdateFlags update_flags) const;
+    Point<dim> transform_unit_to_real_cell_internal (const InternalData &mdata) const;
     
+				     /**
+				      * Transforms the point @p{p} on
+				      * the real cell to the point
+				      * @p{p_unit} on the unit cell
+				      * @p{cell} by a Newton
+				      * iteration.
+				      *
+				      * Takes a reference to an
+				      * @p{InternalData} that is
+				      * assumed to be previously
+				      * created by the @p{get_data}
+				      * function with @p{UpdateFlags}
+				      * including
+				      * @p{update_transformation_values}
+				      * and
+				      * @p{update_transformation_gradients}
+				      * and a one point Quadrature
+				      * including the given point
+				      * @p{p_unit}.  Hence this
+				      * function assumes that
+				      * @p{mdata} already includes the
+				      * transformation shape values
+				      * and gradients computed at
+				      * @p{p_unit}.
+				      *
+				      * These assumptions should be
+				      * fulfilled by the calling
+				      * function. That is up to now
+				      * only the function
+				      * @p{transform_real_to_unit_cell}
+				      * and its overloaded versions.
+				      * @p{mdata} will be changed by
+				      * this function.
+				      */
+    void transform_real_to_unit_cell_internal (const typename Triangulation<dim>::cell_iterator cell,
+					       const Point<dim> &p,
+					       InternalData &mdata,
+					       Point<dim> &p_unit) const;
+    
+				     /**
+				      * Mapping between tensor product
+				      * ordering and real ordering of
+				      * the vertices.
+				      */
+    static const unsigned int vertex_mapping[1<<dim];
+
+  private:
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
