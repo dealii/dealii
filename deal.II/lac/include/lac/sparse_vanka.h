@@ -14,7 +14,7 @@
 #define __deal2__sparse_vanka_h
 
 
-/* Copyright Guido Kanschat, 1999 */
+/* Copyright Guido Kanschat, Wolfgang Bangerth 1999, 2000 */
 
 
 #include <base/smartpointer.h>
@@ -307,21 +307,22 @@ class SparseVanka
 				     /**
 				      * Compute the inverse of the
 				      * block located at position
-				      * #row#. Since the map is used
-				      * quite often, it is generated
-				      * only once in the caller of
-				      * this function and passed to
-				      * this function which first
-				      * clears it. Reusing the map
-				      * makes the process
+				      * #row#. Since the vector is
+				      * used quite often, it is
+				      * generated only once in the
+				      * caller of this function and
+				      * passed to this function which
+				      * first clears it. Reusing the
+				      * vector makes the process
 				      * significantly faster than in
 				      * the case where this function
 				      * re-creates it each time.
 				      */
-    void compute_inverse (const unsigned int               row,
-			  map<unsigned int, unsigned int> &local_index);
+    void compute_inverse (const unsigned int    row,
+			  vector<unsigned int> &local_indices);
 
 };
+
 
 
 /**

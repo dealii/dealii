@@ -129,23 +129,23 @@ void
 SparseVanka<number>::compute_inverses (const unsigned int begin,
 				       const unsigned int end) 
 {
-				   // set-up the map that will be used
+				   // set-up the vector that will be used
 				   // by the functions which we call
 				   // below.
-  map<unsigned int, unsigned int> local_index;
+  vector<unsigned int> local_indices;
 
 				   // traverse all rows of the matrix
 				   // which are selected
   for (unsigned int row=begin; row<end; ++row)
     if (selected[row] == true)
-      compute_inverse (row, local_index);
+      compute_inverse (row, local_indices);
 };
 
 
 template <typename number>
 void
-SparseVanka<number>::compute_inverse (const unsigned int               row,
-				      map<unsigned int, unsigned int> &local_index) 
+SparseVanka<number>::compute_inverse (const unsigned int    row,
+				      vector<unsigned int> &local_indices) 
 {
 				   // first define an alias to the sparsity
 				   // pattern of the matrix, since this
@@ -156,62 +156,24 @@ SparseVanka<number>::compute_inverse (const unsigned int               row,
   const unsigned int row_length = structure.row_length(row);
   inverses[row] = new FullMatrix<float> (row_length,
 					 row_length); 
-				   // mapping between:
-				   // 1 column number of all
-				   //   entries in this row, and
-				   // 2 the position within this
-				   //   row (as stored in the
-				   //   SparsityPattern object
-				   //
-				   // since we do not explicitely
-				   // consider nonsysmmetric sparsity
-				   // patterns, the first element
-				   // of each entry simply denotes
-				   // all degrees of freedom that
-				   // couple with #row#.
-  local_index.clear ();
+
+				   // collect the dofs that couple
+				   // with #row#
+  local_indices.resize (0);
   for (unsigned int i=0; i<row_length; ++i)
-    local_index.insert(pair<unsigned int, unsigned int>
-		       (structure.column_number(row, i), i));
+    local_indices.push_back (structure.column_number(row, i));
+
+  const unsigned int n_couplings = local_indices.size();
   
-				   // Build local matrix and rhs
-  for (map<unsigned int, unsigned int>::const_iterator is=local_index.begin();
-       is!=local_index.end(); ++is)
-    {
-				       // irow loops over all DoFs that
-				       // couple with the present DoF
-      const unsigned int irow = is->first;
-				       // index of DoF irow in the matrix
-				       // row corresponding to DoF #row#.
-				       // runs between 0 and row_length
-      const unsigned int i = is->second;
-				       // number of DoFs coupling to
-				       // irow (including irow itself)
-      const unsigned int irow_length = structure.row_length(irow);
-      
-				       // for all the DoFs that irow
-				       // couples with
-      for (unsigned int j=0; j<irow_length; ++j)
-	{
-					   // col is the number of
-					   // this dof
-	  const unsigned int col = structure.column_number(irow, j);
-					   // find out whether this DoF
-					   // (that couples with #irow#,
-					   // which itself couples with
-					   // #row#) also couples with
-					   // #row#.
-	  const map<unsigned int, unsigned int>::const_iterator js
-	    = local_index.find(col);
-	  
-	  if (js != local_index.end())
-	    (*inverses[row])(i,js->second) = matrix->raw_entry(irow,j);
-	};
-    };
+				   // Build local matrix
+  for (unsigned int i=0; i<n_couplings; ++i)
+    for (unsigned int j=0; j<n_couplings; ++j)
+      (*inverses[row])(i,j) = matrix(local_indices[i], local_indices[j]);
   
-				   // Compute new values
+				   // Compute inverse
   inverses[row]->gauss_jordan();
 };
+
 
 
 template<typename number>
@@ -226,6 +188,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 				   // that actually does the work
   apply_preconditioner (dst, src);
 };
+
 
 
 template<typename number>
@@ -247,7 +210,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
     = matrix->get_sparsity_pattern();
 
 
-// store whether we shall work on
+				   // store whether we shall work on
 				   // the whole matrix, or only on
 				   // blocks. this variable is used to
 				   // optimize access to vectors a
