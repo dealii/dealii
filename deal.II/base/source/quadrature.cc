@@ -41,15 +41,30 @@ using namespace std;
 
 
 template <int dim>
-Quadrature<dim>::Quadrature (const typename std::vector<Point<dim> >  &points,
-			     const std::vector<double>       &weights)
-		: n_quadrature_points(points.size()),
-		  quadrature_points(points),
-		  weights(weights)
+Quadrature<dim>::Quadrature (const typename std::vector<Point<dim> > &points,
+			     const std::vector<double>               &weights)
+		:
+		n_quadrature_points(points.size()),
+		quadrature_points(points),
+		weights(weights)
 {
   Assert(weights.size() == points.size(),
 	 ExcDimensionMismatch(weights.size(), points.size()));
 }
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature (const typename std::vector<Point<dim> > &points)
+		:
+		n_quadrature_points(points.size()),
+		quadrature_points(points),
+		weights(points.size(), atof("Inf"))
+{
+  Assert(weights.size() == points.size(),
+	 ExcDimensionMismatch(weights.size(), points.size()));
+}
+
 
 
 template <int dim>

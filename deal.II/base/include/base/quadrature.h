@@ -83,22 +83,49 @@ class Quadrature : public Subscriptor
     Quadrature (const unsigned int n_quadrature_points);
 
 				     /**
-				      * Build this quadrature formula as the
-				      * tensor product of a formula in a
-				      * dimension one less than the present and
-				      * a formula in one dimension.
+				      * Build this quadrature formula
+				      * as the tensor product of a
+				      * formula in a dimension one
+				      * less than the present and a
+				      * formula in one dimension.
 				      */
     Quadrature (const Quadrature<dim-1> &,
 		const Quadrature<1>     &);
     
 				     /**
-				      * Constructor from given vectors.
+				      * Construct a quadrature formula
+				      * from given vectors of
+				      * quadrature points (which
+				      * should really be in the unit
+				      * cell) and the corresponding
+				      * weights. You will want to have
+				      * the weights sum up to one, but
+				      * this is not checked.
 				      */
     Quadrature (const typename std::vector<Point<dim> > &points,
-		const std::vector<double>      &weights);
+		const std::vector<double>               &weights);
 
 				     /**
-				      * Constructor for a one-point quadrature.
+				      * Construct a dummy quadrature
+				      * formula from a list of points,
+				      * with weights set to
+				      * infinity. The resulting object
+				      * is therefore not meant to
+				      * actually perform integrations,
+				      * but rather to be used with
+				      * @ref{FEValues} objects in
+				      * order to find the position of
+				      * some points (the quadrature
+				      * points in this object) on the
+				      * transformed cell in real
+				      * space.
+				      */
+    Quadrature (const typename std::vector<Point<dim> > &points);
+
+				     /**
+				      * Constructor for a one-point
+				      * quadrature. Sets the weight of
+				      * this point to one.
 				      */
     Quadrature (const Point<dim> &point);
     
