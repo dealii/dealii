@@ -665,10 +665,10 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 					   // it is cheaper to not do so and
 					   // run right until the end of the
 					   // line
-	  const unsigned int row_end = sparsity.get_rowstart_indices()[row+1];
-	  for (unsigned int j=sparsity.get_rowstart_indices()[row]; j<row_end; ++j)
+          for (SparsityPattern::iterator entry = sparsity.begin(row);
+               entry != sparsity.end(row); ++entry)
 	    {
-	      const unsigned int column = sparsity.get_column_numbers()[j];
+	      const unsigned int column = entry->column();
 	      
 					       // end of row reached?
 	      if (column == SparsityPattern::invalid_entry)
@@ -686,8 +686,8 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 			 ++q) 
 		      sparsity.add (row,
 				    lines[distribute[column]].entries[q].first);
-		  };
-	    };
+		  }
+	    }
 	}
       else
 					 // row must be
@@ -695,36 +695,34 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 					 // here the present row is
 					 // not touched (unlike above)
 	{
-	  const unsigned int row_end = sparsity.get_rowstart_indices()[row+1];
-	  for (unsigned int j=sparsity.get_rowstart_indices()[row]; j<row_end; ++j)
+          for (SparsityPattern::iterator entry = sparsity.begin(row);
+               entry != sparsity.end(row); ++entry)
 					     // end of row reached?
-	    if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+	    if (entry->column() == SparsityPattern::invalid_entry)
 	      break;
 	    else
 	      {
-		if (distribute[sparsity.get_column_numbers()[j]] ==
-                    deal_II_numbers::invalid_unsigned_int)
+                const unsigned int column = entry->column();
+		if (distribute[column] == deal_II_numbers::invalid_unsigned_int)
 						   // distribute entry at irregular
 						   // row @p{row} and regular column
 						   // sparsity.colnums[j]
 		  for (unsigned int q=0;
 		       q!=lines[distribute[row]].entries.size(); ++q) 
 		    sparsity.add (lines[distribute[row]].entries[q].first,
-				  sparsity.get_column_numbers()[j]);
+				  column);
 		else
 						   // distribute entry at irregular
 						   // row @p{row} and irregular column
 						   // sparsity.get_column_numbers()[j]
 		  for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 		    for (unsigned int q=0;
-			 q!=lines[distribute[sparsity.get_column_numbers()[j]]]
-					.entries.size(); ++q)
+			 q!=lines[distribute[column]].entries.size(); ++q)
 		      sparsity.add (lines[distribute[row]].entries[p].first,
-				    lines[distribute[sparsity.get_column_numbers()[j]]]
-				    .entries[q].first);
-	      };
-	};
-    };
+				    lines[distribute[column]].entries[q].first);
+	      }
+	}
+    }
   
   sparsity.compress();
 }
