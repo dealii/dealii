@@ -310,7 +310,8 @@ class SparseLUDecomposition : protected SparseMatrix<number>{
 template <typename number>
 inline number
 SparseLUDecomposition<number>::
-get_strengthen_diagonal(const number rowsum, const unsigned int row) const
+get_strengthen_diagonal(const number /*rowsum*/,
+			const unsigned int /*row*/) const
 {
   return strengthen_diagonal;
 };
