@@ -459,6 +459,11 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 				      *  Exception
 				      */
     DeclException0 (ExcAdvanceInvalidObject);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidComparison);
+    
 				     /*@}*/
   protected:
 				     /**
@@ -890,6 +895,8 @@ TriaRawIterator<dim,Accessor>::
 operator < (const TriaRawIterator &i) const {
   Assert (state() != invalid, ExcDereferenceInvalidObject());
   Assert (i.state() != invalid, ExcDereferenceInvalidObject());
+  Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
+	  ExcInvalidComparison());
   
   return ((((accessor.level() < i.accessor.level()) ||
 	    ((accessor.level() == i.accessor.level()) &&
