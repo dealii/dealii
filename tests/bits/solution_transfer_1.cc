@@ -16,6 +16,9 @@
 // vector or vectors as input and an empty vector of vectors as
 // output, then the output was a zero vector even if the input vector
 // was nonzero
+//
+// this was due to us computing the output vector size before we
+// resized the output vector
 
 #include <base/logstream.h>
 #include <grid/tria.h>
@@ -70,4 +73,6 @@ int main ()
 				   // should not be either!
   Assert (solution_out[0].l2_norm() > 0,
 	  ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
