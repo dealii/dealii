@@ -29,6 +29,8 @@
 #endif
 
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <signal.h>
 #include <unistd.h>
 
 #ifndef DEAL_II_USE_DIRECT_ERRNO_H
@@ -331,10 +333,10 @@ void monitor_child_liveness (const pid_t child_pid)
 //           die ("Child process seems to have died!");
       int ret = kill (child_pid, 0);
       if (ret != 0)
-        if (ret == ESRCH)
+        if ((ret == -1) && (errno == ESRCH))
           die ("Child process seems to have died!");
         else
-          die ("Unspecified error while checking for other process!");
+          die ("Unspecified error while checking for other process!", ret, errno);
 
                                        // ok, master still running,
                                        // take a little rest and then
