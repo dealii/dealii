@@ -76,7 +76,7 @@ template <typename> class Vector;
  *
  * @dontinclude block_matrix_array.cc
  *
- * Obviously, we have to include the header file contining the definition
+ * Obviously, we have to include the header file containing the definition
  * of BlockMatrixArray:
  * @skipline block_matrix_array.h
  *
