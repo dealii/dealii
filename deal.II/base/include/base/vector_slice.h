@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------
-#ifndef __deal2__slice_vector_h
-#define __deal2__slice_vector_h
+#ifndef __deal2__vector_slice_h
+#define __deal2__vector_slice_h
 
 #include <base/config.h>
 #include <base/exceptions.h>
@@ -25,13 +25,13 @@
  * every index.
  *
  * Some precautions have to be taken if it is used for a constant
- * vector: the SliceVector object has to be constant, too. The
+ * vector: the VectorSlice object has to be constant, too. The
  * appropriate initalization sequence is like this:
  *
  * @code
  *   void f(const std::vector<int>& v)
  *   {
- *     const SliceVector slice(v,...);
+ *     const VectorSlice slice(v,...);
  *     ...
  *   }
  * @endcode
@@ -39,11 +39,11 @@
  * @author Guido Kanschat, 2004
  */
 template <class VECTOR>
-class SliceVector
+class VectorSlice
 {
   public:
-    SliceVector(VECTOR& v);
-    SliceVector(VECTOR& v,
+    VectorSlice(VECTOR& v);
+    VectorSlice(VECTOR& v,
 		unsigned int start,
 		unsigned int length);
 
@@ -62,15 +62,15 @@ class SliceVector
  * Helper function for creating temporary objects without typing
  * template arguments.
  *
- * @relates SliceVector
+ * @relates VectorSlice
  * @author Guido Kanschat, 2004
  */
 template <class VECTOR>
 inline
-const SliceVector<VECTOR>
+const VectorSlice<VECTOR>
 make_slice (VECTOR& v)
 {
-  const SliceVector<VECTOR> r(v);
+  const VectorSlice<VECTOR> r(v);
   return r;
 }
 
@@ -80,15 +80,15 @@ make_slice (VECTOR& v)
  * Helper function for creating temporary objects without typing
  * template arguments.
  *
- * @relates SliceVector
+ * @relates VectorSlice
  * @author Guido Kanschat, 2004
  */
 template <class VECTOR>
 inline
-const SliceVector<VECTOR>
+const VectorSlice<VECTOR>
 make_slice (VECTOR& v, unsigned int start, unsigned int length)
 {
-  const SliceVector<VECTOR> r(v, start, length);
+  const VectorSlice<VECTOR> r(v, start, length);
   return r;
 }
 
@@ -99,14 +99,14 @@ make_slice (VECTOR& v, unsigned int start, unsigned int length)
 
 template <class VECTOR>
 inline
-SliceVector<VECTOR>::SliceVector(VECTOR& v)
+VectorSlice<VECTOR>::VectorSlice(VECTOR& v)
 		: v(v), start(0), length(v.size())
 {}
 
 
 template <class VECTOR>
 inline
-SliceVector<VECTOR>::SliceVector(VECTOR& v,
+VectorSlice<VECTOR>::VectorSlice(VECTOR& v,
 			 unsigned int start,
 			 unsigned int length)
 		: v(v), start(start), length(length)
@@ -119,7 +119,7 @@ SliceVector<VECTOR>::SliceVector(VECTOR& v,
 template <class VECTOR>
 inline
 unsigned int
-SliceVector<VECTOR>::size() const
+VectorSlice<VECTOR>::size() const
 {
   return length;
 }
@@ -128,7 +128,7 @@ SliceVector<VECTOR>::size() const
 template <class VECTOR>
 inline
 typename VECTOR::reference
-SliceVector<VECTOR>::operator[](unsigned int i)
+VectorSlice<VECTOR>::operator[](unsigned int i)
 {
   Assert ((i<length), ExcIndexRange(i, 0, length));
   
@@ -139,7 +139,7 @@ SliceVector<VECTOR>::operator[](unsigned int i)
 template <class VECTOR>
 inline
 typename VECTOR::const_reference
-SliceVector<VECTOR>::operator[](unsigned int i) const
+VectorSlice<VECTOR>::operator[](unsigned int i) const
 {
   Assert ((i<length), ExcIndexRange(i, 0, length));
   

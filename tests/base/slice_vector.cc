@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------
 
 
-#include <base/slice_vector.h>
+#include <base/vector_slice.h>
 #include <base/logstream.h>
 
 #include <vector>
@@ -21,7 +21,7 @@
 
 void f(const std::vector<int>& v)
 {
-  const SliceVector<const std::vector<int> > s(v,2,3);
+  const VectorSlice<const std::vector<int> > s(v,2,3);
 
   for (unsigned int i=0;i<s.size();++i)
     std::cerr << '\t' << s[i];
@@ -64,7 +64,7 @@ int main()
   for (unsigned int i=0;i<v.size();++i)
     v[i] = i;
   
-  SliceVector<std::vector<int> > s(v, 3, 4);
+  VectorSlice<std::vector<int> > s(v, 3, 4);
 
   for (unsigned int i=0;i<s.size();++i)
     s[i] = i;
@@ -75,7 +75,7 @@ int main()
 
   f(v);
 
-  SliceVector<std::vector<int> > s2(v, 3, 5);
+  VectorSlice<std::vector<int> > s2(v, 3, 5);
   int n = s[4];
   n += 3;
 

@@ -403,7 +403,7 @@ template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (
   const InputVector& fe_function,
-  const std::vector<unsigned int>& indices,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
   std::vector<number> &values) const
 {
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
@@ -495,7 +495,7 @@ template <int dim>
 template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (
   const InputVector& fe_function,
-  const std::vector<unsigned int>& indices,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
   std::vector<Vector<number> >& values) const
 {
 				   // One value per quadrature point
@@ -600,7 +600,7 @@ template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (
   const InputVector& fe_function,
-  const std::vector<unsigned int>& indices,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
   std::vector<Tensor<1,dim> > &values) const
 {
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
@@ -691,7 +691,7 @@ template <int dim>
 template <class InputVector>
 void FEValuesBase<dim>::get_function_grads (
   const InputVector& fe_function,
-  const std::vector<unsigned int>& indices,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
   std::vector<std::vector<Tensor<1,dim> > >& values) const
 {
 				   // One value per quadrature point

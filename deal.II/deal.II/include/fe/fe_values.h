@@ -19,6 +19,7 @@
 #include <base/subscriptor.h>
 #include <base/point.h>
 #include <base/tensor.h>
+#include <base/vector_slice.h>
 #include <base/quadrature.h>
 #include <base/table.h>
 #include <lac/vector.h>
@@ -661,7 +662,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector& fe_function,
-			      const std::vector<unsigned int>& indices,
+			      const VectorSlice<const std::vector<unsigned int> >& indices,
 			      std::vector<number>& values) const;
 
 				     /**
@@ -702,7 +703,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector& fe_function,
-			      const std::vector<unsigned int>& indices,
+			      const VectorSlice<const std::vector<unsigned int> >& indices,
 			      std::vector<Vector<number> >& values) const;
 
 				     /**
@@ -793,7 +794,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
-			     const std::vector<unsigned int>& indices,
+			     const VectorSlice<const std::vector<unsigned int> >& indices,
 			     std::vector<Tensor<1,dim> >& gradients) const;
 
 				     /**
@@ -804,7 +805,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
-			     const std::vector<unsigned int>& indices,
+			     const VectorSlice<const std::vector<unsigned int> >& indices,
 			     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
 
 				     /**

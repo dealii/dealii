@@ -126,7 +126,7 @@ TAGS:
 	@cd $D/common ; etags $D/base/source/*.cc \
 	$D/lac/source/*.cc $D/deal.II/source/*/*.cc \
 	$D/tests/*/*.cc $D/examples/*/*.cc \
-	--language=none --regex='/.*/' \
+	--language=c++ \
 	$D/base/include/*/*.h $D/lac/include/*/*.h \
 	$D/deal.II/include/*/*.h $D/tests/*/*.h; \
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
