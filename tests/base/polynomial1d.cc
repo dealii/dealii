@@ -15,8 +15,6 @@
 // 1d-polynomials, to make sure that all changes we make to these classes
 // do not change the results of these classes.
 
-// added Hierarchical test on 2/11/03 - Brian Carnes
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
