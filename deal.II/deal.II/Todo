@@ -91,6 +91,14 @@ Use a correct strategy to output the reduction rate for adaptively
   refined grids in examples/error-estimation
 
 
+In VectorTools::project_boundary_values, no condensation of sparsity
+  structures, matrices and right hand sides or distribution of
+  solution vectors is performed, This is ok for dim<3 because then
+  there are no constrained nodes on the boundary, but is not
+  acceptable for higher dimensions. Fix this.
+  
+
+
 
 
 DEAL:
