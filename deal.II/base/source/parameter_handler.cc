@@ -2,20 +2,11 @@
 
 #include <basic/parameter_handler.h>
 #include <fstream.h>
-//#include <iomanip.h>
+#include <iomanip.h>
 
 extern "C" {
 #include <stdlib.h>
 }
-
-
-String setw (unsigned int n) {
-  String s;
-  for (unsigned int i=0; i<n; ++i)
-    s =+ ' ';
-  return s;
-};
-
 
 
 
