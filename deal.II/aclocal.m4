@@ -2485,6 +2485,49 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl gcc 2.95 doesn't like it if we have a member template function
+dnl and define it as a template while specializing the outer class
+dnl template. This is a nasty bug that is hard to work around...
+dnl
+dnl Usage: DEAL_II_CHECK_MEMBER_TEMPLATE_SPECIALIZATION_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_MEMBER_TEMPLATE_SPECIALIZATION_BUG, dnl
+[
+  AC_MSG_CHECKING(for template member function specialization bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      template <int dim> struct X 
+      {
+        template <typename T> void f(T);
+      };
+
+      template <>
+      template <typename T>
+      void X<1>::f (T)
+      {}
+
+      template void X<1>::f(int);
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG, 1, 
+                     [Defined if the compiler refuses to specialize
+                      an outer class template while keeping a member
+                      as a template. For the exact failure mode, look at
+                      aclocal.m4 in the top-level directory.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl gcc3.1 (and maybe later compilers) has a bug with long double
 dnl and optimization (see code below), when compiling on Sparc
 dnl machines. Since it affects only one platform and one compiler,
