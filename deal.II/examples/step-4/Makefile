@@ -107,7 +107,7 @@ $(target) : $(libraries)
 # following rule:
 run: $(target)
 	@echo ============================ Running $<
-	@.(include-path-base)/base$(target)
+	@./$(target)
 
 
 # As a last rule to the `make' program, we define what to do when
