@@ -1,0 +1,7 @@
+
+DEAL:1d::void check<1>() -- ok
+DEAL:1d::void check_boundary<1>(const DoFHandler<1> &) -- ok
+DEAL:2d::void check<2>() -- ok
+DEAL:2d::void check_boundary<2>(const DoFHandler<2> &) -- ok
+DEAL:3d::void check<3>() -- ok
+DEAL:3d::void check_boundary<3>(const DoFHandler<3> &) -- ok
