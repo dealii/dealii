@@ -69,24 +69,24 @@ else
 endif
 
 $(LIBDIR)/1d/%.g.o :
-	@echo =====deal.II====1d====debug======$(MT)== $(<:source/%=%)
+	@echo "=====deal.II====1d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 $(LIBDIR)/1d/%.o :
-	@echo =====deal.II====1d====optimized==$(MT)== $(<:source/%=%)
+	@echo "=====deal.II====1d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
 $(LIBDIR)/2d/%.g.o :
-	@echo =====deal.II====2d====debug======$(MT)== $(<:source/%=%)
+	@echo "=====deal.II====2d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 $(LIBDIR)/2d/%.o :
-	@echo =====deal.II====2d====optimized==$(MT)== $(<:source/%=%)
+	@echo "=====deal.II====2d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
 $(LIBDIR)/3d/%.g.o :
-	@echo =====deal.II====3d====debug======$(MT)== $(<:source/%=%)
+	@echo "=====deal.II====3d====debug======$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 $(LIBDIR)/3d/%.o :
-	@echo =====deal.II====3d====optimized==$(MT)== $(<:source/%=%)
+	@echo "=====deal.II====3d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 
@@ -94,53 +94,53 @@ $(LIBDIR)/3d/%.o :
 
 # rules how to make the libraries themselves
 $(LIBDIR)/libdeal_II_1d.g.a: $(go-files-1d)
-	@echo =====deal.II====1d====debug======$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files-1d)
 $(LIBDIR)/libdeal_II_1d.a: $(o-files-1d)
-	@echo =====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files-1d)
 
 
 $(LIBDIR)/libdeal_II_2d.g.a: $(go-files-2d)
-	@echo =====deal.II====2d====debug======$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files-2d)
 $(LIBDIR)/libdeal_II_2d.a: $(o-files-2d)
-	@echo =====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files-2d)
 
 
 $(LIBDIR)/libdeal_II_3d.g.a: $(go-files-3d)
-	@echo =====deal.II====3d====debug======$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files-3d)
 $(LIBDIR)/libdeal_II_3d.a: $(o-files-3d)
-	@echo =====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files-3d)
 
 
 $(LIBDIR)/libdeal_II_1d.g.so: $(go-files-1d)
-	@echo =====deal.II====1d====debug======$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files-1d)
 
 $(LIBDIR)/libdeal_II_1d.so: $(o-files-1d)
-	@echo =====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files-1d)
 
 
 $(LIBDIR)/libdeal_II_2d.g.so: $(go-files-2d)
-	@echo =====deal.II====2d====debug======$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files-2d)
 
 $(LIBDIR)/libdeal_II_2d.so: $(o-files-2d)
-	@echo =====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files-2d)
 
 
 $(LIBDIR)/libdeal_II_3d.g.so: $(go-files-3d)
-	@echo =====deal.II====3d====debug======$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files-3d)
 
 $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
-	@echo =====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files-3d)
 
 
@@ -153,7 +153,7 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #to remake this file upon inclusion at the bottom
 #of this file.
 Makefile.dep: $(cc-files) $(h-files) Makefile
-	@echo ============================ Remaking deal.II/Makefile
+	@echo "============================ Remaking deal.II/Makefile"
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.o):!_DIM_PLACEHOLDER$$1:!g;' \

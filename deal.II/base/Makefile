@@ -79,20 +79,20 @@ endif
 forward: $(forward-declarations)
 
 $(LIBDIR)/libbase.a: $(o-files)
-	@echo =====base=============optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files)
 
 $(LIBDIR)/libbase.g.a: $(go-files)
-	@echo =====base=============debug======$(MT)== Linking library:   $(@F)
+	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files)
 
 
 $(LIBDIR)/libbase.so: $(o-files)
-	@echo =====base=============optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
 
 $(LIBDIR)/libbase.g.so: $(go-files)
-	@echo =====base=============debug======$(MT)== Linking library:   $(@F)
+	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
 
 

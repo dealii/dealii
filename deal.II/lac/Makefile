@@ -31,10 +31,10 @@ else
 endif
 
 $(LIBDIR)/lac/%.g.o :
-	@echo =====lac==============debug======$(MT)== $(<F)
+	@echo "=====lac==============debug======$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 $(LIBDIR)/lac/%.o :
-	@echo =====lac==============optimized==$(MT)== $(<F)
+	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
@@ -52,20 +52,20 @@ endif
 forward: $(forward-declarations)
 
 $(LIBDIR)/liblac.a: $(o-files)
-	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files)
 
 $(LIBDIR)/liblac.g.a: $(go-files)
-	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
+	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(go-files)
 
 
 $(LIBDIR)/liblac.so: $(o-files)
-	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
+	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
 
 $(LIBDIR)/liblac.g.so: $(go-files)
-	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
+	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
 
 
