@@ -869,6 +869,17 @@ class FullMatrix : public Table<2,number>
 		const bool             adding=false) const;
     
 				     /**
+				      * Adding Matrix-vector-multiplication.
+				      *  $w += A*v$
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
+				      */
+    template<typename number2>
+    void vmult_add (Vector<number2>       &w,
+		    const Vector<number2> &v) const;
+    
+				     /**
 				      * Transpose
 				      * matrix-vector-multiplication.
 				      * See vmult() above.
@@ -880,6 +891,18 @@ class FullMatrix : public Table<2,number>
     void Tvmult (Vector<number2>       &w,
 		 const Vector<number2> &v,
 		 const bool             adding=false) const;
+
+				     /**
+				      * Adding transpose
+				      * matrix-vector-multiplication.
+				      * See vmult() above.
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
+				      */
+    template<typename number2>
+    void Tvmult_add (Vector<number2>       &w,
+		     const Vector<number2> &v) const;
 
 				     /**
 				      * Apply the Jacobi
@@ -1066,6 +1089,27 @@ FullMatrix<number>::copy_from (const MATRIX& M)
        entry != end; ++entry)
     this->el(entry->row(), entry->column()) = entry->value();
 }
+
+
+template <typename number>
+template<typename number2>
+void
+FullMatrix<number>::vmult_add (Vector<number2>       &w,
+			       const Vector<number2> &v) const
+{
+  vmult(w, v, true);
+}
+
+
+template <typename number>
+template<typename number2>
+void
+FullMatrix<number>::Tvmult_add (Vector<number2>       &w,
+				const Vector<number2> &v) const
+{
+  Tvmult(w, v, true);
+}
+
 
 //----------------------------------------------------------------------//
 
