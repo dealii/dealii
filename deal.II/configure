@@ -1216,7 +1216,7 @@ else
           GXX_VERSION=compaq_cxx
         else
 
-          is_sun_cc="`($CXX -V 2>&1) | grep 'Sun Workshop'`"
+          is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
           if test "x$is_sun_cc" != "x" ; then
             echo "$ac_t""compiler is Sun Workshop compiler" 1>&6
             GXX_VERSION=sun_workshop
