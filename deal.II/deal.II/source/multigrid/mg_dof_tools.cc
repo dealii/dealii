@@ -464,7 +464,7 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
                         MGLevelObject<Vector<number> > &v,
                         const std::vector<bool> &selected,
 			const std::vector<unsigned int> &target_component,
-			std::vector<std::vector<unsigned int> >& ndofs)
+			const std::vector<std::vector<unsigned int> >& cached_dofs)
 {
   Assert (selected.size() == target_component.size(),
 	  ExcDimensionMismatch(selected.size(), target_component.size()));
@@ -482,19 +482,19 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
   while (!selected[selected_block])
     ++selected_block;
 
-  if (ndofs.size() == 0)
-    {
-      std::vector<std::vector<unsigned int> >
-	new_dofs(mg_dof.get_tria().n_levels(),
-		 std::vector<unsigned int>(target_component.size()));
-      std::swap(ndofs, new_dofs);
-      count_dofs_per_component (mg_dof, ndofs, target_component);
-    }
+  std::vector<std::vector<unsigned int> >
+    n_dofs(mg_dof.get_tria().n_levels(),
+	   std::vector<unsigned int>(target_component.size()));
+
+  if (cached_dofs.size() == 0)
+    count_dofs_per_component (mg_dof, n_dofs, target_component);
+  else
+    n_dofs = cached_dofs;
   
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
     {
-      v[level].reinit(ndofs[level][selected_block]);
+      v[level].reinit(n_dofs[level][selected_block]);
     }
 }
 

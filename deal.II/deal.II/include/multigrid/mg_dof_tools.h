@@ -217,7 +217,7 @@ class MGTools
 		     MGLevelObject<Vector<number> > &v,
 		     const std::vector<bool> &selected,
 		     const std::vector<unsigned int> &target_component,
-		     std::vector<std::vector<unsigned int> >& cached_sizes
+		     const std::vector<std::vector<unsigned int> >& cached_sizes
 		     = std::vector<std::vector<unsigned int> >());
 };
 
