@@ -11,6 +11,14 @@
 
 
 template <int dim>
+HyperBallBoundary<dim>::HyperBallBoundary (const Point<dim> p,
+					   const double     radius) :
+		center(p), radius(radius)
+{};
+
+
+
+template <int dim>
 Point<dim>
 HyperBallBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
@@ -57,6 +65,42 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
+
+
+template <int dim>
+HalfHyperBallBoundary<dim>::HalfHyperBallBoundary (const Point<dim> center,
+						   const double     radius) :
+		HyperBallBoundary<dim> (center, radius)
+{};
+
+
+
+template <int dim>
+Point<dim>
+HalfHyperBallBoundary<dim>::
+get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
+{
+  const Point<dim> line_center = line->center();
+  if (line_center(0) == center(0))
+    return line_center;
+  else
+    return HyperBallBoundary<dim>::get_new_point_on_line (line);
+};
+
+
+
+
+template <int dim>
+Point<dim>
+HalfHyperBallBoundary<dim>::
+get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
+{
+  const Point<dim> quad_center = quad->center();
+  if (quad_center(0) == center(0))
+    return quad_center;
+  else
+    return HyperBallBoundary<dim>::get_new_point_on_quad (quad);
+};
 
 
 
@@ -129,4 +173,5 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 
 // explicit instantiations
 template class HyperBallBoundary<deal_II_dimension>;
+template class HalfHyperBallBoundary<deal_II_dimension>;
 template class HyperShellBoundary<deal_II_dimension>;

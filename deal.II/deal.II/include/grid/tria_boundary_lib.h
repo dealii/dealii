@@ -31,8 +31,8 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 				     /**
 				      * Constructor
 				      */
-    HyperBallBoundary (const Point<dim> p=Point<dim>(), const double radius=1.0) :
-		    center(p), radius(radius) {};
+    HyperBallBoundary (const Point<dim> p      = Point<dim>(),
+		       const double     radius = 1.0);
 
 				     /**
 				      * Refer to the general documentation of
@@ -51,7 +51,7 @@ class HyperBallBoundary : public StraightBoundary<dim> {
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 
-  private:
+  protected:
 				     /**
 				      * Center point of the hyperball.
 				      */
@@ -61,6 +61,42 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 				      * Radius of the hyperball.
 				      */
     const double radius;
+};
+
+
+
+/**
+ * Variant of #HyperBallBoundary# which denotes a half hyper ball
+ * where the first coordinate is restricted to the range $x>=0$ (or
+ * $x>=center(0)$). In two dimensions, this equals the right half
+ * circle, in three space dimensions it is a half ball.
+ *
+ * @author Wolfgang Bangerth, 1999
+ */
+template <int dim>
+class HalfHyperBallBoundary : public HyperBallBoundary<dim> {
+  public:
+				     /**
+				      * Constructor
+				      */
+    HalfHyperBallBoundary (const Point<dim> p      = Point<dim>(),
+			   const double     radius = 1.0);
+
+				     /**
+				      * Check if on the line #x==0#,
+				      * otherwise pass to the base
+				      * class.
+				      */
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+
+				     /**
+				      * Check if on the line #x==0#,
+				      * otherwise pass to the base
+				      * class.
+				      */
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 };
 
     
