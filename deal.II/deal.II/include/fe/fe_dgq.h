@@ -304,4 +304,44 @@ class FE_DGQ : public FiniteElement<dim>
     friend class MappingQ<dim>;
 };
 
+
+// declaration of explicit specializations
+
+template <> 
+const double * const FE_DGQ<1>::Matrices::embedding[];
+
+template <>
+const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices;
+
+template <>
+const double * const FE_DGQ<1>::Matrices::projection_matrices[];
+
+template <>
+const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices;
+
+template <> 
+const double * const FE_DGQ<2>::Matrices::embedding[];
+
+template <>
+const unsigned int FE_DGQ<2>::Matrices::n_embedding_matrices;
+
+template <>
+const double * const FE_DGQ<2>::Matrices::projection_matrices[];
+
+template <>
+const unsigned int FE_DGQ<2>::Matrices::n_projection_matrices;
+
+template <> 
+const double * const FE_DGQ<3>::Matrices::embedding[];
+
+template <>
+const unsigned int FE_DGQ<3>::Matrices::n_embedding_matrices;
+
+template <>
+const double * const FE_DGQ<3>::Matrices::projection_matrices[];
+
+template <>
+const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices;
+
+
 #endif

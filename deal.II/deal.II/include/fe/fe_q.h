@@ -621,6 +621,45 @@ template <> void FE_Q<1>::initialize_unit_face_support_points ();
 template <> void FE_Q<1>::build_face_renumbering (const unsigned int,
 						  std::vector<unsigned int>&);
 
+template <> 
+const double * const 
+FE_Q<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
+
+template <>
+const unsigned int FE_Q<1>::Matrices::n_embedding_matrices;
+
+template <>
+const double * const FE_Q<1>::Matrices::constraint_matrices[];
+
+template <>
+const unsigned int FE_Q<1>::Matrices::n_constraint_matrices;
+
+template <> 
+const double * const 
+FE_Q<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
+
+template <>
+const unsigned int FE_Q<2>::Matrices::n_embedding_matrices;
+
+template <>
+const double * const FE_Q<2>::Matrices::constraint_matrices[];
+
+template <>
+const unsigned int FE_Q<2>::Matrices::n_constraint_matrices;
+
+template <> 
+const double * const 
+FE_Q<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
+
+template <>
+const unsigned int FE_Q<3>::Matrices::n_embedding_matrices;
+
+template <>
+const double * const FE_Q<3>::Matrices::constraint_matrices[];
+
+template <>
+const unsigned int FE_Q<3>::Matrices::n_constraint_matrices;
+
 
 /* ---------------------------- inline functions --------------------- */
 
