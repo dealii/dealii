@@ -170,7 +170,6 @@ namespace PETScWrappers
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
                                        // for all rows globally
-//TODO[WB]: We should do better by providing ways to tell PETSc how to partition the columns
       const int ierr
         = MatCreateMPIAIJ(communicator,
 			  local_rows, local_columns,
@@ -214,7 +213,6 @@ namespace PETScWrappers
       const std::vector<signed int> int_row_lengths (row_lengths.begin(),
                                                      row_lengths.end());
                                        
-//TODO[WB]: We should do better by providing ways to tell PETSc how to partition the columns
       const int ierr
         = MatCreateMPIAIJ(communicator,
 			  local_rows, local_columns,
