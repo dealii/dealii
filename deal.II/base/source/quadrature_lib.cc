@@ -77,13 +77,13 @@ QGauss4<1>::QGauss4 () :
 		Quadrature<1> (4)
 {
 				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./7.*(3-4*sqrt(0.3))),
-					-sqrt(1./7.*(3+4*sqrt(0.3))),
+  static const double xpts_normal[] = { -sqrt(1./7.*(3+4*sqrt(0.3))),
+					-sqrt(1./7.*(3-4*sqrt(0.3))),
 					+sqrt(1./7.*(3-4*sqrt(0.3))),
 					+sqrt(1./7.*(3+4*sqrt(0.3)))  };
 				   // weights on [-1,1]
-  static const double wts_normal[]  = { 1./2. + 1./12.*sqrt(10./3.),
-					1./2. - 1./12.*sqrt(10./3.),
+  static const double wts_normal[]  = { 1./2. - 1./12.*sqrt(10./3.),
+					1./2. + 1./12.*sqrt(10./3.),
 					1./2. + 1./12.*sqrt(10./3.),
 					1./2. - 1./12.*sqrt(10./3.)  };
 
@@ -110,14 +110,14 @@ QGauss5<1>::QGauss5 () :
 		Quadrature<1> (5)
 {
 				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./9.*(5.-2*sqrt(10./7.))),
-					-sqrt(1./9.*(5.+2*sqrt(10./7.))),
+  static const double xpts_normal[] = { -sqrt(1./9.*(5.+2*sqrt(10./7.))),
+					-sqrt(1./9.*(5.-2*sqrt(10./7.))),
 					0,
 					+sqrt(1./9.*(5.-2*sqrt(10./7.))),
 					+sqrt(1./9.*(5.+2*sqrt(10./7.)))  };
 				   // weights on [-1,1]
-  static const double wts_normal[]  = { 0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
-					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)),
+  static const double wts_normal[]  = { 0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)),
+					0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
 					128./225.,
 					0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
 					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)) };
