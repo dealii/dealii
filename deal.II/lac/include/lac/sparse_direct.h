@@ -126,13 +126,16 @@
  *
  * As an alternative, you can call the function @p{set_detached_mode}
  * right after calling the constructor. This lets the program fork, so
- * that we now have two programs that communicate via pipes. Now
- * everytime you call one of the functions of this class, it relays
- * the data to the other program and lets it execute the respective
- * function. The results are then transfered back. Since the MA27
- * functions are only called in the detached program, they will now no
- * longer interfere with the respective calls to other functions with
- * different data, so no synchronisation is necessary any more.
+ * that we now have two programs that communicate via pipes.  The
+ * forked copy of the program then actually replaces itself by a
+ * program called @p{detached_ma27}, that is started in its place
+ * through the @p{execv} system call. Now everytime you call one of
+ * the functions of this class, it relays the data to the other
+ * program and lets it execute the respective function. The results
+ * are then transfered back. Since the MA27 functions are only called
+ * in the detached program, they will now no longer interfere with the
+ * respective calls to other functions with different data, so no
+ * synchronisation is necessary any more.
  *
  * The advantage of this approach is that as many instances of this
  * class may be active at any time as you want. This is handy, if your
