@@ -140,7 +140,7 @@
  *  not recover from programming errors.
  *
  *  If the preprocessor variable #DEBUG# is not set, then nothing
- *  happens, i.e. the #Assert# macro is expanded to #(void) 0;#.
+ *  happens, i.e. the #Assert# macro is expanded to #{}#.
  *
  *  Sometimes, there is no useful condition for an exception other
  *  than that the program flow should not have reached a certain point,
@@ -430,7 +430,7 @@ void __IssueError_Throw (const char *file,
 #else        ////////////////////////////////////////
 
 #define Assert(cond, exc)                     \
-  (void) 0
+  { }
 #endif      ////////////////////////////////////////
 
 
