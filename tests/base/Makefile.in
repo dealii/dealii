@@ -62,6 +62,10 @@ endif
 all: logtest.check reference.check tensor.check quadrature_test.check timer.check
 exe: $(all:.check=.testcase)
 output: $(all:.check=.output)
+
+abort.o : abort.cc
+	@$(CXX)  -c $< -o $@
+
 ############################################################
 # Typical block for building a running program
 #
@@ -111,7 +115,7 @@ tensor.testcase: $(tensor-o-files) $(libraries)
 reference-cc-files = reference.cc
 
 ifeq ($(debug-mode),on)
-reference-o-files = $(reference-cc-files:.cc=.go) abort.go
+reference-o-files = $(reference-cc-files:.cc=.go) abort.o
 else
 reference-o-files = $(reference-cc-files:.cc=.o) abort.o
 endif
