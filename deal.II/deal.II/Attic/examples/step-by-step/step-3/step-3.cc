@@ -1,3 +1,4 @@
+#include <base/function.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
@@ -9,6 +10,8 @@
 #include <fe/fe_values.h>
 #include <dofs/dof_tools.h>
 #include <numerics/data_out.h>
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
 
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -72,6 +75,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 };
 
 
+
 void LaplaceProblem::assemble_system () 
 {
   QGauss3<2>  quadrature_formula;
@@ -112,10 +116,23 @@ void LaplaceProblem::assemble_system ()
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  system_matrix.add (i, j, cell_matrix(i,j));
+	  system_matrix.add (local_dof_indices[i],
+			     local_dof_indices[j],
+			     cell_matrix(i,j));
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	system_rhs(i) += cell_rhs(i);
-    };      
+	system_rhs(local_dof_indices[i]) += cell_rhs(i);
+    };
+
+
+  map<int,double> boundary_values;
+  VectorTools::interpolate_boundary_values (dof_handler,
+					       0,
+					       ZeroFunction<2>(),
+					       boundary_values);
+  MatrixTools<2>::apply_boundary_values (boundary_values,
+					 system_matrix,
+					 solution,
+					 system_rhs);
 };
 
 
@@ -138,8 +155,8 @@ void LaplaceProblem::output_results ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
   
-  ofstream output ("solution.eps");
-  data_out.write_eps (output);
+  ofstream output ("solution.gpl");
+  data_out.write_gnuplot (output);
 };
 
 
