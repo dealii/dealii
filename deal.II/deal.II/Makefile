@@ -63,25 +63,31 @@ go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
 # rules how to generate object files from source files. note that
 # there are some files which needs exceptional rules; these are
 # listed immediately below
+ifneq ($(with-multithreading),no)
+  MT = MT
+else
+  MT = ==
+endif
+
 lib/1d/go/%.go :
-	@echo =====deal.II====1d====debug========= $(<:source/%=%)
+	@echo =====deal.II====1d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 lib/1d/o/%.o :
-	@echo =====deal.II====1d====optimized===== $(<:source/%=%)
+	@echo =====deal.II====1d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
 lib/2d/go/%.go :
-	@echo =====deal.II====2d====debug========= $(<:source/%=%)
+	@echo =====deal.II====2d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 lib/2d/o/%.o :
-	@echo =====deal.II====2d====optimized===== $(<:source/%=%)
+	@echo =====deal.II====2d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
 lib/3d/go/%.go :
-	@echo =====deal.II====3d====debug========= $(<:source/%=%)
+	@echo =====deal.II====3d====debug======$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 lib/3d/o/%.o :
-	@echo =====deal.II====3d====optimized===== $(<:source/%=%)
+	@echo =====deal.II====3d====optimized==$(MT)== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 

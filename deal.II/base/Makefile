@@ -49,12 +49,18 @@ maybe-define-dimension1 = $(strip $(findstring 1,$(findstring _1d.,$@)) \
 maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dimension1))
 
 # production rules
+ifneq ($(with-multithreading),no)
+  MT = MT
+else
+  MT = ==
+endif
+
 lib/go/%.go :
-	@echo =====base=============debug========= $(<F) \
+	@echo =====base=============debug======$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
 lib/o/%.o :
-	@echo =====base=============optimized===== $(<F) \
+	@echo =====base=============optimized==$(MT)== $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
 

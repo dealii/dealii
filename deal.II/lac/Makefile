@@ -24,11 +24,17 @@ include $D/common/Make.global_options
 
 
 # production rules
+ifneq ($(with-multithreading),no)
+  MT = MT
+else
+  MT = ==
+endif
+
 lib/go/%.go :
-	@echo =====lac==============debug========= $(<F)
+	@echo =====lac==============debug======$(MT)== $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 lib/o/%.o :
-	@echo =====lac==============optimized===== $(<F)
+	@echo =====lac==============optimized==$(MT)== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 

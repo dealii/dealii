@@ -11,11 +11,17 @@ include $D/common/Make.global_options
 # Targets for compilation
 ############################################################
 
+ifneq ($(with-multithreading),no)
+  MT = MT
+else
+  MT = ==
+endif
+
 %.g.o : %.cc
-	@echo =====debug========= $<
+	@echo =====debug======$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(CXXFLAGS) -c $< -o $@
 %.o : %.cc
-	@echo =====optimized===== $<
+	@echo =====optimized==$(MT)== $<
 	@$(CXX) $(CXXFLAGS.o) $(CXXFLAGS) -c $< -o $@
 
 ############################################################
