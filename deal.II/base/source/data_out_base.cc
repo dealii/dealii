@@ -2714,9 +2714,9 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
       out << data_names[data_set] << " 1" << std::endl;
-      copy(data_vectors[data_set].begin(),
-	   data_vectors[data_set].end(),
-	   std::ostream_iterator<double>(out, " "));
+      std::copy (data_vectors[data_set].begin(),
+		 data_vectors[data_set].end(),
+		 std::ostream_iterator<double>(out, " "));
       out << std::endl
 	  << std::endl;
     };
@@ -2983,9 +2983,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
        
-      copy(data_vectors[data_set].begin(),
-           data_vectors[data_set].end(),
-           std::ostream_iterator<double>(out, "\n"));
+      std::copy (data_vectors[data_set].begin(),
+		 data_vectors[data_set].end(),
+		 std::ostream_iterator<double>(out, "\n"));
       out << std::endl;
     };
 
@@ -3852,9 +3852,9 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 	  << std::endl
 	  << "LOOKUP_TABLE default"
 	  << std::endl;
-      copy(data_vectors[data_set].begin(),
-	   data_vectors[data_set].end(),
-	   std::ostream_iterator<double>(out, " "));
+      std::copy (data_vectors[data_set].begin(),
+		 data_vectors[data_set].end(),
+		 std::ostream_iterator<double>(out, " "));
       out << std::endl;
     };
   
