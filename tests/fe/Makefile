@@ -94,8 +94,8 @@ show_transform: $(show_transform-o-files) $(libraries)
 
 check: show_transform show_shapes
 	@echo Running programs
-	@show_transform
-	@show_shapes
+	@./show_transform
+	@./show_shapes
 	@echo Checking results
 	$(MAKE) dodiff
 
