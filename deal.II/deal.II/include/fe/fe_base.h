@@ -143,37 +143,37 @@ class FiniteElementData
 		       const unsigned int n_components);
 
 				     /**
-				      * Return the #dofs_per_vertex#.
+				      * Return the @p{dofs_per_vertex}.
 				      */
     unsigned int n_dofs_per_vertex () const;
 
 				     /**
-				      * Return the #dofs_per_line#.
+				      * Return the @p{dofs_per_line}.
 				      */
     unsigned int n_dofs_per_line () const;
 
     				     /**
-				      * Return the #dofs_per_quad#.
+				      * Return the @p{dofs_per_quad}.
 				      */
     unsigned int n_dofs_per_quad () const;
 
     				     /**
-				      * Return the #dofs_per_hex#.
+				      * Return the @p{dofs_per_hex}.
 				      */
     unsigned int n_dofs_per_hex () const;
 
     				     /**
-				      * Return the #dofs_per_face#.
+				      * Return the @p{dofs_per_face}.
 				      */
     unsigned int n_dofs_per_face () const;
 
     				     /**
-				      * Return the #dofs_per_cell#.
+				      * Return the @p{dofs_per_cell}.
 				      */
     unsigned int n_dofs_per_cell () const;
 
     				     /**
-				      * Return the #components#.
+				      * Return the @p{components}.
 				      */
     unsigned int n_components () const;
 
@@ -204,8 +204,8 @@ class FiniteElementData
  *
  * The implementation of this base class is split into two parts:
  * those fields which are not common to all dimensions
- * (#dofs_per_quad# for example are only useful for #dim>=2#) are put
- * into the #FiniteElementData<dim># class which is explicitely
+ * (@p{dofs_per_quad} for example are only useful for @p{dim>=2}) are put
+ * into the @p{FiniteElementData<dim>} class which is explicitely
  * specialized for all used dimensions, while those fields which may
  * be formulated in a dimension-independent way are put into the
  * present class.
@@ -224,9 +224,9 @@ class FiniteElementData
  *
  * \subsection{Finite elements in one dimension}
  *
- * Finite elements in one dimension need only set the #restriction#
- * and #prolongation# matrices. The constructor of this class in one
- * dimension presets the #interface_constraints# matrix to have
+ * Finite elements in one dimension need only set the @p{restriction}
+ * and @p{prolongation} matrices. The constructor of this class in one
+ * dimension presets the @p{interface_constraints} matrix to have
  * dimension zero. Changing this behaviour in derived classes is
  * generally not a reasonable idea and you risk getting into trouble.
  * 
@@ -235,7 +235,7 @@ class FiniteElementData
  * In addition to the fields already present in 1D, a constraint
  * matrix is needed, if the finite element has node values located on
  * edges or vertices. These constraints are represented by a $m\times
- * n$-matrix #interface_constraints#, where $n$ is the number of
+ * n$-matrix @p{interface_constraints}, where $n$ is the number of
  * degrees of freedom on the refined side without the corner vertices
  * (those dofs on the middle vertex plus those on the two lines), and
  * $m$ is that of the unrefined side (those dofs on the two vertices
@@ -315,7 +315,7 @@ class FiniteElementData
  * line, not in terms of the other degrees of freedom on a face.
  *
  * Since the handling of constraints on degrees of freedom is mostly done
- * by the #ConstraintMatrix# class, this class checks whether the constraints
+ * by the @p{ConstraintMatrix} class, this class checks whether the constraints
  * introduced from the two sides are unique; it is able to handle the fact
  * that the constraints for some of the dofs are entered more than once.
  *
