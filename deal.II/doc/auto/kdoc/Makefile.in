@@ -21,10 +21,6 @@ kdoc.numerics = $(shell echo $D/deal.II/include/numerics/*.h)
 kdoc.multigrid= $(shell echo $D/deal.II/include/multigrid/*.h)
 
 
-# for latex-output, we join the different libraries of the
-# deal.II library into just one file
-kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
-
 # specify the names of the resulting doc libraries
 ifeq ($(multigrid),yes)
 kdoc.library-files = base.kdoc         \

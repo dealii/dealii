@@ -3,6 +3,7 @@
 
 # Let ./configure insert whether MG shall be documented
 multigrid = @enablemultigrid@
+DOCXX     = @docxx@
 
 
 # specify which are the include files that a specific documentation libary
@@ -25,12 +26,6 @@ kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
 # include global paths and variables
 include ../../common/Make.global_options
 
-ifeq ($(shell uname),SunOS)
-DOCPP = /home/people/wolf/Config/doc++/bin/doc++
-#DOCPP = /home/people/kanschat/bin/doc++
-else
-DOCPP = doc++
-endif
 
 
 # by default: make library doc and generate an index of all names
@@ -85,9 +80,18 @@ kdoc/names.html: $(kdoc.libray-files)
 # used and since this forces make to re-make the .tex-file each time
 # we ask for it; the right way to do so would be to use dependencies,
 # but it is hard to compute them from the '%'-sign used in the rule
+ifeq ($(DOCXX),)
+%.tex:
+	@echo ---------------------------------------------
+	@echo "Doc++ was not found at ./configure time!"
+	@echo "Can't generate printable documentation."
+	@echo ---------------------------------------------
+	false
+else
 %.tex: %.doc++
-	$(DOCPP) -p -t -u -o $@ -ep a4wide $<
+	$(DOCXX) -p -t -u -o $@ -ep a4wide $<
 	rm $^
+endif
 
 
 # generate temporary files from the doc++-latex-output which have

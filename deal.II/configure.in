@@ -22,6 +22,17 @@ DEAL2_DIR=`pwd`
 AC_SUBST(DEAL2_DIR)
 
 
+dnl    Check for the operating system
+OS=`uname`
+AC_SUBST(OS)
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Find external programs
+dnl -------------------------------------------------------------
+
 dnl    Find a C compiler, which is used when building
 dnl    shared libaries. This modifies the variable CC.
 dnl    In order to get the absolute path of the compiler, use the
@@ -58,14 +69,14 @@ AC_SUBST(GXX_VERSION)
 
 
 
-dnl    Check for the operating system
-OS=`uname`
-AC_SUBST(OS)
-
-
 dnl    Find path to perl
 AC_PATH_PROG(PERL, perl)
 
+
+
+dnl -------------------------------------------------------------
+dnl Multithreading
+dnl -------------------------------------------------------------
 
 dnl    Test whether multithreading support is requested. This
 dnl    does not tell deal.II to actually use it, but the
@@ -113,6 +124,12 @@ else
 fi
 AC_SUBST(enableshared)
 
+
+
+dnl -------------------------------------------------------------
+dnl Multigrid
+dnl -------------------------------------------------------------
+
 dnl    Test if multigrid should be enabled
 dnl    default is no
 AC_ARG_ENABLE(multigrid,
@@ -130,12 +147,18 @@ AC_SUBST(enablemultigrid)
 
 
 
+dnl -------------------------------------------------------------
+dnl Documentation tools
+dnl -------------------------------------------------------------
+
+
 dnl    Find the kdoc directory for documentation. The old one is in
 dnl    doc/auto/scripts, but you might want a newer version.
 AC_ARG_WITH(kdoc,
 [  --with-kdoc=DIR use kdoc installed in DIR],
     kdocdir=$withval,
     kdocdir=doc/auto/scripts/kdoc)
+AC_MSG_CHECKING(for kdoc)
 if test -r $kdocdir/kdoc ; then
   AC_MSG_RESULT(found)
 else
@@ -152,18 +175,36 @@ AC_SUBST(kdocversion)
 
 
 
+dnl    Find the doc++ program
+AC_ARG_WITH(docxx,
+[  --with-docxx=PATH use the doc++ executable pointed to by PATH],
+    docxx=$withval,
+    docxx=`which doc++`)
+AC_MSG_CHECKING(for doc++)
+if test -x $docxx ; then
+  AC_MSG_RESULT(found)
+else
+  AC_MSG_RESULT(not found)
+  docxx=
+fi
+AC_SUBST(docxx)
 
 
-dnl -----------------------------------------------
+
+dnl -------------------------------------------------------------
 dnl Configure other packages
+dnl -------------------------------------------------------------
 
-dnl Configure the `tests' directory, if that is installed.
+dnl    Configure the `tests' directory, if that is installed.
 AC_CONFIG_SUBDIRS(tests)
 
 
 
 
 
+dnl -------------------------------------------------------------
+dnl Output results
+dnl -------------------------------------------------------------
 
 dnl    Write output to the global options file
 AC_OUTPUT(common/Make.global_options doc/Makefile doc/auto/Makefile doc/auto/kdoc/Makefile)
