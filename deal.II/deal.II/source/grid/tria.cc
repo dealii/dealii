@@ -2006,8 +2006,8 @@ void Triangulation<dim>::refine_and_coarsen_fixed_number (const dVector &criteri
 							  const double   bottom_fraction) {
 				   // correct number of cells is
 				   // checked in #refine#
-  Assert ((top_fraction>0) && (top_fraction<=1), ExcInvalidParameterValue());
-  Assert ((bottom_fraction>0) && (bottom_fraction<=1), ExcInvalidParameterValue());
+  Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
+  Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
 				   // refine at least one cell; algorithmic
 				   // simplification
@@ -2045,8 +2045,8 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
 						       const double   bottom_fraction) {
 				   // correct number of cells is
 				   // checked in #refine#
-  Assert ((top_fraction>0) && (top_fraction<=1), ExcInvalidParameterValue());
-  Assert ((bottom_fraction>0) && (bottom_fraction<=1), ExcInvalidParameterValue());
+  Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
+  Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
 
 				   // let tmp be the cellwise square of the
