@@ -584,7 +584,20 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Access to column number field.
 				      * Return the column number of
-				      * the @p{index}th entry in @p{row}.
+				      * the @p{index}th entry in
+				      * @p{row}. Note that the if the
+				      * matrix is square, then the
+				      * first element in each row is
+				      * the diagonal element,
+				      * i.e. @p{column_number(row,0)==row}.
+				      *
+				      * If the sparsity pattern is
+				      * already compressed, then
+				      * (except for the diagonal
+				      * element), the entries are
+				      * sorted by columns,
+				      * i.e. @p{column_number(row,i)}
+				      * @p{<} @p{column_number(row,i+1)}.
 				      */
     unsigned int column_number (const unsigned int row,
 				const unsigned int index) const;
