@@ -252,8 +252,9 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler
 #endif
 
   if (reversed_numbering)
-    for (std::vector<unsigned int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
-      *i = n_dofs-*i;
+    for (std::vector<unsigned int>::iterator i=new_number.begin();
+	 i!=new_number.end(); ++i)
+      *i = n_dofs-*i-1;
 
 				   // actually perform renumbering;
 				   // this is dimension specific and

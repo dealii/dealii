@@ -318,6 +318,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: the <code
+       class="member">DoFRenumbering::Cuthill_McKee</code> function
+       did not work correctly when giving the <code
+       class="member">reversed_numbering</code> flag (off-by-one
+       indexing). This is now fixed.
+       <br>
+       (<a href="mailto:or@winfos.com">Oliver Rheinbach</a> 2001/04/12)
+       </p>
+       
+  <li> <p>
        Changed: A <code class="class">typedef FunctionMap</code> was
        declared in at least four places previously (in classes <code
        class="class">DoFHandler</code>, <code
