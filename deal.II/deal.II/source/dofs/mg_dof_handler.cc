@@ -10,7 +10,7 @@
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
-
+#include <lac/dsmatrix.h>
 
 
 /* ------------------------ MGVertexDoFs ----------------------------------- */
@@ -960,6 +960,40 @@ MGDoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 #endif
 
 
+
+
+template <int dim>
+unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
+  Assert (level < mg_used_dofs.size(), ExcInvalidLevel(level));
+  
+  return mg_used_dofs[level];
+};
+
+
+
+template <int dim>
+void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
+					       dSMatrixStruct     &sparsity) const {
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (sparsity.n_rows() == n_dofs(level),
+	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs(level)));
+  Assert (sparsity.n_cols() == n_dofs(level),
+	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs(level)));
+
+  const unsigned int total_dofs = selected_fe->total_dofs;
+  vector<int> dofs_on_this_cell(total_dofs);
+  cell_iterator cell = begin_active(level),
+		endc = end(level);
+  for (; cell!=endc; ++cell) 
+    {
+      cell->get_mg_dof_indices (dofs_on_this_cell);
+				       // make sparsity pattern for this cell
+      for (unsigned int i=0; i<total_dofs; ++i)
+	for (unsigned int j=0; j<total_dofs; ++j)
+	  sparsity.add (dofs_on_this_cell[i],
+			dofs_on_this_cell[j]);
+    };
+};
 
 
 

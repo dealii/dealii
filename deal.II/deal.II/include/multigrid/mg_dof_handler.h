@@ -156,6 +156,26 @@ class MGDoFHandler : public DoFHandler<dim> {
 				const bool use_constraints         = false,
 				const vector<int> &starting_points = vector<int>());
 
+				     /**
+				      * Write the sparsity structure of the
+				      * matrix belonging to the specified
+				      * #level# including constrained
+				      * degrees of freedom into the
+				      * matrix structure. The sparsity pattern
+				      * does not include entries introduced by
+				      * the elimination of constrained nodes.
+				      * The sparsity
+				      * pattern is not compressed, since if
+				      * you want to call
+				      * #ConstraintMatrix::condense(1)#
+				      * afterwards, new entries have to be
+				      * added. However, if you don't want to call
+				      * #ConstraintMatrix::condense(1)#, you
+				      * have to compress the matrix yourself,
+				      * using #dSMatrixStruct::compress()#.
+				      */
+    void make_sparsity_pattern (const unsigned int level,
+				dSMatrixStruct    &sparsity) const; 
 
 				     /*--------------------------------------*/
     
@@ -623,6 +643,22 @@ class MGDoFHandler : public DoFHandler<dim> {
 				     /*@}*/
 
 				     /*---------------------------------------*/
+
+    				     /**
+				      * Return the number of degrees of freedom
+				      * on the specified level.
+				      * Included in this number are those
+				      * DoFs which are constrained by
+				      * hanging nodes.
+				      */
+    unsigned int n_dofs (const unsigned int level) const;
+
+				     /**
+				      * Exception.
+				      */
+    DeclException1 (ExcInvalidLevel,
+		    int,
+		    << "The level index " << arg1 << "was not in the valid range.");
     
   private:
 
