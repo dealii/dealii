@@ -22,6 +22,7 @@ perl -pi -e 's/\[(\d)\]\[(\d)\] =/($1,$2) =/g;' *2d_inverse_jacobian
 perl -pi -e 's/^\s*t/const double t/g;' *2d_inverse_jacobian_grad
 perl -pi -e 's/x\[(\d)\]/vertices[$1](0)/g;' *2d_inverse_jacobian_grad
 perl -pi -e 's/y\[(\d)\]/vertices[$1](1)/g;' *2d_inverse_jacobian_grad
+perl -pi -e 's/inverseJacobian/jacobians_grad[point]/g;' *2d_inverse_jacobian_grad
 
 perl -pi -e 's/([^;])\n/$1/g;' *2d_shape_grad
 perl -pi -e 's/grad_phi_polynom\[(\d+)\]\[0\] = (.*);/case $1: return Point<2>($2,/g;' *2d_shape_grad

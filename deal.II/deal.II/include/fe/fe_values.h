@@ -148,9 +148,9 @@ template <int dim> class Quadrature;
  *    a reference to a whole field. Usually these fields contain
  *    the values of all trial functions at all quadrature points.
  *
- *  \item #get_function_values#, #get_function_gradients#: these
- *    two functions offer a simple way to avoid the detour of the
- *    trial functions, if you have a finite solution (resp. the
+ *  \item #get_function_values#, #get_function_grads#, #...#: these
+ *    functions offer a simple way to avoid the detour of the
+ *    trial functions, if you have a finite element solution (resp. the
  *    vector of values associated with the different trial functions.)
  *    Then you may want to get information from the restriction of
  *    the finite element function to a certain cell, e.g. the values
@@ -159,7 +159,8 @@ template <int dim> class Quadrature;
  *    you pass it a vector holding the finite element solution and the
  *    functions return the values or gradients of the finite element
  *    function restricted to the cell which was given last time the
- *    #reinit# function was given.
+ *    #reinit# function was given. The same applies for the functions
+ *    returning higher derivatives of the solution.
  *   
  *    Though possible in principle, these functions do not call the
  *    #reinit# function, you have to do so yourself beforehand. On the
@@ -316,7 +317,7 @@ class FEValuesBase {
 				      * documentation for the matrix itself.
 				      */
     const vector<vector<Tensor<1,dim> > > & get_shape_grads () const;
-    
+
 				     /**
 				      * Return the gradients of the finite
 				      * element function characterized
@@ -329,6 +330,53 @@ class FEValuesBase {
 				      */
     void get_function_grads (const dVector          &fe_function,
 			     vector<Tensor<1,dim> > &gradients) const;
+
+    				     /**
+				      * Return the 2nd derivatives of
+				      * the #i#th shape function at
+				      * the #j# quadrature point. If
+				      * you want to get the derivatives
+				      * in one of the coordinate
+				      * directions, use the
+				      * appropriate function of the
+				      * #Tensor# class to extract one
+				      * component. Since only a
+				      * reference to the derivatives'
+				      * values is returned, there
+				      * should be no major performance
+				      * drawback.  The function
+				      * returns the derivatives on the
+				      * real element, not the
+				      * reference element.
+				      */
+    const Tensor<2,dim> & shape_2nd_derivative (const unsigned int function,
+						const unsigned int quadrature_point) const;
+
+				     /**
+				      * Return a pointer to the
+				      * matrix holding all 2nd
+				      * derivatives of shape functions
+				      * at all integration points, on
+				      * the present cell.  For the
+				      * format of this matrix, see the
+				      * documentation for the matrix
+				      * itself.
+				      */
+    const vector<vector<Tensor<2,dim> > > & get_shape_2nd_derivatives () const;
+    
+				     /**
+				      * Return the tensor of second
+				      * derivatives of the finite
+				      * element function characterized
+				      * by #fe_function# restricted to
+				      * #cell# at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * #second_derivatives# object already has
+				      * the right size.
+				      */
+    void get_function_2nd_derivatives (const dVector          &fe_function,
+				       vector<Tensor<2,dim> > &second_derivatives) const;
 
 				     /**
 				      * Return the position of the #i#th
@@ -1151,6 +1199,16 @@ const vector<vector<Tensor<1,dim> > > &
 FEValuesBase<dim>::get_shape_grads () const {
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
+};
+
+
+
+template <int dim>
+inline
+const vector<vector<Tensor<2,dim> > > &
+FEValuesBase<dim>::get_shape_2nd_derivatives () const {
+  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  return shape_2nd_derivatives;
 };
 
 

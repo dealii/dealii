@@ -589,12 +589,15 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * and the given quadrature points on the
 				      * unit cell. The Jacobian matrix is to
 				      * be computed at every quadrature point.
+				      * The derivative of the jacobian matrix
+				      * is the derivative with respect to the
+				      * unit cell coordinates.
 				      * This function has to be in the finite
 				      * element class, since different finite
 				      * elements need different transformations
 				      * of the unit cell to a real cell.
 				      *
-				      * The computation of the three fields may
+				      * The computation of these fields may
 				      * share some common code, which is why we
 				      * put it in one function. However, it may
 				      * not always be necessary to really
@@ -607,25 +610,33 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * of the Jacobi matrix and of the various
 				      * structures to be filled.
 				      *
-				      * It is provided for the finite element
-				      * class in one space dimension, but for
-				      * higher dimensions, it depends on the
-				      * present fe and needs reimplementation
-				      * by the user. This is due to the fact
+				      * This function is provided for
+				      * the finite element class in
+				      * one space dimension, but for
+				      * higher dimensions, it depends
+				      * on the present fe and needs
+				      * reimplementation by the
+				      * user. This is due to the fact
 				      * that the user may want to use
-				      * iso- or subparametric mappings of the
-				      * unit cell to the real cell, which
-				      * makes things much more complicated.
+				      * iso- or subparametric mappings
+				      * of the unit cell to the real
+				      * cell, which makes things much
+				      * more complicated.
 				      *
-				      * The #shape_values/grads_transform#
-				      * arrays store the values and gradients
-				      * of the transformation basis functions.
-				      * While this information is not necessary
-				      * for the computation of the other fields,
-				      * it allows for significant speedups, since
-				      * the values and gradients of the transform
-				      * functions at the quadrature points
-				      * need not be recomputed each time this
+				      * The
+				      * #shape_values/grads_transform#
+				      * arrays store the values and
+				      * gradients of the
+				      * transformation basis
+				      * functions.  While this
+				      * information is not necessary
+				      * for the computation of the
+				      * other fields, it allows for
+				      * significant speedups, since
+				      * the values and gradients of
+				      * the transform functions at the
+				      * quadrature points need not be
+				      * recomputed each time this
 				      * function is called.
 				      *
 				      * The function assumes that the fields
@@ -635,17 +646,18 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * This function is more or less an
 				      * interface to the #FEValues# class and
 				      * should not be used by users unless
-				      * absolutely needed.
-				      */
+				      * absolutely needed.  */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-				 const vector<Point<dim> >            &unit_points,
-				 vector<Tensor<2,dim> >               &jacobians,
-				 const bool           compute_jacobians,
-				 vector<Point<dim> > &support_points,
-				 const bool           compute_support_points,
-				 vector<Point<dim> > &q_points,
-				 const bool           compute_q_points,
-				 const dFMatrix      &shape_values_transform,
+				 const vector<Point<dim> > &unit_points,
+				 vector<Tensor<2,dim> >    &jacobians,
+				 const bool                 compute_jacobians,
+				 vector<Tensor<3,dim> >    &jacobians_grad,
+				 const bool                 compute_jacobians_grad,
+				 vector<Point<dim> >       &support_points,
+				 const bool                 compute_support_points,
+				 vector<Point<dim> >       &q_points,
+				 const bool                 compute_q_points,
+				 const dFMatrix            &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 				 const Boundary<dim> &boundary) const;
 
@@ -758,7 +770,9 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const vector<Point<dim-1> > &unit_points,
 				      const vector<Point<dim> >   &global_unit_points,
 				      vector<Tensor<2,dim> >      &jacobians,
-				      const bool           compute_jacobians,
+				      const bool                   compute_jacobians,
+				      vector<Tensor<3,dim> >      &jacobians_grad,
+				      const bool                   compute_jacobians_grad,
 				      vector<Point<dim> > &support_points,
 				      const bool           compute_support_points,
 				      vector<Point<dim> > &q_points,
@@ -805,7 +819,9 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const vector<Point<dim-1> > &unit_points,
 					 const vector<Point<dim> >   &global_unit_points,
 					 vector<Tensor<2,dim> >      &jacobians,
-					 const bool           compute_jacobians,
+					 const bool                   compute_jacobians,
+					 vector<Tensor<3,dim> >      &jacobians_grad,
+					 const bool           compute_jacobians_grad,
 					 vector<Point<dim> > &q_points,
 					 const bool           compute_q_points,
 					 vector<double>      &face_jacobi_determinants,

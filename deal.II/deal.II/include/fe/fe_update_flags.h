@@ -71,7 +71,7 @@ enum UpdateFlags {
 					* Update the second derivatives of the
 					* shape functions on the real cell.
 				        */
-      update_second_derivatives
+      update_second_derivatives = 64
 };
 
 

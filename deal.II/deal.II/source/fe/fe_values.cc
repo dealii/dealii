@@ -28,6 +28,7 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		n_transform_functions (n_transform_functions),
 		shape_values (n_values_arrays, dFMatrix(n_dofs, n_q_points)),
 		shape_gradients (n_dofs, vector<Tensor<1,dim> >(n_q_points)),
+		shape_2nd_derivatives (n_dofs, vector<Tensor<2,dim> >(n_q_points)),
 		weights (n_q_points, 0),
 		JxW_values (n_q_points, 0),
 		quadrature_points (n_q_points, Point<dim>()),
@@ -128,6 +129,48 @@ void FEValuesBase<dim>::get_function_grads (const dVector          &fe_function,
 
 
 template <int dim>
+const Tensor<2,dim> &
+FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
+					 const unsigned int j) const {
+  Assert (i<shape_2nd_derivatives.size(),
+	  ExcInvalidIndex (i, shape_2nd_derivatives.size()));
+  Assert (j<shape_2nd_derivatives[i].size(),
+	  ExcInvalidIndex (j, shape_2nd_derivatives[i].size()));
+  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+
+  return shape_2nd_derivatives[i][j];
+};
+
+
+
+template <int dim>
+void FEValuesBase<dim>::get_function_2nd_derivatives (const dVector &fe_function,
+						      vector<Tensor<2,dim> > &second_derivatives) const {
+  Assert (second_derivatives.size() == n_quadrature_points,
+	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
+
+				   // get function values of dofs
+				   // on this cell
+  dVector dof_values (total_dofs);
+  present_cell->get_dof_values (fe_function, dof_values);
+
+				   // initialize with zero
+  fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());
+
+				   // add up contributions of trial
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<total_dofs; ++shape_func)
+      {
+	Tensor<2,dim> tmp(shape_2nd_derivatives[shape_func][point]);
+	tmp *= dof_values(shape_func);
+	second_derivatives[point] += tmp;
+      };
+};
+
+
+
+template <int dim>
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const {
   Assert (i<quadrature_points.size(), ExcInvalidIndex(i,quadrature_points.size()));
@@ -218,10 +261,11 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
   present_cell = cell;
 				   // fill jacobi matrices and real
 				   // quadrature points
-  if ((update_flags & update_jacobians) ||
-      (update_flags & update_JxW_values)||
-      (update_flags & update_q_points)  ||
-      (update_flags & update_gradients) ||
+  if ((update_flags & update_jacobians)          ||
+      (update_flags & update_JxW_values)         ||
+      (update_flags & update_q_points)           ||
+      (update_flags & update_gradients)          ||
+      (update_flags & update_second_derivatives) ||
       (update_flags & update_support_points))
     fe->fill_fe_values (cell,
 			unit_quadrature_points,
@@ -230,8 +274,8 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 					update_JxW_values |
 					update_gradients  |
 					update_second_derivatives),
-//			jacobi_matrices_grad,
-//			update_flags & update_second_derivatives,
+			jacobi_matrices_grad,
+			update_flags & update_second_derivatives,
 			support_points,
 			update_flags & update_support_points,
 			quadrature_points,
@@ -407,31 +451,35 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
   selected_dataset = face_no;
 				   // fill jacobi matrices and real
 				   // quadrature points
-  if ((update_flags & update_jacobians) ||
-      (update_flags & update_JxW_values)||
-      (update_flags & update_q_points)  ||
-      (update_flags & update_gradients) ||
-      (update_flags & update_support_points) ||
+  if ((update_flags & update_jacobians)          ||
+      (update_flags & update_JxW_values)         ||
+      (update_flags & update_q_points)           ||
+      (update_flags & update_gradients)          ||
+      (update_flags & update_second_derivatives) ||
+      (update_flags & update_support_points)     ||
       (update_flags & update_JxW_values))
     fe->fill_fe_face_values (cell,
-			    face_no,
-			    unit_face_quadrature_points,
-			    unit_quadrature_points[face_no],
-			    jacobi_matrices,
-			    update_flags & (update_jacobians |
-					    update_gradients |
-					    update_JxW_values),
-			    support_points,
-			    update_flags & update_support_points,
-			    quadrature_points,
-			    update_flags & update_q_points,
-			    face_jacobi_determinants,
-			    update_flags & update_JxW_values,
-			    normal_vectors,
-			    update_flags & update_normal_vectors,
-			    shape_values_transform[face_no],
-			    unit_shape_gradients_transform[face_no],
-			    boundary);
+			     face_no,
+			     unit_face_quadrature_points,
+			     unit_quadrature_points[face_no],
+			     jacobi_matrices,
+			     update_flags & (update_jacobians |
+					     update_gradients |
+					     update_JxW_values |
+					     update_second_derivatives),
+			     jacobi_matrices_grad,
+			     update_flags & update_second_derivatives,
+			     support_points,
+			     update_flags & update_support_points,
+			     quadrature_points,
+			     update_flags & update_q_points,
+			     face_jacobi_determinants,
+			     update_flags & update_JxW_values,
+			     normal_vectors,
+			     update_flags & update_normal_vectors,
+			     shape_values_transform[face_no],
+			     unit_shape_gradients_transform[face_no],
+			     boundary);
 
 				   // compute gradients on real element if
 				   // requested
@@ -579,29 +627,33 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   selected_dataset = face_no*(1<<(dim-1)) + subface_no;
 				   // fill jacobi matrices and real
 				   // quadrature points
-  if ((update_flags & update_jacobians) ||
-      (update_flags & update_JxW_values)||
-      (update_flags & update_q_points)  ||
-      (update_flags & update_gradients) ||
+  if ((update_flags & update_jacobians)          ||
+      (update_flags & update_JxW_values)         ||
+      (update_flags & update_q_points)           ||
+      (update_flags & update_gradients)          ||
+      (update_flags & update_second_derivatives) ||
       (update_flags & update_JxW_values))
     fe->fill_fe_subface_values (cell,
-			       face_no,
-			       subface_no,
-			       unit_face_quadrature_points,
-			       unit_quadrature_points[selected_dataset],
-			       jacobi_matrices,
-			       update_flags & (update_jacobians |
-					       update_gradients |
-					       update_JxW_values),
-			       quadrature_points,
-			       update_flags & update_q_points,
-			       face_jacobi_determinants,
-			       update_flags & update_JxW_values,
-			       normal_vectors,
-			       update_flags & update_normal_vectors,
-			       shape_values_transform[selected_dataset],
-			       unit_shape_gradients_transform[selected_dataset],
-			       boundary);
+				face_no,
+				subface_no,
+				unit_face_quadrature_points,
+				unit_quadrature_points[selected_dataset],
+				jacobi_matrices,
+				update_flags & (update_jacobians |
+						update_gradients |
+						update_JxW_values|
+						update_second_derivatives),
+				jacobi_matrices_grad,
+				update_flags & update_second_derivatives,
+				quadrature_points,
+				update_flags & update_q_points,
+				face_jacobi_determinants,
+				update_flags & update_JxW_values,
+				normal_vectors,
+				update_flags & update_normal_vectors,
+				shape_values_transform[selected_dataset],
+				unit_shape_gradients_transform[selected_dataset],
+				boundary);
 
 				   // compute gradients on real element if
 				   // requested

@@ -280,7 +280,9 @@ template <int dim>
 void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 					   const vector<Point<dim> >            &unit_points,
 					   vector<Tensor<2,dim> >               &jacobians,
-					   const bool           compute_jacobians,
+					   const bool              compute_jacobians,
+					   vector<Tensor<3,dim> > &jacobians_grad,
+					   const bool              compute_jacobians_grad,
 					   vector<Point<dim> > &support_points,
 					   const bool           compute_support_points,
 					   vector<Point<dim> > &q_points,
@@ -379,7 +381,8 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
   is multiplied to the unit cell gradient *from the right*! be very careful
   with these things.
 
-  The following little program tests the correct behaviour:
+  The following little program tests the correct behaviour. The program can
+  also be found in the <tests> directory.
 
   -------------------------------------------
   #include <grid/tria.h>
@@ -488,7 +491,94 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					       // not implemented at present
 	      Assert (false, ExcNotImplemented());
       };
+
   
+  if (compute_jacobians_grad)
+    switch (dim) 
+      {
+	case 1:
+	{
+					   // derivative of the
+					   // jacobian is always zero
+					   // for a linear mapping in 1d
+	  for (unsigned int point=0; point<n_points; ++point)
+	    jacobians_grad[point][0][0][0] = 0;
+	  break;
+	};
+
+	case 2:
+	{
+	  for (unsigned int point=0; point<n_points; ++point)
+	    {
+	      const double xi = unit_points[point](0);
+	      const double eta= unit_points[point](1);
+	
+	      const double t2 = vertices[1](0)*eta;
+	      const double t4 = vertices[3](0)*vertices[2](1);
+	      const double t6 = vertices[0](0)*vertices[2](1);
+	      const double t8 = vertices[0](0)*vertices[3](1);
+	      const double t10 = vertices[3](0)*xi;
+	      const double t13 = vertices[2](0)*xi;
+	      const double t16 = vertices[3](0)*vertices[1](1);
+	      const double t18 = vertices[0](0)*vertices[1](1);
+	      const double t19 = vertices[3](0)*vertices[0](1);
+	      const double t20 = -t2*vertices[3](1)-t4*eta-t6*xi+t8*xi-
+				 t10*vertices[0](1)+t10*vertices[1](1)+
+				 t13*vertices[0](1)-t13*vertices[1](1)+t16
+				 *eta+t18+t19;
+	      const double t23 = vertices[1](0)*vertices[3](1);
+	      const double t26 = vertices[2](0)*eta;
+	      const double t29 = vertices[1](0)*vertices[0](1);
+	      const double t30 = vertices[1](0)*vertices[2](1);
+	      const double t32 = -t16-t18*eta+t6*eta-t23*xi+t2*vertices[0](1)-
+				 t26*vertices[0](1)+t26*vertices[3](1)-
+				 t8-t29+t23+t30
+				 *xi;
+	      const double t33 = t20+t32;
+	      const double t34 = 1/t33;
+	      const double t35 = (vertices[0](1)-vertices[1](1)+
+				  vertices[2](1)-vertices[3](1))*t34;
+	      const double t41 = t33*t33;
+	      const double t42 = 1/t41;
+	      const double t43 = (-vertices[0](1)+vertices[0](1)*xi-
+				  vertices[1](1)*xi+vertices[2](1)*xi+
+				  vertices[3](1)-vertices[3](1)*xi)*t42;
+	      const double t44 = vertices[2](0)*vertices[0](1);
+	      const double t46 = -t6+t8-t19+t16+t44-
+				 vertices[2](0)*vertices[1](1)-
+				 t23+t30;
+	      const double t50 = (vertices[0](0)-vertices[1](0)+
+				  vertices[2](0)-vertices[3](0))*t34;
+	      const double t54 = (-vertices[0](0)+vertices[0](0)*xi-
+				  vertices[1](0)*xi+t13+
+				  vertices[3](0)-t10)*t42;
+	      const double t62 = (-vertices[0](1)+vertices[0](1)*eta+
+				  vertices[1](1)-vertices[1](1)*eta+
+				  vertices[2](1)*eta-
+				  vertices[3](1)*eta)*t42;
+	      const double t67 = (-vertices[0](0)+vertices[0](0)*eta+
+				  vertices[1](0)-t2+t26-vertices[3](0)*eta)*t42;
+	      const double t70 = -t23-t4+t16-t18+t6+t29-t44+
+				 vertices[2](0)*vertices[3](1);
+	      jacobians_grad[point][0][0][0] = t35-t43*t46;
+	      jacobians_grad[point][0][0][1] = -t50+t54*t46;
+	      jacobians_grad[point][0][1][0] = t62*t46;
+	      jacobians_grad[point][0][1][1] = -t67*t46;
+	      jacobians_grad[point][1][0][0] = -t43*t70;
+	      jacobians_grad[point][1][0][1] = t54*t70;
+	      jacobians_grad[point][1][1][0] = -t35+t62*t70;
+	      jacobians_grad[point][1][1][1] = t50-t67*t70;
+	    };
+	  break;
+	  
+	};
+	
+	default:
+					       // not implemented at present
+	      Assert (false, ExcNotImplemented());
+      };
+	
+	      
   
     
   if (compute_support_points)
