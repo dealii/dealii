@@ -1,4 +1,4 @@
-//----------------------------  data_out_base.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  data_out_base.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/data_out_base.h>
@@ -3079,7 +3079,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 
 
 
-//--------------------------------------------------------
+//---------------------------------------------------------------------------
 // Macros for handling Tecplot API data
 
 #ifdef DEAL_II_HAVE_TECPLOT
@@ -3153,7 +3153,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 
 
 #endif
-//--------------------------------------------------------
+//---------------------------------------------------------------------------
 
 
 

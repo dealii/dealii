@@ -1,4 +1,4 @@
-//----------------------------  thread_management.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  thread_management.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/thread_management.h>

@@ -1,4 +1,4 @@
-//----------------------  tensor_product_polynomials.cc  ------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------  tensor_product_polynomials.cc  ------------
+//---------------------------------------------------------------------------
 
 
 #include <base/tensor_product_polynomials.h>

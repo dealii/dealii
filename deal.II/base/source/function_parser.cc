@@ -1,4 +1,4 @@
-//----------------------------  function_parser.cc ---------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  function_parser.cc ---------------------
+//---------------------------------------------------------------------------
 
 #include <base/function_parser.h>
 #include <base/point.h>

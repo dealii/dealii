@@ -1,4 +1,4 @@
-//----------------------------  tensor_function.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  tensor_function.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/tensor_function.h>

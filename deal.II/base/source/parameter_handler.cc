@@ -1,4 +1,4 @@
-//----------------------------  parameter_handler.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  parameter_handler.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 #include <base/parameter_handler.h>
 #include <base/logstream.h>

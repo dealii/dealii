@@ -1,4 +1,4 @@
-//----------------------  polynomial_space.cc  ------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------  polynomial_space.cc  ------------
+//---------------------------------------------------------------------------
 
 
 #include <base/polynomial_space.h>

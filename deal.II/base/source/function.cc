@@ -211,7 +211,7 @@ Function<dim>::memory_consumption () const
 }
 
 
-//------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <int dim>
 ZeroFunction<dim>::ZeroFunction (const unsigned int n_components)
@@ -319,7 +319,7 @@ void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >    
     };
 }
 
-//------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 
 template <int dim>
@@ -397,7 +397,7 @@ ConstantFunction<dim>::memory_consumption () const
   return sizeof (*this);
 }
 
-//------------------------------------------------------------//
+//---------------------------------------------------------------------------
 
 template <int dim>
 ComponentSelectFunction<dim>::
