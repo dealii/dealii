@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,8 +101,11 @@ namespace Threads
   const FunEncapsulation &
   FunEncapsulation::operator = (const FunEncapsulation &/*fun_data*/)
   {
-				     // this is not implemented at present
-    abort ();
+				     // this is not implemented at
+				     // present. return dummy value
+				     // instead
+    Assert (false, ExcNotImplemented());
+    return *static_cast<const FunEncapsulation *>(0);
   };
 
 
