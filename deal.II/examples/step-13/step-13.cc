@@ -1747,8 +1747,8 @@ Solution<dim>::value (const Point<dim>   &p,
 {
   double q = p(0);
   for (unsigned int i=1; i<dim; ++i)
-    q += sin(10*p(i)+5*p(0)*p(0));
-  const double exponential = exp(q);
+    q += std::sin(10*p(i)+5*p(0)*p(0));
+  const double exponential = std::exp(q);
   return exponential;
 };
 
@@ -1772,18 +1772,18 @@ RightHandSide<dim>::value (const Point<dim>   &p,
 {
   double q = p(0);
   for (unsigned int i=1; i<dim; ++i)
-    q += sin(10*p(i)+5*p(0)*p(0));
-  const double u = exp(q);
+    q += std::sin(10*p(i)+5*p(0)*p(0));
+  const double u = std::exp(q);
   double t1 = 1,
 	 t2 = 0,
 	 t3 = 0;
   for (unsigned int i=1; i<dim; ++i)
     {
-      t1 += cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
-      t2 += 10*cos(10*p(i)+5*p(0)*p(0)) -
-	    100*sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
-      t3 += 100*cos(10*p(i)+5*p(0)*p(0))*cos(10*p(i)+5*p(0)*p(0)) -
-	    100*sin(10*p(i)+5*p(0)*p(0));
+      t1 += std::cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
+      t2 += 10*std::cos(10*p(i)+5*p(0)*p(0)) -
+	    100*std::sin(10*p(i)+5*p(0)*p(0)) * p(0)*p(0);
+      t3 += 100*std::cos(10*p(i)+5*p(0)*p(0))*std::cos(10*p(i)+5*p(0)*p(0)) -
+	    100*std::sin(10*p(i)+5*p(0)*p(0));
     };
   t1 = t1*t1;
   
