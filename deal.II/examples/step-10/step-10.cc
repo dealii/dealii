@@ -138,7 +138,7 @@ void gnuplot_output()
 				       // use the
 				       // ``std::istringstream''
 				       // class to generate a name.
-      std::string filename_base = std::string("ball");
+      std::string filename_base = "ball";
       filename_base += '0'+refinement;
 
 				       // Then output the present grid
