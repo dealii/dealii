@@ -228,7 +228,7 @@ void FEQuadraticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterato
   local_mass_matrix(0,1) = local_mass_matrix(1,0) = -1./30.*h;
   local_mass_matrix(0,2) = local_mass_matrix(2,0) = 1./15.*h;
   local_mass_matrix(1,2) = local_mass_matrix(2,1) = 1./15.*h;
-  local_mass_matrix(2,2) = local_mass_matrix(2,2) = 8./15.*h;
+  local_mass_matrix(2,2) = 8./15.*h;
 };
 
 
