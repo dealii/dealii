@@ -661,9 +661,9 @@ GridGenerator::hyper_L (Triangulation<3> &tria,
 
 
 void
-GridGenerator::hyper_ball (Triangulation<3> &tria,
-			   const Point<3>   &p,
-			   const double radius)
+GridGenerator::hyper_ball (Triangulation<3> &/*tria*/,
+			   const Point<3>   &/*p*/,
+			   const double /*radius*/)
 {
 				   // this function used to be
 				   // implemented by the code below,
