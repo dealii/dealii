@@ -100,9 +100,14 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   
         dnl Intel's ICC C++ compiler? On Linux, it uses -V, on Windows
 	dnl it is -help
+	dnl
+	dnl Annoyingly, ecc6.0 prints its version number on a separate
+	dnl line (the previous one ends with the string "applications"),
+	dnl so join this one to the previous one with a little bit of
+	dnl perl.
         is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
         is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
-        is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
+        is_intel_ecc="`($CXX -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
 	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
         if test "x$is_intel_icc" != "x" ; then
 	  version5="`echo $is_intel_icc | grep 'Version 5'`"
