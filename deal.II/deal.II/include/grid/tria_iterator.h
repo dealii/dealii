@@ -252,6 +252,30 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 		     const typename Accessor::AccessorData *local_data = 0);
 
 				     /**
+				      * This is a conversion operator
+				      * (constructor) which takes another
+				      * iterator type and copies the data;
+				      * this conversion works, if there is
+				      * a conversion path from the
+				      * #OtherAccessor# class to the #Accessor#
+				      * class of this object. One such path
+				      * would be derived class to base class,
+				      * which for example may be used to get
+				      * a #Triangulation::raw_cell_iterator# from
+				      * a #DoFHandler::raw_cell_iterator#, since
+				      * the #DoFAccessor# class is derived from
+				      * the #TriaAccessor# class.
+				      *
+				      * Since #TriaIterator# and
+				      * #TriaActiveIterator# are derived classes
+				      * of this class, this constructor also
+				      * serves to convert these iterators with
+				      * other accessor classes.
+				      */
+    template <typename OtherAccessor>
+    TriaRawIterator (const TriaRawIterator<dim,OtherAccessor> &i);
+    
+				     /**
 				      *  @name Dereferencing
 				      */
 				     /*@{*/
@@ -481,6 +505,29 @@ class TriaIterator : public TriaRawIterator<dim,Accessor> {
 		  const int           index,
 		  const typename Accessor::AccessorData *local_data = 0);
     
+				     /**
+				      * This is a conversion operator
+				      * (constructor) which takes another
+				      * iterator type and copies the data;
+				      * this conversion works, if there is
+				      * a conversion path from the
+				      * #OtherAccessor# class to the #Accessor#
+				      * class of this object. One such path
+				      * would be derived class to base class,
+				      * which for example may be used to get
+				      * a #Triangulation::cell_iterator# from
+				      * a #DoFHandler::cell_iterator#, since
+				      * the #DoFAccessor# class is derived from
+				      * the #TriaAccessor# class.
+				      *
+				      * Since #TriaActiveIterator# is a derived
+				      * class of this class, this constructor
+				      * also serves to convert these iterators 
+				      * with other accessor classes.
+				      */
+    template <typename OtherAccessor>
+    TriaIterator (const TriaIterator<dim,OtherAccessor> &i);
+
     				     /**
 				      *  Assignment operator.
 				      */
@@ -612,6 +659,24 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 			const int           index,
 			const typename Accessor::AccessorData *local_data = 0);
 
+				     /**
+				      * This is a conversion operator
+				      * (constructor) which takes another
+				      * iterator type and copies the data;
+				      * this conversion works, if there is
+				      * a conversion path from the
+				      * #OtherAccessor# class to the #Accessor#
+				      * class of this object. One such path
+				      * would be derived class to base class,
+				      * which for example may be used to get
+				      * a #Triangulation::active_cell_iterator# from
+				      * a #DoFHandler::active_cell_iterator#, since
+				      * the #DoFAccessor# class is derived from
+				      * the #TriaAccessor# class.
+				      */
+    template <typename OtherAccessor>
+    TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i);
+
     				     /**
 				      *  Assignment operator.
 				      */
@@ -691,6 +756,15 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor> {
 
 
 /*----------------------- Inline functions -------------------*/
+
+
+
+template <int dim, typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,OtherAccessor> &i)
+		: accessor (i.accessor)
+{};
 
 
 
@@ -787,6 +861,26 @@ inline
 void TriaRawIterator<dim,Accessor>::print (ostream &out) const {
   out << accessor.level() << "." << accessor.index();
 };
+
+
+
+template <int dim, typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,OtherAccessor> &i)
+		: TriaRawIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
+{};
+
+
+
+template <int dim, typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i)
+		: TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
+{};
+
+
 
 
 
