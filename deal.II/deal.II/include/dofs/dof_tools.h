@@ -25,25 +25,29 @@ class DoFTools
 {
   public:
 				     /**
-				      * Extract DoFs of components.
-				      * The bit vector #select#
+				      * Extract the indices of the degrees
+				      * of freedom belonging to certain
+				      * components. The bit vector #select#
 				      * defines, which components of an
 				      * #FESystem# are to be extracted
 				      * from the DoFHandler #dof#. The
-				      * numbers of these dofs are then
-				      * entered consecutively into
-				      * #selected_dofs#.
+				      * respective entries in #selected_dofs#
+				      * are then flagged #true#, while all
+				      * others remain #false#.
 				      *
-				      * A prior ordering of dof-values
-				      * is not destroyed by this process.
+				      * The size of #select# shall equal
+				      * the number of components in the
+				      * finite element used by #dof#.
 				      */
     template<int dim>
     static void extract_dofs(const DoFHandler<dim> &dof,
-			     const vector<bool>     &select,
+			     const vector<bool>    &select,
 			     vector<bool>          &selected_dofs);
 
 				     /**
-				      * Same as #extract_dofs# for multi-level.
+				      * Do the same thing as #extract_dofs#
+				      * for one level of a multi-grid DoF
+				      * numbering.
 				      */
     template<int dim>
     static void extract_level_dofs(const unsigned int       level,

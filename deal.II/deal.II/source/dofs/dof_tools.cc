@@ -32,9 +32,11 @@ DoFTools::extract_dofs(const DoFHandler<dim> &dof,
       c->get_dof_indices(indices);
       for (unsigned int i=0;i<fe.total_dofs;++i)
 	{
-	  pair<unsigned int, unsigned int> comp
-	    = fe.system_to_component_index(i);
-	  selected_dofs[indices[i]] = local_select[comp.first];
+	  const pair<unsigned int, unsigned int> component
+	    = fe.system_to_component_index(i).first;
+
+	  if (local_select[component] == true)
+	    selected_dofs[indices[i]] = true;
 	}
     }
 }
@@ -62,9 +64,10 @@ DoFTools::extract_level_dofs(const unsigned int       level,
       c->get_mg_dof_indices(indices);
       for (unsigned int i=0;i<fe.total_dofs;++i)
 	{
-	  pair<unsigned int, unsigned int> comp
-	    = fe.system_to_component_index(i);
-	  selected_dofs[indices[i]] = local_select[comp.first];
+	  const pair<unsigned int, unsigned int> component
+	    = fe.system_to_component_index(i).first;
+	  if (local_select[component]  == true)
+	    selected_dofs[indices[i]] = true;
 	}
     }
 }
