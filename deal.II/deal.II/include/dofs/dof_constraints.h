@@ -67,7 +67,11 @@ class BlockIndices;
  * the values of constrained nodes from the values of the unconstrained ones
  * using the distribute() function. Note that the condense() function is
  * applied to matrix and right hand side of the linear system, while the
- * distribute() function is applied to the solution vector.
+ * distribute() function is applied to the solution vector. Note also that the
+ * distribute_local_to_global() functions discussed below are equivalent to
+ * condense() functions, and are thus to be applied to matrices and right hand
+ * side vectors, and are not to be confused with the distribute() function
+ * which has to applied to the solution vector.
  *
  *
  * @sect3{Condensing matrices and sparsity patterns}
@@ -169,6 +173,12 @@ class BlockIndices;
  * distribute_local_to_global() functions of this class, which make a
  * subsequent call to condense() unnecessary.
  *
+ * Note that, despite their name which describes what the function really
+ * does, the distribute_local_to_global() functions has to be applied to
+ * matrices and right hand side vectors, whereas the distribute() function
+ * discussed below is applied to the solution vector after solving the linear
+ * system.
+ * 
  * 
  * @sect3{Distributing constraints}
  * 
