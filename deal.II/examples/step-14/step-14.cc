@@ -2854,12 +2854,14 @@ namespace LaplaceSolver
     DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
 					     primal_hanging_node_constraints);
     primal_hanging_node_constraints.close();
-    Vector<double> tmp (PrimalSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolate (DualSolver<dim>::dof_handler,
-			  DualSolver<dim>::solution,
-			  PrimalSolver<dim>::dof_handler,
-			  primal_hanging_node_constraints,
-			  tmp);
+    Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
+    FETools::interpolation_difference (DualSolver<dim>::dof_handler,
+				       dual_hanging_node_constraints,
+				       DualSolver<dim>::solution,
+				       PrimalSolver<dim>::dof_handler,
+				       primal_hanging_node_constraints,
+				       dual_weights);
+    
 				     // Note that this could probably
 				     // have been more efficient since
 				     // those constraints have been
@@ -2870,50 +2872,21 @@ namespace LaplaceSolver
 				     // dual solution. We leave the
 				     // optimization of the program in
 				     // this respect as an exercise.
-
-				     // Once we have the
-				     // down-interpolated field,
-				     // interpolate it back up to the
-				     // dual finite element space,
-				     // just as for the primal
-				     // solution above. This way, we
-				     // again have all information on
-				     // one level, and can work with
-				     // it more simply than
-				     // otherwise. Note that (as in
-				     // the primal case), since the
-				     // solution on the smaller finite
-				     // element space was continuous
-				     // also at hanging nodes (we
-				     // explicitly made it
-				     // continuous), it is also
-				     // conforming in the dual finite
-				     // element space, which must be
-				     // larger. There is thus no need
-				     // for more special actions.
-    Vector<double> i_h_dual_solution (DualSolver<dim>::dof_handler.n_dofs());
-    FETools::interpolate (PrimalSolver<dim>::dof_handler,
-			  tmp,
-			  DualSolver<dim>::dof_handler,
-			  dual_hanging_node_constraints,
-			  i_h_dual_solution);
-
-				     // With all this in place,
-				     // compute z-zh:
-    Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
-    dual_weights = DualSolver<dim>::solution;
-    dual_weights -= i_h_dual_solution;
     
-				     // Then we set up a map between
-				     // face iterators and their jump
-				     // term contributions of faces to
-				     // the error estimator. The
-				     // reason is that we compute the
-				     // jump terms only once, from one
-				     // side of the face, and want to
-				     // collect them only afterwards
-				     // when looping over all cells a
-				     // second time.
+				     // Having computed the dual
+				     // weights we now proceed with
+				     // computing the cell and face
+				     // residuals of the primal
+				     // solution. First we set up a
+				     // map between face iterators and
+				     // their jump term contributions
+				     // of faces to the error
+				     // estimator. The reason is that
+				     // we compute the jump terms only
+				     // once, from one side of the
+				     // face, and want to collect them
+				     // only afterwards when looping
+				     // over all cells a second time.
 				     //
 				     // We initialize this map already
 				     // with a value of -1e20 for all
