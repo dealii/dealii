@@ -208,7 +208,7 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
   const Triangulation<3>::quad_iterator &quad,
   std::vector<Point<3> > &points) const
 {
-  unsigned int m=static_cast<unsigned int> (std::sqrt(points.size()));
+  unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
   Assert(points.size()==m*m, ExcInternalError());
 
   std::vector<Point<3> > lp3(m);

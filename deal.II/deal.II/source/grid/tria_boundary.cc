@@ -178,7 +178,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 				 typename std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size(),
-		     m=static_cast<unsigned int>(std::sqrt(n));
+		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
 				   // is n a square number
   Assert(m*m==n, ExcInternalError());
 
