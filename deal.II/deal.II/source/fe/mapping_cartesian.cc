@@ -13,6 +13,7 @@
 
 #include <base/tensor.h>
 #include <base/quadrature.h>
+#include <base/memory_consumption.h>
 #include <lac/full_matrix.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
