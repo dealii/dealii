@@ -422,7 +422,7 @@ namespace PETScWrappers
   
 
   
-  double
+  PetscScalar
   MatrixBase::residual (VectorBase       &dst,
                         const VectorBase &x,
                         const VectorBase &b) const

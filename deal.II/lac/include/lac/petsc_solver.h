@@ -162,7 +162,7 @@ namespace PETScWrappers
       int
       convergence_test (KSP                 ksp,
                         const int           iteration,
-                        const double        residual_norm,
+                        const PetscScalar   residual_norm,
                         KSPConvergedReason *reason,
                         void               *solver_control);
 
