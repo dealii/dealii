@@ -442,6 +442,33 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New:  <code
+       class="member">DoFTools::compute_intergrid_transfer_representation</class>
+       is a function that generates a matrix representation that can
+       be used to transfer data from one grid to one component of the
+       fields on another, finer, grid.
+       <br>
+       (WB 2001/05/24)
+       </p>
+
+  <li> <p>
+       Changed: the  <code class="class">GeometryInfo</class> class
+       has been reverted from a general template that calculates the
+       values of its member variables by recursion/induction to a set
+       of explicitely specialized classes. This seemed necessary since
+       most compilers objected to the old implementation as the
+       declaration of the values of the class required knowledge of
+       the elements of the class with one lower dimension which was,
+       however, only being declared at present except for 1d. Also,
+       allocating space for variables was difficult as that would mean
+       declaring specializations after their first use. The new (and
+       very old) implementation is entirely compatible to the previous
+       one.
+       <br>
+       (WB 2001/05/23)
+       </p>
+
+  <li> <p>
        Changed: the classes that denote flags to the <code
        class="class">TimeStepBase_Tria</class> class have been move
        from local classes to a namespace of their own, names
