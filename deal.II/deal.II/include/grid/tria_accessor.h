@@ -1934,12 +1934,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     bool active () const;
 
 				     /**
-				      * Test whether the point p is inside
-				      * this cell.
-				      * Up to now, this function is only
-				      * implemented for 2d
+				      * Test whether the point @p{p}
+				      * is inside this cell.
 				      */
-    bool point_inside(const Point<dim> &p) const;
+    bool point_inside (const Point<dim> &p) const;
     
     
 				     /**
