@@ -436,7 +436,7 @@ class MatrixCreator
  * seems to be too expensive.
  *
  * 
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2000
  */
 template <int dim>
 class MatrixTools : public MatrixCreator<dim>
@@ -448,12 +448,30 @@ class MatrixTools : public MatrixCreator<dim>
 				      * as described in the general
 				      * documentation.
 				      */
-    static void apply_boundary_values (const map<unsigned int,double> &boundary_values,
-				       SparseMatrix<double>  &matrix,
-				       Vector<double>        &solution,
-				       Vector<double>        &right_hand_side,
-				       const bool             eliminate_columns = true);
+    static void
+    apply_boundary_values (const map<unsigned int,double> &boundary_values,
+			   SparseMatrix<double>  &matrix,
+			   Vector<double>        &solution,
+			   Vector<double>        &right_hand_side,
+			   const bool             eliminate_columns = true);
 
+				     /**
+				      * Apply dirichlet boundary
+				      * conditions to the system
+				      * matrix and vectors as
+				      * described in the general
+				      * documentation. This function
+				      * works for block sparse
+				      * matrices and block vectors
+				      */
+    template <int blocks>
+    static void
+    apply_boundary_values (const map<unsigned int,double> &boundary_values,
+			   BlockSparseMatrix<double,blocks,blocks> &matrix,
+			   BlockVector<blocks,double> &solution,
+			   BlockVector<blocks,double> &right_hand_side,
+			   const bool                  eliminate_columns = true);
+    
 				     /**
 				      * Exception
 				      */
@@ -461,6 +479,10 @@ class MatrixTools : public MatrixCreator<dim>
 		    int, int,
 		    << "The dimensions " << arg1 << " and " << arg2
 		    << " don't match.");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixNotBlockSquare);
 };
 
 
