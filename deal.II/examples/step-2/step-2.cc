@@ -74,7 +74,7 @@ void make_grid (Triangulation<2> &triangulation)
 			      center, inner_radius, outer_radius, 10);
 
 				   // This is the single difference to
-				   // the respetive function in the
+				   // the respective function in the
 				   // previous program: since we want
 				   // to export the triangulation
 				   // through this function's

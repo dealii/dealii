@@ -33,7 +33,7 @@
 
 				 // The following two files provide
 				 // classes and information for
-				 // multithreaded programs. In the
+				 // multi-threaded programs. In the
 				 // first one, the classes and
 				 // functions are declared which we
 				 // need to start new threads and to
@@ -145,7 +145,7 @@ class AdvectionProblem
 
 				     // When assembling the matrix in
 				     // parallel, we have to
-				     // synchronise when several
+				     // synchronize when several
 				     // threads attempt to write the
 				     // local contributions of a cell
 				     // to the global matrix at the
@@ -176,7 +176,7 @@ class AdvectionProblem
 				     // course, since if only one
 				     // thread is running at a time,
 				     // there is no need to
-				     // synchronise with other
+				     // synchronize with other
 				     // threads.
     Threads::ThreadMutex     assembler_lock;
 };
@@ -1261,7 +1261,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // multi-threading, then there
 				       // can't be parallel threads
 				       // and there is no need to
-				       // synchronise. Thus, the
+				       // synchronize. Thus, the
 				       // ``lock'' and ``release''
 				       // functions are no-ops,
 				       // i.e. they return without
@@ -1540,7 +1540,7 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				 // principle, an optimized
 				 // implementation would find
 				 // neighbors and the quantities
-				 // dependening on them in one step,
+				 // depending on them in one step,
 				 // rather than first building a list
 				 // of neighbors and in a second step
 				 // their contributions.
@@ -1592,7 +1592,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				   // cell and advancing them using
 				   // the given start and end
 				   // index. Note that we can use the
-				   // ``advance'' functino of the
+				   // ``advance'' function of the
 				   // standard C++ library, but that
 				   // we have to cast the distance by
 				   // which the iterator is to be
@@ -1879,7 +1879,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // computation on each of
 				       // them. First we do some
 				       // preliminaries: find out
-				       // about the center iof the
+				       // about the center of the
 				       // present cell and the
 				       // solution at this point. The
 				       // latter is obtained as a

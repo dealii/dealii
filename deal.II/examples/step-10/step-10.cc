@@ -95,7 +95,7 @@ void gnuplot_output()
 				   // the mesh refinement in the loop
 				   // header, which might be uncommon
 				   // but nevertheless works. Also it
-				   // is strangly consistent with
+				   // is strangely consistent with
 				   // incrementing the loop index
 				   // denoting the refinement level.
   for (unsigned int refinement=0; refinement<2;
@@ -165,7 +165,7 @@ void gnuplot_output()
 					   // does so significantly
 					   // faster. ``MappingQ1'' is
 					   // also the class that is
-					   // implicitely used
+					   // implicitly used
 					   // throughout the library
 					   // in many functions and
 					   // classes if you do not
@@ -360,13 +360,13 @@ void compute_pi_by_area ()
       const FE_Q<dim>     dummy_fe (1);
 
 				       // Likewise, we need to create
-				       // a DofHandler object. We do
+				       // a DoFHandler object. We do
 				       // not actually use it, but it
 				       // will provide us with
 				       // `active_cell_iterators' that
-				       // are needed to reinit the
-				       // FEValues object on each cell
-				       // of the triangulation.
+				       // are needed to reinitialize
+				       // the FEValues object on each
+				       // cell of the triangulation.
       DoFHandler<dim> dof_handler (triangulation);
 
 				       // Now we set up the FEValues

@@ -397,7 +397,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // the ``MatrixCreator'' and
 				   // ``MatrixTools''
 				   // classes. Whenever you need a
-				   // slighly different version of
+				   // slightly different version of
 				   // these functions than the ones
 				   // called above, it is certainly
 				   // worthwhile to take a look at the
@@ -439,7 +439,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // fixed R, but it also provides
 				   // quadrature rules of higher
 				   // degree which are no longer
-				   // hardcoded in the library.
+				   // hard-coded in the library.
 
 				   // Since the generation of the body
 				   // force contributions to the right
@@ -508,7 +508,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // Finally, evaluate what we got as
 				   // solution. As stated in the
 				   // introduction, we are interested
-				   // in the H1 seminorm of the
+				   // in the H1 semi-norm of the
 				   // solution. Here, as well, we have
 				   // a function in the library that
 				   // does this, although in a
@@ -529,7 +529,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // (which we make us of here), and
 				   // the one which we have used in
 				   // previous examples which
-				   // implicitely uses ``MappingQ1''.
+				   // implicitly uses ``MappingQ1''.
 				   // Also note that we take a
 				   // quadrature formula of one degree
 				   // higher, in order to avoid

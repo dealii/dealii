@@ -254,11 +254,13 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // usually abort upon the attempt to
 				 // destroy the finite element.
 				 //
-				 // As a sidenote, we remark that
-				 // these exception are not
-				 // particularly popular among
-				 // programmers, since they only tell
-				 // us that some other object is still
+				 // As a side-note, we remark that
+				 // this exception about still used
+				 // objects are not particularly
+				 // popular among programmers using
+				 // deal.II, since they only tell us
+				 // that something is wrong, namely
+				 // that some other object is still
 				 // using the object that is presently
 				 // destructed, but not which one. It
 				 // is therefore often rather
@@ -281,7 +283,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // situation, if we did not write
 				 // this destructor, the compiler will
 				 // generate code that triggers
-				 // exactly the behaviour sketched
+				 // exactly the behavior sketched
 				 // above. The reason is that member
 				 // variables of the
 				 // ``LaplaceProblem'' class are
@@ -600,7 +602,7 @@ void LaplaceProblem<dim>::solve ()
 	    preconditioner);
 
 				   // To set the constrained nodes to
-				   // resonable values, you have to
+				   // reasonable values, you have to
 				   // use the following function. It
 				   // computes the values of these
 				   // nodes from the values of the
@@ -788,7 +790,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // class that implements
 				   // several different algorithms to
 				   // refine a triangulation based on
-				   // cellwise error indicators.
+				   // cell-wise error indicators.
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
 						   0.3, 0.03);
@@ -960,7 +962,7 @@ void LaplaceProblem<dim>::run ()
 				 // switched off in optimized mode, in
 				 // contrast to the ``Assert'' macro
 				 // which we have used to test against
-				 // programming errors. If uncought,
+				 // programming errors. If uncaught,
 				 // these exceptions propagate the
 				 // call tree up to the ``main''
 				 // function, and if they are not
@@ -1060,7 +1062,7 @@ int main ()
 				   // If we got to this point, there
 				   // was no exception which
 				   // propagated up to the main
-				   // functino (maybe there were some,
+				   // function (maybe there were some,
 				   // but they were caught somewhere
 				   // in the program or the
 				   // library). Therefore, the program

@@ -94,7 +94,7 @@ void second_grid ()
                                    // center of the ring shall be the
                                    // point (1,0), and inner and outer
                                    // radius shall be 0.5 and 1. The
-                                   // number of circumferentical cells
+                                   // number of circumferential cells
                                    // could be adjusted automatically
                                    // by this function, but we choose
                                    // to set it explicitely as the
@@ -111,7 +111,7 @@ void second_grid ()
                                    // of the coarse grid (which we
                                    // just created). Here, however, we
                                    // would like to have a curved
-                                   // boundary. Furtunately, some good
+                                   // boundary. Fortunately, some good
                                    // soul implemented an object which
                                    // describes the boundary of a ring
                                    // domain; it only needs the center
