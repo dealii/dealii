@@ -20,9 +20,6 @@
 // for all lower dimensions as well. That is why in this file the check
 // is for deal_II_dimension >= any_number and not for ==
 
-#ifndef M_PI
-# define M_PI		3.14159265358979323846	/* pi */
-#endif
 
 template <typename number>
 number abs (const number a)
@@ -42,7 +39,7 @@ QGauss<1>::QGauss (const unsigned int n)
 
   for (unsigned int i=1;i<=m;++i)
     {
-      z = std::cos(M_PI * (i-.25)/(n+.5));
+      z = std::cos(deal_II_numbers::PI * (i-.25)/(n+.5));
 
 				       // Newton-iteration
       do
