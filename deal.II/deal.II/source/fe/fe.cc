@@ -706,8 +706,6 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 	};
     };
 
-				   // compute ansatz points, which are
-				   // the corners for linear elements
   if (compute_ansatz_points)
     get_ansatz_points (cell, boundary, ansatz_points);
 };
