@@ -17,7 +17,7 @@
 /*----------------------------   fullmatrix.h     ---------------------------*/
 
 #include <base/exceptions.h>
-#include <base/subscriptor.h>
+#include <base/vector2d.h>
 
 #include <vector>
 
@@ -60,7 +60,7 @@ template<typename number> class Vector;
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2001
  */
 template<typename number>
-class FullMatrix : public Subscriptor
+class FullMatrix : public vector2d<number>
 {
   public:
 				     /**
@@ -99,11 +99,6 @@ class FullMatrix : public Subscriptor
 		const unsigned int cols,
 		const number* entries);
 
-
-				     /**
-				      * Destructor. Release all memory.
-				      */
-    ~FullMatrix();
     
 				     /**
 				      * Comparison operator. Be careful with
@@ -126,7 +121,7 @@ class FullMatrix : public Subscriptor
 				      * generate a predefined copy
 				      * operator which is not what we want.
 				      */
-    FullMatrix<number>& operator = (const FullMatrix<number>& src);
+//    FullMatrix<number>& operator = (const FullMatrix<number>& src);
 
 				     /**
 				      * Assignment operator.
@@ -134,8 +129,8 @@ class FullMatrix : public Subscriptor
 				      * into the matrix. The size is
 				      * adjusted if needed.
 				      */
-    template<typename number2>
-    FullMatrix<number>& operator = (const FullMatrix<number2>& src);
+//    template<typename number2>
+//    FullMatrix<number>& operator = (const FullMatrix<number2>& src);
 
 
 				     /**
@@ -159,6 +154,12 @@ class FullMatrix : public Subscriptor
     
 
 				     /**
+				      * Make function of base class available.
+				      */
+    template<typename number2>
+      void fill (const number2*);
+    
+				     /**
 				      * Fill with permutation of another matrix.
 				      *
 				      * The matrix @p{src} is copied
@@ -180,28 +181,20 @@ class FullMatrix : public Subscriptor
 	       const std::vector<unsigned int>& p_rows,
 	       const std::vector<unsigned int>& p_cols);
 
-                                     /**
-				      * Fill matrix with an array of numbers.
-				      * The array is arranged line by line. No
-				      * range checking is performed.
-				      */
-    template<typename number2>
-      void fill (const number2* entries);
-    
 				     /**
 				      * Set dimension to $m\times n$ and
 				      * allocate memory if necessary. Forget
 				      * the previous content of the matrix.
 				      */
-    void reinit (const unsigned int m,
-		 const unsigned int n);
+//    void reinit (const unsigned int m,
+//		 const unsigned int n);
     
 				     /**
 				      * Set dimension to $n\times n$ and
 				      * allocate memory if necessary. Forget
 				      * the previous content of the matrix.
 				      */
-    void reinit (const unsigned int n);
+//    void reinit (const unsigned int n);
     
 				     /**
 				      * Set dimension to $m(B)\times n(B)$ and
@@ -210,8 +203,8 @@ class FullMatrix : public Subscriptor
 				      * However, this function does not copy
 				      * the contents of @p{B}.
 				      */
-    template<typename number2>
-    void reinit (const FullMatrix<number2> &B);
+//    template<typename number2>
+//    void reinit (const FullMatrix<number2> &B);
     
 				     /**
 				      * Number of rows of this matrix.
@@ -237,31 +230,7 @@ class FullMatrix : public Subscriptor
 				      */
     bool all_zero () const;
 
-				     /**
-				      * Return the value of the element @p{(i,j)}.
-				      * Does the same as the private @p{el(i,j)}
-				      * function but does bounds checking in
-				      * debug mode.
-				      */
-    number operator() (const unsigned int i,
-		       const unsigned int j) const;
     
-				     /**
-				      * Return a read-write reference to
-				      * the element @p{(i,j)}.
-				      * Does the same as the private @p{el(i,j)}
-				      * function but does bounds checking in
-				      * debug mode.
-				      */
-    number& operator() (const unsigned int i,
-			const unsigned int j);
-    
-				     /**
-				      * Set all entries in the matrix to
-				      * zero. Do not resize the matrix.
-				      */
-    void clear ();
-
 				     /**
 				      * Weighted addition. The matrix
 				      * @p{s*B} is added to @p{this}.
@@ -656,7 +625,7 @@ class FullMatrix : public Subscriptor
 				      * of this object.
 				      */
     unsigned int memory_consumption () const;
-
+    
 				     /**
 				      * Exception
 				      */
@@ -693,80 +662,11 @@ class FullMatrix : public Subscriptor
 		    << " matrix dimension " << arg1);
 
   private:
-				     /**
-				      * Component-array.
-				      */
-    number *val;
-    
-				     /** 
-				      * Dimension of range.
-				      * Actual number of Columns
-				      */
-    unsigned int dim_range;
-    
-				     /**
-				      * Dimension of image. Actual number of Rows
-				      */
-    unsigned int dim_image;
-    
-				     /**
-				      * Dimension of the array
-				      * holding the values of the
-				      * matrix elements. Determines
-				      * amount of reserved memory.
-				      *
-				      * Actually, the allocated array may
-				      * not have a size equal to the number
-				      * of elements of this matrix, since
-				      * reallocation only happens when the
-				      * size of the matrix is increased.
-				      * Therefore, if the matrix size was
-				      * decreased somewhen in the past,
-				      * @p{val_size} will be larger than
-				      * @p{dim_range * dim_image}.
-				      */
-    unsigned int val_size;
-    
-				     /**
-				      * Return a read-write reference to the
-				      * element @p{(i,j)}.
-				      *
-				      * This function does no bounds
-				      * checking and is only to be used
-				      * internally and in functions
-				      * already checked.
-				      */
-    number & el (const unsigned int i, const unsigned int j);
-    
-				     /**
-				      * Return the value of the element @p{(i,j)}.
-				      *
-				      * This function does no bounds checking
-				      * and is only to be used
-				      * internally and in functions
-				      * already checked.
-				      */
-    number el (const unsigned int i, const unsigned int j) const;    
 };
 
 
 /*-------------------------Inline functions -------------------------------*/
 
-template <typename number>
-inline number &
-FullMatrix<number>::el (const unsigned int i, const unsigned int j)
-{
-  return val[i*dim_range+j];
-};
-
-
-
-template <typename number>
-inline number
-FullMatrix<number>::el (const unsigned int i, const unsigned int j) const
-{
-  return val[i*dim_range+j];
-};
 
 
 
@@ -774,7 +674,7 @@ template <typename number>
 inline unsigned int
 FullMatrix<number>::m() const
 {
-  return dim_image;
+  return n_rows();
 };
 
 
@@ -783,30 +683,18 @@ template <typename number>
 inline unsigned int
 FullMatrix<number>::n() const
 {
-  return dim_range;
+  return n_cols();
 };
 
 
-
 template <typename number>
-inline number
-FullMatrix<number>::operator() (const unsigned int i, const unsigned int j) const
-{  
-  Assert (i<dim_image, ExcIndexRange (i, 0, dim_image));
-  Assert (j<dim_range, ExcIndexRange (j, 0, dim_range));
-  return el(i,j);
-};
-
-
-
-template <typename number>
-inline number &
-FullMatrix<number>::operator() (const unsigned int i, const unsigned int j)
+template <typename number2>
+inline
+void FullMatrix<number>::fill (const number2* src)
 {
-  Assert (i<dim_image, ExcIndexRange (i, 0, dim_image));
-  Assert (j<dim_range, ExcIndexRange (j, 0, dim_range));
-  return el(i,j);
-};
+  vector2d<number>::fill(src);
+}
+
 
 
 /*----------------------------   fullmatrix.h     ---------------------------*/

@@ -26,136 +26,39 @@
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int n) :
-		val (0),
-		dim_range (0),
-		dim_image (0),
-		val_size (0)
-{
-  reinit (n,n);
-};
+		vector2d<number> (n)
+{}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
 				const unsigned int n) :
-		val (0),
-		dim_range (0),
-		dim_image (0),
-		val_size (0)
-{
-  reinit (m,n);
-};
+		vector2d<number> (m, n)
+{}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
 				const unsigned int n,
 				const number* entries) :
-		val (0),
-		dim_range (0),
-		dim_image (0),
-		val_size (0)
-{
-  reinit (m,n);
-
-  if (dim_range*dim_image != 0)
-    std::copy (entries, entries+dim_image*dim_range, val);
-};
+		vector2d<number> (m, n, entries)
+{}
 
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const FullMatrix &m) :
-		Subscriptor (),
-		val (0),
-		dim_range (0),
-		dim_image (0),
-		val_size (0)
-{
-  reinit (m.dim_image, m.dim_range);
-  if (dim_range*dim_image != 0)
-    std::copy (&m.val[0], &m.val[dim_image*dim_range],
-	       &val[0]);
-};
-
-
-template <typename number>
-FullMatrix<number>::~FullMatrix ()
-{
-  if (val != 0)
-    delete[] val;
-};
-
-
-template <typename number>
-void
-FullMatrix<number>::reinit (const unsigned int mm,
-			    const unsigned int nn)
-{
-  dim_range = nn;
-  dim_image = mm;
-
-				   // if zero size was given: free all
-				   // memory
-  if ((dim_range==0) || (dim_image == 0))
-    {
-      if (val != 0)
-	delete[] val;
-
-      val      = 0;
-      val_size = 0;
-
-				       // set both sizes to zero, even
-				       // if one was previously
-				       // nonzero. This simplifies
-				       // some Assertions.
-      dim_range = dim_image = 0;
-
-      return;
-    };
-  
-				   // if new size is nonzero:
-				   // if necessary: allocate
-				   // additional memory
-  if (val_size<nn*mm)
-    {
-      if (val != 0)
-	delete[] val;
-
-      val_size = dim_range * dim_image;
-      val      = new number[val_size];
-    };
-
-				   // Clear contents of old or new
-				   // memory.
-  clear ();
-};
-
-
-template <typename number>
-void
-FullMatrix<number>::reinit (const unsigned int n)
-{
-  reinit (n, n);
-};
-
-
-template <typename number>
-template <typename number2>
-void
-FullMatrix<number>::reinit (const FullMatrix<number2> &B)
-{
-  reinit (B.m(), B.n());
-};
+		vector2d<number> (m)
+{}
 
 
 template <typename number>
 bool
 FullMatrix<number>::all_zero () const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
-  const number *p = &val[0],
-	       *e = &val[n()*m()];
+  const number *p = data(),
+	       *e = data() + n()*m();
   while (p!=e)
     if (*p++ != 0.0)
       return false;
@@ -171,7 +74,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
 			   const Vector<number2>& src,
 			   const bool adding) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
@@ -181,11 +84,11 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
     number2 s;
     number2 s0,s1,s2;
     s   = src(0);
-    s0  = s*val[0]; s1  = s*val[3]; s2  = s*val[6]; 
+    s0  = s*data()[0]; s1  = s*data()[3]; s2  = s*data()[6]; 
     s   = src(1);
-    s0 += s*val[1]; s1 += s*val[4]; s2 += s*val[7];
+    s0 += s*data()[1]; s1 += s*data()[4]; s2 += s*data()[7];
     s   = src(2);
-    s0 += s*val[2]; s1 += s*val[5]; s2 += s*val[8];
+    s0 += s*data()[2]; s1 += s*data()[5]; s2 += s*data()[8];
 
     if (!adding)
     {
@@ -205,13 +108,13 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
     number2 s;
     number2 s0,s1,s2,s3;
     s = src(0);
-    s0  = s*val[0]; s1  = s*val[4]; s2  = s*val[8];  s3  = s*val[12];
+    s0  = s*data()[0]; s1  = s*data()[4]; s2  = s*data()[8];  s3  = s*data()[12];
     s = src(1);
-    s0 += s*val[1]; s1 += s*val[5]; s2 += s*val[9];  s3 += s*val[13];
+    s0 += s*data()[1]; s1 += s*data()[5]; s2 += s*data()[9];  s3 += s*data()[13];
     s = src(2);
-    s0 += s*val[2]; s1 += s*val[6]; s2 += s*val[10]; s3 += s*val[14];
+    s0 += s*data()[2]; s1 += s*data()[6]; s2 += s*data()[10]; s3 += s*data()[14];
     s = src(3);
-    s0 += s*val[3]; s1 += s*val[7]; s2 += s*val[11]; s3 += s*val[15];
+    s0 += s*data()[3]; s1 += s*data()[7]; s2 += s*data()[11]; s3 += s*data()[15];
     
     if (!adding)
     {
@@ -233,29 +136,29 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
     number2 s;
     number2 s0,s1,s2,s3,s4,s5,s6,s7;
     s = src(0);
-    s0 = s*val[0]; s1 = s*val[8]; s2 = s*val[16]; s3 = s*val[24];
-    s4 = s*val[32]; s5 = s*val[40]; s6 = s*val[48]; s7 = s*val[56];
+    s0 = s*data()[0]; s1 = s*data()[8]; s2 = s*data()[16]; s3 = s*data()[24];
+    s4 = s*data()[32]; s5 = s*data()[40]; s6 = s*data()[48]; s7 = s*data()[56];
     s = src(1);
-    s0 += s*val[1]; s1 += s*val[9]; s2 += s*val[17]; s3 += s*val[25];
-    s4 += s*val[33]; s5 += s*val[41]; s6 += s*val[49]; s7 += s*val[57];
+    s0 += s*data()[1]; s1 += s*data()[9]; s2 += s*data()[17]; s3 += s*data()[25];
+    s4 += s*data()[33]; s5 += s*data()[41]; s6 += s*data()[49]; s7 += s*data()[57];
     s = src(2);
-    s0 += s*val[2]; s1 += s*val[10]; s2 += s*val[18]; s3 += s*val[26];
-    s4 += s*val[34]; s5 += s*val[42]; s6 += s*val[50]; s7 += s*val[58];
+    s0 += s*data()[2]; s1 += s*data()[10]; s2 += s*data()[18]; s3 += s*data()[26];
+    s4 += s*data()[34]; s5 += s*data()[42]; s6 += s*data()[50]; s7 += s*data()[58];
     s = src(3);
-    s0 += s*val[3]; s1 += s*val[11]; s2 += s*val[19]; s3 += s*val[27];
-    s4 += s*val[35]; s5 += s*val[43]; s6 += s*val[51]; s7 += s*val[59];
+    s0 += s*data()[3]; s1 += s*data()[11]; s2 += s*data()[19]; s3 += s*data()[27];
+    s4 += s*data()[35]; s5 += s*data()[43]; s6 += s*data()[51]; s7 += s*data()[59];
     s = src(4);
-    s0 += s*val[4]; s1 += s*val[12]; s2 += s*val[20]; s3 += s*val[28];
-    s4 += s*val[36]; s5 += s*val[44]; s6 += s*val[52]; s7 += s*val[60];
+    s0 += s*data()[4]; s1 += s*data()[12]; s2 += s*data()[20]; s3 += s*data()[28];
+    s4 += s*data()[36]; s5 += s*data()[44]; s6 += s*data()[52]; s7 += s*data()[60];
     s = src(5);
-    s0 += s*val[5]; s1 += s*val[13]; s2 += s*val[21]; s3 += s*val[29];
-    s4 += s*val[37]; s5 += s*val[45]; s6 += s*val[53]; s7 += s*val[61];
+    s0 += s*data()[5]; s1 += s*data()[13]; s2 += s*data()[21]; s3 += s*data()[29];
+    s4 += s*data()[37]; s5 += s*data()[45]; s6 += s*data()[53]; s7 += s*data()[61];
     s = src(6);
-    s0 += s*val[6]; s1 += s*val[14]; s2 += s*val[22]; s3 += s*val[30];
-    s4 += s*val[38]; s5 += s*val[46]; s6 += s*val[54]; s7 += s*val[62];
+    s0 += s*data()[6]; s1 += s*data()[14]; s2 += s*data()[22]; s3 += s*data()[30];
+    s4 += s*data()[38]; s5 += s*data()[46]; s6 += s*data()[54]; s7 += s*data()[62];
     s = src(7);
-    s0 += s*val[7]; s1 += s*val[15]; s2 += s*val[23]; s3 += s*val[31];
-    s4 += s*val[39]; s5 += s*val[47]; s6 += s*val[55]; s7 += s*val[63];
+    s0 += s*data()[7]; s1 += s*data()[15]; s2 += s*data()[23]; s3 += s*data()[31];
+    s4 += s*data()[39]; s5 += s*data()[47]; s6 += s*data()[55]; s7 += s*data()[63];
     
     if (!adding)
     {
@@ -282,7 +185,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   }
   else
   {    
-    number* e = val;
+    const number* e = data();
     const unsigned int size_m = m(),
 		       size_n = n();
     if (!adding)
@@ -316,7 +219,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 				 const Vector<number2> &src,
 				 const bool             adding) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
@@ -353,7 +256,7 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
 				     const Vector<number2>& src,
 				     const Vector<number3>& right) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
@@ -379,7 +282,7 @@ template <typename number2>
 void FullMatrix<number>::forward (Vector<number2>& dst,
 				  const Vector<number2>& src) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
@@ -401,7 +304,7 @@ template <typename number2>
 void FullMatrix<number>::backward (Vector<number2>& dst,
 				   const Vector<number2>& src) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
@@ -415,31 +318,13 @@ void FullMatrix<number>::backward (Vector<number2>& dst,
 }
 
 
-template <typename number>
-FullMatrix<number>&
-FullMatrix<number>::operator = (const FullMatrix<number>& m) 
-{
-  reinit (m);
-  if (dim_range*dim_image != 0)
-    std::copy (&m.val[0], &m.val[dim_image*dim_range],
-	       &val[0]);
+/*  template <typename number> */
+/*  template <typename number2> */
+/*  FullMatrix<number>& */
+/*  FullMatrix<number>::operator = (const FullMatrix<number2>& m)  */
+/*  { */
   
-  return *this;
-}
-
-
-template <typename number>
-template <typename number2>
-FullMatrix<number>&
-FullMatrix<number>::operator = (const FullMatrix<number2>& m) 
-{
-  reinit(m);
-  if (dim_range*dim_image != 0)
-    copy (&m.val[0], &m.val[dim_image*dim_range],
-	  &val[0]);
-
-  return *this;
-}
+/*  } */
 
 
 template <typename number>
@@ -463,25 +348,25 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
 					   const std::vector<unsigned int>& p_rows,
 					   const std::vector<unsigned int>& p_cols)
 {
-  Assert (p_rows.size() == dim_image,
-	  ExcDimensionMismatch (p_rows.size(), dim_image));
-  Assert (p_cols.size() == dim_range,
-	  ExcDimensionMismatch (p_cols.size(), dim_range));
+  Assert (p_rows.size() == n_rows(),
+	  ExcDimensionMismatch (p_rows.size(), n_rows()));
+  Assert (p_cols.size() == n_cols(),
+	  ExcDimensionMismatch (p_cols.size(), n_cols()));
 
-  for (unsigned int i=0;i<dim_image;++i)
-    for (unsigned int j=0;j<dim_range;++j)
+  for (unsigned int i=0;i<n_rows();++i)
+    for (unsigned int j=0;j<n_cols();++j)
       el(i,j) = src(p_rows[i], p_cols[j]);
 }
 
 
 
-template <typename number>
-template <typename number2>
-void FullMatrix<number>::fill (const number2* entries)
-{
-    if (dim_range*dim_image != 0)
-      std::copy (entries, entries+dim_image*dim_range, val);
-}
+/*  template <typename number> */
+/*  template <typename number2> */
+/*  void FullMatrix<number>::fill (const number2* entries) */
+/*  { */
+/*      if (n_cols()*n_rows() != 0) */
+/*        std::copy (entries, entries+n_rows()*n_cols(), data()); */
+/*  } */
 
 
 
@@ -490,7 +375,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
 				  const number s,
 				  const unsigned int j)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   for (unsigned int k=0; k<m(); ++k)
     el(i,k) += s*el(j,k);
@@ -504,7 +389,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
 				  const number t,
 				  const unsigned int k)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   const unsigned int size_m = m();
   for (unsigned l=0; l<size_m; ++l)
@@ -516,7 +401,7 @@ template <typename number>
 void FullMatrix<number>::add_col (const unsigned int i, const number s,
 			const unsigned int j)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   for (unsigned int k=0; k<n(); ++k)
     el(k,i) += s*el(k,j);
@@ -528,7 +413,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
 		        const unsigned int j, const number t,
 			const unsigned int k)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   for (unsigned int l=0; l<n(); ++l)
     el(l,i) += s*el(l,j) + t*el(l,k);
@@ -538,7 +423,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
 template <typename number>
 void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   number s;
   for (unsigned int k=0; k<m(); ++k)
@@ -551,7 +436,7 @@ void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
 template <typename number>
 void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   number s;
   for (unsigned int k=0; k<n(); ++k)
@@ -564,7 +449,7 @@ void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
 template <typename number>
 void FullMatrix<number>::diagadd (const number src)
 {
-  Assert (val != 0, ExcEmptyMatrix());  
+  Assert (data() != 0, ExcEmptyMatrix());  
   Assert (m() == n(), ExcDimensionMismatch(m(),n()));
   
   for (unsigned int i=0; i<n(); ++i)
@@ -578,7 +463,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 				const FullMatrix<number2> &src,
 				const bool                 adding) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
@@ -611,7 +496,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 				 const FullMatrix<number2> &src,
 				 const bool                 adding) const
 {
-  Assert (val != 0, ExcEmptyMatrix());  
+  Assert (data() != 0, ExcEmptyMatrix());  
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
   Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
@@ -642,14 +527,14 @@ template <typename number>
 template <typename number2>
 number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   number2 sum = 0.;
   const unsigned int n_rows = m();
-  const number *val_ptr = &val[0];
+  const number *val_ptr = data();
   const number2 *v_ptr;
   
   for (unsigned int row=0; row<n_rows; ++row)
@@ -672,7 +557,7 @@ template <typename number2>
 number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 						   const Vector<number2> &v) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert(m() == u.size(), ExcDimensionMismatch(m(),v.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
@@ -680,7 +565,7 @@ number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
   number2 sum = 0.;
   const unsigned int n_rows = m();
   const unsigned int n_cols = n();
-  const number *val_ptr = &val[0];
+  const number *val_ptr = data();
   const number2 *v_ptr;
   
   for (unsigned int row=0; row<n_rows; ++row)
@@ -701,7 +586,7 @@ number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 template <typename number>
 number FullMatrix<number>::l1_norm () const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   number sum=0, max=0;
   const unsigned int n_rows = m(), n_cols = n();
@@ -721,7 +606,7 @@ number FullMatrix<number>::l1_norm () const
 template <typename number>
 number FullMatrix<number>::linfty_norm () const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   number sum=0, max=0;
   const unsigned int n_rows = m(), n_cols = n();
@@ -744,7 +629,7 @@ FullMatrix<number>::print (std::ostream       &s,
 			   const unsigned int  w,
 			   const unsigned int  p) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   for (unsigned int i=0; i<m(); ++i)
     {
@@ -760,119 +645,122 @@ template <typename number2>
 void
 FullMatrix<number>::add (const number s,const FullMatrix<number2>& src)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
 
+  number* val = const_cast<number*> (data());
+  const number2* srcval = src.data();
+  
   if ((n()==3) && (m()==3))
   {
-    val[0] += s * src.val[0];
-    val[1] += s * src.val[1];
-    val[2] += s * src.val[2];
-    val[3] += s * src.val[3];
-    val[4] += s * src.val[4];
-    val[5] += s * src.val[5];
-    val[6] += s * src.val[6];
-    val[7] += s * src.val[7];
-    val[8] += s * src.val[8];
+    val[0] += s * srcval[0];
+    val[1] += s * srcval[1];
+    val[2] += s * srcval[2];
+    val[3] += s * srcval[3];
+    val[4] += s * srcval[4];
+    val[5] += s * srcval[5];
+    val[6] += s * srcval[6];
+    val[7] += s * srcval[7];
+    val[8] += s * srcval[8];
   }
   else if ((n()==4) && (m()==4))
   {
-    val[0] += s * src.val[0];
-    val[1] += s * src.val[1];
-    val[2] += s * src.val[2];
-    val[3] += s * src.val[3];
-    val[4] += s * src.val[4];
-    val[5] += s * src.val[5];
-    val[6] += s * src.val[6];
-    val[7] += s * src.val[7];
-    val[8] += s * src.val[8];
-    val[9] += s * src.val[9];
-    val[10] += s * src.val[10];
-    val[11] += s * src.val[11];
-    val[12] += s * src.val[12];
-    val[13] += s * src.val[13];
-    val[14] += s * src.val[14];
-    val[15] += s * src.val[15];
+    val[0] += s * srcval[0];
+    val[1] += s * srcval[1];
+    val[2] += s * srcval[2];
+    val[3] += s * srcval[3];
+    val[4] += s * srcval[4];
+    val[5] += s * srcval[5];
+    val[6] += s * srcval[6];
+    val[7] += s * srcval[7];
+    val[8] += s * srcval[8];
+    val[9] += s * srcval[9];
+    val[10] += s * srcval[10];
+    val[11] += s * srcval[11];
+    val[12] += s * srcval[12];
+    val[13] += s * srcval[13];
+    val[14] += s * srcval[14];
+    val[15] += s * srcval[15];
   }
   else if ((n()==8) && (m()==8))
   {
-    val[0] += s * src.val[0];
-    val[1] += s * src.val[1];
-    val[2] += s * src.val[2];
-    val[3] += s * src.val[3];
-    val[4] += s * src.val[4];
-    val[5] += s * src.val[5];
-    val[6] += s * src.val[6];
-    val[7] += s * src.val[7];
-    val[8] += s * src.val[8];
-    val[9] += s * src.val[9];
-    val[10] += s * src.val[10];
-    val[11] += s * src.val[11];
-    val[12] += s * src.val[12];
-    val[13] += s * src.val[13];
-    val[14] += s * src.val[14];
-    val[15] += s * src.val[15];
-    val[16] += s * src.val[16];
-    val[17] += s * src.val[17];
-    val[18] += s * src.val[18];
-    val[19] += s * src.val[19];
+    val[0] += s * srcval[0];
+    val[1] += s * srcval[1];
+    val[2] += s * srcval[2];
+    val[3] += s * srcval[3];
+    val[4] += s * srcval[4];
+    val[5] += s * srcval[5];
+    val[6] += s * srcval[6];
+    val[7] += s * srcval[7];
+    val[8] += s * srcval[8];
+    val[9] += s * srcval[9];
+    val[10] += s * srcval[10];
+    val[11] += s * srcval[11];
+    val[12] += s * srcval[12];
+    val[13] += s * srcval[13];
+    val[14] += s * srcval[14];
+    val[15] += s * srcval[15];
+    val[16] += s * srcval[16];
+    val[17] += s * srcval[17];
+    val[18] += s * srcval[18];
+    val[19] += s * srcval[19];
 
-    val[20] += s * src.val[20];
-    val[21] += s * src.val[21];
-    val[22] += s * src.val[22];
-    val[23] += s * src.val[23];
-    val[24] += s * src.val[24];
-    val[25] += s * src.val[25];
-    val[26] += s * src.val[26];
-    val[27] += s * src.val[27];
-    val[28] += s * src.val[28];
-    val[29] += s * src.val[29];
+    val[20] += s * srcval[20];
+    val[21] += s * srcval[21];
+    val[22] += s * srcval[22];
+    val[23] += s * srcval[23];
+    val[24] += s * srcval[24];
+    val[25] += s * srcval[25];
+    val[26] += s * srcval[26];
+    val[27] += s * srcval[27];
+    val[28] += s * srcval[28];
+    val[29] += s * srcval[29];
 
-    val[30] += s * src.val[30];
-    val[31] += s * src.val[31];
-    val[32] += s * src.val[32];
-    val[33] += s * src.val[33];
-    val[34] += s * src.val[34];
-    val[35] += s * src.val[35];
-    val[36] += s * src.val[36];
-    val[37] += s * src.val[37];
-    val[38] += s * src.val[38];
-    val[39] += s * src.val[39];
+    val[30] += s * srcval[30];
+    val[31] += s * srcval[31];
+    val[32] += s * srcval[32];
+    val[33] += s * srcval[33];
+    val[34] += s * srcval[34];
+    val[35] += s * srcval[35];
+    val[36] += s * srcval[36];
+    val[37] += s * srcval[37];
+    val[38] += s * srcval[38];
+    val[39] += s * srcval[39];
 
-    val[40] += s * src.val[40];
-    val[41] += s * src.val[41];
-    val[42] += s * src.val[42];
-    val[43] += s * src.val[43];
-    val[44] += s * src.val[44];
-    val[45] += s * src.val[45];
-    val[46] += s * src.val[46];
-    val[47] += s * src.val[47];
-    val[48] += s * src.val[48];
-    val[49] += s * src.val[49];
+    val[40] += s * srcval[40];
+    val[41] += s * srcval[41];
+    val[42] += s * srcval[42];
+    val[43] += s * srcval[43];
+    val[44] += s * srcval[44];
+    val[45] += s * srcval[45];
+    val[46] += s * srcval[46];
+    val[47] += s * srcval[47];
+    val[48] += s * srcval[48];
+    val[49] += s * srcval[49];
 
-    val[50] += s * src.val[50];
-    val[51] += s * src.val[51];
-    val[52] += s * src.val[52];
-    val[53] += s * src.val[53];
-    val[54] += s * src.val[54];
-    val[55] += s * src.val[55];
-    val[56] += s * src.val[56];
-    val[57] += s * src.val[57];
-    val[58] += s * src.val[58];
-    val[59] += s * src.val[59];
+    val[50] += s * srcval[50];
+    val[51] += s * srcval[51];
+    val[52] += s * srcval[52];
+    val[53] += s * srcval[53];
+    val[54] += s * srcval[54];
+    val[55] += s * srcval[55];
+    val[56] += s * srcval[56];
+    val[57] += s * srcval[57];
+    val[58] += s * srcval[58];
+    val[59] += s * srcval[59];
 
-    val[60] += s * src.val[60];
-    val[61] += s * src.val[61];
-    val[62] += s * src.val[62];
-    val[63] += s * src.val[63];
+    val[60] += s * srcval[60];
+    val[61] += s * srcval[61];
+    val[62] += s * srcval[62];
+    val[63] += s * srcval[63];
   }
   else
   {
     const unsigned int size = n()*m();
     for (unsigned int i=0; i<size; i++)
-      val[i] += s * src.val[i];
+      val[i] += s * srcval[i];
   }
 }
 
@@ -882,119 +770,122 @@ template <typename number2>
 void
 FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
 
+  number* val = const_cast<number*> (data());
+  const number2* srcval = src.data();
+  
   if ((n()==3) && (m()==3))
   {
-    val[0] += s * src.val[0];
-    val[0] += s * src.val[1];
-    val[0] += s * src.val[2];
-    val[3] += s * src.val[3];
-    val[3] += s * src.val[4];
-    val[3] += s * src.val[5];
-    val[6] += s * src.val[6];
-    val[6] += s * src.val[7];
-    val[6] += s * src.val[8];
+    val[0] += s * srcval[0];
+    val[0] += s * srcval[1];
+    val[0] += s * srcval[2];
+    val[3] += s * srcval[3];
+    val[3] += s * srcval[4];
+    val[3] += s * srcval[5];
+    val[6] += s * srcval[6];
+    val[6] += s * srcval[7];
+    val[6] += s * srcval[8];
   }
   else if ((n()==4) && (m()==4))
   {
-    val[0] += s * src.val[0];
-    val[0] += s * src.val[1];
-    val[0] += s * src.val[2];
-    val[0] += s * src.val[3];
-    val[4] += s * src.val[4];
-    val[4] += s * src.val[5];
-    val[4] += s * src.val[6];
-    val[4] += s * src.val[7];
-    val[8] += s * src.val[8];
-    val[8] += s * src.val[9];
-    val[8] += s * src.val[10];
-    val[8] += s * src.val[11];
-    val[12] += s * src.val[12];
-    val[12] += s * src.val[13];
-    val[12] += s * src.val[14];
-    val[12] += s * src.val[15];
+    val[0] += s * srcval[0];
+    val[0] += s * srcval[1];
+    val[0] += s * srcval[2];
+    val[0] += s * srcval[3];
+    val[4] += s * srcval[4];
+    val[4] += s * srcval[5];
+    val[4] += s * srcval[6];
+    val[4] += s * srcval[7];
+    val[8] += s * srcval[8];
+    val[8] += s * srcval[9];
+    val[8] += s * srcval[10];
+    val[8] += s * srcval[11];
+    val[12] += s * srcval[12];
+    val[12] += s * srcval[13];
+    val[12] += s * srcval[14];
+    val[12] += s * srcval[15];
   }
   else if ((n()==8) && (m()==8))
   {
-    val[0] += s * src.val[0];
-    val[0] += s * src.val[1];
-    val[0] += s * src.val[2];
-    val[0] += s * src.val[3];
-    val[0] += s * src.val[4];
-    val[0] += s * src.val[5];
-    val[0] += s * src.val[6];
-    val[0] += s * src.val[7];
-    val[8] += s * src.val[8];
-    val[8] += s * src.val[9];
-    val[8] += s * src.val[10];
-    val[8] += s * src.val[11];
-    val[8] += s * src.val[12];
-    val[8] += s * src.val[13];
-    val[8] += s * src.val[14];
-    val[8] += s * src.val[15];
-    val[16] += s * src.val[16];
-    val[16] += s * src.val[17];
-    val[16] += s * src.val[18];
-    val[16] += s * src.val[19];
+    val[0] += s * srcval[0];
+    val[0] += s * srcval[1];
+    val[0] += s * srcval[2];
+    val[0] += s * srcval[3];
+    val[0] += s * srcval[4];
+    val[0] += s * srcval[5];
+    val[0] += s * srcval[6];
+    val[0] += s * srcval[7];
+    val[8] += s * srcval[8];
+    val[8] += s * srcval[9];
+    val[8] += s * srcval[10];
+    val[8] += s * srcval[11];
+    val[8] += s * srcval[12];
+    val[8] += s * srcval[13];
+    val[8] += s * srcval[14];
+    val[8] += s * srcval[15];
+    val[16] += s * srcval[16];
+    val[16] += s * srcval[17];
+    val[16] += s * srcval[18];
+    val[16] += s * srcval[19];
 
-    val[16] += s * src.val[20];
-    val[16] += s * src.val[21];
-    val[16] += s * src.val[22];
-    val[16] += s * src.val[23];
-    val[24] += s * src.val[24];
-    val[24] += s * src.val[25];
-    val[24] += s * src.val[26];
-    val[24] += s * src.val[27];
-    val[24] += s * src.val[28];
-    val[24] += s * src.val[29];
+    val[16] += s * srcval[20];
+    val[16] += s * srcval[21];
+    val[16] += s * srcval[22];
+    val[16] += s * srcval[23];
+    val[24] += s * srcval[24];
+    val[24] += s * srcval[25];
+    val[24] += s * srcval[26];
+    val[24] += s * srcval[27];
+    val[24] += s * srcval[28];
+    val[24] += s * srcval[29];
 
-    val[24] += s * src.val[30];
-    val[24] += s * src.val[31];
-    val[32] += s * src.val[32];
-    val[32] += s * src.val[33];
-    val[32] += s * src.val[34];
-    val[32] += s * src.val[35];
-    val[32] += s * src.val[36];
-    val[32] += s * src.val[37];
-    val[32] += s * src.val[38];
-    val[32] += s * src.val[39];
+    val[24] += s * srcval[30];
+    val[24] += s * srcval[31];
+    val[32] += s * srcval[32];
+    val[32] += s * srcval[33];
+    val[32] += s * srcval[34];
+    val[32] += s * srcval[35];
+    val[32] += s * srcval[36];
+    val[32] += s * srcval[37];
+    val[32] += s * srcval[38];
+    val[32] += s * srcval[39];
 
-    val[40] += s * src.val[40];
-    val[40] += s * src.val[41];
-    val[40] += s * src.val[42];
-    val[40] += s * src.val[43];
-    val[40] += s * src.val[44];
-    val[40] += s * src.val[45];
-    val[40] += s * src.val[46];
-    val[40] += s * src.val[47];
-    val[48] += s * src.val[48];
-    val[48] += s * src.val[49];
+    val[40] += s * srcval[40];
+    val[40] += s * srcval[41];
+    val[40] += s * srcval[42];
+    val[40] += s * srcval[43];
+    val[40] += s * srcval[44];
+    val[40] += s * srcval[45];
+    val[40] += s * srcval[46];
+    val[40] += s * srcval[47];
+    val[48] += s * srcval[48];
+    val[48] += s * srcval[49];
 
-    val[48] += s * src.val[50];
-    val[48] += s * src.val[51];
-    val[48] += s * src.val[52];
-    val[48] += s * src.val[53];
-    val[48] += s * src.val[54];
-    val[48] += s * src.val[55];
-    val[56] += s * src.val[56];
-    val[56] += s * src.val[57];
-    val[56] += s * src.val[58];
-    val[56] += s * src.val[59];
+    val[48] += s * srcval[50];
+    val[48] += s * srcval[51];
+    val[48] += s * srcval[52];
+    val[48] += s * srcval[53];
+    val[48] += s * srcval[54];
+    val[48] += s * srcval[55];
+    val[56] += s * srcval[56];
+    val[56] += s * srcval[57];
+    val[56] += s * srcval[58];
+    val[56] += s * srcval[59];
 
-    val[56] += s * src.val[60];
-    val[56] += s * src.val[61];
-    val[56] += s * src.val[62];
-    val[56] += s * src.val[63];
+    val[56] += s * srcval[60];
+    val[56] += s * srcval[61];
+    val[56] += s * srcval[62];
+    val[56] += s * srcval[63];
   }
   else
   {
     const unsigned int size = n()*m();
     for (unsigned int i=0; i<size; i++)
-      val[i] += s * src.val[i];
+      val[i] += s * srcval[i];
   }
 }
 
@@ -1004,121 +895,124 @@ template <typename number2>
 void
 FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   Assert (m() == n(),     ExcNotQuadratic());
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
 
+  number* val = const_cast<number*> (data());
+  const number2* srcval = src.data();
+  
   if ((n()==3) && (m()==3))
   {
-    val[0] += s * src.val[0];
-    val[1] += s * src.val[3];
-    val[2] += s * src.val[6];
+    val[0] += s * srcval[0];
+    val[1] += s * srcval[3];
+    val[2] += s * srcval[6];
 
-    val[3] += s * src.val[1];
-    val[4] += s * src.val[4];
-    val[5] += s * src.val[7];
+    val[3] += s * srcval[1];
+    val[4] += s * srcval[4];
+    val[5] += s * srcval[7];
 
-    val[6] += s * src.val[2];
-    val[7] += s * src.val[5];
-    val[8] += s * src.val[8];
+    val[6] += s * srcval[2];
+    val[7] += s * srcval[5];
+    val[8] += s * srcval[8];
   }
   else if ((n()==4) && (m()==4))
   {
-    val[0] += s * src.val[0];
-    val[1] += s * src.val[4];
-    val[2] += s * src.val[8];
-    val[3] += s * src.val[12];
+    val[0] += s * srcval[0];
+    val[1] += s * srcval[4];
+    val[2] += s * srcval[8];
+    val[3] += s * srcval[12];
 
-    val[4] += s * src.val[1];
-    val[5] += s * src.val[5];
-    val[6] += s * src.val[9];
-    val[7] += s * src.val[13];
+    val[4] += s * srcval[1];
+    val[5] += s * srcval[5];
+    val[6] += s * srcval[9];
+    val[7] += s * srcval[13];
 
-    val[8] += s * src.val[2];
-    val[9] += s * src.val[6];
-    val[10] += s * src.val[10];
-    val[11] += s * src.val[14];
+    val[8] += s * srcval[2];
+    val[9] += s * srcval[6];
+    val[10] += s * srcval[10];
+    val[11] += s * srcval[14];
 
-    val[12] += s * src.val[3];
-    val[13] += s * src.val[7];
-    val[14] += s * src.val[11];
-    val[15] += s * src.val[15];
+    val[12] += s * srcval[3];
+    val[13] += s * srcval[7];
+    val[14] += s * srcval[11];
+    val[15] += s * srcval[15];
   }
   else if ((n()==8) && (m()==8))
   {
-    val[0] += s * src.val[0];
-    val[1] += s * src.val[8];
-    val[2] += s * src.val[16];
-    val[3] += s * src.val[24];
-    val[4] += s * src.val[32];
-    val[5] += s * src.val[40];
-    val[6] += s * src.val[48];
-    val[7] += s * src.val[56];
+    val[0] += s * srcval[0];
+    val[1] += s * srcval[8];
+    val[2] += s * srcval[16];
+    val[3] += s * srcval[24];
+    val[4] += s * srcval[32];
+    val[5] += s * srcval[40];
+    val[6] += s * srcval[48];
+    val[7] += s * srcval[56];
 
-    val[8] += s * src.val[1];
-    val[9] += s * src.val[9];
-    val[10] += s * src.val[17];
-    val[11] += s * src.val[25];
-    val[12] += s * src.val[33];
-    val[13] += s * src.val[41];
-    val[14] += s * src.val[49];
-    val[15] += s * src.val[57];
+    val[8] += s * srcval[1];
+    val[9] += s * srcval[9];
+    val[10] += s * srcval[17];
+    val[11] += s * srcval[25];
+    val[12] += s * srcval[33];
+    val[13] += s * srcval[41];
+    val[14] += s * srcval[49];
+    val[15] += s * srcval[57];
 
-    val[16] += s * src.val[2];
-    val[17] += s * src.val[10];
-    val[18] += s * src.val[18];
-    val[19] += s * src.val[26];
-    val[20] += s * src.val[34];
-    val[21] += s * src.val[42];
-    val[22] += s * src.val[50];
-    val[23] += s * src.val[58];
+    val[16] += s * srcval[2];
+    val[17] += s * srcval[10];
+    val[18] += s * srcval[18];
+    val[19] += s * srcval[26];
+    val[20] += s * srcval[34];
+    val[21] += s * srcval[42];
+    val[22] += s * srcval[50];
+    val[23] += s * srcval[58];
 
-    val[24] += s * src.val[3];
-    val[25] += s * src.val[11];
-    val[26] += s * src.val[19];
-    val[27] += s * src.val[27];
-    val[28] += s * src.val[35];
-    val[29] += s * src.val[43];
-    val[30] += s * src.val[51];
-    val[31] += s * src.val[59];
+    val[24] += s * srcval[3];
+    val[25] += s * srcval[11];
+    val[26] += s * srcval[19];
+    val[27] += s * srcval[27];
+    val[28] += s * srcval[35];
+    val[29] += s * srcval[43];
+    val[30] += s * srcval[51];
+    val[31] += s * srcval[59];
 
-    val[32] += s * src.val[4];
-    val[33] += s * src.val[12];
-    val[34] += s * src.val[20];
-    val[35] += s * src.val[28];
-    val[36] += s * src.val[36];
-    val[37] += s * src.val[44];
-    val[38] += s * src.val[52];
-    val[39] += s * src.val[60];
+    val[32] += s * srcval[4];
+    val[33] += s * srcval[12];
+    val[34] += s * srcval[20];
+    val[35] += s * srcval[28];
+    val[36] += s * srcval[36];
+    val[37] += s * srcval[44];
+    val[38] += s * srcval[52];
+    val[39] += s * srcval[60];
 
-    val[40] += s * src.val[5];
-    val[41] += s * src.val[13];
-    val[42] += s * src.val[21];
-    val[43] += s * src.val[29];
-    val[44] += s * src.val[37];
-    val[45] += s * src.val[45];
-    val[46] += s * src.val[53];
-    val[47] += s * src.val[61];
+    val[40] += s * srcval[5];
+    val[41] += s * srcval[13];
+    val[42] += s * srcval[21];
+    val[43] += s * srcval[29];
+    val[44] += s * srcval[37];
+    val[45] += s * srcval[45];
+    val[46] += s * srcval[53];
+    val[47] += s * srcval[61];
 
-    val[48] += s * src.val[6];
-    val[49] += s * src.val[14];
-    val[50] += s * src.val[22];
-    val[51] += s * src.val[30];
-    val[52] += s * src.val[38];
-    val[53] += s * src.val[46];
-    val[54] += s * src.val[54];
-    val[55] += s * src.val[62];
+    val[48] += s * srcval[6];
+    val[49] += s * srcval[14];
+    val[50] += s * srcval[22];
+    val[51] += s * srcval[30];
+    val[52] += s * srcval[38];
+    val[53] += s * srcval[46];
+    val[54] += s * srcval[54];
+    val[55] += s * srcval[62];
 
-    val[56] += s * src.val[7];
-    val[57] += s * src.val[15];
-    val[58] += s * src.val[23];
-    val[59] += s * src.val[31];
-    val[60] += s * src.val[39];
-    val[61] += s * src.val[47];
-    val[62] += s * src.val[55];
-    val[63] += s * src.val[63];
+    val[56] += s * srcval[7];
+    val[57] += s * srcval[15];
+    val[58] += s * srcval[23];
+    val[59] += s * srcval[31];
+    val[60] += s * srcval[39];
+    val[61] += s * srcval[47];
+    val[62] += s * srcval[55];
+    val[63] += s * srcval[63];
   }
   else
     Assert (false, ExcNotImplemented(n()));
@@ -1127,17 +1021,18 @@ FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
 
 template <typename number>
 bool
-FullMatrix<number>::operator == (const FullMatrix<number> &m) const
+FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 {
 				   // the matrices may either be both
 				   // empty, or of same size and with
 				   // same values, if they shall be
 				   // equal
-  return ( ((val==0) && (m.val==0)) ||
-	   ((dim_range==m.dim_range) &&
-	    (dim_image==m.dim_image) &&
-	    std::equal (&val[0], &val[dim_range*dim_image],
-			&m.val[0])));
+  bool result = (data()==0) && (M.data()==0);
+  result = result || ((m()==M.m()) && (n()==M.n()) &&
+	     std::equal (data(), data()+m()*n(),
+			 M.data()));
+  
+  return result;
 };
 
 
@@ -1145,13 +1040,13 @@ template <typename number>
 double
 FullMatrix<number>::determinant () const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
-  Assert (dim_range == dim_image,
-	  ExcDimensionMismatch(dim_range, dim_image));
-  Assert ((dim_range>=1) && (dim_range<=3), ExcNotImplemented(dim_range));
+  Assert (n_cols() == n_rows(),
+	  ExcDimensionMismatch(n_cols(), n_rows()));
+  Assert ((n_cols()>=1) && (n_cols()<=3), ExcNotImplemented(n_cols()));
   
-  switch (dim_range) 
+  switch (n_cols()) 
     {
       case 1:
             return el(0,0);
@@ -1174,11 +1069,11 @@ template <typename number>
 number
 FullMatrix<number>::norm2 () const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   number s = 0.;
-  for (unsigned int i=0;i<dim_image*dim_range;++i)
-    s += val[i]*val[i];
+  for (unsigned int i=0;i<n_rows()*n_cols();++i)
+    s += data()[i]*data()[i];
   return sqrt(s);
 }
 
@@ -1187,12 +1082,12 @@ template <typename number>
 number
 FullMatrix<number>::relative_symmetry_norm2 () const
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   number s = 0.;
   number a = 0.;
-  for (unsigned int i=0;i<dim_image;++i)
-    for (unsigned int j=0;j<dim_range;++j)
+  for (unsigned int i=0;i<n_rows();++i)
+    for (unsigned int j=0;j<n_cols();++j)
       {
 	a += ((*this)(i,j)-(*this)(j,i))*((*this)(i,j)-(*this)(j,i));
 	s += (*this)(i,j)*(*this)(i,j);
@@ -1204,29 +1099,21 @@ FullMatrix<number>::relative_symmetry_norm2 () const
 
 
 template <typename number>
-void FullMatrix<number>::clear ()
-{
-  if (val != 0)
-    std::fill_n (&val[0], n()*m(), 0);
-};
-
-
-template <typename number>
 void
 FullMatrix<number>::invert (const FullMatrix<number> &M)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
-  Assert (dim_range == dim_image, ExcNotQuadratic());
-  Assert (dim_range == M.dim_range,
-          ExcDimensionMismatch(dim_range,M.dim_range));
-  Assert (dim_image == M.dim_image,
-	  ExcDimensionMismatch(dim_image,M.dim_image));
+  Assert (n_cols() == n_rows(), ExcNotQuadratic());
+  Assert (n_cols() == M.n_cols(),
+          ExcDimensionMismatch(n_cols(),M.n_cols()));
+  Assert (n_rows() == M.n_rows(),
+	  ExcDimensionMismatch(n_rows(),M.n_rows()));
   
-  switch (dim_range) 
+  switch (n_cols()) 
     {
       case 1:
-	    val[0] = 1.0/M.val[0];
+	    el(0,0) = 1.0/M.el(0,0);
 	    return;
       case 2:
 					     // this is Maple output,
@@ -1381,7 +1268,7 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 {
   unsigned int width = width_;
   
-  Assert ((val != 0) || (dim_range+dim_image==0),
+  Assert ((data() != 0) || (n_cols()+n_rows()==0),
 	  ExcInternalError());
   
 				   // set output format, but store old
@@ -1423,8 +1310,8 @@ template <typename number>
 void
 FullMatrix<number>::gauss_jordan()
 {
-  Assert (val != 0, ExcEmptyMatrix());  
-  Assert (dim_range == dim_image, ExcNotQuadratic());
+  Assert (data() != 0, ExcEmptyMatrix());  
+  Assert (n_cols() == n_rows(), ExcNotQuadratic());
   
 				   // Gauss-Jordan-Algorithmus
 				   // cf. Stoer I (4th Edition) p. 153
@@ -1493,11 +1380,11 @@ template <typename number2>
 void
 FullMatrix<number>::householder(Vector<number2>& src)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   // m > n, src.n() = m
-  Assert (dim_range <= dim_image, ExcDimensionMismatch(dim_range, dim_image));
-  Assert (src.size() == dim_image, ExcDimensionMismatch(src.size(), dim_image));
+  Assert (n_cols() <= n_rows(), ExcDimensionMismatch(n_cols(), n_rows()));
+  Assert (src.size() == n_rows(), ExcDimensionMismatch(src.size(), n_rows()));
 
   for (unsigned int j=0 ; j<n() ; ++j)
   {
@@ -1536,7 +1423,7 @@ template <typename number2>
 double
 FullMatrix<number>::least_squares(Vector<number2>& dst, Vector<number2>& src)
 {
-  Assert (val != 0, ExcEmptyMatrix());
+  Assert (data() != 0, ExcEmptyMatrix());
   
   // m > n, m = src.n, n = dst.n
 
@@ -1554,7 +1441,8 @@ template <typename number>
 unsigned int
 FullMatrix<number>::memory_consumption () const
 {
-  return sizeof(*this) + val_size*sizeof(number);
+  return sizeof(*this) - sizeof (vector2d<number>)
+    + vector2d<number>::memory_consumption();
 };
 
 

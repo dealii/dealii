@@ -15,7 +15,7 @@
 
 
 #include <base/point.h>
-#include <lac/full_matrix.h>
+#include <base/vector2d.h>
 #include <grid/geometry_info.h>
 #include <iostream>
 #include <vector>
@@ -418,7 +418,7 @@ class DataOutBase
 					  * should yield the same value for all
 					  * patches provided.
 					  */
-	FullMatrix<double> data;
+	vector2d<double> data;
 	
 					 /**
 					  * Default constructor. Sets

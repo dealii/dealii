@@ -22,7 +22,6 @@ template class FullMatrix<TYPEMAT>;
 
 //template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::fill (const FullMatrix<TYPEMAT2>&, const unsigned, const unsigned);
-template void FullMatrix<TYPEMAT>::reinit (const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::add (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::mmult (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
@@ -33,7 +32,6 @@ template void FullMatrix<TYPEMAT>::add_diag (const TYPEMAT, const FullMatrix<TYP
 #define TYPEVEC double
 #define TYPERES double
 
-template void FullMatrix<TYPEMAT>::fill (const TYPEVEC*);
 template void FullMatrix<TYPEMAT>::fill_permutation (const FullMatrix<TYPEVEC>&,
 						     const std::vector<unsigned int>&,
 						     const std::vector<unsigned int>&);
@@ -50,7 +48,6 @@ template double FullMatrix<TYPEMAT>::least_squares(Vector<TYPEVEC>&, Vector<TYPE
 #undef TYPEVEC
 #define TYPEVEC float
 
-template void FullMatrix<TYPEMAT>::fill (const TYPEVEC*);
 template void FullMatrix<TYPEMAT>::fill_permutation (const FullMatrix<TYPEVEC>&,
 						     const std::vector<unsigned int>&,
 						     const std::vector<unsigned int>&);

@@ -385,16 +385,16 @@ void DataOutBase::write_ucd (const typename std::vector<Patch<dim,spacedim> > &p
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
       
-	  Assert (patch->data.m() == n_data_sets,
-		  ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
-	  Assert (patch->data.n() == (dim==1 ?
+	  Assert (patch->data.n_rows() == n_data_sets,
+		  ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+	  Assert (patch->data.n_cols() == (dim==1 ?
 				      n_subdivisions+1 :
 				      (dim==2 ?
 				       (n_subdivisions+1)*(n_subdivisions+1) :
 				       (dim==3 ?
 					(n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
 					0))),
-		  ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
+		  ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
 	  switch (dim)
 	    {
@@ -531,16 +531,16 @@ void DataOutBase::write_gnuplot (const typename std::vector<Patch<dim,spacedim> 
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
-      Assert (patch->data.m() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
-      Assert (patch->data.n() == (dim==1 ?
+      Assert (patch->data.n_rows() == n_data_sets,
+	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+      Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
 				   (n_subdivisions+1)*(n_subdivisions+1) :
 				   (dim==3 ?
 				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
 				    0))),
-	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
+	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
       switch (dim)
 	{
@@ -830,16 +830,16 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
-      Assert (patch->data.m() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
-      Assert (patch->data.n() == (dim==1 ?
+      Assert (patch->data.n_rows() == n_data_sets,
+	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+      Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
 				   (n_subdivisions+1)*(n_subdivisions+1) :
 				   (dim==3 ?
 				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
 				    0))),
-	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
+	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
       for (unsigned int i=0; i<n_subdivisions; ++i)
 	for (unsigned int j=0; j<n_subdivisions; ++j)
@@ -880,16 +880,16 @@ void DataOutBase::write_povray (const typename std::vector<Patch<dim,spacedim> >
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
-      Assert (patch->data.m() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
-      Assert (patch->data.n() == (dim==1 ?
+      Assert (patch->data.n_rows() == n_data_sets,
+	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+      Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
 				   (n_subdivisions+1)*(n_subdivisions+1) :
 				   (dim==3 ?
 				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
 				    0))),
-	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
+	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
 
       std::vector<Point<spacedim> > ver((n_subdivisions+1)*
@@ -1193,21 +1193,21 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 			    (patch->vertices[3] * (1-x_frac))) * y_frac1) 
 			  };
 
-		  Assert ((flags.height_vector < patch->data.m()) ||
-			  patch->data.m() == 0,
+		  Assert ((flags.height_vector < patch->data.n_rows()) ||
+			  patch->data.n_rows() == 0,
 			  ExcInvalidVectorNumber (flags.height_vector,
-						  patch->data.m()));
+						  patch->data.n_rows()));
 		  const double heights[4]
-		    = { patch->data.m() != 0 ?
+		    = { patch->data.n_rows() != 0 ?
 			patch->data(flags.height_vector,i*(n_subdivisions+1) + j)       * flags.z_scaling : 0,
 			
-			patch->data.m() != 0 ?
+			patch->data.n_rows() != 0 ?
 			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j)   * flags.z_scaling : 0,
 			
-			patch->data.m() != 0 ?
+			patch->data.n_rows() != 0 ?
 			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling : 0,
 			
-			patch->data.m() != 0 ?
+			patch->data.n_rows() != 0 ?
 			patch->data(flags.height_vector,i*(n_subdivisions+1) + j+1)     * flags.z_scaling : 0};
 
 
@@ -1278,21 +1278,21 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 
 		  if (flags.draw_cells && flags.shade_cells)
 		    {
-		      Assert ((flags.color_vector < patch->data.m()) ||
-			      patch->data.m() == 0,
+		      Assert ((flags.color_vector < patch->data.n_rows()) ||
+			      patch->data.n_rows() == 0,
 			      ExcInvalidVectorNumber (flags.color_vector,
-						      patch->data.m()));
+						      patch->data.n_rows()));
 		      const double color_values[4]
-			= { patch->data.m() != 0 ?
+			= { patch->data.n_rows() != 0 ?
 			    patch->data(flags.color_vector,i*(n_subdivisions+1) + j)       : 1,
 			
-			    patch->data.m() != 0 ?
+			    patch->data.n_rows() != 0 ?
 			    patch->data(flags.color_vector,(i+1)*(n_subdivisions+1) + j)   : 1,
 			    
-			    patch->data.m() != 0 ?
+			    patch->data.n_rows() != 0 ?
 			    patch->data(flags.color_vector,(i+1)*(n_subdivisions+1) + j+1) : 1,
 			    
-			    patch->data.m() != 0 ?
+			    patch->data.n_rows() != 0 ?
 			    patch->data(flags.color_vector,i*(n_subdivisions+1) + j+1)     : 1};
 
 						       // set color value to average of the value
@@ -1473,8 +1473,8 @@ void DataOutBase::write_gmv (const typename std::vector<Patch<dim,spacedim> > &p
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert (n_data_sets == patches[0].data.m(),
-	  ExcUnexpectedNumberOfDatasets (patches[0].data.m(), n_data_sets));
+  Assert (n_data_sets == patches[0].data.n_rows(),
+	  ExcUnexpectedNumberOfDatasets (patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -1788,8 +1788,8 @@ void DataOutBase::write_vtk (const typename std::vector<Patch<dim,spacedim> > &p
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert (n_data_sets == patches[0].data.m(),
-	  ExcUnexpectedNumberOfDatasets (patches[0].data.m(), n_data_sets));
+  Assert (n_data_sets == patches[0].data.n_rows(),
+	  ExcUnexpectedNumberOfDatasets (patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -2115,7 +2115,7 @@ DataOutBase::write_gmv_reorder_data_vectors (const typename std::vector<Patch<di
 				   // first patch. the equivalence of
 				   // these two definitions is checked
 				   // in the main function.
-  const unsigned int n_data_sets = patches[0].data.m();
+  const unsigned int n_data_sets = patches[0].data.n_rows();
 
   Assert (data_vectors.size() == n_data_sets,
 	  ExcInternalError());
@@ -2127,16 +2127,16 @@ DataOutBase::write_gmv_reorder_data_vectors (const typename std::vector<Patch<di
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
 	  
-      Assert (patch->data.m() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.m(), n_data_sets));
-      Assert (patch->data.n() == (dim==1 ?
+      Assert (patch->data.n_rows() == n_data_sets,
+	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+      Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
 				   (n_subdivisions+1)*(n_subdivisions+1) :
 				   (dim==3 ?
 				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
 				    0))),
-	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
+	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 	  
       switch (dim)
 	{
