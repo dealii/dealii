@@ -3065,6 +3065,37 @@ class Triangulation : public TriaDimensionInfo<dim>,
     unsigned int n_active_cells (const unsigned int level) const;
 
 				     /**
+				      *  Return total number of used faces,
+				      *  active or not.
+				      *  Maps to <tt>n_lines()</tt> in two space
+				      *  dimensions and so on.
+				      */
+    unsigned int n_faces () const;
+
+    				     /**
+				      *  Return total number of used faces,
+				      *  active or not, on level @p level.
+				      *  Maps to <tt>n_lines(level)</tt> in two space
+				      *  dimensions and so on.
+				      */
+    unsigned int n_faces (const unsigned int level) const;
+
+    				     /**
+				      *  Return total number of active faces.
+				      *  Maps to <tt>n_active_lines()</tt> in two space
+				      *  dimensions and so on.
+				      */
+    unsigned int n_active_faces () const;
+
+    				     /**
+				      * Return total number of active faces
+				      * on level @p level.
+				      * Maps to <tt>n_active_lines(level)</tt> in two
+				      * space dimensions and so on.
+				      */
+    unsigned int n_active_faces (const unsigned int level) const;
+
+				     /**
 				      * Return number of levels in use. This
 				      * may be less than the number of levels
 				      * existing in the triangulation if by

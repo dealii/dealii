@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4031,7 +4031,8 @@ Triangulation<dim>::end_raw_hex (const unsigned int level) const {
 
 template <int dim>
 typename TriaDimensionInfo<dim>::hex_iterator
-Triangulation<dim>::end_hex (const unsigned int level) const {
+Triangulation<dim>::end_hex (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  hex_iterator(end_hex()) :
 	  begin_hex (level+1));
@@ -4040,7 +4041,8 @@ Triangulation<dim>::end_hex (const unsigned int level) const {
 
 template <int dim>
 typename TriaDimensionInfo<dim>::active_hex_iterator
-Triangulation<dim>::end_active_hex (const unsigned int level) const {
+Triangulation<dim>::end_active_hex (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  active_hex_iterator(end_hex()) :
 	  begin_active_hex (level+1));
@@ -4048,7 +4050,8 @@ Triangulation<dim>::end_active_hex (const unsigned int level) const {
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_cells () const {
+unsigned int Triangulation<dim>::n_cells () const
+{
   unsigned int n=0;
   for (unsigned int l=0; l<levels.size(); ++l)
     n += n_cells (l);
@@ -4057,12 +4060,55 @@ unsigned int Triangulation<dim>::n_cells () const {
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_active_cells () const {
+unsigned int Triangulation<dim>::n_active_cells () const
+{
   unsigned int n=0;
   for (unsigned int l=0; l<levels.size(); ++l)
     n += n_active_cells (l);
   return n;
 }
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_faces () const
+{
+  unsigned int n=0;
+  for (unsigned int l=0; l<levels.size(); ++l)
+    n += n_faces (l);
+  return n;
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_active_faces () const
+{
+  unsigned int n=0;
+  for (unsigned int l=0; l<levels.size(); ++l)
+    n += n_active_faces (l);
+  return n;
+}
+
+
+template <int dim>
+unsigned int
+Triangulation<dim>::n_faces(unsigned int l) const
+{
+  if (dim==2) return n_lines(l);
+  if (dim==3) return n_quads(l);
+  return 0;
+}
+
+
+
+template <int dim>
+unsigned int
+Triangulation<dim>::n_active_faces(unsigned int l) const
+{
+  if (dim==2) return n_active_lines(l);
+  if (dim==3) return n_active_quads(l);
+  return 0;
+}
+
 
 
 #if deal_II_dimension == 1

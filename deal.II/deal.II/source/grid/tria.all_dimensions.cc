@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -112,7 +112,6 @@ CellData<3>::rotate (const unsigned int times)
   for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
     vertices[i] = old_vertices[rotations[times][i]];
 }
-
 
 
 bool
