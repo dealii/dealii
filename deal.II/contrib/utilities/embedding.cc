@@ -135,7 +135,11 @@ void compute_embedding (unsigned int degree,
 	{
 	  for (unsigned int j=0;j<fe_coarse.dofs_per_cell;++j)
 	    {
-	      cout << ' ' << setprecision(10) << result[cell][j][i] << "/27.,";
+	      double s = result[cell][j][i];
+	      if (fabs(s) < 1.e-13)
+		cout << " 0,";
+	      else
+		cout << ' ' << setprecision(10) << s << "/27.,";
 	    }
 	  cout << endl;
 	}
