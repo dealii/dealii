@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    block_vector.cc,v 1.14 2003/05/05 13:49:06 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -157,7 +157,11 @@ int main ()
 
                                    // do the same weird stuff as in
                                    // tests/base/reference.cc
+#if __GNUC__ != 2
   std::basic_streambuf<char> *old_cerr_buf = std::cerr.rdbuf();
+#else
+  streambuf *old_cerr_buf = std::cerr.rdbuf();
+#endif
   std::cerr.rdbuf(logfile.rdbuf());
   
   try
