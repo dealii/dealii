@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -177,70 +177,3 @@ template
 void MGSmootherContinuous<BlockVector<float> >::set_zero_interior_boundary (
   const unsigned int,
   BlockVector<float>&) const;
-
-
-  
-template
-MGSmootherRelaxation<SparseMatrix<float>, Vector<float> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<SparseMatrix<float> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-template
-MGSmootherRelaxation<SparseMatrix<float>, Vector<double> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<SparseMatrix<float> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-template
-MGSmootherRelaxation<SparseMatrix<double>, Vector<float> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<SparseMatrix<double> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-template
-MGSmootherRelaxation<SparseMatrix<double>, Vector<double> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<SparseMatrix<double> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-
-template
-MGSmootherRelaxation<BlockSparseMatrix<float>, BlockVector<float> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<BlockSparseMatrix<float> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-template
-MGSmootherRelaxation<BlockSparseMatrix<float>, BlockVector<double> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<BlockSparseMatrix<float> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-template
-MGSmootherRelaxation<BlockSparseMatrix<double>, BlockVector<float> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<BlockSparseMatrix<double> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
-
-template
-MGSmootherRelaxation<BlockSparseMatrix<double>, BlockVector<double> >
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
-		       const MGLevelObject<BlockSparseMatrix<double> >&,
-		       const function_ptr,
-		       const unsigned int,
-		       const double);
