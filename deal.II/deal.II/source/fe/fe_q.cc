@@ -13,6 +13,8 @@
 
 #include <fe/fe_q.h>
 
+#include <memory>
+
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
@@ -1224,261 +1226,283 @@ template <>
 void
 FE_Q<3>::initialize_constraints ()
 {
-    const unsigned int dim = 3;
+  const unsigned int dim = 3;
 
-				   // This algorithm for the automatic generation 
-                                   // of the constraint
-                                   // matrices is different from the one
-                                   // implemented for the 2D elements. Hence
-                                   // it is only suited for standard Finite
-                                   // Elements with a Lagrangian basis.
-                                   // This algorithm consists of two parts. In
-                                   // the first part, the coordinates of the
-                                   // hanging nodes on the master element 
-                                   // will be determined. These points are
-                                   // constructed in a special order. First
-                                   // the hanging node in the mid of the coarser
-                                   // element is considered:
+                                   // This algorithm for the automatic
+                                   // generation of the constraint matrices is
+                                   // different from the one implemented for
+                                   // the 2D elements. Hence it is only suited
+                                   // for standard Finite Elements with a
+                                   // Lagrangian basis.  This algorithm
+                                   // consists of two parts. In the first
+                                   // part, the coordinates of the hanging
+                                   // nodes on the master element will be
+                                   // determined. These points are constructed
+                                   // in a special order (as described in the
+                                   // fe_base.h file for the class
+                                   // FiniteElementBase). First the hanging
+                                   // node in the mid of the coarser element
+                                   // is considered:
+                                   // 
                                    // Coarse      Fine
                                    // +-----+     +--+--+ 
                                    // |     |     |  |  |
                                    // |  *  |     +--+--+
                                    // |     |     |  |  |
                                    // +-----+     +--+--+
+                                   // 
                                    // Then the coordinates of the hanging
-                                   // nodes at the midpoint of the outline of the 
-                                   // coarse element follow:
+                                   // nodes at the midpoint of the outline of
+                                   // the coarse element follow:
+                                   // 
                                    // Coarse      Fine
                                    // +--*--+     +--+--+ 
                                    // |     |     |  |  |
                                    // *     *     +--+--+
                                    // |     |     |  |  |
                                    // +--*--+     +--+--+
-                                   // For Q1 that was it. But for higher order 
-                                   // elements some more constraints are required.
-                                   // Hanging nodes on the lines which are inside
-                                   // the coarse element:
+                                   // 
+                                   // For Q1 that was it. But for higher order
+                                   // elements some more constraints are
+                                   // required.  Hanging nodes on the lines
+                                   // which are inside the coarse element:
+                                   // 
                                    // Coarse      Fine
                                    // +-----+     +--+--+ 
                                    // |  *  |     |  |  |
                                    // | * * |     +--+--+
                                    // |  *  |     |  |  |
                                    // +-----+     +--+--+
+                                   // 
                                    // Hanging nodes on the outside lines:
+                                   // 
                                    // Coarse      Fine
                                    // +-*-*-+     +--+--+ 
                                    // *     *     |  |  |
                                    // |     |     +--+--+
                                    // *     *     |  |  |
                                    // +-*-*-+     +--+--+
+                                   // 
                                    // And finally the interior nodes:
+                                   // 
                                    // Coarse      Fine
                                    // +-----+     +--+--+ 
                                    // | * * |     |  |  |
                                    // |     |     +--+--+
                                    // | * * |     |  |  |
                                    // +-----+     +--+--+
-                                   // Once these points are known, it is pretty 
-                                   // easy to get the contribution of 
-                                   // each node on the coarse
-                                   // face to the value at the hanging nodes.
-                                   // This task is accomplished in the second 
-                                   // part of the algorithm
+                                   // 
+                                   // Once these points are known, it is
+                                   // pretty easy to get the contribution of
+                                   // each node on the coarse face to the
+                                   // value at the hanging nodes.  This task
+                                   // is accomplished in the second part of
+                                   // the algorithm
 
-    // Generate destination points.
-    std::vector<Point<dim-1> > constraint_points;
-    const std::vector<Point<dim-1> > &un_supp = this->get_unit_face_support_points ();
-    const unsigned int pnts = un_supp.size ();
+                                   // Generate destination points.
+  std::vector<Point<dim-1> > constraint_points;
+  const std::vector<Point<dim-1> > &un_supp
+    = this->get_unit_face_support_points ();
+  const unsigned int pnts = un_supp.size ();
 
-    // Add midpoint
-    constraint_points.push_back (Point<dim-1> (0.5, 0.5));
+                                   // Add midpoint
+  constraint_points.push_back (Point<dim-1> (0.5, 0.5));
 
-    // Add midpoints of lines of "mother-face"
-    for (unsigned int face = 0; 
-	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
+                                   // Add midpoints of lines of "mother-face"
+  for (unsigned int face = 0; 
+       face < GeometryInfo<dim>::subfaces_per_face; ++face)
     {
-	Point<dim-1> pnt_temp = un_supp[(face + 1) % 4];
-	pnt_temp *= 0.5;
-	pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
-	constraint_points.push_back (pnt_temp);
+      Point<dim-1> pnt_temp = un_supp[(face + 1) % 4];
+      pnt_temp *= 0.5;
+      pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
+      constraint_points.push_back (pnt_temp);
     }
 
-    // Add nodes of lines interior in the "mother-face"
-    for (unsigned int face = 0; 
-	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
+                                   // Add nodes of lines interior in the
+                                   // "mother-face"
+  for (unsigned int face = 0; 
+       face < GeometryInfo<dim>::subfaces_per_face; ++face)
     {
-	unsigned int line_offset = 4 + ((face + 1) % 4) * (this->degree-1);
-	for (unsigned int line_dof = 0; line_dof < this->degree-1; ++line_dof)
-	{
-	    Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
-	    pnt_temp *= 0.5;
-	    pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
-	    constraint_points.push_back (pnt_temp);
-	}
+      const unsigned int line_offset
+        = 4 + ((face + 1) % 4) * (this->degree-1);
+      for (unsigned int line_dof = 0; line_dof < this->degree-1; ++line_dof)
+        {
+          Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
+          pnt_temp *= 0.5;
+          pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
+          constraint_points.push_back (pnt_temp);
+        }
     }
 
-    // DoFs on bordering lines
-    for (unsigned int line = 0; 
-	 line < GeometryInfo<dim>::lines_per_face; ++line)
+                                   // DoFs on bordering lines
+  for (unsigned int line = 0; 
+       line < GeometryInfo<dim>::lines_per_face; ++line)
     {
-	// This face index runs through the two faces, which share the
-	// line "line" with the coarse element.
-	for (unsigned int face = 0; face < 2; ++face)
-	{
-	    unsigned int offset;
-	    unsigned int line_offset = 4 + (line * (this->degree-1));
+                                       // This face index runs through the two
+                                       // faces, which share the line "line"
+                                       // with the coarse element.
+      for (unsigned int face = 0; face < 2; ++face)
+        {
+          const unsigned int line_offset = 4 + (line * (this->degree-1));
 
-	    // Line 2 and 3 have a different ordering
-	    if (line < 2)
-		offset = ((line + face) % 4);
-	    else
-		offset = ((line + 1 - face) % 4);
+                                           // Line 2 and 3 have a different
+                                           // ordering
+          const unsigned int offset
+            = ((line < 2) ?
+               ((line + face) % 4) :
+               ((line + 1 - face) % 4));
 
-	    for (unsigned int line_dof = 0; line_dof < this->degree-1; ++line_dof)
-	    {
-		Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
-		pnt_temp *= 0.5;
-		pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (offset) * 0.5);
-		constraint_points.push_back (pnt_temp);
-	    }
-	}
+          for (unsigned int line_dof = 0;
+               line_dof < this->degree-1; ++line_dof)
+            {
+              Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
+              pnt_temp *= 0.5;
+              pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (offset) * 0.5);
+              constraint_points.push_back (pnt_temp);
+            }
+        }
     }
 
-    // Create constraints for interior nodes
-    unsigned int dofs_per_face = (this->degree-1) * (this->degree-1);
-    for (unsigned int face = 0; 
-	 face < GeometryInfo<dim>::subfaces_per_face; ++face)
+                                   // Create constraints for interior nodes
+  const unsigned int dofs_per_face = (this->degree-1) * (this->degree-1);
+  for (unsigned int face = 0; 
+       face < GeometryInfo<dim>::subfaces_per_face; ++face)
     {
-	unsigned int face_offset = 4 + (4 * (this->degree-1));
-	for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
-	{
-	    Point<dim-1> pnt_temp = un_supp[face_offset + face_dof];
-	    pnt_temp *= 0.5;
-	    pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
-	    constraint_points.push_back (pnt_temp);
-	}
+      const unsigned int face_offset = 4 + (4 * (this->degree-1));
+      for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
+        {
+          Point<dim-1> pnt_temp = un_supp[face_offset + face_dof];
+          pnt_temp *= 0.5;
+          pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
+          constraint_points.push_back (pnt_temp);
+        }
     }
 
-    // Now construct relation between destination (child)
-    // and source (mother) dofs.
-    std::vector<Polynomials::LagrangeEquidistant> v;
-    for (unsigned int i=0;i<=this->degree;++i)
-	v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
-    TensorProductPolynomials<dim-1>* poly_f;
+                                   // Now construct relation between
+                                   // destination (child) and source (mother)
+                                   // dofs.
+  std::vector<Polynomials::LagrangeEquidistant> v;
+  for (unsigned int i=0;i<=this->degree;++i)
+    v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
 
-    poly_f = new TensorProductPolynomials<dim-1> (v);
+  const std::auto_ptr<const TensorProductPolynomials<dim-1> >
+    poly_f (new TensorProductPolynomials<dim-1> (v));
 
-    unsigned int constraint_no = constraint_points.size ();
-    this->interface_constraints
-        .TableBase<2,double>::reinit (this->interface_constraints_size());
+  this->interface_constraints
+    .TableBase<2,double>::reinit (this->interface_constraints_size());
 
-    for (unsigned int j = 0; j < constraint_no; ++j)
+  for (unsigned int j = 0; j < constraint_points.size(); ++j)
     {
-	double interval = (double) (this->degree * 2);
-	bool mirror[dim - 1];
-	Point<dim-1> constraint_point;
+      const double interval = (double) (this->degree * 2);
+      bool mirror[dim - 1];
+      Point<dim-1> constraint_point;
 
-	for (unsigned int k = 0; k < dim - 1; ++k)
-	{
-	                           // Eliminate FP errors in constraint 
-	                           // points. Due to their
-	                           // origin, they must all be fractions 
- 	                           // of the unit interval. If
-	                           // we have polynomial degree 4, the 
-	                           // refined element has 8 intervals.
-	                           // Hence the coordinates must be 
-	                           // 0, 0.125, 0.25, 0.375 etc. 
-	                           // Now the coordinates of the 
-	                           // constraint points will be multiplied
-	                           // by the inverse of the interval 
-	                           // size (in the example by 8).
-	                           // After that the coordinates must 
-	                           // be integral numbers. Hence a
-	                           // normal truncation is performed and 
-	                           // the coordinates will be scaled
-	                           // back. The equal treatment of 
-	                           // all coordinates should eliminate
-	                           // any FP errors.
-	    int coord_int = (int) (constraint_points[j](k) * interval + 0.25);
-	    constraint_point(k) = (double) coord_int / interval;
+      for (unsigned int k = 0; k < dim - 1; ++k)
+        {
+                                           // Eliminate FP errors in
+                                           // constraint points. Due to their
+                                           // origin, they must all be
+                                           // fractions of the unit
+                                           // interval. If we have polynomial
+                                           // degree 4, the refined element
+                                           // has 8 intervals.  Hence the
+                                           // coordinates must be 0, 0.125,
+                                           // 0.25, 0.375 etc.  Now the
+                                           // coordinates of the constraint
+                                           // points will be multiplied by the
+                                           // inverse of the interval size (in
+                                           // the example by 8).  After that
+                                           // the coordinates must be integral
+                                           // numbers. Hence a normal
+                                           // truncation is performed and the
+                                           // coordinates will be scaled
+                                           // back. The equal treatment of all
+                                           // coordinates should eliminate any
+                                           // FP errors.
+          const int coord_int =
+            static_cast<int> (constraint_points[j](k) * interval + 0.25);
+          constraint_point(k) = 1.*coord_int / interval;
 
-	                           // The following lines of code 
-	                           // should eliminate the problems
-	                           // with the Constraint-Matrix, 
-                                   // which appeared for P>=4. The
-	                           // Constraint-Matrix class 
-	                           // complained about different 
-	                           // constraints for the same 
-	                           // entry of the Constraint-Matrix.
-	                           // Actually this difference 
-	                           // could be attributed to FP
-	                           // errors, as it was in the 
-	                           // range of 1.0e-16. These errors
-	                           // originate in the loss of 
-	                           // symmetry in the FP approximation
-	                           // of the shape-functions. 
-	                           // Considering a 3rd order shape
-	                           // function in 1D, we have 
-	                           // N0(x)=N3(1-x) and N1(x)=N2(1-x).
-	                           // For higher order polynomials 
-	                           // the FP approximations of
-	                           // the shape functions do not 
-	                           // satisfy these equations any more!
-	                           // Thus in the following code 
-	                           // everything is computed in the 
-	                           // interval x \in [0..0.5], 
-	                           // which is sufficient to express
-	                           // all values that could come 
-	                           // out from a computation of any
-	                           // shape function in the full 
-	                           // interval [0..1]. If x > 0.5
-	                           // the computation is done for 
-	                           // 1-x with the shape function 
-	                           // N_{p-n} instead of N_n. 
-	                           // Hence symmetry is preserved and
-	                           // everything works fine ...
-	    if (constraint_point(k) > 0.5)
-	    {
-		constraint_point(k) = 1.0 - constraint_point(k);
-		mirror[k] = true;
-	    }
-	    else
-		mirror[k] = false;
-	}
+                                           // The following lines of code
+                                           // should eliminate the problems
+                                           // with the Constraint-Matrix,
+                                           // which appeared for P>=4. The
+                                           // Constraint-Matrix class
+                                           // complained about different
+                                           // constraints for the same entry
+                                           // of the Constraint-Matrix.
+                                           // Actually this difference could
+                                           // be attributed to FP errors, as
+                                           // it was in the range of
+                                           // 1.0e-16. These errors originate
+                                           // in the loss of symmetry in the
+                                           // FP approximation of the
+                                           // shape-functions.  Considering a
+                                           // 3rd order shape function in 1D,
+                                           // we have N0(x)=N3(1-x) and
+                                           // N1(x)=N2(1-x).  For higher order
+                                           // polynomials the FP
+                                           // approximations of the shape
+                                           // functions do not satisfy these
+                                           // equations any more!  Thus in the
+                                           // following code everything is
+                                           // computed in the interval x \in
+                                           // [0..0.5], which is sufficient to
+                                           // express all values that could
+                                           // come out from a computation of
+                                           // any shape function in the full
+                                           // interval [0..1]. If x > 0.5 the
+                                           // computation is done for 1-x with
+                                           // the shape function N_{p-n}
+                                           // instead of N_n.  Hence symmetry
+                                           // is preserved and everything
+                                           // works fine...
+                                           //
+                                           // For a different explanation of
+                                           // the problem, see the discussion
+                                           // in the FiniteElementBase class
+                                           // for constraint matrices in 3d.
+          if (constraint_point(k) > 0.5)
+            {
+              constraint_point(k) = 1.0 - constraint_point(k);
+              mirror[k] = true;
+            }
+          else
+            mirror[k] = false;
+        }
 
-	for (unsigned i = 0; i < pnts; ++i)
-	{
-	    unsigned int indices[2],
-		new_index;
+      for (unsigned i = 0; i < pnts; ++i)
+        {
+          unsigned int indices[2]
+            = { face_index_map[i] % (this->degree + 1),
+                face_index_map[i] / (this->degree + 1) };
+          
+          for (unsigned int k = 0; k < dim - 1; ++k)
+            if (mirror[k])
+              indices[k] = this->degree - indices[k];
+          
+          const unsigned int
+            new_index = indices[1] * (this->degree + 1) + indices[0];
 
-	    // poly_f->compute_index (face_index_map [i], indices);
-	    indices[0] = face_index_map[i] % (this->degree + 1);
-	    indices[1] = face_index_map[i] / (this->degree + 1);
-	    for (unsigned int k = 0; k < dim - 1; ++k)
-		if (mirror[k])
-		    indices[k] = this->degree - indices[k];
-	    new_index = indices[1] * (this->degree + 1) + indices[0];
-
-	    this->interface_constraints(j,i) = 
-		poly_f->compute_value(new_index, 
-				      constraint_point);
+          this->interface_constraints(j,i) = 
+            poly_f->compute_value (new_index, constraint_point);
 	    
-				   // if the value is small up
-				   // to round-off, then
-				   // simply set it to zero to
-				   // avoid unwanted fill-in
-				   // of the constraint
-				   // matrices (which would
-				   // then increase the number
-				   // of other DoFs a
-				   // constrained DoF would
-				   // couple to)
-	    if (std::fabs(this->interface_constraints(j,i)) < 1e-14)
-		this->interface_constraints(j,i) = 0;
-	}
+                                           // if the value is small up
+                                           // to round-off, then
+                                           // simply set it to zero to
+                                           // avoid unwanted fill-in
+                                           // of the constraint
+                                           // matrices (which would
+                                           // then increase the number
+                                           // of other DoFs a
+                                           // constrained DoF would
+                                           // couple to)
+          if (std::fabs(this->interface_constraints(j,i)) < 1e-14)
+            this->interface_constraints(j,i) = 0;
+        }
     }
-    delete poly_f;
 }
+
 #endif
 
 
