@@ -179,7 +179,6 @@ class FullMatrix : public Subscriptor
     void fill_permutation (const FullMatrix<number2> &src,
 	       const std::vector<unsigned int>& p_rows,
 	       const std::vector<unsigned int>& p_cols);
-    
 
                                      /**
 				      * Fill matrix with an array of numbers.
