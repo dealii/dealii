@@ -5605,7 +5605,7 @@ void TimeStep_Dual<dim>::do_initial_step () {
       UserMatrix system_matrix (system_sparsity,
 				parameters.preconditioning);
       system_matrix.copy_from (mass_matrix);
-      constraints.condense (system_matrix);
+      constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
       const unsigned int
 	solver_steps1 = solve (system_matrix, u, tmp_u_bar),
 	solver_steps2 = solve (system_matrix, v, tmp_v_bar);
@@ -5671,7 +5671,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 			    parameters.theta *
 			    parameters.theta,
 			    laplace_matrix);
-  constraints.condense (system_matrix);
+  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
   if (parameters.extrapolate_old_solutions)
 				     // solve with a hopefully good guess
@@ -5709,7 +5709,7 @@ void TimeStep_Dual<dim>::do_timestep ()
   const unsigned int solver_steps1 = solve (system_matrix, v, right_hand_side1);
 	
   system_matrix.copy_from (mass_matrix);
-  constraints.condense (system_matrix);
+  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
   if (true)
     {
       Vector<double> tmp (right_hand_side2.size());
@@ -7936,7 +7936,7 @@ assemble_vectors (right_hand_side1, right_hand_side2);
 			    parameters.theta *
 			    parameters.theta,
 			    laplace_matrix);
-  constraints.condense (system_matrix);
+  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
 	
   if (parameters.extrapolate_old_solutions)
 				     // solve with a hopefully good guess
@@ -7969,7 +7969,7 @@ assemble_vectors (right_hand_side1, right_hand_side2);
   const unsigned int solver_steps1 = solve (system_matrix, u, right_hand_side1);
 		
   system_matrix.copy_from (mass_matrix);
-  constraints.condense (system_matrix);
+  constraints.condense (static_cast<SparseMatrix<double>&>(system_matrix));
   if (true)
     { 
       Vector<double> tmp (right_hand_side2.size());
