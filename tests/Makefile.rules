@@ -31,9 +31,13 @@ endif
 %.$(OBJEXT) : %.cc Makefile
 	@echo =====optimized===== $<
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+
+######################################################################
+# Don't put $(libraries) into this line since it is already in $^
+######################################################################
 %.exe :
 	@echo =====linking======= $@
-	@$(CXX) $(LDFLAGS) -o $@ $^ $(libraries) $(LIBS)
+	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 
 ############################################################
