@@ -10,6 +10,9 @@
 #I think I have removed any non-supported cross-references, so you
 #should be able to compile with an arbitrary number of processes.
 
+deal_II_dimension=2
+
+
 cc-files = $(wildcard */*.cc)
 h-files  = $(wildcard ../include/*/*.h)
 
@@ -20,11 +23,9 @@ h-files  = $(wildcard ../include/*/*.h)
 # would be the same for both debug and non-debug versions, if we
 # don't care about different directories
 tmp1     = $(notdir $(cc-files))
-o-files  = $(addprefix ../lib/o/,  $(tmp1:.cc=.o) )
-go-files = $(addprefix ../lib/go/, $(tmp1:.cc=.go))
+o-files  = $(addprefix ../lib/$(deal_II_dimension)d/o/,  $(tmp1:.cc=.o) )
+go-files = $(addprefix ../lib/$(deal_II_dimension)d/go/, $(tmp1:.cc=.go))
 
-
-deal_II_dimension=2
 
 CXX       = c++
 INCLUDE   = -I../include -I../../lac/include \
@@ -91,7 +92,7 @@ clean:
 ../lib/Makefile.dep: $(cc-files) $(h-files) Makefile ../Make.global_options
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/libgrid $(INCLUDE) $(cc-files) \
-		| perl -p -e 's!^.*\(.*/(.*)\):!../lib/$$1:!g;' \
+		| perl -p -e 's!^.*\(.*/(.*)\):!../lib/$(deal_II_dimension)d/$$1:!g;' \
 		| perl -pe 's!(/[^/]+\.(o|go)):!/$$2$$1:!g;' \
 		> ../lib/Makefile.dep
 
