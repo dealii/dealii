@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,7 +71,9 @@ template <typename> class Vector;
  * <tt>BlockVector<VECTOR></tt>. SparseMatrix is a possible entry
  * type.
  *
- * @author Guido Kanschat, 2000, 2001, 2005
+ * @include block_matrix_array.cc
+ *
+ * @author Guido Kanschat, 2000 - 2005
  */
 template <class MATRIX>
 class BlockMatrixArray : public Subscriptor

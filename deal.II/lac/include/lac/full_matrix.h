@@ -1,20 +1,18 @@
-//----------------------------  full_matrix.h  ---------------------------
+//------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  full_matrix.h  ---------------------------
+//------------------------------------------------------------------------
 #ifndef __deal2__full_matrix_h
 #define __deal2__full_matrix_h
 
-
-/*----------------------------   fullmatrix.h     ---------------------------*/
 
 #include <base/config.h>
 #include <base/table.h>
@@ -1006,6 +1004,8 @@ class FullMatrix : public Table<2,number>
 };
 
 /*@}*/
+
+/// @if NoDoc
 /*-------------------------Inline functions -------------------------------*/
 
 
@@ -1237,6 +1237,7 @@ FullMatrix<number>::end (const unsigned int r) const
   return const_iterator(this, r+1, 0);
 }
 
+///@endif
 
 #endif
 
