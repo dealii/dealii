@@ -492,7 +492,6 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p)
  * implemented specialized from the general template in order to avoid
  * a compiler warning that the loop is empty.
  */
-template <>
 inline
 ostream & operator << (ostream &out, const Tensor<1,1> &p)
 {
