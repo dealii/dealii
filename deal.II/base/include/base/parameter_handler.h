@@ -1083,7 +1083,8 @@ class MultipleParameterLoop : public ParameterHandler {
   private:
 				     /**
 				      *	Declare what a multiple entry is: a variant
-				      *	entry ({...}) or an array ({{...}})
+				      *	entry (in curly braces #{}#) or an
+				      * array (in double curly braces #{{}}#).
 				      */
     enum MultipleEntryType {
 	  variant, array

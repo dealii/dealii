@@ -341,9 +341,9 @@ class DataOut {
 				     /**
 				      * Add a data vector together with its
 				      * name and the physical unit
-				      * (e.g. meter, kelvin, etc). By default,
-				      * "<dimensionless>" is assumed for the
-				      * units.
+				      * (for example meter, kelvin, etc). By
+				      * default, "<dimensionless>" is assumed
+				      * for the units.
 				      *
 				      * A pointer to the vector is stored, so
 				      * you have to make sure the vector
