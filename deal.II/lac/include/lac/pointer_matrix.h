@@ -44,12 +44,6 @@ class PointerMatrixBase : public Subscriptor
   virtual ~PointerMatrixBase ();
 
 				   /**
-				    * Check if pointer is zero or
-				    * matrix is empty.
-				    */
-  virtual bool empty () const = 0;
-  
-				   /**
 				    * Matrix-vector product.
 				    */
   virtual void vmult (VECTOR& dst,
@@ -108,13 +102,6 @@ public:
 				    * @see SmartPointer
 				    */
   const PointerMatrix& operator= (const MATRIX* M);
-
-				   /**
-				    * Check if pointer is zero or
-				    * matrix is empty.
-				    */
-  virtual bool empty () const;
-  
   
 				   /**
 				    * Matrix-vector product.
@@ -170,15 +157,6 @@ PointerMatrix<MATRIX, VECTOR>::operator= (const MATRIX* M)
 {
   m = M;
   return *this;
-}
-
-template<class MATRIX, class VECTOR>
-inline bool
-PointerMatrix<MATRIX, VECTOR>::empty () const
-{
-  if (m == 0)
-    return true;
-  return m->empty();
 }
 
 template<class MATRIX, class VECTOR>
