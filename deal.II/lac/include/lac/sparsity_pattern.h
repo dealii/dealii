@@ -181,10 +181,18 @@ class SparsityPattern : public Subscriptor
 				      * @p{m} rows and @p{n} columns.
 				      * The matrix may contain at most @p{max_per_row}
 				      * nonzero entries per row.
+				      *
+				      * If the matrix is quadratic,
+				      * then the last parameter
+				      * controls optimized storage of
+				      * diagonal elements for
+				      * relaxation methods of
+				      * SparseMatrix.
 				      */
     SparsityPattern (const unsigned int m,
 		     const unsigned int n,
-		     const unsigned int max_per_row);
+		     const unsigned int max_per_row,
+		     const bool optimize_diagonal = true);
 
 				     /**
 				      * Initialize a rectangular
@@ -196,18 +204,26 @@ class SparsityPattern : public Subscriptor
 				      */
     SparsityPattern (const unsigned int               m,
 		     const unsigned int               n,
-		     const std::vector<unsigned int> &row_lengths);
+		     const std::vector<unsigned int> &row_lengths,
+		     const bool optimize_diagonal = true);
     
 				     /**
-				      * Initialize a square matrix of dimension
+				      * Initialize a quadratic matrix of dimension
 				      * @p{n} with at most @p{max_per_row}
 				      * nonzero entries per row.
+				      *
+				      * This constructor automatically
+				      * enables optimized storage of
+				      * diagonal elements. To avoid
+				      * this, use the constructor
+				      * taking row and column numbers
+				      * separately.
 				      */
     SparsityPattern (const unsigned int n,
 		     const unsigned int max_per_row);
 
 				     /**
-				      * Initialize a square
+				      * Initialize a quadratic
 				      * matrix with @p{m} rows and @p{m}
 				      * columns.  The maximal number
 				      * of nonzero entries for each
@@ -215,7 +231,8 @@ class SparsityPattern : public Subscriptor
 				      * @p{row_lengths} array.
 				      */
     SparsityPattern (const unsigned int               m,
-		     const std::vector<unsigned int> &row_lengths);
+		     const std::vector<unsigned int> &row_lengths,
+		     const bool optimize_diagonal = true);
 
 				     /**
 				      * Make a copy with extra off-diagonals.
@@ -246,7 +263,7 @@ class SparsityPattern : public Subscriptor
 				      * than their being on side-diagonals.
 				      *
 				      * This function requires that @p{original}
-				      * refer to a square matrix structure.
+				      * refer to a quadratic matrix structure.
 				      * It shall be compressed. The matrix 
 				      * structure is not compressed
 				      * after this function finishes.
@@ -283,7 +300,8 @@ class SparsityPattern : public Subscriptor
 				      */
     void reinit (const unsigned int m,
 		 const unsigned int n,
-		 const unsigned int max_per_row);
+		 const unsigned int max_per_row,
+		 const bool optimize_diagonal = true);
 
 				     /**
 				      * Reallocate memory for a matrix
@@ -301,10 +319,19 @@ class SparsityPattern : public Subscriptor
 				      * size extends the old one. This is done
 				      * to save time and to avoid fragmentation
 				      * of the heap.
+				      *
+				      * IF the number of rows equals
+				      * the number of columns and the
+				      * last parameter is true,
+				      * diagonals elements are stored
+				      * first in each row to allow
+				      * optimized access in relaxation
+				      * methods of SparseMatrix.
 				      */
     void reinit (const unsigned int               m,
 		 const unsigned int               n,
-		 const std::vector<unsigned int> &row_lengths);
+		 const std::vector<unsigned int> &row_lengths,
+		 const bool optimize_diagonal = true);
     
 				     /**
 				      * This function compresses the sparsity
@@ -314,7 +341,7 @@ class SparsityPattern : public Subscriptor
 				      * ones to allow faster access by usage
 				      * of binary search algorithms. A special
 				      * sorting scheme is used for the diagonal
-				      * entry of square matrices, which is
+				      * entry of quadratic matrices, which is
 				      * always the first entry of each row.
 				      *
 				      * The memory which is no more
@@ -470,7 +497,8 @@ class SparsityPattern : public Subscriptor
     void copy_from (const unsigned int    n_rows,
 		    const unsigned int    n_cols,
 		    const ForwardIterator begin,
-		    const ForwardIterator end);
+		    const ForwardIterator end,
+		    const bool optimize_diagonal = true);
 
 				     /**
 				      * Copy data from an object of
@@ -481,7 +509,8 @@ class SparsityPattern : public Subscriptor
 				      * sparsity pattern is in
 				      * compressed mode afterwards.
 				      */
-    void copy_from (const CompressedSparsityPattern &csp);
+    void copy_from (const CompressedSparsityPattern &csp,
+		    const bool optimize_diagonal = true);
 
 				     /**
 				      * Take a full matrix and use its
@@ -495,7 +524,8 @@ class SparsityPattern : public Subscriptor
 				      * compressed mode afterwards.
 				      */
     template <typename number>
-    void copy_from (const FullMatrix<number> &matrix);
+    void copy_from (const FullMatrix<number> &matrix,
+		    const bool optimize_diagonal = true);
     
 				     /**
 				      * Return whether the object is empty. It
@@ -586,7 +616,7 @@ class SparsityPattern : public Subscriptor
 				      * This function throws an
 				      * exception if the sparsity
 				      * pattern does not represent a
-				      * square matrix.
+				      * quadratic matrix.
 				      */
     void symmetrize ();
     
@@ -646,10 +676,11 @@ class SparsityPattern : public Subscriptor
 				      * Access to column number field.
 				      * Return the column number of
 				      * the @p{index}th entry in
-				      * @p{row}. Note that the if the
-				      * matrix is square, then the
-				      * first element in each row is
-				      * the diagonal element,
+				      * @p{row}. Note that the if
+				      * diagonal elements are
+				      * optimized, the first element
+				      * in each row is the diagonal
+				      * element,
 				      * i.e. @p{column_number(row,0)==row}.
 				      *
 				      * If the sparsity pattern is
@@ -692,6 +723,15 @@ class SparsityPattern : public Subscriptor
 				      * compressed or not.
 				      */
     bool is_compressed () const;
+
+				     /**
+				      * Determine whether the matrix
+				      * uses special convention for
+				      * quadratic matrices,
+				      * i.e. diagonal element first in
+				      * row.
+				      */
+    bool optimize_diagonal () const;
     
 				     /**
 				      * This is kind of an expert mode. Get 
@@ -842,7 +882,11 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotSquare);
+    DeclException0 (ExcNotQuadratic);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcDiagonalNotOptimized);
 				     /**
 				      * Exception
 				      */
@@ -943,31 +987,31 @@ class SparsityPattern : public Subscriptor
 				      * matrix will also be at position @p{p}
 				      * of the values array of that class.
 				      *
-				      * At the beginning, all elements of
-				      * this array are set to @p{-1} indicating
-				      * invalid (unused) column numbers
-				      * (however, note that if this object
-				      * refers to a square matrix, the diagonal
-				      * elements are preset, see below). Now, if
-				      * nonzero elements are added, one column
-				      * number in the row's respective range
-				      * after the other is set to the column
-				      * number of the added element. When
-				      * compress is called, unused elements
-				      * (indicated by column numbers @p{-1})
-				      * are eliminated by copying the column
-				      * number of subsequent rows and the
-				      * column numbers within each row (with
-				      * the exception of the diagonal element)
-				      * are sorted, such that finding whether
-				      * an element exists and determining its
-				      * position can be done by a binary search.
-				      *
-				      * If this object represents a square
-				      * matrix, the first element in each
-				      * row always denotes the diagonal
-				      * element, i.e.
-				      * @p{colnums[rowstart[r]]==r}.
+				      * At the beginning, all elements
+				      * of this array are set to
+				      * @p{-1} indicating invalid
+				      * (unused) column numbers
+				      * (diagonal elements are preset
+				      * if optimized storage is
+				      * requested, though). Now, if
+				      * nonzero elements are added,
+				      * one column number in the row's
+				      * respective range after the
+				      * other is set to the column
+				      * number of the added
+				      * element. When compress is
+				      * called, unused elements
+				      * (indicated by column numbers
+				      * @p{-1}) are eliminated by
+				      * copying the column number of
+				      * subsequent rows and the column
+				      * numbers within each row (with
+				      * possible exception of the
+				      * diagonal element) are sorted,
+				      * such that finding whether an
+				      * element exists and determining
+				      * its position can be done by a
+				      * binary search.
 				      */
     unsigned int *colnums;
 
@@ -977,6 +1021,12 @@ class SparsityPattern : public Subscriptor
 				      */
     bool compressed;
 
+				     /**
+				      * Is special treatment of
+				      * diagonals enabled?
+				      */
+    bool diagonal_optimized;
+    
 				     /**
 				      * Optimized replacement for
 				      * @p{std::lower_bound} for
@@ -1165,6 +1215,14 @@ SparsityPattern::is_compressed () const
 
 
 inline
+bool
+SparsityPattern::optimize_diagonal () const
+{
+  return (rows == cols);
+}
+
+
+inline
 const unsigned int *
 SparsityPattern::get_rowstart_indices () const
 {
@@ -1247,14 +1305,15 @@ void
 SparsityPattern::copy_from (const unsigned int    n_rows,
 			    const unsigned int    n_cols,
 			    const ForwardIterator begin,
-			    const ForwardIterator end)
+			    const ForwardIterator end,
+			    const bool optimize_diag)
 {
   Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
 	  ExcIteratorRange (std::distance (begin, end), n_rows));
   
 				   // first determine row lengths for
 				   // each row. if the matrix is
-				   // square, then we might have to
+				   // quadratic, then we might have to
 				   // add an additional entry for the
 				   // diagonal, if that is not yet
 				   // present. as we have to call
@@ -1262,18 +1321,18 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 				   // bother to check whether that
 				   // diagonal entry is in a certain
 				   // row or not
-  const bool is_square = (n_rows == n_cols);
+  const bool is_square = optimize_diag && (n_rows == n_cols);
   std::vector<unsigned int> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i=begin; i!=end; ++i)
     row_lengths.push_back (std::distance (i->begin(), i->end())
 			   +
 			   (is_square ? 1 : 0));
-  reinit (n_rows, n_cols, row_lengths);
+  reinit (n_rows, n_cols, row_lengths, is_square);
 
 				   // now enter all the elements into
 				   // the matrix. note that if the
-				   // matrix is square, then we
+				   // matrix is quadratic, then we
 				   // already have the diagonal
 				   // element preallocated
 				   //

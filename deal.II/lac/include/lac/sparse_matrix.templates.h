@@ -836,7 +836,9 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
@@ -879,7 +881,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
 				   // which is much clearer...
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
@@ -945,7 +949,9 @@ SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
 
   dst = src;
   SOR(dst,om);
@@ -961,7 +967,9 @@ SparseMatrix<number>::precondition_TSOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
 
   dst = src;
   TSOR(dst,om);
@@ -976,7 +984,9 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   for (unsigned int row=0; row<m(); ++row)
@@ -1002,7 +1012,9 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   for (unsigned int row=m(); row!=0;)
@@ -1028,7 +1040,9 @@ SparseMatrix<number>::PSOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert (m() == permutation.size(),
 	  ExcDimensionMismatch(m(), permutation.size()));
@@ -1064,7 +1078,9 @@ SparseMatrix<number>::TPSOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert (m() == permutation.size(),
 	  ExcDimensionMismatch(m(), permutation.size()));
@@ -1098,7 +1114,9 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
@@ -1124,7 +1142,9 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
@@ -1162,7 +1182,9 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst,
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),
+	  typename SparsityPattern::ExcNotQuadratic());
+  
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   const unsigned int  n = dst.size();
