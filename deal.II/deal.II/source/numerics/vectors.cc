@@ -1372,8 +1372,10 @@ VectorTools::point_difference (const DoFHandler<dim>& dof,
   Assert(difference.size() == fe.n_components(),
 	 ExcDimensionMismatch(difference.size(), fe.n_components()));
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler->begin_active();
-  const DoFHandler<dim>::active_cell_iterator endc = dof_handler->end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler->begin_active();
+  const typename DoFHandler<dim>::active_cell_iterator
+    endc = dof_handler->end();
 
   std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
   
@@ -1385,8 +1387,8 @@ VectorTools::point_difference (const DoFHandler<dim>& dof,
             cell, evaluation_point);
           for (unsigned int i=0; i<dim; ++i)
             Assert(0<=unit_point(i) && unit_point(i)<=1, ExcInternalError());
-          vector<Point<dim> > quadrature_point(1, unit_point);
-          vector<double> weight(1, 1.);
+          std::vector<Point<dim> > quadrature_point(1, unit_point);
+          std::vector<double> weight(1, 1.);
           Quadrature<dim> quadrature(quadrature_point, weight);
           FEValues<dim> fe_values(
             mapping, fe, quadrature, UpdateFlags(update_values));
