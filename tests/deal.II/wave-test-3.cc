@@ -22,11 +22,9 @@
 #include <lac/full_matrix.h>
 #include <base/parameter_handler.h>
 #include <base/exceptions.h>
+#include <base/quadrature_lib.h>
 #include <base/timer.h>
 
-#include <base/forward_declarations.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <lac/vector.h>
 
 #include <fe/fe_q.h>
