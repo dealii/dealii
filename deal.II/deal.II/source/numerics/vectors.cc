@@ -456,33 +456,89 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 
 
 template <int dim>
-void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof,
+void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 					  const Quadrature<dim>    &quadrature,
-					  const Function<dim>      &rhs,
+					  const Function<dim>      &rhs_function,
 					  Vector<double>           &rhs_vector)
 {
-  Assert (dof.get_fe().n_components() == rhs.n_components,
+  const FiniteElement<dim> &fe  = dof_handler.get_fe();
+  Assert (fe.n_components() == rhs_function.n_components,
 	  ExcComponentMismatch());
+  Assert (rhs_vector.size() == dof_handler.n_dofs(),
+	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+  rhs_vector.clear();
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_q_points |
 					 update_JxW_values);
-  SparseMatrix<double> dummy;
-  const Assembler<dim>::AssemblerData data (dof,
-					    false, true,
-					    dummy, rhs_vector,
-					    quadrature, update_flags);
-  TriaActiveIterator<dim, Assembler<dim> >
-    assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
-	       dof.get_tria().begin_active()->level(),
-	       dof.get_tria().begin_active()->index(),
-	       &data);
-  MassMatrix<dim> equation(&rhs,0);
-  do 
+  FEValues<dim> fe_values (fe, quadrature, update_flags);
+
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+		     n_q_points    = fe_values.n_quadrature_points,
+		     n_components  = fe.n_components();
+  
+  vector<unsigned int> dofs (dofs_per_cell);
+  Vector<double> cell_vector (dofs_per_cell);
+
+  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+					endc = dof_handler.end();
+
+  if (n_components==1)
     {
-      assembler->assemble (equation);
+      vector<double> rhs_values(n_q_points);
+      
+      for (; cell!=endc; ++cell) 
+	{
+	  fe_values.reinit(cell);
+	  
+	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+	  const vector<double>     &weights   = fe_values.get_JxW_values ();
+	  rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
+	  
+	  cell_vector.clear();
+	  for (unsigned int point=0; point<n_q_points; ++point)
+	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
+	      cell_vector(i) += rhs_values[point] *
+				values(i,point) *
+				weights[point];
+	
+	  cell->get_dof_indices (dofs);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    rhs_vector(dofs[i]) += cell_vector(i);
+	}
+      
     }
-  while ((++assembler).state() == valid);
+  else
+    {
+      vector<Vector<double> > rhs_values(n_q_points, Vector<double>(n_components));
+      
+      for (; cell!=endc; ++cell) 
+	{
+	  fe_values.reinit(cell);
+	  
+	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+	  const vector<double>     &weights   = fe_values.get_JxW_values ();
+	  rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
+	  
+	  cell_vector.clear();
+	  for (unsigned int point=0; point<n_q_points; ++point)
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      {
+		const unsigned int component
+		  = fe.system_to_component_index(i).first;
+		
+		cell_vector(i) += rhs_values[point](component) *
+				  values(i,point) *
+				  weights[point];
+	      }
+	  
+	  cell->get_dof_indices (dofs);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    rhs_vector(dofs[i]) += cell_vector(i);
+	}
+    }
 };
 
 
