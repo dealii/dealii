@@ -91,7 +91,50 @@ namespace internal
 	}
       Assert (false, ExcInternalError());
       return TableIndices<4>();
-   }
+    }
+
+
+				     /**
+				      * Typedef template magic
+				      * denoting the result of a
+				      * double contraction between two
+				      * tensors or ranks rank1 and
+				      * rank2. In general, this is a
+				      * tensor of rank
+				      * <tt>rank1+rank2-4</tt>, but if
+				      * this is zero it is a single
+				      * scalar double. For this case,
+				      * we have a specialization.
+				      *
+				      * @author Wolfgang Bangerth, 2005
+				      */
+    template <int rank1, int rank2, int dim>
+    struct double_contraction_result 
+    {
+	typedef SymmetricTensor<rank1+rank2-4,dim> type;
+    };
+    
+
+				     /**
+				      * Typedef template magic
+				      * denoting the result of a
+				      * double contraction between two
+				      * tensors or ranks rank1 and
+				      * rank2. In general, this is a
+				      * tensor of rank
+				      * <tt>rank1+rank2-4</tt>, but if
+				      * this is zero it is a single
+				      * scalar double. For this case,
+				      * we have a specialization.
+				      *
+				      * @author Wolfgang Bangerth, 2005
+				      */
+    template <int dim>
+    struct double_contraction_result<2,2,dim> 
+    {
+	typedef double type;
+    };
+    
     
     
                                      /**
@@ -628,16 +671,37 @@ class SymmetricTensor
     SymmetricTensor   operator - () const;
 
                                      /**
-                                      * Scalar product between two symmetric
-                                      * tensors. It is the contraction
-                                      * <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
-                                      * over all indices <tt>i,j</tt>. While
-                                      * it is possible to define other scalar
-                                      * products (and associated induced
-                                      * norms), this one seems to be the most
-                                      * appropriate one.
+				      * Product between the present
+				      * symmetric tensor and a tensor
+				      * of rank 2. For example, if the
+				      * present object is also a
+				      * rank-2 tensor, then this is
+				      * the scalar-product contraction
+				      * <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
+				      * over all indices
+				      * <tt>i,j</tt>. In this case,
+				      * the return value evaluates to
+				      * a single scalar. While it is
+				      * possible to define other
+				      * scalar product (and associated
+				      * induced norms), this one seems
+				      * to be the most appropriate
+				      * one.
+				      *
+				      * If the present object is a
+				      * rank-4 tensor, the the result
+				      * is a rank-2 tensor, the
+				      * operation contracts over the
+				      * last two indices of the
+				      * present object and the indices
+				      * of the argument, and the
+				      * result is a tensor of rank 2.
                                       */
-    double operator * (const SymmetricTensor &s) const;
+    typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim>::type
+    operator * (const SymmetricTensor<2,dim> &s) const;
+
+    typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim>::type
+    operator * (const SymmetricTensor<4,dim> &s) const;
     
                                      /**
                                       * Return a read-write reference
@@ -719,6 +783,11 @@ class SymmetricTensor
                                       * Data storage for a symmetric tensor.
                                       */
     typename internal::SymmetricTensorAccessors::StorageType<rank,dim>::base_tensor_type data;
+
+				     /**
+				      * Make all other symmetric tensors friends.
+				      */
+    template <int, int> friend class SymmetricTensor;
 };
 
 
@@ -944,7 +1013,7 @@ SymmetricTensor<rank,dim>::memory_consumption ()
 
 
 template <>
-double
+internal::SymmetricTensorAccessors::double_contraction_result<2,2,1>::type
 SymmetricTensor<2,1>::operator * (const SymmetricTensor<2,1> &s) const
 {
   return data[0] * s.data[0];
@@ -953,7 +1022,7 @@ SymmetricTensor<2,1>::operator * (const SymmetricTensor<2,1> &s) const
 
 
 template <>
-double
+internal::SymmetricTensorAccessors::double_contraction_result<2,2,2>::type
 SymmetricTensor<2,2>::operator * (const SymmetricTensor<2,2> &s) const
 {
   return (data[0] * s.data[0] +
@@ -964,7 +1033,7 @@ SymmetricTensor<2,2>::operator * (const SymmetricTensor<2,2> &s) const
 
 
 template <>
-double
+internal::SymmetricTensorAccessors::double_contraction_result<2,2,3>::type
 SymmetricTensor<2,3>::operator * (const SymmetricTensor<2,3> &s) const
 {
   return (data[0] * s.data[0] +
@@ -977,55 +1046,105 @@ SymmetricTensor<2,3>::operator * (const SymmetricTensor<2,3> &s) const
 
 
 
-template <>
-double
-SymmetricTensor<4,1>::operator * (const SymmetricTensor<4,1> &s) const
+internal::SymmetricTensorAccessors::double_contraction_result<4,2,1>::type
+SymmetricTensor<4,1>::
+operator * (const SymmetricTensor<2,1> &s) const
 {
-  return data[0][0] * s.data[0][0];
+  const unsigned int dim = 1;
+  SymmetricTensor<2,dim> tmp;
+  tmp.data[0] = data[0][0] * s.data[0];
+  return tmp;
 }
 
 
 
 template <>
-double
-SymmetricTensor<4,2>::operator * (const SymmetricTensor<4,2> &s) const
+internal::SymmetricTensorAccessors::double_contraction_result<2,4,1>::type
+SymmetricTensor<2,1>::
+operator * (const SymmetricTensor<4,1> &s) const
+{
+  const unsigned int dim = 1;
+  SymmetricTensor<2,dim> tmp;
+  tmp[0][0] = data[0] * s.data[0][0];
+  return tmp;
+}
+
+
+
+template <>
+internal::SymmetricTensorAccessors::double_contraction_result<4,2,2>::type
+SymmetricTensor<4,2>::
+operator * (const SymmetricTensor<2,2> &s) const
 {
   const unsigned int dim = 2;
+  SymmetricTensor<2,dim> tmp;
 
-				   // this is not really efficient and
-				   // could be improved by counting
-				   // how often each tensor entry is
-				   // accessed, but this isn't a
-				   // really frequent operation anyway
-  double t = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  t += (*this)[i][j][k][l] * s[i][j][k][l];
-  return t;
+  for (unsigned int i=0; i<3; ++i)
+    tmp.data[i] = data[i][0] * s.data[0] +
+		  data[i][1] * s.data[1] +
+		  2 * data[i][2] * s.data[2];
+
+  return tmp;
 }
 
 
 
 template <>
-double
-SymmetricTensor<4,3>::operator * (const SymmetricTensor<4,3> &s) const
+internal::SymmetricTensorAccessors::double_contraction_result<2,4,2>::type
+SymmetricTensor<2,2>::
+operator * (const SymmetricTensor<4,2> &s) const
+{
+  const unsigned int dim = 2;
+  SymmetricTensor<2,dim> tmp;
+
+  for (unsigned int i=0; i<3; ++i)
+    tmp.data[i] = data[0] * s.data[0][i] +
+		  data[1] * s.data[1][i] +
+		  2 * data[2] * s.data[2][i];
+
+  return tmp;
+}
+
+
+
+template <>
+internal::SymmetricTensorAccessors::double_contraction_result<4,2,3>::type
+SymmetricTensor<4,3>::
+operator * (const SymmetricTensor<2,3> &s) const
 {
   const unsigned int dim = 3;
+  SymmetricTensor<2,dim> tmp;
 
-				   // this is not really efficient and
-				   // could be improved by counting
-				   // how often each tensor entry is
-				   // accessed, but this isn't a
-				   // really frequent operation anyway
-  double t = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  t += (*this)[i][j][k][l] * s[i][j][k][l];
-  return t;
+  for (unsigned int i=0; i<6; ++i)
+    tmp.data[i] = data[i][0] * s.data[0] +
+		  data[i][1] * s.data[1] +
+		  data[i][2] * s.data[2] +
+		  2 * data[i][3] * s.data[3] +
+		  2 * data[i][4] * s.data[4] +
+		  2 * data[i][5] * s.data[5];
+
+  return tmp;
+}
+
+
+
+template <>
+internal::SymmetricTensorAccessors::double_contraction_result<2,4,3>::type
+SymmetricTensor<2,3>::
+operator * (const SymmetricTensor<4,3> &s) const
+{
+  const unsigned int dim = 3;
+  SymmetricTensor<2,dim> tmp;
+
+  for (unsigned int i=0; i<6; ++i)
+    tmp.data[i] = data[0] * s.data[0][i] +
+		  data[1] * s.data[1][i] +
+		  data[2] * s.data[2][i] +
+		  2 * data[3] * s.data[3][i] +
+		  2 * data[4] * s.data[4][i] +
+		  2 * data[5] * s.data[5][i];
+
+  return tmp;
 }
 
 
@@ -1651,155 +1770,6 @@ operator / (const SymmetricTensor<rank,dim> &t,
 }
 
 
-/**
- * Double contraction between a rank-4 and a rank-2 symmetric tensor,
- * resulting in a symmetric tensor of rank 2. This operation is the
- * symmetric tensor analogon of a matrix-vector multiplication.
- *
- * @related SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-SymmetricTensor<2,1>
-operator * (const SymmetricTensor<4,1> &t,
-	    const SymmetricTensor<2,1> &s)
-{
-  const unsigned int dim = 1;
-  SymmetricTensor<2,dim> tmp;
-  tmp[0][0] = t[0][0][0][0] * s[0][0];
-  return tmp;
-}
-
-
-
-/**
- * Double contraction between a rank-4 and a rank-2 symmetric tensor,
- * resulting in a symmetric tensor of rank 2. This operation is the
- * symmetric tensor analogon of a matrix-vector multiplication.
- *
- * @related SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-SymmetricTensor<2,1>
-operator * (const SymmetricTensor<2,1> &s,
-	    const SymmetricTensor<4,1> &t)
-{
-  const unsigned int dim = 1;
-  SymmetricTensor<2,dim> tmp;
-  tmp[0][0] = t[0][0][0][0] * s[0][0];
-  return tmp;
-}
-
-
-
-/**
- * Double contraction between a rank-4 and a rank-2 symmetric tensor,
- * resulting in a symmetric tensor of rank 2. This operation is the
- * symmetric tensor analogon of a matrix-vector multiplication.
- *
- * @related SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-SymmetricTensor<2,2>
-operator * (const SymmetricTensor<4,2> &t,
-	    const SymmetricTensor<2,2> &s)
-{
-  const unsigned int dim = 2;
-  SymmetricTensor<2,dim> tmp;
-
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      tmp[i][j] = t[i][j][0][0] * s[0][0] +
-		  t[i][j][1][1] * s[1][1] +
-		  2 * t[i][j][0][1] * s[0][1];
-
-  return tmp;
-}
-
-
-
-/**
- * Double contraction between a rank-4 and a rank-2 symmetric tensor,
- * resulting in a symmetric tensor of rank 2. This operation is the
- * symmetric tensor analogon of a matrix-vector multiplication.
- *
- * @related SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-SymmetricTensor<2,2>
-operator * (const SymmetricTensor<2,2> &s,
-	    const SymmetricTensor<4,2> &t)
-{
-  const unsigned int dim = 2;
-  SymmetricTensor<2,dim> tmp;
-
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      tmp[i][j] = s[0][0] * t[0][0][i][j] * +
-		  s[1][1] * t[1][1][i][j] +
-		  2 * s[0][1] * t[0][1][i][j];
-
-  return tmp;
-}
-
-
-
-/**
- * Double contraction between a rank-4 and a rank-2 symmetric tensor,
- * resulting in a symmetric tensor of rank 2. This operation is the
- * symmetric tensor analogon of a matrix-vector multiplication.
- *
- * @related SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-SymmetricTensor<2,3>
-operator * (const SymmetricTensor<4,3> &t,
-	    const SymmetricTensor<2,3> &s)
-{
-  const unsigned int dim = 3;
-  SymmetricTensor<2,dim> tmp;
-
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      tmp[i][j] = t[i][j][0][0] * s[0][0] +
-		  t[i][j][1][1] * s[1][1] +
-		  t[i][j][2][2] * s[2][2] +
-		  2 * t[i][j][0][1] * s[0][1] +
-		  2 * t[i][j][0][2] * s[0][2] +
-		  2 * t[i][j][1][2] * s[1][2];
-
-  return tmp;
-}
-
-
-
-/**
- * Double contraction between a rank-4 and a rank-2 symmetric tensor,
- * resulting in a symmetric tensor of rank 2. This operation is the
- * symmetric tensor analogon of a matrix-vector multiplication.
- *
- * @related SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-SymmetricTensor<2,3>
-operator * (const SymmetricTensor<2,3> &s,
-	    const SymmetricTensor<4,3> &t)
-{
-  const unsigned int dim = 3;
-  SymmetricTensor<2,dim> tmp;
-
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      tmp[i][j] = s[0][0] * t[0][0][i][j] +
-		  s[1][1] * t[1][1][i][j] +
-		  s[2][2] * t[2][2][i][j] +
-		  2 * s[0][1] * t[0][1][i][j] +
-		  2 * s[0][2] * t[0][2][i][j] +
-		  2 * s[1][2] * t[1][2][i][j];
-
-  return tmp;
-}
-
-
 
 
 /**
@@ -1808,10 +1778,11 @@ operator * (const SymmetricTensor<2,3> &s,
  * argument to this function. This operation is the symmetric tensor
  * analogon of a matrix-vector multiplication.
  *
- * This function does the same as a respective operator*, but it avoid
- * a temporary object (that the compiler can optimize away in many
- * cases, however). This function mostly exists for compatibility
- * purposes with the general tensor class.
+ * This function does the same as the member operator* of the
+ * SymmetricTensor class. It should not be used, however, since the
+ * member operator has knowledge of the actual data storage format and
+ * is at least 2 orders of magnitude faster. This function mostly
+ * exists for compatibility purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1832,10 +1803,11 @@ double_contract (SymmetricTensor<2,1> &tmp,
  * argument to this function. This operation is the symmetric tensor
  * analogon of a matrix-vector multiplication.
  *
- * This function does the same as a respective operator*, but it avoid
- * a temporary object (that the compiler can optimize away in many
- * cases, however). This function mostly exists for compatibility
- * purposes with the general tensor class.
+ * This function does the same as the member operator* of the
+ * SymmetricTensor class. It should not be used, however, since the
+ * member operator has knowledge of the actual data storage format and
+ * is at least 2 orders of magnitude faster. This function mostly
+ * exists for compatibility purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1856,10 +1828,11 @@ double_contract (SymmetricTensor<2,1> &tmp,
  * argument to this function. This operation is the symmetric tensor
  * analogon of a matrix-vector multiplication.
  *
- * This function does the same as a respective operator*, but it avoid
- * a temporary object (that the compiler can optimize away in many
- * cases, however). This function mostly exists for compatibility
- * purposes with the general tensor class.
+ * This function does the same as the member operator* of the
+ * SymmetricTensor class. It should not be used, however, since the
+ * member operator has knowledge of the actual data storage format and
+ * is at least 2 orders of magnitude faster. This function mostly
+ * exists for compatibility purposes with the general tensor class.
  *
  * @related SymmetricTensor @author Wolfgang Bangerth, 2005
  */
@@ -1885,10 +1858,11 @@ double_contract (SymmetricTensor<2,2> &tmp,
  * argument to this function. This operation is the symmetric tensor
  * analogon of a matrix-vector multiplication.
  *
- * This function does the same as a respective operator*, but it avoid
- * a temporary object (that the compiler can optimize away in many
- * cases, however). This function mostly exists for compatibility
- * purposes with the general tensor class.
+ * This function does the same as the member operator* of the
+ * SymmetricTensor class. It should not be used, however, since the
+ * member operator has knowledge of the actual data storage format and
+ * is at least 2 orders of magnitude faster. This function mostly
+ * exists for compatibility purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1915,10 +1889,11 @@ double_contract (SymmetricTensor<2,2> &tmp,
  * argument to this function. This operation is the symmetric tensor
  * analogon of a matrix-vector multiplication.
  *
- * This function does the same as a respective operator*, but it avoid
- * a temporary object (that the compiler can optimize away in many
- * cases, however). This function mostly exists for compatibility
- * purposes with the general tensor class.
+ * This function does the same as the member operator* of the
+ * SymmetricTensor class. It should not be used, however, since the
+ * member operator has knowledge of the actual data storage format and
+ * is at least 2 orders of magnitude faster. This function mostly
+ * exists for compatibility purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1948,10 +1923,11 @@ double_contract (SymmetricTensor<2,3> &tmp,
  * argument to this function. This operation is the symmetric tensor
  * analogon of a matrix-vector multiplication.
  *
- * This function does the same as a respective operator*, but it avoid
- * a temporary object (that the compiler can optimize away in many
- * cases, however). This function mostly exists for compatibility
- * purposes with the general tensor class.
+ * This function does the same as the member operator* of the
+ * SymmetricTensor class. It should not be used, however, since the
+ * member operator has knowledge of the actual data storage format and
+ * is at least 2 orders of magnitude faster. This function mostly
+ * exists for compatibility purposes with the general tensor class.
  *
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
