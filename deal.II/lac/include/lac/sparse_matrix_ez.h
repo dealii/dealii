@@ -1176,7 +1176,7 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
 	  ++accessor.a_row;
 	}
       while (accessor.a_row < accessor.matrix->m()
-	     && accessor.column() == SparseMatrixEZ<number>::Entry::invalid);
+	     && accessor.matrix->row_info[accessor.a_row].length == 0);
     }
   return *this;
 }
