@@ -1,8 +1,8 @@
-After almost one year of development, version 4.0 of the deal.II
+After one year of development, version 4.0 of the deal.II
 object-oriented finite element library has been released. It is
 available from the deal.II home-page at
 
-      http://www.dealii.org
+                   http://www.dealii.org
 
 This versions features many new components. The most outstanding
 additions are
@@ -14,13 +14,10 @@ additions are
 - Support for more compilers and operating systems
 - ...
 
-deal.II has grown by approximately 35,000 lines in the meantime, and
-has now more than 200,000 lines of code. A complete list of the more
-than 120 changes in this version with respect to the previous version
-can be found at
- http://www.dealii.org/news/2003/3.4.0-vs-4.0.0.html
+A comprehensive list of new features can be found at
+     http://www.dealii.org/news/3.4.0-vs-4.0.0.html
 
-All main  features of  the previous versions  have been  continued and
+All main features of the previous versions have been continued and
 improved:
 - Support for dimension-independent programming
 - Extensive documentation and working example programs
@@ -30,7 +27,7 @@ improved:
 - Built-in support for symmetric multi-processing (SMP)
 - Output for a variety of visualization platforms.
 
-deal.II can  be downloaded for free  and is distributed  under an Open
+deal.II can be downloaded for free and is distributed under an Open
 Source license.
 
 
