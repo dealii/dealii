@@ -41,7 +41,6 @@ SparseMatrix<number>::SparseMatrix () :
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
-		Subscriptor(),
 		cols(0),
 		val(0),
 		max_len(0)
@@ -70,7 +69,6 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 		val(0),
 		max_len(0)
 {
-  cols->subscribe ();
   reinit();
 };
 
@@ -78,8 +76,6 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c) :
 template <typename number>
 SparseMatrix<number>::~SparseMatrix ()
 {
-  if (cols != 0)
-    cols->unsubscribe();
   cols = 0;
   
   if (val != 0)
@@ -119,12 +115,7 @@ template <typename number>
 void
 SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
 {
-  if (cols != 0)
-    cols->unsubscribe();
-  
   cols = &sparsity;
-  cols->subscribe();
-  
   reinit ();
 };
 
@@ -133,8 +124,6 @@ template <typename number>
 void
 SparseMatrix<number>::clear ()
 {
-  if (cols != 0)
-    cols->unsubscribe ();
   cols = 0;
   if (val) delete[] val;
   val = 0;
