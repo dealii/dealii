@@ -95,6 +95,64 @@ class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
     SmartPointer<const PRECOND> precondition;
 };
 
+//TODO: Improve QR-factorization to make this more efficient.
+
+/**
+ * Coarse grid solver by QR factorization
+ *
+ * This is a direct solver for possibly indefinite coarse grid
+ * problems, using the @p{least_squares} function of the class
+ * FullMatrix.
+ *
+ * Since the currently implemented Householder algorithm transforms
+ * the right hand side immediately, the transformation has to be
+ * computed for each coarse grid solution. Therefore, this coarse grid
+ * solver may be inefficient for larger coarse grid systems.
+ *
+ * @author Guido Kanschat, 2003
+ */
+template<typename number, class VECTOR>
+class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
+{
+  public:
+				     /**
+				      * Constructor, taking the coarse
+				      * grid matrix.
+				      */
+    MGCoarseGridHouseholder (const FullMatrix<number>& A);
+
+				     /**
+				      * Initialize for a new matrix.
+				      */
+    void initialize (const FullMatrix<number>& A);
+    
+				     /**
+				      * Solution operator, defined in
+				      * the base class.
+				      */
+    void operator() (const unsigned int   level,
+		     VECTOR       &dst,
+		     const VECTOR &src) const;
+
+  private:
+				     /**
+				      * Pointer to the coarse grid
+				      * matrix.
+				      */
+    SmartPointer<const FullMatrix<number> > matrix;
+
+				     /**
+				      * Matrix for QR-factorization.
+				      */
+    mutable FullMatrix<number> work;
+
+				     /**
+				      * Auxiliary vector.
+				      */
+    mutable VECTOR aux;
+};
+
+  
 
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
@@ -165,6 +223,39 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 ::set_matrix(const MATRIX &m)
 {
   matrix=&m;
+}
+
+//----------------------------------------------------------------------//
+
+template<typename number, class VECTOR>
+MGCoarseGridHouseholder<number, VECTOR>::MGCoarseGridHouseholder(
+  const FullMatrix<number>& A)
+		:
+		matrix(&A)
+{}
+
+
+
+template<typename number, class VECTOR>
+void
+MGCoarseGridHouseholder<number, VECTOR>::initialize(
+  const FullMatrix<number>& A)
+{
+  matrix = &A;
+}
+
+
+
+template<typename number, class VECTOR>
+void
+MGCoarseGridHouseholder<number, VECTOR>::operator() (
+  const unsigned int,
+  VECTOR       &dst,
+  const VECTOR &src) const
+{
+  work = *matrix;
+  aux = src;
+  work.least_squares(dst, aux);
 }
 
 
