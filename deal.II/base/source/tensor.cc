@@ -17,6 +17,14 @@
 #include <lac/vector.h>
 
 
+// storage for static variables
+template <int dim>
+const unsigned int Tensor<1,dim>::dimension;
+
+template <int rank, int dim>
+const unsigned int Tensor<rank,dim>::dimension;
+
+
 template <int dim>
 void
 Tensor<1,dim>::unroll( Vector<double>& result) const
