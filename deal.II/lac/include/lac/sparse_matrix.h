@@ -184,7 +184,7 @@ namespace internals
                                               * friend so as to allow it to
                                               * generate objects of this type.
                                               */
-            friend class Accessor;
+            template <typename, bool> friend class Accessor;
         };
             
       public:
