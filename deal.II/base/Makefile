@@ -20,7 +20,7 @@ o-files-base2= $(filter-out %data_out_base.o, $(o-files-base1)) \
 o-files-base3= $(sort $(o-files-base2))
 o-files      = $(o-files-base3)
 go-files     = $(patsubst lib/o/%,lib/go/%,$(o-files-base3:.o=.go))
-h-files      = $(shell echo include/base/*.h)
+h-files      = $(sort $(shell echo include/base/*.h))
 
 forward-declarations = $D/base/include/base/forward_declarations.h
 

@@ -37,7 +37,7 @@ endif
 # files for data_out_base.cc, which is why we use the several
 # intermediate o-files-base* rules
 cc-files     = $(shell echo source/*/*.cc)
-h-files      = $(shell echo include/*/*.h)
+h-files      = $(sort $(shell echo include/*/*.h))
 
 forward-declarations = $D/deal.II/include/grid/forward_declarations.h
 
