@@ -336,10 +336,7 @@ QIteratedTrapez<1>::QIteratedTrapez (const unsigned n) :
 // two space dimensions, so we leave in these Assert'ions until
 // that is done
 template <int dim>
-QGauss2<dim>::QGauss2 () :
-		Quadrature<dim> (QGauss2<dim-1>(), QGauss2<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+QGauss2<dim>::QGauss2 () :  Quadrature<dim> (QGauss2<dim-1>(), QGauss2<1>())  {};
 
 template <int dim>
 QGauss3<dim>::QGauss3 () :
@@ -398,10 +395,7 @@ QTrapez<dim>::QTrapez () :
 
 template <int dim>
 QIteratedTrapez<dim>::QIteratedTrapez (const unsigned n) :
-		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n))
-{
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n)) {};
 
 
 
@@ -417,4 +411,16 @@ template class QMidpoint<2>;
 template class QSimpson<2>;
 template class QTrapez<2>;
 template class QIteratedTrapez<2>;
+
+template class QGauss2<3>;
+template class QGauss3<3>;
+template class QGauss4<3>;
+template class QGauss5<3>;
+template class QGauss6<3>;
+template class QGauss7<3>;
+template class QGauss8<3>;
+template class QMidpoint<3>;
+template class QSimpson<3>;
+template class QTrapez<3>;
+template class QIteratedTrapez<3>;
 
