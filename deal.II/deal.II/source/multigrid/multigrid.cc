@@ -199,7 +199,7 @@ void MGTransferBlockBase::build_matrices (
 	      sizes[level+1][i],
 	      sizes[level][j],
 //TODO:[GK] Split this by component to save memory
-	      dofs_per_cell);
+	      dofs_per_cell+1);
 	  else
 	    prolongation_sparsities[level].block(i,j).reinit(
 	      sizes[level+1][i],
