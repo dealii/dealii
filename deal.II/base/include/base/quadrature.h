@@ -73,59 +73,6 @@ template <int dim>
 class Quadrature : public Subscriptor
 {
   public:
-#ifdef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
-				     /**
-				      * Define a typedef for a
-				      * quadrature that acts on an
-				      * object of one dimension
-				      * less. For cells, this would
-				      * then be a face quadrature.
-				      *
-				      * The construct here is only
-				      * used in case we hit a certain
-				      * bug in Sun's Forte
-				      * compiler. Since that compiler
-				      * has trouble (well, an internal
-				      * compiler error) if we typedef
-				      * @p{typedef Quadrature<dim-1>
-				      * SubQuadrature}, we put this
-				      * type into a structure. Since
-				      * again, if the structure is not
-				      * templatized itself, the
-				      * compiler barfs, we put a
-				      * template to it. Now it
-				      * works. Fortunately you will
-				      * not usually come into contact
-				      * with this kludge, but rather
-				      * use the typedef'd type
-				      * directly. We beg your pardon
-				      * for doing such nasty things.
-				      *
-				      * For better readability we
-				      * later typedef this so-created
-				      * type to one in the enclosing
-				      * class.
-				      */
-    template <int dim2>
-    struct SubQuadratureHelper
-    {
-	typedef Quadrature<dim2-1> type;
-    };
-    
-				     /**
-				      * Typedef the kludge declared
-				      * above to a type in the class
-				      * in which we would like to use
-				      * it.
-				      *
-				      * This typedef is only used if
-				      * the respective bug in the
-				      * compiler is encountered,
-				      * otherwise the proper typedef
-				      * below is used.
-				      */
-    typedef typename SubQuadratureHelper<dim>::type SubQuadrature;
-#else
 				     /**
 				      * Define a typedef for a
 				      * quadrature that acts on an
@@ -134,7 +81,6 @@ class Quadrature : public Subscriptor
 				      * then be a face quadrature.
 				      */
     typedef Quadrature<dim-1> SubQuadrature;
-#endif    
     
 				     /**
 				      * Number of quadrature points.
@@ -347,59 +293,6 @@ template <int dim>
 class QProjector
 {
   public:
-#ifdef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
-				     /**
-				      * Define a typedef for a
-				      * quadrature that acts on an
-				      * object of one dimension
-				      * less. For cells, this would
-				      * then be a face quadrature.
-				      *
-				      * The construct here is only
-				      * used in case we hit a certain
-				      * bug in Sun's Forte
-				      * compiler. Since that compiler
-				      * has trouble (well, an internal
-				      * compiler error) if we typedef
-				      * @p{typedef Quadrature<dim-1>
-				      * SubQuadrature}, we put this
-				      * type into a structure. Since
-				      * again, if the structure is not
-				      * templatized itself, the
-				      * compiler barfs, we put a
-				      * template to it. Now it
-				      * works. Fortunately you will
-				      * not usually come into contact
-				      * with this kludge, but rather
-				      * use the typedef'd type
-				      * directly. We beg your pardon
-				      * for doing such nasty things.
-				      *
-				      * For better readability we
-				      * later typedef this so-created
-				      * type to one in the enclosing
-				      * class.
-				      */
-    template <int dim2>
-    struct SubQuadratureHelper
-    {
-	typedef Quadrature<dim2-1> type;
-    };
-    
-				     /**
-				      * Typedef the kludge declared
-				      * above to a type in the class
-				      * in which we would like to use
-				      * it.
-				      *
-				      * This typedef is only used if
-				      * the respective bug in the
-				      * compiler is encountered,
-				      * otherwise the proper typedef
-				      * below is used.
-				      */
-    typedef typename SubQuadratureHelper<dim>::type SubQuadrature;
-#else
 				     /**
 				      * Define a typedef for a
 				      * quadrature that acts on an
@@ -408,7 +301,6 @@ class QProjector
 				      * then be a face quadrature.
 				      */
     typedef Quadrature<dim-1> SubQuadrature;
-#endif    
     
 				     /**
 				      * Compute the quadrature points
