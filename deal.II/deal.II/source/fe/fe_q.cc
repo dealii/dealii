@@ -742,6 +742,16 @@ FE_Q<dim>::build_renumbering (const FiniteElementData<dim> &fe_data,
 					 // vertices of a hexahedron.
 					 // Therefore, this looks quite
 					 // sophisticated.
+					 //
+					 // NB: This same person
+					 // claims to have had good
+					 // reasons then, but seems to
+					 // have forgotten about
+					 // them. At least, the
+					 // numbering was discussed
+					 // with the complaining
+					 // person back then when all
+					 // began :-)
 	switch (dim)
 	  {
 	    case 1:
