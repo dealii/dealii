@@ -31,7 +31,7 @@ ifneq (1,${recursive-make-fwd-decl})
 	@touch $@.old
 	-@cp $@ $@.old > /dev/null 2>&1
 	@perl $D/common/scripts/Make_forward_declarations.pl $(filter-out %forward-declarations.h,$(h-files)) > $@.new
-	@make --silent recursive-make-fwd-decl=1 $@
+	@$(MAKE) --silent recursive-make-fwd-decl=1 $@
 	@rm $@.old $@.new
 else
   ifneq (,$(shell diff $(forward-declarations).old $(forward-declarations).new))
