@@ -1398,6 +1398,20 @@ FE_Q<3>::initialize_constraints ()
 	    interface_constraints(j,i) = 
 		poly_f->compute_value(face_index_map [i], 
 				      constraint_points[j]);
+
+					   // if the value is small up
+					   // to round-off, then
+					   // simply set it to zero to
+					   // avoid unwanted fill-in
+					   // of the constraint
+					   // matrices (which would
+					   // then increase the number
+					   // of other DoFs a
+					   // constrained DoF would
+					   // couple to)
+	    if (std::fabs(interface_constraints(j,i)) < 1e-14)
+		interface_constraints(j,i) = 0;
+
 	    indx++;
 	}
     delete poly_f;
