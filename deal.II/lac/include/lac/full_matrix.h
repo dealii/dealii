@@ -1,8 +1,8 @@
-/*----------------------------   fmatrix.h     ---------------------------*/
+/*----------------------------   fullmatrix.h     ---------------------------*/
 //      $Id$
 #ifndef __lac_fullmatrix_H
 #define __lac_fullmatrix_H
-/*----------------------------   fmatrix.h     ---------------------------*/
+/*----------------------------   fullmatrix.h     ---------------------------*/
 
 // This file is part of the DEAL Library
 // DEAL is Copyright(1995) by
@@ -22,17 +22,25 @@ class iVector;
 
 
 /**
- *  Rectangular/quadratic full matrix.
+ * Rectangular/quadratic full matrix.
  *
- *  Memory for Components is supplied explicitly <p>
- *  ( ! Amount of memory needs not to comply with actual dimension due to reinitializations ! ) <p>
- *  - all necessary methods for matrices are supplied <p>
- *  - operators available are '=' and '( )' <p>
+ * Implementation of a classical rectangular scheme of numbers. The
+ * data type of the entries is provided in the template argument #number#.
+ * The interface is quite fat and in fact has grown every time a new
+ * feature was needed. So, a lot of functions are provided.
+ * 
+ * The since the instantiation of this template is quite an effort,
+ * standard versions are precompiled into the library. These include all
+ * combinations of 'float' and 'double' for matrices and vectors. If you need more
+ * data types, the implementation of non-inline functions is in
+ * "fullmatrix.templates.h". Driver files are in the source tree.
+ *
  *  CONVENTIONS for used 'equations' : <p>
  *  - THIS matrix is always named 'A' <p>
  *  - matrices are always uppercase , vectors and scalars are lowercase <p>
  *  - Transp(A) used for transpose of matrix A
  *
+ * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template<typename number>
 class FullMatrix
@@ -43,11 +51,11 @@ class FullMatrix
 				      */
     number* val;
 				     /** 
-				      * Dimension. Actual number of Columns
+				      * Dimension of range. Actual number of Columns
 				      */
     unsigned int dim_range;
 				     /**
-				      * Dimension. Actual number of Rows
+				      * Dimension of image. Actual number of Rows
 				      */
     unsigned int dim_image;
 				     /**
@@ -56,8 +64,10 @@ class FullMatrix
     unsigned int val_size;
     
 				     /**
-				      * Initialization   . initialize memory for Matrix <p>
-				      * ( m rows , n columns )
+				      * Initialization. Initialize
+				      * memory for a #FullMatrix#
+				      * of #m# rows and #n#
+				      * columns to zero.
 				      */
     void init (const unsigned int m, const unsigned int n);
     
@@ -65,14 +75,19 @@ class FullMatrix
 				      * Return a read-write reference to the
 				      * element #(i,j)#.
 				      *
-				      * This function does no bounds checking.
+				      * This function does no bounds
+				      * checking and is only to be used
+				      * internally and in functions
+				      * already checked.
 				      */
     number& el (const unsigned int i, const unsigned int j);
     
 				     /**
 				      * Return the value of the element #(i,j)#.
 				      *
-				      * This function does no bounds checking.
+				      * This function does no bounds checking and is only to be used
+				      * internally and in functions
+				      * already checked.
 				      */
     number el (const unsigned int i, const unsigned int j) const;
     
@@ -86,9 +101,9 @@ class FullMatrix
     
 				     /**
 				      * Constructor. Initialize the matrix as
-				      * a rectangular #m# times #n# matrix.
+				      * a rectangular matrix.
 				      */
-    FullMatrix (const unsigned int m, const unsigned int n);
+    FullMatrix (const unsigned int rows, const unsigned int cols);
     
 				     /** 
 				      * Copy constructor. Be very careful with
@@ -113,28 +128,42 @@ class FullMatrix
     bool operator == (const FullMatrix<number> &) const;
 
 				     /**
-				      *  A = B           . Copy all elements
+				      * Assignment operator.
+				      * Copy all elements of #src#
+				      into the matrix. The size is
+				      adjusted if needed.
 				      */
     template<typename number2>
-    FullMatrix<number>& operator = (const FullMatrix<number2>& B);
+    FullMatrix<number>& operator = (const FullMatrix<number2>& src);
     
     
 				     /**
-				      *  U(0-m,0-n) = s  . Fill all elements
+				      * Fill rectangular block.
+				      *
+				      * The matrix #src# is copied
+				      into the target. The optional
+				      values #i# and #j# determine the
+				      upper left corner of the image
+				      of #src#.
+				      *
+				      * This function requires that
+				      #i+src.m()<=m()# and
+				      #j+src.n()<=n()#, that is, the
+				      image fits into the space of #this#.
 				      */
     template<typename number2>
     void fill (const FullMatrix<number2>& src,
 	       const unsigned int i=0, const unsigned int j=0);
     
 				     /**
-				      * Change  Dimension.
+				      * Change  Dimensions.
 				      * Set dimension to (m,n) <p>
 				      * ( reinit rectangular matrix )
 				      */
     void reinit (const unsigned int m, const unsigned int n);
     
 				     /**
-				      * Change  Dimension.
+				      * Change  Dimensions.
 				      * Set dimension to (n,n) <p>
 				      * ( reinit quadratic matrix )
 				      */
@@ -149,14 +178,14 @@ class FullMatrix
     void reinit (const FullMatrix<number2> &B);
     
 				     /**
-				      * Return number of rows of this matrix.
+				      * Number of rows of this matrix.
 				      * To remember: this matrix is an
 				      * $m \times n$-matrix.
 				      */
     unsigned int m () const;
     
 				     /**
-				      * Return number of columns of this matrix.
+				      * Number of columns of this matrix.
 				      * To remember: this matrix is an
 				      * $m \times n$-matrix.
 				      */
@@ -172,30 +201,26 @@ class FullMatrix
 				      */
     bool all_zero () const;
 
-				     //@}
-    
-    
-				     /**@name 2: Data-Access
-				      */
-				     //@{
-				     /**
+				     /*
 				      *   Access Elements. returns element at relative 'address' i <p>
 				      *   ( -> access to A(i/n , i mod n) )
 				      */
-    number el (const unsigned int i) const;
+//    number el (const unsigned int i) const;
     
 				     /**
 				      * Return the value of the element #(i,j)#.
-				      * Does the same as the #el(i,j)# function
-				      * but does bounds checking.
+				      * Does the same as the private #el(i,j)# function
+				      * but does bounds checking in
+				      * debug mode.
 				      */
     number operator() (const unsigned int i, const unsigned int j) const;
     
 				     /**
 				      * Return a read-write reference to
 				      * the element #(i,j)#.
-				      * Does the same as the #el(i,j)# function
-				      * but does bounds checking.
+				      * Does the same as the private #el(i,j)# function
+				      * but does bounds checking in
+				      * debug mode.
 				      */
     number& operator() (const unsigned int i, const unsigned int j);
     
@@ -204,55 +229,60 @@ class FullMatrix
 				      * zero.
 				      */
     void clear ();
-				     //@}
-    
-    
-				     /**@name 3: Basic applications on matrices
-				      */
-				     //@{
+
 				     /**
-				      *  A+=B            . Simple addition
+				      *  Weighted addition. The matrix
+				      #s*B# is added to #this#.
+				      *
+				      * $A += sB$
 				      */
     template<typename number2>
     void add (const number s, const FullMatrix<number2>& B);
 
 				     /**
-				      * A+=Transp(B).
-				      * Simple addition of the transpose of B to this
+				      * Weighted addition of the
+				      transpose of #B# to #this#.
+				      *
+				      * $A += s B^T$
 				      */
     template<typename number2>
     void Tadd (const number s, const FullMatrix<number2>& B);
     
 				     /**
-				      * C=A*B.
-				      * Matrix-matrix-multiplication 
+				      * Matrix-matrix-multiplication.
+				      * $C=A*B$.
 				      */
  
     template<typename number2>
     void mmult (FullMatrix<number2>& C, const FullMatrix<number2>& B) const;
     
 				     /**
-				      * C=Transp(A)*B.
 				      * Matrix-matrix-multiplication using
-				      * transpose of this
+				      * transpose of #this#.
+				      * $C=A^T*B.
 				      */
     template<typename number2>
     void Tmmult (FullMatrix<number2>& C, const FullMatrix<number2>& B) const;
     
 				     /**
-				      *  w (+)= A*v.
-				      *  Matrix-vector-multiplication ; <p>
-				      *  ( application of this to a vector v )
-				      *  flag adding=true : w+=A*v
+				      * Matrix-vector-multiplication.
+				      *
+				      * The optional parameter
+				      * #adding# determines, whether the
+				      * result is stored in #w# or addet
+				      * to #w#.
+				      *
+				      * if (adding)
+				      *  w += A*v
+				      *
+				      * if (!adding)
+				      *  w = A*v
 				      */
     template<typename number2>
     void vmult (Vector<number2>& w, const Vector<number2>& v, const bool adding=false) const;
     
 				     /**
-				      *  w (+)= Transp(A)*v.
-				      *  Matrix-vector-multiplication ; <p>
-				      *  (application of transpose of this to a vector v)
-				      *  flag adding=true : w+=A*v
+				      * Transpose matrix-vector-multiplication. See #vmult# above.
 				      */
     template<typename number2>
     void Tvmult (Vector<number2>& w, const Vector<number2>& v, const bool adding=false) const;
@@ -313,6 +343,7 @@ class FullMatrix
 				      * sum of all matrix entries.
 				      */
     double norm2 () const;
+
 				     /**
 				      * Assign the inverse of the given
 				      * matrix to #*this#. This function is
@@ -321,12 +352,7 @@ class FullMatrix
 				      * two and three.
 				      */
     void invert (const FullMatrix<number> &M);
-				     //@}
 
-
-				     /**@name 4: Basic applications on Rows or Columns
-				      */
-				     //@{
 				     /**
 				      *  A(i,1-n)+=s*A(j,1-n).
 				      * Simple addition of rows of this
@@ -366,13 +392,7 @@ class FullMatrix
 				      *  Swap columns i and j of this
 				      */
     void swap_col (const unsigned int i, const unsigned int j);
-				     //@}
 
-
-				     /**@name 5: Mixed stuff. Including more
-				      *  applications on matrices
-				      */
-				     //@{
 				     /**
 				      *  w=b-A*v.
 				      *  Residual calculation , returns |w|
@@ -545,12 +565,12 @@ FullMatrix<number>::n() const
 };
 
 
-template <typename number>
-inline number
-FullMatrix<number>::el (const unsigned int i) const
-{
-  return val[i];
-};
+// template <typename number>
+// inline number
+// FullMatrix<number>::el (const unsigned int i) const
+// {
+//   return val[i];
+// };
 
 
 template <typename number>
