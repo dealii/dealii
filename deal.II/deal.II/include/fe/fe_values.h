@@ -1720,6 +1720,22 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                            face_no);
+    
+				     /**
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given cell of type
+				      * "iterator into a MGDoFHandler
+				      * object", and the finite
+				      * element associated with this
+				      * object. It is assumed that the
+				      * finite element used by the
+				      * given cell is also the one
+				      * used by this @p FEValues
+				      * object.
+				      */
+    void reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+		 const unsigned int                               face_no);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -1835,6 +1851,23 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * @p FESubfaceValues object.
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
+		 const unsigned int                    face_no,
+		 const unsigned int                    subface_no);
+
+    				     /**
+				      * Reinitialize the gradients,
+				      * Jacobi determinants, etc for
+				      * the given cell of type
+				      * "iterator into a MGDoFHandler
+				      * object", and the finite
+				      * element associated with this
+				      * object. It is assumed that the
+				      * finite element used by the
+				      * given cell is also the one
+				      * used by this @p FEValues
+				      * object.
+				      */
+    void reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no);
 
