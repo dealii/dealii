@@ -19,7 +19,6 @@
 #include <grid/tria_iterator.h>
 
 #include <cmath>
-#include <functional>
 
 #if deal_II_dimension != 1
 
@@ -99,31 +98,54 @@ GridTools::diameter (const Triangulation<1> &tria)
 namespace 
 {
   template <int dim>
-  inline
-  Point<dim> shift_point (const Point<dim> p,
-			  const Point<dim> shift)
+  class ShiftPoint
   {
-    return p+shift;
+  public:
+      ShiftPoint (const Point<dim> &shift)
+	  :
+	  shift(shift)
+	  {};
+      Point<dim> operator() (const Point<dim> p) const
+	  {
+	      return p+shift;
+	  };
+  private:
+      const Point<dim> shift;
   };
 
 
 
-  inline
-  Point<2> rotate2d (const Point<2> p,
-		     const double     angle)
+  class Rotate2d
   {
-    return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
-		     std::sin(angle)*p(0) + std::cos(angle) * p(1));
+  public:
+      Rotate2d (const double angle)
+	  :
+	  angle(angle)
+	  {};
+      Point<2> operator() (const Point<2> p) const
+	  {
+	      return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
+			       std::sin(angle)*p(0) + std::cos(angle) * p(1));
+	  };
+  private:
+      const double angle;
   };
 
 
-
-  template <int dim>
-  inline
-  Point<dim> scale_point (const Point<dim> p,
-			  const double factor)
+    template <int dim>
+  class ScalePoint
   {
-    return p*factor;
+  public:
+      ScalePoint (const double factor)
+	  :
+	  factor(factor)
+	  {};
+      Point<dim> operator() (const Point<dim> p) const
+	  {
+	      return p*factor;
+	  };
+  private:
+      const double factor;
   };
 };
 
@@ -133,15 +155,7 @@ void
 GridTools::shift (const Point<dim>   &shift_vector,
 		  Triangulation<dim> &triangulation)
 {
-				   // use a temporary variable to work
-				   // around a bug in icc, which does
-				   // not like it if we take the
-				   // address of the function right
-				   // within the call to std::ptr_fun
-  Point<dim> (*p) (const Point<dim>, const Point<dim>)
-    = &shift_point<dim>;
-  transform (std::bind2nd(std::ptr_fun(p), shift_vector),
-	     triangulation);
+  transform (ShiftPoint<dim>(shift_vector), triangulation);
 };
 
 
@@ -151,9 +165,7 @@ void
 GridTools::rotate (const double      angle,
 		   Triangulation<2> &triangulation)
 {
-  transform (std::bind2nd(std::ptr_fun(&rotate2d),
-			  angle),
-	     triangulation);
+  transform (Rotate2d(angle), triangulation);
 };
 
 #endif
@@ -165,16 +177,7 @@ GridTools::scale (const double        scaling_factor,
 		  Triangulation<dim> &triangulation)
 {
   Assert (scaling_factor>0, ExcScalingFactorNotPositive (scaling_factor));
-  
-				   // use a temporary variable to work
-				   // around a bug in icc, which does
-				   // not like it if we take the
-				   // address of the function right
-				   // within the call to std::ptr_fun
-  Point<dim> (*p) (const Point<dim>, const double)
-    = &scale_point<dim>;
-  transform (std::bind2nd(std::ptr_fun(p), scaling_factor),
-	     triangulation);
+  transform (ScalePoint<dim>(scaling_factor), triangulation);
 };
 
 
