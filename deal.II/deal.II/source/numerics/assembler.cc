@@ -140,6 +140,12 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 				   // get indices of dofs
   vector<int> dofs (n_dofs);
   get_dof_indices (dofs);
+
+				   // one could use the
+				   // #distribute_local_to_global# functions
+				   // here, but they would require getting the
+				   // dof indices twice, so we leave it the
+				   // way it was originally programmed.
   
 				   // distribute cell matrix
   if (assemble_matrix)
