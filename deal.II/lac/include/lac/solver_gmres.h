@@ -60,8 +60,8 @@
  *
  * @author Wolfgang Bangerth
  */
-template<class Matrix, class Vector>
-class SolverGMRES : public Solver<Matrix, Vector>
+template<class Matrix, class VECTOR>
+class SolverGMRES : public Solver<Matrix, VECTOR>
 {
   public:
     				     /**
@@ -91,16 +91,16 @@ class SolverGMRES : public Solver<Matrix, Vector>
 				      * Constructor.
 				      */
     SolverGMRES (SolverControl        &cn,
-		 VectorMemory<Vector> &mem,
+		 VectorMemory<VECTOR> &mem,
 		 const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solver method.
 				      */
     template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
-						       Vector       &x,
-						       const Vector &b,
+    typename Solver<Matrix,VECTOR>::ReturnState solve (const Matrix &A,
+						       VECTOR       &x,
+						       const VECTOR &b,
 						       const Preconditioner& precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
@@ -128,8 +128,8 @@ class SolverGMRES : public Solver<Matrix, Vector>
 				      * tridiagonal structure by givens
 				      * rotation of the last column
 				      */
-    void givens_rotation (Vector &h,  Vector &b,
-			  Vector &ci, Vector &si,
+    void givens_rotation (Vector<double> &h,  Vector<double> &b,
+			  Vector<double> &ci, Vector<double> &si,
 			  int col) const;
 };
 
@@ -139,11 +139,11 @@ class SolverGMRES : public Solver<Matrix, Vector>
 /* --------------------- Inline and template functions ------------------- */
 
 
-template <class Matrix, class Vector>
-SolverGMRES<Matrix,Vector>::SolverGMRES (SolverControl        &cn,
-					 VectorMemory<Vector> &mem,
+template <class Matrix, class VECTOR>
+SolverGMRES<Matrix,VECTOR>::SolverGMRES (SolverControl        &cn,
+					 VectorMemory<VECTOR> &mem,
 					 const AdditionalData &data) :
-		Solver<Matrix,Vector> (cn,mem),
+		Solver<Matrix,VECTOR> (cn,mem),
 		additional_data(data)
 {
   Assert (additional_data.max_n_tmp_vectors >= 10, 
@@ -152,13 +152,13 @@ SolverGMRES<Matrix,Vector>::SolverGMRES (SolverControl        &cn,
 
 
 
-template <class Matrix, class Vector>
+template <class Matrix, class VECTOR>
 inline
 void
-SolverGMRES<Matrix,Vector>::givens_rotation (Vector &h,
-					     Vector &b,
-					     Vector &ci,
-					     Vector &si, 
+SolverGMRES<Matrix,VECTOR>::givens_rotation (Vector<double> &h,
+					     Vector<double> &b,
+					     Vector<double> &ci,
+					     Vector<double> &si, 
 					     int     col) const
 {
   for (int i=0 ; i<col ; i++)
@@ -181,12 +181,12 @@ SolverGMRES<Matrix,Vector>::givens_rotation (Vector &h,
 
 
 
-template<class Matrix, class Vector>
+template<class Matrix, class VECTOR>
 template<class Preconditioner>
-typename Solver<Matrix,Vector>::ReturnState
-SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
-				   Vector      & x,
-				   const Vector& b,
+typename Solver<Matrix,VECTOR>::ReturnState
+SolverGMRES<Matrix,VECTOR>::solve (const Matrix& A,
+				   VECTOR      & x,
+				   const VECTOR& b,
 				   const Preconditioner& precondition)
 {
 				   // this code was written by the fathers of
@@ -199,24 +199,23 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 
   deallog.push("GMRES");
 
-				   // determine how many vectors to allocate.
-				   // if the size of the matrix is very small,
-				   // then only allocate a number of vectors
-				   // which is needed
-  const unsigned int n_tmp_vectors = (A.m()+3 > additional_data.max_n_tmp_vectors ?
-				      additional_data.max_n_tmp_vectors :
-				      A.m()+3);
+				   // Originally, here was a strange computation of
+				   // the number of auxiliary vectors, using
+				   // non-standardized members of the matrix.
+				   // Since it is up to the user to decide on the
+				   // number of auxiliary vectors, this was removed. GK
+  const unsigned int n_tmp_vectors = (additional_data.max_n_tmp_vectors);
 
 				   // allocate an array of n_tmp_vectors
 				   // temporary vectors from the VectorMemory
 				   // object; resize them but do not set their
 				   // values since they will be overwritten soon
 				   // anyway.
-  vector<Vector*> tmp_vectors (n_tmp_vectors, 0);
+  vector<VECTOR*> tmp_vectors (n_tmp_vectors, 0);
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     {
       tmp_vectors[tmp] = memory.alloc();
-      tmp_vectors[tmp]->reinit (x.size(), true);
+      tmp_vectors[tmp]->reinit (x, true);
     };
 
 				   // number of the present iteration; this
@@ -247,8 +246,8 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
   const bool left_precondition = true;
 
 				   // define two aliases
-  Vector &v = *tmp_vectors[0];
-  Vector &p = *tmp_vectors[n_tmp_vectors-1];
+  VECTOR &v = *tmp_vectors[0];
+  VECTOR &p = *tmp_vectors[n_tmp_vectors-1];
 
   
 				   ///////////////////////////////////
@@ -301,7 +300,7 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
 	   ++inner_iteration, ++accumulated_iterations)
 	{
 					   // yet another alias
-	  Vector& vv = *tmp_vectors[inner_iteration+1];
+	  VECTOR& vv = *tmp_vectors[inner_iteration+1];
 	  
 	  if (left_precondition)
 	    {
@@ -397,9 +396,9 @@ SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
   
 
 
-template<class Matrix, class Vector>
+template<class Matrix, class VECTOR>
 double
-SolverGMRES<Matrix,Vector>::criterion () 
+SolverGMRES<Matrix,VECTOR>::criterion () 
 {
 				   // dummy implementation. this function is
 				   // not needed for the present implementation
