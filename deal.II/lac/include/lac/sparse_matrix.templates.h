@@ -101,16 +101,17 @@ SparseMatrix<number>::reinit ()
       max_len = 0;
       return;
     };
-        
-  if (max_len<cols->vec_len)
+
+  const unsigned int N = cols->n_nonzero_elements();
+  if (N > max_len)
     {
       if (val) delete[] val;
-      val = new number[cols->vec_len];
-      max_len = cols->vec_len;
+      val = new number[N];
+      max_len = N;
     };
 
   if (val)
-    fill_n (&val[0], cols->vec_len, 0);
+    fill_n (&val[0], N, 0);
 }
 
 
@@ -175,7 +176,7 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  copy (&matrix.val[0], &matrix.val[cols->vec_len],
+  copy (&matrix.val[0], &matrix.val[cols->n_nonzero_elements()],
 	&val[0]);
   
   return *this;
@@ -195,7 +196,7 @@ SparseMatrix<number>::add_scaled (const number factor,
 
   number             *val_ptr    = &val[0];
   const somenumber   *matrix_ptr = &matrix.val[0];
-  const number *const end_ptr    = &val[cols->vec_len];
+  const number *const end_ptr    = &val[cols->n_nonzero_elements()];
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * *matrix_ptr++;

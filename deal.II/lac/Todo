@@ -26,11 +26,6 @@ Make ILU decomposition faster by following the comment in the
 Change in-class defined SolverSelector functions out-of-class to
   conform to general style guide. (Ralf?)
 
-Eliminate #vec_len# from the SparseMatrixStruct class. This should
-  be rather simple since as far as I can see it is only used once
-  (at all other places, it is only written) and also its value
-  should be equal to rowstart[row].
-
 Why not replace Vector::scale by Vector::operator *= ?
 
 Use the commented-out version in PreconditionBlock::invert_diagblocks

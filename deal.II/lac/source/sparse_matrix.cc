@@ -214,7 +214,7 @@ SparseMatrixStruct::reinit (const unsigned int m,
 {
 				   // simply map this function to the
 				   // other #reinit# function
-  vector<unsigned int> row_lengths (m, max_per_row);
+  const vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 };
 
@@ -231,10 +231,6 @@ SparseMatrixStruct::reinit (const unsigned int m,
 	  
   rows = m;
   cols = n;
-  vec_len = accumulate (row_lengths.begin(), row_lengths.end(), 0);
-  max_row_length = (row_lengths.size() == 0 ?
-		    0 :
-		    *max_element(row_lengths.begin(), row_lengths.end()));
 
 				   // delete empty matrices
   if ((m==0) || (n==0))
@@ -243,13 +239,25 @@ SparseMatrixStruct::reinit (const unsigned int m,
       if (colnums)   delete[] colnums;
       rowstart = 0;
       colnums = 0;
-      max_vec_len = vec_len = max_dim = rows = cols = 0;
+      max_vec_len = max_dim = rows = cols = 0;
 				       // if dimension is zero: ignore
 				       // max_per_row
       max_row_length = 0;
       compressed = false;
       return;
     };
+
+				   // find out how many entries we
+				   // need in the #colnums# array. if
+				   // this number is larger than
+				   // #max_vec_len#, then we will need
+				   // to reallocate memory
+  const unsigned int vec_len = accumulate (row_lengths.begin(),
+					   row_lengths.end(), 0);
+  max_row_length = (row_lengths.size() == 0 ?
+		    0 :
+		    *max_element(row_lengths.begin(), row_lengths.end()));
+
 
 				   // allocate memory for the rowstart
 				   // values, if necessary
@@ -271,7 +279,7 @@ SparseMatrixStruct::reinit (const unsigned int m,
 
 				   // set the rowstart array 
   rowstart[0] = 0;
-  for (unsigned int i=1; i<=rows; i++)
+  for (unsigned int i=1; i<=rows; ++i)
     rowstart[i] = rowstart[i-1]+row_lengths[i-1];
   Assert (rowstart[rows]==vec_len, ExcInternalError());
 
@@ -361,7 +369,7 @@ SparseMatrixStruct::compress ()
 	      ExcInternalError());
     };
   
-  vec_len = rowstart[rows] = next_row_start;
+  rowstart[rows] = next_row_start;
   compressed = true;
 };
 
@@ -384,9 +392,7 @@ SparseMatrixStruct::empty () const {
       Assert (rows==0, ExcInternalError());
       Assert (cols==0, ExcInternalError());
       Assert (colnums==0, ExcInternalError());
-      Assert (vec_len==0, ExcInternalError());
       Assert (max_vec_len==0, ExcInternalError());
-      Assert (vec_len==0, ExcInternalError());
 
       return true;
     };

@@ -498,14 +498,6 @@ class SparseMatrixStruct : public Subscriptor
     unsigned int cols;
 
 				     /**
-				      * Size of the used part of the
-				      * #colnums# array. Might be lower than
-				      * #max_vec_len# if the size was reduced
-				      * somewhen in the past.
-				      */
-    unsigned int vec_len;
-
-				     /**
 				      * Size of the actually allocated array
 				      * #colnums#. Here, the same applies as
 				      * for the #rowstart# array, i.e. it
