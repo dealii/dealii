@@ -48,9 +48,9 @@ namespace PETScWrappers
       
                                        /**
                                         * Create a sparse matrix of dimensions
-                                        * <tt>m</tt> times <tt>n</tt>, with an
+                                        * @arg m times @arg n, with an
                                         * initial guess of
-                                        * <tt>n_nonzero_per_row</tt> nonzero
+                                        * @arg n_nonzero_per_row nonzero
                                         * elements per row. PETSc is able to
                                         * cope with the situation that more
                                         * than this number of elements is
@@ -76,11 +76,11 @@ namespace PETScWrappers
 
                                        /**
                                         * Initialize a rectangular matrix with
-                                        * <tt>m</tt> rows and <tt>n</tt>
+                                        * @arg m rows and @arg n
                                         * columns.  The maximal number of
                                         * nonzero entries for each row
                                         * separately is given by the
-                                        * <tt>row_lengths</tt> array.
+                                        * @arg row_lengths array.
                                         *
                                         * Just as for the other constructors:
                                         * PETSc is able to cope with the
