@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II news page</title>
+    <meta name="author" content="Guido Kanschat">
+    <meta name="keywords" content="deal.II"></head>
+
+<body>
+
+
+<h2>Changes between versions 3.1.1 and 3.1.2</h2>
+
+<ol>
+  <li> <p>
+       The only is change is that the configuration detects the
+       presence of gcc3.0 and works around a bug in it by compiling
+       the file <code>tria_accessor.cc(3d)</code> without optimization
+       flags even for optimized libraries. The gcc bug is documented
+       at the <a
+       href="http://gcc.gnu.org/cgi-bin/gnatsweb.pl?database=gcc&user=guest&password=guest&cmd=login"
+       target="_top">gcc bug tracking system page</a>, as bugs reports c++/615 and
+       optimization/2938.
+       <br>
+       (WB 2001/06/27)
+       </p>
+</ol>
+
+
+<hr>
+
+</body>
+</html>
+
