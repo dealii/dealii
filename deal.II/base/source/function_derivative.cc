@@ -58,7 +58,7 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
   switch (formula)
     {
     case Euler:
-      return (f.value(p+incr, component)-f.value(p-incr, component))/2*h;
+      return (f.value(p+incr, component)-f.value(p-incr, component))/(2*h);
     case UpwindEuler:
       return (f.value(p, component)-f.value(p-incr, component))/h;
     default:
@@ -91,8 +91,11 @@ FunctionDerivative<dim>::value_list (const vector<Point<dim> > &points,
 	}
       f.value_list(p1, values, component);
       f.value_list(p2, e2, component);
+      
       for (unsigned int i=0;i<n;++i)
-	values[i] = (values[i]-e2[i])/2*h;
+	{
+	  values[i] = (values[i]-e2[i])/(2*h);
+	}
       break;
     }    
     case UpwindEuler:
