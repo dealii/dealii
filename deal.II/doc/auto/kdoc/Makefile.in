@@ -55,56 +55,60 @@ kdoc-installed:
 
 # now for the generation of the documentation of the sublibraries.
 # first let kdoc generate the whole thing, then loop over all output
-# files and fix the #include<...> directives to only contain the 
+# files and cut some paths in the output to a reasonable
+# length. before everything else, make sure that kdoc is installed
+
+base.kdoc:      kdoc-installed base-html-files      base-fix-files
+lac.kdoc:       kdoc-installed lac-html-files       lac-fix-files
+grid.kdoc:      kdoc-installed grid-html-files      grid-fix-files
+dof.kdoc:       kdoc-installed dof-html-files       dof-fix-files
+numerics.kdoc:  kdoc-installed numerics-html-files  numerics-fix-files
+multigrid.kdoc: kdoc-installed multigrid-html-files multigrid-fix-files
+
+
+# description of how to make the output of kdoc: first list which
+# files each output dir depends upon, then state the general rule of
+# how to make the output. let everything depend on kdoc being already
+# installed (we need to re-state this dependency here as we could
+# otherwise get problems when using parallel builds)
+base-html-files:      kdoc-installed $(kdoc.base)
+lac-html-files:       kdoc-installed $(kdoc.lac)
+grid-html-files:      kdoc-installed $(kdoc.grid)
+dof-html-files:       kdoc-installed $(kdoc.dof)
+numerics-html-files:  kdoc-installed $(kdoc.numerics)
+multigrid-html-files: kdoc-installed $(kdoc.multigrid)
+%-html-files:
+	@$(PERL) $(KDOCFLAGS) $(subst -html-files,,$@) \
+                              --outputdir $(subst -html-files,,$@) \
+	                      $(^:kdoc-installed=)
+
+
+# now how to fix the files:
+# fix the #include<...> directives to only contain the 
 # paths that are needed inside the programs instead of the global
 # paths
-
-base.kdoc: kdoc-installed $(kdoc.base)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
-	$(^:kdoc-installed=)
-	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
+#
+# also fix include paths in the files header-list.htmlbase-fix-files: base-html-files
+%-fix-files:
+	for htmlfile in $(subst -fix-files,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
 	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
 	done
-	  	
-
-lac.kdoc: kdoc-installed $(kdoc.lac)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
-	--xref base $(^:kdoc-installed=)
-	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
-	    echo "Fixing include paths in $$htmlfile..." ; \
-	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
-	done
-
-grid.kdoc: kdoc-installed $(kdoc.grid)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
-	--xref base --xref lac $(^:kdoc-installed=)
-	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
-	    echo "Fixing include paths in $$htmlfile..." ; \
-	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
-	done
-
-dof.kdoc: kdoc-installed $(kdoc.dof)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
-	--xref base --xref lac --xref grid $(^:kdoc-installed=)
-	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
-	    echo "Fixing include paths in $$htmlfile..." ; \
-	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
-	done
-
-numerics.kdoc: kdoc-installed $(kdoc.numerics)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
-	--xref base --xref lac --xref grid --xref dof $(^:kdoc-installed=)
-	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
-	    echo "Fixing include paths in $$htmlfile..." ; \
-	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
-	done
-
-multigrid.kdoc: kdoc-installed $(kdoc.multigrid)
-	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) --outputdir $(subst .kdoc,,$@) \
-	--xref base --xref lac --xref grid --xref dof --xref numerics $(^:kdoc-installed=)
-	for htmlfile in $(subst .kdoc,,$@)/*html ; do \
-	    echo "Fixing include paths in $$htmlfile..." ; \
-	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' "$$htmlfile" ;\
+	for htmlfile in $(subst -fix-files,,$@)/header-list.html $(subst -fix-files,,$@)/all-globals.html ; do \
+	    echo "Fixing include paths in special file $$htmlfile..." ; \
+	    case "$$htmlfile" in \
+	      *header-list*) \
+			perl -pi -e 's,<TH>$D/?[^/]+/include/(.*?) - $D/?[^/]+/include/(.*?)</TH>,<TH>$$1 - $$2</TH>,g; \
+			             s,(<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' \
+				"$$htmlfile" ;\
+			;; \
+	      *all-globals*) \
+			perl -pi -e 's,(<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' \
+				"$$htmlfile" ;\
+			;; \
+	      *) \
+			echo "*******Unknown file $$htmlfile? Something must have gone wrong!*********" ; \
+			;; \
+	    esac ; \
 	done
 
