@@ -713,6 +713,32 @@ class VectorTools
 				      const Function<dim>   *weight=0);
 
 				     /**
+				      * Mean-value filter for Stokes.
+				      * The pressure in Stokes'
+				      * equations with only Dirichlet
+				      * boundaries for the velocities
+				      * is determined up to a constant
+				      * only. This function allows to
+				      * subtract the mean value of the
+				      * pressure. It is usually called
+				      * in a preconditioner and
+				      * generates updates with mean
+				      * value zero. The mean value is
+				      * understood in the l1-sense.
+				      *
+				      * Apart from the vector @p{v} to
+				      * operate on, this function
+				      * takes a bit vector. This has a
+				      * true entry for every component
+				      * for which the mean value shall
+				      * be computed and later
+				      * subtracted.
+				      */
+//TODO:[GK] Implementation of subtract_mean_value is missing.    
+    static void subtract_mean_value(Vector<double>          &v,
+				    const std::vector<bool> &p_select);
+    
+				     /**
 				      * Compute the mean value of one
 				      * component of the solution.
 				      *
