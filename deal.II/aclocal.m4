@@ -170,7 +170,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -ansi -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
+    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
     CXXFLAGSPIC="-fPIC"  
     LDFLAGSPIC="-fPIC"
 
@@ -752,9 +752,9 @@ AC_DEFUN(DEAL_II_CHECK_USE_ACE, dnl
 
 dnl -------------------------------------------------------------
 dnl If the MT code shall be used through ACE, we might have to 
-dnl adjust the compiler flags: Possibly remove -ansi -pedantic from
-dnl compiler flags again, since ACE yields hundreds of error messages
-dnl with these flags.
+dnl adjust the compiler flags: Possibly remove -pedantic from
+dnl compiler flags again, since ACE yields a lot of error messages
+dnl with this flag.
 dnl
 dnl Usage:
 dnl   DEAL_II_SET_ACE_FLAGS
@@ -765,10 +765,6 @@ AC_DEFUN(DEAL_II_SET_ACE_FLAGS, dnl
   if test "$enablemultithreading" = yes ; then
     if test "$GXX" = yes ; then
       DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
-      if test "x$deal_II_ace_remove_ansi" = "xyes" ; then
-        CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
-        CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-ansi//g;'`"
-      fi
       if test "x$deal_II_ace_remove_pedantic" = "xyes" ; then
         CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-pedantic//g;'`"
         CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-pedantic//g;'`"
@@ -1584,48 +1580,13 @@ AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
 
 
 
-dnl -------------------------------------------------------------
-dnl For gcc 2.95, when using the random_shuffle function with -ansi
-dnl compiler flag, there is an error saying that lrand48 is
-dnl undeclared. Fix that by declaring that function ourselves if
-dnl necessary.
-dnl
-dnl Usage: DEAL_II_HAVE_LRAND48_DECLARED
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_HAVE_LRAND48_DECLARED, dnl
-[
-  AC_MSG_CHECKING(whether lrand48 needs to be declared with -ansi)
-  AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG"
-  AC_TRY_COMPILE(
-    [
-#include <vector>
-#include <algorithm>
-
-void f()
-{
-  std::vector<unsigned int> new_indices;
-  std::random_shuffle (new_indices.begin(), new_indices.end());
-};
-    ],
-    [],
-    [
-      AC_MSG_RESULT(no)
-    ],
-    [
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(DEAL_II_DECLARE_LRAND48, 1, 
-                [Define if you have the rand_r function])
-    ])
-])
 
 
 
 dnl -------------------------------------------------------------
 dnl When compiling with ACE thread support, there are many constructs
 dnl that are not allowed in C++, or that yield warnings when compiling with
-dnl -ansi -pedantic. Check this, and if that is the case, set the variables
+dnl -pedantic. Check this, and if that is the case, set the variables
 dnl $deal_II_ace_remove_ansi and $deal_II_ace_remove_pedantic to "yes".
 dnl
 dnl Usage: DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
@@ -1635,19 +1596,6 @@ AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
 [
   AC_MSG_CHECKING(whether compilation with ACE disallows flags)
   AC_LANG(C++)
-  CXXFLAGS="-ansi -I$withmultithreading"
-  AC_TRY_COMPILE(
-    [
-#  include <ace/Thread_Manager.h>
-#  include <ace/Synch.h>
-    ],
-    [],
-    [
-      deal_II_ace_remove_ansi="no"
-    ],
-    [
-      deal_II_ace_remove_ansi="yes"
-    ])
   CXXFLAGS="-pedantic -Werror -I$withmultithreading"
   AC_TRY_COMPILE(
     [
@@ -1662,18 +1610,10 @@ AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
       deal_II_ace_remove_pedantic="yes"
     ])
 
-  if test $deal_II_ace_remove_ansi = "no" ; then
-    if test $deal_II_ace_remove_pedantic = "no" ; then 
-      AC_MSG_RESULT(no)
-    else
-      AC_MSG_RESULT(-pedantic)
-    fi
+  if test $deal_II_ace_remove_pedantic = "no" ; then 
+    AC_MSG_RESULT(no)
   else
-    if test $deal_II_ace_remove_pedantic = "no" ; then 
-      AC_MSG_RESULT(-ansi)
-    else
-      AC_MSG_RESULT(-ansi -pedantic)
-    fi
+    AC_MSG_RESULT(-pedantic)
   fi
 ])
 
