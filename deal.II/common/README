@@ -1,6 +1,6 @@
 
-First information about deal.II
-===============================
+Information about deal.II
+=========================
 
 Note: this is not yet finished, some information may still be missing
 though we hope that it is complete and correct.
@@ -12,8 +12,8 @@ In order to use the deal.II library (and its sublibraries /base and
   - A fairly complete C++ compiler. We use egcs1.1.2 but other
     compilers might work as well. egcs1.0 will not work, however.
   - Perl: any Perl 5.x version should work.
-  - Make: we use GNU make, version 3.75. We believe that our make
-    files should be portable to other Makes as well.
+  - Make: we use GNU make, version 3.75. Other make programs are not standardized
+    and will quite surely fail to work.
   - In case you want to generate the documentation from the header
     files, you only need Perl installed.
   - In case you want the printable documentation, however, you need
@@ -35,7 +35,7 @@ add it to the list of supported ones (take a look at
 
 2) Installation:
 ----------------
-The whole library usually comes as a .tar.gz file, that is a tar-ified
+The whole library usually comes as a .tar.gz file, that is a tarred
 file archive which is compressed with gzip. After unpacking it with
 gunzip and tar (or tar -xzf if you use GNU tar), you will find several
 subdirectories. Go to the /common subdirectory and type 'make', to
@@ -66,7 +66,7 @@ processors.
 
 3) Problems, questions, further information:
 --------------------------------------------
-Feel free to ask if you encounter any problems with deal.II. If a
+Feel free to ask if you have any problems with deal.II. If a
 question is of general interest, you may want to use our mailing list,
 which can be reached at
   deal@gaia.iwr.uni-heidelberg.de
@@ -93,14 +93,19 @@ principles:
   This is to keep an overview over the number of users and their
   background.
 - The libraries may not be stripped of our copyright and shall not be
-  used in commercial projects without our consent.
+  used in commercial projects without our written prior consent.
 - Scientific publications presenting results obtained with these
   libraries shall state the names of the library and their authors
-  (at present Wolfgang Bangerth and Guido Kanschat).
+  (at present Wolfgang Bangerth and Guido Kanschat). There will be future
+  articles about the library. You will be notified of their appearance.
+  Afterwards, you are kindly required to cite these articles in your
+  publications.
 
 Note: Since our institute is evaluated at regular intervals, we are
 interested in documenting the use of the programs and libraries we
 create. This is the reason for not allowing to freely re-distribute
 them. We would also be interested in collecting publications with
 results obtained with the aid of these libraries and would therefore
-like to ask you to drop us a note about every such publication.
+like to ask you to drop us a note about every such publication. Your
+publication will then be listed on the DEAL homepage. You see, it works
+both ways.
