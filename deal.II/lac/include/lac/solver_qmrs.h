@@ -198,7 +198,7 @@ SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
 			       const AdditionalData &data) :
 		Solver<VECTOR>(cn,mem),
 		additional_data(data)
-{};
+{}
 
 
 template<class VECTOR>
@@ -275,7 +275,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
     throw SolverControl::NoConvergence (this->control().last_step(),
 					this->control().last_value());
 				   // otherwise exit as normal
-};
+}
 
 
 

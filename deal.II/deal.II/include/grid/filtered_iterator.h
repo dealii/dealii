@@ -176,7 +176,7 @@ namespace IteratorFilters
 					*/
       const unsigned int subdomain_id;
   };
-};
+}
 
 
 /**
@@ -688,7 +688,7 @@ FilteredIterator<BaseIterator>::
 FilteredIterator (Predicate p)
 		:
 		predicate (new PredicateTemplate<Predicate>(p))
-{};
+{}
 
 
 
@@ -704,7 +704,7 @@ FilteredIterator (Predicate          p,
 {
   Assert ((state() != IteratorState::valid) || (*predicate) (*this),
 	  ExcInvalidElement(bi));
-};
+}
 
 
 
@@ -715,7 +715,7 @@ FilteredIterator (const FilteredIterator &fi)
 		:
 		BaseIterator (static_cast<BaseIterator>(fi)),
 		predicate (fi.predicate->clone ())
-{};
+{}
 
 
 
@@ -726,7 +726,7 @@ FilteredIterator<BaseIterator>::
 {
   delete predicate;
   predicate = 0;
-};
+}
 
 
 
@@ -740,7 +740,7 @@ operator = (const FilteredIterator &fi)
 	  ExcInvalidElement(fi));
   BaseIterator::operator = (fi);
   return *this;
-};
+}
 
 
 
@@ -754,7 +754,7 @@ operator = (const BaseIterator &bi)
 	  ExcInvalidElement(bi));  
   BaseIterator::operator = (bi);
   return *this;
-};
+}
 
 
 
@@ -770,7 +770,7 @@ set_to_next_positive (const BaseIterator &bi)
     BaseIterator::operator++ ();
   
   return *this;
-};
+}
 
 
 
@@ -786,7 +786,7 @@ set_to_previous_positive (const BaseIterator &bi)
     BaseIterator::operator-- ();
   
   return *this;
-};
+}
 
 
 
@@ -799,7 +799,7 @@ operator == (const FilteredIterator &fi) const
   return (static_cast<const BaseIterator &>(*this)
 	  ==
 	  static_cast<const BaseIterator &>(fi));
-};
+}
 
 
 
@@ -812,7 +812,7 @@ operator != (const FilteredIterator &fi) const
   return (static_cast<const BaseIterator &>(*this)
 	  !=
 	  static_cast<const BaseIterator &>(fi));
-};
+}
 
 
 
@@ -825,7 +825,7 @@ operator < (const FilteredIterator &fi) const
   return (static_cast<const BaseIterator &>(*this)
 	  <
 	  static_cast<const BaseIterator &>(fi));
-};
+}
 
 
 
@@ -837,7 +837,7 @@ FilteredIterator<BaseIterator>::
 operator == (const BaseIterator &bi) const
 {
   return (static_cast<const BaseIterator &>(*this) == bi);
-};
+}
 
 
 
@@ -848,7 +848,7 @@ FilteredIterator<BaseIterator>::
 operator != (const BaseIterator &bi) const
 {
   return (static_cast<const BaseIterator &>(*this) != bi);
-};
+}
 
 
 
@@ -859,7 +859,7 @@ FilteredIterator<BaseIterator>::
 operator < (const BaseIterator &bi) const
 {
   return (static_cast<const BaseIterator &>(*this) < bi);
-};
+}
 
 
 template <typename BaseIterator>
@@ -874,7 +874,7 @@ operator ++ ()
     while ((state() == IteratorState::valid) &&
 	   !(*predicate) (*this));
   return *this;
-};
+}
 
 
 
@@ -892,7 +892,7 @@ operator ++ (int)
     while ((state() == IteratorState::valid) &&
 	   !(*predicate) (*this));
   return old_state;
-};
+}
 
 
 
@@ -909,7 +909,7 @@ operator -- ()
     while ((state() == IteratorState::valid) &&
 	   !(*predicate) (*this));
   return *this;
-};
+}
 
 
 
@@ -927,7 +927,7 @@ operator -- (int)
     while ((state() == IteratorState::valid) &&
 	   !(*predicate) (*this));
   return old_state;
-};
+}
 
 
 
@@ -938,7 +938,7 @@ FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
 PredicateTemplate (const Predicate &predicate)
 		:
 		predicate (predicate)
-{};
+{}
 
 
 
@@ -949,7 +949,7 @@ FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
 operator () (const BaseIterator &bi) const
 {
   return predicate(bi);
-};
+}
 
 
 
@@ -960,7 +960,7 @@ FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
 clone () const
 {
   return new PredicateTemplate (predicate);
-};
+}
 
 
 
@@ -975,7 +975,7 @@ namespace IteratorFilters
   Active::operator () (const Iterator &i) const
   {
     return (i->active());
-  };
+  }
 
 
 // ---------------- IteratorFilters::UserFlagSet ---------
@@ -986,7 +986,7 @@ namespace IteratorFilters
   UserFlagSet::operator () (const Iterator &i) const
   {
     return (i->user_flag_set());
-  };
+  }
 
 
 // ---------------- IteratorFilters::UserFlagNotSet ---------
@@ -997,7 +997,7 @@ namespace IteratorFilters
   UserFlagNotSet::operator () (const Iterator &i) const
   {
     return (! i->user_flag_set());
-  };
+  }
 
 
 // ---------------- IteratorFilters::LevelEqualTo ---------  
@@ -1005,7 +1005,7 @@ namespace IteratorFilters
   LevelEqualTo::LevelEqualTo (const unsigned int level)
 		  :
 		  level (level)
-  {};
+  {}
 
 
 
@@ -1015,7 +1015,7 @@ namespace IteratorFilters
   LevelEqualTo::operator () (const Iterator &i) const
   {
     return (static_cast<unsigned int>(i->level()) == level);
-  };
+  }
 
 
 
@@ -1024,7 +1024,7 @@ namespace IteratorFilters
   SubdomainEqualTo::SubdomainEqualTo (const unsigned int subdomain_id)
 		  :
 		  subdomain_id (subdomain_id)
-  {};
+  {}
 
 
 
@@ -1034,8 +1034,8 @@ namespace IteratorFilters
   SubdomainEqualTo::operator () (const Iterator &i) const
   {
     return (static_cast<unsigned int>(i->subdomain_id()) == subdomain_id);
-  };
-};
+  }
+}
 
 
 /*------------------------- filtered_iterator.h ------------------------*/
