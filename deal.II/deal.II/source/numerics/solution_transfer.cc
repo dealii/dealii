@@ -282,24 +282,16 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	     std::vector<Vector<number> >       &all_out) const
 {
   Assert(prepared_for==coarsening_and_refinement, ExcNotPrepared());
-  for (unsigned int i=0; i<all_in.size(); ++i)
+  const unsigned int size=all_in.size();
+  Assert(all_out.size()==size, ExcDimensionMismatch(all_out.size(), size));
+  for (unsigned int i=0; i<size; ++i)
     Assert (all_in[i].size() == n_dofs_old,
 	    ExcWrongVectorSize(all_in[i].size(), n_dofs_old));
-
-  
-  const unsigned int in_size = all_in.size();
-
-				   // resize the output vector if
-				   // necessary
-  if (all_out.size() != in_size)
-    all_out.resize (in_size, Vector<number>(dof_handler->n_dofs()));
-  else
-    for (unsigned int i=0; i<in_size; ++i)
-      if (all_out[i].size() != dof_handler->n_dofs())
-	all_out[i].reinit (dof_handler->n_dofs());
-
-  for (unsigned int i=0; i<in_size; ++i)
-    for (unsigned int j=0; j<in_size; ++j)
+  for (unsigned int i=0; i<all_out.size(); ++i)
+    Assert (all_out[i].size() == dof_handler->n_dofs(),
+	    ExcWrongVectorSize(all_out[i].size(), dof_handler->n_dofs()));
+  for (unsigned int i=0; i<size; ++i)
+    for (unsigned int j=0; j<size; ++j)
       Assert(&all_in[i] != &all_out[j],
              ExcMessage ("Vectors cannot be used as input and output"
                          " at the same time!"));
@@ -335,7 +327,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 					       // data vectors on this
 					       // cell and prolong it
 					       // to its children
-	      for (unsigned int j=0; j<in_size; ++j)
+	      for (unsigned int j=0; j<size; ++j)
 		{
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    local_values(i)=all_in[j](indexptr->operator[](i));
@@ -358,7 +350,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 					       // distribute the
 					       // stored data to the
 					       // new vectors
-	      for (unsigned int j=0; j<in_size; ++j)
+	      for (unsigned int j=0; j<size; ++j)
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  all_out[j](dofs[i])=valuesptr->operator[](j)(i);
 	    }
@@ -375,6 +367,11 @@ template<int dim, typename number>
 void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 						Vector<number>       &out) const
 {
+  Assert (in.size()==n_dofs_old,
+	  ExcWrongVectorSize(in.size(), n_dofs_old));
+  Assert (out.size()==dof_handler->n_dofs(),
+	  ExcWrongVectorSize(out.size(), dof_handler->n_dofs()));
+
   std::vector<Vector<number> > all_in(1);
   all_in[0] = in;
   std::vector<Vector<number> > all_out(1);
