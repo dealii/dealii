@@ -7894,14 +7894,14 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
     {
       deallog << "[o]";
 
+      DataOut<dim> out;
       DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (parameters.output_format);
       
       string data_filename	= (parameters.output_directory +
 				   "sweep" + int_to_string(sweep_no,2) +
 				   "/" + int_to_string(timestep_no,4) +
-				   DataOut<dim>::default_suffix (output_format));
-      DataOut<dim> out;
+				   out.default_suffix (output_format));
       out.attach_dof_handler (*get_timestep_primal().dof_handler);
       out.add_data_vector (get_timestep_primal().u, "u");
       out.add_data_vector (get_timestep_primal().v, "v");
