@@ -572,7 +572,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
 					  std::vector<bool> (fe.n_components(), true) :
 					  component_mask_);
-  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
+  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
   
 				   // check whether boundary values at
@@ -623,6 +623,22 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 };
 
 
+
+template <>
+void
+VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
+					  const DoFHandler<1>           &dof,
+					  const FunctionMap<1>::type    &function_map,
+					  std::map<unsigned int,double> &boundary_values,
+					  const std::vector<bool>       &component_mask)
+{
+  for (FunctionMap<1>::type::const_iterator i=function_map.begin();
+       i!=function_map.end(); ++i)
+    interpolate_boundary_values (mapping, dof, i->first, *i->second,
+				 boundary_values, component_mask);
+};
+
+
 #endif
 
 
@@ -630,19 +646,24 @@ template <int dim>
 void
 VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping,
 					  const DoFHandler<dim>         &dof,
-					  const unsigned char            boundary_component,
-					  const Function<dim>           &boundary_function,
+					  const typename FunctionMap<dim>::type &function_map,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask_)
 {
-  Assert (boundary_component != 255,
+				   // if for whatever we were passed
+				   // an empty map, return immediately
+  if (function_map.size() == 0)
+    return;
+  
+  Assert (function_map.find(255) == function_map.end(),
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<dim> &fe           = dof.get_fe();
   const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
   
-  Assert (n_components == boundary_function.n_components,
+  Assert ((function_map.size() == 0) ||
+	  (n_components == function_map.begin()->second->n_components),
 	  ExcInvalidFE());
 
 				   // set the component mask to either
@@ -651,7 +672,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
 					  std::vector<bool> (fe.n_components(), true) :
 					  component_mask_);
-  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
+  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
 
 				   // field to store the indices
@@ -686,14 +707,15 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
   Quadrature<dim-1> aux_quad (unit_support_points, dummy_weights);
   FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
 
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
   for (; cell!=endc; ++cell)
     for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
 	 ++face_no)
       {
-	DoFHandler<dim>::face_iterator face = cell->face(face_no);
-	if (boundary_component == face->boundary_indicator()) 
+	typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+	const unsigned char boundary_component = face->boundary_indicator();
+	if (function_map.find(boundary_component) != function_map.end()) 
 					   // face is of the right component
 	  {
 					     // get indices, physical location and
@@ -705,10 +727,10 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 	    
 	    if (fe_is_system)
 	      {
-		boundary_function.vector_value_list (dof_locations, dof_values_system);
+		function_map.find(boundary_component)->second->vector_value_list (dof_locations,
+										  dof_values_system);
 		
 						 // enter into list
-		
 		for (unsigned int i=0; i<face_dofs.size(); ++i)
 		  if (component_mask[fe.face_system_to_component_index(i).first])
 		    boundary_values[face_dofs[i]]
@@ -720,9 +742,9 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 	      {
 						 // get only the one component that
 						 // this function has
-		boundary_function.value_list (dof_locations,
-					      dof_values_scalar,
-					      0);
+		function_map.find(boundary_component)->second->value_list (dof_locations,
+									   dof_values_scalar,
+									   0);
 		
 						 // enter into list
 		
@@ -732,6 +754,24 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 	  }
       }
 }
+
+
+
+template <int dim>
+void
+VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping,
+					  const DoFHandler<dim>         &dof,
+					  const unsigned char            boundary_component,
+					  const Function<dim>           &boundary_function,
+					  std::map<unsigned int,double> &boundary_values,
+					  const std::vector<bool>       &component_mask)
+{
+  typename FunctionMap<dim>::type function_map;
+  function_map[boundary_component] = &boundary_function;
+  interpolate_boundary_values (mapping, dof, function_map, boundary_values,
+			       component_mask);
+};
+
 
   
 template <int dim>
@@ -746,6 +786,21 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
   static const MappingQ1<dim> mapping;
   interpolate_boundary_values(mapping, dof, boundary_component,
 			      boundary_function, boundary_values, component_mask);
+}
+
+
+
+template <int dim>
+void
+VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
+					  const typename FunctionMap<dim>::type &function_map,
+					  std::map<unsigned int,double> &boundary_values,
+					  const std::vector<bool>       &component_mask)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  static const MappingQ1<dim> mapping;
+  interpolate_boundary_values(mapping, dof, function_map,
+			      boundary_values, component_mask);
 }
 
 

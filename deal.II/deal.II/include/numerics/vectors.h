@@ -439,24 +439,29 @@ class VectorTools
 					const Function<dim>   &rhs,
 					Vector<double>        &rhs_vector);
 
-//TODO:[WB] Update interpolate_boundary_values for use of FunctionMap.
-//  keep both, the functions using and the functions not using a FunctionMap.
 				     /**
-				      * Prepare Dirichlet boundary conditions.
-				      * Make up the list of nodes subject
-				      * to Dirichlet boundary conditions
-				      * and the values to be
-				      * assigned to them, by interpolation around
-				      * the boundary. If the
-				      * @p{boundary_values} contained values
-				      * before, the new ones are added, or
-				      * the old one overwritten if a node
-				      * of the boundary part to be projected
-				      * on already was in the variable.
+				      * Prepare Dirichlet boundary
+				      * conditions.  Make up the list
+				      * of degrees of freedom subject
+				      * to Dirichlet boundary
+				      * conditions and the values to
+				      * be assigned to them, by
+				      * interpolation around the
+				      * boundary. If the
+				      * @p{boundary_values} contained
+				      * values before, the new ones
+				      * are added, or the old one
+				      * overwritten if a node of the
+				      * boundary part to be projected
+				      * on already was in the
+				      * variable.
 				      *
-				      * The parameter @p{boundary_component} corresponds
-				      * to the number @p{boundary_indicator} of the face.
-				      * 255 is an illegal value, since it is reserved
+				      * The parameter
+				      * @p{boundary_component}
+				      * corresponds to the number
+				      * @p{boundary_indicator} of the
+				      * face.  255 is an illegal
+				      * value, since it is reserved
 				      * for interior faces.
 				      *
 				      * The flags in the last
@@ -467,13 +472,13 @@ class VectorTools
 				      * specified by the default value
 				      * (i.e. an empty array), all
 				      * components are
-				      * interpolated. If is different
-				      * from the default value, it is
-				      * assumed that the number of
-				      * entries equals the number of
-				      * components in the boundary
-				      * functions and the finite
-				      * element.
+				      * interpolated. If it is
+				      * different from the default
+				      * value, it is assumed that the
+				      * number of entries equals the
+				      * number of components in the
+				      * boundary functions and the
+				      * finite element.
 				      *
 				      * It is assumed that the number
 				      * of components of the function
@@ -487,13 +492,33 @@ class VectorTools
     template <int dim>
     static void interpolate_boundary_values (const Mapping<dim>            &mapping,
 					     const DoFHandler<dim>         &dof,
-					     const unsigned char            boundary_component,
-					     const Function<dim>           &boundary_function,
+					     const typename FunctionMap<dim>::type &function_map,
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
-				      * Calls the @p{interpolate_boundary_values}
+				      * Same function as above, but
+				      * taking only one pair of
+				      * boundary indicator and
+				      * corresponding boundary
+				      * function. Calls the other
+				      * function with remapped
+				      * arguments.
+				      *
+				      * This function is there mainly
+				      * for backward compatibility.
+				      */
+    template <int dim>
+    static void interpolate_boundary_values (const Mapping<dim>            &mapping,
+					     const DoFHandler<dim>         &dof,
+					     const unsigned char            boundary_component,
+					     const Function<dim>           &boundary_function,
+					     std::map<unsigned int,double> &boundary_values,
+					     const std::vector<bool>       &component_mask = std::vector<bool>());
+    
+				     /**
+				      * Calls the other
+				      * @p{interpolate_boundary_values}
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
@@ -504,6 +529,19 @@ class VectorTools
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
+				     /**
+				      * Calls the other
+				      * @p{interpolate_boundary_values}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<dim>()}.
+				      */
+    template <int dim>
+    static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
+					     const typename FunctionMap<dim>::type &function_map,
+					     std::map<unsigned int,double> &boundary_values,
+					     const std::vector<bool>       &component_mask = std::vector<bool>());
+
+    
 //TODO:[WB] Update project_boundary_values for more components
 				     /**
 				      * Project @p{function} to the boundary
