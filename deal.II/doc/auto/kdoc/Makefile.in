@@ -1,0 +1,68 @@
+############################################################
+# $Id$
+############################################################
+
+D           = @DEAL2_DIR@
+multigrid   = @enablemultigrid@
+kdocdir     = $D/@kdocdir@
+kdocversion = @kdocversion@
+
+
+include $D/common/Make.global_options
+
+KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
+
+kdoc.base     = $(shell echo $D/base/include/base/*.h)
+kdoc.lac      = $(shell echo $D/lac/include/lac/*.h)
+kdoc.grid     = $(shell echo $D/deal.II/include/grid/*.h)
+kdoc.dof      = $(shell echo $D/deal.II/include/dofs/*.h) \
+                $(shell echo $D/deal.II/include/fe/*.h)
+kdoc.numerics = $(shell echo $D/deal.II/include/numerics/*.h)
+kdoc.multigrid= $(shell echo $D/deal.II/include/multigrid/*.h)
+
+
+# for latex-output, we join the different libraries of the
+# deal.II library into just one file
+kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
+
+# specify the names of the resulting doc libraries
+ifeq ($(multigrid),yes)
+kdoc.library-files = base.kdoc         \
+                     lac.kdoc          \
+                     grid.kdoc         \
+                     dof.kdoc          \
+                     numerics.kdoc     \
+                     multigrid.kdoc
+else
+kdoc.library-files = base.kdoc         \
+                     lac.kdoc          \
+                     grid.kdoc         \
+                     dof.kdoc          \
+                     numerics.kdoc
+endif
+
+kdoc: $(kdoc.library-files)
+
+base.kdoc: $(kdoc.base)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	$^
+
+lac.kdoc: $(kdoc.lac)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	-l base $^
+
+grid.kdoc: $(kdoc.grid)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	-l base $^
+
+dof.kdoc: $(kdoc.dof)
+	$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	-l base -llac -lgrid $^
+
+numerics.kdoc: $(kdoc.numerics)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	-l base -llac -lgrid -ldof $^
+
+multigrid.kdoc: $(kdoc.multigrid)
+	@$(PERL) $(KDOCFLAGS) $(subst .kdoc,,$@) -d $(subst .kdoc,,$@) -L . \
+	-l base -llac -lgrid -ldof -lnumerics $^

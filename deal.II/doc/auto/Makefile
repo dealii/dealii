@@ -1,10 +1,5 @@
 # Makefile,v 1.8 1999/04/15 17:36:14 wolf Exp
 
-
-##########################################################################
-# Change this section only, if you want to add a documentation library   #
-##########################################################################
-#
 # specify which are the include files that a specific documentation libary
 # depends upon
 kdoc.base     = $(shell echo ../../base/include/base/*.h)
@@ -22,30 +17,9 @@ endif
 # deal.II library into just one file
 kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
 
-# specify the names of the resulting doc libraries
-kdoc.library-files = kdoc/base.kdoc         \
-                     kdoc/lac.kdoc          \
-                     kdoc/basic.kdoc        \
-                     kdoc/grid.kdoc         \
-                     kdoc/dof.kdoc          \
-                     kdoc/numerics.kdoc     \
-                     kdoc/multigrid.kdoc
-
-##########################################################################
-# End of changeable section                                              #
-##########################################################################
-
-
 # include global paths and variables
 include ../../common/Make.global_options
 
-# make rule names to rerun the generation of a library
-kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
-
-
-KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
-#KDOCFLAGS   = /home/people/wolf/var/kdoc/kdoc2/bin/kdoc -a -p \
-#              --html-logo=../../../pictures/deal.II_3.0_2.150.jpg
 ifeq ($(shell uname),SunOS)
 DOCPP = /home/people/wolf/Config/doc++/bin/doc++
 #DOCPP = /home/people/kanschat/bin/doc++
@@ -75,37 +49,12 @@ cvslog:
 ##  targets for kdoc generated HTML output    
 #################################################################################
 
-# make the .kdoc files twice: once without and a second time with
-# crossreferencing the other libraries
-kdoc: $(kdoc.library-files) $(kdoc.library-files.rerun)
+# Make in kdoc subdirectory
 
+kdoc:
+	@cd kdoc ; $(MAKE)
 
-# rule how to generate the documentation the first time, i.e. without
-# crossreferencing the other doc-libraries. we do not try to make it
-# dependent on anything, since it needs to be generated anyway
-#
-# since the rule is a rather complex one, involving the computation of
-# variable names, here is the stripped down version for the base library:
-# kdoc/base.kdoc:
-#	@cd kdoc ; $(PERL) $(KDOCFLAGS) -dbase \
-#		base $(kdoc.base:../..%=../../..%)
-$(kdoc.library-files):
-	@cd kdoc ;                                                 \
-	 $(PERL)   $(KDOCFLAGS)                                    \
-		-d$(subst .kdoc,,$(subst kdoc/,,$@))               \
-		$(subst .kdoc,,$(subst kdoc/,,$@))                 \
-		$($(subst /,.,$(subst .kdoc,,$@)):../..%=../../..%)
-
-# rule how to generate the documentation the second time, i.e. with
-# crossreferencing the other doc-libraries this time. the rule is
-# similar to the above one, but includes the other libraries
-$(kdoc.library-files.rerun):
-	@cd kdoc ;                                                       \
-	 $(PERL)   $(KDOCFLAGS) $(kdoc.library-files:kdoc/%.kdoc=-l%)    \
-		-d$(subst .kdoc.rerun,,$(subst kdoc/,,$@))               \
-		$(subst .kdoc.rerun,,$(subst kdoc/,,$@))                 \
-		$($(subst /,.,$(subst .kdoc.rerun,,$@)):../..%=../../..%)
-
+# Will not work for kdoc2
 
 kdoc/names.html: $(kdoc.libray-files)
 	@cd kdoc ; $(PERL) ../scripts/index.pl *.kdoc > names.html

@@ -3,14 +3,14 @@
 ###############################
 # Configured variables
 
-D        = @top_srcdir@
+D        = @DEAL2_DIR@
 multigrid= @enablemultigrid@
-
+kdocdir  = $(HOME)/tmp/kdoc
 
 
 include $D/common/Make.global_options
 
-
+KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
 
 # generic targets
 default: autogen-doc tutorial development glossary validate-xrefs
@@ -20,11 +20,11 @@ all: default autogen-doc-all
 
 # specific targets
 autogen-doc:
-	cd auto ; $(MAKE) multigrid=$(multigrid)
+	cd auto ; $(MAKE) multigrid=$(multigrid) 'KDOCFLAGS=$(KDOCFLAGS)'
 
 
 autogen-doc-all: 
-	cd auto ; $(MAKE) all multigrid=$(multigrid)
+	cd auto ; $(MAKE) all multigrid=$(multigrid) 'KDOCFLAGS=$(KDOCFLAGS)'
 
 
 tutorial:
@@ -54,4 +54,3 @@ clean:
 
 
 .PHONY: default all autogen-doc autogen-doc-all tutorial clean development validate-xrefs glossary
-

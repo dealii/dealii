@@ -97,6 +97,25 @@ if test $withmultithreading != no ; then
 fi
 AC_SUBST(withmultithreading)
 
+dnl    Find the kdoc directory for documentation. The old one is in
+dnl    doc/auto/scripts, but you might want a newer version.
+AC_ARG_WITH(kdoc,
+[  --with-kdoc=DIR use kdoc installed in DIR],
+    kdocdir=$withval,
+    kdocdir=doc/auto/scripts/kdoc)
+if test -r $kdocdir/kdoc ; then
+  AC_MSG_RESULT(found)
+else
+  AC_MSG_RESULT(not found)
+  AC_MSG_ERROR(Invalid kdoc path)
+fi
+if test -r $kdocdir/Version ; then
+  kdocversion=`cat $kdocdir/Version` ;
+else
+  kdocversion=1;
+fi
+AC_SUBST(kdocdir)
+AC_SUBST(kdocversion)
 
 dnl    Test whether shared libraries support is requested. Note:
 dnl    default is 'yes', if not on AIX
@@ -132,4 +151,4 @@ AC_SUBST(enablemultigrid)
 
 
 dnl    Write output to the global options file
-AC_OUTPUT(common/Make.global_options doc/Makefile)
+AC_OUTPUT(common/Make.global_options doc/Makefile doc/auto/kdoc/Makefile)
