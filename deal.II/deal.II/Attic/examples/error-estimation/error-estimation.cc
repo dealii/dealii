@@ -13,6 +13,7 @@
 #include <fe/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
+#include <numerics/error_estimator.h>
 
 
 #include <map.h>
@@ -227,15 +228,15 @@ void PoissonProblem<dim>::create_new () {
 
 
 template <int dim>
-void PoissonProblem<dim>::run (const unsigned int level) {
+void PoissonProblem<dim>::run (const unsigned int start_level) {
   create_new ();
   
-  cout << "Refinement level = " << level
+  cout << "Refinement level = " << start_level
        << endl;
   
   cout << "    Making grid... ";
   tria->create_hypercube (-1,+1);
-  tria->refine_global (level);
+  tria->refine_global (start_level);
   cout << tria->n_active_cells() << " active cells." << endl;
 
   rhs             = new RHSPoly<dim>();
@@ -292,33 +293,42 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 
-  if (level<=5) 
-    {
-      dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-      dVector h1_seminorm_error_per_dof, h1_error_per_dof;
-      dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
-      dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-      dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell, h1_seminorm_error_per_dof);
-      dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
+  cout << "    Writing to file..." << endl;
+  dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
+  dVector h1_seminorm_error_per_dof, h1_error_per_dof;
+  dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
+  dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
+  dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
+  dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell,
+				      h1_seminorm_error_per_dof);
+  dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
 
-      string filename = "gnuplot.";
-      filename += ('0'+level);
-      cout << "    Writing error plots to <" << filename << ">..." << endl;
-      
-      DataOut<dim> out;
-      ofstream gnuplot(filename.c_str());
-      fill_data (out);
-      out.add_data_vector (l1_error_per_dof, "L1-Error");
-      out.add_data_vector (l2_error_per_dof, "L2-Error");
-      out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
-      out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
-      out.add_data_vector (h1_error_per_dof, "H1-Error");
-      out.write_gnuplot (gnuplot);
-      gnuplot.close ();
-    }
-  else
-    cout << "    Not writing error as grid." << endl;
+  KellyErrorEstimator<dim> ee;
+  QTrapez<dim-1> eq;
+  dVector estimated_error_per_cell, estimated_error_per_dof;
+  ee.estimate_error (*dof, eq, fe, StraightBoundary<dim>(),
+		     KellyErrorEstimator<dim>::FunctionMap(),
+		     solution,
+		     estimated_error_per_cell);
+  dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
+				      estimated_error_per_dof);
+  
+  
+  string filename = "gnuplot.";
+  filename += ('0'+start_level);
+  cout << "    Writing error plots to <" << filename << ">..." << endl;
+  
+  DataOut<dim> out;
+  ofstream gnuplot(filename.c_str());
+  fill_data (out);
+  out.add_data_vector (l1_error_per_dof, "L1-Error");
+  out.add_data_vector (l2_error_per_dof, "L2-Error");
+  out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
+  out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
+  out.add_data_vector (h1_error_per_dof, "H1-Error");
+  out.add_data_vector (estimated_error_per_dof, "Estimated Error");
+  out.write_gnuplot (gnuplot);
+  gnuplot.close ();
   
   cout << endl;
 };
