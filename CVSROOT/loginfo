@@ -17,3 +17,4 @@
 #
 # For example:
 #DEFAULT		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
+deal.* ( echo %s | mail -s "Commit deal" )
