@@ -54,7 +54,7 @@ main()
 {
   Triangulation<2> tr;
   FEQ1<2> q1;
-  DoFHandler<2> dof(&tr);
+  DoFHandler<2> dof(tr);
 
   GridGenerator::hyper_cube(tr, -1., 1.);
   dof.distribute_dofs(q1);
