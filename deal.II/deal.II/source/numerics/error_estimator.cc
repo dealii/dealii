@@ -317,11 +317,11 @@ integrate_over_regular_face (const active_cell_iterator &cell,
     fe_face_values_cell.get_function_grads (solution, psi);
   else
     {
-      vector<vector<Tensor<1,dim> > > tmp (n_components,
-					   psi);
+      vector<vector<Tensor<1,dim> > > tmp (n_q_points,
+					   vector<Tensor<1,dim> >(n_components));
       fe_face_values_cell.get_function_grads (solution, tmp);
-
-      psi.swap (tmp[selected_component]);
+      for (unsigned int i=0; i<n_q_points; ++i)
+	psi[i] = tmp[i][selected_component];
     };
   
   
@@ -361,10 +361,11 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 	fe_face_values_neighbor.get_function_grads (solution, neighbor_psi);
       else
 	{
-	  vector<vector<Tensor<1,dim> > > tmp (n_components,
-					       neighbor_psi);
+	  vector<vector<Tensor<1,dim> > > tmp (n_q_points,
+					       vector<Tensor<1,dim> >(n_components));
 	  fe_face_values_neighbor.get_function_grads (solution, tmp);
-	  neighbor_psi.swap (tmp[selected_component]);
+	  for (unsigned int i=0; i<n_q_points; ++i)
+	    psi[i] = tmp[i][selected_component];
 	};
 
       
@@ -518,10 +519,11 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 	fe_subface_values.get_function_grads (solution, psi);
       else
 	{
-	  vector<vector<Tensor<1,dim> > > tmp (n_components,
-					       psi);
+	  vector<vector<Tensor<1,dim> > > tmp (n_q_points,
+					       vector<Tensor<1,dim> >(n_components));
 	  fe_subface_values.get_function_grads (solution, tmp);
-	  psi.swap (tmp[selected_component]);
+	  for (unsigned int i=0; i<n_q_points; ++i)
+	    psi[i] = tmp[i][selected_component];
 	};
 
 				       // restrict the finite element on the
@@ -533,10 +535,11 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 	fe_face_values.get_function_grads (solution, neighbor_psi);
       else
 	{
-	  vector<vector<Tensor<1,dim> > > tmp (n_components,
-					       neighbor_psi);
+	  vector<vector<Tensor<1,dim> > > tmp (n_q_points,
+					       vector<Tensor<1,dim> >(n_components));
 	  fe_face_values.get_function_grads (solution, tmp);
-	  neighbor_psi.swap (tmp[selected_component]);
+	  for (unsigned int i=0; i<n_q_points; ++i)
+	    psi[i] = tmp[i][selected_component];
 	};
       
 				       // compute the jump in the gradients
