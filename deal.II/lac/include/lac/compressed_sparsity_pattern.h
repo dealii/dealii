@@ -21,7 +21,7 @@
 template <typename number> class SparseMatrix;
 
 #include <vector>
-#include <set>
+#include <algorithm>
 
 /*! @addtogroup Matrix1
  *@{
