@@ -3,7 +3,7 @@
 
 
 # list the directories we want to visit
-subdirs = grid/ dof/ poisson/ convergence/ error-estimation/ multigrid/
+subdirs = grid/ dof/ poisson/ convergence/ error-estimation/ multigrid/ step-by-step/
 
 # define lists of targets: for each directory we produce a target name
 # for compilation, running and cleaning by appending the action to
