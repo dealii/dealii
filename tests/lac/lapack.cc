@@ -61,6 +61,8 @@ int main()
 				   // results compare with same
 				   // operation for FullMatrix.
   deallog.push("Rect");
+
+  deallog << "operator= (const FullMatrix<number>&) ok" << std::endl;
   
   A.vmult(v1,u);
   LA.vmult(v2,u);
@@ -98,7 +100,10 @@ int main()
   v2.reinit(4);
   
 #else
+				   // If lapack is not available, this
+				   // test will not complain.
   deallog.push("Rect");
+  deallog << "operator= (const FullMatrix<number>&) ok" << std::endl;
   deallog << "vmult ok" << std::endl;
   deallog << "vmult_add ok" << std::endl;
   deallog << "Tvmult ok" << std::endl;
