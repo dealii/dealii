@@ -48,57 +48,41 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
   
   for (unsigned int i=0;i<dim;++i)
     if (p1(i) > p2(i))
-      {
-	double h = p1(i);
-	p1(i) = p2(i);
-	p2(i) = h;
-      }
+      std::swap (p1(i), p2(i));
   
   std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
   switch (dim)
     {
       case 1:
-	vertices[0](0) = p1(0);
-	vertices[1](0) = p2(0);
-	break;
+	    vertices[0] = p1;
+	    vertices[1] = p2;
+	    break;
       case 2:
-	vertices[0](0) = p1(0);
-	vertices[1](0) = p2(0);
-	vertices[2](0) = p2(0);
-	vertices[3](0) = p1(0);
-	vertices[0](1) = p1(1);
-	vertices[1](1) = p1(1);
-	vertices[2](1) = p2(1);
-	vertices[3](1) = p2(1);
-	break;
+	    vertices[0] = p1;
+	    vertices[2] = p2;
+	    
+	    vertices[1](0) = p2(0);
+	    vertices[3](0) = p1(0);
+	    vertices[1](1) = p1(1);
+	    vertices[3](1) = p2(1);
+	    break;
       case 3:
-	vertices[0](0) = p1(0);
-	vertices[1](0) = p2(0);
-	vertices[2](0) = p2(0);
-	vertices[3](0) = p1(0);
-	vertices[4](0) = p1(0);
-	vertices[5](0) = p2(0);
-	vertices[6](0) = p2(0);
-	vertices[7](0) = p1(0);
-	vertices[0](1) = p1(0);
-	vertices[1](1) = p1(0);
-	vertices[2](1) = p1(0);
-	vertices[3](1) = p1(0);
-	vertices[4](1) = p2(0);
-	vertices[5](1) = p2(0);
-	vertices[6](1) = p2(0);
-	vertices[7](1) = p2(0);
-	vertices[0](2) = p1(0);
-	vertices[1](2) = p1(0);
-	vertices[2](2) = p2(0);
-	vertices[3](2) = p2(0);
-	vertices[4](2) = p1(0);
-	vertices[5](2) = p1(0);
-	vertices[6](2) = p2(0);
-	vertices[7](2) = p2(0);
-	break;
+	    vertices[0] = vertices[1] = vertices[2] = vertices[3] = p1;
+	    vertices[4] = vertices[5] = vertices[6] = vertices[7] = p2;
+	    
+	    vertices[1](0) = p2(0);
+	    vertices[3](2) = p2(2);
+	    vertices[2](0) = p2(0);
+	    vertices[2](2) = p2(2);
+
+	    vertices[5](2) = p1(2);
+	    vertices[7](0) = p1(0);
+	    vertices[4](0) = p1(0);
+	    vertices[4](2) = p1(2);
+	    
+	    break;
       default:
-	Assert (false, ExcNotImplemented ());
+	    Assert (false, ExcNotImplemented ());
     }
 
 				   // Prepare cell data
