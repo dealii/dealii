@@ -191,8 +191,8 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
   SolverControl::State conv=SolverControl::iterate;
 
 				   // Memory allocation
-  Vr  = memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
-  Vd  = memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
+  Vr  = this->memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
+  Vd  = this->memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
 
   deallog.push("Richardson");
 
@@ -207,7 +207,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
       if (!additional_data.use_preconditioned_residual)
 	{
 	  res = r.l2_norm();
-	  conv = control().check (iter, criterion());
+	  conv = this->control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
 	}
@@ -216,7 +216,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
       if (additional_data.use_preconditioned_residual)
 	{
 	  res = d.l2_norm();
-	  conv = control().check (iter, criterion());
+	  conv = this->control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
 	}
@@ -225,16 +225,16 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
     }
 
 				   // Deallocate Memory
-  memory.free(Vr);
-  memory.free(Vd);
+  this->memory.free(Vr);
+  this->memory.free(Vd);
 
   deallog.pop();
 
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 }
 
@@ -250,8 +250,8 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
   SolverControl::State conv=SolverControl::iterate;
 
 				   // Memory allocation
-  Vr  = memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
-  Vd  = memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
+  Vr  = this->memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
+  Vd  =this-> memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
 
   deallog.push("RichardsonT");
 
@@ -264,7 +264,7 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
       r.sadd(-1.,1.,b);
       res=r.l2_norm();
 
-      conv = control().check (iter, criterion());
+      conv = this->control().check (iter, criterion());
       if (conv != SolverControl::iterate)
 	break;
 
@@ -280,9 +280,9 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
   deallog.pop();
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 }
 

@@ -271,7 +271,7 @@ SolverBicgstab<VECTOR>::start(const MATRIX& A)
   Vp->reinit(*Vx);
   Vv->reinit(*Vx);
   *Vrbar = *Vr;
-  return control().check(step, res);
+  return this->control().check(step, res);
 }
 
 
@@ -337,7 +337,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
       else
 	res = r.l2_norm();
       
-      state = control().check(step, res);
+      state = this->control().check(step, res);
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
@@ -354,14 +354,14 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 			      const PRECONDITIONER& precondition)
 {
   deallog.push("Bicgstab");
-  Vr    = memory.alloc(); Vr->reinit(x);
-  Vrbar = memory.alloc(); Vrbar->reinit(x);
-  Vp    = memory.alloc();
-  Vy    = memory.alloc(); Vy->reinit(x);
-  Vz    = memory.alloc(); Vz->reinit(x);
-  Vs    = memory.alloc(); Vs->reinit(x);
-  Vt    = memory.alloc(); Vt->reinit(x);
-  Vv    = memory.alloc();
+  Vr    = this->memory.alloc(); Vr->reinit(x);
+  Vrbar = this->memory.alloc(); Vrbar->reinit(x);
+  Vp    = this->memory.alloc();
+  Vy    = this->memory.alloc(); Vy->reinit(x);
+  Vz    = this->memory.alloc(); Vz->reinit(x);
+  Vs    = this->memory.alloc(); Vs->reinit(x);
+  Vt    = this->memory.alloc(); Vt->reinit(x);
+  Vv    = this->memory.alloc();
 
   Vx = &x;
   Vb = &b;
@@ -380,22 +380,22 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
     }
   while (state);
 
-  memory.free(Vr);
-  memory.free(Vrbar);
-  memory.free(Vp);
-  memory.free(Vy);
-  memory.free(Vz);
-  memory.free(Vs);
-  memory.free(Vt);
-  memory.free(Vv);
+  this->memory.free(Vr);
+  this->memory.free(Vrbar);
+  this->memory.free(Vp);
+  this->memory.free(Vy);
+  this->memory.free(Vz);
+  this->memory.free(Vs);
+  this->memory.free(Vt);
+  this->memory.free(Vv);
   
   deallog.pop();
   
 				   // in case of failure: throw
 				   // exception
   if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 }
 
