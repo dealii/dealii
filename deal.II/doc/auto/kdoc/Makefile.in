@@ -10,10 +10,10 @@ kdocversion = @kdocversion@
 
 include $D/common/Make.global_options
 
-ifeq ($kdocversion,1)
+ifeq ($(kdocversion),1)
 KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
 else
-KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc
+KDOCFLAGS=-I$(kdocdir) $(kdocdir)/kdoc -a -p -L $D/doc/auto/kdoc -n 
 endif
 
 kdoc.base     = $(shell echo $D/base/include/base/*.h)
