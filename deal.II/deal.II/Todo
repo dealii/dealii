@@ -206,3 +206,8 @@ In GridOut::write_ucd, a vector of vertices is built along with
 Fix a potential problem with viewing angles in 3d Eps GridOut (see
   comment)
 
+
+Move the GridOut::EpsFlags<3>::EpsFlags constructor into the
+  appropriate .cc-file if the compiler supports this.
+
+
