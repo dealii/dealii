@@ -204,7 +204,7 @@ void TestCases<dim>::create_new (const unsigned int) {
   tria = new Triangulation<dim>();
   GridGenerator::hyper_cube(*tria);
 
-  dof = new DoFHandler<dim> (tria);
+  dof = new DoFHandler<dim> (*tria);
 };
 
 

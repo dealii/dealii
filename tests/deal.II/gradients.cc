@@ -38,7 +38,7 @@ int main ()
   tria.begin_active()->vertex(2)(0) = 2;
 
   FEQ1<2> fe;
-  DoFHandler<2> dof(&tria);
+  DoFHandler<2> dof(tria);
   dof.distribute_dofs(fe);
 
   QTrapez<2> q;

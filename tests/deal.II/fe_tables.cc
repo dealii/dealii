@@ -40,7 +40,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr,-1,1);
-  DoFHandler<dim> dof(&tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   StraightBoundary<dim> boundary;
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();

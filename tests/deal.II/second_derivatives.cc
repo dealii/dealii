@@ -29,7 +29,7 @@ int main ()
   GridGenerator::hyper_cube (tria,0,1);
 
   FEQ1<2> fe;
-  DoFHandler<2> dof(&tria);
+  DoFHandler<2> dof(tria);
   dof.distribute_dofs(fe);
 
   StraightBoundary<2> b;

@@ -18,15 +18,6 @@
 
 
 template <int dim>
-DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :
-		tria(tria),
-		used_dofs (0)
-{
-  Assert (tria != 0, ExcInvalidTriangulation());
-};
-
-
-template <int dim>
 DoFHandler<dim>::DoFHandler (Triangulation<dim> &tria) :
 		tria(&tria),
 		used_dofs (0)

@@ -264,7 +264,7 @@ int main ()
 	  make_tria (tria, step);
 	  GridOut().write_gnuplot (tria, logfile);
 	  
-	  DoFHandler<3> dof (&tria);
+	  DoFHandler<3> dof (tria);
 	  dof.distribute_dofs (*fe);
       
 	  ConstraintMatrix constraints;

@@ -78,7 +78,7 @@ unsigned int MGDoFHandler<dim>::MGVertexDoFs::get_finest_level () const {
 /* ------------------------ MGDoFHandler ------------------------------------- */
 
 template <int dim>
-MGDoFHandler<dim>::MGDoFHandler (Triangulation<dim> *tria) :
+MGDoFHandler<dim>::MGDoFHandler (Triangulation<dim> &tria) :
 		DoFHandler<dim> (tria)
 {};
 

@@ -323,7 +323,7 @@ void PoissonProblem<dim>::create_new (const unsigned int) {
   clear ();
   
   tria = new Triangulation<dim>();
-  dof = new DoFHandler<dim> (tria);
+  dof = new DoFHandler<dim> (*tria);
   set_tria_and_dof (tria, dof);
 };
 

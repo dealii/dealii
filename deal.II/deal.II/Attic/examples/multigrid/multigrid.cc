@@ -340,7 +340,7 @@ void PoissonProblem<dim>::create_new () {
   clear ();
   
   tria = new Triangulation<dim>();
-  dof = new MGDoFHandler<dim> (tria);
+  dof = new MGDoFHandler<dim> (*tria);
 };
 
 

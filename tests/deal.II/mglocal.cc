@@ -77,7 +77,7 @@ int main()
   for (unsigned int degree=1;degree<=1;degree++)
     {
       Triangulation<2> tr;
-      MGDoFHandler<2> mgdof(&tr);
+      MGDoFHandler<2> mgdof(tr);
       DoFHandler<2>& dof(mgdof);
   
       GridGenerator::hyper_cube(tr,-M_PI_2,M_PI_2);

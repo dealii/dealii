@@ -5336,7 +5336,7 @@ void TimeStep_Wave<dim>::wake_up (const unsigned int wakeup_level)
 
       sweep_info->get_timers().grid_generation.start();
 
-      dof_handler = new DoFHandler<dim>(tria);
+      dof_handler = new DoFHandler<dim>(*tria);
       dof_handler->distribute_dofs (fe);
 
       if (parameters.renumber_dofs)
