@@ -27,6 +27,7 @@
 #include <numerics/mg_smoother.h>
 #include <numerics/multigrid.templates.h>
 #include <dofs/dof_tools.h>
+#include <dofs/mg_dof_tools.h>
 
 #include <fstream>
 
@@ -133,7 +134,7 @@ int main()
 	    {
 	      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
 				 mgdof.max_couplings_between_dofs());
-	      mgdof.make_sparsity_pattern(i, mgstruct[i]);
+	      MGDoFTools::make_sparsity_pattern(mgdof, i, mgstruct[i]);
 	      mgstruct[i].compress();
 	      
 	      mgA[i].reinit(mgstruct[i]);

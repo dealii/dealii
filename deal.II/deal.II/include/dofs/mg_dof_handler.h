@@ -119,11 +119,21 @@ class MGDoFDimensionInfo<3> {
 
 
 
-
+/**
+ * This class manages degrees of freedom for a multilevel hierarchy of
+ * grids. It does mostly the same as does the #DoDHandler# class, but
+ * it uses a separate enumeration of the degrees of freedom on each
+ * level. For example, a vertex has several DoF numbers, one for each
+ * level of the triangulation on which it exists.
+ *
+ * At present, multilevel algorithms are not fully functional, so this
+ * documentation is still very brief.
+//TODO: Extend MGDoFHandler doc 
+ *
+ * @author Wolfgang Bangerth, 1998, 1999
+ */
 template <int dim>
-class MGDoFHandler
-  :
-  public DoFHandler<dim>
+class MGDoFHandler : public DoFHandler<dim>
 {
   public:
     typedef typename MGDoFDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
@@ -189,27 +199,6 @@ class MGDoFHandler
 				      */
     void renumber_dofs (const unsigned int level,
 			const vector<int> &new_numbers);
-
-				     /**
-				      * Write the sparsity structure of the
-				      * matrix belonging to the specified
-				      * #level# including constrained
-				      * degrees of freedom into the
-				      * matrix structure. The sparsity pattern
-				      * does not include entries introduced by
-				      * the elimination of constrained nodes.
-				      * The sparsity
-				      * pattern is not compressed, since if
-				      * you want to call
-				      * #ConstraintMatrix::condense(1)#
-				      * afterwards, new entries have to be
-				      * added. However, if you don't want to call
-				      * #ConstraintMatrix::condense(1)#, you
-				      * have to compress the matrix yourself,
-				      * using #SparseMatrixStruct::compress()#.
-				      */
-    void make_sparsity_pattern (const unsigned int  level,
-				SparseMatrixStruct &sparsity) const; 
 
 				     /*--------------------------------------*/
     

@@ -42,7 +42,7 @@
  * other basis functions on a cell adjacent to the boundary vanish at the
  * boundary itself, except for those which are located on the boundary.
  *
- * @author Wolfgang Bangerth and others, 1999
+ * @author Wolfgang Bangerth and others, 1998, 1999
  */
 class DoFTools
 {

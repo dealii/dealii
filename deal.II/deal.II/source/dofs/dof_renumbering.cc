@@ -1,14 +1,15 @@
 /* $Id$ */
 
+#include <lac/sparse_matrix.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
 #include <dofs/mg_dof_handler.h>
 #include <dofs/dof_constraints.h>
+#include <dofs/dof_tools.h>
+#include <dofs/mg_dof_tools.h>
 #include <fe/fe.h>
 #include <numerics/dof_renumbering.h>
-#include <dofs/dof_tools.h>
-#include <lac/sparse_matrix.h>
 
 #include <vector>
 #include <map>
@@ -214,7 +215,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>      &dof_handler,
 				   // make the connection graph
   SparseMatrixStruct sparsity (dof_handler.n_dofs(level),
 			       dof_handler.max_couplings_between_dofs());
-  dof_handler.make_sparsity_pattern (level, sparsity);
+  MGDoFTools::make_sparsity_pattern (dof_handler, level, sparsity);
     
   const int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; -1 means

@@ -1539,32 +1539,6 @@ unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
 
 
 
-template <int dim>
-void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
-					       SparseMatrixStruct &sparsity) const {
-  Assert (selected_fe != 0, ExcNoFESelected());
-  Assert (sparsity.n_rows() == n_dofs(level),
-	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs(level)));
-  Assert (sparsity.n_cols() == n_dofs(level),
-	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs(level)));
-
-  const unsigned int dofs_per_cell = selected_fe->dofs_per_cell;
-  vector<int> dofs_on_this_cell(dofs_per_cell);
-  cell_iterator cell = begin(level),
-		endc = end(level);
-  for (; cell!=endc; ++cell) 
-    {
-      cell->get_mg_dof_indices (dofs_on_this_cell);
-				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  sparsity.add (dofs_on_this_cell[i],
-			dofs_on_this_cell[j]);
-    };
-};
-
-
-
 #if deal_II_dimension == 1
 
 template <>
