@@ -56,7 +56,7 @@ extern "C" long int lrand48 (void);
 // level numbering for multigrid as well as numbering for the global
 // system matrix.
 template <class T>
-class WrapMGDoFIterator : public T
+class WrapMGDoFIterator : private T
 {
   public:
     WrapMGDoFIterator (const T& t) : T(t) {}
@@ -64,6 +64,14 @@ class WrapMGDoFIterator : public T
       {
 	T::get_mg_dof_indices(v);
       }
+    bool operator != (const WrapMGDoFIterator<T>& i) const
+      {
+	return (! (T::operator==(i)));
+      }
+				     // Allow access to these operators of T
+    T::operator->;
+    T::operator++;
+    T::operator==;
 };
 
 
