@@ -27,7 +27,7 @@ use strict;
 my $os = `uname -s`;
 
 # die "Use on Linux machines only !" unless ($os =~ m'Linux');
-die "Call as deal user" unless (`who am i` =~ m/deal/);
+#die "Call as deal user" unless (`who am i` =~ m/deal/);
 
 my @recipients;
 
