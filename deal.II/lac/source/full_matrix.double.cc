@@ -46,6 +46,12 @@ template void FullMatrix<TYPEMAT>::backward(Vector<TYPEVEC>&, const Vector<TYPEV
 template void FullMatrix<TYPEMAT>::householder(Vector<TYPEVEC>&);
 template double FullMatrix<TYPEMAT>::least_squares(Vector<TYPEVEC>&, Vector<TYPEVEC>&);
 
+template
+void FullMatrix<TYPEMAT>::precondition_Jacobi (Vector<TYPEVEC> &,
+					       const Vector<TYPEVEC> &,
+					       const TYPEMAT) const;
+
+
 #undef TYPEVEC
 #define TYPEVEC float
 
@@ -61,6 +67,11 @@ template void FullMatrix<TYPEMAT>::forward(Vector<TYPEVEC>&, const Vector<TYPEVE
 template void FullMatrix<TYPEMAT>::backward(Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::householder(Vector<TYPEVEC>&);
 template double FullMatrix<TYPEMAT>::least_squares(Vector<TYPEVEC>&, Vector<TYPEVEC>&);
+
+template
+void FullMatrix<TYPEMAT>::precondition_Jacobi (Vector<TYPEVEC> &,
+					       const Vector<TYPEVEC> &,
+					       const TYPEMAT) const;
 
 #undef TYPERES
 #define TYPERES float

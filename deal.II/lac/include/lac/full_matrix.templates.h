@@ -1251,10 +1251,35 @@ FullMatrix<number>::invert (const FullMatrix<number> &M)
       }
 
       default:
+					     // if no inversion is
+					     // hardcoded, fall back
+					     // to use the
+					     // Gauss-Jordan algorithm
 	    *this = M;
 	    gauss_jordan();
     };    
 };
+
+
+template <typename number>
+template <typename somenumber>
+void
+FullMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
+					 const Vector<somenumber> &src,
+					 const number              om) const
+{
+  Assert (m() == n(), ExcNotQuadratic());
+  Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
+  Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
+
+  const unsigned int n = src.size();
+  somenumber              *dst_ptr = dst.begin();
+  const somenumber        *src_ptr = src.begin();
+  
+  for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr)
+    *dst_ptr = om * *src_ptr / el(i,i);
+};
+
 
 
 template <typename number>

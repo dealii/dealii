@@ -453,6 +453,21 @@ class FullMatrix : public vector2d<number>
     void invert (const FullMatrix<number> &M);
 
 				     /**
+				      * Apply the Jacobi
+				      * preconditioner, which
+				      * multiplies every element of
+				      * the @p{src} vector by the
+				      * inverse of the respective
+				      * diagonal element and
+				      * multiplies the result with the
+				      * damping factor @p{omega}.
+				      */
+    template <typename somenumber>
+    void precondition_Jacobi (Vector<somenumber>       &dst,
+			      const Vector<somenumber> &src,
+			      const number              omega = 1.) const;
+
+				     /**
 				      * $A(i,1-n)+=s*A(j,1-n)$.
 				      * Simple addition of rows of this
 				      */

@@ -333,7 +333,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       Changed: The <code class="class">Vector</code> and
+       New: There is now a function 
+       <code class="member">FullMatrix::precondition_Jacobi</code>. The 
+       <code class="class">PreconditionJacobi</code> class is
+       therefore now also applicable with the full matrix class.
+       <br>
+       (WB 2001/08/11)
+       </p>
+
+  <li> <p>
+       New: The <code class="class">Vector</code> and
        <code class="class">BlockVector</code> classes can now be
        initialized using a new constructor that takes two iterators
        that denote a range of elements which are to be copied.
