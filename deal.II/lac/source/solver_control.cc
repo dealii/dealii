@@ -50,7 +50,7 @@ SolverControl::check (const unsigned int step,
 		      const double check_value)
 {
   if (_log_history && ((step % _log_frequency) == 0))
-    deallog << "Check " << step << "\t" << check_value << endl;
+    deallog << "Check " << step << "\t" << check_value << std::endl;
   
   lstep  = step;
   lvalue = check_value;
@@ -61,7 +61,7 @@ SolverControl::check (const unsigned int step,
 	failure_residual=relative_failure_residual*check_value;
       
       if (_log_result)
-	deallog << "Starting value " << check_value << endl;
+	deallog << "Starting value " << check_value << std::endl;
     }
 
   
@@ -80,7 +80,7 @@ SolverControl::check (const unsigned int step,
     {
       if (_log_result)
 	deallog << "Failure step " << step
-		<< " value " << check_value << endl;
+		<< " value " << check_value << std::endl;
       return failure;
     }
 
@@ -88,7 +88,7 @@ SolverControl::check (const unsigned int step,
     {
       if (_log_result)
 	deallog << "Convergence step " << step
-		<< " value " << check_value << endl;
+		<< " value " << check_value << std::endl;
       return success;
     }
   
@@ -180,7 +180,7 @@ ReductionControl::check (const unsigned int step,
     {
       if (_log_result)
 	deallog << "Convergence step " << step
-		<< " value " << check_value << endl;
+		<< " value " << check_value << std::endl;
       return success;
     }
   else

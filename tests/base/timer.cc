@@ -27,9 +27,9 @@ void compare (double t1, double t2, double ratio)
 				   // relative error < 10%?
   if (d <= .1)
     {
-      deallog << "OK" << endl;
+      deallog << "OK" << std::endl;
     } else {
-      deallog << "Ratio " << r << " should be " << ratio << endl;
+      deallog << "Ratio " << r << " should be " << ratio << std::endl;
     }
 }
 

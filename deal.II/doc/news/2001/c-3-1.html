@@ -126,7 +126,19 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       The <code class="class">Threads</code> now has a barrier
+       Changed: The <code class="class">LogStream</code> class was
+       changed such that it understand the usual <code
+       class="member">std::endl</code> manipulator instead of the
+       special one needed previously. There is therefore no more need
+       to write <code class="member">std::endl</code> at some places
+       and <code class="member">endl</code> at others. The special
+       function <code class="member">endl</code> has gone.
+       <br>
+       (WB 2001/03/28)
+       </p>
+
+  <li> <p>
+       New: The <code class="class">Threads</code> now has a barrier
        class in order to synchronise multiple threads. In
        multithreaded mode, this is an alias to the <code
        class="class">ACE_Barrier</code> class of the ACE library, if
@@ -137,7 +149,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       We now support the output format of the <a
+       New: We now support the output format of the <a
        href="http://www.kitware.com/vtk.html"
        target="_top">Visualization Toolkit (Vtk)</a> from the <code
        class="class">DataOutBase</code> class and all derived classes.

@@ -59,7 +59,7 @@ int main()
     {
       unsigned int dim = (size-1)*(size-1);
 
-      deallog << "Size " << size << " Unknowns " << dim << endl;
+      deallog << "Size " << size << " Unknowns " << dim << std::endl;
       
 				       // Make matrix
       FDMatrix testproblem(size, size);
@@ -88,7 +88,7 @@ int main()
       A.SOR_step(u,f);
       res.add(-1.,u);
     
-      deallog << "SOR-diff:" << res*res << endl;
+      deallog << "SOR-diff:" << res*res << std::endl;
       
       deallog.push("no");
 

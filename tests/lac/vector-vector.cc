@@ -29,12 +29,12 @@ unsigned int check_point = 0;
 template <typename number>
 void print (const Vector<number> &v) 
 {
-//  deallog << "Check point " << check_point << endl;
+//  deallog << "Check point " << check_point << std::endl;
 //  check_point++;
   
   for (unsigned int i=0; i<v.size(); ++i)
     deallog << v(i) << '\t';
-  deallog << endl;
+  deallog << std::endl;
 };
 
 
@@ -42,7 +42,7 @@ void print (const Vector<number> &v)
 template <typename number1, typename number2>
 void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
 {
-  deallog << "Fill & Swap" << endl;
+  deallog << "Fill & Swap" << std::endl;
   Vector<number1> d3(d1.size());
   print (d3);
   
@@ -66,30 +66,30 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d1 = 2.5;
   print (d1);
   
-  deallog << "Extract number" << endl;
+  deallog << "Extract number" << std::endl;
 				   // Each line should contain two equal numbers
   double sum = 0.;
   for (unsigned int i=0;i<N;++i)
     sum += 4.*i-i*i;
-  deallog << d3 * d2 << '\t' << sum << endl;
+  deallog << d3 * d2 << '\t' << sum << std::endl;
 
   sum = 0.;
   for (unsigned int i=0;i<N;++i)
     sum += 4.*i*i;
-  deallog << d2.norm_sqr() << '\t' << sum << endl;
+  deallog << d2.norm_sqr() << '\t' << sum << std::endl;
 
   sum = sqrt(sum);
-  deallog << d2.l2_norm() << '\t' << sum << endl;
+  deallog << d2.l2_norm() << '\t' << sum << std::endl;
 
   sum = 0.;
   for (unsigned int i=0;i<N;++i)
     sum += (2.-.5*i)/N;
-  deallog << d3.mean_value() << '\t' << sum << endl;
+  deallog << d3.mean_value() << '\t' << sum << std::endl;
 
   sum = 0.;
   for (unsigned int i=0;i<N;++i)
     sum += fabs(2.-.5*i);
-  deallog << d3.l1_norm() << '\t' << sum << endl;
+  deallog << d3.l1_norm() << '\t' << sum << std::endl;
 
   sum = 0.;
   for (unsigned int i=0;i<N;++i)
@@ -97,9 +97,9 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
       double t = fabs(2.-.5*i);
       if (t>sum) sum = t;
     }
-  deallog << d3.linfty_norm() << '\t' << sum << endl;
+  deallog << d3.linfty_norm() << '\t' << sum << std::endl;
 
-  deallog << "add & sub" << endl;
+  deallog << "add & sub" << std::endl;
   
   d1 += d2;
   print (d1);
@@ -116,7 +116,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d1.add (2., d2, .5, d3);
   print (d1);
   
-  deallog << "sadd & scale" << endl;
+  deallog << "sadd & scale" << std::endl;
   
   d2.sadd (2., d1);
   print (d2);
@@ -130,7 +130,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d1.scale (4.);
   print (d1);
   
-  deallog << "equ" << endl;
+  deallog << "equ" << std::endl;
   
   d2.equ (.25, d1);
   print (d2);

@@ -34,14 +34,14 @@
 ofstream logfile("fe_tables.output");
 
 #define TEST_ELEMENT(e) { deallog.push(#e); e el;\
-  print_fe_statistics(el); deallog.pop(); deallog << endl; }
+  print_fe_statistics(el); deallog.pop(); deallog << std::endl; }
 #define TEST_MULTIPLE(e,n,d) { deallog.push(#e "x" #n); e eb; FESystem<d> el(eb,n); \
-  print_fe_statistics(el); deallog.pop(); deallog << endl; }
+  print_fe_statistics(el); deallog.pop(); deallog << std::endl; }
 #define TEST_MIXED2(e1,n1,e2,n2,d) { deallog.push(#e1 "x" #n1 "-" #e2 "x" #n2);\
   e1 eb1; e2 eb2; FESystem<d> el(eb1,n1,eb2,n2);\
-  print_fe_statistics(el); deallog.pop(); deallog << endl; }
+  print_fe_statistics(el); deallog.pop(); deallog << std::endl; }
 #define TEST_MATRIX(e1,e2) { deallog.push( #e1 " onto " #e2); e1 el1; e2 el2;\
-  print_fe_matrices(el1,el2); deallog.pop(); deallog << endl; }
+  print_fe_matrices(el1,el2); deallog.pop(); deallog << std::endl; }
 
 template<int dim>
 inline void
@@ -66,9 +66,9 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   deallog << "dofs_per_cell" << " " << fe.dofs_per_cell;
   deallog << ": vertex" << " " << fe.dofs_per_vertex;
   deallog << "  line" << " " << fe.dofs_per_line;
-  deallog << "  quad" <<  " " <<fe.dofs_per_quad << endl;
-  deallog << "n_transform_fct " << fe.n_transform_functions() << endl;
-  deallog << "n_components " << fe.n_components() << endl;
+  deallog << "  quad" <<  " " <<fe.dofs_per_quad << std::endl;
+  deallog << "n_transform_fct " << fe.n_transform_functions() << std::endl;
+  deallog << "n_components " << fe.n_components() << std::endl;
   deallog.push("components");
   for (unsigned i=0;i<fe.dofs_per_cell;++i)
     {
@@ -77,7 +77,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
 	      << p.first << "," << p.second << ") -> "
 	      << fe.component_to_system_index(p.first, p.second)
 	      << " support " << support_points[i] << " unit: " << unit_points[i]
-	      << endl;
+	      << std::endl;
     }
   for (unsigned i=0;i<fe.dofs_per_face;++i)
     {
@@ -86,7 +86,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
 	      << p.first << "," << p.second << ") -> " 
 	      << fe.face_component_to_system_index(p.first, p.second)
 	      << " support " << face_support_points[i]
-	      << endl;
+	      << std::endl;
     }
   deallog.pop();
 }
@@ -98,7 +98,7 @@ print_fe_matrices(const FiniteElement<dim>& high,
 {
   FullMatrix<double> interpolation(low.dofs_per_cell, high.dofs_per_cell);
   FETools::get_interpolation_matrix(high, low, interpolation);
-  deallog << "Interpolation" << endl;
+  deallog << "Interpolation" << std::endl;
   interpolation.print(logfile);
 }
 
@@ -118,7 +118,7 @@ int main()
 	  << " lines: " << GeometryInfo<1>::lines_per_cell
 	  << " quads: " << GeometryInfo<1>::quads_per_cell
 	  << " hexes: " << GeometryInfo<1>::hexes_per_cell
-	  << endl;
+	  << std::endl;
   deallog.pop();
   
   deallog.push("2D");
@@ -126,7 +126,7 @@ int main()
 	  << " lines: " << GeometryInfo<2>::lines_per_cell
 	  << " quads: " << GeometryInfo<2>::quads_per_cell
 	  << " hexes: " << GeometryInfo<2>::hexes_per_cell
-	  << endl;
+	  << std::endl;
   deallog.pop();
   
   deallog.push("3D");
@@ -134,7 +134,7 @@ int main()
 	  << " lines: " << GeometryInfo<3>::lines_per_cell
 	  << " quads: " << GeometryInfo<3>::quads_per_cell
 	  << " hexes: " << GeometryInfo<3>::hexes_per_cell
-	  << endl;
+	  << std::endl;
   deallog.pop();
   
   deallog.push("4D");
@@ -142,7 +142,7 @@ int main()
 	  << " lines: " << GeometryInfo<4>::lines_per_cell
 	  << " quads: " << GeometryInfo<4>::quads_per_cell
 	  << " hexes: " << GeometryInfo<4>::hexes_per_cell
-	  << endl;
+	  << std::endl;
   deallog.pop();
   
   deallog.pop();

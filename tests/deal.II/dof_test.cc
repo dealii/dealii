@@ -226,10 +226,10 @@ template <int dim>
 void TestCases<dim>::run (const unsigned int test_case)
 {
   deallog << "Dimension = " << dim
-       << ", Test case = " << test_case << endl
-       << endl;
+       << ", Test case = " << test_case << std::endl
+       << std::endl;
   
-  deallog << "    Making grid..." << endl;  
+  deallog << "    Making grid..." << std::endl;  
   
   switch (test_case) 
     {
@@ -295,11 +295,11 @@ void TestCases<dim>::run (const unsigned int test_case)
     };
 
 
-  deallog << "    Distributing degrees of freedom..." << endl;
+  deallog << "    Distributing degrees of freedom..." << std::endl;
   FE_Q<dim> fe(1);
   dof->distribute_dofs (fe);
 
-  deallog << "    Renumbering degrees of freedom..." << endl;
+  deallog << "    Renumbering degrees of freedom..." << std::endl;
   DoFRenumbering::Cuthill_McKee (*dof);
     
   SparsityPattern sparsity (dof->n_dofs(),
@@ -309,29 +309,29 @@ void TestCases<dim>::run (const unsigned int test_case)
   DoFTools::make_sparsity_pattern (*dof, sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
-  deallog << "    Writing sparsity pattern..." << endl;
+  deallog << "    Writing sparsity pattern..." << std::endl;
   sparsity.print_gnuplot (logfile);
 
 
 				   // computing constraints
-  deallog << "    Computing constraints..." << endl;
+  deallog << "    Computing constraints..." << std::endl;
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (*dof, constraints);
   constraints.close ();
   constraints.condense (sparsity);
   
-  deallog << "    Writing condensed sparsity pattern..." << endl;
+  deallog << "    Writing condensed sparsity pattern..." << std::endl;
   sparsity.print_gnuplot (logfile);
 
 
-  deallog << endl
-	  << "    Total number of cells         = " << tria->n_cells() << endl
-	  << "    Total number of active cells  = " << tria->n_active_cells() << endl
-	  << "    Number of DoFs                = " << dof->n_dofs() << endl
-	  << "    Number of constraints         = " << constraints.n_constraints() << endl
-	  << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth << endl
+  deallog << std::endl
+	  << "    Total number of cells         = " << tria->n_cells() << std::endl
+	  << "    Total number of active cells  = " << tria->n_active_cells() << std::endl
+	  << "    Number of DoFs                = " << dof->n_dofs() << std::endl
+	  << "    Number of constraints         = " << constraints.n_constraints() << std::endl
+	  << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth << std::endl
 	  << "    Constrained matrix bandwidth  = " << sparsity.bandwidth()
-	  << endl << endl;
+	  << std::endl << std::endl;
 
 				   // release the lock that dof has to the
 				   // finite element object

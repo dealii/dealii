@@ -1,5 +1,5 @@
 
-
+DEAL::
 DEAL::dim=1
 DEAL::fe_data[0]:
 DEAL::dofs_per_vertex=1
@@ -92,7 +92,7 @@ DEAL::first_face_quad_index=4
 DEAL::dofs_per_face=2
 DEAL::dofs_per_cell=10
 DEAL::components=2
-
+DEAL::
 DEAL::dim=2
 DEAL::fe_data[0]:
 DEAL::dofs_per_vertex=1
@@ -185,7 +185,7 @@ DEAL::first_face_quad_index=14
 DEAL::dofs_per_face=10
 DEAL::dofs_per_cell=50
 DEAL::components=2
-
+DEAL::
 DEAL::dim=3
 DEAL::fe_data[0]:
 DEAL::dofs_per_vertex=1

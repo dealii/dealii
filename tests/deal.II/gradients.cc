@@ -52,7 +52,7 @@ int main ()
 
 Vector<double> val(4);
 
-  deallog << "Testing transformation of gradients of shape function:" << endl;
+  deallog << "Testing transformation of gradients of shape function:" << std::endl;
   
 				   // test for each of the four
 				   // shape functions
@@ -98,7 +98,7 @@ bool ok;
       deallog << "  Shape function " << vertex
 	   << ": "
 	   << (ok ? "OK" : "WRONG!")
-	   << endl;
+	   << std::endl;
 
       if (!ok)
 	testcase_succeeded = false;

@@ -40,7 +40,7 @@ int main()
     {
       unsigned int dim = (size-1)*(size-1);
 
-      deallog << "Size " << size << " Unknowns " << dim << endl;
+      deallog << "Size " << size << " Unknowns " << dim << std::endl;
       
 				       // Make matrix
       FDMatrix testproblem(size, size);
@@ -53,7 +53,7 @@ int main()
       
       for (unsigned int test=0; test<2; ++test)
 	{
-	  deallog << "Test " << test << endl;
+	  deallog << "Test " << test << std::endl;
 	  
 					   // generate sparse ILU.
 					   //
@@ -112,7 +112,7 @@ int main()
 	      deallog << "Residual with test vector " << i << ":  "
 		      << " left=" << left_residual
 		      << ", right=" << right_residual
-		      << endl;
+		      << std::endl;
 	    };
 	};
       

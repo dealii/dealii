@@ -169,7 +169,7 @@ void test (const int test_case)
   sprintf(testname, "Test%d.dim%d", test_case , dim);
   
   deallog.push(testname);
-  deallog << "Start" << endl;
+  deallog << "Start" << std::endl;
   
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -178,7 +178,7 @@ void test (const int test_case)
   
   if ((dim==1) && ((test_case==2) || (test_case==3)))
     {
-      deallog << "Impossible for this dimension." << endl;
+      deallog << "Impossible for this dimension." << std::endl;
       return;
     };
 
@@ -258,8 +258,8 @@ switch (test_case)
 
 GridOut().write_ucd (tria, logfile);
     
-  deallog << "     Total number of cells        = " << tria.n_cells() << endl
-       << "     Total number of active cells = " << tria.n_active_cells() << endl;
+  deallog << "     Total number of cells        = " << tria.n_cells() << std::endl
+       << "     Total number of active cells = " << tria.n_active_cells() << std::endl;
 
   deallog.pop();
 };

@@ -32,8 +32,8 @@ template <int dim>
 void check ()
 {
   deallog << "Checking in " << dim << " space dimensions"
-	  << endl
-	  << "---------------------------------------" << endl;
+	  << std::endl
+	  << "---------------------------------------" << std::endl;
   
 				   // create two grids
   Triangulation<dim> tria_1, tria_2;
@@ -88,7 +88,7 @@ void check ()
 				   // two grids
   for (unsigned int i=0; i<3; ++i)
     {
-      deallog << "Refinement step " << i << endl;
+      deallog << "Refinement step " << i << std::endl;
 
       DoFHandler<dim> dof_1 (tria_1);
       DoFHandler<dim> dof_2 (tria_2);
@@ -99,9 +99,9 @@ void check ()
       DoFRenumbering::Cuthill_McKee (dof_2);
 
       deallog << "  Grid 1: " << tria_1.n_active_cells() << " cells, "
-	      << dof_1.n_dofs() << " dofs" << endl;
+	      << dof_1.n_dofs() << " dofs" << std::endl;
       deallog << "  Grid 2: " << tria_2.n_active_cells() << " cells, "
-	      << dof_2.n_dofs() << " dofs" << endl;
+	      << dof_2.n_dofs() << " dofs" << std::endl;
       
 				       // now compute intergrid
 				       // constraints

@@ -817,10 +817,10 @@ void ParameterHandler::log_parameters_section (LogStream &out)
 					 // in the Changed tree and actually
 					 // differs from the default value
 	out << ptr->first << ": "
-	    << pc->entries[ptr->first].first << endl;
+	    << pc->entries[ptr->first].first << std::endl;
       else
 	out << ptr->first << ": "
-	    << ptr->second.first << endl;
+	    << ptr->second.first << std::endl;
     };
 
 

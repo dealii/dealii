@@ -46,78 +46,6 @@
  */
 class LogStream
 {
-  private:
-    
-				     /**
-				      * Stack of strings which are printed
-				      * at the beginning of each line to
-				      * allow identification where the
-				      * output was generated.
-				      */
-    std::stack<std::string> prefixes;
-
-				     /**
-				      * Default stream, where the output
-				      * is to go to. This stream defaults
-				      * to @p{std::cerr}, but can be set to another
-				      * stream through the constructor.
-				      */
-    std::ostream  *std_out;
-
-				     /**
-				      * Pointer to a stream, where a copy of
-				      * the output is to go to. Usually, this
-				      * will be a file stream.
-				      *
-				      * You can set and reset this stream
-				      * by the @p{attach} function.
-				      */
-    std::ostream  *file;
-
-				     /**
-				      * Flag which stores whether the
-				      * last operation was a
-				      * newline-generation. We use this flag
-				      * to generate the list of prefixes at
-				      * the next output, rather than
-				      * immediately after the newline, since
-				      * this might disturb the screen lay-out.
-				      */
-    bool was_endl;
-
-				     /**
-				      * Value denoting the number of
-				      * prefixes to be printed to the
-				      * standard output. If more than
-				      * this number of prefixes is
-				      * pushed to the stack, then no
-				      * output will be generated until
-				      * the number of prefixes shrinks
-				      * back below this number.
-				      */
-    unsigned int std_depth;
-
-				     /**
-				      * Same for the maximum depth of
-				      * prefixes for output to a file.
-				      */
-    unsigned int file_depth;
-
-                                     /**
-				      * Flag for printing execution time.
-				      */
-    bool print_utime;
-
-				     /**
-				      * Flag for printing time differences.
-				      */
-    bool diff_utime;
-
-				     /**
-				      * Time of last output line.
-				      */
-    double last_time;
-      
   public:
 				     /**
 				      * Standard constructor, since we
@@ -224,24 +152,20 @@ class LogStream
     LogStream & operator << (const T &t);
 
 				     /**
-				      * Output a function. This really is not
-				      * to output the function, but calls the
-				      * function on the present object. It
-				      * works the same way as it is possible
-				      * to output the stream manipulators
-				      * (like @p{std::endl}, etc) work on standard
-				      * streams: @p{stream << std::endl;}. We need
-				      * to overload this function in order
-				      * to know when we have to print the
-				      * prefixes, since a user may use several
-				      * calls to @p{operator <<} before the
-				      * line is complete. The overloaded
-				      * function @p{void std::endl(LogStream &)}
-				      * tells the @p{LogStream} that the end of
-				      * the line is reached.
+				      * Treat ostream
+				      * manipulators. This passes on
+				      * the whole thing to the
+				      * template function with the
+				      * exception of the @p{std::endl}
+				      * manipulator, for which special
+				      * action is performed: set the
+				      * @p{was_endl} variable that
+				      * forces this object to generate
+				      * a line head the next time
+				      * something is written by this
+				      * stream.
 				      */
-    LogStream & operator << (void (f)(LogStream &));
-
+    LogStream & operator<< (std::ostream& (*p) (std::ostream&));
 
 				     /**
 				      * Determine an estimate for
@@ -267,17 +191,83 @@ class LogStream
     DeclException0 (ExcNoFileStreamGiven);
 
   private:
+    
+				     /**
+				      * Stack of strings which are printed
+				      * at the beginning of each line to
+				      * allow identification where the
+				      * output was generated.
+				      */
+    std::stack<std::string> prefixes;
+
+				     /**
+				      * Default stream, where the output
+				      * is to go to. This stream defaults
+				      * to @p{std::cerr}, but can be set to another
+				      * stream through the constructor.
+				      */
+    std::ostream  *std_out;
+
+				     /**
+				      * Pointer to a stream, where a copy of
+				      * the output is to go to. Usually, this
+				      * will be a file stream.
+				      *
+				      * You can set and reset this stream
+				      * by the @p{attach} function.
+				      */
+    std::ostream  *file;
+
+				     /**
+				      * Flag which stores whether the
+				      * last operation was a
+				      * newline-generation. We use this flag
+				      * to generate the list of prefixes at
+				      * the next output, rather than
+				      * immediately after the newline, since
+				      * this might disturb the screen lay-out.
+				      */
+    bool was_endl;
+
+				     /**
+				      * Value denoting the number of
+				      * prefixes to be printed to the
+				      * standard output. If more than
+				      * this number of prefixes is
+				      * pushed to the stack, then no
+				      * output will be generated until
+				      * the number of prefixes shrinks
+				      * back below this number.
+				      */
+    unsigned int std_depth;
+
+				     /**
+				      * Same for the maximum depth of
+				      * prefixes for output to a file.
+				      */
+    unsigned int file_depth;
+
+                                     /**
+				      * Flag for printing execution time.
+				      */
+    bool print_utime;
+
+				     /**
+				      * Flag for printing time differences.
+				      */
+    bool diff_utime;
+
+				     /**
+				      * Time of last output line.
+				      */
+    double last_time;
+      
                                      /**
 				      * Print head of line. This prints
 				      * optional time information and
 				      * the contents of the prefix stack.
 				      */
     void print_line_head();
-
-				     /**
-				      * Declare this function as a friend.
-				      */
-    friend void endl (LogStream &);
 };
 
 
@@ -309,26 +299,24 @@ LogStream::operator<< (const T& t)
 }
 
 
-/**
- * Replacement of @p{std::endl} for @p{LogStream}.
- *
- * Overloaded version of the stream manipulator function @p{std::endl} which
- * results in calling the original version of @p{std::endl} for each of the
- * two streams, if the present prefix number does not exceed the
- * specified maximal number.
- *
- * @author Guido Kanschat, 1999
- */
-inline void endl(LogStream& s)
+
+inline
+LogStream &
+LogStream::operator<< (std::ostream& (*p) (std::ostream&))
 {
-  if (s.prefixes.size() <= s.std_depth)
-    *s.std_out << std::endl;
+				   // first pass on to the other
+				   // (templatized function)
+  this->template operator<< <std::ostream & (*)(std::ostream&)> (p);
 
-  if (s.file && (s.prefixes.size() <= s.file_depth))
-    *s.file << std::endl;
+				   // next check whether this is the
+				   // @p{endl} manipulator, and if so
+				   // set a flag
+  if (p == &std::endl)
+    was_endl = true;
 
-  s.was_endl = true;
+  return *this;
 };
+
 
 
 /**

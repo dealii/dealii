@@ -101,11 +101,11 @@ FDMatrix::gnuplot_print(ostream& s, const Vector<number>& V) const
 	{
 					   // Number of the row to be entered
 	  unsigned int row = j+(nx-1)*i;
-	  s << (j+1)/(float)nx << '\t' << (i+1)/(float)ny << '\t' << V(row) << endl;
+	  s << (j+1)/(float)nx << '\t' << (i+1)/(float)ny << '\t' << V(row) << std::endl;
 	}
-      s << endl;
+      s << std::endl;
     } 
-   s << endl;
+   s << std::endl;
 }
 
 

@@ -87,7 +87,7 @@ check_cells (vector<Quadrature<dim>*>& quadratures)
       while (err<1e-15);
 				       // Uncomment here for testing
 //      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
-      deallog << " is exact for polynomials of degree " << i-1 << endl;
+      deallog << " is exact for polynomials of degree " << i-1 << std::endl;
 
       if (dim==1)
 	{
@@ -101,7 +101,7 @@ check_cells (vector<Quadrature<dim>*>& quadratures)
 	    }
 	  if (!in_order)
 	    for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
-	      deallog << points[x] << endl;
+	      deallog << points[x] << std::endl;
 	}
     }  
 }
@@ -170,7 +170,7 @@ check_faces (vector<Quadrature<dim-1>*>& quadratures, bool sub)
       while (err<5e-15);
 				       // Uncomment here for testing
       //      deallog << " (Int " << quadrature_int << '-' << exact_int << '=' << err << ")";
-      deallog << " is exact for polynomials of degree " << i-1 << endl;
+      deallog << " is exact for polynomials of degree " << i-1 << std::endl;
     }
   deallog.pop();
 }

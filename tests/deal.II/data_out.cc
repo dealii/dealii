@@ -136,16 +136,16 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   
   deallog << "   Number of active cells: "
 	  << triangulation.n_active_cells()
-	  << endl
+	  << std::endl
 	  << "   Total number of cells: "
 	  << triangulation.n_cells()
-	  << endl;
+	  << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
   deallog << "   Number of degrees of freedom: "
 	  << dof_handler.n_dofs()
-	  << endl;
+	  << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),

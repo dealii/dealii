@@ -48,7 +48,7 @@ int main ()
 
 Vector<double> val(4);
 
-  deallog << "Testing transformation of 2nd derivatives of shape function:" << endl;
+  deallog << "Testing transformation of 2nd derivatives of shape function:" << std::endl;
   
 				   // test for each of the four
 				   // shape functions. first loop:
@@ -56,7 +56,7 @@ Vector<double> val(4);
 				   // one vertex moved
   for (unsigned int loop=0; loop<=2; ++loop)
     {
-      deallog << "Test loop: " << loop << endl;
+      deallog << "Test loop: " << loop << std::endl;
 	  
       				   // move one vertex of the only cell
       if (loop==1)
@@ -81,12 +81,12 @@ Vector<double> val(4);
 	  vector<Tensor<2,2> > derivs(4);
 	  fevalues.get_function_2nd_derivatives (val, derivs);
 	  
-	  deallog << "Vertex " << vertex << ": " << endl;
+	  deallog << "Vertex " << vertex << ": " << std::endl;
 	  for (unsigned int point=0; point<4; ++point)
 	    for (unsigned int component=0; component<2; ++component)
-	      deallog << derivs[point][component] << endl;
+	      deallog << derivs[point][component] << std::endl;
 	  
-	  deallog << endl;
+	  deallog << std::endl;
 	};
     };
 };

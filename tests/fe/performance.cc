@@ -29,23 +29,23 @@ void performance (Triangulation<dim>& tr,
 		  const Quadrature<dim>& quadrature,
 		  UpdateFlags flags)
 {
-  deallog << "Create dofs" << endl;
+  deallog << "Create dofs" << std::endl;
   DoFHandler<dim> dof (tr);
   dof.distribute_dofs (fe);
 
-  deallog << "Create FEValues" << endl;
+  deallog << "Create FEValues" << std::endl;
   
   FEValues<dim> val (mapping, fe, quadrature, flags);
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   DoFHandler<dim>::active_cell_iterator end = dof.end();
 
-  deallog << "Loop" << endl;
+  deallog << "Loop" << std::endl;
   
   for (;cell != end ; ++cell)
     val.reinit(cell);
 
-  deallog << "End" << endl;
+  deallog << "End" << std::endl;
 }
 
 template <int dim>

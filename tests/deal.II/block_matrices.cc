@@ -116,16 +116,16 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::make_grid_and_dofs ()
   triangulation.refine_global (3);
   deallog << "Number of active cells: "
        << triangulation.n_active_cells()
-       << endl;
+       << std::endl;
   deallog << "Total number of cells: "
        << triangulation.n_cells()
-       << endl;
+       << std::endl;
   
   dof_handler.distribute_dofs (fe);
 
   deallog << "Number of degrees of freedom: "
        << dof_handler.n_dofs()
-       << endl;
+       << std::endl;
 
   reinit_sparsity ();
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
@@ -344,7 +344,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
 				       //<< ' '
 				       //<< typeid(Matrix).name ()
 				       //<< '-'
-	    << i << ' ' << solution(i) << endl;
+	    << i << ' ' << solution(i) << std::endl;
 };
 
     
@@ -410,7 +410,7 @@ int main ()
     };
 
   const unsigned int n_datasets = solutions.size();
-  deallog << "Checking " << n_datasets << " data sets." << endl;
+  deallog << "Checking " << n_datasets << " data sets." << std::endl;
   
   for (unsigned int i=1; i<n_datasets; ++i)
     Assert (solutions[i].size() == solutions[i].size(),
@@ -432,7 +432,7 @@ int main ()
 	    deallog << "Discrepancy: i=" << i << ", j=" << j
 		    << ", sol[i][j]=" << solutions[i][j]
 		    << ", sol[0][j]=" << solutions[0][j]
-		    << endl;
+		    << std::endl;
 	    deallog << flush;
 	    Assert (false, ExcInternalError());
 	  };

@@ -41,11 +41,11 @@
 //   for (unsigned int i=0;i<n;++i)
 //     {
 //       for (unsigned int j=0;j<n;++j)
-// //	s << ((float)i)/n << '\t' << ((float)j)/n << '\t' << v(k++) << endl;
+// //	s << ((float)i)/n << '\t' << ((float)j)/n << '\t' << v(k++) << std::endl;
 // 	s << '\t' << v(k++);
-//       s << endl;
+//       s << std::endl;
 //     }
-//   s << endl;
+//   s << std::endl;
 // }
 
 class FDMG
@@ -125,7 +125,7 @@ for (unsigned int level = 0; level <= maxlevel; ++level)
       const unsigned int size = base * (1 << level);
 
       const unsigned int dim = (size-1)*(size-1);
-      deallog << "Level " << level << " size " << size << endl;
+      deallog << "Level " << level << " size " << size << std::endl;
 
 				       // Make matrix
       vector<SparsityPattern>  structure(maxlevel+1);

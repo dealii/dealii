@@ -253,7 +253,7 @@ int main ()
       
       for (int step=0; step<9; ++step)
 	{
-	  deallog << "Element=" << element << ", Step=" << step << endl;
+	  deallog << "Element=" << element << ", Step=" << step << std::endl;
 	  
 	  Triangulation<3> tria;
 	  make_tria (tria, step);
@@ -271,7 +271,7 @@ int main ()
 					   // release fe
 	  dof.clear ();
 
-	  deallog << endl;
+	  deallog << std::endl;
 	};
 
       delete fe;

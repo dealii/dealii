@@ -27,13 +27,13 @@ check_support (FiniteElement<dim>& finel, const char* name)
   DoFHandler<dim> dof (tr);
   dof.distribute_dofs (finel);
 
-  cout << name << '<' << dim << '>' << " cell support points" << endl;
+  cout << name << '<' << dim << '>' << " cell support points" << std::endl;
   
   vector<Point<dim> > cell_points (finel.dofs_per_cell);
   finel.get_unit_support_points (cell_points);
 
   for (unsigned int k=0;k<cell_points.size();++k)
-    cout << setprecision(3) << cell_points[k] << endl;
+    cout << setprecision(3) << cell_points[k] << std::endl;
   
   vector<Point<dim-1> > face_points;
   finel.get_unit_face_support_points (face_points);
@@ -45,11 +45,11 @@ check_support (FiniteElement<dim>& finel, const char* name)
   unsigned int j=0;
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     {
-      cout << name << '<' << dim << '>' << " face " << i << " support points" << endl;
+      cout << name << '<' << dim << '>' << " face " << i << " support points" << std::endl;
         
       for (unsigned int k=0;k<face_points.size();++k)
 	cout << setprecision(3) << qp.point(j++)
-	     << endl;
+	     << std::endl;
     }
 }
 
@@ -57,14 +57,14 @@ template <int dim>
 inline void
 check_matrices (FiniteElement<dim>& fe, const char* name)
 {
-  cout << name << '<' << dim << '>' << " constraint " << endl;
+  cout << name << '<' << dim << '>' << " constraint " << std::endl;
   fe.constraints().print_formatted (cout, 7, false, 10, "~");
 
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
     {
-      cout << name << '<' << dim << '>' << " restriction " << i << endl;
+      cout << name << '<' << dim << '>' << " restriction " << i << std::endl;
       fe.restrict(i).print_formatted (cout, 3, false, 6, "~");
-      cout << name << '<' << dim << '>' << " embedding " << i << endl;
+      cout << name << '<' << dim << '>' << " embedding " << i << std::endl;
       fe.prolongate(i).print_formatted (cout, 3, false, 6, "~");
     }
 }

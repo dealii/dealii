@@ -107,7 +107,7 @@ TransferTest::prolongate(unsigned l,
 			 Vector<double>&,
 			 const Vector<double>&) const
 {
-  deallog << "Prolongating " << l-1 << " to " << l << endl;
+  deallog << "Prolongating " << l-1 << " to " << l << std::endl;
 }
 
 void
@@ -115,7 +115,7 @@ TransferTest::restrict_and_add (unsigned l,
 				Vector<double>&,
 				const Vector<double>&) const
 {
-  deallog << "Restricting  " << l << " to " << l-1 << endl;
+  deallog << "Restricting  " << l << " to " << l-1 << std::endl;
 }
 
 void
@@ -123,7 +123,7 @@ SmoothTest::smooth (const unsigned int  level,
 		    Vector<double>      &,
 		    const Vector<double>&) const
 {
-  deallog << "Smoothing on " << level << endl;
+  deallog << "Smoothing on " << level << std::endl;
 }
 
 void
@@ -132,7 +132,7 @@ MGTest::level_vmult(unsigned l,
 		       const Vector<double>&,
 		       const Vector<double>&)
 {
-  deallog << "Residual on  " << l << endl;
+  deallog << "Residual on  " << l << std::endl;
 }
 
 void
@@ -148,5 +148,5 @@ MGCoarseGridTest::operator() (unsigned int level,
 			      Vector<double>&,
 			      const Vector<double>&) const
 {
-  deallog << "Solving on   " << level << endl;
+  deallog << "Solving on   " << level << std::endl;
 }

@@ -108,8 +108,8 @@ int main()
 	  hanging_nodes.close();
 
 	  const unsigned int size = dof.n_dofs();
-	  deallog << "DoFs " << size << endl;
-	  deallog << "Levels: " << tr.n_levels() << endl;
+	  deallog << "DoFs " << size << std::endl;
+	  deallog << "Levels: " << tr.n_levels() << std::endl;
 	  
 	  SparsityPattern structure(size, dof.max_couplings_between_dofs());
 	  DoFTools::make_sparsity_pattern(dof, structure);

@@ -39,27 +39,27 @@ int main ()
   deallog << "unrolled:";
   for (unsigned i=0;i<9;i++)
     deallog << ' ' << unrolled(i);
-  deallog << endl;
+  deallog << std::endl;
 
-  deallog << "t=" << endl;
+  deallog << "t=" << std::endl;
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
 	deallog << t[i][j] << ' ';
-      deallog << endl;
+      deallog << std::endl;
     };
-  deallog << endl;
+  deallog << std::endl;
   
   contract (tt,t,t);
 
-  deallog << "tt=" << endl;
+  deallog << "tt=" << std::endl;
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
 	deallog << tt[i][j] << ' ';
-      deallog << endl;
+      deallog << std::endl;
     };
-  deallog << endl;
+  deallog << std::endl;
 
   if (true)
     {
@@ -74,28 +74,28 @@ int main ()
       cross_product(result,e1,e2);
       deallog << '\t' << result[0]
 	      << '\t' << result[1]
-	      << '\t' << result[2] << endl;
+	      << '\t' << result[2] << std::endl;
       
       cross_product(result,e2,e3);
       deallog << '\t' << result[0]
 	      << '\t' << result[1] << '\t'
-	      << result[2] << endl;
+	      << result[2] << std::endl;
       
       cross_product(result,e3,e1);
       deallog << '\t' << result[0]
 	      << '\t' << result[1]
-	      << '\t' << result[2] << endl;
+	      << '\t' << result[2] << std::endl;
       
 	deallog.pop();
     }
 
   if (tt==result)
     {
-      deallog << "Result OK." << endl;
+      deallog << "Result OK." << std::endl;
     }
   else
     {
-      deallog << "Result WRONG!" << endl;
+      deallog << "Result WRONG!" << std::endl;
     };
 
 };

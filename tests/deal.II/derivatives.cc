@@ -169,9 +169,9 @@ check (const unsigned int level,
 	    }
 	}
     }
-      deallog << "L2: " << l2 << endl;
-      deallog << "H1: " << h1 << endl;
-      deallog << "H2: " << h2 << endl;  
+      deallog << "L2: " << l2 << std::endl;
+      deallog << "H1: " << h1 << std::endl;
+      deallog << "H2: " << h2 << std::endl;  
 }
 
 template <int dim>

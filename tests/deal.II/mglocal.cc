@@ -76,7 +76,7 @@ int main()
 //  deallog.log_execution_time(true);
   deallog.depth_console(0);
 
-  deallog << "Test" << endl;
+  deallog << "Test" << std::endl;
   
   Helmholtz equation;
   RHSFunction<2> rhs;
@@ -101,11 +101,11 @@ int main()
   
       dof.distribute_dofs(fe);
       const unsigned int size = dof.n_dofs();
-      deallog << "DoFs " << size << endl;
-      deallog << "Levels: " << tr.n_levels() << endl;
+      deallog << "DoFs " << size << std::endl;
+      deallog << "Levels: " << tr.n_levels() << std::endl;
       for (unsigned int step=1;step < 3; ++step)
 	{
-	  deallog << "smoothing-steps" << step << endl;
+	  deallog << "smoothing-steps" << step << std::endl;
 	  SparsityPattern structure(size, dof.max_couplings_between_dofs());
 	  DoFTools::make_sparsity_pattern(dof, structure);
 

@@ -42,10 +42,10 @@ int main(int, char)
   deallog.depth_console(0);
   
   vector<double> values(1);
-  deallog << "LagrangeEquidistant polynoms:" << endl;
+  deallog << "LagrangeEquidistant polynoms:" << std::endl;
   for (unsigned int order=1; order<=4; ++order)
     {
-      deallog << "Polynomial p of order " << order << endl;
+      deallog << "Polynomial p of order " << order << std::endl;
       for (unsigned int s_point=0; s_point<=order; ++s_point)
 	{
 	  LagrangeEquidistant polynom(order, s_point);
@@ -61,7 +61,7 @@ int main(int, char)
 		deallog << "   ok";
 	      else
 		deallog << "   false";
-	      deallog << endl;
+	      deallog << std::endl;
 
 					       // now also check
 					       // whether the other
@@ -71,14 +71,14 @@ int main(int, char)
 	      if (polynom.value(x) != values[0])
 		{
 		  deallog << "The two `value' functions return different results!"
-			  << endl;
+			  << std::endl;
 		  abort ();
 		};
 	    }
 	}
     }
 
-  deallog << endl << "Test derivatives computed by the Horner scheme:" << endl;
+  deallog << std::endl << "Test derivatives computed by the Horner scheme:" << std::endl;
   LagrangeEquidistant pol(4, 2);
   vector<double> v_horner(6);
   for (unsigned int i=0; i<=10; ++i)
@@ -100,7 +100,7 @@ int main(int, char)
       for (unsigned int i=0; i<v_exact.size(); ++i)
 	{
 //    	  deallog << "v_horner[i]=" << v_horner[i]
-//    	       << "   v_exact[i]=" << v_exact[i] << endl;
+//    	       << "   v_exact[i]=" << v_exact[i] << std::endl;
 	  if (fabs(v_horner[i]-v_exact[i])>1e-12)
 	    ok=false;
 	}
@@ -110,12 +110,12 @@ int main(int, char)
       else
 	deallog << "false";
 
-      deallog << endl;
+      deallog << std::endl;
     }
 
 
-  deallog << endl << "Test of TensorProductPolynomials:" << endl;
-  deallog << "2D Example:" << endl;
+  deallog << std::endl << "Test of TensorProductPolynomials:" << std::endl;
+  deallog << "2D Example:" << std::endl;
   unsigned int p=3,
    n_tensor_pols=(p+1)*(p+1);
   vector<SmartPointer<Polynomial> > pols;
@@ -144,17 +144,17 @@ int main(int, char)
   Q3_4th_shape_function_values_and_grads_dim2(point, v_exact, grad_exact, grad_grad_exact);
 
   unsigned int i=1;
-  deallog << "v_" << i << "=" << vs[i] << endl;
-  deallog << "v_exact=" << v_exact << endl;
-  deallog << "grad_v_" << i << "=" << grads[i] << endl;
-  deallog << "grad_exact=" << grad_exact << endl;
+  deallog << "v_" << i << "=" << vs[i] << std::endl;
+  deallog << "v_exact=" << v_exact << std::endl;
+  deallog << "grad_v_" << i << "=" << grads[i] << std::endl;
+  deallog << "grad_exact=" << grad_exact << std::endl;
   for (unsigned int j=0; j<grad_grads[i].dimension; ++j)
     for (unsigned int k=0; k<grad_grads[i].dimension; ++k)
       {
 	deallog << "grad_grads_" << i<< "[" << j << "][" << k << "]="
-		<< grad_grads[i][j][k] << endl;
+		<< grad_grads[i][j][k] << std::endl;
 	deallog << "grad2_exact[" << j << "][" << k << "]="
-		<< grad_grad_exact[j][k] << endl;
+		<< grad_grad_exact[j][k] << std::endl;
       }
 }
 

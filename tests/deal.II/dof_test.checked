@@ -1,6 +1,6 @@
 
 DEAL::Dimension = 2, Test case = 1
-
+DEAL::
 DEAL::    Making grid...
 DEAL::    Distributing degrees of freedom...
 DEAL::    Renumbering degrees of freedom...
@@ -967,16 +967,16 @@ DEAL::    Writing condensed sparsity pattern...
 47 -58
 48 -58
 56 -58
-
+DEAL::
 DEAL::    Total number of cells         = 53
 DEAL::    Total number of active cells  = 40
 DEAL::    Number of DoFs                = 59
 DEAL::    Number of constraints         = 20
 DEAL::    Unconstrained matrix bandwidth= 30
 DEAL::    Constrained matrix bandwidth  = 36
-
+DEAL::
 DEAL::Dimension = 2, Test case = 2
-
+DEAL::
 DEAL::    Making grid...
 DEAL::    Distributing degrees of freedom...
 DEAL::    Renumbering degrees of freedom...
@@ -2105,16 +2105,16 @@ DEAL::    Writing condensed sparsity pattern...
 56 -72
 70 -72
 71 -72
-
+DEAL::
 DEAL::    Total number of cells         = 69
 DEAL::    Total number of active cells  = 52
 DEAL::    Number of DoFs                = 73
 DEAL::    Number of constraints         = 8
 DEAL::    Unconstrained matrix bandwidth= 34
 DEAL::    Constrained matrix bandwidth  = 34
-
+DEAL::
 DEAL::Dimension = 3, Test case = 1
-
+DEAL::
 DEAL::    Making grid...
 DEAL::    Distributing degrees of freedom...
 DEAL::    Renumbering degrees of freedom...
@@ -11167,16 +11167,16 @@ DEAL::    Writing condensed sparsity pattern...
 231 -234
 232 -234
 233 -234
-
+DEAL::
 DEAL::    Total number of cells         = 137
 DEAL::    Total number of active cells  = 120
 DEAL::    Number of DoFs                = 235
 DEAL::    Number of constraints         = 90
 DEAL::    Unconstrained matrix bandwidth= 175
 DEAL::    Constrained matrix bandwidth  = 200
-
+DEAL::
 DEAL::Dimension = 3, Test case = 2
-
+DEAL::
 DEAL::    Making grid...
 DEAL::    Distributing degrees of freedom...
 DEAL::    Renumbering degrees of freedom...
@@ -15577,11 +15577,11 @@ DEAL::    Writing condensed sparsity pattern...
 120 -124
 122 -124
 123 -124
-
+DEAL::
 DEAL::    Total number of cells         = 73
 DEAL::    Total number of active cells  = 64
 DEAL::    Number of DoFs                = 125
 DEAL::    Number of constraints         = 0
 DEAL::    Unconstrained matrix bandwidth= 85
 DEAL::    Constrained matrix bandwidth  = 85
-
+DEAL::

@@ -151,15 +151,6 @@ LogStream::print_line_head()
 }
 
 
-LogStream&
-LogStream::operator << (void (f)(LogStream &))
-{
-  f(*this);
-  return *this;
-}
-
-
-
 unsigned int
 LogStream::memory_consumption () const
 {

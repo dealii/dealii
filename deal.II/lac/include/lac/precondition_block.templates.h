@@ -135,7 +135,7 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 
   if (same_diagonal)
     {
-      deallog << "PreconditionBlock uses only one diagonal block" << endl;
+      deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
 				       // Invert only the first block
 				       // This is a copy of the code in the
 				       // 'else' part, stripped of the outer loop

@@ -41,23 +41,23 @@ void test_fe_datas()
       fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (4), 2));
     }
   
-  deallog << endl << "dim=" << dim << endl;
+  deallog << std::endl << "dim=" << dim << std::endl;
   for (unsigned int n=0; n<fe_datas.size(); ++n)
     {
       FiniteElementData<dim> *fe_data=fe_datas[n];
-      deallog << "fe_data[" << n <<"]:" << endl;
-      deallog << "dofs_per_vertex=" << fe_data->dofs_per_vertex << endl;
-      deallog << "dofs_per_line=" << fe_data->dofs_per_line << endl;
-      deallog << "dofs_per_quad=" << fe_data->dofs_per_quad << endl;
-      deallog << "dofs_per_hex=" << fe_data->dofs_per_hex << endl;
-      deallog << "first_line_index=" << fe_data->first_line_index << endl;
-      deallog << "first_quad_index=" << fe_data->first_quad_index << endl;
-      deallog << "first_hex_index=" << fe_data->first_hex_index << endl;
-      deallog << "first_face_line_index=" << fe_data->first_face_line_index << endl;
-      deallog << "first_face_quad_index=" << fe_data->first_face_quad_index << endl;
-      deallog << "dofs_per_face=" << fe_data->dofs_per_face << endl;
-      deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << endl;
-      deallog << "components=" << fe_data->components << endl;
+      deallog << "fe_data[" << n <<"]:" << std::endl;
+      deallog << "dofs_per_vertex=" << fe_data->dofs_per_vertex << std::endl;
+      deallog << "dofs_per_line=" << fe_data->dofs_per_line << std::endl;
+      deallog << "dofs_per_quad=" << fe_data->dofs_per_quad << std::endl;
+      deallog << "dofs_per_hex=" << fe_data->dofs_per_hex << std::endl;
+      deallog << "first_line_index=" << fe_data->first_line_index << std::endl;
+      deallog << "first_quad_index=" << fe_data->first_quad_index << std::endl;
+      deallog << "first_hex_index=" << fe_data->first_hex_index << std::endl;
+      deallog << "first_face_line_index=" << fe_data->first_face_line_index << std::endl;
+      deallog << "first_face_quad_index=" << fe_data->first_face_quad_index << std::endl;
+      deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
+      deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
+      deallog << "components=" << fe_data->components << std::endl;
     }
 
 				   // delete all FiniteElementDatas

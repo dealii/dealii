@@ -26,13 +26,13 @@ main()
   clock_t start;
   clock_t diff;
 
-  deallog << "Iterations: " << ITER << endl;
+  deallog << "Iterations: " << ITER << std::endl;
 
   for (unsigned int nx=32; nx<8192 ; nx*=2)
     {
       const unsigned int dim=(nx-1)*(nx-1);
 
-      deallog << "size = " << nx << "  dim = " << dim << endl;
+      deallog << "size = " << nx << "  dim = " << dim << std::endl;
 
       start = clock();
       for (unsigned int i=0;i<ITER;i++)
@@ -41,7 +41,7 @@ main()
 	  v.reinit(dim);
 	}
       diff = clock()-start;
-      deallog << "reinit: " << double(diff)/(2*ITER) << endl;
+      deallog << "reinit: " << double(diff)/(2*ITER) << std::endl;
 
       start = clock();
       for (unsigned int i=0;i<ITER;i++)
@@ -49,7 +49,7 @@ main()
 	  u = (double) i;
 	}
       diff = clock()-start;
-      deallog << "operator=(double): " << double(diff)/ITER << endl;
+      deallog << "operator=(double): " << double(diff)/ITER << std::endl;
 
       QuickMatrix<double> A(nx,nx);
 
@@ -59,7 +59,7 @@ main()
 	  A.vmult(v,u);
 	}
       diff = clock()-start;
-      deallog << "vmult: " << double(diff)/ITER << endl;
+      deallog << "vmult: " << double(diff)/ITER << std::endl;
     }
 }
 

@@ -91,7 +91,7 @@ void test ()
       deallog << "Row " << row << " sparsity:  ";
       for (unsigned int i=0; i<29; ++i)
 	deallog << t[i];
-      deallog << endl;
+      deallog << std::endl;
       
       const unsigned int c=count(t.begin(), t.end(), true);
       
@@ -109,13 +109,13 @@ void test ()
       deallog << "Row=" << row
 	      << ": expected length=" << c
 	      << ", actual length=" << ac
-	      << endl;
+	      << std::endl;
       total_nonzero_elements += ac;
       AssertThrow (c==ac, ExcInternalError());
     };
   deallog << total_nonzero_elements << "=="
 	  << bsp.n_nonzero_elements()
-	  << endl;
+	  << std::endl;
   AssertThrow (total_nonzero_elements == bsp.n_nonzero_elements(),
 	       ExcInternalError());
 
@@ -127,7 +127,7 @@ void test ()
   BlockSparseMatrix<double> bsm (bsp);
   deallog << total_nonzero_elements << "=="
 	  << bsm.n_nonzero_elements()
-	  << endl;
+	  << std::endl;
   AssertThrow (total_nonzero_elements == bsm.n_nonzero_elements(),
 	       ExcInternalError());
   
@@ -180,7 +180,7 @@ void test ()
 
 				       // compare to vmult result
       Assert (row_sum == dst(row), ExcInternalError());
-      deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row) << endl;
+      deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row) << std::endl;
     };
 
 
@@ -188,7 +188,7 @@ void test ()
   const double msp1 = dst.norm_sqr ();
   const double msp2 = bsm.matrix_scalar_product (dst, src);
   Assert (msp1 == msp2, ExcInternalError());
-  deallog << "matrix_scalar_product " << msp1 << ' ' << msp2 << endl;
+  deallog << "matrix_scalar_product " << msp1 << ' ' << msp2 << std::endl;
 };
 
 
@@ -202,25 +202,25 @@ int main ()
     }
   catch (exception &e)
     {
-      cerr << endl << endl
+      cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << e.what() << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      cerr << "Exception on processing: " << e.what() << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
 				       // abort
       return 2;
     }
   catch (...) 
     {
-      cerr << endl << endl
+      cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      cerr << "Unknown exception!" << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
 				       // abort
       return 3;
     };

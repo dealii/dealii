@@ -256,7 +256,7 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
       print_vectors(it, x, g, d);
       
       if (additional_data.log_coefficients)
-	deallog << "alpha-beta:" << alpha << '\t' << beta << endl;
+	deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
       
       conv = control().check(it,res);
       if (conv)

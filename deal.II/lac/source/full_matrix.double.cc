@@ -133,9 +133,9 @@ FullMatrix<double>::invert (const FullMatrix<double> &M)
 //  double condition = s[0]/s[dim_range-1];
   
   if (info!=0)
-    deallog << "inverting error " << info << ' ' << erg << endl;
+    deallog << "inverting error " << info << ' ' << erg << std::endl;
   if (rank<(int)dim_range)
-    deallog << "rank deficiency " << rank << endl;
+    deallog << "rank deficiency " << rank << std::endl;
   delete[] work;
   delete[] s;
   delete[] matrix;

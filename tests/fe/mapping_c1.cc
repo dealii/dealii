@@ -92,10 +92,10 @@ int main ()
 	    {
 	      Point<2> radius = c1_values.quadrature_point(i);
   	      radius /= std::sqrt(radius.square());
-	      deallog << "Normalized radius=" << radius << endl;
+	      deallog << "Normalized radius=" << radius << std::endl;
 
-	      deallog << "C1 normal vector " << i << ": " << c1_values.normal_vector(i) << endl;
-	      deallog << "Q3 normal vector " << i << ": " << q3_values.normal_vector(i) << endl;
+	      deallog << "C1 normal vector " << i << ": " << c1_values.normal_vector(i) << std::endl;
+	      deallog << "Q3 normal vector " << i << ": " << q3_values.normal_vector(i) << std::endl;
 	    };
 	  
 

@@ -54,7 +54,7 @@ print_matrix(ostream& of,
   Vector<double> in(n_fine);
   Vector<double> out(n_coarse);
 
-  of << name << endl;
+  of << name << std::endl;
   for (unsigned int i=0;i<n_fine;++i)
     {
       in = 0.;
@@ -63,7 +63,7 @@ print_matrix(ostream& of,
       transfer.restrict_and_add(level,out,in);
       out.print(of, 3, false);
     }
-  of << endl;
+  of << std::endl;
 }
 
 

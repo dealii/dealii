@@ -358,7 +358,7 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   do 
     {
       if (step)
-	deallog << "Restart step " << step << endl;
+	deallog << "Restart step " << step << std::endl;
       if (start(A) == SolverControl::success) break;  
       state = iterate(A, precondition);
     }

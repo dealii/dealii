@@ -189,7 +189,7 @@ compute_area(Mapping<dim> &mapping,
   double area=0;
   for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
     area+=JxW[i];
-  deallog << "  area=" << area << endl;
+  deallog << "  area=" << area << std::endl;
 }
 
 
@@ -371,7 +371,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
 template<int dim>
 void mapping_test()
 {
-  deallog << "dim=" << dim << endl;
+  deallog << "dim=" << dim << std::endl;
   
   std::vector<Mapping<dim> *> mapping_ptr;
   std::vector<std::string> mapping_strings;
@@ -409,9 +409,9 @@ void mapping_test()
       dof.distribute_dofs(fe_q4);      
       DoFHandler<dim>::cell_iterator cell = dof.begin_active();
       
-      deallog << "Triangulation" << i << ":" << endl;
+      deallog << "Triangulation" << i << ":" << std::endl;
 
-      deallog << "exact_area=" << exact_areas[i] << endl;
+      deallog << "exact_area=" << exact_areas[i] << std::endl;
       for (unsigned int j=0; j<mapping_size; ++j)
 	if (show[i][j])
 	  {
@@ -422,7 +422,7 @@ void mapping_test()
 		std::ostrstream ost(st2, 99);
 		ost << "Mapping" << dim << "d-" << i << '-'
 		    << mapping_strings[j] << ".output" << std::ends;
-		deallog << st2 << endl;
+		deallog << st2 << std::endl;
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, st2);
 		compute_area(*mapping_ptr[j], fe_q4, cell);
 	      }
@@ -432,7 +432,7 @@ void mapping_test()
 		std::ostrstream ost(st2, 99);
 		ost << "MappingFace" << dim << "d-" << i << '-'
 		    << mapping_strings[j] << ".output" << std::ends;
-		deallog << st2 << endl;	    
+		deallog << st2 << std::endl;	    
 		plot_faces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
 
@@ -441,7 +441,7 @@ void mapping_test()
 		std::ostrstream ost(st2, 99);
 		ost << "MappingSubface" << dim << "d-" << i << '-'
 		    << mapping_strings[j] << ".output" << std::ends;
-		deallog << st2 << endl;	    
+		deallog << st2 << std::endl;	    
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
 
@@ -454,7 +454,7 @@ void mapping_test()
 		Point<dim> p_real=mapping.transform_unit_to_real_cell(cell, p_unit);
 		Point<dim> p_re_unit=mapping.transform_real_to_unit_cell(cell, p_real);
 		deallog << "p_unit=" << p_unit << ",  p_real=" << p_real
-			<< ",  p_re_unit=" << p_re_unit << endl;
+			<< ",  p_re_unit=" << p_re_unit << std::endl;
 	      }
 	    
 	    delete[] st2;

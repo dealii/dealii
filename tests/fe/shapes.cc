@@ -58,12 +58,12 @@ plot_shape_functions(Mapping<dim>& mapping,
 		{
 		  gnuplot << " " << fe.shape_value(i,k) + 1.;
 		}
-	      gnuplot << endl;
+	      gnuplot << std::endl;
 	      k++;
 	    }
-	  gnuplot << endl;
+	  gnuplot << std::endl;
 	}
-      gnuplot << endl;
+      gnuplot << std::endl;
     }
 }
 
@@ -118,12 +118,12 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 		    {
 		      gnuplot << " " << fe.shape_value(i,k) + 1.;
 		    }
-		  gnuplot << endl;
+		  gnuplot << std::endl;
 		  k++;
 		}
-	      gnuplot << endl;
+	      gnuplot << std::endl;
 	    }
-	  gnuplot << endl;
+	  gnuplot << std::endl;
 	} else {
 	  for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face; ++s)
 	    {
@@ -140,12 +140,12 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 			{
 			  gnuplot << " " << sub.shape_value(i,k) + 1.;
 			}
-		      gnuplot << endl;
+		      gnuplot << std::endl;
 		      k++;
 		    }
-		  gnuplot << endl;
+		  gnuplot << std::endl;
 		}
-	      gnuplot << endl;	      
+	      gnuplot << std::endl;	      
 	    }
 	}
     }

@@ -35,12 +35,12 @@ void test ()
 				   // no output expected here
   deallog.push("empty constructor");
   for (unsigned int i=0 ; i<i3.size() ; ++i)
-    deallog << i << '\t' << i3.local_to_global(i,0) << endl;
+    deallog << i << '\t' << i3.local_to_global(i,0) << std::endl;
   for (unsigned int i=0 ; i<i3.total_size() ; ++i)
     deallog << i
 	    << '\t' << i3.global_to_local(i).first
 	    << '\t' << i3.global_to_local(i).second
-	    << endl;
+	    << std::endl;
   deallog.pop();
 
   i3.reinit(ivector);
@@ -57,7 +57,7 @@ void test ()
 	      << '\t' << i2.global_to_local(i).second
 	      << '\t' << i3.global_to_local(i).first
 	      << '\t' << i3.global_to_local(i).second
-	      << endl;
+	      << std::endl;
     }
 
   deallog.pop();
@@ -66,7 +66,7 @@ void test ()
   for (unsigned int i=0 ; i<i1.size() ; ++i)
     for (unsigned int j=0 ; j<ivector[i] ; ++j)
       deallog << i << '\t' << j << '\t'
-	      << i1.local_to_global(i,j) << endl;
+	      << i1.local_to_global(i,j) << std::endl;
   
   deallog.pop();
 
@@ -80,9 +80,9 @@ void test ()
       deallog << i
 	      << '\t' << i1.global_to_local(i).first
 	      << '\t' << i1.global_to_local(i).second
-	      << endl;
+	      << std::endl;
     }
-  deallog << "---" << endl;
+  deallog << "---" << std::endl;
   
   ivector.erase(ivector.begin());
   ivector.erase(ivector.begin());
@@ -94,11 +94,11 @@ void test ()
       deallog << i
 	      << '\t' << i1.global_to_local(i).first
 	      << '\t' << i1.global_to_local(i).second
-	      << endl;
+	      << std::endl;
     }
   deallog.pop();
 
-  deallog << "Range" << endl;
+  deallog << "Range" << std::endl;
   unsigned int i = i1.global_to_local(3).first;
   i = i1.local_to_global(1,2);
   i = i1.local_to_global(2,0);
@@ -122,25 +122,25 @@ int main ()
     }
   catch (exception &e)
     {
-      cerr << endl << endl
+      cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << e.what() << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      cerr << "Exception on processing: " << e.what() << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
 				       // abort
       return 2;
     }
   catch (...) 
     {
-      cerr << endl << endl
+      cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      cerr << "Unknown exception!" << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
 				       // abort
       return 3;
     };

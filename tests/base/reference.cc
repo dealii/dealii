@@ -25,19 +25,19 @@ public:
   Test(const char* n) :
 		  name(n)
       {
-	deallog << "Construct " << name << endl;
+	deallog << "Construct " << name << std::endl;
       }
   ~Test()
       {
-	deallog << "Destruct " << name << endl;
+	deallog << "Destruct " << name << std::endl;
       }	  
   void f()
   {
-    deallog << "mutable" << endl;
+    deallog << "mutable" << std::endl;
   }
   void f() const
   {
-    deallog << "const" << endl;
+    deallog << "const" << std::endl;
   }
 };
 

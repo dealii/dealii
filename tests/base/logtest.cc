@@ -21,17 +21,17 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  deallog << "Test" << endl;
+  deallog << "Test" << std::endl;
   deallog.push("l1");
-  deallog << "Test1" << endl;
+  deallog << "Test1" << std::endl;
   deallog.push("l2");
-  deallog << "Test2" << "Test3" << endl;
+  deallog << "Test2" << "Test3" << std::endl;
   deallog.push("l3");
   deallog << "Test4";
   deallog.pop();
-  deallog << "Test5" << endl;
+  deallog << "Test5" << std::endl;
   deallog.pop();
-  deallog << "Test6" << endl;
+  deallog << "Test6" << std::endl;
   deallog.pop();
-  deallog << "Test7" << endl;
+  deallog << "Test7" << std::endl;
 }

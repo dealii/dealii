@@ -72,7 +72,7 @@ main ()
 	  double a = z.l2_norm();
 	  if (a > 1.e-12) deallog << a << ' ';
 	}
-      deallog << endl;
+      deallog << std::endl;
     }
 
   if (true)
@@ -96,12 +96,12 @@ main ()
 	  C(i,i+1) = -sin(i+1);
 	  
 	  C.print_formatted (logfile);
-	  deallog << "l1-norm: " << C.l1_norm() << endl;
+	  deallog << "l1-norm: " << C.l1_norm() << std::endl;
 	  D = C;
 	  D.gauss_jordan();
 	  D.print_formatted (logfile);
-	  deallog << "linfty-norm: " << D.linfty_norm() << endl
-		  << "Frobenius-norm: " << D.norm2() << endl;
+	  deallog << "linfty-norm: " << D.linfty_norm() << std::endl
+		  << "Frobenius-norm: " << D.norm2() << std::endl;
 	  
 					   // Rotate original matrix
 	  A.mmult(H,C);
@@ -122,7 +122,7 @@ main ()
 	    von_Mises(control, mem, 0.);
 	  double eigen = 0.;
 	  von_Mises.solve(eigen, A, u);
-	  deallog << "Eigenvalue: " << eigen << endl;
+	  deallog << "Eigenvalue: " << eigen << std::endl;
 	}
       if (true)
 	{
@@ -131,7 +131,7 @@ main ()
 	    von_Mises(control, mem, -4.);
 	  double eigen = 0.;
 	  von_Mises.solve(eigen, A, u);
-	  deallog << "Eigenvalue: " << eigen << endl;
+	  deallog << "Eigenvalue: " << eigen << std::endl;
 	}
       H = A;
       H.gauss_jordan();
@@ -143,7 +143,7 @@ main ()
 	    von_Mises(control, mem, 0.);
 	  double eigen = 0.;
 	  von_Mises.solve(eigen, H, u);
-	  deallog << "Eigenvalue: " << eigen << endl;
+	  deallog << "Eigenvalue: " << eigen << std::endl;
 	}
       if (true)
 	{
@@ -152,7 +152,7 @@ main ()
 	    von_Mises(control, mem, -4.);
 	  double eigen = 0.;
 	  von_Mises.solve(eigen, H, u);
-	  deallog << "Eigenvalue: " << eigen << endl;
+	  deallog << "Eigenvalue: " << eigen << std::endl;
 	}
     }
 }

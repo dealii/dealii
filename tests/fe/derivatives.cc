@@ -50,13 +50,13 @@ plot_derivatives(Mapping<dim>& mapping,
 	{
 	  for (unsigned int mx=0;mx<=div;++mx)
 	    {
-	      deallog << q.point(k) << endl;
+	      deallog << q.point(k) << std::endl;
 	  
 	      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		{
 		  deallog << "\tGrad " << fe.shape_grad(i,k);
 		  deallog << "\t2nd " << fe.shape_2nd_derivative(i,k);
-		  deallog << endl;
+		  deallog << std::endl;
 		}
 	      k++;
 	    }
