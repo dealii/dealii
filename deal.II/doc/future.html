@@ -48,14 +48,22 @@
          complicated applications.
 	 </p>
 
-    <li> <p>
-         <strong>Faster linear algebra:</strong>
-	 The linear algebra implementation in
-         <acronym>deal.II</acronym> is quite fast, but only compared
-         to other C/C++ implementations. We know that Fortran
-         compilers can do a much better job in optimizing the tight
-         inner loops of matrix-vector operations. We plan to try
-         interfaces from C to Fortran for that purpose.
+    <li> <p> 
+         <strong>Faster linear algebra:</strong> The linear
+         algebra implementation in <acronym>deal.II</acronym> is quite
+         fast, at least compared to other C/C++ implementations. We
+         know that Fortran compilers can sometimes do a better job in
+         optimizing some algorithms. We therefore would like to
+         interface from C to Fortran for that purpose.
+	 </p>
+	 
+	 <p>
+	 On the other hand, we have made some initial experiments with
+	 interfacing to BLAS routines on SUN, but it turned out that
+	 our own implementation of the routines we tried was faster
+	 than the ones in the vendor BLAS. Nevertheless, interfacing
+	 to LAPACK or other libraries implementing high level
+	 algorithms would be interesting.
 	 </p>
 
     <li> <p>
