@@ -1343,7 +1343,7 @@ inline
 number SparseMatrix<number>::diag_element (const unsigned int i) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),  ExcMatrixNotSquare());
   Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
@@ -1359,7 +1359,7 @@ inline
 number & SparseMatrix<number>::diag_element (const unsigned int i)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (cols->optimize_diagonal(),  ExcMatrixNotSquare());
   Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each

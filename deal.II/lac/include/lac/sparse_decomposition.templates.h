@@ -151,6 +151,8 @@ SparseLUDecomposition<number>::reinit ()
 template <typename number>
 void SparseLUDecomposition<number>::reinit (const SparsityPattern& sparsity)
 {
+  Assert (sparsity.optimize_diagonal(),
+	  typename SparsityPattern::ExcDiagonalNotOptimized());
   decomposed = false;
   if (true)
     {
