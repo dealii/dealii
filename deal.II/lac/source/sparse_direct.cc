@@ -21,6 +21,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/errno.h>
 
 
 // if we know that at least one of the HSL functions are there,
@@ -230,9 +231,16 @@ struct SparseDirectMA27::DetachedModeData
     template <typename T>
     void put (const T *t, const size_t N, const char */*debug_info*/) const
       {
-        write (server_client_pipe[1],
-               reinterpret_cast<const char *> (t),
-               sizeof(T) * N);
+        try_write:
+        int ret = write (server_client_pipe[1],
+                         reinterpret_cast<const char *> (t),
+                         sizeof(T) * N);
+                                         // if read call was
+                                         // interrupted, just
+                                         // retry
+        if ((ret<0) && (errno==EINTR))
+          goto try_write;
+        
         fflush (NULL);
       };
 
@@ -242,15 +250,24 @@ struct SparseDirectMA27::DetachedModeData
         unsigned int count = 0;
         while (count < sizeof(T)*N)
           {
+            try_read:
             int ret = read (client_server_pipe[0],
                             reinterpret_cast<char *> (t) + count,
                             sizeof(T) * N - count);
-            AssertThrow (ret >= 0,
-                         ExcReadError(ret, errno));
+                                             // if read call was
+                                             // interrupted, just
+                                             // retry
+            if ((ret<0) && (errno==EINTR))
+              goto try_read;
+
+                                             // however, if something
+                                             // more serious happened,
+                                             // then note this!
+            AssertThrow (ret >= 0, ExcReadError(ret, errno));
+            
             count += ret;
           };
-      };
-    
+      };    
 };
 
 
