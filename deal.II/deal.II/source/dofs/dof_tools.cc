@@ -470,10 +470,10 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 					endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->face(face)->has_children()) 
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->has_children()) 
 	{
-	  const DoFHandler<dim>::face_iterator face = cell->face(face);
+	  const DoFHandler<dim>::face_iterator face = cell->face(f);
 	  
 					   // fill the dofs indices. Use same
 					   // enumeration scheme as in
@@ -851,10 +851,10 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 					endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->face(face)->has_children()) 
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->has_children()) 
 	{
-	  const DoFHandler<dim>::face_iterator face = cell->face(face);
+	  const DoFHandler<dim>::face_iterator face = cell->face(f);
 	  
 	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 	    selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
