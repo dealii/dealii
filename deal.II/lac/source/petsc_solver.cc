@@ -47,29 +47,25 @@ namespace PETScWrappers
     int ierr;
 
                                      // first create a solver object
-    SLES sles;
-    ierr = SLESCreate (mpi_communicator, &sles);
+    KSP ksp;
+    ierr = KSPCreate (mpi_communicator, &ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set the matrices involved. the
                                      // last argument is irrelevant here,
                                      // since we use the solver only once
                                      // anyway
-    ierr = SLESSetOperators (sles, A, preconditioner,
-                             SAME_PRECONDITIONER);
+    ierr = KSPSetOperators (ksp, A, preconditioner,
+                            SAME_PRECONDITIONER);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // let derived classes set the solver
                                      // type, and the preconditioning object
                                      // set the type of preconditioner
-    KSP ksp;
-    ierr = SLESGetKSP (sles, &ksp);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
     set_solver_type (ksp);
     
     PC pc;
-    ierr = SLESGetPC (sles, &pc);
+    ierr = KSPGetPC (ksp, &pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     preconditioner.set_preconditioner_type (pc);
@@ -88,19 +84,19 @@ namespace PETScWrappers
     
                                      // then do the real work: set up solver
                                      // internal data and solve the
-                                     // system. this could be joined in one
-                                     // operation, but it is recommended this
-                                     // way to be able to separate statistic
-                                     // output if requested
-    int iterations = 0;
-    ierr = SLESSetUp (sles, b, x);
+                                     // system.
+    ierr = KSPSetRhs(ksp,b);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    ierr = KSPSetSolution(ksp,x);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    ierr = KSPSetUp (ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
-    ierr = SLESSolve (sles, b, x, &iterations);
+    ierr = KSPSolve (ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // and destroy the solver object
-    ierr = SLESDestroy (sles);
+    ierr = KSPDestroy (ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // in case of failure: throw
