@@ -127,11 +127,12 @@ class MatrixOut : public DataOutInterface<2,2>
 					  */
 	unsigned int block_size;
 
-				       /**
-					* If true, plot discontinuous
-					* patches, one for each entry.
-					**/
-      bool discontinuous;
+					 /**
+					  * If true, plot
+					  * discontinuous patches, one
+					  * for each entry.
+					  */
+	bool discontinuous;
 
 					 /**
 					  * Default constructor. Set
