@@ -506,6 +506,18 @@ AH_TOP(
 AH_BOTTOM(
 [
 /**
+ * Depending on the use of threads, we will have to make some variables
+ * volatile. We do this here in a very old-fashioned C-style, but still
+ * convenient way.
+ */
+#ifdef DEAL_II_USE_MT
+#  define DEAL_VOLATILE volatile
+#else
+#  define DEAL_VOLATILE
+#endif
+
+
+/**
  * Have a namespace into which we declare some numeric constants, such
  * as pi. Unfortunately, these are not always available, on all systems
  * or depending on compiler flags, so we duplicate their declarations
