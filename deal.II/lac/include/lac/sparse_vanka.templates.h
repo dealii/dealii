@@ -411,9 +411,9 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 {
   Assert (n_blocks > 0, ExcInternalError());
 
-  const unsigned int n_inverses = count (selected.begin(),
-					 selected.end(),
-					 true);
+  const unsigned int n_inverses = std::count (selected.begin(),
+					      selected.end(),
+					      true);
   
   const unsigned int n_inverses_per_block = std::max(n_inverses / n_blocks, 1U);
   
