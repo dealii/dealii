@@ -429,9 +429,10 @@ class Exception5 : public ExceptionBase {                             \
 			   way.
 */
 
-#include <exception>
+//#include <exception>
 
-class GlobalExcIO : public exception {
+class GlobalExcIO// : public exception
+{
   public:
     virtual const char * what () const {
       return __PRETTY_FUNCTION__;
