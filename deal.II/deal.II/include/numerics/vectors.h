@@ -351,9 +351,9 @@ class VectorTools
 				      * @p{dof}.
 				      *
 				      * Note that you may have to call
-				      * @p{hanging_nodes.distribute(data_2)}
+				      * @p{hanging_nodes.distribute(vec)}
 				      * with the hanging nodes from
-				      * space @p{dof_2} afterwards, to
+				      * space @p{dof} afterwards, to
 				      * make the result continuous
 				      * again.
 				      *
