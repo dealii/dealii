@@ -275,6 +275,13 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W //g;'`"
     fi
 
+    dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning
+    case "$target" in
+      *apple-darwin*)
+	CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
+        ;;
+    esac
+
     dnl In order to link shared libraries, almost all versions of gcc can
     dnl use CXX, i.e. the C++ compiler. The exception is gcc2.95, for which
     dnl we have to use the C compiler, unless we want to get linker errors
