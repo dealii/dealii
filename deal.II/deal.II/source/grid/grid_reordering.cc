@@ -619,7 +619,7 @@ bool GridReordering<dim>::Cell::check_consistency (const unsigned int rot) const
     {
       const FaceData &face = faces[rot][face_no]->second;
 
-      for (unsigned int face_rot=0; face_rot<this->rotational_states_of_faces-1; ++face_rot)
+      for (unsigned int face_rot=0; face_rot<rotational_states_of_faces-1; ++face_rot)
 	{
 	  const FaceData &reverse_face = face.reverse_faces[face_rot]->second;
 	  if (reverse_face.use_count != 0)
@@ -736,14 +736,14 @@ void GridReordering<dim>::track_back (typename std::vector<Cell> &cells,
 				       // stack
       rotation_states.pop_back();
     };
-  Assert (last_rotation_state < this->rotational_states_of_cells, ExcInternalError());
+  Assert (last_rotation_state < rotational_states_of_cells, ExcInternalError());
   
 				   // now we will have to find out
 				   // whether we can try the last cell
 				   // we have popped from the stack in
 				   // another rotation state, or will
 				   // have to backtrack further:
-  if (last_rotation_state < this->rotational_states_of_cells-1)
+  if (last_rotation_state < rotational_states_of_cells-1)
     {
 				       // possible. push that state to
 				       // the stack and leave
@@ -820,7 +820,7 @@ bool GridReordering<dim>::try_rotate_single_neighbors (typename std::vector<Cell
 					   // that have already been
 					   // tried:
 	  for (unsigned int neighbor_rot=old_rotation_state+1;
-	       neighbor_rot<this->rotational_states_of_cells; ++neighbor_rot)
+	       neighbor_rot<rotational_states_of_cells; ++neighbor_rot)
 	    {
 					       // first, if the
 					       // neighbor itself does
@@ -840,7 +840,7 @@ bool GridReordering<dim>::try_rotate_single_neighbors (typename std::vector<Cell
 					       // orientation
 	      cells[neighbor_no].mark_faces_used (neighbor_rot);
 
-	      for (unsigned int cell_rot=0; cell_rot<this->rotational_states_of_cells; ++cell_rot)
+	      for (unsigned int cell_rot=0; cell_rot<rotational_states_of_cells; ++cell_rot)
 		if (cells[cell_no].check_consistency (cell_rot) == true)
 		  {
 						     // ah, see,
@@ -968,7 +968,7 @@ void GridReordering<dim>::find_reordering (typename std::vector<Cell>           
 					   // no, doesn't work. see if
 					   // we can rotate the top
 					   // cell so that it works
-	  if (rotation_states.back()+1 < this->rotational_states_of_cells)
+	  if (rotation_states.back()+1 < rotational_states_of_cells)
 	    {
 					       // yes, can be
 					       // done. then do so and
