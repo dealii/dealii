@@ -78,14 +78,14 @@ class EigenPower : private Solver<VECTOR>
 
 				     /**
 				      * Power method. @p{x} is the
-				      * (not necessarily normalized)
-				      * start vector for the power
-				      * method. After the iteration,
-				      * @p{value} is the approximated
-				      * eigenvalue and @p{x} is the
-				      * corresponding eigenvector,
-				      * normalized with respect to the
-				      * l2-norm.
+				      * (not necessarily normalized,
+				      * but nonzero) start vector for
+				      * the power method. After the
+				      * iteration, @p{value} is the
+				      * approximated eigenvalue and
+				      * @p{x} is the corresponding
+				      * eigenvector, normalized with
+				      * respect to the l2-norm.
 				      */
     template <class MATRIX>
     void
