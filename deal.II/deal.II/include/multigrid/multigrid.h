@@ -4,12 +4,15 @@
 #define __multigrid_H
 /*----------------------------   multigrid.h     ---------------------------*/
 
-#include <vector>
-#include <base/smartpointer.h>
+#include <base/subscriptor.h>
 #include <lac/forward-declarations.h>
+#include <basic/forward-declarations.h>
+#include <lac/sparsematrix.h>
 #include <lac/vector.h>
 
+#include <vector>
 class MGTransferBase;
+
 
 
 /**
@@ -183,20 +186,133 @@ class MultiGridBase
 };
 
 
-class MGTransferBase
-  :
-  public Subscriptor
+
+/**
+ * Base class used to declare the operations needed by a concrete class
+ * implementing prolongation and restriction of vectors in the multigrid
+ * context. This class is an abstract one and has no implementations of
+ * possible algorithms for these operations.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ */
+class MGTransferBase  :  public Subscriptor
 {
   public:
+				     /**
+				      * Destructor. Does nothing here, but
+				      * needs to be declared virtual anyway.
+				      */
     virtual ~MGTransferBase();
 
-    virtual void prolongate(unsigned l,
-			    Vector<float>& dst,
-			    const Vector<float>& src) const = 0;
-    virtual void restrict(unsigned l,
-			  Vector<float>& dst,
-			  const Vector<float>& src) const = 0;
+				     /**
+				      * Prolongate a vector from level
+				      * #to_level-1# to level #to_level#.
+				      *
+				      * #src# is assumed to be a vector with
+				      * as many elements as there are degrees
+				      * of freedom on the coarser level of
+				      * the two involved levels, while #src#
+				      * shall have as many elements as there
+				      * are degrees of freedom on the finer
+				      * level.
+				      */
+    virtual void prolongate (const unsigned int   to_level,
+			     Vector<float>       &dst,
+			     const Vector<float> &src) const = 0;
+
+				     /**
+				      * Restrict a vector from level
+				      * #from_level# to level
+				      * #from_level-1#.
+				      *
+				      * #src# is assumed to be a vector with
+				      * as many elements as there are degrees
+				      * of freedom on the finer level of
+				      * the two involved levels, while #src#
+				      * shall have as many elements as there
+				      * are degrees of freedom on the coarser
+				      * level.
+				      */
+    virtual void restrict (const unsigned int   from_level,
+			   Vector<float>       &dst,
+			   const Vector<float> &src) const = 0;
 };
+
+
+
+/**
+ * Implementation of the #MGTransferBase# interface for which the transfer
+ * operations are prebuilt upon construction of the object of this class as
+ * matrices. This is the fast way, since it only needs to build the operation
+ * once by looping over all cells and storing the result in a matrix for
+ * each level, but requires additional memory.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ */
+class MGTransferPrebuilt : public MGTransferBase 
+{
+  public:
+
+				     /**
+				      * Destructor.
+				      */
+    virtual ~MGTransferPrebuilt ();
+    
+				     /**
+				      * Actually build the prolongation
+				      * matrices for each level.
+				      */
+    template <int dim>
+    void build_matrices (const MGDoFHandler<dim> &mg_dof);
+
+				     /**
+				      * Prolongate a vector from level
+				      * #to_level-1# to level #to_level#.
+				      *
+				      * #src# is assumed to be a vector with
+				      * as many elements as there are degrees
+				      * of freedom on the coarser level of
+				      * the two involved levels, while #src#
+				      * shall have as many elements as there
+				      * are degrees of freedom on the finer
+				      * level.
+				      */
+    virtual void prolongate (const unsigned int  to_level,
+			     Vector<float>       &dst,
+			     const Vector<float> &src) const = 0;
+
+				     /**
+				      * Restrict a vector from level
+				      * #from_level# to level
+				      * #from_level-1#.
+				      *
+				      * #src# is assumed to be a vector with
+				      * as many elements as there are degrees
+				      * of freedom on the finer level of
+				      * the two involved levels, while #src#
+				      * shall have as many elements as there
+				      * are degrees of freedom on the coarser
+				      * level.
+				      */
+    virtual void restrict (const unsigned int   from_level,
+			   Vector<float>       &dst,
+			   const Vector<float> &src) const = 0;
+
+  private:
+
+    vector<SparseMatrixStruct>   prolongation_sparsities;
+
+					 /**
+					  * The actual prolongation matrix.
+					  * column indices belong to the
+					  * dof indices of the mother cell,
+					  * i.e. the coarse level.
+					  * while row indices belong to the
+					  * child cell, i.e. the fine level.
+					  */
+    vector<SparseMatrix<float> > prolongation_matrices;
+};
+
 
 
 /*----------------------------   multigrid.h     ---------------------------*/
