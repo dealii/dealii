@@ -232,6 +232,15 @@ void Triangulation<dim>::block_write (ostream &out) const
   write_bool_vector (0, vertices_used, 0, out);
 };
 
+
+
+template <int dim>
+void Triangulation<dim>::block_read (istream &) 
+{
+  Assert (false, ExcNotImplemented());
+};
+
+
   
 
 #if deal_II_dimension == 1
