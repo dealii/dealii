@@ -46,7 +46,7 @@ class MappingQ : public MappingQ1<dim>
 				      * degree of mapping polynomials
 				      * on boundary cells.
 				      */
-    MappingQ (unsigned int p);
+    MappingQ (const unsigned int p);
 
 				     /**
 				      * Destructor.
@@ -179,6 +179,60 @@ class MappingQ : public MappingQ1<dim>
 	MappingQ1<dim>::InternalData mapping_q1_data;
     };
 
+				     /**
+				      * For @p{dim=2,3}. Append
+				      * (appends) the support points
+				      * of all shape functions located
+				      * on bounding lines to the
+				      * vector @p{a}. Points located
+				      * on the line but on vertices
+				      * are not included.
+				      *
+				      * Needed by the
+				      * @p{compute_support_points_simple(laplace)}
+				      * functions. For @p{dim=1} this
+				      * function is empty.
+				      *
+				      * This function is made virtual
+				      * in order to allow derived
+				      * classes to choose shape
+				      * function support points
+				      * differently than the present
+				      * class, which chooses the
+				      * points as interpolation points
+				      * on the boundary.
+				      */
+    virtual void
+    add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
+			     std::vector<Point<dim> > &a) const;
+
+				     /**
+				      * For @p{dim=3}. Append the
+				      * support points of all shape
+				      * functions located on bounding
+				      * faces (quads in 3d) to the
+				      * vector @p{a}. Points located
+				      * on the line but on vertices
+				      * are not included.
+				      *
+				      * Needed by the
+				      * @p{compute_support_points_laplace}
+				      * function. For @p{dim=1} and 2
+				      * this function is empty.
+				      *
+				      * This function is made virtual
+				      * in order to allow derived
+				      * classes to choose shape
+				      * function support points
+				      * differently than the present
+				      * class, which chooses the
+				      * points as interpolation points
+				      * on the boundary.
+				      */
+    virtual void
+    add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
+			    std::vector<Point<dim> > &a) const;
+    
   private:
     
 				     /**
@@ -315,61 +369,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     void compute_support_points_simple(
       const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
-    
-				     /**
-				      * For @p{dim=2,3}. Append
-				      * (appends) the support points
-				      * of all shape functions located
-				      * on bounding lines to the
-				      * vector @p{a}. Points located
-				      * on the line but on vertices
-				      * are not included.
-				      *
-				      * Needed by the
-				      * @p{compute_support_points_simple(laplace)}
-				      * functions. For @p{dim=1} this
-				      * function is empty.
-				      *
-				      * This function is made virtual
-				      * in order to allow derived
-				      * classes to choose shape
-				      * function support points
-				      * differently than the present
-				      * class, which chooses the
-				      * points as interpolation points
-				      * on the boundary.
-				      */
-    virtual void
-    add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
-			     std::vector<Point<dim> > &a) const;
-
-				     /**
-				      * For @p{dim=3}. Append the
-				      * support points of all shape
-				      * functions located on bounding
-				      * faces (quads in 3d) to the
-				      * vector @p{a}. Points located
-				      * on the line but on vertices
-				      * are not included.
-				      *
-				      * Needed by the
-				      * @p{compute_support_points_laplace}
-				      * function. For @p{dim=1} and 2
-				      * this function is empty.
-				      *
-				      * This function is made virtual
-				      * in order to allow derived
-				      * classes to choose shape
-				      * function support points
-				      * differently than the present
-				      * class, which chooses the
-				      * points as interpolation points
-				      * on the boundary.
-				      */
-    virtual void
-    add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
-			    std::vector<Point<dim> > &a) const;
+      std::vector<Point<dim> > &a) const;    
     
 				     /**
 				      * For @p{dim=2} and 3. Simple
@@ -460,8 +460,6 @@ class MappingQ : public MappingQ1<dim>
 				      * @p{dofs_per_cell}.
 				      */
     std::vector<unsigned int> renumber;
-
-  private:
 
 				     /**
 				      * If this flag is set @p{true}
