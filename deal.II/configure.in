@@ -44,54 +44,6 @@ AC_LANG_CPLUSPLUS
 
 
 
-
-dnl -------------------------------------------------------------
-dnl Test whether shared libraries support is requested.
-dnl Default is yes, but value will be adjusted to operating system
-dnl below.
-dnl This has been moved before the compiler section, so CXXFLAGS and
-dnl LDFLAGS can be set accordingly
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(shared,
-[  --enable-shared Set compiler flags to generate shared libraries],
-    enableshared=$enableval,
-    enableshared=yes)
-
-dnl On AIX and alpha, shared libs don't work for us at present, so 
-dnl disable them (we should probably use libtool there). Likewise on
-dnl CygWin Windows systems, where we don't know how to create shared
-dnl libs at all (at least at present)
-case "$target" in
-   *-aix* | alpha*-linux* | alpha*-osf4* | *cygwin )
-	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
-	   enableshared=no 
-	   ;;
-esac
-
-
-dnl Set compile flags accordingly
-if test $enableshared = yes ; then
-  AC_MSG_RESULT(configuring for shared libraries)
-  CFLAGS="$CFLAGS -fPIC"
-  CXXFLAGS="$CXXFLAGS -fPIC"
-  LDFLAGS="$LDFLAGS -fPIC"
-
-  lib_suffix=.so;
-else
-  AC_MSG_RESULT(configuring for static libraries)
-dnl Define these variables so they are not filled with default values later
-  CFLAGS="$CFLAGS "
-  CXXFLAGS="$CXXFLAGS "
-  LDFLAGS="$LDFLAGS "
-
-  lib_suffix=.a;
-fi
-
-
-AC_SUBST(enableshared)
-AC_SUBST(lib_suffix)
-
-
 dnl -------------------------------------------------------------
 dnl Find external programs
 dnl -------------------------------------------------------------
@@ -160,6 +112,57 @@ else
   fi
 fi
 AC_SUBST(GXX_VERSION)
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Next test whether shared libraries support is requested. This
+dnl has to be done before other flags are set, as they might depend
+dnl on whether we want to use shared libs.
+dnl 
+dnl Default to shared libs is yes, but value will be adjusted to 
+dnl operating system below.
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(shared,
+[  --enable-shared Set compiler flags to generate shared libraries],
+    enableshared=$enableval,
+    enableshared=yes)
+
+dnl On AIX and alpha, shared libs don't work for us at present, so 
+dnl disable them (we should probably use libtool there). Likewise on
+dnl CygWin Windows systems, where we don't know how to create shared
+dnl libs at all (at least at present)
+case "$target" in
+   *-aix* | alpha*-linux* | alpha*-osf4* | *cygwin )
+	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
+	   enableshared=no 
+	   ;;
+esac
+
+
+dnl Set compile flags accordingly
+if test $enableshared = yes ; then
+  AC_MSG_RESULT(configuring for shared libraries)
+  CFLAGS="$CFLAGS -fPIC"
+  CXXFLAGS="$CXXFLAGS -fPIC"
+  LDFLAGS="$LDFLAGS -fPIC"
+
+  lib_suffix=.so;
+else
+  AC_MSG_RESULT(configuring for static libraries)
+dnl Define these variables so they are not filled with default values later
+  CFLAGS="$CFLAGS "
+  CXXFLAGS="$CXXFLAGS "
+  LDFLAGS="$LDFLAGS "
+
+  lib_suffix=.a;
+fi
+
+
+AC_SUBST(enableshared)
+AC_SUBST(lib_suffix)
+
 
 
 
