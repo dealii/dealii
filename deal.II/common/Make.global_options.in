@@ -123,7 +123,7 @@ ifneq ($(with-multithreading),no)
   LIBPATH    += -L$(ACE_ROOT)/ace
 
   lib-ACE     = $(ACE_ROOT)/ace/libACE.so
-  LIBS       += -l$(lib-ACE)
+  LIBS       += $(lib-ACE)
 
   vpath %.a $(ACE_ROOT)
 endif
