@@ -31,6 +31,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <a name="incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
+<p style="color:red">
+Following are a few modifications to the library that unfortunately
+are incompatible with previous versions of the library, but which we
+deem necessary for the future maintainability of the
+library. Unfortunately, some of these changes will require
+modifications to application programs. We apologize for the
+inconvenience this causes.
+</p>
+
+
 <ol>
   <li> <p> Removed: All the matrix classes have functions <code
        class="member">reinit</code> that are used to resize the
@@ -50,20 +60,33 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2004/05/10)
        </p>
 
-  <li> <p> Removed: All the vector and block vector classes had a member
-       function <code class="member">clear</code> which simply resets all
-       values of the vector to zero. It did not change the size of the vector,
-       though. This was confusing, since the standard C++ container classes
-       implement the semantics that the <code class="member">clear</code>
-       functions delete all entries of the containers, i.e. resize it to zero,
+  <li> <p> Removed: All the vector and block vector classes as well as
+       the <code class="class">FullMatrix</code> class (the latter
+       through its <code class="class">Table</code> base class) had a
+       member function <code class="member">clear</code> which simply
+       resets all values of the vector or matrix to zero. It did not
+       change the size of the object, though. This was confusing,
+       since the standard C++ container classes implement the
+       semantics that the <code class="member">clear</code> functions
+       delete all entries of the containers, i.e. resize it to zero,
        and we implemented similar semantics also for the <code
-       class="class">SparseMatrix</code><code class="class">DoFHandler</code>,
-       <code class="class">ConstraintMatrix</code> and various other
-       classes. To avoid this confusion in the future, the <code
-       class="member">clear</code> function has been dropped from the
-       interface of the vector classes. To set all elements of a vector to
-       zero without changing its size, the recommended way is to use the more
-       obvious notation <code class="member">v=0</code>.  
+       class="class">SparseMatrix</code>, <code
+       class="class">DoFHandler</code>, <code
+       class="class">ConstraintMatrix</code> and various other
+       classes.
+       <br>
+       To avoid this confusion in the future, the <code
+       class="member">clear</code> functions have been dropped from
+       the interface of the vector and full matrix classes, and the
+       remaining instances where deal.II classes have a function of
+       that name really mean that the object is reset to its virginial
+       state. To set all
+       elements of a vector to zero without changing its size, the
+       recommended way is to use the more obvious notation <code
+       class="member">v=0</code>, while the full matrix class now has
+       a function <code class="member">FullMatrix::set_zero()</code>. To
+       reset the elements of a table over arbitrary objects, use
+       <code class="member">Table<T>::reset_values()</code>.
        <br> 
        (WB 2004/05/10)
        </p>
