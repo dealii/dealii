@@ -411,6 +411,18 @@ class BlockSparseMatrix : public Subscriptor
 	      const number value);
     
 				     /**
+				      * Multiply the entire matrix by a
+				      * fixed factor.
+				      */
+    BlockSparseMatrix & operator *= (const number factor);
+    
+				     /**
+				      * Divide the entire matrix by a
+				      * fixed factor.
+				      */
+    BlockSparseMatrix & operator /= (const number factor);
+    
+				     /**
 				      * Add @p{value} to the element
 				      * @p{(i,j)}.  Throws an error if
 				      * the entry does not
@@ -619,6 +631,16 @@ class BlockSparseMatrix : public Subscriptor
 			      const BlockVector<somenumber> &src,
 			      const number                   omega = 1.) const;
 
+                                     /* call print functions for 
+				      * the SparseMatrix blocks.
+				      */
+    void print_formatted (std::ostream       &out,
+			  const unsigned int  precision   = 3,
+			  const bool          scientific  = true,
+			  const unsigned int  width       = 0,
+			  const char         *zero_string = " ",
+			  const double        denominator = 1.) const;
+
 				     /**
 				      * Return a (constant) reference
 				      * to the underlying sparsity
@@ -667,6 +689,10 @@ class BlockSparseMatrix : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotBlockSquare);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixNotInitialized);
 
     
   private:
@@ -1019,6 +1045,40 @@ BlockSparseMatrix<number>::set (const unsigned int i,
   block(row_index.first,col_index.first).set (row_index.second,
 					      col_index.second,
 					      value);
+}
+
+
+
+template <typename number>
+inline
+BlockSparseMatrix<number> &
+BlockSparseMatrix<number>::operator *= (const number factor)
+{
+  Assert (columns != 0, ExcMatrixNotInitialized());
+  Assert (rows != 0, ExcMatrixNotInitialized());
+
+  for (unsigned int r=0; r<rows; ++r)
+    for (unsigned int c=0; c<columns; ++c)
+      block(r,c) *= factor;
+
+  return *this;
+}
+
+
+
+template <typename number>
+inline
+BlockSparseMatrix<number> &
+BlockSparseMatrix<number>::operator /= (const number factor)
+{
+  Assert (columns != 0, ExcMatrixNotInitialized());
+  Assert (rows != 0, ExcMatrixNotInitialized());
+
+  for (unsigned int r=0; r<rows; ++r)
+    for (unsigned int c=0; c<columns; ++c)
+      block(r,c) /= factor;
+
+  return *this;
 }
 
 
