@@ -523,8 +523,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   if (variable)
     steps2 *= (1<<(maxlevel-level));
 
-  Vector<double>* r = mem.alloc();
-  Vector<double>* d = mem.alloc();
+  VECTOR* r = mem.alloc();
+  VECTOR* d = mem.alloc();
   r->reinit(u);
   d->reinit(u);
 
