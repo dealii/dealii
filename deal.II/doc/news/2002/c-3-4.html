@@ -139,6 +139,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2002/09/08)
        </p>
 
+  <li> <p> New: global exception class <code
+  class="class">ExcIteratorPastEnd</code>, which should be used if an
+  iterator is incremented or decremented beyond its end value.
+  <br>
+  (GK 2002/09/10)
+  </p>
+
   <li> <p> 
        Extended: Previously, the <code class="class">Threads::PosixThreadBarrier</code>
        class could not be used at all (they threw exceptions), if your system
