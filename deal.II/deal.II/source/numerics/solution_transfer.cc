@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -197,17 +197,27 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
   const unsigned int n_coarsen_fathers = n_cells_to_coarsen /
 					 GeometryInfo<dim>::children_per_cell;
 
-				   // allocate the needed memory
-  indices_on_cell=std::vector<std::vector<unsigned int> > (
-    n_cells_to_stay_or_refine,
-    std::vector<unsigned int> (dofs_per_cell));
-  
-  dof_values_on_cell=std::vector<std::vector<Vector<number> > > (
-    n_coarsen_fathers,
-    std::vector<Vector<number> > (in_size, Vector<number> (dofs_per_cell)));
-
-  all_pointerstructs=std::vector<Pointerstruct> (
-    n_cells_to_stay_or_refine+n_coarsen_fathers);
+				   // allocate the needed memory. initialize
+                                   // the following arrays in an efficient
+                                   // way, without copying much
+  {  
+    std::vector<std::vector<unsigned int> >
+      tmp(n_cells_to_stay_or_refine,
+          std::vector<unsigned int> (dofs_per_cell));
+    indices_on_cell.swap (tmp);
+  }
+  {
+    std::vector<std::vector<Vector<number> > >
+      tmp(n_coarsen_fathers,
+          std::vector<Vector<number> > (in_size,
+                                        Vector<number> (dofs_per_cell)));
+    dof_values_on_cell.swap (tmp);
+  }
+  {
+    std::vector<Pointerstruct>
+      tmp(n_cells_to_stay_or_refine+n_coarsen_fathers);
+    all_pointerstructs.swap (tmp);
+  }
 
 
 				   // we need counters for
