@@ -206,7 +206,7 @@ BlockIndices::reinit (const std::vector<unsigned int> &n)
 
 inline
 std::pair<unsigned int,unsigned int>
-BlockIndices::global_to_local (const unsigned int i) const throw()
+BlockIndices::global_to_local (const unsigned int i) const 
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
 
@@ -221,7 +221,7 @@ BlockIndices::global_to_local (const unsigned int i) const throw()
 inline
 unsigned int
 BlockIndices::local_to_global (const unsigned int block,
-			       const unsigned int index) const throw()
+			       const unsigned int index) const 
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   Assert (index < start_indices[block+1]-start_indices[block],
@@ -233,7 +233,7 @@ BlockIndices::local_to_global (const unsigned int block,
 
 inline
 unsigned int
-BlockIndices::size () const throw()
+BlockIndices::size () const 
 {
   return n_blocks;
 }
@@ -242,7 +242,7 @@ BlockIndices::size () const throw()
 
 inline
 unsigned int
-BlockIndices::total_size () const throw()
+BlockIndices::total_size () const 
 {
   return start_indices[n_blocks];
 }
@@ -251,7 +251,7 @@ BlockIndices::total_size () const throw()
 
 inline
 unsigned int
-BlockIndices::block_size (const unsigned int block) const throw()
+BlockIndices::block_size (const unsigned int block) const 
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block+1]-start_indices[block];
@@ -272,7 +272,7 @@ BlockIndices::operator = (const BlockIndices &b)
 
 inline
 bool
-BlockIndices::operator == (const BlockIndices &b) const throw()
+BlockIndices::operator == (const BlockIndices &b) const 
 {
   if (n_blocks != b.n_blocks)
     return false;
@@ -288,7 +288,7 @@ BlockIndices::operator == (const BlockIndices &b) const throw()
 
 inline
 void
-BlockIndices::swap (BlockIndices &b) throw()
+BlockIndices::swap (BlockIndices &b) 
 {
   Assert (n_blocks == b.n_blocks,
 	  ExcDimensionMismatch(n_blocks, b.n_blocks));  
@@ -301,7 +301,7 @@ BlockIndices::swap (BlockIndices &b) throw()
 
 inline
 unsigned int
-BlockIndices::memory_consumption () const throw()
+BlockIndices::memory_consumption () const 
 {
   return (sizeof(*this) + 
 	  start_indices.size() * sizeof(start_indices[0]));
@@ -320,7 +320,7 @@ BlockIndices::memory_consumption () const throw()
  * @author Wolfgang Bangerth, 2000
  */
 inline
-void swap (BlockIndices &u, BlockIndices &v) throw()
+void swap (BlockIndices &u, BlockIndices &v) 
 {
   u.swap (v);
 }
