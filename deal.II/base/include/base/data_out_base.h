@@ -21,6 +21,13 @@
 #include <vector>
 #include <string>
 
+// Only include the Tecplot API header if the appropriate files
+// were detected by configure
+#ifdef DEAL_II_HAVE_TECPLOT
+#  include "TECIO.h"
+#  include <string.h>
+#endif
+
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
 #ifdef HAVE_STD_OSTREAM_HEADER
@@ -286,14 +293,22 @@ class ParameterHandler;
  * @sect3{Tecplot format}
  *
  * The @p{write_tecplot} function and the @p{write} function through the @p{tecplot}
- * parameter write the data in the Tecplot (http://www.amtec.com) FEBLOCK format. The
+ * parameter write the data in the Tecplot @url{http://www.amtec.com} FEBLOCK format. The
  * program supports 1, 2, and 3D data and has features such as contouring, slicing,
  * drawing streamlines, and animation. Patches are written as a collection of
  * quadrilaterals in 2D or bricks in 3D, with the nodal values interpolated to
- * (bi-,tri-) linear elements.
+ * (bi-,tri-) linear elements. These functions will write Tecplot ASCII formatted files.
+ * 
+ * Additionally, Tecplot binary output is supported through the @p{write_tecplot_binary}
+ * and the @p{write} function through the @p{tecplot_binary} parameter.  For this to work
+ * properly @p{./configure} checks for the Tecplot API at build time. To write Tecplot binary
+ * files directly make sure that the TECHOME environment variable points to the
+ * Tecplot installation directory, and that the files $TECHOME/include/TECIO.h
+ * and $TECHOME/lib/tecio.a are readable.  If these files are not availabe (or in the
+ * case of 1D) @p{write_tecplot_binary} will simply call @{write_tecplot} and thus larger
+ * ASCII data files will be produced rather than more efficient Tecplot binary files.
+ * For more information consult the Tecplot Users and Reference manuals.
  *
- * Future work will write Tecplot binary files directly rather than the current
- * ASCI text files provided the proper libraries are detected at compile time.
  *
  *
  * @sect3{VTK format}
@@ -1140,18 +1155,25 @@ class DataOutBase
 				      */
     struct TecplotFlags 
     {
-      private:
-					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * @p{private} as well).
-					  */
-	int dummy;
 
       public:
+
+					 /**
+					  * This variable is needed to hold the
+					  * output file name when using the
+					  * Tecplot API to write binary files.
+					  * If the user doesn't set the file
+					  * name with this variable only
+					  * ASCII Tecplot output will be
+					  * produced.
+					  */
+        const char* tecplot_binary_file_name;
+      
+	                                 /**
+	                                  * Constructor
+	                                  **/
+	TecplotFlags (const char* tecplot_binary_file_name = NULL);
+      
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -1327,7 +1349,7 @@ class DataOutBase
     				     /**
 				      * Write the given list of patches
 				      * to the output stream in Tecplot
-				      * format. See the general
+				      * ASCII format. See the general
 				      * documentation for more information
 				      * on the parameters.
 				      */
@@ -1336,6 +1358,27 @@ class DataOutBase
 			       const std::vector<std::string>          &data_names,
 			       const TecplotFlags                      &flags,
 			       std::ostream                            &out);
+
+    				     /**
+				      * Write the given list of patches
+				      * to the output stream in Tecplot
+				      * binary format. See the general
+				      * documentation for more information
+				      * on the parameters. @p{tecplot_binary_file_name}
+				      * (specified through the TecplotFlags
+				      * struct) indicates the name of the file
+				      * to be written.  If the file name is not
+				      * set ASCII output is produced.
+				      *
+				      * If the Tecplot API is not present this simply
+				      * calls the standard write_tecplot file so that
+				      * ASCII output is still produced.
+				      */
+    template <int dim, int spacedim>
+    static void write_tecplot_binary (const typename std::vector<Patch<dim,spacedim> > &patches,
+				      const std::vector<std::string>          &data_names,
+				      const TecplotFlags                      &flags,
+				      std::ostream                            &out);
 
     				     /**
 				      * Write the given list of
@@ -1406,7 +1449,19 @@ class DataOutBase
 				      * Exception
 				      */
     DeclException0 (ExcIO);
-
+				     /**
+				       * Exception
+				       */
+    DeclException0 (ExcTecplotAPIError);
+ 				      /**
+				       * Exception
+				       */
+    DeclException1 (ExcErrorOpeningTecplotFile,
+		    char*,
+		    << "There was an error opening Tecplot file " << arg1
+		    << " for output");
+    
+      
   private:
 				     /**
 				      * Class holding the data of one
@@ -1600,7 +1655,7 @@ class DataOutInterface : private DataOutBase
 				      * the presently supported output
 				      * formats.
 				      */
-    enum OutputFormat { default_format, dx, ucd, gnuplot, povray, eps, gmv, tecplot, vtk };
+    enum OutputFormat { default_format, dx, ucd, gnuplot, povray, eps, gmv, tecplot, tecplot_binary, vtk };
 
 				     /**
 				      * Obtain data through the
@@ -1658,6 +1713,16 @@ class DataOutInterface : private DataOutBase
 				      * format.
 				      */
     void write_tecplot (std::ostream &out) const;
+
+    				     /**
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it in the Tecplot binary
+				      * output format. Note that the name
+				      * of the output file must be specified
+				      * through the TecplotFlags interface.
+				      */
+    void write_tecplot_binary (std::ostream &out) const;
 
     				     /**
 				      * Obtain data through the

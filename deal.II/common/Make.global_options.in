@@ -35,12 +35,17 @@ enable-shared        = @enableshared@
 DEAL_II_MAJOR        = @DEAL_II_MAJOR@
 DEAL_II_MINOR        = @DEAL_II_MINOR@
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
+TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
+TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
 
 # if HSL sublibs are used, add F77 libs to linker flags
 ifeq ($(USE_CONTRIB_HSL),yes)
   LDFLAGS += $(F77LDFLAGS)
   LIBS    += $(F77LIBS)
 endif
+
+# if Tecplot is used, link against tecio.a
+LIBS += $(TECIO_LIBRARY)
 
 ######################################################
 # now configuration for compiler flags, pathes, etc
@@ -90,12 +95,14 @@ include-path-base        = $D/base/include
 include-path-lac         = $D/lac/include
 include-path-deal2       = $D/deal.II/include
 include-path-contrib-hsl = $D/contrib/hsl/include
+include-path-tecplot     = $(TECIO_INCLUDE)
 
 
 INCLUDE           = $(addprefix -I, $(include-path-base) \
                                     $(include-path-lac)  \
                                     $(include-path-deal2)\
-			            $(include-path-contrib-hsl))
+			            $(include-path-contrib-hsl)\
+				    $(include-path-tecplot))
 
 # compiler flags for debug and optimized mode
 CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)

@@ -82,5 +82,8 @@
 /* Enable the multigrid components of the library */
 #undef ENABLE_MULTIGRID
 
+/* Flag indicating whether the library shall be compiled to use the Tecplot interface */
+#undef DEAL_II_HAVE_TECPLOT
+
 
 #endif

@@ -180,7 +180,8 @@
       <dt> <code>LIBS</code> </dt>
       <dd> <p>
            Additional libraries to be linked in, such as Fortran
-           support or the ACE library when multithreading is enabled.
+           support, the ACE library when multithreading is enabled, or
+           Tecplot libraries when binary output is available.
            </p>
       </dd>
 
@@ -379,8 +380,30 @@
     your program shall use multithreading or not. 
     </p>
 
-    </ul>
 
+    <li><h4>Variables associated with Tecplot binary support</h4>
+ 
+    <p>
+    If ./configure, detects a valid Tecplot API installation $(INCLUDE) and
+    $(LIBS) are augmented by the Tecplot API include and library paths, and
+    the following symbols are meaningful:
+
+    <dl>
+      <dt> <code>TECIO_INCLUDE</code> </dt>
+      <dd> <p>
+           Path to the Tecplot API header files as found by ./configure
+           </p>
+      </dd>
+
+
+      <dt> <code>TECIO_LIBRARY</code> </dt>
+      <dd> <p>
+           Path to the Tecplot API library
+           </p>
+      </dd>
+    </dl>
+
+    </ul>
 
 
     <a name="values">

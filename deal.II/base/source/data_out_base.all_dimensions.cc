@@ -382,6 +382,13 @@ DataOutBase::GmvFlags::memory_consumption () const
 
 
 
+DataOutBase::TecplotFlags::TecplotFlags (const char* tecplot_binary_file_name) :
+  tecplot_binary_file_name(tecplot_binary_file_name)
+{
+};
+
+
+
 void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 {};
 

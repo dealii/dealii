@@ -158,7 +158,7 @@
            GNUPLOT, 
 	   <a href="http://www-xdiv.lanl.gov/XCM/gmv/" target="_top">GMV
  	                              (general mesh viewer)</a>, 
-	   <a href="http://www.amtec.com" target="_top">Tecplot</a>, 
+	   <a href="http://www.amtec.com" target="_top">Tecplot</a> (ASCII and binary), 
            <a href="http://www.kitware.com/vtk.html"
                  target="_top">Visualization Toolkit (Vtk)</a>,
 	   <a href="http://www.avs.com" target="_top">AVS Explorer</a>,
@@ -603,6 +603,14 @@
       of some sparse direct solvers. For a description of how to
       include these functions, see
       <a href="external-libs/hsl.html" target="body">this page</a>.
+      </p>
+      
+      <li>
+      <p>
+      Deal.II supports writing <a href="http://www.amtec.com">Tecplot</a>
+      binary files directly. For this feature to work properly be sure that the
+      environment variable TECHOME points to a valid Tecplot installation and that
+      the files $TECHOME/include/TECIO.h and $TECHOME/lib/tecio.a exist.
       </p>
     </ul>
     </p>

@@ -47,14 +47,28 @@ documentation, etc</a>.
   <code class="member">n</code> to be compliant wth the new class <code
   class="class">PolynomialSpace</code>.
   <br>
-  GK 2002/02/11)
+  (GK 2002/02/11)
   </p>
 
   <li> <p> New: The class <code class="class">PolynomialSpace</code>
   implements the space of polynomials at most a certain degree in
   arbitrary space dimensions.
   <br>
-  GK 2002/02/11)
+  (GK 2002/02/11)
+  </p>
+
+  <li> <p> New: The function <code class="class">DataOutBase</code>::
+  <code class="member">write_tecplot_binary</code> has been added.  This
+  function will write Tecplot binary files if the Tecplot API is detected
+  by ./configure.  To use this feature be sure that the environment
+  variable TECHOME points to a valid Tecplot installation and that the files
+  $TECHOME/include/TECIO.h and $TECHOME/lib/tecio.a exist.  The name of the
+  file to be written is specified through the <code class="class">DataOutBase</code>
+  ::<code class="member">TecplotFlags</code>.
+  <code class="member">tecplot_binary_file_name</code> variable. If the API is not
+  available this code simply calls the existing ASCII output function.
+  <br>
+  (BK 2002/02/11)
   </p>
 
 <ol>
@@ -83,7 +97,7 @@ documentation, etc</a>.
   <li> <p> New: Finite element family with complete polynomial spaces
   for discontinuous Galerkin: <code class="class">FE_DGP</code>
   <br>
-  GK 2002/02/11)
+  (GK 2002/02/11)
   </p>
 
 <ol>

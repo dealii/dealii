@@ -956,6 +956,13 @@ AC_SUBST(docxx)
 
 
 
+dnl    Find the Tecplot libraries and headers if available
+dnl
+DEAL_II_CONFIGURE_TECPLOT
+
+
+
+
 dnl -------------------------------------------------------------
 dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
 dnl -------------------------------------------------------------

@@ -50,6 +50,8 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>ACE_ROOT=$(ACE_ROOT)</code>' >> $@
 	@echo '<li><code>lib-ACE=$(lib-ACE)</code>' >> $@
 	@echo '<li><code>with-multithreading=$(with-multithreading)</code>' >> $@
+	@echo '<li><code>TECIO_INCLUDE=$(TECIO_INCLUDE)</code>' >> $@
+	@echo '<li><code>TECIO_LIBRARY=$(TECIO_LIBRARY)</code>' >> $@
 	@cat makefiles.2.html >> $@
 
 
