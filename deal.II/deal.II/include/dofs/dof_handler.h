@@ -617,8 +617,8 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * #dof_data# is adjusted to the right
 				      * size.
 				      */
-    void distribute_cell_to_dof_vector (const vector<double> &cell_data,
-					dVector              &dof_data) const;
+    void distribute_cell_to_dof_vector (const dVector &cell_data,
+					dVector       &dof_data) const;
 
 				     /**
 				      *  @name Cell iterator functions

@@ -200,16 +200,16 @@ enum NormType {
   and care should be taken to chose the right formula.
   
   To get the {\it global} L_1 error, you have to sum up the entries in
-  #difference#, e.g. using the STL function
-  #accumulate (d.begin(), d.end(), 0)#, if #d# is the difference vector.
+  #difference#, e.g. using #dVector::l1_norm# function.
   For the global L_2 difference, you have to sum up the squares of the
-  entries and take the root of the sum. These two operations represent the
+  entries and take the root of the sum, e.g. using #dVector::l2_norm.
+  These two operations represent the
   l_1 and l_2 norms of the vectors, but you need not take the absolute
   value of each entry, since the cellwise norms are already positive.
   
   To get the global mean difference, simply sum up the elements as above.
   To get the L_\infty norm, take the maximum of the vector elements, e.g.
-  using the STL function #max_element (d.begin(), d.end())#.
+  using the #dVector::linfty_norm# function.
   */
 template <int dim>
 class ProblemBase {
@@ -298,7 +298,7 @@ class ProblemBase {
 				      * class for more information.
 				      */
     void integrate_difference (const Function<dim>      &exact_solution,
-			       vector<double>           &difference,
+			       dVector                  &difference,
 			       const Quadrature<dim>    &q,
 			       const FiniteElement<dim> &fe,
 			       const NormType           &norm) const;
