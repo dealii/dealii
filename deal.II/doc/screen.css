@@ -1,7 +1,16 @@
 
-body { background-image: none;
-       background-color: white; 
-     }
+body {
+	background-image: none;
+	background-color: white; 
+}
+
+body.title {
+	background-image: url(pictures/title-background.jpg);
+}
+
+body.navbar {
+	background-image: url(pictures/deal.II-text.jpg);
+}
 
 frameset { background-color: white;
 	   border-color: white;
