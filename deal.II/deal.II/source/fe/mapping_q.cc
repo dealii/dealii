@@ -853,6 +853,7 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
 {
 				   // there are no points on bounding
 				   // lines which are to be added
+  const unsigned int dim=1;
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
 
