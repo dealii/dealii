@@ -6,7 +6,7 @@
 html: deal.tag
 
 private:
-	perl -pi -e 's/(EXTRACT_PRIVATE\s*=\s*)NO/$$1YES/' options.dox
+	perl -pi -e 's/(EXTRACT_PRIVATE\s*=\s*)NO/$$1YES/;s/(INTERNAL_DOCS\s*=\s*)NO/$$1YES/;' options.dox
 	$(MAKE) html
 
 %.tag: %.dox
