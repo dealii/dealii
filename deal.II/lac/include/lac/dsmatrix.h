@@ -1,4 +1,9 @@
-// $Id$
+/*----------------------------   dsmatrix.h     ---------------------------*/
+/*      <Id:>                 */
+#ifndef __dsmatrix_H
+#define __dsmatrix_H
+/*----------------------------   dsmatrix.h     ---------------------------*/
+
 
 // This file is part of the DEAL Library
 // DEAL is Copyright(1995) by
@@ -41,24 +46,13 @@ class dSMatrixStruct
 public:
   //////////
   void reinit(int m, int n, int max_per_row);
-  //////////
-  dSMatrixStruct(int m, int n, int max_per_row) 
-    : max_dim(0), max_vec_len(0), rowstart(0), colnums(0)
-      {
-	reinit(m,n,max_per_row);
-      }
-  //////////
-  dSMatrixStruct(int n, int max_per_row)
-    : max_dim(0), max_vec_len(0), rowstart(0), colnums(0)
-      {
-	reinit(n,n,max_per_row);
-      }
-  //////////
-  ~dSMatrixStruct()
-    {
-      delete[] rowstart;
-      delete[] colnums;
-    }
+				     //////////
+  dSMatrixStruct(int m, int n, int max_per_row);
+    
+				     //////////
+  dSMatrixStruct(int n, int max_per_row);
+				     //////////
+  ~dSMatrixStruct();
   //////////
   void compress();
   //////////
@@ -74,10 +68,10 @@ public:
   //////////
   void add_matrix(const iVector& rows, const iVector& cols);
 
-  void print_gnuplot (ostream &) const;
-  int n_rows () const {  return rows;   };
-  int n_cols () const {  return cols;   };
-  int bandwidth () const;
+    void print_gnuplot (ostream &) const;
+    int n_rows () const;
+    int n_cols () const;
+    int bandwidth () const;
 
     friend class ConstraintMatrix;
     friend class DoFHandler<1>;
@@ -108,8 +102,6 @@ public:
 
 
 
-
-
 /*
 CLASS
    dSMatrix
@@ -133,17 +125,11 @@ class dSMatrix
     dSMatrix ();
     
 				     //
-    dSMatrix(dSMatrixStruct& c)
-		    : cols(&c), val(0), max_len(0)
-      {
-	reinit();
-      }
+    dSMatrix(dSMatrixStruct& c);
+    
 				     //
-    ~dSMatrix()
-      {
-	delete[] val;
-      }
-
+    ~dSMatrix();
+    
 
 				     //
     void reinit();
@@ -151,23 +137,15 @@ class dSMatrix
     void reinit (dSMatrixStruct &);
 
 				     //
-    int m() const { return cols->rows; }
+    int m() const;
 				     //
-    int n() const { return cols->cols; }
+    int n() const;
 
 				     //
-    void set(int i,int j,double value) {
-      Assert (cols->operator()(i,j) != -1,
-	      ExcInvalidIndex(i,j));
-      val[cols->operator()(i,j)] = value;
-    }
+    void set (int i, int j, double value);
 				     //
-    void add(int i,int j,double value) {
-      Assert (cols->operator()(i,j) != -1,
-	      ExcInvalidIndex(i,j));
-      val[cols->operator()(i,j)]+= value;
-    }
-  
+    void add (int i, int j, double value);
+    
 				     //
     void vmult (dVector& dst,const dVector& src) const;
 				     //
@@ -217,4 +195,73 @@ class dSMatrix
 
   friend class ConstraintMatrix;
 };
+
+
+
+
+
+/*---------------------- Inline functions -----------------------------------*/
+
+inline
+int dSMatrixStruct::n_rows () const {
+  return rows;
+};
+
+
+
+inline
+int dSMatrixStruct::n_cols () const {
+  return cols;
+};
+
+
+
+
+
+inline
+int dSMatrix::m () const
+{
+  return cols->rows;
+};
+
+
+
+inline
+int dSMatrix::n () const
+{
+  return cols->cols;
+};
+
+
+
+inline
+void dSMatrix::set (int i, int j, double value) {
+  Assert (cols->operator()(i,j) != -1,
+	  ExcInvalidIndex(i,j));
+  val[cols->operator()(i,j)] = value;
+};
+
+
+
+inline
+void dSMatrix::add (int i, int j, double value) {
+  Assert (cols->operator()(i,j) != -1,
+	  ExcInvalidIndex(i,j));
+  val[cols->operator()(i,j)]+= value;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+/*----------------------------   dsmatrix.h     ---------------------------*/
+/* end of #ifndef __dsmatrix_H */
 #endif
+/*----------------------------   dsmatrix.h     ---------------------------*/

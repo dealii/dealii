@@ -115,6 +115,40 @@ inline void quicksort(long r, T* a)
 
 
 
+
+dSMatrixStruct::dSMatrixStruct(int m, int n, int max_per_row) 
+		: max_dim(0),
+		  max_vec_len(0),
+		  rowstart(0),
+		  colnums(0)
+{
+  reinit (m,n,max_per_row);
+};
+
+
+
+dSMatrixStruct::dSMatrixStruct(int n, int max_per_row)
+		: max_dim(0),
+		  max_vec_len(0),
+		  rowstart(0),
+		  colnums(0)
+{
+  reinit (n,n,max_per_row);
+};
+
+
+
+dSMatrixStruct::~dSMatrixStruct ()
+{
+  if (rowstart != 0)
+    delete[] rowstart;
+  if (colnums != 0)
+    delete[] colnums;
+}
+
+
+
+
 void
 dSMatrixStruct::reinit(int m, int n, int max_per_row)
 {
@@ -149,6 +183,7 @@ dSMatrixStruct::reinit(int m, int n, int max_per_row)
 
   compressed = 0;
 }
+
 
 void
 dSMatrixStruct::compress()
@@ -191,6 +226,7 @@ dSMatrixStruct::compress()
   delete[] entries;
 }
 
+
 int
 dSMatrixStruct::operator () (int i, int j)
 {
@@ -198,6 +234,7 @@ dSMatrixStruct::operator () (int i, int j)
     if (colnums[k] == j) return k;
   return -1;
 }
+
 
 void
 dSMatrixStruct::add (int i, int j)
@@ -224,6 +261,8 @@ dSMatrixStruct::add (int i, int j)
   Assert (false, ExcNotEnoughSpace(i));
 }
 
+
+
 void
 dSMatrixStruct::add_matrix(int n, int* rowcols)
 {
@@ -232,6 +271,7 @@ dSMatrixStruct::add_matrix(int n, int* rowcols)
     for (j=0;j<n;j++)
       add(rowcols[i], rowcols[j]);
 }
+
 
 
 void
@@ -243,6 +283,8 @@ dSMatrixStruct::add_matrix(int m, int n, int* rows, int* cols)
       add(rows[i], cols[j]);
 }
 
+
+
 void
 dSMatrixStruct::add_matrix(const iVector& rowcols)
 {
@@ -251,6 +293,7 @@ dSMatrixStruct::add_matrix(const iVector& rowcols)
     for (j=0;j<rowcols.n();j++)
       add(rowcols(i), rowcols(j));
 }
+
 
 
 void
@@ -263,6 +306,7 @@ dSMatrixStruct::add_matrix(const iVector& rows, const iVector& cols)
 }
 
 
+
 void
 dSMatrixStruct::print_gnuplot (ostream &out) const
 {
@@ -271,6 +315,7 @@ dSMatrixStruct::print_gnuplot (ostream &out) const
       if (colnums[j]>=0)
 	out << i << " " << -colnums[j] << endl;
 }
+
 
 
 int
@@ -304,13 +349,29 @@ dSMatrix::dSMatrix () :
 		max_len(0) {};
 
 
+
+dSMatrix::dSMatrix (dSMatrixStruct &c)
+		: cols(&c), val(0), max_len(0)
+{
+  reinit();
+};
+
+
+
+dSMatrix::~dSMatrix ()
+{
+  delete[] val;
+};
+
+
+
 void
 dSMatrix::reinit()
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->compressed, ExcNotCompressed());
   
-  if(max_len<cols->vec_len)
+  if (max_len<cols->vec_len)
   {
     if (val) delete[] val;
     val = new double[cols->vec_len];
@@ -349,6 +410,7 @@ dSMatrix::vmult(dVector& dst,const dVector& src) const
       dst(i) = s;
     }
 }
+
 
 void
 dSMatrix::Tvmult(dVector& dst,const dVector& src) const
