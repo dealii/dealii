@@ -153,7 +153,7 @@ clean:
 	rm -f *.o *.go *.output
 
 veryclean: clean
-	rm -f solver mgbase mg benchmark *.inp *.gpl *.eps *.gnuplot
+	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
 
 ############################################################
 # Automatic generation of dependencies
