@@ -1353,7 +1353,8 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
   for (unsigned int i=0; i<ret_val.size(); ++i)
     {
       Assert (ret_val[i].first < dim, ExcInternalError());
-      Assert (ret_val[i].second < test[dim].size(), ExcInternalError());
+      Assert (ret_val[i].second < test[ret_val[i].first].size(),
+	      ExcInternalError());
       Assert (test[ret_val[i].first][ret_val[i].second] == false,
               ExcInternalError());
       
