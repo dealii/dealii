@@ -25,7 +25,7 @@
 
 
 template <int dim>
-FE_DGQ<dim>::FE_DGQ (unsigned int degree)
+FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
 				    std::vector<bool>(1,true),
