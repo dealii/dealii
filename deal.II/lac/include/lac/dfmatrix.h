@@ -361,6 +361,32 @@ class dFMatrix
 				      * Output of the matrix in user-defined format.
 				      */
     void print (FILE* fp, const char* format = 0) const;
+
+				     /**
+				      * Print the matrix in the usual format,
+				      * i.e. as a matrix and not as a list of
+				      * nonzero elements. For better
+				      * readability, zero elements
+				      * are displayed as empty space.
+				      *
+				      * Each entry is printed in scientific
+				      * format, with one pre-comma digit and
+				      * the number of digits given by
+				      * #precision# after the comma, with one
+				      * space following.
+				      * The precision defaults to four, which
+				      * suffices for most cases. The precision
+				      * and output format are {\it not}
+				      * properly reset to the old values
+				      * when the function exits.
+				      *
+				      * You should be aware that this function
+				      * may produce {\bf large} amounts of
+				      * output if applied to a large matrix!
+				      * Be careful with it.
+				      */
+    void print_formatted (ostream &out,
+			  const unsigned int presicion=3) const;
 				     //@}
 
 				     /**

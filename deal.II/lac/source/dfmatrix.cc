@@ -1,10 +1,10 @@
 // $Id$
 
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstdio>
 #include <lac/dfmatrix.h>
-
+#include <iomanip>
 
 
 
@@ -980,3 +980,22 @@ void dFMatrix::invert (const dFMatrix &M) {
     };    
 };
   
+
+
+void dFMatrix::print_formatted (ostream &out, const unsigned int precision) const {
+  out.precision (precision);
+  out.setf (ios::scientific, ios::floatfield);   // set output format
+  
+  for (unsigned int i=0; i<m(); ++i) 
+    {
+      for (unsigned int j=0; j<n(); ++j)
+	if (el(i,j) != 0)
+	  out << setw(precision+7)
+	      << el(i,j) << ' ';
+	else
+	  out << setw(precision+8) << " ";
+      out << endl;
+    };
+
+  out.setf (0, ios::floatfield);                 // reset output format
+};
