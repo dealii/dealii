@@ -1079,12 +1079,13 @@ fi
 
 
 
+
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
   enableshared=$enableval
 else
-  if test $OS = AIX -o $OS = IRIX64 ; then
+  if test $OS = AIX ; then
       enableshared=no ;
     else
       enableshared=yes ;
@@ -1131,7 +1132,7 @@ else
 fi
 
 echo $ac_n "checking for kdoc""... $ac_c" 1>&6
-echo "configure:1135: checking for kdoc" >&5
+echo "configure:1136: checking for kdoc" >&5
 if test -r $kdocdir/kdoc ; then
   echo "$ac_t""found" 1>&6
 else
@@ -1160,7 +1161,7 @@ if test "$docxx" = to-be-determined ; then
   # Extract the first word of ""doc++"", so it can be a program name with args.
 set dummy "doc++"; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1164: checking for $ac_word" >&5
+echo "configure:1165: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_docxx'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1194,7 +1195,7 @@ fi
 
 else
   echo $ac_n "checking for doc++""... $ac_c" 1>&6
-echo "configure:1198: checking for doc++" >&5
+echo "configure:1199: checking for doc++" >&5
   if test -x "$docxx" ; then
     echo "$ac_t""yes" 1>&6
   else
