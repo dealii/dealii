@@ -137,8 +137,8 @@ clean-data:
 # `lib/'.
 lib/Makefile.dep: $(cc-files) $(h-files) $(lib-h-files) Makefile
 	@echo =====waves=======$(deal_II_dimension)d================== Remaking Makefile
-	@perl $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
-	 | perl -p -e 's!^lib/g?o/(.*):!lib/$(deal_II_dimension)d/$$1:!g;' \
+	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) $(cc-files) \
+	 | $(PERL) -p -e 's!^lib/g?o/(.*):!lib/$(deal_II_dimension)d/$$1:!g;' \
 		> lib/Makefile.dep
 
 include lib/Makefile.dep

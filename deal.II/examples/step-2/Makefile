@@ -148,8 +148,8 @@ Makefile.dep: $(target).cc Makefile \
                            $(include-path-lac)/lac/*.h      \
                            $(include-path-deal2)/*/*.h)
 	@echo ============================ Remaking Makefile
-	@perl $D/common/scripts/make_dependencies.pl  $(INCLUDE) $(target).cc \
-		| perl -pi -e 's!lib/g?o/!!g;' \
+	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) $(target).cc \
+		| $(PERL) -pi -e 's!lib/g?o/!!g;' \
 		> Makefile.dep
 
 # To make the dependencies known to `make', we finally have to include

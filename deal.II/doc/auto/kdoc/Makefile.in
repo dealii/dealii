@@ -95,19 +95,19 @@ multigrid-html-files: kdoc-installed $(kdoc.multigrid)
 %-fix-files:
 	for htmlfile in $(subst -fix-files,,$@)/*html ; do \
 	    echo "Fixing include paths in $$htmlfile..." ; \
-	    perl -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g; \
+	    $(PERL) -pi -e 's,(#include &lt;<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g; \
                          s,<h1>Source: $D/?(.*)</h1>,<h1>Source: $$1</h1>,g;' "$$htmlfile" ;\
 	done
 	for htmlfile in $(subst -fix-files,,$@)/header-list.html $(subst -fix-files,,$@)/all-globals.html ; do \
 	    echo "Fixing include paths in special file $$htmlfile..." ; \
 	    case "$$htmlfile" in \
 	      *header-list*) \
-			perl -pi -e 's,<TH>$D/?[^/]+/include/(.*?) - $D/?[^/]+/include/(.*?)</TH>,<TH>$$1 - $$2</TH>,g; \
+			$(PERL) -pi -e 's,<TH>$D/?[^/]+/include/(.*?) - $D/?[^/]+/include/(.*?)</TH>,<TH>$$1 - $$2</TH>,g; \
 			             s,(<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' \
 				"$$htmlfile" ;\
 			;; \
 	      *all-globals*) \
-			perl -pi -e 's,(<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' \
+			$(PERL) -pi -e 's,(<A HREF=\"[^\"]+\">)$D/?[^/]+/include/,$$1,g;' \
 				"$$htmlfile" ;\
 			;; \
 	      *) \
