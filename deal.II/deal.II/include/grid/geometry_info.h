@@ -1109,7 +1109,7 @@ GeometryInfo<1>::cell_to_child_coordinates (const Point<1>    &p,
 					    const unsigned int child_index)
 {
   Assert (child_index < GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange (child_index, GeometryInfo<dim>::children_per_cell));
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
   const double x = p[0]*2 - (child_index == 1 ? 1. : 0.);
   return Point<dim>(x);
 }
@@ -1122,7 +1122,7 @@ GeometryInfo<2>::cell_to_child_coordinates (const Point<2>    &p,
 					    const unsigned int child_index)
 {
   Assert (child_index < GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange (child_index, GeometryInfo<dim>::children_per_cell));
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
 
   const double x = p[0]*2 - ((child_index == 1) || (child_index == 2) ? 1. : 0.);
   const double y = p[1]*2 - ((child_index == 2) || (child_index == 3) ? 1. : 0.);
@@ -1138,7 +1138,7 @@ GeometryInfo<3>::cell_to_child_coordinates (const Point<3>    &p,
 					    const unsigned int child_index)
 {
   Assert (child_index < GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange (child_index, GeometryInfo<dim>::children_per_cell));
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
 
   const double x = p[0]*2 - ((child_index == 1) || (child_index == 2) ||
 			     (child_index == 5) || (child_index == 6)    ? 1. : 0.);
