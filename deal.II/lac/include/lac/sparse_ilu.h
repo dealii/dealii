@@ -171,6 +171,13 @@ class SparseILU : protected SparseMatrix<number>
 			      const Vector<somenumber> &src) const;
 
 				     /**
+				      * Same as #apply_decomposition#, format for LAC.
+				      */
+    template <typename somenumber>
+    void operator() (Vector<somenumber>       &dst,
+		     const Vector<somenumber> &src) const;
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotSquare);
@@ -190,7 +197,14 @@ class SparseILU : protected SparseMatrix<number>
 		    << " is not greater or equal than zero!");
 };
 
-
+template <typename number>
+template <typename somenumber>
+void
+SparseILU<number>::operator() (Vector<somenumber>       &dst,
+			       const Vector<somenumber> &src) const
+{
+  apply_decomposition(dst, src);
+}
 
 
 
