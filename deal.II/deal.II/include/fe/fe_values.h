@@ -827,7 +827,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Constant reference to the
 				      * current cell
 				      */
-    const typename Triangulation<dim>::cell_iterator get_cell () const;
+    typename Triangulation<dim>::cell_iterator get_cell () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -1551,7 +1551,7 @@ FEValuesBase<dim>::get_mapping () const
 
 template <int dim>
 inline
-const typename Triangulation<dim>::cell_iterator
+typename Triangulation<dim>::cell_iterator
 FEValuesBase<dim>::get_cell () const
 {
   return present_cell;
