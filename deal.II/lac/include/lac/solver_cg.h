@@ -78,7 +78,10 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    Vector *Vr, *Vp, *Vz, *VAp;
+    Vector *Vr;
+    Vector *Vp;
+    Vector *Vz;
+    Vector *VAp;
     
 				     /**
 				      * Within the iteration loop, the
@@ -157,7 +160,7 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
       memory.free(Vp);
       memory.free(Vz);
       memory.free(VAp);
-      
+      deallog.pop();
       return success;
     };
   
