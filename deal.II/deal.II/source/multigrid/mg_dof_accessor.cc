@@ -140,9 +140,9 @@ void
 MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
-  Assert (dof_handler != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
-  Assert (mg_dof_handler != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::DoFAccessor<1>::ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (mg_dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
   Assert (dof_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
