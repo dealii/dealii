@@ -29,7 +29,10 @@
  *
  * Given a vector of @{n} one-dimensional polynomials @{P1} to @{Pn},
  * this class generates @p{n} to the power of @p{dim} polynomials of
- * the form @p{ Qijk(x,y,z) = Pi(x)Pj(y)Pk(z)}.
+ * the form @p{ Qijk(x,y,z) = Pi(x)Pj(y)Pk(z)}. If the base
+ * polynomials are mutually orthogonal on the interval $[-1,1]$ or
+ * $[0,d], then the tensor product polynomials are orthogonal on
+ * $[-1,1]^d$ or $[0,1]^d$, respectively.
  *
  * @author Ralf Hartmann, 2000, documentation Guido Kanschat
  */

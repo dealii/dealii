@@ -43,7 +43,12 @@ template <int dim> class FESystem;
  * support points. This is then fed into an object of class
  * @ref{FEValues}. Even for evaluation on the unit cell, you will need
  * a triangulation containing that single cell.
- * 
+ *
+ * Basically, this class just declares the shape function and their
+ * derivatives on the unit cell $[0,1]^d$, and the means to transform
+ * them onto a given cell in physical space if provided by the
+ * @ref{FEValues} class with a @ref{Mapping} object.
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001
  */
 template <int dim>
