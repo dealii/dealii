@@ -1727,7 +1727,7 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
   public:
-    RightHandSide () {};
+    RightHandSide () : Function<dim> () {};
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const;
