@@ -34,6 +34,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: <code>base/config.h</code> now exports the
+       <acronym>deal.II</acronym> base directory through the
+       <code>DEAL_II_PATH</code> preprocessor variable.
+       <br>
+       (WB 2002/09/09)
+       </p>
+
+  <li> <p> 
        Removed: The forward declarations files have gone. We have never
        propagated their use in the example programs, but these files have been
        there in the base, lac, and grid include directories, and forward

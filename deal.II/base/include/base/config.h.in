@@ -87,6 +87,9 @@
    friends of the enclosing class. */
 #undef DEAL_II_NESTED_CLASS_FRIEND_BUG
 
+/* Path to the deal.II directory */
+#undef DEAL_II_PATH
+
 /* Define if we have to work around a bug in Sun's Forte compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.
    */
