@@ -2271,7 +2271,7 @@ class Triangulation : public TriaDimensionInfo<dim> {
 
     
 				     /**
-				      *  @name Information about the triangulation
+				      * @name Information about the triangulation
 				      */
 				     /*@{*/
 				     /**
@@ -2398,10 +2398,10 @@ class Triangulation : public TriaDimensionInfo<dim> {
     unsigned int n_active_cells () const;
 
     				     /**
-				      *  Return total number of active cells
-				      *  on level #level#.
-				      *  Maps to #n_active_lines(level)# in one space
-				      *  dimension and so on.
+				      * Return total number of active cells
+				      * on level #level#.
+				      * Maps to #n_active_lines(level)# in one
+				      * space dimension and so on.
 				      *
 				      * Regarding the computational effort of
 				      * this function, the same applies as
@@ -2410,22 +2410,31 @@ class Triangulation : public TriaDimensionInfo<dim> {
     unsigned int n_active_cells (const unsigned int level) const;
 
 				     /**
-				      *  Return number of levels in use.
+				      * Return number of levels in use. This
+				      * may be less than the number of levels
+				      * existing in the triangulation if by
+				      * coarsening the highest level was
+				      * completely depopulated. That level is
+				      * not removed, since it will most likely
+				      * be repopulated soon by the next
+				      * refinement process.
 				      */
     unsigned int n_levels () const;
 
 				     /**
-				      * Return the maximum number of cells meeting
-				      * at a common vertex. Since this number is
-				      * an invariant under refinement, only the cells
-				      * on the coarsest level are considered. The
+				      * Return the maximum number of cells
+				      * meeting at a common vertex. Since this
+				      * number is an invariant under refinement,
+				      * only the cells on
+				      * the coarsest level are considered. The
 				      * operation is thus reasonably fast. The
 				      * invariance is only true for sufficiently
 				      * many cells in the coarsest triangulation
-				      * (e.g. for a single cell one would be returned),
+				      * (e.g. for a single cell one would be
+				      * returned),
 				      * so a minimum of four is returned in
-				      * two dimensions, 8 in three dimensions, etc,
-				      * which is how many cells meet if the
+				      * two dimensions, 8 in three dimensions,
+				      * etc, which is how many cells meet if the
 				      * triangulation is refined.
 				      *
 				      * In one space dimension, two is returned.
