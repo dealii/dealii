@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,9 @@ template <int dim> class MGDoFHandler;
 /*
  * MGTransferBase is defined in mg_base.h
  */
+
+/*!@addtogroup mg */
+/*@{*/
 
 /**
  * Implementation of the MGTransferBase interface for which the transfer
@@ -810,6 +813,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
                                       */
     unsigned int mg_selected_component;
 };
+
+/*@}*/
 
 //----------------------------------------------------------------------//
 template <typename number>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,8 @@ template <typename number> class Vector;
 template <typename number> class BlockVector;
 template <class number> class FullMatrix;
 
+/*!@addtogroup mg */
+/*@{*/
 
 /**
  * This is a collection of functions operating on, and manipulating
@@ -220,5 +222,6 @@ class MGTools
 		     std::vector<std::vector<unsigned int> >& cached_sizes);
 };
 
+/*@}*/
 
 #endif

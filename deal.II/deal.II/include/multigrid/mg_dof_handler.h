@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,9 +12,6 @@
 //----------------------------  mg_dof_handler.h  ---------------------------
 #ifndef __deal2__mg_dof_handler_h
 #define __deal2__mg_dof_handler_h
-
-
-/*----------------------------   mg_dof.h     ---------------------------*/
 
 
 #include <base/config.h>
@@ -27,9 +24,10 @@ template <int dim>              class MGDoFObjectAccessor<1, dim>;
 template <int dim>              class MGDoFObjectAccessor<2, dim>;
 template <int dim>              class MGDoFObjectAccessor<3, dim>;
 
+/*!@addtogroup mg */
+/*@{*/
+
 /**
- * @brief Iterators for MDDoFHandler
- *
  * Depending on the dimension, this class defines the iterator types for
  * MGDoFHandler objects.
  *
@@ -1165,6 +1163,7 @@ class MGDoFHandler : public DoFHandler<dim>
     template <int dim1, int dim2> friend class MGDoFObjectAccessor;
 };
 
+/*@}*/
 
 /* ----------------------- Inline functions of MGDoFHandler -------------------*/
 

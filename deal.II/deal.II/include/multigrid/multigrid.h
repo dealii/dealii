@@ -25,144 +25,210 @@
 
 #include <vector>
 
-
-//TODO:[GK] Cleanup
-//  move definitions of virtual destructors to mg_base.templates.h
-//
+/*!@addtogroup mg */
+/*@{*/
 
 /**
  * Implementation of the multigrid method.
  *
- * Warning: multigrid on locally refined meshes only works with
+ * @warning multigrid on locally refined meshes only works with
  * <b>discontinuous finite elements</b> right now. It is not clear,
  * whether the paradigm of local smoothing we use is applicable to
  * continuous elements with hanging nodes; in fact, most people you
  * meet on conferences seem to deny this.
  *
- * The function actually performing a multi-level V-cycle,
- * @p level_v_step, as well as the function @p vcycle, calling it,
- * require several helper classes handed over as template parameters.
- * These classes have to meet the following requirements:
+ * The function which starts a multigrid cycle on the finest level is
+ * cycle(). Depending on the cycle type chosen with the constructor
+ * (see enum Cycle), this function triggers one of the cycles
+ * level_v_step(), level_w_step() or level_f_step().
  *
- * <tt>MATRIX</tt> is a matrix as specified for LAC-solvers, that is, it
- * has a function
- * @code
- *   void MATRIX::vmult(VECTOR& x, const VECTOR& b)
- * @endcode
- * performing the matrix vector product <i>x=Ab</i>.
+ * @note The interface of this class is still very clumsy. In
+ * particular, you will have to set up quite a few auxiliary objects
+ * before you can use it. Unfortunately, it seems that this can be
+ * avoided only be restricting the flexibility of this class in an
+ * unacceptable way.
  *
- * <tt>SMOOTH</tt> is a class with a function
- * @code
- *   void SMOOTH::smooth (unsigned int level, VECTOR& x, const VECTOR& b)
- * @endcode
- * modifying the vector <i>x</i> such that the residual <i>b-Ax</i>
- * on level <i>l</i> is smoothened. Refer to MGSmootherRelaxation
- * for an example.
- *
- * <tt>COARSE</tt> has an
- * @code
- *   void COARSE::operator() (VECTOR& x, const VECTOR& b)
- * @endcode
- * returning the solution to the system <tt>Ax=b</tt> on the coarsest level
- * in <i>x</i>.
- * 
- * @author Guido Kanschat, 1999 - 2004
+ * @author Guido Kanschat, 1999 - 2005
  */
 template <class VECTOR>
 class Multigrid : public Subscriptor
 {
   public:
-  typedef VECTOR vector_type;
-  typedef const VECTOR const_vector_type;
+				     /**
+				      * List of implemented cycle types.
+				      */
+    enum Cycle
+    {
+					   /// The V-cycle
+	  v_cycle,
+					   /// The W-cycle (not working yet)
+	  w_cycle,
+					   /// The F-cycle (not working yet)
+	  f_cycle
+    };
+    
+    typedef VECTOR vector_type;
+    typedef const VECTOR const_vector_type;
   
 				     /**
 				      * Constructor. The
-				      * @p MGDoFHandler is used to
+				      * MGDoFHandler is used to
 				      * determine the highest possible
-				      * level. @p transfer is an
+				      * level. <tt>transfer</tt> is an
 				      * object performing prolongation
 				      * and restriction.
 				      *
-				      * The V-cycle will start on
-				      * level @p maxlevel and goes
-				      * down to level @p minlevel,
-				      * where the coarse grid solver
-				      * will be used.
-				      *
 				      * This function already
 				      * initializes the vectors which
-				      * will be used later on in the
+				      * will be used later in the
 				      * course of the
 				      * computations. You should
 				      * therefore create objects of
 				      * this type as late as possible.
 				      */
-  template <int dim>
+    template <int dim>
     Multigrid(const MGDoFHandler<dim>& mg_dof_handler,
 	      const MGMatrixBase<VECTOR>& matrix,
 	      const MGCoarseGridBase<VECTOR>& coarse,
 	      const MGTransferBase<VECTOR>& transfer,
 	      const MGSmootherBase<VECTOR>& pre_smooth,
 	      const MGSmootherBase<VECTOR>& post_smooth,
-	      const unsigned int            minlevel = 0,
-	      const unsigned int            maxlevel = 1000000);
-
+	      Cycle cycle = v_cycle);
+				     /**
+				      * Experimental constructor for
+				      * cases in which no MGDoFHandler
+				      * is available.
+				      *
+				      * @warning Not intended for general use.
+				      */
+    Multigrid(const unsigned int minlevel,
+	      const unsigned int maxlevel,
+	      const MGMatrixBase<VECTOR>& matrix,
+	      const MGCoarseGridBase<VECTOR>& coarse,
+	      const MGTransferBase<VECTOR>& transfer,
+	      const MGSmootherBase<VECTOR>& pre_smooth,
+	      const MGSmootherBase<VECTOR>& post_smooth,
+	      Cycle cycle = v_cycle);
 
 				     /**
 				      * Reinit this class according to
-				      * @p minlevel and @p maxlevel.
+				      * #minlevel and #maxlevel.
 				      */
     void reinit (const unsigned int minlevel,
 		 const unsigned int maxlevel);
 
 				     /**
+				      * Execute one multigrid
+				      * cycle. The type of cycle is
+				      * selected by the constructor
+				      * argument cycle. See the enum
+				      * Cycle for available types.
+				      */
+    void cycle ();
+    
+				     /**
 				      * Execute one step of the
-				      * v-cycle algorithm.  This
+				      * V-cycle algorithm.  This
 				      * function assumes, that the
-				      * vector @p defect is properly
-				      * filled with the residual in
-				      * the outer defect correction
-				      * scheme (usually performed by
+				      * multilevel vector #defect is
+				      * filled with the residual of an
+				      * outer defect correction
+				      * scheme. This is usually taken
+				      * care of by
 				      * PreconditionMG). After
-				      * execution of <tt>vcycle()</tt>, the
-				      * result is in the vector
-				      * @p solution. See
+				      * vcycle(), the result is in the
+				      * multilevel vector
+				      * #solution. See
 				      * <tt>copy_*_mg</tt> in class
-				      * @p MGTools if you want to use
+				      * MGTools if you want to use
 				      * these vectors yourself.
 				      *
 				      * The actual work for this
 				      * function is done in
-				      * @p level_v_step.
+				      * level_v_step().
 				      */
-    void vcycle();
+    void vcycle ();
 
 				     /**
 				      * Set additional matrices to
 				      * correct residual computation
-				      * at refinement edges.
+				      * at refinement edges. These
+				      * matrices originate from
+				      * discontinuous Galerkin methods
+				      * (see FE_DGQ etc.), where they
+				      * correspond tu the edge fluxes
+				      * at the refinement edge between
+				      * two levels.
 				      */
     void set_edge_matrices (const MGMatrixBase<VECTOR>& edge_down,
 			    const MGMatrixBase<VECTOR>& edge_up);
 
+				     /**
+				      * Set the highest level for
+				      * which the multilevel method is
+				      * performed. By default, this is
+				      * the finest level of the
+				      * Triangulation; therefore, this
+				      * function will only accept
+				      * arguments smaller than the
+				      * current #maxlevel.
+				      */
+    void set_maxlevel(unsigned int);
+
+				     /**
+				      * Chance #cycle_type used in cycle().
+				      */
+    void set_cycle(Cycle);
+    
+				     /**
+				      * Set the debug level. Higher
+				      * values will create more
+				      * debugging output during the
+				      * multigrid cycles.
+				      */
+    void set_debug(unsigned int);
+    
+				     /**
+				      * Exception.
+				      */
+    DeclException2(ExcSwitchedLevels, int, int,
+		   << "minlevel and maxlevel switched, should be: "
+		   << arg1 << "<=" << arg2);
   private:
     
 				     /**
-				      * The actual v-cycle multigrid method.
-				      * @p level is the level the
-				      * function should work on. It
+				      * The V-cycle multigrid method.
+				      * <tt>level</tt> is the level the
+				      * function starts on. It
 				      * will usually be called for the
 				      * highest level from outside,
 				      * but will then call itself
-				      * recursively for @p level-1,
-				      * unless we are on @p minlevel
-				      * where instead of recursing
-				      * deeper, the coarse grid solver
-				      * is used to solve the matrix of
-				      * this level.
+				      * recursively for <tt>level-1</tt>,
+				      * unless we are on #minlevel
+				      * where the coarse grid solver
+				      * solves the problem exactly.
 				      */
     void level_v_step (const unsigned int level);
 
+				     /**
+				      * The actual W-cycle multigrid method.
+				      * <tt>level</tt> is the level the
+				      * function starts on. It
+				      * will usually be called for the
+				      * highest level from outside,
+				      * but will then call itself
+				      * recursively for <tt>level-1</tt>,
+				      * unless we are on #minlevel
+				      * where the coarse grid solver
+				      * solves the problem exactly.
+				      */
+    void level_w_step (const unsigned int level);
+
+				     /**
+				      * Cycle type performed by the method cycle().
+				      */
+    Cycle cycle_type;
+    
 				     /**
 				      * Level for coarse grid solution.
 				      */
@@ -172,28 +238,29 @@ class Multigrid : public Subscriptor
 				      * Highest level of cells.
 				      */
     unsigned int maxlevel;
-    
+
+  public:
 				     /**
-				      * Auxiliary vector. Contains the
-				      * defect to be corrected before
-				      * the multigrid step.
+				      * Input vector for the
+				      * cycle. Contains the defect of
+				      * the outer method projected to
+				      * the multilevel vectors.
 				      */
     MGLevelObject<VECTOR> defect;
 
 				     /**
-				      * Auxiliary vector. Contains the
-				      * updated solution after the
+				      * The solution update after the
 				      * multigrid step.
 				      */
     MGLevelObject<VECTOR> solution;
     
+  private:
 				     /**
 				      * Auxiliary vector.
 				      */
     MGLevelObject<VECTOR> t;    
 
 
-  private:
 				     /**
 				      * The matrix for each level.
 				      */
@@ -230,11 +297,12 @@ class Multigrid : public Subscriptor
     SmartPointer<const MGMatrixBase<VECTOR> > edge_up;
 
 				     /**
-				      * Exception.
+				      * Level for debug
+				      * output. Defaults to zero and
+				      * can be set by set_debug().
 				      */
-    DeclException2(ExcSwitchedLevels, int, int,
-		   << "minlevel and maxlevel switched, should be: "
-		   << arg1 << "<=" << arg2);
+    unsigned int debug;
+    
     template<int dim, class VECTOR2, class TRANSFER> friend class PreconditionMG;
 };
 
@@ -244,7 +312,6 @@ class Multigrid : public Subscriptor
  * Here, we collect all information needed for multi-level preconditioning
  * and provide the standard interface for LAC iterative methods.
  *
- * The template parameter class @p MG is required to inherit @p MGBase.
  * Furthermore, it needs functions <tt>void copy_to_mg(const VECTOR&)</tt>
  * to store @p src in the right hand side of the multi-level method and
  * <tt>void copy_from_mg(VECTOR&)</tt> to store the result of the v-cycle in @p dst.
@@ -324,13 +391,15 @@ class PreconditionMG : public Subscriptor
 				      */
     SmartPointer<Multigrid<VECTOR> > multigrid;
     
-				   /**
-				    * Object for grid tranfer.
-				    */
+				     /**
+				      * Object for grid tranfer.
+				      */
     SmartPointer<const TRANSFER> transfer;  
 };
 
+/*@}*/
 
+/// @if NoDoc
 /* --------------------------- inline functions --------------------- */
 
 
@@ -342,12 +411,11 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 			      const MGTransferBase<VECTOR>& transfer,
 			      const MGSmootherBase<VECTOR>& pre_smooth,
 			      const MGSmootherBase<VECTOR>& post_smooth,
-			      const unsigned int min_level,
-			      const unsigned int max_level)
+			      Multigrid<VECTOR>::Cycle cycle)
 		:
-		minlevel(min_level),
-		maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,
-				  max_level)),
+		cycle_type(cycle),
+		minlevel(0),
+		maxlevel(mg_dof_handler.get_tria().n_levels()-1),
 		defect(minlevel,maxlevel),
 		solution(minlevel,maxlevel),
 		t(minlevel,maxlevel),
@@ -357,23 +425,11 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 		pre_smooth(&pre_smooth),
 		post_smooth(&post_smooth),
 		edge_down(0),
-		edge_up(0)
+		edge_up(0),
+		debug(0)
 {}
 
 
-template <class VECTOR>
-void
-Multigrid<VECTOR>::reinit(const unsigned int min_level,
-			  const unsigned int max_level)
-{
-  minlevel=min_level;
-  maxlevel=max_level;
-  defect.resize(minlevel, maxlevel);
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
-}
-
-  
 /* --------------------------- inline functions --------------------- */
 
 
@@ -405,7 +461,7 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
 		       src);
-  multigrid->vcycle();
+  multigrid->cycle();
   transfer->copy_from_mg(*mg_dof_handler,
 			 dst,
 			 multigrid->solution);
@@ -422,7 +478,7 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
 		       src);
-  multigrid->vcycle();
+  multigrid->cycle();
   transfer->copy_from_mg_add(*mg_dof_handler,
 			     dst,
 			     multigrid->solution);
@@ -450,5 +506,6 @@ PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult_add (
   Assert(false, ExcNotImplemented());
 }
 
+/// @endif
 
 #endif

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+/*!@addtogroup mg */
+/*@{*/
 
 /**
  * An array with an object for each level.  The purpose of this class
@@ -112,6 +114,7 @@ class MGLevelObject : public Subscriptor
     std::vector<boost::shared_ptr<Object> > objects;
 };
 
+/*@}*/
 
 /* ------------------------------------------------------------------- */
 
@@ -215,7 +218,4 @@ MGLevelObject<Object>::memory_consumption () const
 }
 
 
-/*-----------------------   mg_level_object.h     -----------------------*/
-
 #endif
-/*-----------------------   mg_level_object.h     -----------------------*/

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,8 @@ template <int dim>              class MGDoFObjectAccessor<1, dim>;
 template <int dim>              class MGDoFObjectAccessor<2, dim>;
 template <int dim>              class MGDoFObjectAccessor<3, dim>;
 
+/*!@addtogroup mg */
+/*@{*/
 
 /**
  * Define the basis for accessors to the degrees of freedom for
@@ -680,6 +682,8 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
 				      */
     DeclException0 (ExcNotUsefulForThisDimension);
 };
+
+/*@}*/
 
 
 template<> MGDoFCellAccessor<1>::face_iterator

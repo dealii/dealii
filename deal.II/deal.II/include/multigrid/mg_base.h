@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,8 @@
 #include <lac/vector.h>
 
 
-
+/*!@addtogroup mg */
+/*@{*/
 
 
 /**
@@ -226,9 +227,7 @@ class MGSmootherBase : public Subscriptor
 		       const VECTOR&      rhs) const = 0;  
 };
 
+/*@}*/
 
-
-/*----------------------------   mgbase.h     ---------------------------*/
 
 #endif
-/*----------------------------   mgbase.h     ---------------------------*/

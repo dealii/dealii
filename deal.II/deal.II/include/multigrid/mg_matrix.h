@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,9 @@
 #include <lac/vector.h>
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
+
+/*!@addtogroup mg */
+/*@{*/
 
 /**
  * Multilevel matrix. This class implements the interface defined by
@@ -180,6 +183,7 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
     
 };
 
+/*@}*/
 
 /*----------------------------------------------------------------------*/
 
