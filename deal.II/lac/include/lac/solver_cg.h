@@ -51,11 +51,24 @@ class SolverCG : public Subscriptor, private Solver<VECTOR>
     				     /**
 				      * Standardized data struct to
 				      * pipe additional data to the
-				      * solver. This solver does not
-				      * need additional data yet.
+				      * solver.
 				      */
     struct AdditionalData
     {
+				       /**
+					* Write coefficients alpha and
+					* beta to the log file for later use.
+					*/
+      bool log_coefficients;
+
+				       /**
+					* Constructor. Initialize data fields.
+					* Confer the description of those.
+					*/
+      AdditionalData (bool log_coefficients = false)
+	:
+	log_coefficients (log_coefficients)
+	{}
     };
 
 				     /**
@@ -125,6 +138,11 @@ class SolverCG : public Subscriptor, private Solver<VECTOR>
 				      * the square root of the @p{res2} value.
 				      */
     double res2;
+
+				     /**
+				      * Additional parameters.
+				      */
+    AdditionalData additional_data;
 };
 
 
@@ -134,9 +152,10 @@ class SolverCG : public Subscriptor, private Solver<VECTOR>
 template<class VECTOR>
 SolverCG<VECTOR>::SolverCG(SolverControl &cn,
 			   VectorMemory<VECTOR> &mem,
-			   const AdditionalData &)
+			   const AdditionalData &data)
 		:
-		Solver<VECTOR>(cn,mem)
+  Solver<VECTOR>(cn,mem),
+  additional_data(data)
 {}
 
 
@@ -235,6 +254,9 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
       res = g.l2_norm();
 
       print_vectors(it, x, g, d);
+      
+      if (additional_data.log_coefficients)
+	deallog << "alpha-beta:" << alpha << '\t' << beta << endl;
       
       conv = control().check(it,res);
       if (conv)

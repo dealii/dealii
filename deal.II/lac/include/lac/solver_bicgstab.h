@@ -197,7 +197,7 @@ class SolverBicgstab : public Subscriptor, private Solver<VECTOR>
     double res;
 
 				     /**
-				      * Additional parameters..
+				      * Additional parameters.
 				      */
     AdditionalData additional_data;
   
