@@ -184,8 +184,9 @@ void ConstraintMatrix::add_entries (const unsigned int                        li
 
 void ConstraintMatrix::close ()
 {
-  Assert (sorted==false, ExcMatrixIsClosed());
-
+  if (sorted == true)
+    return;
+  
 				   // sort the entries in the different lines
 				   // and strip zero entries
   std::vector<ConstraintLine>::iterator line = lines.begin(),
