@@ -537,4 +537,5 @@ template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal
 
 
 template void MGTools::count_dofs_per_component<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-						   std::vector<std::vector<unsigned int> >&);
+						   std::vector<std::vector<unsigned int> >&,
+								    std::vector<unsigned int> guidos_special_arg);
