@@ -21,6 +21,11 @@
 #include <numeric>
 
 
+
+const unsigned int SparsityPattern::invalid_entry;
+
+
+
 SparsityPattern::SparsityPattern () :
 		max_dim(0),
 		max_vec_len(0),
