@@ -53,11 +53,24 @@
 #  include <strstream>
 #endif
 
+				 // @sect{Evaluating the solution}
 
-
+				 // As mentioned in the introduction,
+				 // significant parts of the program
+				 // have simply been taken over from
+				 // the step-13 example program. We
+				 // therefore only comment on those
+				 // things that are new.
+				 //
+				 // First, the framework for
+				 // evaluation of solutions is
+				 // unchanged, i.e. the base class is
+				 // the same, and the class to
+				 // evaluate the solution at a grid
+				 // point is unchanged:
 namespace Evaluation
 {
-
+				   // @sect4{The EvaluationBase class}
   template <int dim>
   class EvaluationBase 
   {
@@ -87,7 +100,7 @@ namespace Evaluation
   };
 
 
-
+				   // @sect4{The PointValueEvaluation class}
   template <int dim>
   class PointValueEvaluation : public EvaluationBase<dim>
   {
@@ -158,6 +171,31 @@ namespace Evaluation
   };
 
 
+				   // @sect4{The GridOutput class}
+
+				   // Since this program has a more
+				   // difficult structure (it computed
+				   // a dual solution in addition to a
+				   // primal one), writing out the
+				   // solution is no more done by an
+				   // evaluation object since we want
+				   // to write both solutions at once
+				   // into one file, and that requires
+				   // some more information than
+				   // available to the evaluation
+				   // classes.
+				   //
+				   // However, we also want to look at
+				   // the grids generated. This again
+				   // can be done with one such
+				   // class. Its structure is analog
+				   // to the ``SolutionOutput'' class
+				   // of the previous example program,
+				   // so we do not discuss it here in
+				   // more detail. Furthermore,
+				   // everything that is used here has
+				   // already been used in previous
+				   // example programs.
   template <int dim>
   class GridOutput : public EvaluationBase<dim>
   {
@@ -204,10 +242,32 @@ namespace Evaluation
 };
 
   
+				 // @sect3{The Laplace solver classes}
 
+				 // Next are the actual solver
+				 // classes. Again, we discuss only
+				 // the differences to the previous
+				 // program.
 namespace LaplaceSolver
 {
 
+				   // @sect{The Laplace solver base class}
+
+				   // This class is almost unchanged,
+				   // with the exception that it
+				   // declares two more functions:
+				   // ``output_solution'' will be used
+				   // to generate output files from
+				   // the actual solutions computed by
+				   // derived classes, and the
+				   // ``set_refinement_cycle''
+				   // function by which the testing
+				   // framework sets the number of the
+				   // refinement cycle to a local
+				   // variable in this class; this
+				   // number is later used to generate
+				   // filenames for the solution
+				   // output.
   template <int dim>
   class Base
   {
@@ -252,7 +312,11 @@ namespace LaplaceSolver
   };
   
 
+				   // @sect4{The Laplace Solver class}
 
+				   // Likewise, the ``Solver'' class
+				   // is entirely unchanged and will
+				   // thus not be discussed.
   template <int dim>
   class Solver : public virtual Base<dim>
   {
@@ -511,7 +575,47 @@ namespace LaplaceSolver
 
 
 
+				   // @sect{The PrimalSolver class}
 
+				   // The ``PrimalSolver'' class is
+				   // also mostly unchanged except for
+				   // overloading the functions
+				   // ``solve_problem'', ``n_dofs'',
+				   // and ``postprocess'' of the base
+				   // class. These overloaded
+				   // functions do nothing particular
+				   // besides calling the functions of
+				   // the base class -- that seems
+				   // superfluous, but works around a
+				   // bug in a popular compiler which
+				   // requires us to write such
+				   // functions for the following
+				   // scenario: Besides the
+				   // ``PrimalSolver'' class, we will
+				   // have a ``DualSolver'', both
+				   // derived from ``Solver''. We will
+				   // then have a final classes which
+				   // derived from these two, which
+				   // will then have two instances of
+				   // the ``Solver'' class as its base
+				   // classes. If we want, for
+				   // example, the number of degrees
+				   // of freedom of the primal solver,
+				   // we would have to indicate this
+				   // like so:
+				   // ``PrimalSolver<dim>::n_dofs()''.
+				   // However, the compiler does not
+				   // accept this since the ``n_dofs''
+				   // function is actually from a base
+				   // class of the ``PrimalSolver''
+				   // class, so we have to inject the
+				   // name from the base to the
+				   // derived class using these
+				   // additional functions.
+				   //
+				   // Except for the reimplementation
+				   // of these three functions, this
+				   // class is also unchanged.
   template <int dim>
   class PrimalSolver : public Solver<dim>
   {
@@ -523,7 +627,6 @@ namespace LaplaceSolver
 		    const Function<dim>      &rhs_function,
 		    const Function<dim>      &boundary_values);
 
-				       //TODO!!
       virtual
       void
       solve_problem ();
@@ -633,7 +736,7 @@ namespace LaplaceSolver
   };
 
 
-
+				   //TODO!!
   template <int dim>
   class RefinementGlobal : public PrimalSolver<dim>
   {
@@ -1244,7 +1347,7 @@ namespace Data
 				     // evaluation point (3/4,3/4) in
 				     // this example is a grid point,
 				     // we refine twice globally:
-    coarse_grid.refine_global (2);
+    coarse_grid.refine_global (4);
   };
 };
 
@@ -2609,7 +2712,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	};
 
 
-      if (solver.n_dofs() < 5000)
+      if (solver.n_dofs() < 500000)
 	solver.refine_grid ();
       else
 	break;
@@ -2625,17 +2728,17 @@ template <int dim>
 void solve_problem ()
 {
   Triangulation<dim> triangulation (Triangulation<dim>::smoothing_on_refinement);
-  const FE_Q<dim>          primal_fe(1);
-  const FE_Q<dim>          dual_fe(2);
+  const FE_Q<dim>          primal_fe(3);
+  const FE_Q<dim>          dual_fe(4);
   const QGauss4<dim>       quadrature;
   const QGauss4<dim-1>     face_quadrature;
 
   const Data::SetUpBase<dim> *data =
-    new Data::SetUp<Data::CurvedRidges<dim>,dim> ();
+    new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
 
   data->create_coarse_grid (triangulation);
   
-  const Point<dim> evaluation_point(0.5,0.5);
+  const Point<dim> evaluation_point(0.75,0.75);
   const DualFunctional::PointValueEvaluation<dim>
     dual_functional (evaluation_point);
   
@@ -2651,7 +2754,7 @@ void solve_problem ()
 
   TableHandler results_table;
   Evaluation::PointValueEvaluation<dim>
-    postprocessor1 (Point<dim>(0.5,0.5), results_table);
+    postprocessor1 (Point<dim>(0.75,0.75), results_table);
   Evaluation::GridOutput<dim>
     postprocessor2 ("grid");
 
