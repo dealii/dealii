@@ -647,7 +647,10 @@ void Triangulation<dim>::set_all_refine_flags () {
 		       endc = end();
 
   for (; cell != endc; ++cell)
-    cell->set_refine_flag ();
+    {
+      cell->clear_coarsen_flag();
+      cell->set_refine_flag ();
+    };
 };
 
 
@@ -664,135 +667,97 @@ void Triangulation<dim>::refine_global (const unsigned int times) {
 
 
 template <int dim>
-void Triangulation<dim>::save_refine_flags (ostream &out) const {
-  unsigned int N = n_active_cells();
+void Triangulation<dim>::save_refine_flags (vector<bool> &v) const {
+  v.resize (n_active_cells(), false);
+  vector<bool>::iterator  i = v.begin();
   active_cell_iterator cell = begin_active(),
 		       endc = end();
+  for (; cell!=endc; ++cell, ++i)
+    *i = cell->refine_flag_set();
+};
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
-  
-  for (unsigned int position=0; cell!=endc; ++cell, ++position)
-    flags[position/8] |= (cell->refine_flag_set() ? (1<<(position%8)) : 0);
 
-				   // format:
-				   // 0. magic number 0xabcc
-				   // 1. number of active cells
-				   // 2. the flags
-				   // 3. magic number 0xabcd
-  out << mn_tria_refine_flags_begin << " " << N << endl;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    out << static_cast<unsigned int>(flags[i]) << " ";
-  
-  out << endl;
-  out << mn_tria_refine_flags_end << endl;
 
-  delete[] flags;
+template <int dim>
+void Triangulation<dim>::save_refine_flags (ostream &out) const {
+  vector<bool> v;
+  save_refine_flags (v);
+  write_bool_vector (mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end,
+		     out);
 };
 
 
 
 template <int dim>
 void Triangulation<dim>::load_refine_flags (istream &in) {
-  unsigned int magic_number;
-  in >> magic_number;
-  Assert (magic_number==mn_tria_refine_flags_begin, ExcGridReadError());
+  vector<bool> v;
+  read_bool_vector (mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end,
+		    in);
+  load_refine_flags (v);
+};
 
-  unsigned int N;
-  in >> N;
-  Assert (N==n_active_cells(), ExcGridsDoNotMatch(N, n_active_cells()));
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  unsigned short int tmp;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    {
-      in >> tmp;
-      flags[i] = tmp;
-    };
-  
+
+template <int dim>
+void Triangulation<dim>::load_refine_flags (const vector<bool> &v) {
+  Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
-  unsigned int position=0;
-  for (; cell!=endc; ++cell, ++position)
-    if (flags[position/8] & (1<<(position%8)))
+  vector<bool>::const_iterator i = v.begin();
+  for (; cell!=endc; ++cell, ++i)
+    if (*i == true)
       cell->set_refine_flag();
     else
       cell->clear_refine_flag();
+};
 
-  Assert (position==N, ExcGridReadError());
 
-  in >> magic_number;
-  Assert (magic_number==mn_tria_refine_flags_end, ExcGridReadError());
 
-  delete[] flags;
+template <int dim>
+void Triangulation<dim>::save_coarsen_flags (vector<bool> &v) const {
+  v.resize (n_active_cells(), false);
+  vector<bool>::iterator  i = v.begin();
+  active_cell_iterator cell = begin_active(),
+		       endc = end();
+  for (; cell!=endc; ++cell, ++i)
+    *i = cell->coarsen_flag_set();
 };
 
 
 
 template <int dim>
 void Triangulation<dim>::save_coarsen_flags (ostream &out) const {
-  unsigned int N = n_active_cells();
-  active_cell_iterator cell = begin_active(),
-		       endc = end();
-
-  unsigned char *flags = new unsigned char[N/8+1];
-  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
-  
-  for (unsigned int position=0; cell!=endc; ++cell, ++position)
-    flags[position/8] |= (cell->coarsen_flag_set() ? (1<<(position%8)) : 0);
-
-				   // format:
-				   // 0. magic number
-				   // 1. number of active cells
-				   // 2. the flags
-				   // 3. magic number 0xabcd
-  out << mn_tria_coarsen_flags_begin << " " << N << endl;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    out << static_cast<unsigned int>(flags[i]) << " ";
-  
-  out << endl;
-  out << mn_tria_coarsen_flags_end << endl;
-
-  delete[] flags;
+  vector<bool> v;
+  save_coarsen_flags (v);
+  write_bool_vector (mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end,
+		     out);
 };
 
 
 
 template <int dim>
 void Triangulation<dim>::load_coarsen_flags (istream &in) {
-  unsigned int magic_number;
-  in >> magic_number;
-  Assert (magic_number==mn_tria_coarsen_flags_begin, ExcGridReadError());
+  vector<bool> v;
+  read_bool_vector (mn_tria_coarsen_flags_begin, v, mn_tria_coarsen_flags_end,
+		    in);
+  load_coarsen_flags (v);
+};
 
-  unsigned int N;
-  in >> N;
-  Assert (N==n_active_cells(), ExcGridsDoNotMatch(N, n_active_cells()));
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  unsigned short int tmp;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    {
-      in >> tmp;
-      flags[i] = tmp;
-    };
-  
+
+template <int dim>
+void Triangulation<dim>::load_coarsen_flags (const vector<bool> &v) {
+  Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
-  unsigned int position=0;
-  for (; cell!=endc; ++cell, ++position)
-    if (flags[position/8] & (1<<(position%8)))
+  vector<bool>::const_iterator i = v.begin();
+  for (; cell!=endc; ++cell, ++i)
+    if (*i == true)
       cell->set_coarsen_flag();
     else
       cell->clear_coarsen_flag();
-
-  Assert (position==N, ExcGridReadError());
-
-  in >> magic_number;
-  Assert (magic_number==mn_tria_coarsen_flags_end, ExcGridReadError());
-
-  delete[] flags;
 };
 
 
@@ -812,6 +777,13 @@ void Triangulation<1>::clear_user_flags () {
 template <>
 void Triangulation<1>::save_user_flags (ostream &out) const {
   save_user_flags_line (out);
+};
+
+
+
+template <>
+void Triangulation<1>::save_user_flags (vector<bool> &v) const {
+  save_user_flags_line (v);
 };
 
 #endif
@@ -840,75 +812,64 @@ void Triangulation<2>::save_user_flags (ostream &out) const {
   save_user_flags_quad (out);
 };
 
+
+
+template <>
+void Triangulation<2>::save_user_flags (vector<bool> &v) const {
+  save_user_flags_line (v);
+  save_user_flags_quad (v);
+};
+
+
 #endif
 
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_line (ostream &out) const {
-  unsigned int N = n_lines();
+void Triangulation<dim>::save_user_flags_line (vector<bool> &v) const {
+  v.resize (n_lines(), false);
+  vector<bool>::iterator  i = v.begin();
   line_iterator line = begin_line(),
-		endc = end_line();
+		endl = end_line();
+  for (; line!=endl; ++line, ++i)
+    *i = line->user_flag_set();
+};
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
-  
-  for (unsigned int position=0; line!=endc; ++line, ++position)
-    flags[position/8] |= (line->user_flag_set() ? (1<<(position%8)) : 0);
 
-				   // format:
-				   // 0. magic number 0xabce
-				   // 1. number of lines
-				   // 2. the flags
-				   // 3. magic number 0xabcf
-  out << mn_tria_line_user_flags_begin << " " << N << endl;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    out << static_cast<unsigned int>(flags[i]) << " ";
-  
-  out << endl;
-  out << mn_tria_line_user_flags_end << endl;
 
-  delete[] flags;
+template <int dim>
+void Triangulation<dim>::save_user_flags_line (ostream &out) const {
+  vector<bool> v;
+  save_user_flags_line (v);
+  write_bool_vector (mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end,
+		     out);
 };
 
 
 
 template <int dim>
 void Triangulation<dim>::load_user_flags_line (istream &in) {
-  unsigned int magic_number;
-  in >> magic_number;
-  Assert (magic_number==mn_tria_line_user_flags_begin, ExcGridReadError());
+  vector<bool> v;
+  read_bool_vector (mn_tria_line_user_flags_begin, v, mn_tria_line_user_flags_end,
+		    in);
+  load_user_flags_line (v);
+};
 
-  unsigned int N;
-  in >> N;
-  Assert (N==n_lines(), ExcGridsDoNotMatch(N, n_lines()));
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  unsigned short int tmp;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    {
-      in >> tmp;
-      flags[i] = tmp;
-    };
-  
+
+template <int dim>
+void Triangulation<dim>::load_user_flags_line (const vector<bool> &v) {
+  Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   line_iterator line = begin_line(),
-		endc = end_line();
-  unsigned int position=0;
-  for (; line!=endc; ++line, ++position)
-    if (flags[position/8] & (1<<(position%8)))
+		endl = end_line();
+  vector<bool>::const_iterator i = v.begin();
+  for (; line!=endl; ++line, ++i)
+    if (*i == true)
       line->set_user_flag();
     else
       line->clear_user_flag();
-
-  Assert (position==N, ExcGridReadError());
-
-  in >> magic_number;
-  Assert (magic_number==mn_tria_line_user_flags_end, ExcGridReadError());
-
-  delete[] flags;
 };
-
 
 
 
@@ -920,8 +881,21 @@ void Triangulation<1>::save_user_flags_quad (ostream &) const {
 };
 
 
+
+template <>
+void Triangulation<1>::save_user_flags_quad (vector<bool> &) const {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
 template <>
 void Triangulation<1>::load_user_flags_quad (istream &) {
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+template <>
+void Triangulation<1>::load_user_flags_quad (const vector<bool> &) {
   Assert (false, ExcFunctionNotUseful());
 };
 
@@ -931,68 +905,49 @@ void Triangulation<1>::load_user_flags_quad (istream &) {
 
 
 template <int dim>
-void Triangulation<dim>::save_user_flags_quad (ostream &out) const {
-  unsigned int N = n_quads();
+void Triangulation<dim>::save_user_flags_quad (vector<bool> &v) const {
+  v.resize (n_quads(), false);
+  vector<bool>::iterator  i = v.begin();
   quad_iterator quad = begin_quad(),
-		endc = end_quad();
+		endq = end_quad();
+  for (; quad!=endq; ++quad, ++i)
+    *i = quad->user_flag_set();
+};
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
-  
-  for (unsigned int position=0; quad!=endc; ++quad, ++position)
-    flags[position/8] |= (quad->user_flag_set() ? (1<<(position%8)) : 0);
 
-				   // format:
-				   // 0. magic number 0xabce
-				   // 1. number of quads
-				   // 2. the flags
-				   // 3. magic number 0xabcf
-  out << mn_tria_quad_user_flags_begin << " " << N << endl;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    out << static_cast<unsigned int>(flags[i]) << " ";
-  
-  out << endl;
-  out << mn_tria_quad_user_flags_end << endl;
 
-  delete[] flags;
+template <int dim>
+void Triangulation<dim>::save_user_flags_quad (ostream &out) const {
+  vector<bool> v;
+  save_user_flags_quad (v);
+  write_bool_vector (mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end,
+		     out);
 };
 
 
 
 template <int dim>
 void Triangulation<dim>::load_user_flags_quad (istream &in) {
-  unsigned int magic_number;
-  in >> magic_number;
-  Assert (magic_number==mn_tria_quad_user_flags_begin, ExcGridReadError());
+  vector<bool> v;
+  read_bool_vector (mn_tria_quad_user_flags_begin, v, mn_tria_quad_user_flags_end,
+		    in);
+  load_user_flags_quad (v);
+};
 
-  unsigned int N;
-  in >> N;
-  Assert (N==n_quads(), ExcGridsDoNotMatch(N, n_quads()));
 
-  unsigned char *flags = new unsigned char[N/8+1];
-  unsigned short int tmp;
-  for (unsigned int i=0; i<N/8+1; ++i) 
-    {
-      in >> tmp;
-      flags[i] = tmp;
-    };
-  
+
+template <int dim>
+void Triangulation<dim>::load_user_flags_quad (const vector<bool> &v) {
+  Assert (v.size() == n_active_cells(), ExcGridReadError());
   
   quad_iterator quad = begin_quad(),
-		endc = end_quad();
-  unsigned int position=0;
-  for (; quad!=endc; ++quad, ++position)
-    if (flags[position/8] & (1<<(position%8)))
+		endq = end_quad();
+  vector<bool>::const_iterator i = v.begin();
+  for (; quad!=endq; ++quad, ++i)
+    if (*i == true)
       quad->set_user_flag();
     else
       quad->clear_user_flag();
-
-  Assert (position==N, ExcGridReadError());
-
-  in >> magic_number;
-  Assert (magic_number==mn_tria_quad_user_flags_end, ExcGridReadError());
-
-  delete[] flags;
 };
 
 
@@ -2110,7 +2065,29 @@ void Triangulation<dim>::execute_coarsening_and_refinement () {
 
 template <>
 void Triangulation<1>::execute_refinement () {
+  const unsigned int dim = 2;
   prepare_refinement ();
+  
+				   // check whether a new level is needed
+				   // we have to check for this on the
+				   // highest level only (on this, all
+				   // used cells are also active, so we
+				   // only have to check for this)
+  if (true)
+    {
+      raw_cell_iterator cell = begin_active (levels.size()-1),
+			endc = end();
+      for (; cell != endc; ++cell)
+	if (cell->used())
+	  if (cell->refine_flag_set()) 
+	    {
+	      levels.push_back (new TriangulationLevel<dim>);
+	      break;
+	    };
+    };
+  
+
+
 
 				   // check how much space is needed
 				   // on every level
@@ -2302,7 +2279,28 @@ void Triangulation<1>::execute_refinement () {
 
 template <>
 void Triangulation<2>::execute_refinement () {
+  const unsigned int dim = 2;
   prepare_refinement ();
+  
+				   // check whether a new level is needed
+				   // we have to check for this on the
+				   // highest level only (on this, all
+				   // used cells are also active, so we
+				   // only have to check for this)
+  if (true)
+    {
+      raw_cell_iterator cell = begin_active (levels.size()-1),
+			endc = end();
+      for (; cell != endc; ++cell)
+	if (cell->used())
+	  if (cell->refine_flag_set()) 
+	    {
+	      levels.push_back (new TriangulationLevel<dim>);
+	      break;
+	    };
+    };
+
+
 
 				   // check how much space is needed
 				   // on every level
@@ -2887,9 +2885,40 @@ void Triangulation<2>::execute_refinement () {
 template <int dim>
 void Triangulation<dim>::execute_coarsening () {
   prepare_coarsening ();
+  				   // loop over all cells. Flag all cells of
+				   // which all children are flagged for
+				   // coarsening and delete the childrens'
+				   // flags. In effect, only those
+				   // cells are flagged of which originally
+				   // all children were flagged and for which
+				   // all children are on the same refinement
+				   // level. For flagging, the user flags are
+				   // used, to avoid confusion and because
+				   // non-active cells can't be flagged for
+				   // coarsening. Note that because of the
+				   // effects of #prepare_coarsening#, of a
+				   // cell either all or no children must
+				   // be flagged for coarsening, so it is
+				   // ok to only check the first child
+  clear_user_flags ();
 
-  cell_iterator cell = last(levels.size()-2),
+  cell_iterator cell = begin(),
 		endc = end();
+  for (; cell!=endc; ++cell) 
+    if (!cell->active())
+      if (cell->child(0)->coarsen_flag_set())
+	{
+	  cell->set_user_flag();
+	  for (unsigned int child=0;
+	       child<GeometryInfo<dim>::children_per_cell; ++child)
+	    {
+	      Assert (cell->child(child)->coarsen_flag_set(),
+		      ExcInternalError());
+	      cell->child(child)->clear_coarsen_flag();
+	    };
+	};
+  
+
 				   // now do the actual coarsening step. Since
 				   // the loop goes over used cells only we need
 				   // not worry about deleting some cells since
@@ -2899,7 +2928,7 @@ void Triangulation<dim>::execute_coarsening () {
 				   // delete some cells if their neighbors
 				   // have already been deleted (if the latter
 				   // are on a higher level for example)
-  for (; cell!=endc; --cell)
+  for (cell = last(levels.size()-2); cell!=endc; --cell)
     if (cell->user_flag_set())
 				       // use a separate function, since this
 				       // is dimension specific
@@ -2917,7 +2946,9 @@ void Triangulation<dim>::execute_coarsening () {
 
 
 template <int dim>
-void Triangulation<dim>::prepare_refinement () {
+bool Triangulation<dim>::prepare_refinement () {
+  bool cells_changed = false;
+  
 				   // make sure no two adjacent active cells
 				   // have refinement levels differing
 				   // with more than one.
@@ -2973,8 +3004,11 @@ void Triangulation<dim>::prepare_refinement () {
 			  &&
 			  (cell->neighbor(i)->refine_flag_set() == false))
 			{
+			  if (cell->neighbor(i)->coarsen_flag_set())
+			    cell->neighbor(i)->clear_coarsen_flag();
 			  cell->neighbor(i)->set_refine_flag();
 			  mesh_changed_in_this_loop = true;
+			  cells_changed = true;
 			};
 		    };
 	      }
@@ -2996,7 +3030,9 @@ void Triangulation<dim>::prepare_refinement () {
 
 						       // refine cell and
 						       // update vertex levels
+		      cell->clear_coarsen_flag();
 		      cell->set_refine_flag();
+		      cells_changed = true;
 						       // note that we can only
 						       // enter this branch if the
 						       // cell is not yet flagged,
@@ -3041,7 +3077,10 @@ void Triangulation<dim>::prepare_refinement () {
 
 		  if (unrefined_neighbors < refined_neighbors)
 		    {
+		      if (cell->coarsen_flag_set())
+			cell->clear_coarsen_flag();
 		      cell->set_refine_flag ();
+		      cells_changed = true;
 		      mesh_changed_in_this_loop = true;
 		    };
 		};
@@ -3051,25 +3090,23 @@ void Triangulation<dim>::prepare_refinement () {
       
     };
   
-
-				   // check whether a new level is needed
-  raw_cell_iterator cell = begin_active (levels.size()-1),
-		    endc = end();
-  for (; cell != endc; ++cell)
-    if (cell->refine_flag_set()==true) 
-      {
-	levels.push_back (new TriangulationLevel<dim>);
-	return;
-      };
+  return cells_changed;
 };
 
 
 
 template <int dim>
-void Triangulation<dim>::prepare_coarsening () {
-  cell_iterator cell = begin(),
-		endc = end();  
-
+bool Triangulation<dim>::prepare_coarsening () {
+				   // checking whether the coarsen flags
+				   // changed in this function is quite
+				   // a hard task, since we transform
+				   // from coarsen to user flags and back.
+				   // we do the check by saving the flags
+				   // before and after the operation and
+				   // compare them
+  vector<bool> flags_before;
+  save_coarsen_flags (flags_before);
+  
 				   // loop over all cells. Flag all cells of
 				   // which all children are flagged for
 				   // coarsening and delete the childrens'
@@ -3096,7 +3133,9 @@ void Triangulation<dim>::prepare_coarsening () {
 				   // flagged for coarsening
   unsigned int flagged_children;
   
-  for (cell=begin(); cell!=endc; ++cell) 
+  cell_iterator cell = begin(),
+		endc = end();
+  for (; cell!=endc; ++cell) 
     {
 				       // nothing to do if we are already on
 				       // the finest level; if we are on the
@@ -3255,6 +3294,22 @@ void Triangulation<dim>::prepare_coarsening () {
 	}
       while (flags_changed_in_this_loop);
     };
+
+				   // revert change of flags: use coarsen
+				   // flags again and delete user flags
+  for (cell=begin(); cell!=endc; ++cell)
+    if (cell->user_flag_set())
+      {
+	cell->clear_user_flag();
+	for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+	  cell->child(c)->set_coarsen_flag();
+      };
+  
+
+  vector<bool> flags_after;
+  save_coarsen_flags (flags_after);
+
+  return flags_before != flags_after;
 };
 
 
@@ -3362,6 +3417,69 @@ void Triangulation<2>::delete_cell (cell_iterator &cell) {
 };
 
 #endif
+
+
+
+template <int dim>
+void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
+					    const vector<bool> &v,
+					    const unsigned int  magic_number2,
+					    ostream            &out) {
+  const unsigned int N = v.size();
+  unsigned char *flags = new unsigned char[N/8+1];
+  for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;
+  
+  for (unsigned int position=0; position<N; ++position)
+    flags[position/8] |= (v[position] ? (1<<(position%8)) : 0);
+
+				   // format:
+				   // 0. magic number
+				   // 1. number of flags
+				   // 2. the flags
+				   // 3. magic number
+  out << magic_number1 << " " << N << endl;
+  for (unsigned int i=0; i<N/8+1; ++i) 
+    out << static_cast<unsigned int>(flags[i]) << " ";
+  
+  out << endl << magic_number2 << endl;
+
+  delete[] flags;
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
+					   vector<bool>       &v,
+					   const unsigned int  magic_number2,
+					   istream            &in) {
+  unsigned int magic_number;
+  in >> magic_number;
+  Assert (magic_number==magic_number1, ExcGridReadError());
+
+  unsigned int N;
+  in >> N;
+  v.resize (N);
+
+  unsigned char *flags = new unsigned char[N/8+1];
+  unsigned short int tmp;
+  for (unsigned int i=0; i<N/8+1; ++i) 
+    {
+      in >> tmp;
+      flags[i] = tmp;
+    };
+
+  for (unsigned int position=0; position!=N; ++position)
+    v[position] = (flags[position/8] & (1<<(position%8)));
+
+  in >> magic_number;
+  Assert (magic_number==magic_number2, ExcGridReadError());
+
+  delete[] flags;
+};
+
+
+
 
 
 
