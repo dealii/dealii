@@ -616,11 +616,12 @@ void Vector<Number>::block_write (ostream &out) const
 				   // problems in a multithreaded
 				   // environment
   const unsigned int sz = size();
-  out.write (reinterpret_cast<const char*>(&sz),
-	     reinterpret_cast<const char*>(&sz+1)
-	     - reinterpret_cast<const char*>(&sz));
-  const char intro = '[';
-  out.write (&intro, 1);
+  char buf[16];
+  
+  sprintf(buf, "%d", sz);
+  strcat(buf, "\n[");
+  
+  out.write(buf, strlen(buf));
   out.write (reinterpret_cast<const char*>(begin()),
 	     reinterpret_cast<const char*>(end())
 	     - reinterpret_cast<const char*>(begin()));
@@ -640,12 +641,12 @@ void Vector<Number>::block_read (istream &in)
   AssertThrow (in, ExcIO());
 
   unsigned int sz;
-				   // other version of
-				   //  in >> sz;
-				   // reason as above
-  in.read (reinterpret_cast<void*>(&sz),
-	   reinterpret_cast<const char*>(&sz+1)
-	   - reinterpret_cast<const char*>(&sz));
+
+  char buf[16];
+  
+
+  in.getline(buf,16,'\n');
+  sz=atoi(buf);
   
 				   // fast initialization, since the
 				   // data elements are overwritten anyway
