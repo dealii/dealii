@@ -413,7 +413,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl To avoid the annoying `LOOP WAS VECTORIZED' remarks use
           dnl -vec_report0 for reducing output
           if test "x$GXX_VERSION" = "xintel_icc8" ; then
-            CXXFLAGSO="$CXXFLAGSO -vec_report0
+            CXXFLAGSO="$CXXFLAGSO -vec_report0"
           fi
 
           dnl We would really like to use  -ansi -Xc, since that
