@@ -144,7 +144,9 @@ namespace Evaluation
       for (unsigned int vertex=0;
 	   vertex<GeometryInfo<dim>::vertices_per_cell;
 	   ++vertex)
-	if (cell->vertex(vertex) == evaluation_point)
+	if (cell->vertex(vertex).distance (evaluation_point)
+	    <
+	    cell->diameter() * 1e-8)
 	  {
 	    point_value = solution(cell->vertex_dof_index(vertex,0));
 
@@ -1936,7 +1938,10 @@ namespace DualFunctional
 
 				     // ...then loop over cells and
 				     // find the evaluation point
-				     // among the vertices:
+				     // among the vertices (or very
+				     // close to a vertex, which may
+				     // happen due to floating point
+				     // round-off):
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
@@ -1944,7 +1949,8 @@ namespace DualFunctional
       for (unsigned int vertex=0;
 	   vertex<GeometryInfo<dim>::vertices_per_cell;
 	   ++vertex)
-	if (cell->vertex(vertex) == evaluation_point)
+	if (cell->vertex(vertex).distance(evaluation_point)
+	    < cell->diameter()*1e-8)
 	  {
 					     // Ok, found, so set
 					     // corresponding entry,
