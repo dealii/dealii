@@ -172,7 +172,6 @@ include $D/common/scripts/forward_declarations
 
 clean: 
 	-rm -f *~ */*~ */*/*~ Makefile.dep
-	cd lib ; $(MAKE) clean
 
 
 ###################
