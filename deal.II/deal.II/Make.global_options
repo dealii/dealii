@@ -11,7 +11,7 @@ CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
-           -pg -fno-rtti -fno-exceptions $(INCLUDE) \
+           -fno-rtti -fno-exceptions $(INCLUDE) \
            -Ddeal_II_dimension=$(deal_II_dimension)
 
 ifeq ($(shell uname),Linux)
