@@ -5269,11 +5269,9 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-        cat >>confdefs.h <<_ACEOF
+
+cat >>confdefs.h <<_ACEOF
 #define DEAL_II_ANON_NAMESPACE_BOGUS_WARNING 1
-                     Flag indicating whether there is a bug in the
-	              compiler that leads to bogus warnings for
-	              inline class members in anonymous namespaces
 _ACEOF
 
 

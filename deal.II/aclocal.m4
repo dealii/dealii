@@ -2798,7 +2798,7 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG3, dnl
    ],
    [
 	AC_MSG_RESULT(yes)
-        AC_DEFINE_UNQUOTED(DEAL_II_ANON_NAMESPACE_BOGUS_WARNING, 1 
+        AC_DEFINE_UNQUOTED(DEAL_II_ANON_NAMESPACE_BOGUS_WARNING, 1,
                      [Flag indicating whether there is a bug in the
 	              compiler that leads to bogus warnings for
 	              inline class members in anonymous namespaces])

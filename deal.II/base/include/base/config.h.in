@@ -35,6 +35,10 @@
    */
 #undef DEAL_II_ABORT_NOTHROW_EXCEPTION
 
+/* Flag indicating whether there is a bug in the compiler that leads to bogus
+   warnings for inline class members in anonymous namespaces */
+#undef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+
 /* Defined if the compiler needs to see the static keyword even for functions
    in anonymous namespaces, to avoid duplicate symbol errors when linking. For
    the details, look at aclocal.m4 in the top-level directory. */
