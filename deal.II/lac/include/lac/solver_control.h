@@ -327,15 +327,17 @@ class SolverControl : public Subscriptor
 				      * known it is 0.
 				      */
     double       failure_residual;
-
     
 				     /**
-				      * Log convergence history to @p{deallog}.
+				      * Log convergence history to
+				      * @p{deallog}.
 				      */
+//TODO:[GK] leading underscores are prohibited by the C++ standard in user code. what is the reason here anyway?
     bool         _log_history;
 				     /**
 				      * Log only every nth step.
 				      */
+//TODO:[GK] leading underscores are prohibited by the C++ standard in user code. what is the reason here anyway?
     unsigned int _log_frequency;
     
 				     /**
@@ -346,6 +348,7 @@ class SolverControl : public Subscriptor
 				      * success together with @p{lstep}
 				      * and @p{lvalue} are logged.
 				      */
+//TODO:[GK] leading underscores are prohibited by the C++ standard in user code. what is the reason here anyway?
     bool         _log_result;
 };
 
@@ -452,7 +455,7 @@ SolverControl::max_steps () const
 
 
 inline unsigned int
-SolverControl::set_max_steps (unsigned int newval)
+SolverControl::set_max_steps (const unsigned int newval)
 {
   unsigned int old = maxsteps;
   maxsteps = newval;
@@ -485,7 +488,7 @@ SolverControl::tolerance () const
 
 
 inline double
-SolverControl::set_tolerance (double t)
+SolverControl::set_tolerance (const double t)
 {
   double old = tol;
   tol = t;
@@ -494,7 +497,7 @@ SolverControl::set_tolerance (double t)
 
 
 inline void
-SolverControl::log_history (bool newval)
+SolverControl::log_history (const bool newval)
 {
   _log_history = newval;
 }
@@ -509,7 +512,7 @@ SolverControl::log_history () const
 
 
 inline void
-SolverControl::log_result (bool newval)
+SolverControl::log_result (const bool newval)
 {
   _log_result = newval;
 }
@@ -523,7 +526,7 @@ ReductionControl::reduction () const
 
 
 inline double
-ReductionControl::set_reduction (double t)
+ReductionControl::set_reduction (const double t)
 {
   double old = reduce;
   reduce = t;
