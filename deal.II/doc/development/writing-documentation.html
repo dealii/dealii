@@ -49,7 +49,7 @@
     </p>
 
 
-    <a name="API">
+    <a name="API"></a>
     <h3>Writing API documentation</h3>
 
     <p>
@@ -69,7 +69,7 @@
     Basically, every declaration, whether class or member
     function/variable declaration, global function or namespace, may
     be preceded by a comment of the following form:
-    <code>
+    </p>
     <pre>
       /**
        * This is an example documentation.
@@ -95,7 +95,7 @@
           const unsigned int abc;
       };
     </pre>
-    </code>
+    <p>
     <acronym>doxygen</acronym> will then generate a page for the class
     <code>TestClass</code> and document each of the member functions
     and variables. The content of the <code>@author</code> tag will be
@@ -110,24 +110,23 @@
     doxygen supports a great number of tags for enumerations,
     sectioning, markup, and other fields. For example, here is how to
     generate
+    </p>
     <ul> <li> <em>Itemized lists:</em>
-         <p>
 	 By writing comments like the following,
-	 <code><pre>
+	 <pre>
 	   /**
-	    * <ul>
-	    *   <li> foo
-	    *   <li> bar
-	    * </ul>
+	    * &lt;ul&gt;
+	    *   &lt;li&gt; foo
+	    *   &lt;li&gt; bar
+	    * &lt;/ul&gt;
 	    */
-	 </pre></code>
+	 </pre>
 	 you can get itemized lists both in the online and printed
 	 documentation:
 	 <ul>
 	 <li> foo
 	 <li> bar
 	 </ul> 
-	 </p>
 	 
 	 <p>
 	 In other words, one can use standard HTML tags for this
@@ -138,7 +137,8 @@
     <li> <em>Verbatim output:</em>
          <p>
 	 If you write comments like this,
-	 <code><pre>
+	 </p>
+	 <pre>
 	   /**
 	    * @verbatim
 	    *   void foobar ()
@@ -147,29 +147,25 @@
 	    *   };
 	    * @endverbatim
 	    */
-	 </pre></code>
+	 </pre>
 	 you will get the lines between the verbatim environment with
 	 the same formatting and in typewriter font:
-	 <code><pre>
+	 <pre>
      void foobar ()
      {
        i = 0;
      };
-	 </pre></code>
+	 </pre>
 	 This is useful if you want to include small sample code snippets
 	 into your documentation. In particular, it is important that
 	 the formatting is preserved, which is not the case for all
 	 other text.
-	 </p>
 
     <li> <em>Typewriter font:</em>
-
-         <p>
-	 In order to use typewriter font for instance for function
+	 <p>In order to use typewriter font for instance for function
 	 arguments or variables, use the <code>&lt;tt&gt;</code> HTML
 	 tag. For a single word, you can also use the form <code>@p
-	 one_word_without_spaces</code>.
-	 </p>
+	 one_word_without_spaces</code>.</p>
 
 	 <p>
 	 If you refer to member variables and member functions
@@ -214,11 +210,10 @@
 	 <acronym>doxygen</acronym> generated anchors.
 	 </p>
     </ul>
-    </p>
 
 
 
-    <a name="examples">
+    <a name="examples"></a>
     <h3>Writing example programs</h3>
 
     <h4>The Tutorial</h4>
