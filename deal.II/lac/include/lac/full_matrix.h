@@ -557,7 +557,6 @@ class FullMatrix : public Subscriptor
 				      */
     void print_formatted (ostream &out,
 			  const unsigned int presicion=3) const;
-				     //@}
 
 				     /**
 				      * Exception
