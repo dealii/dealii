@@ -42,9 +42,9 @@ plot_transformation(Mapping<dim> &mapping,
 				      | update_JxW_values));
 
   fe_values.reinit(cell);
-  const vector<double> &JxW=fe_values.get_JxW_values();
+  const std::vector<double> &JxW=fe_values.get_JxW_values();
   
-  ofstream gnuplot(name);
+  std::ofstream gnuplot(name);
 
   unsigned int k=0;
   for (unsigned int nz=0; nz<=((dim>2) ? div : 0); ++nz)
@@ -55,12 +55,12 @@ plot_transformation(Mapping<dim> &mapping,
 	    {
 	      gnuplot << fe_values.quadrature_point(k);
 	      double J = JxW[k] / q.weight(k);
-	      gnuplot << ' ' << J << endl;
+	      gnuplot << ' ' << J << std::endl;
 	      ++k;
 	    }
-	  gnuplot << endl;
+	  gnuplot << std::endl;
 	}
-      gnuplot << endl;  
+      gnuplot << std::endl;  
     }
 }
 
@@ -73,7 +73,7 @@ plot_faces(Mapping<dim> &mapping,
 	   DoFHandler<dim>::cell_iterator &cell,
 	   const char* name)
 {
-  ofstream gnuplot(name);
+  std::ofstream gnuplot(name);
 
   QGauss4<dim-1> q;
   const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
@@ -88,7 +88,7 @@ plot_faces(Mapping<dim> &mapping,
     {
       fe_values.reinit(cell, face_nr);
 
-      const vector<Point<dim> > &normals
+      const std::vector<Point<dim> > &normals
 	=fe_values.get_normal_vectors();
 
       unsigned int k=0;
@@ -98,12 +98,12 @@ plot_faces(Mapping<dim> &mapping,
 	    {
 	      Point<dim> x = fe_values.quadrature_point(k);
 	      Tensor<1,dim> n = normals[k];
-	      gnuplot << x << '\t' << n << endl;
+	      gnuplot << x << '\t' << n << std::endl;
 	      ++k;
 	    }
-	  gnuplot << endl;
+	  gnuplot << std::endl;
 	}
-      gnuplot << endl;      
+      gnuplot << std::endl;      
     }
 }
 
@@ -116,7 +116,7 @@ plot_subfaces(Mapping<dim> &mapping,
 	      DoFHandler<dim>::cell_iterator &cell,
 	      const char* name)
 {
-  ofstream gnuplot(name);
+  std::ofstream gnuplot(name);
 
   QGauss4<dim-1> q;
   const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
@@ -133,7 +133,7 @@ plot_subfaces(Mapping<dim> &mapping,
       {
 	fe_values.reinit(cell, face_nr, sub_nr);
 	
-	const vector<Point<dim> > &normals
+	const std::vector<Point<dim> > &normals
 	  =fe_values.get_normal_vectors();
 	
 	unsigned int k=0;
@@ -143,12 +143,12 @@ plot_subfaces(Mapping<dim> &mapping,
 	      {
 		Point<dim> x = fe_values.quadrature_point(k);
 		Tensor<1,dim> n = normals[k];
-		gnuplot << x << '\t' << n << endl;
+		gnuplot << x << '\t' << n << std::endl;
 		++k;
 	      }
-	    gnuplot << endl;
+	    gnuplot << std::endl;
 	  }
-	gnuplot << endl;
+	gnuplot << std::endl;
       }
 }
 
@@ -184,7 +184,7 @@ compute_area(Mapping<dim> &mapping,
   FEValues<dim> fe_values(mapping, fe, gauss4,
 			UpdateFlags(update_JxW_values));
   fe_values.reinit(cell);
-  const vector<double> &JxW=fe_values.get_JxW_values();
+  const std::vector<double> &JxW=fe_values.get_JxW_values();
 
   double area=0;
   for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
@@ -194,25 +194,25 @@ compute_area(Mapping<dim> &mapping,
 
 
 template<int dim>
-void create_triangulations(vector<Triangulation<dim> *> &,
-			   vector<Boundary<dim> *> &,
-			   vector<double> &)
+void create_triangulations(std::vector<Triangulation<dim> *> &,
+			   std::vector<Boundary<dim> *> &,
+			   std::vector<double> &)
 {
   Assert(false, ExcNotImplemented());
 }
 
 
 
-vector<vector<unsigned int> > show;
+std::vector<std::vector<unsigned int> > show;
 unsigned int mapping_size;
 
 
 template<>
-void create_triangulations(vector<Triangulation<1> *> &tria_ptr,
-			   vector<Boundary<1> *> &,
-			   vector<double> &exact_areas)
+void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
+			   std::vector<Boundary<1> *> &,
+			   std::vector<double> &exact_areas)
 {
-  show.resize(1, vector<unsigned int> (mapping_size,0));
+  show.resize(1, std::vector<unsigned int> (mapping_size,0));
   Triangulation<1> *tria=new Triangulation<1>();
   tria_ptr.push_back(tria);
   GridGenerator::hyper_cube(*tria, 1., 3.);
@@ -224,13 +224,13 @@ void create_triangulations(vector<Triangulation<1> *> &tria_ptr,
 
 
 template<>
-void create_triangulations(vector<Triangulation<2> *> &tria_ptr,
-			   vector<Boundary<2> *> &boundary_ptr,
-			   vector<double> &exact_areas)
+void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
+			   std::vector<Boundary<2> *> &boundary_ptr,
+			   std::vector<double> &exact_areas)
 {
   Triangulation<2> *tria;
   show.clear();
-  show.resize(3, vector<unsigned int> (mapping_size,0));
+  show.resize(3, std::vector<unsigned int> (mapping_size,0));
 				   // tria0: 3x3 square rotated
   if (1)
     {
@@ -298,13 +298,13 @@ void create_triangulations(vector<Triangulation<2> *> &tria_ptr,
 
 
 template<>
-void create_triangulations(vector<Triangulation<3> *> &tria_ptr,
-			   vector<Boundary<3> *> &boundary_ptr,
-			   vector<double> &exact_areas)
+void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
+			   std::vector<Boundary<3> *> &boundary_ptr,
+			   std::vector<double> &exact_areas)
 {
   Triangulation<3> *tria;
   show.clear();
-  show.resize(4, vector<unsigned int> (mapping_size,0));
+  show.resize(4, std::vector<unsigned int> (mapping_size,0));
   
 				   // 2x2 cube
   if (1)
@@ -373,8 +373,8 @@ void mapping_test()
 {
   deallog << "dim=" << dim << endl;
   
-  vector<Mapping<dim> *> mapping_ptr;
-  vector<string> mapping_strings;
+  std::vector<Mapping<dim> *> mapping_ptr;
+  std::vector<std::string> mapping_strings;
 
   MappingQ1<dim> q1_old;
   MappingQ<dim> q1(1);
@@ -394,9 +394,9 @@ void mapping_test()
 
   mapping_size=mapping_ptr.size();
   
-  vector<Triangulation<dim> *> tria_ptr;
-  vector<Boundary<dim> *> boundary_ptr;
-  vector<double> exact_areas;
+  std::vector<Triangulation<dim> *> tria_ptr;
+  std::vector<Boundary<dim> *> boundary_ptr;
+  std::vector<double> exact_areas;
   
   create_triangulations(tria_ptr, boundary_ptr, exact_areas);
   Assert(show.size()==tria_ptr.size(), ExcInternalError());
@@ -419,9 +419,9 @@ void mapping_test()
 
 	    if (true)
 	      {
-		ostrstream ost(st2, 99);
+		std::ostrstream ost(st2, 99);
 		ost << "Mapping" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".output" << ends;
+		    << mapping_strings[j] << ".output" << std::ends;
 		deallog << st2 << endl;
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, st2);
 		compute_area(*mapping_ptr[j], fe_q4, cell);
@@ -429,18 +429,18 @@ void mapping_test()
 	    
 	    if (dim>1)
 	      {
-		ostrstream ost(st2, 99);
+		std::ostrstream ost(st2, 99);
 		ost << "MappingFace" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".output" << ends;
+		    << mapping_strings[j] << ".output" << std::ends;
 		deallog << st2 << endl;	    
 		plot_faces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
 
 	    if (dim>1)
 	      {
-		ostrstream ost(st2, 99);
+		std::ostrstream ost(st2, 99);
 		ost << "MappingSubface" << dim << "d-" << i << '-'
-		    << mapping_strings[j] << ".output" << ends;
+		    << mapping_strings[j] << ".output" << std::ends;
 		deallog << st2 << endl;	    
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, st2);
 	      }
@@ -478,9 +478,9 @@ void mapping_test()
 
 int main()
 {
-  ofstream logfile ("mapping.output");
+  std::ofstream logfile ("mapping.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
   
