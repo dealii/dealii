@@ -36,6 +36,10 @@
    the details, look at aclocal.m4 in the top-level directory. */
 #undef DEAL_II_ANON_NAMESPACE_BUG
 
+/* Defined if the compiler has a problem with assigning arrays in conditionals
+   */
+#undef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG
+
 /* Backward compatibility support for functions and classes that do not take
    an explicit mapping variable, but rather use a default Q1 mapping instead
    */
