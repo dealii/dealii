@@ -24,4 +24,7 @@ Here are some conventions for source code of the deal.II library:
 6./ Whenever a function does not change any of the member variable of
   the embedding class/object, it should be marked as const.
 
-7./ Each class has to have at least 200 pages of documentation ;-)
+7./ Function and variable names may not consist of only one or two
+  letters, unless the variable is a pure counting index.
+
+8./ Each class has to have at least 200 pages of documentation ;-)
