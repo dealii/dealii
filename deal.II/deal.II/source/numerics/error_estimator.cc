@@ -32,7 +32,8 @@ void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 					     const Boundary<1> &,
 					     const FunctionMap &,
 					     const dVector &,
-					     dVector &) {
+					     dVector &,
+					     const Function<1> *) {
   Assert(false, ExcNotImplemented());
 };
 
@@ -46,7 +47,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					       const Boundary<dim>      &boundary,
 					       const FunctionMap        &neumann_bc,
 					       const dVector            &solution,
-					       dVector                  &error) {
+					       dVector                  &error,
+					       const Function<dim> *coefficient) {
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
@@ -138,7 +140,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 				       fe_face_values_cell,
 				       fe_face_values_neighbor,
 				       face_integrals,
-				       solution);
+				       solution,
+				       coefficient);
 	else
 					   // otherwise we need to do some
 					   // special computations which do
@@ -148,7 +151,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					 n_q_points,
 					 fe_face_values_cell,
 					 fe_subface_values,
-					 face_integrals, solution);
+					 face_integrals, solution,
+					 coefficient);
       };
 
 
@@ -190,7 +194,8 @@ void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iter
 							  FEFaceValues<1>        &,
 							  FEFaceValues<1>        &,
 							  FaceIntegrals          &,
-							  const dVector          &) {
+							  const dVector          &,
+							  const Function<1>      *) {
   Assert (false, ExcInternalError());
 };
 
@@ -206,7 +211,8 @@ integrate_over_irregular_face (const active_cell_iterator &,
 			       FEFaceValues<1>            &,
 			       FESubfaceValues<1>         &,
 			       FaceIntegrals              &,
-			       const dVector              &) {
+			       const dVector              &,
+			       const Function<1>          *) {
   Assert (false, ExcInternalError());
 };
 
@@ -225,7 +231,8 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 			     FEFaceValues<dim>          &fe_face_values_cell,
 			     FEFaceValues<dim>          &fe_face_values_neighbor,
 			     FaceIntegrals              &face_integrals,
-			     const dVector              &solution) {
+			     const dVector              &solution,
+			     const Function<dim>        *coefficient) {
   const DoFHandler<dim>::face_iterator face = cell->face(face_no);
   
 				   // initialize data of the restriction
@@ -238,7 +245,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				   // points
 				   //
 				   // let psi be a short name for
-				   // [grad u_h]
+				   // [a grad u_h]
   vector<Point<dim> > psi(n_q_points);
   fe_face_values_cell.get_function_grads (solution, psi);
   
@@ -311,7 +318,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
   
   for (unsigned int point=0; point<n_q_points; ++point)
     phi[point] = psi[point]*normal_vectors[point];
-  
+
   
   if (face->at_boundary() == true)
 				     // neumann boundary face. compute
@@ -334,11 +341,22 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 	phi[point] -= g[point];
     };
   
+				   // if a coefficient was given: use that
+				   // to scale the jump in the gradient
+  if (coefficient != 0)
+    {
+      vector<double>      coefficient_values (n_q_points);
+      coefficient->value_list (fe_face_values_cell.get_quadrature_points(),
+			       coefficient_values);
+      for (unsigned int point=0; point<n_q_points; ++point)
+	phi[point] *= coefficient_values[point];
+    };
+      
   
 				   // now phi contains the following:
-				   // - for an internal face, phi=[du/dn]
+				   // - for an internal face, phi=[a du/dn]
 				   // - for a neumann boundary face,
-				   //   phi=du/dn-g
+				   //   phi=a du/dn-g
 				   // each component being the
 				   // mentioned value at one of the
 				   // quadrature points
@@ -368,7 +386,8 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 			       FEFaceValues<dim>          &fe_face_values,
 			       FESubfaceValues<dim>       &fe_subface_values,
 			       FaceIntegrals              &face_integrals,
-			       const dVector              &solution) {
+			       const dVector              &solution,
+			       const Function<dim>        *coefficient) {
   const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
   Assert (neighbor.state() == valid, ExcInternalError());
   Assert (neighbor->has_children(), ExcInternalError());
@@ -378,7 +397,7 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 				   // points
 				   //
 				   // let psi be a short name for
-				   // [grad u_h]
+				   // [a grad u_h]
   vector<Point<dim> > psi(n_q_points);
 
 				   // store which number #cell# has in the
@@ -428,23 +447,35 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 		 psi.begin(),
 		 minus<Point<dim> >());
 
-      				   // next we have to multiply this with
-				   // the normal vector. Since we have
-				   // taken the difference of gradients
-				   // for internal faces, we may chose
-				   // the normal vector of one cell,
-				   // taking that of the neighbor
-				   // would only change the sign. We take
-				   // the outward normal.
-				   //
-				   // let phi be the name of the integrand
+				       // next we have to multiply this with
+				       // the normal vector. Since we have
+				       // taken the difference of gradients
+				       // for internal faces, we may chose
+				       // the normal vector of one cell,
+				       // taking that of the neighbor
+				       // would only change the sign. We take
+				       // the outward normal.
+				       //
+				       // let phi be the name of the integrand
       vector<double> phi(n_q_points,0);
       const vector<Point<dim> > &normal_vectors(fe_face_values.
 						get_normal_vectors());
   
       for (unsigned int point=0; point<n_q_points; ++point)
 	phi[point] = psi[point]*normal_vectors[point];
-				       // take the square of the phi[i]
+      
+				       // if a coefficient was given: use that
+				       // to scale the jump in the gradient
+      if (coefficient != 0)
+	{
+	  vector<double>      coefficient_values (n_q_points);
+	  coefficient->value_list (fe_face_values.get_quadrature_points(),
+				   coefficient_values);
+	  for (unsigned int point=0; point<n_q_points; ++point)
+	    phi[point] *= coefficient_values[point];
+	};
+
+				   // take the square of the phi[i]
 				       // for integration
       transform (phi.begin(), phi.end(),
 		 phi.begin(), ptr_fun(sqr));

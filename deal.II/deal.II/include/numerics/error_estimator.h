@@ -36,7 +36,12 @@ class dVector;
  *  integrals computed here show superconvergence properties, i.e. they tend
  *  to zero faster than the error itself, thus ruling out the values as error
  *  indicators.
- *  
+ *
+ *  The error estimator really only estimates the error for the generalized
+ *  Poisson equation $-\nabla\cdot a(x) \nabla u = f$ with either Dirichlet
+ *  boundary conditions or generalized Neumann boundary conditions involving
+ *  the conormal derivative $a\frac{du}{dn} = g$.
+ *
  *  The error estimator returns a vector of estimated errors per cell which
  *  can be used to feed the #Triangulation<dim>::refine_*# functions.
  *
@@ -45,7 +50,7 @@ class dVector;
  *
  *  In principle, the implementation of the error estimation is simple: let
  *  $$ \eta_K^2 =
- *  \frac h{24} \int_{\partial K} \left[\frac{\partial u_h}{\partial n}\right]^2 do
+ *  \frac h{24} \int_{\partial K} \left[a \frac{\partial u_h}{\partial n}\right]^2 do
  *  $$
  *  be the error estimator for cell $K$. $[\cdot]$ denotes the jump of the
  *  argument at the face. In the paper of Ainsworth, $h$ is divided by $24$,
@@ -107,7 +112,7 @@ class dVector;
  *
  *  \item The face belongs to a Neumann boundary.  In this case, the
  *    contribution of the face $F\in\partial K$ looks like
- *    $$ \int_F \left|g-\frac{\partial u_h}{\partial n}\right| ds $$
+ *    $$ \int_F \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds $$
  *    where $g$ is the Neumann boundary function.
  *
  *  \item No other boundary conditions are considered.
@@ -156,14 +161,22 @@ class KellyErrorEstimator {
 				      *	guaranteed by the #map# data type.
 				      */
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
-    
+
+				     /**
+				      * Implementation of the error estimator
+				      * described above. You may give a
+				      * coefficient, but there is a default
+				      * value which denotes the constant
+				      * coefficient with value one.
+				      */
     static void estimate_error (const DoFHandler<dim>    &dof,
 				const Quadrature<dim-1>  &quadrature,
 				const FiniteElement<dim> &fe,
 				const Boundary<dim>      &boundary,
 				const FunctionMap        &neumann_bc,
 				const dVector            &solution,
-				dVector                  &error);
+				dVector                  &error,
+				const Function<dim>      *coefficient = 0);
 
 				     /**
 				      * Exception
@@ -220,7 +233,8 @@ class KellyErrorEstimator {
 					     FEFaceValues<dim>   &fe_face_values_cell,
 					     FEFaceValues<dim>   &fe_face_values_neighbor,
 					     FaceIntegrals       &face_integrals,
-					     const dVector       &solution);
+					     const dVector       &solution,
+					     const Function<dim> *coefficient);
 
 				     /**
 				      * The same applies as for the function
@@ -238,7 +252,8 @@ class KellyErrorEstimator {
 					       FEFaceValues<dim>    &fe_face_values,
 					       FESubfaceValues<dim> &fe_subface_values,
 					       FaceIntegrals        &face_integrals,
-					       const dVector        &solution);
+					       const dVector        &solution,
+					       const Function<dim> *coefficient);
 };
 
 
