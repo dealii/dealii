@@ -149,20 +149,22 @@ endif
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 
-include-path-base          = $D/base/include
-include-path-lac           = $D/lac/include
-include-path-deal2         = $D/deal.II/include
-include-path-contrib-hsl   = $D/contrib/hsl/include
-include-path-contrib-boost = $D/contrib/boost/include
-include-path-tecplot       = $(TECIO_INCLUDE)
-include-path-petsc         = $(DEAL_II_PETSC_DIR)/include
-include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
-include-path-metis         = $(DEAL_II_METIS_DIR)/Lib
+include-path-base            = $D/base/include
+include-path-lac             = $D/lac/include
+include-path-deal2           = $D/deal.II/include
+include-path-contrib-hsl     = $D/contrib/hsl/include
+include-path-contrib-umfpack = $D/contrib/umfpack/UMFPACK/Include
+include-path-contrib-boost   = $D/contrib/boost/include
+include-path-tecplot         = $(TECIO_INCLUDE)
+include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
+include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
+include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 
 INCLUDE           = $(addprefix -I, $(include-path-base) \
                                     $(include-path-lac)  \
                                     $(include-path-deal2)\
 			            $(include-path-contrib-hsl)\
+			            $(include-path-contrib-umfpack)\
 			            $(include-path-contrib-boost)\
 				    $(include-path-tecplot))
 
