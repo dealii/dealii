@@ -63,29 +63,29 @@ debug: 2dg 1dg 3dg
 # listed immediately below
 ../lib/1d/go/%.go :
 	@echo ==============1d======debug============= $<
-	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 ../lib/1d/o/%.o :
 	@echo ==============1d======optimized========= $<
-	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
 ../lib/2d/go/%.go :
 	@echo ==============2d======debug============= $<
-	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 ../lib/2d/o/%.o :
 	@echo ==============2d======optimized========= $<
-	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
 ../lib/3d/go/%.go :
 	@echo ==============3d======debug============= $<
-	@$(CXX) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 ../lib/3d/o/%.o :
 	@echo ==============3d======optimized========= $<
-	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 # special rules for exceptional files
 ../lib/3d/o/q1_mapping_jacobians_3d.o:
 	@echo "==============3d======opt==(special)====" $<
-	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
 
 
 

@@ -14,10 +14,10 @@ include $D/common/Make.global_options
 
 ../lib/go/%.go :
 	@echo ============================ Compiling with debugging information:   $<
-	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -c $< -o $@
 ../lib/o/%.o :
 	@echo ============================ Compiling with optimization:   $<
-	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -c $< -o $@
 
 
 lib: ../lib/liblac.g.a ../lib/liblac.a

@@ -33,12 +33,12 @@ libs.g = -ldeal_II_2d.g -llac.g -lbase.g
 
 ifeq ($(debug-mode),on)
 libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS)
+flags     = $(CXXFLAGS.g)
 endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS)
+flags     = $(CXXFLAGS.o)
 endif
 
 
@@ -64,7 +64,7 @@ target1-o-files = $(target1-cc-files:.cc=.o)
 endif
 
 target1: $(target1-o-files) $(libraries)
-	$(CXX) $(flags) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(flags) -o $@ $^
 
 ############################################################
 # Continue with other targets if needed
