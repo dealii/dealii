@@ -48,6 +48,7 @@ class PoissonEquation :  public Equation<dim> {
 template <int dim>
 inline
 double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
+  const double pi = 3.1415926536;
   switch (dim) 
     {
       case 1:
@@ -58,12 +59,14 @@ double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
 //	    return ((1-3.1415926536*3.1415926536) *
 //		    cos(3.1415926536*p(0)) *
 //		    cos(3.1415926536*p(1)));
-	    return (p(0)*p(0)*p(0)+p(1)*p(1)*p(1)
-		    - 3./2.*(p(0)*p(0)+p(1)*p(1))
-		    - 6*(p(0)+p(1))
-		    + 6);
-//	    return 1.;
-	    
+//	    return (p(0)*p(0)*p(0)+p(1)*p(1)*p(1)
+//		    - 3./2.*(p(0)*p(0)+p(1)*p(1))
+//		    - 6*(p(0)+p(1))
+//		    + 6);
+	    return (-2.0*cos(pi*p(0)/2)*p(1)*sin(pi*p(1)) +
+		    2.0*p(0)*sin(pi*p(0)/2)*pi*p(1)*sin(pi*p(1)) +
+		    5.0/4.0*p(0)*p(0)*cos(pi*p(0)/2)*pi*pi*p(1)*sin(pi*p(1)) -
+		    2.0*p(0)*p(0)*cos(pi*p(0)/2)*cos(pi*p(1))*pi);
       default:
 	    return 0;
     };
@@ -101,9 +104,9 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
       {
 	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
 	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
-			       fe_values.shape_grad(j,point) +
+			       fe_values.shape_grad(j,point)/* +
 			       fe_values.shape_value(i,point) *
-			       fe_values.shape_value(j,point)) *
+			       fe_values.shape_value(j,point)*/) *
 			      fe_values.JxW(point);
 	rhs(i) += fe_values.shape_value(i,point) *
 		  right_hand_side(fe_values.quadrature_point(point)) *
@@ -118,7 +121,8 @@ int main () {
   Triangulation<2>   tria;
   DoFHandler<2>      dof(&tria);
   FELinear<2>        fe;
-  ProblemBase<2>     problem(&tria, &dof);
+  ProblemBase<2>     problem;
+  problem.set_tria_and_dof (&tria, &dof);
   PoissonEquation<2> equation;
   QGauss4<2>         quadrature;
 
@@ -135,14 +139,14 @@ int main () {
 //  tria.execute_refinement ();
 //  tria.begin_active(2)->set_refine_flag();
 //  tria.execute_refinement ();
-  tria.refine_global (3);
+//  tria.refine_global (5);
 
-/*
+
   const unsigned int dim=2;
   tria.refine_global (1);
 	
   Triangulation<dim>::active_cell_iterator cell, endc;
-  for (int i=0; i<8; ++i) 
+  for (int i=0; i<12; ++i) 
     {
       int n_levels = tria.n_levels();
       cell = tria.begin_active();
@@ -162,7 +166,7 @@ int main () {
       tria.execute_refinement ();
     };
   tria.refine_global (1);
-*/
+
 
   cout << "Distributing dofs... "; 
   dof.distribute_dofs (fe);
