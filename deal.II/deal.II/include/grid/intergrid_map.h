@@ -24,11 +24,44 @@
  * Keys for this map are all cells on the source grid, whether active or
  * not.
  *
+ * For example, consider these two one-dimensional grids:
+ * \begin{verbatim}
+ * Grid 1:
+ *   x--x--x-----x-----------x
+ *    1  2    3        4 
+ *
+ * Grid 2:
+ *   x-----x-----x-----x-----x
+ *      1     2     3     4
+ * \end{verbatim}
+ * (Cell numbers are only given as an example and will not correspond
+ * to real cell iterator's indices.) The mapping from grid 1 to grid 2
+ * will then be as follows:
+ * \begin{verbatim}
+ *    Cell on grid 1         Cell on grid 2
+ *          1  ------------------>  1
+ *          2  ------------------>  1
+ *          3  ------------------>  2
+ *          4  ------------------>  mother cell of cells 3 and 4
+ *                                  (a non-active cell, not shown here)
+ * \end{verbatim}
+ * Besides the mappings shown here, the non-active cells on grid 1 are also
+ * valid keys. For example, the mapping for the mother cell of cells 1 and 2
+ * on the first grid will point to cell 1 on the second grid.
+ *
  * The implementation of this class is such that not only cell iterators
  * into triangulations can be mapped, but also iterators into objects of
  * type #DoFHandler# and #MGDoFHandler#. The extension to other classes
  * offering iterator functions and some minor additional requirements is
  * simple.
+ *
+ * Note that this class could in principle be base on the C++ #map<Key,Value>#
+ * data type. Instead, it uses another data format which is more effective both
+ * in terms of computing time for access as well as with regard to memory
+ * consumpion.
+ *
+ *
+ * \section{Usage}
  *
  * In practice, use of this class is as follows:
  * \begin{verbatim}
