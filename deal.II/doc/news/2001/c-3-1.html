@@ -306,6 +306,16 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: Class <code class="class">CompressedSparsityPattern</code>
+       may be used as an intermediate form of the <code
+       class="class">SparsityPattern</code> class if memory
+       requirements are tight during construction of the sparsity
+       pattern.
+       <br>
+       (WB 2001/06/22)
+       </p>
+
+  <li> <p>
        New: There are now functions 
        <code class="member">SparsityPattern::copy_from</code> and
        <code class="member">SparseMatrix::copy_from</code>
@@ -441,6 +451,17 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: Implement
+       <code class="member">DoFTools::make_sparsity_pattern</class>,
+       <code class="member">DoFTools::make_boundary_sparsity_pattern</class>,
+       and 
+       <code class="member">ConstraintMatrix::condense</class> to work on
+       the <code class="class">CompressedSparsityPattern</code> class.
+       <br>
+       (WB 2001/06/22)
+       </p>
+
   <li> <p>
        New: <code class="member">FE*Values::get_quadrature</class>
        returns a reference to the quadrature formula used by a

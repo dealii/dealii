@@ -27,6 +27,7 @@
 #include <fe/fe_values.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
 
@@ -66,6 +67,7 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 			dofs_on_this_cell[j]);
     }
 }
+
 
 
 template <int dim, class SparsityPattern>
@@ -115,8 +117,10 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
 }
 
 
+
 #if deal_II_dimension == 1
 
+template <class SparsityPattern>
 void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>             &dof_handler,
 					  const FunctionMap<1>::type      &function_map,
@@ -160,6 +164,7 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1>             &dof_h
 
 
 
+template <class SparsityPattern>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
 					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					       SparsityPattern    &sparsity)
@@ -179,7 +184,7 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<1> &dof_handler,
 #endif
 
 
-template <int dim>
+template <int dim, class SparsityPattern>
 void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
@@ -192,9 +197,19 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 	  ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs()));
   Assert (sparsity.n_cols() == dof.n_boundary_dofs(),
 	  ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs()));
-  Assert (*max_element(dof_to_boundary_mapping.begin(),
-		       dof_to_boundary_mapping.end()) == sparsity.n_rows()-1,
-	  ExcInternalError());
+#ifdef DEBUG
+  if (true)
+    {
+      unsigned int max_element = 0;
+      for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+	   i!=dof_to_boundary_mapping.end(); ++i)
+	if ((*i != DoFHandler<dim>::invalid_dof_index) &&
+	    (*i > max_element))
+	  max_element = *i;
+      Assert (max_element  == sparsity.n_rows()-1,
+	      ExcInternalError());
+    };
+#endif
 
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
   std::vector<unsigned int> dofs_on_this_face(dofs_per_face);
@@ -216,12 +231,6 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
       {
 	face->get_dof_indices (dofs_on_this_face);
 
-					 // make sure all dof indices have a
-					 // boundary index
-	Assert (*min_element(dofs_on_this_face.begin(),
-			     dofs_on_this_face.end()) != DoFHandler<dim>::invalid_dof_index,
-		ExcInternalError());
-	
 					 // make sparsity pattern for this cell
 	for (unsigned int i=0; i<dofs_per_face; ++i)
 	  for (unsigned int j=0; j<dofs_per_face; ++j) 
@@ -231,7 +240,8 @@ DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 };
 
 
-template <int dim>
+
+template <int dim, class SparsityPattern>
 void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 					       const typename FunctionMap<dim>::type  &boundary_indicators,
 					       const std::vector<unsigned int>  &dof_to_boundary_mapping,
@@ -270,11 +280,6 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
       {
 	face->get_dof_indices (dofs_on_this_face);
 
-					 // make sure all dof indices have a
-					 // boundary index
-	Assert (*min_element(dofs_on_this_face.begin(),
-			     dofs_on_this_face.end()) != DoFHandler<dim>::invalid_dof_index,
-		ExcInternalError());
 					 // make sparsity pattern for this cell
 	for (unsigned int i=0; i<dofs_per_face; ++i)
 	  for (unsigned int j=0; j<dofs_per_face; ++j)
@@ -2163,34 +2168,63 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 				      SparsityPattern    &,
 				      const FullMatrix<double>&,
 				      const FullMatrix<double>&);
+#endif
+
 template void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 					  const std::vector<unsigned int>  &,
 					  SparsityPattern    &);
 template void
 DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+					  const std::vector<unsigned int>  &,
+					  CompressedSparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+					  const std::vector<unsigned int>  &,
+					  BlockSparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
 					  const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
 					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
 					  SparsityPattern    &sparsity);
-#endif
+template void
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+					  const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+					  CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+					  const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+					  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+					  BlockSparsityPattern    &sparsity);
 
 template void
-DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
 				 SparsityPattern    &sparsity);
+
+template void
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
+				 CompressedSparsityPattern    &sparsity);
 
 template void
 DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
 				 BlockSparsityPattern                &sparsity);
 
 template void 
-DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
 				 const std::vector<std::vector<bool> > &mask,
 				 SparsityPattern             &sparsity);
 
 template void 
-DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension>& dof,
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
+				 const std::vector<std::vector<bool> > &mask,
+				 CompressedSparsityPattern             &sparsity);
+
+template void 
+DoFTools::make_sparsity_pattern (const DoFHandler<deal_II_dimension> &dof,
 				 const std::vector<std::vector<bool> > &mask,
 				 BlockSparsityPattern        &sparsity);
+
 
 template
 void

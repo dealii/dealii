@@ -1,4 +1,4 @@
-//----------------------------  derivative_approximation.cc  ---------------------------
+//----------------------------  matrices.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  derivative_approximation.cc  ---------------------------
+//----------------------------  matrices.cc  ---------------------------
 
 
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2001 */

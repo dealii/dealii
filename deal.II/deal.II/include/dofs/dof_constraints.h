@@ -20,6 +20,7 @@
 #include <base/subscriptor.h>
 
 class SparsityPattern;
+class CompressedSparsityPattern;
 class BlockSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
@@ -282,6 +283,13 @@ class ConstraintMatrix : public Subscriptor
 				      * patterns.
 				      */
     void condense (BlockSparsityPattern &sparsity) const;
+
+				     /**
+				      * Same function as above, but
+				      * condenses square compressed
+				      * sparsity patterns.
+				      */
+    void condense (CompressedSparsityPattern &sparsity) const;
     
 				     /**
 				      * Condense a given matrix. The associated

@@ -18,6 +18,7 @@
 #include <base/subscriptor.h>
 
 template <typename number> class SparseMatrix;
+class CompressedSparsityPattern;
 
 #include <vector>
 #include <iterator>
@@ -460,6 +461,15 @@ class SparsityPattern : public Subscriptor
 		    const unsigned int    n_cols,
 		    const ForwardIterator begin,
 		    const ForwardIterator end);
+
+				     /**
+				      * Copy data from an object of
+				      * type
+				      * @ref{CompressedSparsityPattern}. Previous
+				      * content of this object is
+				      * lost.
+				      */
+    void copy_from (const CompressedSparsityPattern &csp);
     
 				     /**
 				      * Return whether the object is empty. It

@@ -12,7 +12,8 @@
 //----------------------------  sparsity_pattern.cc  ---------------------------
 
 
-#include <lac/sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
 
 #include <iostream>
 #include <iomanip>
@@ -447,6 +448,16 @@ SparsityPattern::compress ()
 
 
 
+void
+SparsityPattern::copy_from (const CompressedSparsityPattern &csp) 
+{
+  copy_from (csp.n_rows(), csp.n_cols(),
+	     csp.column_indices.begin(),
+	     csp.column_indices.end());
+};
+
+
+
 bool
 SparsityPattern::empty () const
 {
@@ -583,7 +594,8 @@ SparsityPattern::symmetrize ()
 				   // the transpose element. note:
 				   //
 				   // 1. that the sparsity pattern
-				   // changes which we work on
+				   // changes which we work on, but
+				   // not the present row
 				   //
 				   // 2. that the @p{add} function can
 				   // be called on elements that
@@ -599,8 +611,12 @@ SparsityPattern::symmetrize ()
 	  break;
 
 					 // otherwise add the
-					 // transpose entry
-	add (colnums[k], row);
+					 // transpose entry if this is
+					 // not the diagonal (that
+					 // would not harm, only take
+					 // time to check up)
+	if (colnums[k] != row)
+	  add (colnums[k], row);
       };
 };
 
