@@ -41,7 +41,7 @@
  * polynomial space it gives the indices i,j,k of the one-dimensional
  * polynomials in x,y and z direction. The ordering of the
  * dim-dimensional polynomials can be changed by using the
- * set_polynomial_ordering() function.
+ * set_numbering() function.
  *
  * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003, Ralf Hartmann 2004
  */
@@ -254,7 +254,7 @@ PolynomialSpace<dim>::PolynomialSpace (const std::vector<Pol> &pols)
 				   // per default set this index map
 				   // to identity. This map can be
 				   // changed by the user through the
-				   // set_renumbering function
+				   // set_numbering function
   for (unsigned int i=0; i<n_pols; ++i)
     {
       index_map[i]=i;
