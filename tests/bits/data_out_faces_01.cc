@@ -46,6 +46,7 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out_faces.write_gmv (deallog.get_file_stream());
   data_out_faces.write_tecplot (deallog.get_file_stream());
   data_out_faces.write_vtk (deallog.get_file_stream());
+  data_out_faces.write_gnuplot (deallog.get_file_stream());
 
 				   // povray and eps cannot presently
 				   // write out face data
