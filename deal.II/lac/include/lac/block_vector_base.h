@@ -231,6 +231,19 @@ namespace internal
 
       public:
                                          /**
+                                          * Type of the number this
+                                          * iterator points
+                                          * to. Depending on the value
+                                          * of the second template
+                                          * parameter, this is either a
+                                          * constant or non-const
+                                          * number.
+                                          */
+        typedef
+        typename Types<BlockVectorType,constness>::value_type
+        value_type;
+	
+                                         /**
                                           * Declare some typedefs which
                                           * are standard for iterators
                                           * and are used by algorithms
@@ -239,7 +252,6 @@ namespace internal
                                           * they work on.
                                           */
         typedef std::random_access_iterator_tag               iterator_type;
-        typedef typename Types<BlockVectorType,constness>::value_type  value_type;
         typedef ptrdiff_t                                     difference_type;
         typedef typename BlockVectorType::reference           reference;
         typedef value_type                                   *pointer;
@@ -259,19 +271,6 @@ namespace internal
         typename Types<BlockVectorType,constness>::BlockVector
         BlockVector;
 
-                                         /**
-                                          * Type of the number this
-                                          * iterator points
-                                          * to. Depending on the value
-                                          * of the second template
-                                          * parameter, this is either a
-                                          * constant or non-const
-                                          * number.
-                                          */
-        typedef
-        typename Types<BlockVectorType,constness>::value_type
-        value_type;
-	
                                          /**
                                           * Construct an iterator from
                                           * a vector to which we point
