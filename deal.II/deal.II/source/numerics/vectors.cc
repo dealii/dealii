@@ -1059,8 +1059,17 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 				   const Quadrature<dim> &q,
 				   const NormType        &norm,
 				   const Function<dim>   *weight,
-				   double exponent)
+				   const double           exponent_1)
 {
+				   // we mark the "exponent" parameter
+				   // to this function "const" since
+				   // it is strictly incoming, but we
+				   // need to set it to something
+				   // different later on, if
+				   // necessary, so have a read-write
+				   // version of it:
+  double exponent = exponent_1;
+  
   const unsigned int        n_q_points   = q.n_quadrature_points;
   const FiniteElement<dim> &fe           = dof.get_fe();
   const unsigned int        n_components = fe.n_components();
@@ -1338,7 +1347,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 				   const Quadrature<dim>    &q,
 				   const NormType           &norm,
 				   const Function<dim>      *weight,
-				   double exponent)
+				   const double              exponent)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
