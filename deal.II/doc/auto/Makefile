@@ -1,4 +1,4 @@
-# $Id$
+# Makefile,v 1.8 1999/04/15 17:36:14 wolf Exp
 
 
 ##########################################################################
@@ -7,19 +7,19 @@
 #
 # specify which are the include files that a specific documentation libary
 # depends upon
-kdoc.base = $(wildcard ../../base/include/base/*.h)
-kdoc.lac  = $(wildcard ../../lac/include/lac/*.h)
-kdoc.basic= $(wildcard ../../deal.II/include/basic/*.h)
-kdoc.grid = $(wildcard ../../deal.II/include/grid/tria*.h)\
-            ../../deal.II/include/grid/geometry_info.h
-kdoc.dof  = $(wildcard ../../deal.II/include/grid/dof*.h) \
-            $(wildcard ../../deal.II/include/grid/mg_*.h) \
-            $(wildcard ../../deal.II/include/fe/*.h)
-kdoc.num  = $(wildcard ../../deal.II/include/numerics/*.h)
+kdoc.base     = $(wildcard ../../base/include/base/*.h)
+kdoc.lac      = $(wildcard ../../lac/include/lac/*.h)
+kdoc.basic    = $(wildcard ../../deal.II/include/basic/*.h)
+kdoc.grid     = $(wildcard ../../deal.II/include/grid/tria*.h)\
+                ../../deal.II/include/grid/geometry_info.h
+kdoc.dof      = $(wildcard ../../deal.II/include/grid/dof*.h) \
+                $(wildcard ../../deal.II/include/grid/mg_*.h) \
+                $(wildcard ../../deal.II/include/fe/*.h)
+kdoc.numerics = $(wildcard ../../deal.II/include/numerics/*.h)
 
 # for latex-output, we join the different libraries of the
 # deal.II library into just one file
-kdoc.dealII = $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.num)
+kdoc.dealII = $(kdoc.basic) $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
 
 # user projects. the projects should be independant of each other, so
 # we need not take care of cross-dependencies each time 
