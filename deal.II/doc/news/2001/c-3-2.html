@@ -108,12 +108,27 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: the <code
+       class="member">deal_II_exceptions::set_additional_assert_output</code>
+       function allows to set additional output to be printed upon
+       triggering an <code class="member">Assert()</code> call. This
+       is helpful for parallel applications where you only see the
+       text of the message but do not know from which cluster node it
+       stems.
+       <br>
+       (WB 2002/01/10)
+       </p>
+
+  <li> <p>
        Changed: when an assertion fails in the <code
        class="member">Assert()</code> function, the program is usually
        aborted. Don't abort it any more if there is an active C++
-       somewhere since we would lose its message if we aborted the
-       program. In that case only report the error and write out an
-       indication why we do not abort the program any more.
+       exception somewhere since we would lose its message if we
+       aborted the program. In that case only report the error and
+       write out an indication why we do not abort the program any
+       more. On the other hand, also suppress output of further failed
+       <code class="member">Assert()</code> calls, since they often
+       are follow-ups of the first one.
        <br>
        (WB 2002/01/09)
        </p>
