@@ -32,6 +32,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: The <code class="member">TriaDimensionInfo</code> and
+       <code class="member">DoFDimensionInfo</code> classes that were used to
+       declare typedefs for the iterators have been moved to a namespace
+       internal (so as to get them out of the class index in the documentation
+       -- these classes were not meant for use in applications after all), and
+       have been renamed to <code class="member">TriaIteratorSelector</code>
+       and <code class="member">DoFIteratorSelector</code>, since that is what
+       they are.
+       <br>
+       (WB 2003/02/13)
+       </p>
+
+  <li> <p> 
        Changed: Due to the demand for different <code
        class="class">DoFHandler</code> classes (mainly for the planned
        hp-DoFHandler) the DoFHandler has been introduced as a
