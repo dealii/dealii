@@ -43,10 +43,12 @@ inline double sqr_point (const Tensor<1,dim> &p) {
 
 template <int dim>
 void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
-				      const FiniteElement<dim> &fe,
-				      const Boundary<dim>      &boundary,
-				      const Function<dim>      &function,
-				      dVector                  &vec) {
+				    const Boundary<dim>      &boundary,
+				    const Function<dim>      &function,
+				    dVector                  &vec)
+{
+  const FiniteElement<dim> &fe = dof.get_fe();
+  
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
   vector<int>         dofs_on_cell (fe.total_dofs);
@@ -72,10 +74,10 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 
 template <int dim> void
 VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
-			 const DoFHandler<dim>    &low_dof,
-			 const dFMatrix           &transfer,
-			 const dVector            &high,
-			 dVector                  &low)
+			      const DoFHandler<dim>    &low_dof,
+			      const dFMatrix           &transfer,
+			      const dVector            &high,
+			      dVector                  &low)
 {
   dVector cell_high(high_dof.get_fe().total_dofs);
   dVector cell_low(low_dof.get_fe().total_dofs);
@@ -97,7 +99,6 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
 template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
-			      const FiniteElement<1> &,
 			      const Boundary<1>      &,
 			      const Quadrature<1>    &,
 			      const Function<1>      &,
@@ -122,7 +123,6 @@ void VectorTools<1>::project (const DoFHandler<1>    &,
 template <int dim>
 void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const ConstraintMatrix   &constraints,
-				const FiniteElement<dim> &fe,
 				const Boundary<dim>      &boundary,
 				const Quadrature<dim>    &q,
 				const Function<dim>      &function,
@@ -130,7 +130,9 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const bool                enforce_zero_boundary,
 				const Quadrature<dim-1>  &q_boundary,
 				const bool                project_to_boundary_first) {
-  				   // make up boundary values
+  const FiniteElement<dim> &fe = dof.get_fe();
+
+				   // make up boundary values
   map<int,double> boundary_values;
 
   if (enforce_zero_boundary == true) 
@@ -163,7 +165,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 	FunctionMap boundary_functions;
 	for (unsigned char c=0; c<255; ++c)
 	  boundary_functions[c] = &function;
-	project_boundary_values (dof, boundary_functions, fe, q_boundary,
+	project_boundary_values (dof, boundary_functions, q_boundary,
 				 boundary, boundary_values);
       };
 
@@ -179,8 +181,8 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   
   dSMatrix mass_matrix (sparsity);
   dVector tmp (mass_matrix.n());
-  MatrixCreator<dim>::create_mass_matrix (dof, fe, boundary, mass_matrix);
-  VectorTools<dim>::create_right_hand_side (dof, fe, q, boundary,
+  MatrixCreator<dim>::create_mass_matrix (dof, boundary, mass_matrix);
+  VectorTools<dim>::create_right_hand_side (dof, q, boundary,
 					    function, tmp);
 
   constraints.condense (mass_matrix);
@@ -203,11 +205,12 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
-					       const FiniteElement<dim> &fe,
 					       const Quadrature<dim>    &q,
 					       const Boundary<dim>      &boundary,
 					       const Function<dim>      &rhs,
 					       dVector                  &rhs_vector) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+  
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
   dSMatrix dummy;
@@ -236,7 +239,6 @@ template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 					     const FunctionMap &,
-					     const FiniteElement<1> &,
 					     const Boundary<1> &,
 					     map<int,double>   &) {
   Assert (false, ExcNotImplemented());
@@ -250,11 +252,13 @@ template <int dim>
 void
 VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					       const FunctionMap     &dirichlet_bc,
-					       const FiniteElement<dim> &fe,
 					       const Boundary<dim>      &boundary,
 					       map<int,double>   &boundary_values) {
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
+
+  const FiniteElement<dim> &fe = dof.get_fe();
+
 				   // use two face iterators, since we need
 				   // a DoF-iterator for the dof indices, but
 				   // a Tria-iterator for the fe object
@@ -293,7 +297,6 @@ template <int dim>
 void
 VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const FunctionMap        &boundary_functions,
-					   const FiniteElement<dim> &fe,
 					   const Quadrature<dim-1>  &q,
 					   const Boundary<dim>      &boundary,
 					   map<int,double>   &boundary_values) {
@@ -331,7 +334,7 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   dVector        rhs(sparsity.n_rows());
   
 
-  MatrixTools<dim>::create_boundary_mass_matrix (dof, fe, q, boundary,
+  MatrixTools<dim>::create_boundary_mass_matrix (dof, q, boundary,
 						 mass_matrix, boundary_functions,
 						 rhs, dof_to_boundary_mapping);
 
@@ -371,11 +374,10 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     const Function<dim>      &exact_solution,
 					     dVector                  &difference,
 					     const Quadrature<dim>    &q,
-					     const FiniteElement<dim> &fe,
 					     const NormType           &norm,
 					     const Boundary<dim>      &boundary) {
-  Assert (fe == dof.get_fe(), ExcInvalidFE());
-  
+  const FiniteElement<dim> &fe = dof.get_fe();
+    
   difference.reinit (dof.get_tria().n_active_cells());
   
   UpdateFlags update_flags = UpdateFlags (update_q_points  |

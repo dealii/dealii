@@ -21,11 +21,12 @@
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
-					     const FiniteElement<dim> &fe,
 					     const Quadrature<dim>    &q,
 					     const Boundary<dim>      &boundary,
 					     dSMatrix                 &matrix,
 					     const Function<dim> * const a) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+
   dVector dummy;    // no entries, should give an error if accessed
   UpdateFlags update_flags = update_JxW_values;
   if (a != 0)
@@ -52,13 +53,14 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
-					     const FiniteElement<dim> &fe,
 					     const Quadrature<dim>    &q,
 					     const Boundary<dim>      &boundary,
 					     dSMatrix                 &matrix,
 					     const Function<dim>      &rhs,
 					     dVector                  &rhs_vector,
 					     const Function<dim> * const a) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
   const AssemblerData<dim> data (dof,
@@ -82,9 +84,10 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
-					     const FiniteElement<dim> &fe,
 					     const Boundary<dim>      &boundary,
 					     dSMatrix                 &matrix) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+
   const unsigned int total_dofs = fe.total_dofs;
   
   dFMatrix    local_mass_matrix (total_dofs, total_dofs);
@@ -110,7 +113,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 template <>
 void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
-						    const FiniteElement<1> &,
 						    const Quadrature<0>    &,
 						    const Boundary<1>      &,
 						    dSMatrix               &,
@@ -127,7 +129,6 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 
 template <int dim>
 void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
-						      const FiniteElement<dim> &fe,
 						      const Quadrature<dim-1>  &q,
 						      const Boundary<dim>      &boundary,
 						      dSMatrix                 &matrix,
@@ -135,6 +136,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 						      dVector                  &rhs_vector,
 						      vector<int>              &dof_to_boundary_mapping,
 						      const Function<dim>      *a) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+
   Assert (matrix.n() == dof.n_boundary_dofs(rhs), ExcInternalError());
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
@@ -321,11 +324,12 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
-						const FiniteElement<dim> &fe,
 						const Quadrature<dim>    &q,
 						const Boundary<dim>      &boundary,
 						dSMatrix                 &matrix,
 						const Function<dim> * const a) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+
   dVector dummy;   // no entries, should give an error if accessed
   UpdateFlags update_flags = UpdateFlags(update_gradients |
 					 update_JxW_values);
@@ -352,13 +356,14 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
-						const FiniteElement<dim> &fe,
 						const Quadrature<dim>    &q,
 						const Boundary<dim>      &boundary,
 						dSMatrix                 &matrix,
 						const Function<dim>      &rhs,
 						dVector                  &rhs_vector,
 						const Function<dim> * const a) {
+  const FiniteElement<dim> &fe = dof.get_fe();
+
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
 					 update_gradients |
 					 update_JxW_values);

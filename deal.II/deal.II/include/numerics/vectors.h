@@ -245,6 +245,8 @@ enum NormType {
  *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
  * \end{itemize}
  *
+ * All functions use the finite element given to the #DoFHandler# object the last
+ * time that the degrees of freedom were distributed over the triangulation.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -274,28 +276,27 @@ class VectorTools {
 				      * class for further information.
 				      */
     static void interpolate (const DoFHandler<dim>    &dof,
-			     const FiniteElement<dim> &fe,
 			     const Boundary<dim>      &boundary,
 			     const Function<dim>      &function,
 			     dVector                  &vec);
 
-				   /**
-				    * Interpolate different finite element
-				    * spaces. The interpolation is
-				    * executed from the higher order
-				    * space represented by #high# to
-				    the lower order space
-				    #low#. The interpolation on each
-				    cell is represented by the matrix
-				    #transfer#. Curved boundaries are
-				    neglected so far.
-				   */
-  static void interpolate(const DoFHandler<dim>    &high_dof,
-			  const DoFHandler<dim>    &low_dof,
-			  const dFMatrix& transfer,
-			  const dVector& high,
-			  dVector& low);
-  
+				     /**
+				      * Interpolate different finite
+				      * element spaces. The
+				      * interpolation is executed from
+				      * the higher order space
+				      * represented by #high# to the
+				      * lower order space #low#. The
+				      * interpolation on each cell is
+				      * represented by the matrix
+				      * #transfer#. Curved boundaries
+				      * are neglected so far.
+				      */
+    static void interpolate(const DoFHandler<dim>    &high_dof,
+			    const DoFHandler<dim>    &low_dof,
+			    const dFMatrix           &transfer,
+			    const dVector            &high,
+			    dVector                  &low);
 			  
 				     /**
 				      * Compute the projection of
@@ -315,7 +316,6 @@ class VectorTools {
 				      */
     static void project (const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
-			 const FiniteElement<dim> &fe,
 			 const Boundary<dim>      &boundary,
 			 const Quadrature<dim>    &q,
 			 const Function<dim>      &function,
@@ -331,7 +331,6 @@ class VectorTools {
 				      * class for further information.
 				      */				      
     static void create_right_hand_side (const DoFHandler<dim>    &dof,
-					const FiniteElement<dim> &fe,
 					const Quadrature<dim>    &q,
 					const Boundary<dim>      &boundary,
 					const Function<dim>      &rhs,
@@ -354,9 +353,8 @@ class VectorTools {
 				      */
     static void interpolate_boundary_values (const DoFHandler<dim> &dof,
 					     const FunctionMap     &dirichlet_bc,
-					     const FiniteElement<dim> &fe,
-					     const Boundary<dim> &boundary,
-					     map<int,double>     &boundary_values);
+					     const Boundary<dim>   &boundary,
+					     map<int,double>       &boundary_values);
     
 				     /**
 				      * Project #function# to the boundary
@@ -373,7 +371,6 @@ class VectorTools {
 				      */
     static void project_boundary_values (const DoFHandler<dim>    &dof,
 					 const FunctionMap        &boundary_functions,
-					 const FiniteElement<dim> &fe,
 					 const Quadrature<dim-1>  &q,
 					 const Boundary<dim>      &boundary,
 					 map<int,double>          &boundary_values);
@@ -393,7 +390,6 @@ class VectorTools {
 				      const Function<dim>      &exact_solution,
 				      dVector                  &difference,
 				      const Quadrature<dim>    &q,
-				      const FiniteElement<dim> &fe,
 				      const NormType           &norm,
 				      const Boundary<dim> &boundary=StraightBoundary<dim>());
 

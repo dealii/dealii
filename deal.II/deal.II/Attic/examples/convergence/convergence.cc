@@ -39,13 +39,13 @@ class PoissonEquation :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
   protected:
     const Function<dim> &right_hand_side;
 };
@@ -152,7 +152,7 @@ template <>
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,
-				   const Triangulation<2>::cell_iterator &) const {
+				   const DoFHandler<2>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
     for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
       {
@@ -171,7 +171,7 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 template <int dim>
 void PoissonEquation<dim>::assemble (dFMatrix            &,
 				     const FEValues<dim> &,
-				     const Triangulation<dim>::cell_iterator &) const {
+				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -180,7 +180,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &,
 template <int dim>
 void PoissonEquation<dim>::assemble (dVector             &,
 				     const FEValues<dim> &,
-				     const Triangulation<dim>::cell_iterator &) const {
+				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -337,7 +337,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  l1_error_per_cell,
-					  *quadrature, *fe, L1_norm);
+					  *quadrature, L1_norm);
   cout << l1_error_per_cell.l1_norm() << endl;
   l1_error.push_back (l1_error_per_cell.l1_norm());
 
@@ -345,7 +345,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  l2_error_per_cell,
-					  *quadrature, *fe, L2_norm);
+					  *quadrature, L2_norm);
   cout << l2_error_per_cell.l2_norm() << endl;
   l2_error.push_back (l2_error_per_cell.l2_norm());
 
@@ -353,7 +353,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  linfty_error_per_cell,
-					  *quadrature, *fe, Linfty_norm);
+					  *quadrature, Linfty_norm);
   cout << linfty_error_per_cell.linfty_norm() << endl;
   linfty_error.push_back (linfty_error_per_cell.linfty_norm());
   
@@ -361,7 +361,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  h1_seminorm_error_per_cell,
-					  *quadrature, *fe, H1_seminorm);
+					  *quadrature, H1_seminorm);
   cout << h1_seminorm_error_per_cell.l2_norm() << endl;
   h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
 
@@ -369,7 +369,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   VectorTools<dim>::integrate_difference (*dof_handler,
 					  solution, sol,
 					  h1_error_per_cell,
-					  *quadrature, *fe, H1_norm);
+					  *quadrature, H1_norm);
   cout << h1_error_per_cell.l2_norm() << endl;
   h1_error.push_back (h1_error_per_cell.l2_norm());
 

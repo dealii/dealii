@@ -126,7 +126,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // in the docs
   map<int, double> boundary_value_list;
   VectorTools<dim>::interpolate_boundary_values (*dof_handler,
-						 dirichlet_bc, fe, boundary,
+						 dirichlet_bc, boundary,
 						 boundary_value_list);
   MatrixTools<dim>::apply_boundary_values (boundary_value_list,
 					   system_matrix, solution,

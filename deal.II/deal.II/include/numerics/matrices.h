@@ -154,6 +154,10 @@ class dSMatrix;
  * useful if you want to create many right hand side vectors.
  *
  *
+ * All functions in this collection use the finite elemen given to the
+ * #DoFHandler# object the last time that the degrees of freedom were
+ * distributed on the triangulation.
+ *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -190,7 +194,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
-				    const FiniteElement<dim> &fe,
 				    const Quadrature<dim>    &q,
 				    const Boundary<dim>      &boundary,
 				    dSMatrix                 &matrix,
@@ -214,7 +217,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
-				    const FiniteElement<dim> &fe,
 				    const Quadrature<dim>    &q,
 				    const Boundary<dim>      &boundary,
 				    dSMatrix                 &matrix,
@@ -242,7 +244,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
-				    const FiniteElement<dim> &fe,
 				    const Boundary<dim>      &boundary,
 				    dSMatrix                 &matrix);
     
@@ -262,7 +263,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
-					     const FiniteElement<dim> &fe,
 					     const Quadrature<dim-1>  &q,
 					     const Boundary<dim>      &boundary,
 					     dSMatrix                 &matrix,
@@ -280,7 +280,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
-				       const FiniteElement<dim> &fe,
 				       const Quadrature<dim>    &q,
 				       const Boundary<dim>      &boundary,
 				       dSMatrix &matrix,
@@ -296,7 +295,6 @@ class MatrixCreator {
 				      * for more information.
 				      */
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
-				       const FiniteElement<dim> &fe,
 				       const Quadrature<dim>    &q,
 				       const Boundary<dim>      &boundary,
 				       dSMatrix &matrix,
@@ -304,14 +302,14 @@ class MatrixCreator {
 				       dVector                  &rhs_vector,
 				       const Function<dim>      *a = 0);
 
-				   /**
-				    * Build Lagrange interpolation
-				    matrix of different finite
-				    elements.
-				   */
-  static void create_interpolation_matrix(const FiniteElement<dim> &high,
-					  const FiniteElement<dim> &low,
-					  dFMatrix& result);
+				     /**
+				      * Build Lagrange interpolation
+				      * matrix of different finite
+				      * elements.
+				      */
+    static void create_interpolation_matrix(const FiniteElement<dim> &high,
+					    const FiniteElement<dim> &low,
+					    dFMatrix& result);
 
 
 				     /**
