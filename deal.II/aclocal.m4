@@ -805,8 +805,11 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 	;;
 
     AIXF77)
-        F77FLAGSG="$FFLAGS -g"
-        F77FLAGSO="$FFLAGS -O3 -w"
+	dnl Set flags for AIX's xlf compiler. -qextname instructs the compiler
+	dnl to append an underscore to external function names, which is what
+	dnl we expect when linking to the HSL functions
+        F77FLAGSG="$FFLAGS -g -qextname"
+        F77FLAGSO="$FFLAGS -O3 -w -qextname"
         F77LIBS="$F77LIBS -lxlf90"  
 
         F77FLAGSPIC="unknown!"
