@@ -8,6 +8,7 @@
 
 #include <base/forward-declarations.h>
 #include <base/exceptions.h>
+#include <basic/forward-declarations.h>
 #include <map>
 
 
