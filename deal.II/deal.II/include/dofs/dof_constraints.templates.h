@@ -906,16 +906,15 @@ ConstraintMatrix::distribute (VectorType &vec) const
   std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
   for (; next_constraint != lines.end(); ++next_constraint) 
     {
-				       // make entry in line
-				       // next_constraint.line first
-				       // set it to zero
-      vec(next_constraint->line) = 0.;
-				       // then add the different
-				       // contributions
+				       // fill entry in line
+				       // next_constraint.line by adding the
+				       // different contributions
+      double new_value = 0;
       for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-	vec(next_constraint->line) += (vec(next_constraint->entries[i].first) *
-				       next_constraint->entries[i].second);
-    };
+	new_value += (vec(next_constraint->entries[i].first) *
+                      next_constraint->entries[i].second);
+      vec(next_constraint->line) = new_value;
+    }
 }
 
 
