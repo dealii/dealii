@@ -109,15 +109,6 @@ class Timer
 				      * running.
 				      */
     bool                running;
-
-				     /**
-				      * Return #cumulative_time# plus the
-				      * number of overflows times the number
-				      * of seconds per overflow. Do not include
-				      * the time since the last overflow
-				      * occured.
-				      */
-    double full_time () const;
 };
 
 
