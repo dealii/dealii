@@ -622,7 +622,19 @@ void
 MappingQ<dim>::apply_laplace_vector(const Table<2,double> &lvs,
 				    std::vector<Point<dim> > &a) const
 {
+                                   // check whether the data we need
+                                   // is really available. if you fail
+                                   // here and if
+                                   // lvs==laplace_on_quad_vector in
+                                   // the calling function, then we
+                                   // didn't compute the quad laplace
+                                   // vector. this is mentioned in the
+                                   // constructor of this class,
+                                   // although I don't understand the
+                                   // reason for not aborting there
+                                   // any more [WB]
   Assert(lvs.n_rows()!=0, ExcLaplaceVectorNotSet(degree));
+  
   const unsigned int n_inner_apply=lvs.n_rows();
   Assert(n_inner_apply==n_inner || n_inner_apply==(degree-1)*(degree-1),
 	 ExcInternalError());
@@ -792,54 +804,94 @@ MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_
 
 template<>
 void
-MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
-				     std::vector<Point<3> >                &a) const
+MappingQ<3>::
+add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
+                        std::vector<Point<3> >                &a) const
 {
   const unsigned int faces_per_cell    = GeometryInfo<3>::faces_per_cell,
 		     vertices_per_face = GeometryInfo<3>::vertices_per_face,
 		     lines_per_face    = GeometryInfo<3>::lines_per_face,
 		     vertices_per_cell = GeometryInfo<3>::vertices_per_cell;
-  
-  static const unsigned int face_vertex_to_cell_vertex
+
+                                   // mapping of faces to vertex
+                                   // indices for properly oriented
+                                   // faces
+  static const unsigned int face_vertex_to_cell_vertex1
     [faces_per_cell][vertices_per_face]={{0,1,2,3},
 					 {4,5,6,7},
 					 {0,1,5,4},
 					 {1,5,6,2},
 					 {3,2,6,7},
 					 {0,4,7,3}};
-  
-  static const unsigned int face_line_to_cell_line
+                                   // same if the face is in opposite
+                                   // orientation
+  static const unsigned int face_vertex_to_cell_vertex2
+    [faces_per_cell][vertices_per_face]={{0,3,2,1},
+					 {4,7,6,5},
+					 {0,4,5,1},
+					 {1,2,6,5},
+					 {3,7,6,2},
+					 {0,3,7,4}};
+
+                                   // indices of the lines that bound
+                                   // a properly oriented face
+  static const unsigned int face_line_to_cell_line1
     [faces_per_cell][lines_per_face]={{0,1,2,3},
 				      {4,5,6,7},
 				      {0,9,4,8},
 				      {9,5,10,1},
 				      {2,10,6,11},
 				      {8,7,11,3}};
+                                   // same for faces in wrong
+                                   // orientation
+  static const unsigned int face_line_to_cell_line2
+    [faces_per_cell][lines_per_face]={{3,2,1,0},
+				      {7,6,5,4},
+				      {8,4,9,0},
+				      {1,10,5,9},
+				      {11,6,10,2},
+				      {3,11,7,8}};
 
   static const StraightBoundary<3> straight_boundary;
 				   // used if face quad at boundary or
 				   // entirely in the interior of the
 				   // domain
   std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
-				   // used if only one line of face quad is at boundary
+				   // used if only one line of face
+				   // quad is at boundary
   std::vector<Point<3> > b(4*degree);
   
   
-				   // loop over all faces and collect points on them
+				   // loop over all faces and collect
+				   // points on them
   for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
     {
-      const Triangulation<3>::face_iterator face=cell->face(face_no);
-      
+      const Triangulation<3>::face_iterator face = cell->face(face_no);
+
+                                       // select the correct mappings
+                                       // for the present face
+      const bool face_orientation = cell->face_orientation(face_no);
+
+      const unsigned int (&face_vertex_to_cell_vertex)[vertices_per_face]
+        = (face_orientation ?
+           face_vertex_to_cell_vertex1[face_no] :
+           face_vertex_to_cell_vertex2[face_no]);
+      const unsigned int (&face_line_to_cell_line)[lines_per_face]
+        = (face_orientation ?
+           face_line_to_cell_line1[face_no] :
+           face_line_to_cell_line2[face_no]);
+
+                                       // some sanity checks up front
       for (unsigned int i=0; i<vertices_per_face; ++i)
-	Assert(face->vertex_index(i)==
-	       cell->vertex_index(face_vertex_to_cell_vertex[face_no][i]),
-	       ExcInternalError());
+        Assert(face->vertex_index(i)==
+               cell->vertex_index(face_vertex_to_cell_vertex[i]),
+               ExcInternalError());
       
       for (unsigned int i=0; i<lines_per_face; ++i)
-	Assert(face->line(i)==
-	       cell->line(face_line_to_cell_line[face_no][i]),
-	       ExcInternalError());
-
+        Assert(face->line(i)==
+               cell->line(face_line_to_cell_line[i]),
+               ExcInternalError());
+      
 				       // if face at boundary, then
 				       // ask boundary object to
 				       // return intermediate points
@@ -884,16 +936,17 @@ MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell
 					       // that this is the
 					       // right size
 	      Assert(b.size()==vertices_per_face+lines_per_face*(degree-1),
-		     ExcDimensionMismatch(b.size(), vertices_per_face+lines_per_face*(degree-1)));
+		     ExcDimensionMismatch(b.size(),
+                                          vertices_per_face+lines_per_face*(degree-1)));
 	      
 					       // sort the points into b
-	      for (unsigned int i=0; i<vertices_per_face; ++i)
-		b[i]=a[face_vertex_to_cell_vertex[face_no][i]];
+              for (unsigned int i=0; i<vertices_per_face; ++i)
+                b[i]=a[face_vertex_to_cell_vertex[i]];
 		      
-	      for (unsigned int i=0; i<lines_per_face; ++i)
-		for (unsigned int j=0; j<degree-1; ++j)
-		  b[vertices_per_face+i*(degree-1)+j]=
-		    a[vertices_per_cell+face_line_to_cell_line[face_no][i]*(degree-1)+j];
+              for (unsigned int i=0; i<lines_per_face; ++i)
+                for (unsigned int j=0; j<degree-1; ++j)
+                  b[vertices_per_face+i*(degree-1)+j]=
+                    a[vertices_per_cell+face_line_to_cell_line[i]*(degree-1)+j];
 
 					       // Now b includes the
 					       // right order of
