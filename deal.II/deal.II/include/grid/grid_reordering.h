@@ -95,9 +95,13 @@ class GridReorderingInfo<3>
 				      * orientations of a face in
 				      * 2d. It is the quadrilateral
 				      * rotated in all four
-				      * orientations.
+				      * orientations, and also viewed
+				      * from the back, i.e. vertices
+				      * not numbered in
+				      * counter-clockwise sense but in
+				      * the other direction.
 				      */
-    static const unsigned int rotational_states_of_faces = 4;
+    static const unsigned int rotational_states_of_faces = 8;
 };
 
 

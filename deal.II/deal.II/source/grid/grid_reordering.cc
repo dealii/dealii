@@ -228,19 +228,41 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 	{ { vertices[3], vertices[2], vertices[6], vertices[7] } },
 	{ { vertices[0], vertices[4], vertices[7], vertices[3] } } };
   Face new_faces[GeometryInfo<dim>::faces_per_cell][rotational_states_of_faces]
-    = { { new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[2], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	{ new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] } };
-    
+    = { { new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[2], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+	{ new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] }};
+
+				   // first do the faces in their
+				   // usual direction
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int rot=1; rot<rotational_states_of_faces; ++rot)
+    for (unsigned int rot=1; rot<rotational_states_of_faces/2; ++rot)
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
 	new_faces[face][rot].vertices[v]
 	  = new_faces[face][0].vertices[(v+rot) % GeometryInfo<dim>::vertices_per_face];
-
+				   // then do everything as viewed
+				   // from the back. this is simple,
+				   // as we only have to revert
+				   // indices 1 and 3
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int rot=rotational_states_of_faces/2; rot<rotational_states_of_faces; ++rot)
+      {
+	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+	  new_faces[face][rot].vertices[v]
+	    = new_faces[face][rot-rotational_states_of_faces/2].vertices[v];
+	swap (new_faces[face][rot].vertices[1],
+	      new_faces[face][rot].vertices[3]);
+      };
+  
+	
 				   // now insert all the faces, by now
 				   // without specific order with
 				   // respect to the orientational
@@ -282,23 +304,49 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 				   // that the present cell is one of
 				   // the neighbors
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
-      if (new_faces_ptr[rot][face]->second.adjacent_cells[0] ==
-	  FaceData::invalid_adjacent_cell)
+    {
+//        cout << "Entering cell " << cell_no << " as adjacent to face <";
+//        for (unsigned int i=0; i<4; ++i)
+//  	cout << new_faces_ptr[0][face]->first.vertices[i] << ' ';
+//        cout << '>';
+      
+    if (new_faces_ptr[0][face]->second.adjacent_cells[0] ==
+	FaceData::invalid_adjacent_cell)
+      {
+//	cout << " as neighbor 0" << endl;
 					 // no, faces had not been
 					 // used before, so we are the
 					 // first adjacent cell
-	new_faces_ptr[rot][face]->second.adjacent_cells[0] = cell_no;
-      else
+	for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+	  {
+	    Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0]
+		    == FaceData::invalid_adjacent_cell,
+		    ExcInternalError());
+	    new_faces_ptr[rot][face]->second.adjacent_cells[0] = cell_no;
+	  };
+      }
+    else
+      {	
 					 // otherwise: cell had been
 					 // entered before, so we are
 					 // the second neighbor
-	{
-	  Assert (new_faces_ptr[rot][face]->second.adjacent_cells[1] ==
-		  FaceData::invalid_adjacent_cell,
-		  ExcInternalError());
-	  new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
-	};
+	const unsigned int
+	  previous_neighbor = new_faces_ptr[0][face]->second.adjacent_cells[0];
+//	cout << " as neighbor 1 (previous: " << previous_neighbor << ")" << endl;
+	for (unsigned int rot=0; rot<rotational_states_of_faces; ++rot)
+	  {
+	    Assert (new_faces_ptr[rot][face]->second.adjacent_cells[0] ==
+		    previous_neighbor,
+		    ExcInternalError());
+	    Assert (new_faces_ptr[rot][face]->second.adjacent_cells[1] ==
+		    FaceData::invalid_adjacent_cell,
+		    ExcInternalError());
+	    new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
+	  };
+      };
+    };
+  
+  
 
 				   // we still have to link cell in
 				   // its 24 different orientations to
@@ -394,22 +442,27 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 					   // we have already created
 	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	    {
-	      unsigned int f, r;
-	      for (f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-		for (r=0; r<rotational_states_of_cells; ++r)
+	      bool face_found = false;
+	      for (unsigned int f=0;
+		   (!face_found) && (f<GeometryInfo<dim>::faces_per_cell); ++f)
+		for (unsigned int r=0; r<rotational_states_of_faces; ++r)
 		  if (standard_faces[face] == new_faces[f][r])
 		    {
 		      cell_orientation_faces[rot][face] = make_pair(f,r);
+		      face_found = true;
 		      break;
 		    };
 
 					       // make sure that we
 					       // have found something
 					       // indeed
-	      Assert ( ! ((f == GeometryInfo<dim>::faces_per_cell) &&
-			  (r == rotational_states_of_cells)),
-		       ExcInternalError());
+	      Assert (face_found == true, ExcInternalError());
 	    };
+//  	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+//  	    cout << "cell_orientation_faces[" << rot << "][" << face << "]="
+//  		 << cell_orientation_faces[rot][face].first << '.'
+//  		 << cell_orientation_faces[rot][face].second
+//  		 << endl;
 
 					   // more checks: make sure
 					   // that each of the
@@ -439,6 +492,7 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 					   // once, so no more checks
 					   // necessary
 	};
+
 				       // that's it: we now know which
 				       // faces build up this cell in
 				       // each of its possible
@@ -454,7 +508,7 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 				   // link the faces in their
 				   // directions to the cell in each
 				   // of its orientations
-  for (unsigned int rot=0; rotational_states_of_cells; ++rot)
+  for (unsigned int rot=0; rot<rotational_states_of_cells; ++rot)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       faces[rot][face] = new_faces_ptr
 			 [cell_orientation_faces[rot][face].second]
@@ -467,20 +521,9 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 template <int dim>
 void GridReordering<dim>::Cell::fix_cell_neighbors ()
 {
+//  cout << "Fixing neighbors for cell " << cell_no << endl;
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
-				       // first assert that the
-				       // neighborship info of all
-				       // versions of the same face is
-				       // identical
-      for (unsigned int rot=1; rot<rotational_states_of_faces; ++rot)
-	for (unsigned int adjacent_cell=0; adjacent_cell<2; ++adjacent_cell)
-	  Assert (faces[rot][face]->second.adjacent_cells[adjacent_cell]
-		  ==
-		  faces[0][face]->second.adjacent_cells[adjacent_cell],
-		  ExcInternalError());
-      
-
 				       // then insert the neighbor
 				       // behind this face as neighbor
 				       // of the present cell. note
@@ -536,6 +579,7 @@ void GridReordering<dim>::Cell::find_backtracking_point ()
 				   // of course, not hold for cell 0,
 				   // from which we should never be
 				   // forced to track back
+  track_back_to_cell = cell_no-1;
   if (cell_no == 0)
     track_back_to_cell = 0;
   else
@@ -883,7 +927,7 @@ void GridReordering<dim>::find_reordering (vector<Cell<dim> >         &cells,
       if (rotation_states.size() > max_size)
 	{
 	  max_size = rotation_states.size();
-  	  if (max_size % 10 == 0)
+//  	  if (max_size % 10 == 0)
   	    cout << "New max size " << rotation_states.size() << endl;
 	};
       
@@ -1147,9 +1191,6 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
       if (i->second.adjacent_cells[k] != FaceData::invalid_adjacent_cell)
 	i->second.adjacent_cells[k] = new_cell_numbers[i->second.adjacent_cells[k]];
 
-//    for (unsigned int i=0; i<cells.size(); ++i)
-//      cout << "[" << i << "->" << new_cell_numbers[i] << "]";
-  
   return new_cell_numbers;
 };
 
@@ -1158,17 +1199,6 @@ GridReordering<dim>::presort_cells (vector<Cell<dim> > &cells,
 template <int dim>
 void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 {
-				   // the present function might
-				   // actually work in 3d, but the
-				   // ones it calls probably not. will
-				   // have to think about what needs
-				   // to be changed. however, rather
-				   // than killing the program when
-				   // calling functions that may not
-				   // work, kill it here if the
-				   // dimension is not appropriate
-  Assert (dim==2, ExcNotImplemented());
-  
 				   // we need more information than
 				   // provided by the input parameter,
 				   // in particular we need
@@ -1195,7 +1225,10 @@ void GridReordering<dim>::reorder_cells (vector<CellData<dim> > &original_cells)
 				   // insert the neighbor indices into
 				   // the cells themselves
   for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-    cells[cell_no].fix_cell_neighbors ();
+    {
+      Cell &cell = cells[cell_no];
+      cell.fix_cell_neighbors ();
+    };
 
 
 				   // do a preordering step in order
@@ -1250,3 +1283,5 @@ void
 GridReordering<deal_II_dimension>::
 reorder_cells (vector<CellData<deal_II_dimension> > &);
 #endif
+
+

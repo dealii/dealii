@@ -22,10 +22,6 @@
 
 
 
-
-#include <fstream>
-
-
 template <int dim>
 GridIn<dim>::GridIn () :
 		tria(0) {};
@@ -543,6 +539,83 @@ GridIn<2>::debug_output_grid (const vector<CellData<2> > &cells,
 };
 
 #endif
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+GridIn<3>::debug_output_grid (const vector<CellData<3> > &cells,
+			      const vector<Point<3> >    &vertices,
+			      ostream                    &out)
+{
+  for (unsigned int cell=0; cell<cells.size(); ++cell)
+    {
+				       // line 0
+      out << vertices[cells[cell].vertices[0]]
+	  << endl
+	  << vertices[cells[cell].vertices[1]]
+	  << endl << endl << endl;
+				       // line 1
+      out << vertices[cells[cell].vertices[1]]
+	  << endl
+	  << vertices[cells[cell].vertices[2]]
+	  << endl << endl << endl;
+				       // line 2
+      out << vertices[cells[cell].vertices[3]]
+	  << endl
+	  << vertices[cells[cell].vertices[2]]
+	  << endl << endl << endl;
+				       // line 3
+      out << vertices[cells[cell].vertices[0]]
+	  << endl
+	  << vertices[cells[cell].vertices[3]]
+	  << endl << endl << endl;
+				       // line 4
+      out << vertices[cells[cell].vertices[4]]
+	  << endl
+	  << vertices[cells[cell].vertices[5]]
+	  << endl << endl << endl;
+				       // line 5
+      out << vertices[cells[cell].vertices[5]]
+	  << endl
+	  << vertices[cells[cell].vertices[6]]
+	  << endl << endl << endl;
+				       // line 6
+      out << vertices[cells[cell].vertices[7]]
+	  << endl
+	  << vertices[cells[cell].vertices[6]]
+	  << endl << endl << endl;
+				       // line 7
+      out << vertices[cells[cell].vertices[4]]
+	  << endl
+	  << vertices[cells[cell].vertices[7]]
+	  << endl << endl << endl;
+				       // line 8
+      out << vertices[cells[cell].vertices[0]]
+	  << endl
+	  << vertices[cells[cell].vertices[4]]
+	  << endl << endl << endl;
+				       // line 9
+      out << vertices[cells[cell].vertices[1]]
+	  << endl
+	  << vertices[cells[cell].vertices[5]]
+	  << endl << endl << endl;
+				       // line 10
+      out << vertices[cells[cell].vertices[2]]
+	  << endl
+	  << vertices[cells[cell].vertices[6]]
+	  << endl << endl << endl;
+				       // line 11
+      out << vertices[cells[cell].vertices[3]]
+	  << endl
+	  << vertices[cells[cell].vertices[7]]
+	  << endl << endl << endl;
+    };
+};
+
+#endif
+
 
 
 //explicit instantiations
