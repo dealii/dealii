@@ -34,16 +34,16 @@ class PoissonEquation :  public Equation<dim> {
   public:
     PoissonEquation (const Function<dim> &rhs) :
 		    Equation<dim>(1),
+		    use_coefficient(false),
 		    right_hand_side (rhs),
-		    coefficient (default_coefficient),
-		    use_coefficient(false) {};
+		    coefficient (default_coefficient) {};
 
     PoissonEquation (const Function<dim> &rhs,
 		     const Function<dim> &coefficient ) :
 		    Equation<dim>(1),
+		    use_coefficient(true),
 		    right_hand_side (rhs),
-		    coefficient (coefficient),
-		    use_coefficient(true) {};
+		    coefficient (coefficient) {};
 
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
