@@ -21,6 +21,8 @@
  * real space and $N_j(\vec \xi)$ is the value of the basis function associated
  * with the $j$th corner point, on the unit cell at point $\vec \xi$. The sum
  * over $j$ runs over all corner points.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class FELinear : public FiniteElement<dim> {

@@ -15,6 +15,8 @@
  *   the triangulation is concerned: the index in the level
  *   it belongs to. The level index is implicitely given by the position
  *   in the #lines.lines# list attached to the information of each level.
+ *
+ *   @author Wolfgang Bangerth, 1998
  */
 class Line {
   public:

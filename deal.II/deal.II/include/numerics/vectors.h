@@ -243,6 +243,9 @@ enum NormType {
  *   For the global $H_1$ norm and seminorm, the same rule applies as for the
  *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
  * \end{itemize}
+ *
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class VectorTools {

@@ -24,6 +24,8 @@
  * any dimension. Second order means that it integrates polynomials of
  * third order exact. In general, a formula of order #n# exactly
  * integrates polynomials of order #2n-1#.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class Quadrature {

@@ -17,6 +17,8 @@
  *   it belongs to. The level index is implicitely given by the position
  *   in the #quads.quads# list attached to the information of each level
  *   of the triangulation.
+ *
+ *   @author Wolfgang Bangerth, 1998
  */
 class Quad {
   public:

@@ -417,11 +417,16 @@ struct FiniteElementBase : public FiniteElementData<dim> {
  *   function to the finite element space is applied. At present, only few
  *   places where this is used in the library come to mind to the author,
  *   namely the treating of boundary values in the #ProblemBase# class and
- *   the interpolation in the #VectorCreator# collection. You should also
+ *   the interpolation in the #VectorTools# collection. You should also
  *   look out for other places where explicit use of the ansatz points is
  *   made if you want to use elements of other classes. A hint may be the
  *   use of the #get_ansatz_points# and #get_face_ansatz_points# functions
  *   of this class.
+ *
+ *   This also is used in some sense in the
+ *   #DoFHandler::distribute_cell_to_dof_vector# where it is assumed that
+ *   the degrees of freedom denote function values and not derivatives or
+ *   the like.
  *
  * \item Vanishing of basis functions on faces: when projecting a function
  *   to the boundary, use if made of the assumption that all basis functions

@@ -31,6 +31,8 @@
  *   the new point right into the middle of the given points, and
  *   #HyperBallBoundary<dim># creating a hyperball with given radius
  *   around a given center point.
+ *
+ *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class Boundary {

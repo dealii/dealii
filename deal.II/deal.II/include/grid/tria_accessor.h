@@ -52,6 +52,8 @@ enum IteratorState { valid, past_the_end, invalid };
  *   data members, offers comparison operators and the like), but has no
  *   functionality to actually dereference data. This is done in the derived
  *   classes.
+ *
+ *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class TriaAccessor {
@@ -168,14 +170,6 @@ class TriaAccessor {
 				     /**
 				      *  Exception
 				      */
-    DeclException0 (ExcRefineCellNotUsed);
-				     /**
-				      *  Exception
-				      */
-    DeclException0 (ExcRefineCellNotActive);
-				     /**
-				      *  Exception
-				      */
     DeclException1 (ExcInvalidNeighbor,
 		    int,
 		    << "Neighbor indices must be between 0 and 2^dim-1, but "
@@ -269,6 +263,8 @@ class TriaAccessor {
  *   point to lines in #dim# space dimensions. There is a derived class
  *   for lines in one space dimension, in which case a line is also a cell
  *   and thus has much more functionality than in lower dimensions.
+ *
+ *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class LineAccessor :  public TriaAccessor<dim> {
@@ -487,6 +483,8 @@ class LineAccessor :  public TriaAccessor<dim> {
  *   to me). There is a derived class
  *   for quads in two space dimension, in which case a quad is also a cell
  *   and thus has much more functionality than in lower dimensions.
+ *
+ *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class QuadAccessor :  public TriaAccessor<dim> {
@@ -820,6 +818,8 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
  * example they can be flagged for refinement, they have neighbors, they have
  * the possibility to check whether they are at the boundary etc. This class
  * offers access to all this data.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class CellAccessor :  public TriaSubstructAccessor<dim> {
@@ -948,6 +948,18 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
 				      */
     bool active () const;
     
+				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcRefineCellNotActive);
+				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcCellFlaggedForRefinement);
+				     /**
+				      *  Exception
+				      */
+    DeclException0 (ExcCellFlaggedForCoarsening);    
   private:
     				     /**
 				      *  Copy operator. This is normally

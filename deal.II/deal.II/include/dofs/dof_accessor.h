@@ -36,6 +36,8 @@ class dVector;
  * that every iterator which is once assigned to is a valid
  * object. However, this assertion only holds in debug mode, when
  * the #Assert# macro is switched on.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class DoFAccessor {
@@ -151,6 +153,8 @@ class DoFAccessor {
  * multiple inheritance of #DoFLineAccessor# and #CellAccessor<1>#.
  *
  * The same concept is used with #DoFQuadAccessor# classes etc.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename BaseClass>
 class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
@@ -438,6 +442,8 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
  * access to the neighbors and children as #DoFCellAccessor# objects
  * rather than #CellAccessor# objects (the latter function was inherited
  * from the #CellAccessor<dim># class).
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class DoFCellAccessor :  public DoFSubstructAccessor<dim> {

@@ -142,6 +142,9 @@ class dSMatrix;
  * once. If you only want to create a right hand side as above, there is
  * a function in the #VectorCreator# class. The use of the latter may be
  * useful if you want to create many right hand side vectors.
+ *
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class MatrixCreator {

@@ -194,6 +194,8 @@ struct SubCellData {
  * backtracking nor whether it can be done with a stopping algorithm, if
  * possible within polynomial time. This kind of numbering must be made
  * upon construction of the coarse grid, unfortunately.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class DataIn {
@@ -317,6 +319,8 @@ class DataIn {
  * #set parametric# and #splot "filename" using 1:2:x# to get a 3d surface
  * plot of the (#x-2#)th data set. For example, using #x=4# would mean to
  * plot the second data set.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>  
 class DataOut {

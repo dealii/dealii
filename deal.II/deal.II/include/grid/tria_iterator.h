@@ -127,16 +127,16 @@ template <int dim> class Triangulation;
  *   \begin{itemize}
  *     \item It must have two members named #present_level# and #present_index#
  *       storing the address of the element in the triangulation presently
- *pointed to. Furthermore, the three #Tria{Raw| |Active}Iterator# classes
- *have to be friends to the accessor or these data members must be public.
+ *       pointed to. Furthermore, the three #Tria{Raw| |Active}Iterator# classes
+ *       have to be friends to the accessor or these data members must be public.
  *     \item It must have a constructor which takes 1. a #Triangulation<dim>*#,
  *       2. and 3. and integer, denoting the initial level and index.
  *     \item For the #TriaIterator# and the #TriaActiveIterator# class, it must
  *       have a member function #bool used()#, for the latter a member function
- *#bool active()#.
+ *       #bool active()#.
  *     \item It should not modify the #present_level# and #present_index# fields,
  *       since this is what the iterator classes do, but it should use them to
- *dereference the data it points to.
+ *       dereference the data it points to.
  *     \item It must have void operators #++# and #--#.	
  *   \end{itemize}
  *   Then the iterator is able to do what it is supposed to. All of the necessary

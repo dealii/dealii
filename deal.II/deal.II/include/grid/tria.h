@@ -922,7 +922,15 @@ enum MeshSmoothing {
  *     certain fraction of the total error. If this fraction is 50 per cent,
  *     for example, the threshold is computed such that the cells with a
  *     criterion greater than the threshold together account for half of the
- *     total error.
+ *     total error. The definition of the fraction is a bit unintuitive, since
+ *     the total error is the sum over all cells of the local contribution
+ *     squared. We define that the fraction $\alpha$ be such that those
+ *     elements with the greatest error are refined for which the condition
+ *     $\sum \eta_K^2 \le \alpha\eta^2$ holds. Note that $\alpha$ is not
+ *     squared. The sum runs over the mentioned
+ *     cells, $\eta_K$ are the local error indicators and $\eta$ is the global
+ *     indicator with $\eta^2 = \sum \eta_K^2$, with here the sum running over
+ *     all cells.
  *
  *     This strategy is more suited for singular functions and error
  *     functionals, but may lead to very slow convergence of the grid

@@ -86,6 +86,8 @@ template <int dim> class Function;
  * the boundary_values using the #MatrixTool::interpolate_boundary_values#
  * function. See there for more information.
  *
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class ProblemBase {

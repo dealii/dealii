@@ -28,6 +28,8 @@ class dVector;
  * Equation objects need only provide functions which set up the cell
  * matrices and the cell right hand side. These are then automatically inserted
  * into the global matrices and vectors.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class Equation {
@@ -217,6 +219,8 @@ struct AssemblerData {
 /**
  * An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
  * functionality to assemble global matrices and vectors from cell base ones.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class Assembler : public DoFCellAccessor<dim> {

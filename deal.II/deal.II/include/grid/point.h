@@ -26,6 +26,8 @@
  * gradient of a function be a #point# vector:
  * #Point<dim> gradient_of_f (const Point<dim> &x)#. #Point#s have all
  * functionality for this, e.g. scalar products, addition etc.
+ *
+ * @author Wolfgang Bangerth, 1997
  */
 template <int dim>
 class Point {

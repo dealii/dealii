@@ -92,6 +92,8 @@ class dVector;
  * with two vectors, one working in-place. The operation of distribution undoes
  * the condensation process in some sense, but it should be noted that it is not
  * the inverse operation.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 class ConstraintMatrix {
   public:
