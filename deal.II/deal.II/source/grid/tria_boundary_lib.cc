@@ -326,6 +326,20 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+void
+HalfHyperBallBoundary<1>::
+get_intermediate_points_on_quad (const typename Triangulation<1>::quad_iterator &,
+				 typename std::vector<Point<1> > &) const
+{
+  Assert (false, ExcInternalError());
+};
+
+#endif
+
+
 /* ---------------------------------------------------------------------- */
 
 
