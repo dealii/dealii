@@ -322,7 +322,8 @@ DEAL_II_CHECK_IBM_XLC_ERROR
 dnl See whether we can use the std::iterator class
 DEAL_II_HAVE_STD_ITERATOR
 
-
+dnl See whether we have to declare lrand48 ourselves with -ansi
+DEAL_II_HAVE_LRAND48_DECLARED
 
 dnl Find path to a Fortran 77 compiler. By default try to find a
 dnl vendor compiler which is usually names `f77', and only if that could

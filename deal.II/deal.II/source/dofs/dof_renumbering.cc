@@ -36,6 +36,17 @@ using namespace std;
 #endif
 
 
+// for whatever reason, the random_shuffle function used below needs
+// lrand48 to be declared when using -ansi as compiler flag (rather
+// than do so itself). however, inclusion of <cstdlib> or <stdlib.h>
+// does not help, so we declare that function ourselves. Since this
+// holds only for some compiler versions, do so conditionally on a
+// ./configure-time test
+#ifdef DEAL_II_DECLARE_LRAND48
+extern "C" long int lrand48 (void);
+#endif
+
+
 template <int dim>
 void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
 				    const bool                       reversed_numbering,

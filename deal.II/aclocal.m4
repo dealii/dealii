@@ -365,3 +365,35 @@ AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
       AC_MSG_RESULT(no)
     ])
 )
+
+
+dnl For gcc 2.95, when using the random_shuffle function with -ansi compiler flag,
+dnl there is an error saying that lrand48 is undeclared. Fix that by declaring
+dnl that function ourselves if necessary.
+dnl
+dnl Usage: DEAL_II_HAVE_LRAND48_DECLARED
+dnl
+AC_DEFUN(DEAL_II_HAVE_LRAND48_DECLARED, dnl
+  AC_MSG_CHECKING(whether lrand48 needs to be declared with -ansi)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <vector>
+#include <algorithm>
+
+void f()
+{
+  std::vector<unsigned int> new_indices;
+  random_shuffle (new_indices.begin(), new_indices.end());
+};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(DEAL_II_DECLARE_LRAND48)
+    ])
+)
