@@ -2730,6 +2730,83 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG2, dnl
 
 
 dnl -------------------------------------------------------------
+dnl A third test: MIPSpro gives a bogus warning about unused code 
+dnl on code that is clearly used, when inline member functions
+dnl are in classes in anonymous namespaces. Check for this to allow
+dnl us to work around this problem
+dnl
+dnl Usage: DEAL_II_CHECK_ANON_NAMESPACE_BUG3
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG3, dnl
+[
+  AC_MSG_CHECKING(for bogus warning with anonymous namespaces)
+
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  case "$GXXVERSION" in
+    gcc*)
+	CXXFLAGS="$CXXFLAGS -Werror"
+	;;
+    MIPSpro*)
+	CXXFLAGS="$CXXFLAGS -diagerror"
+	;;
+  esac
+
+  AC_TRY_COMPILE(
+   [
+     template<int dim> class Point
+     {
+       public:
+         Point() {};
+     };
+     
+     class GridTools {
+       public:
+         template <int dim> static void shift (const Point<dim> &s);
+         
+         template <typename Predicate>
+         static void transform (const Predicate    &predicate);
+     };
+     
+     namespace {
+       template <int dim> class ShiftPoint {
+         public:
+           ShiftPoint (const Point<dim>   &) {};
+           void g() const;
+       };
+     
+       template<int dim> void ShiftPoint<dim>::g() const {}
+     }
+     
+     template <typename Predicate>
+     void GridTools::transform (const Predicate &predicate)
+     { predicate.g(); }
+     
+     template <int dim>
+     void GridTools::shift (const Point<dim>   &s)
+     { transform (ShiftPoint<dim>(s)); }
+     
+     template void GridTools::shift (const Point<1>   &);
+   ],
+   [
+	;
+   ],
+   [
+	AC_MSG_RESULT(no)
+   ],
+   [
+	AC_MSG_RESULT(yes)
+        AC_DEFINE_UNQUOTED(DEAL_II_ANON_NAMESPACE_BOGUS_WARNING, 1 
+                     [Flag indicating whether there is a bug in the
+	              compiler that leads to bogus warnings for
+	              inline class members in anonymous namespaces])
+   ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl We have so many templates in deal.II that sometimes we need
 dnl to make it clear with which types a template parameter can
 dnl be instantiated. There is a neat trick to do this: SFINAE
