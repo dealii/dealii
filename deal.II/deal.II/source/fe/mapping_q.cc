@@ -656,12 +656,6 @@ MappingQ<dim>::compute_mapping_support_points(
 				   // following function
   if (use_mapping_q_on_all_cells || cell->has_boundary_lines())
     compute_support_points_laplace(cell, a);
-//  compute_support_points_simple(cell, a);
-//TODO:[RH] (later) can we delete the previous line?  
-				   // keep last line for easy
-				   // switching between the two
-				   // possible cases of computing the
-				   // support points.
   else
 				     // otherwise: use a Q1 mapping
 				     // for which the mapping shape
@@ -717,86 +711,6 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
 }
 
 
-
-//TODO:[RH] (later) remove the following function altogether
-template <int dim>
-void
-MappingQ<dim>::compute_support_points_simple(const typename Triangulation<dim>::cell_iterator &cell,
-					     std::vector<Point<dim> > &a) const
-{
-  Assert(a.size()==0, ExcInternalError());
-				   // the vertices first
-  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    a.push_back(cell->vertex(i));
-  
-  if (degree>1)
-    {
-				       // then the points on lines
-				       // (for dim=2,3)
-      add_line_support_points (cell, a);
-      
-				       // then the points on quads
-				       // (for dim=3)
-      fill_quad_support_points_simple (cell, a);
-      
-				       // then the points in cell. for
-				       // this we need the midpoint of
-				       // the points already in @p{a}
-      const Point<dim> middle = std::accumulate(a.begin(), a.end(), Point<dim>())
-				/ a.size();
-
-      switch (degree)
-	{
-	  case 2:
-	{
-	  a.push_back(middle);
-	  break;
-	};
-
-	  case 3:
-	{
-					   // The four points in the
-					   // cell are located at
-					   // the midpoint between
-					   // the middle point and
-					   // the 4 vertices
-	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    a.push_back(middle*2./3.+cell->vertex(this->vertex_mapping[i])/3.);
-	  break;
-	};
-
-	  case 4:
-	{
-	  Assert(a.size()==16, ExcInternalError());
-	  a.insert(a.end(), 9, Point<dim>());
-	    
-	  const unsigned int inner_map[8]=
-	  { 0, 1, 2, 5, 8, 7, 6, 3 };
-	    
-	    
-					   // The nine points in the
-					   // cell are located at the
-					   // midpoint between the
-					   // middle point and (the 4
-					   // vertices and the face
-					   // midpoints)
-	    
-	  a[16+4]=middle;
-	  for (unsigned int i=0, j=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    {
-	      a[16+inner_map[j++]]=(middle+cell->vertex(i))/2.;
-	      a[16+inner_map[j++]]=(middle+(cell->vertex(i)+cell->vertex((i+1)%4))/2.)/2.;
-	    }
-	  break;
-	};
-
-	  default:
-	    Assert(false, ExcNotImplemented());
-	};
-    };
-  
-  Assert(a.size()==n_shape_functions, ExcInternalError());
-}
 
 
 
@@ -1014,42 +928,6 @@ MappingQ<dim>::add_quad_support_points(const typename Triangulation<dim>::cell_i
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 
-
-#if deal_II_dimension==3
-
-template <>
-void
-MappingQ<3>::fill_quad_support_points_simple (const Triangulation<3>::cell_iterator &cell,
-					      std::vector<Point<3> > &a) const
-{
-  static const StraightBoundary<3> straight_boundary;
-
-  const Boundary<3> *boundary = 0;
-
-  std::vector<Point<3> > quad_points;
-  Assert(degree>1, ExcInternalError());
-  quad_points.resize((degree-1)*(degree-1));
-  
-  for (unsigned int quad_no=0; quad_no<GeometryInfo<3>::quads_per_cell; ++quad_no)
-    {
-      const Triangulation<3>::quad_iterator quad = cell->face(quad_no);
-      if (quad->at_boundary())
-	boundary=&quad->get_triangulation().get_boundary(quad->boundary_indicator());
-      else
-	boundary=&straight_boundary;
-
-      boundary->get_intermediate_points_on_quad (quad, quad_points);
-      a.insert (a.end(), quad_points.begin(), quad_points.end());
-    }
-}
-
-#endif
-
-template <int dim>
-void
-MappingQ<dim>::fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &,
-						std::vector<Point<dim> > &) const
-{}
 
 
 template <int dim>
