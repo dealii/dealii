@@ -1209,8 +1209,8 @@ FETools::get_fe_from_name_aux (const std::string &name)
 						 // present position
 						 // to the end
 		const std::pair<FiniteElement<dim> *, unsigned int> tmp_x
-		  = FETools::get_fe_from_name_aux<dim> (std::string(name.begin()+position,
-								    name.end()));
+		  = get_fe_from_name_aux<dim> (std::string(name.begin()+position,
+							   name.end()));
 		base_fes.push_back (tmp_x.first);
 		position += tmp_x.second;
 		
