@@ -4,7 +4,6 @@
 #include <lac/solver_control.h>
 
 
-
 /*----------------------- SolverControl ---------------------------------*/
 
 
@@ -18,6 +17,9 @@ SolverControl::SolverControl (const unsigned int maxiter,
 		log_history(log_history)
 {};
 
+
+SolverControl::~SolverControl() 
+{};
 
 
 SolverControl::State
@@ -75,6 +77,8 @@ ReductionControl::ReductionControl(const unsigned int n,
 {};
 
 
+ReductionControl::~ReductionControl()
+{};
 
 
 double
