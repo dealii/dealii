@@ -28,6 +28,44 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
+<a name="incompatible"></a>
+<h3 style="color:red">Incompatibilities</h3>
+
+<p style="color:red">
+Following are a few modifications to the library that unfortunately
+are incompatible with previous versions of the library, but which we
+deem necessary for the future maintainability of the
+library. Unfortunately, some of these changes will require
+modifications to application programs. We apologize for the
+inconvenience this causes.
+</p>
+
+
+<ol>
+  <li> <p>Changed: <code class="class">DoFTools</code>::<code
+  class="member">make_flux_sparsity_pattern</code>, <code
+  class="class">MGTools</code>::<code
+  class="member">make_flux_sparsity_pattern</code> and similar
+  functions in these classes do not receive arguments of type <code
+  class="class">FullMatrix&lt;double&gt;</code> anymore. Instead, they
+  get a <code class="class">Table&lt;2,DoFTools::Coupling&gt;</code>,
+  which contains more meaningful enums.
+  <br>
+  (GK 2005/03/09)
+  </p>
+
+  <li> <p>Changed: <code class="class">Multigrid</code>::<code
+  class="member">Multigrid</code> receives an argument determining the
+  type of multigrid cycle istead of the minimum and maximum
+  levels. The latter were rarely used anyway and can be modified by
+  <code class="member">set_minlevel()</code> and <code
+  class="member">set_maxlevel()</code>
+  <br>
+  (GK 2005/03/09)
+  </p>
+
+</ol>
+
 <a name="general"></a>
 <h3>General</h3>
 
