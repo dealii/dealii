@@ -228,6 +228,15 @@ class MGDoFHandler : public DoFHandler<dim>
     void renumber_dofs (const unsigned int               level,
 			const std::vector<unsigned int> &new_numbers);
 
+				     /**
+				      * Redeclare this function of the
+				      * @ref{DoFHandler} basis class
+				      * as otherwise it is hidden from
+				      * the function with the same
+				      * name, see above.
+				      */
+    void renumber_dofs (const std::vector<unsigned int> &new_numbers);
+    
 				     /*--------------------------------------*/
     
 				     /**
@@ -831,6 +840,7 @@ class MGDoFHandler : public DoFHandler<dim>
     
 				     /*---------------------------------------*/
 
+    
     				     /**
 				      * Return the number of degrees
 				      * of freedom on the specified
@@ -841,6 +851,15 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
     unsigned int n_dofs (const unsigned int level) const;
 
+				     /**
+				      * Redeclare this function of the
+				      * @ref{DoFHandler} basis class
+				      * as otherwise it is hidden from
+				      * the function with the same
+				      * name, see above.
+				      */
+    unsigned int n_dofs () const;
+    
 				     /**
 				      * Exception.
 				      */
@@ -1075,8 +1094,25 @@ class MGDoFHandler : public DoFHandler<dim>
 };
 
 
-/* ----------------------- Inline functions of MGVertexDoFs -------------------*/
+/* ----------------------- Inline functions of MGDoFHandler -------------------*/
 
+template <int dim>
+inline
+unsigned int MGDoFHandler<dim>::n_dofs() const
+{
+  return DoFHandler<dim>::n_dofs();
+}
+
+
+template <int dim>
+inline
+void MGDoFHandler<dim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+{
+  return DoFHandler<dim>::renumber_dofs (new_numbers);
+}
+
+
+/* ----------------------- Inline functions of MGVertexDoFs -------------------*/
 
 template <int dim>
 inline
