@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2003 by the deal.II authors */
+/*    Copyright (C) 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -26,6 +26,7 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/grid_generator.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
@@ -48,6 +49,9 @@
 				 // Then, we need some pre-made
 				 // transfer routines between grids.
 #include <multigrid/mg_transfer.h>
+                                 // And a file in which equivalents to the
+                                 // DoFTools class are declared:
+#include <multigrid/mg_dof_tools.h>
 
 				 // This is C++ ... see step 5 for
 				 // further comments.
@@ -162,7 +166,7 @@ void LaplaceProblem<dim>::setup_system ()
       mg_sparsity[level].reinit (mg_dof_handler.n_dofs(level),
 				 mg_dof_handler.n_dofs(level),
 				 mg_dof_handler.max_couplings_between_dofs());
-      MGTools:::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
+      MGTools::make_sparsity_pattern (mg_dof_handler, mg_sparsity[level], level);
       mg_sparsity[level].compress();
       mg_matrices[level].reinit(mg_sparsity[level]);
     }
@@ -305,7 +309,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
     {
 				       // Remember the level of the
 				       // current cell.
-      const unsigned int level = cell->level()
+      const unsigned int level = cell->level();
       cell_matrix.clear ();
 
 				       // Compute the values specified
@@ -341,9 +345,9 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 					     // And now add everything
 					     // to the matrix on the
 					     // right level.
-	    mg_matrices[level]..add (local_dof_indices[i],
-				     local_dof_indices[j],
-				     cell_matrix(i,j));
+	    mg_matrices[level].add (local_dof_indices[i],
+                                    local_dof_indices[j],
+                                    cell_matrix(i,j));
 	};
     };
 
@@ -477,7 +481,7 @@ void LaplaceProblem<dim>::run ()
       if (cycle == 0)
 	{
 					   // Generate a simple hypercube grid.
-	  GridGenerator::hyper_cube(tr);
+	  GridGenerator::hyper_cube(triangulation);
 	  
 	}
 				       // If this is not the first
