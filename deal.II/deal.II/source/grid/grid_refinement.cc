@@ -125,7 +125,8 @@ void GridRefinement::coarsen (Triangulation<dim>   &tria,
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) <= threshold)
-      cell->set_coarsen_flag();
+      if (!cell->refine_flag_set())
+        cell->set_coarsen_flag();
 };
 
 
