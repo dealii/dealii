@@ -12,7 +12,9 @@
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_q.h>
+#include <fe/fe_q_hierarchical.h>
 #include <fe/fe_dgp.h>
+#include <fe/fe_dgp_monomial.h>
 #include <fe/fe_dgp_nonparametric.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_nedelec.h>
@@ -417,6 +419,39 @@ void plot_FE_Q_shape_functions()
 
 
 template<int dim>
+void plot_FE_Q_Hierarchical_shape_functions()
+{
+  MappingQ1<dim> m;
+
+  FE_Q_Hierarchical<dim> q1(1);
+  plot_shape_functions(m, q1, "QHierarchical1");
+  plot_face_shape_functions(m, q1, "QHierarchical1");
+  test_compute_functions(m, q1, "QHierarchical1");
+
+  FE_Q_Hierarchical<dim> q2(2);
+  plot_shape_functions(m, q2, "QHierarchical2");
+  plot_face_shape_functions(m, q2, "QHierarchical2");
+  test_compute_functions(m, q2, "QHierarchical2");
+
+				   // skip the following tests to
+				   // reduce run-time
+  if (dim < 3)
+    {
+      FE_Q_Hierarchical<dim> q3(3);
+      plot_shape_functions(m, q3, "QHierarchical3");
+      plot_face_shape_functions(m, q3, "QHierarchical3");
+      test_compute_functions(m, q3, "QHierarchical3");
+
+      FE_Q_Hierarchical<dim> q4(4);
+      plot_shape_functions(m, q4, "QHierarchical4");
+      plot_face_shape_functions(m, q4, "QHierarchical4");
+      test_compute_functions(m, q4, "QHierarchical4");
+    }
+}
+
+
+
+template<int dim>
 void plot_FE_DGQ_shape_functions()
 {
   MappingQ1<dim> m;
@@ -493,6 +528,31 @@ void plot_FE_DGP_shape_functions()
 //    plot_shape_functions(m, p9, "DGP9");
 //    FE_DGP<dim> p10(10);
 //    plot_shape_functions(m, p10, "DGP10");
+}
+
+
+template<int dim>
+void plot_FE_DGPMonomial_shape_functions()
+{
+  MappingQ1<dim> m;
+
+  FE_DGPMonomial<dim> p1(1);
+  plot_shape_functions(m, p1, "DGPMonomial1");
+  plot_face_shape_functions(m, p1, "DGPMonomial1");
+  test_compute_functions(m, p1, "DGPMonomial1");
+
+  FE_DGPMonomial<dim> p2(2);
+  plot_shape_functions(m, p2, "DGPMonomial2");
+  plot_face_shape_functions(m, p2, "DGPMonomial2");
+  test_compute_functions(m, p2, "DGPMonomial2");
+
+  if (dim<3)
+    {
+      FE_DGPMonomial<dim> p3(3);
+      plot_shape_functions(m, p3, "DGPMonomial3");
+      plot_face_shape_functions(m, p3, "DGPMonomial3");
+      test_compute_functions(m, p3, "DGPMonomial3");
+    }
 }
 
 
@@ -601,10 +661,18 @@ main()
   plot_FE_Q_shape_functions<2>();
   plot_FE_Q_shape_functions<3>();
 
+  plot_FE_Q_Hierarchical_shape_functions<1>();
+  plot_FE_Q_Hierarchical_shape_functions<2>();
+  plot_FE_Q_Hierarchical_shape_functions<3>();
+
   plot_FE_DGP_shape_functions<1>();
   plot_FE_DGP_shape_functions<2>();
   plot_FE_DGP_shape_functions<3>();
   
+  plot_FE_DGPMonomial_shape_functions<1>();
+  plot_FE_DGPMonomial_shape_functions<2>();
+  plot_FE_DGPMonomial_shape_functions<3>();
+
   plot_FE_DGPNonparametric_shape_functions<1>();
   plot_FE_DGPNonparametric_shape_functions<2>();
   plot_FE_DGPNonparametric_shape_functions<3>();
