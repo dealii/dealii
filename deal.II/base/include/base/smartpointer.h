@@ -20,18 +20,19 @@
  *
  * #SmartPointer# does NOT implement any memory handling! Especially,
  * deleting a #SmartPointer# does not delete the object. Writing
- * <PRE>
+ * \begin{verbatim}
  * SmartPointer<T> t = new T;
- * </PRE>
+ * \end{verbatim}
  * is a sure way to program a memory leak! The secure version is
- * <PRE>
+ * \begin{verbatim}
  * T* p = new T;
  * {
  *   SmartPointer<T> t = p;
  *   ...
  * }
  * delete p;
- * </PRE> */
+ * \end{verbatim}
+ */
 template<class T>
 class SmartPointer
 {
