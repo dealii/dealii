@@ -107,7 +107,7 @@ int main ()
 	    deallog << "Polynomial " << i
 		    << ": Values q(" << 2.*x-1.
 		    << ") and p(" << x
-		    << ") differ by 10^" << std::log(diff)/std::log(10)
+		    << ") differ by 10^" << std::log(diff)/std::log(10.)
 		    << " after shift: " << q[i].value(2.*x-1.)
 		    << " != " << p[i].value(x)
 		    << std::endl;
