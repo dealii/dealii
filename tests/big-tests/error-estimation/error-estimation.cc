@@ -22,8 +22,8 @@
 #include <numerics/solutiontransfer.h>
 #include <lac/vector.h>
 
-#include <map.h>
-#include <fstream.h>
+#include <map>
+#include <fstream>
 #include <cmath>
 #include <string>
 #include <cstdlib>

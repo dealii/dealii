@@ -23,8 +23,8 @@
 #include <lac/sparsematrix.h>
 
 
-#include <map.h>
-#include <fstream.h>
+#include <map>
+#include <fstream>
 #include <cmath>
 #include <cstdlib>
 

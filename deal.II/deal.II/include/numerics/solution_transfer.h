@@ -5,10 +5,15 @@
 #define __solutiontransfer_H
 /*----------------------------   solutiontransfer.h     ----------------------*/
 
+
+#include <lac/forward-declarations.h>
+#include <basic/forward-declarations.h>
+
 #include <base/exceptions.h>
-#include <vector.h>
-template <typename number> class Vector;
-template <int dim> class DoFHandler;
+#include <vector>
+
+
+
 
 /**
  * Transfers a discrete FE function (like a solution vector) by interpolation
