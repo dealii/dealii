@@ -196,6 +196,14 @@ class DataOut_DoFData : public DataOutInterface<dim>
 				      * conversion of the #name# to a vector
 				      * of strings, to the other
 				      * #add_data_vector# function above.
+				      *
+				      * If #data# is a vector with
+				      * multiple components this
+				      * function will generate
+				      * distinct names for all
+				      * components by appending an
+				      * underscore and the number of
+				      * each component to #name#
 				      */
     void add_data_vector (const Vector<double> &data,
 			  const string         &name);
