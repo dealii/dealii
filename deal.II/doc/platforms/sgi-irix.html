@@ -16,21 +16,20 @@
 
     <p>
     <acronym>deal.II</acronym> works without problems with shared
-    libraries on this platform, if you list the paths
-    <code>$D/base/lib</code>, <code>$D/lac/lib</code>, and
-    <code>$D/deal.II/lib</code> in your <code>$LD_LIBRARY_PATH</code>
+    libraries on this platform, if you list the path
+    <code>$D/lib</code> in your <code>$LD_LIBRARY_PATH</code>
     environment variable, where <code>$D</code> is the path to your
     installation of the <acronym>deal.II</acronym> library. The
     necessary actions can be done with the commands
     <pre>
     <code>
-      setenv LD_LIBRARY_PATH $D/base/lib:$D/lac/lib:$D/deal.II/lib:$LD_LIBRARY_PATH
+      setenv LD_LIBRARY_PATH $D/lib:$LD_LIBRARY_PATH
     </code>
     </pre>
     for csh-like shells, or by
     <pre>
     <code>
-      export LD_LIBRARY_PATH=$D/base/lib:$D/lac/lib:$D/deal.II/lib:$LD_LIBRARY_PATH
+      export LD_LIBRARY_PATH=$D/lib:$LD_LIBRARY_PATH
     </code>
     </pre>
     if you use the ``bash'' shell. Please substitute <code>$D</code>
@@ -61,6 +60,25 @@
     find out how to do that).
     </p>
 
+    <p>
+    When compiling <acronym>deal.II</acronym> with the MIPSpro
+    compiler in 64-bit mode it is necessary to
+    <pre>
+    <code>
+      setenv CXXFLAGS -64
+      setenv LDFLAGS -64
+    </code>
+    </pre>
+    before calling <code>./configure</code>.
+    Furthermore, the <code>$LD_LIBRARY64_PATH</code> (instead of the
+    <code>$LD_LIBRARY_PATH</code>) environment variable needs to be set
+    <pre>
+    <code>
+      setenv LD_LIBRARY64_PATH $D/lib:$LD_LIBRARY64_PATH
+    </code>
+    </pre>
+    On ``bash'' shells use the <code>export</code> command accordingly.
+    </p>
 
   </body>
 </html>
