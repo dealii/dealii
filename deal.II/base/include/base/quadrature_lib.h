@@ -1,5 +1,5 @@
 /*----------------------------   quadrature_lib.h     ---------------------------*/
-/*      <Id:>                 */
+/*      $Id$                 */
 #ifndef __quadrature_lib_H
 #define __quadrature_lib_H
 /*----------------------------   quadrature_lib.h     ---------------------------*/
