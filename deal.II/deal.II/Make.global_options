@@ -16,7 +16,7 @@ INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
 CXXFLAGS.g= -ansi -DDEBUG -ggdb -Wall -W -pedantic -Wconversion \
             -Winline -Woverloaded-virtual -fno-builtin\
             $(INCLUDE)
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
+CXXFLAGS  =-O3 -Wuninitialized -ffast-math \
            -felide-constructors -fnonnull-objects \
            $(INCLUDE)
 
