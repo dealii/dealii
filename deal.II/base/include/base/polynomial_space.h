@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,10 +28,12 @@
  * Representation of the space of polynomials of degree at most n in
  * higher dimensions.
  *
- * Given a vector of @p{n} one-dimensional polynomials @p{P0} to @p{Pn},
- * where @p{Pi} has degree @p{i}, this class generates all polynomials
- * of the form @p{ Pijk(x,y,z) = Pi(x)Pj(y)Pk(z)}, where the sum of
- * @p{i}, @p{j} and @p{k} is less than or equal @p{n}.
+ * Given a vector of <i>n</i> one-dimensional polynomials
+ * <i>P<sub>0</sub></i> to <i>P<sub>n</sub></i>, where
+ * <i>P<sub>i</sub></i> has degree <i>i</i>, this class generates all
+ * polynomials of the form <i> P<sub>ijk</sub>(x,y,z) =
+ * P<sub>i</sub>(x)P<sub>j</sub>(y)P<sub>k</sub>(z)</i>, where the sum
+ * of <i>i</i>, <i>j</i> and <i>k</i> is less than or equal <i>n</i>.
  *
  * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003
  */
@@ -40,19 +42,18 @@ class PolynomialSpace
 {
   public:
 				     /**
-				      * Constructor. @p{pols} is a
+				      * Constructor. <tt>pols</tt> is a
 				      * vector of pointers to
 				      * one-dimensional polynomials
-				      * and will be copied into the
-				      * member variable
-				      * @p{polynomials}.  The static
+				      * and will be copied into a
+				      * private member variable. The static
 				      * type of the template argument
-				      * @p{pols} needs to be
+				      * <tt>pols</tt> needs to be
 				      * convertible to
-				      * @p{Polynomial<double>},
+				      * Polynomials::Polynomial@<double@>,
 				      * i.e. should usually be a
 				      * derived class of
-				      * @p{Polynomial<double>}.
+				      * Polynomials::Polynomial@<double@>.
 				      */
     template <class Pol>
     PolynomialSpace (const std::vector<Pol> &pols);
@@ -61,11 +62,11 @@ class PolynomialSpace
 				      * Computes the value and the
 				      * first and second derivatives
 				      * of each polynomial at
-				      * @p{unit_point}.
+				      * <tt>unit_point</tt>.
 				      *
 				      * The size of the vectors must
-				      * either be equal @p{0} or equal
-				      * @p{n()}.  In the first case,
+				      * either be equal 0 or equal
+				      * n(). In the first case,
 				      * the function will not compute
 				      * these values, i.e. you
 				      * indicate what you want to have
@@ -76,9 +77,9 @@ class PolynomialSpace
 				      * derivatives of all polynomials
 				      * then use this function, rather
 				      * than using any of the
-				      * @p{compute_value},
-				      * @p{compute_grad} or
-				      * @p{compute_grad_grad}
+				      * compute_value(),
+				      * compute_grad() or
+				      * compute_grad_grad()
 				      * functions, see below, in a
 				      * loop over all polynomials.
 				      */
@@ -89,31 +90,31 @@ class PolynomialSpace
     
 				     /**
 				      * Computes the value of the
-				      * @p{i}th polynomial at
-				      * @p{unit_point}.
+				      * <tt>i</tt>th polynomial at
+				      * <tt>unit_point</tt>.
 				      *
-				      * Consider using @p{compute} instead.
+				      * Consider using compute() instead.
 				      */
     double compute_value (const unsigned int i,
 			  const Point<dim> &p) const;
 
 				     /**
 				      * Computes the gradient of the
-				      * @p{i}th polynomial at
-				      * @p{unit_point}.
+				      * <tt>i</tt>th polynomial at
+				      * <tt>unit_point</tt>.
 				      *
-				      * Consider using @p{compute} instead.
+				      * Consider using compute() instead.
 				      */
     Tensor<1,dim> compute_grad (const unsigned int i,
 				const Point<dim> &p) const;
 
 				     /**
 				      * Computes the second derivative
-				      * (grad_grad) of the @p{i}th
+				      * (grad_grad) of the <tt>i</tt>th
 				      * polynomial at
-				      * @p{unit_point}.
+				      * <tt>unit_point</tt>.
 				      *
-				      * Consider using @p{compute} instead.
+				      * Consider using compute() instead.
 				      */
     Tensor<2,dim> compute_grad_grad (const unsigned int i,
                                      const Point<dim> &p) const;
@@ -122,12 +123,12 @@ class PolynomialSpace
 				      * Return the number of
 				      * polynomials spanning the space
 				      * represented by this
-				      * class. Here, if @p{N} is the
+				      * class. Here, if <tt>N</tt> is the
 				      * number of one-dimensional
 				      * polynomials given, then the
 				      * result of this function is
-				      * @p{N} in 1d, @p{N(N+1)/2} in
-				      * 2d, and @p{N(N+1)(N+2)/6 in
+				      * <i>N</i> in 1d, <i>N(N+1)/2</i> in
+				      * 2d, and <i>N(N+1)(N+2)/6</i> in
 				      * 3d.
 				      */
     unsigned int n () const;
@@ -154,7 +155,7 @@ class PolynomialSpace
 	    
   private:
 				     /**
-				      * Copy of the vector @p{pols} of
+				      * Copy of the vector <tt>pols</tt> of
 				      * polynomials given to the
 				      * constructor.
 				      */
@@ -162,7 +163,7 @@ class PolynomialSpace
 
 				     /**
 				      * Store the precomputed value
-				      * which the @p{n()} function
+				      * which the <tt>n()</tt> function
 				      * returns.
 				      */
     const unsigned int n_pols;
@@ -170,11 +171,11 @@ class PolynomialSpace
 				     /**
 				      * Compute numbers in x, y and z
 				      * direction. Given an index
-				      * @p{n} in the d-dimensional
+				      * <tt>n</tt> in the d-dimensional
 				      * polynomial space, compute the
 				      * indices i,j,k such that
-				      * @p{p_n(x,y,z) =
-				      * p_i(x)p_j(y)p_k(z)}.
+				      * <i>p<sub>n</sub>(x,y,z) =
+				      * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
 				      */
     void compute_index (const unsigned int n,
                         unsigned int      (&index)[dim]) const;
@@ -187,6 +188,7 @@ class PolynomialSpace
     static unsigned int compute_n_pols (const unsigned int n);
 };
 
+/// @if NoDoc
 
 /* -------------- declaration of explicit specializations --- */
 
@@ -232,6 +234,6 @@ PolynomialSpace<dim>::degree() const
   return polynomials.size();
 }
 
-  
+/// @endif  
 
 #endif
