@@ -94,6 +94,8 @@ parameter_handler_1.exe : parameter_handler_1.g.$(OBJEXT)  $(libraries)
 parameter_handler_2.exe : parameter_handler_2.g.$(OBJEXT)  $(libraries)
 sparse_lu_decomposition_1.exe: sparse_lu_decomposition_1.g.$(OBJEXT) $(libraries)
 block_sparse_matrix_1.exe:block_sparse_matrix_1.g.$(OBJEXT) $(libraries)
+hyper_ball_3d.exe       : hyper_ball_3d.g.$(OBJEXT)        $(libraries)
+cylinder.exe            : cylinder.g.$(OBJEXT)             $(libraries)
 
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
@@ -117,7 +119,8 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	roy_1 \
         denis_1 \
 	unit_support_points parameter_handler_1 parameter_handler_2 \
-	sparse_lu_decomposition_1 block_sparse_matrix_1
+	sparse_lu_decomposition_1 block_sparse_matrix_1 \
+	hyper_ball_3d cylinder
 
 ############################################################
 
