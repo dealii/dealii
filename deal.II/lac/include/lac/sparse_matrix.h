@@ -712,7 +712,6 @@ class SparseMatrix : public Subscriptor
 				      * This function
 				      * may produce @em{large} amounts of
 				      * output if applied to a large matrix!
-				      * Be careful with it.
 				      */
     void print_formatted (ostream            &out,
 			  const unsigned int  precision   = 3,
