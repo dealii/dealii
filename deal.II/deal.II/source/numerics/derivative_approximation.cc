@@ -27,9 +27,6 @@
 #include <cmath>
 
 
-//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
-static const MappingQ1<deal_II_dimension> mapping;
-
 
 template <typename T>
 static T sqr (const T t)
@@ -193,17 +190,52 @@ DerivativeApproximation::SecondDerivative<dim>::symmetrize (Derivative &d)
 template <int dim>
 void 
 DerivativeApproximation::
-approximate_gradient (const DoFHandler<dim> &dof_handler,
+approximate_gradient (const Mapping<dim>    &mapping,
+		      const DoFHandler<dim> &dof_handler,
 		      const Vector<double>  &solution,
 		      Vector<float>         &derivative_norm,
 		      const unsigned int     component)
 {
-  approximate_derivative<Gradient<dim>,dim> (dof_handler,
+  approximate_derivative<Gradient<dim>,dim> (mapping,
+					     dof_handler,
 					     solution,
 					     component,
 					     derivative_norm);
 };
 
+
+template <int dim>
+void 
+DerivativeApproximation::
+approximate_gradient (const DoFHandler<dim> &dof_handler,
+		      const Vector<double>  &solution,
+		      Vector<float>         &derivative_norm,
+		      const unsigned int     component)
+{
+  static const MappingQ1<dim> mapping;
+  approximate_derivative<Gradient<dim>,dim> (mapping,
+					     dof_handler,
+					     solution,
+					     component,
+					     derivative_norm);
+};
+
+
+template <int dim>
+void 
+DerivativeApproximation::
+approximate_second_derivative (const Mapping<dim>    &mapping,
+			       const DoFHandler<dim> &dof_handler,
+			       const Vector<double>  &solution,
+			       Vector<float>         &derivative_norm,
+			       const unsigned int     component)
+{
+  approximate_derivative<SecondDerivative<dim>,dim> (mapping,
+						     dof_handler,
+						     solution,
+						     component,
+						     derivative_norm);
+};
 
 
 template <int dim>
@@ -214,18 +246,20 @@ approximate_second_derivative (const DoFHandler<dim> &dof_handler,
 			       Vector<float>         &derivative_norm,
 			       const unsigned int     component)
 {
-  approximate_derivative<SecondDerivative<dim>,dim> (dof_handler,
+  static const MappingQ1<dim> mapping;
+  approximate_derivative<SecondDerivative<dim>,dim> (mapping,
+						     dof_handler,
 						     solution,
 						     component,
 						     derivative_norm);
 };
 
 
-
 template <class DerivativeDescription, int dim>
 void 
 DerivativeApproximation::
-approximate_derivative (const DoFHandler<dim> &dof_handler,
+approximate_derivative (const Mapping<dim>    &mapping,
+			const DoFHandler<dim> &dof_handler,
 			const Vector<double>  &solution,
 			const unsigned int     component,
 			Vector<float>         &derivative_norm)
@@ -244,7 +278,7 @@ approximate_derivative (const DoFHandler<dim> &dof_handler,
 		    Threads::encapsulate
 		    (&DerivativeApproximation::
 		     template approximate<DerivativeDescription,dim>)
-		    .collect_args (dof_handler, solution, component,
+		    .collect_args (mapping, dof_handler, solution, component,
 				   index_intervals[i],
 				   derivative_norm));
   thread_manager.wait ();
@@ -254,7 +288,8 @@ approximate_derivative (const DoFHandler<dim> &dof_handler,
 
 template <class DerivativeDescription, int dim>
 void 
-DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
+DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
+				      const DoFHandler<dim> &dof_handler,
 				      const Vector<double>  &solution,
 				      const unsigned int     component,
 				      const IndexInterval   &index_interval,
@@ -475,11 +510,27 @@ DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 template
 void 
 DerivativeApproximation::
+approximate_gradient (const Mapping<deal_II_dimension> &mapping,
+		      const DoFHandler<deal_II_dimension> &dof_handler,
+		      const Vector<double>  &solution,
+		      Vector<float>         &derivative_norm,
+		      const unsigned int     component);
+template
+void 
+DerivativeApproximation::
 approximate_gradient (const DoFHandler<deal_II_dimension> &dof_handler,
 		      const Vector<double>  &solution,
 		      Vector<float>         &derivative_norm,
 		      const unsigned int     component);
 
+template
+void 
+DerivativeApproximation::
+approximate_second_derivative (const Mapping<deal_II_dimension>    &mapping,
+			       const DoFHandler<deal_II_dimension> &dof_handler,
+			       const Vector<double>  &solution,
+			       Vector<float>         &derivative_norm,
+			       const unsigned int     component);
 template
 void 
 DerivativeApproximation::
