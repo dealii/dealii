@@ -27,6 +27,7 @@
 #endif
 
 #include <strstream>
+#include <cmath>
 
 
 
