@@ -481,7 +481,8 @@ class FEValuesBase
 
 				     /**
 				      * Return a pointer to the array holding
-				      * the JxW values at the different
+				      * the Jacobi determinant times the
+				      * quadrature weight at the different
 				      * quadrature points.
 				      */
     const vector<double> & get_JxW_values () const;
