@@ -108,6 +108,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: <code class="class">ExcFileNotOpen</code> can be used
+       after initializing an <code class="class">fstream</code>
+       object. This allows to avoid some cryptic <code
+       class="class">ExcIO</code>s.
+       <br>
+       (GK 2001/12/18)
+       </p>
+
+  <li> <p>
        Changed: The <code class="class">OutputStyle</code> enum used
        to indicate the output format has been moved into the
        <code class="class">ParameterHandler</code> class.

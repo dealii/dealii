@@ -655,6 +655,13 @@ namespace StandardExceptions
   DeclException0 (ExcIO);
 
 				   /**
+				    * An error occured opening the named file.
+				    */
+  DeclException1 (ExcFileNotOpen,
+		  char*,
+		  << "Could not open file " << arg1);
+
+				   /**
 				    * Exception denoting a part of the
 				    * library or application program
 				    * that has not yet been
