@@ -436,6 +436,7 @@ class DataOutBase
 					  * plotted.
 					  *
 					  * Default: #true#.
+					  */
 	bool   draw_mesh;
 
 					 /**
