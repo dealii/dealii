@@ -321,6 +321,18 @@ SparseMatrixStruct::empty () const {
 
 
 
+unsigned int
+SparseMatrixStruct::max_entries_per_row () const 
+{
+  unsigned int m = 0;
+  for (unsigned int i=1; i<rows; ++i)
+    m = max (m, rowstart[i]-rowstart[i-1]);
+
+  return m;
+};
+
+
+
 int
 SparseMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
 {

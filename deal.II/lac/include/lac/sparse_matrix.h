@@ -174,7 +174,16 @@ class SparseMatrixStruct : public Subscriptor
 				      * dimensions are zero.
 				      */
     bool empty () const;
-    
+
+				     /**
+				      * Return the maximum number of entries per
+				      * row. Before compression, this equals the
+				      * number given to the constructor, while
+				      * after compression, it equals the maximum
+				      * number of entries actually allocated by
+				      * the user.
+				      */
+    unsigned int max_entries_per_row () const;
 
 				     /**
 				      * Return the index of the matrix
