@@ -505,6 +505,8 @@ template<int dim>
 inline unsigned
 FESystem<dim>::element_multiplicity(unsigned index) const
 {
+  Assert (index < base_elements.size(), 
+	  ExcIndexRange(index, 0, base_elements.size()));
   return base_elements[index].second;
 }
 
@@ -514,6 +516,8 @@ template <int dim>
 inline const FiniteElement<dim>&
 FESystem<dim>::base_element(unsigned index) const
 {
+  Assert (index < base_elements.size(), 
+	  ExcIndexRange(index, 0, base_elements.size()));
   return *base_elements[index].first;
 }
 
