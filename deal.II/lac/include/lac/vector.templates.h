@@ -586,11 +586,9 @@ void Vector<Number>::print (std::ostream      &out,
 
   out.precision (precision);
   if (scientific)
-    {
-      out.setf (std::ios::scientific, std::ios::floatfield);
-    } else {
-      out.setf (std::ios::fixed, std::ios::floatfield);
-    }
+    out.setf (std::ios::scientific, std::ios::floatfield);
+  else
+    out.setf (std::ios::fixed, std::ios::floatfield);
 
   if (across)
     for (unsigned int i=0; i<size(); ++i)

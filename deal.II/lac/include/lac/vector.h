@@ -416,13 +416,23 @@ class Vector
     void print (const char* format = 0) const;
 
 				     /**
-				      * Print to a stream.
-				      * 
+				      * Print to a
+				      * stream. @p{precision} denotes
+				      * the desired precision with
+				      * which values shall be printed,
+				      * @p{scientific} whether
+				      * scientific notation shall be
+				      * used. If @p{across} is
+				      * @p{true} then the vector is
+				      * printed in a line, while if
+				      * @p{false} then the elements
+				      * are printed on a separate line
+				      * each.
 				      */
     void print (std::ostream       &out,
-		const unsigned int  precision = 3,
+		const unsigned int  precision  = 3,
 		const bool          scientific = true,
-		const bool          across = true) const;
+		const bool          across     = true) const;
 
 				     /**
 				      * Write the vector en bloc to a file. This
