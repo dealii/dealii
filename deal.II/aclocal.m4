@@ -1144,17 +1144,26 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
   	    F77_VERSION="MIPSproF77"
 
           else
+
+            F77_VERSION_STRING=`($F77 -V 2>&1)`
+            is_intel_ifc="`echo $F77_VERSION_STRING | grep 'Intel(R) Fortran'`"
+	    if test "x$is_intel_ifc" != "x" ; then
+  	      AC_MSG_RESULT(F77 compiler is Intel Fortran)
+              F77_VERSION=INTEL_F77
+
+            else
+
   
-           dnl Now, this is a hard case, we have no more clues...
-            F77_VERSION="UnknownF77"
-  	    AC_MSG_RESULT(F77 compiler is unkown. no flags set!)
+              dnl Now, this is a hard case, we have no more clues...
+              F77_VERSION="UnknownF77"
+  	      AC_MSG_RESULT(F77 compiler is unkown. no flags set!)
+            fi
           fi
         fi
       fi
     fi
   fi
 ])
-
 
 
 dnl -------------------------------------------------------------
@@ -1214,6 +1223,11 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
   
   	F77FLAGSPIC="shared -KPIC"
 	;;
+
+    INTEL_F77*)
+            F77FLAGSG="$FFLAGS"  
+            F77FLAGSO="$FFLAGS -O3"
+	    ;;
 
     UnknownF77)
 	dnl Disable unknown FORTRAN compiler.
