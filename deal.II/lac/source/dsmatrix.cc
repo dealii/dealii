@@ -5,8 +5,8 @@
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
 #include <lac/dsmatrix.h>
-#include <ostream.h>
-
+#include <iostream>
+#include <iomanip>
 
 /*----------------- from sort.h -------------------------*/
 
@@ -624,4 +624,18 @@ void dSMatrix::print (ostream &out) const {
   for (unsigned int i=0; i<cols->rows; ++i)
     for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
       out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << endl;
+};
+
+
+
+void dSMatrix::print_formatted (ostream &out) const {
+  for (unsigned int i=0; i<m(); ++i) 
+    {
+      for (unsigned int j=0; j<n(); ++j)
+	if ((*cols)(i,j) != -1)
+	  out << setw(6) << val[cols->operator()(i,j)] << " ";
+	else
+	  out << "       ";
+      out << endl;
+    };
 };

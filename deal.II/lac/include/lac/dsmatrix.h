@@ -321,6 +321,25 @@ class dSMatrix
     void print (ostream &out) const;
 
 				     /**
+				      * Print the matrix in the usual format,
+				      * i.e. as a matrix and not as a list of
+				      * nonzero elements. For better
+				      * readability, elements not in the matrix
+				      * are displayed as empty space, while
+				      * matrix elements which are explicitely
+				      * set to zero are displayed as such.
+				      *
+				      * Each entry is printed as a six character
+				      * wide field, with one space following.
+				      *
+				      * You should be aware that this function
+				      * may produce {\bf large} amounts of
+				      * output if applied to a large matrix!
+				      * Be careful with it.
+				      */
+    void print_formatted (ostream &out) const;
+    
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcNotCompressed);
