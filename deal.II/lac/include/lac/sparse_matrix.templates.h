@@ -629,7 +629,7 @@ void
 SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 					 const Vector<somenumber> &u,
 					 const Vector<somenumber> &b,
-					 const pair<unsigned int, unsigned int> &interval,
+					 const pair<unsigned int, unsigned int> interval,
 					 somenumber               *partial_norm) const
 {
   const unsigned int begin_row = interval.first,

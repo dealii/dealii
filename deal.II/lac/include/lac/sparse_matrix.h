@@ -797,7 +797,7 @@ class SparseMatrix : public Subscriptor
     void threaded_residual (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &u,
 			    const Vector<somenumber> &b,
-			    const pair<unsigned int,unsigned int> &interval,
+			    const pair<unsigned int,unsigned int> interval,
 			    somenumber               *partial_norm) const;
 
 
