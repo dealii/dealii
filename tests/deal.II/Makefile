@@ -66,7 +66,7 @@ targets = $(addsuffix .target, $(executables))
 # the right filename by dropping the suffix added for the make-rule
 %.target : %
 	@echo ============================ Executing Testcase:   $<
-	./$< > $(subst testcase,output,$<)
+	@./$< > $(subst testcase,output,$<)
 
 # this is the main target
 # make dependence so that it first wants to compile all files then
