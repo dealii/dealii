@@ -119,16 +119,14 @@ TriaIterator<dim,Accessor>::TriaIterator () :
 
 template <int dim, typename Accessor>
 inline
-TriaIterator<dim,Accessor>::
-TriaIterator (const TriaIterator<dim,Accessor> &i) :
+TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,Accessor> &i) :
 		TriaRawIterator<dim,Accessor> (static_cast<TriaRawIterator<dim,Accessor> >(i)) {};
 
 
 
 template <int dim, typename Accessor>
 inline
-TriaIterator<dim,Accessor>::
-TriaIterator (const TriaRawIterator<dim,Accessor> &i) :
+TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,Accessor> &i) :
 		TriaRawIterator<dim,Accessor> (i)
 {
 #ifdef DEBUG
@@ -258,16 +256,14 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator () :
 
 template <int dim, typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::
-TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &i) :
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &i) :
 		TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,Accessor> >(i)) {};
 
 
 
 template <int dim, typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::
-TriaActiveIterator (const TriaRawIterator<dim,Accessor> &i) :
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,Accessor> &i) :
 		TriaIterator<dim,Accessor> (i)
 {
 #ifdef DEBUG
@@ -286,8 +282,7 @@ TriaActiveIterator (const TriaRawIterator<dim,Accessor> &i) :
 
 template <int dim, typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::
-TriaActiveIterator (const TriaIterator<dim,Accessor> &i) :
+TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Accessor> &i) :
 		TriaIterator<dim,Accessor> (i)
 {
 #ifdef DEBUG

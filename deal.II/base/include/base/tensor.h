@@ -191,7 +191,8 @@ class Tensor
 
 template <int rank_, int dim>
 inline
-Tensor<rank_,dim>::Tensor () {
+Tensor<rank_,dim>::Tensor ()
+{
 // default constructor. not specifying an initializer list calls
 // the default constructor of the subobjects, which initialize them
 // selves. therefore, the tensor is set to zero this way
@@ -201,7 +202,8 @@ Tensor<rank_,dim>::Tensor () {
 
 template <int rank_, int dim>
 inline
-Tensor<rank_,dim>::Tensor (const array_type &initializer) {
+Tensor<rank_,dim>::Tensor (const array_type &initializer)
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] =  Tensor<rank_-1,dim>(initializer[i]);
 };
@@ -212,8 +214,8 @@ Tensor<rank_,dim>::Tensor (const array_type &initializer) {
 template <int rank_, int dim>
 inline
 Tensor<rank_-1,dim> &
-Tensor<rank_,dim>::
-operator[] (const unsigned int i) {
+Tensor<rank_,dim>::operator[] (const unsigned int i)
+{
   Assert (i<dim, ExcIndexRange(i, 0, dim));
   
   return subtensor[i];
@@ -224,8 +226,8 @@ operator[] (const unsigned int i) {
 template <int rank_, int dim>
 inline
 const Tensor<rank_-1,dim> &
-Tensor<rank_,dim>::
-operator[] (const unsigned int i) const {
+Tensor<rank_,dim>::operator[] (const unsigned int i) const
+{
   Assert (i<dim, ExcIndexRange(i, 0, dim));
   
   return subtensor[i];
@@ -236,8 +238,8 @@ operator[] (const unsigned int i) const {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::
-operator = (const Tensor<rank_,dim> &t) {
+Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t)
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = t.subtensor[i];
   return *this;
@@ -248,8 +250,8 @@ operator = (const Tensor<rank_,dim> &t) {
 template <int rank_, int dim>
 inline
 bool
-Tensor<rank_,dim>::
-operator == (const Tensor<rank_,dim> &p) const {
+Tensor<rank_,dim>::operator == (const Tensor<rank_,dim> &p) const
+{
   for (unsigned int i=0; i<dim; ++i)
     if (subtensor[i] != p.subtensor[i]) return false;
   return true;
@@ -260,8 +262,8 @@ operator == (const Tensor<rank_,dim> &p) const {
 template <int rank_, int dim>
 inline
 bool
-Tensor<rank_,dim>::
-operator != (const Tensor<rank_,dim> &p) const {
+Tensor<rank_,dim>::operator != (const Tensor<rank_,dim> &p) const
+{
   return !((*this) == p);
 };
 
@@ -270,8 +272,8 @@ operator != (const Tensor<rank_,dim> &p) const {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::
-operator += (const Tensor<rank_,dim> &p) {
+Tensor<rank_,dim>::operator += (const Tensor<rank_,dim> &p)
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] += p.subtensor[i];
   return *this;
@@ -282,8 +284,8 @@ operator += (const Tensor<rank_,dim> &p) {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::
-operator -= (const Tensor<rank_,dim> &p) {
+Tensor<rank_,dim>::operator -= (const Tensor<rank_,dim> &p)
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] -= p.subtensor[i];
   return *this;
@@ -294,8 +296,8 @@ operator -= (const Tensor<rank_,dim> &p) {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::
-operator *= (const double &s) {
+Tensor<rank_,dim>::operator *= (const double &s)
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] *= s;
   return *this;
@@ -306,8 +308,8 @@ operator *= (const double &s) {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
-Tensor<rank_,dim>::
-operator /= (const double &s) {
+Tensor<rank_,dim>::operator /= (const double &s)
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] /= s;
   return *this;
@@ -318,8 +320,8 @@ operator /= (const double &s) {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim>
-Tensor<rank_,dim>::
-operator + (const Tensor<rank_,dim> &t) const {
+Tensor<rank_,dim>::operator + (const Tensor<rank_,dim> &t) const
+{
   Tensor<rank_,dim> tmp(*this);
   
   for (unsigned int i=0; i<dim; ++i)
@@ -333,8 +335,8 @@ operator + (const Tensor<rank_,dim> &t) const {
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim>
-Tensor<rank_,dim>::
-operator - (const Tensor<rank_,dim> &t) const {
+Tensor<rank_,dim>::operator - (const Tensor<rank_,dim> &t) const
+{
   Tensor<rank_,dim> tmp(*this);
   
   for (unsigned int i=0; i<dim; ++i)
@@ -347,7 +349,8 @@ operator - (const Tensor<rank_,dim> &t) const {
 
 template <int rank_, int dim>
 inline
-void Tensor<rank_,dim>::clear () {
+void Tensor<rank_,dim>::clear ()
+{
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i].clear();
 };

@@ -260,7 +260,8 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p);
 
 template <int dim>
 inline
-Tensor<1,dim>::Tensor (const bool initialize) {
+Tensor<1,dim>::Tensor (const bool initialize)
+{
   Assert (dim>0, ExcDimTooSmall(dim));
 
   if (initialize)
@@ -272,7 +273,8 @@ Tensor<1,dim>::Tensor (const bool initialize) {
 
 template <int dim>
 inline
-Tensor<1,dim>::Tensor (const array_type &initializer) {
+Tensor<1,dim>::Tensor (const array_type &initializer)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] = initializer[i];
 };
@@ -281,7 +283,8 @@ Tensor<1,dim>::Tensor (const array_type &initializer) {
 
 template <int dim>
 inline
-Tensor<1,dim>::Tensor (const Tensor<1,dim> &p) {
+Tensor<1,dim>::Tensor (const Tensor<1,dim> &p)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
 };
@@ -290,8 +293,8 @@ Tensor<1,dim>::Tensor (const Tensor<1,dim> &p) {
 
 template <int dim>
 inline
-double Tensor<1,dim>::
-operator [] (const unsigned int index) const {
+double Tensor<1,dim>::operator [] (const unsigned int index) const
+{
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
@@ -300,8 +303,8 @@ operator [] (const unsigned int index) const {
 
 template <int dim>
 inline
-double & Tensor<1,dim>::
-operator [] (const unsigned int index) {
+double & Tensor<1,dim>::operator [] (const unsigned int index)
+{
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
 };
@@ -310,8 +313,8 @@ operator [] (const unsigned int index) {
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::
-operator = (const Tensor<1,dim> &p) {
+Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
   return *this;
@@ -321,8 +324,8 @@ operator = (const Tensor<1,dim> &p) {
 
 template <int dim>
 inline
-bool Tensor<1,dim>::
-operator == (const Tensor<1,dim> &p) const {
+bool Tensor<1,dim>::operator == (const Tensor<1,dim> &p) const
+{
   for (unsigned int i=0; i<dim; ++i)
     if (values[i] != p.values[i]) return false;
   return true;
@@ -332,8 +335,8 @@ operator == (const Tensor<1,dim> &p) const {
 
 template <int dim>
 inline
-bool Tensor<1,dim>::
-operator != (const Tensor<1,dim> &p) const {
+bool Tensor<1,dim>::operator != (const Tensor<1,dim> &p) const
+{
   return !((*this) == p);
 };
 
@@ -341,8 +344,8 @@ operator != (const Tensor<1,dim> &p) const {
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::
-operator += (const Tensor<1,dim> &p) {
+Tensor<1,dim> & Tensor<1,dim>::operator += (const Tensor<1,dim> &p)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] += p.values[i];
   return *this;
@@ -352,8 +355,8 @@ operator += (const Tensor<1,dim> &p) {
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::
-operator -= (const Tensor<1,dim> &p) {
+Tensor<1,dim> & Tensor<1,dim>::operator -= (const Tensor<1,dim> &p)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] -= p.values[i];
   return *this;
@@ -363,8 +366,8 @@ operator -= (const Tensor<1,dim> &p) {
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::
-operator *= (const double &s) {
+Tensor<1,dim> & Tensor<1,dim>::operator *= (const double &s)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] *= s;
   return *this;
@@ -374,8 +377,8 @@ operator *= (const double &s) {
 
 template <int dim>
 inline
-Tensor<1,dim> & Tensor<1,dim>::
-operator /= (const double &s) {
+Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s)
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] /= s;
   return *this;
@@ -385,8 +388,8 @@ operator /= (const double &s) {
 
 template <int dim>
 inline
-double Tensor<1,dim>::
-operator * (const Tensor<1,dim> &p) const {
+double Tensor<1,dim>::operator * (const Tensor<1,dim> &p) const
+{
   double q=0;
   for (unsigned int i=0; i<dim; ++i)
     q += values[i] * p.values[i];
@@ -397,8 +400,8 @@ operator * (const Tensor<1,dim> &p) const {
 
 template <int dim>
 inline
-Tensor<1,dim> Tensor<1,dim>::
-operator + (const Tensor<1,dim> &p) const {
+Tensor<1,dim> Tensor<1,dim>::operator + (const Tensor<1,dim> &p) const
+{
   return (Tensor<1,dim>(*this) += p);
 };
 
@@ -406,8 +409,8 @@ operator + (const Tensor<1,dim> &p) const {
 
 template <int dim>
 inline
-Tensor<1,dim> Tensor<1,dim>::
-operator - (const Tensor<1,dim> &p) const {
+Tensor<1,dim> Tensor<1,dim>::operator - (const Tensor<1,dim> &p) const
+{
   return (Tensor<1,dim>(*this) -= p);
 };
 
@@ -415,7 +418,8 @@ operator - (const Tensor<1,dim> &p) const {
 
 template <int dim>
 inline
-void Tensor<1,dim>::clear () {
+void Tensor<1,dim>::clear ()
+{
   for (unsigned int i=0; i<dim; ++i)
     values[i] = 0;
 };
@@ -427,7 +431,8 @@ void Tensor<1,dim>::clear () {
 
 template <int dim>
 inline
-ostream & operator << (ostream &out, const Tensor<1,dim> &p) {
+ostream & operator << (ostream &out, const Tensor<1,dim> &p)
+{
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
   out << p[dim-1];
@@ -438,7 +443,8 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p) {
 
 template <>
 inline
-ostream & operator << (ostream &out, const Tensor<1,1> &p) {
+ostream & operator << (ostream &out, const Tensor<1,1> &p)
+{
   out << p[0];
 
   return out;

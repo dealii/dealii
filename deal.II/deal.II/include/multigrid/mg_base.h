@@ -552,8 +552,7 @@ MGLevelObject<Object>::get_maxlevel () const
 
 
 template<class SOLVER, class MATRIX, class PRECOND>
-MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::
-MGCoarseGridLACIteration(SOLVER        &s,
+MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::MGCoarseGridLACIteration(SOLVER        &s,
 			 const MATRIX  &m,
 			 const PRECOND &p)
 		:
@@ -566,8 +565,7 @@ MGCoarseGridLACIteration(SOLVER        &s,
 
 template<class SOLVER, class MATRIX, class PRECOND>
 void
-MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::
-operator() (const unsigned int    /* level */,
+MGCoarseGridLACIteration<SOLVER,MATRIX,PRECOND>::operator() (const unsigned int    /* level */,
 	    Vector<double>       &dst,
 	    const Vector<double> &src) const
 {

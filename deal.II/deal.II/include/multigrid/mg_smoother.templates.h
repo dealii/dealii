@@ -3,8 +3,7 @@
 
 template<typename number>
 template<int dim>
-MGSmootherRelaxation<number>::
-MGSmootherRelaxation (const MGDoFHandler<dim>                       &mg_dof,
+MGSmootherRelaxation<number>::MGSmootherRelaxation (const MGDoFHandler<dim>                       &mg_dof,
 		      const MGLevelObject<SparseMatrix<number> > &matrix,
 		      const function_ptr                             relaxation,
 		      const unsigned int                             steps,

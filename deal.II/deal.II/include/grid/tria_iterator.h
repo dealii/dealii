@@ -891,8 +891,7 @@ TriaRawIterator<dim,Accessor>::state () const {
 template <int dim, typename Accessor>
 inline
 bool
-TriaRawIterator<dim,Accessor>::
-operator < (const TriaRawIterator &i) const {
+TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const {
   Assert (state() != invalid, ExcDereferenceInvalidObject());
   Assert (i.state() != invalid, ExcDereferenceInvalidObject());
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),

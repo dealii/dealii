@@ -177,7 +177,7 @@ class LogStream
 				      * be prepended by the user time used
 				      * by the running program so far.
 				      */
-  void log_execution_time(bool flag);
+    void log_execution_time(bool flag);
 
 				     /**
 				      * Output a constant something through
@@ -236,8 +236,7 @@ private:
 template <class T>
 inline
 LogStream &
-LogStream::
-operator<< (const T& t)
+LogStream::operator<< (const T& t)
 {
 				   // if the previous command was an
 				   // #endl#, print the topmost prefix
