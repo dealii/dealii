@@ -196,6 +196,47 @@ namespace
   }
 }
 
+template<int dim>
+void FETools::compute_component_wise(
+  const FiniteElement<dim>& element,
+  std::vector<unsigned int>& renumbering,
+  std::vector<std::vector<unsigned int> >& comp_start)
+{
+  Assert(renumbering.size() == element.dofs_per_cell,
+	 ExcDimensionMismatch(renumbering.size(),
+			      element.dofs_per_cell));
+  
+  comp_start.resize(element.n_base_elements());
+  
+  unsigned int k=0;
+  for (unsigned int i=0;i<comp_start.size();++i)
+    {
+      comp_start[i].resize(element.element_multiplicity(i));
+      const unsigned int increment
+	= element.base_element(i).dofs_per_cell;
+      
+      for (unsigned int j=0;j<comp_start[i].size();++j)
+	{
+	  comp_start[i][j] = k;
+	  k += increment;
+	}
+    }
+  
+				   // For each index i of the
+				   // unstructured cellwise
+				   // numbering, renumbering
+				   // contains the index of the
+				   // cell-block numbering
+  for (unsigned int i=0;i<element.dofs_per_cell;++i)
+    {
+      std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+	indices = element.system_to_base_index(i);
+      renumbering[i] = comp_start[indices.first.first][indices.first.second]
+			     +indices.second;
+    }
+}
+
+
 
 template <int dim, typename number>
 void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
@@ -1539,6 +1580,11 @@ FETools::get_fe_from_name_aux (const std::string &name)
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
+
+template
+void FETools::compute_component_wise(
+  const FiniteElement<deal_II_dimension>& element,
+  std::vector<unsigned int>&, std::vector<std::vector<unsigned int> >&);
 template
 void FETools::get_interpolation_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,

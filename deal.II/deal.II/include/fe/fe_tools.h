@@ -41,11 +41,38 @@ class ConstraintMatrix;
  * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
  * dual solution $z$.
  *
- * @author Ralf Hartmann, 2000
+ * @author Ralf Hartmann, Guido Kanschat, 2000, 2004
  */
 class FETools
 {
   public:
+				     /**
+				      * Compute the vector required to
+				      * renumber the dofs of a cell by
+				      * component. Furthermore,
+				      * compute the vector storing the
+				      * start indices of each
+				      * component in the local block
+				      * vector.
+				      *
+				      * The second vector is organized
+				      * such that there is a vector
+				      * for each base element
+				      * containing the start index for
+				      * each component served by this
+				      * base element.
+				      *
+				      * While the first vector is
+				      * checked to have the correct
+				      * size, the second one is
+				      * reinitialized for convenience.
+				      */
+    template<int dim>
+    static void compute_component_wise(
+      const FiniteElement<dim>&                fe,
+      std::vector<unsigned int>&               renumbering,
+      std::vector<std::vector<unsigned int> >& start_indices);
+    
 				     /**
 				      * Gives the interpolation matrix
 				      * that interpolates a @p fe1-
