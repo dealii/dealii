@@ -16,6 +16,8 @@
 
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
+#include <cmath>
+
 
 template <typename Number> class BlockVector;
 
