@@ -222,7 +222,7 @@ DataOutBase::EpsFlags::default_color_function (const double x,
 					       const double xmin,
 					       const double xmax)
 {
-  RgbValues rgb_values;
+  RgbValues rgb_values = { 0,0,0 };
   
 // A difficult color scale:
 //     xmin          = black  (1)
