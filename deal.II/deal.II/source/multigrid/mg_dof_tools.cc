@@ -377,10 +377,17 @@ template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
                         MGLevelObject<BlockVector<number> >& v,
-                        const std::vector<bool>& selected)
+                        const std::vector<bool>& selected_in)
 {
-  const unsigned int ncomp = mg_dof.get_fe().n_components();
+				   // Copy selection vector to
+				   // non-const since we may want to
+				   // do some manipulations.
+  std::vector<bool> selected = selected_in;
   
+  const unsigned int ncomp = mg_dof.get_fe().n_components();
+
+				   // If selected is an empty vector,
+				   // all components are selected.
   if (selected.size() == 0)
     {
       selected.resize(ncomp);
