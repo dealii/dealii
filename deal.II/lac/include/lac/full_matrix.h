@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -164,16 +164,21 @@ class FullMatrix : public Table<2,number>
 	bool operator != (const const_iterator&) const;
 
                                          /**
-                                          * Comparison
-                                          * operator. Result is true
-                                          * if either the first row
-                                          * number is smaller or if
-                                          * the row numbers are
-                                          * equal and the first
+                                          * Comparison operator. Result is
+                                          * true if either the first row
+                                          * number is smaller or if the row
+                                          * numbers are equal and the first
                                           * index is smaller.
                                           */
 	bool operator < (const const_iterator&) const;
 
+                                         /**
+                                          * Comparison operator. Compares just
+                                          * the other way around than the
+                                          * operator above.
+                                          */
+	bool operator > (const const_iterator&) const;
+        
       private:
                                          /**
                                           * Store an object of the
@@ -1181,6 +1186,16 @@ operator < (const const_iterator& other) const
   return (accessor.row() < other.accessor.row() ||
 	  (accessor.row() == other.accessor.row() &&
            accessor.column() < other.accessor.column()));
+}
+
+
+template <typename number>
+inline
+bool
+FullMatrix<number>::const_iterator::
+operator > (const const_iterator& other) const
+{
+  return (other < *this);
 }
 
 
