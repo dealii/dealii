@@ -62,13 +62,10 @@ check_vmult_quadratic(std::vector<double>& residuals,
   
   PreconditionBlockJacobi<MATRIX, float> block_jacobi;
   block_jacobi.initialize(A, data);
-  block_jacobi.invert_diagblocks();
   PreconditionBlockSSOR<MATRIX, float> block_ssor;
   block_ssor.initialize(A, data);
-  block_ssor.invert_diagblocks();
   PreconditionBlockSOR<MATRIX, float> block_sor;
   block_sor.initialize(A, data);
-  block_sor.invert_diagblocks();
   
   u = 0.;
   f = 1.;
