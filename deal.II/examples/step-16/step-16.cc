@@ -53,6 +53,10 @@
                                  // DoFTools class are declared:
 #include <multigrid/mg_dof_tools.h>
 
+#include <multigrid/mg_coarse.h>
+#include <multigrid/mg_smoother.h>
+#include <multigrid/mg_matrix.h>
+
 				 // This is C++ ... see step 5 for
 				 // further comments.
 #include <fstream>
@@ -151,8 +155,14 @@ void LaplaceProblem<dim>::setup_system ()
 				   // revision). Remark, that the
 				   // finest level is nlevels-1.
   const unsigned int nlevels = triangulation.n_levels();
-  mg_sparsity.resize(0, nlevels-1);
+				   // We first have to resize the
+				   // container holding the
+				   // SparseMatrix classes, since they
+				   // have to release their
+				   // SparsityPattern before it can be
+				   // destroyed.
   mg_matrices.resize(0, nlevels-1);
+  mg_sparsity.resize(0, nlevels-1);
 
 				   // Now, we have to build a matrix
 				   // on each level. Technically, we
@@ -238,9 +248,11 @@ void LaplaceProblem<dim>::assemble_system ()
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
-				   * fe_values.shape_grad(j,q_point)
-				   * fe_values.JxW(q_point));
+	      cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point)
+				    * fe_values.shape_grad(j,q_point))
+				    + fe_values.shape_value(i,q_point)
+				    * fe_values.shape_value(j,q_point))
+				   * fe_values.JxW(q_point);
 
 					     // For the right hand
 					     // side, a constant value
@@ -263,15 +275,15 @@ void LaplaceProblem<dim>::assemble_system ()
     };
 
 				   // Again use zero boundary values:
-  std::map<unsigned int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (mg_dof_handler,
-					    0,
-					    ZeroFunction<dim>(),
-					    boundary_values);
-  MatrixTools::apply_boundary_values (boundary_values,
-				      system_matrix,
-				      solution,
-				      system_rhs);
+//   std::map<unsigned int,double> boundary_values;
+//   VectorTools::interpolate_boundary_values (mg_dof_handler,
+// 					    0,
+// 					    ZeroFunction<dim>(),
+// 					    boundary_values);
+//   MatrixTools::apply_boundary_values (boundary_values,
+// 				      system_matrix,
+// 				      solution,
+// 				      system_rhs);
 }
 
 
@@ -280,7 +292,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // the same as above. Only the loop
 				 // goes over all existing cells now
 				 // and the results must be entered
-				 // into the right matrix.
+				 // into the correct matrix.
 
 				 // Since we only do multi-level
 				 // preconditioning, no right-hand
@@ -291,7 +303,8 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   QGauss2<dim>  quadrature_formula;
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_gradients |
+			   UpdateFlags(update_values |
+				       update_gradients |
 				       update_q_points  |
 				       update_JxW_values));
 
@@ -303,8 +316,8 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
 				   // 
-  typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-					  endc = mg_dof_handler.end();
+  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+					    endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
     {
 				       // Remember the level of the
@@ -323,9 +336,11 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
-				   * fe_values.shape_grad(j,q_point)
-				   * fe_values.JxW(q_point));
+	      cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point)
+				    * fe_values.shape_grad(j,q_point))
+				   + fe_values.shape_value(i,q_point)
+				   * fe_values.shape_value(j,q_point))
+				  * fe_values.JxW(q_point);
 	  };
 
 
@@ -352,15 +367,15 @@ void LaplaceProblem<dim>::assemble_multigrid ()
     };
 
 				   // Again use zero boundary values:
-  std::map<unsigned int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (mg_dof_handler,
-					    0,
-					    ZeroFunction<dim>(),
-					    boundary_values);
-  MatrixTools::apply_boundary_values (boundary_values,
-				      system_matrix,
-				      solution,
-				      system_rhs);
+//   std::map<unsigned int,double> boundary_values;
+//   VectorTools::interpolate_boundary_values (mg_dof_handler,
+// 					    0,
+// 					    ZeroFunction<dim>(),
+// 					    boundary_values);
+//   MatrixTools::apply_boundary_values (boundary_values,
+// 				      system_matrix,
+// 				      solution,
+// 				      system_rhs);
 }
 
 
@@ -374,48 +389,84 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
+				   // Create a memory handler for
+				   // regular vectors. Note, that
+				   // GrowingVectorMemory is more time
+				   // efficient than
+				   // PrimitiveVectorMemory.
+  GrowingVectorMemory<>   vector_memory;
+
+				   // Now, create an object handling
+				   // the transfer of functions
+				   // between different grid
+				   // levels.
+  MGTransferPrebuilt<double> mg_transfer;
+  mg_transfer.build_matrices(mg_dof_handler);
+
+				   // Next, we need a coarse grid
+				   // solver. Since our coarse grid is
+				   // VERY coarse, we decide for a
+				   // direct solver, even if its
+				   // implementation is not very
+				   // clever.
+  FullMatrix<float> coarse_matrix;
+  coarse_matrix.copy_from (mg_matrices[0]);
+  MGCoarseGridHouseholder<float, Vector<double> > mg_coarse;
+  mg_coarse.initialize(coarse_matrix);
+
+				   // The final ingredient for the
+				   // multilevel preconditioner is the
+				   // smoother. It is very customary
+				   // to use a relaxation method
+				   // here. Names are getting quite
+				   // long here, so we help with
+				   // typedefs.
+  typedef PreconditionSOR<SparseMatrix<float> > RELAXATION;
+  MGSmootherRelaxation<SparseMatrix<float>, RELAXATION, Vector<double> >
+    mg_smoother(vector_memory);
+
+				   // Initialize the smoother with our
+				   // level matrices and the required,
+				   // additional data for the
+				   // relaxaton method with default
+				   // values.
+  RELAXATION::AdditionalData smoother_data;
+  mg_smoother.initialize(mg_matrices, smoother_data);
+  
+				   // Do two smoothing steps per level
+  mg_smoother.set_steps(2);
+				   // Since the SOR method is not
+				   // symmetric, but we use conjugate
+				   // gradient iteration below, here
+				   // is a trick to make the
+				   // multilevel preconditioner a
+				   // symmetric operator even for
+				   // nonsymmetric smoothers.
+  mg_smoother.set_symmetric(true);
+
+				   // We must wrap our matrices in an
+				   // object having the required
+				   // multiplication functions.
+  MGMatrix<SparseMatrix<float>, Vector<double> >
+    mg_matrix(&mg_matrices);
+				   // Now, we are ready to set up the
+				   // V-cycle operator and the
+				   // multilevel preconditioner.
+  Multigrid<Vector<double> > mg(mg_dof_handler,
+				mg_matrix,
+				mg_coarse,
+				mg_transfer,
+				mg_smoother,
+				mg_smoother);
+  PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<double> >
+    preconditioner(mg_dof_handler, mg, mg_transfer);
+  
+				   // Finally, create the solver
+				   // object and solve the system
   SolverControl           solver_control (1000, 1e-12);
-  PrimitiveVectorMemory<> vector_memory;
   SolverCG<>              cg (solver_control, vector_memory);
 
-				   // The only thing we have to alter
-				   // is that we need an object which
-				   // will act as a preconditioner. We
-				   // will use SSOR (symmetric
-				   // successive overrelaxation), with
-				   // a relaxation factor of 1.2. For
-				   // this purpose, the SparseMatrix
-				   // class has a function which does
-				   // one SSOR step, and we need to
-				   // package the address of this
-				   // function together with the
-				   // matrix on which it should act
-				   // (which is the matrix to be
-				   // inverted) and the relaxation
-				   // factor into one object. This can
-				   // be done like this:
-  PreconditionSSOR<> preconditioner;
-  preconditioner.initialize(system_matrix, 1.2);
-				   // (Note that we did not have to
-				   // explicitely pass the address of
-				   // the SSOR function of the matrix
-				   // to this objects, rather it is
-				   // hardcoded into the object, thus
-				   // the name.)
-				   //
-				   // The default template parameters
-				   // of the ``PreconditionRelaxation''
-				   // class is the matrix type, which
-				   // defaults to the types used in
-				   // this program.
-
-				   // Calling the solver now looks
-				   // mostly like in the example
-				   // before, but where there was an
-				   // object of type
-				   // PreconditionIdentity before,
-				   // there now is the newly generated
-				   // preconditioner object.
+  
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
@@ -503,6 +554,7 @@ void LaplaceProblem<dim>::run ()
 
       setup_system ();
       assemble_system ();
+      assemble_multigrid ();
       solve ();
       output_results (cycle);
     };
