@@ -147,6 +147,25 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
                                                // but there seems to
                                                // be no other way than
                                                // that...
+                                               //
+                                               // note: to make things
+                                               // consistent, and
+                                               // restriction
+                                               // independent of the
+                                               // order in which we
+                                               // travel across the
+                                               // cells of the coarse
+                                               // grid, we have to
+                                               // make sure that we
+                                               // take the same small
+                                               // line when visiting
+                                               // its two neighbors,
+                                               // to get the value for
+                                               // the mother line. we
+                                               // take the first line
+                                               // always, in the
+                                               // canonical direction
+                                               // of lines
 	      this->restriction[0](0,0) = 2.;
 	      this->restriction[1](1,1) = 2.;
 	      this->restriction[3](2,2) = 2.;
@@ -184,16 +203,25 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 	    case 1:
 	    {
 					       // same principle as in
-					       // 2d
+					       // 2d, take one child
+					       // cell to get at the
+					       // values of each of
+					       // the 12 lines
 	      this->restriction[0](0,0) = 2.;
+	      this->restriction[0](3,3) = 2.;
 	      this->restriction[1](1,1) = 2.;
-	      this->restriction[2](2,2) = 2.;
-	      this->restriction[3](3,3) = 2.;
+	      this->restriction[3](2,2) = 2.;
+              
 	      this->restriction[4](4,4) = 2.;
+	      this->restriction[4](7,7) = 2.;
 	      this->restriction[5](5,5) = 2.;
-	      this->restriction[6](6,6) = 2.;
-	      this->restriction[7](7,7) = 2.;
-	      
+	      this->restriction[7](6,6) = 2.;
+              
+	      this->restriction[0](8,8) = 2.;
+	      this->restriction[1](9,9) = 2.;
+	      this->restriction[2](10,10) = 2.;
+	      this->restriction[3](11,11) = 2.;
+              
 	      break;
 	    };
 	    
