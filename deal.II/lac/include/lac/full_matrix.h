@@ -423,8 +423,9 @@ class FullMatrix : public Subscriptor
     
 				     /**
 				      * A=Inverse(A). Inversion of
-				      * this by Gauss-Jordan-algorithm
-				      * with partial pivoting.  This
+				      * this matrix by
+				      * Gauss-Jordan algorithm with
+				      * partial pivoting.  This
 				      * process is well-behaved for
 				      * positive definite matrices,
 				      * but be aware of round-off
@@ -432,7 +433,7 @@ class FullMatrix : public Subscriptor
 				      *
 				      * The numerical effort to invert
 				      * an @p{n x n} matrix is of the
-				      * order @p{n³}.
+				      * order @p{n**3}.
 				      */
     void gauss_jordan ();
 
