@@ -1,15 +1,15 @@
-//----------------------------  solver_richardson.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  solver_richardson.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__solver_richardson_h
 #define __deal2__solver_richardson_h
 
@@ -138,16 +138,25 @@ class SolverRichardson : public Solver<VECTOR>
     virtual typename VECTOR::value_type criterion();
     
 				     /**
-				      * Temporary vectors, allocated through
-				      * the @p VectorMemory object at the start
+				      * Residual. Temporary vector allocated through
+				      * the VectorMemory object at the start
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
-    VECTOR *Vr;
-    VECTOR *Vd;
-
+    VECTOR* Vr;
 				     /**
-				      * Damping parameter.
+				      * Preconditioned
+				      * residual. Temporary vector
+				      * allocated through the
+				      * VectorMemory object at the
+				      * start of the actual solution
+				      * process and deallocated at the
+				      * end.
+				      */    
+    VECTOR* Vd;
+    
+				     /**
+				      * Control parameters.
 				      */
     AdditionalData additional_data;
     
@@ -207,7 +216,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 				   // Memory allocation
   Vr  = this->memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
   Vd  = this->memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
-
+  
   deallog.push("Richardson");
   
   try 
@@ -219,23 +228,18 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 					   // but do it in 2 steps
 	  A.vmult(r,x);
 	  r.sadd(-1.,1.,b);
-	  
-	  if (!additional_data.use_preconditioned_residual)
-	    {
-	      res = r.l2_norm();
-	      conv = this->control().check (iter, criterion());
-	      if (conv != SolverControl::iterate)
-		break;
-	    }
-	  
 	  precondition.vmult(d,r);
-	  if (additional_data.use_preconditioned_residual)
-	    {
-	      res = d.l2_norm();
-	      conv = this->control().check (iter, criterion());
-	      if (conv != SolverControl::iterate)
-		break;
-	    }
+
+					   // The required norm of the
+					   // (preconditioned)
+					   // residual is computed in
+					   // criterion() and stored
+					   // in res.
+	  conv = this->control().check (iter, criterion());
+//	  conv = this->control().check (iter, std::sqrt(A.matrix_norm_square(r)));
+	  if (conv != SolverControl::iterate)
+	    break;
+	  
 	  x.add(additional_data.omega,d);
 	  print_vectors(iter,x,r,d);
 	}
@@ -274,7 +278,7 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 				   // Memory allocation
   Vr  = this->memory.alloc(); VECTOR& r  = *Vr; r.reinit(x);
   Vd  =this-> memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
-
+  
   deallog.push("RichardsonT");
 
   try
@@ -286,13 +290,12 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 					   // but do it in 2 steps
 	  A.Tvmult(r,x);
 	  r.sadd(-1.,1.,b);
-	  res=r.l2_norm();
+	  precondition.Tvmult(d,r);
 	  
 	  conv = this->control().check (iter, criterion());
 	  if (conv != SolverControl::iterate)
 	    break;
 	  
-	  precondition.Tvmult(d,r);
 	  x.add(additional_data.omega,d);
 	  print_vectors(iter,x,r,d);
 	}
@@ -332,6 +335,10 @@ template <class VECTOR>
 inline typename VECTOR::value_type
 SolverRichardson<VECTOR>::criterion()
 {
+  if (!additional_data.use_preconditioned_residual)
+    res = Vr->l2_norm();
+  else
+    res = Vd->l2_norm();
   return res;
 }
 
