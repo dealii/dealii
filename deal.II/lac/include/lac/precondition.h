@@ -643,9 +643,9 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 	      const MATRIX& m,
 	      const PRECONDITION& p)
 {
-  solver = s;
-  matrix = m;
-  precondition = p;
+  solver = &s;
+  matrix = &m;
+  precondition = &p;
 }
 
 
