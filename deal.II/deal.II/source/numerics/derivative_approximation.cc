@@ -159,10 +159,6 @@ double
 DerivativeApproximation::SecondDerivative<3>::
 derivative_norm (const Derivative &d)
 {
-  cout << "**************** d" << endl
-       << d
-       << endl;
-
 /*
   compute the three eigenvalues of the tensor @p{d} and take the
   largest. one could use the following maple script to generate C
@@ -228,18 +224,12 @@ void
 DerivativeApproximation::SecondDerivative<dim>::symmetrize (Derivative &d)
 {
 				   // symmetrize non-diagonal entries
-  cout << "----------1 d" << endl
-       << d
-       << endl;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i+1; j<dim; ++j)
       {
 	const double s = (d[i][j] + d[j][i]) / 2;
 	d[i][j] = d[j][i] = s;
       };
-  cout << "----------2 d" << endl
-       << d
-       << endl;
 };
 
 
@@ -546,8 +536,6 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 				       // gradient
       AssertThrow (determinant(Y) != 0,
 		   ExcInsufficientDirections());
-      cout << "--------------- Y" << endl
-	   << Y << endl;
       
 				       // first symmetrize g
       DerivativeDescription::symmetrize (projected_derivative);
