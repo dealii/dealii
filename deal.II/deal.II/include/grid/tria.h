@@ -1359,48 +1359,80 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				     /**
 				      *  Return total number of used lines,
 				      *  active or not.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_lines () const;
     
 				     /**
 				      *  Return total number of used lines,
 				      *  active or not on level #level#.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_lines (const unsigned int level) const;
     
 				     /**
 				      *  Return total number of active lines,
 				      *  active or not.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_lines () const;
     
 				     /**
 				      *  Return total number of active lines,
 				      *  active or not on level #level#.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_lines (const unsigned int level) const;
     
 				     /**
 				      *  Return total number of used quads,
 				      *  active or not.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_quads () const;
     
 				     /**
 				      *  Return total number of used quads,
 				      *  active or not on level #level#.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_quads (const unsigned int level) const;
     
 				     /**
 				      *  Return total number of active quads,
 				      *  active or not.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_quads () const;
     
 				     /**
 				      *  Return total number of active quads,
 				      *  active or not on level #level#.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_quads (const unsigned int level) const;
     
@@ -1409,6 +1441,18 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  active or not.
 				      *  Maps to #n_lines()# in one space
 				      *  dimension and so on.
+				      *
+				      * Be a bit careful with this function,
+				      * since it needs quite some computational
+				      * ressources: the number of cells is
+				      * computed by looping over all cells,
+				      * rather than by returning a pre-stored
+				      * value. It is therefore often better
+				      * to rewrite lines like
+				      * #for (i=0; i<tria.n_cells(); ++i) ...#
+				      * by
+				      * #const unsigned int n=tria.n_cells();#
+				      * #for (i=0; i<n; ++i) ...#.
 				      */
     unsigned int n_cells () const;
 
@@ -1417,13 +1461,21 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  active or not, on level #level#.
 				      *  Maps to #n_lines(level)# in one space
 				      *  dimension and so on.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_cells (const unsigned int level) const;
 
     				     /**
 				      *  Return total number of active cells.
 				      *  Maps to #n_active_lines()# in one space
-				      *  dimension and so on.				 
+				      *  dimension and so on.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_cells () const;
 
@@ -1432,6 +1484,10 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      *  on level #level#.
 				      *  Maps to #n_active_lines(level)# in one space
 				      *  dimension and so on.
+				      *
+				      * Regarding the computational effort of
+				      * this function, the same applies as
+				      * for the #n_cells()# function.
 				      */
     unsigned int n_active_cells (const unsigned int level) const;
 
