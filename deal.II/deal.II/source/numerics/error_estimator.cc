@@ -58,7 +58,8 @@ namespace
   const Quadrature<0> * const        invalid_face_quadrature = 0;
   const FunctionMap<1>::type * const invalid_function_map    = 0;
   const std::vector<const Vector<double> *> * const invalid_solutions = 0;
-  KellyErrorEstimator<1>::FaceIntegrals * const invalid_face_integrals = 0;
+  std::map<DoFHandler<1>::face_iterator,std::vector<double> >
+  * const invalid_face_integrals = 0;
 }
 
 
