@@ -86,9 +86,9 @@ MAIL='mail'
 ######################################################################
 
 if test -d $target ; then rm -rf $target ; fi
-mkdir $target
+mkdir $target 2>&1
 cd $target
-$CVS co deal.II
+$CVS co deal.II 2>&1
 cd deal.II
 
 # Echo system information for later parsing
@@ -118,19 +118,16 @@ fi ; echo $result > result ) | tee -a log
 
 echo "CHECKING RESULTS AT " `date '+%Y-%m-%d %T'` | tee -a log
 
-# now decide what to do with the output. if the build succeeded then
-# simply delete it and replace it by a success message for mailing to
-# the result server. Otherwise store it under a name that identifies
-# the build and is given by the calling site
+# Now send the result to the mailing address for success and failure,
+# respectively. If the build succeded, remove traces.  Remark: we
+# don't remove the results on failure, since some cron jobs do not
+# send email on failure.
 
 if test "`cat result`" = "failed" ; then
-	$MAIL build-failure@dealii.org < log
+    $MAIL build-failure@dealii.org < log 2>&1
 else
-	$MAIL build-success@dealii.org < log
+    $MAIL build-success@dealii.org < log 2>&1
+    cd ../../
+    rm -rf $target
 fi
 
-echo "CLEANING UP AT " `date '+%Y-%m-%d %T'` | tee -a log
-
-# finally clean up
-cd ../../
-rm -rf $target
