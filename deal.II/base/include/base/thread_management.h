@@ -4837,7 +4837,7 @@ namespace Threads
               ArgRefs  arg_refs)
         {
           internal::call (fun_ptr, obj, arg_refs, rv);
-        };
+        }
 
                                        /**
                                         * Initialize the return value
@@ -4850,7 +4850,7 @@ namespace Threads
               ArgRefs arg_refs)
         {
           internal::call (fun_ptr, arg_refs, rv);
-        };
+        }
 
                                        /**
                                         * Get the return value of the
@@ -4860,14 +4860,14 @@ namespace Threads
       RT return_value () const 
         {
           return rv.get();
-        };
+        }
 
                                        /**
                                         * Join this thread. Is of
                                         * course a no-op in this of no
                                         * thread support.
                                         */
-      void join () const {};
+      void join () const {}
 
                                        /**
                                         * Compare for equality of
@@ -4883,7 +4883,7 @@ namespace Threads
       bool operator == (const Thread &)
         {
           return true;
-        };
+        }
       
     private:
                                        /**
@@ -4965,7 +4965,7 @@ namespace Threads
         operator() () {
           return Thread<RT> (mem_fun_ptr, c,
                              ArgList());
-        };
+        }
     
       private:
         C         &c;
