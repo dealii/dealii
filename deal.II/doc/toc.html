@@ -10,6 +10,106 @@
   <body>
 
 
+    <h2>What is <acronym>deal.II</acronym>?</h2>
+
+    <p>
+    <acronym>deal.II</acronym> is a C++ program library targeted at
+    adaptive finite elements and error estimation. It uses
+    state-of-the-art programming techniques of the C++ programming
+    language to offer you a modern interface to the complex data
+    structures and algorithms required for adaptivity and enables you
+    to use a variety of finite elements in one, two, and three space
+    dimensions, as well as time-dependent problems.
+    </p>
+
+    <p>
+    The main aim of <acronym>deal.II</acronym> is to enable
+    development of modern finite element algorithms, using among other
+    aspects sophisticated error estimators and adaptive
+    meshes. Writing such programs is a non-trivial task, and
+    successful programs tend to become very large and complex. We
+    therefore believe that this is best done using a program library
+    that frees the application programmer from aspects like grid
+    handling and refinement, handling of degrees of freedom, input
+    of meshes and output of results in graphics formats, and the
+    like. Also, support for several space dimensions at once is
+    included in a way such that programs can be written independent of
+    the space dimension without unreasonable penalties on run-time and
+    memory consumption. 
+    </p>
+
+    <p>
+    <acronym>deal.II</acronym> emerged from the work at the
+    <a href="http://gaia.iwr.uni-heidelberg.de" target="_top">
+    Numerical Methods Group</a> of the University of Heidelberg, which
+    is at the forefront of adaptive finite element methods and error
+    estimators. It is used in several large research projects in
+    Heidelberg and elsewhere.
+    </p>
+
+
+    <h2>What <acronym>deal.II</acronym> can offer you</h2>
+
+    <p>
+    If you are active in the field of adaptive finite element methods,
+    <acronym>deal.II</acronym> might be the right library for your
+    projects. Among other features, it offers:
+    </p>
+
+    <ul>
+    <li> <p>
+         Support for one, two, and three space dimensions, using a
+         unified interface that enables writing programs almost
+         dimension independent.
+	 </p>
+
+    <li> <p>
+         Handling of locally refined grids, including algorithms to
+         adaptively refine them, using error indicators and
+         estimators.
+	 </p>
+
+    <li> <p>
+         Support for a variety of finite elements, including Lagrange
+         elements of order one through four, and discontinuous
+         elements. 
+	 </p>
+
+    <li> <p>
+         Extensive documentation: about 200 pages of tutorials,
+         several reports, and far more than 1,000 pages of programming
+         interface documentation with explanations of all classes,
+         functions, and variables.
+	 </p>
+
+    <li> <p>
+         Modern software techniques that make access to the complex
+         data structures and algorithms as transparent as possible.
+	 </p>
+
+    <li> <p>
+         Fast algorithms that enable you to solve problems with
+         up to several millions of degrees of freedom quickly.
+	 </p>
+
+    <li> <p>
+         Support for several output formats, including some common
+         formats for visualisation of scientific data.
+	 </p>
+
+    <li> <p>
+         Support for a variety of computer platforms, including
+         multiprocessor machines.
+	 </p>
+
+    <li> <p>
+         Free source code under an Open Source license, and the
+         invitation to contribute to further development of the
+         library.
+	 </p>
+    </ul>
+
+
     <h2>Online documentation</h2>
 
     <acronym>deal.II</acronym> has quite extensive online
@@ -34,22 +134,18 @@
 
     <li> <p>Programming interface documentation: the classes and methods
          in the library are extensively documented (presently
-         approximately 1250 pages if printed). We write this
-         documentation directly into the source code, which makes it
-         much easier to keep it up to date, and use automatic tools to
-         extract it into HTML or into printable formats. 
-	 </p>
-
-	 <p>
-	 This API documentation is split into several parts, according
+         approximately 1250 pages if printed). This API documentation
+         is split into several parts, according 
 	 to the sub-libraries and the different directories of the main
 	 <acronym>deal.II</acronym> library:
 	 <ul>
 	   <li> <a href="auto/kdoc/base/index.html" target="body">
-                 <code>/base</code> library</a>,
+                 <code>/base</code> library</a>: a set of classes not
+                 specifically related to finite elements, but
+                 nonetheless important for the overall library,
 	   <li> <a href="auto/kdoc/lac/index.html" target="body">
-                 <code>/lac</code> library</a>: <B>L</B>inear
-		  <B>A</B>lgebra <B>C</B>lasses,
+                 <code>/lac</code> library</a>: <em>L</em>inear
+		  <em>a</em>lgebra <em>c</em>lasses,
 	   <li> <a href="auto/kdoc/grid/index.html" target="body">
 	        Grid handling</a> in the 
                  <code>/deal.II</code> library,
