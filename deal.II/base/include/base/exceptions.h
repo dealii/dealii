@@ -493,7 +493,7 @@ class Exception2 : public ExceptionBase {                             \
   public:                                                             \
       Exception2 (const type1 a1, const type2 a2) :                   \
 	      arg1 (a1), arg2(a2) {};                                 \
-      virtual void PrintInfo (ostream &out) const {                           \
+      virtual void PrintInfo (ostream &out) const {                   \
         out outsequence << endl;                                      \
       };                                                              \
   private:                                                            \
@@ -512,7 +512,7 @@ class Exception3 : public ExceptionBase {                             \
   public:                                                             \
       Exception3 (const type1 a1, const type2 a2, const type3 a3) :   \
 	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
-      virtual void PrintInfo (ostream &out) const {                           \
+      virtual void PrintInfo (ostream &out) const {                   \
         out outsequence << endl;                                      \
       };                                                              \
   private:                                                            \
@@ -533,7 +533,7 @@ class Exception4 : public ExceptionBase {                             \
       Exception4 (const type1 a1, const type2 a2,                     \
 	    const type3 a3, const type4 a4) :                         \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {};             \
-      virtual void PrintInfo (ostream &out) const {                           \
+      virtual void PrintInfo (ostream &out) const {                   \
         out outsequence << endl;                                      \
       };                                                              \
   private:                                                            \
@@ -555,7 +555,7 @@ class Exception5 : public ExceptionBase {                             \
       Exception5 (const type1 a1, const type2 a2, const type3 a3,     \
 	    const type4 a4, const type5 a5) :                         \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {};   \
-      virtual void PrintInfo (ostream &out) const {                           \
+      virtual void PrintInfo (ostream &out) const {                   \
         out outsequence << endl;                                      \
       };                                                              \
   private:                                                            \
