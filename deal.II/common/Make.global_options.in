@@ -47,8 +47,6 @@ endif
 
 # path for libraries 
 
-lib-path-contrib-hsl = $D/contrib/hsl/lib
-
 LIBPATH    += $(addprefix -L,$(libdir))
 
 
@@ -56,15 +54,6 @@ LIBPATH    += $(addprefix -L,$(libdir))
 
 vpath %.a $(libdir)
 vpath %.so $(libdir)
-
-# if HSL sublibs are used, add them to the path
-ifeq ($(USE_CONTRIB_HSL),yes)
-  LIBPATH += $(addprefix -L,$(lib-path-contrib-hsl))
-  vpath %.a $(lib-path-contrib-hsl)
-  vpath %.so $(lib-path-contrib-hsl)
-endif
-
-
 
 
 
@@ -84,7 +73,7 @@ lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
 lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
 lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 
-lib-contrib-hsl = $(lib-path-contrib-hsl)/libhsl$(lib-suffix)
+lib-contrib-hsl = $(LIBDIR)/libhsl$(lib-suffix)
 
 # if HSL is used, always link it in conjunction with liblac
 ifeq ($(USE_CONTRIB_HSL),yes)

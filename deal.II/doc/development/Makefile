@@ -23,7 +23,6 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>lib-path-base=$(lib-path-base)</code>' >> $@
 	@echo '<li><code>lib-path-lac=$(lib-path-lac)</code>' >> $@
 	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@
-	@echo '<li><code>lib-path-contrib-hsl=$(lib-path-contrib-hsl)</code>' >> $@
 	@echo '<li><code>LIBPATH=$(LIBPATH)</code>' >> $@
 	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
 	@echo '<li><code>lib-base.o=$(lib-base.o)</code>' >> $@
