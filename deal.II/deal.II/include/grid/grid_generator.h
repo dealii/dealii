@@ -384,7 +384,8 @@ class GridGenerator
 			  const double      half_length = 1.);
 
 				     /**
-				      * Non-implemented dummy for compilation purposes.
+				      * Non-implemented dummy for compilation
+				      * purposes.
 				      */
     static void cylinder (Triangulation<1> &tria,
 			  const double      radius,
