@@ -484,4 +484,199 @@ MGTransferSelect<number>::copy_from_mg_add(
 }
 
 
+#if deal_II_dimension == 1
+
+template <typename number>
+template <int dim, class InVector>
+void
+MGTransferBlock<number>::copy_to_mg (
+  const MGDoFHandler<dim>&,
+  MGLevelObject<BlockVector<number> >&,
+  const InVector&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#else
+
+
+template <typename number>
+template <int dim, class InVector>
+void
+MGTransferBlock<number>::copy_to_mg (
+  const MGDoFHandler<dim>& mg_dof_handler,
+  MGLevelObject<BlockVector<number> >& dst,
+  const InVector& src) const
+{
+				   // Make src a real finite element function
+//  InVector src = osrc;
+//  constraints->distribute(src);
+
+  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_face = fe.dofs_per_face;
+
+				   // set the elements of the vectors
+				   // on all levels to zero
+  unsigned int minlevel = dst.get_minlevel();
+  unsigned int maxlevel = dst.get_maxlevel();
+  
+  dst.clear();
+
+//TODO:[GK] Make sure dst is not too large ans sizes is filled  
+  for (unsigned int l=minlevel;l<=maxlevel;++l)
+    dst[l].reinit(sizes[l]);
+  
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  std::vector<unsigned int> level_face_indices (dofs_per_face);
+
+				   // traverse the grid top-down
+				   // (i.e. starting with the most
+				   // refined grid). this way, we can
+				   // always get that part of one
+				   // level of the output vector which
+				   // corresponds to a region which is
+				   // more refined, by restriction of
+				   // the respective vector on the
+				   // next finer level, which we then
+				   // already have built.
+  for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
+    {
+      typename MGDoFHandler<dim>::active_cell_iterator
+	level_cell = mg_dof_handler.begin_active(level);
+      const typename MGDoFHandler<dim>::active_cell_iterator
+	level_end  = mg_dof_handler.end_active(level);
+
+				       // Compute coarse level right hand side
+				       // by restricting from fine level.
+      for (; level_cell!=level_end; ++level_cell)
+	{
+	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
+					   // get the dof numbers of
+					   // this cell for the global
+					   // and the level-wise
+					   // numbering
+	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_mg_dof_indices (level_dof_indices);
+
+					   // transfer the global
+					   // defect in the vector
+					   // into the level-wise one
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
+//TODO:[GK] Not sure if this works if components are selected
+	      dst[level](level_dof_indices[i])
+		  = src(global_dof_indices[i]);
+	    }
+//TODO: Special treatment of faces? Copy from MGTransferPrebuilt when done there.
+	}
+				       // for that part of the level
+				       // which is further refined:
+				       // get the defect by
+				       // restriction of the defect on
+				       // one level higher
+      if (static_cast<unsigned int>(level) < maxlevel)
+	{
+	  restrict_and_add (level+1, dst[level], dst[level+1]);
+	}
+    };
+};
+
+#endif
+
+
+template <typename number>
+template <int dim, class OutVector>
+void
+MGTransferBlock<number>::copy_from_mg(
+  const MGDoFHandler<dim>& mg_dof_handler,
+  OutVector &dst,
+  const MGLevelObject<BlockVector<number> > &src) const
+{
+
+  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
+
+  typename MGDoFHandler<dim>::active_cell_iterator
+    level_cell = mg_dof_handler.begin_active();
+  const typename MGDoFHandler<dim>::active_cell_iterator
+    endc = mg_dof_handler.end();
+				   // traverse all cells and copy the
+				   // data appropriately to the output
+				   // vector
+
+				   // Is the level monotonuosly increasing?
+
+  for (; level_cell != endc; ++level_cell)
+    {
+       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
+      const unsigned int level = level_cell->level();
+				       // get the dof numbers of
+				       // this cell for the global
+				       // and the level-wise
+				       // numbering
+      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_mg_dof_indices(level_dof_indices);
+
+				       // copy level-wise data to
+				       // global vector
+//TODO:[GK] Does this work with selected components?
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	dst(global_dof_indices[i])
+	  = src[level](level_dof_indices[i]);
+    }
+}
+
+template <typename number>
+template <int dim, class OutVector>
+void
+MGTransferBlock<number>::copy_from_mg_add(
+  const MGDoFHandler<dim>& mg_dof_handler,
+  OutVector &dst,
+  const MGLevelObject<BlockVector<number> > &src) const
+{
+
+  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
+
+  typename MGDoFHandler<dim>::active_cell_iterator
+    level_cell = mg_dof_handler.begin_active();
+  const typename MGDoFHandler<dim>::active_cell_iterator
+    endc = mg_dof_handler.end();
+
+				   // traverse all cells and copy the
+				   // data appropriately to the output
+				   // vector
+
+				   // Is the level monotonuosly increasing?
+  for (; level_cell != endc; ++level_cell)
+    {
+       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
+      const unsigned int level = level_cell->level();
+
+				       // get the dof numbers of
+				       // this cell for the global
+				       // and the level-wise
+				       // numbering
+      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_mg_dof_indices(level_dof_indices);
+
+//TODO:[GK] Probably wrong for continuous elements
+
+				       // copy level-wise data to
+				       // global vector
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	dst(global_dof_indices[i])
+	  += src[level](level_dof_indices[i]);
+    }
+}
+
+
 #endif

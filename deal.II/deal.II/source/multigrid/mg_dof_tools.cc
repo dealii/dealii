@@ -511,57 +511,6 @@ template void MGTools::reinit_vector<deal_II_dimension> (const MGDoFHandler<deal
 					MGLevelObject<Vector<float> >&);
 
 
-//  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransfer<Vector<double> >&,
-//  				   MGLevelObject<Vector<double> >&,
-//  				   const Vector<double>&);
-
-//  template void MGTools::copy_from_mg<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  				    Vector<double>&,
-//  				    const MGLevelObject<Vector<double> >&);
-
-//  template void MGTools::copy_from_mg_add<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  					Vector<double>&,
-//  					const MGLevelObject<Vector<double> >&);
-
-//  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransfer<Vector<double> >&,
-//  				   MGLevelObject<Vector<double> >&,
-//  				   const Vector<float>&);
-
-//  template void MGTools::copy_from_mg<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  				    Vector<double>&,
-//  				    const MGLevelObject<Vector<float> >&);
-
-//  template void MGTools::copy_from_mg_add<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  					Vector<double>&,
-//  					const MGLevelObject<Vector<float> >&);
-
-//  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransfer<Vector<double> >&,
-//  				   MGLevelObject<Vector<double> >&,
-//  				   const BlockVector<double>&);
-
-//  template void MGTools::copy_from_mg<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  				    BlockVector<double>&,
-//  				    const MGLevelObject<Vector<double> >&);
-
-//  template void MGTools::copy_from_mg_add<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  					BlockVector<double>&,
-//  					const MGLevelObject<Vector<double> >&);
-
-//  template void MGTools::copy_to_mg<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
-//  				   const MGTransfer<Vector<double> >&,
-//  				   MGLevelObject<Vector<double> >&,
-//  				   const BlockVector<float>&);
-
-//  template void MGTools::copy_from_mg<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  				    BlockVector<double>&,
-//  				    const MGLevelObject<Vector<float> >&);
-
-//  template void MGTools::copy_from_mg_add<deal_II_dimension>(const MGDoFHandler<deal_II_dimension>&,
-//  					BlockVector<double>&,
-//  					const MGLevelObject<Vector<float> >&);
 
 template void MGTools::count_dofs_per_component<deal_II_dimension> (const MGDoFHandler<deal_II_dimension>&,
 						   std::vector<std::vector<unsigned int> >&);

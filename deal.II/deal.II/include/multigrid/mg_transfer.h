@@ -318,7 +318,49 @@ class MGTransferBlock : public MGTransfer<BlockVector<number> >,
 				   BlockVector<number>       &dst,
 				   const BlockVector<number> &src) const;
 
-  protected: 
+    				     /**
+				      * Transfer from a vector on the
+				      * global grid to vectors defined
+				      * on each of the levels
+				      * separately, i.a. an @p{MGVector}.
+				      */
+    template<int dim, class InVector>
+    void
+    copy_to_mg (const MGDoFHandler<dim>& mg_dof,
+		MGLevelObject<BlockVector<number> >& dst,
+		const InVector& src) const;
+
+				     /**
+				      * Transfer from multi-level vector to
+				      * normal vector.
+				      *
+				      * Copies data from active
+				      * portions of an MGVector into
+				      * the respective positions of a
+				      * @p{Vector<number>}. In order to
+				      * keep the result consistent,
+				      * constrained degrees of freedom
+				      * are set to zero.
+				      */
+    template<int dim, class OutVector>
+    void
+    copy_from_mg (const MGDoFHandler<dim>& mg_dof,
+		  OutVector& dst,
+		  const MGLevelObject<BlockVector<number> >& src) const;
+
+				     /**
+				      * Add a multi-level vector to a
+				      * normal vector.
+				      *
+				      * Works as the previous
+				      * function, but probably not for
+				      * continuous elements.
+				      */
+    template<int dim, class OutVector>
+    void
+    copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
+		      OutVector& dst,
+		      const MGLevelObject<BlockVector<number> >& src) const;
 };
 
 
