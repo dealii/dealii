@@ -50,6 +50,25 @@ class BlockVector
 {
   public:
 				     /**
+				      * Declare standard types used in
+				      * all containers. These types
+				      * parallel those in the #C++#
+				      * standard libraries
+				      * #vector<...># class. The
+				      * #iterator# types are not
+				      * declared at present, since
+				      * there are no iterators
+				      * implemented that cycle through
+				      * the individual sub-vectors.
+				      */
+    typedef Number value_type;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef size_t size_type;
+
+				     /**
 				      *  Dummy-Constructor. Dimension=0
 				      */
     BlockVector ();
