@@ -1589,6 +1589,26 @@ SparseMatrix<number>::const_iterator::operator++ ()
 
 template <typename number>
 inline
+typename SparseMatrix<number>::const_iterator
+SparseMatrix<number>::const_iterator::operator++ (int)
+{
+  Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+
+  typename SparseMatrix<number>::const_iterator iter=*this;
+  
+  ++accessor.a_index;
+  if (accessor.a_index >=
+      accessor.matrix->get_sparsity_pattern().row_length(accessor.a_row))
+    {
+      accessor.a_index = 0;
+      accessor.a_row++;
+    }
+  return iter;
+}
+
+
+template <typename number>
+inline
 const typename SparseMatrix<number>::const_iterator::Accessor &
 SparseMatrix<number>::const_iterator::operator* () const
 {
