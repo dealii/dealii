@@ -298,7 +298,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
   for (unsigned int c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
 
-  unsigned int n_rows = sparsity.n_rows();
+  const unsigned int n_rows = sparsity.n_rows();
   for (unsigned int row=0; row<n_rows; ++row)
     {
       if (distribute[row] == -1)
