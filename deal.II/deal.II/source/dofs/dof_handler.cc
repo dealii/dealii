@@ -875,7 +875,7 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 
       				       // dofs of quad
   if (selected_fe->dofs_per_quad > 0)
-    for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
+    for (unsigned int d=0; d<selected_fe->dofs_per_quad; ++d)
       cell->set_dof_index (d, next_free_dof++);
 
   
