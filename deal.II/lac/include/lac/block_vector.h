@@ -1029,9 +1029,10 @@ class BlockVector
     BlockVector<Number> & operator *= (const Number factor);
 
 				     /**
-				      *  U=a*V. Replacing.
+				      *  U=a*V. Assignment.
 				      */
-    void equ (const Number a, const BlockVector<Number>& V);
+    template <typename Number2>
+    void equ (const Number a, const BlockVector<Number2>& V);
     
 				     /**
 				      * U=a*V+b*W.

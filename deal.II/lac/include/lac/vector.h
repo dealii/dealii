@@ -417,9 +417,10 @@ class Vector
     void scale (const Vector<Number> &scaling_factors);
     
 				     /**
-				      *  U=a*V. Replacing.
+				      *  U=a*V. Assignment.
 				      */
-    void equ (const Number a, const Vector<Number>& V);
+    template <typename Number2>
+    void equ (const Number a, const Vector<Number2>& V);
     
 				     /**
 				      * U=a*V+b*W.

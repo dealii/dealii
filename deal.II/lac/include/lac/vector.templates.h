@@ -454,13 +454,14 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 
 
 template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number>& u)
+template <typename Number2>
+void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
 {
   Assert (dim!=0, ExcEmptyVector());
   Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
   iterator i_ptr = begin(),
 	   i_end = end();
-  const_iterator u_ptr = u.begin();
+  typename Vector<Number2>::const_iterator u_ptr = u.begin();
   while (i_ptr!=i_end)
     *i_ptr++ = a * *u_ptr++;
 }

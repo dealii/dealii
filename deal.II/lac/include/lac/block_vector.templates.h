@@ -452,8 +452,9 @@ void BlockVector<Number>::equ (const Number a,
 
 
 template <typename Number>
+template <typename Number2>
 void BlockVector<Number>::equ (const Number a,
-			       const BlockVector<Number>& v)
+			       const BlockVector<Number2>& v)
 {
   Assert (num_blocks == v.num_blocks,
 	  ExcDimensionMismatch(num_blocks, v.num_blocks));
