@@ -40,10 +40,6 @@ using namespace std;
 
 
 
-//TODO:[RH,GK] Replace global by local object; better: have two functions, or by default arg
-static const MappingQ1<deal_II_dimension> mapping_q1;
-
-
 // TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
 // TODO:[WB] implement multithreading for this function.
 template <int dim>
