@@ -271,6 +271,45 @@ class DoFRenumbering
 		    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
 
 				     /**
+				      * Sort the degrees of freedom by
+				      * component. The numbering within
+				      * each component is not touched,
+				      * so a degree of freedom with index
+				      * $i$, belonging to some component,
+				      * and another degree of freedom
+				      * with index $j$ belonging to the same
+				      * component will be assigned new
+				      * indices $n(i)$ and $n(j)$ with
+				      * $n(i)<n(j)$ if $i<j$ and
+				      * $n(i)>n(j)$ if $i>j$.
+				      *
+				      * You may want to give the order in
+				      * which the components are to be ordered
+				      * (e.g. if the second argument contains
+				      * the numbers @p{(0, 3, 2, 1)}, then all
+				      * indices of component @p{0} will be
+				      * before those of component @p{3}, before
+				      * those of component @p{2}, ...). The
+				      * length of this list has to be the
+				      * same as the number of components
+				      * in the finite element, and has to
+				      * contain all numbers counted from
+				      * zero onwards. If
+				      * you ommit this argument, the same
+				      * order as given by the finite element
+				      * is used.
+				      *
+				      * For finite elements with only one
+				      * component, this function is the
+				      * identity operation.
+				      */
+    template <int dim>
+    static void
+    component_wise (MGDoFHandler<dim>&               dof_handler,
+		    unsigned int                     level,
+		    const std::vector<unsigned int>& component_order = std::vector<unsigned int>());
+
+				     /**
 				      * Cell-wise renumbering for DG
 				      * elements.  This function takes
 				      * the ordered set of cells in
