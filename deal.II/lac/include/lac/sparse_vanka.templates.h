@@ -597,7 +597,7 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
           typedef void (SparseVanka<number>::*mem_fun_p)
             (Vector<number2> &,
              const Vector<number2> &,
-             const std::vector<bool> *) const;
+             const std::vector<bool> * const) const;
           const mem_fun_p comp
             = &SparseVanka<number>::template apply_preconditioner<number2>;
           Threads::ThreadManager thread_manager;
