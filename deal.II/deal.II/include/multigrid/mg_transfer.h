@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,7 @@
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 
-#include <boost_local/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 template <int dim> class MGDoFHandler;

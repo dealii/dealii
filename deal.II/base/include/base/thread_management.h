@@ -22,9 +22,9 @@
 #include <utility>
 
 #include <list>
-#include <boost_local/type_traits.hpp>
-#include <boost_local/tuple/tuple.hpp>
-#include <boost_local/shared_ptr.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_POSIX)
