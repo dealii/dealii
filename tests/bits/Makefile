@@ -48,6 +48,7 @@ tests_x = anna_? \
 	  mapping_q4_3d \
 	  q_points \
           find_cell_* \
+          sparsity_pattern_* \
           sparse_matrix_* \
 	  full_matrix_vector_* \
 	  solver_selector \
