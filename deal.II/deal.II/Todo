@@ -181,3 +181,7 @@ Move the TriaNumberCache into the Triangulation class once the
   
 
 Fix vectors.cc to not use HUGE_VAL (GK)
+
+
+In Tria::distort_random: replace the initial value 1e308 by the
+  diameter of the domain (sum of diameters of coarse level cells).
