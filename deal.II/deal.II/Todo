@@ -37,27 +37,6 @@ In VectorTools::project_boundary_values, no condensation of sparsity
   acceptable for higher dimensions. Fix this.
 
 
-Check all places where condensation of matrices/vectors and
-  application of boundary values takes place. I am not sure about
-  the right order in which they have to be applied, but in 2D there
-  is no difference since constrained dofs cannot be on the boundary.
-  Problems with the order will therefore not show up in 2D but may
-  become apparent in 3D, so keep this in mind for the implementation
-  of the 3D library.
-
-
-No support points for non-Lagrangian elements? Check for Langrange in
-  interpolation? Interpolation functions do not really make sense if
-  node values are momenta of the trial functions. For these cases,
-  something els must be devised. Still, to allow for upwind-ordering,
-  it would be good to assign a point to the functions, maybe a kind
-  of center of mass.
-
-
-Think about the problem pointed at in the documentation of
-  FiniteElementBase::restriction.
-
-
 Implement the random distortion in Triangulation for hanging nodes
   also. Hanging nodes need to be reset to the correct mean value
   at the end, which is simple for 2D but difficult for 3D. Maybe take
@@ -77,19 +56,11 @@ Add tests in Triangulation<3>::create_triangulation for faces (quads)
   mirrored direction.
 
 
-Implement boundary information for Triangulation<3>::create_triangulation
-
-
 Better estimates for DoFHandler<3>::max_couplings_between_dofs
 
 
 Check optimized code with -Winline and act accordingly. Unfortunately,
   most warnings are from the STL.
-
-
-Look at the hyper-L and hyper-ball code in 3d. I suspect the cubes are
-  turned inside out, but I haven't the time right now to look at this.
-  The hypercube is fixed, however.
 
 
 Unify lots of code of the two Cuthill-McKee dof renumbering functions
@@ -105,7 +76,7 @@ Add support for MGTransferPrebuilt and MGSmoother if a user wants
 
 
 Fix MGTransferPrebuilt::build_matrices, think about diagonals in
-square sparse matrices.
+  square sparse matrices.
 
 
 In GridOut::write_ucd, a vector of vertices is built along with
@@ -118,15 +89,6 @@ In GridOut::write_ucd, a vector of vertices is built along with
 
 Fix a potential problem with viewing angles in 3d Eps GridOut (see
   comment)
-
-
-Move the GridOut::EpsFlags<3>::EpsFlags constructor into the
-  appropriate .cc-file if the compiler supports this. Same
-  applies to DataOut::Patch<dim>
-
-
-Remove the hack in Make_forward_declarations when using gcc2.95. See
-  the cvs diffs of 1.6 to 1.7 for the reason.
 
 
 Move the TriaNumberCache into the Triangulation class once the
@@ -142,9 +104,3 @@ DataOut determines whether something is a DoF or cell vector by the
   since there the number of elements of both types of vectors is the
   same, but the ordering will usually differ. Errors cannot be plotted
   anyway, since they are float vectors.
-
-
-Move GeometryInfo to base
-
-
-Fill in the missing comment in FEValues::FEValues (GK!)
