@@ -126,15 +126,24 @@ else
       GXX_VERSION=MIPSpro
     else
 
+      # Intel's ICC C++ compiler?
       is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
       if test "x$is_intel_icc" != "x" ; then
         AC_MSG_RESULT(compiler is Intel ICC)
         GXX_VERSION=intel_icc
       else
 
-        dnl  Aw, nothing suitable found...
-        AC_MSG_ERROR(Unrecognized compiler, sorry)
-        exit 1
+        # Or DEC's cxx compiler?
+        is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
+        if test "x$is_dec_cxx" != "x" ; then
+          AC_MSG_RESULT(compiler is Compaq cxx)
+          GXX_VERSION=compaq_cxx
+        else
+
+          dnl  Aw, nothing suitable found...
+          AC_MSG_ERROR(Unrecognized compiler, sorry)
+          exit 1
+        fi
       fi
     fi
   fi
@@ -271,18 +280,19 @@ else
 
       else
 
-        dnl Other compiler
+	if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
+	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi_errors -w0 -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -model ansi -accept restrict_keyword -fast"
+          dnl if necessary: -shared, -pthread 
+          dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
+          dnl                -pch? -noimplicit_include?
+        else
 
-        dnl For DECs cxx we should use the following options:
-        dnl   CXXFLAGSO: -ansi_alias -O3
-        dnl   CXXFLAGSG: -std strict_ansi_errors -w0
-        dnl if necessary: -shared, -pthread 
-        dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
-        dnl                -pch? -noimplicit_include?
-
-        AC_MSG_ERROR(No compiler options for this C++ compiler
-                     specified at present)
-        exit 1
+          dnl Other compiler
+          AC_MSG_ERROR(No compiler options for this C++ compiler
+                       specified at present)
+          exit 1
+        fi
       fi
     fi
   fi
@@ -381,6 +391,13 @@ if test $enableshared = yes ; then
                 CXXFLAGSG="$CXXFLAGSG -KPIC"
                 CXXFLAGSO="$CXXFLAGSO -KPIC"
                 LDFLAGS="$LDFLAGS -KPIC"
+                ;;
+
+	compaq_cxx)
+		CFLAGS="$CFLAGS -shared"
+                CXXFLAGSG="$CXXFLAGSG -shared"
+                CXXFLAGSO="$CXXFLAGSO -shared"
+                LDFLAGS="$LDFLAGS -shared"
                 ;;
 
         *)
