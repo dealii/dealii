@@ -763,6 +763,124 @@ SlitSingularityFunction::gradient_list (const vector<Point<2> > &points,
 
 //////////////////////////////////////////////////////////////////////
 
+template<int dim>
+JumpFunction<dim>::JumpFunction(const Point<dim>& direction,
+				double steepness)
+		:
+		direction(direction),
+		steepness(steepness)
+{
+  switch (dim)
+    {
+      case 1:
+	    angle = 0;
+	    break;
+      case 2:
+	    angle = atan2(direction(0),direction(1));
+	    break;
+      case 3:
+	    Assert(false, ExcNotImplemented());
+    }
+  sine = sin(angle);
+  cosine = cos(angle);
+}
+
+	    
+
+template<int dim>
+double
+JumpFunction<dim>::value (const Point<dim>   &p,
+			    const unsigned int) const
+{
+  double x = steepness*(cosine*p(0)+sine*p(1));
+  return -atan(x);
+}
+
+
+
+template<int dim>
+void
+JumpFunction<dim>::value_list (const vector<Point<dim> > &p,
+				 vector<double>          &values,
+				 const unsigned int) const
+{
+  Assert (values.size() == p.size(),
+	  ExcDimensionMismatch(values.size(), p.size()));
+
+  for (unsigned int i=0;i<p.size();++i)
+    {
+      double x = steepness*(cosine*p[i](0)+sine*p[i](1));
+      values[i] = -atan(x);
+    }
+}
+
+
+template<int dim>
+double
+JumpFunction<dim>::laplacian (const Point<dim>   &p,
+			    const unsigned int) const
+{
+  double x = steepness*(cosine*p(0)+sine*p(1));
+  double r = 1+x*x;
+  return 2*steepness*steepness*x/(r*r);
+}
+
+
+template<int dim>
+void
+JumpFunction<dim>::laplacian_list (const vector<Point<dim> > &p,
+				     vector<double>          &values,
+				     const unsigned int) const
+{
+  Assert (values.size() == p.size(),
+	  ExcDimensionMismatch(values.size(), p.size()));
+
+  double f = 2*steepness*steepness;
+  
+  for (unsigned int i=0;i<p.size();++i)
+    {
+      double x = steepness*(cosine*p[i](0)+sine*p[i](1));
+      double r = 1+x*x;
+      values[i] = f*x/(r*r);
+    }
+}
+
+
+
+template<int dim>
+Tensor<1,dim>
+JumpFunction<dim>::gradient (const Point<dim>   &p,
+			       const unsigned int) const
+{
+  double x = steepness*(cosine*p(0)+sine*p(1));
+  double r = -steepness*(1+x*x);
+  Tensor<1,dim> erg;
+  erg[0] = cosine*r;
+  erg[1] = sine*r;
+  return erg;
+}
+
+
+
+template<int dim>
+void
+JumpFunction<dim>::gradient_list (const vector<Point<dim> > &p,
+				    vector<Tensor<1,dim> >  &gradients,
+				    const unsigned int) const
+{
+  Assert (gradients.size() == p.size(),
+	  ExcDimensionMismatch(gradients.size(), p.size()));
+
+  for (unsigned int i=0; i<p.size(); ++i)
+    {
+      double x = steepness*(cosine*p[i](0)+sine*p[i](1));
+      double r = -steepness*(1+x*x);
+      gradients[i][0] = cosine*r;
+      gradients[i][1] = sine*r;
+    }
+}
+
+
 template SquareFunction<1>;
 template SquareFunction<2>;
 template SquareFunction<3>;
@@ -775,3 +893,6 @@ template CosineFunction<3>;
 template ExpFunction<1>;
 template ExpFunction<2>;
 template ExpFunction<3>;
+template JumpFunction<1>;
+template JumpFunction<2>;
+template JumpFunction<3>;

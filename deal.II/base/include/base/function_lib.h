@@ -32,39 +32,39 @@ class SquareFunction : public Function<dim>
 {
   public:
 				     /**
-				      * @reimplemented
+				      * Function value at one point.
 				      */
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 
 				     /**
-				      * @reimplemented
+				      * Function values at multiple points.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values,
 			     const unsigned int         component = 0) const;
 
 				     /**
-				      * @reimplemented
+				      * Gradient at one point.
 				      */
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				    const unsigned int  component = 0) const;
 
 				     /**
-				      * @reimplemented
+					Gradients at multiple points.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<1,dim> >    &gradients,
 				const unsigned int         component = 0) const;
 
 				     /**
-				      * @reimplemented
+				      * Laplacian of the function at one point.
 				      */
     double laplacian (const Point<dim>   &p,
 		      const unsigned int  component = 0) const;
 
 				     /**
-				      * @reimplemented
+				      * Laplacian of the function at multiple points.
 				      */
     void laplacian_list (const vector<Point<dim> > &points,
 			 vector<double>            &values,
@@ -327,6 +327,99 @@ class SlitSingularityFunction : public Function<2>
 			vector<double>            &values,
 			const unsigned int         component = 0) const;
 };
+
+
+/**
+ * A jump in x-direction transported into some direction.
+ *
+ * If the advection is parallel to the y-axis, the function is
+ * @p{-atan(sx)}, where @p{s} is the steepness parameter provided in
+ * the constructor.
+ *
+ * For different advection directions, this function will be turned in
+ * the parameter space.
+ *
+ * Together with the function, its derivatives and Laplacian are defined.
+ *
+ * @author: Guido Kanschat, 2000
+ */
+template<int dim>
+class JumpFunction : public Function<dim>
+{
+  public:
+				     /**
+				      * Constructor. Provide the
+				      * advection direction here and
+				      * the steepness of the slope.
+				      */
+    JumpFunction (const Point<dim>& direction, double steepness);
+    
+				     /**
+				      * Function value at one point.
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Function values at multiple points.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;
+
+				     /**
+				      * Gradient at one point.
+				      */
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+					Gradients at multiple points.
+				      */
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<Tensor<1,dim> >    &gradients,
+				const unsigned int         component = 0) const;
+
+				     /**
+				      * Laplacian of the function at one point.
+				      */
+    double laplacian (const Point<dim>   &p,
+		      const unsigned int  component = 0) const;
+
+				     /**
+				      * Laplacian of the function at multiple points.
+				      */
+    void laplacian_list (const vector<Point<dim> > &points,
+			 vector<double>            &values,
+			 const unsigned int         component = 0) const;
+
+  protected:
+				     /**
+				      * Advection vector.
+				      */
+    Point<dim> direction;
+				     /**
+				      * Steepness (maximal derivative) of the slope.
+				      */
+    double steepness;
+
+				     /**
+				      * Advection angle.
+				      */
+    double angle;
+
+				     /**
+				      * Sine of @p{angle}.
+				      */
+    double sine;
+
+				     /**
+				      * Cosine of @p{angle}.
+				      */
+    double cosine;
+};
+
+
 
 
 #endif
