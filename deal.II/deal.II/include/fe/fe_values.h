@@ -1211,7 +1211,7 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
   Assert (component < fe->n_components(),
 	  ExcIndexRange(component, 0, fe->n_components()));
 			
-				   // if this particulat shape
+				   // if this particular shape
 				   // function is primitive, then we
 				   // can take a short-cut by checking
 				   // whether the requested component
@@ -1223,7 +1223,7 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
   if (fe->is_primitive(i))
     {
       if (component == fe->system_to_component_index(i).first)
-	return this->shape_values(i,j);
+	return this->shape_values(this->shape_function_to_row_table[i],j);
       else
 	return 0;
     }
@@ -1232,9 +1232,8 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 				       // no, this shape function is
 				       // not primitive. then we have
 				       // to loop over its components
-				       // and to find the
-				       // corresponding row in the
-				       // arrays of this
+				       // to find the corresponding
+				       // row in the arrays of this
 				       // object. before that check
 				       // whether the shape function
 				       // is non-zero at all within
@@ -1308,7 +1307,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
   Assert (component < fe->n_components(),
 	  ExcIndexRange(component, 0, fe->n_components()));
 			
-				   // if this particulat shape
+				   // if this particular shape
 				   // function is primitive, then we
 				   // can take a short-cut by checking
 				   // whether the requested component
@@ -1320,7 +1319,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
   if (fe->is_primitive(i))
     {
       if (component == fe->system_to_component_index(i).first)
-	return this->shape_gradients[i][j];
+	return this->shape_gradients[this->shape_function_to_row_table[i]][j];
       else
 	return Tensor<1,dim>();
     }
@@ -1329,9 +1328,8 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 				       // no, this shape function is
 				       // not primitive. then we have
 				       // to loop over its components
-				       // and to find the
-				       // corresponding row in the
-				       // arrays of this
+				       // to find the corresponding
+				       // row in the arrays of this
 				       // object. before that check
 				       // whether the shape function
 				       // is non-zero at all within
@@ -1405,7 +1403,7 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
   Assert (component < fe->n_components(),
 	  ExcIndexRange(component, 0, fe->n_components()));
 			
-				   // if this particulat shape
+				   // if this particular shape
 				   // function is primitive, then we
 				   // can take a short-cut by checking
 				   // whether the requested component
@@ -1417,7 +1415,7 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
   if (fe->is_primitive(i))
     {
       if (component == fe->system_to_component_index(i).first)
-	return this->shape_2nd_derivatives[i][j];
+	return this->shape_2nd_derivatives[this->shape_function_to_row_table[i]][j];
       else
 	return Tensor<2,dim>();
     }
@@ -1426,9 +1424,8 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 				       // no, this shape function is
 				       // not primitive. then we have
 				       // to loop over its components
-				       // and to find the
-				       // corresponding row in the
-				       // arrays of this
+				       // to find the corresponding
+				       // row in the arrays of this
 				       // object. before that check
 				       // whether the shape function
 				       // is non-zero at all within
