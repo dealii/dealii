@@ -181,6 +181,24 @@ class FECrissCross : public FiniteElement<dim>
     FECrissCross ();
     
 				     /**
+				      * Transforms the point @p{p} on
+				      * the unit cell to the point
+				      * @p{p_real} on the real cell
+				      * @p{cell} and returns @p{p_real}.
+				      */
+    virtual Point<dim> transform_unit_to_real_cell (const DoFHandler<dim>::cell_iterator cell,
+						    const Point<dim> &p) const;
+    
+				     /**
+				      * Transforms the point @p{p} on
+				      * the real cell to the point
+				      * @p{p_unit} on the unit cell
+				      * @p{cell} and returns @p{p_unit}.
+				      */
+    virtual Point<dim> transform_real_to_unit_cell (const DoFHandler<dim>::cell_iterator cell,
+						    const Point<dim> &p) const;
+
+				     /**
 				      * Return the value of the @p{i}th shape
 				      * function at point @p{p} on the unit cell.
 				      */
