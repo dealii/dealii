@@ -12,7 +12,7 @@
 //----------------------------  dof_constraints_05.cc  ---------------------------
 
 
-// simply check what happens when calling DoFConstraints::set_zero
+// simply check what happens when calling DoFConstraints::set_zero on
 // vectors. This test was written when I changed a few things in the algorithm
 
 #include "../tests.h"
