@@ -78,7 +78,7 @@ MAIL='mail'
 if test -d $target ; then rm -rf $target ; fi
 mkdir $target 2>&1
 cd $target
-$CVS checkout deal.II 2>&1
+$CVS -q checkout deal.II 2>&1
 cd deal.II
 
 # Echo system information for later parsing
