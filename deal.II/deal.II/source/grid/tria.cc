@@ -3922,9 +3922,6 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
 
 template <int dim>
 void Triangulation<dim>::execute_coarsening_and_refinement () {
-  prepare_refinement ();
-  prepare_coarsening ();
-
   execute_coarsening();
   execute_refinement();
 };
@@ -3937,6 +3934,7 @@ void Triangulation<dim>::execute_coarsening_and_refinement () {
 template <>
 void Triangulation<1>::execute_refinement () {
   const unsigned int dim = 2;
+  prepare_refinement ();
   
 				   // check whether a new level is needed
 				   // we have to check for this on the
@@ -4157,6 +4155,7 @@ void Triangulation<1>::execute_refinement () {
 template <>
 void Triangulation<2>::execute_refinement () {
   const unsigned int dim = 2;
+  prepare_refinement ();
   
 				   // check whether a new level is needed
 				   // we have to check for this on the
@@ -4764,6 +4763,9 @@ template <>
 void Triangulation<3>::execute_refinement () {
   const unsigned int dim = 3;
 
+				   // do some grid smoothing
+  prepare_refinement ();
+  
 				   // check whether a new level is needed
 				   // we have to check for this on the
 				   // highest level only (on this, all
@@ -5959,6 +5961,7 @@ void Triangulation<3>::execute_refinement () {
 
 template <int dim>
 void Triangulation<dim>::execute_coarsening () {
+  prepare_coarsening ();
   				   // loop over all cells. Flag all cells of
 				   // which all children are flagged for
 				   // coarsening and delete the childrens'
