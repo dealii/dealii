@@ -66,12 +66,14 @@ namespace PETScWrappers
                                         * whether we should tell PETSc that
                                         * the matrix is going to be symmetric
                                         * (as indicated by the call
-                                        * <tt>MatSetOption(mat,MAT_SYMMETRIC)</tt>. Note
-                                        * that the PETSc documentation states
-                                        * that one cannot form an ILU
-                                        * decomposition of a matrix for which
-                                        * this flag has been set. The default
-                                        * value of this flag is @p false.
+                                        * <tt>MatSetOption(mat,
+                                        * MAT_SYMMETRIC)</tt>. Note that the
+                                        * PETSc documentation states that one
+                                        * cannot form an ILU decomposition of
+                                        * a matrix for which this flag has
+                                        * been set to @p true, only an
+                                        * ICC. The default value of this flag
+                                        * is @p false.
                                         */
       SparseMatrix (const unsigned int m,
                     const unsigned int n,
@@ -97,12 +99,14 @@ namespace PETScWrappers
                                         * whether we should tell PETSc that
                                         * the matrix is going to be symmetric
                                         * (as indicated by the call
-                                        * <tt>MatSetOption(mat,MAT_SYMMETRIC)</tt>. Note
-                                        * that the PETSc documentation states
-                                        * that one cannot form an ILU
-                                        * decomposition of a matrix for which
-                                        * this flag has been set. The default
-                                        * value of this flag is @p false.
+                                        * <tt>MatSetOption(mat,
+                                        * MAT_SYMMETRIC)</tt>. Note that the
+                                        * PETSc documentation states that one
+                                        * cannot form an ILU decomposition of
+                                        * a matrix for which this flag has
+                                        * been set to @p true, only an
+                                        * ICC. The default value of this flag
+                                        * is @p false.
                                         */
       SparseMatrix (const unsigned int               m,
                     const unsigned int               n,
