@@ -738,6 +738,17 @@ void GridGenerator::hyper_shell (Triangulation<3>   &,
 #endif
 
 
+#if deal_II_dimension == 1
+
+template <>
+void GridGenerator::laplace_transformation (Triangulation<1> &,
+					    const std::map<unsigned int,Point<1> > &)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#else
+
 template <int dim>
 void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 					    const std::map<unsigned int,Point<dim> > &new_points)
@@ -817,6 +828,8 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 }
 
 
+#endif
+
 void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 				   const std::map<unsigned int,double> &m,
 				   Vector<double> &u)
@@ -847,7 +860,9 @@ GridGenerator::hyper_cube (Triangulation<deal_II_dimension> &,
 			   const double,
 			   const double);
 
+#if deal_II_dimension != 1
 template void
 GridGenerator::laplace_transformation (Triangulation<deal_II_dimension> &,
 				       const std::map<unsigned int,Point<deal_II_dimension> > &);
 
+#endif
