@@ -1,5 +1,16 @@
-# Copyright (C) 1999, 2000 by Wolfgang Bangerth, Univerisity of Heidelberg.de
+# Copyright (C) 1999, 2000 by the deal.II group
 
+print <<'EOT'
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>Makefile fro deal.II</title>
+    <meta name="author" content="deal@iwr.uni-heidelberg.de">
+    <meta name="keywords" content="deal.II Makefile"></head>
+  <body>
+EOT
+;
 
 # ignore the first few lines
 $_ = <>;
@@ -58,5 +69,4 @@ if ($state == $program_mode) {
    print "</code></pre>\n";
 }
 
-
-
+print "</body>\n</html>\n";
