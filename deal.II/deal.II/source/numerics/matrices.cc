@@ -23,7 +23,9 @@
 #include <numerics/matrices.h>
 #include <numerics/assembler.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 
 #include <algorithm>
 #include <set>
@@ -676,8 +678,8 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 
 
 
-/*
 
+/*
 template <int dim>
 template <int blocks>
 void
@@ -693,7 +695,8 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 	  ExcDimensionsDontMatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
 	  ExcDimensionsDontMatch(matrix.n(), solution.size()));
-  Assert (matrix.get_row_indices() == matrix.get_column_indices(),
+  Assert (matrix.get_sparsity_pattern().get_row_indices() == 
+	  matrix.get_sparsity_pattern().get_column_indices(),
 	  ExcMatrixNotBlockSquare());
   
 				   // if no boundary values are to be applied
@@ -704,7 +707,9 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 
   map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
 					    endd = boundary_values.end();
-  const unsigned int n_dofs             = matrix.m();
+  const unsigned int n_dofs = matrix.m();
+  const BlockSparsityPattern<blocks,blocks> &
+    sparsity_pattern = matrix.get_sparsity_pattern();
 
 				   // if a diagonal entry is zero
 				   // later, then we use another
@@ -712,20 +717,45 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				   // the first nonzero diagonal
 				   // element of the matrix, or 1 if
 				   // there is no such thing
-  double first_nonzero_diagonal_entry = 1;
-  for (unsigned int i=0; i<n_dofs; ++i)
-    if (matrix.diag_element(i) != 0)
-      {
-	first_nonzero_diagonal_entry = matrix.diag_element(i);
+  double first_nonzero_diagonal_entry = 0;
+  for (unsigned int diag_block=0; diag_block<blocks; ++diag_block)
+    {
+      for (unsigned int i=0; i<matrix.block(diag_block,diag_block).n(); ++i)
+	if (matrix.block(diag_block,diag_block).diag_element(i) != 0)
+	  {
+	    first_nonzero_diagonal_entry 
+	      = matrix.block(diag_block,diag_block).diag_element(i);
+	    break;
+	  };
+				       // check whether we have found
+				       // something in the present
+				       // block
+      if (first_nonzero_diagonal_entry != 0)
 	break;
-      };
-
+    };
+				   // nothing found on all diagonal
+				   // blocks? if so, use 1.0 instead
+  if (first_nonzero_diagonal_entry == 0)
+    first_nonzero_diagonal_entry = 1;
   
+  
+				   // pointer to the mapping between
+				   // global and block indices. since
+				   // the row and column mappings are
+				   // equal, store a pointer on only
+				   // one of them
+  const BlockIndices<blocks> &
+    index_mapping = sparsity_pattern.get_column_indices();
+  
+				   // now loop over all boundary dofs
   for (; dof != endd; ++dof)
     {
       Assert (dof->first < n_dofs, ExcInternalError());
       
       const unsigned int dof_number = dof->first;
+      const pair<unsigned int,unsigned int>
+	block_index = index_mapping.global_to_local (dof_number);
+
 				       // for each boundary dof:
       
 				       // set entries of this line
@@ -736,10 +766,33 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				       // we shall not set
 				       // matrix.global_entry(
 				       //     sparsity_rowstart[dof.first])
-      const unsigned int last = sparsity_rowstart[dof_number+1];
-      for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
-	matrix.global_entry(j) = 0.;
+      for (unsigned int block_col=0; block_col<blocks; ++block_col)
+	{
+	  const SparsityPattern &
+	    local_sparsity = sparsity_pattern.block(block_index.first,
+						    block_col);
 
+					   // find first and last
+					   // entry in the present row
+					   // of the present
+					   // block. exclude the main
+					   // diagonal element, which
+					   // is the diagonal element
+					   // of a diagonal block,
+					   // which must be a square
+					   // matrix so the diagonal
+					   // element is the first of
+					   // this row.
+	  const unsigned int 
+	    last  = local_sparsity.rowstart[block_index.second+1],
+	    first = (block_col == block_index.first ?
+		     local_sparsity.rowstart[block_index.second]+1 :
+		     local_sparsity.rowstart[block_index.second]);
+	  
+	  for (unsigned int j=first; j<last; ++j)
+	    matrix.block(block_index.first,block_col).global_entry(j) = 0.;
+	};
+      
 
 				       // set right hand side to
 				       // wanted value: if main diagonal
@@ -755,16 +808,21 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				       // store the new rhs entry to make
 				       // the gauss step more efficient
       double new_rhs;
-      if (matrix.diag_element(dof_number) != 0.0)
-	new_rhs = right_hand_side(dof_number)
-		= dof->second * matrix.diag_element(dof_number);
+      if (matrix.block(block_index.first, block_index.first)
+	  .diag_element(block_index.second) != 0.0)
+	new_rhs = dof->second * 
+		  matrix.block(block_index.first, block_index.first)
+		  .diag_element(block_index.second);
       else
 	{
-	  matrix.set (dof_number, dof_number,
-		      first_nonzero_diagonal_entry);
-	  new_rhs = right_hand_side(dof_number)
-		  = dof->second * first_nonzero_diagonal_entry;
+	  matrix.block(block_index.first, block_index.first)
+	    .set (block_index.second,
+		  block_index.second,
+		  first_nonzero_diagonal_entry);
+	  new_rhs = dof->second * first_nonzero_diagonal_entry;
 	};
+      right_hand_side.block(block_index.first)(block_index.second)
+	= new_rhs;
 
 
 				       // if the user wants to have
@@ -773,13 +831,17 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				       // sparsity pattern is
 				       // symmetric, then do a Gauss
 				       // elimination step with the
-				       // present row
+				       // present row. this is a
+				       // little more complicated for
+				       // block matrices.
       if (preserve_symmetry)
 	{
 					   // store the only nonzero entry
 					   // of this line for the Gauss
 					   // elimination step
-	  const double diagonal_entry = matrix.diag_element(dof_number);
+	  const double diagonal_entry 
+	    = matrix.block(block_index.first,block_index.first)
+	    .diag_element(block_index.second);
 	  
 					   // we have to loop over all
 					   // rows of the matrix which
@@ -792,56 +854,76 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					   // these rows cheaply by
 					   // looking at the nonzero
 					   // column numbers of the
-					   // present row. we need not
-					   // look at the first entry,
-					   // since that is the
-					   // diagonal element and
-					   // thus the present row
-	  for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
+					   // present row.
+					   //
+					   // note that if we check
+					   // whether row #row# in
+					   // block (r,c) is non-zero,
+					   // then we have to check
+					   // for the existence of
+					   // column #row# in block
+					   // (c,r), i.e. of the
+					   // transpose block
+	  for (unsigned int block_row=0; block_row<blocks; ++block_row)
 	    {
-	      const unsigned int row = sparsity_colnums[j];
-
-					       // find the position of
-					       // element
-					       // (row,dof_number)
-	      const unsigned int *
-		p = lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-				&sparsity_colnums[sparsity_rowstart[row+1]],
-				dof_number);
-
-					       // check whether this line has
-					       // an entry in the regarding column
-					       // (check for ==dof_number and
-					       // != next_row, since if
-					       // row==dof_number-1, *p is a
-					       // past-the-end pointer but points
-					       // to dof_number anyway...)
-					       //
-					       // there should be such an entry!
-	      Assert ((*p == dof_number) &&
-		      (p != &sparsity_colnums[sparsity_rowstart[row+1]]),
-		      ExcInternalError());
-
-	      const unsigned int global_entry
-		= (p - &sparsity_colnums[sparsity_rowstart[0]]);
+	      const SparsityPattern &transpose_sparsity
+		= sparsity_pattern.block (block_index.first,block_row);
 	      
-					       // correct right hand side
-	      right_hand_side(row) -= matrix.global_entry(global_entry) /
-				      diagonal_entry * new_rhs;
+					       // traverse the row of
+					       // the transpose block
+					       // to find the
+					       // interesting rows in
+					       // the present block
+	      const unsigned int
+		first = (block_index.first == block_row ?
+			 transpose_sparsity.rowstart[block_index.second]+1 :
+			 transpose_sparsity.rowstart[block_index.second]),
+		last  = transpose_sparsity.rowstart[block_index.second+1];
 	      
-					       // set matrix entry to zero
-	      matrix.global_entry(global_entry) = 0.;
+	      for (unsigned int j=first; j<last; ++j)
+		{
+		  const unsigned int row = transpose_sparsity.colnums[j];
+
+						   // find the position of
+						   // element
+						   // (row,dof_number)
+		  const unsigned int *
+		    p = lower_bound(&transpose_sparsity.colnums[transpose_sparsity.rowstart[row]+1],
+				    &transpose_sparsity.colnums[transpose_sparsity.rowstart[row+1]],
+				    block_index.second);
+
+						   // check whether this line has
+						   // an entry in the regarding column
+						   // (check for ==dof_number and
+						   // != next_row, since if
+						   // row==dof_number-1, *p is a
+						   // past-the-end pointer but points
+						   // to dof_number anyway...)
+						   //
+						   // there should be such an entry!
+		  Assert ((*p == block_index.second) &&
+			  (p != &transpose_sparsity.colnums[transpose_sparsity.rowstart[row+1]]),
+			  ExcInternalError());
+		  
+		  const unsigned int global_entry
+		    = (p - &transpose_sparsity.colnums[transpose_sparsity.rowstart[0]]);
+		  
+						   // correct right hand side
+		  right_hand_side.block(block_row)(row)
+		    -= matrix.block(block_row,block_index.first).global_entry(global_entry) /
+		    diagonal_entry * new_rhs;
+		  
+						   // set matrix entry to zero
+		  matrix.block(block_row,block_index.first).global_entry(global_entry) = 0.;
+		};
 	    };
 	};
 
 				       // preset solution vector
-      solution(dof_number) = dof->second;
+      solution.block(block_index.first)(block_index.second) = dof->second;
     };
 };
-
-
 */
-
 
 
 template <int dim>
@@ -1256,3 +1338,23 @@ template class MatrixTools<deal_II_dimension>;
 template class MassMatrix<deal_II_dimension>;
 template class LaplaceMatrix<deal_II_dimension>;
 
+/*
+template
+void
+MatrixTools<deal_II_dimension>::
+apply_boundary_values (const map<unsigned int,double> &,
+		       BlockSparseMatrix<double,2,2>  &,
+		       BlockVector<2,double>          &,
+		       BlockVector<2,double>          &,
+		       const bool);
+
+template
+void
+MatrixTools<deal_II_dimension>::
+apply_boundary_values (const map<unsigned int,double> &,
+		       BlockSparseMatrix<double,3,3>  &,
+		       BlockVector<3,double>          &,
+		       BlockVector<3,double>          &,
+		       const bool);
+
+*/
