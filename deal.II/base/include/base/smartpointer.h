@@ -44,7 +44,8 @@ class SmartPointer
     SmartPointer(T* tt) :
 		    t(tt) 
       {
-	t->subscribe();
+	if (t)
+	  t->subscribe();
       }
 
 				   /**
