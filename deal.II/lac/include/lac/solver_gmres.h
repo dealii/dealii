@@ -37,10 +37,7 @@ class SolverGMRES : public Solver<Matrix, Vector> {
 				      */
     SolverGMRES (SolverControl        &cn,
 		 VectorMemory<Vector> &mem,
-		 const unsigned int    n_tmp_vectors) :
-		    Solver<Matrix,Vector> (cn,mem),
-		    n_tmp_vectors (n_tmp_vectors)
-      {};
+		 const unsigned int    n_tmp_vectors);
     
 				     /**
 				      * Solver method.
