@@ -208,7 +208,7 @@ performance: $(performance-o-files) $(libraries)
 # Continue with other targets if needed
 ############################################################
 
-check: fe_data_test.check mapping.check derivatives.check shapes.check
+check: fe_data_test.check mapping.check mapping_c1.check derivatives.check shapes.check
 	@echo Checking results
 	$(MAKE) dodiff
 
