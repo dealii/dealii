@@ -925,7 +925,7 @@ template <class MATRIX>
 void
 FullMatrix<number>::copy_from (const MATRIX& M)
 {
-  reinit (M.m(), M.n());
+  this->reinit (M.m(), M.n());
   const typename MATRIX::const_iterator end = M.end();
   for (typename MATRIX::const_iterator entry = M.begin();
        entry != end; ++entry)
