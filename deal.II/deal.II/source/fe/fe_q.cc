@@ -1462,13 +1462,9 @@ FE_Q<3>::initialize_constraints ()
                                            // the problem, see the discussion
                                            // in the FiniteElementBase class
                                            // for constraint matrices in 3d.
-          if (constraint_point(k) > 0.5)
-            {
-              constraint_point(k) = 1.0 - constraint_point(k);
-              mirror[k] = true;
-            }
-          else
-            mirror[k] = false;
+          mirror[k] = (constraint_point(k) > 0.5);
+          if (mirror[k])
+            constraint_point(k) = 1.0 - constraint_point(k);
         }
 
       for (unsigned i = 0; i < pnts; ++i)
