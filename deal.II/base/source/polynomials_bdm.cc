@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,7 +69,7 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int j=0;j<dim;++j)
 	{
 	  values[i+j*n_sub][j] = p_values[i];
-	  std::cerr << i+j*n_sub << ' ' << j << ' ' << p_values[i] << std::endl;
+//	  std::cerr << i+j*n_sub << ' ' << j << ' ' << p_values[i] << std::endl;
 	}
       
     }
@@ -147,7 +147,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 	      p(1) = x;
 	      break;	      
 	  }
-	std::cerr << p << std::endl;
+//	std::cerr << p << std::endl;
 	
 	compute (p, values, grads, grad_grads);
 	for (unsigned int i=0;i<n();++i)
@@ -157,7 +157,9 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 	  }
       }
 				   // Volume integrals are missing
-  Assert (polynomial_space.degree() < 2,
+				   //
+				   // This degree is one larger
+  Assert (polynomial_space.degree() <= 2,
 	  ExcNotImplemented());
 }
 
