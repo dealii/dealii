@@ -1,24 +1,17 @@
 # $Id$
 
 
-all: lac doc 
+all: lac
 
-clean: doc-clean source-clean
+clean: source-clean
 	rm -f *~ include/*~ include/*/*~ lib/lib*
 
 lac:
 	cd source ; make
 
-doc:
-	cd doc ; make
-
-
-doc-clean:
-	cd doc ; make clean
-
 source-clean:
 	cd source ; make clean
 
 
-.PHONY: all deal.II doc
-.PHONY: clean doc-clean source-clean
+.PHONY: all deal.II
+.PHONY: clean source-clean
