@@ -95,6 +95,22 @@ namespace PETScWrappers
                                               * Exception
                                               */
             DeclException0 (ExcBeyondEndOfMatrix);
+                                             /**
+                                              * Exception
+                                              */
+            DeclException1 (ExcPETScError,
+                            int,
+                            << "An error with error number " << arg1
+                            << " occured while calling a PETSc function");
+                                             /**
+                                              * Exception
+                                              */
+            DeclException3 (ExcAccessToNonlocalRow,
+                            int, int, int,
+                            << "You tried to access row " << arg1
+                            << " of a distributed matrix, but only rows "
+                            << arg2 << " through " << arg3
+                            << " are stored locally and can be accessed.");
             
           private:
                                              /**

@@ -13,6 +13,8 @@
 
 
 #include <lac/petsc_matrix_base.h>
+#include <lac/petsc_sparse_matrix.h>
+#include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/petsc_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
@@ -40,8 +42,39 @@ namespace PETScWrappers
       
                                        // otherwise first flush PETSc caches
       matrix->compress ();
-      
-      const signed int a_row_int = this->a_row;
+
+                                       // next get the number of the row
+                                       // relative to the rows this process
+                                       // actually stores (remember that
+                                       // matrices can be distributed)
+      signed int local_row;
+      if (dynamic_cast<const PETScWrappers::SparseMatrix *>(matrix) != 0)
+        {
+          local_row = this->a_row;
+        }
+      else if (dynamic_cast<const PETScWrappers::MPI::SparseMatrix *>(matrix)
+               != 0)
+        {
+                                           // first verify that the requested
+                                           // element is actually locally
+                                           // available
+          int ierr;
+          int begin, end;
+          ierr = MatGetOwnershipRange (static_cast<const Mat &>(*matrix),
+                                       &begin, &end);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          AssertThrow ((this->a_row >= static_cast<unsigned int>(begin)) &&
+                       (this->a_row < static_cast<unsigned int>(end)),
+                       ExcAccessToNonlocalRow (this->a_row, begin, end-1));
+
+                                           // alright, so we seem to have this
+                                           // particular row on the present
+                                           // processor
+          local_row = this->a_row - begin;
+        }
+      else
+        Assert (false, ExcInternalError());
 
                                        // get a representation of the present
                                        // row
@@ -50,7 +83,7 @@ namespace PETScWrappers
       PetscScalar *values;
 
       int ierr;
-      ierr = MatGetRow(*matrix, a_row_int, &ncols, &colnums, &values);
+      ierr = MatGetRow(*matrix, local_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
                                        // copy it into our caches
@@ -59,7 +92,7 @@ namespace PETScWrappers
       value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
 
                                        // and finally restore the matrix
-      ierr = MatRestoreRow(*matrix, a_row_int, &ncols, &colnums, &values);
+      ierr = MatRestoreRow(*matrix, local_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
     }
   }
