@@ -207,6 +207,6 @@ all-cc-files = $(shell echo *.cc)
 Makefile.depend: $(all-cc-files)
 	@echo =====Dependencies== Makefile.depend
 	@$(CXX) $(flags) $^ -M > $@
-	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.g.o:/;' $@
+	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.g.o:/;' $@
 
 include Makefile.depend
