@@ -2991,9 +2991,10 @@ namespace LaplaceSolver
 				     // sure that the contributions of
 				     // each of the faces are there,
 				     // and add them up. Only take
-				     // half of the jump term, since
-				     // the other half will be taken
-				     // by the neighboring cell.
+				     // minus one half of the jump
+				     // term, since the other half
+				     // will be taken by the
+				     // neighboring cell.
     unsigned int present_cell=0;  
     for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
 	 cell!=DualSolver<dim>::dof_handler.end();
@@ -3005,7 +3006,7 @@ namespace LaplaceSolver
 		 face_integrals.end(),
 		 ExcInternalError());
 	  error_indicators(present_cell)
-	    += 0.5*face_integrals[cell->face(face_no)];
+	    -= 0.5*face_integrals[cell->face(face_no)];
 	};
     std::cout << "   Estimated error="
 	      << std::accumulate (error_indicators.begin(),
@@ -3368,7 +3369,7 @@ namespace LaplaceSolver
 				     // normal vector:
     for (unsigned int p=0; p<n_q_points; ++p)
       face_data.jump_residual[p]
-	= ((face_data.neighbor_grads[p] - face_data.cell_grads[p]) *
+	= ((face_data.cell_grads[p] - face_data.neighbor_grads[p]) *
 	   face_data.fe_face_values_cell.normal_vector(p));
 
 				     // Next get the dual weights for
@@ -3410,7 +3411,7 @@ namespace LaplaceSolver
 				     // faces of each cell; we thus
 				     // visit the same face twice. We
 				     // take account of this by using
-				     // this factor 1/2 later, when we
+				     // this factor -1/2 later, when we
 				     // sum up the contributions for
 				     // each cell individually.
     face_integrals[cell->face(face_no)] = face_integral;
@@ -3523,7 +3524,7 @@ namespace LaplaceSolver
 					 // the other function:
 	for (unsigned int p=0; p<n_q_points; ++p)
 	  face_data.jump_residual[p]
-	     = ((face_data.cell_grads[p] - face_data.neighbor_grads[p]) *
+	     = ((face_data.neighbor_grads[p] - face_data.cell_grads[p]) *
 		face_data.fe_face_values_neighbor.normal_vector(p));
 
 					 // Then get dual weights:
