@@ -282,8 +282,7 @@ namespace Polynomials
  *
  * @author Guido Kanschat, 2000
  */
-  template <typename number>
-  class Legendre : public Polynomial<number>
+  class Legendre : public Polynomial<double>
   {
     public:
                                        /**
@@ -305,14 +304,14 @@ namespace Polynomials
                                         * classes.
                                         */
       static
-      std::vector<Polynomial<number> >
+      std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
     
     private:
                                        /**
                                         * Coefficients for the interval $[0,1]$.
                                         */
-      static std::vector<const std::vector<number> *> shifted_coefficients;
+      static std::vector<const std::vector<double> *> shifted_coefficients;
     
                                        /**
                                         * Vector with already computed
@@ -324,7 +323,7 @@ namespace Polynomials
                                         * vectors in order to simplify
                                         * programming multithread-safe.
                                         */
-      static std::vector<const std::vector<number> *> recursive_coefficients;
+      static std::vector<const std::vector<double> *> recursive_coefficients;
     
                                        /**
                                         * Compute coefficients recursively.
@@ -338,7 +337,7 @@ namespace Polynomials
                                         * constructor of
                                         * @ref{Polynomial}.
                                         */
-      static const std::vector<number> &
+      static const std::vector<double> &
       get_coefficients (const unsigned int k);
   };
 
@@ -384,8 +383,7 @@ namespace Polynomials
  *
  * @author Brian Carnes, 2002
  */
-  template <typename number>
-  class Hierarchical : public Polynomial<number>
+  class Hierarchical : public Polynomial<double>
   {
     public:
                                      /**
@@ -416,7 +414,7 @@ namespace Polynomials
 				      * classes.
 				      */
       static
-      std::vector<Polynomial<number> >
+      std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
     
     private:
@@ -432,10 +430,10 @@ namespace Polynomials
 				      * constructor of
 				      * @ref{Polynomial}.
 				      */
-     static const std::vector<number> &
+     static const std::vector<double> &
      get_coefficients (const unsigned int k);
  
-     static std::vector<const std::vector<number> *> recursive_coefficients;
+     static std::vector<const std::vector<double> *> recursive_coefficients;
    };  
 }
 

@@ -252,7 +252,8 @@ namespace Polynomials
 // ------------------ class LagrangeEquidistant --------------- //
 
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
-                                            const unsigned int support_point):
+                                            const unsigned int support_point)
+		  :
                   Polynomial<double>(compute_coefficients(n,support_point))
   {}
 
@@ -514,20 +515,23 @@ namespace Polynomials
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  template <typename number>
-  std::vector<const std::vector<number> *>
-  Legendre<number>::recursive_coefficients(
-    20, static_cast<const std::vector<number>*>(0));
-  template <typename number>
-  std::vector<const std::vector<number> *>
-  Legendre<number>::shifted_coefficients(
-    20, static_cast<const std::vector<number>*>(0));
+  std::vector<const std::vector<double> *>
+  Legendre::recursive_coefficients(20,
+				   static_cast<const std::vector<double>*>(0));
+  std::vector<const std::vector<double> *>
+  Legendre::shifted_coefficients(20,
+				 static_cast<const std::vector<double>*>(0));
 
 
+  Legendre::Legendre (const unsigned int k)
+                  :
+                  Polynomial<double> (get_coefficients(k))
+  {}
 
-  template <typename number>
+
+  
   void
-  Legendre<number>::compute_coefficients (const unsigned int k_)
+  Legendre::compute_coefficients (const unsigned int k_)
   {
                                      // make sure we call the
                                      // Polynomial::shift function
@@ -572,10 +576,10 @@ namespace Polynomials
                                              // later assign it to the
                                              // coefficients array to
                                              // make it const
-            std::vector<number> *c0 = new std::vector<number>(1);
+            std::vector<double> *c0 = new std::vector<double>(1);
             (*c0)[0] = 1.;
 
-            std::vector<number> *c1 = new std::vector<number>(2);
+            std::vector<double> *c1 = new std::vector<double>(2);
             (*c1)[0] = 0.;
             (*c1)[1] = 1.;
 
@@ -585,14 +589,14 @@ namespace Polynomials
             recursive_coefficients[1] = c1;
                                              // Compute polynomials
                                              // orthogonal on [0,1]
-            c0 = new std::vector<number>(*c0);
-            c1 = new std::vector<number>(*c1);
+            c0 = new std::vector<double>(*c0);
+            c1 = new std::vector<double>(*c1);
 	  
-            Polynomial<number>::template shift<SHIFT_TYPE> (*c0, -1.);
-            Polynomial<number>::scale(*c0, 2.);
-            Polynomial<number>::template shift<SHIFT_TYPE> (*c1, -1.);
-            Polynomial<number>::scale(*c1, 2.);
-            Polynomial<number>::multiply(*c1, std::sqrt(3.));
+            Polynomial<double>::shift<SHIFT_TYPE> (*c0, -1.);
+            Polynomial<double>::scale(*c0, 2.);
+            Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
+            Polynomial<double>::scale(*c1, 2.);
+            Polynomial<double>::multiply(*c1, std::sqrt(3.));
             shifted_coefficients[0]=c0;
             shifted_coefficients[1]=c1;
           }
@@ -610,11 +614,11 @@ namespace Polynomials
             compute_coefficients(k-1);
             coefficients_lock.acquire ();
 
-            std::vector<number> *ck = new std::vector<number>(k+1);
+            std::vector<double> *ck = new std::vector<double>(k+1);
 	  
-            const number a = 1./(k);
-            const number b = a*(2*k-1);
-            const number c = a*(k-1);
+            const double a = 1./(k);
+            const double b = a*(2*k-1);
+            const double c = a*(k-1);
 	  
             (*ck)[k]   = b*(*recursive_coefficients[k-1])[k-1];
             (*ck)[k-1] = b*(*recursive_coefficients[k-1])[k-2];
@@ -631,10 +635,10 @@ namespace Polynomials
             recursive_coefficients[k] = ck;
                                              // and compute the
                                              // coefficients for [0,1]
-            ck = new std::vector<number>(*ck);
-            Polynomial<number>::template shift<SHIFT_TYPE> (*ck, -1.);
-            Polynomial<number>::scale(*ck, 2.);
-            Polynomial<number>::multiply(*ck, std::sqrt(2.*k+1.));
+            ck = new std::vector<double>(*ck);
+            Polynomial<double>::shift<SHIFT_TYPE> (*ck, -1.);
+            Polynomial<double>::scale(*ck, 2.);
+            Polynomial<double>::multiply(*ck, std::sqrt(2.*k+1.));
             shifted_coefficients[k] = ck;
           };
       };
@@ -642,9 +646,8 @@ namespace Polynomials
 
 
 
-  template <typename number>
-  const std::vector<number> &
-  Legendre<number>::get_coefficients (const unsigned int k)
+  const std::vector<double> &
+  Legendre::get_coefficients (const unsigned int k)
   {
                                      // first make sure the coefficients
                                      // get computed if so necessary
@@ -659,22 +662,13 @@ namespace Polynomials
 
 
 
-  template <typename number>
-  Legendre<number>::Legendre (const unsigned int k)
-                  :
-                  Polynomial<number> (get_coefficients(k))
-  {}
-
-
-
-  template <typename number>
-  std::vector<Polynomial<number> >
-  Legendre<number>::generate_complete_basis (const unsigned int degree)
+  std::vector<Polynomial<double> >
+  Legendre::generate_complete_basis (const unsigned int degree)
   {
     std::vector<Polynomial<double> > v;
     v.reserve(degree+1);
     for (unsigned int i=0; i<=degree; ++i)
-      v.push_back (Legendre<double>(i));
+      v.push_back (Legendre(i));
     return v;
   }
 
@@ -686,16 +680,21 @@ namespace Polynomials
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  template <typename number>
-  std::vector<const std::vector<number> *>
-  Hierarchical<number>::recursive_coefficients(
-     20, static_cast<const std::vector<number>*>(0));
+  std::vector<const std::vector<double> *>
+  Hierarchical::recursive_coefficients(
+     20, static_cast<const std::vector<double>*>(0));
 
 
 
-  template <typename number>
+  Hierarchical::Hierarchical (const unsigned int k)
+                      :
+                      Polynomial<double> (get_coefficients(k))
+  {}
+
+
+
   void
-  Hierarchical<number>::compute_coefficients (const unsigned int k_)
+  Hierarchical::compute_coefficients (const unsigned int k_)
   {
     unsigned int k = k_;
 
@@ -730,11 +729,11 @@ namespace Polynomials
                                              // later assign it to the
                                              // coefficients array to
                                              // make it const
-	    std::vector<number> *c0 = new std::vector<number>(2);
+	    std::vector<double> *c0 = new std::vector<double>(2);
 	    (*c0)[0] =  1.;
 	    (*c0)[1] = -1.;
 
-	    std::vector<number> *c1 = new std::vector<number>(2);
+	    std::vector<double> *c1 = new std::vector<double>(2);
 	    (*c1)[0] = 0.;
 	    (*c1)[1] = 1.;
 
@@ -749,9 +748,9 @@ namespace Polynomials
 	    compute_coefficients(1);
 	    coefficients_lock.acquire ();
 
-	    std::vector<number> *c2 = new std::vector<number>(3);
+	    std::vector<double> *c2 = new std::vector<double>(3);
 
-	    const number a = 1.; //1./8.;
+	    const double a = 1.; //1./8.;
 
 	    (*c2)[0] =   0.*a;
 	    (*c2)[1] =  -4.*a;
@@ -773,9 +772,9 @@ namespace Polynomials
 	    compute_coefficients(k-1);
 	    coefficients_lock.acquire ();
 
-	    std::vector<number> *ck = new std::vector<number>(k+1);
+	    std::vector<double> *ck = new std::vector<double>(k+1);
 	   
-	    const number a = 1.; //1./(2.*k);
+	    const double a = 1.; //1./(2.*k);
 
 	    (*ck)[0] = - a*(*recursive_coefficients[k-1])[0];
 	  
@@ -789,7 +788,7 @@ namespace Polynomials
 	                                  // basis fcn phi_2
 	    if ( (k%2) == 0 )
 	      {
-		number b = 1.; //8.;
+		double b = 1.; //8.;
 		//for (unsigned int i=1; i<=k; i++)
 		//  b /= 2.*i;
 
@@ -807,9 +806,8 @@ namespace Polynomials
 
 
 
-  template <typename number>
-  const typename std::vector<number> &
-  Hierarchical<number>::get_coefficients (const unsigned int k)
+  const std::vector<double> &
+  Hierarchical::get_coefficients (const unsigned int k)
   {
 				   // first make sure the coefficients
 				   // get computed if so necessary
@@ -819,7 +817,7 @@ namespace Polynomials
 				   // of coefficients. do that in a MT
                                      // safe way
     coefficients_lock.acquire ();
-    const std::vector<number> *p = recursive_coefficients[k];
+    const std::vector<double> *p = recursive_coefficients[k];
     coefficients_lock.release ();
 
 				   // return the object pointed
@@ -831,17 +829,8 @@ namespace Polynomials
 
 
 
-  template <typename number>
-  Hierarchical<number>::Hierarchical (const unsigned int k)
-                      :
-                      Polynomial<number> (get_coefficients(k))
-  {}
-
-
-
-  template <typename number>
-  std::vector<Polynomial<number> >
-  Hierarchical<number>::generate_complete_basis (const unsigned int degree)
+  std::vector<Polynomial<double> >
+  Hierarchical::generate_complete_basis (const unsigned int degree)
   {
     if (degree==0)
                                        // create constant
@@ -860,7 +849,7 @@ namespace Polynomials
         std::vector<Polynomial<double> > v;
         v.reserve(degree+1);
         for (unsigned int i=0; i<=degree; ++i)
-          v.push_back (Hierarchical<double>(i));
+          v.push_back (Hierarchical(i));
         return v;
       }
   }
@@ -882,7 +871,4 @@ namespace Polynomials
   template void Polynomial<long double>::shift(const long double offset);
   template void Polynomial<float>::shift(const long double offset);
   template void Polynomial<double>::shift(const long double offset);
-
-  template class Legendre<double>;
-  template class Hierarchical<double>;
 }
