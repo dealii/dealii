@@ -15,6 +15,7 @@
 #include <base/logstream.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/block_sparse_matrix.h>
+#include <lac/block_vector.h>
 #include <fstream>
 #include <algorithm>
 
@@ -139,6 +140,55 @@ void test ()
   for (unsigned int row=0; row<19; ++row)
     for (unsigned int i=0; i<10; ++i)
       bsm.add (row, (row*5+i*9)%29, 0.5);
+
+				   // now allocate two block vectors
+				   // and see what we can get after
+				   // vmults:
+  BlockVector<2,double> src;
+  vector<unsigned int> src_sizes (2);
+  src_sizes[0] = 10;
+  src_sizes[1] = 19;
+  src.reinit (src_sizes);
+
+  BlockVector<3,double> dst;
+  vector<unsigned int> dst_sizes (3);
+  dst_sizes[0] = 2;
+  dst_sizes[1] = 7;
+  dst_sizes[2] = 10;
+  dst.reinit (dst_sizes);
+
+  for (unsigned int i=0; i<29; ++i)
+    src(i) = i;
+
+  bsm.vmult (dst, src);
+				   // now check what came out
+  for (unsigned int row=0; row<19; ++row)
+    {
+      vector<double> t(29, 0);
+				       // first check which elements
+				       // in this row exist
+      for (unsigned int i=0; i<10; ++i)
+	t[(row*5+i*9)%29] = row*((row*5+i*9)%29);
+      
+      for (unsigned int i=0; i<10; ++i)
+	t[(row*5+i*9)%29] += 0.5;
+
+				       // compute the exact result
+      double row_sum = 0;
+      for (unsigned int i=0; i<29; ++i)
+	row_sum += t[i]*i;
+
+				       // compare to vmult result
+      Assert (row_sum == dst(row), ExcInternalError());
+      deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row) << endl;
+    };
+
+
+				   // test matrix_scalar_product. note that dst=M*src
+  const double msp1 = dst.norm_sqr ();
+  const double msp2 = bsm.matrix_scalar_product (dst, src);
+  Assert (msp1 == msp2, ExcInternalError());
+  deallog << "matrix_scalar_product " << msp1 << ' ' << msp2 << endl;
 };
 
 
