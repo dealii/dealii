@@ -138,7 +138,9 @@ const double * const FE_DGQ<1>::Matrices::embedding[] =
 };
 
 
-const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices = 5;
+const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices
+  = sizeof(FE_DGQ<1>::Matrices::embedding) /
+    sizeof(FE_DGQ<1>::Matrices::embedding[0]);
 
 
 
@@ -156,7 +158,10 @@ const double * const FE_DGQ<1>::Matrices::projection_matrices[] =
 };
 
 
-const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices = 8;
+const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices
+  = sizeof(FE_DGQ<1>::Matrices::projection_matrices) /
+    sizeof(FE_DGQ<1>::Matrices::projection_matrices[0]);
+
 
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty

@@ -90,8 +90,6 @@ namespace FE_Q_1d
 // embedding matrices
 
 
-const unsigned int  FE_Q<1>::Matrices::n_embedding_matrices = 4;
-
 const double * const
 FE_Q<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell] =
 {
@@ -100,6 +98,12 @@ FE_Q<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell] =
   {FE_Q_1d::q3_into_q3_refined_0, FE_Q_1d::q3_into_q3_refined_1},
   {FE_Q_1d::q4_into_q4_refined_0, FE_Q_1d::q4_into_q4_refined_1},
 };
+
+const unsigned int
+FE_Q<1>::Matrices::n_embedding_matrices
+  = sizeof(FE_Q<1>::Matrices::embedding) /
+    sizeof(FE_Q<1>::Matrices::embedding[0]);
+
 
 
 // No constraints in 1d

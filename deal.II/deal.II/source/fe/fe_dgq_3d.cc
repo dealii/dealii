@@ -396,7 +396,10 @@ const double * const FE_DGQ<3>::Matrices::embedding[] =
 };
 
 
-const unsigned int FE_DGQ<3>::Matrices::n_embedding_matrices = 4;
+const unsigned int FE_DGQ<3>::Matrices::n_embedding_matrices
+  = sizeof(FE_DGQ<3>::Matrices::embedding) /
+    sizeof(FE_DGQ<3>::Matrices::embedding[0]);
+
 
 
 const double * const FE_DGQ<3>::Matrices::projection_matrices[] =
@@ -408,7 +411,9 @@ const double * const FE_DGQ<3>::Matrices::projection_matrices[] =
       FE_DGQ_3d::dgq4_refined_onto_dgq4
 };
 
-const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices = 5;
+const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices
+  = sizeof(FE_DGQ<3>::Matrices::projection_matrices) /
+    sizeof(FE_DGQ<3>::Matrices::projection_matrices[0]);
 
 
 #else // #if deal_II_dimension
