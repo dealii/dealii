@@ -35,7 +35,7 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 
 template <int dim>
 void
-PersistentTriangulation<dim>::restore_grid () {
+PersistentTriangulation<dim>::restore () {
 				   // copy the old triangulation.
 				   // this will yield an error if the
 				   // underlying triangulation was not
