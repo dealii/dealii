@@ -69,24 +69,47 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 
 template <int dim>
 void
-PersistentTriangulation<dim>::restore () {
-				   // copy the old triangulation.
-				   // this will yield an error if the
-				   // underlying triangulation was not
-				   // empty
-  Triangulation<dim>::copy_triangulation (*coarse_grid);
+PersistentTriangulation<dim>::restore ()
+{  
+				   // for each of the previous
+				   // refinement sweeps
+  for (unsigned int i=0; i<refine_flags.size()+1; ++i) 
+    restore(i);
+};
 
-				   // for each of the previous refinement
-				   // sweeps
-  for (unsigned int i=0; i<refine_flags.size(); ++i) 
+
+template <int dim>
+void
+PersistentTriangulation<dim>::restore (const unsigned int step) {
+
+  if (step==0)
+				     // copy the old triangulation.
+				     // this will yield an error if
+				     // the underlying triangulation
+				     // was not empty
+    Triangulation<dim>::copy_triangulation (*coarse_grid);
+  else
+				     // for each of the previous
+				     // refinement sweeps
     {
-				       // get flags
-      load_refine_flags  (refine_flags[i]);
-      load_coarsen_flags (coarsen_flags[i]);
+      Assert(step<refine_flags.size()+1,
+	     ExcDimensionMismatch(step, refine_flags.size()+1));
+      
+      load_refine_flags  (refine_flags[step-1]);
+      load_coarsen_flags (coarsen_flags[step-1]);
 
       Triangulation<dim>::execute_coarsening_and_refinement ();
     };
 };
+
+
+
+template <int dim>
+unsigned int
+PersistentTriangulation<dim>::n_refinement_steps() const
+{
+  return refine_flags.size();
+}
 
 
 template <int dim>
@@ -139,10 +162,9 @@ void
 PersistentTriangulation<dim>::read_flags(std::istream &in)
 {
   Assert(refine_flags.size()==0 && coarsen_flags.size()==0,
-	 ExcTriaNotEmpty());
-
+	 ExcFlagsNotCleared());
   AssertThrow (in, ExcIO());
-
+  
   unsigned int magic_number;
   in >> magic_number;
   AssertThrow(magic_number==mn_persistent_tria_flags_begin,
@@ -167,6 +189,14 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
   AssertThrow (in, ExcIO());
 }
 
+
+template <int dim>
+void
+PersistentTriangulation<dim>::clear_flags()
+{
+  refine_flags.clear();
+  coarsen_flags.clear();
+}
 
 
 template <int dim>

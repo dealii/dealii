@@ -140,18 +140,39 @@ class PersistentTriangulation : public Triangulation<dim>
     virtual void execute_coarsening_and_refinement ();
 
     				     /**
-				      * Restore the grid according to the saved
-				      * data. For this, the coarse grid is
-				      * copied and the grid is stepwise
-				      * rebuilt using the saved flags.
+				      * Restore the grid according to
+				      * the saved data. For this, the
+				      * coarse grid is copied and the
+				      * grid is stepwise rebuilt using
+				      * the saved flags.
 				      *
-				      * Note that this function will result in
-				      * an error if the underlying triangulation
-				      * is not empty, i.e. it will only succeed
-				      * if this object is newly created or
-				      * @p{clear()} was called on it before.
+				      * Note that this function will
+				      * result in an error if the
+				      * underlying triangulation is
+				      * not empty, i.e. it will only
+				      * succeed if this object is
+				      * newly created or @p{clear()}
+				      * was called on it before.
 				      */
     void restore ();
+
+				     /**
+				      * Differential restore. Performs
+				      * the @p{step}th local
+				      * refinement and coarsening step.
+				      * Step 0 stands for the copying
+				      * of the coarse grid.
+				      */
+    void restore (const unsigned int step);
+
+				     /**
+				      * Returns the number of
+				      * refinement and coarsening
+				      * steps. This is given by the
+				      * size of the @p{refine_flags}
+				      * vector.
+				      */
+    unsigned int n_refinement_steps () const;
 
 				     /**
 				      * Overload this function to use
@@ -197,6 +218,12 @@ class PersistentTriangulation : public Triangulation<dim>
     virtual void read_flags(std::istream &in);
 
 				     /**
+				      * Clears all flags. Retains the
+				      * same coarse grid.
+				      */
+    virtual void clear_flags();
+
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
@@ -211,6 +238,10 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * Exception.
 				      */
     DeclException0 (ExcTriaNotEmpty);
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcFlagsNotCleared);
     
   private:
 				     /**
