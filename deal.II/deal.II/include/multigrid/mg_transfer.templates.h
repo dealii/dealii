@@ -350,7 +350,7 @@ MGTransferSelect<number>::do_copy_to_mg (
   unsigned int minlevel = dst.get_minlevel();
   unsigned int maxlevel = dst.get_maxlevel();
   
-  dst.clear();
+  dst=0;
   
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
 	 ExcMatricesNotBuilt());
@@ -683,7 +683,7 @@ MGTransferBlock<number>::copy_to_mg (
   unsigned int minlevel = dst.get_minlevel();
   unsigned int maxlevel = dst.get_maxlevel();
   
-  dst.clear();
+  dst=0;
 
   MGTools::reinit_vector(mg_dof_handler, dst, mg_selected, mg_target_component);
   
