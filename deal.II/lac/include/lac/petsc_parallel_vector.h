@@ -30,7 +30,7 @@ namespace PETScWrappers
  * Namespace for PETSc classes that work in parallel over MPI, such as
  * distributed vectors and matrices.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   namespace MPI
@@ -135,7 +135,7 @@ namespace PETScWrappers
  * operations at the same time, for example by placing zero additions if
  * necessary.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
     class Vector : public VectorBase

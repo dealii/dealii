@@ -36,7 +36,7 @@ namespace PETScWrappers
  * functions). Only the functions creating a vector of specific type differ,
  * and are implemented in this particular class.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class Vector : public VectorBase

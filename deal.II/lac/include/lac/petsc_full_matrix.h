@@ -24,7 +24,7 @@
 
 namespace PETScWrappers
 {
-/*! @addtogroup PETSc
+/*! @addtogroup PETScWrappers
  *@{
  */
 

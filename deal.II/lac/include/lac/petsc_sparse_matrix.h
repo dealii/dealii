@@ -34,7 +34,7 @@ namespace PETScWrappers
  * virtual functions). Only the functions creating a matrix of specific type
  * differ, and are implemented in this particular class.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SparseMatrix : public MatrixBase

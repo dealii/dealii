@@ -32,7 +32,7 @@ template <typename number> class Vector;
 /**
  * A namespace in which wrapper classes for PETSc objects reside.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
 namespace PETScWrappers
@@ -44,7 +44,7 @@ namespace PETScWrappers
 /**
  * A namespace for internal implementation details of the PETScWrapper
  * members.
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  */
   namespace internal
   {
@@ -65,7 +65,7 @@ namespace PETScWrappers
                                       * scalar value of this element. It also
                                       * has a variety of assignment operator
                                       * for writing to this one element.
-				      * @ingroup PETSc
+				      * @ingroup PETScWrappers
                                       */
     class VectorReference
     {
@@ -200,7 +200,7 @@ namespace PETScWrappers
  * after vector assembly. Therefore, you need to call Vector::compress()
  * before you actually use the vector.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class VectorBase
@@ -662,7 +662,7 @@ namespace PETScWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   inline

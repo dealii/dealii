@@ -42,7 +42,7 @@ namespace PETScWrappers
  * surprisingly only shows the nonzero elements of the matrix, not all
  * elements.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Guido Kanschat, Roy Stogner, Wolfgang Bangerth, 2004
  */
     class const_iterator
@@ -277,7 +277,7 @@ namespace PETScWrappers
  * call SparseMatrix::compress() once at the end of the assembly stage and
  * before the matrix is actively used.
  * 
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class MatrixBase 

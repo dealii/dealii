@@ -44,7 +44,7 @@ namespace PETScWrappers
  * to individual elements in the documentation to the parallel vector
  * class. These comments apply here as well.
  * 
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
     class SparseMatrix : public MatrixBase

@@ -37,7 +37,7 @@ namespace PETScWrappers
  * classes simply set the right flags to select one solver or another, or to
  * set certain parameters for individual solvers.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverBase
@@ -148,7 +148,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc Richardson
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverRichardson : public SolverBase
@@ -230,7 +230,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc Chebychev
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverChebychev : public SolverBase
@@ -296,7 +296,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc CG
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverCG : public SolverBase
@@ -362,7 +362,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc BiCG
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverBiCG : public SolverBase
@@ -511,7 +511,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc BiCGStab
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverBicgstab : public SolverBase
@@ -577,7 +577,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc CG Squared
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverCGS : public SolverBase
@@ -643,7 +643,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc TFQMR
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverTFQMR : public SolverBase
@@ -714,7 +714,7 @@ namespace PETScWrappers
  * with an error indicating failure to converge with PETSc 2.1.6 and
  * prior. This should be fixed in later versions of PETSc, though.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverTCQMR : public SolverBase
@@ -780,7 +780,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc CR
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverCR : public SolverBase
@@ -846,7 +846,7 @@ namespace PETScWrappers
  * An implementation of the solver interface using the PETSc Least Squares
  * solver.
  *
- * @ingroup PETSc
+ * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class SolverLSQR : public SolverBase
