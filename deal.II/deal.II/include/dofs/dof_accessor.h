@@ -668,7 +668,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom located on quads.
  *
- * @see DoFObjectAccessor
+ * @ref DoFObjectAccessor
  */
 template <int dim>
 class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
@@ -865,7 +865,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom located on hexes.
  *
- * @see DoFObjectAccessor
+ * @ref DoFObjectAccessor
  */
 template <int dim>
 class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,

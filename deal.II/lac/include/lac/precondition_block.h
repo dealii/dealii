@@ -281,7 +281,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      
 				     /**
 				      * Flag for diagonal compression.
-				      * @see set_same_diagonal()
+				      * @ref set_same_diagonal()
 				      */
     bool same_diagonal;
 };

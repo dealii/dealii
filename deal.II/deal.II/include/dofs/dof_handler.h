@@ -41,8 +41,8 @@ template <int dim> class Triangulation;
  * Define some types which differ between the dimensions. This class
  * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
  * 
- * @see DoFDimensionInfo<1>
- * @see DoFDimensionInfo<2>
+ * @ref DoFDimensionInfo<1>
+ * @ref DoFDimensionInfo<2>
  *
  * @author Wolfgang Bangerth, 1998
  */

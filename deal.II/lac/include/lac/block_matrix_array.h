@@ -213,7 +213,7 @@ class BlockMatrixArray : public Subscriptor
  * matrix. Then, forward or backward insertion is performed
  * block-wise. The diagonal blocks are NOT inverted for this purpose!
  *
- * While block indices may be duplicated (see @see{BlockMatrixArray})
+ * While block indices may be duplicated (see @ref{BlockMatrixArray})
  * to add blocks, this is not allowed on the diagonal. A short
  * computation reveals why.
  *

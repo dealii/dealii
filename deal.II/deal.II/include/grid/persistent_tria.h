@@ -277,7 +277,7 @@ class PersistentTriangulation : public Triangulation<dim>
     std::vector<std::vector<bool> >   refine_flags;
 
 				     /**
-				      * @see refine_flags
+				      * @ref refine_flags
 				      */
     std::vector<std::vector<bool> >   coarsen_flags;
 };

@@ -31,8 +31,8 @@ template <int dim>              class MGDoFObjectAccessor<3, dim>;
  * Define some types which differ between the dimensions. This class
  * is analogous to the @ref{TriaDimensionInfo} class hierarchy.
  * 
- * @see MGDoFDimensionInfo<1>
- * @see MGDoFDimensionInfo<2>
+ * @ref MGDoFDimensionInfo<1>
+ * @ref MGDoFDimensionInfo<2>
  */
 template <int dim>
 class MGDoFDimensionInfo

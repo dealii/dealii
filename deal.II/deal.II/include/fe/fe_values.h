@@ -731,7 +731,7 @@ class FEValues : public FEValuesBase<dim>
  * interface to access those. Implementations are in derived classes
  * @p{FEFaceValues} and @p{FESubfaceValues}.
  *
- * @see{FEValuesBase}
+ * @ref{FEValuesBase}
  *
  *  @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */

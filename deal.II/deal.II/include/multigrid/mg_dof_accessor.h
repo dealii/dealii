@@ -341,7 +341,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 /**
  * Grant access to the multilevel degrees of freedom located on quads.
  *
- * @see DoFLineAccessor
+ * @ref DoFLineAccessor
  */
 template <int dim>
 class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
@@ -466,7 +466,7 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 /**
  * Grant access to the multilevel degrees of freedom located on hexhedra.
  *
- * @see DoFLineAccessor
+ * @ref DoFLineAccessor
  */
 template <int dim>
 class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,

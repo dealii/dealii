@@ -1588,7 +1588,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   object, you should be well aware that you might involuntarily alter the
  *   data stored in the triangulation.
  *
- *   @see TriaRawIterator
+ *   @ref TriaRawIterator
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>

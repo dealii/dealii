@@ -224,10 +224,10 @@ template <int dim> class Triangulation;
  *   to the disallowed state "invalid" which increases the chance that somehwen
  *   earlier than for past-the-end iterators an exception is raised.
  *
- *   @see Triangulation
- *   @see TriaDimensionInfo<1>
- *   @see TriaDimensionInfo<2>
- *   @see TriaDimensionInfo<3>
+ *   @ref Triangulation
+ *   @ref TriaDimensionInfo<1>
+ *   @ref TriaDimensionInfo<2>
+ *   @ref TriaDimensionInfo<3>
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename Accessor>

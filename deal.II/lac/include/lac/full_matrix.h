@@ -593,7 +593,7 @@ class FullMatrix : public vector2d<number>
 				      * Backward elimination of upper
 				      * triangle.
 				      *
-				      * @see forward
+				      * @ref forward
 				      */
     template<typename number2>
     void backward (Vector<number2>       &dst,

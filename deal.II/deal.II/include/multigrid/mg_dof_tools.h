@@ -61,7 +61,7 @@ class MGTools
 				     /**
 				      * Make a sparsity pattern including fluxes
 				      * of discontinuous Galerkin methods.
-				      * @see make_sparsity_pattern
+				      * @ref make_sparsity_pattern
 				      * $see DoFTools
 				      */
     template <int dim, class SparsityPattern>
@@ -74,8 +74,8 @@ class MGTools
 				      * Create sparsity pattern for
 				      * the fluxes at refinement
 				      * edges. 
-				      * @see{make_flux_sparsity_pattern}
-				      * @see{DoFTools}
+				      * @ref{make_flux_sparsity_pattern}
+				      * @ref{DoFTools}
 				      */
     template <int dim, class SparsityPattern>
     static void

@@ -465,7 +465,7 @@ namespace deal_II_exceptions
  *  exception generation mechanism used in the
  *  @p{Assert} macro.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
     void issue_error_assert (const char *file,
 			     int         line,
@@ -480,7 +480,7 @@ namespace deal_II_exceptions
  *  exception generation mechanism used in the
  *  @p{AssertThrow} macro.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
     template <class exc>
     void issue_error_throw (const char *file,
@@ -505,7 +505,7 @@ namespace deal_II_exceptions
  *  difficulties in connection with the way we use the macro and the
  *  declaration of the exception classes.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
     template <class exc>
     inline
@@ -544,7 +544,7 @@ namespace deal_II_exceptions
  *
  * See the @p{ExceptionBase} class for more information.
  *
- * @see ExceptionBase
+ * @ref ExceptionBase
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #define Assert(cond, exc)                                           \
@@ -582,7 +582,7 @@ namespace deal_II_exceptions
  *
  * See the @p{ExceptionBase} class for more information.
  *
- * @see ExceptionBase
+ * @ref ExceptionBase
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #ifndef DISABLE_ASSERT_THROW
@@ -619,7 +619,7 @@ namespace deal_II_exceptions
 /**
  * See the @p{ExceptionBase} class for a detailed description.
  *
- * @see ExceptionBase
+ * @ref ExceptionBase
  * @author Wolfgang Bangerth, November 1997
  */
 #define DeclException0(Exception0)  \
@@ -631,7 +631,7 @@ class Exception0 :  public ExceptionBase {}
   *  Declare an exception class with
   *  one additional parameter.
   *
-  *  @see ExceptionBase
+  *  @ref ExceptionBase
   */
 #define DeclException1(Exception1, type1, outsequence)                \
 class Exception1 : public ExceptionBase {                             \
@@ -651,7 +651,7 @@ class Exception1 : public ExceptionBase {                             \
  *  Declare an exception class with
  *  two additional parameters.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
 #define DeclException2(Exception2, type1, type2, outsequence)         \
 class Exception2 : public ExceptionBase {                             \
@@ -673,7 +673,7 @@ class Exception2 : public ExceptionBase {                             \
  *  Declare an exception class with
  *  three additional parameters.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
 #define DeclException3(Exception3, type1, type2, type3, outsequence)  \
 class Exception3 : public ExceptionBase {                             \
@@ -696,7 +696,7 @@ class Exception3 : public ExceptionBase {                             \
  *  Declare an exception class with
  *  four additional parameters.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
 #define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
 class Exception4 : public ExceptionBase {                             \
@@ -721,7 +721,7 @@ class Exception4 : public ExceptionBase {                             \
  *  Declare an exception class with
  *  five additional parameters.
  *
- *  @see ExceptionBase
+ *  @ref ExceptionBase
  */
 #define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
 class Exception5 : public ExceptionBase {                             \

@@ -154,14 +154,14 @@ class FiniteElement : public FiniteElementBase<dim>
 				     /**
 				      * Compute flags for initial
 				      * update only.
-				      * @see{FEValuesBase}
+				      * @ref{FEValuesBase}
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
   
 				     /**
 				      * Compute flags for update on
 				      * each cell.
-				      * @see{FEValuesBase}
+				      * @ref{FEValuesBase}
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
   

@@ -1431,7 +1431,7 @@ namespace TimeStepBase_Tria_Flags
       const double        cell_number_corridor_top;
       
 				       /**
-					* @see cell_number_corridor_top
+					* @ref cell_number_corridor_top
 					*/
       const double        cell_number_corridor_bottom;
 
@@ -1836,7 +1836,7 @@ class TimeStepBase_Tria : public TimeStepBase
     std::vector<std::vector<bool> >   refine_flags;
 
 				     /**
-				      * @see refine_flags
+				      * @ref refine_flags
 				      */
     std::vector<std::vector<bool> >   coarsen_flags;
 

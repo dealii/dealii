@@ -27,8 +27,8 @@
  *  hierarchy of a triangulation. This template is only declared to allow
  *  specializations for different dimensions.
  *
- *  @see TriangulationLevel<1>
- *  @see TriangulationLevel<2>
+ *  @ref TriangulationLevel<1>
+ *  @ref TriangulationLevel<2>
  */
 template <int dim>
 class TriangulationLevel

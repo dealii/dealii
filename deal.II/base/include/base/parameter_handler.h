@@ -1054,7 +1054,7 @@ namespace Patterns
  *   This class is inspired by the @p{MenuSystem} class of @p{DiffPack}.
  *
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
- *   @see MultipleParameterLoop
+ *   @ref MultipleParameterLoop
  */
 class ParameterHandler
 {
@@ -1615,7 +1615,7 @@ class ParameterHandler
  *
  *   @author Wolfgang Bangerth, October 1997
  *   @version 1.0
- *   @see ParameterHandler
+ *   @ref ParameterHandler
  */
 class MultipleParameterLoop : public ParameterHandler
 {
