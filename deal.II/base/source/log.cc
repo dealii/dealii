@@ -25,7 +25,8 @@ LogStream deallog;
 LogStream::LogStream()
 		: std_out(&std::cerr), file(0), was_endl(true),
 		  std_depth(10000), file_depth(10000),
-		  print_utime(false)
+		  print_utime(false), diff_utime(false),
+		  last_time (0.)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
@@ -94,9 +95,16 @@ LogStream::depth_file(unsigned n)
 
 
 void
-LogStream::log_execution_time(bool flag)
+LogStream::log_execution_time (bool flag)
 {
   print_utime = flag;
+}
+
+
+void
+LogStream::log_time_differences (bool flag)
+{
+  diff_utime = flag;
 }
 
 
@@ -104,11 +112,17 @@ void
 LogStream::print_line_head()
 {
   rusage usage;
-  float utime = 0.;
+  double utime = 0.;
   if (print_utime)
     {
       getrusage(RUSAGE_SELF, &usage);
       utime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+      if (diff_utime)
+	{
+	  double diff = utime - last_time;
+	  last_time = utime;
+	  utime = diff;
+	}
     }
   
   const string& head = prefixes.top();

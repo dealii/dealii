@@ -108,6 +108,16 @@ class LogStream
 				      */
     bool print_utime;
 
+				     /**
+				      * Flag for printing time differences.
+				      */
+    bool diff_utime;
+
+				     /**
+				      * Time of last output line.
+				      */
+    double last_time;
+      
   public:
 				     /**
 				      * Standard constructor, since we
@@ -115,13 +125,13 @@ class LogStream
 				      * @p{deallog} in the library. Set the
 				      * standard output stream to @p{std::cerr}.
 				      */
-    LogStream();
+    LogStream ();
     
 				     /**
 				      * Enable output to a second
 				      * stream @p{o}.
 				      */
-    void attach(std::ostream& o);
+    void attach (std::ostream& o);
     
 				     /**
 				      * Disable output to the second
@@ -129,17 +139,17 @@ class LogStream
 				      * @p{close} on the stream that was
 				      * previously attached to this object.
 				      */
-    void detach();
+    void detach ();
 
 				     /**
 				      * Gives the default stream (@p{std_out}).
 				      */
-    std::ostream& get_console();
+    std::ostream& get_console ();
 
 				     /**
 				      * Gives the file stream.
 				      */
-    std::ostream& get_file_stream();
+    std::ostream& get_file_stream ();
     
 				     /**
 				      * Push another prefix on the
@@ -153,7 +163,7 @@ class LogStream
 				     /**
 				      * Remove the last prefix.
 				      */
-    void pop();
+    void pop ();
      
 				     /**
 				      * Maximum number of levels to be
@@ -185,8 +195,27 @@ class LogStream
 				      * be prepended by the user time used
 				      * by the running program so far.
 				      */
-    void log_execution_time(bool flag);
+    void log_execution_time (bool flag);
 
+				     /**
+				      * Output time differences
+				      * between consecutive logs. If
+				      * this function is invoked with
+				      * @p{true}, the time difference
+				      * between the previous log line
+				      * and the recent one is
+				      * printed. If it is invoked with
+				      * @p{false}, the accumulated
+				      * time since start of the
+				      * program is printed (default
+				      * behavior).
+				      *
+				      * The measurement of times is
+				      * not changed by this function,
+				      * just the output.
+				      */
+    void log_time_differences (bool flag);
+    
 				     /**
 				      * Output a constant something through
 				      * this stream.
