@@ -1216,14 +1216,16 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     };            
  *   \end{verbatim}
  *
- *   You should take note of one caveat: if you have concave boundaries, you
- *   must make sure that a new boundary vertex does not lie to much inside the
- *   to be refined cell. The reason is that the center vertex is placed at the
- *   point which is the arithmetic mean of the vertices of the original cell.
- *   Therefore if your new boundary vertex is too near the center of the old
- *   quadrilateral or hexahedron, the distance to the midpoint vertex will become
- *   too small, thus generating distorted cells. Remedy: take care
- *   of such situations when defining the coarse grid.
+ *   You should take note of one caveat: if you have concave
+ *   boundaries, you must make sure that a new boundary vertex does
+ *   not lie too much inside the cell which is to be refined. The
+ *   reason is that the center vertex is placed at the point which is
+ *   the arithmetic mean of the vertices of the original cell.
+ *   Therefore if your new boundary vertex is too near the center of
+ *   the old quadrilateral or hexahedron, the distance to the midpoint
+ *   vertex will become too small, thus generating distorted
+ *   cells. Remedy: take care of such situations when defining the
+ *   coarse grid.
  *
  *
  *   \subsection{Technical details}
