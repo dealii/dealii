@@ -180,7 +180,7 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
 				   // for this case and otherwise
 				   // throw an exception:
   Assert (values.size() == dim, 
-	  ExcVectorHasWrongSize (values.size(), dim));
+	  ExcDimensionMismatch (values.size(), dim));
 				   // Likewise, if by some accident
 				   // someone tried to compile and run
 				   // the program in only one space
@@ -248,7 +248,7 @@ void RightHandSide<dim>::vector_value_list (const vector<Point<dim> > &points,
 				   // correctly, i.e. to the number of
 				   // input points:
   Assert (value_list.size() == n_points, 
-	  ExcVectorHasWrongSize (value_list.size(), n_points));
+	  ExcDimensionMismatch (value_list.size(), n_points));
 
 				   // Finally we treat each of the
 				   // points. In one of the previous

@@ -163,10 +163,10 @@ void Coefficient<dim>::value_list (const vector<Point<dim> > &points,
   const unsigned int n_points = points.size();
 
   Assert (values.size() == n_points, 
-	  ExcVectorHasWrongSize (values.size(), n_points));
+	  ExcDimensionMismatch (values.size(), n_points));
   
   Assert (component == 0, 
-	  ExcWrongComponent (component, 1));
+	  ExcIndexRange (component, 0, 1));
   
   for (unsigned int i=0; i<n_points; ++i)
     {

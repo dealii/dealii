@@ -15,6 +15,10 @@
 
 #include <lac/vector_memory.h>
 
+template <typename number> class Vector;
+template <typename number> class SparseMatrix;
+
+
 /**
  * No preconditioning.
  * This class helps you, if you want to use a linear solver without

@@ -198,12 +198,12 @@ void Coefficient<dim>::value_list (const vector<Point<dim> > &points,
 				   // classes derived from
 				   // ``Function'', that class
 				   // declares an exception
-				   // ``ExcVectorHasWrongSize'' which
+				   // ``ExcDimensionMismatch'' which
 				   // takes the sizes of two vectors
 				   // and prints some output in case
 				   // the condition is violated:
   Assert (values.size() == n_points, 
-	  ExcVectorHasWrongSize (values.size(), n_points));
+	  ExcDimensionMismatch (values.size(), n_points));
 				   // Since examples are not very good
 				   // if they do not demonstrate their
 				   // point, we will show how to
@@ -242,7 +242,7 @@ void Coefficient<dim>::value_list (const vector<Point<dim> > &points,
 				   // components that this function
 				   // has.)
   Assert (component == 0, 
-	  ExcWrongComponent (component, 1));
+	  ExcIndexRange (component, 0, 1));
   
   for (unsigned int i=0; i<n_points; ++i)
     {

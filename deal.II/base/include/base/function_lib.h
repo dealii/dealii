@@ -62,15 +62,15 @@ class PillowFunction : public Function<dim>
 				     /**
 				      * Laplacian at a single point.
 				      */
-    double laplacian(const Point<dim>   &p,
-		     const unsigned int  component = 0) const;
+    double laplacian (const Point<dim>   &p,
+		      const unsigned int  component = 0) const;
 
 				     /**
 				      * Laplacian at multiple points.
 				      */
-    void laplacian_list(const vector<Point<dim> > &points,
-			vector<double>            &values,
-			const unsigned int         component = 0) const;
+    void laplacian_list (const vector<Point<dim> > &points,
+			 vector<double>            &values,
+			 const unsigned int         component = 0) const;
 };
 
 

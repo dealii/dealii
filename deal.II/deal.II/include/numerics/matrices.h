@@ -25,6 +25,9 @@ template<typename number> class SparseMatrix;
 
 template <typename number, int rows, int columns  >  class BlockSparseMatrix;
 template <int n_blocks, typename Number> class BlockVector;
+
+template <int dim> class DoFHandler;
+template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
 template <int dim> class Equation;
 

@@ -21,6 +21,10 @@
 #include <map>
 
 
+template <int dim> class FEFaceValues;
+template <int dim> class FESubfaceValues;
+
+
 
 /**
  *  Implementation of the error estimator by Kelly, Gago, Zienkiewicz
