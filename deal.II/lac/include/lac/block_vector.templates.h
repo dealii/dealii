@@ -20,14 +20,6 @@
 
 
 template <int n_blocks, typename Number>
-static inline Number sqr (const Number x)
-{
-  return x*x;
-};
-
-
-
-template <int n_blocks, typename Number>
 BlockVector<n_blocks,Number>::BlockVector ()
 {}
 
