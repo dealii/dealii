@@ -643,50 +643,48 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
     {
       if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
 	{
-					   // regular line. loop over
-					   // cols. note that this changes the
-					   // line we are presently working
-					   // on: we add additional
-					   // entries. these are put to the
-					   // end of the row. however, as
-					   // constrained nodes cannot be
-					   // constrained to other constrained
-					   // nodes, nothing will happen if we
-					   // run into these added nodes, as
-					   // they can't be distributed
-					   // further. we might store the
-					   // position of the last old entry
-					   // and stop work there, but since
-					   // operating on the newly added
-					   // ones only takes two comparisons
-					   // (column index valid,
+					   // regular line. loop over cols all
+					   // valid cols. note that this
+					   // changes the line we are
+					   // presently working on: we add
+					   // additional entries. these are
+					   // put to the end of the
+					   // row. however, as constrained
+					   // nodes cannot be constrained to
+					   // other constrained nodes, nothing
+					   // will happen if we run into these
+					   // added nodes, as they can't be
+					   // distributed further. we might
+					   // store the position of the last
+					   // old entry and stop work there,
+					   // but since operating on the newly
+					   // added ones only takes two
+					   // comparisons (column index valid,
 					   // distribute[column] necessarily
 					   // ==deal_II_numbers::invalid_unsigned_int),
 					   // it is cheaper to not do so and
 					   // run right until the end of the
 					   // line
           for (SparsityPattern::iterator entry = sparsity.begin(row);
-               entry != sparsity.end(row); ++entry)
+               ((entry != sparsity.end(row)) &&
+                entry->is_valid_entry());
+               ++entry)
 	    {
 	      const unsigned int column = entry->column();
-	      
-					       // end of row reached?
-	      if (column == SparsityPattern::invalid_entry)
-		break;
-	      else
-		if (distribute[column] != deal_II_numbers::invalid_unsigned_int)
-		  {
-						     // distribute entry
-						     // at regular row
-						     // @p{row} and
-						     // irregular column
-						     // sparsity.colnums[j]
-		    for (unsigned int q=0;
-			 q!=lines[distribute[column]].entries.size();
-			 ++q) 
-		      sparsity.add (row,
-				    lines[distribute[column]].entries[q].first);
-		  }
+
+              if (distribute[column] != deal_II_numbers::invalid_unsigned_int)
+                {
+                                                   // distribute entry
+                                                   // at regular row
+                                                   // @p{row} and
+                                                   // irregular column
+                                                   // sparsity.colnums[j]
+                  for (unsigned int q=0;
+                       q!=lines[distribute[column]].entries.size();
+                       ++q) 
+                    sparsity.add (row,
+                                  lines[distribute[column]].entries[q].first);
+                }
 	    }
 	}
       else
@@ -696,31 +694,27 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 					 // not touched (unlike above)
 	{
           for (SparsityPattern::iterator entry = sparsity.begin(row);
-               entry != sparsity.end(row); ++entry)
-					     // end of row reached?
-	    if (entry->column() == SparsityPattern::invalid_entry)
-	      break;
-	    else
-	      {
-                const unsigned int column = entry->column();
-		if (distribute[column] == deal_II_numbers::invalid_unsigned_int)
-						   // distribute entry at irregular
-						   // row @p{row} and regular column
-						   // sparsity.colnums[j]
-		  for (unsigned int q=0;
-		       q!=lines[distribute[row]].entries.size(); ++q) 
-		    sparsity.add (lines[distribute[row]].entries[q].first,
-				  column);
-		else
-						   // distribute entry at irregular
-						   // row @p{row} and irregular column
-						   // sparsity.get_column_numbers()[j]
-		  for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
-		    for (unsigned int q=0;
-			 q!=lines[distribute[column]].entries.size(); ++q)
-		      sparsity.add (lines[distribute[row]].entries[p].first,
-				    lines[distribute[column]].entries[q].first);
-	      }
+               (entry != sparsity.end(row)) && entry->is_valid_entry(); ++entry)
+            {
+              const unsigned int column = entry->column();
+              if (distribute[column] == deal_II_numbers::invalid_unsigned_int)
+                                                 // distribute entry at irregular
+                                                 // row @p{row} and regular column
+                                                 // sparsity.colnums[j]
+                for (unsigned int q=0;
+                     q!=lines[distribute[row]].entries.size(); ++q) 
+                  sparsity.add (lines[distribute[row]].entries[q].first,
+                                column);
+              else
+                                                 // distribute entry at irregular
+                                                 // row @p{row} and irregular column
+                                                 // sparsity.get_column_numbers()[j]
+                for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+                  for (unsigned int q=0;
+                       q!=lines[distribute[column]].entries.size(); ++q)
+                    sparsity.add (lines[distribute[row]].entries[p].first,
+                                  lines[distribute[column]].entries[q].first);
+            }
 	}
     }
   
@@ -920,30 +914,24 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 
               for (SparsityPattern::const_iterator
                      entry = block_sparsity.begin(block_index.second);
-                   entry != block_sparsity.end(block_index.second); ++entry)
-						 // end of row reached?
-		if (entry->column() == SparsityPattern::invalid_entry)
-		  {
-						     // nothing more
-						     // to do
-		    break;
-		  }
-		else
-		  {
-		    const unsigned int global_col
-		      = index_mapping.local_to_global(block_col, entry->column());
-		    
-		    if (distribute[global_col] != -1)
-						       // distribute entry at regular
-						       // row @p{row} and irregular column
-						       // global_col
-		      {
-			for (unsigned int q=0;
-			     q!=lines[distribute[global_col]].entries.size(); ++q)
-			  sparsity.add (row,
-                                        lines[distribute[global_col]].entries[q].first);
-		      }
-		  }
+                   (entry != block_sparsity.end(block_index.second)) &&
+                     entry->is_valid_entry();
+                   ++entry)
+                {
+                  const unsigned int global_col
+                    = index_mapping.local_to_global(block_col, entry->column());
+                  
+                  if (distribute[global_col] != -1)
+                                                     // distribute entry at regular
+                                                     // row @p{row} and irregular column
+                                                     // global_col
+                    {
+                      for (unsigned int q=0;
+                           q!=lines[distribute[global_col]].entries.size(); ++q)
+                        sparsity.add (row,
+                                      lines[distribute[global_col]].entries[q].first);
+                    }
+                }
 	    }
 	}
       else
@@ -960,37 +948,32 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 	      
               for (SparsityPattern::const_iterator
                      entry = block_sparsity.begin(block_index.second);
-                   entry != block_sparsity.end(block_index.second); ++entry)
-						 // end of row reached?
-		if (entry->column() == SparsityPattern::invalid_entry)
-		  {
-						     // nothing more to do
-		    break;
-		  }
-		else
-		  {
-		    const unsigned int global_col
-		      = index_mapping.local_to_global (block_col, entry->column());
-		    
-		    if (distribute[global_col] == -1)
-						       // distribute entry at irregular
-						       // row @p{row} and regular column
-						       // global_col.
-		      {
-			for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
-			  sparsity.add (lines[distribute[row]].entries[q].first, global_col);
-		      }
-		    else
-						       // distribute entry at irregular
-						       // row @p{row} and irregular column
-						       // @p{global_col}
-		      {
-			for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
-			  for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
-			    sparsity.add (lines[distribute[row]].entries[p].first,
-					  lines[distribute[global_col]].entries[q].first);
-		      }
-		  }
+                   (entry != block_sparsity.end(block_index.second)) &&
+                     entry->is_valid_entry();
+                   ++entry)
+                {
+                  const unsigned int global_col
+                    = index_mapping.local_to_global (block_col, entry->column());
+                  
+                  if (distribute[global_col] == -1)
+                                                     // distribute entry at irregular
+                                                     // row @p{row} and regular column
+                                                     // global_col.
+                    {
+                      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+                        sparsity.add (lines[distribute[row]].entries[q].first, global_col);
+                    }
+                  else
+                                                     // distribute entry at irregular
+                                                     // row @p{row} and irregular column
+                                                     // @p{global_col}
+                    {
+                      for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+                        for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
+                          sparsity.add (lines[distribute[row]].entries[p].first,
+                                        lines[distribute[global_col]].entries[q].first);
+                    }
+                }
 	    }
 	}
     }
