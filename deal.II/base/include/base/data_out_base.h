@@ -910,6 +910,48 @@ class DataOutBase
  * its member classes.
  *
  *
+ * \section{Run time selection of output parameters}
+ *
+ * In the output flags classes, described above, many flags are
+ * defined for output in the different formats. In order to make them
+ * available to the input file handler class #ParameterHandler#, each
+ * of these has a function declaring these flags to the parameter
+ * handler and to read them back from an actual input file. In order
+ * to avoid that in user programs these functions have to be called
+ * for each available output format and the respective flag class, the
+ * present #DataOut_Interface# class offers a function
+ * #declare_parameters# which calls the respective function of all
+ * known output format flags classes. The flags of each such format
+ * are packed together in a subsection in the input file.
+ * Likewise, there is a function #parse_parameters# which reads
+ * these parameters and stores them in the flags associated with
+ * this object (see above).
+ * 
+ * Using these functions, you do not have to track which formats are
+ * presently implemented.
+ *
+ * Usage is as follows:
+ * \begin{verbatim}
+ *                               // within function declaring parameters:
+ *   ...
+ *   prm.enter_subsection ("Output format options");
+ *     DataOutInterface<dim>::declare_parameters (prm);
+ *   prm.leave_subsection ();
+ *   ...
+ *
+ *
+ *                               // within function doing the output:
+ *   ...
+ *   DataOut<dim> out;
+ *   prm.enter_subsection ("Output format options");
+ *   out.parse_parameters (prm);
+ *   prm.leave_subsection ();
+ *   ...
+ * \end{verbatim}
+ * Note that in the present example, the class #DataOut# was used. However, any
+ * other class derived from #DataOut_Interface# would work alike.
+ *
+ *
  * \subsection{Run time selection of formats}
  *
  * This class, much like the #GridOut# class, has a set of functions
@@ -926,6 +968,7 @@ class DataOutBase
  * in parameter files much easier, and especially independent of
  * the formats presently implemented. User programs need therefore not
  * be changed whenever a new format is implemented.
+ *
  *
  * @author Wolfgang Bangerth, 1999
  */
