@@ -84,6 +84,12 @@ dnl On SunOS 4.x, the `getrusage' function exists, but is not declared
 dnl in the respective header file `resource.h', as one would think when
 dnl reading the man pages. Then we have to declare this function 
 dnl ourselves...
+dnl
+dnl If the function is not properly declared, then we augment the
+dnl CXXFLAGS[OG] by `-DNO_HAVE_GETRUSAGE'
+dnl
+dnl Usage: DEAL_II_CHECK_GETRUSAGE
+dnl
 AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
   AC_MSG_CHECKING(whether getrusage is properly declared)
   AC_REQUIRE([AC_LANG_CPLUSPLUS])
