@@ -279,7 +279,7 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
   QGauss3<dim>                    quadrature;
 
   unsigned int refine_step = 0;
-  while (tria->n_active_cells() < 5000)
+  while (tria->n_active_cells() < 6000)
     {
       cout << "Refinement step " << refine_step
 	   << ", using " << tria->n_active_cells() << " active cells."
@@ -323,10 +323,11 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       cout << "    Estimating H1 error... ";
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
-//      ee.estimate_error (*dof, eq, fe, boundary,
-//			 KellyErrorEstimator<dim>::FunctionMap(),
-//			 solution,
-//			 estimated_error_per_cell);
+//      
+      ee.estimate_error (*dof, eq, fe, boundary,
+			 KellyErrorEstimator<dim>::FunctionMap(),
+			 solution,
+			 estimated_error_per_cell);
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 
@@ -336,8 +337,9 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
 					  linfty_error_per_dof);
       dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
-//      dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
-//					  estimated_error_per_dof);
+//
+      dof->distribute_cell_to_dof_vector (estimated_error_per_cell,
+					  estimated_error_per_dof);
   
   
       DataOut<dim> out;
@@ -345,9 +347,10 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
       out.add_data_vector (l2_error_per_dof, "L2-Error");
       out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
       out.add_data_vector (h1_error_per_dof, "H1-Error");
-//      out.add_data_vector (estimated_error_per_dof, "Estimated Error");
-      string filename = "gnuplot.";
-//  string filename = "ee.";
+//
+      out.add_data_vector (estimated_error_per_dof, "Estimated Error");
+//      string filename = "gnuplot.";
+      string filename = "ee.";
       switch (refine_mode) 
 	{
 	  case global:
@@ -387,11 +390,11 @@ void PoissonProblem<dim>::run (const unsigned int start_level,
 		break;
 	};
       cout << endl << endl;
-      cout << endl;
       ++refine_step;
     };
   
   print_history (refine_mode);
+  cout << endl << endl << endl;
 };
 
 
@@ -459,7 +462,7 @@ int main () {
   PoissonProblem<2> problem;
 
   problem.run (2, PoissonProblem<2>::global);
-  problem.run (2, PoissonProblem<2>::true_error);
+//  problem.run (2, PoissonProblem<2>::true_error);
 
   return 0;
 };
