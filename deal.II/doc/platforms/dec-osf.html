@@ -98,5 +98,47 @@
     </p>
 
 
+    <p>
+    As a last note: we have experienced link problems when using the
+    ``squangle'' scheme of the compiler, with error messages like
+    <pre>
+      /usr/bin/ld:
+      Unresolved:
+      type_info::operator==(type_info const &) const
+      collect2: ld returned 1 exit status
+    </pre>
+    These errors are due to the fact that the function
+    <code class="member">type_info::operator==(const typeinfo &)</code>
+    can be squangled into the two strings
+    <code class="member">__eq__C9type_infoRC9type_info</code> and
+    <code class="member">__eq__C9type_infoRCB0</code> alike, with the
+    same meaning. The latter uses a ``back-reference'' to denote the
+    parameter with the same type as the class (this is the ``B0''
+    part, identifying the parameter type with the class type), while
+    the first version explicitely lists the parameter type. Of course,
+    the compiler should be consistent in what version it generates,
+    but it is not, unfortunately.
+    </p>
+
+    <p>
+    It is possible to work around this bug in the compiler by the
+    following small hack, which you have to compile and link in with
+    all programs that use the
+    <code class="member">type_info::operator==(const typeinfo &)</code>
+    function:
+    <pre>
+      extern "C" {
+        int __eq__C9type_infoRC9type_info (void *x1, void *x2);
+        int __eq__C9type_infoRCB0 (void *x1, void *x2) {
+          return __eq__C9type_infoRC9type_info(x1,x2);
+        };
+      };
+    </pre>
+    Note that the ``step-7'' example program uses this operator, and
+    therefore needs to be linked with this code
+    snippet. Alternatively, you can insert these lines into one of your
+    source files, if you experience the problems described above.
+    </p>
+
   </body>
 </html>
