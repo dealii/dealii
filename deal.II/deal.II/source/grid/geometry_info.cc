@@ -15,11 +15,11 @@
 #include <grid/geometry_info.h>
 
 
-template <> const unsigned int GeometryInfo<deal_II_dimension>::vertices_per_cell;
-template <> const unsigned int GeometryInfo<deal_II_dimension>::lines_per_cell;
-template <> const unsigned int GeometryInfo<deal_II_dimension>::quads_per_cell;
-template <> const unsigned int GeometryInfo<deal_II_dimension>::hexes_per_cell;
-template <> const unsigned int GeometryInfo<deal_II_dimension>::children_per_cell;
+template <int dim> const unsigned int GeometryInfo<dim>::vertices_per_cell;
+template <int dim> const unsigned int GeometryInfo<dim>::lines_per_cell;
+template <int dim> const unsigned int GeometryInfo<dim>::quads_per_cell;
+template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
+template <int dim> const unsigned int GeometryInfo<dim>::children_per_cell;
 
 
 template <>
@@ -36,3 +36,6 @@ template <>
 const unsigned int GeometryInfo<3>::opposite_face[GeometryInfo<3>::faces_per_cell]
 = { 1, 0, 4, 5, 2, 3 };
 
+
+
+template class GeometryInfo<deal_II_dimension>;
