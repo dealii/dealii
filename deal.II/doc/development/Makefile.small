@@ -131,7 +131,7 @@ clean:
 # since the executable depends on some include files from the library,
 # besides the C++ application file of course, it is necessary to
 # re-generate the executable when one of the files it depends on has
-# changed. The following rule to created a dependency file
+# changed. The following rule creates a dependency file
 # `Makefile.dep', which `make' uses to determine when to regenerate
 # the executable. This file is automagically remade whenever needed,
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
