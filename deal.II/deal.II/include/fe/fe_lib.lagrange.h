@@ -84,6 +84,8 @@ class FELinear : public FELinearMapping<dim> {
  * Define a (bi-, tri-, etc)quadratic finite element in #dim# space dimensions.
  * A linear (subparametric) mapping from the unit cell
  * to the real cell is implemented.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class FEQuadraticSub : public FELinearMapping<dim> {
@@ -164,6 +166,8 @@ class FEQuadraticSub : public FELinearMapping<dim> {
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line and the counterclockwise numbering of the interior degrees of
  * freedom.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class FECubicSub : public FELinearMapping<dim> {
@@ -245,6 +249,8 @@ class FECubicSub : public FELinearMapping<dim> {
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line and the numbering of the interior degrees of
  * freedom.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class FEQuarticSub : public FELinearMapping<dim> {

@@ -345,7 +345,13 @@ class LineAccessor :  public TriaAccessor<dim> {
 
 				     /**
 				      * Access the value of the user pointer
-				      * of this line.
+				      * of this line. It is in the
+				      * responsibility of the user to make
+				      * sure that the pointer points to
+				      * something useful. You should use the
+				      * new style cast operator to maintain
+				      * a minimum of typesafety, e.g.
+				      * #A *a=static_cast<A*>(cell->user_pointer());#.
 				      */
     void * user_pointer () const;
     
@@ -605,7 +611,13 @@ class QuadAccessor :  public TriaAccessor<dim> {
 
 				     /**
 				      * Access the value of the user pointer
-				      * of this line.
+				      * of this line. It is in the
+				      * responsibility of the user to make
+				      * sure that the pointer points to
+				      * something useful. You should use the
+				      * new style cast operator to maintain
+				      * a minimum of typesafety, e.g.
+				      * #A *a=static_cast<A*>(cell->user_pointer());#.
 				      */
     void * user_pointer () const;
 
