@@ -490,6 +490,8 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
         F77_VERSION_STRING=`($F77 -V 2>&1)`
         if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" \
                 -o \
+                -n "`echo $F77_VERSION_STRING | grep \"Sun WorkShop\"`"
+                -o \
                 -n "`echo $F77_VERSION_STRING | grep \"Forte Developer\"`" ; then
           dnl OK, this is the Sun Fortran77 compiler
   	  AC_MSG_RESULT(F77 compiler is Sun WorkShop f77)
@@ -507,7 +509,7 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
           else
   
            dnl Now, this is a hard case, we have no more clues...
-            F77_VERSION=
+            F77_VERSION="UnknownF77"
   	    AC_MSG_RESULT(F77 compiler is unkown. no flags set!)
           fi
         fi
@@ -573,9 +575,24 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
   	F77FLAGSPIC="shared -KPIC"
 	;;
 
+    UnknownF77)
+	dnl Disable unknown FORTRAN compiler.
+	dnl Allows configure to finish,
+	dnl but disables compiling FORTRAN code
+	F77="UnknownF77"
+        F77FLAGSG="$FFLAGS -g"
+        F77FLAGSO="$FFLAGS -O2"
+        F77LIBS="$F77LIBS"  
+
+        F77FLAGSPIC="unknown!"
+	AC_MSG_RESULT(Unknown FORTRAN compiler has been disabled!)
+        ;;
+
+        dnl Keep this line just in case we change default options
+	dnl back to error message
     *)
 	AC_MSG_ERROR(No compiler options for F77 compiler
-                     "$F77_VERSION" specified at present)
+                     "$F77_VERSION" specified: modification of aclocal.m4 necessary)
         ;;
   esac
 ])
@@ -1577,9 +1594,6 @@ AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
       AC_MSG_RESULT(no)
     ])
 ])
-
-
-
 
 
 
