@@ -49,6 +49,11 @@ class Polynomial : public Subscriptor
 				      */
     Polynomial (const vector<double> &coefficients);
 
+                                     /**
+				      * Default-Constructor.
+				      */
+    Polynomial ();
+    
 				     /**
 				      * Return the value of this
 				      * polynomial at the given point.
@@ -83,6 +88,11 @@ class Polynomial : public Subscriptor
 				      */
     DeclException0 (ExcEmptyArray);
     
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcVoidPolynomial);
+    
   protected:
 
 				     /**
@@ -99,14 +109,14 @@ class Polynomial : public Subscriptor
 
 
 /**
- * Class of Lagrange polynomials with equidistant interpolation
- * points. The polynomial of order @p{n} has got @p{n+1} interpolation
+ * Lagrange polynomials with equidistant interpolation
+ * points in [0,1]. The polynomial of degree @p{n} has got @p{n+1} interpolation
  * points. The interpolation points are sorted in ascending
  * order. This order gives an index to each interpolation point.  A
- * Lagrangian polynomial equals 1 at one interpolation point that is
- * then called `support point', and 0 at all other interpolation
- * points. For example, if the order is 3, and the support point is 1,
- * then the polynomial represented by this object is of cubic and its
+ * Lagrangian polynomial equals to 1 at its `support point',
+ * and 0 at all other interpolation
+ * points. For example, if the degree is 3, and the support point is 1,
+ * then the polynomial represented by this object is cubic and its
  * value is 1 at the point @p{x=1/3}, and zero at the point @p{x=0},
  * @p{x=2/3}, and @p{x=1}.
  *
@@ -127,6 +137,12 @@ class LagrangeEquidistant: public Polynomial
     LagrangeEquidistant (const unsigned int n,
 			 const unsigned int support_point);
 
+                                     /**
+				      * Default-constructor.
+				      */
+    LagrangeEquidistant ();
+    
+
 				     /**
 				      * Exception
 				      */
@@ -142,11 +158,7 @@ class LagrangeEquidistant: public Polynomial
 				      * @p{Polynomial}. This function
 				      * is @p{static} to allow to be
 				      * called in the
-				      * constructor. This in turn
-				      * enables us to have the
-				      * @p{coefficients} of the base
-				      * class to be a @p{const}
-				      * vector.
+				      * constructor.
 				      */
     static 
     vector<double> 

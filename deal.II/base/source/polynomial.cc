@@ -21,8 +21,16 @@ Polynomial::Polynomial (const vector<double> &a):
 
 
 
+Polynomial::Polynomial ()
+  :
+  coefficients(0)
+{}
+
+
+
 double Polynomial::value (const double x) const
 {
+  Assert (coefficients.size() > 0, ExcVoidPolynomial());
   const unsigned int m=coefficients.size();
 
 				   // Horner scheme
@@ -38,6 +46,7 @@ double Polynomial::value (const double x) const
 void Polynomial::value (const double    x,
 			vector<double> &values) const
 {
+  Assert (coefficients.size() > 0, ExcVoidPolynomial());
   Assert (values.size() > 0, ExcEmptyArray());
   const unsigned int values_size=values.size();
   
@@ -79,6 +88,11 @@ void Polynomial::value (const double    x,
 LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
 					  const unsigned int support_point):
 		Polynomial(compute_coefficients(n,support_point))
+{}
+
+
+
+LagrangeEquidistant::LagrangeEquidistant ()
 {}
 
 
