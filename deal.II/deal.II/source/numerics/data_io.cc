@@ -80,7 +80,7 @@ void DataIn<dim>::read_ucd (istream &in) {
 				   // set up mapping between numbering
 				   // in ucd-file (key) and in the
 				   // vertices vector
-  map<int,int,less<int> > vertex_indices;
+  map<int,int> vertex_indices;
   
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
     {

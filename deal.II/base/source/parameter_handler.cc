@@ -111,7 +111,7 @@ void ParameterHandler::clear () {
   changed_entries.entries.erase (changed_entries.entries.begin(),
 				 changed_entries.entries.end());
 
-  map<String, Section*, less<String> >::iterator p;
+  map<String, Section*>::iterator p;
 
   for (p=defaults.subsections.begin(); p!=defaults.subsections.end(); ++p)
     delete p->second;
@@ -212,7 +212,7 @@ const String & ParameterHandler::get (const String &entry_string) const {
 
 				   // entry exists; now find out whether
 				   // it was changed:
-  map<String, pair<String,String>, less<String> >::const_iterator ptr;
+  map<String, pair<String,String> >::const_iterator ptr;
   ptr = pc->entries.find (entry_string);
   if (ptr != pc->entries.end())
     return ptr->second.first;
@@ -302,7 +302,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
   Section *pc = get_present_changed_subsection ();
 
 				   // traverse entry list
-  map<String, pair<String,String>, less<String> >::const_iterator ptr;
+  map<String, pair<String,String> >::const_iterator ptr;
 
 				   // first find out the longest entry name
   unsigned int longest_entry = 0;
@@ -361,7 +361,7 @@ void ParameterHandler::print_parameters_section (ostream &out,
   
 
 				   // now transverse subsections tree
-  map<String, Section*, less<String> >::const_iterator ptrss;
+  map<String, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
     {
       switch (style) 
@@ -600,7 +600,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
 ParameterHandler::Section::~Section () {
   entries.erase (entries.begin(), entries.end());
 
-  map<String, Section*, less<String> >::iterator p;
+  map<String, Section*>::iterator p;
 
   for (p=subsections.begin(); p!=subsections.end(); ++p)
     delete p->second;
@@ -726,7 +726,7 @@ void MultipleParameterLoop::init_branches () {
 void MultipleParameterLoop::init_branches_section (const ParameterHandler::Section &sec) {
 				   // check all entries in the present subsection
 				   // whether it is a multiple entry
-  map<String, pair<String,String>, less<String> >::const_iterator e;
+  map<String, pair<String,String> >::const_iterator e;
   for (e = sec.entries.begin(); e != sec.entries.end(); ++e) 
     if (e->second.first.contains('{')) 
       multiple_choices.push_back (Entry(subsection_path,
@@ -735,7 +735,7 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
 	        
 
 				   // transverse subsections
-  map<String, Section*, less<String> >::const_iterator s;
+  map<String, Section*>::const_iterator s;
   for (s = sec.subsections.begin(); s != sec.subsections.end(); ++s) 
     {
       enter_subsection (s->first);

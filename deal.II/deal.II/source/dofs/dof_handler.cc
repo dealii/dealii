@@ -880,7 +880,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				       // store for each coordination
 				       // number the dofs with these
 				       // coordination number
-      multimap<unsigned int, int, less<unsigned int> > dofs_by_coordination;
+      multimap<unsigned int, int> dofs_by_coordination;
       
 				       // find coordination number for
 				       // each of these dofs
@@ -902,7 +902,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 	};
       
 				       ////
-      multimap<unsigned int, int, less<unsigned int> >::iterator i;
+      multimap<unsigned int, int>::iterator i;
       for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i) 
 	new_number[i->second] = next_free_number++;
 

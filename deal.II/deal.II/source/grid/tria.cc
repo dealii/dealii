@@ -167,7 +167,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				   // object itself. In the first run, these
 				   // iterators are all invalid ones, but they
 				   // are filled afterwards
-  map<pair<int,int>,line_iterator,less<pair<int,int> > > needed_lines;
+  map<pair<int,int>,line_iterator> needed_lines;
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
 #ifdef DEBUG
@@ -263,7 +263,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   if (true) 
     {
       vector<unsigned short int> vertex_touch_count (v.size(), 0);
-      map<pair<int,int>,line_iterator,less<pair<int,int> > >::iterator i;
+      map<pair<int,int>,line_iterator>::iterator i;
       for (i=needed_lines.begin(); i!=needed_lines.end(); i++) 
 	{
 					   // touch the vertices of this line
@@ -288,7 +288,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
   if (true) 
     {
       raw_line_iterator line = begin_raw_line();
-      map<pair<int,int>,line_iterator,less<pair<int,int> > >::iterator i;
+      map<pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
 	  line->set (Line(i->first.first, i->first.second));
@@ -300,7 +300,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 				   // store for each line index
 				   // the adjacent cells
-  map<int,vector<cell_iterator>,less<int> > adjacent_cells;
+  map<int,vector<cell_iterator> > adjacent_cells;
 
 				   // finally make up cells
   if (true) 
