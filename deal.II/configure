@@ -980,8 +980,8 @@ else
 fi
 
 if test $withmultithreading != no ; then
-  echo $ac_n "checking checking for ACE""... $ac_c" 1>&6
-echo "configure:985: checking checking for ACE" >&5
+  echo $ac_n "checking for ACE""... $ac_c" 1>&6
+echo "configure:985: checking for ACE" >&5
   if test -d $withmultithreading ; then
     echo "$ac_t""found" 1>&6
   else

@@ -81,7 +81,7 @@ AC_ARG_WITH(multithreading,
     withmultithreading=$withval,
     withmultithreading=no)
 if test $withmultithreading != no ; then
-  AC_MSG_CHECKING(checking for ACE)
+  AC_MSG_CHECKING(for ACE)
   if test -d $withmultithreading ; then
     AC_MSG_RESULT(found)
   else
