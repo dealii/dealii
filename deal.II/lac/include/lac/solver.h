@@ -17,6 +17,9 @@ template <class Vector> class VectorMemory;
  * return states of linear solvers and provides interfaces to a memory
  * pool and the control object.
  *
+ *
+ * \subsection{Requirements for template classes}
+ *
  * The class is templated to allow for different matrix and vector
  * classes, since iterative solvers do not rely on any special structure
  * of matrices or the format of storage. However, there are some common
@@ -25,6 +28,7 @@ template <class Vector> class VectorMemory;
  * are listed following. The classes do not declare any concrete
  * class, they are rather intended to form a `signature' which a concrete
  * class has to conform to.
+ *
  * \begin{verbatim}
  * class Matrix
  * {
