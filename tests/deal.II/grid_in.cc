@@ -70,19 +70,25 @@ void test2 ()
 }
 
 
-// void filename_resolution()
-// {
-//   Triangulation<2> tria;
-//   GridIn<2> gi;
+template<int dim>
+void check_file (const std::string name,
+		 typename GridIn<dim>::Format format)
+{
+  Triangulation<dim> tria;
+  GridIn<dim> gi;
+  gi.attach_triangulation (tria);
+  gi.read(name, format);
+  deallog << name
+	  << '\t' << tria.n_vertices()
+	  << '\t' << tria.n_cells()
+	  << std::endl;
+}
 
-//   gi.attach_triangulation (tria);
-//   gi.read(std::string("grid_in_2d"), GridIn<2>::ucd);
-//   deallog << tria.n_vertices() << '\t' << tria.n_cells()
-// 	  << std::endl;
-//   gi.read(std::string("grid_in_2d"), GridIn<2>::xda);
-//   deallog << tria.n_vertices() << '\t' << tria.n_cells()
-// 	  << std::endl;
-// }
+void filename_resolution()
+{
+  check_file<2> (std::string("grid_in_2d.inp"), GridIn<2>::ucd);
+  check_file<2> (std::string("grid_in_2d.xda"), GridIn<2>::xda);
+}
 
 
 int main ()
@@ -94,6 +100,6 @@ int main ()
   test1<2> ();
   test2<2> ();
   
-//  filename_resolution();
+  filename_resolution();
 }
 
