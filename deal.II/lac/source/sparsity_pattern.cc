@@ -566,14 +566,16 @@ SparsityPattern::operator () (const unsigned int i,
     return rowstart[i];
 
 				   // all other entries are sorted, so
-				   // we can use a binary seach algorithm
+				   // we can use a binary search
+				   // algorithm
 				   //
-				   // note that the entries are only sorted
-				   // upon compression, so this would fail
-				   // for non-compressed sparsity patterns;
-				   // however, that is why the Assertion is
-				   // at the top of this function, so it
-				   // may not be called for noncompressed
+				   // note that the entries are only
+				   // sorted upon compression, so this
+				   // would fail for non-compressed
+				   // sparsity patterns; however, that
+				   // is why the Assertion is at the
+				   // top of this function, so it may
+				   // not be called for noncompressed
 				   // structures.
   const unsigned int * const sorted_region_start = (rows==cols ?
 						    &colnums[rowstart[i]+1] :
@@ -581,8 +583,7 @@ SparsityPattern::operator () (const unsigned int i,
   const unsigned int * const p = optimized_lower_bound (sorted_region_start,
 							&colnums[rowstart[i+1]],
 							j);
-  if ((*p == j) &&
-      (p != &colnums[rowstart[i+1]]))
+  if ((p != &colnums[rowstart[i+1]])  &&  (*p == j))
     return (p - &colnums[0]);
   else
     return invalid_entry;
