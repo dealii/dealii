@@ -46,9 +46,9 @@ namespace PETScWrappers
 
                                        // get a representation of the present
                                        // row
-      int          ncols;
-      int         *colnums;
-      PetscScalar *values;
+      int                ncols;
+      const int         *colnums;
+      const PetscScalar *values;
 
       int ierr;
       ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);

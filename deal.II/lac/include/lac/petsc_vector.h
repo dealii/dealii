@@ -257,10 +257,38 @@ namespace PETScWrappers
     int ierr = VecDestroy (vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // then do the gather operation
+                                     // then do the gather
+                                     // operation. <rant>petsc has changed its
+                                     // interface again, and replaced a single
+                                     // function call by several calls that
+                                     // are hard to understand. gets me all
+                                     // annoyed at their development
+                                     // model</rant>
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
     ierr = VecConvertMPIToSeqAll (static_cast<const Vec &>(v),
                                   &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+#else
+    
+    VecScatter ctx;
+
+    ierr = VecScatterCreateToAll (static_cast<const Vec &>(v), &ctx, &vector);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = VecScatterBegin (static_cast<const Vec &>(v), vector,
+                            INSERT_VALUES, SCATTER_FORWARD, ctx);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = VecScatterEnd (static_cast<const Vec &>(v), vector,
+                          INSERT_VALUES, SCATTER_FORWARD, ctx);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = VecScatterDestroy (ctx);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+#endif
     
     return *this;
   }

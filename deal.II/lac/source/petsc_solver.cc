@@ -168,7 +168,10 @@ namespace PETScWrappers
     
                                      // then do the real work: set up solver
                                      // internal data and solve the
-                                     // system.
+                                     // system. unfortunately, the call
+                                     // sequence is different between PETSc
+                                     // versions 2.2.0 and 2.2.1
+#  if (PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)
     ierr = KSPSetRhs(solver_data->ksp,b);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = KSPSetSolution(solver_data->ksp, x);
@@ -178,6 +181,13 @@ namespace PETScWrappers
     
     ierr = KSPSolve (solver_data->ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+#  else
+    ierr = KSPSetUp (solver_data->ksp);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = KSPSolve (solver_data->ksp, b, x);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+#  endif 
 
 #endif
                                      // destroy solver object
