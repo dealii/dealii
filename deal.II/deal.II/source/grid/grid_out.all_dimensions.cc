@@ -79,12 +79,14 @@ namespace GridOutFlags
 	       const double       line_width,
 	       const bool color_lines_on_user_flag,
 	       const unsigned int n_boundary_face_points,
-	       const bool         write_cell_numbers)
+	       const bool         write_cell_numbers,
+	       const bool         write_cell_number_level)
 		  :
 		  EpsFlagsBase(size_type, size, line_width,
 			       color_lines_on_user_flag,
 			       n_boundary_face_points),
-		  write_cell_numbers (write_cell_numbers)
+		  write_cell_numbers (write_cell_numbers),
+		  write_cell_number_level (write_cell_number_level)
   {};
 
 

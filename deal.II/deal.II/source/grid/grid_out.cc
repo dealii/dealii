@@ -1056,12 +1056,20 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	cell = tria.begin_active (),
 	endc = tria.end ();
       for (; cell!=endc; ++cell)
-	out << (cell->center()(0)-offset(0))*scale << ' '
-	    << (cell->center()(1)-offset(1))*scale
-	    << " m" << std::endl
-	    << "[ [(Helvetica) 12.0 0.0 true true (" << cell << " )] "
-	    << "] -6 MCshow"
-	    << std::endl;
+	{
+	  out << (cell->center()(0)-offset(0))*scale << ' '
+	      << (cell->center()(1)-offset(1))*scale
+	      << " m" << std::endl
+	      << "[ [(Helvetica) 12.0 0.0 true true (";
+	  if (eps_flags_2.write_cell_number_level)
+	    out << cell;
+	  else
+	    out << cell->index();
+
+	  out  << " )] "
+	       << "] -6 MCshow"
+	       << std::endl;
+	};
     };
 
   out << "showpage" << std::endl;

@@ -289,9 +289,24 @@ namespace GridOutFlags
 					*
 					* The format of the cell
 					* number written is
-					* @p{level.index}.
+					* @p{level.index}, or simply
+					* @p{index}, depending on the
+					* value of the following flag.
 					*/
       bool write_cell_numbers;
+				       /**
+					* If the cell numbers shall be
+					* written, using the above
+					* flag, then the value of this
+					* flag determines whether the
+					* format shall be
+					* @p{level.index}, or simply
+					* @p{index}. If @p{true}, the
+					* first format is
+					* taken. Default is @p{true}.
+					*/
+      bool write_cell_number_level;
+      
       
 				       /**
 					* Constructor.
@@ -301,7 +316,8 @@ namespace GridOutFlags
 	   const double       line_width = 0.5,
 	   const bool         color_lines_on_user_flag = false,
 	   const unsigned int n_boundary_face_points = 2,
-	   const bool         write_cell_numbers = false);
+	   const bool         write_cell_numbers = false,
+	   const bool         write_cell_number_level = true);
   };
   
 				   /**
