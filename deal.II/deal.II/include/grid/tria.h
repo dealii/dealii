@@ -623,7 +623,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *       class which takes a triangulation and fills it by a division
  *       of the required domain.
  *   
- *     @item Reading in a triangulation: By using an object of the @p{DataIn}
+ *     @item Reading in a triangulation: By using an object of the @p{GridIn}
  *        class, you can read in fairly general triangulations. See there for
  *        more information. The mentioned class uses the interface described
  *        directly below to transfer the data into the triangulation.
@@ -632,7 +632,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *        by providing a list of vertices and a list of cells. Each such cell
  *        consists of a vector storing the indices of the vertices of this cell
  *        in the vertex list. To see how this works, you can take a look at the
- *        @p{DataIn<dim>::read_*} functions. The appropriate function to be
+ *        @p{GridIn<dim>::read_*} functions. The appropriate function to be
  *        called is @p{Triangulation<dim>::create_triangulation (2)}.
  *
  *        Creating the hierarchical information needed for this library from
@@ -661,7 +661,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *        There are more subtle conditions which must be imposed upon the
  *        vertex numbering within cells. See the documentation for the
- *        @ref{DataIn} class for more details on this. They do not only
+ *        @ref{GridIn} class for more details on this. They do not only
  *        hold for the data read from an UCD or any other input file, but
  *        also for the data passed to the
  *        @p{Triangulation<dim>::create_triangulation (2)} function.
