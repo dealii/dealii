@@ -763,7 +763,7 @@ namespace Patterns
  *     prm.read_input ("simulation.in");
  *     // or
  *     char *in = "set Time step size = 0.3 \n ...";
- *     prm.read_input (in);
+ *     prm.read_input_from_string (in);
  *     ...
  *   @end{verbatim}
  *   You can use several sources of input successively. Entries which are changed more than
