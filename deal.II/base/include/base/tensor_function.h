@@ -26,7 +26,7 @@
 /**
  *  This class is a model for a tensor valued function.
  *  It returns the value
- *  at a given point through the #operator ()# member functions,
+ *  at a given point through the @p{operator ()} member functions,
  *  which are virtual. It also has a function to return a whole list of
  *  values at different points to reduce the overhead of the virtual function
  *  calls; this function is preset to successively call the function returning
@@ -68,11 +68,11 @@ class TensorFunction : public FunctionTime,
     virtual Tensor<rank, dim> value (const Point<dim> &p) const;
 
 				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#.
-				      * It is assumed that #values#
+				      * Set @p{values} to the point values
+				      * of the function at the @p{points}.
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points#
+				      * the same size as the @p{points}
 				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
@@ -85,11 +85,11 @@ class TensorFunction : public FunctionTime,
     virtual Tensor<rank+1,dim> gradient (const Point<dim> &p) const;
 
 				     /**
-				      * Set #gradients# to the gradients of
-				      * the function at the #points#.
-				      * It is assumed that #values# 
+				      * Set @p{gradients} to the gradients of
+				      * the function at the @p{points}.
+				      * It is assumed that @p{values} 
 				      * already has the right size, i.e.
-				      * the same size as the #points# array.
+				      * the same size as the @p{points} array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<rank+1,dim> > &gradients) const;

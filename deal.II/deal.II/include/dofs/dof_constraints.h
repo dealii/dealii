@@ -44,7 +44,7 @@ template <int n_blocks> class BlockIndices;
  * operation.
  *
  * Condensation is done in four steps: first the large matrix sparsity pattern
- * is created (e.g. using #DoFHandler::create_sparsity_pattern#), then the
+ * is created (e.g. using @p{DoFHandler::create_sparsity_pattern}), then the
  * sparsity pattern of the condensed matrix is made out of the large sparsity
  * pattern and the constraints. After that the global matrix is assembled and
  * finally condensed. To do these steps, you have (at least) two possibilities:
@@ -58,7 +58,7 @@ template <int n_blocks> class BlockIndices;
  *   two major drawbacks: keeping two matrices at the same time can be quite
  *   unacceptable in many cases, since these matrices may be several 10 or even
  *   100 MB large. Secondly, the condensation process is quite expensive, since
- *   {\it all} entries of the matrix have to be copied, not only those which are
+ *   @em{all} entries of the matrix have to be copied, not only those which are
  *   subject to constraints.
  *
  * \item Use only one sparsity pattern and one matrix: doing it this way, the
@@ -89,14 +89,14 @@ template <int n_blocks> class BlockIndices;
  * Usually, the second way is chosen since memory consumption upon construction
  * of a second matrix rules out the first possibility.
  *
- * This class provides two sets of #condense# functions: those taking two
+ * This class provides two sets of @p{condense} functions: those taking two
  * arguments refer to the first possibility above, those taking only one do
  * their job in-place and refer to the second possibility.
  *
  * Condensing vectors works exactly as described above for matrices.
  *
  * After solving the condensed system of equations, the solution vector has to
- * be redistributed. This is done by the two #distribute# function, one working
+ * be redistributed. This is done by the two @p{distribute} function, one working
  * with two vectors, one working in-place. The operation of distribution undoes
  * the condensation process in some sense, but it should be noted that it is not
  * the inverse operation.
@@ -167,17 +167,17 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Return whether the degree of
-				      * freedom with number #index# is
+				      * freedom with number @p{index} is
 				      * a constrained one.
 				      *
-				      * Note that if #close# was
+				      * Note that if @p{close} was
 				      * called before, then this
 				      * function is significantly
 				      * faster, since then the
 				      * constrained degrees of freedom
 				      * are sorted and we can do a
 				      * binary search, while before
-				      * #close# was called, we have to
+				      * @p{close} was called, we have to
 				      * perform a linear search
 				      * through all entries.
 				      */
@@ -190,7 +190,7 @@ class ConstraintMatrix : public Subscriptor
 				      * in 2d a hanging node is
 				      * constrained only to its two
 				      * neighbors, so the returned
-				      * value would be #2#. However,
+				      * value would be @p{2}. However,
 				      * for higher order elements
 				      * and/or higher dimensions, or
 				      * other types of constraints,
@@ -251,7 +251,7 @@ class ConstraintMatrix : public Subscriptor
 				      * matrix struct should be condensed and
 				      * compressed. It is the user's
 				      * responsibility to guarantee that all
-				      * entries in the #condensed# matrix be
+				      * entries in the @p{condensed} matrix be
 				      * zero!
 				      *
 				      * The constraint matrix object must be
@@ -280,15 +280,15 @@ class ConstraintMatrix : public Subscriptor
     void condense (BlockSparseMatrix<number,blocks,blocks> &sparsity) const;
     
 				     /**
-				      * Condense the given vector #uncondensed#
-				      * into #condensed#. It is the user's
+				      * Condense the given vector @p{uncondensed}
+				      * into @p{condensed}. It is the user's
 				      * responsibility to guarantee that all
-				      * entries of #condensed# be zero!
+				      * entries of @p{condensed} be zero!
 				      *
-				      * The #VectorType# may be a
-				      * #Vector<float>#,
-				      * #Vector<double>#,
-				      * #BlockVector<...>#, or any
+				      * The @p{VectorType} may be a
+				      * @p{Vector<float>},
+				      * @p{Vector<double>},
+				      * @p{BlockVector<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -298,10 +298,10 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Condense the given vector
-				      * in-place. The #VectorType# may
-				      * be a #Vector<float>#,
-				      * #Vector<double>#,
-				      * #BlockVector<...>#, or any
+				      * in-place. The @p{VectorType} may
+				      * be a @p{Vector<float>},
+				      * @p{Vector<double>},
+				      * @p{BlockVector<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -310,22 +310,22 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Re-distribute the elements of
-				      * the vector #condensed# to
-				      * #uncondensed#. It is the
+				      * the vector @p{condensed} to
+				      * @p{uncondensed}. It is the
 				      * user's responsibility to
 				      * guarantee that all entries of
-				      * #uncondensed# be zero!
+				      * @p{uncondensed} be zero!
 				      *
 				      * This function undoes the
-				      * action of #condense# somehow,
+				      * action of @p{condense} somehow,
 				      * but it should be noted that it
 				      * is not the inverse of
-				      * #condense#.
+				      * @p{condense}.
 				      *
-				      * The #VectorType# may be a
-				      * #Vector<float>#,
-				      * #Vector<double>#,
-				      * #BlockVector<...>#, or any
+				      * The @p{VectorType} may be a
+				      * @p{Vector<float>},
+				      * @p{Vector<double>},
+				      * @p{BlockVector<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -336,10 +336,10 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Re-distribute the elements of
 				      * the vector in-place. The
-				      * #VectorType# may be a
-				      * #Vector<float>#,
-				      * #Vector<double>#,
-				      * #BlockVector<...>#, or any
+				      * @p{VectorType} may be a
+				      * @p{Vector<float>},
+				      * @p{Vector<double>},
+				      * @p{BlockVector<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -350,10 +350,10 @@ class ConstraintMatrix : public Subscriptor
 				      * Delete hanging nodes in a
 				      * vector.  Sets all hanging node
 				      * values to zero. The
-				      * #VectorType# may be a
-				      * #Vector<float>#,
-				      * #Vector<double>#,
-				      * #BlockVector<...>#, or any
+				      * @p{VectorType} may be a
+				      * @p{Vector<float>},
+				      * @p{Vector<double>},
+				      * @p{BlockVector<...>}, or any
 				      * other type having the same
 				      * interface.
 				      */
@@ -368,7 +368,7 @@ class ConstraintMatrix : public Subscriptor
 				      * This function writes out all entries
 				      * in the constraint matrix lines with
 				      * their value in the form
-				      * #row col : value#. Unconstrained lines
+				      * @p{row col : value}. Unconstrained lines
 				      * containing only one identity entry are
 				      * not stored in this object and are not
 				      * printed.
@@ -443,7 +443,7 @@ class ConstraintMatrix : public Subscriptor
 					  * For the reason why we use a vector
 					  * instead of a map and the consequences
 					  * thereof, the same applies as what is
-					  * said for #ConstraintMatrix::lines#.
+					  * said for @p{ConstraintMatrix::lines}.
 					  */
 	vector<pair<unsigned int,double> > entries;
 
@@ -472,7 +472,7 @@ class ConstraintMatrix : public Subscriptor
 				      * at the end, so the order is
 				      * unspecified after all entries are
 				      * inserted. Sorting of the entries takes
-				      * place when calling the #close()# function.
+				      * place when calling the @p{close()} function.
 				      *
 				      * We could, instead of using a vector, use
 				      * an associative array, like a map to

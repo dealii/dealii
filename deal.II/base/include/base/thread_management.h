@@ -38,7 +38,7 @@ namespace Threads
  * multithreading. It allows to write programs such that they start
  * new threads and/or lock objects in multithreading mode, and use
  * dummy thread management and synchronisation classes instead when
- * running in single-thread mode. Specifically, the #spawn# functions
+ * running in single-thread mode. Specifically, the @p{spawn} functions
  * only call the function but wait for it to return instead of running
  * in on another thread, and the mutices do nothing really. The only
  * reason to provide such a function is that the program can be
@@ -74,7 +74,7 @@ namespace Threads
  * using multithreading. It allows to write programs such that they
  * start new threads and/or lock objects in multithreading mode, and
  * use dummy thread management and synchronisation classes instead
- * when running in single-thread mode. Specifically, the #spawn#
+ * when running in single-thread mode. Specifically, the @p{spawn}
  * functions only call the function but wait for it to return instead
  * of running in on another thread, and the mutices do nothing
  * really. The only reason to provide such a function is that the
@@ -145,7 +145,7 @@ namespace Threads
 /**
  * Class used to store a pointer temporarily and delete the object
  * pointed to upon destruction of this object. For more information on
- * use and internals of this class see the report on this subject.
+ * use and internals of this class see the report on multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -155,10 +155,10 @@ namespace Threads
 				       /**
 					* Default constructor. Construct
 					* the object empty, i.e. set
-					* #data==0#. Since this is not
+					* @p{data==0}. Since this is not
 					* very useful, disallow it by
 					* declaring this constructor
-					* #private#.
+					* @p{private}.
 					*/
       FunEncapsulation ();
 
@@ -166,28 +166,28 @@ namespace Threads
 				       /**
 					* Copy constructor. Clone the
 					* object pointed to by
-					* #fun_data.fun_data_base#.
+					* @p{fun_data.fun_data_base}.
 					*/
       FunEncapsulation (const FunEncapsulation &fun_encapsulation);
 
 				       /**
 					* This is the usual
-					* constructor. Set #fun_data_base# to
-					* #fun_data_base#. This is what
-					* the #fun_data_*# functions
+					* constructor. Set @p{fun_data_base} to
+					* @p{fun_data_base}. This is what
+					* the @p{fun_data_*} functions
 					* use.
 					*/
       FunEncapsulation (FunDataBase *fun_data_base);
 
 				       /**
 					* Destructor. Delete the object
-					* pointed to by #fun_data_base#.
+					* pointed to by @p{fun_data_base}.
 					*/
       ~FunEncapsulation ();
 
 				       /**
 					* Copy another object of this
-					* type by cloning its #fun_data_base#
+					* type by cloning its @p{fun_data_base}
 					* object.
 					*/
       const FunEncapsulation & operator = (const FunEncapsulation &fun_encapsulation);
@@ -204,7 +204,7 @@ namespace Threads
 /**
  * Abstract base class for those classes that actually store
  * parameters of functions. For more information on use and internals
- * of this class see the report on this subject.
+ * of this class see the report on multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -275,7 +275,7 @@ namespace Threads
 					* Make the thread starter
 					* function a friend, since it
 					* needs to have access to the
-					* #thread_entry_point# variable.
+					* @p{thread_entry_point} variable.
 					*/
       friend void spawn (ThreadManager          &thread_manager,
 			 const FunEncapsulation &fun_data);
@@ -286,7 +286,7 @@ namespace Threads
 /**
  * Class to store the parameters of a void function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -390,7 +390,7 @@ namespace Threads
 /**
  * Class to store the parameters of a unary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -492,7 +492,7 @@ namespace Threads
 /**
  * Class to store the parameters of a binary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -596,7 +596,7 @@ namespace Threads
 /**
  * Class to store the parameters of a ternary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -703,7 +703,7 @@ namespace Threads
 /**
  * Class to store the parameters of a quaternary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -814,7 +814,7 @@ namespace Threads
 /**
  * Class to store the parameters of a quintary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -927,7 +927,7 @@ namespace Threads
 /**
  * Class to store the parameters of a function with 6 arguments. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, Ralf Hartmann, 2000
  */
@@ -1043,7 +1043,7 @@ namespace Threads
 /**
  * Class to store the parameters of a void function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -1145,7 +1145,7 @@ namespace Threads
 /**
  * Class to store the parameters of a unary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -1255,7 +1255,7 @@ namespace Threads
 /**
  * Class to store the parameters of a binary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -1367,7 +1367,7 @@ namespace Threads
 /**
  * Class to store the parameters of a ternary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -1483,7 +1483,7 @@ namespace Threads
 /**
  * Class to store the parameters of a quaternary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -1602,7 +1602,7 @@ namespace Threads
 /**
  * Class to store the parameters of a quintary function. For more
  * information on use and internals of this class see the report on
- * this subject.
+ * multithreading.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -1851,7 +1851,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -1865,7 +1865,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -1881,7 +1881,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -1897,7 +1897,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -1913,7 +1913,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -1930,7 +1930,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -1946,7 +1946,7 @@ namespace Threads
 				    * thread can later be spawned.
 				    * For more information on use and
 				    * internals of this class see the
-				    * report on this subject.
+				    * report on multithreading.
 				    *
 				    * This function exists once for
 				    * each number of parameters.
@@ -2077,7 +2077,7 @@ namespace Threads
 				   /**
 				    * Spawn a new thread using the
 				    * function and parameters
-				    * encapsulated in #fun_data#, and
+				    * encapsulated in @p{fun_data}, and
 				    * using the given thread manager
 				    * object.
 				    */
@@ -2096,17 +2096,17 @@ namespace Threads
 
 
 				   /**
-				    * Split the range #[begin,end)#
-				    * into #n_intervals# subintervals
+				    * Split the range @p{[begin,end)}
+				    * into @p{n_intervals} subintervals
 				    * of equal size. The last interval
 				    * will be a little bit larger, if
 				    * the number of elements in the
 				    * whole range is not exactly
-				    * divisible by #n_intervals#. The
+				    * divisible by @p{n_intervals}. The
 				    * type of the iterators has to
 				    * fulfill the requirements of a
 				    * forward iterator,
-				    * i.e. #operator++# must be
+				    * i.e. @p{operator++} must be
 				    * available, and of course it must
 				    * be assignable.
 				    *
@@ -2114,7 +2114,7 @@ namespace Threads
 				    * returned as a vector of pairs of
 				    * iterators, where each pair
 				    * denotes the range
-				    * #[begin[i],end[i])#.
+				    * @p{[begin[i],end[i])}.
 				    */
   template <typename ForwardIterator>
   vector<pair<ForwardIterator,ForwardIterator> >
@@ -2123,7 +2123,7 @@ namespace Threads
 	       const unsigned int n_intervals);
 
 				   /**
-				    * Split the interval #[begin,end)#
+				    * Split the interval @p{[begin,end)}
 				    * into subintervals of (almost)
 				    * equal size. This function works
 				    * mostly as the one before, with
@@ -2142,7 +2142,7 @@ namespace Threads
  * This class is used to make some sanity checks on the numbers of
  * objects of some types related with thread spawning, which are
  * created and deleted. This is a helpful thing when trying to
- * implement the data copying using #clone# functions etc, in order to
+ * implement the data copying using @p{clone} functions etc, in order to
  * avoid that there are some objects which are copied but not deleted.
  *
  * It basically only monitors the number of objects which is alive at
@@ -2249,7 +2249,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2327,7 +2327,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2409,7 +2409,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2497,7 +2497,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2590,7 +2590,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2688,7 +2688,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2792,7 +2792,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2877,7 +2877,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -2959,7 +2959,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3046,7 +3046,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3139,7 +3139,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3238,7 +3238,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3342,7 +3342,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function
@@ -3451,7 +3451,7 @@ namespace Threads
 
 				   // copying of parameters is done,
 				   // now we can release the lock on
-				   // #fun_data#
+				   // @p{fun_data}
     fun_data->lock.release ();
 
 				     // call the function

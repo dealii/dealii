@@ -26,7 +26,7 @@ template <typename number> class SparseMatrix;
  * Structure representing the sparsity pattern of a sparse matrix.
  * 
  * The following picture will illustrate the relation between the
- * #SparsityPattern# an the #SparseMatrix#.
+ * @p{SparsityPattern} an the @p{SparseMatrix}.
  *
  * \begin{verbatim}
  *  SparsityPattern:                               \
@@ -87,13 +87,13 @@ template <typename number> class SparseMatrix;
  *                                                /
  * \end{verbatim}
  *
- * If you want to get the #3# you need to get its position in the
+ * If you want to get the @p{3} you need to get its position in the
  * table above and its value by returning the value of the element on
- * which the pointer shows, using #*val#.  For example #val[8]=3#. Its
- * position is #colnums[8]# so #row=2#. In other words, if you want to get
- * the element #a_{24}# you know that #row=2#. To get the element, a
- * search of #4# form #colnums[rowstart[2]]# to #colnums[rowstart[3]]# is
- * needed. Then #a_{24}=val[number of the found element] = 3#.
+ * which the pointer shows, using @p{*val}.  For example @p{val[8]=3}. Its
+ * position is @p{colnums[8]} so @p{row=2}. In other words, if you want to get
+ * the element @p{a_{24}} you know that @p{row=2}. To get the element, a
+ * search of @p{4} form @p{colnums[rowstart[2]]} to @p{colnums[rowstart[3]]} is
+ * needed. Then @p{a_{24}=val[number of the found element] = 3}.
  *
  *
  * @author Wolfgang Bangerth and others
@@ -104,7 +104,7 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Define a value which is used
 				      * to indicate that a certain
-				      * value in the #colnums# array
+				      * value in the @p{colnums} array
 				      * is unused, i.e. does not
 				      * represent a certain column
 				      * number index.
@@ -112,9 +112,9 @@ class SparsityPattern : public Subscriptor
 				      * Indices with this invalid
 				      * value are used to insert new
 				      * entries to the sparsity
-				      * pattern using the #add# member
+				      * pattern using the @p{add} member
 				      * function, and are removed when
-				      * calling #compress#.
+				      * calling @p{compress}.
 				      *
 				      * You should not assume that the
 				      * variable declared here has a
@@ -135,7 +135,7 @@ class SparsityPattern : public Subscriptor
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the #reinit# function.
+				      * the @p{reinit} function.
 				      */
     SparsityPattern ();
     
@@ -150,8 +150,8 @@ class SparsityPattern : public Subscriptor
 				      * if yo want to use the STL data types
 				      * on classes like this, e.g. to write
 				      * such statements like
-				      * #v.push_back (SparsityPattern());#,
-				      * with #v# a vector of #SparsityPattern#
+				      * @p{v.push_back (SparsityPattern());},
+				      * with @p{v} a vector of @p{SparsityPattern}
 				      * objects.
 				      *
 				      * Usually, it is sufficient to use the
@@ -168,8 +168,8 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Initialize a rectangular matrix with
-				      * #m# rows and #n# columns.
-				      * The matrix may contain at most #max_per_row#
+				      * @p{m} rows and @p{n} columns.
+				      * The matrix may contain at most @p{max_per_row}
 				      * nonzero entries per row.
 				      */
     SparsityPattern (const unsigned int m,
@@ -178,11 +178,11 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Initialize a rectangular
-				      * matrix with #m# rows and #n#
+				      * matrix with @p{m} rows and @p{n}
 				      * columns.  The maximal number
 				      * of nonzero entries for each
 				      * row is given by the
-				      * #row_lengths# array.
+				      * @p{row_lengths} array.
 				      */
     SparsityPattern (const unsigned int          m,
 		     const unsigned int          n,
@@ -190,7 +190,7 @@ class SparsityPattern : public Subscriptor
     
 				     /**
 				      * Initialize a square matrix of dimension
-				      * #n# with at most #max_per_row#
+				      * @p{n} with at most @p{max_per_row}
 				      * nonzero entries per row.
 				      */
     SparsityPattern (const unsigned int n,
@@ -198,11 +198,11 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Initialize a square
-				      * matrix with #m# rows and #m#
+				      * matrix with @p{m} rows and @p{m}
 				      * columns.  The maximal number
 				      * of nonzero entries for each
 				      * row is given by the
-				      * #row_lengths# array.
+				      * @p{row_lengths} array.
 				      */
     SparsityPattern (const unsigned int          m,
 		     const vector<unsigned int> &row_lengths);
@@ -223,27 +223,27 @@ class SparsityPattern : public Subscriptor
 				      * or other incomplete decompositions.
 				      * Therefore, additional to the original
 				      * entry structure, space for
-				      * #extra_off_diagonals#
+				      * @p{extra_off_diagonals}
 				      * side-diagonals is provided on both
 				      * sides of the main diagonal.
 				      *
-				      * #max_per_row# is the maximum number of
+				      * @p{max_per_row} is the maximum number of
 				      * nonzero elements per row which this
 				      * structure is to hold. It is assumed
 				      * that this number is sufficiently large
 				      * to accomodate both the elements in
-				      * #original# as well as the new
+				      * @p{original} as well as the new
 				      * off-diagonal elements created by this
 				      * constructor. You will usually want to
 				      * give the same number as you gave for
-				      * #original# plus the number of side
+				      * @p{original} plus the number of side
 				      * diagonals times two. You may however
 				      * give a larger value if you wish to add
 				      * further nonzero entries for the
 				      * decomposition based on other criteria
 				      * than their being on side-diagonals.
 				      *
-				      * This function requires that #original#
+				      * This function requires that @p{original}
 				      * refer to a square matrix structure.
 				      * It shall be compressed. The matrix 
 				      * structure is not compressed
@@ -261,13 +261,13 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Reallocate memory and set up data
 				      * structures for a new matrix with
-				      * #m# rows and #n# columns,
-				      * with at most #max_per_row#
+				      * @p{m} rows and @p{n} columns,
+				      * with at most @p{max_per_row}
 				      * nonzero entries per row.
 				      *
 				      * This function simply maps its
 				      * operations to the other
-				      * #reinit# function.
+				      * @p{reinit} function.
 				      */
     void reinit (const unsigned int m,
 		 const unsigned int n,
@@ -275,14 +275,14 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Reallocate memory for a matrix
-				      * of size #m \times n#. The
+				      * of size @p{m \times n}. The
 				      * number of entries for each row
 				      * is taken from the array
-				      * #row_lengths# which has to
+				      * @p{row_lengths} which has to
 				      * give this number of each row
-				      * #i=1...m#.
+				      * @p{i=1...m}.
 				      *
-				      * If #m*n==0# all memory is freed,
+				      * If @p{m*n==0} all memory is freed,
 				      * resulting in a total reinitialization
 				      * of the object. If it is nonzero, new
 				      * memory is only allocated if the new
@@ -308,8 +308,8 @@ class SparsityPattern : public Subscriptor
 				      * The memory which is no more
 				      * needed is released.
 				      *
-				      * #SparseMatrix# objects require the
-				      * #SparsityPattern# objects they are
+				      * @p{SparseMatrix} objects require the
+				      * @p{SparsityPattern} objects they are
 				      * initialized with to be compressed, to
 				      * reduce memory requirements.
 				      */
@@ -335,14 +335,14 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Return the index of the matrix
-				      * element with row number #i# and
-				      * column number #j#. If the matrix
+				      * element with row number @p{i} and
+				      * column number @p{j}. If the matrix
 				      * element is not a nonzero one,
-				      * return #SparsityPattern::invalid_entry#.
+				      * return @p{SparsityPattern::invalid_entry}.
 				      *
 				      * This function is usually called
-				      * by the #operator()# of the
-				      * #SparseMatrix#. It shall only be
+				      * by the @p{operator()} of the
+				      * @p{SparseMatrix}. It shall only be
 				      * called for compressed sparsity
 				      * patterns, since in this case
 				      * searching whether the entry
@@ -365,11 +365,11 @@ class SparsityPattern : public Subscriptor
     
 				     /**
 				      * Print the sparsity of the matrix
-				      * in a format that #gnuplot# understands
+				      * in a format that @p{gnuplot} understands
 				      * and which can be used to plot the
 				      * sparsity pattern in a graphical
 				      * way. The format consists of pairs
-				      * #i j# of nonzero elements, each
+				      * @p{i j} of nonzero elements, each
 				      * representing one entry of this
 				      * matrix, one per line of the output
 				      * file. Indices are counted from
@@ -378,14 +378,14 @@ class SparsityPattern : public Subscriptor
 				      * way as matrices are displayed, we
 				      * print the negative of the column
 				      * index, which means that the
-				      * #(0,0)# element is in the top left
+				      * @p{(0,0)} element is in the top left
 				      * rather than in the bottom left
 				      * corner.
 				      *
 				      * Print the sparsity pattern in
 				      * gnuplot by setting the data style
 				      * to dots or points and use the
-				      * #plot# command.
+				      * @p{plot} command.
 				      */
     void print_gnuplot (ostream &out) const;
 
@@ -411,7 +411,7 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Access to column number field.
 				      * Return the column number of
-				      * the #index#th entry in #row#.
+				      * the @p{index}th entry in @p{row}.
 				      */
     unsigned int column_number (const unsigned int row,
 				const unsigned int index) const;
@@ -452,11 +452,11 @@ class SparsityPattern : public Subscriptor
 				      * read-only.
 				      *
 				      * Use of this function is highly
-				      * deprecated. Use #row_length#
-				      * and #column_number# instead.
+				      * deprecated. Use @p{row_length}
+				      * and @p{column_number} instead.
 				      *
 				      * Though the return value is declared
-				      * #const#, you should be aware that it
+				      * @p{const}, you should be aware that it
 				      * may change if you call any nonconstant
 				      * function of objects which operate on
 				      * it.
@@ -478,11 +478,11 @@ class SparsityPattern : public Subscriptor
 				      * readonly.
 				      *
 				      * Use of this function is highly
-				      * deprecated. Use #row_length#
-				      * and #column_number# instead.
+				      * deprecated. Use @p{row_length}
+				      * and @p{column_number} instead.
 				      *
 				      * Though the return value is declared
-				      * #const#, you should be aware that it
+				      * @p{const}, you should be aware that it
 				      * may change if you call any nonconstant
 				      * function of objects which operate on
 				      * it.
@@ -554,13 +554,13 @@ class SparsityPattern : public Subscriptor
   private:
 				     /**
 				      * Maximum number of rows that can
-				      * be stored in the #row_start# array.
+				      * be stored in the @p{row_start} array.
 				      * Since reallocation of that array
 				      * only happens if the present one is
 				      * too small, but never when the size
 				      * of this matrix structure shrinks,
-				      * #max_dim# might be larger than
-				      * #rows# and in this case #row_start#
+				      * @p{max_dim} might be larger than
+				      * @p{rows} and in this case @p{row_start}
 				      * has more elements than are used.
 				      */
     unsigned int max_dim;
@@ -579,8 +579,8 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Size of the actually allocated array
-				      * #colnums#. Here, the same applies as
-				      * for the #rowstart# array, i.e. it
+				      * @p{colnums}. Here, the same applies as
+				      * for the @p{rowstart} array, i.e. it
 				      * may be larger than the actually used
 				      * part of the array.
 				      */
@@ -589,7 +589,7 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Maximum number of elements per
 				      * row. This is set to the value
-				      * given to the #reinit# function
+				      * given to the @p{reinit} function
 				      * (or to the constructor), or to
 				      * the maximum row length
 				      * computed from the vectors in
@@ -597,32 +597,32 @@ class SparsityPattern : public Subscriptor
 				      * constructors or reinit
 				      * versions are called. Its value
 				      * is more or less meaningsless
-				      * after #compress()# has been
+				      * after @p{compress()} has been
 				      * called.
 				      */
     unsigned int max_row_length;
 
 				     /**
 				      * Array which hold for each row which
-				      * is the first element in #colnums#
+				      * is the first element in @p{colnums}
 				      * belonging to that row. Note that
 				      * the size of the array is one larger
 				      * than the number of rows, because
 				      * the last element is used for
-				      * #row=rows#, i.e. the row past the
+				      * @p{row=rows}, i.e. the row past the
 				      * last used one. The value of
-				      * #rowstart[rows]# equals the index
+				      * @p{rowstart[rows]} equals the index
 				      * of the element past the end in
-				      * #colnums#; this way, we are able to
+				      * @p{colnums}; this way, we are able to
 				      * write loops like
-				      * #for (i=rowstart[k]; i<rowstart[k+1]; ++i)#
+				      * @p{for (i=rowstart[k]; i<rowstart[k+1]; ++i)}
 				      * also for the last row.
 				      *
 				      * Note that the actual size of the
 				      * allocated memory may be larger than
 				      * the region that is used. The actual
 				      * number of elements that was allocated
-				      * is stored in #max_dim#.
+				      * is stored in @p{max_dim}.
 				      */
     unsigned int *rowstart;
 
@@ -630,21 +630,21 @@ class SparsityPattern : public Subscriptor
 				      * Array of column numbers. In this array,
 				      * we store for each non-zero element its
 				      * column number. The column numbers for
-				      * the elements in row #r# are stored
+				      * the elements in row @p{r} are stored
 				      * within the index range
-				      * #rowstart[r]...rowstart[r+1]#. Therefore
+				      * @p{rowstart[r]...rowstart[r+1]}. Therefore
 				      * to find out whether a given element
-				      * #(r,c)# exists, we have to check
-				      * whether the column number #c# exists in
+				      * @p{(r,c)} exists, we have to check
+				      * whether the column number @p{c} exists in
 				      * the abovementioned range within this
 				      * array. If it exists, say at position
-				      * #p# within this array, the value of
+				      * @p{p} within this array, the value of
 				      * the respective element in the sparse
-				      * matrix will also be at position #p#
+				      * matrix will also be at position @p{p}
 				      * of the values array of that class.
 				      *
 				      * At the beginning, all elements of
-				      * this array are set to #-1# indicating
+				      * this array are set to @p{-1} indicating
 				      * invalid (unused) column numbers
 				      * (however, note that if this object
 				      * refers to a square matrix, the diagonal
@@ -654,7 +654,7 @@ class SparsityPattern : public Subscriptor
 				      * after the other is set to the column
 				      * number of the added element. When
 				      * compress is called, unused elements
-				      * (indicated by column numbers #-1#)
+				      * (indicated by column numbers @p{-1})
 				      * are eliminated by copying the column
 				      * number of subsequent rows and the
 				      * column numbers within each row (with
@@ -667,12 +667,12 @@ class SparsityPattern : public Subscriptor
 				      * matrix, the first element in each
 				      * row always denotes the diagonal
 				      * element, i.e.
-				      * #colnums[rowstart[r]]==r#.
+				      * @p{colnums[rowstart[r]]==r}.
 				      */
     unsigned int *colnums;
 
 				     /**
-				      * Store whether the #compress# function
+				      * Store whether the @p{compress} function
 				      * was called for this object.
 				      */
     bool compressed;

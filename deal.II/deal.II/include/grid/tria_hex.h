@@ -17,18 +17,18 @@
 #include <base/exceptions.h>
 
 /**
- *   #Hexahedron#s denote the fundamental entities of triangulations in three
+ *   @p{Hexahedron}s denote the fundamental entities of triangulations in three
  *   dimensions. They are
  *   characterized by the (global) indices of the six bounding quadrilaterals.
  *
  *   A heaxhedron itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level
  *   it belongs to. The level index is implicitely given by the position
- *   in the #hexes.hexes# list attached to the information of each level
+ *   in the @p{hexes.hexes} list attached to the information of each level
  *   of the triangulation.
  *
  *   For conventions on the numbering of faces, lines and vertices within a
- *   hexahedron, refer to the documentation of the #Triangulation# class.
+ *   hexahedron, refer to the documentation of the @p{Triangulation} class.
  *
  *   @author Wolfgang Bangerth, 1998
  */
@@ -37,7 +37,7 @@ class Hexahedron {
 
 				     /**
 				      *  Construct a Hex with quad
-				      *  indices #i0# through #i5#. By default,
+				      *  indices @p{i0} through @p{i5}. By default,
 				      *  indices are set to -1, i.e. an
 				      *  invalid value.
 				      *
@@ -52,14 +52,14 @@ class Hexahedron {
 		const int i5 = -1);
     
 				     /**
-				      *  Return the index of quad #i#=0
+				      *  Return the index of quad @p{i}=0
 				      *  through 5.
 				      */
     int quad (const int i) const;
     
 				     /**
-				      *  Set the index of the #i#th quad to
-				      *  #index#. #i#=0 through 5.
+				      *  Set the index of the @p{i}th quad to
+				      *  @p{index}. @p{i}=0 through 5.
 				      */
     void set_quad (const int i, const int index);
     

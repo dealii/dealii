@@ -23,7 +23,7 @@ template <int dim> class DoFHandler;
 class EpsOutputData;
 
 /**
- * This class is deprecated. Use the #DataOut# class instead.
+ * This class is deprecated. Use the @p{DataOut} class instead.
  *
  * This class implements an output mechanism for grid and simulation data
  * in several formats.
@@ -33,12 +33,12 @@ class EpsOutputData;
  * Encapsulated Postscript supports Q1-Elements only.
  *
  * It allows the user to attach a degree of freedom handler object
- * (#DoFHandler#) which also gives access to the geometry data of the
+ * (@p{DoFHandler}) which also gives access to the geometry data of the
  * underlying triangulation and to add data vectors of which the values
  * are to be written.
  *
  *
- * \subsection{Limitations}
+ * @sect3{Limitations}
  * 
  * At present, no grouping of components to vectors is implemented, i.e.
  * you can only write each component independent of the others. Also, it
@@ -46,7 +46,7 @@ class EpsOutputData;
  * with more or less than one degree of freedom per vertex.
  *
  * 
- * \subsection{UCD format}
+ * @sect3{UCD format}
  *
  * The UCD format is described in the AVS developer's guide. Due to
  * limitations in the present format, only node based data can be output,
@@ -65,7 +65,7 @@ class EpsOutputData;
  * much easier.
  *
  *
- * \subsection{GNUPLOT draft format}
+ * @sect3{GNUPLOT draft format}
  *
  * The GNUPLOT format is not able to handle data on unstructured grids
  * directly. Directly would mean that you only give the vertices and
@@ -73,27 +73,27 @@ class EpsOutputData;
  * to represent the data. This is only possible for a structured tensor
  * product grid in two dimensions.
  *
- * In one dimension, the format is obviously #x v1 v2 ...#, where #x#
- * is the coordinate value of a grid point, while the #vi# are the
+ * In one dimension, the format is obviously @p{x v1 v2 ...}, where @p{x}
+ * is the coordinate value of a grid point, while the @p{vi} are the
  * vector elements referring to the present node. Within GNUPLOT,
- * call #plot "filename" using 1:x#. #x# denotes the number of the data set you
- * want to see plus one. For example #using 1:4# would mean to plot the
+ * call @p{plot "filename" using 1:x}. @p{x} denotes the number of the data set you
+ * want to see plus one. For example @p{using 1:4} would mean to plot the
  * third data vector.
  *
- * For more than one dimension, the #DataOut_Old<dim>::write_gnuplot()# somehow
- * duplicates the functionality of the #Triangulation<dim>::print_gnuplot()#
+ * For more than one dimension, the @p{DataOut_Old<dim>::write_gnuplot()} somehow
+ * duplicates the functionality of the @p{Triangulation<dim>::print_gnuplot()}
  * functions. These, however, offer more functionality in some respect.
  * The grid is represented as a sequence of lines, where each cell is
  * a sequence of five vertices (the first one is appended at the end to close
  * the contour of the cell) with the data appended after each vertex. Each cell
- * is therefore a sequence of five lines #x y v1 v2 ...# forming together
+ * is therefore a sequence of five lines @p{x y v1 v2 ...} forming together
  * the bounding line of this cell. After each cell, two newlines are inserted
  * to prevent GNUPLOT from joining the lines bounding two cells.
  *
- * To view the results in two dimensions, use #set data style lines#
- * within gnuplot and call #plot "filename"# to see the grid. Use
- * #set parametric# and #splot "filename" using 1:2:x# to get a 3d surface
- * plot of the (#x-2#)th data set. For example, using #x=4# would mean to
+ * To view the results in two dimensions, use @p{set data style lines}
+ * within gnuplot and call @p{plot "filename"} to see the grid. Use
+ * @p{set parametric} and @p{splot "filename" using 1:2:x} to get a 3d surface
+ * plot of the (@p{x-2})th data set. For example, using @p{x=4} would mean to
  * plot the second data set.
  *
  * This format is somewhat restricted to continuous data and to finite elements
@@ -107,7 +107,7 @@ class EpsOutputData;
  * interior of a cell nor on the lines bounding it.
  *
  *
- * \subsection{GNUPLOT 'quality' format}
+ * @sect3{GNUPLOT 'quality' format}
  *
  * To remedy the abovementioned problems, the GNUPLOT 'quality' format was
  * introduced. As noted above, GNUPLOT can handle tensor grids and displays
@@ -115,7 +115,7 @@ class EpsOutputData;
  * than one tensor grid, then called a patch. The idea now is to describe
  * each cell as a patch of $N\times N$ points (in 2D). For linear elements,
  * $2\times 2$ is sufficient, but for higher elements you will want to use
- * a higher number. The #write_gnuplot# function writes the data in this format
+ * a higher number. The @p{write_gnuplot} function writes the data in this format
  * and the argument it takes is the number of subintervals it divides each cell
  * into, i.e. $N-1$.
  *
@@ -125,7 +125,7 @@ class EpsOutputData;
  * also plot discontinuities, if they are there.
  *
  *
- * \subsection{POVRAY mesh format}
+ * @sect3{POVRAY mesh format}
  *
  * POVRAY is a ray tracing tool in the public domain and poduces high quality
  * images of three dimensional scenes. Since this tool can handle only one
@@ -140,55 +140,55 @@ class EpsOutputData;
  * term of memory and speed to the triangle mesh supported by POVRAY.
  *
  *
- * \subsection{Encapsulated Postscript format}
+ * @sect3{Encapsulated Postscript format}
  *
  * There is a function for generating encapsulated Postscript
  * (EPS) without the need for another graphics tool. This functionality
- * is provided through #write_eps# and #EpsOutputData#. 
- * #write_eps# can use one data vector for height information and one
+ * is provided through @p{write_eps} and @p{EpsOutputData}. 
+ * @p{write_eps} can use one data vector for height information and one
  * cell vector for shading information. Control is done through an
- * object of class #EpsOutputData# as follows or by default.
+ * object of class @p{EpsOutputData} as follows or by default.
  *
- * Vectors are added as usual by #add_data_vector#. Then one has to
+ * Vectors are added as usual by @p{add_data_vector}. Then one has to
  * decide, wether to produce a 2D or 3D plot. This is done by setting
- * #height_info# to 
+ * @p{height_info} to 
  * \begin{description} 
  *   \item[NoHeight] for 2D-Output (or Top-View thats the same by no
  *     turning is done) or to
  *   \item[HeightVector] for 3D-Output. You have to attach a
- *     #dof_data_vector# to actually get 3D. If you don't then output
+ *     @p{dof_data_vector} to actually get 3D. If you don't then output
  *     will be generated in 2D.
- *   \item[DefaultHeight] is 3D if there is a #dof_data_vector# and 2D if
+ *   \item[DefaultHeight] is 3D if there is a @p{dof_data_vector} and 2D if
  *     none is present.
  * \end{description}
- * For 3D-Output one has to set #azimuth# and #elevation# for the
- * angle of view and #height_vector# to the number of the #dof_data#
+ * For 3D-Output one has to set @p{azimuth} and @p{elevation} for the
+ * angle of view and @p{height_vector} to the number of the @p{dof_data}
  * vector that provides the height information to be used. The default
  * values are analogous to GNUPlot for azimuth and elevation and
  * vector 0 for the height vector.
  *
  * The cells can be shaded in four different modes, controlled by the
- * attribute #cell_shading#:
+ * attribute @p{cell_shading}:
  * \begin{enumerate}
  *   \item[NoShading] provides transparent shading.
  *   \item[ShadingVector] uses a cell vector to do shading. The number
- *     of the cell vector to be uses is provided in #cell_vector#. To
- *     scale the cell vector there is the method #color#. It is called
+ *     of the cell vector to be uses is provided in @p{cell_vector}. To
+ *     scale the cell vector there is the method @p{color}. It is called
  *     with the actual value of the cell, the maximum and the minimum
  *     value of a cell in the cell vector. It returns three values for
- *     red, green and blue. If there no #cell_data# vector than there is
+ *     red, green and blue. If there no @p{cell_data} vector than there is
  *     transparent shading.
  *   \item[LightShaded] just shades the plot. This is controlled by
- *     the vector #light# which stores the direction of the light 
+ *     the vector @p{light} which stores the direction of the light 
  *     beams. This is done only if there is height information.
  *   \item[DefaultShading] is controlled by presence of different
  *     vectors. If there no height information then do no
- *     shading. Otherwise if there is #cell_data# use this for shading.
+ *     shading. Otherwise if there is @p{cell_data} use this for shading.
  *     Otherwise do light shading.
  * \end{enumerate}
  *
  * Finnaly one can choose to mark the cell boundaries by setting
- * #cell_boundary_shading#. It can take one of four values:
+ * @p{cell_boundary_shading}. It can take one of four values:
  * \begin{itemize}
  *   \item NoBoundary for no cell boundaries,
  *   \item DefaultBoundary or
@@ -198,13 +198,13 @@ class EpsOutputData;
  *
  * Another interesting feature is that you can write multiple
  * eps-pictures to one file by just doing several invocations of
- * #write_eps#. One than can switch between the different graphics
- * with the #>># Button in GhostView for example.
+ * @p{write_eps}. One than can switch between the different graphics
+ * with the @p{>>} Button in GhostView for example.
  *
  *
- * \subsection{GMV format}
+ * @sect3{GMV format}
  *
- * The #write_gmv# function and the #write# function through the #gmv# parameter
+ * The @p{write_gmv} function and the @p{write} function through the @p{gmv} parameter
  * write the data in a format understood by the GMV (general mesh viewer)
  * program. This program is able to generate 2d and 3d plots of almost
  * arbitrarily many data sets, along with shading, cuts through data sets and
@@ -250,7 +250,7 @@ class DataOut_Old {
 				      * you have to make sure the vector
 				      * exists at that address at least as
 				      * long as you call the
-				      * #write_*# functions.
+				      * @p{write_*} functions.
 				      *
 				      * It is assumed that the vector has the
 				      * same number of components as there are
@@ -264,7 +264,7 @@ class DataOut_Old {
 				      * The name and unit of a data vector shall
 				      * only contain characters which are
 				      * letters, underscore and a few other
-				      * ones. Refer to the #ExcInvalidCharacter#
+				      * ones. Refer to the @p{ExcInvalidCharacter}
 				      * exception declared in this class to
 				      * see which characters are valid and which
 				      * are not.
@@ -277,7 +277,7 @@ class DataOut_Old {
 				      * Release the pointers to the data
 				      * vectors. You have to set all data
 				      * entries again using the
-				      * #add_data_vector# function. The pointer
+				      * @p{add_data_vector} function. The pointer
 				      * to the dof handler remains stored,
 				      * however.
 				      */
@@ -298,7 +298,7 @@ class DataOut_Old {
 				     /**
 				      * Write data and grid in GNUPLOT format.
 				      * Write a patch for each grid cell using
-				      * #accuracy# subintervals per dimension.
+				      * @p{accuracy} subintervals per dimension.
 				      */
     void write_gnuplot (ostream &out, const unsigned int accuracy=1) const;
 
@@ -333,10 +333,10 @@ class DataOut_Old {
     void write_gmv (ostream &out) const;
 
 				     /**
-				      * Write data and grid to #out# according
+				      * Write data and grid to @p{out} according
 				      * to the given data format. This function
 				      * simply calls the appropriate
-				      * #write_*# function.
+				      * @p{write_*} function.
 				      *
 				      * In case of gnuplot output, the
 				      * standard accuracy of 1 is
@@ -350,12 +350,12 @@ class DataOut_Old {
 				      * usually has. At present the following
 				      * formats are defined:
 				      * \begin{itemize}
-				      * \item #ucd#: #.inp#
-				      * \item #gnuplot# and #gnuplot_draft#:
-				      *    #.gnuplot#
-				      * \item #povray_mesh#: #.pov#
-				      * \item #eps#: #.eps#
-				      * \item #gmv#: #.gmv#.
+				      * \item @p{ucd}: @p{.inp}
+				      * \item @p{gnuplot} and @p{gnuplot_draft}:
+				      *    @p{.gnuplot}
+				      * \item @p{povray_mesh}: @p{.pov}
+				      * \item @p{eps}: @p{.eps}
+				      * \item @p{gmv}: @p{.gmv}.
 				      * \end{itemize}
 				      *
 				      * Since this function does not need data
@@ -366,7 +366,7 @@ class DataOut_Old {
     static string default_suffix (const OutputFormat output_format);
 
 				     /**
-				      * Return the #OutputFormat# value
+				      * Return the @p{OutputFormat} value
 				      * corresponding to the given string. If
 				      * the string does not match any known
 				      * format, an exception is thrown.
@@ -382,16 +382,16 @@ class DataOut_Old {
 				      *
 				      * To get a list of presently available
 				      * format names, e.g. to give it to the
-				      * #ParameterHandler# class, use the
-				      * function #get_output_format_names ()#.
+				      * @p{ParameterHandler} class, use the
+				      * function @p{get_output_format_names ()}.
 				      */
     static OutputFormat parse_output_format (const string &format_name);
 
 				     /**
 				      * Return a list of implemented output
 				      * formats. The different names are
-				      * separated by vertical bar signs (#`|'#)
-				      * as used by the #ParameterHandler#
+				      * separated by vertical bar signs (@p{`|'})
+				      * as used by the @p{ParameterHandler}
 				      * classes.
 				      */
     static string get_output_format_names ();
@@ -489,7 +489,7 @@ class DataOut_Old {
 				      * triangulation which have a boundary
 				      * indicator not equal to zero. Only
 				      * these faces are explicitely printed
-				      * in the #write_*# functions;
+				      * in the @p{write_*} functions;
 				      * all faces with indicator 255 are
 				      * interior ones and an indicator with
 				      * value zero for faces at the boundary
@@ -499,34 +499,34 @@ class DataOut_Old {
 				      * list in one dimension.
 				      *
 				      * The reason for this function is the
-				      * same as for #write_ucd_faces#. See
+				      * same as for @p{write_ucd_faces}. See
 				      * there for more information.
 				      */
     unsigned int n_boundary_faces () const;
 
 				     /**
 				      * Write the grid information about
-				      * faces to #out#. Only those faces
+				      * faces to @p{out}. Only those faces
 				      * are printed which are on the boundary
 				      * and which have a boundary indicator
 				      * not equal to zero, since the latter
 				      * is the default for boundary faces.
 				      *
 				      * Since cells and faces are continuously
-				      * numbered, the #starting_index# for
+				      * numbered, the @p{starting_index} for
 				      * the numbering of the faces is passed
 				      * also.
 				      *
 				      * This function unfortunately can not
-				      * be included in the regular #write_ucd#
+				      * be included in the regular @p{write_ucd}
 				      * function, since it needs special
-				      * treatment for the case #dim==1#, in
+				      * treatment for the case @p{dim==1}, in
 				      * which case the face iterators are
-				      * #void*#'s and lack the member functions
+				      * @p{void*}'s and lack the member functions
 				      * which are called. We would not actually
 				      * call these functions, but the compiler
 				      * would complain anyway when compiling
-				      * the function for #dim==1#. Bad luck.
+				      * the function for @p{dim==1}. Bad luck.
 				      */
     void write_ucd_faces (ostream &out,
 			  const unsigned int starting_index) const;
@@ -602,7 +602,7 @@ class DataOut_Old {
 
 /**
  * Structure for the control of encapsulated postscript output. See
- * general documentation of class #DataOut_Old# for description.
+ * general documentation of class @p{DataOut_Old} for description.
  *
  * @author Stefan Nauber
  */
@@ -701,16 +701,16 @@ class EpsOutputData{
 				      * Default constructor. Sets height and
 				      * shading flags to their default values,
 				      * azimut and elevation to 0.2 each, and
-				      * puts the light source at #(-1,-1,0)#.
+				      * puts the light source at @p{(-1,-1,0)}.
 				      */
     EpsOutputData();
 
 				     /**
 				      * Function returning a color value in
 				      * rgb variables corresponding to the
-				      * given value #x#. #x# is considered
+				      * given value @p{x}. @p{x} is considered
 				      * to be a values within the range
-				      * #xmin...xmax#.
+				      * @p{xmin...xmax}.
 				      */
     void color (const float x,
 		const float xmax,

@@ -32,10 +32,10 @@ class ConstraintMatrix;
  *  Denote which norm/integral is to be computed. The following possibilities
  *  are implemented:
  *  \begin{itemize}
- *  \item #mean#: the function or difference of functions is integrated
+ *  \item @p{mean}: the function or difference of functions is integrated
  *    on each cell.
- *  \item #L1_norm#: the absolute value of the function is integrated.
- *  \item #L2_norm#: the square of the function is integrated on each
+ *  \item @p{L1_norm}: the absolute value of the function is integrated.
+ *  \item @p{L2_norm}: the square of the function is integrated on each
  *    cell; afterwards the root is taken of this value.
  *  \end{itemize}
  */
@@ -57,7 +57,7 @@ enum NormType {
  * element space and other operations.
  *
  *
- * \subsection{Description of operations}
+ * @sect3{Description of operations}
  *
  * This collection of methods offers the following operations:
  * \begin{itemize}
@@ -95,14 +95,14 @@ enum NormType {
  *   given function onto the finite element space restricted to the boundary
  *   of the domain, then taking this information and using it to eliminate
  *   the boundary nodes from the mass matrix of the whole domain, using the
- *   #MatrixTools::apply_boundary_values# function. The projection of the
+ *   @p{MatrixTools::apply_boundary_values} function. The projection of the
  *   trace of the function to the boundary is done with the
- *   #VectorTools::project_boundary_values# (see below) function, which is
+ *   @p{VectorTools::project_boundary_values} (see below) function, which is
  *   called with a map of boundary functions in which all boundary indicators
- *   from zero to 254 (255 is used for other purposes, see the #Triangulation#
+ *   from zero to 254 (255 is used for other purposes, see the @p{Triangulation}
  *   class documentation) point to the function to be projected. The projection
  *   to the boundary takes place using a second quadrature formula on the
- *   boundary given to the #project# function. The first quadrature formula is
+ *   boundary given to the @p{project} function. The first quadrature formula is
  *   used to compute the right hand side, while the global projection is done by
  *   exact integration of the mass matrix instead of evaluating it by a quadrature
  *   formula. This is faster in this case and more accurate.
@@ -124,8 +124,8 @@ enum NormType {
  *   reverse should also hold if no projection to the boundary is performed.
  *
  *   The selection whether the projection to the boundary first is needed is
- *   done with the #project_to_boundary_first# flag passed to the function.
- *   If #false# is given, the additional quadrature formula for faces is
+ *   done with the @p{project_to_boundary_first} flag passed to the function.
+ *   If @p{false} is given, the additional quadrature formula for faces is
  *   ignored.
  *
  *   You should be aware of the fact that if no projection to the boundary
@@ -134,8 +134,8 @@ enum NormType {
  *   important case, which tells the function to enforce zero boundary values
  *   on the respective boundary parts. Since enforced zero boundary values
  *   could also have been reached through projection, but are more economically
- *   obtain using other methods, the #project_to_boundary_first# flag is
- *   ignored if the #enforce_zero_boundary# flag is set.
+ *   obtain using other methods, the @p{project_to_boundary_first} flag is
+ *   ignored if the @p{enforce_zero_boundary} flag is set.
  *
  *   The solution of the linear system is presently done using a simple CG
  *   method without preconditioning and without multigrid. This is clearly not
@@ -143,17 +143,17 @@ enum NormType {
  *   detail may change in the future.
  *
  * \item Creation of right hand side vectors:
- *   The #create_right_hand_side# function computes the vector
+ *   The @p{create_right_hand_side} function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
- *   #MatrixCreator::create_*# functions which take a right hand side do,
+ *   @p{MatrixCreator::create_*} functions which take a right hand side do,
  *   but without assembling a matrix.
  *
  * \item Interpolation of boundary values:
- *   The #MatrixTools::apply_boundary_values# function takes a list
+ *   The @p{MatrixTools::apply_boundary_values} function takes a list
  *   of boundary nodes and their values. You can get such a list by interpolation
- *   of a boundary function using the #interpolate_boundary_values# function.
+ *   of a boundary function using the @p{interpolate_boundary_values} function.
  *   To use it, you have to
- *   specify a list of pairs of boundary indicators (of type #unsigned char#;
+ *   specify a list of pairs of boundary indicators (of type @p{unsigned char};
  *   see the section in the documentation of the \Ref{Triangulation} class for more
  *   details) and the according functions denoting the dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
@@ -165,7 +165,7 @@ enum NormType {
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
  *   to use the L2-projection of the boundary function or any other method. For
- *   this purpose to the #VectorTools::project_boundary_values#
+ *   this purpose to the @p{VectorTools::project_boundary_values}
  *   function below.
  *
  *   You should be aware that the boundary function may be evaluated at nodes
@@ -184,38 +184,38 @@ enum NormType {
  *   the place of the respective boundary point.
  *
  * \item Projection of boundary values:
- *   The #project_boundary_values# function acts similar to the
- *   #interpolate_boundary_values# function, apart from the fact that it does
+ *   The @p{project_boundary_values} function acts similar to the
+ *   @p{interpolate_boundary_values} function, apart from the fact that it does
  *   not get the nodal values of boundary nodes by interpolation but rather
  *   through the $L_2$-projection of the trace of the function to the boundary.
  *
  *   The projection takes place on all boundary parts with boundary indicators
  *   listed in the map of boundary functions. These boundary parts may or may
  *   not be contiguous. For these boundary parts, the mass matrix is assembled
- *   using the #MatrixTools::create_boundary_mass_matrix# function, as well as
+ *   using the @p{MatrixTools::create_boundary_mass_matrix} function, as well as
  *   the appropriate right hand side. Then the resulting system of equations is
  *   solved using a simple CG method (without preconditioning), which is in most
  *   cases sufficient for the present purpose.
  *
  * \item Computing errors:
- *   The function #integrate_difference# performs the calculation of the error
+ *   The function @p{integrate_difference} performs the calculation of the error
  *   between the finite element solution and a given (continuous) reference
  *   function in different norms. The integration is performed using a given
  *   quadrature formulae and assumes that the given finite element objects equals
  *   that used for the computation of the solution.
  * 
- *   The result ist stored in a vector (named #difference#), where each entry
+ *   The result ist stored in a vector (named @p{difference}), where each entry
  *   equals the given norm of the difference on one cell. The order of entries
- *   is the same as a #cell_iterator# takes when started with #begin_active# and
- *   promoted with the #++# operator.
+ *   is the same as a @p{cell_iterator} takes when started with @p{begin_active} and
+ *   promoted with the @p{++} operator.
  * 
- *   You can use the #distribute_cell_to_dof_vector# function of the #DoFHandler#
+ *   You can use the @p{distribute_cell_to_dof_vector} function of the @p{DoFHandler}
  *   class to convert cell based data to a data vector with values on the degrees
- *   of freedom, which can then be attached to a #DataOut# object to be printed.
+ *   of freedom, which can then be attached to a @p{DataOut} object to be printed.
  * 
  *   Presently, there is the possibility to compute the following values from the
- *   difference, on each cell: #mean#, #L1_norm#, #L2_norm#, #Linfty_norm#,
- *   #H1_seminorm#.
+ *   difference, on each cell: @p{mean}, @p{L1_norm}, @p{L2_norm}, @p{Linfty_norm},
+ *   @p{H1_seminorm}.
  *   For the mean difference value, the reference function minus the numerical
  *   solution is computed, not the other way round.
  *
@@ -241,23 +241,23 @@ enum NormType {
  *   The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
  *   full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
  * 
- *   To get the {\it global} $L_1$ error, you have to sum up the entries in
- *   #difference#, e.g. using #Vector<double>::l1_norm# function.
+ *   To get the @em{global} $L_1$ error, you have to sum up the entries in
+ *   @p{difference}, e.g. using @p{Vector<double>::l1_norm} function.
  *   For the global $L_2$ difference, you have to sum up the squares of the
- *   entries and take the root of the sum, e.g. using #Vector<double>::l2_norm#.
+ *   entries and take the root of the sum, e.g. using @p{Vector<double>::l2_norm}.
  *   These two operations represent the
  *   $l_1$ and $l_2$ norms of the vectors, but you need not take the absolute
  *   value of each entry, since the cellwise norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
- *   using the #Vector<double>::linfty_norm# function.
+ *   using the @p{Vector<double>::linfty_norm} function.
  *
  *   For the global $H_1$ norm and seminorm, the same rule applies as for the
  *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
  * \end{itemize}
  *
- * All functions use the finite element given to the #DoFHandler# object the last
+ * All functions use the finite element given to the @p{DoFHandler} object the last
  * time that the degrees of freedom were distributed over the triangulation. Also,
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
@@ -269,12 +269,12 @@ class VectorTools
   public:
 				     /**
 				      * Compute the interpolation of
-				      * #function# at the support
+				      * @p{function} at the support
 				      * points to the finite element
 				      * space. It is assumed that the
 				      * number of components of
-				      * #function# matches that of the
-				      * finite element used by #dof#.
+				      * @p{function} matches that of the
+				      * finite element used by @p{dof}.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
@@ -288,19 +288,19 @@ class VectorTools
 				      * Interpolate different finite
 				      * element spaces. The
 				      * interpolation of vector
-				      * #data_1# is executed from the
+				      * @p{data_1} is executed from the
 				      * FE space represented by
-				      * #dof_1# to the vector #data_2#
-				      * on FE space #dof_2#. The
+				      * @p{dof_1} to the vector @p{data_2}
+				      * on FE space @p{dof_2}. The
 				      * interpolation on each cell is
 				      * represented by the matrix
-				      * #transfer#. Curved boundaries
+				      * @p{transfer}. Curved boundaries
 				      * are neglected so far.
 				      *
 				      * Note that you may have to call
-				      * #hanging_nodes.distribute(data_2)#
+				      * @p{hanging_nodes.distribute(data_2)}
 				      * with the hanging nodes from
-				      * space #dof_2# afterwards, to
+				      * space @p{dof_2} afterwards, to
 				      * make the result continuous
 				      * again.
 				      */
@@ -313,7 +313,7 @@ class VectorTools
 			  
 				     /**
 				      * Compute the projection of
-				      * #function# to the finite element space.
+				      * @p{function} to the finite element space.
 				      *
 				      * By default, projection to the boundary
 				      * and enforcement of zero boundary values
@@ -328,9 +328,9 @@ class VectorTools
 				      * of the finite element space on the
 				      * present grid. To this end, the mass
 				      * matrix is assembled exactly using the
-				      * #create_mass_matrix# function in the
-				      * #MatrixTools# collection. This function
-				      * uses the #get_local_mass_matrix#
+				      * @p{create_mass_matrix} function in the
+				      * @p{MatrixTools} collection. This function
+				      * uses the @p{get_local_mass_matrix}
 				      * function of the finite element; however,
 				      * this function is not supported by all
 				      * finite elements, in which case we
@@ -372,19 +372,19 @@ class VectorTools
 				      * and the values to be
 				      * assigned to them, by interpolation around
 				      * the boundary. If the
-				      * #boundary_values# contained values
+				      * @p{boundary_values} contained values
 				      * before, the new ones are added, or
 				      * the old one overwritten if a node
 				      * of the boundary part to be projected
 				      * on already was in the variable.
 				      *
-				      * The parameter #boundary_component# corresponds
-				      * to the number #boundary_indicator# of the face.
+				      * The parameter @p{boundary_component} corresponds
+				      * to the number @p{boundary_indicator} of the face.
 				      * 255 is an illegal value, since it is reserved
 				      * for interior faces.
 				      *
 				      * The flags in the last
-				      * parameter, #component_mask#
+				      * parameter, @p{component_mask}
 				      * denote which components of the
 				      * finite element space shall be
 				      * interpolated. If it is left as
@@ -401,9 +401,9 @@ class VectorTools
 				      *
 				      * It is assumed that the number
 				      * of components of the function
-				      * in #boundary_function# matches that
+				      * in @p{boundary_function} matches that
 				      * of the finite element used by
-				      * #dof#.
+				      * @p{dof}.
 				      *
 				      * See the general doc for more
 				      * information.
@@ -418,10 +418,10 @@ class VectorTools
 //TODO: Update project_boundary_values for more components
 //TODO: Replace FunctionMap
 				     /**
-				      * Project #function# to the boundary
+				      * Project @p{function} to the boundary
 				      * of the domain, using the given quadrature
 				      * formula for the faces. If the
-				      * #boundary_values# contained values
+				      * @p{boundary_values} contained values
 				      * before, the new ones are added, or
 				      * the old one overwritten if a node
 				      * of the boundary part to be projected
@@ -429,9 +429,9 @@ class VectorTools
 				      *
 				      * It is assumed that the number
 				      * of components of
-				      * #boundary_function#
+				      * @p{boundary_function}
 				      * matches that of the finite
-				      * element used by #dof#.
+				      * element used by @p{dof}.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
@@ -451,16 +451,16 @@ class VectorTools
 				      * object.
 				      *
 				      * Note that this function returns
-				      * its results in a vector of #float#s,
-				      * rather than in a vector of #double#s,
+				      * its results in a vector of @p{float}s,
+				      * rather than in a vector of @p{double}s,
 				      * since accuracy is not that important
 				      * here and to save memory. During
 				      * computation of the results, the full
-				      * accuracy of the #double# data type is
+				      * accuracy of the @p{double} data type is
 				      * used.
 				      *
 				      * The additional argument
-				      * #weight# allows to evaluate
+				      * @p{weight} allows to evaluate
 				      * weighted norms.  The weight
 				      * function may be
 				      * one-dimensional, establishing
@@ -485,9 +485,9 @@ class VectorTools
 				      *
 				      * It is assumed that the number
 				      * of components of the function
-				      * #exact_solution# matches that
+				      * @p{exact_solution} matches that
 				      * of the finite element used by
-				      * #dof#.
+				      * @p{dof}.
 				      *
 				      * See the general documentation of this
 				      * class for more information.
@@ -512,7 +512,7 @@ class VectorTools
 				      * preconditioner and generates
 				      * updates with mean value zero.
 				      *
-				      * Apart from the vector #v# to
+				      * Apart from the vector @p{v} to
 				      * operate on, this function
 				      * takes a bit vector. This has a
 				      * true entry for every component

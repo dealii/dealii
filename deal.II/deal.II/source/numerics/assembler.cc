@@ -95,7 +95,7 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
   get_dof_indices (dofs);
 
 				   // one could use the
-				   // #distribute_local_to_global# functions
+				   // @p{distribute_local_to_global} functions
 				   // here, but they would require getting the
 				   // dof indices twice, so we leave it the
 				   // way it was originally programmed.

@@ -579,7 +579,7 @@ integrate_over_regular_face (Data                       &data,
       Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       
 				       // get restriction of finite element
-				       // function of #neighbor# to the
+				       // function of @p{neighbor} to the
 				       // common face.
       fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
       
@@ -719,8 +719,8 @@ integrate_over_irregular_face (Data                       &data,
 				   // index the number of the
 				   // quadrature point
   
-				   // store which number #cell# has in the
-				   // list of neighbors of #neighbor#
+				   // store which number @p{cell} has in the
+				   // list of neighbors of @p{neighbor}
   const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
   Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
   
@@ -748,8 +748,8 @@ integrate_over_irregular_face (Data                       &data,
       fe_subface_values.get_function_grads (data.solution, data.psi[this_thread]);
 
 				       // restrict the finite element on the
-				       // neighbor cell to the common #subface#.
-				       // store the gradient in #neighbor_psi#
+				       // neighbor cell to the common @p{subface}.
+				       // store the gradient in @p{neighbor_psi}
       
       fe_face_values.reinit (neighbor_child, neighbor_neighbor);
       fe_face_values.get_function_grads (data.solution, data.neighbor_psi[this_thread]);

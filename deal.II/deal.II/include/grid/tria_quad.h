@@ -18,14 +18,14 @@
 
 
 /**
- *   #Quad#s denote the fundamental entities of triangulations in two dimensions
+ *   @p{Quad}s denote the fundamental entities of triangulations in two dimensions
  *   and the boundaries of hexaeders in three dimensions. They are
  *   characterized by the (global) indices of the dour bounding lines.
  *
  *   A quad itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level
  *   it belongs to. The level index is implicitely given by the position
- *   in the #quads.quads# list attached to the information of each level
+ *   in the @p{quads.quads} list attached to the information of each level
  *   of the triangulation.
  *
  *   @author Wolfgang Bangerth, 1998
@@ -35,7 +35,7 @@ class Quad {
 
 				     /**
 				      *  Construct a Quad with line
-				      *  indices #i0# through #i3#. By default,
+				      *  indices @p{i0} through @p{i3}. By default,
 				      *  indices are set to -1, i.e. an
 				      *  invalid value.
 				      *
@@ -48,14 +48,14 @@ class Quad {
 	  const int i3 = -1);
     
 				     /**
-				      *  Return the index of line #i#=0
+				      *  Return the index of line @p{i}=0
 				      *  through 3.
 				      */
     int line (const int i) const;
     
 				     /**
-				      *  Set the index of the #i#th line to
-				      *  #index#. #i#=0 through 3.
+				      *  Set the index of the @p{i}th line to
+				      *  @p{index}. @p{i}=0 through 3.
 				      */
     void set_line (const int i, const int index);
     

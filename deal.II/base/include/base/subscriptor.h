@@ -27,8 +27,8 @@
  * constructor by reference, is stored. Then, the original object may
  * not be deleted before the dependent object is deleted. You can assert
  * this constraint by letting the object passed be derived from this class
- * and let the user #subscribe# to this object. The destructor the used
- * object inherits from the #Subscriptor# class then will lead to an error
+ * and let the user @p{subscribe} to this object. The destructor the used
+ * object inherits from the @p{Subscriptor} class then will lead to an error
  * when destruction is attempted while there are still subscriptions.
  */
 class Subscriptor
@@ -61,7 +61,7 @@ class Subscriptor
 				      * care, too, because the counter
 				      * has to remain the same. It therefore
 				      * does nothing more than returning
-				      * #*this#.
+				      * @p{*this}.
 				      */
     Subscriptor& operator = (const Subscriptor&);
         
@@ -98,7 +98,7 @@ class Subscriptor
 
 				     /**
 				      * Exception: object should be used
-				      * when #unsubscribe# is called.
+				      * when @p{unsubscribe} is called.
 				      */
     DeclException0(ExcNotUsed);
 
@@ -115,7 +115,7 @@ class Subscriptor
 				      * The creator (and owner) of an object
 				      * is not counted.
 				      *
-				      * We use the #mutable# keyword in order
+				      * We use the @p{mutable} keyword in order
 				      * to allow subscription to constant
 				      * objects also.
 				      */

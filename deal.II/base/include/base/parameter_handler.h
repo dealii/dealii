@@ -102,8 +102,8 @@ struct Patterns {
 				      * a sequence of values given like a
 				      * regular expression. For example, if
 				      * the string given to the constructor
-				      * is "red|blue|black", then the #match#
-				      * function returns #true# exactly if
+				      * is "red|blue|black", then the @p{match}
+				      * function returns @p{true} exactly if
 				      * the string is either "red" or "blue"
 				      * or "black". Spaces around the pipe
 				      * signs do not matter and are
@@ -121,14 +121,14 @@ struct Patterns {
 
 
 				     /**
-				      * This class is much like the #Selection#
+				      * This class is much like the @p{Selection}
 				      * class, but it allows the input to be
 				      * a comma-separated list of values which
 				      * each have to be given in the constructor
 				      * argument. For example, if the string to
-				      * the constructor was #"ucd|gmv|eps"#, then
+				      * the constructor was @p{"ucd|gmv|eps"}, then
 				      * the following would be legal input:
-				      * #eps, gmv#. You may give an arbitrarily
+				      * @p{eps, gmv}. You may give an arbitrarily
 				      * long list of values, where there may be
 				      * as many spaces around commas as you like.
 				      * However, commas are not allowed inside
@@ -153,7 +153,7 @@ struct Patterns {
 				     /**
 				      * Test for the string being either
 				      * "true" or "false". This is mapped
-				      * to the #Selection# class.
+				      * to the @p{Selection} class.
 				      */
     class Bool : public Selection {
       public:
@@ -182,7 +182,7 @@ struct Patterns {
 
 
 /**
- *   The #ParameterHandler# class provides a standard interface to an input file
+ *   The @p{ParameterHandler} class provides a standard interface to an input file
  *   which provides at run-time for program parameters such as time step sizes,
  *   geometries, right hand sides etc. The input for the program is given in files,
  *   streams or strings in memory using text like
@@ -194,9 +194,9 @@ struct Patterns {
  *   structure.
  *
  *   
- *   \subsection{Declaration of entries}
+ *   @sect3{Declaration of entries}
  *   
- *   In order to use the facilities of a #ParameterHandler# object, one first has
+ *   In order to use the facilities of a @p{ParameterHandler} object, one first has
  *   to make known the different entries the input file may or may not contain. This
  *   is done in the following way:
  *   \begin{verbatim}
@@ -210,15 +210,15 @@ struct Patterns {
  *                       Patterns::Anything());
  *     ...
  *   \end{verbatim}
- *   Each entry is declared using the function #declare_entry#. The first parameter is
+ *   Each entry is declared using the function @p{declare_entry}. The first parameter is
  *   the name of the entry (in short: the entry). The second is the default answer to
  *   be taken in case the entry is not specified in the input file. The third parameter
  *   is a regular expression which the input (and the default answer) has to match.
- *   Several such regular expressions are defined in #Patterns#.
+ *   Several such regular expressions are defined in @p{Patterns}.
  *
  *   Entries may be located in subsections which form a kind of input tree. For example
  *   input parameters for linear solver routines should be classified in a subsection
- *   named #Linear solver# or any other suitable name. This is accomplished in the
+ *   named @p{Linear solver} or any other suitable name. This is accomplished in the
  *   following way:
  *   \begin{verbatim}
  *     ...
@@ -241,7 +241,7 @@ struct Patterns {
  *
  *   Subsections may be nested. For example a nonlinear solver may have a linear solver
  *   as member object. Then the function call tree would be something like (if the class
- *   #NonLinEq# has a member variables #eq# of type #LinEq#):
+ *   @p{NonLinEq} has a member variables @p{eq} of type @p{LinEq}):
  *   \begin{verbatim}
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
@@ -254,11 +254,11 @@ struct Patterns {
  *   \end{verbatim}
  *
  *   For class member functions which declare the different entries we propose to use the
- *   common name #declare_parameters#. In normal cases this method can be #static# since the
+ *   common name @p{declare_parameters}. In normal cases this method can be @p{static} since the
  *   entries will not depend on any previous knowledge. Classes for which entries should
  *   logically be grouped into subsections should declare these subsections themselves. If
  *   a class has two or more member variables of the same type both of which should have
- *   their own parameters, this parent class' method #declare_parameters# is responsible to
+ *   their own parameters, this parent class' method @p{declare_parameters} is responsible to
  *   group them into different subsections:
  *   \begin{verbatim}
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
@@ -275,7 +275,7 @@ struct Patterns {
  *   \end{verbatim}
  *
  *
- *   \subsection{Input files and special characters}
+ *   @sect3{Input files and special characters}
  *
  *   For the first example above the input file would look like the following:
  *   \begin{verbatim}
@@ -289,27 +289,27 @@ struct Patterns {
  *     end
  *     ...                       # other stuff
  *   \end{verbatim}
- *   The words #subsection#, #set# and #end# may be either written in lowercase or uppercase
+ *   The words @p{subsection}, @p{set} and @p{end} may be either written in lowercase or uppercase
  *   letters. Leading and trailing whitespace is removed, multiple whitespace is condensed into
  *   only one. Since the latter applies also to the name of an entry, an entry name will not
  *   be recognised if in the declaration multiple whitespace is used.
  *
- *   In entry names and values the following characters are not allowed: \#, #{#, #}#, #|#.
- *   Their use is reserved for the \ref{MultipleParameterLoop} class.
+ *   In entry names and values the following characters are not allowed: @p{#}, @p{\{}, 
+ *   @p{\}}, @p{|}. Their use is reserved for the \ref{MultipleParameterLoop} class.
  *   
  *   Comments starting with \# are skipped.
  *   
  *   We propose to use the following
  *   scheme to name entries: start the first word with a capital letter and use lowercase
  *   letters further on. The same applies to the possible entry values to the right of the
- *   #=# sign.
+ *   @p{=} sign.
  *
  *   
- *   \subsection{Reading data from input sources}
+ *   @sect3{Reading data from input sources}
  *   
- *   In order to read input you can use three possibilities: reading from an #istream# object,
+ *   In order to read input you can use three possibilities: reading from an @p{istream} object,
  *   reading from a file of which the name is given and reading from a string in memory in
- *   which the lines are separated by #\n# characters. These possibilites are used as follows:
+ *   which the lines are separated by @p{\n} characters. These possibilites are used as follows:
  *   \begin{verbatim}
  *     ParameterHandler prm;
  *     ...
@@ -325,18 +325,18 @@ struct Patterns {
  *   \end{verbatim}
  *   You can use several sources of input successively. Entries which are changed more than
  *   once will be overwritten everytime they are used. It is suggested to let the name of
- *   parameter input end in #.prm#.
+ *   parameter input end in @p{.prm}.
  *
- *   You should not try to declare entries using #declare_entry# and #enter_subsection# with as
- *   yet unknown subsection names after using #read_input#. The results in this case are
+ *   You should not try to declare entries using @p{declare_entry} and @p{enter_subsection} with as
+ *   yet unknown subsection names after using @p{read_input}. The results in this case are
  *   unspecified.
  *
- *   If an error occurs upon reading the input, error messages are written to #cerr#.
+ *   If an error occurs upon reading the input, error messages are written to @p{cerr}.
  *
  *   
- *   \subsection{Getting entry values out of a #ParameterHandler# object}
+ *   @sect3{Getting entry values out of a @p{ParameterHandler} object}
  *   
- *   Each class gets its data out of a #ParameterHandler# object by calling the #get (...)#
+ *   Each class gets its data out of a @p{ParameterHandler} object by calling the @p{get (...)}
  *   member functions like this:
  *   \begin{verbatim}
  *      void NonLinEq::get_parameters (ParameterHandler &prm) {
@@ -346,7 +346,7 @@ struct Patterns {
  *       prm.leave_subsection ();
  *     };
  *   \end{verbatim}
- *   #get()# returns the value of the given entry. If the entry was not specified in the input
+ *   @p{get()} returns the value of the given entry. If the entry was not specified in the input
  *   source(s), the default value is returned. You have to enter and leave subsections
  *   exactly as you did when declaring subsection. You may chose the order in which to
  *   transverse the subsection tree.
@@ -354,17 +354,17 @@ struct Patterns {
  *   It is guaranteed that only entries matching the given regular expression are returned,
  *   i.e. an input entry value which does not match the regular expression is not stored.
  *
- *   You can use #get# to retrieve the parameter in text form, #get_integer# to get an integer
- *   or #get_double# to get a double. You can also use #get_bool#.
+ *   You can use @p{get} to retrieve the parameter in text form, @p{get_integer} to get an integer
+ *   or @p{get_double} to get a double. You can also use @p{get_bool}.
  *   It will cause an internal error if the string could not be 
  *   converted to an integer, double or a bool. This should, though, not
  *   happen if you correctly specified the regular expression for this entry; you should not
  *   try to get out an integer or a double from an entry for which no according regular
- *   expression was set. The internal error is raised through the #Assert()# macro family
+ *   expression was set. The internal error is raised through the @p{Assert()} macro family
  *   which only works in debug mode.
  *
  *   If you want to print out all user selectable features, use the
- *   #print_parameters# function. It is generally a good idea to print all parameters
+ *   @p{print_parameters} function. It is generally a good idea to print all parameters
  *   at the beginning of a log file, since this way input and output are together in
  *   one file which makes matching at a later time easier. Additionally, the function
  *   also print those entries which have not been modified in the input file und are
@@ -373,14 +373,14 @@ struct Patterns {
  *   input file.
  *   
  *   
- *   \subsection{Style guide for data retrieval}
+ *   @sect3{Style guide for data retrieval}
  *   
- *   We propose that every class which gets data out of a #ParameterHandler# object provides
- *   a function named #get_parameters#. This should be declared #virtual#. #get_parameters#
- *   functions in derived classes should call the #BaseClass::get_parameters# function.
+ *   We propose that every class which gets data out of a @p{ParameterHandler} object provides
+ *   a function named @p{get_parameters}. This should be declared @p{virtual}. @p{get_parameters}
+ *   functions in derived classes should call the @p{BaseClass::get_parameters} function.
  *
  *
- *   \subsection{Experience with large parameter lists}
+ *   @sect3{Experience with large parameter lists}
  *  
  *   Experience has shown that in programs defining larger numbers of parameters (more than,
  *   say, fifty) it is advantageous to define an additional class holding these parameters.
@@ -394,18 +394,18 @@ struct Patterns {
  *   up your main class with dozens or more variables denoting the parameters.
  *
  *
- *   \subsection{Possible future extensions}
+ *   @sect3{Possible future extensions}
  *   
  *   \begin{itemize}
  *   \item Allow long input lines to be broken by appending a backslash character
  *     (just like C macros and shell input).
- *   \item Provide an #input filename# command for the input file to enable users to put the
+ *   \item Provide an @p{input filename} command for the input file to enable users to put the
  *     most common parameters into separate files.
  *   \end{itemize}  
  *
  *
  *   
- *   \subsection{Worked Example}
+ *   @sect3{Worked Example}
  *
  *   This is the code:
  *   \begin{verbatim}
@@ -606,9 +606,9 @@ struct Patterns {
  *   \end{verbatim}
  *
  *   
- *   \subsection{References}
+ *   @sect3{References}
  *
- *   This class is inspired by the #MenuSystem# class of #DiffPack#.
+ *   This class is inspired by the @p{MenuSystem} class of @p{DiffPack}.
  *
  *   @memo  This class provides a standard interface to an input file
  *   which provides at run-time for program parameters such as time step sizes,
@@ -635,7 +635,7 @@ class ParameterHandler
     
 				     /**
 				      * Read input from a stream until stream
-				      * returns #eof# condition or error.
+				      * returns @p{eof} condition or error.
 				      *
 				      * Return whether the read was successful.
 				      */
@@ -656,7 +656,7 @@ class ParameterHandler
     				     /**
 				      * Read input from a string in memory. The
 				      * lines in memory have to be separated by
-				      * #\n# characters.
+				      * @p{\n} characters.
 				      *
 				      * Return whether the read was successful.
 				      */
@@ -664,7 +664,7 @@ class ParameterHandler
 
 				     /**
 				      * Return status of this object:
-				      * #true#=clean or #false#=error occured.
+				      * @p{true}=clean or @p{false}=error occured.
 				      */
     bool ok() const;
 
@@ -675,13 +675,13 @@ class ParameterHandler
 
 
 				     /**
-				      * Declare a new entry with name #entry#,
+				      * Declare a new entry with name @p{entry},
 				      * default and for which
-				      * any input has to match the #pattern#
+				      * any input has to match the @p{pattern}
 				      * (default: any pattern).
-				      * @return #false# if entry already exists or
+				      * @return @p{false} if entry already exists or
 				      * default value does not match the regular
-				      * expression; #true# otherwise.
+				      * expression; @p{true} otherwise.
 				      */
     bool declare_entry    (const string &entry,
 			   const string &default_value,
@@ -696,47 +696,47 @@ class ParameterHandler
     
 				     /**
 				      * Leave present subsection.
-				      * @return #false# if there is no subsection
+				      * @return @p{false} if there is no subsection
 				      * to leave; true otherwise.
 				      */
     bool leave_subsection ();
 
 				     /**
-				      * Return value of entry #entry_string#.
+				      * Return value of entry @p{entry_string}.
 				      * If the entry was changed, then the changed
 				      * value is returned, otherwise the default
 				      * value. If the value of an undeclared entry
 				      * is required, an empty string is returned and
-				      * #assert# is used to check whether this entry
+				      * @p{assert} is used to check whether this entry
 				      * was declared (therefore an exception may be
 				      * thrown).
 				      */
     const string & get (const string &entry_string) const;
     
 				     /**
-				      * Return value of entry #entry_string# as
-				      * #long int#.
+				      * Return value of entry @p{entry_string} as
+				      * @p{long int}.
 				      */
     long int       get_integer (const string &entry_string) const;
     
 				     /**
-				      * Return value of entry #entry_string# as
-				      * #double#.
+				      * Return value of entry @p{entry_string} as
+				      * @p{double}.
 				      */
     double         get_double (const string &entry_string) const;
 
 				     /**
-				      * Return value of entry #entry_string# as
-				      * #bool#.
+				      * Return value of entry @p{entry_string} as
+				      * @p{bool}.
 				      */
     bool           get_bool (const string &entry_string) const;
 
 				     /**
 				      * Print all parameters with the given style
-				      * to #out#. Presently only #Text# and #LaTeX#
+				      * to @p{out}. Presently only @p{Text} and @p{LaTeX}
 				      * are implemented.
 				      *
-				      * In #Text# format, the output is formatted
+				      * In @p{Text} format, the output is formatted
 				      * in such a way that it is possible to
 				      * use it for later input again. This is most
 				      * useful to record the parameters set for
@@ -750,7 +750,7 @@ class ParameterHandler
 
 				     /**
 				      * Print out the parameters of the subsection
-				      * given by the #subsection_path# member
+				      * given by the @p{subsection_path} member
 				      * variable.
 				      */
     void print_parameters_section (ostream &out,
@@ -837,47 +837,47 @@ class ParameterHandler
 				      * Analogue list of changed entries. The
 				      * tree of subsections is there even if there
 				      * are no changed entry values in a
-				      * subsection; therefore #enter_subsection#
-				      * has to create the tree in both #Defaults#
-				      * and #changed_entries#.
+				      * subsection; therefore @p{enter_subsection}
+				      * has to create the tree in both @p{Defaults}
+				      * and @p{changed_entries}.
 				      */
     Section changed_entries;
 
 				     /**
 				      * Scan one line of input.
-				      * #lineno# is the number of the line presently
+				      * @p{lineno} is the number of the line presently
 				      * scanned (for the logs if there are messages).
-				      * @return #false# if line contained stuff
+				      * @return @p{false} if line contained stuff
 				      * that could not be understood, the uppermost
-				      * subsection was to be left by an #END# or
-				      * #end# statement, a value for a non-declared
+				      * subsection was to be left by an @p{END} or
+				      * @p{end} statement, a value for a non-declared
 				      * entry was given or teh entry value did not
-				      * match the regular expression. #true#
+				      * match the regular expression. @p{true}
 				      * otherwise
 				      */
     bool scan_line (string line, const unsigned int lineno);
 
 				     /**
-				      * Get a pointer to the #Section# structure
-				      * in the #Defaults# tree
+				      * Get a pointer to the @p{Section} structure
+				      * in the @p{Defaults} tree
 				      * for the subsection we are presently in.
 				      */
     Section*       get_present_defaults_subsection ();
     
 				     /**
-				      * Same, #const# version.
+				      * Same, @p{const} version.
 				      */ 
     const Section* get_present_defaults_subsection () const;
 
 				     /**
-				      * Get a pointer to the #Section# structure
-				      * in the #changed_entries# tree
+				      * Get a pointer to the @p{Section} structure
+				      * in the @p{changed_entries} tree
 				      * for the subsection we are presently in.
 				      */
     Section* get_present_changed_subsection ();
     
     				     /**
-				      * Same, #const# version.
+				      * Same, @p{const} version.
 				      */
     const Section* get_present_changed_subsection () const;
 
@@ -886,9 +886,9 @@ class ParameterHandler
 
 
 /**
- *   The class #MultipleParameterLoop# offers an easy possibility to test several
+ *   The class @p{MultipleParameterLoop} offers an easy possibility to test several
  *   parameter sets during one run of the program. For this it uses the
- *   #ParameterHandler# class to read in data in a standardized form, searches for
+ *   @p{ParameterHandler} class to read in data in a standardized form, searches for
  *   variant entry values and performs a loop over all combinations of parameters.
  *
  *   Variant entry values are given like this:
@@ -896,7 +896,7 @@ class ParameterHandler
  *     set Time step size = { 0.1 | 0.2 | 0.3 }
  *   \end{verbatim}
  *   The loop will then perform three runs of the program, one for each value
- *   of #Time step size#, while all other parameters are as specified or with their
+ *   of @p{Time step size}, while all other parameters are as specified or with their
  *   default value. If there are several variant entry values in the input a loop is
  *   performed for each combination of variant values:
  *   \begin{verbatim}
@@ -911,10 +911,10 @@ class ParameterHandler
  *     set Output file = ofile.{{ 1 | 2 | 3 | 4 }}
  *   \end{verbatim}
  *   This indicates that if there are variant entries producing a total of four
- *   different runs will write their results to the files #ofile.1#, #ofile.2#,
- *   #ofile.3# and #ofile.4#, respectively. Array entries do not generate multiple
+ *   different runs will write their results to the files @p{ofile.1}, @p{ofile.2},
+ *   @p{ofile.3} and @p{ofile.4}, respectively. Array entries do not generate multiple
  *   runs of the main loop themselves, but if there are variant entries, then in
- *   the #n#th run of the main loop, also the #n#th value of an array is returned.
+ *   the @p{n}th run of the main loop, also the @p{n}th value of an array is returned.
  *
  *   Since the different variants are constructed in the order of declaration, not in
  *   the order in which the variat entries appear in the input file, it may be
@@ -930,13 +930,13 @@ class ParameterHandler
  *   program.
  *
  *   
- *   \subsection{Usage}
+ *   @sect3{Usage}
  *   
- *   The usage of this class is similar to the #ParameterHandler# class. First the
+ *   The usage of this class is similar to the @p{ParameterHandler} class. First the
  *   entries and subsections have to be declared, then a loop is performed in which
  *   the different parameter sets are set, a new instance of a user class is created
  *   which is then called. Taking the classes of the example for the
- *   #ParameterHandler# class, the extended program would look like this:
+ *   @p{ParameterHandler} class, the extended program would look like this:
  *   \begin{verbatim}
  *     class HelperClass : public MultipleParameterLoop::UserClass {
  *       public:
@@ -987,23 +987,23 @@ class ParameterHandler
  *         
  *   As can be seen, first a new helper class has to be set up. This must contain
  *   a virtual constructor for a problem class. You can also derive your problem
- *   class from #MultipleParameterLoop::UserClass# and let #create_new# clear all
+ *   class from @p{MultipleParameterLoop::UserClass} and let @p{create_new} clear all
  *   member variables. If you have access to all inherited member variables in
  *   some way this is the recommended procedure. A third possibility is to use
  *   multiple inheritance and derive a helper class from both the
- *   #MultipleParameterLoop::UserClass# and the problem class. In any case,
- *   #create_new# has to provide a clean problem object which is the problem in
+ *   @p{MultipleParameterLoop::UserClass} and the problem class. In any case,
+ *   @p{create_new} has to provide a clean problem object which is the problem in
  *   the second and third possibility. However, if possible, the second way should
  *   be chosen.
  *
  *   The derived class also
  *   has to provide for member functions which declare the entries and which run
  *   the program. Running the program includes getting the parameters out of the
- *   #ParameterHandler# object.
+ *   @p{ParameterHandler} object.
  *
  *   After defining an object of this helper class and an object of the
- *   #MultipleParameterLoop# class, the entries have to be declared in the same way
- *   as for the #ParameterHandler# class. Then the input has to be read. Finally
+ *   @p{MultipleParameterLoop} class, the entries have to be declared in the same way
+ *   as for the @p{ParameterHandler} class. Then the input has to be read. Finally
  *   the loop is called. This executes the following steps:
  *   \begin{verbatim}
  *     for each combination
@@ -1015,27 +1015,27 @@ class ParameterHandler
  *         UserObject.run (*this);
  *       };
  *   \end{verbatim}
- *   #UserObject# is the parameter to the #loop# function. #create_new# is given the number
+ *   @p{UserObject} is the parameter to the @p{loop} function. @p{create_new} is given the number
  *   of the run (starting from one) to enable naming output files differently for each
  *   run.
  *
  *   
- *   \subsection{Syntax for variant and array entry values}
+ *   @sect3{Syntax for variant and array entry values}
  *   
- *   Variant values are specified like #prefix{ v1 | v2 | v3 | ... }postfix#. Whitespace
- *   to the right of the opening brace #{# is ignored as well as to the left of the
- *   closing brace #}# while whitespace on the respectively other side is not ignored.
- *   Whitespace around the mid symbols #|# is also ignored. The empty selection
- *   #prefix{ v1 | }postfix# is also allowed and produces the strings #prefixv1postfix# and
- *   #prefixpostfix#.
+ *   Variant values are specified like @p{prefix{ v1 | v2 | v3 | ... }postfix}. Whitespace
+ *   to the right of the opening brace @p{{} is ignored as well as to the left of the
+ *   closing brace @p{}} while whitespace on the respectively other side is not ignored.
+ *   Whitespace around the mid symbols @p{|} is also ignored. The empty selection
+ *   @p{prefix{ v1 | }postfix} is also allowed and produces the strings @p{prefixv1postfix} and
+ *   @p{prefixpostfix}.
  *
  *   The syntax for array values is equal, apart from the double braces:
- *   #prefix{{ v1 | v2 | v3 }}postfix#.
+ *   @p{prefix{{ v1 | v2 | v3 }}postfix}.
  *   
  *
- *   \subsection{Worked example}
+ *   @sect3{Worked example}
  *   
- *   Given the above extensions to the example program for the #ParameterHandler# and the
+ *   Given the above extensions to the example program for the @p{ParameterHandler} and the
  *   following input file
  *   \begin{verbatim}
  *     set Equation 1 = Poisson
@@ -1091,12 +1091,12 @@ class ParameterHandler
  *              eq1=Poisson, eq2=Navier-Stokes
  *              Matrix1=Sparse, Matrix2=Full
  *   \end{verbatim}
- *   Since #create_new# gets the number of the run it would also be possible to output
+ *   Since @p{create_new} gets the number of the run it would also be possible to output
  *   the number of the run.
  *   
  *   
- *   \subsection{References}
- *   This class is inspired by the #Multipleloop# class of #DiffPack#.
+ *   @sect3{References}
+ *   This class is inspired by the @p{Multipleloop} class of @p{DiffPack}.
  *
  *   @memo  This class provides an interface to an input file which provides at
  *   run-time for multiple program parameters sets. The class performs a loop over
@@ -1115,7 +1115,7 @@ class MultipleParameterLoop : public ParameterHandler {
     class UserClass {
       public:
 					 /**
-					  * #create_new# must provide a clean
+					  * @p{create_new} must provide a clean
 					  * object, either by creating a new one
 					  * or by cleaning an old one.
 					  */
@@ -1123,7 +1123,7 @@ class MultipleParameterLoop : public ParameterHandler {
 	
 					 /**
 					  * This should declare parameters and call
-					  * the #declare_parameters# function of the
+					  * the @p{declare_parameters} function of the
 					  * problem class.
 					  */
 	virtual void declare_parameters (ParameterHandler &prm) = 0;
@@ -1150,7 +1150,7 @@ class MultipleParameterLoop : public ParameterHandler {
 
     				     /**
 				      * Read input from a stream until stream
-				      * returns #eof# condition or error.
+				      * returns @p{eof} condition or error.
 				      */
     virtual bool read_input (istream &Input);
     
@@ -1163,7 +1163,7 @@ class MultipleParameterLoop : public ParameterHandler {
     				     /**
 				      * Read input from a string in memory. The
 				      *  lines in memory have to be separated by
-				      *  #\n# characters.
+				      *  @p{\n} characters.
 				      */
     virtual bool read_input_from_string (const char *s);
 
@@ -1175,8 +1175,8 @@ class MultipleParameterLoop : public ParameterHandler {
   private:
 				     /**
 				      *	Declare what a multiple entry is: a variant
-				      *	entry (in curly braces #{}#) or an
-				      * array (in double curly braces #{{}}#).
+				      *	entry (in curly braces @p{{}}) or an
+				      * array (in double curly braces @p{{{}}}).
 				      */
     enum MultipleEntryType {
 	  variant, array
@@ -1197,7 +1197,7 @@ class MultipleParameterLoop : public ParameterHandler {
 					  * Construct an object with given subsection
 					  * path, name and value. The splitting up
 					  * into the different variants is done
-					  * later by #split_different_values#.
+					  * later by @p{split_different_values}.
 					  */
 	Entry (const vector<string> &Path, const string &Name, const string &Value);
 
@@ -1225,7 +1225,7 @@ class MultipleParameterLoop : public ParameterHandler {
 					 /**
 					  * List of entry values constructed out of
 					  * what was given in the input file (that
-					  * is stored in #EntryValue#.
+					  * is stored in @p{EntryValue}.
 					  */
 	vector<string> different_values;
 

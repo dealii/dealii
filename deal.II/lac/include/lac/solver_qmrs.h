@@ -33,10 +33,10 @@
  * inverse.
  *
  * Like all other solver classes, this class has a local structure called
- * #AdditionalData# which is used to pass additional parameters to the
+ * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
  * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the #SolverSelector# and
+ * to the constructor because this makes the use of the @p{SolverSelector} and
  * other classes much easier and guarantees that these will continue to
  * work even if number or type of the additional parameters for a certain
  * solver changes.
@@ -60,7 +60,7 @@ class SolverQMRS : private Solver<VECTOR>
 				      *
 				      * There are two possibilities to compute
 				      * the residual: one is an estimate using
-				      * the computed value #tau#. The other
+				      * the computed value @p{tau}. The other
 				      * is exact computation using another matrix
 				      * vector multiplication.
 				      *
@@ -131,7 +131,7 @@ class SolverQMRS : private Solver<VECTOR>
     
 				     /**
 				      * Temporary vectors, allocated through
-				      * the #VectorMemory# object at the start
+				      * the @p{VectorMemory} object at the start
 				      * of the actual solution process and
 				      * deallocated at the end.
 				      */
@@ -153,11 +153,11 @@ class SolverQMRS : private Solver<VECTOR>
 				      * Within the iteration loop, the
 				      * square of the residual vector is
 				      * stored in this variable. The
-				      * function #criterion# uses this
+				      * function @p{criterion} uses this
 				      * variable to compute the convergence
 				      * value, which in this class is the
 				      * norm of the residual vector and thus
-				      * the square root of the #res2# value.
+				      * the square root of the @p{res2} value.
 				      */
     double res2;
 				     /**

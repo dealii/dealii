@@ -17,9 +17,9 @@
 #include <string>
 
 /**
- * Identification of a program run. #JobIdentifier# determines the
+ * Identification of a program run. @p{JobIdentifier} determines the
  * start time of a program run and stores it as a program
- * identifier. There exists a library object #dealjobid# of this
+ * identifier. There exists a library object @p{dealjobid} of this
  * class. This object can be accessed by all output functions to
  * provide an id for the current job.
  */

@@ -1547,12 +1547,14 @@ void LaplaceProblem<dim>::run ()
 				   // GMV format.
   data_out.write_gmv (output);
 
-				   // In each cycle values were added to
-				   // the TableHandler. Now write the table
-				   // to #cout#. Note, that the output in
-				   // text format is a quite simple one
-				   // and the captions may not be printed
-				   // directly above the specific columns.
+				   // In each cycle values were added
+				   // to the TableHandler. Now write
+				   // the table to the standard output
+				   // stream cout. Note, that the
+				   // output in text format is a quite
+				   // simple one and the captions may
+				   // not be printed directly above
+				   // the specific columns.
   convergence_table.write_text(cout);
 				   // The table can also be written
 				   // into a tex file.  The (nicely)

@@ -28,15 +28,15 @@
  * a usual finite element object, which is composed of several other finite
  * elements of the same class each.
  *
- * Basically, this composed finite element has #N# times as many degrees of
- * freedom (and therefore also #N# times as many shape functions) as a single
+ * Basically, this composed finite element has @p{N} times as many degrees of
+ * freedom (and therefore also @p{N} times as many shape functions) as a single
  * object of the underlying finite element would have had. Among these,
- * always #N# have the same properties, i.e. are represented by the same
- * shape functions. These #N# shape functions for each degree of freedom
+ * always @p{N} have the same properties, i.e. are represented by the same
+ * shape functions. These @p{N} shape functions for each degree of freedom
  * of the basic finite element are numbered consecutively, i.e. for
- * the common case of a velocity #(u,v,w)#, the sequence of basis functions
- * will be #u1, v1, w1, u2, v2, w2, ..., uN, vN, wN# compared to
- *  #u1, ..., uN, v1, ..., vN, w1, ...wN#.
+ * the common case of a velocity @p{(u,v,w)}, the sequence of basis functions
+ * will be @p{u1, v1, w1, u2, v2, w2, ..., uN, vN, wN} compared to
+ *  @p{u1, ..., uN, v1, ..., vN, w1, ...wN}.
  *
  * Using this scheme, the overall numbering of degrees of freedom is as
  * follows: for each subobject (vertex, line, quad, or hex), the degrees
@@ -44,14 +44,14 @@
  * before turning for the next dof on this subobject or for the next subobject.
  * For example, for the bicubic element in one space dimension, and for
  * two subobjects grouped together by this class, the ordering for
- * the system #s=(u,v)# is:
+ * the system @p{s=(u,v)} is:
  * \begin{itemize}
- * \item First vertex: #u0, v0 = s0, s1#
- * \item Second vertex: #u1, v1 = s2, s3#
+ * \item First vertex: @p{u0, v0 = s0, s1}
+ * \item Second vertex: @p{u1, v1 = s2, s3}
  * \item First degree of freedom on the line (=cell):
- *   #u2, v2 = s3, s4#
+ *   @p{u2, v2 = s3, s4}
  * \item Second degree of freedom on the line:
- *   #u3, v3 = s5, s6#.
+ *   @p{u3, v3 = s5, s6}.
  * \end{itemize}
  *
  * In the most cases, the composed element behaves as if it were a usual element
@@ -60,11 +60,11 @@
  * couple the degrees of freedom of the subobject. E.g. the continuity requirement
  * is imposed for the shape functions of the subobjects separately; no requirement
  * exist between shape functions of different subobjects, i.e. in the above
- * example: on a hanging node, the respective value of the #u# velocity is only
- * coupled to #u# at the vertices and the line on the larger cell next to this
- * vertex, there is no interaction with #v# and #w# of this or the other cell.
+ * example: on a hanging node, the respective value of the @p{u} velocity is only
+ * coupled to @p{u} at the vertices and the line on the larger cell next to this
+ * vertex, there is no interaction with @p{v} and @p{w} of this or the other cell.
  *
- * Likewise, the matrix computed by the #get_local_mass_matrix# function, which
+ * Likewise, the matrix computed by the @p{get_local_mass_matrix} function, which
  * originally is defined to be $m_{ij} = \int_K \phi_i \phi_j dx$ contains
  * only those $m_{ij}$ for which the respective shape functions belong to the
  * same subobject, all other entries are set to zero. The matrix therefore is
@@ -93,14 +93,14 @@ class FESystem : public FiniteElement<dim>
 				      * and the number of elements you want to
 				      * group together using this class.
 				      *
-				      * In fact, the object #fe# is not used,
+				      * In fact, the object @p{fe} is not used,
 				      * apart from getting the number of dofs
 				      * per vertex, line, etc for that finite
 				      * element class. The objects creates its
 				      * own copy of the finite element object
 				      * at construction time (but after
 				      * the initialization of the base class
-				      * #FiniteElement#, which is why we need
+				      * @p{FiniteElement}, which is why we need
 				      * a valid finite element object passed
 				      * to the constructor).
 				      *
@@ -140,40 +140,40 @@ class FESystem : public FiniteElement<dim>
     virtual ~FESystem ();
 
     				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      *
-				      * For an element composed of #N#
-				      * subelements, the first #N# shape
+				      * For an element composed of @p{N}
+				      * subelements, the first @p{N} shape
 				      * functions refer to the zeroth shape
 				      * function of the underlying object,
-				      * the shape functions #N..2N-1# refer
+				      * the shape functions @p{N..2N-1} refer
 				      * to the base shape function with
-				      * number #1#, and so on. The #i# shape
+				      * number @p{1}, and so on. The @p{i} shape
 				      * function therefore equals the
-				      * #i/N# the shape function of the
+				      * @p{i/N} the shape function of the
 				      * base object.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>  &p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      *
 				      * For the ordering of shape functions
-				      * refer to the #shape_value# function.
+				      * refer to the @p{shape_value} function.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      *
 				      * For the ordering of shape functions
-				      * refer to the #shape_value# function.
+				      * refer to the @p{shape_value} function.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -183,7 +183,7 @@ class FESystem : public FiniteElement<dim>
 				      * information on this function.
 				      *
 				      * For the ordering of shape functions
-				      * refer to the #shape_value# function.
+				      * refer to the @p{shape_value} function.
 				      */
     virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
@@ -192,7 +192,7 @@ class FESystem : public FiniteElement<dim>
 				      * information on this function.
 				      *
 				      * For the ordering of shape functions
-				      * refer to the #shape_value# function.
+				      * refer to the @p{shape_value} function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				     vector<Point<dim> > &support_points) const;
@@ -238,9 +238,9 @@ class FESystem : public FiniteElement<dim>
 				      * matrix of the base finite element as
 				      * described above. However, this is
 				      * not the numbering used by the
-				      * #FESystem# class, so the block
+				      * @p{FESystem} class, so the block
 				      * structure is usually lost for
-				      * the {\it local} mass matrices, but
+				      * the @em{local} mass matrices, but
 				      * can be recovered in the global
 				      * matrix by suitable renumbering
 				      * of global DoF numbers.
@@ -252,7 +252,7 @@ class FESystem : public FiniteElement<dim>
 					FullMatrix<double> &local_mass_matrix) const;
 
 				     /**
-				      * Return the value of the #i#th shape
+				      * Return the value of the @p{i}th shape
 				      * function of the transformation mapping
 				      * from unit cell to real cell. Since
 				      * the transform functions are not
@@ -267,7 +267,7 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Same as above: return gradient of the
-				      * #i#th shape function for the mapping
+				      * @p{i}th shape function for the mapping
 				      * from unit to real cell.
 				      */
     virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
@@ -306,7 +306,7 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the normal vectors to the
-				      * face with number #face_no# of #cell#.
+				      * face with number @p{face_no} of @p{cell}.
 				      *
 				      * Since this function is only about the
 				      * mapping from unit to real cell, it
@@ -325,8 +325,8 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Return the normal vectors to the
-				      * subface with number #subface_no# of
-				      * the face with number #face_no# of #cell#.
+				      * subface with number @p{subface_no} of
+				      * the face with number @p{face_no} of @p{cell}.
 				      *
 				      * Since this function is only about the
 				      * mapping from unit to real cell, it
@@ -347,7 +347,7 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Implementation of the
 				      * corresponding function of
-				      * #FiniteElement#.
+				      * @p{FiniteElement}.
 				      */
     virtual void fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >            &unit_points,
@@ -389,7 +389,7 @@ class FESystem : public FiniteElement<dim>
 				      * want to have an FEValues object
 				      * with a lot of equal entries. Ok,
 				      * so initialize your FEValues with
-				      * the #base_element# you get by
+				      * the @p{base_element} you get by
 				      * this function. In a mixed
 				      * discretization, you can choose
 				      * the different base element types
@@ -422,11 +422,11 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Helper function used in the constructor:
-				      * take a #FiniteElementData# object
+				      * take a @p{FiniteElementData} object
 				      * and return an object of the same type
 				      * with the number of degrees of
 				      * freedom per vertex, line, etc.
-				      * multiplied by #n#. Don't touch the
+				      * multiplied by @p{n}. Don't touch the
 				      * number of functions for the
 				      * transformation from unit to real
 				      * cell.
@@ -460,11 +460,11 @@ class FESystem : public FiniteElement<dim>
 
 				     /**
 				      * Helper function used in the constructor:
-				      * takes a #FiniteElement# object
+				      * takes a @p{FiniteElement} object
 				      * and returns an boolean vector including
-				      * the #restriction_is_additive_flags# of
-				      * the mixed element consisting of #N#
-				      * elements of the sub-element #fe#.
+				      * the @p{restriction_is_additive_flags} of
+				      * the mixed element consisting of @p{N}
+				      * elements of the sub-element @p{fe}.
 				      */
     static vector<bool>
     compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
@@ -496,29 +496,29 @@ class FESystem : public FiniteElement<dim>
 				      * This function is simply singled out of
 				      * the constructor. It sets up the
 				      * index table for the system as well as
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since the operation of this
 				      * function can be done without explicit
 				      * knowledge of the data type of the
 				      * underlying finite element class, we
 				      * don't want to have this function in
 				      * the general template definition in
-				      * the #.h# file.
+				      * the @p{.h} file.
 				      */
     void initialize();
 
 				     /**
-				      * Used by #initialize#.
+				      * Used by @p{initialize}.
 				      */
     void build_cell_table();
     
 				     /**
-				      * Used by #initialize#.
+				      * Used by @p{initialize}.
 				      */
     void build_face_table();
 
 				     /**
-				      * Used by #initialize#.
+				      * Used by @p{initialize}.
 				      */
     void build_interface_constraints ();
     

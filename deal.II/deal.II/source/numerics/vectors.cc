@@ -77,7 +77,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
   fe.get_unit_support_points(unit_support_points);
 
 				   // The following works well
-				   // if #dofs_per_x<=1 (x=vertex,line,cell)#
+				   // if @p{dofs_per_x<=1 (x=vertex,line,cell)}
 				   // as then
 				   // the multiple support_points
 				   // are placed one after another.
@@ -85,12 +85,12 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 				   // find the support points 
 				   // on a cell that
 				   // are multiply mentioned in 
-				   // #unit_support_points#.
+				   // @p{unit_support_points}.
 				   // Mark the first representative
 				   // of each multiply mentioned
 				   // support point by setting
-				   // #true# in the boolean vector 
-				   // #is_representative_point#.
+				   // @p{true} in the boolean vector 
+				   // @p{is_representative_point}.
 //   vector<bool>  is_representative_point(fe.dofs_per_cell, false);
 //   is_representative_point[0]=true;
 //   unsigned int n_rep_points=1;
@@ -136,7 +136,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 // 				       // whole vector
 //       int last_rep_point = -1;
 // 				       // it holds `is_representative_point[0]=true'
-// 				       // therefore the first #last_rep_point# is 0
+// 				       // therefore the first @p{last_rep_point} is 0
 // 				       // and we need to start with
 // 				       // `last_rep_point = -1'
 //       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -152,7 +152,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 //     }
 
 				   // The following is more general.
-				   // It also works if #dofs_per_x>1#,
+				   // It also works if @p{dofs_per_x>1},
 				   // i.e. it is usable also for systems
 				   // including
 				   // FEQ3, FEQ4, FEDG_Qx.
@@ -160,14 +160,14 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 				   // Find the support points 
 				   // on a cell that
 				   // are multiply mentioned in 
-				   // #unit_support_points#.
+				   // @p{unit_support_points}.
 				   // Mark the first representative
 				   // of each multiply mentioned
 				   // support point by appending its
-				   // dof index to #dofs_of_rep_points#.
+				   // dof index to @p{dofs_of_rep_points}.
 				   // Each multiple point gets to know
 				   // the dof index of its representative
-				   // point by the #dof_to_rep_dof_table#.
+				   // point by the @p{dof_to_rep_dof_table}.
 
 				   // the following vector collects all dofs i,
 				   // 0<=i<fe.dofs_per_cell, for that
@@ -398,7 +398,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
       {
 					 // set up a list of boundary functions for
 					 // the different boundary parts. We want the
-					 // #function# to hold on all parts of the
+					 // @p{function} to hold on all parts of the
 					 // boundary
 	map<unsigned char,const Function<dim>*> boundary_functions;
 	for (unsigned char c=0; c<255; ++c)
@@ -560,7 +560,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
 
 				   // set the component mask to either
 				   // the original value or a vector
-				   // of #true#s
+				   // of @p{true}s
   const vector<bool> component_mask ((component_mask_.size() == 0) ?
 				     vector<bool> (fe.n_components(), true) :
 				     component_mask_);
@@ -570,7 +570,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
 				   // check whether boundary values at
 				   // the left or right boundary of
 				   // the line are
-				   // requested. #direction# denotes
+				   // requested. @p{direction} denotes
 				   // the neighboring direction in
 				   // which we seek the boundary,
 				   // i.e. 0 is left boundary and 1 is
@@ -638,7 +638,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 
 				   // set the component mask to either
 				   // the original value or a vector
-				   // of #true#s
+				   // of @p{true}s
   const vector<bool> component_mask ((component_mask_.size() == 0) ?
 				     vector<bool> (fe.n_components(), true) :
 				     component_mask_);
@@ -727,7 +727,7 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				   // to be condensed and the solution is to
 				   // be distributed afterwards, which is not
 				   // yet implemented. The reason for this is
-				   // that we cannot simply use the #condense#
+				   // that we cannot simply use the @p{condense}
 				   // family of functions, since the matrices
 				   // and vectors do not use the global
 				   // numbering but rather the boundary
@@ -772,8 +772,8 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				       // this dof is on one of the
 				       // interesting boundary parts
 				       //
-				       // remember: #i# is the global dof
-				       // number, #dof_to_boundary_mapping[i]#
+				       // remember: @p{i} is the global dof
+				       // number, @p{dof_to_boundary_mapping[i]}
 				       // is the number on the boundary and
 				       // thus in the solution vector
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
@@ -1034,7 +1034,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
  					     // H1_norm starts at the previous
  					     // case statement, but continues
  					     // here!
-					     // Until now, #diff# includes the
+					     // Until now, @p{diff} includes the
 					     // square of the L2_norm.
 
  					     // in praxi: first compute
@@ -1043,7 +1043,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 					     // try to be a little clever
 					     // to avoid recursive virtual
 					     // function calls when calling
-					     // #gradient_list# for functions
+					     // @p{gradient_list} for functions
 					     // that are really scalar
 					     // functions
 	    if (fe_is_system)

@@ -342,7 +342,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 					   // determine whether dof[i] is a
 					   // dof on the present face. We do so
 					   // by getting the dofs on the
-					   // face into #dofs_on_face_vector#,
+					   // face into @p{dofs_on_face_vector},
 					   // a vector as always. Usually,
 					   // searching in a vector is
 					   // inefficient, so we copy the dofs
@@ -871,11 +871,11 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					   // present row.
 					   //
 					   // note that if we check
-					   // whether row #row# in
+					   // whether row @p{row} in
 					   // block (r,c) is non-zero,
 					   // then we have to check
 					   // for the existence of
-					   // column #row# in block
+					   // column @p{row} in block
 					   // (c,r), i.e. of the
 					   // transpose block
 	  for (unsigned int block_row=0; block_row<blocks; ++block_row)

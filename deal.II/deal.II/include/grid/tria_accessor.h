@@ -56,7 +56,7 @@ class TriaAccessor
 				      * iterator classes. Since the pure
 				      * triangulation iterators need no
 				      * additional data, this data type is
-				      * #void#.
+				      * @p{void}.
 				      */
     typedef void AccessorData;
 
@@ -88,10 +88,10 @@ class TriaAccessor
 				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
+				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
+				      *  pointed to by @p{b} to the object
+				      *  pointed to by @p{a} and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -251,9 +251,9 @@ class TriaAccessor
 
 /**
  * Common template for line, quad, hex accessors.
- * According to #celldim# objects of this class represent lines,
- * quadrilaterals, or hexahedra in #dim# space dimensions. Concrete implementations
- * are done for specialized #celldim# template parameter. For easier access,
+ * According to @p{celldim} objects of this class represent lines,
+ * quadrilaterals, or hexahedra in @p{dim} space dimensions. Concrete implementations
+ * are done for specialized @p{celldim} template parameter. For easier access,
  * we nevertheless document all functions of the specialized classes here as
  * well. However, they are not implemented.
  *
@@ -282,18 +282,18 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 
 				     /**
 				      *  Copy the data of a line. Only
-				      * implemented for #celldim==1#.
+				      * implemented for @p{celldim==1}.
 				      */
 
     void set (const Line&) const;
 				     /**
 				      *  Copy the data of the given quad. Only
-				      * implemented for #celldim==2#.
+				      * implemented for @p{celldim==2}.
 				      */
     void set (const Quad&) const;
 				     /**
 				      *  Copy the data of the given hex. Only
-				      * implemented for #celldim==3#.
+				      * implemented for @p{celldim==3}.
 				      */
     void set (const Hexahedron&) const;
     
@@ -301,58 +301,58 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Index of vertex. The convention regarding the
 				      *  numbering of vertices is laid down
 				      *  in the documentation of the
-				      *  #Triangulation# class.
+				      *  @p{Triangulation} class.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Reference (not an iterator!)
-				      *  to the #i#th vertex.
+				      *  to the @p{i}th vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
-				      *  Pointer to the #i#th line
+				      *  Pointer to the @p{i}th line
 				      *  bounding this object.
 				      *
-				      * Implemented only for #celldim>1#.
+				      * Implemented only for @p{celldim>1}.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
 
 				     /**
-				      * Line index of the #i#th
+				      * Line index of the @p{i}th
 				      * line. The level is naturally
 				      * the same as that of the object.
 				      *
-				      * Implemented only for #celldim>1#.
+				      * Implemented only for @p{celldim>1}.
 				      */
     unsigned int line_index (const unsigned int i) const;
     
     				     /**
-				      *  Pointer to the #i#th quad
+				      *  Pointer to the @p{i}th quad
 				      *  bounding this object.
 				      *
-				      * Implemented only for #celldim>2#.
+				      * Implemented only for @p{celldim>2}.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> > quad (const unsigned int i) const;
 
 				     /**
-				      * Quad index of the #i#th
+				      * Quad index of the @p{i}th
 				      * quad. The level is naturally
 				      * the same as that of the object.
 				      *
-				      * Implemented only for #celldim>2#.
+				      * Implemented only for @p{celldim>2}.
 				      */
     unsigned int quad_index (const unsigned int i) const;
 
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is #true# for all
+				      *  value is @p{true} for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return #false#. Since raw
+				      *  can return @p{false}. Since raw
 				      *  iterators are only used in
 				      *  the interiors of the library,
 				      *  you will not usually need
@@ -361,7 +361,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the #used# flag. You should know
+				      *  Set the @p{used} flag. You should know
 				      *  quite exactly what you are doing of you
 				      *  touch this function. It is exclusively
 				      *  for internal use in the library.
@@ -369,7 +369,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the #used# flag. You should know
+				      *  Clear the @p{used} flag. You should know
 				      *  quite exactly what you are doing of you
 				      *  touch this function. It is exclusively
 				      *  for internal use in the library.
@@ -405,13 +405,13 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer
-				      * to #p#.
+				      * to @p{p}.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer
-				      * to a #NULL# pointer.
+				      * to a @p{NULL} pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -422,19 +422,19 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * something useful. You should use the
 				      * new style cast operator to maintain
 				      * a minimum of typesafety, e.g.
-				      * #A *a=static_cast<A*>(cell->user_pointer());#.
+				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
 
 				     /**
-				      *  Pointer to the #i#th
+				      *  Pointer to the @p{i}th
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
     child (const unsigned int i) const;
 
 				     /**
-				      *  Index of the #i#th child.
+				      *  Index of the @p{i}th child.
 				      *  The level of the child is one higher
 				      *  than that of the present cell.
 				      *  If the child does not exist, -1
@@ -469,7 +469,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * Number of times that this
 				      * object is refined. Note that not all
 				      * its children are refined that often
-				      * (which is why we prepend #max_#), 
+				      * (which is why we prepend @p{max_}), 
 				      * the returned number is rather the
 				      * maximum number of refinement in
 				      * any branch of children of this object.
@@ -485,14 +485,14 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * Since boundary data is only useful
 				      * for structures with a dimension less
 				      * than the dimension of a cell, this
-				      * function issues an error if #dim<4#.
+				      * function issues an error if @p{dim<4}.
 				      */
     unsigned char boundary_indicator () const;
 
 				     /**
 				      * Set the boundary indicator.
 				      * The same applies as for the
-				      * #boundary_indicator()# function.
+				      * @p{boundary_indicator()} function.
 				      *
 				      * Caution: Never set the
 				      * boundary indicator to 255, unless
@@ -513,9 +513,9 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * is always 255 if the hex is in the
 				      * interior of the domain. Obviously,
 				      * the use of this function is only
-				      * possible for #dim>celldim#;
-				      * however, for #dim==celldim#, an object is
-				      * a cell and the #CellAccessor# class
+				      * possible for @p{dim>celldim};
+				      * however, for @p{dim==celldim}, an object is
+				      * a cell and the @p{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -583,10 +583,10 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
+				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
+				      *  pointed to by @p{b} to the object
+				      *  pointed to by @p{a} and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -619,7 +619,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  the previous element.
 				      *
 				      *  The previous element is previous on
-				      *  this level if #index>0#. If the
+				      *  this level if @p{index>0}. If the
 				      *  present element is the first on
 				      *  this level, the last on the
 				      *  previous level is accessed.
@@ -665,7 +665,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of lines. This accessor is used to
- *   point to lines in #dim# space dimensions. There is a derived class
+ *   point to lines in @p{dim} space dimensions. There is a derived class
  *   for lines in one space dimension, in which case a line is also a cell
  *   and thus has much more functionality than in other dimensions.
  *
@@ -696,25 +696,25 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     void set (const Line &l) const;
 
 				     /**
-				      *  Return the index of vertex #i=0,1#
+				      *  Return the index of vertex @p{i=0,1}
 				      *  of a line.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
 				     /**
 				      *  Return a reference (not an iterator!)
-				      *  to the #i#th vertex.
+				      *  to the @p{i}th vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is #true# for all
+				      *  value is @p{true} for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return #false#. Since raw
+				      *  can return @p{false}. Since raw
 				      *  iterators are only used in
 				      *  the interiors of the library,
 				      *  you will not usually need
@@ -723,13 +723,13 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the #used# flag. Only for
+				      *  Set the @p{used} flag. Only for
 				      *  internal use in the library.
 				      */
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the #used# flag. Only for
+				      *  Clear the @p{used} flag. Only for
 				      *  internal use in the library.
 				      */
     void clear_used_flag () const;
@@ -766,13 +766,13 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer of this line
-				      * to #p#.
+				      * to @p{p}.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer of this line
-				      * to a #NULL# pointer.
+				      * to a @p{NULL} pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -784,19 +784,19 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * something useful. You should use the
 				      * new style cast operator to maintain
 				      * a minimum of typesafety, e.g.
-				      * #A *a=static_cast<A*>(cell->user_pointer());#.
+				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
     
 				     /**
-				      *  Return a pointer to the #i#th
+				      *  Return a pointer to the @p{i}th
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     child (const unsigned int i) const;
 
 				     /**
-				      *  Return the index of the #i#th child.
+				      *  Return the index of the @p{i}th child.
 				      *  The level of the child is one higher
 				      *  than that of the present cell.
 				      *  If the child does not exist, -1
@@ -831,7 +831,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * Return the number of times that this
 				      * cell is refined. Note that not all
 				      * its children are refined that often
-				      * (which is why we prepend #max_#), 
+				      * (which is why we prepend @p{max_}), 
 				      * the returned number is rather the
 				      * maximum number of refinement in
 				      * any branch of children of this object.
@@ -843,7 +843,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * line. Since boundary data is only useful
 				      * for structures with a dimension less
 				      * than the dimension of a cell, this
-				      * function issues an error if #dim<2#.
+				      * function issues an error if @p{dim<2}.
 				      *
 				      * If the return value is 255, then this
 				      * line is in the interior of the domain.
@@ -853,7 +853,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Set the boundary indicator of this line.
 				      * The same applies as for the
-				      * #boundary_indicator()# function.
+				      * @p{boundary_indicator()} function.
 				      *
 				      * You should be careful with this function
 				      * and especially never try to set the
@@ -874,9 +874,9 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      * the boundary indicator field, which
 				      * is always 255 if the line is in the
 				      * interior of the domain. Obviously,
-				      * this is only possible for #dim>1#;
-				      * however, for #dim==1#, a line is
-				      * a cell and the #CellAccessor# class
+				      * this is only possible for @p{dim>1};
+				      * however, for @p{dim==1}, a line is
+				      * a cell and the @p{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -911,7 +911,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Return the barycenter of the line,
 				      * which is the midpoint. The same
-				      * applies as for the #center# function
+				      * applies as for the @p{center} function
 				      * with regard to lines at the boundary.
 				      */
     Point<dim> barycenter () const;
@@ -919,7 +919,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Return the length of the line.
 				      * The same
-				      * applies as for the #center# function
+				      * applies as for the @p{center} function
 				      * with regard to lines at the boundary.
 				      */
     double measure () const;
@@ -944,10 +944,10 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
+				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
+				      *  pointed to by @p{b} to the object
+				      *  pointed to by @p{a} and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -982,7 +982,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  the previous element.
 				      *
 				      *  The previous element is previous on
-				      *  this level if #index>0#. If the
+				      *  this level if @p{index>0}. If the
 				      *  present element is the first on
 				      *  this level, the last on the
 				      *  previous level is accessed.
@@ -999,7 +999,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of quads. This accessor is used to
- *   point to quads in #dim# space dimensions (only #dim>=2# seems reasonable
+ *   point to quads in @p{dim} space dimensions (only @p{dim>=2} seems reasonable
  *   to me). There is a derived class
  *   for quads in two space dimension, in which case a quad is also a cell
  *   and thus has much more functionality than in other dimensions.
@@ -1031,9 +1031,9 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     void set (const Quad &q) const;
     
 				     /**
-				      *  Return index of vertex #i=0 through 3# of
-				      *  a quad. The #i#th vertex is the common
-				      *  one of line #i# and #(i+3)%4#. See also
+				      *  Return index of vertex @p{i=0 through 3} of
+				      *  a quad. The @p{i}th vertex is the common
+				      *  one of line @p{i} and @p{(i+3)%4}. See also
 				      *  the introduced convention
 				      *  (\Ref{Triangulation}).
 				      */ 
@@ -1041,19 +1041,19 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
     				     /**
 				      *  Return a reference (not an iterator!)
-				      *  to the #i#th vertex.
+				      *  to the @p{i}th vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
-				      *  Return a pointer to the #i#th line
-				      *  bounding this #Quad#.
+				      *  Return a pointer to the @p{i}th line
+				      *  bounding this @p{Quad}.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
 				     /**
-				      * Return the line index of the #i#th
+				      * Return the line index of the @p{i}th
 				      * side (a line). The level is naturally
 				      * the same as that of the quad.
 				      */
@@ -1062,11 +1062,11 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is #true# for all
+				      *  value is @p{true} for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return #false#. Since raw
+				      *  can return @p{false}. Since raw
 				      *  iterators are only used in
 				      *  the interiors of the library,
 				      *  you will not usually need
@@ -1075,7 +1075,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the #used# flag. You should know
+				      *  Set the @p{used} flag. You should know
 				      *  quite exactly what you are doing of you
 				      *  touch this function. It is exclusively
 				      *  for internal use in the library.
@@ -1083,7 +1083,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the #used# flag. You should know
+				      *  Clear the @p{used} flag. You should know
 				      *  quite exactly what you are doing of you
 				      *  touch this function. It is exclusively
 				      *  for internal use in the library.
@@ -1122,13 +1122,13 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer of this quad
-				      * to #p#.
+				      * to @p{p}.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer of this quad
-				      * to a #NULL# pointer.
+				      * to a @p{NULL} pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -1140,18 +1140,18 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * something useful. You should use the
 				      * new style cast operator to maintain
 				      * a minimum of typesafety, e.g.
-				      * #A *a=static_cast<A*>(cell->user_pointer());#.
+				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
 
 				     /**
-				      *  Return a pointer to the #i#th
+				      *  Return a pointer to the @p{i}th
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> > child (const unsigned int i) const;
 
 				     /**
-				      *  Return the index of the #i#th child.
+				      *  Return the index of the @p{i}th child.
 				      *  The level of the child is one higher
 				      *  than that of the present cell.
 				      *  If the child does not exist, -1
@@ -1186,7 +1186,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * Return the number of times that this
 				      * cell is refined. Note that not all
 				      * its children are refined that often
-				      * (which is why we prepend #max_#), 
+				      * (which is why we prepend @p{max_}), 
 				      * the returned number is rather the
 				      * maximum number of refinement in
 				      * any branch of children of this object.
@@ -1198,7 +1198,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * quad. Since boundary data is only useful
 				      * for structures with a dimension less
 				      * than the dimension of a cell, this
-				      * function issues an error if #dim<3#.
+				      * function issues an error if @p{dim<3}.
 				      *
 				      * If the return value is 255, then this
 				      * quad is in the interior of the domain.
@@ -1208,7 +1208,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Set the boundary indicator of this quad.
 				      * The same applies as for the
-				      * #boundary_indicator()# function.
+				      * @p{boundary_indicator()} function.
 				      *
 				      * You should be careful with this function
 				      * and especially never try to set the
@@ -1229,9 +1229,9 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * the boundary indicator field, which
 				      * is always 255 if the quad is in the
 				      * interior of the domain. Obviously,
-				      * this function is only useful for #dim>2#;
-				      * however, for #dim==2#, a quad is
-				      * a cell and the #CellAccessor# class
+				      * this function is only useful for @p{dim>2};
+				      * however, for @p{dim==2}, a quad is
+				      * a cell and the @p{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -1280,7 +1280,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Return the barycenter of the qaud. The
-				      * same applies as for the #center# function
+				      * same applies as for the @p{center} function
 				      * with regard to quads at the boundary.
 				      */
     Point<dim> barycenter () const;
@@ -1318,10 +1318,10 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
+				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
+				      *  pointed to by @p{b} to the object
+				      *  pointed to by @p{a} and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -1354,7 +1354,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  the previous element.
 				      *
 				      *  The previous element is previous on
-				      *  this level if #index>0#. If the
+				      *  this level if @p{index>0}. If the
 				      *  present element is the first on
 				      *  this level, the last on the
 				      *  previous level is accessed.
@@ -1371,7 +1371,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 
 /**
  *   Accessor to dereference the data of hexahedra. This accessor is used to
- *   point to hexs in #dim# space dimensions (only #dim>=3# seems reasonable
+ *   point to hexs in @p{dim} space dimensions (only @p{dim>=3} seems reasonable
  *   to me). There is a derived class
  *   for hexs in three space dimension, in which case a hex is also a cell
  *   and thus has much more functionality than in other dimensions.
@@ -1403,43 +1403,43 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     void set (const Hexahedron &h) const;
     
 				     /**
-				      *  Return index of vertex #i=0 through 7# of
+				      *  Return index of vertex @p{i=0 through 7} of
 				      *  a hex. The convention regarding the
 				      *  numbering of vertices is laid down
 				      *  in the documentation of the
-				      *  #Triangulation# class.
+				      *  @p{Triangulation} class.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Return a reference (not an iterator!)
-				      *  to the #i#th vertex.
+				      *  to the @p{i}th vertex.
 				      */
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
-				      *  Return a pointer to the #i#th line
-				      *  bounding this #Hex#.
+				      *  Return a pointer to the @p{i}th line
+				      *  bounding this @p{Hex}.
 				      */
     TriaIterator<dim,TriaObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
 				     /**
-				      * Return the line index of the #i#th
+				      * Return the line index of the @p{i}th
 				      * line. The level is naturally
 				      * the same as that of the hex.
 				      */
     unsigned int line_index (const unsigned int i) const;
     
     				     /**
-				      *  Return a pointer to the #i#th quad
-				      *  bounding this #Hex#.
+				      *  Return a pointer to the @p{i}th quad
+				      *  bounding this @p{Hex}.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
 
 				     /**
-				      * Return the quad index of the #i#th
+				      * Return the quad index of the @p{i}th
 				      * side (a quad). The level is naturally
 				      * the same as that of the hex.
 				      */
@@ -1448,11 +1448,11 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Test for the element being
 				      *  used or not.  The return
-				      *  value is #true# for all
+				      *  value is @p{true} for all
 				      *  iterators that are either
 				      *  normal iterators or active
 				      *  iterators, only raw iterators
-				      *  can return #false#. Since raw
+				      *  can return @p{false}. Since raw
 				      *  iterators are only used in
 				      *  the interiors of the library,
 				      *  you will not usually need
@@ -1461,7 +1461,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     bool used () const;
 
 				     /**
-				      *  Set the #used# flag. You should know
+				      *  Set the @p{used} flag. You should know
 				      *  quite exactly what you are doing of you
 				      *  touch this function. It is exclusively
 				      *  for internal use in the library.
@@ -1469,7 +1469,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the #used# flag. You should know
+				      *  Clear the @p{used} flag. You should know
 				      *  quite exactly what you are doing of you
 				      *  touch this function. It is exclusively
 				      *  for internal use in the library.
@@ -1508,13 +1508,13 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Set the user pointer of this hex
-				      * to #p#.
+				      * to @p{p}.
 				      */
     void set_user_pointer (void *p) const;
 
 				     /**
 				      * Reset the user pointer of this hex
-				      * to a #NULL# pointer.
+				      * to a @p{NULL} pointer.
 				      */
     void clear_user_pointer () const;
 
@@ -1526,19 +1526,19 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * something useful. You should use the
 				      * new style cast operator to maintain
 				      * a minimum of typesafety, e.g.
-				      * #A *a=static_cast<A*>(cell->user_pointer());#.
+				      * @p{A *a=static_cast<A*>(cell->user_pointer());}.
 				      */
     void * user_pointer () const;
 
 				     /**
-				      *  Return a pointer to the #i#th
+				      *  Return a pointer to the @p{i}th
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<3, dim> >
     child (const unsigned int i) const;
 
 				     /**
-				      *  Return the index of the #i#th child.
+				      *  Return the index of the @p{i}th child.
 				      *  The level of the child is one higher
 				      *  than that of the present cell.
 				      *  If the child does not exist, -1
@@ -1573,7 +1573,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * Return the number of times that this
 				      * cell is refined. Note that not all
 				      * its children are refined that often
-				      * (which is why we prepend #max_#), 
+				      * (which is why we prepend @p{max_}), 
 				      * the returned number is rather the
 				      * maximum number of refinement in
 				      * any branch of children of this object.
@@ -1585,7 +1585,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * hex. Since boundary data is only useful
 				      * for structures with a dimension less
 				      * than the dimension of a cell, this
-				      * function issues an error if #dim<4#.
+				      * function issues an error if @p{dim<4}.
 				      *
 				      * If the return value is 255, then this
 				      * line is in the interior of the domain.
@@ -1595,7 +1595,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Set the boundary indicator of this hex.
 				      * The same applies as for the
-				      * #boundary_indicator()# function.
+				      * @p{boundary_indicator()} function.
 				      *
 				      * You should be careful with this function
 				      * and especially never try to set the
@@ -1617,9 +1617,9 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      * is always 255 if the hex is in the
 				      * interior of the domain. Obviously,
 				      * the use of this function is only
-				      * possible for #dim>3#;
-				      * however, for #dim==3#, a hex is
-				      * a cell and the #CellAccessor# class
+				      * possible for @p{dim>3};
+				      * however, for @p{dim==3}, a hex is
+				      * a cell and the @p{CellAccessor} class
 				      * offers another possibility to
 				      * determine whether a cell is at the
 				      * boundary or not.
@@ -1694,10 +1694,10 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
+				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
+				      *  pointed to by @p{b} to the object
+				      *  pointed to by @p{a} and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on
@@ -1730,7 +1730,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  the previous element.
 				      *
 				      *  The previous element is previous on
-				      *  this level if #index>0#. If the
+				      *  this level if @p{index>0}. If the
 				      *  present element is the first on
 				      *  this level, the last on the
 				      *  previous level is accessed.
@@ -1779,7 +1779,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 		    TriaObjectAccessor<dim,dim> (parent, level, index, local_data) {};
 
 				     /**
-				      *  Return a pointer to the #i#th
+				      *  Return a pointer to the @p{i}th
 				      *  neighbor.
 				      *  If the neighbor does not exist, an
 				      *  invalid iterator is returned.
@@ -1788,22 +1788,22 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     neighbor (const unsigned int i) const;
 
 				     /**
-				      *  Return the index of the #i#th neighbor.
+				      *  Return the index of the @p{i}th neighbor.
 				      *  If the neighbor does not exist, its
 				      *  index is -1.
 				      */
     int neighbor_index (const unsigned int i) const;
 
     				     /**
-				      *  Return the level of the #i#th neighbor.
+				      *  Return the level of the @p{i}th neighbor.
 				      *  If the neighbor does not exist, its
 				      *  level is -1.
 				      */
     int neighbor_level (const unsigned int i) const;
 
 				     /**
-				      *  Set the neighbor #i# of this cell
-				      *  to the cell pointed to by #pointer#.
+				      *  Set the neighbor @p{i} of this cell
+				      *  to the cell pointed to by @p{pointer}.
 				      *  This line must be used.
 				      */
     void set_neighbor (const unsigned int i,
@@ -1812,10 +1812,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      * Return the how-many'th
 				      * neighbor this cell is of
-				      * #cell->neighbor(neighbor)#,
-				      * i.e. return the number #n#
+				      * @p{cell->neighbor(neighbor)},
+				      * i.e. return the number @p{n}
 				      * such that
-				      * #cell->neighbor(neighbor)->neighbor(n)==cell#. This
+				      * @p{cell->neighbor(neighbor)->neighbor(n)==cell}. This
 				      * function is the right one if
 				      * you want to know how to get
 				      * back from a neighbor to the
@@ -1825,9 +1825,9 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * only useful if the neighbor is
 				      * not on a coarser level than
 				      * the present cell
-				      * (i.e. #cell->neighbor(neighbor)->level()#
+				      * (i.e. @p{cell->neighbor(neighbor)->level()}
 				      * needs to be equal to
-				      * #cell->level()#, since
+				      * @p{cell->level()}, since
 				      * otherwise the neighbors of the
 				      * neighbor cell are on a coarser
 				      * level than the present one and
@@ -1837,10 +1837,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     unsigned int neighbor_of_neighbor (const unsigned int neighbor) const;
     
 				     /**
-				      *  Return whether the #i#th vertex or
+				      *  Return whether the @p{i}th vertex or
 				      *  face (depending on the dimension) is
 				      *  part of the boundary. This is true, if
-				      *  the #i#th neighbor does not exist.
+				      *  the @p{i}th neighbor does not exist.
 				      */
     bool at_boundary (const unsigned int i) const;
 
@@ -1888,7 +1888,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     void clear_coarsen_flag () const;
 
 				     /**
-				      *  Return a pointer to the #i#th
+				      *  Return a pointer to the @p{i}th
 				      *  child. Overloaded version which returns
 				      *  a more reasonable iterator class.
 				      */
@@ -1896,7 +1896,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     child (const unsigned int i) const;
 
 				     /**
-				      * Return an iterator to the #i#th face
+				      * Return an iterator to the @p{i}th face
 				      * of this cell.
 				      *
 				      * This function is not implemented in 1D,
@@ -1938,10 +1938,10 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
+				      *  @p{iterator a,b;  *a=*b;}. Since
 				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
+				      *  pointed to by @p{b} to the object
+				      *  pointed to by @p{a} and since
 				      *  accessors are not real but
 				      *  virtual objects, this operation
 				      *  is not useful for iterators on

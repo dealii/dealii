@@ -27,13 +27,13 @@ template <int dim> class Triangulation;
  * the different output functions based on a parameter given, e.g., through
  * a parameter file, thus making user programs invariant of the number and
  * names of the file formats implemented in this class. The main advantage of
- * this class over the #DataOut# class is that it does not have to mess around
- * with actual data vectors and that no #DoFHandler# object is needed to
+ * this class over the @p{DataOut} class is that it does not have to mess around
+ * with actual data vectors and that no @p{DoFHandler} object is needed to
  * write the pure geometrical information involved here.
  *
- * Available output formats can be found in the functions with names #write_...#
+ * Available output formats can be found in the functions with names @p{write_...}
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  * Usage is simple: either you use the direct form
  * \begin{verbatim}
  *   ofstream output_file("some_filename");
@@ -47,28 +47,28 @@ template <int dim> class Triangulation;
  *   ofstream output_file("some_filename" + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
  * \end{verbatim}
- * The function #get_output_format_names()# provides a list of possible names of
- * output formats in a string that is understandable by the #ParameterHandler# class.
+ * The function @p{get_output_format_names()} provides a list of possible names of
+ * output formats in a string that is understandable by the @p{ParameterHandler} class.
  *
- * Note that here, we have created an unnamed object of type #GridOut# and called
- * one of its #write_*# functions. This looks like as if the respective function
- * could really be made #static#. This was not done in order to allow for
+ * Note that here, we have created an unnamed object of type @p{GridOut} and called
+ * one of its @p{write_*} functions. This looks like as if the respective function
+ * could really be made @p{static}. This was not done in order to allow for
  * parameters to be passed to the different output functions in a way compatible
  * with the scheme of allowing the right output format to be selected at run-time
- * through the generic #write# function.
+ * through the generic @p{write} function.
  *
  * In order to explain this, consider each function had one or more additional
  * parameters giving the details of output, for example position of the spectator
  * for 3d meshed, line thicknesses, etc. While this would allow each output
  * function any flexibility it needs, it would not allow us to use the generic
- * function #write# which is given a parameter determining the output format,
+ * function @p{write} which is given a parameter determining the output format,
  * since it is impractical to give it a list of parameters for each and every
  * output format supported which it may then pass on to the respective output
  * function.
  *
- * Rather, we have chosen to let each object of this class #GridOut# have a
+ * Rather, we have chosen to let each object of this class @p{GridOut} have a
  * set of parameters for each supported output format. These are collected
- * in structures #EpsFlags#, #GnuplotFlags#, etc and you can set your preferred
+ * in structures @p{EpsFlags}, @p{GnuplotFlags}, etc and you can set your preferred
  * flags like this:
  * \begin{verbatim}
  *   GridOut grid_out;
@@ -81,18 +81,18 @@ template <int dim> class Triangulation;
  * The respective output function then use the so-set flags. By default, they
  * are set to reasonable values as described above and in the documentation
  * of the different flags structures. Resetting the flags can
- * be done by calling #grid_out.set_flags (GridOut::UcdFlags());#, since the
+ * be done by calling @p{grid_out.set_flags (GridOut::UcdFlags());}, since the
  * default constructor of each of the flags structures sets the parameters
  * to their initial values.
  *
  * The advantage of this approach is that it is possible to change the flags
  * of one or more output formats according to your needs and later use the
- * generic #write# function; the actual output function then called will
+ * generic @p{write} function; the actual output function then called will
  * use the flags as set before.
  *
  * Note that some of the structures describing the flags of the different
  * output formats are empty since the respective format does not support
- * any flags. The structure and the #set_flags# function are provided
+ * any flags. The structure and the @p{set_flags} function are provided
  * anyway. Note also that some of the structures may differ between the
  * dimensions supported by this class; they then have a template parameter,
  * as usual.
@@ -120,7 +120,7 @@ class GridOut
 					  * by this, so you can switch it off
 					  * this way.
 					  *
-					  * Default: #true#.
+					  * Default: @p{true}.
 					  */
 	bool write_preamble;
 	
@@ -139,7 +139,7 @@ class GridOut
 					  * to write the triangulation to
 					  * view or print it.
 					  *
-					  * Default: #false#.
+					  * Default: @p{false}.
 					  */
 	bool write_faces;
 
@@ -169,7 +169,7 @@ class GridOut
 					  * the size of the output
 					  * significantly, however.
 					  *
-					  * Default: #false#.
+					  * Default: @p{false}.
 					  */
 	bool write_cell_numbers;
 					 /**
@@ -196,7 +196,7 @@ class GridOut
 					 /**
 					  * Enum denoting the possibilities
 					  * whether the scaling should be done
-					  * such that the given #size# equals
+					  * such that the given @p{size} equals
 					  * the width or the height of
 					  * the resulting picture.
 					  */
@@ -205,7 +205,7 @@ class GridOut
 	};
 
 					 /**
-					  * See above. Default is #width#.
+					  * See above. Default is @p{width}.
 					  */
 	SizeType size_type;
 	
@@ -216,7 +216,7 @@ class GridOut
 					  * strange unit 1/72 inch. Whether
 					  * this is height or width is
 					  * specified by the flag
-					  * #size_type#.
+					  * @p{size_type}.
 					  *
 					  * Default is 300.
 					  */
@@ -228,7 +228,7 @@ class GridOut
 					  */
 	double line_width;
 					 /**
-					  * Should lines with a set #user_flag#
+					  * Should lines with a set @p{user_flag}
 					  * be drawn in a different color?
 					  */
 	bool color_lines_on_user_flag;
@@ -358,7 +358,7 @@ class GridOut
 				      * flags controlling the output
 				      * can be found in the
 				      * documentation of the
-				      * #GridOut::GnuplotFlags# class.
+				      * @p{GridOut::GnuplotFlags} class.
 				      */
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
@@ -377,14 +377,14 @@ class GridOut
 				      * only, you can decide through
 				      * additional flags (see below,
 				      * and the documentation of the
-				      * #GridOut::UcdFlags# class)
+				      * @p{GridOut::UcdFlags} class)
 				      * whether boundary faces with
 				      * non-zero boundary indicator
 				      * shall be written to the file
 				      * explicitely. This is useful,
 				      * if you want to re-read the
 				      * grid later on, since
-				      * #deal.II# sets the boundary
+				      * @p{deal.II} sets the boundary
 				      * indicator to zero by default;
 				      * therefore, to obtain the
 				      * same triangulation as before,
@@ -397,7 +397,7 @@ class GridOut
 				      * flags controlling the output
 				      * can be found in the
 				      * documentation of the
-				      * #GridOut::UcdFlags# class.
+				      * @p{GridOut::UcdFlags} class.
 				      */
     template <int dim>
     void write_ucd (const Triangulation<dim> &tria,
@@ -420,7 +420,7 @@ class GridOut
 				      * shall fit into is determined
 				      * by the output flags (see
 				      * below, and the documentation
-				      * of the #GridOut::EpsFlags#
+				      * of the @p{GridOut::EpsFlags}
 				      * class).
 				      *
 				      * The bounding box is close to
@@ -434,11 +434,11 @@ class GridOut
 				      * of which the default is 300.
 				      *
 				      * The flag 
-				      * #color_lines_on_user_flag#
+				      * @p{color_lines_on_user_flag}
 				      * allows to draw lines with the
-				      * #user_flag# set to be drawn in
+				      * @p{user_flag} set to be drawn in
 				      * red. The colors black and red
-				      * are defined as #b# and #r# in
+				      * are defined as @p{b} and @p{r} in
 				      * the preamble of the output
 				      * file and can be changed there
 				      * according to need.
@@ -447,7 +447,7 @@ class GridOut
 				      * flags controlling the output
 				      * can be found in the
 				      * documentation of the
-				      * #GridOut::EpsFlags#
+				      * @p{GridOut::EpsFlags}
 				      * class. Especially the
 				      * viewpoint for three
 				      * dimensional grids is of
@@ -458,10 +458,10 @@ class GridOut
 		    ostream                  &out);
     
 				     /**
-				      * Write data and grid to #out# according
+				      * Write data and grid to @p{out} according
 				      * to the given data format. This function
 				      * simply calls the appropriate
-				      * #write_*# function.
+				      * @p{write_*} function.
 				      */
     template <int dim>
     void write (const Triangulation<dim> &tria,
@@ -504,9 +504,9 @@ class GridOut
 				      * usually has. At present the following
 				      * formats are defined:
 				      * \begin{itemize}
-				      * \item #gnuplot#: #.gnuplot#
-				      * \item #ucd#: #.inp#
-				      * \item #eps#: #.eps#.
+				      * \item @p{gnuplot}: @p{.gnuplot}
+				      * \item @p{ucd}: @p{.inp}
+				      * \item @p{eps}: @p{.eps}.
 				      * \end{itemize}
 				      *
 				      * Since this function does not need data
@@ -517,7 +517,7 @@ class GridOut
     static string default_suffix (const OutputFormat output_format);
 
 				     /**
-				      * Return the #OutputFormat# value
+				      * Return the @p{OutputFormat} value
 				      * corresponding to the given string. If
 				      * the string does not match any known
 				      * format, an exception is thrown.
@@ -533,16 +533,16 @@ class GridOut
 				      *
 				      * To get a list of presently available
 				      * format names, e.g. to give it to the
-				      * #ParameterHandler# class, use the
-				      * function #get_output_format_names ()#.
+				      * @p{ParameterHandler} class, use the
+				      * function @p{get_output_format_names ()}.
 				      */
     static OutputFormat parse_output_format (const string &format_name);
 
 				     /**
 				      * Return a list of implemented output
 				      * formats. The different names are
-				      * separated by vertical bar signs (#`|'#)
-				      * as used by the #ParameterHandler#
+				      * separated by vertical bar signs (@p{`|'})
+				      * as used by the @p{ParameterHandler}
 				      * classes.
 				      */
     static string get_output_format_names ();
@@ -562,21 +562,21 @@ class GridOut
 				     /**
 				      * Flags to be used upon output of UCD
 				      * data. Can be changed by using the
-				      * #set_flags# function.
+				      * @p{set_flags} function.
 				      */
     UcdFlags     ucd_flags;
 
 				     /**
 				      * Flags to be used upon output of GNUPLOT
 				      * data. Can be changed by using the
-				      * #set_flags# function.
+				      * @p{set_flags} function.
 				      */
     GnuplotFlags gnuplot_flags;
 
 				     /**
 				      * Flags to be used upon output of EPS
 				      * data in one space dimension. Can be
-				      * changed by using the #set_flags#
+				      * changed by using the @p{set_flags}
 				      * function.
 				      */
     EpsFlags<1>  eps_flags_1;
@@ -584,7 +584,7 @@ class GridOut
 				     /**
 				      * Flags to be used upon output of EPS
 				      * data in two space dimensions. Can be
-				      * changed by using the #set_flags#
+				      * changed by using the @p{set_flags}
 				      * function.
 				      */
     EpsFlags<2>  eps_flags_2;
@@ -592,7 +592,7 @@ class GridOut
 				     /**
 				      * Flags to be used upon output of EPS
 				      * data in three space dimensions. Can be
-				      * changed by using the #set_flags#
+				      * changed by using the @p{set_flags}
 				      * function.
 				      */
     EpsFlags<3>  eps_flags_3;
@@ -600,27 +600,27 @@ class GridOut
 
 				     /**
 				      * Write the grid information about
-				      * faces to #out#. Only those faces
+				      * faces to @p{out}. Only those faces
 				      * are printed which are on the boundary
 				      * and which have a boundary indicator
 				      * not equal to zero, since the latter
 				      * is the default for boundary faces.
 				      *
 				      * Since cells and faces are continuously
-				      * numbered, the #starting_index# for
+				      * numbered, the @p{starting_index} for
 				      * the numbering of the faces is passed
 				      * also.
 				      *
 				      * This function unfortunately can not
-				      * be included in the regular #write_ucd#
+				      * be included in the regular @p{write_ucd}
 				      * function, since it needs special
-				      * treatment for the case #dim==1#, in
+				      * treatment for the case @p{dim==1}, in
 				      * which case the face iterators are
-				      * #void*#'s and lack the member functions
+				      * @p{void*}'s and lack the member functions
 				      * which are called. We would not actually
 				      * call these functions, but the compiler
 				      * would complain anyway when compiling
-				      * the function for #dim==1#. Bad luck.
+				      * the function for @p{dim==1}. Bad luck.
 				      */
     template <int dim>
     void write_ucd_faces (const Triangulation<dim> &tria,
@@ -632,7 +632,7 @@ class GridOut
 				      * triangulation which have a boundary
 				      * indicator not equal to zero. Only
 				      * these faces are explicitely printed
-				      * in the #write_*# functions;
+				      * in the @p{write_*} functions;
 				      * all faces with indicator 255 are
 				      * interior ones and an indicator with
 				      * value zero for faces at the boundary
@@ -642,7 +642,7 @@ class GridOut
 				      * list in one dimension.
 				      *
 				      * The reason for this function is the
-				      * same as for #write_ucd_faces#. See
+				      * same as for @p{write_ucd_faces}. See
 				      * there for more information.
 				      */
     template <int dim>

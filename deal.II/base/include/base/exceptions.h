@@ -29,12 +29,12 @@
  *  and variables directly since the interface
  *  and mechanism may be subject to change. Rather
  *  create new exception classes using the
- *  #DeclException# macro family.
+ *  @p{DeclException} macro family.
  *
  *
- *  \section{General overview of the exception handling mechanism in #deal.II#}
+ *  @sect2{General overview of the exception handling mechanism in @p{deal.II}}
  *
- *  The error handling mechanism in #deal.II# is generally used in two ways.
+ *  The error handling mechanism in @p{deal.II} is generally used in two ways.
  *  The first uses error checking in debug mode only and is useful for programs
  *  which are not fully tested. When the program shows no error anymore, one may
  *  switch off error handling and get better performance by this, since checks
@@ -49,7 +49,7 @@
  *  I/O errors, failing memory requests and the like. It does not make much
  *  sense to turn this mode off, since this kind of errors may happen in tested
  *  and untested programs likewise. Exceptions of this kind do not terminate the
- *  program, rather they throw exceptions in the #C++# manner, allowing the
+ *  program, rather they throw exceptions in the @p{C++} manner, allowing the
  *  program to catch them and eventually do something about it. As it may be
  *  useful to have some information printed out if an exception could not be
  *  handled properly, additional information is passed along as for the first
@@ -60,30 +60,30 @@
  *  this.
  *
  *  Both modes use exception classes, which need to have special features
- *  additionally to the #C++# standard's #exception# class. Such a class
+ *  additionally to the @p{C++} standard's @p{exception} class. Such a class
  *  is declared by the following lines of code:
  *   \begin{verbatim}
  *     DeclException2 (ExcDomain, int, int,
  *                     << "Index= " << arg1 << "Upper Bound= " << arg2);
  *  \end{verbatim}
- *  This declares an exception class named #ExcDomain#, which
+ *  This declares an exception class named @p{ExcDomain}, which
  *  has two variables as additional information (named
- *  #arg1# and #arg2# by default) and which outputs the
- *  given sequence (which is appended to an #ostream#
+ *  @p{arg1} and @p{arg2} by default) and which outputs the
+ *  given sequence (which is appended to an @p{ostream}
  *  variable's name, thus the weird syntax). There are
- *  other #DeclExceptionN# macros for exception classes
+ *  other @p{DeclExceptionN} macros for exception classes
  *  with more or no parameters. It is proposed to let start
- *  the name of all exceptions by #Exc...# and to declare them locally to
+ *  the name of all exceptions by @p{Exc...} and to declare them locally to
  *  the class it is to be used in. Declaring exceptions globally is possible
  *  but pollutes the global namespace, is less readable and thus unnecessary.
  *
  *  Since exception classes are declared the same way for both modes of error
  *  checking, it is possible to use an exception declared through the
- *  #DeclExceptionN(...)# macro family in both modes; there is no need to
+ *  @p{DeclExceptionN(...)} macro family in both modes; there is no need to
  *  declare different classes for each of these.
  *
  *
- *  \section{Use of the debug mode exceptions}
+ *  @sect2{Use of the debug mode exceptions}
  *
  *  To use the exception mechanism for debug mode error checking, write lines
  *  like the following in your source code:
@@ -100,16 +100,16 @@
  *    #endif
  *  \end{verbatim}
  *  i.e. it issues an error only if the preprocessor variable
- *  #DEBUG# is set and if the given condition (in this case
- *  #n<dim# is violated.
+ *  @p{DEBUG} is set and if the given condition (in this case
+ *  @p{n<dim} is violated.
  *
- *  If the exception was declared using the #DeclException0 (...)#
+ *  If the exception was declared using the @p{DeclException0 (...)}
  *  macro, i.e. without any additional parameters, its name has
  *  nonetheless to be given with parentheses:
- *  #Assert (i>m, ExcSomewhat());#
+ *  @p{Assert (i>m, ExcSomewhat());}
  *
- *  \subsection{How it works internally}
- *  If the #DEBUG# preprocessor directive is set, the call #Assert (cond, exc);#
+ *  @sect3{How it works internally}
+ *  If the @p{DEBUG} preprocessor directive is set, the call @p{Assert (cond, exc);}
  *  is converted by the preprocessor into the sequence
  *  \begin{verbatim}
  *    if (!(cond))
@@ -124,45 +124,45 @@
  *  line in which the exception occured as well as
  *  the condition itself and the call sequence of the
  *  exception object is transferred. Additionally an object
- *  of the form given by #exc# is created (this is normally an
- *  unnamed object like in #ExcDomain (n, dim)# of class
- *  #ExcDomain#) and transferred to the #__IssueError_Assert#
+ *  of the form given by @p{exc} is created (this is normally an
+ *  unnamed object like in @p{ExcDomain (n, dim)} of class
+ *  @p{ExcDomain}) and transferred to the @p{__IssueError_Assert}
  *  function.
  *
- *  #__PRETTY__FUNCTION__# is a macro defined only by the GNU CC
+ *  @p{__PRETTY__FUNCTION__} is a macro defined only by the GNU CC
  *  compiler and gives the name of the function. If another compiler
- *  is used, we set #__PRETTY_FUNCTION__ = "(unknown)"#.
+ *  is used, we set @p{__PRETTY_FUNCTION__ = "(unknown)"}.
  *
- *  In #__IssueError# the given data
- *  is transferred into the #exc# object by calling the
- *  #SetFields# function; after that, the general error info
- *  is printed onto #cerr# using the #PrintError# function of
- *  #exc# and finally the exception specific data is printed
- *  using the user defined function #PrintError# (which is
- *  normally created using the #DeclException (...)# macro
+ *  In @p{__IssueError} the given data
+ *  is transferred into the @p{exc} object by calling the
+ *  @p{SetFields} function; after that, the general error info
+ *  is printed onto @p{cerr} using the @p{PrintError} function of
+ *  @p{exc} and finally the exception specific data is printed
+ *  using the user defined function @p{PrintError} (which is
+ *  normally created using the @p{DeclException (...)} macro
  *  family.
  *
- *  After printing all this information, #abort()# is called.
+ *  After printing all this information, @p{abort()} is called.
  *  This terminates the program, which is the right thing to do for
  *  this kind of error checking since it is used to detect programming
  *  errors rather than run-time errors; a program can, by definition,
  *  not recover from programming errors.
  *
- *  If the preprocessor variable #DEBUG# is not set, then nothing
- *  happens, i.e. the #Assert# macro is expanded to #{}#.
+ *  If the preprocessor variable @p{DEBUG} is not set, then nothing
+ *  happens, i.e. the @p{Assert} macro is expanded to @p{{}}.
  *
  *  Sometimes, there is no useful condition for an exception other
  *  than that the program flow should not have reached a certain point,
- *  e.g. a #default# section of a #switch# statement. In this case,
+ *  e.g. a @p{default} section of a @p{switch} statement. In this case,
  *  raise the exception by the following construct:
  *  \begin{verbatim}
  *    Assert (false, ExcInternalError());
  *  \end{verbatim}
  *
  *
- *  \section{Use of run-time exceptions}
+ *  @sect2{Use of run-time exceptions}
  *
- *  For this mode, the standard #C++# #throw# and #catch# concept exists. We
+ *  For this mode, the standard @p{C++} @p{throw} and @p{catch} concept exists. We
  *  want to keep to this, but want to extend it a bit. In general, the
  *  structure is the same, i.e. you normally raise and exception by
  *  \begin{verbatim}
@@ -181,18 +181,18 @@
  *      do_something_to_reciver ();
  *    };
  *  \end{verbatim}
- *  #exception# is a standard #C++# class providing basic functionality for
- *  exceptions, such as the virtual function #what()# which returns some
+ *  @p{exception} is a standard @p{C++} class providing basic functionality for
+ *  exceptions, such as the virtual function @p{what()} which returns some
  *  information on the exception itself. This information is useful if an
  *  exception can't be handled properly, in which case as precise a description
  *  as possible should be printed.
  *
  *  The problem here is that to get significant and useful information out
- *  of #what()#, it is necessary to overload this function in out exception
- *  class and call the #throw# operator with additional arguments to the
- *  exception class. The first thing, overloading the #what# function is
- *  done using the #DeclExceptionN# macros, but putting the right information,
- *  which is the same as explained above for the #Assert# expansion, requires
+ *  of @p{what()}, it is necessary to overload this function in out exception
+ *  class and call the @p{throw} operator with additional arguments to the
+ *  exception class. The first thing, overloading the @p{what} function is
+ *  done using the @p{DeclExceptionN} macros, but putting the right information,
+ *  which is the same as explained above for the @p{Assert} expansion, requires
  *  some work if one would want to write it down each time:
  *  \begin{verbatim}
  *    if (!cond)
@@ -205,8 +205,8 @@
  *      };
  *  \end{verbatim}
  *
- *  For this purpose, the macro #AssertThrow# was invented. It does mainly
- *  the same job as does the #Assert# macro, but it does not kill the
+ *  For this purpose, the macro @p{AssertThrow} was invented. It does mainly
+ *  the same job as does the @p{Assert} macro, but it does not kill the
  *  program, it rather throws an exception as shown above. The mode of usage
  *  is
  *  \begin{verbatim}
@@ -214,14 +214,14 @@
  *  \end{verbatim}
  *  The condition to be checked is incorporated into the macro in order to
  *  allow passing the violated condition as a string. The expansion of the
- *  #AssertThrow# macro is not affected by the #DEBUG# preprocessor variable.
+ *  @p{AssertThrow} macro is not affected by the @p{DEBUG} preprocessor variable.
  *
  *
- *  \section{Description of the #DeclExceptionN# macro family}
+ *  @sect2{Description of the @p{DeclExceptionN} macro family}
  *
  *  Declare an exception class without any additional parameters.
- *  There is a whole family of #DeclException?# macros
- *  where #?# is to be replaced by the number of additional
+ *  There is a whole family of @p{DeclException?} macros
+ *  where @p{?} is to be replaced by the number of additional
  *  parameters (0 to 5 presently).
  *  
  *  The syntax is as follows:
@@ -272,7 +272,7 @@
  *    --------------------------------------------------------
  *  \end{verbatim}
  *  
- *  Obviously for the #DeclException0(name)# macro, no types and
+ *  Obviously for the @p{DeclException0(name)} macro, no types and
  *  also no output sequence is allowed.
  *
  *
@@ -289,7 +289,7 @@ class ExceptionBase : public exception {
 				      *  The constructor takes the file in which the
 				      *  error happened, the line and the violated
 				      *  condition as well as the name of the
-				      *  exception class as a #char*# as arguments.
+				      *  exception class as a @p{char*} as arguments.
 				      */
     ExceptionBase (const char* f, const int l, const char *func,
 		   const char* c, const char *e);
@@ -329,8 +329,8 @@ class ExceptionBase : public exception {
 				      *
 				      *  This function is mainly used when using
 				      *  exceptions declared by the
-				      *  #DeclException*# macros with the #throw#
-				      *  mechanism or the #AssertThrow# macro.
+				      *  @p{DeclException*} macros with the @p{throw}
+				      *  mechanism or the @p{AssertThrow} macro.
 				      */
     virtual const char * what () const;
 
@@ -365,7 +365,7 @@ class ExceptionBase : public exception {
 /**
  *  This routine does the main work for the
  *  exception generation mechanism used in the
- *  #Assert# macro.
+ *  @p{Assert} macro.
  *
  *  @see ExceptionBase
  */
@@ -394,7 +394,7 @@ void __IssueError_Assert (const char *file,
 /**
  *  This routine does the main work for the
  *  exception generation mechanism used in the
- *  #AssertThrow# macro.
+ *  @p{AssertThrow} macro.
  *
  *  @see ExceptionBase
  */
@@ -416,7 +416,7 @@ void __IssueError_Throw (const char *file,
 /**
  *  This is the main routine in the exception mechanism for debug mode
  *  error checking. See the
- *  #ExceptionBase# class for more information.
+ *  @p{ExceptionBase} class for more information.
  *
  *  @memo Assert that a certain condition is fulfilled, otherwise
  *   issue an error and abort the program.
@@ -442,7 +442,7 @@ void __IssueError_Throw (const char *file,
 /**
  *  This is the main routine in the exception mechanism for run-time mode
  *  error checking. See the
- *  #ExceptionBase# class for more information.
+ *  @p{ExceptionBase} class for more information.
  *
  *  @memo Assert that a certain condition is fulfilled, otherwise
  *   throw an exception
@@ -467,7 +467,7 @@ void __IssueError_Throw (const char *file,
 #endif
 
 /**
- * See the #ExceptionBase# class for a detailed description.
+ * See the @p{ExceptionBase} class for a detailed description.
  *
  * @see ExceptionBase
  * @author Wolfgang Bangerth, November 1997

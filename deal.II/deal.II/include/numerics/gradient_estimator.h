@@ -72,11 +72,11 @@
  * the values of the finite element field at the centers of the cells
  * are taken. It might therefore only be useful to use this class for
  * discontinuous, piecewise constant elements (i.e. using the
- * #FEDG_Q0# class), since all other finite elements can approximate
+ * @p{FEDG_Q0} class), since all other finite elements can approximate
  * gradients themselves.
  *
  *
- * \section{Refinement indicators based on the gradients}
+ * @sect2{Refinement indicators based on the gradients}
  *
  * If you would like to base a refinement criterion upon this
  * approximation of the gradient, you will have to scale the results

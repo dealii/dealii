@@ -113,8 +113,8 @@ void SwappableVector<number>::swap_out (const string &name)
 #endif
   
 				   //  check that we have not called
-				   //  #alert# without the respective
-				   //  #reload# function
+				   //  @p{alert} without the respective
+				   //  @p{reload} function
   Assert (data_is_preloaded == false, ExcInternalError());
   
   ofstream tmp_out(filename.c_str());
@@ -134,7 +134,7 @@ template <typename number>
 void SwappableVector<number>::reload () 
 {
 				   // if in MT mode: synchronise with
-				   // possibly existing #alert# calls
+				   // possibly existing @p{alert} calls
 #ifdef DEAL_II_USE_MT
   lock.acquire ();
 #endif

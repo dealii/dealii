@@ -28,7 +28,7 @@ class SolverControl;
  * pool and the control object.
  *
  *
- * \subsection{Requirements for template classes}
+ * @sect3{Requirements for template classes}
  *
  * The class is templated to allow for different matrix and vector
  * classes, since iterative solvers do not rely on any special structure
@@ -98,15 +98,15 @@ class SolverControl;
  * \end{verbatim}
  *
  *
- * \subsection{AdditionalData}
+ * @sect3{AdditionalData}
  *
- * Several solvers need additional data, like the damping parameter #omega# of the
- * #SolverRichardson# class or the maximum number of temporary vectors of the #SolverGMRES#.
- * To have a standardized constructor for each solver class the #struct AdditionalData#
+ * Several solvers need additional data, like the damping parameter @p{omega} of the
+ * @p{SolverRichardson} class or the maximum number of temporary vectors of the @p{SolverGMRES}.
+ * To have a standardized constructor for each solver class the @p{struct AdditionalData}
  * has been introduced to each solver class. Some solvers need no additional data, like
- * #SolverCG# or #SolverBicgstab#. For these solvers the struct #AdditionalData# is empty
+ * @p{SolverCG} or @p{SolverBicgstab}. For these solvers the struct @p{AdditionalData} is empty
  * and calling the constructor may be done without giving the additional structure as
- * an argument as a default #AdditionalData# is set by default. 
+ * an argument as a default @p{AdditionalData} is set by default. 
  *
  * Now the generating of a solver looks like
  * \begin{verbatim}
@@ -123,10 +123,10 @@ class SolverControl;
  * \end{verbatim}
  *
  * Using a unified constructor parameter list for all solvers was introduced when the
- * #SolverSelector# class was written; the unified interface enabled us to use this
+ * @p{SolverSelector} class was written; the unified interface enabled us to use this
  * class unchanged even if the number of types of parameters to a certain solver
  * changes and it is still possible in a simple way to give these additional data to
- * the #SolverSelector# object for each solver which it may use.
+ * the @p{SolverSelector} object for each solver which it may use.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997, 1998, 1999
  */

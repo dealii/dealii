@@ -145,7 +145,7 @@ namespace Threads
   void spawn (ThreadManager          &thread_manager,
 	      const FunEncapsulation &fun_data)
   {
-				     // lock the #fun_data_base# object
+				     // lock the @p{fun_data_base} object
 				     // to avoid destruction while its
 				     // data is still accessed. the lock
 				     // is released by the new thread

@@ -88,7 +88,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern<blocks,blocks> &sparsity) 
 		    
 		    if (distribute[global_col] != -1)
 						       // distribute entry at regular
-						       // row #row# and irregular column
+						       // row @p{row} and irregular column
 						       // global_col
 		      {
 			for (unsigned int q=0;
@@ -131,7 +131,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern<blocks,blocks> &sparsity) 
 		    
 		    if (distribute[global_col] == -1)
 						       // distribute entry at irregular
-						       // row #row# and regular column
+						       // row @p{row} and regular column
 						       // global_col.
 		      {
 			for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
@@ -140,8 +140,8 @@ void ConstraintMatrix::condense (BlockSparsityPattern<blocks,blocks> &sparsity) 
 		      }
 		    else
 						       // distribute entry at irregular
-						       // row #row# and irregular column
-						       // #global_col#
+						       // row @p{row} and irregular column
+						       // @p{global_col}
 		      {
 			for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 			  for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
@@ -197,7 +197,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
-					   // note that #lines# is ordered
+					   // note that @p{lines} is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -215,8 +215,8 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether #next_constraint# is a valid
-				   // iterator, since #next_constraint# is
+				   // whether @p{next_constraint} is a valid
+				   // iterator, since @p{next_constraint} is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
@@ -326,7 +326,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 	    {
 	      if (distribute[sparsity.get_column_numbers()[j]] != -1)
 						 // distribute entry at regular
-						 // row #row# and irregular column
+						 // row @p{row} and irregular column
 						 // sparsity.get_column_numbers()[j]; set old
 						 // entry to zero
 		{
@@ -360,7 +360,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 	    {
 	      if (distribute[sparsity.get_column_numbers()[j]] == -1)
 						 // distribute entry at irregular
-						 // row #row# and regular column
+						 // row @p{row} and regular column
 						 // sparsity.get_column_numbers()[j]. set old
 						 // entry to zero
 		{
@@ -375,7 +375,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 		}
 	      else
 						 // distribute entry at irregular
-						 // row #row# and irregular column
+						 // row @p{row} and irregular column
 						 // sparsity.get_column_numbers()[j]
 						 // set old entry to one if on main
 						 // diagonal, zero otherwise
@@ -477,7 +477,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed
 		    
 		    if (distribute[global_col] != -1)
 						       // distribute entry at regular
-						       // row #row# and irregular column
+						       // row @p{row} and irregular column
 						       // global_col;
 						       // set old entry to zero
 		      {
@@ -532,7 +532,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed
 		    
 		    if (distribute[global_col] == -1)
 						       // distribute entry at irregular
-						       // row #row# and regular column
+						       // row @p{row} and regular column
 						       // global_col. set old
 						       // entry to zero
 		      {
@@ -550,8 +550,8 @@ ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed
 		      }
 		    else
 						       // distribute entry at irregular
-						       // row #row# and irregular column
-						       // #global_col#
+						       // row @p{row} and irregular column
+						       // @p{global_col}
 						       // set old entry to one if on main
 						       // diagonal, zero otherwise
 		      {
@@ -608,7 +608,7 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
-					   // note that #lines# is ordered
+					   // note that @p{lines} is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -626,8 +626,8 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether #next_constraint# is a valid
-				   // iterator, since #next_constraint# is
+				   // whether @p{next_constraint} is a valid
+				   // iterator, since @p{next_constraint} is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
@@ -739,7 +739,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 	{
 					   // this line is constrained
 	  old_line.push_back (-1);
-					   // note that #lines# is ordered
+					   // note that @p{lines} is ordered
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -757,8 +757,8 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether #next_constraint# is a valid
-				   // iterator, since #next_constraint# is
+				   // whether @p{next_constraint} is a valid
+				   // iterator, since @p{next_constraint} is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist

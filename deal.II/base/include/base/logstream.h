@@ -31,15 +31,15 @@
  * \end{itemize}
  *
  * The usual usage of this class is through the pregenerated object
- * #deallog#. Typical steps are
+ * @p{deallog}. Typical steps are
  * <OL>
- * <LI> #deallog.attach(ostream)#: write logging information into a file.
- * <LI> #deallog.depth_console(n)#: restrict output on screen to outer loops.
+ * <LI> @p{deallog.attach(ostream)}: write logging information into a file.
+ * <LI> @p{deallog.depth_console(n)}: restrict output on screen to outer loops.
  * <LI> Before entering a new phase of your program, e.g. a new loop,
- * #deallog.push("loopname")#.
- * <LI> #deallog << anything << endl;# to write logging information
- * (Usage of #endl# is mandatory!).
- * <LI> #deallog.pop()# when leaving that stage entered with #push#.
+ * @p{deallog.push("loopname")}.
+ * <LI> @p{deallog << anything << endl;} to write logging information
+ * (Usage of @p{endl} is mandatory!).
+ * <LI> @p{deallog.pop()} when leaving that stage entered with @p{push}.
  * </OL>
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
@@ -59,7 +59,7 @@ class LogStream
 				     /**
 				      * Default stream, where the output
 				      * is to go to. This stream defaults
-				      * to #cerr#, but can be set to another
+				      * to @p{cerr}, but can be set to another
 				      * stream through the constructor.
 				      */
     ostream  *std_out;
@@ -70,7 +70,7 @@ class LogStream
 				      * will be a file stream.
 				      *
 				      * You can set and reset this stream
-				      * by the #attach# function.
+				      * by the @p{attach} function.
 				      */
     ostream  *file;
 
@@ -112,27 +112,27 @@ class LogStream
 				     /**
 				      * Standard constructor, since we
 				      * intend to provide an object
-				      * #deallog# in the library. Set the
-				      * standard output stream to #cerr#.
+				      * @p{deallog} in the library. Set the
+				      * standard output stream to @p{cerr}.
 				      */
     LogStream();
     
 				     /**
 				      * Enable output to a second
-				      * stream #o#.
+				      * stream @p{o}.
 				      */
     void attach(ostream& o);
     
 				     /**
 				      * Disable output to the second
 				      * stream. You may want to call
-				      * #close# on the stream that was
+				      * @p{close} on the stream that was
 				      * previously attached to this object.
 				      */
     void detach();
 
 				     /**
-				      * Gives the default stream (#std_out#).
+				      * Gives the default stream (@p{std_out}).
 				      */
     ostream& get_console();
 
@@ -161,9 +161,9 @@ class LogStream
 				      * function allows to restrict
 				      * console output to the upmost
 				      * levels of iterations. Only
-				      * output with less than #n#
+				      * output with less than @p{n}
 				      * prefixes is printed. By calling
-				      * this function with #n=0#, no
+				      * this function with @p{n=0}, no
 				      * console output will be written.
 				      */
     void depth_console (unsigned int n);
@@ -172,7 +172,7 @@ class LogStream
 				      * Maximum number of levels to be
 				      * written to the log file. The
 				      * functionality is the same as
-				      * #depth_console#, nevertheless,
+				      * @p{depth_console}, nevertheless,
 				      * this function should be used
 				      * with care, since it may spoile
 				      * the value of a log file.
@@ -200,15 +200,15 @@ class LogStream
 				      * function on the present object. It
 				      * works the same way as it is possible
 				      * to output the stream manipulators
-				      * (like #endl#, etc) work on standard
-				      * streams: #stream << endl;#. We need
+				      * (like @p{endl}, etc) work on standard
+				      * streams: @p{stream << endl;}. We need
 				      * to overload this function in order
 				      * to know when we have to print the
 				      * prefixes, since a user may use several
-				      * calls to #operator <<# before the
+				      * calls to @p{operator <<} before the
 				      * line is complete. The overloaded
-				      * function #void endl(LogStream &)#
-				      * tells the #LogStream# that the end of
+				      * function @p{void endl(LogStream &)}
+				      * tells the @p{LogStream} that the end of
 				      * the line is reached.
 				      */
     LogStream & operator << (void (f)(LogStream &));
@@ -242,7 +242,7 @@ LogStream &
 LogStream::operator<< (const T& t)
 {
 				   // if the previous command was an
-				   // #endl#, print the topmost prefix
+				   // @p{endl}, print the topmost prefix
 				   // and a colon
   if (was_endl)
     {
@@ -262,10 +262,10 @@ LogStream::operator<< (const T& t)
 
 
 /**
- * Replacement of #endl# for #LogStream#.
+ * Replacement of @p{endl} for @p{LogStream}.
  *
- * Overloaded version of the stream manipulator function #endl# which
- * results in calling the original version of #endl# for each of the
+ * Overloaded version of the stream manipulator function @p{endl} which
+ * results in calling the original version of @p{endl} for each of the
  * two streams, if the present prefix number does not exceed the
  * specified maximal number.
  *

@@ -34,7 +34,7 @@
  * the number of iterations needed to solve the problem to the given
  * criterion, an intermediate solution is computed and a restart is
  * performed. If you don't want to use the restarted method, you can
- * limit the number of iterations (stated in the #SolverControl#
+ * limit the number of iterations (stated in the @p{SolverControl}
  * object given to the constructor) to be below the number of
  * temporary vectors minus three. Note the subtraction, which is due
  * to the fact that three vectors are used for other purposes, so the
@@ -57,15 +57,15 @@
  * possibilities is to use a good preconditioner.
  *
  * Like all other solver classes, this class has a local structure called
- * #AdditionalData# which is used to pass additional parameters to the
+ * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
  * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the #SolverSelector# and
+ * to the constructor because this makes the use of the @p{SolverSelector} and
  * other classes much easier and guarantees that these will continue to
  * work even if number or type of the additional parameters for a certain
  * solver changes.
  *
- * For the GMRes method, the #AdditionalData# structure contains the number
+ * For the GMRes method, the @p{AdditionalData} structure contains the number
  * of temporary vectors as commented upon above. By default, the number
  * of these vectors is set to 30.
  *
@@ -298,7 +298,7 @@ unsigned int dim = 0;
 				       // many steps as there are temporary
 				       // vectors. the number of steps actually
 				       // been done is propagated outside
-				       // through the #dim# variable
+				       // through the @p{dim} variable
       for (unsigned int inner_iteration=0;
 	   ((inner_iteration < n_tmp_vectors-2)
 	    &&

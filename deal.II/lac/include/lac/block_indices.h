@@ -45,7 +45,7 @@ class BlockIndices
 				      * block from the given
 				      * argument. The size of the
 				      * vector shall be equal to
-				      * #n_blocks#.
+				      * @p{n_blocks}.
 				      */
     BlockIndices (const vector<unsigned int> &n);
     
@@ -54,14 +54,14 @@ class BlockIndices
 				      * within each block from the
 				      * given argument. The size of
 				      * the vector shall be equal to
-				      * #n_blocks#.
+				      * @p{n_blocks}.
 				      */
     void reinit (const vector<unsigned int> &n);
     
 				     /**
 				      * Return the block and the
 				      * index within that block
-				      * for the global index #i#. The
+				      * for the global index @p{i}. The
 				      * first element of the pair is
 				      * the block, the second the
 				      * index within that.
@@ -71,7 +71,7 @@ class BlockIndices
 
 				     /**
 				      * Return the global index of
-				      * #index# in block #block#.
+				      * @p{index} in block @p{block}.
 				      */
     unsigned int local_to_global (const unsigned int block,
 				  const unsigned int index) const;
@@ -231,7 +231,7 @@ BlockIndices<n_blocks>::swap (BlockIndices<n_blocks> &b)
 
 
 /**
- * Global function #swap# which overloads the default implementation
+ * Global function @p{swap} which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two objects.
  *

@@ -109,7 +109,7 @@
  * decomposition of a domain using quadrilaterals is easier.
  *
  *
- * \section{Hanging nodes}
+ * @sect2{Hanging nodes}
  *
  * Hanging nodes are handled exactly like for any other element. It should
  * however be noted that the support of basis functions get quite
@@ -131,13 +131,13 @@
  *   *-----------------o--------*-----
  * \end{verbatim}
  * The dotted area is the support of the basis function associated with the
- * bottom middle vertex (denoted by #o#) after the hanging node in the center
+ * bottom middle vertex (denoted by @p{o}) after the hanging node in the center
  * of the `picture' was eliminated. This strange structure of the support
  * should not pose too many problems in practice, it is only note here for
  * completeness and for curiosity.
  *
  *
- * \section{Experience with the criss-cross element}
+ * @sect2{Experience with the criss-cross element}
  *
  * Experience is that the error for the criss cross element shows
  * the same convergence rate as the linear Lagrange element ($h^2$ for the
@@ -159,7 +159,7 @@
  * values on the unit disk (resp. a triangulation of that) and hanging nodes.
  *
  *
- * \section{Using quadrature formulae for this element}
+ * @sect2{Using quadrature formulae for this element}
  *
  * When using one of the usual quadrature formulae, a common problem is
  * that some of the quadrature points lie on the interfaces of the
@@ -180,23 +180,23 @@ class FECrissCross : public FiniteElement<dim> {
     FECrissCross ();
     
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      *
 				      * The second derivatives are zero almost
 				      * everywhere for this element; however,
@@ -236,8 +236,8 @@ class FECrissCross : public FiniteElement<dim> {
 					FullMatrix<double> &local_mass_matrix) const;
 
     				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      * Here, the (bi-)linear basis functions
 				      * are meant, which are used for the
 				      * computation of the transformation from
@@ -247,8 +247,8 @@ class FECrissCross : public FiniteElement<dim> {
 					  const Point<dim> &p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      * Here, the (bi-)linear basis functions
 				      * are meant, which are used for the
 				      * computation of the transformation from
@@ -283,7 +283,7 @@ class FECrissCross : public FiniteElement<dim> {
 
 				     /**
 				      * Return the normal vectors to the
-				      * face with number #face_no# of #cell#.
+				      * face with number @p{face_no} of @p{cell}.
 				      *
 				      * For linear finite elements, this function
 				      * is particularly simple since all normal
@@ -302,8 +302,8 @@ class FECrissCross : public FiniteElement<dim> {
 
 				     /**
 				      * Return the normal vectors to the
-				      * subface with number #subface_no# of
-				      * the face with number #face_no# of #cell#.
+				      * subface with number @p{subface_no} of
+				      * the face with number @p{face_no} of @p{cell}.
 				      *
 				      * For linear finite elements, this function
 				      * is particularly simple since all normal

@@ -64,10 +64,10 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 
 
 				   // first thing: copy over all elements
-				   // of #matrix# to the present object
+				   // of @p{matrix} to the present object
 				   //
 				   // note that some elements in this
-				   // matrix may not be in #matrix#,
+				   // matrix may not be in @p{matrix},
 				   // so we need to preset our matrix
 				   // by zeroes.
   if (true)

@@ -32,11 +32,11 @@ template <int rank, int dim> class Tensor;
 
 
 /**
- * This class is a specialized version of the #Tensor<rank,dim># class.
+ * This class is a specialized version of the @p{Tensor<rank,dim>} class.
  * It handles tensors with one index, i.e. vectors, of fixed dimension
  * and offers the functionality needed for tensors of higher rank.
  *
- * In many cases, you will want to use the more specialized #Point# class
+ * In many cases, you will want to use the more specialized @p{Point} class
  * which acts as a tensor of rank one but has more functionality.
  */
 template <int dim>
@@ -48,7 +48,7 @@ class Tensor<1,dim> {
 				      * explicit knowledge of it's
 				      * data type. Implementation is
 				      * this way instead of providing
-				      * a function #dimension()#
+				      * a function @p{dimension()}
 				      * because now it is possible to
 				      * get the dimension at compile
 				      * time without the expansion and
@@ -70,7 +70,7 @@ class Tensor<1,dim> {
 #if (__GNUC__==2) && (__GNUC_MINOR__ < 95)  
 				     /**
 				      * Unnecessary variable, only used in
-				      * the declaration of #array_type#.
+				      * the declaration of @p{array_type}.
 				      * This variable should be omitted,
 				      * but egcs1.1.2 chokes on that so
 				      * we need it presently.
@@ -82,8 +82,8 @@ class Tensor<1,dim> {
 				      * be used to initialize statically
 				      * an object of this type.
 				      *
-				      * Use the same condition for #dim==0#
-				      * as in the #TensorBase<1,dim># class.
+				      * Use the same condition for @p{dim==0}
+				      * as in the @p{TensorBase<1,dim>} class.
 				      */
     typedef double array_type[array_size];
 #else
@@ -93,15 +93,15 @@ class Tensor<1,dim> {
 				      * be used to initialize statically
 				      * an object of this type.
 				      *
-				      * Use the same condition for #dim==0#
-				      * as in the #TensorBase<1,dim># class.
+				      * Use the same condition for @p{dim==0}
+				      * as in the @p{TensorBase<1,dim>} class.
 				      */
     typedef double array_type[(dim!=0) ? dim : 1];
 #endif
     
 				     /**
 				      * Constructor. Initialize all entries
-				      * to zero if #initialize==true#; this
+				      * to zero if @p{initialize==true}; this
 				      * is the default behaviour.
 				      */
     explicit Tensor (const bool initialize = true);
@@ -118,20 +118,20 @@ class Tensor<1,dim> {
     Tensor (const Tensor<1,dim> &);
 
 				     /**
-				      *  Read access to the #index#th coordinate.
+				      *  Read access to the @p{index}th coordinate.
 				      *
-				      * Note that the derived #Point# class also
-				      * provides access through the #()#
+				      * Note that the derived @p{Point} class also
+				      * provides access through the @p{()}
 				      * operator for backcompatibility.
 				      */
     double   operator [] (const unsigned int index) const;
 
     				     /**
-				      *  Read and write access to the #index#th
+				      *  Read and write access to the @p{index}th
 				      *  coordinate.
 				      *
-				      * Note that the derived #Point# class also
-				      * provides access through the #()#
+				      * Note that the derived @p{Point} class also
+				      * provides access through the @p{()}
 				      * operator for backcompatibility.
 				      */
     double & operator [] (const unsigned int index);
@@ -162,13 +162,13 @@ class Tensor<1,dim> {
     Tensor<1,dim> & operator -= (const Tensor<1,dim> &);
 
 				     /**
-				      *  Scale the vector by #factor#, i.e. multiply
-				      *  all coordinates by #factor#.
+				      *  Scale the vector by @p{factor}, i.e. multiply
+				      *  all coordinates by @p{factor}.
 				      */
     Tensor<1,dim> & operator *= (const double &factor);
 
 				     /**
-				      *  Scale the vector by #1/factor#.
+				      *  Scale the vector by @p{1/factor}.
 				      */
     Tensor<1,dim> & operator /= (const double &factor);
 
@@ -179,14 +179,14 @@ class Tensor<1,dim> {
 
 				     /**
 				      *  Add two tensors. If possible, use
-				      *  #operator +=# instead since this does not
+				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Tensor<1,dim>   operator + (const Tensor<1,dim> &) const;
 
 				     /**
 				      *  Subtract two tensors. If possible, use
-				      *  #operator +=# instead since this does not
+				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Tensor<1,dim>   operator - (const Tensor<1,dim> &) const;
@@ -210,7 +210,7 @@ class Tensor<1,dim> {
   protected:
 				     /**
 				      * Store the values in a simple array.
-				      * For #dim==0# store one element, because
+				      * For @p{dim==0} store one element, because
 				      * otherways the compiler would choke.
 				      * We catch this case in the constructor
 				      * to disallow the creation of such
@@ -249,7 +249,7 @@ DeclException1 (ExcDimTooSmall,
 
 				 /**
 				  *  Prints the values of this point in the
-				  *  form #x1 x2 x3 etc#.
+				  *  form @p{x1 x2 x3 etc}.
 				  */
 template <int dim>
 ostream & operator << (ostream &out, const Tensor<1,dim> &p);

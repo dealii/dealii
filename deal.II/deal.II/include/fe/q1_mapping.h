@@ -35,9 +35,9 @@ class FEQ1Mapping : public FiniteElement<dim>
 				     /**
 				      * Constructor. Simply passes through
 				      * its arguments to the base class. For
-				      * one space dimension, #dofs_per_quad#
+				      * one space dimension, @p{dofs_per_quad}
 				      * shall be zero; similarly, for one and
-				      * two space dimensions, #dofs_per_hex#
+				      * two space dimensions, @p{dofs_per_hex}
 				      * shall be zero.
 				      */
     FEQ1Mapping (const unsigned int  dofs_per_vertex,
@@ -48,8 +48,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 		 const vector<bool> &restriction_is_additive_flags);
 
     				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      * Here, the (bi-)linear basis functions
 				      * are meant, which are used for the
 				      * computation of the transformation from
@@ -59,8 +59,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 					  const Point<dim>   &p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      * Here, the (bi-)linear basis functions
 				      * are meant, which are used for the
 				      * computation of the transformation from
@@ -95,7 +95,7 @@ class FEQ1Mapping : public FiniteElement<dim>
 
 				     /**
 				      * Return the normal vectors to the
-				      * face with number #face_no# of #cell#.
+				      * face with number @p{face_no} of @p{cell}.
 				      *
 				      * For linear finite elements, this function
 				      * is particularly simple since all normal
@@ -114,8 +114,8 @@ class FEQ1Mapping : public FiniteElement<dim>
 
 				     /**
 				      * Return the normal vectors to the
-				      * subface with number #subface_no# of
-				      * the face with number #face_no# of #cell#.
+				      * subface with number @p{subface_no} of
+				      * the face with number @p{face_no} of @p{cell}.
 				      *
 				      * For linear finite elements, this function
 				      * is particularly simple since all normal

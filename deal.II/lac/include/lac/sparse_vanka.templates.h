@@ -160,7 +160,7 @@ SparseVanka<number>::compute_inverse (const unsigned int    row,
 					 row_length); 
 
 				   // collect the dofs that couple
-				   // with #row#
+				   // with @p{row}
   local_indices.resize (row_length);
   for (unsigned int i=0; i<row_length; ++i)
     local_indices[i] = structure.column_number(row, i);
@@ -276,7 +276,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 					 // patterns, the first element
 					 // of each entry simply denotes
 					 // all degrees of freedom that
-					 // couple with #row#.
+					 // couple with @p{row}.
 	local_index.clear ();
 	for (unsigned int i=0; i<row_length; ++i)
 	  local_index.insert(pair<unsigned int, unsigned int>
@@ -290,7 +290,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 					     // couple with the present DoF
 	    const unsigned int irow = is->first;
 					     // index of DoF irow in the matrix
-					     // row corresponding to DoF #row#.
+					     // row corresponding to DoF @p{row}.
 					     // runs between 0 and row_length
 	    const unsigned int i = is->second;
 					     // number of DoFs coupling to
@@ -308,10 +308,10 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 						 // this dof
 		const unsigned int col = structure.column_number(irow, j);
 						 // find out whether this DoF
-						 // (that couples with #irow#,
+						 // (that couples with @p{irow},
 						 // which itself couples with
-						 // #row#) also couples with
-						 // #row#.
+						 // @p{row}) also couples with
+						 // @p{row}.
 		const map<unsigned int, unsigned int>::const_iterator js
 		  = local_index.find(col);
 						 // if not, then still use
@@ -498,11 +498,11 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 		++access_count[block_number][structure.column_number(row, i)];
 	    };
 
-					 // now we know that block #i#
-					 // wants to write to DoF #j#
+					 // now we know that block @p{i}
+					 // wants to write to DoF @p{j}
 					 // as often as
-					 // #access_count[i][j]#
-					 // times. Let #j# be allotted
+					 // @p{access_count[i][j]}
+					 // times. Let @p{j} be allotted
 					 // to the block which
 					 // accesses it most often.
 					 //

@@ -26,9 +26,9 @@
  *   The center of the ball and its radius may be given upon construction of
  *   an object of this type. They default to the origin and a radius of 1.0.
  *
- *   This class is derived from #StraightBoundary# rather than from
- *   #Boundary#, which would seem natural, since this way we can use the
- *   #StraightBoundary<dim>::in_between(neighbors)# function.
+ *   This class is derived from @p{StraightBoundary} rather than from
+ *   @p{Boundary}, which would seem natural, since this way we can use the
+ *   @p{StraightBoundary<dim>::in_between(neighbors)} function.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -81,7 +81,7 @@ class HyperBallBoundary : public StraightBoundary<dim> {
 
 
 /**
- * Variant of #HyperBallBoundary# which denotes a half hyper ball
+ * Variant of @p{HyperBallBoundary} which denotes a half hyper ball
  * where the first coordinate is restricted to the range $x>=0$ (or
  * $x>=center(0)$). In two dimensions, this equals the right half
  * circle, in three space dimensions it is a half ball.
@@ -98,7 +98,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim> {
 			   const double     radius = 1.0);
 
 				     /**
-				      * Check if on the line #x==0#,
+				      * Check if on the line @p{x==0},
 				      * otherwise pass to the base
 				      * class.
 				      */
@@ -106,7 +106,7 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim> {
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
 
 				     /**
-				      * Check if on the line #x==0#,
+				      * Check if on the line @p{x==0},
 				      * otherwise pass to the base
 				      * class.
 				      */

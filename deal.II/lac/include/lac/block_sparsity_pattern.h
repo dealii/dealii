@@ -24,27 +24,27 @@
  * This is a block version of the sparsity pattern class. It has not
  * much functionality, but only administrated an array of sparsity
  * pattern objects and delegates work to them. It has mostly the same
- * interface as has the #SparsityPattern# class, and simply transforms
+ * interface as has the @p{SparsityPattern} class, and simply transforms
  * calls to its member functions to calls to the respective member
  * functions of the member sparsity patterns.
  *
- * The largest difference between the #SparsityPattern# class and this
+ * The largest difference between the @p{SparsityPattern} class and this
  * class is probably the absence of several of the constructors as
- * well as the absenceof the #reinit# functions. The reason is that
+ * well as the absenceof the @p{reinit} functions. The reason is that
  * mostly, the matrices have different properties and you will want to
  * initialize the blocks making up the matrix separately. You can
- * access the different blocks using the #block(row,col)# function.
+ * access the different blocks using the @p{block(row,col)} function.
  *
  * Attention: this object is not automatically notified if the size of
  * one of its subobjects' size is changed. After you initialize the
  * sizes of the subobjects, you will therefore have to call the
- * #collect_sizes()# function of this class! Note that, of course, all
+ * @p{collect_sizes()} function of this class! Note that, of course, all
  * sub-matrices in a row have to have the same number of rows, and
  * that all sub-matrices in a column have to have the same number of
  * columns.
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -64,14 +64,14 @@ class BlockSparsityPattern : public Subscriptor
 				     /**
 				      * Define a value which is used
 				      * to indicate that a certain
-				      * value in the #colnums# array
+				      * value in the @p{colnums} array
 				      * is unused, i.e. does not
 				      * represent a certain column
 				      * number index.
 				      *
 				      * This value is only an alias to
 				      * the respective value of the
-				      * #SparsityPattern# class.
+				      * @p{SparsityPattern} class.
 				      */
     static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
     
@@ -83,7 +83,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the #reinit# function.
+				      * the @p{reinit} function.
 				      */
     BlockSparsityPattern ();
 
@@ -149,7 +149,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * This function compresses the
 				      * sparsity structures that this
 				      * object represents. It simply
-				      * calls #compress# for all
+				      * calls @p{compress} for all
 				      * sub-objects.
 				      */
     void compress ();
@@ -186,7 +186,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * bad happens.
 				      *
 				      * This function simply finds out
-				      * to which block #(i,j)# belongs
+				      * to which block @p{(i,j)} belongs
 				      * and then relays to that block.
 				      */
     void add (const unsigned int i, const unsigned int j);
@@ -287,8 +287,8 @@ class BlockSparsityPattern : public Subscriptor
 				     /**
 				      * Make the block sparse matrix a
 				      * friend, so that it can use our
-				      * #row_indices# and
-				      * #column_indices# objects.
+				      * @p{row_indices} and
+				      * @p{column_indices} objects.
 				      */
     template <typename number, int r, int c>
     friend class BlockSparseMatrix;
@@ -350,7 +350,7 @@ BlockSparsityPattern<rows,columns>::add (const unsigned int i,
 {
 				   // if you get an error here, are
 				   // you sure you called
-				   // #collect_sizes()# before?
+				   // @p{collect_sizes()} before?
   const pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);

@@ -30,14 +30,14 @@ template<typename number> class Vector;
  *
  * Implementation of a classical rectangular scheme of numbers. The
  * data type of the entries is provided in the template argument
- * #number#.  The interface is quite fat and in fact has grown every
+ * @p{number}.  The interface is quite fat and in fact has grown every
  * time a new feature was needed. So, a lot of functions are provided.
  *
  * Since the instantiation of this template is quite an effort,
  * standard versions are precompiled into the library. These include
- * all combinations of #float# and #double# for matrices and
+ * all combinations of @p{float} and @p{double} for matrices and
  * vectors. If you need more data types, the implementation of
- * non-inline functions is in #fullmatrix.templates.h#. Driver files
+ * non-inline functions is in @p{fullmatrix.templates.h}. Driver files
  * are in the source tree.
  *
  * Internal calculations are usually done with the accuracy of the
@@ -45,7 +45,7 @@ template<typename number> class Vector;
  * type, the matrix number type is used.
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -64,12 +64,12 @@ class FullMatrix : public Subscriptor
   public:
 				     /**
 				      * Constructor. Initialize the matrix as
-				      * a square matrix with dimension #n#.
+				      * a square matrix with dimension @p{n}.
 				      *
 				      * In order to avoid the implicit
 				      * conversion of integers and other types
 				      * to a matrix, this constructor is
-				      * declared #explicit#.
+				      * declared @p{explicit}.
 				      *
 				      * By default, no memory is allocated.
 				      */
@@ -105,7 +105,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Assignment operator.
-				      * Copy all elements of #src#
+				      * Copy all elements of @p{src}
 				      * into the matrix. The size is
 				      * adjusted if needed.
 				      *
@@ -119,7 +119,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Assignment operator.
-				      * Copy all elements of #src#
+				      * Copy all elements of @p{src}
 				      * into the matrix. The size is
 				      * adjusted if needed.
 				      */
@@ -130,16 +130,16 @@ class FullMatrix : public Subscriptor
 				     /**
 				      * Fill rectangular block.
 				      *
-				      * The matrix #src# is copied
+				      * The matrix @p{src} is copied
 				      * into the target. The optional
-				      * values #i# and #j# determine the
+				      * values @p{i} and @p{j} determine the
 				      * upper left corner of the image
-				      * of #src#.
+				      * of @p{src}.
 				      *
 				      * This function requires that
-				      * #i+src.m()<=m()# and
-				      * #j+src.n()<=n()#, that is, the
-				      * image fits into the space of #this#.
+				      * @p{i+src.m()<=m()} and
+				      * @p{j+src.n()<=n()}, that is, the
+				      * image fits into the space of @p{this}.
 				      */
     template<typename number2>
     void fill (const FullMatrix<number2> &src,
@@ -166,7 +166,7 @@ class FullMatrix : public Subscriptor
 				      * allocate memory if necessary. Forget
 				      * the previous content of the matrix.
 				      * However, this function does not copy
-				      * the contents of #B#.
+				      * the contents of @p{B}.
 				      */
     template<typename number2>
     void reinit (const FullMatrix<number2> &B);
@@ -196,8 +196,8 @@ class FullMatrix : public Subscriptor
     bool all_zero () const;
 
 				     /**
-				      * Return the value of the element #(i,j)#.
-				      * Does the same as the private #el(i,j)#
+				      * Return the value of the element @p{(i,j)}.
+				      * Does the same as the private @p{el(i,j)}
 				      * function but does bounds checking in
 				      * debug mode.
 				      */
@@ -206,8 +206,8 @@ class FullMatrix : public Subscriptor
     
 				     /**
 				      * Return a read-write reference to
-				      * the element #(i,j)#.
-				      * Does the same as the private #el(i,j)#
+				      * the element @p{(i,j)}.
+				      * Does the same as the private @p{el(i,j)}
 				      * function but does bounds checking in
 				      * debug mode.
 				      */
@@ -222,7 +222,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Weighted addition. The matrix
-				      * #s*B# is added to #this#.
+				      * @p{s*B} is added to @p{this}.
 				      *
 				      * $A += sB$
 				      */
@@ -232,7 +232,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Weighted addition of the
-				      * transpose of #B# to #this#.
+				      * transpose of @p{B} to @p{this}.
 				      *
 				      * $A += s B^T$
 				      */
@@ -244,8 +244,8 @@ class FullMatrix : public Subscriptor
 				      * Matrix-matrix-multiplication.
 				      * $C=A*B$.
 				      *
-				      * Assumes that #A# and #B# have
-				      * compatible sizes and thet #C#
+				      * Assumes that @p{A} and @p{B} have
+				      * compatible sizes and thet @p{C}
 				      * already has the right size.
 				      */
     template<typename number2>
@@ -254,11 +254,11 @@ class FullMatrix : public Subscriptor
     
 				     /**
 				      * Matrix-matrix-multiplication using
-				      * transpose of #this#.
+				      * transpose of @p{this}.
 				      * $C=A^T*B$.
 				      *
-				      * Assumes that #A# and #B# have
-				      * compatible sizes and thet #C#
+				      * Assumes that @p{A} and @p{B} have
+				      * compatible sizes and thet @p{C}
 				      * already has the right size.
 				      */
     template<typename number2>
@@ -269,9 +269,9 @@ class FullMatrix : public Subscriptor
 				      * Matrix-vector-multiplication.
 				      *
 				      * The optional parameter
-				      * #adding# determines, whether the
-				      * result is stored in #w# or added
-				      * to #w#.
+				      * @p{adding} determines, whether the
+				      * result is stored in @p{w} or added
+				      * to @p{w}.
 				      *
 				      * if (adding)
 				      *  $w += A*v$
@@ -286,7 +286,7 @@ class FullMatrix : public Subscriptor
     
 				     /**
 				      * Transpose matrix-vector-multiplication.
-				      * See #vmult# above.
+				      * See @p{vmult} above.
 				      */
     template<typename number2>
     void Tvmult (Vector<number2>       &w,
@@ -295,7 +295,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Return the square of the norm
-				      * of the vector #v# with respect
+				      * of the vector @p{v} with respect
 				      * to the norm induced by this
 				      * matrix,
 				      * i.e. $\left(v,Mv\right)$. This
@@ -316,7 +316,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Build the matrix scalar product
-				      * #u^T M v#. This function is mostly
+				      * @p{u^T M v}. This function is mostly
 				      * useful when building the cellwise
 				      * scalar product of two functions in
 				      * the finite element context.
@@ -385,7 +385,7 @@ class FullMatrix : public Subscriptor
 
 				     /**
 				      * Assign the inverse of the given
-				      * matrix to #*this#. This function is
+				      * matrix to @p{*this}. This function is
 				      * only implemented (hardcoded) for
 				      * square matrices of dimension one,
 				      * two, three and four, since the
@@ -402,10 +402,10 @@ class FullMatrix : public Subscriptor
 				      *
 				      * For all other sizes than the ones given
 				      * above, an exception of type
-				      * #ExcNotImplemented(dim_range)# is
+				      * @p{ExcNotImplemented(dim_range)} is
 				      * thrown, which you can catch and use
 				      * some other method to invert the matrix,
-				      * e.g. the #gauss_jordan# function.
+				      * e.g. the @p{gauss_jordan} function.
 				      */
     void invert (const FullMatrix<number> &M);
 
@@ -537,11 +537,11 @@ class FullMatrix : public Subscriptor
 				      * Each entry is printed in scientific
 				      * format, with one pre-comma digit and
 				      * the number of digits given by
-				      * #precision# after the comma, with one
+				      * @p{precision} after the comma, with one
 				      * space following.
 				      * The precision defaults to four, which
 				      * suffices for most cases. The precision
-				      * and output format are {\it not}
+				      * and output format are @em{not}
 				      * properly reset to the old values
 				      * when the function exits.
 				      *
@@ -622,14 +622,14 @@ class FullMatrix : public Subscriptor
 				      * size of the matrix is increased.
 				      * Therefore, if the matrix size was
 				      * decreased somewhen in the past,
-				      * #val_size# will be larger than
-				      * #dim_range * dim_image#.
+				      * @p{val_size} will be larger than
+				      * @p{dim_range * dim_image}.
 				      */
     unsigned int val_size;
     
 				     /**
 				      * Return a read-write reference to the
-				      * element #(i,j)#.
+				      * element @p{(i,j)}.
 				      *
 				      * This function does no bounds
 				      * checking and is only to be used
@@ -639,7 +639,7 @@ class FullMatrix : public Subscriptor
     number & el (const unsigned int i, const unsigned int j);
     
 				     /**
-				      * Return the value of the element #(i,j)#.
+				      * Return the value of the element @p{(i,j)}.
 				      *
 				      * This function does no bounds checking
 				      * and is only to be used

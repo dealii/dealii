@@ -25,7 +25,7 @@
 
 
 /**
- * Abstract base class for the #TableEntry# class. See there.
+ * Abstract base class for the @p{TableEntry} class. See there.
  * This class is not to be used by the user.
  *
  * @author Ralf Hartmann, 1999
@@ -55,13 +55,13 @@ class TableEntryBase
 
 
 /**
- * A #TableEntry# stores the value of a table entry.
+ * A @p{TableEntry} stores the value of a table entry.
  * The value type of this table entry is arbitrary. For
- * a #TableEntry<typename value_type># with a non-common value
+ * a @p{TableEntry<typename value_type>} with a non-common value
  * type you may want to specialize the output functions in order
  * to get nicer output. This class is not to be used by the user.
  *
- * For more detail see the #TableHandler# class.
+ * For more detail see the @p{TableHandler} class.
  *
  * @author Ralf Hartmann, 1999
  */
@@ -104,33 +104,33 @@ class TableEntry : public TableEntryBase
 
 
 /**
- * The #TableHandler# stores #TableEntries# of arbitrary value type and 
+ * The @p{TableHandler} stores @p{TableEntries} of arbitrary value type and 
  * writes the table as text or in tex format to an output stream. The value
  * type actually may vary from column to column and from row to row. 
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  *
  * The most important function is the templatized function 
- * #add_value(const string &key, const value_type value)#, that adds a column
- * with the name #key# to the table if this column does not yet exist and adds the 
- * value of #value_type# (e.g. #unsigned int#, #double#, #string#, ...) to this column.
+ * @p{add_value(const string &key, const value_type value)}, that adds a column
+ * with the name @p{key} to the table if this column does not yet exist and adds the 
+ * value of @p{value_type} (e.g. @p{unsigned int}, @p{double}, @p{string}, ...) to this column.
  * After the table is complete there are different possibilities of output, e.g.
- * into a tex file with #write_tex(ofstream &file)# or as text with 
- * #write_text (ostream &out)#. 
+ * into a tex file with @p{write_tex(ofstream &file)} or as text with 
+ * @p{write_text (ostream &out)}. 
  *
  * Two (or more) columns may be merged into a "supercolumn" by twice
- * (or multiple) calling #add_column_to_supercolumn(...)#, see
+ * (or multiple) calling @p{add_column_to_supercolumn(...)}, see
  * there. Additionally there is a function to set for each column the
  * precision of the output of numbers, and there are several functions
  * to prescribe the format and the captions the columns are written
  * with in tex mode.
  *
- * \subsection{Example}
+ * @sect3{Example}
  * This is a simple example demonstrating the usage of this class. The first column
- * includes the numbers #i=1..n#, the second $1^2$...$n^2$, the third $sqrt(1)...sqrt(n)$,
+ * includes the numbers @p{i=1..n}, the second $1^2$...$n^2$, the third $sqrt(1)...sqrt(n)$,
  * where the second and third columns are merged into one supercolumn 
- * with the superkey #squares and roots#. Additionally the first column is
- * aligned to the right (the default was #centered#) and the precision of
+ * with the superkey @p{squares and roots}. Additionally the first column is
+ * aligned to the right (the default was @p{centered}) and the precision of
  * the square roots are set to be 6 (instead of 4 as default).
  *
  * \begin{verbatim}
@@ -169,8 +169,8 @@ class TableHandler
     
 				     /**
 				      * Adds a column (if not yet existent) with
-				      * the key #key#
-				      * and adds the value of #value_type#
+				      * the key @p{key}
+				      * and adds the value of @p{value_type}
 				      * to the column.
 				      */
     template <typename value_type>
@@ -181,11 +181,11 @@ class TableHandler
 				      * Creates a sypercolumn (if not yet
 				      * existent) and includes column to it.
 				      * The keys of the column and the supercolumn
-				      * are #key# and #superkey#, respectively.
-				      * To merge two columns #c1# and #c2# to
-				      * a supercolumn #sc# hence call
-				      * #add_column_to_supercolumn(c1,sc)# and
-				      * #add_column_to_supercolumn(c2,sc)#.
+				      * are @p{key} and @p{superkey}, respectively.
+				      * To merge two columns @p{c1} and @p{c2} to
+				      * a supercolumn @p{sc} hence call
+				      * @p{add_column_to_supercolumn(c1,sc)} and
+				      * @p{add_column_to_supercolumn(c2,sc)}.
 				      *
 				      * Concerning the order of the columns,
 				      * the supercolumn replaces the first
@@ -201,7 +201,7 @@ class TableHandler
 				      * Change the order of columns and
 				      * supercolumns in the table.
 				      *
-				      * #new_order# includes the keys and
+				      * @p{new_order} includes the keys and
 				      * superkeys of the columns and
 				      * supercolumns in the order the user like to.
 				      * If a superkey is included the keys
@@ -215,24 +215,24 @@ class TableHandler
 				      * This function may also be used to break
 				      * big tables with to many columns into smaller
 				      * ones. Call this function with
-				      * the first e.g. five columns and then #write_*#.
+				      * the first e.g. five columns and then @p{write_*}.
 				      * Afterwards call this function with the 
-				      * next e.g. five columns and again #write_*#,
+				      * next e.g. five columns and again @p{write_*},
 				      * and so on.
 				      */
     void set_column_order (const vector<string> &new_order);
     
 				     /**
-				      * Sets the #precision# e.g. double or float
-				      * variables are written with. #precision# is
+				      * Sets the @p{precision} e.g. double or float
+				      * variables are written with. @p{precision} is
 				      * the same as in calling
-				      * #out << setprecision(precision)#.
+				      * @p{out << setprecision(precision)}.
 				      */
     void set_precision (const string &key,
 			const unsigned int precision);
 
 				     /**
-				      * Sets the #scientific_flag#. True means
+				      * Sets the @p{scientific_flag}. True means
 				      * scientific, false means fixed point
 				      * notation.
 				      */
@@ -240,9 +240,9 @@ class TableHandler
 			 bool scientific);
 
 				     /**
-				      * Sets the caption of the column #key#
+				      * Sets the caption of the column @p{key}
 				      * for tex output. You may want to chose
-				      * this different from #key#, if it 
+				      * this different from @p{key}, if it 
 				      * contains formulas or similar constructs.
 				      */
     void set_tex_caption (const string &key,
@@ -250,8 +250,8 @@ class TableHandler
 
 				     /**
 				      * Sets the caption the the supercolumn
-				      * #superkey# for tex output. You may want
-				      * to chose this different from #superkey#,
+				      * @p{superkey} for tex output. You may want
+				      * to chose this different from @p{superkey},
 				      * if it contains formulas or similar
 				      * constructs.
 				      */
@@ -260,10 +260,10 @@ class TableHandler
 
 				     /**
 				      * Sets the tex output format of a column.
-				      * e.g. #c#, #r#, #l#, or #p{3cm}#. The
-				      * default is #c#. Also if this function
+				      * e.g. @p{c}, @p{r}, @p{l}, or @p{p{3cm}}. The
+				      * default is @p{c}. Also if this function
 				      * is not called for a column, the default
-				      * is preset to be #c#.
+				      * is preset to be @p{c}.
 				      */
     void set_tex_format (const string &key,
 			 const string &format="c");
@@ -343,30 +343,30 @@ class TableHandler
 					  * List of entries within this column.
 					  * They may actually be of very 
 					  * different type, since we use the
-					  * templated #TableEntry<T># class
+					  * templated @p{TableEntry<T>} class
 					  * for actual values, which is only
-					  * a wrapper for #T#, but is derived
-					  * from #TableEntryBase#.
+					  * a wrapper for @p{T}, but is derived
+					  * from @p{TableEntryBase}.
 					  */
 	vector<TableEntryBase *> entries;
 	
 					 /**
 					  * The caption of the column in tex output.
 					  * By default, this is the key string that
-					  * is given to the #TableHandler# by
-					  * #TableHandler::add_value(...)#. This may
+					  * is given to the @p{TableHandler} by
+					  * @p{TableHandler::add_value(...)}. This may
 					  * be changed by calling
-					  * #TableHandler::set_tex_caption(...)#.
+					  * @p{TableHandler::set_tex_caption(...)}.
 					  */
 	string tex_caption;
 
 					 /**
 					  * The column format in tex output.
-					  * By default, this is #"c"#, meaning
+					  * By default, this is @p{"c"}, meaning
 					  * `centered'. This may
 					  * be changed by calling
-					  * #TableHandler::set_tex_format(...)#
-					  * with #"c", "r", "l"# for centered,
+					  * @p{TableHandler::set_tex_format(...)}
+					  * with @p{"c", "r", "l"} for centered,
 					  * right or left.
 					  */
 	
@@ -380,7 +380,7 @@ class TableHandler
 	unsigned int precision;
 
 					 /**
-					  * #scientific#=false means fixed
+					  * @p{scientific}=false means fixed
 					  * point notation.
 					  */
 	bool scientific;
@@ -395,12 +395,12 @@ class TableHandler
 				     /**
 				      * Help function that gives a vector of
 				      * the keys of all columns that are mentioned
-				      * in #column_order#, where each supercolumn key
+				      * in @p{column_order}, where each supercolumn key
 				      * is replaced by its subcolumn keys.
 				      *
 				      * This function implicitly checks the
 				      * consistency of the data. The result is
-				      * returned in #sel_columns#.
+				      * returned in @p{sel_columns}.
 				      */
     void get_selected_columns (vector<string> &sel_columns) const;
     
@@ -420,7 +420,7 @@ class TableHandler
 				      * by the user.
 				      * By default this is the order of
 				      * adding the columns. This order may be
-				      * changed by #set_column_order(...)#.
+				      * changed by @p{set_column_order(...)}.
 				      */
     vector<string> column_order;
 
@@ -436,7 +436,7 @@ class TableHandler
 				      * It is allowed that a supercolumn has got
 				      * the same key as a column.
 				      *
-				      * Note that we do not use a #multimap#
+				      * Note that we do not use a @p{multimap}
 				      * here since the order of column
 				      * keys for each supercolumn key is
 				      * relevant.
@@ -450,7 +450,7 @@ class TableHandler
 				      *
 				      * By default these are just the
 				      * supercolumn keys but they may be changed
-				      * by #set_tex_supercaptions(...)#.
+				      * by @p{set_tex_supercaptions(...)}.
 				      */
     map<string, string> tex_supercaptions;
 };

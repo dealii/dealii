@@ -757,7 +757,7 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () 
 
 const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const {
   Section* sec = const_cast<Section*>(&defaults); // not nice, but needs to be and
-				   // after all: we do not change #sec#
+				   // after all: we do not change @p{sec}
   vector<string>::const_iterator SecName = subsection_path.begin();
     
   while (SecName != subsection_path.end()) 

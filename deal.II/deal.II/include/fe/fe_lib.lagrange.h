@@ -20,7 +20,7 @@
 #include <fe/q1_mapping.h>
 
 /**
- * Isoparametric Q1 finite element in #dim# space dimensions.
+ * Isoparametric Q1 finite element in @p{dim} space dimensions.
  *
  * The linear, isoparametric mapping from a point $\vec \xi$ on the unit cell
  * to a point $\vec x$ on the real cell is defined as
@@ -47,33 +47,33 @@ class FEQ1 : public FEQ1Mapping<dim>
 				     /**
 				      * Constructor that is called by the
 				      * constructor of the derived
-				      * #FEDG_Q1# class.
+				      * @p{FEDG_Q1} class.
 				      * It uses  no dofs in the vertices and 
 				      * $2^d$ dofs per cell. No constraint
 				      * matrices are build.
-				      * For more detail see class #FEDGLinear#.
+				      * For more detail see class @p{FEDGLinear}.
 				      */
     FEQ1 (const int);
     
   public:
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      *
 				      * For linear elements, all second
 				      * derivatives on the unit cell are zero.
@@ -122,7 +122,7 @@ class FEQ1 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.
@@ -132,7 +132,7 @@ class FEQ1 : public FEQ1Mapping<dim>
 
 
 /**
- * Subparametric Q2 finite element in #dim# space dimensions.
+ * Subparametric Q2 finite element in @p{dim} space dimensions.
  * A Q1 mapping from the unit cell
  * to the real cell is implemented.
  *
@@ -181,33 +181,33 @@ class FEQ1 : public FEQ1Mapping<dim>
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
  *   \begin{itemize}
- *   \item Index 0: #[0, 0, 0]#;
- *   \item Index 1: #[1, 0, 0]#;
- *   \item Index 2: #[1, 0, 1]#;
- *   \item Index 3: #[0, 0, 1]#;
- *   \item Index 4: #[0, 1, 0]#;
- *   \item Index 5: #[1, 1, 0]#;
- *   \item Index 6: #[1, 1, 1]#;
- *   \item Index 7: #[0, 1, 1]#;
- *   \item Index 8: #[1/2, 0, 0]#;
- *   \item Index 9: #[1, 0, 1/2]#;
- *   \item Index 10: # [1/2, 0, 1]#;
- *   \item Index 11: # [0, 0, 1/2]#;
- *   \item Index 12: # [1/2, 1, 0]#;
- *   \item Index 13: # [1, 1, 1/2]#;
- *   \item Index 14: # [1/2, 1, 1]#;
- *   \item Index 15: # [0, 1, 1/2]#;
- *   \item Index 16: # [0, 1/2, 0]#;
- *   \item Index 17: # [1, 1/2, 0]#;
- *   \item Index 18: # [1, 1/2, 1]#;
- *   \item Index 19: # [0, 1/2, 1]#;
- *   \item Index 20: # [1/2, 0, 1/2]#;
- *   \item Index 21: # [1/2, 1, 1/2]#;
- *   \item Index 22: # [1/2, 1/2, 0]#;
- *   \item Index 23: # [1, 1/2, 1/2]#;
- *   \item Index 24: # [1/2, 1/2, 1]#;
- *   \item Index 25: # [0, 1/2, 1/2]#;
- *   \item Index 26: # [1/2, 1/2, 1/2]#; 
+ *   \item Index 0: @p{[0, 0, 0]};
+ *   \item Index 1: @p{[1, 0, 0]};
+ *   \item Index 2: @p{[1, 0, 1]};
+ *   \item Index 3: @p{[0, 0, 1]};
+ *   \item Index 4: @p{[0, 1, 0]};
+ *   \item Index 5: @p{[1, 1, 0]};
+ *   \item Index 6: @p{[1, 1, 1]};
+ *   \item Index 7: @p{[0, 1, 1]};
+ *   \item Index 8: @p{[1/2, 0, 0]};
+ *   \item Index 9: @p{[1, 0, 1/2]};
+ *   \item Index 10: @p{[1/2, 0, 1]};
+ *   \item Index 11: @p{[0, 0, 1/2]};
+ *   \item Index 12: @p{[1/2, 1, 0]};
+ *   \item Index 13: @p{[1, 1, 1/2]};
+ *   \item Index 14: @p{[1/2, 1, 1]};
+ *   \item Index 15: @p{[0, 1, 1/2]};
+ *   \item Index 16: @p{[0, 1/2, 0]};
+ *   \item Index 17: @p{[1, 1/2, 0]};
+ *   \item Index 18: @p{[1, 1/2, 1]};
+ *   \item Index 19: @p{[0, 1/2, 1]};
+ *   \item Index 20: @p{[1/2, 0, 1/2]};
+ *   \item Index 21: @p{[1/2, 1, 1/2]};
+ *   \item Index 22: @p{[1/2, 1/2, 0]};
+ *   \item Index 23: @p{[1, 1/2, 1/2]};
+ *   \item Index 24: @p{[1/2, 1/2, 1]};
+ *   \item Index 25: @p{[0, 1/2, 1/2]};
+ *   \item Index 26: @p{[1/2, 1/2, 1/2]}; 
  *   \end{itemize}
  * \end{itemize}
  *
@@ -225,35 +225,35 @@ class FEQ2 : public FEQ1Mapping<dim>
 				     /**
 				      * Constructor that is called by the
 				      * constructor of the derived
-				      * #FEDGQuadraticSub# class.
+				      * @p{FEDGQuadraticSub} class.
 				      * It uses no dofs in the vertices, no
 				      * dofs in the lines and 
 				      * $3^d$ dofs per cell. No constraint
 				      * matrices are build.
 				      * For more detail see class 
-				      * #FEDGQuadraticSub#.
+				      * @p{FEDGQuadraticSub}.
 				      */
     FEQ2 (const int);
     
   public:
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -299,7 +299,7 @@ class FEQ2 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.
@@ -309,7 +309,7 @@ class FEQ2 : public FEQ1Mapping<dim>
 
 
 /**
- * Subparametric Q3 finite element in #dim# space dimensions.
+ * Subparametric Q3 finite element in @p{dim} space dimensions.
  * A Q1 mapping from the unit cell
  * to the real cell is implemented.
  *
@@ -347,34 +347,34 @@ class FEQ3 : public FEQ1Mapping<dim>
 				     /**
 				      * Constructor that is called by the
 				      * constructor of the derived
-				      * #FEDGCubicSub# class.
+				      * @p{FEDGCubicSub} class.
 				      * It uses  no dofs in the vertices and 
 				      * $4^d$ dofs per cell. No constraint
 				      * matrices are build.
 				      * For more detail see class
-				      * #FEDGCubicSub#.
+				      * @p{FEDGCubicSub}.
 				      */
     FEQ3 (const int);
 
   public:
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -420,7 +420,7 @@ class FEQ3 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.
@@ -430,7 +430,7 @@ class FEQ3 : public FEQ1Mapping<dim>
 
 
 /**
- * Subparametric Q4 finite element in #dim# space dimensions.
+ * Subparametric Q4 finite element in @p{dim} space dimensions.
  * A linear (subparametric) mapping from the unit cell
  * to the real cell is implemented.
  *
@@ -470,34 +470,34 @@ class FEQ4 : public FEQ1Mapping<dim>
 				     /**
 				      * Constructor that is called by the
 				      * constructor of the derived
-				      * #FEDGQuarticSub# class.
+				      * @p{FEDGQuarticSub} class.
 				      * It uses  no dofs in the vertices and 
 				      * $5^d$ dofs per cell. No constraint
 				      * matrices are build.
 				      * For more detail see class
-				      * #FEDGQuarticSub#.
+				      * @p{FEDGQuarticSub}.
 				      */
     FEQ4 (const int);
 
   public:
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -543,7 +543,7 @@ class FEQ4 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.

@@ -26,38 +26,42 @@ template <typename number> class Vector;
 
 
 /**
- * Base class for #PreconditionBlockJacobi#, #PreconditionBlockSOR#, ...
- * This class assumes the #SparseMatrix<number># consisting of invertible blocks 
- * of #blocksize# on the diagonal and provides the inversion of the diagonal blocks
- * of the matrix. NOT only block diagonal matrices are allowed but all
- * matrices of arbitrary structure with the minimal property of having
- * invertible blocks on the diagonal!
+ * Base class for @p{PreconditionBlockJacobi},
+ * @p{PreconditionBlockSOR}, ...  This class assumes the
+ * @p{SparseMatrix<number>} consisting of invertible blocks of
+ * @p{blocksize} on the diagonal and provides the inversion of the
+ * diagonal blocks of the matrix. NOT only block diagonal matrices are
+ * allowed but all matrices of arbitrary structure with the minimal
+ * property of having invertible blocks on the diagonal!
  *
- * This block matrix structure is given e.g. for the DG method
- * for the transport equation. For a downstream numbering the matrices
- * even have got a block lower left matrix structure, i.e. the matrices
- * are empty above the diagonal blocks.
+ * This block matrix structure is given e.g. for the DG method for the
+ * transport equation. For a downstream numbering the matrices even
+ * have got a block lower left matrix structure, i.e. the matrices are
+ * empty above the diagonal blocks.
  *
- * For all matrices that are empty above and below the diagonal
- * blocks (i.e. for all block diagonal matrices) the #BlockJacobi# preconditioner
- * is a direct solver. For all matrices that are empty only above the diagonal blocks
- * (e.g. the matrices one gets by the DG method with downstream numbering)
- * #BlockSOR# is a direct solver.
+ * For all matrices that are empty above and below the diagonal blocks
+ * (i.e. for all block diagonal matrices) the @p{BlockJacobi}
+ * preconditioner is a direct solver. For all matrices that are empty
+ * only above the diagonal blocks (e.g. the matrices one gets by the
+ * DG method with downstream numbering) @p{BlockSOR} is a direct
+ * solver.
  * 
- * This first implementation of the #PreconditionBlock# assumes the
- * matrix has blocks each of the same block size. Varying
- * block sizes within the matrix must still be implemented if needed.
+ * This first implementation of the @p{PreconditionBlock} assumes the
+ * matrix has blocks each of the same block size. Varying block sizes
+ * within the matrix must still be implemented if needed.
  *
- * The first template parameter denotes the type of number representation in
- * the sparse matrix, the second denotes the type of number representation in
- * which the inverted diagonal block matrices are stored within this class
- * by #invert_diagblocks()#. If you don't want to use the block inversion as
- * an exact solver, but rather as a preconditioner, you may probably want to
- * store the inverted blocks with less accuracy than the original matrix;
- * for example, #number==double, inverse_type=float# might be a viable choice.
+ * The first template parameter denotes the type of number
+ * representation in the sparse matrix, the second denotes the type of
+ * number representation in which the inverted diagonal block matrices
+ * are stored within this class by @p{invert_diagblocks()}. If you
+ * don't want to use the block inversion as an exact solver, but
+ * rather as a preconditioner, you may probably want to store the
+ * inverted blocks with less accuracy than the original matrix; for
+ * example, @p{number==double, inverse_type=float} might be a viable
+ * choice.
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -97,11 +101,11 @@ class PreconditionBlock: public Subscriptor
 		     const unsigned int block_size);
 
 				     /**
-				      * Deletes the inverse diagonal block
-				      * matrices if existent, sets the
-				      * blocksize to 0, hence leaves the
-				      * class in the state that it had 
-				      * directly after
+				      * Deletes the inverse diagonal
+				      * block matrices if existent,
+				      * sets the blocksize to 0, hence
+				      * leaves the class in the state
+				      * that it had directly after
 				      * calling the constructor.
 				      */
     virtual void clear();
@@ -122,28 +126,31 @@ class PreconditionBlock: public Subscriptor
     void set_same_diagonal ();
     
     				     /**
-				      * Stores the inverse of
-				      * the diagonal blocks
-				      * in #inverse#. This costs some 
+				      * Stores the inverse of the
+				      * diagonal blocks in
+				      * @p{inverse}. This costs some
 				      * additional memory - for DG
-				      * methods about 1/3 (for double inverses) 
-				      * or 1/6 (for float inverses) of that
-				      * used for the matrix - but it
-				      * makes the preconditioning much faster.
+				      * methods about 1/3 (for double
+				      * inverses) or 1/6 (for float
+				      * inverses) of that used for the
+				      * matrix - but it makes the
+				      * preconditioning much faster.
 				      *
-				      * It is not allowed to call this function
-				      * twice (will produce an error) before
-				      * a call of #clear(..)#
-				      * because at the second time there already
+				      * It is not allowed to call this
+				      * function twice (will produce
+				      * an error) before a call of
+				      * @p{clear(...)}  because at the
+				      * second time there already
 				      * exist the inverse matrices.
 				      *
-				      * After this function is called, the
-				      * lock on the matrix given through the
-				      * #use_matrix# function is released,
-				      * i.e. you may overwrite of delete it.
-				      * You may want to do this in case
-				      * you use this matrix to precondition
-				      * another matrix.
+				      * After this function is called,
+				      * the lock on the matrix given
+				      * through the @p{use_matrix}
+				      * function is released, i.e. you
+				      * may overwrite of delete it.
+				      * You may want to do this in
+				      * case you use this matrix to
+				      * precondition another matrix.
 				      */
     void invert_diagblocks();
 
@@ -188,37 +195,43 @@ class PreconditionBlock: public Subscriptor
    
   protected:
 				     /**
-				      * Access to the inverse diagonal blocks.
-				      * 
+				      * Access to the inverse diagonal
+				      * blocks.
 				      */
     const FullMatrix<inverse_type>& inverse (unsigned int i) const;
     
 				     /**
-				      * Size of the blocks. Each diagonal
-				      * block is assumed to be of the
-				      * same size.
+				      * Size of the blocks. Each
+				      * diagonal block is assumed to
+				      * be of the same size.
 				      */
     unsigned int blocksize;
 
 				     /**
-				      * Pointer to the matrix. Make sure that
-				      * the matrix exists as long as this class
-				      * needs it, i.e. until calling #invert_diagblocks#,
-				      * or (if the inverse matrices should not be
-				      * stored) until the last call of the 
-				      * preconditoining #vmult# function of the
+				      * Pointer to the matrix. Make
+				      * sure that the matrix exists as
+				      * long as this class needs it,
+				      * i.e. until calling
+				      * @p{invert_diagblocks}, or (if
+				      * the inverse matrices should
+				      * not be stored) until the last
+				      * call of the preconditoining
+				      * @p{vmult} function of the
 				      * derived classes.
 				      */
     SmartPointer<const SparseMatrix<number> > A;
 
   private:
 				     /**
-				      * Storage of the inverse matrices of
-				      * the diagonal blocks matrices as
-				      * #FullMatrix<inverse_type># matrices.
-				      * For BlockSOR as preconditioning
-				      * using #inverse_type=float# saves memory
-				      * in comparison with #inverse_type=double#.
+				      * Storage of the inverse
+				      * matrices of the diagonal
+				      * blocks matrices as
+				      * @p{FullMatrix<inverse_type>}
+				      * matrices.  For BlockSOR as
+				      * preconditioning using
+				      * @p{inverse_type=float} saves
+				      * memory in comparison with
+				      * @p{inverse_type=double}.
 				      */
     vector<FullMatrix<inverse_type> > _inverse;
 
@@ -230,32 +243,36 @@ class PreconditionBlock: public Subscriptor
 };
 
 
+
 /**
  * Block Jacobi preconditioning.
  */
-template<typename number,
-         typename inverse_type = number>
+template<typename number, typename inverse_type = number>
 class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
 {
   public:
 				     /**
-				      * Execute block Jacobi preconditioning.
+				      * Execute block Jacobi
+				      * preconditioning.
 				      *
-				      * This function will automatically use the
-				      * inverse matrices if they exist, if not
-				      * then BlockJacobi will need much time
-				      * inverting the diagonal block
-				      * matrices in each preconditioning step.
+				      * This function will
+				      * automatically use the inverse
+				      * matrices if they exist, if not
+				      * then BlockJacobi will need
+				      * much time inverting the
+				      * diagonal block matrices in
+				      * each preconditioning step.
 				      */
     template <typename number2>
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Same as #vmult#, since Jacobi is symmetric.
+				      * Same as @p{vmult}, since Jacobi is symmetric.
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 };
+
 
 
 /**
@@ -263,10 +280,9 @@ class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
  *
  * The diagonal blocks and the elements 
  * (of arbitray structure) below the diagonal blocks are used
- * in the #operator ()# function of this class.
+ * in the @p{operator ()} function of this class.
  */
-template<typename number,
-         typename inverse_type = number>
+template<typename number, typename inverse_type = number>
 class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
 {
   public:
@@ -287,16 +303,19 @@ class PreconditionBlockSOR : public PreconditionBlock<number,inverse_type>
     void set_omega(number omega);
     
 				     /**
-				      * Execute block SOR preconditioning.
+				      * Execute block SOR
+				      * preconditioning.
 				      *
-				      * This function will automatically use the
-				      * inverse matrices if they exist, if not
-				      * then BlockSOR will waste much time
-				      * inverting the diagonal block
-				      * matrices in each preconditioning step.
+				      * This function will
+				      * automatically use the inverse
+				      * matrices if they exist, if not
+				      * then BlockSOR will waste much
+				      * time inverting the diagonal
+				      * block matrices in each
+				      * preconditioning step.
 				      *
-				      * For matrices which are
-				      * empty above the diagonal blocks
+				      * For matrices which are empty
+				      * above the diagonal blocks
 				      * BlockSOR is a direct solver.
 				      */
     template <typename number2>

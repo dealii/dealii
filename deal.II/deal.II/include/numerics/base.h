@@ -42,9 +42,9 @@ template <int dim> class Equation;
  * a display of concept how to work with deal.II.
  *
  *
- * \subsection{Assemblage}
+ * @sect3{Assemblage}
  *
- * The #assemble# member function does the assemblage of the system matrix and
+ * The @p{assemble} member function does the assemblage of the system matrix and
  * the given number of right hand sides. It does the following steps:
  * \begin{itemize}
  *   \item Initialize solution vector with zero entries.
@@ -60,33 +60,33 @@ template <int dim> class Equation;
  *     induced by hanging nodes.
  * \end{itemize}
  *
- * The #assemble# function needs an object describing the boundary of the domain,
+ * The @p{assemble} function needs an object describing the boundary of the domain,
  * since for higher order finite elements, we may be tempted to use curved faces
  * of cells for better approximation of the boundary. In this case, the
  * transformation from the unit cell to the real cell requires knowledge of
  * the exact boundary of the domain.
  * 
  *
- * \subsection{Solving}
+ * @sect3{Solving}
  *
- * Calling the #solve# function with a solver object, the system of equations
- * which results after having called the #assemble# function is solved. After
+ * Calling the @p{solve} function with a solver object, the system of equations
+ * which results after having called the @p{assemble} function is solved. After
  * this, the solution vector is distributed again, i.e. the constrained nodes
  * are given their correct values.
  *
  *
- * \subsection{Boundary conditions}
+ * @sect3{Boundary conditions}
  *
  * During assemblage of matrices and right hand side, use is made of dirichlet
- * boundary conditions (in short: bc) specified to the #assemble# function. You
- * can specify a list of pairs of boundary indicators (of type #unsigned char#;
+ * boundary conditions (in short: bc) specified to the @p{assemble} function. You
+ * can specify a list of pairs of boundary indicators (of type @p{unsigned char};
  * see the section in the documentation of the \Ref{Triangulation} class for more
  * details) and the according functions denoting the dirichlet boundary values
  * of the nodes on boundary faces with this boundary indicator.
  *
  * To actually apply the boundary conditions, use is made of the
- * #MatrixTools::apply_boundary_values# function and by interpolation of
- * the #boundary_values# using the #MatrixTool::interpolate_boundary_values#
+ * @p{MatrixTools::apply_boundary_values} function and by interpolation of
+ * the @p{boundary_values} using the @p{MatrixTool::interpolate_boundary_values}
  * function. See there for more information.
  *
  *
@@ -103,7 +103,7 @@ class ProblemBase
 				      *	values on this part of the boundary.
 				      *	Only one boundary function may be given
 				      *	for each boundary indicator, which is
-				      *	guaranteed by the #map# data type.
+				      *	guaranteed by the @p{map} data type.
 				      *	
 				      *	See the general documentation of this
 				      *	class for more detail.
@@ -175,27 +175,27 @@ class ProblemBase
     virtual void solve ();
 
 				     /**
-				      * Initialize the #DataOut# object with
+				      * Initialize the @p{DataOut} object with
 				      * the grid and DoF handler used for this
 				      * computation, as well as with the
 				      * solution. Overload this function if
 				      * you have multiple data sets to be
 				      * written, or alternativelt call this
 				      * function and attach the additional
-				      * vectors directly to the #DataOut#
+				      * vectors directly to the @p{DataOut}
 				      * object.
 				      *
 				      * The solution name are
 				      * derived by calling the virtual
-				      * function #get_solution_name#.
+				      * function @p{get_solution_name}.
 				      */
     virtual void fill_data (DataOut<dim> &) const;
 
 
 				     /**
 				      * Return the name of the solution as a
-				      * #string#. The default implementation
-				      * returns #"solution"#.
+				      * @p{string}. The default implementation
+				      * returns @p{"solution"}.
 				      * Overload this function, if you
 				      * want anything else.
 				      */

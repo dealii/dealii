@@ -62,15 +62,15 @@ template<typename number> class Vector;
  * function at one or several points.
  *
  * You will usually only overload those functions you need; the
- * functions returning several values at a time (#value_list#,
- * #vector_value_list#, and gradient analoga) will call those
- * returning only one value (#value#, #vector_value#, and gradient
+ * functions returning several values at a time (@p{value_list},
+ * @p{vector_value_list}, and gradient analoga) will call those
+ * returning only one value (@p{value}, @p{vector_value}, and gradient
  * analoga), while those ones will throw an exception when called but
  * not overloaded.
  *
  * Note however, that the functions returning all components of the
- * function at one or several points (i.e. #vector_value#,
- * #vector_value_list#), will not call the function returning one
+ * function at one or several points (i.e. @p{vector_value},
+ * @p{vector_value_list}), will not call the function returning one
  * component at one point repeatedly, once for each point and
  * component. The reason is efficiency: this would amount to too many
  * virtual function calls. If you have vector-valued functions, you
@@ -85,11 +85,11 @@ template<typename number> class Vector;
  *
  *
  * Support for time dependant functions can be found in the base
- * class #FunctionTime#.
+ * class @p{FunctionTime}.
  *
  * {\bf Note}: if the functions you are dealing with have sizes which
- * are a priori known (for example, #dim# elements), you might
- * consider using the #TensorFunction# class instead.
+ * are a priori known (for example, @p{dim} elements), you might
+ * consider using the @p{TensorFunction} class instead.
  *
  * @author Wolfgang Bangerth, 1998, 1999
  */
@@ -142,37 +142,37 @@ class Function : public FunctionTime,
 				      *
 				      * Be default, this function
 				      * repeatedly calls the other
-				      * #operator()# for each
+				      * @p{operator()} for each
 				      * component separately, to fill
 				      * the output array.
 				      *
-				      * #values# shall have the right
+				      * @p{values} shall have the right
 				      * size beforehand,
-				      * i.e. #n_components#.
+				      * i.e. @p{n_components}.
 				      */
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const;
     
 				     /**
-				      * Set #values# to the point
+				      * Set @p{values} to the point
 				      * values of the specified
 				      * component of the function at
-				      * the #points#.  It is assumed
-				      * that #values# already has the
+				      * the @p{points}.  It is assumed
+				      * that @p{values} already has the
 				      * right size, i.e.  the same
-				      * size as the #points# array.
+				      * size as the @p{points} array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<double>            &values,
 			     const unsigned int         component = 0) const;
 
 				     /**
-				      * Set #values# to the point
+				      * Set @p{values} to the point
 				      * values of the function at the
-				      * #points#.  It is assumed that
-				      * #values# already has the right
+				      * @p{points}.  It is assumed that
+				      * @p{values} already has the right
 				      * size, i.e.  the same size as
-				      * the #points# array, and that
+				      * the @p{points} array, and that
 				      * all elements be vectors with
 				      * the same number of components
 				      * as this function has.
@@ -197,28 +197,28 @@ class Function : public FunctionTime,
 					   vector<Tensor<1,dim> > &gradients) const;
     
 				     /**
-				      * Set #gradients# to the
+				      * Set @p{gradients} to the
 				      * gradients of the specified
 				      * component of the function at
-				      * the #points#.  It is assumed
-				      * that #gradients# already has the
+				      * the @p{points}.  It is assumed
+				      * that @p{gradients} already has the
 				      * right size, i.e.  the same
-				      * size as the #points# array.
+				      * size as the @p{points} array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<1,dim> >    &gradients,
 				const unsigned int         component = 0) const;
     
 				     /**
-				      * Set #gradients# to the gradients of
-				      * the function at the #points#,
+				      * Set @p{gradients} to the gradients of
+				      * the function at the @p{points},
 				      * for all components.
-				      * It is assumed that #gradients# 
+				      * It is assumed that @p{gradients} 
 				      * already has the right size, i.e.
-				      * the same size as the #points# array.
+				      * the same size as the @p{points} array.
 				      *
 				      * The outer loop over
-				      * #gradients# is over the points
+				      * @p{gradients} is over the points
 				      * in the list, the inner loop
 				      * over the different components
 				      * of the function.
@@ -228,15 +228,15 @@ class Function : public FunctionTime,
 
 				     /**
 				      * Compute the Laplacian of a
-				      * given component at point #p#.
+				      * given component at point @p{p}.
 				      */
     virtual double laplacian (const Point<dim>   &p,
 			      const unsigned int  component = 0) const;
 
 				     /**
 				      * Compute the Laplacian of all
-				      * components at point #p# and
-				      * store them in #values#.
+				      * components at point @p{p} and
+				      * store them in @p{values}.
 				      */
     virtual void vector_laplacian (const Point<dim>   &p,
 				     Vector<double>     &values) const;
@@ -303,12 +303,12 @@ class ZeroFunction : public Function<dim>
 				 Vector<double>   &return_value) const;
 
 				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#,
+				      * Set @p{values} to the point values
+				      * of the function at the @p{points},
 				      * for the given component.
-				      * It is assumed that #values#
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points#
+				      * the same size as the @p{points}
 				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
@@ -316,12 +316,12 @@ class ZeroFunction : public Function<dim>
 			     const unsigned int         component = 0) const;
 
 				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#,
+				      * Set @p{values} to the point values
+				      * of the function at the @p{points},
 				      * for all components.
-				      * It is assumed that #values#
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points#
+				      * the same size as the @p{points}
 				      * array.
 				      */
     virtual void vector_value_list (const vector<Point<dim> > &points,
@@ -345,27 +345,27 @@ class ZeroFunction : public Function<dim>
 					   vector<Tensor<1,dim> > &gradients) const;
     
 				     /**
-				      * Set #gradients# to the gradients of
-				      * the function at the #points#,
+				      * Set @p{gradients} to the gradients of
+				      * the function at the @p{points},
 				      * for the given component.
-				      * It is assumed that #values#
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points# array.
+				      * the same size as the @p{points} array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<1,dim> >    &gradients,
 				const unsigned int         component = 0) const;
     
 				     /**
-				      * Set #gradients# to the gradients of
-				      * the function at the #points#,
+				      * Set @p{gradients} to the gradients of
+				      * the function at the @p{points},
 				      * for all components.
-				      * It is assumed that #gradients# 
+				      * It is assumed that @p{gradients} 
 				      * already has the right size, i.e.
-				      * the same size as the #points# array.
+				      * the same size as the @p{points} array.
 				      *
 				      * The outer loop over
-				      * #gradients# is over the points
+				      * @p{gradients} is over the points
 				      * in the list, the inner loop
 				      * over the different components
 				      * of the function.
@@ -379,12 +379,12 @@ class ZeroFunction : public Function<dim>
  * Provide a function which always returns a constant value, which is
  * delivered upon construction. Obviously, the derivates of this
  * function are zero, which is why we derive this class from
- * #ZeroFunction#: we then only have to overload th value functions,
+ * @p{ZeroFunction}: we then only have to overload th value functions,
  * not all the derivatives. In some way, it would be more obvious to
  * do the derivation in the opposite direction, i.e. let
- * #ZeroFunction# be a more specialized version of #ConstantFunction#;
+ * @p{ZeroFunction} be a more specialized version of @p{ConstantFunction};
  * however, this would be more inefficient, since we could not make
- * use of the fact that the function value of the #ZeroFunction# is
+ * use of the fact that the function value of the @p{ZeroFunction} is
  * known at compile time and need not be looked up somewhere in
  * memory.
  *
@@ -431,12 +431,12 @@ class ConstantFunction : public ZeroFunction<dim>
 				 Vector<double>   &return_value) const;
 
 				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#,
+				      * Set @p{values} to the point values
+				      * of the function at the @p{points},
 				      * for the given component.
-				      * It is assumed that #values#
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points#
+				      * the same size as the @p{points}
 				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
@@ -444,12 +444,12 @@ class ConstantFunction : public ZeroFunction<dim>
 			     const unsigned int         component = 0) const;
 
 				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#,
+				      * Set @p{values} to the point values
+				      * of the function at the @p{points},
 				      * for all components.
-				      * It is assumed that #values#
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points#
+				      * the same size as the @p{points}
 				      * array.
 				      */
     virtual void vector_value_list (const vector<Point<dim> > &points,
@@ -494,12 +494,12 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				 Vector<double>   &return_value) const;
 
 				     /**
-				      * Set #values# to the point values
-				      * of the function at the #points#,
+				      * Set @p{values} to the point values
+				      * of the function at the @p{points},
 				      * for all components.
-				      * It is assumed that #values#
+				      * It is assumed that @p{values}
 				      * already has the right size, i.e.
-				      * the same size as the #points#
+				      * the same size as the @p{points}
 				      * array.
 				      */
     virtual void vector_value_list (const vector<Point<dim> > &points,

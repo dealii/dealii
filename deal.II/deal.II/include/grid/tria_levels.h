@@ -36,7 +36,7 @@ class TriangulationLevel;
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
- *  In #TriangulationLevel<0># all data is stored which is not
+ *  In @p{TriangulationLevel<0>} all data is stored which is not
  *  dependant on the dimension, e.g. a field to store the
  *  refinement flag for the cells (what a cell actually is
  *  is declared elsewhere), etc. Actually, it is only cell-based
@@ -63,8 +63,8 @@ class TriangulationLevel<0> {
 				      *  vector depends on the dimension: in
 				      *  one dimension, the length of this
 				      *  vector equals the length of the
-				      *  #lines# vector, in two dimensions
-				      *  that of the #quads# vector, etc.
+				      *  @p{lines} vector, in two dimensions
+				      *  that of the @p{quads} vector, etc.
 				      */
     vector<bool> refine_flags;
 
@@ -78,26 +78,26 @@ class TriangulationLevel<0> {
 				     /**
 				      *  Levels and indices of the neighbors
 				      *  of the cells. Convention is, that the
-				      *  neighbors of the cell with index #i#
+				      *  neighbors of the cell with index @p{i}
 				      *  are stored in the fields following
 				      *  $i*(2*real_space_dimension)$, e.g. in
 				      *  one spatial dimension, the neighbors
-				      *  of cell 0 are stored in #neighbors[0]#
-				      *  and #neighbors[1]#, the neighbors of
-				      *  cell 1 are stored in #neighbors[2]#
-				      *  and #neighbors[3]#, and so on.
+				      *  of cell 0 are stored in @p{neighbors[0]}
+				      *  and @p{neighbors[1]}, the neighbors of
+				      *  cell 1 are stored in @p{neighbors[2]}
+				      *  and @p{neighbors[3]}, and so on.
 				      *
-				      *  In neighbors, #neighbors[i].first# is
-				      *  the level, while #neighbors[i].first#
+				      *  In neighbors, @p{neighbors[i].first} is
+				      *  the level, while @p{neighbors[i].first}
 				      *  is the index of the neighbor.
 				      *
 				      *  If a neighbor does not exist (cell is
-				      *  at the boundary), #level=index=-1#
+				      *  at the boundary), @p{level=index=-1}
 				      *  is set.
 				      *
-				      *  {\bf Conventions:} The #i#th neighbor
+				      *  {\bf Conventions:} The @p{i}th neighbor
 				      *  of a cell is the one which shares
-				      *  the #i#th face (#Line# in 2D, #Quad#
+				      *  the @p{i}th face (@p{Line} in 2D, @p{Quad}
 				      *  in 3D) of this cell.
 				      *
 				      *  The neighbor of a cell has at most the
@@ -127,13 +127,13 @@ class TriangulationLevel<0> {
     
 				     /**
 				      *  Reserve enough space to accomodate
-				      *  #total_cells# cells on this level.
-				      *  Since there are no #used# flags on this
+				      *  @p{total_cells} cells on this level.
+				      *  Since there are no @p{used} flags on this
 				      *  level, you have to give to total number
 				      *  of cells, not only the number of newly
 				      *  to accomodate ones, like in the
-				      *  #TriangulationLevel<N>::reserve_space#
-				      *  functions, with #N>0#.
+				      *  @p{TriangulationLevel<N>::reserve_space}
+				      *  functions, with @p{N>0}.
 				      *
 				      *  Since the
 				      *  number of neighbors per cell depends
@@ -146,10 +146,10 @@ class TriangulationLevel<0> {
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag #DEBUG#
+				      *  called with the prepro flag @p{DEBUG}
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  #TriangulationLevel# classes.
+				      *  @p{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 
@@ -180,7 +180,7 @@ class TriangulationLevel<0> {
  *  
  *  In one dimension, this is a list of the lines associated with this level,
  *  as well as a list with the indices of the children of these lines.
- *  The #TriangulationsLevel# objects of higher dimensions are derived from
+ *  The @p{TriangulationsLevel} objects of higher dimensions are derived from
  *  this one.
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
@@ -220,22 +220,22 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 					  *  stored in this list. A line is
 					  *  called active if it has no
 					  *  children. The function
-					  *  #TriaIterator::active()#
+					  *  @p{TriaIterator::active()}
 					  *  tests for this.
 					  */
 	vector<int>  children;
 	
 					 /**
 					  *  Vector storing whether a line is
-					  *  used in the #lines# vector.
+					  *  used in the @p{lines} vector.
 					  *
 					  *  Since it is difficult to delete
-					  *  elements in a #vector#, when an
+					  *  elements in a @p{vector}, when an
 					  *  element is not needed any more
 					  *  (e.g. after derefinement), it is
 					  *  not deleted from the list, but
-					  *  rather the according #used# flag
-					  *  is set to #false#.
+					  *  rather the according @p{used} flag
+					  *  is set to @p{false}.
 					  */
 	vector<bool> used;
 
@@ -248,7 +248,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 					  *  already been processed.
 					  *
 					  *  You can clear all used flags using
-					  *  #Triangulation<>::clear_user_flags()#.
+					  *  @p{Triangulation<>::clear_user_flags()}.
 					  */
 	vector<bool> user_flags;
 
@@ -292,9 +292,9 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 
     				     /**
 				      *  Assert that enough space is allocated
-				      *  to accomodate #new_lines# new lines.
+				      *  to accomodate @p{new_lines} new lines.
 				      *  This function does not only call
-				      *  #vector::reserve()#, but does really
+				      *  @p{vector::reserve()}, but does really
 				      *  append the needed elements.
 				      *  There are pendants for higher
 				      *  dimensions, which you have to call
@@ -303,7 +303,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 				      *  between the number of new quads and
 				      *  the number of new lines, etc.). Also
 				      *  don't forget to call the
-				      *  #TriangulationLevel<0>::reserve_space#
+				      *  @p{TriangulationLevel<0>::reserve_space}
 				      *  function.
 				      */
     void reserve_space (const unsigned int new_lines);
@@ -311,10 +311,10 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag #DEBUG#
+				      *  called with the prepro flag @p{DEBUG}
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  #TriangulationLevel# classes.
+				      *  @p{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 };
@@ -328,7 +328,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0> {
  *  information about the children of these lines and quads.
  *
  *  The vector of lines and their children is derived from
- *  #TriangulationLevel<1>#.
+ *  @p{TriangulationLevel<1>}.
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
  *  @author Wolfgang Bangerth, 1998
@@ -342,16 +342,16 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *  level.
 				      *
 				      *  It is fully analogous to the
-				      *  #LinesData# structure inherited from
-				      *  #Triangulation<1>#.
+				      *  @p{LinesData} structure inherited from
+				      *  @p{Triangulation<1>}.
 				      */
     struct QuadsData {
 					 /**
-					  *  Same as for the #lines# array.
+					  *  Same as for the @p{lines} array.
 					  */
 	vector<Quad> quads;
 					 /**
-					  *  Same as for the #LineData::chilren#
+					  *  Same as for the @p{LineData::chilren}
 					  *  array, but since there are four
 					  *  children, the index points to the
 					  *  first while the other three are
@@ -360,12 +360,12 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 	vector<int>  children;
 
 					 /**
-					  *  Same as for #LineData::used#.
+					  *  Same as for @p{LineData::used}.
 					  */
 	vector<bool> used;
 
 					 /**
-					  *  Same as for #LineData::used#.
+					  *  Same as for @p{LineData::used}.
 					  */
 	vector<bool> user_flags;
 
@@ -410,17 +410,17 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 
     				     /**
 				      *  Assert that enough space is allocated
-				      *  to accomodate #new_quads# new quads.
+				      *  to accomodate @p{new_quads} new quads.
 				      */
     void reserve_space (const unsigned int new_quads);
 
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag #DEBUG#
+				      *  called with the prepro flag @p{DEBUG}
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  #TriangulationLevel# classes.
+				      *  @p{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 };
@@ -434,7 +434,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
  *  information about the children of these lines, quads and hexs.
  *
  *  The vectors of lines and quads and their children are derived from
- *  #TriangulationLevel<2>#.
+ *  @p{TriangulationLevel<2>}.
  *
  *  @memo Information belonging to one level of the multilevel hierarchy.
  *  @author Wolfgang Bangerth, 1998
@@ -448,16 +448,16 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  level.
 				      *
 				      *  It is fully analogous to the
-				      *  #LinesData# structure inherited from
-				      *  #Triangulation<1>#.
+				      *  @p{LinesData} structure inherited from
+				      *  @p{Triangulation<1>}.
 				      */
     struct HexesData {
 					 /**
-					  *  Same as for the #lines# array.
+					  *  Same as for the @p{lines} array.
 					  */
 	vector<Hexahedron> hexes;
 					 /**
-					  *  Same as for the #LineData::chilren#
+					  *  Same as for the @p{LineData::chilren}
 					  *  array, but since there are four
 					  *  children, the index points to the
 					  *  first while the other three are
@@ -466,12 +466,12 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 	vector<int>  children;
 
 					 /**
-					  *  Same as for #LineData::used#.
+					  *  Same as for @p{LineData::used}.
 					  */
 	vector<bool> used;
 
 					 /**
-					  *  Same as for #LineData::used#.
+					  *  Same as for @p{LineData::used}.
 					  */
 	vector<bool> user_flags;
 
@@ -516,17 +516,17 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 
     				     /**
 				      *  Assert that enough space is allocated
-				      *  to accomodate #new_quads# new quads.
+				      *  to accomodate @p{new_quads} new quads.
 				      */
     void reserve_space (const unsigned int new_quads);
 
 				     /**
 				      *  Check the memory consistency of the
 				      *  different containers. Should only be
-				      *  called with the prepro flag #DEBUG#
+				      *  called with the prepro flag @p{DEBUG}
 				      *  set. The function should be called from
 				      *  the functions of the higher
-				      *  #TriangulationLevel# classes.
+				      *  @p{TriangulationLevel} classes.
 				      */
     void monitor_memory (const unsigned int true_dimension) const;
 };

@@ -24,7 +24,7 @@
 
 
 /**
- * Dimension independent data for finite elements. See the #FiniteElementBase#
+ * Dimension independent data for finite elements. See the @p{FiniteElementBase}
  * class for more information.
  */
 template<int dim>
@@ -116,7 +116,7 @@ class FiniteElementData
 				      * Default constructor. Constructs
 				      * an element
 				      * which is not so useful. Checking
-				      * #dofs_per_cell# is therefore a good way to
+				      * @p{dofs_per_cell} is therefore a good way to
 				      * check if something went wrong. 
 				      */
     FiniteElementData ();
@@ -159,42 +159,42 @@ class FiniteElementData
     virtual ~FiniteElementData ();
 
 				     /**
-				      * Return the #dofs_per_vertex#.
+				      * Return the @p{dofs_per_vertex}.
 				      */
     unsigned int n_dofs_per_vertex () const;
 
 				     /**
-				      * Return the #dofs_per_line#.
+				      * Return the @p{dofs_per_line}.
 				      */
     unsigned int n_dofs_per_line () const;
 
     				     /**
-				      * Return the #dofs_per_quad#.
+				      * Return the @p{dofs_per_quad}.
 				      */
     unsigned int n_dofs_per_quad () const;
 
     				     /**
-				      * Return the #dofs_per_hex#.
+				      * Return the @p{dofs_per_hex}.
 				      */
     unsigned int n_dofs_per_hex () const;
 
     				     /**
-				      * Return the #dofs_per_face#.
+				      * Return the @p{dofs_per_face}.
 				      */
     unsigned int n_dofs_per_face () const;
 
     				     /**
-				      * Return the #dofs_per_cell#.
+				      * Return the @p{dofs_per_cell}.
 				      */
     unsigned int n_dofs_per_cell () const;
 
     				     /**
-				      * Return the #components#.
+				      * Return the @p{components}.
 				      */
     unsigned int n_components () const;
 
     				     /**
-				      * Return the #transform_functions#.
+				      * Return the @p{transform_functions}.
 				      */
     unsigned int n_transform_functions () const;
 
@@ -224,8 +224,8 @@ class FiniteElementData
  * of the actual type (linear, quadratic, etc).
  *
  * The implementation of this base class is split into two parts: those fields
- * which are not common to all dimensions (#dofs_per_quad# for example are only
- * useful for #dim>=2#) are put into the #FiniteElementData<dim># class which
+ * which are not common to all dimensions (@p{dofs_per_quad} for example are only
+ * useful for @p{dim>=2}) are put into the @p{FiniteElementData<dim>} class which
  * is explicitely specialized for all used dimensions, while those fields which
  * may be formulated in a dimension-independent way are put into the present
  * class.
@@ -254,7 +254,7 @@ class FiniteElementBase : public Subscriptor,
 				      * Return a readonly reference to the
 				      * matrix which describes the transfer of a
 				      * child with the given number to the
-				      * mother cell. See the #restriction# array
+				      * mother cell. See the @p{restriction} array
 				      * for more information.
 				      */
     const FullMatrix<double> & restrict (const unsigned int child) const;
@@ -290,8 +290,8 @@ class FiniteElementBase : public Subscriptor,
 				      * Since this function is not that important,
 				      * we avoid an implementational question
 				      * about comparing arrays and do not compare
-				      * the matrix arrays #restriction# and
-				      * #prolongation#.
+				      * the matrix arrays @p{restriction} and
+				      * @p{prolongation}.
 				      */
     bool operator == (const FiniteElementBase<dim> &) const;
 
@@ -333,7 +333,7 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * This table converts a
 				      * component number to the
-				      * #base_element# number. While
+				      * @p{base_element} number. While
 				      * component information contains
 				      * multiplicity of base elements,
 				      * the result allows access to
@@ -343,7 +343,7 @@ class FiniteElementBase : public Subscriptor,
     unsigned int component_to_base(unsigned int index) const;
 
 				     /**
-				      * Access the #restriction_is_additive_flag#
+				      * Access the @p{restriction_is_additive_flag}
 				      * field. See there for more information on 
 				      * its contents.
 				      */
@@ -364,9 +364,9 @@ class FiniteElementBase : public Subscriptor,
     
   protected:
 				     /**
-				      * Have #N=2^dim# matrices keeping the
+				      * Have @p{N=2^dim} matrices keeping the
 				      * restriction constants for the transfer
-				      * of the #i#th child to the mother cell.
+				      * of the @p{i}th child to the mother cell.
 				      * The numbering conventions for the
 				      * degree of freedom indices are descibed
 				      * in the derived classes.
@@ -390,7 +390,7 @@ class FiniteElementBase : public Subscriptor,
 				      * the respective restriction matrix and
 				      * clobber these contributions together.
 				      * However, you must take care not to
-				      * #add# these together, since nodes which
+				      * @p{add} these together, since nodes which
 				      * belong to more than one child would then
 				      * be counted more than once; rather, you
 				      * have to overwrite the nonzero
@@ -452,7 +452,7 @@ class FiniteElementBase : public Subscriptor,
 				      * 
 				      * At least for the first case
 				      * (the DG(r) elements), the
-				      * #restriction_is_additive_flags# was
+				      * @p{restriction_is_additive_flags} was
 				      * introduced, see there for more
 				      * information. For the latter
 				      * case, NO SOLUTION HAS BEEN
@@ -460,8 +460,8 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * To compute the interpolation of a
 				      * finite element field to a cell, you
-				      * may use the #get_interpolated_dof_values#
-				      * function of the #DoFCellAccessor# class.
+				      * may use the @p{get_interpolated_dof_values}
+				      * function of the @p{DoFCellAccessor} class.
 				      * See there for more information.
 				      *
 				      * Upon assembling the transfer matrix
@@ -477,9 +477,9 @@ class FiniteElementBase : public Subscriptor,
 #endif
 
     				     /**
-				      * Have #N=2^dim# matrices keeping the
+				      * Have @p{N=2^dim} matrices keeping the
 				      * prolongation constants for the transfer
-				      * of the mother cell to the #i#th child.
+				      * of the mother cell to the @p{i}th child.
 				      * The numbering conventions for the
 				      * degree of freedom indices are descibed
 				      * in the derived classes.
@@ -487,11 +487,11 @@ class FiniteElementBase : public Subscriptor,
 				      * to the destination cell, i.e. the
 				      * refined one, while the column indices
 				      * are for the unrefined cell's degrees of
-				      * freedom. Thus, if #u0# is the vector
+				      * freedom. Thus, if @p{u0} is the vector
 				      * of values of degrees of freedom on the
-				      * coarse cell, #prolongation[i]*u0#
+				      * coarse cell, @p{prolongation[i]*u0}
 				      * yields the vector of values of the
-				      * degrees of freedom on the #i#th child
+				      * degrees of freedom on the @p{i}th child
 				      * cell.
 				      *
 				      * On the other hand, for finite elements
@@ -565,7 +565,7 @@ class FiniteElementBase : public Subscriptor,
 				      *
 				      * This table converts a
 				      * component number to the
-				      * #base_element# number. While
+				      * @p{base_element} number. While
 				      * component information contains
 				      * multiplicity of base elements,
 				      * the result allows access to
@@ -713,17 +713,17 @@ class FiniteElementBase : public Subscriptor,
 				      * hard coded and the summation
 				      * over all child cells is
 				      * switched on by setting the
-				      * #restriction_is_additive_flags#
-				      * to #true#.
+				      * @p{restriction_is_additive_flags}
+				      * to @p{true}.
 				      *
 				      * Given these notes, the flag
 				      * under consideration has to be
-				      * set to #false# for the usual
+				      * set to @p{false} for the usual
 				      * continuous Lagrange elements,
-				      * and #true# for the other cases
+				      * and @p{true} for the other cases
 				      * mentioned above. The main
 				      * function where it is used is
-				      * #DoFAccessor::get_interpolated_dof_values#.
+				      * @p{DoFAccessor::get_interpolated_dof_values}.
 				      * There is one flag per
 				      * component.
 				      */
@@ -735,7 +735,7 @@ class FiniteElementBase : public Subscriptor,
 
 /**
  * Finite Element in any dimension. This class declares the
- * functionality to fill the fields of the #FiniteElementBase#
+ * functionality to fill the fields of the @p{FiniteElementBase}
  * class. Since this is something that depends on the actual finite
  * element, the functions are declared virtual if it is not possible
  * to provide a reasonable standard implementation. Note that you will
@@ -743,26 +743,26 @@ class FiniteElementBase : public Subscriptor,
  * programs, as you will normally be interested in the values and
  * derivatives of shape functions on cells in physical space, rather
  * than on the unit cell. In that case, you will have to use the
- * #FEValues# class and its siblings.
+ * @p{FEValues} class and its siblings.
  *
  *
- * \subsection{Finite elements in one dimension}
+ * @sect3{Finite elements in one dimension}
  *
- * Finite elements in one dimension need only set the #restriction# and
- * #prolongation# matrices in #FiniteElementBase<1>#. The constructor of
- * this class in one dimension presets the #interface_constraints# matrix
+ * Finite elements in one dimension need only set the @p{restriction} and
+ * @p{prolongation} matrices in @p{FiniteElementBase<1>}. The constructor of
+ * this class in one dimension presets the @p{interface_constraints} matrix
  * by the unit matrix with dimension one. Changing this behaviour in
  * derived classes is generally not a reasonable idea and you risk getting
  * in terrible trouble.
  * 
  * 
- * \subsection{Finite elements in two dimensions}
+ * @sect3{Finite elements in two dimensions}
  * 
  * In addition to the fields already present in 1D, a constraint matrix
  * is needed in case two quads meet at a common line of which one is refined
  * once more than the other one. Then there are constraints referring to the
  * hanging nodes on that side of the line which is refined. These constraints
- * are represented by a $m\times n$-matrix #interface_constraints#, where $n$ is the
+ * are represented by a $m\times n$-matrix @p{interface_constraints}, where $n$ is the
  * number of degrees of freedom on the refined side (those dofs on the middle
  * vertex plus those on the two lines), and $m$ is that of the unrefined side
  * (those dofs on the two vertices plus those on the line). The matrix is thus
@@ -788,7 +788,7 @@ class FiniteElementBase : public Subscriptor,
  * at the time of this writing whether this is a constraint itself.
  *
  *
- * \subsection{Finite elements in three dimensions}
+ * @sect3{Finite elements in three dimensions}
  *
  * For the interface constraints, almost the same holds as for the 2D case.
  * The numbering for the indices $m$ on the mother face is obvious and keeps
@@ -842,7 +842,7 @@ class FiniteElementBase : public Subscriptor,
  *
  * The faces of a hexahedron are arranged in a way such that
  * some must be viewed from the inside and some from the outside of the cell to
- * show this order; refer to the documentation of the #Triangulation# class for
+ * show this order; refer to the documentation of the @p{Triangulation} class for
  * the definition of this.
  *
  * If of the cells adjacent to one line more than one is refined and there is
@@ -859,12 +859,12 @@ class FiniteElementBase : public Subscriptor,
  * degrees of freedom on a face.
  *
  * Since the handling of constraints on degrees of freedom is mostly done
- * by the #ConstraintMatrix# class, this class checks whether the constraints
+ * by the @p{ConstraintMatrix} class, this class checks whether the constraints
  * introduced from the two sides are unique; it is able to handle the fact
  * that the constraints for some of the dofs are entered more than once.
  *
  *
- * \subsection{Notes on three space dimensions}
+ * @sect3{Notes on three space dimensions}
  *
  * In three space dimensions, using locally refined elements involves
  * a difficulty not found in one or two spatial dimensions: the common
@@ -931,7 +931,7 @@ class FiniteElementBase : public Subscriptor,
  *
  * A second, but related problem comes into play when trying to
  * compute integrals over faces which are refined from one side. For
- * this problem, the #FESubfaceValues# class exists, and it evaluates
+ * this problem, the @p{FESubfaceValues} class exists, and it evaluates
  * certain functions of the finite element class involving the
  * Jacobian determinant of the mapping of unit face to real face,
  * restricted to a subface, and the normal vectors to the subfaces. We
@@ -960,9 +960,9 @@ class FiniteElementBase : public Subscriptor,
  * Within this library, the present implementation uses the second way.
  *
  *
- * \subsection{Notes on extending the finite element library}
+ * @sect3{Notes on extending the finite element library}
  *
- * The #deal.II# library was mainly made to use lagrange elements of arbitrary
+ * The @p{deal.II} library was mainly made to use lagrange elements of arbitrary
  * order. For this reason, there may be places in the library where it uses
  * features of finite elements which may not be as general as desirable as may
  * be. Most of these restrictions don't come to mind and may cause problems
@@ -986,15 +986,15 @@ class FiniteElementBase : public Subscriptor,
  *   Both these assumptions are used when interpolation of a continuous
  *   function to the finite element space is applied. At present, only few
  *   places where this is used in the library come to mind to the author,
- *   namely the treating of boundary values in the #ProblemBase# class and
- *   the interpolation in the #VectorTools# collection. You should also
+ *   namely the treating of boundary values in the @p{ProblemBase} class and
+ *   the interpolation in the @p{VectorTools} collection. You should also
  *   look out for other places where explicit use of the support points is
  *   made if you want to use elements of other classes. A hint may be the
- *   use of the #get_support_points# and #get_face_support_points# functions
+ *   use of the @p{get_support_points} and @p{get_face_support_points} functions
  *   of this class.
  *
  *   This also is used in some sense in the
- *   #DoFHandler::distribute_cell_to_dof_vector# where it is assumed that
+ *   @p{DoFHandler::distribute_cell_to_dof_vector} where it is assumed that
  *   the degrees of freedom denote function values and not derivatives or
  *   the like.
  *
@@ -1004,13 +1004,13 @@ class FiniteElementBase : public Subscriptor,
  *   on the boundary face itself. For Lagrange elements this is true, but it
  *   may or may not be true in other cases.
  *
- *   This assumption is used in the #VectorTools::project_boundary_values#,
- *   #MatrixCreator::create_boundary_mass_matrix#,
- *   #DoFHandler::make_boundary_sparsity_pattern#,
- *   #DoFHandler::map_dof_to_boundary_indices# and may be a few other places.
- *   The places in the #DoFHandler# class are probably not that dangerous,
+ *   This assumption is used in the @p{VectorTools::project_boundary_values},
+ *   @p{MatrixCreator::create_boundary_mass_matrix},
+ *   @p{DoFHandler::make_boundary_sparsity_pattern},
+ *   @p{DoFHandler::map_dof_to_boundary_indices} and may be a few other places.
+ *   The places in the @p{DoFHandler} class are probably not that dangerous,
  *   since wrong results will most likely lead to internal errors through
- *   the #Assert# mechanism, but the first places will lead to undiscovered
+ *   the @p{Assert} mechanism, but the first places will lead to undiscovered
  *   errors if not thought of properly.
  *
  *   This assumption also comes into play when computing the constraints of
@@ -1019,7 +1019,7 @@ class FiniteElementBase : public Subscriptor,
  *   constrained nodes happens with the face nodes on the large call. If
  *   the assumption does not hold, then the distribution has to happen
  *   with all nodes on the small and the large cells. This is not
- *   implemented in the #DoFHandler# class as of now.
+ *   implemented in the @p{DoFHandler} class as of now.
  * \end{itemize}
  *
  * @author Wolfgang Bangerth, 1998
@@ -1042,17 +1042,17 @@ class FiniteElement : public FiniteElementBase<dim>
     virtual ~FiniteElement () {};
     
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at the point #p#.
-				      * #p# is a point on the reference element.
+				      * Return the value of the @p{i}th shape
+				      * function at the point @p{p}.
+				      * @p{p} is a point on the reference element.
 				      */
     virtual double shape_value (const unsigned int i,
 			        const Point<dim> &p) const = 0;
 
 				     /**
 				      * Return the gradient of the
-				      * #i#th shape function at the
-				      * point #p#.  #p# is a point on
+				      * @p{i}th shape function at the
+				      * point @p{p}.  @p{p} is a point on
 				      * the reference element, and
 				      * likewise the gradient is the
 				      * gradient on the unit cell with
@@ -1064,8 +1064,8 @@ class FiniteElement : public FiniteElementBase<dim>
 
 				     /**
 				      * Return the tensor of second
-				      * derivatives of the #i#th shape
-				      * function at point #p# on the
+				      * derivatives of the @p{i}th shape
+				      * function at point @p{p} on the
 				      * unit cell. The derivatives are
 				      * derivatives on the unit cell
 				      * with respect to unit cell
@@ -1075,7 +1075,7 @@ class FiniteElement : public FiniteElementBase<dim>
 					   const Point<dim>   &p) const = 0;
 
 				     /**
-				      * Return the value of the #i#th
+				      * Return the value of the @p{i}th
 				      * shape function of the
 				      * transformation mapping from
 				      * unit cell to real cell. For
@@ -1090,7 +1090,7 @@ class FiniteElement : public FiniteElementBase<dim>
 
 				     /**
 				      * Same as above: return gradient
-				      * of the #i#th shape function
+				      * of the @p{i}th shape function
 				      * for the mapping from unit to
 				      * real cell.
 				      */
@@ -1140,7 +1140,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * more complicated.
 				      *
 				      * The
-				      * #shape_values/grads_transform#
+				      * @p{shape_values/grads_transform}
 				      * arrays store the values and
 				      * gradients of the
 				      * transformation basis
@@ -1165,7 +1165,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * the correct values beforehand.
 				      *
 				      * This function is more or less an
-				      * interface to the #FEValues# class and
+				      * interface to the @p{FEValues} class and
 				      * should not be used by users unless
 				      * absolutely needed.
 				      */
@@ -1184,9 +1184,9 @@ class FiniteElement : public FiniteElementBase<dim>
 
 				     /**
 				      * Do the same thing that the other
-				      * #fill_fe_values# function does,
+				      * @p{fill_fe_values} function does,
 				      * exception that a face rather than
-				      * a cell is considered. The #face_no#
+				      * a cell is considered. The @p{face_no}
 				      * parameter denotes the number of the
 				      * face to the given cell to be
 				      * considered.
@@ -1195,14 +1195,14 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * formula are given on the unit face
 				      * which is a mannifold of dimension
 				      * one less than the dimension of the
-				      * cell. The #global_unit_points# 
+				      * cell. The @p{global_unit_points} 
 				      * denote the position of the unit points
 				      * on the selected face on the unit cell.
 				      * This additional information is passed
-				      * since the #FEFaceValues# class can
+				      * since the @p{FEFaceValues} class can
 				      * compute them once and for all,
 				      * eliminating the need to recompute it
-				      * each time #FEFaceValues::reinit# is
+				      * each time @p{FEFaceValues::reinit} is
 				      * called.
 				      *
 				      * The jacobian matrix is evaluated at
@@ -1222,13 +1222,13 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * along faces. Note that we here return
 				      * the inverse of the determinant of the
 				      * jacobi matrices as explained in the
-				      * documentation of the #FEValues# class.
+				      * documentation of the @p{FEValues} class.
 				      * 
 				      * The support points are the
 				      * off-points of those trial functions
 				      * located on the given face; this
 				      * information is taken over from the
-				      * #get_face_support_points# function.
+				      * @p{get_face_support_points} function.
 				      *
 				      * The order of trial functions is the
 				      * same as if it were a cell of dimension
@@ -1240,11 +1240,11 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * The same applies for the quadrature
 				      * points which also use the standard
 				      * direction of faces as laid down by
-				      * the #Triangulation# class.
+				      * the @p{Triangulation} class.
 				      *
 				      * There is a standard implementation for
 				      * dimensions greater than one. It
-				      * uses the #fill_fe_values()#
+				      * uses the @p{fill_fe_values()}
 				      * function to retrieve the wanted
 				      * information. Since this operation acts
 				      * only on unit faces and cells it does
@@ -1263,9 +1263,9 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * real face, the support points
 				      * and the outward normal vectors. For
 				      * these fields, there exist pure
-				      * virtual functions, #get_face_jacobians#,
-				      * #get_face_support_points# and
-				      * #get_normal_vectors#.
+				      * virtual functions, @p{get_face_jacobians},
+				      * @p{get_face_support_points} and
+				      * @p{get_normal_vectors}.
 				      *
 				      * Though there is a standard
 				      * implementation, there
@@ -1275,14 +1275,14 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Since any implementation for one
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
-				      * when called with #dim==1#.
+				      * when called with @p{dim==1}.
 				      *
 				      * The function assumes that the fields
 				      * already have the right number of
 				      * elements.
 				      *
 				      * This function is more or less an
-				      * interface to the #FEFaceValues# class
+				      * interface to the @p{FEFaceValues} class
 				      * and should not be used by users unless
 				      * absolutely needed.
 				      */
@@ -1312,24 +1312,24 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * element to a subface (the child of a
 				      * face) rather than to a face. The number
 				      * of the subface in the face is given by
-				      * the #subface_no# parameter. The meaning
+				      * the @p{subface_no} parameter. The meaning
 				      * of the other parameters is the same as
-				      * for the #fill_fe_face_values# function.
+				      * for the @p{fill_fe_face_values} function.
 				      *
 				      * Since the usage of support points on
 				      * subfaces is not useful, it is excluded
 				      * from the interface to this function.
 				      *
-				      * Like for the #fill_fe_face_values#
+				      * Like for the @p{fill_fe_face_values}
 				      * function, there is a default
 				      * implementation, using the
-				      * #fill_fe_values# function. There may
+				      * @p{fill_fe_values} function. There may
 				      * be better and more efficient solutions
 				      * for a special finite element, which is
 				      * why this function is made virtual.
 				      *
 				      * This function is more or less an
-				      * interface to the #FESubfaceValues# class
+				      * interface to the @p{FESubfaceValues} class
 				      * and should not be used by users unless
 				      * absolutely needed.
 				      */				       
@@ -1356,10 +1356,10 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * trial functions on the unit cell.
 				      *
 				      * The function assumes that the
-				      * #unit_points# array already has the
+				      * @p{unit_points} array already has the
 				      * right size. The order of points in
 				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function.
+				      * the @p{cell->get_dof_indices} function.
 				      *
 				      * For one space dimension there is a
 				      * standard implementation assuming
@@ -1376,20 +1376,20 @@ class FiniteElement : public FiniteElementBase<dim>
 				      *
 				      * This function implements a subset of
 				      * the information delivered by the
-				      * #fill_fe_values# function to the
-				      * #FEValues# class. However, since it
+				      * @p{fill_fe_values} function to the
+				      * @p{FEValues} class. However, since it
 				      * is useful to use information about
-				      * off-points without using #FEValues#
+				      * off-points without using @p{FEValues}
 				      * objects (e.g. in interpolating functions
 				      * to the finite element space), this
 				      * function is excluded from the
 				      * abovementioned one.
 				      *
 				      * The function assumes that the
-				      * #support_points# array already has the
+				      * @p{support_points} array already has the
 				      * right size. The order of points in
 				      * the array matches that returned by
-				      * the #cell->get_dof_indices# function.
+				      * the @p{cell->get_dof_indices} function.
 				      *
 				      * For one space dimension there is a
 				      * standard implementation assuming
@@ -1417,11 +1417,11 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * of the trial functions which are
 				      * located on the face, rather than of
 				      * all basis functions, which is done by
-				      * the #get_support_points# function.
+				      * the @p{get_support_points} function.
 				      *
 				      * This function produces a subset of
 				      * the information provided by the
-				      * #fill_fe_face_values()# function.
+				      * @p{fill_fe_face_values()} function.
 				      * However, you should not try
 				      * to implement this function using the
 				      * abovementioned function, since usually
@@ -1437,24 +1437,24 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * to interpolate boundary values to the
 				      * finite element functions. If integration
 				      * along faces is needed, we still need
-				      * the #fill_fe_face_values# function.
+				      * the @p{fill_fe_face_values} function.
 				      *
 				      * The function assumes that the
-				      * #support_points# array already has the
+				      * @p{support_points} array already has the
 				      * right size. The order of points in
 				      * the array matches that returned by
-				      * the #face->get_dof_indices# function.
+				      * the @p{face->get_dof_indices} function.
 				      *
 				      * Since any implementation for one
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
-				      * when called with #dim==1#.
+				      * when called with @p{dim==1}.
 				      *
 				      * Regarding information about the
 				      * boundary, which is necessary for
 				      * higher order transformations than
 				      * the usual (bi-, tri-)linear ones,
-				      * refer to the #get_support_points#
+				      * refer to the @p{get_support_points}
 				      * function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
@@ -1463,7 +1463,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				     /**
 				      * This is the second separated function
 				      * described in the documentation of the
-				      * #fill_fe_face_values# function. It
+				      * @p{fill_fe_face_values} function. It
 				      * returns the determinants of the
 				      * transformation from the unit face to the
 				      * real face at the
@@ -1471,13 +1471,13 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Since any implementation for one
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
-				      * when called with #dim==1#.
+				      * when called with @p{dim==1}.
 				      *
 				      * Regarding information about the
 				      * boundary, which is necessary for
 				      * higher order transformations than
 				      * the usual (bi-, tri-)linear ones,
-				      * refer to the #get_support_points#
+				      * refer to the @p{get_support_points}
 				      * function.
 				      */
     virtual void get_face_jacobians (const DoFHandler<dim>::face_iterator &face,
@@ -1488,8 +1488,8 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Does the same as the above function,
 				      * except that it computes the Jacobi
 				      * determinant of the transformation from
-				      * the unit face to the subface of #face#
-				      * with number #subface_no#.
+				      * the unit face to the subface of @p{face}
+				      * with number @p{subface_no}.
 				      *
 				      * The function needs not take special care
 				      * about boundary approximation, since it
@@ -1504,7 +1504,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				     /**
 				      * Compute the normal vectors to the cell
 				      * at the quadrature points. See the
-				      * documentation for the #fill_fe_face_values#
+				      * documentation for the @p{fill_fe_face_values}
 				      * function for more details. The function
 				      * must guarantee that the length of the
 				      * vectors be one.
@@ -1512,13 +1512,13 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Since any implementation for one
 				      * dimension would be senseless, all
 				      * derived classes should throw an error
-				      * when called with #dim==1#.
+				      * when called with @p{dim==1}.
 				      *
 				      * Regarding information about the
 				      * boundary, which is necessary for
 				      * higher order transformations than
 				      * the usual (bi-, tri-)linear ones,
-				      * refer to the #get_support_points#
+				      * refer to the @p{get_support_points}
 				      * function.
 				      */
     virtual void get_normal_vectors (const DoFHandler<dim>::cell_iterator &cell,
@@ -1529,7 +1529,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				     /**
 				      * Does the same as the above function,
 				      * except that it refers to the
-				      * subface #subface_no# of the given face.
+				      * subface @p{subface_no} of the given face.
 				      *
 				      * The function needs not take special care
 				      * about boundary approximation, since it
@@ -1549,7 +1549,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * quadrature, which may be done using
 				      * an equation object and an assembler,
 				      * as is done for the Laplace matrix
-				      * in the #MatrixTools# class for example.
+				      * in the @p{MatrixTools} class for example.
 				      *
 				      * The exact integration is possible since
 				      * an exact representation for the Jacobi
@@ -1595,16 +1595,16 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * documentation, but should check for
 				      * them in debug mode. For that purpose,
 				      * an exception with the longish name
-				      * #ExcJacobiDeterminantHasWrongSign#
+				      * @p{ExcJacobiDeterminantHasWrongSign}
 				      * is declared.
 				      *
-				      * The function takes a #DoFHandler#
+				      * The function takes a @p{DoFHandler}
 				      * iterator, which provides a superset
 				      * of information to the geometrical
 				      * information needed for the computations.
 				      * The additional data should not be
-				      * used, however a #DoFHandler# iterator
-				      * was preferred over a #Triangulation#
+				      * used, however a @p{DoFHandler} iterator
+				      * was preferred over a @p{Triangulation}
 				      * iterator since this is what usually
 				      * is available in places where this
 				      * function is called.
@@ -1625,7 +1625,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * of the matrix as well as for the
 				      * setting up using a script. For
 				      * example, the size of the generated
-				      * #C++# code for the local mass
+				      * @p{C++} code for the local mass
 				      * matrix in 3d is 4.383.656 bytes
 				      * already for the trilinear element.
 				      * Higher order elements would
@@ -1635,9 +1635,9 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * not to implement the functionality of
 				      * this function, that function is supposed
 				      * to throw an exception of class
-				      * #ExcComputationNotUseful# declared
+				      * @p{ExcComputationNotUseful} declared
 				      * in this class, for example through the
-				      * #AssertThrow# mechanism; you can catch
+				      * @p{AssertThrow} mechanism; you can catch
 				      * this exception and compute the mass matrix
 				      * by quadrature instead. Finite element
 				      * classes not implementing this function
@@ -1648,7 +1648,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * boundary, which is necessary for
 				      * higher order transformations than
 				      * the usual (bi-, tri-)linear ones,
-				      * refer to the #get_support_points#
+				      * refer to the @p{get_support_points}
 				      * function.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
@@ -1664,7 +1664,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				     /**
 				      * Access to base element
 				      * objects.  By default,
-				      * #base_element(0)# is #this#.
+				      * @p{base_element(0)} is @p{this}.
 				      * This function is overloaded by
 				      * system elements to allow
 				      * access to the different

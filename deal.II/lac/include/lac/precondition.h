@@ -60,9 +60,9 @@ class PreconditionIdentity
  * classes.
  *
  * It seems that all builtin preconditioners have a relaxation
- * parameter, so please use #PreconditionRelaxation# for these.
+ * parameter, so please use @p{PreconditionRelaxation} for these.
  *
- * \subsection{Use}
+ * @sect3{Use}
  * You will usually not want to create a named object of this type,
  * although possible. The most common use is like this:
  * \begin{verbatim}
@@ -74,8 +74,8 @@ class PreconditionIdentity
  *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi));
  * \end{verbatim}
  * This creates an unnamed object to be passed as the fourth parameter to
- * the solver function of the #SolverGMRES# class. It assumes that the
- * #SparseMatrix# class has a function #precondition_Jacobi# taking two
+ * the solver function of the @p{SolverGMRES} class. It assumes that the
+ * @p{SparseMatrix} class has a function @p{precondition_Jacobi} taking two
  * vectors (source and destination) as parameters. (Actually, there is no
  * function like that, the existing function takes a third parameter,
  * denoting the relaxation parameter; this example is therefore only meant to
@@ -258,8 +258,8 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
  * inverse of the matrix. Naturally, this solver needs another
  * preconditionig method.
  *
- * Usually, the use of #ReductionControl# is preferred over the use of
- * the basic #SolverControl# in defining this solver.
+ * Usually, the use of @p{ReductionControl} is preferred over the use of
+ * the basic @p{SolverControl} in defining this solver.
  *
  * @author Guido Kanschat, 1999
  */

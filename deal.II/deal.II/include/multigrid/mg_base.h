@@ -52,13 +52,13 @@ class MGLevelObject : public Subscriptor
 		      const unsigned int maxlevel = 0);
     
 				     /**
-				      * Access object on level #level#.
+				      * Access object on level @p{level}.
 				      */
     Object & operator[] (const unsigned int level);
     
 				     /**
 				      * Access object on level
-				      * #level#. Constant version.
+				      * @p{level}. Constant version.
 				      */
     const Object & operator[] (const unsigned int level) const;
 
@@ -66,24 +66,24 @@ class MGLevelObject : public Subscriptor
 				      * Delete all previous contents
 				      * of this object and reset its
 				      * size according to the values
-				      * of #new_minlevel# and
-				      * #new_maxlevel#.
+				      * of @p{new_minlevel} and
+				      * @p{new_maxlevel}.
 				      */
     void resize (const unsigned int new_minlevel,
 		 const unsigned int new_maxlevel);
     
 				     /**
-				      * Call #clear# on all objects
+				      * Call @p{clear} on all objects
 				      * stored by this object. This
 				      * function is only implemented
-				      * for some #Object# classes,
+				      * for some @p{Object} classes,
 				      * most notably for vectors and
 				      * matrices. Note that if
-				      * #Object==Vector<T>#, #clear#
+				      * @p{Object==Vector<T>}, @p{clear}
 				      * will set all entries to zero,
 				      * while if
-				      * #Object==std::vector<T>#,
-				      * #clear# deletes the elements
+				      * @p{Object==std::vector<T>},
+				      * @p{clear} deletes the elements
 				      * of the vectors. This class
 				      * might therefore not be useful
 				      * for STL vectors.
@@ -129,7 +129,7 @@ class MGCoarseGridSolver : public Subscriptor
 				      * This is only the interface for
 				      * a function defined in a derived
 				      * class like
-				      * #MGCoarseGridLACIteration#.
+				      * @p{MGCoarseGridLACIteration}.
 				      *
 				      * Note that the information
 				      * about the matrix is removed to
@@ -146,8 +146,8 @@ class MGCoarseGridSolver : public Subscriptor
  * This is a little wrapper, transforming a triplet of iterative
  * solver, matrix and preconditioner into a coarse grid solver.
  *
- * The type of the matrix (i.e. the template parameter #MATRIX#)
- * should be derived from #Subscriptor# to allow for the use of a
+ * The type of the matrix (i.e. the template parameter @p{MATRIX})
+ * should be derived from @p{Subscriptor} to allow for the use of a
  * smart pointer to it.
  *
  * @author Guido Kanschat, 1999
@@ -213,15 +213,15 @@ class MGTransferBase : public Subscriptor
 
 				     /**
 				      * Prolongate a vector from level
-				      * #to_level-1# to level
-				      * #to_level#. The previous
-				      * content of #dst# is
+				      * @p{to_level-1} to level
+				      * @p{to_level}. The previous
+				      * content of @p{dst} is
 				      * overwritten.
 				      *
-				      * #src# is assumed to be a vector with
+				      * @p{src} is assumed to be a vector with
 				      * as many elements as there are degrees
 				      * of freedom on the coarser level of
-				      * the two involved levels, while #src#
+				      * the two involved levels, while @p{src}
 				      * shall have as many elements as there
 				      * are degrees of freedom on the finer
 				      * level.
@@ -232,23 +232,23 @@ class MGTransferBase : public Subscriptor
 
 				     /**
 				      * Restrict a vector from level
-				      * #from_level# to level
-				      * #from_level-1# and add this
+				      * @p{from_level} to level
+				      * @p{from_level-1} and add this
 				      * restriction to
-				      * #dst#. Obviously, if the
+				      * @p{dst}. Obviously, if the
 				      * refined region on level
-				      * #from_level# is smaller than
-				      * that on level #from_level-1#,
+				      * @p{from_level} is smaller than
+				      * that on level @p{from_level-1},
 				      * some degrees of freedom in
-				      * #dst# are not covered and will
+				      * @p{dst} are not covered and will
 				      * not be altered. For the other
 				      * degress of freedom, the result
 				      * of the restriction is added.
 				      *
-				      * #src# is assumed to be a vector with
+				      * @p{src} is assumed to be a vector with
 				      * as many elements as there are degrees
 				      * of freedom on the finer level of
-				      * the two involved levels, while #src#
+				      * the two involved levels, while @p{src}
 				      * shall have as many elements as there
 				      * are degrees of freedom on the coarser
 				      * level.
@@ -270,10 +270,10 @@ class MGTransferBase : public Subscriptor
  * not sure that these restrictions on the class might cause numerical
  * inefficiencies.
  *
- * The function #precondition# is the actual multigrid method and
+ * The function @p{precondition} is the actual multigrid method and
  * makes use of several operations to be implemented in derived
- * classes. It takes a defect in #src# and the result is the multigrid
- * preconditioned defect in #dst#.
+ * classes. It takes a defect in @p{src} and the result is the multigrid
+ * preconditioned defect in @p{dst}.
  *
  * @author Guido Kanschat, 1999
  */
@@ -309,20 +309,20 @@ class MGBase : public Subscriptor
 				      * Execute one step of the
 				      * v-cycle algorithm.  This
 				      * function assumes, that the
-				      * vector #d# is properly filled
+				      * vector @p{d} is properly filled
 				      * with the residual in the outer
 				      * defect correction
 				      * scheme. After execution of
-				      * #vcycle()#, the result is in
-				      * the vector #s#. We propose to
-				      * write functions #copy_from_mg#
-				      * and #copy_to_mg# in derived
-				      * classes of #MGBase# to access
-				      * #d# and #s#.
+				      * @p{vcycle()}, the result is in
+				      * the vector @p{s}. We propose to
+				      * write functions @p{copy_from_mg}
+				      * and @p{copy_to_mg} in derived
+				      * classes of @p{MGBase} to access
+				      * @p{d} and @p{s}.
 				      *
 				      * The actual work for this
 				      * function is done in
-				      * #level_mgstep#.
+				      * @p{level_mgstep}.
 				      */
     void vcycle(const MGSmootherBase     &pre_smooth,
 		const MGSmootherBase     &post_smooth,
@@ -363,13 +363,13 @@ class MGBase : public Subscriptor
 
 				     /**
 				      * The actual v-cycle multigrid method.
-				      * #level# is the level the
+				      * @p{level} is the level the
 				      * function should work on. It
 				      * will usually be called for the
 				      * highest level from outside,
 				      * but will then call itself
-				      * recursively for #level-1#,
-				      * unless we are on #minlevel#
+				      * recursively for @p{level-1},
+				      * unless we are on @p{minlevel}
 				      * where instead of recursing
 				      * deeper, the coarse grid solver
 				      * is used to solve the matrix of
@@ -381,7 +381,7 @@ class MGBase : public Subscriptor
 		       const MGCoarseGridSolver &cgs);  
 
 				     /**
-				      * Apply negative #vmult# on all
+				      * Apply negative @p{vmult} on all
 				      * cells of a level.
 				      * This is implemented in a
 				      * derived class.
@@ -412,10 +412,10 @@ class MGBase : public Subscriptor
  * Here, we collect all information needed for multi-level preconditioning
  * and provide the standard interface for LAC iterative methods.
  *
- * The template parameter class #MG# is required to inherit #MGBase#.
- * Furthermore, it needs functions #void copy_to_mg(const VECTOR&)#
- * to store #src# in the right hand side of the multi-level method and
- * #void copy_from_mg(VECTOR&)# to store the result of the v-cycle in #dst#.
+ * The template parameter class @p{MG} is required to inherit @p{MGBase}.
+ * Furthermore, it needs functions @p{void copy_to_mg(const VECTOR&)}
+ * to store @p{src} in the right hand side of the multi-level method and
+ * @p{void copy_from_mg(VECTOR&)} to store the result of the v-cycle in @p{dst}.
  *
  * @author Guido Kanschat, 1999
  */
@@ -436,8 +436,8 @@ class PreconditionMG
     
 				     /**
 				      * Preconditioning operator,
-				      * calling the #vcycle# function
-				      * of the #MG# object passed to
+				      * calling the @p{vcycle} function
+				      * of the @p{MG} object passed to
 				      * the constructor.
 				      *
 				      * This is the operator used by

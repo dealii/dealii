@@ -24,8 +24,8 @@
  * in the decomposition that do not fit into the sparsity structure of this
  * object are discarded.
  *
- * The algorithm used by this class is as follows (indices run from #0#
- * to #N-1#):
+ * The algorithm used by this class is as follows (indices run from @p{0}
+ * to @p{N-1}):
  * \begin{verbatim}
  * copy original matrix into a[i,j]
  * 
@@ -41,37 +41,37 @@
  * \end{verbatim}
  * Using this algorithm, we store the decomposition as a sparse matrix, for
  * which the user has to give a sparsity pattern and which is why this
- * class is derived from the #SparseMatrix#. Since it is not a matrix in
- * the usual sense, the derivation is #protected# rather than #public#.
+ * class is derived from the @p{SparseMatrix}. Since it is not a matrix in
+ * the usual sense, the derivation is @p{protected} rather than @p{public}.
  *
  * Note that in the algorithm given, the lower left part of the matrix base
- * class is used to store the #L# part of the decomposition, while 
- * the upper right part is used to store #U#. The diagonal is used to
+ * class is used to store the @p{L} part of the decomposition, while 
+ * the upper right part is used to store @p{U}. The diagonal is used to
  * store the inverses of the diagonal elements of the decomposition; the
  * latter makes the application of the decomposition faster, since inversion
  * by the diagonal element has to be done only once, rather than at each
  * application (multiplication is much faster than division).
  *
  *
- * \subsection{Fill-in}
+ * @sect3{Fill-in}
  *
  * The sparse ILU is frequently used with additional fill-in, i.e. the
  * sparsity structure of the decomposition is denser than that of the matrix
- * to be decomposed. The #decompose# function of this class allows this fill-in
+ * to be decomposed. The @p{decompose} function of this class allows this fill-in
  * as long as all entries present in the original matrix are present in the
  * decomposition also, i.e. the sparsity pattern of the decomposition is a
  * superset of the sparsity pattern in the original matrix.
  *
  * Such fill-in can be accomplished by various ways, one of which is a
- * copy-constructor of the #SparsityPattern# class which allows the addition
+ * copy-constructor of the @p{SparsityPattern} class which allows the addition
  * of side-diagonals to a given sparsity structure.
  *
  *
- * \subsection{Use as a preconditioner}
+ * @sect3{Use as a preconditioner}
  *
  * If you want to use an object of this class as a preconditioner for another
  * matrix, you can do so by calling the solver function using the following
- * sequence, for example (#ilu_sparsity# is some sparsity pattern to be used
+ * sequence, for example (@p{ilu_sparsity} is some sparsity pattern to be used
  * for the decomposition, which you have to create beforehand):
  * \begin{verbatim}
  *   SparseILU<double> ilu (ilu_sparsity);
@@ -83,7 +83,7 @@
  * \end{verbatim}
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -113,7 +113,7 @@ class SparseILU : protected SparseMatrix<number>
 				      *
 				      * You have to initialize
 				      * the matrix before usage with
-				      * #reinit(SparsityPattern)#.
+				      * @p{reinit(SparsityPattern)}.
 				      */
     SparseILU ();
 
@@ -122,12 +122,12 @@ class SparseILU : protected SparseMatrix<number>
 				      * sparsity structure to represent the
 				      * sparsity pattern of this decomposition.
 				      * You can change the sparsity pattern later
-				      * on by calling the #reinit# function.
+				      * on by calling the @p{reinit} function.
 				      *
 				      * You have to make sure that the lifetime
 				      * of the sparsity structure is at least
 				      * as long as that of this object or as
-				      * long as #reinit# is not called with a
+				      * long as @p{reinit} is not called with a
 				      * new sparsity structure.
 				      */
     SparseILU (const SparsityPattern &sparsity);
@@ -135,7 +135,7 @@ class SparseILU : protected SparseMatrix<number>
 				     /**
 				      * Reinitialize the object but keep to
 				      * the sparsity pattern previously used.
-				      * This may be necessary if you #reinit#'d
+				      * This may be necessary if you @p{reinit}'d
 				      * the sparsity structure and want to
 				      * update the size of the matrix.
 				      *
@@ -189,7 +189,7 @@ class SparseILU : protected SparseMatrix<number>
 			      const Vector<somenumber> &src) const;
 
 				     /**
-				      * Same as #apply_decomposition#, format for LAC.
+				      * Same as @p{apply_decomposition}, format for LAC.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,

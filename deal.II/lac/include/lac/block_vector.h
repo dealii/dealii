@@ -24,15 +24,15 @@
 /**
  * Several vectors of data. 
  *
- * The BlockVector is a collection of normal LAC-#Vector#s. Each of
+ * The BlockVector is a collection of normal LAC-@p{Vector}s. Each of
  * the vectors inside can have a different size.
  *
- * The functionality of #BlockVector# includes everything a #Vector#
- * can do, plus the access to a single #Vector# inside the
- * #BlockVector# by #block(i)#.
+ * The functionality of @p{BlockVector} includes everything a @p{Vector}
+ * can do, plus the access to a single @p{Vector} inside the
+ * @p{BlockVector} by @p{block(i)}.
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -52,10 +52,10 @@ class BlockVector
 				     /**
 				      * Declare standard types used in
 				      * all containers. These types
-				      * parallel those in the #C++#
+				      * parallel those in the @p{C++}
 				      * standard libraries
-				      * #vector<...># class. The
-				      * #iterator# types are not
+				      * @p{vector<...>} class. The
+				      * @p{iterator} types are not
 				      * declared at present, since
 				      * there are no iterators
 				      * implemented that cycle through
@@ -89,7 +89,7 @@ class BlockVector
 // 				      * Copy constructor taking a BlockVector of
 // 				      * another data type. This will fail if
 // 				      * there is no conversion path from
-// 				      * #OtherNumber# to #Number#. Note that
+// 				      * @p{OtherNumber} to @p{Number}. Note that
 // 				      * you may lose accuracy when copying
 // 				      * to a BlockVector with data elements with
 // 				      * less accuracy.
@@ -99,7 +99,7 @@ class BlockVector
 //     BlockVector (const BlockVector<OtherNumber> &v);
     
 				     /**
-				      * Constructor. Set dimension to #n# and
+				      * Constructor. Set dimension to @p{n} and
 				      * initialize all elements with zero.
 				      */
     BlockVector (const vector<unsigned int> &n);
@@ -111,19 +111,19 @@ class BlockVector
 
 				     /**
 				      * Change the dimension of the vector to
-				      * #N#. The reserved memory for this vector
+				      * @p{N}. The reserved memory for this vector
 				      * remains unchanged if possible, to make
 				      * things faster, but this may waste some
 				      * memory, so take this in the back of your
 				      * head.
-				      * However, if #N==0# all memory is freed,
+				      * However, if @p{N==0} all memory is freed,
 				      * i.e. if you want to resize the vector
 				      * and release the memory not needed, you
-				      * have to first call #reinit(0)# and then
-				      * #reinit(N)#. This cited behaviour is
+				      * have to first call @p{reinit(0)} and then
+				      * @p{reinit(N)}. This cited behaviour is
 				      * analogous to that of the STL containers.
 				      *
-				      * On #fast==false#, the vector is filled by
+				      * On @p{fast==false}, the vector is filled by
 				      * zeros.
 				      */ 
     void reinit (const vector<unsigned int> &N,
@@ -131,29 +131,29 @@ class BlockVector
     
 				     /**
 				      * Change the dimension to that of the
-				      * vector #V#. The same applies as for
-				      * the other #reinit# function.
+				      * vector @p{V}. The same applies as for
+				      * the other @p{reinit} function.
 				      *
-				      * The elements of #V# are not copied, i.e.
+				      * The elements of @p{V} are not copied, i.e.
 				      * this function is the same as calling
-				      * #reinit (V.size(), fast)#.
+				      * @p{reinit (V.size(), fast)}.
 				      */
     void reinit (const BlockVector<n_blocks,Number> &V,
 		 const bool                          fast=false);
     
 				     /**
 				      * Set all entries to zero. Equivalent to
-				      * #v = 0#, but more obvious and faster.
+				      * @p{v = 0}, but more obvious and faster.
 				      * Note that this function does not change
 				      * the size of the vector, unlike the
-				      * STL's #vector<>::clear# function.
+				      * STL's @p{vector<>::clear} function.
 				      */
     void clear ();
     
 				     /**
 				      * Swap the contents of this
 				      * vector and the other vector
-				      * #v#. One could do this
+				      * @p{v}. One could do this
 				      * operation with a temporary
 				      * variable and copying over the
 				      * data elements, but this
@@ -166,11 +166,11 @@ class BlockVector
 				      * data around.
 				      *
 				      * This function is analog to the
-				      * the #swap# function of all C++
+				      * the @p{swap} function of all C++
 				      * standard containers. Also,
 				      * there is a global function
-				      * #swap(u,v)# that simply calls
-				      * #u.swap(v)#, again in analogy
+				      * @p{swap(u,v)} that simply calls
+				      * @p{u.swap(v)}, again in analogy
 				      * to standard functions.
 				      */
     void swap (BlockVector<n_blocks,Number> &v);
@@ -289,29 +289,29 @@ class BlockVector
 				     //@{
 				     /**
 				      * Addition operator.
-				      * Fast equivalent to #U.add(1, V)#.
+				      * Fast equivalent to @p{U.add(1, V)}.
 				      */
     BlockVector<n_blocks,Number> &
     operator += (const BlockVector<n_blocks,Number> &V);
 
     				     /**
 				      * Subtraction operator.
-				      * Fast equivalent to #U.add(-1, V)#.
+				      * Fast equivalent to @p{U.add(-1, V)}.
 				      */
     BlockVector<n_blocks,Number> &
     operator -= (const BlockVector<n_blocks,Number> &V);
 
 				     /**
 				      * $U(0-DIM)+=s$.
-				      * Addition of #s# to all components. Note
-				      * that #s# is a scalar and not a vector.
+				      * Addition of @p{s} to all components. Note
+				      * that @p{s} is a scalar and not a vector.
 				      */
     void add (const Number s);
     
 				     /**
 				      * U+=V.
 				      * Simple vector addition, equal to the
-				      * #operator +=#.
+				      * @p{operator +=}.
 				      */
     void add (const BlockVector<n_blocks,Number>& V);
     
@@ -360,7 +360,7 @@ class BlockVector
 				     /**
 				      * Scale each element of the vector by the
 				      * given factor. This function was
-				      * previously called #equ(Number)#, which
+				      * previously called @p{equ(Number)}, which
 				      * in my eyes is an extremely unintuitive
 				      * naming and was thus replaced.
 				      */
@@ -546,7 +546,7 @@ BlockVector<n_blocks,Number>::get_block_indices () const
 
 
 /**
- * Global function #swap# which overloads the default implementation
+ * Global function @p{swap} which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *

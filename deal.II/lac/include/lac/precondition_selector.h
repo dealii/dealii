@@ -20,27 +20,27 @@
 /**
  * Selects the preconditioner. The constructor of this class takes 
  * the name of the preconditioning and the damping parameter 
- * #omega# of the preconditioning and the #use_matrix# function takes
+ * @p{omega} of the preconditioning and the @p{use_matrix} function takes
  * the matrix that is used
- * by the matrix-builtin precondition functions. Each time, the #operator()# function
+ * by the matrix-builtin precondition functions. Each time, the @p{operator()} function
  * is called, this preselected preconditioner, this matrix and
- * this #omega# is used
+ * this @p{omega} is used
  * for the preconditioning. This class is designed for being used as
- * argument of the #solve# function of a #Solver# and it covers the
+ * argument of the @p{solve} function of a @p{Solver} and it covers the
  * selection of all matrix-builtin precondition functions. The selection
  * of other preconditioners, like BlockSOR or ILU should be handled in
  * derived classes by the user.
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  * The simplest use of this class is the following:
  * \begin{verbatim}
- *                                  // generate a #SolverControl# and
- *                                  // a #VectorMemory#
+ *                                  // generate a @p{SolverControl} and
+ *                                  // a @p{VectorMemory}
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
  *                                  // generate a solver
  * SolverCG<SparseMatrix<double>, Vector<double> > solver(control, memory);
- *                                  // generate a #PreconditionSelector#
+ *                                  // generate a @p{PreconditionSelector}
  * PreconditionSelector<SparseMatrix<double>, Vector<double> >
  *   preconditioning("jacobi", 1.);
  *                                  // give a matrix whose diagonal entries
@@ -48,21 +48,21 @@
  *                                  // Generally the matrix of the linear
  *                                  // equation system Ax=b.
  * preconditioning.use_matrix(A);
- *                                  // call the #solve# function with this
+ *                                  // call the @p{solve} function with this
  *                                  // preconditioning as last argument
  * solver.solve(A,x,b,preconditioning);
  * \end{verbatim}
- * The same example where also the #SolverSelector# class is used reads
+ * The same example where also the @p{SolverSelector} class is used reads
  * \begin{verbatim}
- *                                  // generate a #SolverControl# and
- *                                  // a #VectorMemory#
+ *                                  // generate a @p{SolverControl} and
+ *                                  // a @p{VectorMemory}
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
- *                                  // generate a #SolverSelector# that
- *                                  // calls the #SolverCG#
+ *                                  // generate a @p{SolverSelector} that
+ *                                  // calls the @p{SolverCG}
  * SolverSelector<SparseMatrix<double>, Vector<double> > 
  *   solver_selector("cg", control, memory);
- *                                  // generate a #PreconditionSelector#
+ *                                  // generate a @p{PreconditionSelector}
  * PreconditionSelector<SparseMatrix<double>, Vector<double> >
  *   preconditioning("jacobi", 1.);
  *
@@ -70,7 +70,7 @@
  *
  * solver_selector.solve(A,x,b,preconditioning);
  * \end{verbatim}
- * Now the use of the #SolverSelector# in combination with the #PreconditionSelector#
+ * Now the use of the @p{SolverSelector} in combination with the @p{PreconditionSelector}
  * allows the user to select both, the solver and the preconditioner, at the
  * beginning of his program and each time the
  * solver is started (that is several times e.g. in a nonlinear iteration) this
@@ -85,7 +85,7 @@ class PreconditionSelector
   public:
     
 				     /**
-				      * Constructor. #omega# denotes
+				      * Constructor. @p{omega} denotes
 				      * the damping parameter of
 				      * the preconditioning.
 				      */
@@ -100,8 +100,8 @@ class PreconditionSelector
 				     /**
 				      * Takes the matrix that is needed
 				      * for preconditionings that involves a
-				      * matrix. e.g. for #precondition_jacobi#,
-				      * #~_sor#, #~_ssor#.
+				      * matrix. e.g. for @p{precondition_jacobi},
+				      * @p{~_sor}, @p{~_ssor}.
 				      */
     void use_matrix(const Matrix &M);
 
@@ -136,7 +136,7 @@ class PreconditionSelector
 				     /**
 				      * Matrix that is used for the
 				      * matrix-builtin preconditioning function.
-				      * cf. also #PreconditionUseMatrix#.
+				      * cf. also @p{PreconditionUseMatrix}.
 				      */
     SmartPointer<const Matrix> A;
     

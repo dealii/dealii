@@ -38,37 +38,37 @@ template <int dim> class Equation;
  * of this type, though you may do so.
  *
  *
- * \subsection{Conventions for all functions}
+ * @sect3{Conventions for all functions}
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
- * sparsity pattern (#SparsityPattern#) corresponding to the given degree
+ * sparsity pattern (@p{SparsityPattern}) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
- * You can do this by calling the #DoFHandler<dim>::make_sparsity_pattern#
+ * You can do this by calling the @p{DoFHandler<dim>::make_sparsity_pattern}
  * function.
  *
  * Furthermore it is assumed that no relevant data is in the matrix. All
  * entries will be overwritten. Entries which are not needed by the matrix
- * (and were thus added 'by hand' after #make_sparsity_pattern# was called)
+ * (and were thus added 'by hand' after @p{make_sparsity_pattern} was called)
  * are not touched and in special are not set to zero, so you have to care
  * yourself about that if you really need these entries.
  *
  *
- * \subsection{Supported matrices}
+ * @sect3{Supported matrices}
  *
  * At present there are functions to create the following matrices:
  * \begin{itemize}
- * \item #create_mass_matrix#: create the matrix with entries
+ * \item @p{create_mass_matrix}: create the matrix with entries
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$. Here, the $\phi_i$
  *   are the basis functions of the finite element space given.
- *   This function uses the #MassMatrix# class.
+ *   This function uses the @p{MassMatrix} class.
  *
  *   Two ways to create this matrix are offered. The first one uses
- *   numerical quadrature and the #MassMatrix# class. In this case,
+ *   numerical quadrature and the @p{MassMatrix} class. In this case,
  *   a coefficient may be given to evaluate
  *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
  *   This way of setting up the mass matrix is quite general, but has
- *   some drawbacks, see the documentation of the #MassMatrix# class.
+ *   some drawbacks, see the documentation of the @p{MassMatrix} class.
  *
  *   The other way uses exact integration, as offered by the finite
  *   element class used. This way you can avoid quadrature errors and
@@ -80,26 +80,26 @@ template <int dim> class Equation;
  *   composed of several subelements. In this case, using the
  *   quadrature free way (without coefficient) results in a matrix
  *   which does not couple the subelements, as described in the
- *   #FESystem::get_local_mass_matrix# documentation, while the
+ *   @p{FESystem::get_local_mass_matrix} documentation, while the
  *   way using quadrature sets up the full matrix, i.e. with the
  *   cross coupling of shape functions belonging to different subelements.
  *
  *   If the finite element for which the mass matrix is to be built
  *   has more than one component, the resulting matrix will not couple
  *   the different components. It will furthermore accept a single
- *   coefficient through the #Function# parameter for all
+ *   coefficient through the @p{Function} parameter for all
  *   components. If you want different coefficients for the different
  *   parameters, you need to pass a function object representing the
  *   respective number of components.
  *
- * \item #create_laplace_matrix#: there are two versions of this; the
- *   one which takes the #Function<dim># object creates
+ * \item @p{create_laplace_matrix}: there are two versions of this; the
+ *   one which takes the @p{Function<dim>} object creates
  *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$,
  *   $a$ being the given function, while the other one assumes that
  *   $a=1$ which enables some optimizations. In fact the two versions
  *   are in one function, the coefficient being given as a defaulted
  *   argument, which is a pointer to a function and defaults to zero.
- *   This function uses the #LaplaceMatrix# class.
+ *   This function uses the @p{LaplaceMatrix} class.
  *
  *   If the finite element in use presently has more than only one
  *   component, this function may not be overly useful and presently
@@ -111,7 +111,7 @@ template <int dim> class Equation;
  * several matrices and could then condense afterwards only once,
  * instead of for every matrix. To actually do computations with these
  * matrices, you have to condense the matrix using the
- * #ConstraintMatrix::condense# function; you also have to condense the
+ * @p{ConstraintMatrix::condense} function; you also have to condense the
  * right hand side accordingly and distribute the solution afterwards.
  *
  * In all cases, the elements of the matrix to be assembled are simply
@@ -119,18 +119,18 @@ template <int dim> class Equation;
  * to clear the matrix before assemblage.
  *
  * If you want to use boundary conditions, you have to use a function
- * like #ProblemBase<>::apply_dirichlet_bc# to matrix and right hand
+ * like @p{ProblemBase<>::apply_dirichlet_bc} to matrix and right hand
  * side.
  *
  *
- * \subsection{Matrices on the boundary}
+ * @sect3{Matrices on the boundary}
  *
- * The #create_boundary_mass_matrix# creates the matrix with entries
+ * The @p{create_boundary_mass_matrix} creates the matrix with entries
  * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the union
  * of boundary parts with indicators contained in a set passed to the
  * function (i.e. if you want to set up the mass matrix for the parts of
  * the boundary with indicators zero and 2, you pass the function a set
- * of #unsigned char#s as parameter #boundary_parts# containing the elements
+ * of @p{unsigned char}s as parameter @p{boundary_parts} containing the elements
  * zero and 2). The $\phi_i$ are the basis functions which have at least
  * part of their support om $\Gamma$. The mapping between row and column
  * indices in the mass matrix and the right hand side and the global degree
@@ -145,21 +145,21 @@ template <int dim> class Equation;
  * This function needs to get passed a matrix object to hold the resulting sparse
  * matrix. This object is supposed to be initialized with a suitable sparsity
  * pattern, which can be created using the
- * #DoFHandler<>::make_boundary_sparsity_pattern# function.
+ * @p{DoFHandler<>::make_boundary_sparsity_pattern} function.
  *
  * The object describing the exact form of the boundary is obtained from the
  * triangulation object.
  *
- * \subsection{Right hand sides}
+ * @sect3{Right hand sides}
  *
  * In many cases, you will not only want to build the matrix, but also
  * a right hand side, which will give a vector with
  * $f_i = \int_\Omega f(x) \phi_i(x) dx$. For this purpose, each function
  * exists in two versions, one only building the matrix and one also
- * building the right hand side vector. (The #create_mass_matrix# function
+ * building the right hand side vector. (The @p{create_mass_matrix} function
  * which does not use quadrature does not offer a version to evaluate a right
  * hand side also, since this needs quadrature anyway. Take look at the
- * #VectorTools# class to find a function to set up a right hand side vector
+ * @p{VectorTools} class to find a function to set up a right hand side vector
  * only.)
  *
  * Creation of the right hand side
@@ -170,12 +170,12 @@ template <int dim> class Equation;
  * penalty, since then many values of a certain finite element have to
  * be computed twice, so it is more economical to  implement it more than
  * once. If you only want to create a right hand side as above, there is
- * a function in the #VectorCreator# class. The use of the latter may be
+ * a function in the @p{VectorCreator} class. The use of the latter may be
  * useful if you want to create many right hand side vectors.
  *
  *
  * All functions in this collection use the finite elemen given to the
- * #DoFHandler# object the last time that the degrees of freedom were
+ * @p{DoFHandler} object the last time that the degrees of freedom were
  * distributed on the triangulation.
  *
  * @author Wolfgang Bangerth, 1998
@@ -191,7 +191,7 @@ class MatrixCreator
 				      *	values on this part of the boundary.
 				      *	Only one boundary function may be given
 				      *	for each boundary indicator, which is
-				      *	guaranteed by the #map# data type.
+				      *	guaranteed by the @p{map} data type.
 				      *	
 				      *	See the general documentation of this
 				      *	class for more detail.
@@ -274,7 +274,7 @@ class MatrixCreator
 				      *
 				      * The matrix is assumed to already be
 				      * initialized with a suiting sparsity
-				      * pattern (the #DoFHandler# provides an
+				      * pattern (the @p{DoFHandler} provides an
 				      * appropriate function).
 				      *
 				      * See the general doc of this class
@@ -342,13 +342,13 @@ class MatrixCreator
  * and others.
  *
  *
- * \subsection{Boundary conditions}
+ * @sect3{Boundary conditions}
  *
- * The #apply_boundary_values# function inserts boundary conditions of
+ * The @p{apply_boundary_values} function inserts boundary conditions of
  * into a system of equations.  To actually do this you have to specify
  * a list of degree of freedom indices along with the values these degrees of
  * freedom shall assume. To see how to get such a list, see the discussion
- * of the #VectorTools::interpolate_boundary_values# function.
+ * of the @p{VectorTools::interpolate_boundary_values} function.
  *
  * The inclusion into the assemblage process is as follows: when the matrix and
  * vectors are set up, a list of nodes subject to dirichlet bc is made and
@@ -375,7 +375,7 @@ class MatrixCreator
  * solver which can handle nonsymmetric matrices in any case, so there
  * may be no need to do the Gauss elimination anyway. In fact, this is
  * the way the function works: it takes a parameter
- * (#elininate_columns#) that specifies whether the sparsity pattern
+ * (@p{elininate_columns}) that specifies whether the sparsity pattern
  * is symmetric; if so, then the column is eliminated and the right
  * hand side is also modified accordingly. If not, then only the row
  * is deleted and the column is not touched at all, and all right hand
@@ -383,21 +383,21 @@ class MatrixCreator
  * remain unchanged.
  *
  * If the sparsity pattern for your matrix is non-symmetric, you must
- * set the value of this parameter to #false# in any case, since then
+ * set the value of this parameter to @p{false} in any case, since then
  * we can't eliminate the column without searching all rows, which
- * would be too expensive (if #N# be the number of rows, and #m# the
+ * would be too expensive (if @p{N} be the number of rows, and @p{m} the
  * number of nonzero elements per row, then eliminating one column is
- * an #O(N*log(m))# operation, since searching in each row takes
- * #log(m)# operations). If your sparsity pattern is symmetric, but
- * your matrix is not, then you might specify #false# as well. If your
+ * an @p{O(N*log(m))} operation, since searching in each row takes
+ * @p{log(m)} operations). If your sparsity pattern is symmetric, but
+ * your matrix is not, then you might specify @p{false} as well. If your
  * sparsity pattern and matrix are both symmetric, you might want to
- * specify #true# (the complexity of eliminating one row is then
- * #O(m*log(m))#, since we only have to search #m# rows for the
- * respective element of the column). Given the fact that #m# is
+ * specify @p{true} (the complexity of eliminating one row is then
+ * @p{O(m*log(m))}, since we only have to search @p{m} rows for the
+ * respective element of the column). Given the fact that @p{m} is
  * roughly constant, irrespective of the discretization, and that the
- * number of boundary nodes is #sqrt(N)# in 2d, the algorithm for
- * symmetric sparsity patterns is #O(sqrt(N)*m*log(m))#, while it
- * would be #O(N*sqrt(N)*log(m))# for the general case; the latter
+ * number of boundary nodes is @p{sqrt(N)} in 2d, the algorithm for
+ * symmetric sparsity patterns is @p{O(sqrt(N)*m*log(m))}, while it
+ * would be @p{O(N*sqrt(N)*log(m))} for the general case; the latter
  * is too expensive to be performed.
  *
  * It seems as if we had to make clear not to overwrite the lines of other
@@ -484,7 +484,7 @@ class MatrixTools : public MatrixCreator<dim>
 
 
 /**
- * Equation class to be passed to the #Assembler# if you want to make up the
+ * Equation class to be passed to the @p{Assembler} if you want to make up the
  * mass matrix for your problem. The mass matrix is the matrix with
  * $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$.
  *
@@ -501,16 +501,16 @@ class MatrixTools : public MatrixCreator<dim>
  * since it does not depend on the operator.
  *
  * The defaults for both right hand side and coefficient function is a
- * #NULL# pointer. If you need a coefficient but no right hand side object,
- * simply pass a #NULL# pointer to the constructor for its first argument.
+ * @p{NULL} pointer. If you need a coefficient but no right hand side object,
+ * simply pass a @p{NULL} pointer to the constructor for its first argument.
  *
  *
- * \subsection{Other possibilities}
+ * @sect3{Other possibilities}
  *
  * You will usually want to use this object only if you have coefficients
  * which vary over each cell. If you have coefficients which are constant
  * on each cell or even on the whole domain, you can get the local mass
- * matrix easier by calling the #FiniteElement::get_local_mass_matrix# and
+ * matrix easier by calling the @p{FiniteElement::get_local_mass_matrix} and
  * then scaling this one on each cell. This has the additional benefit that
  * the mass matrix is evaluated exactly, i.e. not using a quadrature formula
  * and is normally much faster since it can be precomputed and needs only
@@ -519,7 +519,7 @@ class MatrixTools : public MatrixCreator<dim>
  * The useful use of this object is therefore probable one of the following
  * cases:
  * \begin{itemize}
- * \item Mass lumping: use an #Assembler# object and a special quadrature
+ * \item Mass lumping: use an @p{Assembler} object and a special quadrature
  *   formula to voluntarily evaluate the mass matrix incorrect. For example
  *   by using the trapezoidal formula, the mass matrix will become a
  *   diagonal (at least if no hanging nodes are considered). However, there
@@ -543,9 +543,9 @@ class MatrixTools : public MatrixCreator<dim>
  *    the form $s_{ij} = m_{ij} + \alpha a_{ij}$, for example, with $M$ and
  *    $A$ being the mass and laplace matrix, respectively (this matrix $S$
  *    occurs in the discretization of the heat and the wave equation, amoung
- *    others), once could conceive an equation object in which the #assemble#
+ *    others), once could conceive an equation object in which the @p{assemble}
  *    functions do nothing but sum up the contributions delivered by the
- *    #assemble# functions of the #MassMatrix# and #LaplaceMatrix# classes.
+ *    @p{assemble} functions of the @p{MassMatrix} and @p{LaplaceMatrix} classes.
  *    Since numerical quadrature is necessary here anyway, this way is
  *    justifyable to quickly try something out. In the further process it
  *    may be useful to replace this behaviour by more sophisticated methods,
@@ -636,7 +636,7 @@ class MassMatrix :  public Equation<dim> {
 
 
 /**
- * Equation class to be passed to the #Assembler# if you want to make up the
+ * Equation class to be passed to the @p{Assembler} if you want to make up the
  * laplace matrix for your problem. The laplace matrix is the matrix with
  * $a_{ij} = \int_\Omega \nabla\phi_i(x) \cdot \nabla\phi_j(x) dx$.
  *
@@ -653,8 +653,8 @@ class MassMatrix :  public Equation<dim> {
  * since it does not depend on the operator.
  *
  * The defaults for both right hand side and coefficient function is a
- * #NULL# pointer. If you need a coefficient but no right hand side object,
- * simply pass a #NULL# pointer to the constructor for its first argument.
+ * @p{NULL} pointer. If you need a coefficient but no right hand side object,
+ * simply pass a @p{NULL} pointer to the constructor for its first argument.
  */
 template <int dim>
 class LaplaceMatrix :  public Equation<dim> {

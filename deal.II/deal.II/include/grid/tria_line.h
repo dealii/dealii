@@ -24,7 +24,7 @@
  *   A line itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level
  *   it belongs to. The level index is implicitely given by the position
- *   in the #lines.lines# list attached to the information of each level.
+ *   in the @p{lines.lines} list attached to the information of each level.
  *
  *   @author Wolfgang Bangerth, 1998
  */
@@ -32,7 +32,7 @@ class Line {
   public:
 				     /**
 				      *  Construct a line with end point
-				      *  indices #i0# and #i1#. By default,
+				      *  indices @p{i0} and @p{i1}. By default,
 				      *  indices are set to -1, i.e. an
 				      *  invalid value.
 				      */
@@ -40,14 +40,14 @@ class Line {
 	  const int i1 = -1);
     
 				     /**
-				      *  Return the index of end point #i#=0
+				      *  Return the index of end point @p{i}=0
 				      *  or 1.
 				      */
     int vertex (const int i) const;
     
 				     /**
-				      *  Set the index of the #i#th vertex to
-				      *  #index#. #i#=0 or 1.
+				      *  Set the index of the @p{i}th vertex to
+				      *  @p{index}. @p{i}=0 or 1.
 				      */
     void set_vertex (const int i, const int index);
     

@@ -125,7 +125,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 				       //
 				       // we do the copying in two steps:
 				       // first we note that the elements in
-				       // #original# are sorted, so we may
+				       // @p{original} are sorted, so we may
 				       // first copy all the elements up to
 				       // the first side-diagonal one which
 				       // is to be filled in. then we insert
@@ -136,7 +136,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
       const unsigned int * const
 	original_row_start = &original.colnums[original.rowstart[row]] + 1;
 				       // the following requires that
-				       // #original# be compressed since
+				       // @p{original} be compressed since
 				       // otherwise there might be invalid_entry's
       const unsigned int * const
 	original_row_end   = &original.colnums[original.rowstart[row+1]];
@@ -147,7 +147,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 				       // bottom of matrix, then set
 				       // these pointers such that no
 				       // copying is necessary (see
-				       // the #copy# commands)
+				       // the @p{copy} commands)
       const unsigned int * const
 	original_last_before_side_diagonals
 	= (row > extra_off_diagonals ?
@@ -232,7 +232,7 @@ SparsityPattern::reinit (const unsigned int m,
 			 const unsigned int max_per_row)
 {
 				   // simply map this function to the
-				   // other #reinit# function
+				   // other @p{reinit} function
   const vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 };
@@ -267,9 +267,9 @@ SparsityPattern::reinit (const unsigned int m,
     };
 
 				   // find out how many entries we
-				   // need in the #colnums# array. if
+				   // need in the @p{colnums} array. if
 				   // this number is larger than
-				   // #max_vec_len#, then we will need
+				   // @p{max_vec_len}, then we will need
 				   // to reallocate memory
 				   //
 				   // note that the number of elements
@@ -366,7 +366,7 @@ SparsityPattern::compress ()
 	  tmp_entries[row_length] = colnums[j];
 	else
 	  break;
-				       // now #rowstart# is
+				       // now @p{rowstart} is
 				       // the number of entries in
 				       // this line
 

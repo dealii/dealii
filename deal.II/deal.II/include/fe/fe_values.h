@@ -28,7 +28,7 @@ template <int dim> class Quadrature;
 
 /**
  *  This class offers a multitude of arrays and other fields which are used by
- *  the derived classes #FEValues#, #FEFaceValues# and #FESubfaceValues#.
+ *  the derived classes @p{FEValues}, @p{FEFaceValues} and @p{FESubfaceValues}.
  *  In principle, it is the
  *  back end of the front end for the unification of a certain finite element
  *  and a quadrature formula which evaluates certain aspects of the finite
@@ -58,14 +58,14 @@ template <int dim> class Quadrature;
  *  a cell (using a given quadrature rule), we may be tempted to compute the
  *  restriction to all faces at startup (thus ending in four array of trial
  *  function values in two dimensions, one per face, and even more in higher
- *  dimensions) and let the respective #reinit# function of the derived classes
+ *  dimensions) and let the respective @p{reinit} function of the derived classes
  *  set a number which of the fields is to be taken when the user requests the
- *  function values. This is done through the #selected_dataset# variable. See
- *  the derived classes and the #get_values# function for the exact usage of
+ *  function values. This is done through the @p{selected_dataset} variable. See
+ *  the derived classes and the @p{get_values} function for the exact usage of
  *  this variable.
  *
- *  For many of the actual computations done by the #fill_fe_*# functions of
- *  the #FiniteElement# class and its decendants, the values and gradients of
+ *  For many of the actual computations done by the @p{fill_fe_*} functions of
+ *  the @p{FiniteElement} class and its decendants, the values and gradients of
  *  the transformation functions are needed. For example, for the computation
  *  of the real location of a quadrature point from the location on the unit
  *  cell, the values are needed, while for the computation of the Jacobian
@@ -73,25 +73,25 @@ template <int dim> class Quadrature;
  *  functions coincide with the trial functions, this does not hold for higher
  *  order elements with subparametric mappings and for other types of elements
  *  such as non-conforming ones, etc, such that the precomputed values and
- *  gradients of the trial functions (#unit_shape_values# and
- *  #unit_shape_grads#) cannot be used for the present purpose.
- *  In principle, these values could be computed each time the #fill_fe_*#
+ *  gradients of the trial functions (@p{unit_shape_values} and
+ *  @p{unit_shape_grads}) cannot be used for the present purpose.
+ *  In principle, these values could be computed each time the @p{fill_fe_*}
  *  function is called; however, this computation is highly redundant, since
  *  only the values on the unit cell and only at the quadrature points are
- *  needed, i.e. they are the same for each cell that #fill_fe_*# is called.
- *  Therefore, two additional arrays, #unit_shape_values_transform# and
- *  #unit_shape_grads_transform# are provided, which are filled upon construction
+ *  needed, i.e. they are the same for each cell that @p{fill_fe_*} is called.
+ *  Therefore, two additional arrays, @p{unit_shape_values_transform} and
+ *  @p{unit_shape_grads_transform} are provided, which are filled upon construction
  *  of an object of this type, which the actual finite element may or may not
- *  use. Later on, the #fill_fe_*# functions are passed pointers to these
+ *  use. Later on, the @p{fill_fe_*} functions are passed pointers to these
  *  arrays, which they may use to extract the values and gradients of the
  *  transform functions. If a concrete finite element choses not to use this
- *  field, it shall set its field #transform_functions# to zero.
+ *  field, it shall set its field @p{transform_functions} to zero.
  *
- *  The #unit_shape_grads_transform# array is provided by the derived classes
+ *  The @p{unit_shape_grads_transform} array is provided by the derived classes
  *  to allow for the inclusion of multiple faces, etc.
  *
  *
- *  \subsection{Definitions}
+ *  @sect3{Definitions}
  *
  *  The Jacobian matrix is defined to be
  *  $$ J_{ij} = {d\xi_i \over dx_j} $$
@@ -120,12 +120,12 @@ template <int dim> class Quadrature;
  *  \textit{from the right}; the whole situation is a bit confusing and it
  *  either takes deep though or trial-and-error to do it right. Some more
  *  information on this can be found in the source code documentation for the
- *  #FEQ1Mapping<dim>::fill_fe_values# function, where also a small test
+ *  @p{FEQ1Mapping<dim>::fill_fe_values} function, where also a small test
  *  program is presented.
  *
  *  The derivatives of the Jacobi matrices at the quadrature points with respect
  *  to unit cell coordinates is stored in the field names
- *  #jacobi_matrices_grad#. Since the gradient of a shape function is given by
+ *  @p{jacobi_matrices_grad}. Since the gradient of a shape function is given by
  *  $\partial_i \phi = \sum_k  \hat\partial_k \hat\phi  J_{ki}$, where
  *  $\hat\partial$ denotes differentiation on the unit cell, the second
  *  derivative of a function is given by
@@ -140,20 +140,20 @@ template <int dim> class Quadrature;
  *  stored in the named field.
  *
  *  
- *  \subsection{Member functions}
+ *  @sect3{Member functions}
  *
  *  The functions of this class fall into different cathegories:
  *  \begin{itemize}
- *  \item #shape_value#, #shape_grad#, etc: return one of the values
+ *  \item @p{shape_value}, @p{shape_grad}, etc: return one of the values
  *    of this object at a time. In many cases you will want to get
  *    a whole bunch at a time for performance or convenience reasons,
- *    then use the #get_*# functions.
+ *    then use the @p{get_*} functions.
  *   
- *  \item #get_shape_values#, #get_shape_grads#, etc: these return
+ *  \item @p{get_shape_values}, @p{get_shape_grads}, etc: these return
  *    a reference to a whole field. Usually these fields contain
  *    the values of all trial functions at all quadrature points.
  *
- *  \item #get_function_values#, #get_function_grads#, #...#: these
+ *  \item @p{get_function_values}, @p{get_function_grads}, @p{...}: these
  *    functions offer a simple way to avoid the detour of the
  *    trial functions, if you have a finite element solution (resp. the
  *    vector of values associated with the different trial functions.)
@@ -164,34 +164,34 @@ template <int dim> class Quadrature;
  *    you pass it a vector holding the finite element solution and the
  *    functions return the values or gradients of the finite element
  *    function restricted to the cell which was given last time the
- *    #reinit# function was given. The same applies for the functions
+ *    @p{reinit} function was given. The same applies for the functions
  *    returning higher derivatives of the solution.
  *   
  *    Though possible in principle, these functions do not call the
- *    #reinit# function, you have to do so yourself beforehand. On the
+ *    @p{reinit} function, you have to do so yourself beforehand. On the
  *    other hand, a copy of the cell iterator is stored which was used
- *    last time the #reinit# function was called. This frees us from
+ *    last time the @p{reinit} function was called. This frees us from
  *    the need to pass the cell iterator again to these two functions,
  *    which guarantees that the cell used here is in sync with that used
- *    for the #reinit# function. You should, however, make sure that
- *    nothing substantial happens to the #DoFHandler# object or any
- *    other involved instance between the #reinit# and the #get_function_*#
+ *    for the @p{reinit} function. You should, however, make sure that
+ *    nothing substantial happens to the @p{DoFHandler} object or any
+ *    other involved instance between the @p{reinit} and the @p{get_function_*}
  *    functions are called.
  *
- *  \item #reinit#: initialize the #FEValues# object for a certain cell.
+ *  \item @p{reinit}: initialize the @p{FEValues} object for a certain cell.
  *    This function is not in the present class but only in the derived
  *    classes and has a variable call syntax. 
  *    See the docs for the derived classes for more information.
  * \end{itemize}
  *
  *
- * \subsection{Implementational issues}
+ * @sect3{Implementational issues}
  *
- * The #FEValues# object keeps track of those fields which really need to
+ * The @p{FEValues} object keeps track of those fields which really need to
  * be computed, since the computation of the gradients of the trial functions
  * and of other values on each real cell can be quite an expensive thing
  * if it is not needed. The
- * object knows about which fields are needed by the #UpdateFlags# object
+ * object knows about which fields are needed by the @p{UpdateFlags} object
  * passed through the constructor. In debug mode, the accessor functions, which
  * return values from the different fields, check whether the required field
  * was initialized, thus avoiding use of unitialized data.
@@ -199,14 +199,14 @@ template <int dim> class Quadrature;
  * Functions should not assume that one flag is needed for another object as
  * well. For example, the computation of the Jacobi determinant usually
  * requires the computation of the Jacobi matrix. However, functions shall
- * not assume that someone who wants to get the #JxW_values# must set the
- * #update_jacobians# flag besides the #update_JxW_values# flag.
+ * not assume that someone who wants to get the @p{JxW_values} must set the
+ * @p{update_jacobians} flag besides the @p{update_JxW_values} flag.
  *
  * It is also forbidden that the constructor of a class set the
- * #update_jacobians# flag if the user specifies #update_JxW_values#. This is
- * since derived classes may be able to compute the #JxW_values# field without
+ * @p{update_jacobians} flag if the user specifies @p{update_JxW_values}. This is
+ * since derived classes may be able to compute the @p{JxW_values} field without
  * the Jacobian matrices, but need to do the latter since they can't know who
- * set the #update_jacobians# flag.
+ * set the @p{update_jacobians} flag.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -240,12 +240,12 @@ class FEValuesBase
     
 				     /**
 				      * Constructor. Set up the array sizes
-				      * with #n_q_points# quadrature points,
-				      * #n_support_points# support points (on
-				      * the cell or face), #n_dof# trial
+				      * with @p{n_q_points} quadrature points,
+				      * @p{n_support_points} support points (on
+				      * the cell or face), @p{n_dof} trial
 				      * functions per cell and with the
 				      * given pattern to update the fields
-				      * when the #reinit# function of the
+				      * when the @p{reinit} function of the
 				      * derived classes is called. The
 				      * fields themselves are not set up,
 				      * this must happen in the derived
@@ -262,10 +262,10 @@ class FEValuesBase
 
 
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at the #j# quadrature point
+				      * Return the value of the @p{i}th shape
+				      * function at the @p{j} quadrature point
 				      * on the cell, face or subface selected
-				      * the last time the #reinit# function
+				      * the last time the @p{reinit} function
 				      * of the derived class was called.
 				      */
     double shape_value (const unsigned int function,
@@ -276,7 +276,7 @@ class FEValuesBase
 				      * all values of shape functions at all
 				      * integration points, on the present cell,
 				      * face or subface selected
-				      * the last time the #reinit# function
+				      * the last time the @p{reinit} function
 				      * of the derived class was called.
 				      * For the format of this matrix, see the
 				      * documentation for the matrix itself.
@@ -286,9 +286,9 @@ class FEValuesBase
 				     /**
 				      * Return the values of the finite
 				      * element function characterized
-				      * by #fe_function# restricted to
+				      * by @p{fe_function} restricted to
 				      * the cell, face or subface selected
-				      * the last time the #reinit# function
+				      * the last time the @p{reinit} function
 				      * of the derived class was called,
 				      * at the quadrature points.
 				      *
@@ -299,19 +299,19 @@ class FEValuesBase
 				      * To get values of
 				      * multi-component elements,
 				      * there is another
-				      * #get_function_values#
+				      * @p{get_function_values}
 				      * returning a vector of vectors of
 				      * results.
 				      *
 				      * The function assumes that the
-				      * #values# object already has the
+				      * @p{values} object already has the
 				      * right size.
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * #Vector<double>#,
-				      * #Vector<float>#, or
-				      * #BlockVector<double,...>#.
+				      * @p{Vector<double>},
+				      * @p{Vector<float>}, or
+				      * @p{BlockVector<double,...>}.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector &fe_function,
@@ -322,26 +322,26 @@ class FEValuesBase
 				      * element functions.
 				      *
 				      * This function does the same as
-				      * the other #get_function_values#,
+				      * the other @p{get_function_values},
 				      * but applied to multi-component
 				      * elements.
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * #Vector<double>#,
-				      * #Vector<float>#, or
-				      * #BlockVector<double,...>#.
+				      * @p{Vector<double>},
+				      * @p{Vector<float>}, or
+				      * @p{BlockVector<double,...>}.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
 			      vector<Vector<number> > &values) const;
 
     				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at the #j# quadrature point.
+				      * Return the gradient of the @p{i}th shape
+				      * function at the @p{j} quadrature point.
 				      * If you want to get the derivative in
 				      * one of the coordinate directions, use
-				      * the appropriate function of the #Tensor#
+				      * the appropriate function of the @p{Tensor}
 				      * class to extract one component. Since
 				      * only a reference to the gradient's value
 				      * is returned, there should be no major
@@ -364,22 +364,22 @@ class FEValuesBase
 				     /**
 				      * Return the gradients of the finite
 				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
+				      * by @p{fe_function} restricted to
+				      * @p{cell} at the quadrature points.
 				      *
 				      * If the present cell is not an active
 				      * one the interpolated function values
 				      * are returned.
 				      *
 				      * The function assumes that the
-				      * #gradients# object already has the
+				      * @p{gradients} object already has the
 				      * right size.
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * #Vector<double>#,
-				      * #Vector<float>#, or
-				      * #BlockVector<double,...>#.
+				      * @p{Vector<double>},
+				      * @p{Vector<float>}, or
+				      * @p{BlockVector<double,...>}.
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector      &fe_function,
@@ -388,27 +388,27 @@ class FEValuesBase
 				     /**
 				      * Return the gradients of the finite
 				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
+				      * by @p{fe_function} restricted to
+				      * @p{cell} at the quadrature points.
 				      *
 				      * If the present cell is not an active
 				      * one the interpolated function values
 				      * are returned.
 				      *
 				      * The function assumes that the
-				      * #gradients# object already has the
+				      * @p{gradients} object already has the
 				      * right size.
 				      *
 				      * This function does the same as
-				      * the other #get_function_values#,
+				      * the other @p{get_function_values},
 				      * but applied to multi-component
 				      * elements.
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * #Vector<double>#,
-				      * #Vector<float>#, or
-				      * #BlockVector<double,...>#.
+				      * @p{Vector<double>},
+				      * @p{Vector<float>}, or
+				      * @p{BlockVector<double,...>}.
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector               &fe_function,
@@ -416,13 +416,13 @@ class FEValuesBase
 
     				     /**
 				      * Return the 2nd derivatives of
-				      * the #i#th shape function at
-				      * the #j# quadrature point. If
+				      * the @p{i}th shape function at
+				      * the @p{j} quadrature point. If
 				      * you want to get the derivatives
 				      * in one of the coordinate
 				      * directions, use the
 				      * appropriate function of the
-				      * #Tensor# class to extract one
+				      * @p{Tensor} class to extract one
 				      * component. Since only a
 				      * reference to the derivatives'
 				      * values is returned, there
@@ -451,25 +451,25 @@ class FEValuesBase
 				      * Return the tensor of second
 				      * derivatives of the finite
 				      * element function characterized
-				      * by #fe_function# restricted to
-				      * #cell# at the quadrature points.
+				      * by @p{fe_function} restricted to
+				      * @p{cell} at the quadrature points.
 				      *
 				      * The function assumes that the
-				      * #second_derivatives# object already has
+				      * @p{second_derivatives} object already has
 				      * the right size.
 				      *
 				      * The actual data type of the
 				      * input vector may be either a
-				      * #Vector<double>#,
-				      * #Vector<float>#, or
-				      * #BlockVector<double,...>#.
+				      * @p{Vector<double>},
+				      * @p{Vector<float>}, or
+				      * @p{BlockVector<double,...>}.
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector      &fe_function,
 				       vector<Tensor<2,dim> > &second_derivatives) const;
 
 				     /**
-				      * Return the position of the #i#th
+				      * Return the position of the @p{i}th
 				      * quadrature point in real space.
 				      *
 				      * If this object is used to evaluate
@@ -491,7 +491,7 @@ class FEValuesBase
 
 				     /**
 				      * Return the point in real space where
-				      * the #i#th trial function is located
+				      * the @p{i}th trial function is located
 				      * (location is in the sense of where it
 				      * assumes its nominal properties, e.g. at
 				      * the vertex of a cell, at the center of
@@ -506,7 +506,7 @@ class FEValuesBase
 				      * locations.
 				      *
 				      * For the evaluation of finite elements on
-				      * faces of cells, #i# is the number
+				      * faces of cells, @p{i} is the number
 				      * of the trial function on the face, not
 				      * on the cell.
 				      */
@@ -521,7 +521,7 @@ class FEValuesBase
     
 				     /**
 				      * Return the Jacobi determinant times
-				      * the weight of the #i#th quadrature
+				      * the weight of the @p{i}th quadrature
 				      * point.
 				      *
 				      * If faces of cells are concerned,
@@ -529,7 +529,7 @@ class FEValuesBase
 				      * transformation of the unit face to
 				      * the present face, not of the unit
 				      * cell to the real cell (unlike for
-				      * the #jacobi_matrix# array of the
+				      * the @p{jacobi_matrix} array of the
 				      * derived classes which store the cell
 				      * transformation's Jacobi matrix in
 				      * all cases).
@@ -605,7 +605,7 @@ class FEValuesBase
 				      * vector contains as many elements as
 				      * there are faces, for subfaces the same
 				      * applies. Which of the matrices is active
-				      * is determined by the #selected_dataset#
+				      * is determined by the @p{selected_dataset}
 				      * variable.
 				      */
     vector<FullMatrix<double> >     shape_values;
@@ -619,7 +619,7 @@ class FEValuesBase
 				      * archetypic style.
 				      *
 				      * This field is reset each time
-				      * #reinit# is called and contains the
+				      * @p{reinit} is called and contains the
 				      * gradients on the real element, rather
 				      * than on the reference element.
 				      */
@@ -630,7 +630,7 @@ class FEValuesBase
 				      * functions at the quadrature points.
 				      *
 				      * This field is reset each time
-				      * #reinit# is called and contains the
+				      * @p{reinit} is called and contains the
 				      * gradients on the real element, rather
 				      * than on the reference element.
 				      */
@@ -653,7 +653,7 @@ class FEValuesBase
 				      * Store an array of weights times the
 				      * Jacobi determinant at the quadrature
 				      * points. This function is reset each time
-				      * #reinit# is called. The Jacobi determinant
+				      * @p{reinit} is called. The Jacobi determinant
 				      * is actually the reciprocal value of the
 				      * Jacobi matrices stored in this class,
 				      * see the general documentation of this
@@ -663,7 +663,7 @@ class FEValuesBase
 
 				     /**
 				      * Array of quadrature points. This array
-				      * is set up upon calling #reinit# and
+				      * is set up upon calling @p{reinit} and
 				      * contains the quadrature points on the
 				      * real element, rather than on the
 				      * reference element.
@@ -682,7 +682,7 @@ class FEValuesBase
 				     /**
 				      * Store the jacobi matrices at the
 				      * different quadrature points. This field
-				      * is set each time #reinit# is called.
+				      * is set each time @p{reinit} is called.
 				      *
 				      * If faces rather than cells are considered
 				      * this is the Jacobi matrix of the
@@ -696,14 +696,14 @@ class FEValuesBase
 
 				     /**
 				      * Store the derivatives of the jacobi
-				      * matrices. If #J[j][k]# is the jacobi
-				      * matrix, then the index #[i][j][k]#
+				      * matrices. If @p{J[j][k]} is the jacobi
+				      * matrix, then the index @p{[i][j][k]}
 				      * of this field denotes the derivation
-				      * of #J[j][k]# with respect to the
-				      * #i#th variable.
+				      * of @p{J[j][k]} with respect to the
+				      * @p{i}th variable.
 				      *
 				      * The same general remarks apply as for
-				      * #jacobi_matrices#.
+				      * @p{jacobi_matrices}.
 				      */
     vector<Tensor<3,dim> > jacobi_matrices_grad;
     
@@ -716,23 +716,23 @@ class FEValuesBase
 				      * really needed for the assemblage of
 				      * matrices and vectors but makes that
 				      * operation much faster. Each time the
-				      * #FEValues::reinit# function calls
-				      * the #FiniteElemenet::fill_fe_values#
+				      * @p{FEValues::reinit} function calls
+				      * the @p{FiniteElemenet::fill_fe_values}
 				      * function, this and the next array are
-				      * passed. The #fill_fe_values# function
+				      * passed. The @p{fill_fe_values} function
 				      * may or may not use this field.
 				      *
-				      * The element #(i,j)# denotes the value
-				      * of the #i#th transfer basis function
-				      * at the #j#th quadrature point.
+				      * The element @p{(i,j)} denotes the value
+				      * of the @p{i}th transfer basis function
+				      * at the @p{j}th quadrature point.
 				      */
     vector<FullMatrix<double> >     shape_values_transform;
 
 				     /**
 				      * Store which of the data sets in the
-				      * #shape_values# array is presently
+				      * @p{shape_values} array is presently
 				      * active. This variable is set by the
-				      * #reinit# functions of the derived
+				      * @p{reinit} functions of the derived
 				      * classes. For the exact meaning see
 				      * there and in the doc for this class.
 				      */
@@ -746,9 +746,9 @@ class FEValuesBase
 
 				     /**
 				      * Store the cell selected last time
-				      * the #reinit# function was called
+				      * the @p{reinit} function was called
 				      * to make access
-				      * to the #get_function_*# functions
+				      * to the @p{get_function_*} functions
 				      * safer.
 				      */
     DoFHandler<dim>::cell_iterator present_cell;
@@ -797,7 +797,7 @@ class FEValues : public FEValuesBase<dim>
 				      * the fields related to a real face (like
 				      * gradients, true quadrature points, etc.)
 				      * need to be initialized using the
-				      * #reinit# function.
+				      * @p{reinit} function.
 				      *
 				      * UPDATE!
 				      *
@@ -849,7 +849,7 @@ class FEValues : public FEValuesBase<dim>
 				     /**
 				      * Gradients of the basis
 				      * functions of the transformation.
-				      * Analogous to the #shape_values_transform#
+				      * Analogous to the @p{shape_values_transform}
 				      * array of the base class.
 				      */
     vector<vector<Tensor<1,dim> > > unit_shape_gradients_transform;
@@ -868,7 +868,7 @@ class FEValues : public FEValuesBase<dim>
  *  This class provides for the data elements needed for the restriction of
  *  finite elements to faces or subfaces. It does no real computations, apart
  *  from initialization of the fields with the right size. It more or
- *  less is only a base class to the #FEFaceValues# and #FESubfaceValues#
+ *  less is only a base class to the @p{FEFaceValues} and @p{FESubfaceValues}
  *  classes which do the real computations. See there for descriptions of
  *  what is really going on.
  *
@@ -877,16 +877,16 @@ class FEValues : public FEValuesBase<dim>
  *  those common concepts here, rather than in the derived classes.
  *
  *
- *  \subsection{Technical issues}
+ *  @sect3{Technical issues}
  *
  *  The unit face is defined to be the tensor product of the interval $[0,1]$
  *  in the present number of dimensions minus one. In part of the literature,
  *  the convention is used that the unit cell/face be the tensor product of the
  *  interval $[-1,1]$, which is to distinguished properly. A subface is the
  *  child of a face; they are numbered in the way laid down in the
- *  #Triangulation# class.
+ *  @p{Triangulation} class.
  *
- *  Just like in the #FEValues# class, function values and gradients on the unit
+ *  Just like in the @p{FEValues} class, function values and gradients on the unit
  *  face or subface are evaluated at the quadrature points only once, and stored
  *  by the common base class. Being a tensor of rank zero, the function values
  *  remain the same when we want them at the quadrature points on the real cell,
@@ -894,7 +894,7 @@ class FEValues : public FEValuesBase<dim>
  *  Jacobi matrix of the transformation, which we need to compute for each cell
  *  and each quadrature point.
  *
- *  However, while in the #FEValues# class the quadrature points are always the
+ *  However, while in the @p{FEValues} class the quadrature points are always the
  *  same, here we deal with more than one (sub)face. We therefore store the values
  *  and gradients of the trial functions on the unit cell in an array with as
  *  many elements as there are (sub)faces on a cell. The same applies for the
@@ -905,12 +905,12 @@ class FEValues : public FEValuesBase<dim>
  *  with the Jacobi matrix.
  *
  *  
- *  When the #reinit# function of a derived class is called, only those
+ *  When the @p{reinit} function of a derived class is called, only those
  *  gradients, quadrature points etc are transformed to the real cell which
  *  belong to the selected face or subface. The number of the selected face
- *  or subface is stored in the #selected_dataset# variable of the base class
- *  such that the #shape_value# function can return the shape function's
- *  values on the (sub)face which was last selected by a call to the #reinit#
+ *  or subface is stored in the @p{selected_dataset} variable of the base class
+ *  such that the @p{shape_value} function can return the shape function's
+ *  values on the (sub)face which was last selected by a call to the @p{reinit}
  *  function.
  *
  *  In addition to the complications described above, we need two different
@@ -943,13 +943,13 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * duty of the derived class's
 				      * constructors.
 				      *
-				      * #n_faces_or_subfaces# is the number
+				      * @p{n_faces_or_subfaces} is the number
 				      * of faces or subfaces that this object
 				      * is to store. The actual number depends
 				      * on the derived class, for
-				      * #FEFaceValues# it is #2*dim#, while for
-				      * the #FESubfaceValues# class it is
-				      * #2*dim*(1<<(dim-1))#, i.e. the number
+				      * @p{FEFaceValues} it is @p{2*dim}, while for
+				      * the @p{FESubfaceValues} class it is
+				      * @p{2*dim*(1<<(dim-1))}, i.e. the number
 				      * of faces times the number of subfaces
 				      * per face.
 				      */
@@ -963,7 +963,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 
     				     /**
 				      * Return the outward normal vector to
-				      * the cell at the #i#th quadrature
+				      * the cell at the @p{i}th quadrature
 				      * point. The length of the vector
 				      * is normalized to one.
 				      */
@@ -987,7 +987,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      *
 				      * There is one element for each face or
 				      * subface, with indices like that:
-				      * #unit_shape_gradients[face][dof][q_point]#
+				      * @p{unit_shape_gradients[face][dof][q_point]}
 				      */
     vector<vector<vector<Tensor<1,dim> > > > unit_shape_gradients;
     
@@ -1004,7 +1004,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				     /**
 				      * Gradients of the basis
 				      * functions of the transformation.
-				      * Analogous to the #shape_values_transform#
+				      * Analogous to the @p{shape_values_transform}
 				      * array of the base class.
 				      */
     vector<vector<vector<Tensor<1,dim> > > > unit_shape_gradients_transform;
@@ -1051,7 +1051,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
  * Represent a finite element evaluated with a specific quadrature rule on
  * the face of a cell.
  *
- * This class is very similar to the #FEValues# class; see there for more
+ * This class is very similar to the @p{FEValues} class; see there for more
  * documentation. It is, however, a bit more involved: since we want to
  * compute the restriction of finite element functions (here: the basis
  * functions, but a finite element function is obtained by multiplication
@@ -1086,7 +1086,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * the fields related to a real face (like
 				      * gradients, true quadrature points, etc.)
 				      * need to be initialized using the
-				      * #reinit# function.
+				      * @p{reinit} function.
 				      *
 				      * UPDATE!
 				      *
@@ -1110,7 +1110,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the face with
-				      * number #face_no# of #cell#
+				      * number @p{face_no} of @p{cell}
 				      * and the given finite element.
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
@@ -1122,14 +1122,14 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  * Represent a finite element evaluated with a specific quadrature rule on
  * the child of the face of a cell.
  *
- * This class is very similar to the #FEFaceValues# class; see there for
+ * This class is very similar to the @p{FEFaceValues} class; see there for
  * more documentation. It serves the computation of interface integrals
  * where the cells on both sides of the face have different refinement
  * levels. This is useful for example when we want to integrate the jump
  * of the gradient of the finite element solution along the boundary of
  * a cell to estimate the error. Now, this is not so much of a problem
  * if all neighbors of the cell have the same refinement level, then we
- * will use the #FEFaceValues# class, but it gets trickier if one of the
+ * will use the @p{FEFaceValues} class, but it gets trickier if one of the
  * cells is more refined than the other.
  *
  * To this end, there seem to be two ways which may be applicable:
@@ -1145,7 +1145,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  *   a practical one, namely that by refining the cell virtually, we would
  *   end up with child cells which do not exist in real and can thus not be
  *   represented in terms of iterators. This would mean that we had to change
- *   the whole interface to the #FE*Values# classes to accept cell corner
+ *   the whole interface to the @p{FE*Values} classes to accept cell corner
  *   points by value, etc, instead of relying on appropriate iterators. This
  *   seems to be clumsy and not very suitable to maintain an orthogonal
  *   programming style. Apart from that, we already have iterators, why
@@ -1176,7 +1176,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  *   points $(0,0)$, $(0.25,0)$ and $(0.5,0)$ (coordinates on the cell)
  *   which is not symmetric as was the original quadrature rule for a line.
  *   This modified quadrature rule is computed by projection onto the subface
- *   using the #QProjector<dim>::project_to_subface()# function. The neighboring
+ *   using the @p{QProjector<dim>::project_to_subface()} function. The neighboring
  *   cell, being refined once more than the present is evaluated with the
  *   quadrature formula projected to the common face, but using the original
  *   quadrature formula. This way, the locations of the quadrature points
@@ -1188,21 +1188,21 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  * function's gradient across cell boundaries is computed.
  *
  *
- * \subsection{Other implementational subjects}
+ * @sect3{Other implementational subjects}
  *
  * It does not seem useful to ask for the off-points of the trial functions
- * (name #support_points# in the #FEValuesBase# class) for subfaces. These are
+ * (name @p{support_points} in the @p{FEValuesBase} class) for subfaces. These are
  * therefore not supported for this class and should throw an error if
- * accessed. Specifying #update_support_points# for the #UpdateFlags# in the
+ * accessed. Specifying @p{update_support_points} for the @p{UpdateFlags} in the
  * constructor is disallowed.
  *
  * The values of the trial functions on the subfaces are stored as an array
  * of matrices, each matrix representing the values of the trial functions at
  * the quadrature points at one subface. The ordering is as follows: the values
- * of the trial functions at face #face#, subface #subface# are stored in
- * #shape_values[face*(1<<(dim-1))+subface]#. The same order applies for the
+ * of the trial functions at face @p{face}, subface @p{subface} are stored in
+ * @p{shape_values[face*(1<<(dim-1))+subface]}. The same order applies for the
  * quadrature points on the unit cell, which are stored in the
- * #unit_quadrature_points# array. Note that #1<<(dim-1)# is the number of
+ * @p{unit_quadrature_points} array. Note that @p{1<<(dim-1)} is the number of
  * subfaces per face.
  *
  * One subtle problem is that if a face is at the boundary, then computation
@@ -1213,7 +1213,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  * boundary, in the end this class was invented to facilitate integration
  * along faces with cells of different refinement levels on both sides,
  * integration along the boundary of the domain is better done through
- * the #FEFaceValues# class. For this reason, calling #reinit# with a
+ * the @p{FEFaceValues} class. For this reason, calling @p{reinit} with a
  * boundary face will result in an error.
  * 
  * @author Wolfgang Bangerth, 1998
@@ -1236,7 +1236,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * the fields related to a real face (like
 				      * gradients, true quadrature points, etc.)
 				      * need to be initialized using the
-				      * #reinit# function.
+				      * @p{reinit} function.
 				      */
     FESubfaceValues (const FiniteElement<dim> &fe,
 		     const Quadrature<dim-1>  &face_quadrature,
@@ -1245,7 +1245,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				     /**
 				      * Reinitialize the gradients, Jacobi
 				      * determinants, etc for the face with
-				      * number #face_no# of #cell#
+				      * number @p{face_no} of @p{cell}
 				      * and the given finite element.
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,

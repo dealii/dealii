@@ -19,7 +19,7 @@ template <class T> class SmartPointer;
  * This class provides a map between two grids which are derived from
  * the same coarse grid. For each cell iterator of the source map, it provides
  * the respective cell iterator on the destination map, through its
- * #operator []#.
+ * @p{operator []}.
  *
  * Usually, the two grids will be refined differently. Then, the value
  * returned for an iterator on the source grid will be either:
@@ -60,17 +60,17 @@ template <class T> class SmartPointer;
  *
  * The implementation of this class is such that not only cell iterators
  * into triangulations can be mapped, but also iterators into objects of
- * type #DoFHandler# and #MGDoFHandler#. The extension to other classes
+ * type @p{DoFHandler} and @p{MGDoFHandler}. The extension to other classes
  * offering iterator functions and some minor additional requirements is
  * simple.
  *
- * Note that this class could in principle be based on the C++ #map<Key,Value>#
+ * Note that this class could in principle be based on the C++ @p{map<Key,Value>}
  * data type. Instead, it uses another data format which is more effective both
  * in terms of computing time for access as well as with regard to memory
  * consumpion.
  *
  *
- * \section{Usage}
+ * @sect2{Usage}
  *
  * In practice, use of this class is as follows:
  * \begin{verbatim}
@@ -92,15 +92,15 @@ template <class T> class SmartPointer;
  *                                           endc = dof_handler_1.end();
  *   for (; cell!=endc; ++cell)
  *                    // now do something with the cell of dof_handler_2
- *                    // corresponding to #cell# (which is one of
+ *                    // corresponding to @p{cell} (which is one of
  *                    // dof_handler_1
  *     f( grid_1_to_2_map[cell]);
  * \end{verbatim}
  *
  * Note that the template parameters to this class have to be given as
- * #InterGridMap<DoFHandler,2>#, i.e. the dimension is given explicitely and
+ * @p{InterGridMap<DoFHandler,2>}, i.e. the dimension is given explicitely and
  * no dimension is attributed to the first parameter, which here is
- * #DoFHandler# (and could equally well be #Triangulation# or #MGDoFHandler#).
+ * @p{DoFHandler} (and could equally well be @p{Triangulation} or @p{MGDoFHandler}).
  *
  * @author Wolfgang Bangerth, 1999
  */
@@ -209,16 +209,16 @@ class InterGridMap
 		      const cell_iterator &dst_cell);
 
 				     /**
-				      * Set the value of the key #src_cell#
-				      * to #dst_cell#. Do so as well for
+				      * Set the value of the key @p{src_cell}
+				      * to @p{dst_cell}. Do so as well for
 				      * all the children and their children
-				      * of #src_cell#. This function is
+				      * of @p{src_cell}. This function is
 				      * used for cells which are more
-				      * refined on #src_grid# than on
-				      * #dst_grid#; then all values of
+				      * refined on @p{src_grid} than on
+				      * @p{dst_grid}; then all values of
 				      * the hierarchy of cells and their
 				      * children point to one cell on the
-				      * #dst_grid#.
+				      * @p{dst_grid}.
 				      */
     void set_entries_to_cell (const cell_iterator &src_cell,
 			      const cell_iterator &dst_cell);

@@ -15,14 +15,14 @@
 
 
 /**
- * Provide a set of flags which tells the #FEValues<>::reinit# function, which
+ * Provide a set of flags which tells the @p{FEValues<>::reinit} function, which
  * fields are to be updated for each cell. E.g. if you do not need the
  * gradients since you want to assemble the mass matrix, you can switch that
  * off. By default, all flags are off, i.e. no reinitialization will be done.
  *
  * A variable of this type has to be passed to the constructor of the
- * #FEValues# object. You can select more than one flag by concatenation
- * using the #|# (bitwise #or#) operator.
+ * @p{FEValues} object. You can select more than one flag by concatenation
+ * using the @p{|} (bitwise @p{or}) operator.
  */
 enum UpdateFlags {
 				       /**
@@ -73,7 +73,7 @@ enum UpdateFlags {
 					* located.
 					*
 					* Giving this flag to the
-					* #FESubfaceValues# class will result
+					* @p{FESubfaceValues} class will result
 					* in an error, since support points are
 					* not useful in that case.
 					*/
@@ -82,10 +82,10 @@ enum UpdateFlags {
 				        * Update the outward normal vectors
 				        * to the face relative to this cell.
 				        * This flag is only evaluated by
-				        * the #FEFaceValues# class.
+				        * the @p{FEFaceValues} class.
 					*
 					* Giving this flag to the
-					* #FEValues# class will result in
+					* @p{FEValues} class will result in
 					* an error, since normal vectors are
 					* not useful in that case.
 				        */

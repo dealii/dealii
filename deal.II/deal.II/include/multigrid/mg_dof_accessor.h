@@ -23,14 +23,14 @@ template <int dim> class MGDoFHandler;
  * a multigrid DoF handler object.
  *
  * Note that it is allowed to construct an object of which the
- * #mg_dof_handler# pointer is a Null pointer. Such an object would
+ * @p{mg_dof_handler} pointer is a Null pointer. Such an object would
  * result in a strange kind of behaviour, though every reasonable
  * operating system should disallow access through that pointer.
  * The reason we do not check for the null pointer in the
- * constructor which gets passed the #DoFHandler# pointer is that
+ * constructor which gets passed the @p{DoFHandler} pointer is that
  * if we did we could not make dof iterators member of other classes
- * (like in the #FEValues# class) if we did not know about the
- * #DoFHandler# object to be used upon construction of that object.
+ * (like in the @p{FEValues} class) if we did not know about the
+ * @p{DoFHandler} object to be used upon construction of that object.
  * Through the way this class is implemented here, we allow the
  * creation of a kind of virgin object which only gets useful if
  * assigned to from another object before first usage.
@@ -39,7 +39,7 @@ template <int dim> class MGDoFHandler;
  * which has an invalid dof handler pointer. This is to guarantee
  * that every iterator which is once assigned to is a valid
  * object. However, this assertion only holds in debug mode, when
- * the #Assert# macro is switched on.
+ * the @p{Assert} macro is switched on.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -55,7 +55,7 @@ class MGDoFAccessor {
 
 				     /**
 				      * This should be the default constructor.
-				      * We cast away the #const#ness of the
+				      * We cast away the @p{const}ness of the
 				      * pointer which clearly is EVIL but
 				      * we can't help without making all
 				      * functions which could somehow use
@@ -89,7 +89,7 @@ class MGDoFAccessor {
 
   protected:
 				     /**
-				      * Store the address of the #MGDoFHandler# object
+				      * Store the address of the @p{MGDoFHandler} object
 				      * to be accessed.
 				      */
     MGDoFHandler<dim> *mg_dof_handler;  
@@ -99,14 +99,14 @@ class MGDoFAccessor {
 /* -------------------------------------------------------------------------- */
 
 /**
- * This is a switch class which only declares a #typdef#. It is meant to
- * determine which class a #MGDoFObjectAccessor# class is to be derived
- * from. By default, #MGDoFObjectAccessor<celldim,dim># derives from
- * the #typedef# in the general #MGDoFObjectAccessor_Inheritance<celldim,dim>#
- * class, which is #DoFObjectAccessor<celldim,dim>#,
- * but if #celldim==dim#, then the specialization #MGDoFObjectAccessor_Inheritance<dim,dim>#
- * is used which declares its local type to be #DoFCellAccessor<dim>#. Therefore,
- * the inheritance is automatically chosen to be from #DoFCellAccessor# if the
+ * This is a switch class which only declares a @p{typdef}. It is meant to
+ * determine which class a @p{MGDoFObjectAccessor} class is to be derived
+ * from. By default, @p{MGDoFObjectAccessor<celldim,dim>} derives from
+ * the @p{typedef} in the general @p{MGDoFObjectAccessor_Inheritance<celldim,dim>}
+ * class, which is @p{DoFObjectAccessor<celldim,dim>},
+ * but if @p{celldim==dim}, then the specialization @p{MGDoFObjectAccessor_Inheritance<dim,dim>}
+ * is used which declares its local type to be @p{DoFCellAccessor<dim>}. Therefore,
+ * the inheritance is automatically chosen to be from @p{DoFCellAccessor} if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
@@ -115,7 +115,7 @@ template <int celldim, int dim>
 class MGDoFObjectAccessor_Inheritance 
 {
 				     /**
-				      * Declaration of the #typedef#.
+				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
 				      * more information.
 				      */
@@ -124,14 +124,14 @@ class MGDoFObjectAccessor_Inheritance
 
 
 /**
- * This is a switch class which only declares a #typdef#. It is meant to
- * determine which class a #DoFObjectAccessor# class is to be derived
- * from. By default, #DoFObjectAccessor<celldim,dim># derives from
- * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
- * class, which is #TriaObjectAccessor<celldim,dim>#,
- * but if #celldim==dim#, then the specialization #TriaObjectAccessor<dim,dim>#
- * is used which declares its local type to be #CellAccessor<dim>#. Therefore,
- * the inheritance is automatically chosen to be from #CellAccessor# if the
+ * This is a switch class which only declares a @p{typdef}. It is meant to
+ * determine which class a @p{DoFObjectAccessor} class is to be derived
+ * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
+ * the @p{typedef} in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
+ * class, which is @p{TriaObjectAccessor<celldim,dim>},
+ * but if @p{celldim==dim}, then the specialization @p{TriaObjectAccessor<dim,dim>}
+ * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
+ * the inheritance is automatically chosen to be from @p{CellAccessor} if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
@@ -140,7 +140,7 @@ template <int dim>
 class MGDoFObjectAccessor_Inheritance<dim,dim>
 {
 				     /**
-				      * Declaration of the #typedef#.
+				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
 				      * more information.
 				      */
@@ -197,7 +197,7 @@ class MGDoFObjectAccessor<0, dim>
  * lines in 1D-, 2D-, etc dimensions).
  *
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  *
  * The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
  * declare typedefs to iterators using the accessors declared in this class
@@ -206,11 +206,11 @@ class MGDoFObjectAccessor<0, dim>
  * as they provide easier typing (much less complicated names!).
  * 
  * 
- * \subsection{Notes about the class hierarchy structure}
+ * @sect3{Notes about the class hierarchy structure}
  *
- * Inheritance from #MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass# yields
- * inheritance from #DoFCellAccessor<1># if #dim==1# and from
- * #TriaObjectAccessor<1,dim># for all other #dim# values. Thus, an object
+ * Inheritance from @p{MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass} yields
+ * inheritance from @p{DoFCellAccessor<1>} if @p{dim==1} and from
+ * @p{TriaObjectAccessor<1,dim>} for all other @p{dim} values. Thus, an object
  * of this class shares all features of cells in one dimension, but behaves
  * like an ordinary line in all other cases.
  *
@@ -235,9 +235,9 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
     MGDoFObjectAccessor ();
     
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #MGDoFHandler<dim># object.
+				      * to a @p{MGDoFHandler<dim>} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
 			 const int           level,
@@ -245,31 +245,31 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 			 const AccessorData *local_data);
     
 				     /**
-				      * Return the index of the #i#th degree
+				      * Return the index of the @p{i}th degree
 				      * of freedom of this line on the level
 				      * this line lives on.
 				      */
     unsigned int mg_dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
+				      * Set the index of the @p{i}th degree
 				      * of freedom of this line on the
-				      * level this line lives on to #index#.
+				      * level this line lives on to @p{index}.
 				      */
     void set_mg_dof_index (const unsigned int i,
 			   const unsigned int index) const;
 
 				     /**
-				      * Return the index of the #i#th degree
-				      * on the #vertex#th vertex for the
+				      * Return the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex for the
 				      * level this line lives on.
 				      */
     unsigned int mg_vertex_dof_index (const unsigned int vertex,
 				      const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex to #index#
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex to @p{index}
 				      * for the level this line lives on.
 				      */
     void set_mg_vertex_dof_index (const unsigned int vertex,
@@ -311,7 +311,7 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 			    Vector<number>       &dof_values) const;
 
 				     /**
-				      * Return the #i#th child as a MGDoF line
+				      * Return the @p{i}th child as a MGDoF line
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a line accessor without
@@ -351,9 +351,9 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
     MGDoFObjectAccessor ();
 
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #DoFHandler<dim># object.
+				      * to a @p{DoFHandler<dim>} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
 		       const int           level,
@@ -361,32 +361,32 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 		       const AccessorData *local_data);
     
 				     /**
-				      * Return the index of the #i#th degree
+				      * Return the index of the @p{i}th degree
 				      * of freedom of this quad on the level
 				      * this quad lives on.
 				      */
     unsigned int mg_dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
+				      * Set the index of the @p{i}th degree
 				      * of freedom of this quad on the
-				      * level this quad lives on to #index#.
+				      * level this quad lives on to @p{index}.
 				      */
     void set_mg_dof_index (const unsigned int i,
 			   const unsigned int index) const;
 
 				     /**
-				      * Return the index of the #i#th degree
-				      * on the #vertex#th vertex for the level
+				      * Return the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex for the level
 				      * this quad lives on.
 				      */
     unsigned int mg_vertex_dof_index (const unsigned int vertex,
 				      const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex for the
-				      * level this quad lives on to #index#.
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex for the
+				      * level this quad lives on to @p{index}.
 				      */
     void set_mg_vertex_dof_index (const unsigned int vertex,
 				  const unsigned int i,
@@ -428,14 +428,14 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 			    Vector<number>       &dof_values) const;
 
    				     /**
-				      * Return a pointer to the #i#th line
-				      * bounding this #Quad#.
+				      * Return a pointer to the @p{i}th line
+				      * bounding this @p{Quad}.
 				      */
     TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
 				     /**
-				      * Return the #i#th child as a DoF quad
+				      * Return the @p{i}th child as a DoF quad
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a quad accessor without
@@ -476,9 +476,9 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
     MGDoFObjectAccessor ();
 
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #DoFHandler<dim># object.
+				      * to a @p{DoFHandler<dim>} object.
 				      */
     MGDoFObjectAccessor (Triangulation<dim> *tria,
 		      const int           level,
@@ -486,32 +486,32 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 		      const AccessorData *local_data);
     
 				     /**
-				      * Return the index of the #i#th degree
+				      * Return the index of the @p{i}th degree
 				      * of freedom of this hex on the level
 				      * this quad lives on.
 				      */
     unsigned int mg_dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
+				      * Set the index of the @p{i}th degree
 				      * of freedom of this hex on the
-				      * level this hex lives on to #index#.
+				      * level this hex lives on to @p{index}.
 				      */
     void set_mg_dof_index (const unsigned int i,
 			   const unsigned int index) const;
 
 				     /**
-				      * Return the index of the #i#th degree
-				      * on the #vertex#th vertex for the level
+				      * Return the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex for the level
 				      * this hex lives on.
 				      */
     unsigned int mg_vertex_dof_index (const unsigned int vertex,
 				      const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex for the
-				      * level this hex lives on to #index#.
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex for the
+				      * level this hex lives on to @p{index}.
 				      */
     void set_mg_vertex_dof_index (const unsigned int vertex,
 				  const unsigned int i,
@@ -553,21 +553,21 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 			    Vector<number>       &dof_values) const;
 
     				     /**
-				      * Return a pointer to the #i#th line
-				      * bounding this #Hex#.
+				      * Return a pointer to the @p{i}th line
+				      * bounding this @p{Hex}.
 				      */
     TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
 				     /**
-				      * Return a pointer to the #i#th quad
-				      * bounding this #Hex#.
+				      * Return a pointer to the @p{i}th quad
+				      * bounding this @p{Hex}.
 				      */
     TriaIterator<dim,MGDoFObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
 
 				     /**
-				      * Return the #i#th child as a DoF quad
+				      * Return the @p{i}th child as a DoF quad
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a hex accessor without
@@ -586,13 +586,13 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
- * #DoFObjectAccessor<1, 1># and #DoFObjectAccessor<2, 2># for the space dimension
+ * @p{DoFObjectAccessor<1, 1>} and @p{DoFObjectAccessor<2, 2>} for the space dimension
  * one and two, respectively, this class only collects the pieces
- * together by deriving from the appropriate #DoF*Accessor# and the
- * right #CellAccessor<dim># and finally adding two functions which give
- * access to the neighbors and children as #DoFCellAccessor# objects
- * rather than #CellAccessor# objects (the latter function was inherited
- * from the #CellAccessor<dim># class).
+ * together by deriving from the appropriate @p{DoF*Accessor} and the
+ * right @p{CellAccessor<dim>} and finally adding two functions which give
+ * access to the neighbors and children as @p{DoFCellAccessor} objects
+ * rather than @p{CellAccessor} objects (the latter function was inherited
+ * from the @p{CellAccessor<dim>} class).
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -622,7 +622,7 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
 		    MGDoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
 
 				     /**
-				      * Return the #i#th neighbor as a MGDoF cell
+				      * Return the @p{i}th neighbor as a MGDoF cell
 				      * iterator. This function is needed since
 				      * the neighbor function of the base
 				      * class returns a cell accessor without
@@ -631,7 +631,7 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
     TriaIterator<dim,MGDoFCellAccessor<dim> > neighbor (const unsigned int) const;
 
     				     /**
-				      * Return the #i#th child as a MGDoF cell
+				      * Return the @p{i}th child as a MGDoF cell
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a cell accessor without
@@ -640,7 +640,7 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
     TriaIterator<dim,MGDoFCellAccessor<dim> > child (const unsigned int) const;
 
     				     /**
-				      * Return an iterator to the #i#th face
+				      * Return an iterator to the @p{i}th face
 				      * of this cell.
 				      *
 				      * This function is not implemented in 1D,

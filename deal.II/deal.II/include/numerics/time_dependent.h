@@ -48,7 +48,7 @@
  * use the same setup and therefore this class.
  *
  *
- * \subsection{Overview}
+ * @sect3{Overview}
  *
  * The general structure of a time dependent problem solver using a timestepping
  * scheme is about the following: we have a collection of time step objects
@@ -116,7 +116,7 @@
  * stepping scheme which needs to look ahead one time step and needs the
  * data of the last two time steps, the following pseudocode described
  * what the centeral loop function of this class will do when we move
- * from timestep #n-1# to timestep #n#:
+ * from timestep @p{n-1} to timestep @p{n}:
  * \begin{verbatim}
  *   wake up timestep n+1 with signal 1
  *   wake up timestep n with signal 0
@@ -129,20 +129,20 @@
  * \end{verbatim}
  * The signal number here denotes the distance of the timestep being sent
  * the signal to the timestep where computations are done on. The calls to
- * the #wake_up# and #sleep# functions with signal 0 could in principle
+ * the @p{wake_up} and @p{sleep} functions with signal 0 could in principle
  * be absorbed into the function doing the computation; we use these
  * redundant signals, however, in order to separate computations and data
  * management from each other, allowing to put all stuff around grid
  * management, data reload and storage into one set of functions and
  * computations into another.
  *
- * In the example above, possible actions might be: timestep #n+1# rebuilds
+ * In the example above, possible actions might be: timestep @p{n+1} rebuilds
  * the computational grid (there is a specialized class which can do this
- * for you); timestep #n# builds matrices sets solution vectors to the right
+ * for you); timestep @p{n} builds matrices sets solution vectors to the right
  * size, maybe using an initial guess; then it does the computations; then
  * it deletes the matrices since they are not needed by subsequent timesteps;
- * timestep #n-1# deletes those data vectors which are only needed by one
- * timestep ahead; timestep #n-2# deletes the remaining vectors and deletes
+ * timestep @p{n-1} deletes those data vectors which are only needed by one
+ * timestep ahead; timestep @p{n-2} deletes the remaining vectors and deletes
  * the computational grid, somewhere storing information how to rebuild it
  * eventually.
  *
@@ -159,8 +159,8 @@
  * This pattern is repeated for each loop in each sweep.
  *
  * For the different loops within each sweep, the numbers of timesteps
- * to look ahead (i.e. the maximum signal number to the #wake_up# function)
- * and the look-behind (i.e. the maximum signal number to the #sleep#
+ * to look ahead (i.e. the maximum signal number to the @p{wake_up} function)
+ * and the look-behind (i.e. the maximum signal number to the @p{sleep}
  * function) can be chosen separately. For example, it is usually only
  * needed to look one time step behind when computing error estimation
  * (in some cases, it may vene be possible to not look ahead or back
@@ -169,14 +169,14 @@
  *
  * Finally, a note on the direction of look-ahead and look-back is in
  * place: look-ahead always refers to the direction the loop is running
- * in, i.e. for loops running forward, #wake_up# is called for timestep
+ * in, i.e. for loops running forward, @p{wake_up} is called for timestep
  * objects with a greater time value than the one previously computed on,
- * while #sleep# is called for timesteps with a lower time. If the loop
+ * while @p{sleep} is called for timesteps with a lower time. If the loop
  * runs in the opposite direction, e.g. when solving a global dual
  * problem, this order is reversed.
  *
  *
- * \subsection{Implementation}
+ * @sect3{Implementation}
  *
  * The main loop of a program using this class will usually look like
  * the following one, taken modified from the wave program:
@@ -210,9 +210,9 @@
  *       timestep_manager.run_sweep (sweep);
  *   };
  * \end{verbatim}
- * Here, #timestep_manager# is an object of type #TimeDependent_Wave#, which
- * is a class derived from #TimeDependent#. #start_sweep#, 
- * #solve_primal_problem#, #solve_dual_problem#, #postprocess# and #end_sweep#
+ * Here, @p{timestep_manager} is an object of type @p{TimeDependent_Wave}, which
+ * is a class derived from @p{TimeDependent}. @p{start_sweep}, 
+ * @p{solve_primal_problem}, @p{solve_dual_problem}, @p{postprocess} and @p{end_sweep}
  * are functions inherited from this class. They all do a loop over all 
  * timesteps within this object and call the respective function on each of
  * these objects. For example, here are two of the functions as they are
@@ -250,25 +250,25 @@
  *   };
  * \end{verbatim}
  * The latter function shows rather clear how most of the loops are
- * invoked (#solve_primal_problem#, #solve_dual_problem#, #postprocess#,
- * #refine_grids# and #write_statistics# all have this form, where the
+ * invoked (@p{solve_primal_problem}, @p{solve_dual_problem}, @p{postprocess},
+ * @p{refine_grids} and @p{write_statistics} all have this form, where the
  * latter two give functions of the derived timestep class, rather than
- * from the base class). The function #TimeStepBase::init_for_primal_problem#
+ * from the base class). The function @p{TimeStepBase::init_for_primal_problem}
  * and the respective ones for the other operations defined by that class
  * are only used to store the type of operation which the loop presently
  * performed will do.
  *
- * As can be seen, most of the work is done by the #do_loop# function of
+ * As can be seen, most of the work is done by the @p{do_loop} function of
  * this class, which takes the addresses of two functions which are used
  * to initialize all timestep objects for the loop and to actually perform
  * some action. The next parameter gives some information on the look-ahead
  * and look-back and the last one denotes in which direction the loop is
  * to be run.
  *
- * Using function pointers through the #mem_fun# functions provided by
- * the #C++# standard library, it is possible to do neat tricks, like
+ * Using function pointers through the @p{mem_fun} functions provided by
+ * the @p{C++} standard library, it is possible to do neat tricks, like
  * the following, also taken from the wave program, in this case from
- * the function #refine_grids#:
+ * the function @p{refine_grids}:
  * \begin{verbatim}
  *   ...
  *   compute the thresholds for refinement
@@ -281,18 +281,18 @@
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
  * \end{verbatim}
- * #TimeStepBase_Wave<dim>::refine_grid# is a function taking an argument, unlike
+ * @p{TimeStepBase_Wave<dim>::refine_grid} is a function taking an argument, unlike
  * all the other functions used above within the loops. However, in this special
  * case the parameter was the same for all timesteps and known before the loop
  * was started, so we fixed it and made a function object which to the outside
  * world does not take parameters.
  *
  * Since it is the central function of this class, we finally present a
- * stripped down version of the #do_loop# method, which is shown in order
+ * stripped down version of the @p{do_loop} method, which is shown in order
  * to provide a better understanding of the internals of this class. For
  * brevity we have omitted the parts that deal with backward running loops
  * as well as the checks whether wake-up and sleep operations act on timesteps
- * outside #0..n_timesteps-1#.
+ * outside @p{0..n_timesteps-1}.
  * \begin{verbatim}
  *   template <typename InitFunctionObject, typename LoopFunctionObject>
  *   void TimeDependent::do_loop (InitFunctionObject      init_function,
@@ -350,7 +350,7 @@ class TimeDependent
 				      * ahead of the present one we shall
 				      * start waking up timestep objects
 				      * and how many timesteps behind
-				      * we shall call their #sleep#
+				      * we shall call their @p{sleep}
 				      * method.
 				      */
     struct TimeSteppingData
@@ -389,7 +389,7 @@ class TimeDependent
 					  * The value of this number determines,
 					  * how many time steps ahead the
 					  * time step manager start to call
-					  * the #wake_up# function for each
+					  * the @p{wake_up} function for each
 					  * time step.
 					  */
 	const unsigned int look_ahead;
@@ -411,7 +411,7 @@ class TimeDependent
 					  * steps after having done
 					  * computations on a tim level
 					  * the time step manager will
-					  * call the #sleep# function for
+					  * call the @p{sleep} function for
 					  * each time step.
 					  */
 	const unsigned int look_back;
@@ -420,7 +420,7 @@ class TimeDependent
 				     /**
 				      * Enum offering the different directions
 				      * in which a loop executed by
-				      * #do_loop# may be run.
+				      * @p{do_loop} may be run.
 				      */
     enum Direction {
 	  forward, backward
@@ -437,8 +437,8 @@ class TimeDependent
 				     /**
 				      * Destructor. This will delete the
 				      * objects pointed to by the pointers
-				      * given to the #insert_*# and
-				      * #add_timestep# functions, i.e.
+				      * given to the @p{insert_*} and
+				      * @p{add_timestep} functions, i.e.
 				      * it will delete the objects doing
 				      * the computations on each time step.
 				      */
@@ -449,19 +449,19 @@ class TimeDependent
 				      * position is a pointer to an existing
 				      * time step object, or a null pointer
 				      * denoting the end of the timestep
-				      * sequence. If #position# is non-null,
+				      * sequence. If @p{position} is non-null,
 				      * the new time step will be inserted
 				      * before the respective element.
 				      *
 				      * Note that by giving an object
 				      * to this function, the
-				      * #TimeDependent# object assumes
+				      * @p{TimeDependent} object assumes
 				      * ownership of the object; it will
 				      * therefore also take care of
 				      * deletion of the objects its manages.
 				      *
 				      * There is another function,
-				      * #add_timestep#, which inserts a
+				      * @p{add_timestep}, which inserts a
 				      * time step at the end of the list.
 				      *
 				      * Note that this function does not
@@ -469,7 +469,7 @@ class TimeDependent
 				      * within the other timestep objects,
 				      * nor does it set the timestep number
 				      * of this new timestep. This is only
-				      * done upon calling the #start_sweep#
+				      * done upon calling the @p{start_sweep}
 				      * function. In not changing the timestep
 				      * numbers, it is simpler to operate
 				      * on a space-time triangulation since
@@ -480,7 +480,7 @@ class TimeDependent
 			  TimeStepBase       *new_timestep);
 
 				     /**
-				      * Just like #insert_timestep#, but
+				      * Just like @p{insert_timestep}, but
 				      * insert at the end.
 				      *
 				      * This mechanism usually will result
@@ -508,7 +508,7 @@ class TimeDependent
 				      * numbers stored within the
 				      * other timestep objects. This
 				      * is only done upon calling the
-				      * #start_sweep# function. In not
+				      * @p{start_sweep} function. In not
 				      * changing the timestep numbers,
 				      * it is simpler to operate on a
 				      * space-time triangulation since
@@ -520,76 +520,76 @@ class TimeDependent
     
 				     /**
 				      * Solve the primal problem; uses the
-				      * functions #init_for_primal_problem#
-				      * and #solve_primal_problem# of the
-				      * #TimeStepBase# class through the
-				      * #do_loop# function of this class.
+				      * functions @p{init_for_primal_problem}
+				      * and @p{solve_primal_problem} of the
+				      * @p{TimeStepBase} class through the
+				      * @p{do_loop} function of this class.
 				      *
 				      * Look ahead and look back are
-				      * determined by the #timestepping_data_primal#
+				      * determined by the @p{timestepping_data_primal}
 				      * object given to the constructor.
 				      */
     void solve_primal_problem ();
 
 				     /**
 				      * Solve the dual problem; uses the
-				      * functions #init_for_dual_problem#
-				      * and #solve_dual_problem# of the
-				      * #TimeStepBase# class through the
-				      * #do_loop# function of this class.
+				      * functions @p{init_for_dual_problem}
+				      * and @p{solve_dual_problem} of the
+				      * @p{TimeStepBase} class through the
+				      * @p{do_loop} function of this class.
 				      *
 				      * Look ahead and look back are
-				      * determined by the #timestepping_data_dual#
+				      * determined by the @p{timestepping_data_dual}
 				      * object given to the constructor.
 				      */
     void solve_dual_problem ();
 
 				     /**
 				      * Do a postprocessing round; uses the
-				      * functions #init_for_postprocessing#
-				      * and #postprocess# of the
-				      * #TimeStepBase# class through the
-				      * #do_loop# function of this class.
+				      * functions @p{init_for_postprocessing}
+				      * and @p{postprocess} of the
+				      * @p{TimeStepBase} class through the
+				      * @p{do_loop} function of this class.
 				      *
 				      * Look ahead and look back are
-				      * determined by the #timestepping_data_postprocess#
+				      * determined by the @p{timestepping_data_postprocess}
 				      * object given to the constructor.
 				      */
     void postprocess ();
     
 				     /**
 				      * Do a loop over all timesteps, call the
-				      * #init_function# at the beginning and
-				      * the #loop_function# of each time step.
-				      * The #timestepping_data# determine how
+				      * @p{init_function} at the beginning and
+				      * the @p{loop_function} of each time step.
+				      * The @p{timestepping_data} determine how
 				      * many timesteps in front and behind
-				      * the present one the #wake_up# and
-				      * #sleep# functions are called.
+				      * the present one the @p{wake_up} and
+				      * @p{sleep} functions are called.
 				      *
 				      * To see how this function work, note that
-				      * the function #solve_primal_problem# only
+				      * the function @p{solve_primal_problem} only
 				      * consists of a call to
-				      * #  do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
+				      * @p{do_loop (mem_fun(&TimeStepBase::init_for_primal_problem),
 				      *	   mem_fun(&TimeStepBase::solve_primal_problem),
-				      *	   timestepping_data_primal, forward);#.
+				      *	   timestepping_data_primal, forward);}.
 				      *
 				      * Note also, that the given class from which
 				      * the two functions are taken needs not
-				      * necessarily be #TimeStepBase#, but it
+				      * necessarily be @p{TimeStepBase}, but it
 				      * could also be a derived class, that is
-				      * #static_cast#able from a #TimeStepBase#.
+				      * @p{static_cast}able from a @p{TimeStepBase}.
 				      * The function may be a virtual function
 				      * (even a pure one) of that class, which
 				      * should help if the actual class where it
 				      * is implemented is one which is derived
 				      * through virtual base classes and thus
-				      * unreachable by #static_cast# from the
-				      * #TimeStepBase# class.
+				      * unreachable by @p{static_cast} from the
+				      * @p{TimeStepBase} class.
 				      *
 				      * Instead of using the above form, you can
 				      * equally well use
-				      * #bind2nd(mem_fun1(&X::unary_function),
-				      *          arg)# which lets the #do_loop#
+				      * @p{bind2nd(mem_fun1(&X::unary_function), arg)} 
+				      * which lets the @p{do_loop}
 				      * function call teh given function with
 				      * the specified parameter. Note that you
 				      * need to bind the second parameter since
@@ -614,7 +614,7 @@ class TimeDependent
 				      * deleted) and transmit the number of
 				      * the present sweep to these objects.
 				      *
-				      * It also calls the #init_for_sweep#
+				      * It also calls the @p{init_for_sweep}
 				      * function of each time step object,
 				      * after the numbers above are set.
 				      *
@@ -628,22 +628,22 @@ class TimeDependent
 				      * should be called bottom-up.
 				      *
 				      * The default implementation of this
-				      * function calls #start_sweep# on all
+				      * function calls @p{start_sweep} on all
 				      * time step objects.
 				      */
     virtual void start_sweep (const unsigned int sweep_no);
 
 				     /**
 				      * Analogon to the above
-				      * function, calling #end_sweep#
+				      * function, calling @p{end_sweep}
 				      * of each time step object. The
 				      * same applies with respect to
-				      * the #virtual#ness of this
+				      * the @p{virtual}ness of this
 				      * function as for the previous
 				      * one.
 				      *
 				      * This function does not
-				      * guarantee that #end_sweep# is
+				      * guarantee that @p{end_sweep} is
 				      * called for successive time
 				      * steps, rather the order of
 				      * time steps for which the
@@ -653,7 +653,7 @@ class TimeDependent
 				      * function has been called for
 				      * previous time steps
 				      * already. If in multithread
-				      * mode, the #end_sweep# function
+				      * mode, the @p{end_sweep} function
 				      * of several time steps is
 				      * called at once, so you should
 				      * use synchronization
@@ -689,14 +689,14 @@ class TimeDependent
 
 				     /**
 				      * Number of the present sweep. This is
-				      * reset by the #start_sweep# function
+				      * reset by the @p{start_sweep} function
 				      * called at the outset of each sweep.
 				      */
     unsigned int sweep_no;
 
 				     /**
 				      * Some flags telling the
-				      * #solve_primal_problem# function what to
+				      * @p{solve_primal_problem} function what to
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
@@ -704,7 +704,7 @@ class TimeDependent
 
 				     /**
 				      * Some flags telling the
-				      * #solve_dual_problem# function what to
+				      * @p{solve_dual_problem} function what to
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
@@ -712,7 +712,7 @@ class TimeDependent
 
 				     /**
 				      * Some flags telling the
-				      * #postprocess# function what to
+				      * @p{postprocess} function what to
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
@@ -721,7 +721,7 @@ class TimeDependent
   private:
 
 				     /**
-				      * Do the work of #end_sweep()#
+				      * Do the work of @p{end_sweep()}
 				      * for some timesteps only. This
 				      * is useful in multithread mode.
 				      */
@@ -734,7 +734,7 @@ class TimeDependent
 /**
  * Base class for a time step in time dependent problems. This class provides
  * barely more than the basic framework, defining the necessary virtual
- * functions (namely #sleep# and #wake_up#), the interface to previous
+ * functions (namely @p{sleep} and @p{wake_up}), the interface to previous
  * and following grids, and some functions to be called before a new loop
  * over all time steps is started.
  *
@@ -795,7 +795,7 @@ class TimeStepBase : public Subscriptor
 
 				     /**
 				      * This is the opposite function
-				      * to #wake_up#. It is used to
+				      * to @p{wake_up}. It is used to
 				      * delete data or save it to disk
 				      * after they are no more needed
 				      * for the present sweep. Typical
@@ -820,7 +820,7 @@ class TimeStepBase : public Subscriptor
 				      * and so on. You should take good care,
 				      * however, not to install large objects,
 				      * which should be deferred until the
-				      * #wake_up# function is called.
+				      * @p{wake_up} function is called.
 				      *
 				      * A typical action of this function
 				      * would be sorting out names of
@@ -828,7 +828,7 @@ class TimeStepBase : public Subscriptor
 				      * process of solving, etc.
 				      *
 				      * At the time this function is called,
-				      * the values of #timestep_no#, #sweep_no#
+				      * the values of @p{timestep_no}, @p{sweep_no}
 				      * and the pointer to the previous and
 				      * next time step object already have
 				      * their correct value.
@@ -854,7 +854,7 @@ class TimeStepBase : public Subscriptor
 				      * function is called (i.e. before the
 				      * solution takes place on the first
 				      * time level). By default, this function
-				      * sets the #next_action# variable of
+				      * sets the @p{next_action} variable of
 				      * this class. You may overload this
 				      * function, but you should call this
 				      * function within your own one.
@@ -878,8 +878,8 @@ class TimeStepBase : public Subscriptor
 				      * manager object when solving the
 				      * primal problem on this time level
 				      * is needed. It is called after
-				      * the #wake_up# function was
-				      * called and before the #sleep#
+				      * the @p{wake_up} function was
+				      * called and before the @p{sleep}
 				      * function will be called. There
 				      * is no default implementation for
 				      * obvious reasons, so you have
@@ -892,8 +892,8 @@ class TimeStepBase : public Subscriptor
 				      * manager object when solving the
 				      * dual problem on this time level
 				      * is needed. It is called after
-				      * the #wake_up# function was
-				      * called and before the #sleep#
+				      * the @p{wake_up} function was
+				      * called and before the @p{sleep}
 				      * function will be called. There
 				      * is a default implementation
 				      * doing plain nothing since some
@@ -910,8 +910,8 @@ class TimeStepBase : public Subscriptor
 				      * manager object when postprocessing
 				      * this time level
 				      * is needed. It is called after
-				      * the #wake_up# function was
-				      * called and before the #sleep#
+				      * the @p{wake_up} function was
+				      * called and before the @p{sleep}
 				      * function will be called. There
 				      * is a default implementation
 				      * doing plain nothing since some
@@ -955,7 +955,7 @@ class TimeStepBase : public Subscriptor
 				      * value to return in that case would
 				      * not be zero, since valid computation
 				      * can be done with that, but would
-				      * be a denormalized value such as #NaN#.
+				      * be a denormalized value such as @p{NaN}.
 				      * However, there is not much difference
 				      * in finding that the results of a
 				      * computation are all denormalized values
@@ -1025,7 +1025,7 @@ class TimeStepBase : public Subscriptor
 				      * problem is actual, or any of
 				      * the other actions
 				      * specified. This variable is
-				      * set by the #init_for_*#
+				      * set by the @p{init_for_*}
 				      * functions.
 				      */
     unsigned int next_action;
@@ -1103,11 +1103,11 @@ class TimeStepBase : public Subscriptor
 
 
 /**
- * Specialisation of #TimeStepBase# which addresses some aspects of grid handling.
+ * Specialisation of @p{TimeStepBase} which addresses some aspects of grid handling.
  * In particular, this class is thought to make handling of grids available that
  * are adaptively refined on each time step separately or with a loose coupling
  * between time steps. It also takes care of deleting and rebuilding grids when
- * memory resources are a point, through the #sleep# and #wake_up# functions
+ * memory resources are a point, through the @p{sleep} and @p{wake_up} functions
  * declared in the base class.
  *
  * In addition to that, it offers functions which do some rather hairy refinement
@@ -1203,15 +1203,15 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * stored to disk, etc. By default,
 				      * this function rebuilds the triangulation
 				      * if the respective flag has been set to
-				      * destroy it in the #sleep# function.
+				      * destroy it in the @p{sleep} function.
 				      * It does so also the first time we
-				      * hit this function and #wakeup_level#
-				      * equals #flags.wakeup_level_to_build_grid#,
+				      * hit this function and @p{wakeup_level}
+				      * equals @p{flags.wakeup_level_to_build_grid},
 				      * independently of the value of the
 				      * mentioned flag. (Actually, it does so
 				      * whenever the triangulation pointer
 				      * equals the Null pointer and the
-				      * value of #wakeup_level# is right.)
+				      * value of @p{wakeup_level} is right.)
 				      *
 				      * Since this is an important task, you
 				      * should call this function from your
@@ -1226,7 +1226,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 
 				     /**
 				      * This is the opposite function
-				      * to #wake_up#. It is used to
+				      * to @p{wake_up}. It is used to
 				      * delete data or save it to disk
 				      * after they are no more needed
 				      * for the present sweep. Typical
@@ -1242,7 +1242,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * in the flags for this object, the
 				      * triangulation is deleted and the
 				      * refinement history saved such that
-				      * the respective #wake_up# function can
+				      * the respective @p{wake_up} function can
 				      * rebuild it. You should therefore call
 				      * this function from your overloaded
 				      * version, preferrably at the end so
@@ -1279,8 +1279,8 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * Respective init function for the
 				      * refinement loop; does nothing in
 				      * the default implementation, apart from
-				      * setting #next_action# to
-				      * #grid_refinement# but can
+				      * setting @p{next_action} to
+				      * @p{grid_refinement} but can
 				      * be overloaded.
 				      */
     virtual void init_for_refinement ();
@@ -1289,7 +1289,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * Virtual function that should fill
 				      * the vector with the refinement
 				      * criteria for the present triangulation.
-				      * It is used within the #refine_grid#
+				      * It is used within the @p{refine_grid}
 				      * function to get the criteria for
 				      * the present time step, since they
 				      * can't be passed through its
@@ -1323,10 +1323,10 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * base class. Note that the
 				      * triangulation is frequently
 				      * deleted and rebuilt by the
-				      * functions #sleep# and
-				      * #wake_up# to save memory, if
+				      * functions @p{sleep} and
+				      * @p{wake_up} to save memory, if
 				      * such a behaviour is specified
-				      * in the #flags# structure.
+				      * in the @p{flags} structure.
 				      */
     Triangulation<dim>       *tria;
 
@@ -1382,7 +1382,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 
 
 /**
- * This structure is used to tell the #TimeStepBase_Tria# class how grids should
+ * This structure is used to tell the @p{TimeStepBase_Tria} class how grids should
  * be handled. It has flags defining the moments where grids shall be
  * re-made and when they may be deleted. Also, one variable states whether
  * grids should be kept in memory or should be deleted between to uses to
@@ -1408,7 +1408,7 @@ struct TimeStepBase_Tria<dim>::Flags
     
 				     /**
 				      * This flag determines whether the
-				      * #sleep# and #wake_up# functions shall
+				      * @p{sleep} and @p{wake_up} functions shall
 				      * delete and rebuild the triangulation.
 				      * While for small problems, this is
 				      * not necessary, for large problems
@@ -1428,22 +1428,22 @@ struct TimeStepBase_Tria<dim>::Flags
 
 				     /**
 				      * This number denotes the parameter to
-				      * the #wake_up# function at which it
+				      * the @p{wake_up} function at which it
 				      * shall rebuild the grid. Obviously,
 				      * it shall be less than or equal to the
-				      * #look_ahead# number passed to the
+				      * @p{look_ahead} number passed to the
 				      * time step management object; if it
 				      * is equal, then the grid is rebuilt
-				      * the first time the #wake_up# function
-				      * is called. If #delete_and_rebuild_tria#
-				      * is #false#, this number has no meaning.
+				      * the first time the @p{wake_up} function
+				      * is called. If @p{delete_and_rebuild_tria}
+				      * is @p{false}, this number has no meaning.
 				      */
     const unsigned int wakeup_level_to_build_grid;
 
 				     /**
 				      * This is the opposite flag to the one
 				      * above: it determines at which call to
-				      * #sleep# the grid shall be deleted.
+				      * @p{sleep} the grid shall be deleted.
 				      */
     const unsigned int sleep_level_to_delete_grid;
 
@@ -1457,7 +1457,7 @@ struct TimeStepBase_Tria<dim>::Flags
 
 
 /**
- * This structure is used to tell the #TimeStepBase_Tria# class how grids should
+ * This structure is used to tell the @p{TimeStepBase_Tria} class how grids should
  * be refined. Before we explain all the different variables, fist some terminology:
  * \begin{itemize}
  * \item Correction: after having flagged some cells of the triangulation for
@@ -1473,10 +1473,10 @@ struct TimeStepBase_Tria<dim>::Flags
  * \end{itemize}
  *
  *
- * \subsection{Description of flags}
+ * @sect3{Description of flags}
  *
  * \begin{itemize}
- * \item #max_refinement_level#: Cut the refinement of cells at a given level.
+ * \item @p{max_refinement_level}: Cut the refinement of cells at a given level.
  *   This flag does not influence the flagging of cells, so not more cells
  *   on the coarser levels are flagged than usual. Rather, the flags are all
  *   set, but when it comes to the actual refinement, the maximum refinement
@@ -1486,7 +1486,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   refinement with adaptive refinement when you don't want the latter
  *   to refine more than the global refinement.
  *
- * \item #first_sweep_with_correction#: When using cell number correction
+ * \item @p{first_sweep_with_correction}: When using cell number correction
  *   as defined above, it may be worth while to start with this only in
  *   later sweeps, not already in the first one. If this variable is
  *   zero, then start with the first sweep, else with a higher one. The
@@ -1495,21 +1495,21 @@ struct TimeStepBase_Tria<dim>::Flags
  *   the sweeps where we start to be interested in the actual results of
  *   the computations.
  *
- * \item #min_cells_for_correction#: If we want a more free process of
+ * \item @p{min_cells_for_correction}: If we want a more free process of
  *   grid development, we may want to impose less rules for grids with few
  *   cells also. This variable sets a lower bound for the cell number of
  *   grids where corrections are to be performed.
  *
- * \item #cell_number_corridor_top#: Fraction of the number of cells by
+ * \item @p{cell_number_corridor_top}: Fraction of the number of cells by
  *   which the number of cells of one grid may be higher than that on the
  *   previous grid. Common values are 10 per cent (i.e. 0.1). The naming
  *   of the variable results from the goal to define a target corridor
  *   for the number of cells after refinement has taken place.
  *
- * \item #cell_number_corridor_bottom#: Fraction of the number of cells by
+ * \item @p{cell_number_corridor_bottom}: Fraction of the number of cells by
  *   which the number of cells of one grid may be lower than that on the
  *   previous grid. Common values are 5 per cent (i.e. 0.05). Usually this
- *   number will be smaller than #cell_number_corridor_top# since an
+ *   number will be smaller than @p{cell_number_corridor_top} since an
  *   increase of the number of cells is not harmful (though it increases
  *   the numerical amount of work needed to solve the problem) while a
  *   sharp decrease may reduce the accuracy of the final result even if
@@ -1520,28 +1520,28 @@ struct TimeStepBase_Tria<dim>::Flags
  *   direction is reversed, so the two values defining the cell number
  *   corridor should be about equal.
  *
- * \item #correction_relaxations#: This is a list of pairs of number with the
- *   following meaning: just as for #min_cells_for_correction#, it may be
+ * \item @p{correction_relaxations}: This is a list of pairs of number with the
+ *   following meaning: just as for @p{min_cells_for_correction}, it may be
  *   worth while to reduce the requirements upon grids if the have few cells.
  *   The present variable stores a list of cell numbers along with some values
  *   which tell us that the cell number corridor should be enlarged by a
- *   certain factor. For example, if this list was #((100 5) (200 3) (500 2))#,
+ *   certain factor. For example, if this list was @p{((100 5) (200 3) (500 2))},
  *   this would mean that for grids with a cell number below 100, the
- *   #cell_number_corridor_*# variables are to be multiplied by 5 before they
+ *   @p{cell_number_corridor_*} variables are to be multiplied by 5 before they
  *   are applied, for cell numbers below 200 they are to be multiplied by 3,
  *   and so on.
  *
- *   #correction_relaxations# is actually a vector of such list. Each entry
+ *   @p{correction_relaxations} is actually a vector of such list. Each entry
  *   in this vector denotes the relaxation rules for one sweep. The last
  *   entry defines the relaxation rules for all following sweeps. This
  *   scheme is adopted to allow for stricter corrections in later sweeps
  *   while the relaxations may be more generous in the first sweeps.
  *
- *   There is a static variable #default_correction_relaxations# which you
+ *   There is a static variable @p{default_correction_relaxations} which you
  *   can use as a default value. It is an empty list and thus defines no
  *   relaxations.
  *
- * \item #cell_number_correction_steps#: Usually, if you want the number of
+ * \item @p{cell_number_correction_steps}: Usually, if you want the number of
  *   cells to be corrected, the target corridor for the cell number is computed
  *   and some additional cells are flagged or flags are removed. But since
  *   the cell number resulting after flagging and deflagging can not be
@@ -1552,7 +1552,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   regularly. Setting the variable to zero will result in no correction
  *   steps at all.
  *
- * \item #mirror_flags_to_previous_grid#: If a cell on the present grid is
+ * \item @p{mirror_flags_to_previous_grid}: If a cell on the present grid is
  *   flagged for refinement, also flag the corresponding cell on the previous
  *   grid. This is useful if, for example, error indicators are computed for
  *   space-time cells, but are stored for the second grid only. Now, since the
@@ -1560,7 +1560,7 @@ struct TimeStepBase_Tria<dim>::Flags
  *   may be useful to flag both if necessary. This is done if the present
  *   variable is set.
  *
- * \item #adapt_grids#: adapt the present grid to the previous one in the sense
+ * \item @p{adapt_grids}: adapt the present grid to the previous one in the sense
  *   defined above. What is actually done here is the following: if going from
  *   the previous to the present grid would result in double refinement or
  *   double coarsening of some cells, then we try to flag these cells for
@@ -1713,7 +1713,7 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
  * Structure given to the actual refinement function, telling it which
  * thresholds to take for coarsening and refinement. The actual refinement
  * criteria are loaded by calling the virtual function
- * #get_tria_refinement_criteria#.
+ * @p{get_tria_refinement_criteria}.
  */
 template <int dim>
 struct TimeStepBase_Tria<dim>::RefinementData 

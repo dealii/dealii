@@ -276,7 +276,7 @@ void FESystem<dim>::build_interface_constraints ()
 				   // described in the FiniteElement class. you
 				   // may want to look there first before trying
 				   // to understand the following, especially
-				   // the mapping of the #n# index.
+				   // the mapping of the @p{n} index.
 				   //
 				   // in order to map it to the fe-system class,
 				   // we have to know which base element a

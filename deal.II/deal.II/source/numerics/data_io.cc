@@ -1050,13 +1050,13 @@ void DataOut_Old<2>::write_eps (ostream &out, const EpsOutputData &eod) const {
 	   cells2.insert(cd);
 	 };
 
-					// since we don't need #cells# any
+					// since we don't need @p{cells} any
 					// more, delete it now
        cells.clear ();
      }
    else 
-				      // copy #cells# to #cells2#. since
-				      // we don't need #cells# any
+				      // copy @p{cells} to @p{cells2}. since
+				      // we don't need @p{cells} any
 				      // more, we use a trick for copying
 				      // that is significantly faster
      cells2.swap (cells);

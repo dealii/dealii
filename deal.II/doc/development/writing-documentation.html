@@ -66,7 +66,7 @@
     JavaDoc</a> standard, with some small additions which we will
     explain below. The patched version of kdoc is included into the
     library and can be found in the
-    <code>deal.II/doc/auto/script/kdoc</code> directory.
+    <code>deal.II/contrib/kdoc</code> directory.
     </p>
 
     <p>
@@ -176,23 +176,28 @@
     <li> <em>Typewriter font:</em>
          <p>
 	 One would often like to use a typewriter font for variable,
-	 function, or class names. For this, Doc++ has the special
-	 sequence <code>#...#</code>, which generates output in which
-	 the content inside the <code>#</code> characters is set in
-	 typewriter font. We have extended kdoc for this feature as well.
+	 function, or class names. For this, the <code>@p{...}</code>
+	 tag is used, which generates output in which the content
+	 inside the braces is set in typewriter font.
 	 </p>
 
 	 <p>
 	 As a convention, we always enclose variable and function
-	 names into <code>#...#</code> in order to give them a visible
+	 names into <code>@p{...}</code> in order to give them a visible
 	 distinction.
+	 </p>
+
+    <li> <em>Emphasis:</em>
+         <p>
+	 To generate output in italics, use the <code>@em{...}</code> tag.
 	 </p>
 
     <li> <em>Sections:</em>
          <p>
-	 Sections can be generated using 
-	 <code>\section{...}, \subsection{...},
-	 \subsubsection{...}</code> tags.
+	 Sections can be generated using <code>@sect1{...},
+	 @sect2{...}, @sect3{...}, @sect4{...}</code> tags. We don't
+	 normally use <code>@sect1{...}</code> as it produces section
+	 titles that are overly large compared to the rest of a page.
 	 </p>
     </ul>
     </p>
@@ -202,22 +207,12 @@
     <h4>Future directions</h4>
 
     <p>
-    In the not-so-far future, we hope to be able to switch to 
-    <a href="http://www.ph.unimelb.edu.au/~ssk/kde/kdoc/" target="_top">kdoc2</a>,
-    which offers a much nicer output and a greatly improved parser. At
-    present, this program is still in alpha stage, but once stable we
-    will use for the generation of documentation. In particular, we
-    will then start thinking about using kdoc also for the generation
-    of printable documentation, through its DocBook SGML backend.
-    </p>
-
-    <p>
-    Speaking of SGML, we are considering switching to DocBook SGML
-    altogether. At present, printing of some documentation, most
+    We are considering switching to DocBook SGML instead of Latex for
+    printed output. At present, printing of some documentation, most
     notably the example programs is not really supported, and we
     consider ways to convert them to SGML along with most other
     documentation, since SGML is readily convertible into many other
-    formats, for example HTML and Postscript.
+    formats, for Postscript.
     </p>
 
     <p>

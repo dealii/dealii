@@ -23,7 +23,7 @@
 /**
  * Print intermediate solutions in solvers.
  * This is derived from a solver class provided as template argument.
- * It implements the #print_vector# function of the solver using a
+ * It implements the @p{print_vector} function of the solver using a
  * @ref DoFHandler. This way, the intermediate vectors can be viewed as
  * finite element functions.
  *
@@ -44,7 +44,7 @@ class DoFPrintSolverStep :
 				      * function.
 				      *
 				      * One output file with the name
-				      * #basename.[step].[suffix]#
+				      * @p{basename.[step].[suffix]}
 				      * will be produced for each
 				      * iteration step.
 				      */

@@ -24,7 +24,7 @@ template <int dim> class MGDoFHandler;
 /**
  * Abstract base class for multigrid smoothers.
  * In fact, this class only provides the interface of the smoothing function.
- * Using #deal.II# grid handling, #MGSmoother# is a good point to start.
+ * Using @p{deal.II} grid handling, @p{MGSmoother} is a good point to start.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
@@ -39,20 +39,20 @@ class MGSmootherBase :  public Subscriptor
     virtual ~MGSmootherBase();
     
 				     /**
-				      * Smooth the residual of #u# on
+				      * Smooth the residual of @p{u} on
 				      * the given level. If $S$ is the
 				      * smoothing operator, then this
 				      * function should do the
 				      * following operation:
-				      * $u += S (rhs - Au)$, where #u# and
-				      * #rhs# are the input parameters.
+				      * $u += S (rhs - Au)$, where @p{u} and
+				      * @p{rhs} are the input parameters.
 				      *
 				      * This function should keep the
 				      * interior level boundary
 				      * values, so you may want to
-				      * call #set_zero_interior_boundary#
+				      * call @p{set_zero_interior_boundary}
 				      * in the derived class
-				      * #MGSmoother# somewhere in your
+				      * @p{MGSmoother} somewhere in your
 				      * derived function, or another
 				      * function doing similar things.
 				      */
@@ -75,7 +75,7 @@ class MGSmootherIdentity : public MGSmootherBase
   public:
 				     /**
 				      * Implementation of the
-				      * interface in #MGSmootherBase#.
+				      * interface in @p{MGSmootherBase}.
 				      * This function does nothing,
 				      * which by comparison with the
 				      * definition of this function
@@ -91,7 +91,7 @@ class MGSmootherIdentity : public MGSmootherBase
 
 /**
  * Base class for multigrid smoothers. It declares the interface
- * to smoothers by inheriting #MGSmootherBase# and implements some functionality for setting
+ * to smoothers by inheriting @p{MGSmootherBase} and implements some functionality for setting
  * the values
  * of vectors at interior boundaries (i.e. boundaries between differing
  * levels of the triangulation) to zero, by building a list of these degrees
@@ -119,7 +119,7 @@ class MGSmoother : public MGSmootherBase
 				      * on the interior boundaries between
 				      * the different levels, which are
 				      * needed by the function
-				      * #set_zero_interior_boundaries#.
+				      * @p{set_zero_interior_boundaries}.
 				      *
 				      * Since this function is implemented
 				      * a bit different in 1d (there are no
@@ -138,10 +138,10 @@ class MGSmoother : public MGSmootherBase
 				      * on the interior boundaries between
 				      * the different levels, which are
 				      * needed by the function
-				      * #set_zero_interior_boundaries#.
+				      * @p{set_zero_interior_boundaries}.
 				      *
 				      * The parameter steps indicates the number of smoothing
-				      * steps to be executed by #smooth#.
+				      * steps to be executed by @p{smooth}.
 				      */
     template <int dim>
     MGSmoother (const MGDoFHandler<dim> &mg_dof,
@@ -151,9 +151,9 @@ class MGSmoother : public MGSmootherBase
 				      * Reset the values of the degrees of
 				      * freedom on interior boundaries between
 				      * different levels to zero in the given
-				      * data vector #u#.
+				      * data vector @p{u}.
 				      *
-				      * Since the coarsest level (#level==0#)
+				      * Since the coarsest level (@p{level==0})
 				      * has no interior boundaries, this
 				      * function does nothing in this case.
 				      */
@@ -208,14 +208,14 @@ class MGSmootherRelaxation : public MGSmoother
     
 				     /**
 				      * Constructor.
-				      * The constructor uses an #MGDoFHandler# to initialize
+				      * The constructor uses an @p{MGDoFHandler} to initialize
 				      * data structures for interior level boundary handling
-				      * in #MGSmoother#.
+				      * in @p{MGSmoother}.
 				      *
 				      * Furthermore, it takes a pointer to the
 				      * level matrices and their smoothing function.
 				      * This function must perform one relaxation step
-				      * like #SparseMatrix<number>::SOR_step# does. Do not
+				      * like @p{SparseMatrix<number>::SOR_step} does. Do not
 				      * use the preconditioning methods because they apply
 				      * a preconditioning matrix to the residual.
 				      *
@@ -231,8 +231,8 @@ class MGSmootherRelaxation : public MGSmoother
 			 const double                                   omega = 1.);
     
 				     /**
-				      * Implementation of the interface in #MGSmootherBase#.
-				      * We use the SOR method in #SparseMatrix# for the real work
+				      * Implementation of the interface in @p{MGSmootherBase}.
+				      * We use the SOR method in @p{SparseMatrix} for the real work
 				      * and find a way to keep the boundary values.
 				      */
     virtual void smooth (const unsigned int   level,

@@ -20,16 +20,16 @@
 
 /**
  * Smart pointers avoid destruction of an object in use. They can be used just
- * like a pointer (i.e. using the #*# and #-># operators and through casting)
+ * like a pointer (i.e. using the @p{*} and @p{->} operators and through casting)
  * but make sure that the object pointed to is not deleted in the course of
  * use of the pointer by signalling the pointee its use.
  *
- * Objects pointed to should inherit #Subscriptor# or must implement
+ * Objects pointed to should inherit @p{Subscriptor} or must implement
  * the same functionality. Null pointers are an exception from this
  * rule and are allowed, too.
  *
- * #SmartPointer# does NOT implement any memory handling! Especially,
- * deleting a #SmartPointer# does not delete the object. Writing
+ * @p{SmartPointer} does NOT implement any memory handling! Especially,
+ * deleting a @p{SmartPointer} does not delete the object. Writing
  * \begin{verbatim}
  * SmartPointer<T> t = new T;
  * \end{verbatim}
@@ -43,10 +43,10 @@
  * delete p;
  * \end{verbatim}
  *
- * Note that a smart pointer can handle #const#ness of an object, i.e.
- * a #SmartPointer<const ABC># really behaves as if it were a pointer to
+ * Note that a smart pointer can handle @p{const}ness of an object, i.e.
+ * a @p{SmartPointer<const ABC>} really behaves as if it were a pointer to
  * a constant object (disallowing write access when dereferenced), while
- * #SmartPointer<ABC># is a mutable pointer.
+ * @p{SmartPointer<ABC>} is a mutable pointer.
  */
 template<typename T>
 class SmartPointer
@@ -59,8 +59,8 @@ class SmartPointer
 
 				     /*
 				      * Copy constructor for
-				      * #SmartPointer#. We copy the object
-				      * subscribed to from #tt#, but subscribe
+				      * @p{SmartPointer}. We copy the object
+				      * subscribed to from @p{tt}, but subscribe
 				      * ourselves to it again.
 				      */
     SmartPointer (const SmartPointer<T> &tt);
@@ -95,7 +95,7 @@ class SmartPointer
 
 				     /**
 				      *Assignment operator for
-				      * #SmartPointer#.  The pointer
+				      * @p{SmartPointer}.  The pointer
 				      * subscribes to the new object
 				      * automatically and unsubscribes
 				      * to an old one if it exists.

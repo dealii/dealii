@@ -54,7 +54,7 @@ void TriangulationLevel<0>::reserve_space (const unsigned int total_cells,
 				   // so only allocate new space if needed.
 				   //
 				   // note that all arrays should have equal
-				   // sizes (checked by #monitor_memory#
+				   // sizes (checked by @p{monitor_memory}
   if (total_cells > refine_flags.size()) 
     {
       refine_flags.reserve (total_cells);
@@ -103,7 +103,7 @@ void TriangulationLevel<1>::reserve_space (const unsigned int new_lines)
 					  lines.used.end(),
 					  bind2nd (equal_to<bool>(), true));
 
-				   // same as in #reserve_space<0>#: only
+				   // same as in @p{reserve_space<0>}: only
 				   // allocate space if necessary
   if (new_size>lines.lines.size()) 
     {

@@ -47,12 +47,12 @@ template <int dim> class Triangulation;
  * further details.
  *
  *
- * \subsection{Structure of input grid data}
+ * @sect3{Structure of input grid data}
  * 
  * It is your duty to use a correct numbering of vertices in the cell list,
  * i.e. for lines, you have to first give the vertex with the lower coordinate
  * value, then that with the higher coordinate value. For quadrilaterals in
- * two dimensions, the vertex indices in the #quad# list have to be such that
+ * two dimensions, the vertex indices in the @p{quad} list have to be such that
  * the vertices are numbered in counter-clockwise sense.
  *
  * In two dimensions, another difficulty occurs, which has to do with the sense
@@ -73,10 +73,10 @@ template <int dim> class Triangulation;
  *   0---1---2
  * \end{verbatim}
  * may be characterised by the vertex numbers (0 1 4 3) and (1 2 5 4), since
- * the middle line would get the direction #1->4# when viewed from both cells.
+ * the middle line would get the direction @p{1->4} when viewed from both cells.
  * The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
- * quad would give the common line the direction #1->4#, while the right one
- * would want to use #4->1#, leading to ambiguity. The #Triangulation# object
+ * quad would give the common line the direction @p{1->4}, while the right one
+ * would want to use @p{4->1}, leading to ambiguity. The @p{Triangulation} object
  * is capable of detecting this special case, which can be eliminated by
  * rotating the indices of the right quad by two. However, it would not
  * know what to do if you gave the vertex indices (4 1 2 5), since then it

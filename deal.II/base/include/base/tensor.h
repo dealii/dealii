@@ -23,7 +23,7 @@ template <int rank_, int dim> class Tensor;
  * an arbitrary number of indices. The Tensor class provides an
  * indexing operator and a bit of infrastructure, but most
  * functionality is recursively handed down to tensors of rank 1 or
- * put into external templated functions, e.g. the #contract# family.
+ * put into external templated functions, e.g. the @p{contract} family.
  *
  * Using this tensor class for objects of rank 2 has advantages over
  * matrices in many cases since the dimension is known to the compiler
@@ -41,7 +41,7 @@ class Tensor
 				      * explicit knowledge of it's
 				      * data type. Implementation is
 				      * this way instead of providing
-				      * a function #dimension()#
+				      * a function @p{dimension()}
 				      * because now it is possible to
 				      * get the dimension at compile
 				      * time without the expansion and
@@ -116,26 +116,26 @@ class Tensor
     Tensor<rank_,dim> & operator -= (const Tensor<rank_,dim> &);
 
 				     /**
-				      *  Scale the tensor by #factor#, i.e. multiply
-				      *  all coordinates by #factor#.
+				      *  Scale the tensor by @p{factor}, i.e. multiply
+				      *  all coordinates by @p{factor}.
 				      */
     Tensor<rank_,dim> & operator *= (const double &factor);
 
 				     /**
-				      *  Scale the vector by #1/factor#.
+				      *  Scale the vector by @p{1/factor}.
 				      */
     Tensor<rank_,dim> & operator /= (const double &factor);
 
 				     /**
 				      *  Add two tensors. If possible, use
-				      *  #operator +=# instead since this does not
+				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Tensor<rank_,dim>   operator + (const Tensor<rank_,dim> &) const;
 
 				     /**
 				      *  Subtract two tensors. If possible, use
-				      *  #operator +=# instead since this does not
+				      *  @p{operator +=} instead since this does not
 				      *  need to copy a point at least once.
 				      */
     Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
@@ -364,7 +364,7 @@ DeclException1 (ExcInvalidTensorIndex,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 1. The result is
- * #dest[i] = sum_j src1[i][j] src2[j]#.
+ * @p{dest[i] = sum_j src1[i][j] src2[j]}.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -384,7 +384,7 @@ void contract (Tensor<1,dim>       &dest,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The result is
- * #dest[i][k] = sum_j src1[i][j] src2[j][k]#.
+ * @p{dest[i][k] = sum_j src1[i][j] src2[j][k]}.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -405,11 +405,11 @@ void contract (Tensor<2,dim>       &dest,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The
- * contraction is performed over index #index1# of the first tensor,
- * and #index2# of the second tensor. Thus, if #index1==2#,
- * #index2==1#, the result is the usual contraction, but if for
- * example #index1==1#, #index2==2#, then the result is
- * #dest[i][k] = sum_j src1[j][i] src2[k][j]#.
+ * contraction is performed over index @p{index1} of the first tensor,
+ * and @p{index2} of the second tensor. Thus, if @p{index1==2},
+ * @p{index2==1}, the result is the usual contraction, but if for
+ * example @p{index1==1}, @p{index2==2}, then the result is
+ * @p{dest[i][k] = sum_j src1[j][i] src2[k][j]}.
  *
  * Note that the number of the index is counted from 1 on, not from
  * zero as usual.
@@ -476,7 +476,7 @@ void contract (Tensor<2,dim>       &dest,
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 1. The
- * contraction is performed over index #index1# of the first
+ * contraction is performed over index @p{index1} of the first
  * tensor.
  *
  * Note that the number of the index is counted from 1 on, not from
@@ -524,7 +524,7 @@ void contract (Tensor<2,dim>       &dest,
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 2. The result is
- * #dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]#.
+ * @p{dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]}.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -546,7 +546,7 @@ void contract (Tensor<3,dim>       &dest,
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 3. The result is
- * #dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]#.
+ * @p{dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]}.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -567,7 +567,7 @@ void contract (Tensor<3,dim>       &dest,
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 3. The result is
- * #dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]#.
+ * @p{dest[i][j][k][l] = sum_m src1[i][j][m] src2[m][k][l]}.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -603,7 +603,7 @@ double determinant (const Tensor<rank,1> &t)
 				   // can be computed by recursion. we
 				   // need therefore not try to access
 				   // the number itself, which is
-				   // difficult since it needs #rank#
+				   // difficult since it needs @p{rank}
 				   // indirections, which is not
 				   // computable in the general
 				   // template
@@ -628,7 +628,7 @@ double determinant (const Tensor<1,1> &t)
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for #dim==2#.
+ * Compute the determinant of a tensor or rank 2, here for @p{dim==2}.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -643,7 +643,7 @@ double determinant (const Tensor<2,2> &t)
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for #dim==3#.
+ * Compute the determinant of a tensor or rank 2, here for @p{dim==3}.
  *
  * @author Wolfgang Bangerth, 1998
  */

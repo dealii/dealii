@@ -21,22 +21,22 @@ template <int n_blocks, typename Number> class BlockVector;
 
 /**
  * Blocked sparse matrix. The behaviour of objects of this type is
- * almost as for the #SparseMatrix<...># objects, with most of the
+ * almost as for the @p{SparseMatrix<...>} objects, with most of the
  * functions being implemented in both classes. The main difference is
  * that the matrix represented by this object is composed of an array
- * of sparse matrices (i.e. of type #SparseMatrix<number>#) and all
+ * of sparse matrices (i.e. of type @p{SparseMatrix<number>}) and all
  * accesses to the elements of this object are relayed to accesses of
  * the base matrices.
  *
  * In addition to the usual matrix access and linear algebra
- * functions, there are functions #block# which allow access to the
+ * functions, there are functions @p{block} which allow access to the
  * different blocks of the matrix. This may, for example, be of help
  * when you want to implement Schur complement methods, or block
  * preconditioners, where each block belongs to a specific component
  * of the equation you are presently discretizing.
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -72,7 +72,7 @@ class BlockSparseMatrix : public Subscriptor
 				      *
 				      * You have to initialize
 				      * the matrix before usage with
-				      * #reinit(BlockSparsityPattern)#.
+				      * @p{reinit(BlockSparsityPattern)}.
 				      */
     BlockSparseMatrix ();
 
@@ -82,7 +82,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * represent the sparsity pattern
 				      * of this matrix. You can change
 				      * the sparsity pattern later on
-				      * by calling the #reinit#
+				      * by calling the @p{reinit}
 				      * function.
 				      *
 				      * This constructor initializes
@@ -94,7 +94,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * lifetime of the sparsity
 				      * structure is at least as long
 				      * as that of this matrix or as
-				      * long as #reinit# is not called
+				      * long as @p{reinit} is not called
 				      * with a new sparsity structure.
 				      */
     BlockSparseMatrix (const BlockSparsityPattern<rows,columns> &sparsity);
@@ -113,10 +113,10 @@ class BlockSparseMatrix : public Subscriptor
 				      * Reinitialize the object but
 				      * keep to the sparsity pattern
 				      * previously used.  This may be
-				      * necessary if you #reinit#'d
+				      * necessary if you @p{reinit}'d
 				      * the sparsity structure and
 				      * want to update the size of the
-				      * matrix. It only calls #reinit#
+				      * matrix. It only calls @p{reinit}
 				      * on the sub-matrices.
 				      *
 				      * If the sparsity pattern has
@@ -136,7 +136,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * reserved.
 				      *
 				      * Basically, this function only
-				      * calls #reinit# of the
+				      * calls @p{reinit} of the
 				      * sub-matrices with the block
 				      * sparsity patterns of the
 				      * parameter.
@@ -173,7 +173,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * the sparsity pattern it was
 				      * previously tied to.
 				      *
-				      * This calls #clear# on all
+				      * This calls @p{clear} on all
 				      * sub-matrices.
 				      */
     virtual void clear ();
@@ -182,7 +182,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * Return whether the object is
 				      * empty. It is empty if either
 				      * both dimensions are zero or no
-				      * #SparsityPattern# is
+				      * @p{SparsityPattern} is
 				      * associated.
 				      */
     bool empty () const;
@@ -216,7 +216,7 @@ class BlockSparseMatrix : public Subscriptor
     unsigned int n_nonzero_elements () const;
     
 				     /**
-				      * Set the element #(i,j)# to #value#.
+				      * Set the element @p{(i,j)} to @p{value}.
 				      * Throws an error if the entry does
 				      * not exist. Still, it is allowed to store
 				      * zero values in non-existent fields.
@@ -226,8 +226,8 @@ class BlockSparseMatrix : public Subscriptor
 	      const number value);
     
 				     /**
-				      * Add #value# to the element
-				      * #(i,j)#.  Throws an error if
+				      * Add @p{value} to the element
+				      * @p{(i,j)}.  Throws an error if
 				      * the entry does not
 				      * exist. Still, it is allowed to
 				      * store zero values in
@@ -247,7 +247,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * cheaper. Since this operation
 				      * is notheless not for free, we
 				      * do not make it available
-				      * through #operator =#, since
+				      * through @p{operator =}, since
 				      * this may lead to unwanted
 				      * usage, e.g. in copy arguments
 				      * to functions, which should
@@ -261,15 +261,15 @@ class BlockSparseMatrix : public Subscriptor
 				      * of this matrix.
 				      *
 				      * The function returns a
-				      * reference to #this#.
+				      * reference to @p{this}.
 				      */
     template <typename somenumber>
     BlockSparseMatrix<number,rows,columns> &
     copy_from (const BlockSparseMatrix<somenumber,rows,columns> &source);
 
 				     /**
-				      * Add #matrix# scaled by
-				      * #factor# to this matrix. The
+				      * Add @p{matrix} scaled by
+				      * @p{factor} to this matrix. The
 				      * function throws an error if
 				      * the sparsity patterns of the
 				      * two involved matrices do not
@@ -312,7 +312,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * #vmult# but takes the
+				      * @p{vmult} but takes the
 				      * transposed matrix.
 				      */
     template <typename somenumber>
@@ -334,7 +334,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * multiplication. Add $M^T*src$
 				      * to $dst$ with $M$ being this
 				      * matrix. This function does the
-				      * same as #vmult_add# but takes
+				      * same as @p{vmult_add} but takes
 				      * the transposed matrix.
 				      */
     template <typename somenumber>
@@ -379,13 +379,13 @@ class BlockSparseMatrix : public Subscriptor
     
 				     /**
 				      * Compute the residual of an
-				      * equation #Ax=b#, where the
+				      * equation @p{Ax=b}, where the
 				      * residual is defined to be
-				      * #r=b-Ax# with #x# typically
+				      * @p{r=b-Ax} with @p{x} typically
 				      * being an approximate of the
 				      * true solution of the
 				      * equation. Write the residual
-				      * into #dst#.
+				      * into @p{dst}.
 				      */
     template <typename somenumber>
     somenumber residual (BlockVector<rows,somenumber>          &dst,
@@ -396,11 +396,11 @@ class BlockSparseMatrix : public Subscriptor
 				      * Apply the Jacobi
 				      * preconditioner, which
 				      * multiplies every element of
-				      * the #src# vector by the
+				      * the @p{src} vector by the
 				      * inverse of the respective
 				      * diagonal element and
 				      * multiplies the result with the
-				      * damping factor #omega#.
+				      * damping factor @p{omega}.
 				      *
 				      * The matrix needs to be square
 				      * for this operation.
@@ -416,7 +416,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * pattern of this matrix.
 				      *
 				      * Though the return value is
-				      * declared #const#, you should
+				      * declared @p{const}, you should
 				      * be aware that it may change if
 				      * you call any nonconstant
 				      * function of objects which
@@ -437,7 +437,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * matrix. In order to guarantee
 				      * that it is not deleted while
 				      * still in use, we subscribe to
-				      * it using the #SmartPointer#
+				      * it using the @p{SmartPointer}
 				      * class.
 				      */
     SmartPointer<const BlockSparsityPattern<rows,columns> > sparsity_pattern;
@@ -700,9 +700,9 @@ residual (BlockVector<rows,somenumber>          &dst,
 	  const BlockVector<rows,somenumber>    &b) const
 {
 				   // in block notation, the residual is
-				   // #r_i = b_i - \sum_j A_ij x_j#.
+				   // @p{r_i = b_i - \sum_j A_ij x_j}.
 				   // this can be written as
-				   // #r_i = b_i - A_i0 x_0 - \sum_{j>0} A_ij x_j#.
+				   // @p{r_i = b_i - A_i0 x_0 - \sum_{j>0} A_ij x_j}.
 				   //
 				   // for the first two terms, we can
 				   // call the residual function of

@@ -34,7 +34,7 @@ void DataOutStack<dim>::new_parameter_value (const double p,
   parameter      = p;
   parameter_step = dp;
 
-				   // check whether the user called #finish_...#
+				   // check whether the user called @p{finish_...}
 				   // at the end of the previous parameter step
 				   //
 				   // this is to prevent serious waste of

@@ -805,7 +805,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	      previous_cells -= (GeometryInfo<dim>::children_per_cell-1) /
 				GeometryInfo<dim>::children_per_cell;
 	    
-					 // #previous_cells# now gives the
+					 // @p{previous_cells} now gives the
 					 // number of cells which would result
 					 // from the flags on the previous grid
 					 // if we refined it now. However, some
@@ -858,7 +858,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					 // note that for each cell that
 					 // we unflag we have to diminish the
 					 // estimated number of cells by
-					 // #children_per_cell#.
+					 // @p{children_per_cell}.
 	if (estimated_cells > previous_cells*(1.+delta_up)) 
 	  {
 					     // only limit the cell number
@@ -921,7 +921,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					       // new grid is to be enlarged
 	      double delta_cells = previous_cells*(1.-delta_down)-estimated_cells;
 					       // heuristics: usually, if we
-					       // add #delta_cells# to the
+					       // add @p{delta_cells} to the
 					       // present state, we end up
 					       // with much more than only
 					       // (1-delta_down)*prev_cells

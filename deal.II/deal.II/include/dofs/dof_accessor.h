@@ -37,14 +37,14 @@ template <int dim> class DoFHandler;
  * Define the basis for accessors to the degrees of freedom.
  *
  * Note that it is allowed to construct an object of which the
- * #dof_handler# pointer is a Null pointer. Such an object would
+ * @p{dof_handler} pointer is a Null pointer. Such an object would
  * result in a strange kind of behaviour, though every reasonable
  * operating system should disallow access through that pointer.
  * The reason we do not check for the null pointer in the
- * constructor which gets passed the #DoFHandler# pointer is that
+ * constructor which gets passed the @p{DoFHandler} pointer is that
  * if we did we could not make dof iterators member of other classes
- * (like in the #FEValues# class) if we did not know about the
- * #DoFHandler# object to be used upon construction of that object.
+ * (like in the @p{FEValues} class) if we did not know about the
+ * @p{DoFHandler} object to be used upon construction of that object.
  * Through the way this class is implemented here, we allow the
  * creation of a kind of virgin object which only gets useful if
  * assigned to from another object before first usage.
@@ -53,7 +53,7 @@ template <int dim> class DoFHandler;
  * which has an invalid dof handler pointer. This is to guarantee
  * that every iterator which is once assigned to is a valid
  * object. However, this assertion only holds in debug mode, when
- * the #Assert# macro is switched on.
+ * the @p{Assert} macro is switched on.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -68,7 +68,7 @@ class DoFAccessor
 
 				     /**
 				      * This should be the default constructor.
-				      * We cast away the #const#ness of the
+				      * We cast away the @p{const}ness of the
 				      * pointer which clearly is EVIL but
 				      * we can't help without making all
 				      * functions which could somehow use
@@ -85,7 +85,7 @@ class DoFAccessor
 
 				     /**
 				      * Return a handle on the
-				      * #DoFHandler# object which we
+				      * @p{DoFHandler} object which we
 				      * are using.
 				      */
     const DoFHandler<dim> &
@@ -120,7 +120,7 @@ class DoFAccessor
 
   protected:
 				     /**
-				      * Store the address of the #DoFHandler# object
+				      * Store the address of the @p{DoFHandler} object
 				      * to be accessed.
 				      */
     DoFHandler<dim> *dof_handler;  
@@ -130,14 +130,14 @@ class DoFAccessor
 /* -------------------------------------------------------------------------- */
 
 /**
- * This is a switch class which only declares a #typedef#. It is meant to
- * determine which class a #DoFObjectAccessor# class is to be derived
- * from. By default, #DoFObjectAccessor<celldim,dim># derives from
- * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
- * class, which is #TriaObjectAccessor<celldim,dim>#,
- * but if #celldim==dim#, then the specialization #DoFObjectAccessor_Inheritance<dim,dim>#
- * is used which declares its local type to be #CellAccessor<dim>#. Therefore,
- * the inheritance is automatically chosen to be from #CellAccessor# if the
+ * This is a switch class which only declares a @p{typedef}. It is meant to
+ * determine which class a @p{DoFObjectAccessor} class is to be derived
+ * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
+ * the @p{typedef} in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
+ * class, which is @p{TriaObjectAccessor<celldim,dim>},
+ * but if @p{celldim==dim}, then the specialization @p{DoFObjectAccessor_Inheritance<dim,dim>}
+ * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
+ * the inheritance is automatically chosen to be from @p{CellAccessor} if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
@@ -146,7 +146,7 @@ template <int celldim, int dim>
 class DoFObjectAccessor_Inheritance 
 {
 				     /**
-				      * Declaration of the #typedef#.
+				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
 				      * more information.
 				      */
@@ -155,14 +155,14 @@ class DoFObjectAccessor_Inheritance
 
 
 /**
- * This is a switch class which only declares a #typedef#. It is meant to
- * determine which class a #DoFObjectAccessor# class is to be derived
- * from. By default, #DoFObjectAccessor<celldim,dim># derives from
- * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
- * class, which is #TriaObjectAccessor<celldim,dim>#,
- * but if #celldim==dim#, then the specialization #DoFObjectAccessor_Inheritance<dim,dim>#
- * is used which declares its local type to be #CellAccessor<dim>#. Therefore,
- * the inheritance is automatically chosen to be from #CellAccessor# if the
+ * This is a switch class which only declares a @p{typedef}. It is meant to
+ * determine which class a @p{DoFObjectAccessor} class is to be derived
+ * from. By default, @p{DoFObjectAccessor<celldim,dim>} derives from
+ * the @p{typedef} in the general @p{DoFObjectAccessor_Inheritance<celldim,dim>}
+ * class, which is @p{TriaObjectAccessor<celldim,dim>},
+ * but if @p{celldim==dim}, then the specialization @p{DoFObjectAccessor_Inheritance<dim,dim>}
+ * is used which declares its local type to be @p{CellAccessor<dim>}. Therefore,
+ * the inheritance is automatically chosen to be from @p{CellAccessor} if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @author Wolfgang Bangerth, 1999
@@ -171,7 +171,7 @@ template <int dim>
 class DoFObjectAccessor_Inheritance<dim,dim>
 {
 				     /**
-				      * Declaration of the #typedef#.
+				      * Declaration of the @p{typedef}.
 				      * See the full documentation for
 				      * more information.
 				      */
@@ -189,7 +189,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * parameters. In this class here, we only collect all functions which
  * are in the specialized classes for simpler reference. Some
  * functions, however, might be missing in the specialized classes,
- * such as #quad# in the accessors for lines and quads, etc.
+ * such as @p{quad} in the accessors for lines and quads, etc.
  *
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (\Ref{TriaAccessor}). It enables
@@ -199,7 +199,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * lines in 1D-, 2D-, etc dimensions).
  *
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  *
  * The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
  * declare typedefs to iterators using the accessors declared in this class
@@ -208,7 +208,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * as they provide easier typing (much less complicated names!).
  * 
  * 
- * \subsection{Notes about the class hierarchy structure}
+ * @sect3{Notes about the class hierarchy structure}
  *
  * See the report on this subject, which is available from the general
  * documentation directory.
@@ -241,9 +241,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
     DoFObjectAccessor ();
 
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #DoFHandler<dim># object.
+				      * to a @p{DoFHandler<dim>} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		    const int           level,
@@ -253,28 +253,28 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 		    DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass (tria,level,index) {};
     
 				     /**
-				      * Index of the #i#th degree
+				      * Index of the @p{i}th degree
 				      * of freedom of this object.
 				      */
     unsigned int dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
-				      * of freedom of this object to #index#.
+				      * Set the index of the @p{i}th degree
+				      * of freedom of this object to @p{index}.
 				      */
     void set_dof_index (const unsigned int i,
 			const int index) const;
 
 				     /**
-				      * Index of the #i#th degree
-				      * on the #vertex#th vertex.
+				      * Index of the @p{i}th degree
+				      * on the @p{vertex}th vertex.
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
 				   const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex to #index#.
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex to @p{index}.
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
@@ -308,9 +308,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * active cells.
 				      *
 				      * The input vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -324,11 +324,11 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * #get_dof_values#: it takes a vector
+				      * @p{get_dof_values}: it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
-				      * data vector #values#. This function
+				      * data vector @p{values}. This function
 				      * is only callable for active cells.
 				      *
 				      * Note that for continuous finite
@@ -346,9 +346,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to this function.
 				      *
 				      * The output vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -361,21 +361,21 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 			 OutputVector         &values) const;
 
     				     /**
-				      *  Pointer to the #i#th line
+				      *  Pointer to the @p{i}th line
 				      *  bounding this Object.
 				      */
     TriaIterator<dim,DoFObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
     				     /**
-				      *  Pointer to the #i#th quad
+				      *  Pointer to the @p{i}th quad
 				      *  bounding this Object.
 				      */
     TriaIterator<dim,DoFObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
     
 				     /**
-				      * #i#th child as a #DoFObjectAccessor#
+				      * @p{i}th child as a @p{DoFObjectAccessor}
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a hex accessor without
@@ -390,7 +390,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * to the global one and entering the
 				      * local values into the global vector.
 				      *
-				      * The elements are {\it added} up to
+				      * The elements are @em{added} up to
 				      * the elements in the global vector,
 				      * rather than just set, since this is
 				      * usually what one wants.
@@ -400,7 +400,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * #distribute_local_to_global(dVector,dVector)#
+				      * @p{distribute_local_to_global(dVector,dVector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -451,7 +451,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * lines in 1D-, 2D-, etc dimensions).
  *
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  *
  * The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
  * declare typedefs to iterators using the accessors declared in this class
@@ -460,11 +460,11 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * as they provide easier typing (much less complicated names!).
  * 
  * 
- * \subsection{Notes about the class hierarchy structure}
+ * @sect3{Notes about the class hierarchy structure}
  *
- * Inheritance from #DoFObjectAccessor_Inheritance<1,dim>::BaseClass# yields
- * inheritance from #CellAccessor<1># if #dim==1# and from
- * #TriaObjectAccessor<1,dim># for all other #dim# values. Thus, an object
+ * Inheritance from @p{DoFObjectAccessor_Inheritance<1,dim>::BaseClass} yields
+ * inheritance from @p{CellAccessor<1>} if @p{dim==1} and from
+ * @p{TriaObjectAccessor<1,dim>} for all other @p{dim} values. Thus, an object
  * of this class shares all features of cells in one dimension, but behaves
  * like an ordinary line in all other cases.
  *
@@ -495,9 +495,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
     DoFObjectAccessor ();
     
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #DoFHandler<dim># object.
+				      * to a @p{DoFHandler<dim>} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		       const int           level,
@@ -507,28 +507,28 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 		    DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,level,index) {};
     
 				     /**
-				      * Return the index of the #i#th degree
+				      * Return the index of the @p{i}th degree
 				      * of freedom of this line.
 				      */
     unsigned int dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
-				      * of freedom of this line to #index#.
+				      * Set the index of the @p{i}th degree
+				      * of freedom of this line to @p{index}.
 				      */
     void set_dof_index (const unsigned int i,
 			const unsigned int index) const;
 
 				     /**
-				      * Return the index of the #i#th degree
-				      * on the #vertex#th vertex.
+				      * Return the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex.
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
 				   const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex to #index#.
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex to @p{index}.
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
@@ -559,9 +559,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -575,11 +575,11 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * #get_dof_values#: it takes a vector
+				      * @p{get_dof_values}: it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
-				      * data vector #values#. This function
+				      * data vector @p{values}. This function
 				      * is only callable for active cells.
 				      *
 				      * Note that for continuous finite
@@ -596,9 +596,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -611,7 +611,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 			 OutputVector         &values) const;
 
 				     /**
-				      * Return the #i#th child as a DoF line
+				      * Return the @p{i}th child as a DoF line
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a line accessor without
@@ -626,7 +626,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * to the global one and entering the
 				      * local values into the global vector.
 				      *
-				      * The elements are {\it added} up to
+				      * The elements are @em{added} up to
 				      * the elements in the global vector,
 				      * rather than just set, since this is
 				      * usually what one wants.
@@ -636,7 +636,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * #distribute_local_to_global(dVector,dVector)#
+				      * @p{distribute_local_to_global(dVector,dVector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -683,9 +683,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
     DoFObjectAccessor ();
 
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #DoFHandler<dim># object.
+				      * to a @p{DoFHandler<dim>} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		     const int           level,
@@ -695,28 +695,28 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 		    DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,level,index) {};
     
 				     /**
-				      * Return the index of the #i#th degree
+				      * Return the index of the @p{i}th degree
 				      * of freedom of this quad.
 				      */
     unsigned int dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
-				      * of freedom of this quad to #index#.
+				      * Set the index of the @p{i}th degree
+				      * of freedom of this quad to @p{index}.
 				      */
     void set_dof_index (const unsigned int i,
 			const unsigned int index) const;
 
 				     /**
-				      * Return the index of the #i#th degree
-				      * on the #vertex#th vertex.
+				      * Return the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex.
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
 				   const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex to #index#.
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex to @p{index}.
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
@@ -748,9 +748,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -764,11 +764,11 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * #get_dof_values#: it takes a vector
+				      * @p{get_dof_values}: it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
-				      * data vector #values#. This function
+				      * data vector @p{values}. This function
 				      * is only callable for active cells.
 				      *
 				      * Note that for continuous finite
@@ -785,9 +785,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -800,14 +800,14 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 			 OutputVector         &values) const;
 
     				     /**
-				      *  Return a pointer to the #i#th line
-				      *  bounding this #Quad#.
+				      *  Return a pointer to the @p{i}th line
+				      *  bounding this @p{Quad}.
 				      */
     TriaIterator<dim,DoFObjectAccessor<1, dim> >
     line (const unsigned int i) const;
     
 				     /**
-				      * Return the #i#th child as a DoF quad
+				      * Return the @p{i}th child as a DoF quad
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a quad accessor without
@@ -823,7 +823,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * to the global one and entering the
 				      * local values into the global vector.
 				      *
-				      * The elements are {\it added} up to
+				      * The elements are @em{added} up to
 				      * the elements in the global vector,
 				      * rather than just set, since this is
 				      * usually what one wants.
@@ -833,7 +833,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * #distribute_local_to_global(dVector,dVector)#
+				      * @p{distribute_local_to_global(dVector,dVector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -880,9 +880,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     DoFObjectAccessor ();
 
     				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to a #DoFHandler<dim># object.
+				      * to a @p{DoFHandler<dim>} object.
 				      */
     DoFObjectAccessor (Triangulation<dim> *tria,
 		    const int           level,
@@ -892,28 +892,28 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 		    DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,level,index) {};
     
 				     /**
-				      * Return the index of the #i#th degree
+				      * Return the index of the @p{i}th degree
 				      * of freedom of this hex.
 				      */
     unsigned int dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the #i#th degree
-				      * of freedom of this hex to #index#.
+				      * Set the index of the @p{i}th degree
+				      * of freedom of this hex to @p{index}.
 				      */
     void set_dof_index (const unsigned int i,
 			const unsigned int index) const;
 
 				     /**
-				      * Return the index of the #i#th degree
-				      * on the #vertex#th vertex.
+				      * Return the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex.
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
 				   const unsigned int i) const;
 
 				     /**
-				      * Set the index of the #i#th degree
-				      * on the #vertex#th vertex to #index#.
+				      * Set the index of the @p{i}th degree
+				      * on the @p{vertex}th vertex to @p{index}.
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
@@ -945,9 +945,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * cells.
 				      *
 				      * The input vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -961,11 +961,11 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * #get_dof_values#: it takes a vector
+				      * @p{get_dof_values}: it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
-				      * data vector #values#. This function
+				      * data vector @p{values}. This function
 				      * is only callable for active cells.
 				      *
 				      * Note that for continuous finite
@@ -982,9 +982,9 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * have the right size beforehand.
 				      *
 				      * The output vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in
@@ -997,21 +997,21 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 			 OutputVector         &values) const;
 
     				     /**
-				      *  Return a pointer to the #i#th line
-				      *  bounding this #Hex#.
+				      *  Return a pointer to the @p{i}th line
+				      *  bounding this @p{Hex}.
 				      */
     TriaIterator<dim,DoFObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
     				     /**
-				      *  Return a pointer to the #i#th quad
-				      *  bounding this #Hex#.
+				      *  Return a pointer to the @p{i}th quad
+				      *  bounding this @p{Hex}.
 				      */
     TriaIterator<dim,DoFObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
     
 				     /**
-				      * Return the #i#th child as a DoF hex
+				      * Return the @p{i}th child as a DoF hex
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a hex accessor without
@@ -1026,7 +1026,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * to the global one and entering the
 				      * local values into the global vector.
 				      *
-				      * The elements are {\it added} up to
+				      * The elements are @em{added} up to
 				      * the elements in the global vector,
 				      * rather than just set, since this is
 				      * usually what one wants.
@@ -1036,7 +1036,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function does much the same as the
-				      * #distribute_local_to_global(dVector,dVector)#
+				      * @p{distribute_local_to_global(dVector,dVector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
@@ -1056,18 +1056,18 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
- * #DoFObjectAccessor<1, 1># and #DoFObjectAccessor<2, 2># for the space dimension
+ * @p{DoFObjectAccessor<1, 1>} and @p{DoFObjectAccessor<2, 2>} for the space dimension
  * one and two, respectively, this class only collects the pieces
- * together by deriving from the appropriate #DoF*Accessor# and the
- * right #CellAccessor<dim># and finally adding two functions which give
- * access to the neighbors and children as #DoFCellAccessor# objects
- * rather than #CellAccessor# objects (the latter function was inherited
- * from the #CellAccessor<dim># class).
+ * together by deriving from the appropriate @p{DoF*Accessor} and the
+ * right @p{CellAccessor<dim>} and finally adding two functions which give
+ * access to the neighbors and children as @p{DoFCellAccessor} objects
+ * rather than @p{CellAccessor} objects (the latter function was inherited
+ * from the @p{CellAccessor<dim>} class).
  *
- * Note that since for the class we derive from, i.e. #DoFObjectAccessor<dim,dim>#,
+ * Note that since for the class we derive from, i.e. @p{DoFObjectAccessor<dim,dim>},
  * the two template parameters are equal, the base class is actually derived from
- * #CellAccessor#, which makes the functions of this class available to the
- * #DoFCellAccessor# class as well.
+ * @p{CellAccessor}, which makes the functions of this class available to the
+ * @p{DoFCellAccessor} class as well.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -1092,7 +1092,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 		     DoFObjectAccessor<dim, dim> (tria,level,index,local_data) {};
 
 				     /**
-				      * Return the #i#th neighbor as a DoF cell
+				      * Return the @p{i}th neighbor as a DoF cell
 				      * iterator. This function is needed since
 				      * the neighbor function of the base
 				      * class returns a cell accessor without
@@ -1101,7 +1101,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
     TriaIterator<dim,DoFCellAccessor<dim> > neighbor (const unsigned int) const;
 
     				     /**
-				      * Return the #i#th child as a DoF cell
+				      * Return the @p{i}th child as a DoF cell
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a cell accessor without
@@ -1110,7 +1110,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
     TriaIterator<dim,DoFCellAccessor<dim> > child (const unsigned int) const;
 
     				     /**
-				      * Return an iterator to the #i#th face
+				      * Return an iterator to the @p{i}th face
 				      * of this cell.
 				      *
 				      * This function is not implemented in 1D,
@@ -1126,7 +1126,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * then, the returned value is the vector
 				      * of nodal values on that cell. You could
 				      * then as well get the desired values
-				      * through the #get_dof_values# function
+				      * through the @p{get_dof_values} function
 				      * In the other case, when the cell has
 				      * children, we use the restriction
 				      * matrices provided by the finite element
@@ -1157,7 +1157,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * what the this function does in these
 				      * cases.
 				      *
-				      * Unlike the #get_dof_values#
+				      * Unlike the @p{get_dof_values}
 				      * function, this function is
 				      * associated to cells rather
 				      * than to lines, quads, and
@@ -1172,7 +1172,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 
 				     /**
 				      * This, again, is the counterpart to
-				      * #get_interpolated_dof_values#: you
+				      * @p{get_interpolated_dof_values}: you
 				      * specify the dof values on a cell and
 				      * these are interpolated to the children
 				      * of the present cell and set on the
@@ -1182,12 +1182,12 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * the cell pointed to by this object is
 				      * terminal, then the dof values are set
 				      * in the global data vector by calling
-				      * the #set_dof_values# function;
+				      * the @p{set_dof_values} function;
 				      * otherwise, the values are prolonged
 				      * to each of the children and this
 				      * function is called for each of them.
 				      *
-				      * Using the #get_interpolated_dof_values#
+				      * Using the @p{get_interpolated_dof_values}
 				      * and this function, you can compute the
 				      * interpolation of a finite element
 				      * function to a coarser grid by first
@@ -1223,7 +1223,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * the prolongation matrices represent in
 				      * this case.
 				      *
-				      * Unlike the #set_dof_values#
+				      * Unlike the @p{set_dof_values}
 				      * function, this function is
 				      * associated to cells rather
 				      * than to lines, quads, and
@@ -1233,9 +1233,9 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * objects.
 				      *
 				      * The output vector may be either
-				      * a #Vector<float>#,
-				      * #Vector<double>#, or a
-				      * #BlockVector<...,double>#. It
+				      * a @p{Vector<float>},
+				      * @p{Vector<double>}, or a
+				      * @p{BlockVector<...,double>}. It
 				      * is in the responsibility of
 				      * the caller to assure that the
 				      * types of the numbers stored in

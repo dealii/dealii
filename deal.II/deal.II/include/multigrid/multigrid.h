@@ -27,7 +27,7 @@
 
 /**
  * Implementation of multigrid with matrices.
- * While #MGBase# was only an abstract framework for the V-cycle,
+ * While @p{MGBase} was only an abstract framework for the V-cycle,
  * here we have the implementation of the pure virtual functions defined there.
  * Furthermore, level information is obtained from a triangulation object.
  * 
@@ -75,7 +75,7 @@ class Multigrid : public MGBase
 				      * Transfer from a vector on the
 				      * global grid to vectors defined
 				      * on each of the levels
-				      * separately, i.a. an #MGVector#.
+				      * separately, i.a. an @p{MGVector}.
 				      */
     template<typename number>
     void copy_to_mg (const Vector<number> &src);
@@ -87,7 +87,7 @@ class Multigrid : public MGBase
 				      * Copies data from active
 				      * portions of an MGVector into
 				      * the respective positions of a
-				      * #Vector<double>#. In order to
+				      * @p{Vector<double>}. In order to
 				      * keep the result consistent,
 				      * constrained degrees of freedom
 				      * are set to zero.
@@ -96,7 +96,7 @@ class Multigrid : public MGBase
     void copy_from_mg (Vector<number> &dst) const;
 
 				     /**
-				      * Negative #vmult# on a level.
+				      * Negative @p{vmult} on a level.
 //TODO: what does this function do?				      
 				      * @see MGBase.
 				      */
@@ -120,7 +120,7 @@ class Multigrid : public MGBase
 
   private:
 				     /**
-				      * Associated #MGDoFHandler#.
+				      * Associated @p{MGDoFHandler}.
 				      */
     SmartPointer<const MGDoFHandler<dim> > mg_dof_handler;
 
@@ -133,7 +133,7 @@ class Multigrid : public MGBase
 				     /**
 				      * Matrices for each level. The
 				      * matrices are prepared by the
-				      * constructor of #Multigrid# and
+				      * constructor of @p{Multigrid} and
 				      * can be accessed for
 				      * assembling.
 				      */
@@ -148,7 +148,7 @@ class Multigrid : public MGBase
 
 
 /**
- * Implementation of the #MGTransferBase# interface for which the transfer
+ * Implementation of the @p{MGTransferBase} interface for which the transfer
  * operations are prebuilt upon construction of the object of this class as
  * matrices. This is the fast way, since it only needs to build the operation
  * once by looping over all cells and storing the result in a matrix for
@@ -173,15 +173,15 @@ class MGTransferPrebuilt : public MGTransferBase
 
 				     /**
 				      * Prolongate a vector from level
-				      * #to_level-1# to level
-				      * #to_level#. The previous
-				      * content of #dst# is
+				      * @p{to_level-1} to level
+				      * @p{to_level}. The previous
+				      * content of @p{dst} is
 				      * overwritten.
 				      *
-				      * #src# is assumed to be a vector with
+				      * @p{src} is assumed to be a vector with
 				      * as many elements as there are degrees
 				      * of freedom on the coarser level of
-				      * the two involved levels, while #src#
+				      * the two involved levels, while @p{src}
 				      * shall have as many elements as there
 				      * are degrees of freedom on the finer
 				      * level.
@@ -192,23 +192,23 @@ class MGTransferPrebuilt : public MGTransferBase
 
 				     /**
 				      * Restrict a vector from level
-				      * #from_level# to level
-				      * #from_level-1# and add this
+				      * @p{from_level} to level
+				      * @p{from_level-1} and add this
 				      * restriction to
-				      * #dst#. Obviously, if the
+				      * @p{dst}. Obviously, if the
 				      * refined region on level
-				      * #from_level# is smaller than
-				      * that on level #from_level-1#,
+				      * @p{from_level} is smaller than
+				      * that on level @p{from_level-1},
 				      * some degrees of freedom in
-				      * #dst# are not covered and will
+				      * @p{dst} are not covered and will
 				      * not be altered. For the other
 				      * degress of freedom, the result
 				      * of the restriction is added.
 				      *
-				      * #src# is assumed to be a vector with
+				      * @p{src} is assumed to be a vector with
 				      * as many elements as there are degrees
 				      * of freedom on the finer level of
-				      * the two involved levels, while #src#
+				      * the two involved levels, while @p{src}
 				      * shall have as many elements as there
 				      * are degrees of freedom on the coarser
 				      * level.

@@ -19,7 +19,7 @@
 template <int _dim> struct GeometryInfo;
 
 /**
- * Pseudo-class for recursive functions in #GeometryInfo<dim>#.
+ * Pseudo-class for recursive functions in @p{GeometryInfo<dim>}.
  */
 struct GeometryInfo<0>
 {
@@ -35,9 +35,9 @@ struct GeometryInfo<0>
  * Topological description of cells.
  *
  * This class contains as static members information on vertices and
- * faces of a #dim#-dimensinal grid cell. The interface is the same
+ * faces of a @p{dim}-dimensinal grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. #sub_faces_per_cell# in
+ * cell, it is (correctly) set to zero, e.g. @p{sub_faces_per_cell} in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -81,8 +81,8 @@ struct GeometryInfo
 				      * dimension, we provide a useless
 				      * number (in the hope that a compiler
 				      * may warn when it sees constructs like
-				      * #for (i=0; i<vertices_per_face; ++i)#,
-				      * at least if #i# is an #unsigned int#.
+				      * @p{for (i=0; i<vertices_per_face; ++i)},
+				      * at least if @p{i} is an @p{unsigned int}.
 				      */
     static const unsigned int vertices_per_face = GeometryInfo<_dim-1>::vertices_per_cell;
 
@@ -102,8 +102,8 @@ struct GeometryInfo
 				      * Computation of this value
 				      * follows the idea, that
 				      * building a hypercube of
-				      * dimension #dim# from one of
-				      * dimension #dim#-1 can be done
+				      * dimension @p{dim} from one of
+				      * dimension @p{dim}-1 can be done
 				      * in the following two steps:
 				      *
 				      * 1. Duplicated it in the new coordinate direction.
@@ -119,7 +119,7 @@ struct GeometryInfo
 				     /**
 				      * Number of quadrilaterals of a cell.
 				      *
-				      * Computation is analogous to #lines_per_cell#.
+				      * Computation is analogous to @p{lines_per_cell}.
 				      */
     static const unsigned int quads_per_cell = (2*GeometryInfo<dim-1>::quads_per_cell
 						+ GeometryInfo<dim-1>::lines_per_cell);
@@ -128,7 +128,7 @@ struct GeometryInfo
 				      * Number of hexahedra of a cell.
 				      *
 				      * Computation is analogous to
-				      * #lines_per_cell#. Very
+				      * @p{lines_per_cell}. Very
 				      * important for more than three
 				      * dimensions!
 				      */
@@ -139,8 +139,8 @@ struct GeometryInfo
 				      * List of numbers which is
 				      * denote which face is opposite
 				      * to a given face. In 1d, this
-				      * list is #{1,0}#, in 2d #{2, 3, 0, 1}#,
-				      * in 3d #{1, 0, 4, 5, 2, 3}#.
+				      * list is @p{{1,0}}, in 2d @p{{2, 3, 0, 1}},
+				      * in 3d @p{{1, 0, 4, 5, 2, 3}}.
 				      */
     static const unsigned int opposite_face[faces_per_cell];
     
@@ -182,7 +182,7 @@ struct GeometryInfo
 				      * For three spatial dimensions,
 				      * the exact order of the children is
 				      * laid down in the documentation of
-				      * the #Triangulation# class.
+				      * the @p{Triangulation} class.
 				      */
     static unsigned int child_cell_on_face (unsigned int face,
 					    unsigned int subface);

@@ -141,7 +141,7 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 				       // row, column are the global numbering
 				       // of the unkowns.
 
-				       // set the #_inverse# array to the right
+				       // set the @p{_inverse} array to the right
 				       // size. we could do it like this:
 				       // _inverse = vector<>(n_cells,FullMatrix<>())
 				       // but this would involve copying many

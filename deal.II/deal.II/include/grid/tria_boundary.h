@@ -32,7 +32,7 @@ template <int dim> class Triangulation;
  *     Point<2> new_vertex = boundary.get_new_point_on_line (line);
  *     ...
  *   \end{verbatim}
- *   #line# denotes the line at the boundary that shall be refined
+ *   @p{line} denotes the line at the boundary that shall be refined
  *   and for which we seek the common point of the two child lines.
  *
  *   In 3D, a new vertex may be placed on the middle of a line or on
@@ -62,9 +62,9 @@ template <int dim> class Triangulation;
  *   about boundary indicators and the like, as well as all other information
  *   provided by these objects.
  *
- *   There are specialisations, #StraightBoundary<dim>#, which places
+ *   There are specialisations, @p{StraightBoundary<dim>}, which places
  *   the new point right into the middle of the given points, and
- *   #HyperBallBoundary<dim># creating a hyperball with given radius
+ *   @p{HyperBallBoundary<dim>} creating a hyperball with given radius
  *   around a given center point.
  *
  *   @author Wolfgang Bangerth, 1999
@@ -101,11 +101,11 @@ class Boundary : public Subscriptor {
 				      * not be called for lower dimensions.
 				      *
 				      * This function is called after the
-				      * four lines bounding the given #quad#
+				      * four lines bounding the given @p{quad}
 				      * are refined, so you may want to use
 				      * the information provided by
-				      * #quad->line(i)->child(j)#, #i=0...3#,
-				      * #j=0,1#.
+				      * @p{quad->line(i)->child(j)}, @p{i=0...3},
+				      * @p{j=0,1}.
 				      *
 				      * Because in 2D, this function is not
 				      * needed, it is not made pure virtual,

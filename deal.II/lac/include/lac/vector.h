@@ -19,17 +19,17 @@
 
 
 /**
- *  Numerical Vector of data.  For this class there are different
- * types of functions available. The first type of function mesures
- * the norm of the vector in order to mesure its length in a suitable
- * norm. The second type support the abgebraic operation for
- * vectors. The third und last type helps us to manipulate the
- * components of the vector.
- * As opposed to the array of the C++ standard library called #vector#, this class implements
- * an element of a vector space suitable for numerical computations.
+ * Numerical vector of data.  For this class there are different types
+ * of functions available. The first type of function mesures the norm
+ * of the vector in order to mesure its length in a suitable norm. The
+ * second type support the abgebraic operation for vectors. The third
+ * und last type helps us to manipulate the components of the vector.
+ * As opposed to the array of the C++ standard library called
+ * @p{vector} (with a lowercase "v"), this class implements an element
+ * of a vector space suitable for numerical computations.
  *
  *
- * \section{On template instantiations}
+ * @sect2{On template instantiations}
  *
  * Member functions of this class are either implemented in this file
  * or in a file of the same name with suffix ``.templates.h''. For the
@@ -48,8 +48,8 @@ class Vector {
 				     /**
 				      * Declare standard types used in all
 				      * containers. These types parallel
-				      * those in the #C++# standard libraries
-				      * #vector<...># class.
+				      * those in the @p{C++} standard libraries
+				      * @p{vector<...>} class.
 				      */
     typedef Number value_type;
     typedef value_type* pointer;
@@ -86,7 +86,7 @@ class Vector {
 // 				      * Copy constructor taking a vector of
 // 				      * another data type. This will fail if
 // 				      * there is no conversion path from
-// 				      * #OtherNumber# to #Number#. Note that
+// 				      * @p{OtherNumber} to @p{Number}. Note that
 // 				      * you may lose accuracy when copying
 // 				      * to a vector with data elements with
 // 				      * less accuracy.
@@ -96,7 +96,7 @@ class Vector {
 //     Vector (const Vector<OtherNumber> &v);
     
 				     /**
-				      * Constructor. Set dimension to #n# and
+				      * Constructor. Set dimension to @p{n} and
 				      * initialize all elements with zero.
 				      */
     Vector (const unsigned int n);
@@ -111,28 +111,28 @@ class Vector {
 
 				     /**
 				      * Set all entries to zero. Equivalent to
-				      * #v = 0#, but more obvious and faster.
+				      * @p{v = 0}, but more obvious and faster.
 				      * Note that this function does not change
 				      * the size of the vector, unlike the
-				      * STL's #vector<>::clear# function.
+				      * STL's @p{vector<>::clear} function.
 				      */
     void clear ();    
 
 				     /**
 				      * Change the dimension of the vector to
-				      * #N#. The reserved memory for this vector
+				      * @p{N}. The reserved memory for this vector
 				      * remains unchanged if possible, to make
 				      * things faster, but this may waste some
 				      * memory, so take this in the back of your
 				      * head.
-				      * However, if #N==0# all memory is freed,
+				      * However, if @p{N==0} all memory is freed,
 				      * i.e. if you want to resize the vector
 				      * and release the memory not needed, you
-				      * have to first call #reinit(0)# and then
-				      * #reinit(N)#. This cited behaviour is
+				      * have to first call @p{reinit(0)} and then
+				      * @p{reinit(N)}. This cited behaviour is
 				      * analogous to that of the STL containers.
 				      *
-				      * On #fast==false#, the vector is filled by
+				      * On @p{fast==false}, the vector is filled by
 				      * zeros.
 				      */ 
     void reinit (const unsigned int N,
@@ -140,12 +140,12 @@ class Vector {
     
 				     /**
 				      * Change the dimension to that of the
-				      * vector #V#. The same applies as for
-				      * the other #reinit# function.
+				      * vector @p{V}. The same applies as for
+				      * the other @p{reinit} function.
 				      *
-				      * The elements of #V# are not copied, i.e.
+				      * The elements of @p{V} are not copied, i.e.
 				      * this function is the same as calling
-				      * #reinit (V.size(), fast)#.
+				      * @p{reinit (V.size(), fast)}.
 				      */
     void reinit (const Vector<Number> &V,
 		 const bool            fast=false);
@@ -153,7 +153,7 @@ class Vector {
 				     /**
 				      * Swap the contents of this
 				      * vector and the other vector
-				      * #v#. One could do this
+				      * @p{v}. One could do this
 				      * operation with a temporary
 				      * variable and copying over the
 				      * data elements, but this
@@ -166,11 +166,11 @@ class Vector {
 				      * data around.
 				      *
 				      * This function is analog to the
-				      * the #swap# function of all C++
+				      * the @p{swap} function of all C++
 				      * standard containers. Also,
 				      * there is a global function
-				      * #swap(u,v)# that simply calls
-				      * #u.swap(v)#, again in analogy
+				      * @p{swap(u,v)} that simply calls
+				      * @p{u.swap(v)}, again in analogy
 				      * to standard functions.
 				      */
     void swap (Vector<Number> &v);
@@ -229,10 +229,10 @@ class Vector {
 
 				     /**
 				      * Return dimension of the vector. This
-				      * function was formerly called #n()#, but
-				      * was renamed to get the #Vector# class
+				      * function was formerly called @p{n()}, but
+				      * was renamed to get the @p{Vector} class
 				      * closer to the C++ standard library's
-				      * #vector# container.
+				      * @p{vector} container.
 				      */
     unsigned int size () const;
 
@@ -247,8 +247,8 @@ class Vector {
     bool all_zero () const;
     
 				     /**
-				      * Make the #Vector# class a bit like the
-				      * #vector<># class of the C++ standard
+				      * Make the @p{Vector} class a bit like the
+				      * @p{vector<>} class of the C++ standard
 				      * library by returning iterators to
 				      * the start and end of the elements of this
 				      * vector.
@@ -298,27 +298,27 @@ class Vector {
 				     //@{
 				     /**
 				      * Addition operator.
-				      * Fast equivalent to #U.add(1, V)#.
+				      * Fast equivalent to @p{U.add(1, V)}.
 				      */
     Vector<Number> & operator += (const Vector<Number> &V);
 
     				     /**
 				      * Subtraction operator.
-				      * Fast equivalent to #U.add(-1, V)#.
+				      * Fast equivalent to @p{U.add(-1, V)}.
 				      */
     Vector<Number> & operator -= (const Vector<Number> &V);
 
 				     /**
 				      * $U(0-DIM)+=s$.
-				      * Addition of #s# to all components. Note
-				      * that #s# is a scalar and not a vector.
+				      * Addition of @p{s} to all components. Note
+				      * that @p{s} is a scalar and not a vector.
 				      */
     void add (const Number s);
     
 				     /**
 				      * U+=V.
 				      * Simple vector addition, equal to the
-				      * #operator +=#.
+				      * @p{operator +=}.
 				      */
     void add (const Vector<Number>& V);
     
@@ -383,7 +383,7 @@ class Vector {
 				     /**
 				      * Compute the elementwise ratio of the
 				      * two given vectors, that is let
-				      * #this[i] = a[i]/b[i]#. This is useful
+				      * @p{this[i] = a[i]/b[i]}. This is useful
 				      * for example if you want to compute
 				      * the cellwise ratio of true to estimated
 				      * error.
@@ -391,7 +391,7 @@ class Vector {
 				      * This vector is appropriately scaled to
 				      * hold the result.
 				      *
-				      * If any of the #b[i]# is zero, the result
+				      * If any of the @p{b[i]} is zero, the result
 				      * is undefined. No attempt is made to
 				      * catch such situations.
 				      */
@@ -481,16 +481,16 @@ class Vector {
 				     /**
 				      * Dimension. Actual number of components
 				      * contained in the vector.
-				      * Get this number by calling #size()#.
+				      * Get this number by calling @p{size()}.
 				      */
     unsigned int dim;
 
 				     /**
 				      * Amount of memory actually reserved for
 				      * this vector. This number may be greater
-				      * than #dim# if a #reinit# was called with
+				      * than @p{dim} if a @p{reinit} was called with
 				      * less memory requirements than the vector
-				      * needed last time. At present #reinit#
+				      * needed last time. At present @p{reinit}
 				      * does not free memory when the number of
 				      * needed elements is reduced.
 				      */
@@ -562,7 +562,7 @@ Number& Vector<Number>::operator() (const unsigned int i)
 
 
 /**
- * Global function #swap# which overloads the default implementation
+ * Global function @p{swap} which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *

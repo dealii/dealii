@@ -46,13 +46,13 @@ template <int dim> class FESubfaceValues;
  *  the conormal derivative $a\frac{du}{dn} = g$.
  *
  *  The error estimator returns a vector of estimated errors per cell which
- *  can be used to feed the #Triangulation<dim>::refine_*# functions. This
- *  vector contains elements of data type #float#, rather than #double#,
+ *  can be used to feed the @p{Triangulation<dim>::refine_*} functions. This
+ *  vector contains elements of data type @p{float}, rather than @p{double},
  *  since accuracy is not so important here, and since this can save rather
  *  a lot of memory, when using many cells.
  *
  *  
- *  \subsection{Implementation}
+ *  @sect3{Implementation}
  *
  *  In principle, the implementation of the error estimation is simple: let
  *  $$ \eta_K^2 =
@@ -66,8 +66,8 @@ template <int dim> class FESubfaceValues;
  *  is considered, but may lead to wrong results. You may scale the vector
  *  appropriately afterwards.
  *
- *  To perform the integration, use is made of the #FEFaceValues# and
- *  #FESubfaceValues# classes. The integration is performed by looping
+ *  To perform the integration, use is made of the @p{FEFaceValues} and
+ *  @p{FESubfaceValues} classes. The integration is performed by looping
  *  over all cells and integrating over faces that are not yet treated.
  *  This way we avoid integration on faces twice, once for each time we
  *  visit one of the adjacent cells. In a second loop over all cells, we
@@ -75,11 +75,11 @@ template <int dim> class FESubfaceValues;
  *  square of the jumps) of each cell and take the square root.
  *
  *  The integration is done using a quadrature formula on the face.
- *  For linear trial functions (#FELinear#), the #Gauss2# or even the
- *  #Midpoint# rule will suffice. For higher order elements, it is
+ *  For linear trial functions (@p{FELinear}), the @p{Gauss2} or even the
+ *  @p{Midpoint} rule will suffice. For higher order elements, it is
  *  necessary to utilize higher order quadrature formulae as well.
  *
- *  We store the contribution of each face in a #map#, as provided by the
+ *  We store the contribution of each face in a @p{map}, as provided by the
  *  C++ standard library, with the iterator pointing to that face being the
  *  key into the map. In fact, we do not store the indicator per face, but
  *  only the integral listed above. When looping the second time over all
@@ -94,7 +94,7 @@ template <int dim> class FESubfaceValues;
  *  the diameter of the cell.
  *  
  *
- *  \subsection{Vector-valued functions}
+ *  @sect3{Vector-valued functions}
  *
  *  If the finite element field for which the error is to be estimated
  *  is vector-valued, i.e. the finite element has more than one
@@ -102,7 +102,7 @@ template <int dim> class FESubfaceValues;
  *  components at the same time. The main function of this class takes
  *  a list of flags denoting the components for which components the
  *  error estimator is to be applied; by default, it is a list of only
- *  #true#s, meaning that all variables shall be treated.
+ *  @p{true}s, meaning that all variables shall be treated.
  *
  *  In case the different components of a field have different
  *  physical meaning (for example velocity and pressure in the Stokes
@@ -116,7 +116,7 @@ template <int dim> class FESubfaceValues;
  *  a scalar coefficient which will then be used for all components.
  *
  *
- *  \subsection{Boundary values}
+ *  @sect3{Boundary values}
  *  
  *  If the face is at the boundary, i.e. there is no neighboring cell to which
  *  the jump in the gradiend could be computed, there are two possibilities:
@@ -154,11 +154,11 @@ template <int dim> class FESubfaceValues;
  *  conditions.
  *
  *  
- *  \subsection{Handling of hanging nodes}
+ *  @sect3{Handling of hanging nodes}
  *  
  *  The integration along faces with hanging nodes is quite tricky, since one
  *  of the elements has to be shifted one level up or down. See the
- *  documentation for the #FESubfaceValues# class for more information about
+ *  documentation for the @p{FESubfaceValues} class for more information about
  *  technical issues regarding this topic.
  *
  *  In praxi, since we integrate over each face only once, we do this when we
@@ -192,7 +192,7 @@ class KellyErrorEstimator
 				      *	values on this part of the boundary.
 				      *	Only one boundary function may be given
 				      *	for each boundary indicator, which is
-				      *	guaranteed by the #map# data type.
+				      *	guaranteed by the @p{map} data type.
 				      */    
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
@@ -220,11 +220,11 @@ class KellyErrorEstimator
 				      * components you want to
 				      * evaluate, in case the finite
 				      * element used by the
-				      * #DoFHandler# object is
+				      * @p{DoFHandler} object is
 				      * vector-valued. You then have
 				      * to set those entries to true
 				      * in the bit-vector
-				      * #component_mask# for which the
+				      * @p{component_mask} for which the
 				      * respective component is to be
 				      * used in the error
 				      * estimator. The default is to
@@ -237,7 +237,7 @@ class KellyErrorEstimator
 				      * The estimator supports
 				      * multithreading and splits the
 				      * cells to
-				      * #multithread_info.n_default_threads#
+				      * @p{multithread_info.n_default_threads}
 				      * (default) threads. The number
 				      * of threads to be used in
 				      * multithreaded mode can be set
@@ -306,7 +306,7 @@ class KellyErrorEstimator
 				      * first, class member data is
 				      * not possible because no real
 				      * object is created (all
-				      * functions are #static#), which
+				      * functions are @p{static}), which
 				      * is a historical
 				      * reason. Second, if we don't
 				      * collect the data the various
@@ -364,7 +364,7 @@ class KellyErrorEstimator
 					  * on one cell
 					  *
 					  * Let psi be a short name for
-					  * #a grad u_h#, where the second
+					  * @p{a grad u_h}, where the second
 					  * index be the component of the
 					  * finite element, and the first
 					  * index the number of the
@@ -419,7 +419,7 @@ class KellyErrorEstimator
 				      * Computates the error on all cells
 				      * of the domain with the number n,
 				      * satisfying
-				      * #n=this_thread (mod n_threads)#
+				      * @p{n=this_thread (mod n_threads)}
 				      * This enumeration is chosen to
 				      * generate a random distribution
 				      * of all cells.
@@ -447,7 +447,7 @@ class KellyErrorEstimator
 				      * The meaning of the parameters becomes
 				      * clear when looking at the source
 				      * code. This function is only
-				      * externalized from #estimate_error#
+				      * externalized from @p{estimate_error}
 				      * to avoid ending up with a function
 				      * of 500 lines of code.
 				      */
@@ -462,7 +462,7 @@ class KellyErrorEstimator
 				     /**
 				      * The same applies as for the function
 				      * above, except that integration is
-				      * over face #face_no# of #cell#, where
+				      * over face @p{face_no} of @p{cell}, where
 				      * the respective neighbor is refined,
 				      * so that the integration is a bit more
 				      * complex.

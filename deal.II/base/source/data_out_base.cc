@@ -1652,7 +1652,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 	    };
 	};
 
-				       // now write the data vectors to #out#
+				       // now write the data vectors to @p{out}
 				       // the '1' means: node data (as opposed
 				       // to cell data, which we do not
 				       // support explicitely here)

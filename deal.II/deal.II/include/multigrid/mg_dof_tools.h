@@ -19,13 +19,13 @@
 /**
  * This is a collection of functions operating on, and manipulating
  * the numbers of degrees of freedom in a multilevel triangulation. It
- * is similar in purpose and function to the #DoFTools# class, but
- * operates on #MGDoFHandler# objects instead of #DoFHandler#
+ * is similar in purpose and function to the @p{DoFTools} class, but
+ * operates on @p{MGDoFHandler} objects instead of @p{DoFHandler}
  * objects. See there and the documentation of the member functions
  * for more information.
  *
  * All member functions are static, so there is no need to create an
- * object of class #MGDoFTools#.
+ * object of class @p{MGDoFTools}.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000
  */
@@ -35,12 +35,12 @@ class MGDoFTools
 				     /**
 				      * Write the sparsity structure
 				      * of the matrix belonging to the
-				      * specified #level#. The sparsity pattern
+				      * specified @p{level}. The sparsity pattern
 				      * is not compressed, so before 
 				      * creating the actual matrix
 				      * you have to compress the
 				      * matrix yourself, using
-				      * #SparseMatrixStruct::compress()#.
+				      * @p{SparseMatrixStruct::compress()}.
 				      *
 				      * There is no need to consider
 				      * hanging nodes here, since only

@@ -29,12 +29,12 @@ template <int dim> class Triangulation;
  *       domain which is the tensor product of an interval $[a,b]$ in
  *       the given number of spatial dimensions. If you want to create such
  *       a domain, which is a common test case for model problems, call
- *       #GridGenerator::hyper_cube (tria, a,b)#, which produces a
+ *       @p{GridGenerator::hyper_cube (tria, a,b)}, which produces a
  *       hypercube domain triangulated with exactly one element. You can
  *       get tensor product meshes by successive refinement of this cell.
  *
  *    \item Generalized L-shape domain:
- *      using the #GridGenerator::hyper_L (tria, a,b)# function produces
+ *      using the @p{GridGenerator::hyper_L (tria, a,b)} function produces
  *      the hypercube with the interval $[a,b]$ without the hypercube
  *      made out of the interval $[(a+b)/2,b]$. Let, for example, be $a=-1$
  *      and $b=1$, then the hpyer-L in two dimensions is the region
@@ -43,8 +43,8 @@ template <int dim> class Triangulation;
  *
  *    \item Hyper balls:
  *      You get the circle or ball (or generalized: hyperball) around origin
- *      #p# and with radius #r# by calling
- *      #GridGenerator::hyper_ball (tria, p, r)#. The circle is triangulated
+ *      @p{p} and with radius @p{r} by calling
+ *      @p{GridGenerator::hyper_ball (tria, p, r)}. The circle is triangulated
  *      by five cells, the ball by seven cells. The diameter of the center cell is
  *      chosen so that the aspect ratio of the boundary cells after one refinement
  *      is minimized in some way. To create a hyperball in one dimension results in
@@ -57,12 +57,12 @@ template <int dim> class Triangulation;
  *    \item Hyper shell: A hyper shell is the region between two hyper
  *      sphere with the same origin. Therefore, it is a ring in two
  *      spatial dimensions. To triangulation it, call the function
- *      #GridGenerator::hyper_shell (tria, origin, inner_radius,
- *      outer_radius, N)#, where the center of the spheres as well as
+ *      @pGridGenerator::hyper_shell (tria, origin, inner_radius, outer_radius, N)},
+ *      where the center of the spheres as well as
  *      the inner and outer radius of the two spheres are given as
  *      shown.
  *
- *      The parameter #N# denotes how many cells are to be used for
+ *      The parameter @p{N} denotes how many cells are to be used for
  *      this coarse triangulation. It defaults to zero, which tells
  *      the function to chose the number itself; this, then, is done
  *      such that the aspect ration of the resulting cells is as small
@@ -72,7 +72,7 @@ template <int dim> class Triangulation;
  *      used in the radial direction.
  *
  *      You need to attach a boundary object to the triangulation. A
- *      suitable boundary class is provided as #HyperSphereBoundary#
+ *      suitable boundary class is provided as @p{HyperSphereBoundary}
  *      in the library.
  *
  * \item Slit domain: The slit domain is a variant of the hyper cube
@@ -115,7 +115,7 @@ class GridGenerator
 				      * lower and upper bound of the
 				      * inner hypercube in all
 				      * coordinate directions.
-				      * #thickness# marks the size of
+				      * @p{thickness} marks the size of
 				      * the layer cells.
 				      *
 				      * If the flag colorize is set,
@@ -153,7 +153,7 @@ class GridGenerator
 
 				     /**
 				      * Initialize the given triangulation with a
-				      * hyper-L consisting of exactly #2^dim-1#
+				      * hyper-L consisting of exactly @p{2^dim-1}
 				      * cells. See the general documentation for a
 				      * description of the L-region. The limits
 				      * default to minus unity and unity.
@@ -170,7 +170,7 @@ class GridGenerator
 				      * Initialize the given
 				      * Triangulation with a hypercube
 				      * with a slit. The slit goes
-				      * from #(x=0,y=-1)# to #(0,0)# in 2d.
+				      * from @p{(x=0,y=-1)} to @p{(0,0)} in 2d.
 				      *
 				      * The triangulation needs to be void
 				      * upon calling this function.

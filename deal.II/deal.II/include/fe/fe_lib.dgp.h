@@ -40,23 +40,23 @@ class FEDG_P1 : public FEQ1Mapping<dim>
     FEDG_P1 ();
 
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      *
 				      * For linear elements, all second
 				      * derivatives on the unit cell are zero.
@@ -105,7 +105,7 @@ class FEDG_P1 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.
@@ -137,23 +137,23 @@ class FEDG_P2 : public FEQ1Mapping<dim>
     FEDG_P2 ();
 
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -199,7 +199,7 @@ class FEDG_P2 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.
@@ -231,23 +231,23 @@ class FEDG_P3 : public FEQ1Mapping<dim>
     FEDG_P3 ();
 
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -293,7 +293,7 @@ class FEDG_P3 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.
@@ -325,23 +325,23 @@ class FEDG_P4 : public FEQ1Mapping<dim>
     FEDG_P4 ();
 
 				     /**
-				      * Return the value of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the value of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
 
 				     /**
-				      * Return the gradient of the #i#th shape
-				      * function at point #p# on the unit cell.
+				      * Return the gradient of the @p{i}th shape
+				      * function at point @p{p} on the unit cell.
 				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
 				     /**
 				      * Return the tensor of second derivatives
-				      * of the #i#th shape function at
-				      * point #p# on the unit cell.
+				      * of the @p{i}th shape function at
+				      * point @p{p} on the unit cell.
 				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
@@ -387,7 +387,7 @@ class FEDG_P4 : public FEQ1Mapping<dim>
 				     /**
 				      * This function is simply singled out of
 				      * the constructor; it sets up the
-				      * #restriction# and #prolongation#
+				      * @p{restriction} and @p{prolongation}
 				      * matrices. Since we have two constructors
 				      * which need this functionality, we
 				      * provide a single function for this.

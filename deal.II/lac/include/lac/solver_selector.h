@@ -28,35 +28,35 @@
 
 
 /**
- * By calling the #solve# function of this #SolverSelector#, it selects
- * the #solve# function of that #Solver# that was specified in the constructor
+ * By calling the @p{solve} function of this @p{SolverSelector}, it selects
+ * the @p{solve} function of that @p{Solver} that was specified in the constructor
  * of this class.
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  * The simplest use of this class is the following:
  * \begin{verbatim}
- *                                  // generate a #SolverControl# and
- *                                  // a #VectorMemory#
+ *                                  // generate a @p{SolverControl} and
+ *                                  // a @p{VectorMemory}
  * SolverControl control;
  * VectorMemory<Vector<double> > memory;
  *                                  // Line 3:
  *                                  //
- *                                  // generate a #SolverSelector# that
- *                                  // calls the #SolverCG#
+ *                                  // generate a @p{SolverSelector} that
+ *                                  // calls the @p{SolverCG}
  * SolverSelector<SparseMatrix<double>, Vector<double> > 
  *   solver_selector("cg", control, memory);
- *                                  // generate e.g. a #PreconditionRelaxation#
+ *                                  // generate e.g. a @p{PreconditionRelaxation}
  * PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
  *   preconditioning(A, &SparseMatrix<double>
  *                   ::template precondition_SSOR<double>,0.8);
- *                                  // call the #solve# function with this
+ *                                  // call the @p{solve} function with this
  *                                  // preconditioning as last argument
  * solver_selector.solve(A,x,b,preconditioning);
  * \end{verbatim}
- * But the full usefulness of the #SolverSelector# class is not clear
- * until the presentation of the following
- * example that assumes the user using the #ParameterHandler# class and having
- * declared a "solver" entry, e.g. with
+ * But the full usefulness of the @p{SolverSelector} class is not
+ * clear until the presentation of the following example that assumes
+ * the user using the @p{ParameterHandler} class and having declared a
+ * "solver" entry, e.g. with
  * \begin{verbatim}
  * Parameter_Handler prm;
  * prm.declare_entry ("solver", "none",
@@ -75,12 +75,12 @@
  *
  *
  * If at some time there exists a new solver "xyz" then the user does not need
- * to change his program. Only in the implementation of the #SolverSelector#
+ * to change his program. Only in the implementation of the @p{SolverSelector}
  * the calling of this solver has to be added and each user with program lines
  * quoted above only needs to 'set solver = xyz' in his parameter file to get
  * access to that new solver.  :-)
  *
- * (By the way, thanks to Wolfgang for implementing the #ParameterHandler#.)
+ * (By the way, thanks to Wolfgang for implementing the @p{ParameterHandler}.)
  * 
  * @author Ralf Hartmann, 1999
  */
@@ -90,9 +90,9 @@ class SolverSelector
   public:
 
 				     /**
-				      * Constructor. Takes the #SolverName#,
-				      * the #SolverControl# and the 
-				      * #VectorMemory# as argument.
+				      * Constructor. Takes the @p{SolverName},
+				      * the @p{SolverControl} and the 
+				      * @p{VectorMemory} as argument.
 				      */
     SolverSelector(const string solvername,
 		   SolverControl &control,
@@ -104,9 +104,9 @@ class SolverSelector
     ~SolverSelector();
 
 				     /**
-				      * Solver procedure. Calls the #solve#
+				      * Solver procedure. Calls the @p{solve}
 				      * function
-				      * of the #solver# whose #SolverName#
+				      * of the @p{solver} whose @p{SolverName}
 				      * was specified in the constructor.
 				      * 
 				      */
@@ -118,28 +118,28 @@ class SolverSelector
     
 				     /**
 				      * Set the additional data. For more
-				      * info see the #Solver# class.
+				      * info see the @p{Solver} class.
 				      */
     void set_data(const typename SolverRichardson<Vector>
 		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the #Solver# class.
+				      * info see the @p{Solver} class.
 				      */
     void set_data(const typename SolverCG<Vector>
 		  ::AdditionalData &data);
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the #Solver# class.
+				      * info see the @p{Solver} class.
 				      */
     void set_data(const typename SolverBicgstab<Vector>
 		  ::AdditionalData &data); 
 
 				     /**
 				      * Set the additional data. For more
-				      * info see the #Solver# class.
+				      * info see the @p{Solver} class.
 				      */
     void set_data(const typename SolverGMRES<Vector>
 		  ::AdditionalData &data);
@@ -164,16 +164,16 @@ class SolverSelector
     string solver_name;
     
 				     /**
-				      * Stores the #SolverControl# that
+				      * Stores the @p{SolverControl} that
 				      * is needed in the constructor of
-				      * each #Solver# class.
+				      * each @p{Solver} class.
 				      */
     SmartPointer<SolverControl> control;
 
 				     /**
-				      * Stores the #VectorMemory# that
+				      * Stores the @p{VectorMemory} that
 				      * is needed in the constructor of
-				      * each #Solver# class.
+				      * each @p{Solver} class.
 				      */
     SmartPointer<VectorMemory<Vector> > vector_memory;
 

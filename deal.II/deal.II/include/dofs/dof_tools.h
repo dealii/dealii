@@ -33,9 +33,9 @@ template <template <int> class GridClass, int dim> class InterGridMap;
  * documentation stating some commonalities.
  *
  * All member functions are static, so there is no need to create an
- * object of class #DoFTools#.
+ * object of class @p{DoFTools}.
  *
- * \subsection{Setting up sparsity patterns}
+ * @sect3{Setting up sparsity patterns}
  *
  * When assembling system matrices, the entries are usually of the form
  * $a_{ij} = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an
@@ -82,7 +82,7 @@ class DoFTools
 				      * correspond to degrees of
 				      * freedom of at least one common
 				      * cell. Therefore,
-				      * #make_sparsity_pattern# just
+				      * @p{make_sparsity_pattern} just
 				      * loops over all cells and
 				      * enters all couplings local to
 				      * that cell. As the generation
@@ -99,17 +99,17 @@ class DoFTools
 				      * of hanging nodes.  They have
 				      * to be taken care of by a call
 				      * to
-				      * #ConstraintMatrix::condense()#
+				      * @p{ConstraintMatrix::condense()}
 				      * afterwards.
 				      *
 				      * Remember using
-				      * #SparsityPattern::compress()#
+				      * @p{SparsityPattern::compress()}
 				      * after generating the pattern.
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
-				      * #SparsityPattern#,
-				      * #BlockSparsityPattern#, or any
+				      * @p{SparsityPattern},
+				      * @p{BlockSparsityPattern}, or any
 				      * other class that satisfies
 				      * similar requirements.
 				      */
@@ -121,7 +121,7 @@ class DoFTools
 				      * Locate non-zero entries for
 				      * mixed methods.  This function
 				      * does mostly the same as the
-				      * other #make_sparsity_pattern#,
+				      * other @p{make_sparsity_pattern},
 				      * but it is specialized for
 				      * mixed finite elements and
 				      * allows to specify which
@@ -138,7 +138,7 @@ class DoFTools
 				      *
 				      * in two space dimensions,
 				      * using stable Q2/Q1 mixed
-				      * elements (using the #FESystem#
+				      * elements (using the @p{FESystem}
 				      * class), then you don't want
 				      * all degrees of freedom to
 				      * couple in each equation. You
@@ -153,21 +153,21 @@ class DoFTools
 				      * \end{verbatim}
 				      * where "1" indicates that two
 				      * variables (i.e. components of
-				      * the #FESystem#) couple in the
+				      * the @p{FESystem}) couple in the
 				      * respective equation, and a "0"
 				      * means no coupling, in which
 				      * case it is not necessary to
 				      * allocate space in the matrix
 				      * structure. Obviously, the mask
 				      * refers to components of the
-				      * composed #FESystem#, rather
+				      * composed @p{FESystem}, rather
 				      * than to the degrees of freedom
 				      * contained in there.
 				      *
 				      * This function is designed to
 				      * accept a mask, like the one
 				      * shown above, through the
-				      * #mask# parameter, which
+				      * @p{mask} parameter, which
 				      * contains boolean values. It
 				      * builds the matrix structure
 				      * just like the previous
@@ -179,8 +179,8 @@ class DoFTools
 				      *
 				      * The actual type of the
 				      * sparsity pattern may be
-				      * #SparsityPattern#,
-				      * #BlockSparsityPattern#, or any
+				      * @p{SparsityPattern},
+				      * @p{BlockSparsityPattern}, or any
 				      * other class that satisfies
 				      * similar requirements.
 				      */
@@ -201,14 +201,14 @@ class DoFTools
 				      * nodes.  The sparsity pattern
 				      * is not compressed, since if
 				      * you want to call
-				      * #ConstraintMatrix::condense(1)#
+				      * @p{ConstraintMatrix::condense(1)}
 				      * afterwards, new entries have
 				      * to be added. However, if you
 				      * don't want to call
-				      * #ConstraintMatrix::condense(1)#,
+				      * @p{ConstraintMatrix::condense(1)},
 				      * you have to compress the
 				      * matrix yourself, using
-				      * #SparsityPattern::compress()#.
+				      * @p{SparsityPattern::compress()}.
 				      *
 				      * Since this function is
 				      * obviously useless in one
@@ -231,9 +231,9 @@ class DoFTools
 				      * the boundary indicator is listed in the
 				      * set of numbers passed to this function.
 				      *
-				      * In fact, rather than a #set#
+				      * In fact, rather than a @p{set}
 				      * of boundary indicators, a
-				      * #map# needs to be passed,
+				      * @p{map} needs to be passed,
 				      * since most of the functions
 				      * handling with boundary
 				      * indicators take a mapping of
@@ -267,7 +267,7 @@ class DoFTools
 				      * couple across faces of cells.
 				      * This is a replacement of the
 				      * function
-				      * #make_sparsity_pattern# for
+				      * @p{make_sparsity_pattern} for
 				      * discontinuous methods. Since
 				      * the fluxes include couplings
 				      * between neighboring elements,
@@ -323,11 +323,11 @@ class DoFTools
 				      * immediately. The object is not cleared
 				      * before use, so you should make sure
 				      * it containts only constraints you still
-				      * want; otherwise call the #clear#
+				      * want; otherwise call the @p{clear}
 				      * function.
 				      *
 				      * To condense a given sparsity pattern,
-				      * use #ConstraintMatrix::condense#.
+				      * use @p{ConstraintMatrix::condense}.
 				      * Before doing so, you need to close
 				      * the constraint object, which must be
 				      * done after all constraints are entered.
@@ -350,22 +350,22 @@ class DoFTools
 				      * the resulting field will not be
 				      * continuous at hanging nodes. This can,
 				      * however, easily be arranged by calling
-				      * the appropraite #distribute# function
-				      * of a #ConstraintMatrix# object created
-				      * for this #DoFHandler# object.
+				      * the appropraite @p{distribute} function
+				      * of a @p{ConstraintMatrix} object created
+				      * for this @p{DoFHandler} object.
 				      *
 				      * It is assumed that the number of
-				      * elements in #cell_data# equals the
+				      * elements in @p{cell_data} equals the
 				      * number of active cells. The size of
-				      * #dof_data# is adjusted to the right
+				      * @p{dof_data} is adjusted to the right
 				      * size.
 				      *
 				      * Note that the input vector may be
 				      * a vector of any data type as long
-				      * as it is convertible to #double#.
+				      * as it is convertible to @p{double}.
 				      * The output vector, being a data
 				      * vector on the grid, always consists
-				      * of elements of type #double#.
+				      * of elements of type @p{double}.
 				      *
 				      * In case the finite element used by
 				      * this DoFHandler consists of more than
@@ -380,8 +380,8 @@ class DoFTools
 				      * not changed.
 				      *
 				      * It is assumed that the output vector
-				      * #dof_data# already has the right size,
-				      * i.e. #n_dofs()# elements.
+				      * @p{dof_data} already has the right size,
+				      * i.e. @p{n_dofs()} elements.
 				      */
     template <int dim, typename Number>
     static void
@@ -393,21 +393,21 @@ class DoFTools
 				     /**
 				      * Extract the indices of the degrees
 				      * of freedom belonging to certain
-				      * components. The bit vector #select#
+				      * components. The bit vector @p{select}
 				      * defines, which components of an
-				      * #FESystem# are to be extracted
-				      * from the DoFHandler #dof#. The
-				      * respective entries in #selected_dofs#
-				      * are then flagged #true#, while all
-				      * others are set to #false#.
+				      * @p{FESystem} are to be extracted
+				      * from the DoFHandler @p{dof}. The
+				      * respective entries in @p{selected_dofs}
+				      * are then flagged @p{true}, while all
+				      * others are set to @p{false}.
 				      *
-				      * The size of #component_select#
+				      * The size of @p{component_select}
 				      * shall equal the number of
 				      * components in the finite
-				      * element used by #dof#. The
-				      * size of #selected_dofs# shall
+				      * element used by @p{dof}. The
+				      * size of @p{selected_dofs} shall
 				      * equal
-				      * #dof_handler.n_dofs()#. Previous
+				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
 				      * overwritten.
 				      */
@@ -419,7 +419,7 @@ class DoFTools
 
 				     /**
 				      * Do the same thing as
-				      * #extract_dofs# for one level
+				      * @p{extract_dofs} for one level
 				      * of a multi-grid DoF numbering.
 				      */
     template <int dim>
@@ -436,19 +436,19 @@ class DoFTools
 				      * of the solution. The function
 				      * returns its results in the
 				      * last parameter which contains
-				      * #true# is a degree of freedom
+				      * @p{true} is a degree of freedom
 				      * is at the boundary and belongs
 				      * to one of the selected
-				      * components, and #false#
+				      * components, and @p{false}
 				      * otherwise.
 				      *
-				      * The size of #component_select#
+				      * The size of @p{component_select}
 				      * shall equal the number of
 				      * components in the finite
-				      * element used by #dof#. The
-				      * size of #selected_dofs# shall
+				      * element used by @p{dof}. The
+				      * size of @p{selected_dofs} shall
 				      * equal
-				      * #dof_handler.n_dofs()#. Previous
+				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
 				      * overwritten.
 				      */
@@ -464,9 +464,9 @@ class DoFTools
 				      * constraints, i.e. all hanging
 				      * nodes.
 				      *
-				      * The size of #selected_dofs#
+				      * The size of @p{selected_dofs}
 				      * shall equal
-				      * #dof_handler.n_dofs()#. Previous
+				      * @p{dof_handler.n_dofs()}. Previous
 				      * contents of this array or
 				      * overwritten.
 				      */
@@ -668,7 +668,7 @@ class DoFTools
 				      * to the variable ``q''; zero
 				      * would be ``u'', two would be
 				      * ``lambda''). Furthermore, an
-				      * object of type #IntergridMap#
+				      * object of type @p{IntergridMap}
 				      * is needed; this could in
 				      * principle be generated by the
 				      * function itself from the two
@@ -680,7 +680,7 @@ class DoFTools
 				      * it. Finally, the computed
 				      * constraints are entered into a
 				      * variable of type
-				      * #ConstraintMatrix#; the
+				      * @p{ConstraintMatrix}; the
 				      * constraints are added,
 				      * i.e. previous contents which
 				      * may have, for example, be

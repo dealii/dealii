@@ -57,7 +57,7 @@ class Equation
 				      * derived classes should check for
 				      * this.
 				      * For that purpose, the two exceptions
-				      * #ExcWrongSize# and #ExcObjectNotEmpty#
+				      * @p{ExcWrongSize} and @p{ExcObjectNotEmpty}
 				      * are declared.
 				      */
     virtual void assemble (FullMatrix<double>  &cell_matrix,
@@ -75,7 +75,7 @@ class Equation
 				      * derived classes should check for
 				      * this.
 				      * For that purpose, the two exceptions
-				      * #ExcWrongSize# and #ExcObjectNotEmpty#
+				      * @p{ExcWrongSize} and @p{ExcObjectNotEmpty}
 				      * are declared.
 				      */
     virtual void assemble (FullMatrix<double>  &cell_matrix,
@@ -92,7 +92,7 @@ class Equation
 				      * derived classes should check for
 				      * this.
 				      * For that purpose, the two exceptions
-				      * #ExcWrongSize# and #ExcObjectNotEmpty#
+				      * @p{ExcWrongSize} and @p{ExcObjectNotEmpty}
 				      * are declared.
 				      */
     virtual void assemble (Vector<double>      &rhs,
@@ -136,7 +136,7 @@ class Equation
 /**
  * The use of this class is now deprecated!
  *
- * An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
+ * An @p{Assembler} is a specialized version of a @p{DoFCellAccessor} which adds
  * functionality to assemble global matrices and vectors from cell base ones.
  *
  * @author Wolfgang Bangerth, 1998
@@ -228,9 +228,9 @@ class Assembler : public DoFCellAccessor<dim>
     Assembler ();
     
 				     /**
-				      * Constructor. The #local_data#
+				      * Constructor. The @p{local_data}
 				      * argument is assumed to be a pointer
-				      * to an #AssemblerData# object. The data
+				      * to an @p{AssemblerData} object. The data
 				      * is copied, so the object need not live
 				      * longer than the constructor call.
 				      */

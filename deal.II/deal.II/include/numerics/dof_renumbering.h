@@ -21,7 +21,7 @@
  * Implementation of a number of renumbering algorithms for the degrees of
  * freedom on a triangulation.
  *
- * \section{Cuthill-McKee like algorithms}
+ * @sect2{Cuthill-McKee like algorithms}
  *
  * Within this class, the Cuthill-McKee algorithm is implemented. It starts
  * at a degree of freedom, searches the other DoFs for those which are couple
@@ -70,22 +70,22 @@
  * not that important any more.
  *
  * 
- * \subsection{Implementation of renumbering schemes}
+ * @sect3{Implementation of renumbering schemes}
  *
  * The renumbering algorithms need quite a lot of memory, since they have
  * to store for each dof with which other dofs it couples. This is done
- * using a #SparsityPattern# object used to store the sparsity pattern of
+ * using a @p{SparsityPattern} object used to store the sparsity pattern of
  * matrices. It
  * is not useful for the user to do anything between distributing the dofs
- * and renumbering, i.e. the calls to #DoFHandler::distribute_dofs# and
- * #DoFHandler::renumber_dofs# should follow each other immediately. If
+ * and renumbering, i.e. the calls to @p{DoFHandler::distribute_dofs} and
+ * @p{DoFHandler::renumber_dofs} should follow each other immediately. If
  * you try to create a sparsity pattern or anything else in between, these
  * will be invalid afterwards.
  *
  * The renumbering may take care of dof-to-dof couplings only induced by
  * eliminating constraints. In addition to the memory consumption mentioned
  * above, this also takes quite some computational time, but it may be
- * switched off upon calling the #renumber_dofs# function. This will then
+ * switched off upon calling the @p{renumber_dofs} function. This will then
  * give inferior results, since knots in the graph (representing dofs)
  * are not found to be neighbors even if they would be after condensation.
  * 
@@ -105,7 +105,7 @@
  * will search for its own starting point.
  *
  * 
- * \subsection{Results of renumbering}
+ * @sect3{Results of renumbering}
  *
  * The renumbering schemes mentioned above do not lead to optimal results.
  * However, after all there is no algorithm that accomplishes this within
@@ -139,23 +139,23 @@
  * may be difficult, however, and in many cases will not justify the effort.
  *
  *
- * \section{Componentwise numbering}
+ * @sect2{Componentwise numbering}
  *
- * For finite elements composed of several base elements using the #FESystem#
+ * For finite elements composed of several base elements using the @p{FESystem}
  * class, or for elements which provide several components themselves, it
  * may be of interest to sort the DoF indices by component. This will then
  * bring out the block matrix structure, since otherwise the degrees of freedom
  * are numbered cell-wise without taking into account that they may belong to
  * different components.
  *
- * This kind of numbering may be obtained by calling the #component_wise# function
+ * This kind of numbering may be obtained by calling the @p{component_wise} function
  * of this class. Since it does not touch the order of indices within each, it
  * may be worthwhile to first renumber using the Cuthill-McKee or a similar
  * algorithm and afterwards renumbering component-wise. This will bring out the
  * matrix structure and additionally have a good numbering within each block.
  *
  *
- * \section{Multigrid DoF numbering}
+ * @sect2{Multigrid DoF numbering}
  *
  * Most algorithms also work on multigrid degree of freedom numberings. Refer
  * to the actual function declarations to get more information on this.
@@ -223,10 +223,10 @@ class DoFRenumbering
 				      * You may want to give the order in
 				      * which the components are to be ordered
 				      * (e.g. if the second argument contains
-				      * the numbers #(0, 3, 2, 1)#, then all
-				      * indices of component #0# will be
-				      * before those of component #3#, before
-				      * those of component #2#, ...). The
+				      * the numbers @p{(0, 3, 2, 1)}, then all
+				      * indices of component @p{0} will be
+				      * before those of component @p{3}, before
+				      * those of component @p{2}, ...). The
 				      * length of this list has to be the
 				      * same as the number of components
 				      * in the finite element, and has to
@@ -247,8 +247,8 @@ class DoFRenumbering
 
 				     /**
 				      * Sort those degrees of freedom
-				      * which are tagged with #true#
-				      * in the #selected_dofs# array
+				      * which are tagged with @p{true}
+				      * in the @p{selected_dofs} array
 				      * to the back of the DoF
 				      * numbers. The sorting is
 				      * stable, i.e. the relative

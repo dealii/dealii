@@ -101,7 +101,7 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
 
 
 /**
- * Memory keeping allocated vectors.  This #VectorMemory# is able to
+ * Memory keeping allocated vectors.  This @p{VectorMemory} is able to
  * grow infinitely (according to computer memory).  A vector once
  * allocated will stay in the memory pool, though, and it will be
  * reused in later allocation.

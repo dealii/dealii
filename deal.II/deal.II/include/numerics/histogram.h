@@ -32,7 +32,7 @@
  * intervals are used for each of them anyway, to make comparison easier.
  *
  *
- * \subsection{Ways to generate the intervals}
+ * @sect3{Ways to generate the intervals}
  *
  * At present, the following schemes for interval spacing are implemented:
  * \begin{itemize}
@@ -45,15 +45,15 @@
  * \end{itemize}
  *
  * To keep programs extendible, you can use the two functions
- * #get_interval_spacing_names# and #parse_interval_spacing#, which always
+ * @p{get_interval_spacing_names} and @p{parse_interval_spacing}, which always
  * give you a complete list of spacing formats presently supported and are
- * able to generate the respective value of the #enum#. If you use them,
+ * able to generate the respective value of the @p{enum}. If you use them,
  * you can write your program in a way such that it only needs to be
  * recompiled to take effect of newly added formats, without changing your
  * code.
  *
  *
- * \subsection{Output formats}
+ * @sect3{Output formats}
  *
  * At present, only GNUPLOT output is supported.
  *
@@ -84,25 +84,25 @@ class Histogram
 				      *
 				      * The histograms will be arranged such
 				      * that the computed intervals of the
-				      * #values[i][j]# form the x-range,
+				      * @p{values[i][j]} form the x-range,
 				      * and the number of values in each
 				      * interval will be the y-range (for
 				      * 2d plots) or the z-range (for 3d
-				      * plots). For 3d plots, the #y_values#
+				      * plots). For 3d plots, the @p{y_values}
 				      * parameter is used to assign each
 				      * data set a value in the y direction,
 				      * which is the depth coordinate in the
 				      * resulting plot. For 2d plots,
-				      * the #y_values# are ignored.
+				      * the @p{y_values} are ignored.
 				      *
 				      * If you give only one data set, i.e.
-				      * #values.size()==1#, then the
+				      * @p{values.size()==1}, then the
 				      * resulting histogram will be a 2d
 				      * one.
 				      *
-				      * #n_intervals# denotes the number of
+				      * @p{n_intervals} denotes the number of
 				      * intervals into which the data will be
-				      * sorted; #interval_spacing# denotes
+				      * sorted; @p{interval_spacing} denotes
 				      * the way the bounds of the intervals
 				      * are computed. Refer to the general
 				      * documentation for more information
@@ -126,7 +126,7 @@ class Histogram
 
 				     /**
 				      * Write the histogram computed by
-				      * the #evaluate# function to a
+				      * the @p{evaluate} function to a
 				      * stream in a format suitable to
 				      * the GNUPLOT program. The function
 				      * generates 2d or 3d histograms.
@@ -144,7 +144,7 @@ class Histogram
 				      * Get a string containing one of the
 				      * names returned by the above function
 				      * and return the respective value of
-				      * #IntervalSpacing#. Throw an error
+				      * @p{IntervalSpacing}. Throw an error
 				      * if the string is no valid one.
 				      */
     static IntervalSpacing parse_interval_spacing (const string &name);
@@ -222,8 +222,8 @@ class Histogram
 				      * logarithmic case interval spacing
 				      * scheme.
 				      *
-				      * Return #true#, if (#n1<n2#,
-				      * and (#n1>0# or #n2<0#)), or
+				      * Return @p{true}, if (@p{n1<n2},
+				      * and (@p{n1>0} or @p{n2<0})), or
 				      * (n2<n1 and n1>0 and n2<=0). This
 				      * in effect sorts all negativ
 				      * numbers to be larger than the
@@ -236,13 +236,13 @@ class Histogram
 				     /**
 				      * Vector holding one set of intervals
 				      * for each data set given to the
-				      * #evaluate# function.
+				      * @p{evaluate} function.
 				      */
     vector<vector<Interval> > intervals;
 
 				     /**
 				      * Values for the depth axis of 3d
-				      * histograms. Stored in the #evaluate#
+				      * histograms. Stored in the @p{evaluate}
 				      * function.
 				      */
     vector<double>            y_values;

@@ -215,7 +215,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					     const SubCellData &subcelldata) {
 				   // note: since no boundary information
 				   // can be given in one dimension, the
-				   // #subcelldata# field is ignored. (only
+				   // @p{subcelldata} field is ignored. (only
 				   // used for error checking, which is a
 				   // good idea in any case)
   
@@ -800,10 +800,10 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 				       // of four numbers denoting the index
 				       // of the four lines bounding th
 				       // quad. we can get this index by
-				       // asking #needed_lines# for an
+				       // asking @p{needed_lines} for an
 				       // iterator to this line, dereferencing
 				       // it and thus return an iterator into
-				       // the #lines# array of the
+				       // the @p{lines} array of the
 				       // triangulation, which is already set
 				       // up. we can then ask this iterator
 				       // for its index within the present
@@ -3304,7 +3304,7 @@ Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<number> &crite
 						     const double         bottom_fraction)
 {
 				   // correct number of cells is
-				   // checked in #refine#
+				   // checked in @p{refine}
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
@@ -3348,7 +3348,7 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
 						       const double         top_fraction,
 						       const double         bottom_fraction) {
 				   // correct number of cells is
-				   // checked in #refine#
+				   // checked in @p{refine}
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
@@ -3356,7 +3356,7 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
 				   // up and compare with
-				   // #fraction_of_error*total_error#.
+				   // @p{fraction_of_error*total_error}.
   Vector<number> tmp(criteria);
   const double total_error = tmp.l1_norm();
 
@@ -3877,7 +3877,7 @@ void Triangulation<2>::execute_refinement () {
    
    First:
    Set up an array of the 3x3 vertices, which are distributed on the cell
-   (the array consists of indices into the #vertices# vector
+   (the array consists of indices into the @p{vertices} vector
    
      6--5--4
      |  |  |
@@ -3927,7 +3927,7 @@ void Triangulation<2>::execute_refinement () {
    be replaced and because that also is the number of the subline which
    will be the interface between that neighbor and the to be created cell.
    We will store this number (between 0 and 3) in the field
-   #neighbors_neighbor#.
+   @p{neighbors_neighbor}.
 
    It would be sufficient to use the children of the common line to the
    neighbor, if we only wanted to get the new sublines and the new vertex,
@@ -3960,9 +3960,9 @@ void Triangulation<2>::execute_refinement () {
 					      cell->neighbor(3)};
 	    int               neighbors_neighbor[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
 
-					     // remember: the #i#th line
+					     // remember: the @p{i}th line
 					     // is the common line to the
-					     // #i#th neighbor
+					     // @p{i}th neighbor
 	    for (unsigned int nb=0; nb<4; ++nb)
 	      {
 		bool neighbor_refined=false;
@@ -5532,7 +5532,7 @@ void Triangulation<dim>::execute_coarsening () {
 				   // used, to avoid confusion and because
 				   // non-active cells can't be flagged for
 				   // coarsening. Note that because of the
-				   // effects of #prepare_coarsening#, of a
+				   // effects of @p{prepare_coarsening}, of a
 				   // cell either all or no children must
 				   // be flagged for coarsening, so it is
 				   // ok to only check the first child
@@ -5742,8 +5742,8 @@ void Triangulation<dim>::fix_coarsen_flags () {
 				   // no mother cell, i.e. on the
 				   // coarsest level are deleted explicitely.
   clear_user_flags ();
-				   // number of active children of #cell#.
-				   // number of children of #cell# which are
+				   // number of active children of @p{cell}.
+				   // number of children of @p{cell} which are
 				   // flagged for coarsening
   unsigned int flagged_children;
       
@@ -5866,7 +5866,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   // which case we would have to re-run
 				   // the loop. the other possibility to
 				   // find this out would be to set a
-				   // flag #something_changed# to true
+				   // flag @p{something_changed} to true
 				   // each time we change something.
 				   // however, sometimes one change in
 				   // one of the parts of the loop is
@@ -6547,7 +6547,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 
 				   // find out whether something was really
 				   // changed in this function. Note that
-				   // #flags_before_loop# represents the
+				   // @p{flags_before_loop} represents the
 				   // state after the last loop, i.e.
 				   // the present state
   return ((flags_before[0] != flags_before_loop[0]) ||
@@ -6670,7 +6670,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 				   // of this cell (the case that the
 				   // neighbors are more refined than
 				   // the children was eliminated in
-				   // #prepare_coarsening#
+				   // @p{prepare_coarsening}
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell;
 	 ++n)
@@ -6685,7 +6685,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 		ExcInternalError());
 	
 					 // if the neighbor's level is the
-					 // same as that of #cell#, then
+					 // same as that of @p{cell}, then
 					 // it's neighbor pointers points
 					 // to this cell rather than to
 					 // this cell's child. In that
@@ -6800,7 +6800,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // of this cell (the case that the
 				   // neighbors are more refined than
 				   // the children was eliminated in
-				   // #prepare_coarsening#
+				   // @p{prepare_coarsening}
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
       {
@@ -6814,7 +6814,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 		ExcInternalError());
 	
 					 // if the neighbor's level is the
-					 // same as that of #cell#, then
+					 // same as that of @p{cell}, then
 					 // it's neighbor pointers points
 					 // to this cell rather than to
 					 // this cell's child. In that

@@ -524,7 +524,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 
   				   // set up an array of the unit points
 				   // on the given face, but in coordinates
-				   // of the space with #dim# dimensions.
+				   // of the space with @p{dim} dimensions.
 				   // the points are still on the unit
 				   // cell, not on the real cell.
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -685,7 +685,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 
   				   // set up an array of the unit points
 				   // on the given face, but in coordinates
-				   // of the space with #dim# dimensions.
+				   // of the space with @p{dim} dimensions.
 				   // the points are still on the unit
 				   // cell, not on the real cell.
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)

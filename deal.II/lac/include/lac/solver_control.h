@@ -23,29 +23,29 @@ class ParameterHandler;
  *
  * Used by iterative methods to
  * determine whether the iteration should be continued. To this respect,
- * the virtual function #check()# is called in each iteration
+ * the virtual function @p{check()} is called in each iteration
  * with the current iteration
  * step and the value indicating convergence (usually the residual).
  *
- * After the iteration has terminated, the functions #last_value# and
- * #last_step# can be used to obtain information about the final state
+ * After the iteration has terminated, the functions @p{last_value} and
+ * @p{last_step} can be used to obtain information about the final state
  * of the iteration.
  *
- * #check()# can be replaced in derived classes to allow for more
+ * @p{check()} can be replaced in derived classes to allow for more
  * sophisticated tests.
  *
  *
- * \section{State}
- * The return states of the check function are of type #State#, which is an
+ * @sect2{State}
+ * The return states of the check function are of type @p{State}, which is an
  * enum local to this class. It indicates the state the
  * solver is in.
  *
  * The possible values of State are
  * \begin{itemize}
- * \item #iterate = 0#: continue the iteration.
- * \item #success#: the goal is reached, the iterative method can terminate
+ * \item @p{iterate = 0}: continue the iteration.
+ * \item @p{success}: the goal is reached, the iterative method can terminate
  *       successfully.
- * \item #failure#: the iterative method should stop because convergence 
+ * \item @p{failure}: the iterative method should stop because convergence 
  *       could not be achieved or at least was not achieved within the given
  *       maximal number of iterations.
  * \end{itemize}
@@ -55,7 +55,7 @@ class SolverControl : public Subscriptor
   public:
 
 				     /**
-				      * #Enum# denoting the different
+				      * @p{Enum} denoting the different
 				      * states a solver can be in. See
 				      * the general documentation of
 				      * this class for more
@@ -67,21 +67,21 @@ class SolverControl : public Subscriptor
     
 				     /**
 				      * Constructor. The parameters
-				      * #n# and #tol# are the
+				      * @p{n} and @p{tol} are the
 				      * maximum number of iteration
 				      * steps before failure and the
 				      * tolerance to determine success
 				      * of the iteration.
 				      *
-				      * #log_history# specifies whether
+				      * @p{log_history} specifies whether
 				      * the history (i.e. the value to
 				      * be checked and the number of
 				      * the iteration step) shall be
-				      * printed to #deallog# stream.
+				      * printed to @p{deallog} stream.
 				      * Default is: do not print. Similarly,
-				      *  #log_result#
+				      *  @p{log_result}
 				      * specifies the whether the final result is logged
-				      * to #deallog#. Default is yes.
+				      * to @p{deallog}. Default is yes.
 				      */
     SolverControl (const unsigned int n = 100,
 		   const double tol = 1.e-10,
@@ -112,32 +112,32 @@ class SolverControl : public Subscriptor
 				      * to determine, whether the
 				      * allowed number of steps has
 				      * been exceeded and returns
-				      * #failure# in this case. If
-				      * #check_value# is below the
+				      * @p{failure} in this case. If
+				      * @p{check_value} is below the
 				      * prescribed tolerance, it
-				      * returns #success#. In all
-				      * other cases #iterate# is
+				      * returns @p{success}. In all
+				      * other cases @p{iterate} is
 				      * returned to suggest
 				      * continuation of the iterative
 				      * procedure.
 				      *
-				      * #check()# additionally
-				      * preserves #step# and
-				      * #check_value#. These
+				      * @p{check()} additionally
+				      * preserves @p{step} and
+				      * @p{check_value}. These
 				      * values are accessible by
-				      * #last_value()# and
-				      * #last_step()#.
+				      * @p{last_value()} and
+				      * @p{last_step()}.
 				      *
 				      * Derived classes may overload this
 				      * function, e.g. to log the convergence
-				      * indicators (#check_value#) or to do
+				      * indicators (@p{check_value}) or to do
 				      * other computations.
 				      */
     virtual State check (const unsigned int step, const double check_value);
 
 				     /**
 				      * Return the convergence value of last
-				      * iteration step for which #check# was
+				      * iteration step for which @p{check} was
 				      * called by the solver.
 				      */
     double last_value() const;
@@ -206,7 +206,7 @@ class SolverControl : public Subscriptor
     unsigned int       lstep;
 
 				     /**
-				      * Log convergence history to #deallog#.
+				      * Log convergence history to @p{deallog}.
 				      */
     bool         _log_history;
 				     /**
@@ -216,18 +216,18 @@ class SolverControl : public Subscriptor
     
 				     /**
 				      * Log iteration result to
-				      * #deallog#.  If true, after
+				      * @p{deallog}.  If true, after
 				      * finishing the iteration, a
 				      * statement about failure or
-				      * success together with #lstep#
-				      * and #lvalue# are logged.
+				      * success together with @p{lstep}
+				      * and @p{lvalue} are logged.
 				      */
     bool         _log_result;
 };
 
 
 /**
- * Specialization of #SolverControl# which returns #success# if either
+ * Specialization of @p{SolverControl} which returns @p{success} if either
  * the specified tolerance is achieved or if the initial residual (or
  * whatever criterion was chosen by the solver class) is reduced by a
  * given factor. This is useful in cases where you don't want to solve
@@ -275,7 +275,7 @@ class ReductionControl : public SolverControl
 				      * of an iteration.  This function
 				      * calls the one in the base
 				      * class, but sets the tolerance
-				      * to #reduction * initial value#
+				      * to @p{reduction * initial value}
 				      * upon the first iteration.
 				      */
     virtual State check (const unsigned int step,

@@ -23,10 +23,10 @@
  * Bicgstab algorithm by van der Vorst.
  *
  * Like all other solver classes, this class has a local structure called
- * #AdditionalData# which is used to pass additional parameters to the
+ * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
  * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the #SolverSelector# and
+ * to the constructor because this makes the use of the @p{SolverSelector} and
  * other classes much easier and guarantees that these will continue to
  * work even if number or type of the additional parameters for a certain
  * solver changes.

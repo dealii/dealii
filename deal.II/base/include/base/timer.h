@@ -22,7 +22,7 @@
  * microsecond. 
  *
  *
- * \subsection{Usage}
+ * @sect3{Usage}
  *
  * Use of this class is as you might expect by looking at the member
  * functions:
@@ -42,7 +42,7 @@
  * \end{verbatim}
  *
  * Alternatively, you can also restart the timer instead of resetting
- * it. The times between successive calls to #start/stop# will then be
+ * it. The times between successive calls to @p{start/stop} will then be
  * accumulated.
  *
  * Note: the implementation of this class is system dependent.
@@ -89,16 +89,16 @@ class Timer
   private:
 
 				     /**
-				      * Value of the user time when #start#
+				      * Value of the user time when @p{start}
 				      * was called the last time or when the
-				      * object was created and no #stop# was
+				      * object was created and no @p{stop} was
 				      * issued in between.
 				      */
     double              start_time;
 
 				     /**
 				      * Accumulated time for all previous
-				      * #start#/#stop# cycles. The time for
+				      * @p{start}/@p{stop} cycles. The time for
 				      * the present cycle is not included.
 				      */
     double              cumulative_time;

@@ -206,7 +206,7 @@ prepare_for_coarsening_and_refinement(const vector<Vector<number> > &all_in)
 				   // the 'to_stay_or_refine' cells 'n_sr',
 				   // the 'coarsen_fathers' cells 'n_cf',
 				   // and all the cells where a
-				   // #Pointerstruct# is needed 'n'
+				   // @p{Pointerstruct} is needed 'n'
   unsigned int n_sr=0, n_cf=0, n=0;
   DoFHandler<dim>::cell_iterator cell = dof_handler->begin();  
   for (; cell!=endc; ++cell) 

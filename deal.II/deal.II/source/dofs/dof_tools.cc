@@ -505,7 +505,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
 	  
 					   // fill the dofs indices. Use same
 					   // enumeration scheme as in
-					   // #FiniteElement::constraints()#
+					   // @p{FiniteElement::constraints()}
 	  unsigned int next_index = 0;
 	  for (unsigned int vertex=0; vertex<2; ++vertex)
 	    for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
@@ -598,7 +598,7 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 	  
 					   // fill the dofs indices. Use same
 					   // enumeration scheme as in
-					   // #FiniteElement::constraints()#
+					   // @p{FiniteElement::constraints()}
 	  unsigned int next_index = 0;
 	  for (unsigned int vertex=0; vertex<4; ++vertex)
 	    for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
@@ -1306,8 +1306,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 	    global_parameter_representation.clear ();
 	    
 					     // distribute the representation of
-					     // #local_parameter_dof# on the
-					     // parameter grid cell #cell# to
+					     // @p{local_parameter_dof} on the
+					     // parameter grid cell @p{cell} to
 					     // the global data space
 	    coarse_to_fine_grid_map[cell]->
 	      set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
@@ -1318,26 +1318,26 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 					     // non-zero entries in that vector and
 					     // store the result
 					     //
-					     // what we have learned: if entry #i#
+					     // what we have learned: if entry @p{i}
 					     // of the global vector holds the value
-					     // #v[i]#, then this is the weight with
+					     // @p{v[i]}, then this is the weight with
 					     // which the present dof contributes
-					     // to #i#. there may be several such
-					     // #i#s and their weights' sum should
-					     // be one. Then, #v[i]# should be
-					     // equal to #\sum_j w_{ij} p[j]# with
-					     // #p[j]# be the values of the degrees
+					     // to @p{i}. there may be several such
+					     // @p{i}s and their weights' sum should
+					     // be one. Then, @p{v[i]} should be
+					     // equal to @p{\sum_j w_{ij} p[j]} with
+					     // @p{p[j]} be the values of the degrees
 					     // of freedom on the coarse grid. we
 					     // can thus compute constraints which
-					     // link the degrees of freedom #v[i]#
+					     // link the degrees of freedom @p{v[i]}
 					     // on the fine grid to those on the
-					     // coarse grid, #p[j]#. Now to use
+					     // coarse grid, @p{p[j]}. Now to use
 					     // these as real constraints, rather
 					     // than as additional equations, we
 					     // have to identify representants
-					     // among the #i# for each #j#. this will
+					     // among the @p{i} for each @p{j}. this will
 					     // be done by simply taking the first
-					     // #i# for which #w_{ij}==1#.
+					     // @p{i} for which @p{w_{ij}==1}.
 	    for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
 					       // set this weight if it belongs
 					       // to a parameter dof.

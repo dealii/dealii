@@ -201,7 +201,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 	{
 					   // this line is constrained
 	  new_line.push_back (-1);
-					   // note that #lines# is ordered	  
+					   // note that @p{lines} is ordered	  
 	  ++shift;
 	  ++next_constraint;
 	  if (next_constraint == lines.end())
@@ -219,8 +219,8 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 
   next_constraint = lines.begin();
 				   // note: in this loop we need not check
-				   // whether #next_constraint# is a valid
-				   // iterator, since #next_constraint# is
+				   // whether @p{next_constraint} is a valid
+				   // iterator, since @p{next_constraint} is
 				   // only evaluated so often as there are
 				   // entries in new_line[*] which tells us
 				   // which constraints exist
@@ -315,7 +315,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 	      if (distribute[column] != -1)
 		{
 						   // distribute entry at regular
-						   // row #row# and irregular column
+						   // row @p{row} and irregular column
 						   // sparsity.colnums[j]
 		  for (unsigned int q=0;
 		       q!=lines[distribute[column]].entries.size();
@@ -335,7 +335,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 	    {
 	      if (distribute[sparsity.get_column_numbers()[j]] == -1)
 						 // distribute entry at irregular
-						 // row #row# and regular column
+						 // row @p{row} and regular column
 						 // sparsity.colnums[j]
 		for (unsigned int q=0;
 		     q!=lines[distribute[row]].entries.size(); ++q) 
@@ -343,7 +343,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 				sparsity.get_column_numbers()[j]);
 	      else
 						 // distribute entry at irregular
-						 // row #row# and irregular column
+						 // row @p{row} and irregular column
 						 // sparsity.get_column_numbers()[j]
 		for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 		  for (unsigned int q=0;
