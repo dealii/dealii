@@ -1037,7 +1037,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       constraints.condense (sparsity);
     };
     
-  int n_dofs = sparsity.n_rows();
+  int total_dofs = sparsity.n_rows();
 				   // store the new dof numbers; -1 means
 				   // that no new number was chosen yet
 				   //
@@ -1056,7 +1056,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
   
 				   // delete disallowed elements
   for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-    if ((last_round_dofs[i]<0) || (last_round_dofs[i]>=n_dofs))
+    if ((last_round_dofs[i]<0) || (last_round_dofs[i]>=total_dofs))
       last_round_dofs[i] = -1;
   
   remove_if (last_round_dofs.begin(), last_round_dofs.end(),
@@ -1069,8 +1069,8 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
   if (last_round_dofs.size() == 0)
     {
       int          starting_point   = -1;
-      unsigned int min_coordination = n_dofs;
-      for (int row=0; row<n_dofs; ++row) 
+      unsigned int min_coordination = total_dofs;
+      for (int row=0; row<total_dofs; ++row) 
 	{
 	  unsigned int j;
 	  for (j=sparsity.get_rowstart_indices()[row];
@@ -1179,7 +1179,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				   //  test for all indices numbered
   if (find (new_number.begin(), new_number.end(), -1) != new_number.end())
     Assert (false, ExcRenumberingIncomplete());
-  Assert (next_free_number == n_dofs,
+  Assert (next_free_number == total_dofs,
 	  ExcRenumberingIncomplete());
 #endif
 
@@ -1190,7 +1190,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       case reverse_Cuthill_McKee:
       {
 	for (vector<int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
-	  *i = n_dofs-*i;
+	  *i = total_dofs-*i;
 	break;
       };
       default:

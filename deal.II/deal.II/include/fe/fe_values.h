@@ -248,7 +248,7 @@ class FEValuesBase {
 				      */
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int n_support_points,
-		  const unsigned int n_dofs,
+		  const unsigned int total_dofs,
 		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
 		  const UpdateFlags         update_flags,
@@ -879,7 +879,7 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 				      */
     FEFaceValuesBase (const unsigned int n_q_points,
 		      const unsigned int n_support_points,
-		      const unsigned int n_dofs,
+		      const unsigned int total_dofs,
 		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags         update_flags,

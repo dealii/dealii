@@ -565,11 +565,11 @@ template <int dim>
 void
 DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
 						   dVector       &interpolated_values) const {
-  const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
+  const unsigned int n_dofs = dof_handler->get_fe().total_dofs;
   
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
-  Assert (interpolated_values.size() == total_dofs,
+  Assert (interpolated_values.size() == n_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
@@ -581,8 +581,8 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
   else
 				     // otherwise clobber them from the children
     {
-      dVector tmp1(total_dofs);
-      dVector tmp2(total_dofs);
+      dVector tmp1(n_dofs);
+      dVector tmp2(n_dofs);
       
       interpolated_values.clear ();
 
@@ -605,7 +605,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
 					   // end in adding up the contribution
 					   // from nodes on boundaries of
 					   // children more than once.
-	  for (unsigned int i=0; i<total_dofs; ++i)
+	  for (unsigned int i=0; i<n_dofs; ++i)
 	    if (tmp2(i) != 0)
 	      interpolated_values(i) = tmp2(i);
 	};
@@ -618,11 +618,11 @@ template <int dim>
 void
 DoFCellAccessor<dim>::set_dof_values_by_interpolation (const dVector &local_values,
 						       dVector       &values) const {
-  const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
+  const unsigned int n_dofs = dof_handler->get_fe().total_dofs;
   
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
-  Assert (local_values.size() == total_dofs,
+  Assert (local_values.size() == n_dofs,
 	  ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
@@ -634,7 +634,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const dVector &local_valu
   else
 				     // otherwise distribute them to the children
     {
-      dVector tmp(total_dofs);
+      dVector tmp(n_dofs);
       
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
 	   ++child)

@@ -16,104 +16,18 @@
 
 
 template <int dim> class Boundary;
-template <int dim> struct FiniteElementData;
+template <int dim> class FiniteElementData;
 
 
 
 /**
- * Dimension dependent data for finite elements. See the #FiniteElementBase#
+ * Dimension independent data for finite elements. See the #FiniteElementBase#
  * class for more information.
  */
-struct FiniteElementData<1> {
-				     /**
-				      * Number of degrees of freedom on
-				      * a vertex.
-				      */
-    const unsigned int dofs_per_vertex;
-
-				     /** Number of degrees of freedom
-				      *  on a line.
-				      */
-    const unsigned int dofs_per_line;
-
-				     /**
-				      * Number of degrees of freedom on a
-				      * face. This information is
-				      * redundant to some fields in the
-				      * derived classes but makes
-				      * writing dimension independant
-				      * programs easier.
-				      */
-    const unsigned int dofs_per_face;
-    
-				     /**
-				      * Total number of degrees of freedom
-				      * on a cell. This information is
-				      * redundant to some fields in the
-				      * derived classes but makes
-				      * writing dimension independant
-				      * programs easier.
-				      */
-    const unsigned int total_dofs;
-
-				     /**
-				      * Number of basis functions used for the
-				      * transformation from unit cell to real
-				      * cell. For a linear mapping, this number
-				      * equals the number of vertices.
-				      */
-    const unsigned int n_transform_functions;
-    
-				   /**
-				    * Number of components.
-				    */
-    const unsigned int n_components;
-
-    				     /**
-				      * Default constructor. Constructs an element
-				      * which is not so useful. Checking
-				      * #total_dofs# is therefore a good way to
-				      * check if something went wrong.
-				      */
-    FiniteElementData ();
-
-				     /**
-				      * A more useful version to construct
-				      * an object of this type.
-				      */
-    FiniteElementData (const unsigned int dofs_per_vertex,
-		       const unsigned int dofs_per_line,
-		       const unsigned int n_transform_functions,
-		       const unsigned int n_components = 1);
-
-				     /**
-				      * Another frequently used useful
-				      * constructor, copying the data from
-				      * another object.
-				      */
-    FiniteElementData (const FiniteElementData<1> &fe_data);
-
-				     /**
-				      * Comparison operator. It is not clear to
-				      * me why we have to declare and implement
-				      * this one explicitely.
-				      */
-    bool operator == (const FiniteElementData<1> &) const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInternalError);
-};
-
-
-
-
-/**
- * Dimension dependent data for finite elements. See the #FiniteElementBase#
- * class for more information.
- */
-struct FiniteElementData<2> {
+template<int dim>
+class FiniteElementData
+{
+  public:
 				     /**
 				      * Number of degrees of freedom on
 				      * a vertex.
@@ -126,10 +40,15 @@ struct FiniteElementData<2> {
     const unsigned int dofs_per_line;
 
 				     /** Number of degrees of freedom
-				      *  on a quad.
+				      *  on a quadrilateral.
 				      */
     const unsigned int dofs_per_quad;
 
+				     /** Number of degrees of freedom
+				      *  on a hexahedron.
+				      */
+    const unsigned int dofs_per_hex;
+
 				     /**
 				      * Number of degrees of freedom on a
 				      * face. This information is
@@ -139,6 +58,21 @@ struct FiniteElementData<2> {
 				      * programs easier.
 				      */
     const unsigned int dofs_per_face;
+    
+				     /**
+				      * First index of dof on a line.
+				      */
+    const unsigned int first_line_index;
+    
+				     /**
+				      * First index of dof on a quad.
+				      */
+    const unsigned int first_quad_index;
+    
+				     /**
+				      * First index of dof on a hexahedron.
+				      */
+    const unsigned int first_hex_index;
     
 				     /**
 				      * Total number of degrees of freedom
@@ -172,21 +106,41 @@ struct FiniteElementData<2> {
     FiniteElementData ();
 
 				     /**
-				      * A more useful version to construct
-				      * an object of this type.
+				      * Constructor for a 1-dimensional
+				      * object.
+				      */
+    FiniteElementData (const unsigned int dofs_per_vertex,
+		       const unsigned int dofs_per_line,
+		       const unsigned int n_transform_functions,
+		       const unsigned int n_components);
+
+				     /**
+				      * Constructor for a 2-dimensional
+				      * object.
 				      */
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
 		       const unsigned int dofs_per_quad,
 		       const unsigned int n_transform_functions,
-		       const unsigned int n_components = 1);
+		       const unsigned int n_components);
 
-    				     /**
-				      * Another frequently used useful
-				      * constructor, copying the data from
-				      * another object.
+				     /**
+				      * Constructor for a 3-dimensional
+				      * object.
 				      */
-    FiniteElementData (const FiniteElementData<2> &fe_data);
+    FiniteElementData (const unsigned int dofs_per_vertex,
+		       const unsigned int dofs_per_line,
+		       const unsigned int dofs_per_quad,
+		       const unsigned int dofs_per_hex,
+		       const unsigned int n_transform_functions,
+		       const unsigned int n_components);
+
+//     				     /**
+// 				      * Another frequently used useful
+// 				      * constructor, copying the data from
+// 				      * another object.
+// 				      */
+//     FiniteElementData (const FiniteElementData<2> &fe_data);
 
 				     /**
 				      * Comparison operator. It is not clear to
@@ -198,7 +152,8 @@ struct FiniteElementData<2> {
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcInternalError);
+    DeclException2 (ExcDimensionMismatch, int, int,
+		    << "used " << arg1 << "-d constructor for " << arg2 << "-d object");
 };
 
     
@@ -1175,7 +1130,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 
 template <int dim>
 inline unsigned
-FiniteElementBase<dim>::component_to_system_index (unsigned component,
+FiniteElementBase<dim>::component_to_system_index (unsigned /*component*/,
 						   unsigned component_index) const
 {
   Assert(false, ExcNotImplemented());

@@ -24,7 +24,8 @@ FELinearMapping<1>::FELinearMapping (const unsigned int dofs_per_vertex,
 				     const unsigned int dofs_per_quad) :
 		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
 							dofs_per_line,
-							GeometryInfo<1>::vertices_per_cell))
+							GeometryInfo<1>::vertices_per_cell,
+							1))
 {
   Assert (dofs_per_quad==0, ExcInvalidData());
 };
@@ -146,7 +147,8 @@ FELinearMapping<2>::FELinearMapping (const unsigned int dofs_per_vertex,
 		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
-							GeometryInfo<2>::vertices_per_cell))
+							GeometryInfo<2>::vertices_per_cell,
+							1))
 {};
 
 
