@@ -1550,6 +1550,7 @@ inline
 unsigned int
 TableIndicesBase<N>::operator [] (const unsigned int i) const 
 {
+  Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];
 };
 
