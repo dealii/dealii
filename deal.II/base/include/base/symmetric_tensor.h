@@ -52,6 +52,46 @@ namespace internal
       else
 	return TableIndices<2>(previous_indices[0], new_index);
     }
+
+
+
+				     /**
+				      * Create a TableIndices<4>
+				      * object where the first entries
+				      * up to <tt>position-1</tt> are
+				      * taken from previous_indices,
+				      * and new_index is put at
+				      * position
+				      * <tt>position</tt>. The
+				      * remaining indices remain in
+				      * invalid state.
+				      */
+    TableIndices<4> merge (const TableIndices<4> &previous_indices,
+			   const unsigned int     new_index,
+			   const unsigned int     position)
+    {
+      Assert (position < 4, ExcIndexRange (position, 0, 4));
+
+      switch (position)
+	{
+	  case 0:
+		return TableIndices<4>(new_index);
+	  case 1:
+		return TableIndices<4>(previous_indices[0],
+				       new_index);
+	  case 2:
+		return TableIndices<4>(previous_indices[0],
+				       previous_indices[1],
+				       new_index); 
+	  case 3:
+		return TableIndices<4>(previous_indices[0],
+				       previous_indices[1],
+				       previous_indices[2],
+				       new_index);
+	}
+      Assert (false, ExcInternalError());
+      return TableIndices<4>();
+   }
     
     
                                      /**
@@ -209,7 +249,7 @@ namespace internal
  *
  * @author Wolfgang Bangerth, 2002, 2005
  */
-    template <int rank, int dim, bool constness, unsigned int P>
+    template <int rank, int dim, bool constness, int P>
     class Accessor
     {
       public:
@@ -468,6 +508,25 @@ namespace internal
  * <tt>SymmetricTensor<1,dim></tt> and <tt>SymmetricTensor<3,dim></tt> do not
  * exist and their use will most likely lead to compiler errors.
  *
+ *
+ * <h3>Accessing elements</h3>
+ *
+ * The elements of a tensor <tt>t</tt> can be accessed using the
+ * bracket operator, i.e. for a tensor of rank 4,
+ * <tt>t[0][1][0][1]</tt> accesses the element
+ * <tt>t<sub>0101</sub></tt>. This access can be used for both reading
+ * and writing (if the tensor is non-constant at least). You may also
+ * perform other operations on it, although that may lead to confusing
+ * situations because several elements of the tensor are stored at the
+ * same location. For example, for a rank-2 tensor that is assumed to
+ * be zero at the beginning, writing <tt>t[0][1]+=1; t[1][0]+=1;</tt>
+ * will lead to the same element being increased by one
+ * <em>twice</em>, because even though the accesses use different
+ * indices, the elements that are accessed are symmetric and therefore
+ * stored at the same location. It may therefore be useful in
+ * application programs to restrict operations on individual elements
+ * to simple reads or writes.
+ *
  * @author Wolfgang Bangerth, 2005
  */
 template <int rank, int dim>
@@ -659,7 +718,7 @@ class SymmetricTensor
                                      /**
                                       * Data storage for a symmetric tensor.
                                       */
-    typename internal::SymmetricTensorAccessors::StorageType<2,dim>::base_tensor_type data;
+    typename internal::SymmetricTensorAccessors::StorageType<rank,dim>::base_tensor_type data;
 };
 
 
@@ -670,24 +729,24 @@ namespace internal
 {
   namespace SymmetricTensorAccessors
   {
-//     template <int rank, int dim, bool constness, int P>
-//     Accessor<rank,dim,constness,P>::
-//     Accessor (const tensor_type        &tensor,
-// 	      const TableIndices<rank> &previous_indices)
-// 		    :
-// 		    tensor (tensor),
-// 		    previous_indices (previous_indices)
-//     {}
+    template <int rank, int dim, bool constness, int P>
+    Accessor<rank,dim,constness,P>::
+    Accessor (tensor_type              &tensor,
+	      const TableIndices<rank> &previous_indices)
+		    :
+		    tensor (tensor),
+		    previous_indices (previous_indices)
+    {}
 
 
 
-//     template <int rank, int dim, bool constness, int P>
-//     Accessor<rank,dim,constness,P-1>
-//     Accessor<rank,dim,constness,P>::operator[] (const unsigned int i)
-//     {
-//       return Accessor<dim,rank,constness,P-1> (tensor,
-// 					       merge (previous_indices, i, rank-P));
-//     }
+    template <int rank, int dim, bool constness, int P>
+    Accessor<rank,dim,constness,P-1>
+    Accessor<rank,dim,constness,P>::operator[] (const unsigned int i)
+    {
+      return Accessor<rank,dim,constness,P-1> (tensor,
+					       merge (previous_indices, i, rank-P));
+    }
 
 
 
@@ -919,6 +978,59 @@ SymmetricTensor<2,3>::operator * (const SymmetricTensor<2,3> &s) const
 
 
 template <>
+double
+SymmetricTensor<4,1>::operator * (const SymmetricTensor<4,1> &s) const
+{
+  return data[0][0] * s.data[0][0];
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,2>::operator * (const SymmetricTensor<4,2> &s) const
+{
+  const unsigned int dim = 2;
+
+				   // this is not really efficient and
+				   // could be improved by counting
+				   // how often each tensor entry is
+				   // accessed, but this isn't a
+				   // really frequent operation anyway
+  double t = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  t += (*this)[i][j][k][l] * s[i][j][k][l];
+  return t;
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,3>::operator * (const SymmetricTensor<4,3> &s) const
+{
+  const unsigned int dim = 3;
+
+				   // this is not really efficient and
+				   // could be improved by counting
+				   // how often each tensor entry is
+				   // accessed, but this isn't a
+				   // really frequent operation anyway
+  double t = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  t += (*this)[i][j][k][l] * s[i][j][k][l];
+  return t;
+}
+
+
+
+template <>
 double &
 SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices)
 {
@@ -1070,6 +1182,238 @@ SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices) const
 
 
 
+template <>
+double &
+SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices)
+{
+  const unsigned int rank = 4;
+  const unsigned int dim  = 1;
+  for (unsigned int r=0; r<rank; ++r)
+    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+
+  return data[0][0];
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices) const
+{
+  const unsigned int rank = 4;
+  const unsigned int dim  = 1;
+  for (unsigned int r=0; r<rank; ++r)
+    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+
+  return data[0][0];
+}
+
+
+
+template <>
+double &
+SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices)
+{
+  const unsigned int rank = 4;
+  const unsigned int dim  = 2;
+  for (unsigned int r=0; r<rank; ++r)
+    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+
+				   // each entry of the tensor can be
+				   // thought of as an entry in a
+				   // matrix that maps the rolled-out
+				   // rank-2 tensors into rolled-out
+				   // rank-2 tensors. this is the
+				   // format in which we store rank-4
+				   // tensors. determine which
+				   // position the present entry is
+				   // stored in
+  unsigned int base_index[2] ;
+  if ((indices[0] == 0) && (indices[1] == 0))
+    base_index[0] = 0;
+  else if ((indices[0] == 1) && (indices[1] == 1))
+    base_index[0] = 1;
+  else
+    base_index[0] = 2;
+
+  if ((indices[2] == 0) && (indices[3] == 0))
+    base_index[1] = 0;
+  else if ((indices[2] == 1) && (indices[3] == 1))
+    base_index[1] = 1;
+  else
+    base_index[1] = 2;  
+
+  return data[base_index[0]][base_index[1]];
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices) const
+{
+  const unsigned int rank = 4;
+  const unsigned int dim  = 2;
+  for (unsigned int r=0; r<rank; ++r)
+    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+
+				   // each entry of the tensor can be
+				   // thought of as an entry in a
+				   // matrix that maps the rolled-out
+				   // rank-2 tensors into rolled-out
+				   // rank-2 tensors. this is the
+				   // format in which we store rank-4
+				   // tensors. determine which
+				   // position the present entry is
+				   // stored in
+  unsigned int base_index[2] ;
+  if ((indices[0] == 0) && (indices[1] == 0))
+    base_index[0] = 0;
+  else if ((indices[0] == 1) && (indices[1] == 1))
+    base_index[0] = 1;
+  else
+    base_index[0] = 2;
+
+  if ((indices[2] == 0) && (indices[3] == 0))
+    base_index[1] = 0;
+  else if ((indices[2] == 1) && (indices[3] == 1))
+    base_index[1] = 1;
+  else
+    base_index[1] = 2;  
+
+  return data[base_index[0]][base_index[1]];
+}
+
+
+
+template <>
+double &
+SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices)
+{
+  const unsigned int rank = 4;
+  const unsigned int dim  = 3;
+  for (unsigned int r=0; r<rank; ++r)
+    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+
+				   // each entry of the tensor can be
+				   // thought of as an entry in a
+				   // matrix that maps the rolled-out
+				   // rank-2 tensors into rolled-out
+				   // rank-2 tensors. this is the
+				   // format in which we store rank-4
+				   // tensors. determine which
+				   // position the present entry is
+				   // stored in
+  unsigned int base_index[2] ;
+  if ((indices[0] == 0) && (indices[1] == 0))
+    base_index[0] = 0;
+  else if ((indices[0] == 1) && (indices[1] == 1))
+    base_index[0] = 1;
+  else if ((indices[0] == 2) && (indices[1] == 2))
+    base_index[0] = 2;
+  else if (((indices[0] == 0) && (indices[1] == 1)) ||
+	   ((indices[0] == 1) && (indices[1] == 0)))
+    base_index[0] = 3;
+  else if (((indices[0] == 0) && (indices[1] == 2)) ||
+	   ((indices[0] == 2) && (indices[1] == 0)))
+    base_index[0] = 4;
+  else
+    {
+      Assert (((indices[0] == 1) && (indices[1] == 2)) ||
+	      ((indices[0] == 2) && (indices[1] == 1)),
+	      ExcInternalError());
+      base_index[0] = 5;
+    }
+
+  if ((indices[2] == 0) && (indices[3] == 0))
+    base_index[1] = 0;
+  else if ((indices[2] == 1) && (indices[3] == 1))
+    base_index[1] = 1;
+  else if ((indices[2] == 2) && (indices[3] == 2))
+    base_index[1] = 2;
+  else if (((indices[2] == 0) && (indices[3] == 1)) ||
+	   ((indices[2] == 1) && (indices[3] == 0)))
+    base_index[1] = 3;
+  else if (((indices[2] == 0) && (indices[3] == 2)) ||
+	   ((indices[2] == 2) && (indices[3] == 0)))
+    base_index[1] = 4;
+  else
+    {
+      Assert (((indices[2] == 1) && (indices[3] == 2)) ||
+	      ((indices[2] == 2) && (indices[3] == 1)),
+	      ExcInternalError());
+      base_index[1] = 5;
+    }
+  
+  return data[base_index[0]][base_index[1]];
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices) const
+{
+  const unsigned int rank = 4;
+  const unsigned int dim  = 3;
+  for (unsigned int r=0; r<rank; ++r)
+    Assert (indices[r] < dim, ExcIndexRange (indices[r], 0, dim));
+
+				   // each entry of the tensor can be
+				   // thought of as an entry in a
+				   // matrix that maps the rolled-out
+				   // rank-2 tensors into rolled-out
+				   // rank-2 tensors. this is the
+				   // format in which we store rank-4
+				   // tensors. determine which
+				   // position the present entry is
+				   // stored in
+  unsigned int base_index[2] ;
+  if ((indices[0] == 0) && (indices[1] == 0))
+    base_index[0] = 0;
+  else if ((indices[0] == 1) && (indices[1] == 1))
+    base_index[0] = 1;
+  else if ((indices[0] == 2) && (indices[1] == 2))
+    base_index[0] = 2;
+  else if (((indices[0] == 0) && (indices[1] == 1)) ||
+	   ((indices[0] == 1) && (indices[1] == 0)))
+    base_index[0] = 3;
+  else if (((indices[0] == 0) && (indices[1] == 2)) ||
+	   ((indices[0] == 2) && (indices[1] == 0)))
+    base_index[0] = 4;
+  else
+    {
+      Assert (((indices[0] == 1) && (indices[1] == 2)) ||
+	      ((indices[0] == 2) && (indices[1] == 1)),
+	      ExcInternalError());
+      base_index[0] = 5;
+    }
+
+  if ((indices[2] == 0) && (indices[3] == 0))
+    base_index[1] = 0;
+  else if ((indices[2] == 1) && (indices[3] == 1))
+    base_index[1] = 1;
+  else if ((indices[2] == 2) && (indices[3] == 2))
+    base_index[1] = 2;
+  else if (((indices[2] == 0) && (indices[3] == 1)) ||
+	   ((indices[2] == 1) && (indices[3] == 0)))
+    base_index[1] = 3;
+  else if (((indices[2] == 0) && (indices[3] == 2)) ||
+	   ((indices[2] == 2) && (indices[3] == 0)))
+    base_index[1] = 4;
+  else
+    {
+      Assert (((indices[2] == 1) && (indices[3] == 2)) ||
+	      ((indices[2] == 2) && (indices[3] == 1)),
+	      ExcInternalError());
+      base_index[1] = 5;
+    }
+  
+  return data[base_index[0]][base_index[1]];
+}
+
+
+
 template <int rank, int dim>
 internal::SymmetricTensorAccessors::Accessor<rank,dim,true,rank-1>
 SymmetricTensor<rank,dim>::operator [] (const unsigned int row) const
@@ -1096,7 +1440,7 @@ template <>
 double
 SymmetricTensor<2,1>::norm () const
 {
-  return std::sqrt(data[0]*data[0]);
+  return std::fabs(data[0]);
 }
 
 
@@ -1116,6 +1460,65 @@ SymmetricTensor<2,3>::norm () const
 {
   return std::sqrt(data[0]*data[0] + data[1]*data[1] + data[2]*data[2] +
                    2*data[3]*data[3] + 2*data[4]*data[4] + 2*data[5]*data[5]);
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,1>::norm () const
+{
+  return std::fabs(data[0][0]);
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,2>::norm () const
+{
+  const unsigned int dim = 2;
+
+				   // this is not really efficient and
+				   // could be improved by counting
+				   // how often each tensor entry is
+				   // accessed, but this isn't a
+				   // really frequent operation anyway
+  double t = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  {
+	    const double a = (*this)[i][j][k][l];
+	    t += a * a;
+	  }
+  return std::sqrt(t);
+}
+
+
+
+template <>
+double
+SymmetricTensor<4,3>::norm () const
+{
+  const unsigned int dim = 3;
+
+				   // this is not really efficient and
+				   // could be improved by counting
+				   // how often each tensor entry is
+				   // accessed, but this isn't a
+				   // really frequent operation anyway
+  double t = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  {
+	    const double a = (*this)[i][j][k][l];
+	    t += a * a;
+	  }
+  return std::sqrt(t);
 }
 
 
