@@ -133,8 +133,14 @@ void
 GridTools::shift (const Point<dim>   &shift_vector,
 		  Triangulation<dim> &triangulation)
 {
-  transform (std::bind2nd(std::ptr_fun(&shift_point<dim>),
-			  shift_vector),
+				   // use a temporary variable to work
+				   // around a bug in icc, which does
+				   // not like it if we take the
+				   // address of the function right
+				   // within the call to std::ptr_fun
+  Point<dim> (*p) (const Point<dim>, const Point<dim>)
+    = &shift_point<dim>;
+  transform (std::bind2nd(std::ptr_fun(p), shift_vector),
 	     triangulation);
 };
 
@@ -160,8 +166,14 @@ GridTools::scale (const double        scaling_factor,
 {
   Assert (scaling_factor>0, ExcScalingFactorNotPositive (scaling_factor));
   
-  transform (std::bind2nd(std::ptr_fun(&scale_point<dim>),
-			  scaling_factor),
+				   // use a temporary variable to work
+				   // around a bug in icc, which does
+				   // not like it if we take the
+				   // address of the function right
+				   // within the call to std::ptr_fun
+  Point<dim> (*p) (const Point<dim>, const double)
+    = &scale_point<dim>;
+  transform (std::bind2nd(std::ptr_fun(p), scaling_factor),
 	     triangulation);
 };
 
