@@ -813,6 +813,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 
 /*------------------------------- Explicit Instantiations -------------*/
 
+template class FEValuesData<deal_II_dimension>;
 template class FEValuesBase<deal_II_dimension>;
 template class FEValues<deal_II_dimension>;
 
