@@ -57,6 +57,7 @@ tests = fe_data_test fe_traits fe_tools_test mapping \
         transfer internals \
 	dgq_1 \
 	q_1 q_2 q_3 q_4 \
+	rt_1 rt_2 rt_3 rt_4 rt_5 rt_6 \
 	system_1 \
         non_primitive_1 non_primitive_2 \
         nedelec nedelec_2 nedelec_3 up_and_down
