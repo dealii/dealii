@@ -269,7 +269,9 @@ number SparseMatrix<number>::linfty_norm () const
 template <typename number>
 template <typename somenumber>
 double
-SparseMatrix<number>::residual (Vector<somenumber>& dst, const Vector<somenumber>& u, const Vector<somenumber>& b) const
+SparseMatrix<number>::residual (Vector<somenumber>& dst,
+				const Vector<somenumber>& u,
+				const Vector<somenumber>& b) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
