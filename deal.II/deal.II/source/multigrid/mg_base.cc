@@ -16,7 +16,6 @@
 #include <multigrid/mg_smoother.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
-#include <iostream>
 #include <cmath>
 
 
