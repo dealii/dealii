@@ -335,6 +335,61 @@ void GridGenerator::hyper_cube_slit<> (Triangulation<3> &,
 };
 
 
+template<>
+void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
+					 const double l,
+					 const double r,
+					 const double d,
+					 bool colorize)
+{
+  vector<Point<3> > vertices(64);
+  double coords[4];
+  coords[0] = l-d;
+  coords[1] = l;
+  coords[2] = r;
+  coords[3] = r+d;
+
+  unsigned int k=0;
+  for (unsigned int i0=0;i0<4;++i0)
+    for (unsigned int i1=0;i1<4;++i1)
+      for (unsigned int i2=0;i2<4;++i2)
+	vertices[k++] = Point<3>(coords[i2], coords[i1], coords[i0]);
+
+  const unsigned char materials[27] = {
+	21,20,22,
+	17,16,18,
+	25,24,26,
+	5 , 4, 6,
+	1 , 0, 2,
+	9 , 8,10,
+	37,36,38,
+	33,32,34,
+	41,40,42
+  };
+  
+  vector<CellData<3> > cells(27);
+  k = 0;
+  for (unsigned int i0=0;i0<3;++i0)
+    for (unsigned int i1=0;i1<3;++i1)
+      for (unsigned int i2=0;i2<3;++i2)
+	{
+	  cells[k].vertices[0] = i2+4*i1+16*i0;
+	  cells[k].vertices[1] = i2+4*i1+16*i0+1;
+	  cells[k].vertices[2] = i2+4*i1+16*i0+5;
+	  cells[k].vertices[3] = i2+4*i1+16*i0+4;
+	  cells[k].vertices[4] = i2+4*i1+16*i0+16;
+	  cells[k].vertices[5] = i2+4*i1+16*i0+17;
+	  cells[k].vertices[6] = i2+4*i1+16*i0+21;
+	  cells[k].vertices[7] = i2+4*i1+16*i0+20;
+	  if (colorize)
+	    cells[k].material_id = materials[k];
+	  ++k;
+	}
+  tria.create_triangulation (vertices,
+			     cells,
+			     SubCellData());       // no boundary information
+}
+  
 template <>
 void GridGenerator::hyper_L<> (Triangulation<3> &tria,
 			       const double a,
