@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,8 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 
-#include <vector.h>
+#include <vector>
+
 
 /**
  * Base class for all 1D polynomials. A pollynomial is represented in
