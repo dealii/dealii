@@ -94,6 +94,7 @@ class FEValuesData
 				      * thus have a row in the array
 				      * presently under discussion.
 				      */
+//TODO[WB]: use vector2d here    
     typedef FullMatrix<double> ShapeVector;
 
 				     /**
@@ -102,6 +103,7 @@ class FEValuesData
 				      * is the same as for the
 				      * @ref{ShapeVector} data type.
 				      */
+//TODO[WB]: use vector2d here
     typedef
     std::vector<std::vector<Tensor<1,dim> > >
     GradientVector;
@@ -110,6 +112,7 @@ class FEValuesData
 				      * Likewise for second order
 				      * derivatives.
 				      */
+//TODO[WB]: use vector2d here
     typedef
     std::vector<std::vector<Tensor<2,dim> > >
     GradGradVector;
