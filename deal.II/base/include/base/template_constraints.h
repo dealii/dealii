@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal authors
+//    Copyright (C) 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,6 +97,74 @@ template <typename T> struct constraint_and_return_value<false,T>
 };
 
 #endif
+
+
+
+/**
+ * A class to perform comparisons of arbitrary pointers for equality. In some
+ * circumstances, one would like to make sure that two arguments to a function
+ * are not the same object. One would, in this case, make sure that their
+ * addresses are not the same. However, sometimes the types of these two
+ * arguments may be template types, and they may be the same type or not. In
+ * this case, a simple comparison as in <tt>&object1 != &object2</tt> does
+ * only work if the types of the two objects are equal, but the compiler will
+ * barf if they are not. However, in the latter case, since the types of the
+ * two objects are different, we can be sure that the two objects cannot be
+ * the same.
+ *
+ * This class implements a comparison function that always returns @p false if
+ * the types of its two arguments are different, and returns <tt>p1 == p2</tt>
+ * otherwise.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+struct PointerComparison 
+{
+                                     /**
+                                      * Comparison function for pointers of
+                                      * the same type. Returns @p true if the
+                                      * two pointers are equal.
+                                      */
+    template <typename T>
+    static bool equal (const T *p1, const T *p2);
+
+                                     /**
+                                      * Comparison function for pointers of
+                                      * different types. The C++ language does
+                                      * not allow comparing these pointers
+                                      * using <tt>operator==</tt>. However,
+                                      * since the two pointers have different
+                                      * types, we know that they can't be the
+                                      * same, so we always return @p false.
+                                      */
+    template <typename T, typename U>
+    static bool equal (const T*, const U*);    
+};
+
+
+
+// --------------- inline functions -----------------
+
+
+template <typename T, typename U>
+inline
+bool
+PointerComparison::equal (const T*, const U*)
+{
+  return false;
+}
+
+
+
+template <typename T>
+inline
+bool
+PointerComparison::equal (const T *p1, const T *p2)
+{
+  return (p1==p2);
+}
+
+
 
 
 #endif
