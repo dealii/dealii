@@ -234,7 +234,8 @@ class DataOutBase
 				      * information on its contents
 				      * and purposes.
 				      *
-				      * @author Wolfgang Bangerth */
+				      * @author Wolfgang Bangerth
+				      */
     template <int dim>
     struct Patch
     {
