@@ -17,6 +17,10 @@ h-files      = $(sort $(shell echo include/base/*.h))
 # get options which hold for all files of the project
 include $D/common/Make.global_options
 
+# there's an extra .o file for the function parser that we need to link into
+# libbase
+extra-o-files = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+
 
 # production rules
 ifneq ($(with-multithreading),no)
@@ -40,22 +44,22 @@ libo: $(LIBDIR)/libbase$(lib-suffix)
 
 $(LIBDIR)/libbase$(static-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@$(AR) ru $@ $(o-files)
+	@$(AR) ru $@ $(o-files) $(extra-o-files)
 	@$(RANLIB) $@
 
 $(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(AR) ru $@ $(go-files)
+	@$(AR) ru $@ $(go-files) $(extra-o-files)
 	@$(RANLIB) $@
 
 
 $(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(extra-o-files)
 
 $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(extra-o-files)
 
 
 
