@@ -180,8 +180,7 @@ class SolverControl : public Subscriptor
  * of iterations is 20, the reduction factor is 1% und the tolerance
  * is 0.1%. The initial residual is 2.5. The process will break if 20
  * iteration are comleted or the new residual is less then 2.5*1% or
- * if it is less then 0.1%.
- 
+ * if it is less then 0.1%. 
  */
 class ReductionControl : public SolverControl
 {
