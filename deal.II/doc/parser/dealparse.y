@@ -15,6 +15,16 @@ int yylex();
 void enterfunction();
 void enterbaseinitializers();  
 
+string doctext;
+string cvs_id;
+  
+void printdoc(ostream& s)
+  {
+    s << doctext << endl;
+    doctext = string("");
+  }
+  
+      
 void yyerror(const char* s)
   {
     cerr << s << endl;
@@ -22,6 +32,7 @@ void yyerror(const char* s)
 %}
 
 %token NAMESPACE
+%token USING
 %token CLASS
 %token TYPEDEF
 %token ACCESS
@@ -29,6 +40,7 @@ void yyerror(const char* s)
 %token FARG
 %token CONST
 %token STATIC
+%token EXTERN
 %token MUTABLE
 %token VIRTUAL
 %token ENUM
@@ -55,7 +67,7 @@ all:  declaration_list
 
 declaration_list: declaration
   | declaration_list { cout << "@@@" << endl; } declaration
-  | NAMESPACE '{' declaration_list '}' ';'
+  | declaration_list NAMESPACE identifier '{' declaration_list '}' ';'
   | declaration_list ';'
 ;
 
@@ -67,30 +79,39 @@ declaration:
   | variable_declaration ';'
   | enum_declaration ';'
   | typedef_declaration ';'
-  | template_declaration class_declaration ';'
-    { cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
+  | template_declaration
+    { cout << setw(OUTW) << "@Template-Description:" << $1 << endl; } class_declaration ';'
   | template_declaration function_declaration ';'
     { cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
   | template_declaration function_declaration '{' { enterfunction(); 
       cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
   | template_declaration function_declaration ':' { enterbaseinitializers(); 
       cout << setw(OUTW) << "@Template-Description:" << $1 << endl; }
+  | using_declaration ';';
   | deal_exception_declaration ';'
   | ';'
+;
+
+using_declaration:
+  USING NAMESPACE identifier
 ;
 
 variable_declaration:
   vartype identifier
     { cout << setw(OUTW) << "@Variable-Declaration:" << $2 << endl
+	   << cvs_id << endl
 	   << setw(OUTW) << "@Type:" << $1 << endl
 	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
-	   << setw(OUTW) << "@Access:" << access_stack.top() << endl; }
+	   << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+      printdoc(cout); }
   | vartype identifier array_dimensions
     { cout << setw(OUTW) << "@Variable-Declaration:" << $2 << endl
+	   << cvs_id << endl
 	   << setw(OUTW) << "@Type:" << $1 << endl
 	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	   << setw(OUTW) << "@Access:" << access_stack.top() << endl
-	   << setw(OUTW) << "@Array-Dimension:" << $3 << endl; }
+	   << setw(OUTW) << "@Array-Dimension:" << $3 << endl;
+      printdoc(cout); }
   | variable_declaration '=' expression
 /*  | enum_declaration identifier*/
 ;
@@ -98,13 +119,37 @@ variable_declaration:
 typedef_declaration:
     TYPEDEF vartype identifier
       { cout << setw(OUTW) << "@Typedef:" << $3 << endl
+	   << cvs_id << endl
 	     << setw(OUTW) << "@Type:" << $2 << endl
-	     << setw(OUTW) << "@Access:" << access_stack.top() << endl; }
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+	printdoc(cout); }
+    | TYPEDEF  vartype '(' '*' identifier ')' argument_declaration
+      { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $4 << endl
+	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+	printdoc(cout); }
+    | TYPEDEF  vartype '(' identifier ':' ':' '*' identifier ')' argument_declaration
+      { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $8 << endl
+	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+	printdoc(cout); }
+    | TYPEDEF  vartype '(' '*' identifier ')' argument_declaration CONST
+      { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $4 << endl
+	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+	printdoc(cout); }
+    | TYPEDEF  vartype '(' identifier ':' ':' '*' identifier ')' argument_declaration CONST
+      { cout << setw(OUTW) << "@Typedef-Functionpointer:" << $8 << endl
+	     << setw(OUTW) << "@Type:" << $2<< endl
+	     << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+	printdoc(cout); }
     | TYPEDEF vartype identifier array_dimensions
       { cout << setw(OUTW) << "@Typedef:" << $3 << endl
+	     << cvs_id << endl
 	     << setw(OUTW) << "@Type:" << $2 << endl
 	     << setw(OUTW) << "@Access:" << access_stack.top() << endl
-	     << setw(OUTW) << "@Array-Dimension:" << $4 << endl; }
+	     << setw(OUTW) << "@Array-Dimension:" << $4 << endl;
+	printdoc(cout); }
 ;
 
 array_dimensions:
@@ -118,17 +163,21 @@ function_declaration:
   function_name argument_declaration
     {
       cout << setw(OUTW) << "@Function-Definition:" << $1 << endl
+	   << cvs_id << endl
 	   << setw(OUTW) << "@Function-Parameters:" << $2 << endl
 	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	   << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+      printdoc(cout);
     }
   | function_name argument_declaration CONST
     {
       cout << setw(OUTW) << "@Function-Definition:" << $1 << endl
+	   << cvs_id << endl
 	   << setw(OUTW) << "@Function-Parameters:" << $2 << endl
 	   << setw(OUTW) << "@Const:" << "const" << endl
 	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
 	   << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+      printdoc(cout);
     }
   | vartype function_declaration
     {
@@ -172,6 +221,8 @@ argument:
   | vartype identifier { $$ = $1 + SPC + $2; }
   | vartype identifier '=' default_arg
     { $$ = $1 + SPC + $2 + string(" = ") + $4; }
+  | vartype  '=' default_arg
+    { $$ = $1 + SPC + string(" = ") + $3; }
   | CLASS IDENTIFIER { $$ = $1 + SPC + $2; }
   | vartype '(' identifier ')' argument_declaration
     { $$ = $1 + $2 + $3 + $4 + string(" (") + $5 + string(")"); }
@@ -191,14 +242,16 @@ enum_list: /* empty */
 ;
 
 enumerator: IDENTIFIER
-  | IDENTIFIER '=' literal
+  | IDENTIFIER '=' expression
 ;
 
 class_declaration: class_head
   | class_head
     {
-      cout << "@@@" << endl << setw(OUTW) << "@Class-Definition:" << $1 << endl
+      cout << setw(OUTW) << "@Class-Definition:" << $1 << endl
+	   << cvs_id << endl
 	   << setw(OUTW) << "@In-Class:" << class_stack.top() << endl;
+      printdoc(cout);
       class_name = class_stack.top() + string("::") + class_name;
       class_stack.push(class_name);
       access_stack.push(string("private"));
@@ -253,8 +306,8 @@ member_declaration:
 ;
 
 friend_declaration:
-  FRIEND /* declaration { cout << setw(OUTW) << "Friend:" << endl; } */
-  | TEMPLATE '<' '>' FRIEND /*declaration { cout << setw(OUTW) << "Friend:" << endl; } */
+  FRIEND /* declaration  { cout << setw(OUTW) << "Friend:" << endl; } */
+  | template_declaration FRIEND /* declaration { cout << setw(OUTW) << "Friend:" << endl; } */
 ;
 
 vartype:
@@ -266,6 +319,8 @@ vartype:
   | vartype '*' { $$ = $1 + string("*"); }
   | STATIC vartype { $$ = string("static ") + $2; }
   | MUTABLE vartype { $$ = string("mutable ") + $2; }
+  | EXTERN vartype { $$ = $2; }
+
 ;
 
 virtualopt: VIRTUAL { $$ = string("virtual"); }
@@ -285,6 +340,7 @@ expression:
   | identifier
   | OP expression { $$ = $1 + $2; }
   | expression OP expression { $$ = $1 + $2 + $3; }
+  | expression '*' expression { $$ = $1 + $2 + $3; }
   | expression INT { $$ = $1 + $2; }
   | identifier argument_declaration { $$ = $1 + $2; }
   | '(' expression ')' { $$ = $1 + $2 + $3; }
@@ -298,7 +354,8 @@ literal:
 ;
 
 template_args:
-  '<' template_arglist '>' { $$ = string("<") + $2 + string(">"); }
+  '<' '>' { $$ = string("<>"); }
+  | '<' template_arglist '>' { $$ = string("<") + $2 + string(">"); }
 ;
 
 template_arglist:
@@ -309,11 +366,12 @@ template_arglist:
 template_arg:
   vartype
   | expression
-  | CLASS IDENTIFIER { $$ = $1 + SPC + $2; }
+  | CLASS identifier { $$ = $1 + SPC + $2; }
 ;
 
 template_statement:
   TEMPLATE '<' arguments '>' { $$ = $3; }
+  | TEMPLATE '<'  '>' { $$ = SPC; }
 ;
 
 template_declaration:
@@ -323,13 +381,18 @@ template_declaration:
 
 deal_exception_declaration:
   DECLEXCEPTION '(' IDENTIFIER deal_exception_arglist ')'
+  { cout << setw(OUTW) << $1 << ':' << $3 << endl
+	 << setw(OUTW) << "@In-Class:" << class_stack.top() << endl
+	 << setw(OUTW) << "@Access:" << access_stack.top() << endl;
+    printdoc(cout); }
 ;
 
 deal_exception_arglist: /* empty */
   | deal_exception_arglist ',' deal_exception_arg
 ;
 
-deal_exception_arg: identifier
+deal_exception_arg:
+  vartype
   | deal_exception_output_declaration
   | literal
 ;

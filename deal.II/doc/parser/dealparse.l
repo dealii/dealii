@@ -9,6 +9,8 @@
 #include "dealparse.tab.h"
 
 extern int yydebug;
+extern string doctext;
+extern string cvs_id;
 
 %}
 
@@ -18,13 +20,14 @@ extern int yydebug;
 %x INSTRING
 %x INFUNCTION
 %x BASEINIT
+%x DOCCOMMENT
 
 NAME  [_a-zA-Z][_a-zA-Z0-9]*
 INT   [+-]?[0-9]+
 WHITE [ \t\n\f\v]
 CLASS (class)|(struct)|(union)
 ACCESS (public)|(protected)|(private)
-OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)|(->)
+OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)|(->)|(\+\+)|(\-\-)
 
 %%
 
@@ -32,17 +35,16 @@ OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)|(->)
 
 "//<"               { return COMTEMP; }
 
- /* End of declaration section */
+"/**"		{ yy_push_state(DOCCOMMENT); }
+<DOCCOMMENT>\*\/       { yy_pop_state(); }
+<DOCCOMMENT>.|\n	{ doctext += string(yytext); }
 
-\n?"/*"[-* ]*[Ii]nline.* { return ENDOFDECL; }
-
-
-\n?"/*"             { yy_push_state(COMMENT); }
+"/*"             { yy_push_state(COMMENT); }
 <COMMENT>.
 <COMMENT>\n
 <COMMENT>"*/"       { yy_pop_state(); }
 
-DeclException[0-9]  { return(DECLEXCEPTION); }
+DeclException[0-9]  { yylval = string("@") + string(yytext); return(DECLEXCEPTION); }
 <EXC_IGNORE>.
 <EXC_IGNORE>\n
 <EXC_IGNORE>");" { yy_pop_state(); }
@@ -50,6 +52,13 @@ DeclException[0-9]  { return(DECLEXCEPTION); }
 "//"                { yy_push_state(LINECOMMENT); }
 <LINECOMMENT>.
 <LINECOMMENT>\n     { yy_pop_state(); }
+
+ /* scan CVS id in file preamble */
+
+"$Id$" { cvs_id = string(yytext); }
+<LINECOMMENT>"$Id$" { cvs_id = string(yytext); }
+<COMMENT>"$Id$" { cvs_id = string(yytext); }
+
 
  /* Ignore function bodies */
 
@@ -73,17 +82,19 @@ friend[^;]+; { return FRIEND; }
 
  /*** keywords ***/
 
-const    { return CONST; }
-virtual  { return VIRTUAL; }
-operator { return OPERATOR; }
-unsigned { return UNSIGNED; }
-static   { return STATIC; }
-mutable  { return MUTABLE; }
-template { return TEMPLATE; }
-enum     { return ENUM; }
-friend   { return FRIEND; }
-typedef  { return TYPEDEF; }
+const     { return CONST; }
+virtual   { return VIRTUAL; }
+operator  { return OPERATOR; }
+unsigned  { return UNSIGNED; }
+static    { return STATIC; }
+extern    { return EXTERN; }
+mutable   { return MUTABLE; }
+template  { return TEMPLATE; }
+enum      { return ENUM; }
+friend    { return FRIEND; }
+typedef   { return TYPEDEF; }
 namespace { return NAMESPACE; }
+using     { return USING; }
 typename {}
 
 {CLASS}  { yylval = string(yytext); return CLASS; }
