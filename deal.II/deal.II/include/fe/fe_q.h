@@ -19,8 +19,11 @@
 template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
+
+
 /**
  * Tensor product elements based on equidistant support points.
+//TODO: Document node numbering etc. copy from old documentation 
  */
 template <int dim>
 class FE_Q : public FiniteElement<dim>
@@ -36,18 +39,6 @@ class FE_Q : public FiniteElement<dim>
 				      * Destructor.
 				      */
     ~FE_Q ();
-
-				     /**
-				      * Compute flags for initial
-				      * update only.
-				      */
-    virtual UpdateFlags update_once (UpdateFlags flags) const;
-  
-				     /**
-				      * Compute flags for update on
-				      * each cell.
-				      */
-    virtual UpdateFlags update_each (UpdateFlags flags) const;
 
 				     /**
 				      * Return the support points of
@@ -114,8 +105,7 @@ class FE_Q : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-  protected:
-
+  protected:    
 				     /**
 				      * @p{clone} function instead of
 				      * a copy constructor.
@@ -178,6 +168,74 @@ class FE_Q : public FiniteElement<dim>
 			    FEValuesData<dim>& data) const ;
 
   private:
+
+				     /**
+				      * Declare a nested class which
+				      * will has static definitions of
+				      * various matrices such as
+				      * constraint and embedding
+				      * matrices. The definition of
+				      * the various static fields are
+				      * in the files @p{mat_q.[123]}
+				      * in the source directory.
+				      */
+    struct Matrices {
+					 /**
+					  * Embedding matrices. For
+					  * each element type (the
+					  * first index) there are as
+					  * many embedding matrices as
+					  * there are children per
+					  * cell. The first index
+					  * starts with linear
+					  * elements and goes up in
+					  * polynomial degree. The
+					  * array may grow in the
+					  * future with the number of
+					  * elements for which these
+					  * matrices have been
+					  * computed. If for some
+					  * element, the matrices have
+					  * not been computed then you
+					  * may use the element
+					  * nevertheless but can not
+					  * access the respective
+					  * fields.
+					  */
+	static const double * const
+	embedding[][GeometryInfo<dim>::children_per_cell];
+
+					 /**
+					  * Number of elements (first
+					  * index) the above field
+					  * has. Equals the highest
+					  * polynomial degree for
+					  * which the embedding
+					  * matrices have been
+					  * computed.
+					  */
+	static const unsigned int n_embedding_matrices;
+
+					 /**
+					  * As the
+					  * @p{embedding_matrices}
+					  * field, but for the
+					  * interface constraints. One
+					  * for each element for which
+					  * it has been computed.
+					  */
+	static const double * const constraint_matrices[];
+
+					 /**
+					  * Like
+					  * @p{n_embedding_matrices},
+					  * but for the number of
+					  * interface constraint
+					  * matrices.
+					  */
+	static const unsigned int n_constraint_matrices;
+    };
+    
 				     /**
 				      * Only for internal use. Its
 				      * full name is
@@ -221,8 +279,8 @@ class FE_Q : public FiniteElement<dim>
 				      * @p{FiniteElementData} argument.
 				      */
     static void build_renumbering (const FiniteElementData<dim> &fe_data,
-				   unsigned int degree,
-				   std::vector<unsigned int>& numbering);
+				   const unsigned int            degree,
+				   std::vector<unsigned int>    &numbering);
 
 				     /**
 				      * Map tensor product data to
@@ -235,18 +293,34 @@ class FE_Q : public FiniteElement<dim>
 				      *
 				      * It is used to compute the
 				      * order of face support points.
+				      *
+				      * In 1d, this function does
+				      * nothing.
 				      */
     static void build_face_renumbering (const FiniteElementData<dim-1> &fe_data,
-					unsigned int degree,
-					std::vector<unsigned int>& numbering);
+					const unsigned int              degree,
+					std::vector<unsigned int>      &numbering);
 
 				     /**
 				      * Compute support points.
 				      */
-    static void compute_support_points (std::vector<Point<dim> >& support_points,
-					unsigned int degree,
-					const std::vector<unsigned int>& renumber);
+    static void compute_support_points (const unsigned int               degree,
+					const std::vector<unsigned int> &renumber,
+					std::vector<Point<dim> >        &support_points);
 
+
+				     /**
+				      * Compute flags for initial
+				      * update only.
+				      */
+    virtual UpdateFlags update_once (UpdateFlags flags) const;
+  
+				     /**
+				      * Compute flags for update on
+				      * each cell.
+				      */
+    virtual UpdateFlags update_each (UpdateFlags flags) const;
+    
 				     /**
 				      * Degree of the polynomials.
 				      */  
