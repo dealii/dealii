@@ -15,10 +15,10 @@ include ../../common/Make.global_options
 
 
 # get lists of files we need
-cc-files    = $(wildcard *.cc)
-lib-h-files = $(wildcard ../../deal_II/include/*/*.h) \
-              $(wildcard ../../lac/include/*/*.h) \
-              $(wildcard ../../base/include/*/*.h)
+cc-files    = $(shell echo *.cc)
+lib-h-files = $(shell echo ../../deal_II/include/*/*.h) \
+              $(shell echo ../../lac/include/*/*.h) \
+              $(shell echo ../../base/include/*/*.h)
 executables = $(cc-files:.cc=.testcase)
 output-files= $(cc-files:.cc=.output)
 

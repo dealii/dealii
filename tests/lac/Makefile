@@ -169,7 +169,7 @@ veryclean: clean
 # Automatic generation of dependencies
 ############################################################
 
-all-cc-files = $(wildcard *.cc)
+all-cc-files = $(shell echo *.cc)
 
 Make.depend: $(all-cc-files)
 	@echo =====Dependencies=== Make.depend
