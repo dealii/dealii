@@ -95,6 +95,27 @@
   archive</a> might be advisable in case of difficulties.
   </p>
 
+  <p>
+  Also note that on some installations of CygWin, one of the system
+  header files used the proprocessor to define <code>quad</code> to
+  <code>quad_t</code>. Since <acronym>deal.II</acronym> uses the name
+  <code>quad</code> as a function name, the name is sometimes
+  replaced, sometimes not, depending on the order of include files and
+  whether the respective system header was included at all. This leads
+  to compilation errors.
+  </p>
+
+  <p>
+  Since the offending preprocessor define is only active when
+  <code>_POSIX_SOURCE</code> is not set, <acronym>deal.II</acronym>
+  releases <em>after</em> version 3.4 set this flag, to avoid the
+  problem, but releases up to and including version 3.4 may not
+  work. For more information, refer to the 
+  <a href="http://www.dealii.org/mail/msg00773.html">mailing list
+  thread on this subject</a>, and follow-up messages.
+  </p>
+
+
   <h4>Other Windows compilers</h4>
   <p>
   Authomatic configuration requires a lot of Unix tools. We have not
