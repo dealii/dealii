@@ -63,6 +63,10 @@ class ShiftedMatrix
     SmartPointer<const MATRIX> A;
 
 				     /**
+				      * Auxiliary vector.
+				      */
+    VECTOR aux;
+				     /**
 				      * Shift parameter.
 				      */
     double sigma;
@@ -165,7 +169,8 @@ inline void
 ShiftedMatrix<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
   A.vmult(dst, src);
-  dst.add(sigma, src);
+  if (sigma != 0.)
+    dst.add(sigma, src);
 }
 
 
@@ -177,7 +182,8 @@ ShiftedMatrix<MATRIX>::residual (VECTOR& dst,
 				 const VECTOR& rhs) const
 {
   A.vmult(dst, src);
-  dst.add(sigma, src);
+  if (sigma != 0.)
+    dst.add(sigma, src);
   dst.sadd(-1.,1.,rhs);
   return dst.l2_norm ();
 }
@@ -221,7 +227,12 @@ ShiftedMatrixGeneralized<MATRIX, MASSMATRIX>::vmult (VECTOR& dst,
 						     const VECTOR& src) const
 {
   A.vmult(dst, src);
-  dst.add(sigma, src);
+  if (sigma != 0.)
+    {
+      aux.reinit(dst);
+      M.vmult(aux, src);
+      dst.add(sigma, aux);
+    }
 }
 
 
@@ -233,7 +244,12 @@ ShiftedMatrixGeneralized<MATRIX, MASSMATRIX>::residual (VECTOR& dst,
 							const VECTOR& rhs) const
 {
   A.vmult(dst, src);
-  dst.add(sigma, src);
+  if (sigma != 0.)
+    {
+      aux.reinit(dst);
+      M.vmult(aux, src);
+      dst.add(sigma, aux);
+    }
   dst.sadd(-1.,1.,rhs);
   return dst.l2_norm ();
 }
