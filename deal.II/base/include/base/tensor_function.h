@@ -57,17 +57,53 @@ class TensorFunction : public FunctionTime,
   public:
 				     /**
 				      * Define typedefs for the return
-				      * types of the @p{value} and the
-				      * @p{gradient} functions.
+				      * types of the @p{value}
+				      * functions.
 				      */
     typedef Tensor<rank,dim> value_type;
 
+#ifdef DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND
+				     /**
+				      * Define a typedef for the
+				      * return value of the gradient
+				      * function.
+				      *
+				      * The construct here is only
+				      * used in case we hit a certain
+				      * bug in Sun's Forte
+				      * compiler. See the respective
+				      * macro in the aclocal.m4 file
+				      * for a full description of the
+				      * bug, or the documentation to
+				      * the quadrature class.
+				      *
+				      * For better readability we
+				      * later typedef this so-created
+				      * type to one in the enclosing
+				      * class.
+				      */
     template <int dim2>
     struct GradientTypeHelper
     {
 	typedef Tensor<rank+1,dim> type;
     };
+
+				     /**
+				      * Typedef the kludge declared
+				      * above to a type in the class
+				      * in which we would like to use
+				      * it.
+				      *
+				      * This typedef is only used if
+				      * the respective bug in the
+				      * compiler is encountered,
+				      * otherwise the proper typedef
+				      * below is used.
+				      */
     typedef typename GradientTypeHelper<dim>::type gradient_type;
+#else
+    typedef Tensor<rank+1,dim> gradient_type;
+#endif    
     
 				     /**
 				      * Constructor. May take an

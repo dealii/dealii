@@ -52,6 +52,11 @@
 /* Minor version number of deal.II */
 #undef DEAL_II_MINOR
 
+/* Define if we have to work around a bug in Sun's Forte compiler. See the
+   aclocal.m4 file in the top-level directory for a description of this bug.
+   */
+#undef DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
+
 /* Flag indicating whether the library shall be compiler for multithreaded
    applications */
 #undef DEAL_II_USE_MT

@@ -220,25 +220,6 @@ class Tensor<1,dim>
 				      */
     static unsigned int memory_consumption ();
 
-  protected:
-				     /**
-				      * Help function for unroll.
-				      */
-    void unroll_recursion (Vector<double> &result,
-			   unsigned int   &start_index) const;
-
-				     // make the following classes
-				     // friends to this class. in principle,
-				     // it would suffice if otherrank==2,
-				     // but then the compiler complains
-				     // that this be an explicit specialization
-				     // which is not what we want
-				     //
-				     // also, it would be sufficient to make
-				     // the function unroll_loops a friend,
-				     // but that seems to be impossible as well.
-    template<int otherrank, int otherdim>  friend class Tensor;
-
   private:
 				     /**
 				      * Store the values in a simple array.
@@ -249,6 +230,39 @@ class Tensor<1,dim>
 				      * an object.
 				      */
     double values[(dim!=0) ? (dim) : 1];
+
+#ifdef DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
+  public:
+#endif
+				     /**
+				      * Help function for unroll. If
+				      * we have detected an access
+				      * control bug in the compiler,
+				      * this function is declared
+				      * public, otherwise private. Do
+				      * not attempt to use this
+				      * function from outside in any
+				      * case, even if it should be
+				      * public for your compiler.
+				      */
+    void unroll_recursion (Vector<double> &result,
+			   unsigned int   &start_index) const;
+    
+  private:
+				     /**
+				      * Make the following classes
+				      * friends to this class. In
+				      * principle, it would suffice if
+				      * otherrank==2, but that is not
+				      * possible in C++ at present.
+				      *
+				      * Also, it would be sufficient
+				      * to make the function
+				      * unroll_loops a friend, but
+				      * that seems to be impossible as
+				      * well.
+				      */
+    template<int otherrank, int otherdim>  friend class Tensor;
 
 				     /**
 				      * Point is allowed access to

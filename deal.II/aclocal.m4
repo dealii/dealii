@@ -1211,7 +1211,7 @@ of this bug.])
 
 dnl -------------------------------------------------------------
 dnl Sun's Forte compiler (at least up to the Version 7 Early Access
-dnl release) have a problem with the following code, when compiling
+dnl release) has a problem with the following code, when compiling
 dnl with debug output:
 dnl 
 dnl /* ---------------------------------------------------------- */
@@ -1256,6 +1256,71 @@ AC_DEFUN(DEAL_II_CHECK_LOCAL_TYPEDEF_COMP, dnl
     [
       AC_MSG_RESULT(yes. trying to work around)
       AC_DEFINE(DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND, 1, 
+                [Define if we have to work around a bug in Sun's Forte compiler.
+See the aclocal.m4 file in the top-level directory for a description
+of this bug.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Sun's Forte compiler (at least up to the Version 7 Early Access
+dnl release) have a problem with the following code, when compiling
+dnl with debug output:
+dnl 
+dnl /* ----------------------------------------------- */
+dnl /* Problem 14: Access control. Friendship is not   */
+dnl /* granted although explicitly declared.           */
+dnl template <int N, int M> class T      {    void bar ();  };
+dnl 
+dnl template <int M>        class T<1,M> { 
+dnl   private:
+dnl     static int i;
+dnl     template <int N1, int N2> friend class T;
+dnl };
+dnl 
+dnl template <int N,int M> void T<N,M>::bar () { 
+dnl   T<N-1,M>::i; 
+dnl };
+dnl 
+dnl template class T<2,1> ; 
+dnl /* ---------------------------------------------------------- */
+dnl
+dnl The compiler does not allow access to T<1,1>::i, although the
+dnl accessing class is explicitly marked friend.
+dnl
+dnl Usage: DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
+[
+  AC_MSG_CHECKING(for partially specialized template access control bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <int N, int M> class T      {    void bar ();  };
+
+	template <int M>        class T<1,M> { 
+	  private:
+	    static int i;
+	    template <int N1, int N2> friend class T;
+	};
+
+	template <int N,int M> void T<N,M>::bar () { 
+	  T<N-1,M>::i; 
+	};
+
+	template class T<2,1> ; 
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. trying to work around)
+      AC_DEFINE(DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND, 1, 
                 [Define if we have to work around a bug in Sun's Forte compiler.
 See the aclocal.m4 file in the top-level directory for a description
 of this bug.])
