@@ -41,7 +41,7 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
-all: solver mgbase mg
+all: solver mgbase mg benchmark
 
 ############################################################
 # Typical block for building a running program
@@ -139,10 +139,10 @@ target1: $(target1-o-files) $(libraries)
 ############################################################
 
 clean:
-	rm -f *.o *.go
+	rm -f *.o *.go *.output
 
 veryclean: clean
-	rm -f solver *.inp *.gpl *.eps *.gnuplot
+	rm -f solver mgbase mg benchmark *.inp *.gpl *.eps *.gnuplot
 
 ############################################################
 # Automatic generation of dependencies
