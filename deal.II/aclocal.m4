@@ -102,7 +102,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	dnl it is -help
         is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
         is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
-	is_intel_icc="$is_intel_icc1$is_intel_icc2"
+        is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
         if test "x$is_intel_icc" != "x" ; then
 	  version5="`echo $is_intel_icc | grep 'Version 5'`"
 	  version6="`echo $is_intel_icc | grep 'Version 6'`"
@@ -122,68 +123,60 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           fi fi fi
         else
   
-          dnl Intel's ECC C++ compiler for the Itanium?
-          is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
-          if test "x$is_intel_ecc" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Intel Itanium ECC)
-            GXX_VERSION=intel_ecc
+          dnl Or DEC's cxx compiler?
+          is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
+          if test "x$is_dec_cxx" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is Compaq cxx)
+            GXX_VERSION=compaq_cxx
           else
   
-            dnl Or DEC's cxx compiler?
-            is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
-            if test "x$is_dec_cxx" != "x" ; then
-              AC_MSG_RESULT(C++ compiler is Compaq cxx)
-              GXX_VERSION=compaq_cxx
+      	    dnl Sun Workshop?
+            is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
+            if test "x$is_sun_cc" != "x" ; then
+              AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
+              GXX_VERSION=sun_workshop
             else
   
-      	      dnl Sun Workshop?
-              is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
-              if test "x$is_sun_cc" != "x" ; then
-                AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
-                GXX_VERSION=sun_workshop
+  	      dnl Sun Forte?
+              is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
+              if test "x$is_sun_forte_cc" != "x" ; then
+                AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
+                GXX_VERSION=sun_forte
               else
   
-  	        dnl Sun Forte?
-                is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
-                if test "x$is_sun_forte_cc" != "x" ; then
-                  AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
-                  GXX_VERSION=sun_forte
-                else
+  	        dnl Portland Group C++?
+  	        is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+  	        if test "x$is_pgcc" != "x" ; then
+  	          AC_MSG_RESULT(C++ compiler is Portland Group C++)
+  	          GXX_VERSION=portland_group
+  	        else
   
-  	          dnl Portland Group C++?
-  	          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-  	          if test "x$is_pgcc" != "x" ; then
-  	            AC_MSG_RESULT(C++ compiler is Portland Group C++)
-  	            GXX_VERSION=portland_group
+  	          dnl HP aCC?
+  	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
+  	          if test "x$is_aCC" != "x" ; then
+  	            AC_MSG_RESULT(C++ compiler is HP aCC)
+  	            GXX_VERSION=hp_aCC
   	          else
   
-  	            dnl HP aCC?
-  	            is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
-  	            if test "x$is_aCC" != "x" ; then
-  	              AC_MSG_RESULT(C++ compiler is HP aCC)
-  	              GXX_VERSION=hp_aCC
+  	            dnl KAI C++? It seems as if the documented options
+		    dnl -V and --version are not always supported, so give
+	            dnl the whole thing a second try by looking for /KCC/
+	 	    dnl somewhere in the paths that are output by -v. This
+	            dnl is risky business, since this combination of
+	            dnl characters might appear on other installations
+                    dnl of other compilers as well, so put this test to
+                    dnl the very end of the detection chain for the
+                    dnl various compilers
+  	            is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
+  	            is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
+  	            if test "x$is_kai_cc" != "x" ; then
+  	              AC_MSG_RESULT(C++ compiler is KAI C++)
+  	              GXX_VERSION=kai_cc
   	            else
   
-  	              dnl KAI C++? It seems as if the documented options
-		      dnl -V and --version are not always supported, so give
-	              dnl the whole thing a second try by looking for /KCC/
-	 	      dnl somewhere in the paths that are output by -v. This
-	              dnl is risky business, since this combination of
-	              dnl characters might appear on other installations
-                      dnl of other compilers as well, so put this test to
-                      dnl the very end of the detection chain for the
-                      dnl various compilers
-  	              is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
-  	              is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
-  	              if test "x$is_kai_cc" != "x" ; then
-  	                AC_MSG_RESULT(C++ compiler is KAI C++)
-  	                GXX_VERSION=kai_cc
-  	              else
-  
-                        dnl  Aw, nothing suitable found...
-                        AC_MSG_ERROR([Unrecognized compiler -- sorry])
-                        exit 1
-                      fi
+                      dnl  Aw, nothing suitable found...
+                      AC_MSG_ERROR([Unrecognized compiler -- sorry])
+                      exit 1
                     fi
                   fi
                 fi
@@ -330,7 +323,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       (allowed for compatibility)' (I don't understand what the
           dnl       compiler means)
           CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC -shared"
 
@@ -354,30 +347,14 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias"
           fi
-          ;;
-  
-      intel_ecc)
-          dnl Disable some compiler warnings, as they often are wrong on
-          dnl our code:
-          dnl #175: `subscript out of range' (doesn't take into account that
-          dnl       some code is only reachable for some dimensions)
-          dnl #327: `NULL reference is not allowed' (this happens when we
-          dnl       write "*static_cast<double*>(0)" or some such thing,
-          dnl       which we do to create invalid references)
-          dnl #424: `extra ";" ignored'
-          dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
-          dnl       (allowed for compatibility)' (I don't understand what the
-          dnl       compiler means)
-	  dnl
-          dnl Note: we would really like to use  -ansi -Xc, since that
-	  dnl is _very_ picky about standard C++, and is thus very efficient
-          dnl in detecting slight standard violations, but these flags are
-          dnl also very efficient in crashing the compiler (it generates a
-          dnl segfault)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424"
-          CXXFLAGSPIC="-KPIC"
-          LDFLAGSPIC="-KPIC -shared"
+
+	  dnl If we are on an x86 platform, add -tpp6 -axiMK to optimization
+	  dnl flags
+	  case "$target" in
+	    *86*)
+		CXXFLAGSO="$CXXFLAGSO -tpp6 -axiMK"
+		;;
+	  esac
           ;;
   
       compaq_cxx)
