@@ -69,8 +69,8 @@ class SparseMatrixStruct
 
 				     /**
 				      * Initialize a rectangular matrix with
-				      * #m# rows and #n# columns,
-				      * with at most #max_per_row#
+				      * #m# rows and #n# columns.
+				      * The matrix may contain at most #max_per_row#
 				      * nonzero entries per row.
 				      */
     SparseMatrixStruct (const unsigned int m,
@@ -85,6 +85,18 @@ class SparseMatrixStruct
     SparseMatrixStruct (const unsigned int n,
 			const unsigned int max_per_row);
 
+				     /**
+				      * Make a copy with extra off-diagonals.
+				      *
+				      * This constructs objects intended for
+				      * the application of the ILU(n)-method.
+				      * Therefore, additional to the original
+				      * entry structure, space for #extra_cols#
+				      * side-diagonals is provided.
+				      */
+    SparseMatrixStruct(const SparseMatrixStruct& original,
+		       unsigned int extra_cols);
+    
 				     /**
 				      * Destructor.
 				      */
@@ -555,7 +567,36 @@ class SparseMatrix
 				      * #this#.
 				      */
     template <typename somenumber>
-    SparseMatrix<number> & copy_from (const SparseMatrix<somenumber> &);
+    SparseMatrix<number> & copy_from (const SparseMatrix<somenumber> &source);
+
+				     /**
+				      * Generate ILU.
+				      * The matrix will entries contain the
+				      * incomplete LU-factorization of
+				      * the matrix #source#. Having a matrix
+				      * #source# and a matrix structure object
+				      * #struct#, the code for generating
+				      * an ILU factorization reads
+				      * \begin{verbatim}
+				      * SparseMatrix<float> ilu(struct);
+				      * ilu.ILU(source);
+				      * \end{verbatim}
+				      *
+				      * If additional side diagonals are
+				      * needed (ILU(n)-algorithm), you have to
+				      * construct a second matrix structure:
+				      * \begin{verbatim}
+				      * SparseMatrixStruct ilustruct(struct,n);
+				      * SparseMatrix<float> ilu(ilustruct);
+				      * ilu.ILU(source);
+				      * \end{verbatim}
+				      *
+				      * After generating the ILU-decomposition,
+				      * it can be applied to a vector by
+				      * #backward_forward#.
+				      */
+    template <typename somenumber>
+    SparseMatrix<number> & ILU (const SparseMatrix<somenumber> &source);
 
 				     /**
 				      * Add #matrix# scaled by #factor# to this
@@ -571,7 +612,8 @@ class SparseMatrix
 				      * data type of this matrix.
 				      */
     template <typename somenumber>
-    void add_scaled (const number factor, const SparseMatrix<somenumber> &matrix);
+    void add_scaled (const number factor,
+		     const SparseMatrix<somenumber> &matrix);
     
 				     /**
 				      * Return the value of the entry (i,j).
@@ -640,7 +682,13 @@ class SparseMatrix
     template <typename somenumber>
     void Tvmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
   
-
+				     /**
+				      * Do backward-forward solution of a
+				      * previously generated ILU.
+				      */
+    template <typename somenumber>
+    void backward_forward (Vector<somenumber>& v);
+    
 				     /**
 				      * Return the norm of the vector #v# with
 				      * respect to the norm induced by this
@@ -817,12 +865,18 @@ class SparseMatrix
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcNoILU);
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcInvalidConstructorCall);
     
   private:
     const SparseMatrixStruct * cols;
     number* val;
     unsigned int max_len;
+    bool is_ilu;
+    
 
 				     // make all other sparse matrices
 				     // friends

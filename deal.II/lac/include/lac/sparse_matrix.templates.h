@@ -21,9 +21,9 @@ template <typename number>
 SparseMatrix<number>::SparseMatrix () :
 		cols(0),
 		val(0),
-		max_len(0)
+		max_len(0),
+		is_ilu(false)
 {};
-
 
 
 template <typename number>
@@ -41,7 +41,10 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c)
-		: cols(&c), val(0), max_len(0)
+		: cols(&c),
+		  val(0),
+		  max_len(0),
+		  is_ilu(false)
 {
   reinit();
 };
@@ -80,13 +83,16 @@ SparseMatrix<number>::reinit ()
 
   if (val)
     fill_n (&val[0], cols->vec_len, 0);
+
+  is_ilu = false;
 }
 
 
 
 template <typename number>
 void
-SparseMatrix<number>::reinit (const SparseMatrixStruct &sparsity) {
+SparseMatrix<number>::reinit (const SparseMatrixStruct &sparsity)
+{
   cols = &sparsity;
   reinit ();
 };
@@ -95,11 +101,13 @@ SparseMatrix<number>::reinit (const SparseMatrixStruct &sparsity) {
 
 template <typename number>
 void
-SparseMatrix<number>::clear () {
+SparseMatrix<number>::clear ()
+{
   cols = 0;
   if (val) delete[] val;
   val = 0;
   max_len = 0;
+  is_ilu = false;
 };
 
 
@@ -118,7 +126,8 @@ SparseMatrix<number>::empty () const
 
 template <typename number>
 unsigned int
-SparseMatrix<number>::n_nonzero_elements () const {
+SparseMatrix<number>::n_nonzero_elements () const
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->n_nonzero_elements ();
 };
@@ -128,7 +137,8 @@ SparseMatrix<number>::n_nonzero_elements () const {
 template <typename number>
 template <typename somenumber>
 SparseMatrix<number> &
-SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix) {
+SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
@@ -140,6 +150,7 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix) {
   while (val_ptr != end_ptr)
     *val_ptr++ = *matrix_ptr++;
   
+  is_ilu = false;
   return *this;
 };
 
@@ -149,7 +160,8 @@ template <typename number>
 template <typename somenumber>
 void
 SparseMatrix<number>::add_scaled (const number factor,
-				  const SparseMatrix<somenumber> &matrix) {
+				  const SparseMatrix<somenumber> &matrix)
+{
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
@@ -160,6 +172,7 @@ SparseMatrix<number>::add_scaled (const number factor,
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * *matrix_ptr++;
+  is_ilu = false;
 };
 
 
@@ -314,7 +327,8 @@ SparseMatrix<number>::residual (Vector<somenumber>& dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst, const Vector<somenumber>& src,
+SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst,
+					   const Vector<somenumber>& src,
 					   const number om) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
@@ -339,7 +353,8 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>& dst, const Vector
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst, const Vector<somenumber>& src,
+SparseMatrix<number>::precondition_SSOR (Vector<somenumber>& dst,
+					 const Vector<somenumber>& src,
 					 const number om) const
 {
 				   // to understand how this function works

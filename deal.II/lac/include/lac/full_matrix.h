@@ -455,13 +455,22 @@ class FullMatrix
     double residual (Vector<number2>& w, const Vector<number2>& v, const Vector<number3>& b) const;
 
 				     /**
-				      *  Inversion of lower triangle .
+				      * Forward elimination of lower triangle.
+				      * Inverts the lower triangle of a
+				      * quadratic matrix.
+				      *
+				      * If the matrix has more columns than rows,
+				      * this function only operates on the left
+				      * square submatrix. If there are more rows,
+				      * the upper square part of the matrix
+				      * is considered
 				      */
     template<typename number2>
     void forward (Vector<number2>& dst, const Vector<number2>& src) const;
 
 				     /**
-				      *  Inversion of upper triangle .
+				      * Backward elimination of upper triangle.
+				      * @see forward
 				      */
     template<typename number2>
     void backward (Vector<number2>& dst, const Vector<number2>& src) const;

@@ -422,14 +422,14 @@ double FullMatrix<number>::residual (Vector<number2>& dst, const Vector<number2>
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::forward (Vector<number2>& dst, const Vector<number2>& src) const
+void FullMatrix<number>::forward (Vector<number2>& dst,
+				  const Vector<number2>& src) const
 {
-  Assert(n() == m(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   unsigned int i,j;
-  unsigned int nu = (m()<n() ? m() : n());
+  unsigned int nu = ( (m()<n()) ? m() : n());
   double s;
   for (i=0; i<nu; ++i)
     {
@@ -443,7 +443,8 @@ void FullMatrix<number>::forward (Vector<number2>& dst, const Vector<number2>& s
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::backward (Vector<number2>& dst, const Vector<number2>& src) const
+void FullMatrix<number>::backward (Vector<number2>& dst,
+				   const Vector<number2>& src) const
 {
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
