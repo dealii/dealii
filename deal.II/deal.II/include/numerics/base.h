@@ -261,6 +261,14 @@ class ProblemBase {
     ProblemBase ();
 
 				     /**
+				      * Destructor. Declare this only to have
+				      * a virtual destructor, which is safer
+				      * as we have virtual functions.
+				      * It actually does nothing spectacular.
+				      */
+    virtual ~ProblemBase ();
+
+				     /**
 				      * Use this triangulation and
 				      * degree of freedom object during the
 				      * lifetime of this object. The dof
@@ -282,14 +290,6 @@ class ProblemBase {
 				      */
     void clear ();
     
-				     /**
-				      * Destructor. Declare this only to have
-				      * a virtual destructor, which is safer
-				      * as we have virtual functions.
-				      * It actually does nothing spectacular.
-				      */
-    virtual ~ProblemBase ();
-
 				     /**
 				      * Initiate the process of assemblage of
 				      * vectors and system matrix. Use the
@@ -331,7 +331,7 @@ class ProblemBase {
 			       const FiniteElement<dim> &fe,
 			       const NormType           &norm,
 			       const Boundary<dim> &boundary=StraightBoundary<dim>()) const;
-    
+
 				     /**
 				      * Initialize the #DataOut# object with
 				      * the grid and DoF handler used for this

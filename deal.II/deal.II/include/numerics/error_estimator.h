@@ -82,6 +82,9 @@ class dVector;
    of the elements has to be shifted one level up or down. See the
    documentation for the #FEFaceValues# class for more information about
    technical issues regarding this topic.
+
+   The error estimator returns a vector of estimated errors per cell which
+   can be used to feed rge #Triangulation<dim>::refine_*# functions.
    
    @author Wolfgang Bangerth, 1998; thanks to Franz-Theo Suttmeier for
      clarifications about boundary conditions.
