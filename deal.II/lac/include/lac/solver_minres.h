@@ -40,6 +40,11 @@
  *
  * The preconditioner has to be positive definite and symmetric
  *
+ * The algorithm is taken from the Master thesis of Astrid Batterman
+ * with some changes.
+ * The full text can be found at
+ * #http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html#
+ *
  * @author Thomas Richter, 2000
  */
 template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
@@ -186,10 +191,6 @@ SolverMinRes<Matrix,Vector>::solve (const Matrix &A,
 
 				   // Start of the solving process
   
-				   // The algorithm is taken from
-				   // Astrid Battermann, Master thesis
-				   // with some changes
-
   A.vmult(m[0],x);
   u[1] = b;
   u[1].add(-1.,m[0]);
@@ -201,6 +202,7 @@ SolverMinRes<Matrix,Vector>::solve (const Matrix &A,
   precondition (v,u[1]);
   
   delta[1] = v * u[1];
+				   // Preconditioner positive
   Assert (delta[1]>=0, ExcPreconditionerNotDefinite());
   
   r0 = sqrt(delta[1]);
