@@ -26,7 +26,8 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		JxW_values(quadrature.n_quadrature_points, 0),
 		quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
 		unit_quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
-		jacobi_matrices (quadrature.n_quadrature_points)
+		jacobi_matrices (quadrature.n_quadrature_points,
+				 dFMatrix(dim,dim))
 {
   for (unsigned int i=0; i<fe.total_dofs; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
@@ -95,6 +96,7 @@ void FEValues<1>::reinit (const Triangulation<1>::cell_iterator &cell,
 		     unit_quadrature_points,
 		     jacobi_matrices,
 		     quadrature_points);
+
 				   // compute gradients on real element
   for (unsigned int i=0; i<fe.total_dofs; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j)

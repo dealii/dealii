@@ -34,12 +34,19 @@ Unify CellAccessor<1> and <2> by renaming
 
 Add support for fast assemblage of mass matrices.
 
+Make AssemblerData a local class to Assembler again if gcc2.8 supports it.
 
 
 
 DEAL:
 make dSMatrixStruct warn if max # of entries per row is overrun!
 
+let dSMatrixStruct have an empty constructor to allow for member
+  objects being initialized later
+
 why do loops in dFMatrix run backwards?
 
 Let an empty dfmatrix assume it has dimensions zero rather than one!
+
+Is dvector::operator= (double) really useful or does it make more
+  confusion than it helps?

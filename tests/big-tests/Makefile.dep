@@ -12,7 +12,7 @@ grid_test.o: grid/grid_test.cc ../include/grid/tria_iterator.h \
  /usr/local/lib/g++-include/new.h /usr/local/lib/g++-include/std/new.h \
  /usr/local/lib/g++-include/std/cstddef.h \
  /usr/local/include/g++/stl_raw_storage_iter.h \
- ../include/basic/exceptions.h ../include/grid/point.h \
+ ../../base/include/base/exceptions.h ../include/grid/point.h \
  ../include/grid/tria_accessor.h ../include/grid/tria.h \
  /usr/local/include/g++/vector.h /usr/local/include/g++/algobase.h \
  /usr/local/include/g++/pair.h /usr/local/include/g++/stl_pair.h \
@@ -31,3 +31,85 @@ grid_test.o: grid/grid_test.cc ../include/grid/tria_iterator.h \
  /usr/include/math.h /usr/include/floatingpoint.h /usr/include/stdio.h \
  /usr/include/sys/va_list.h /usr/include/sys/ieeefp.h \
  /usr/local/include/g++/fstream.h
+dof_test.o: dof/dof_test.cc ../include/grid/dof.h \
+ /usr/local/include/g++/vector.h /usr/local/include/g++/algobase.h \
+ /usr/local/include/g++/pair.h /usr/local/include/g++/stl_config.h \
+ /usr/local/include/g++/stl_relops.h /usr/local/include/g++/stl_pair.h \
+ /usr/local/include/g++/iterator.h /usr/local/include/g++/function.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/stddef.h \
+ /usr/local/include/g++/stl_function.h \
+ /usr/local/include/g++/iostream.h /usr/local/include/g++/streambuf.h \
+ /usr/local/include/g++/libio.h /usr/local/lib/g++-include/_G_config.h \
+ /usr/local/include/g++/stl_iterator.h \
+ /usr/local/include/g++/type_traits.h \
+ /usr/local/include/g++/stl_construct.h \
+ /usr/local/lib/g++-include/new.h /usr/local/lib/g++-include/std/new.h \
+ /usr/local/lib/g++-include/std/cstddef.h \
+ /usr/local/include/g++/stl_raw_storage_iter.h \
+ /usr/local/include/g++/stl_algobase.h /usr/include/string.h \
+ /usr/include/sys/feature_tests.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/limits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/syslimits.h \
+ /usr/include/limits.h /usr/include/sys/isa_defs.h \
+ /usr/include/stdlib.h /usr/local/include/g++/stl_uninitialized.h \
+ /usr/local/include/g++/alloc.h /usr/local/include/g++/stl_alloc.h \
+ /usr/local/sparc-sun-solaris2.5.1/include/assert.h \
+ /usr/local/include/g++/stl_vector.h ../include/fe/fe.h \
+ ../../lac/include/lac/dfmatrix.h /usr/include/stdio.h \
+ /usr/include/sys/va_list.h ../../lac/include/lac/dvector.h \
+ ../../base/include/base/types.h ../../lac/include/lac/vectorbase.h \
+ ../../base/include/base/exceptions.h ../../lac/include/lac/ivector.h \
+ ../include/grid/point.h ../include/grid/tria.h \
+ ../include/grid/tria_line.h ../include/grid/tria_quad.h \
+ ../include/grid/tria_boundary.h ../include/fe/fe_lib.h \
+ ../include/grid/tria_iterator.h ../include/grid/tria_accessor.h \
+ ../../lac/include/lac/dsmatrix.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/math.h \
+ /usr/include/math.h /usr/include/floatingpoint.h \
+ /usr/include/sys/ieeefp.h ../include/basic/parameter_handler.h \
+ /usr/local/include/g++/map.h /usr/local/include/g++/tree.h \
+ /usr/local/include/g++/stl_tree.h /usr/local/include/g++/stl_map.h \
+ /usr/local/lib/g++-include/String.h \
+ /usr/local/lib/g++-include/Regex.h ../include/grid/dof_constraints.h \
+ /usr/local/include/g++/fstream.h /usr/local/include/g++/cmath
+poisson.o: poisson/poisson.cc ../include/grid/dof.h \
+ /usr/local/include/g++/vector.h /usr/local/include/g++/algobase.h \
+ /usr/local/include/g++/pair.h /usr/local/include/g++/stl_config.h \
+ /usr/local/include/g++/stl_relops.h /usr/local/include/g++/stl_pair.h \
+ /usr/local/include/g++/iterator.h /usr/local/include/g++/function.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/stddef.h \
+ /usr/local/include/g++/stl_function.h \
+ /usr/local/include/g++/iostream.h /usr/local/include/g++/streambuf.h \
+ /usr/local/include/g++/libio.h /usr/local/lib/g++-include/_G_config.h \
+ /usr/local/include/g++/stl_iterator.h \
+ /usr/local/include/g++/type_traits.h \
+ /usr/local/include/g++/stl_construct.h \
+ /usr/local/lib/g++-include/new.h /usr/local/lib/g++-include/std/new.h \
+ /usr/local/lib/g++-include/std/cstddef.h \
+ /usr/local/include/g++/stl_raw_storage_iter.h \
+ /usr/local/include/g++/stl_algobase.h /usr/include/string.h \
+ /usr/include/sys/feature_tests.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/limits.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/syslimits.h \
+ /usr/include/limits.h /usr/include/sys/isa_defs.h \
+ /usr/include/stdlib.h /usr/local/include/g++/stl_uninitialized.h \
+ /usr/local/include/g++/alloc.h /usr/local/include/g++/stl_alloc.h \
+ /usr/local/sparc-sun-solaris2.5.1/include/assert.h \
+ /usr/local/include/g++/stl_vector.h ../include/fe/fe.h \
+ ../../lac/include/lac/dfmatrix.h /usr/include/stdio.h \
+ /usr/include/sys/va_list.h ../../lac/include/lac/dvector.h \
+ ../../base/include/base/types.h ../../lac/include/lac/vectorbase.h \
+ ../../base/include/base/exceptions.h ../../lac/include/lac/ivector.h \
+ ../include/grid/point.h ../include/grid/tria.h \
+ ../include/grid/tria_line.h ../include/grid/tria_quad.h \
+ ../include/grid/tria_boundary.h ../include/fe/fe_lib.h \
+ ../include/grid/tria_accessor.h ../include/grid/dof_accessor.h \
+ ../include/grid/tria_iterator.h ../../lac/include/lac/dsmatrix.h \
+ /usr/local/lib/gcc-lib/sparc-sun-solaris2.5.1/2.8.0/include/math.h \
+ /usr/include/math.h /usr/include/floatingpoint.h \
+ /usr/include/sys/ieeefp.h ../include/grid/dof_constraints.h \
+ ../include/basic/data_io.h /usr/local/lib/g++-include/String.h \
+ /usr/local/lib/g++-include/Regex.h ../include/numerics/base.h \
+ ../include/numerics/assembler.h ../include/fe/quadrature_lib.h \
+ ../include/fe/quadrature.h /usr/local/include/g++/fstream.h \
+ /usr/local/include/g++/cmath

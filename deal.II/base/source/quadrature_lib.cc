@@ -12,8 +12,8 @@ QGauss2<1>::QGauss2 () :
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
-      quadrature_points.push_back (Point<1> (xpts[i]));
-      weights.push_back (wts[i]);
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
     };
 };
 
@@ -36,8 +36,8 @@ QGauss2x4<1>::QGauss2x4 () :
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
-      quadrature_points.push_back (Point<1> (xpts[i]));
-      weights.push_back (wts[i]);
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
     };
 };
 
@@ -58,8 +58,8 @@ QGauss4<1>::QGauss4 () :
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
-      quadrature_points.push_back (Point<1> (xpts[i]));
-      weights.push_back (wts[i]);
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
     };
 };
 
@@ -86,8 +86,8 @@ QGauss8<1>::QGauss8 () :
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
-      quadrature_points.push_back (Point<1> (xpts[i]));
-      weights.push_back (wts[i]);
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
     };
 };
 
@@ -96,8 +96,8 @@ QGauss8<1>::QGauss8 () :
 QMidpoint<1>::QMidpoint () :
 		Quadrature<1>(1)
 {
-  quadrature_points.push_back (0.5);
-  weights.push_back (1.0);
+  quadrature_points[0] = 0.5;
+  weights[0] = 1.0;
 };
 
 
@@ -110,8 +110,8 @@ QSimpson<1>::QSimpson () :
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
-      quadrature_points.push_back (Point<1> (xpts[i]));
-      weights.push_back (wts[i]);
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
     };
 };
 
@@ -125,7 +125,26 @@ QTrapez<1>::QTrapez () :
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
-      quadrature_points.push_back (Point<1> (xpts[i]));
-      weights.push_back (wts[i]);
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
     };
+};
+
+
+
+
+QGauss4<2>::QGauss4 () :
+		Quadrature<2> (4) {
+  static const double xpts[] = { 0.211324865,   0.788675135, 
+				 0.211324865,   0.788675135  };
+  static const double ypts[] = { 0.211324865,   0.211324865,
+				 0.788675135,   0.788675135  };
+  static const double wts[]  = { 1./4., 1./4., 1./4., 1./4.  };
+  
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<2>(xpts[i], ypts[i]);
+      weights[i] = wts[i];
+    };
+  
 };

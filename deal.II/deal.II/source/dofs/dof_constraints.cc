@@ -235,6 +235,11 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
 
 
 
+void ConstraintMatrix::condense (const dSMatrix &uncondensed,
+				 dSMatrix       &condensed) const {};
+void ConstraintMatrix::condense (dSMatrix &uncondensed) const {};
+
+
 
 unsigned int ConstraintMatrix::n_constraints () const {
   return lines.size();

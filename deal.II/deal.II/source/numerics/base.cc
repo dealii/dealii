@@ -18,7 +18,7 @@ ProblemBase<dim>::ProblemBase (Triangulation<dim> *tria,
 		tria(tria),
 		dof_handler(dof),
 		system_sparsity(1,1,1),        // dummy initialisation, is later reinit'd
-		system_matrix(system_sparsity),// dummy initialisation, is later reinit'd
+		system_matrix(),               // dummy initialisation, is later reinit'd
 		right_hand_sides (n_rhs, (dVector*)0)	
 {
   Assert (tria == &dof->get_tria(), ExcDofAndTriaDontMatch());
@@ -35,7 +35,8 @@ ProblemBase<dim>::ProblemBase (Triangulation<dim> *tria,
 
 template <int dim>
 void ProblemBase<dim>::assemble (const Equation<dim>   &equation,
-				 const Quadrature<dim> &quadrature) {
+				 const Quadrature<dim> &quadrature,
+				 const FiniteElement<dim> &fe) {
   system_sparsity.reinit (dof_handler->n_dofs(),
 			  dof_handler->n_dofs(),
 			  dof_handler->max_couplings_between_dofs());
@@ -55,11 +56,12 @@ void ProblemBase<dim>::assemble (const Equation<dim>   &equation,
   system_matrix.reinit (system_sparsity);
 
 				   // create assembler
-  Assembler<dim>::AssemblerData data (dof_handler,
-				      true, true, //assemble matrix and rhs
-				      right_hand_sides.size(),   //one rhs
-				      this,
-				      &quadrature);
+  AssemblerData<dim> data (*dof_handler,
+			   true, true, //assemble matrix and rhs
+			   right_hand_sides.size(),   //one rhs
+			   *this,
+			   quadrature,
+			   fe);
   TriaActiveIterator<dim, Assembler<dim> > assembler (tria,
 						      tria->begin_active()->level(),
 						      tria->begin_active()->index(),

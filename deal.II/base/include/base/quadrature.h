@@ -41,6 +41,14 @@ class Quadrature {
 				      */
     double weight (const unsigned int i) const;
 
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidIndex,
+		    int, int,
+		    << "The index " << arg1
+		    << " is out of range, it should be less than " << arg2);
+
   protected:
 				     /**
 				      * List of quadrature points. To be filled

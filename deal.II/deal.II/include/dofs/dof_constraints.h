@@ -12,6 +12,7 @@
 
 
 class ostream;
+class dSMatrix;
 class dSMatrixStruct;
 
 
@@ -173,6 +174,28 @@ class ConstraintMatrix {
 				      * end of the function.
 				      */
     void condense (dSMatrixStruct &sparsity) const;
+
+				     /**
+				      * Condense a given matrix. The associated
+				      * matrix struct should be condensed and
+				      * compressed.
+				      *
+				      * The constraint matrix object must be
+				      * closed to call this function.
+				      */
+    void condense (const dSMatrix &uncondensed,
+		   dSMatrix       &condensed) const;
+
+
+				     /**
+				      * This function does much the same as
+				      * the above one, except that it condenses
+				      * the matrix 'in-place'. See the general
+				      * documentation of this class for more
+				      * detailed information.
+				      */
+    void condense (dSMatrix &matrix) const;
+
     
 				     /**
 				      * Print the constraint lines. Mainly for

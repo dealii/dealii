@@ -51,7 +51,7 @@ FELinear<1>::FELinear () :
 
 double
 FELinear<1>::shape_value(const unsigned int i,
-			       const Point<1>& p) const
+			 const Point<1>& p) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
   switch (i)
@@ -226,8 +226,7 @@ FELinear<2>::shape_grad (const unsigned int i,
 
 
 // this function may be generalised to three or more dimensions with gcc2.8
-// you will have to change the number of vertices and the setting up of the
-// jacobi matrices
+// you will have to change the number of vertices
 void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				  const vector<Point<2> >               &unit_points,
 				  vector<dFMatrix>  &jacobians,
@@ -332,6 +331,40 @@ FEQuadratic<2>::FEQuadratic () :
 
 
 
+template <int dim>
+double
+FEQuadratic<dim>::shape_value (const unsigned int i,
+			       const Point<dim> &) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (false, ExcNotImplemented());
+  return 0.;
+};
+
+
+
+template <int dim>
+Point<dim>
+FEQuadratic<dim>::shape_grad (const unsigned int i,
+			      const Point<dim> &) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (false, ExcNotImplemented());
+  return Point<dim> ();
+};
+
+
+
+void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
+				     const vector<Point<2> >               &,
+				     vector<dFMatrix>  &,
+				     vector<Point<2> > &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
 
 
 FECubic<1>::FECubic () :
@@ -352,4 +385,52 @@ void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 
 FECubic<2>::FECubic () :
 		FiniteElement<2> (1, 2, 4) {};
+
+
+
+
+template <int dim>
+double
+FECubic<dim>::shape_value (const unsigned int i,
+			   const Point<dim> &) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (false, ExcNotImplemented());
+  return 0.;
+};
+
+
+
+template <int dim>
+Point<dim>
+FECubic<dim>::shape_grad (const unsigned int i,
+			  const Point<dim> &) const
+{
+  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (false, ExcNotImplemented());
+  return Point<dim> ();
+};
+
+
+
+void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
+				 const vector<Point<2> >               &,
+				 vector<dFMatrix>  &,
+				 vector<Point<2> > &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
+
+
+// explicite instantiations
+
+template class FELinear<1>;
+template class FELinear<2>;
+template class FEQuadratic<1>;
+template class FEQuadratic<2>;
+template class FECubic<1>;
+template class FECubic<2>;
 

@@ -354,6 +354,10 @@ class FiniteElementBase {
 				      * Exception
 				      */
     DeclException0 (ExcPureFunctionCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotImplemented);
     
   protected:
 				     /**

@@ -6,7 +6,7 @@
 
 
 #include <lac/dsmatrix.h>
-
+#include <base/exceptions.h>
 
 // forward declaration
 template <int dim> class Triangulation;
@@ -17,24 +17,103 @@ template <int dim> class Quadrature;
 
 
 
+/**
+  Base class for user problems. This class stores the system matrix and right
+  hand side vectors as well as a solution vector. It initiates the assemblage
+  process of matrix and vectors and so on.
 
+  This class is not extremely versatile as could certainly be. For example
+  it presently only supports sparse matrices and has no multigrid features.
+  However, all these things depend strongly on the problem and it seems
+  best to implement many of these things yourself. Thus, this class is more
+  a display of concept haw to work with deal.II.
+
+
+  {\bf Assemblage}
+
+  The #assemble# member function does the assemblage of the system matrix and
+  the given number of right hand sides. It does the following steps:
+  \begin{itemize}
+    \item Create sparsity pattern of the system matrix and condense it with
+      the constraints induced by hanging nodes.
+    \item Initialize an assembler object.
+    \item Loop over all cells and assemble matrix and vectors using the given
+      quadrature formula and the equation object which contains the weak
+      formulation of the equation.
+    \item Condense the system matrix with the constraints induced by hanging
+      nodes.
+  \end{itemize}
+  */
 template <int dim>
 class ProblemBase {
   public:
+				     /**
+				      * Constructor. Use this triangulation and
+				      * degree of freedom object during the
+				      * lifetime of this object. The dof
+				      * object must refer to the given
+				      * triangulation. The number of right hand
+				      * sides being assembled defaults to one.
+				      */
     ProblemBase (Triangulation<dim> *tria,
-		 DoFHandler<dim>    *dof_handler);
+		 DoFHandler<dim>    *dof_handler,
+		 const unsigned int  n_rhs=1);
 
-    virtual void assemble (const Equation<dim> &equation,
-			   const Quadrature<dim> &q);
+				     /**
+				      * Initiate the process of assemblage of
+				      * vectors and system matrix. Use the
+				      * given equation object and the given
+				      * quadrature formula.
+				      *
+				      * For what exactly happens here, refer to
+				      * the general doc of this class.
+				      */
+    virtual void assemble (const Equation<dim>      &equation,
+			   const Quadrature<dim>    &q,
+			   const FiniteElement<dim> &fe);
 
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcDofAndTriaDontMatch);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoMemory);
+    
   protected:
+				     /**
+				      * Pointer to the triangulation to work on.
+				      */
     Triangulation<dim> *tria;
+
+				     /**
+				      * Pointer to the degree of freedom handler
+				      * to work with.
+				      */
     DoFHandler<dim>    *dof_handler;
 
-    dSMatrix            system_matrix;
+				     /**
+				      * Sparsity pattern of the system matrix.
+				      */
     dSMatrixStruct      system_sparsity;
 
+				     /**
+				      * System matrix.
+				      */
+    dSMatrix            system_matrix;
+
+				     /**
+				      * Pointers to the right hand sides to the
+				      * problem. Usually, one only needs one
+				      * right hand side, but simetimes one
+				      * wants more.
+				      */
     vector<dVector*>    right_hand_sides;
+
+				     /**
+				      * Solution vector.
+				      */
     dVector             solution;
 
   friend class Assembler<dim>;

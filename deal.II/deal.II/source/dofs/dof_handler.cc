@@ -834,6 +834,7 @@ void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
 
 void DoFHandler<1>::make_constraint_matrix (ConstraintMatrix &cm) const {
   cm.clear ();
+  cm.close ();
 };
 
 

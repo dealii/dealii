@@ -5,8 +5,9 @@ INCPATH   = -I../include -I../../lac/include -I../../base/include
 CXXFLAGS.g= -DDEBUG -g -Wall $(INCPATH)
 CXXFLAGS  = -O3 $(INCPATH)
 
-LIBS.g    = -L../lib -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
-LIBS      = -L../lib -lbasic -lgrid -lfe -lnumerics 
+LIBPATH   = -L../lib -L../../lac/lib
+LIBS.g    = $(LIBPATH) -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
+LIBS      = $(LIBPATH) -lbasic -lgrid -lfe -lnumerics 
 
 ifeq ($(shell uname),SunOS)
 CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
@@ -14,17 +15,22 @@ CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
 endif
 
 
-cc-files = grid/grid_test.cc
+cc-files = grid/grid_test.cc dof/dof_test.cc poisson/poisson.cc
 o-files  = $(cc-files:.cc=.o)
 h-files  = $(wildcard ../include/*.h)
 
-examples: grid/grid_test dof/dof_test
+examples: $(cc-files:.cc=)
 
+%.o : %.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-grid/grid_test: grid/grid_test.o ../lib/libgrid.a
+grid/grid_test: grid/grid_test.o
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
 
-dof/dof_test: dof/dof_test.o ../lib/libgrid.g.a ../lib/libdeal.g.a
+dof/dof_test: dof/dof_test.o
+	$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
+
+poisson/poisson: poisson/poisson.o
 	$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
 
 
@@ -52,6 +58,6 @@ clean:
 #to remake this file upon inclusion at the bottom
 #of this file.
 Makefile.dep: $(cc-files) $(h-files)
-	$(CXX) -I../include -M $(cc-files) > Makefile.dep
+	$(CXX) $(INCPATH) -M $(cc-files) > Makefile.dep
 
 include Makefile.dep

@@ -469,9 +469,10 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * one dimension, the functions returns
 				      * immediately after clearing the
 				      * constraint matrix.
-				      *
 				      * For more than one dimension, the matrix
-				      * is cleared before usage.
+				      * is cleared before usage. The constraint
+				      * matrix is closed anyway, no matter of the
+				      * dimension.
 				      *
 				      * To condense a given sparsity pattern,
 				      * use #ConstraintMatrix::condense#.

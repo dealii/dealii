@@ -89,6 +89,62 @@ class Equation {
 
 
 
+/**
+ * Structure to be passed upon
+ * construction of an assembler object
+ * through the iterator object. See
+ * \Ref{TriaRawIterator} for a discussion
+ * of this mechanism.
+ */
+template <int dim>
+struct AssemblerData {
+				     /**
+				      * Constructor.
+				      */
+    AssemblerData (const DoFHandler<dim>    &dof,
+		   const bool                assemble_matrix,
+		   const bool                assemble_rhs,
+		   const unsigned int        n_rhs,
+		   ProblemBase<dim>         &problem,
+		   const Quadrature<dim>    &quadrature,
+		   const FiniteElement<dim> &fe);
+    
+				     /**
+				      * Pointer to the dof handler object
+				      * to be used to iterate on.
+				      */
+    const DoFHandler<dim>  &dof;
+				     /**
+				      * Flags whether to assemble the matrix
+				      * and right hand sides.
+				      */
+    const bool              assemble_matrix, assemble_rhs;
+				     /**
+				      * How many right hand sides are there.
+				      */
+    const unsigned int      n_rhs;
+				     /**
+				      * Pointer to the #ProblemBase# object
+				      * of which the global matrices and
+				      * vectors are to be assembled.
+				      */
+    ProblemBase<dim>       &problem;
+				     /**
+				      * Pointer to a quadrature object to be
+				      * used for this assemblage process.
+				      */
+    const Quadrature<dim>  &quadrature;
+				     /**
+				      * Use this FE type for the assemblage
+				      * process. The FE object must match that
+				      * used to construct the #DoFHandler#
+				      * object.
+				      */
+    const FiniteElement<dim> &fe;
+};
+
+
+
 
 /**
   An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
@@ -97,38 +153,6 @@ class Equation {
 template <int dim>
 class Assembler : public DoFCellAccessor<dim> {
   public:
-				     /**
-				      * Structure to be passed upon
-				      * construction of an assembler object.
-				      */
-    struct AssemblerData {
-					 /**
-					  * Pointer to the dof handler object
-					  * to be used to iterate on.
-					  */
-	DoFHandler<dim>  *dof;
-					 /**
-					  * Flags whether to assemble the matrix
-					  * and right hand sides.
-					  */
-	bool              assemble_matrix, assemble_rhs;
-					 /**
-					  * How many right hand sides are there.
-					  */
-	unsigned int      n_rhs;
-					 /**
-					  * Pointer to the #ProblemBase# object
-					  * of which the global matrices and
-					  * vectors are to be assembled.
-					  */
-	ProblemBase<dim> *problem;
-					 /**
-					  * Pointer to a quadrature object to be
-					  * used for this assemblage process.
-					  */
-	Quadrature<dim>  *quadrature;
-    };
-
 				     /**
 				      * Default constructor, unused thus not
 				      * implemented.
@@ -196,7 +220,23 @@ class Assembler : public DoFCellAccessor<dim> {
 				      * of which we are to use the matrices
 				      * and vectors.
 				      */
-    ProblemBase<dim> *problem;
+    ProblemBase<dim> &problem;
+
+				     /**
+				      * Pointer to the finite element used for
+				      * the assemblage process. We store a
+				      * pointer to the finite element, not a
+				      * copy, but this is not a problem, since
+				      * #Assembler# objects are usually created
+				      * and deleted by the
+				      * #ProblemBase::assemble# routine, which
+				      * itself gets passed the finite element;
+				      * the lifetime of the #Assembler# object
+				      * is thus less than the lifetime of the
+				      * finite element object and storing
+				      * a pointer is not risky.
+				      */
+    const FiniteElement<dim> &fe;
 
 				     /**
 				      * The finite element evaluated at the
