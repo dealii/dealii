@@ -19,13 +19,13 @@
 #include <base/point.h>
 
 
-
+//! Topological description of cells.
 /**
- * Topological description of cells. This general template is not
- * used, rather explicit specializations are provided for all
- * dimensions for which this class might be of use. The fields
- * provided by each of these specializations are identical, so that
- * access to them in a dimension independent way is possible.
+ * This template specifies the interface to the topological structure
+ * of the mesh cells. The actual implementation of these values is
+ * provided by specializations. The fields provided by each of these
+ * specializations are identical, so that access to them in a
+ * dimension independent way is possible.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -36,7 +36,7 @@ struct GeometryInfo
 				      * Present dimension. Does not
 				      * look useful, but might be.
 				      */
-    static const unsigned int dim;
+    static const unsigned int dim = dimension;
 
 				     /**
 				      * Number of children of a refined cell.
@@ -46,7 +46,7 @@ struct GeometryInfo
 				     /**
 				      * Number of faces of a cell.
 				      */
-    static const unsigned int faces_per_cell;
+    static const unsigned int faces_per_cell = 2 * dim;
 
 				     /**
 				      * Number of children of a face
@@ -57,7 +57,7 @@ struct GeometryInfo
 				     /**
 				      * Number of vertices of a cell.
 				      */
-    static const unsigned int vertices_per_cell;
+    static const unsigned int vertices_per_cell = 1 << dim;
 
 				     /**
 				      * Number of vertices on each face.
@@ -103,7 +103,7 @@ struct GeometryInfo
     
 
 				     /**
-				      * Rearrange verices for OpenDX
+				      * Rearrange vertices for OpenDX
 				      * output.  For a cell being
 				      * written in OpenDX format, each
 				      * entry in this field contains
@@ -175,7 +175,7 @@ struct GeometryInfo
 				      * documentation of the
 				      * @ref{Triangulation} class.
 				      */
-    static Point<dim> unit_cell_vertex (const unsigned int vertex);
+    static Point<dimension> unit_cell_vertex (const unsigned int vertex);
 
 				     /**
 				      * Report, for @p{vertex=0,1} the
@@ -214,13 +214,13 @@ struct GeometryInfo
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * @p{GeometryInfo<dim>::children_per_cell}.
+				      * @p{GeometryInfo<dimension>::children_per_cell}.
 				      *
 				      * The order of child cells is
 				      * described the documentation of
 				      * the @ref{Triangulation} class.
 				      */
-    static unsigned int child_cell_from_point (const Point<dim> &p);
+    static unsigned int child_cell_from_point (const Point<dimension> &p);
 
 				     /**
 				      * Given coordinates @p{p} on the
@@ -236,7 +236,7 @@ struct GeometryInfo
 				      * depends on the number of the
 				      * child.
 				      */
-    static Point<dim> cell_to_child_coordinates (const Point<dim>    &p,
+    static Point<dimension> cell_to_child_coordinates (const Point<dimension>    &p,
 						 const unsigned int child_index);
 
 				     /**
@@ -247,7 +247,7 @@ struct GeometryInfo
 				      * coordinate system of the
 				      * mother cell.
 				      */
-    static Point<dim> child_to_cell_coordinates (const Point<dim>    &p,
+    static Point<dimension> child_to_cell_coordinates (const Point<dimension>    &p,
 						 const unsigned int child_index);
 
 				     /**
@@ -255,7 +255,7 @@ struct GeometryInfo
 				      * is inside the unit cell of the
 				      * present space dimension.
 				      */
-    static bool is_inside_unit_cell (const Point<dim> &p);
+    static bool is_inside_unit_cell (const Point<dimension> &p);
     
 				     /**
 				      * Exception
