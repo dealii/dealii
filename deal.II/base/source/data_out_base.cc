@@ -2686,8 +2686,8 @@ namespace
     ~TecplotMacros();
     float & nd(const unsigned int i, const unsigned int j);
     int   & cd(const unsigned int i, const unsigned int j);
-    float* nodalData;
-    int*   connData;
+    std::vector<float> nodalData;
+    std::vector<int>   connData;
   private:
     unsigned int n_nodes;
     unsigned int n_vars;
@@ -2697,7 +2697,7 @@ namespace
 }
 
 
-
+inline
 TecplotMacros::TecplotMacros(const unsigned int n_nodes,
 			     const unsigned int n_vars,
 			     const unsigned int n_cells,
@@ -2707,16 +2707,15 @@ TecplotMacros::TecplotMacros(const unsigned int n_nodes,
   n_cells(n_cells),
   n_vert(n_vert)
 {
-  nodalData = new float[n_nodes*n_vars];
-  connData  = new int[n_cells*n_vert];
+  nodalData.resize(n_nodes*n_vars);
+  connData.resize(n_cells*n_vert);
 };
 
 
 
+inline
 TecplotMacros::~TecplotMacros()
 {
-  delete [] nodalData;
-  delete [] connData;
 };
 
 
@@ -2896,7 +2895,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
    Threads::ThreadManager thread_manager;
    void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-		    Table<2,dim> &)
+		    Table<2,double> &)
      = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
    Threads::spawn (thread_manager,
 		   Threads::encapsulate (fun_ptr)
@@ -3099,12 +3098,12 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
      int total = (vars_per_node*num_nodes);
 
      ierr = TECDAT (&total,
-		    tm.nodalData,
+		    &tm.nodalData[0],
 		    &is_double);
      
      Assert (ierr == 0, ExcTecplotAPIError());
      
-     ierr = TECNOD (tm.connData);
+     ierr = TECNOD (&tm.connData[0]);
      
      Assert (ierr == 0, ExcTecplotAPIError());
      
