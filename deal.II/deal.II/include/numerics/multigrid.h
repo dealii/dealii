@@ -8,6 +8,16 @@ class dVector;
 
 /**
  * Vector with data for each level.
+ *
+ * This class provides auxiliary vectors for the multigrid method. It
+ * seems, that it is used only locally in class #MultiGrid#, so do not
+ * bother about it.
+ *
+ * In case your smoothing method needs auxiliary vectors, you should
+ * use a memory class for each level separately. If memory is short,
+ * one object for all levels could be a better choice.
+ *
+ * @author Guido Kanschat, 1999
  */
 class MGVector
 {
@@ -41,11 +51,22 @@ public:
  * functions #vmult# and #precondition# and possibly their transposed
  * versions are needed.
  *
+ * The functionality of the multigrid method is restricted to defect
+ * correction. It is <B>not</B> iterative and the start solution is
+ * always zero. Since by this <I>u<SUP>E</SUP><SUB>l</SUB></I> and
+ * <I>u<SUP>A</SUP><SUB>l</SUB></I> (see report on multigrid) are
+ * always zero, restriction is simplified a lot and maybe even the
+ * seam condition on grids is oblivious. Still, I am not sure that
+ * these restrictions on the class might cause numerical
+ * inefficiencies.
+ *
  * The function #precondition# is the actual multigrid method and
  * makes use of several operations to be implemented in derived
- * classes...
+ * classes. It takes a defect in #src# and the result is the multigrid
+ * preconditioned defect in #dst#.
  *
- */
+ * @author Guido Kanschat, 1999
+ * */
 class MultiGrid
 {
   MultiGrid(const MultiGrid&);
@@ -114,6 +135,13 @@ protected:
 				    * This function is required to
 				    * perform #steps# iterations to
 				    * smoothen the residual $Ax-b$.
+				    *
+				    * When overloading this function
+				    * in derived classes, make sure
+				    * that smoothing only applies to
+				    * interior degrees of freedom of
+				    * the actual level.
+				    *
 				    */
   virtual void smooth(unsigned level,
 		      dVector& x,
@@ -201,6 +229,10 @@ public:
 				    */
   void vmult(dVector& dst, const dVector& src) const;
 				   /** Multigrid preconditioning.
+				    *
+				    * This is the function, where the
+				    * multigrid method is implemented.
+				    *
 				    */
   void precondition(dVector& dst, const dVector& src) const;
 };
