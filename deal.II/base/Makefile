@@ -50,11 +50,11 @@ maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dim
 
 # production rules
 lib/go/%.go :
-	@echo =================== Compiling with debugging information:   $(<F) \
+	@echo =====base=============debug============= $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
 lib/o/%.o :
-	@echo =================== Compiling with optimization:   $(<F) \
+	@echo =====base=============optimized========= $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
 
@@ -64,11 +64,11 @@ lib: lib/libbase.g.a lib/libbase.a
 libg: lib/libbase.g.a
 
 lib/libbase.a: $(forward-declarations) $(o-files)
-	@echo ======================================== Updating library:   $@
+	@echo =====base=============debug========= Updating library:   $@
 	@ar ruv $@ $(o-files)
 
 lib/libbase.g.a: $(forward-declarations) $(go-files)
-	@echo ======================================== Updating library:   $@
+	@echo =====base=============optimized===== Updating library:   $@
 	@ar ruv $@ $(go-files)
 
 

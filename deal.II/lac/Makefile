@@ -25,10 +25,10 @@ include $D/common/Make.global_options
 
 # production rules
 lib/go/%.go :
-	@echo =================== Compiling with debugging information:   $(<F)
+	@echo =====lac==============debug========= $(<F)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -c $< -o $@
 lib/o/%.o :
-	@echo =================== Compiling with optimization:   $(<F)
+	@echo =====lac==============optimized===== $(<F)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -c $< -o $@
 
 
@@ -37,11 +37,11 @@ lib: lib/liblac.g.a lib/liblac.a
 libg: lib/liblac.g.a
 
 lib/liblac.a: $(forward-declarations) $(o-files)
-	@echo ======================================== Updating library:   $@
+	@echo =====lac==============optimized===== Updating library:   $@
 	@ar ruv $@ $(o-files)
 
 lib/liblac.g.a: $(forward-declarations) $(go-files)
-	@echo ======================================== Updating library:   $@
+	@echo =====lac==============debug========= Updating library:   $@
 	@ar ruv $@ $(go-files)
 
 

@@ -51,52 +51,52 @@ include $D/common/Make.global_options
 # there are some files which needs exceptional rules; these are
 # listed immediately below
 lib/1d/go/%.go :
-	@echo ==============1d======debug============= $(<:source/%=%)
+	@echo =====deal.II====1d====debug========= $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=1 -c $< -o $@
 lib/1d/o/%.o :
-	@echo ==============1d======optimized========= $(<:source/%=%)
+	@echo =====deal.II====1d====optimized===== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=1 -c $< -o $@
 
 lib/2d/go/%.go :
-	@echo ==============2d======debug============= $(<:source/%=%)
+	@echo =====deal.II====2d====debug========= $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=2 -c $< -o $@
 lib/2d/o/%.o :
-	@echo ==============2d======optimized========= $(<:source/%=%)
+	@echo =====deal.II====2d====optimized===== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=2 -c $< -o $@
 
 lib/3d/go/%.go :
-	@echo ==============3d======debug============= $(<:source/%=%)
+	@echo =====deal.II====3d====debug========= $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) -Ddeal_II_dimension=3 -c $< -o $@
 lib/3d/o/%.o :
-	@echo ==============3d======optimized========= $(<:source/%=%)
+	@echo =====deal.II====3d====optimized===== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
 # special rules for exceptional files
 lib/3d/o/q1_mapping_jacobians_3d.o:
-	@echo "==============3d======opt==(special)====" $(<:source/%=%)
+	@echo =====deal.II====3d====opt==special== $(<:source/%=%)
 	@$(CXX) $(CXXFLAGS) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
 
 
 # rules how to make the libraries themselves
 lib/libdeal_II_1d.g.a: $(go-files-1d)
-	@echo ======================================== Updating library:   $(@F)
+	@echo =====deal.II====1d====debug========= Updating library:   $(@F)
 	@ar ruv $@ $(go-files-1d)
 lib/libdeal_II_1d.a: $(o-files-1d)
-	@echo ======================================== Updating library:   $(@F)
+	@echo =====deal.II====1d====optimized===== Updating library:   $(@F)
 	@ar ruv $@ $(o-files-1d)
 
 lib/libdeal_II_2d.g.a: $(go-files-2d)
-	@echo ======================================== Updating library:   $(@F)
+	@echo =====deal.II====2d====debug========= Updating library:   $(@F)
 	@ar ruv $@ $(go-files-2d)
 lib/libdeal_II_2d.a: $(o-files-2d)
-	@echo ======================================== Updating library:   $(@F)
+	@echo =====deal.II====2d====optimized===== Updating library:   $(@F)
 	@ar ruv $@ $(o-files-2d)
 
 lib/libdeal_II_3d.g.a: $(go-files-3d)
-	@echo ======================================== Updating library:   $(@F)
+	@echo =====deal.II====3d====debug========= Updating library:   $(@F)
 	@ar ruv $@ $(go-files-3d)
 lib/libdeal_II_3d.a: $(o-files-3d)
-	@echo ======================================== Updating library:   $(@F)
+	@echo =====deal.II====3d====optimized===== Updating library:   $(@F)
 	@ar ruv $@ $(o-files-3d)
 
 
