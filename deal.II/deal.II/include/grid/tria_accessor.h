@@ -339,8 +339,17 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     unsigned int quad_index (const unsigned int i) const;
 
 				     /**
-				      *  Test for the element being used
-				      *  or not.
+				      *  Test for the element being
+				      *  used or not.  The return
+				      *  value is #true# for all
+				      *  iterators that are either
+				      *  normal iterators or active
+				      *  iterators, only raw iterators
+				      *  can return #false#. Since raw
+				      *  iterators are only used in
+				      *  the interiors of the library,
+				      *  you will not usually need
+				      *  this function.
 				      */
     bool used () const;
 
@@ -692,18 +701,29 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     Point<dim> & vertex (const unsigned int i) const;
 
 				     /**
-				      *  Test for the element being used
-				      *  or not.
+				      *  Test for the element being
+				      *  used or not.  The return
+				      *  value is #true# for all
+				      *  iterators that are either
+				      *  normal iterators or active
+				      *  iterators, only raw iterators
+				      *  can return #false#. Since raw
+				      *  iterators are only used in
+				      *  the interiors of the library,
+				      *  you will not usually need
+				      *  this function.
 				      */
     bool used () const;
 
 				     /**
-				      *  Set the #used# flag.
+				      *  Set the #used# flag. Only for
+				      *  internal use in the library.
 				      */
     void set_used_flag () const;
 
 				     /**
-				      *  Clear the #used# flag.
+				      *  Clear the #used# flag. Only for
+				      *  internal use in the library.
 				      */
     void clear_used_flag () const;
 
@@ -765,7 +785,8 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  Return a pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<1, dim> > child (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> >
+    child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th child.
@@ -1021,7 +1042,8 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Quad#.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> >
+    line (const unsigned int i) const;
 
 				     /**
 				      * Return the line index of the #i#th
@@ -1031,8 +1053,17 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     unsigned int line_index (const unsigned int i) const;
     
 				     /**
-				      *  Test for the element being used
-				      *  or not.
+				      *  Test for the element being
+				      *  used or not.  The return
+				      *  value is #true# for all
+				      *  iterators that are either
+				      *  normal iterators or active
+				      *  iterators, only raw iterators
+				      *  can return #false#. Since raw
+				      *  iterators are only used in
+				      *  the interiors of the library,
+				      *  you will not usually need
+				      *  this function.
 				      */
     bool used () const;
 
@@ -1383,7 +1414,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Hex#.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> >
+    line (const unsigned int i) const;
 
 				     /**
 				      * Return the line index of the #i#th
@@ -1396,7 +1428,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  Return a pointer to the #i#th quad
 				      *  bounding this #Hex#.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<2, dim> > quad (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<2, dim> >
+    quad (const unsigned int i) const;
 
 				     /**
 				      * Return the quad index of the #i#th
@@ -1406,8 +1439,17 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     unsigned int quad_index (const unsigned int i) const;
 
 				     /**
-				      *  Test for the element being used
-				      *  or not.
+				      *  Test for the element being
+				      *  used or not.  The return
+				      *  value is #true# for all
+				      *  iterators that are either
+				      *  normal iterators or active
+				      *  iterators, only raw iterators
+				      *  can return #false#. Since raw
+				      *  iterators are only used in
+				      *  the interiors of the library,
+				      *  you will not usually need
+				      *  this function.
 				      */
     bool used () const;
 
@@ -1485,7 +1527,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  Return a pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<3, dim> > child (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<3, dim> >
+    child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th child.
@@ -1734,7 +1777,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  If the neighbor does not exist, an
 				      *  invalid iterator is returned.
 				      */
-    TriaIterator<dim,CellAccessor<dim> > neighbor (const unsigned int i) const;
+    TriaIterator<dim,CellAccessor<dim> >
+    neighbor (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th neighbor.
@@ -1841,7 +1885,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  child. Overloaded version which returns
 				      *  a more reasonable iterator class.
 				      */
-    TriaIterator<dim,CellAccessor<dim> > child (const unsigned int i) const;
+    TriaIterator<dim,CellAccessor<dim> >
+    child (const unsigned int i) const;
 
 				     /**
 				      * Return an iterator to the #i#th face
