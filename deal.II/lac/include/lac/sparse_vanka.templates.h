@@ -340,9 +340,12 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 						 //
 						 // note that if so, we already
 						 // have copied the entry above
-//TODO:	why is dst accessed here???
 		if (js == local_index.end())
-		  b(i) -= matrix->raw_entry(irow,j) * dst(col);
+		  {
+		    if (!range_is_restricted ||
+			((begin <= col) && (col < end)))
+		      b(i) -= matrix->raw_entry(irow,j) * dst(col);
+		  }
 		else
 						     // if so, then build the
 						     // matrix out of it
