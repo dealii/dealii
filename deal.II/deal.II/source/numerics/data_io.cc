@@ -12,7 +12,6 @@
 #include <fe/fe_values.h>
 #include <fe/fe.h>
 #include <lac/vector.h>
-
 #include <map>
 #include <iostream>
 #include <iomanip>
@@ -1041,12 +1040,12 @@ template <>
 void DataOut<2>::write_epsgrid (ostream &out) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
   
-  // write preamble
+				   // write preamble
   if (true) 
     {
-      // block this to have local
-      // variables destroyed after
-      // use
+				       // block this to have local
+				       // variables destroyed after
+				       // use
       time_t  time1= time (0);
       tm     *time = localtime(&time1); 
       out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
@@ -1062,7 +1061,7 @@ void DataOut<2>::write_epsgrid (ostream &out) const {
 	  << "%%BoundingBox: 0 0 310 310" << endl;
     };  
 
-  // Get scaling factors for Bounding Box 310 x 310
+				   // Get scaling factors for Bounding Box 310 x 310
   
   DoFHandler<2>::active_cell_iterator cell;
   DoFHandler<2>::active_cell_iterator endc = dofs->end();
@@ -1109,14 +1108,14 @@ void DataOut<2>::write_epsgrid (ostream &out) const {
 
 
 template <>
-void DataOut<2>::write_eps (ostream &out) const {
+void DataOut<2>::write_eps (ostream &out, const eps_output_data EOD) const {
   Assert (dofs != 0, ExcNoDoFHandlerSelected());
-  
-  // write preamble
+
   {
-    // block this to have local
-    // variables destroyed after
-    // use
+				     // write preamble
+				     // block this to have local
+				     // variables destroyed after
+				     // use
     time_t  time1= time (0);
     tm     *time = localtime(&time1); 
     out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
@@ -1131,91 +1130,202 @@ void DataOut<2>::write_eps (ostream &out) const {
 	<< setw(2) << time->tm_sec << endl
 	<< "%%BoundingBox: -5 -5 305 305" << endl;
   };  
-    
-  DoFHandler<2>::active_cell_iterator cell;
-  DoFHandler<2>::active_cell_iterator endc = dofs->end();
 
-  multiset<DataOut<2>::eps_cell_data> cells;
+   
+				    // Make output values local by
+				    // copying them to a multiset.
+				    // Perform the necessary turn.
+   DoFHandler<2>::active_cell_iterator cell;
+   DoFHandler<2>::active_cell_iterator endc = dofs->end();
+   unsigned i;
+   unsigned cell_index=0;
+   eps_cell_data cd;
+   bool cell_data_p;
+   multiset<DataOut<2>::eps_cell_data> cells;
+   multiset<DataOut<2>::eps_cell_data> cells2;
+   typename multiset<DataOut<2>::eps_cell_data>::iterator c;
+   
+   cell_data_p = ((cell_data.size())>0) && (EOD.cell_type == EOD.Vector);
 
-  unsigned i;
-
-  // Now get output values
-  for(cell=dofs->begin_active(); cell!=endc; ++cell)
+   for(cell=dofs->begin_active(); cell!=endc; ++cell,++cell_index)
      {
-       eps_cell_data cd;
        cd.vertices.resize(4);
        for (i=0; i<4; i++)
 	 {
 	   (cd.vertices[i]).x=cell->vertex(i)(0);
 	   (cd.vertices[i]).y=cell->vertex(i)(1);
-	   (cd.vertices[i]).z=(*dof_data[0].data)(cell->vertex_dof_index(i,0));
+	   switch (EOD.height_type)
+	     {
+	       case EOD.Vector:
+		     (cd.vertices[i]).z=(*dof_data[EOD.height_vector].data)(cell->vertex_dof_index(i,0)); 
+		     break;
+	       case EOD.None:
+		     (cd.vertices[i]).z=0;
+		     break;
+	       default:
+		     break;
+	     };
+	       
 	 };
-       cd.turn(0.2,0.2);
+       if (EOD.height_type==EOD.Vector)
+	 {
+	   cd.turn(EOD.azimuth,EOD.elevation);
+	 };
+       if (cell_data_p)
+	 cd.red=(*cell_data[EOD.cell_vector].data)(cell_index);
        cells.insert(cd);
      };
 
-  // Get scaling factors for Bounding Box 310 x 310
-  typename multiset<DataOut<2>::eps_cell_data>::iterator c;
+				    // Now we proceed with the
+				    // multiset cells. First we look
+				    // for extrema.
+   
 
-  double xmin=cells.begin()->vertices[0].x;
-  double xmax=xmin;
-  double ymin=cells.begin()->vertices[0].y;
-  double ymax=ymin;
+   double xvv,yvv,cvv;
+   double xmin=cells.begin()->vertices[0].x;
+   double xmax=xmin;
+   double ymin=cells.begin()->vertices[0].y;
+   double ymax=ymin;
+   float cell_vector_min=cells.begin()->red; 
+   float cell_vector_max=cell_vector_min;
 
-  for(c=cells.begin();c!=cells.end();c++)
-    {
-      for (i=0; i<4; i++)
-	{
-	  double x,y;
-	  
-	  x=c->vertices[i].x;
-	  xmin=(xmin < x ? xmin : x);
-	  xmax=(xmax > x ? xmax : x);
-
-	  y=c->vertices[i].y;
-	  ymin=(ymin < y ? ymin : y);
-	  ymax=(ymax > y ? ymax : y);
+   for(c=cells.begin();c!=cells.end();c++,cell_index++)
+     {
+       for (i=0; i<4; i++)
+	 {
+	   xvv=c->vertices[i].x;
+	   xmin=(xmin < xvv ? xmin : xvv);
+	   xmax=(xmax > xvv ? xmax : xvv);
+	   
+	   yvv=c->vertices[i].y;
+	   ymin=(ymin < yvv ? ymin : yvv);
+	   ymax=(ymax > yvv ? ymax : yvv);
+	 }
+       if (cell_data_p) 
+	 {
+	   cvv = c->red;
+	   cell_vector_max = (cell_vector_max > cvv ? cell_vector_max : cvv);
+	   cell_vector_min = (cell_vector_min < cvv ? cell_vector_min : cvv);
 	}
     };
+   cells2.clear();
 
-  //  shift so that lower bounds are at (0,0), i.e. substract xmin, ymin resp.
-  //  scale to 300x300
 
-  double xscale = 300 / (xmax-xmin);
-  double yscale = 300 / (ymax-ymin);
-  double scale = (xscale < yscale ? xscale : yscale);
-  double color,x[7],y[7],z[7];
+				    // If we want shaded output we can
+				    // do the shading now.
+   if (EOD.cell_type==EOD.Shaded)
+     {
+       double spann1[3], spann2[3], normal[3];
+       double light_norm, normal_norm;
+       float color;
 
-  //  Now we are ready to output...
+       for (c=cells.begin();c!=cells.end();c++)
+	 {
+	   cd = (*c);
+
+	   spann1[0]=spann2[0]=cd.vertices[0].x;
+	   spann1[1]=spann2[1]=cd.vertices[0].y;
+	   spann1[2]=spann2[2]=cd.vertices[0].z;
+
+	   spann1[0]-=cd.vertices[1].x;
+	   spann1[1]-=cd.vertices[1].y;
+	   spann1[2]-=cd.vertices[1].z;
+		      
+	   spann2[0]-=cd.vertices[2].x;
+	   spann2[1]-=cd.vertices[2].y;
+	   spann2[2]-=cd.vertices[2].z;
+
+	   normal[0] = spann1[1]*spann2[2]-spann1[2]*spann2[1];
+	   normal[1] = spann1[2]*spann2[0]-spann1[0]*spann2[2];
+	   normal[2] = spann1[0]*spann2[1]-spann1[1]*spann2[0];
+
+	   normal_norm = sqrt(normal[0]*normal[0]+normal[1]*normal[1]+normal[2]*normal[2]);
+	   light_norm = sqrt(EOD.light[0]*EOD.light[0]+EOD.light[1]*EOD.light[1]+EOD.light[2]*EOD.light[2]);
+
+	   color = EOD.light[0]*normal[0]+EOD.light[1]*normal[1]+EOD.light[2]*normal[2];
+	   color /= light_norm * normal_norm;
+	   
+	   cd.red=color;
+	   cd.green=color;
+	   cd.blue=color;
+
+	   cells2.insert(cd);
+	 };
+     }
+   else
+     cells2=cells;
+
+
+				    // Next we have to shift and scale
+				    // a bit so that everything still
+				    // arrives in our bounding box of
+				    // 310x310.
+				    // If cell_data_p we also scale
+				    // this so that it is in the range
+				    // between 0 and 1.
+
+   double xscale = 300 / (xmax-xmin);
+   double yscale = 300 / (ymax-ymin);
+   double scale = (xscale < yscale ? xscale : yscale);
+   
+   cells.clear();
+
+
+   for (c=cells2.begin();c!=cells2.end();c++)
+     {
+       cd= (*c);
+       for (i=0;i<4;i++)
+	 {
+	   cd.vertices[i].x=(cd.vertices[i].x-xmin)*scale;
+	   cd.vertices[i].y=(cd.vertices[i].y-ymin)*scale;
+	 };
+       if (cell_data_p)
+	 {
+	   EOD.color(cd.red,cell_vector_max,cell_vector_min,cd.red,cd.green,cd.blue);
+	 };
+       cells.insert(cd);
+     };
+
+
+				    //  Now we are ready to output...
+
+   cell_data_p = cell_data_p || (EOD.cell_type==EOD.Shaded);
 
   for (c=cells.begin();c!=cells.end();c++)
     {
-      for (i=0;i<4;i++)
+      if (cell_data_p)
 	{
-	  x[i]=c->vertices[i].x;
-	  y[i]=c->vertices[i].y;
-	  z[i]=c->vertices[i].z;
-	}
-      x[4]=x[0]-x[1]; x[5]=x[0]-x[2];
-      y[4]=y[0]-y[1]; y[5]=y[0]-y[2];
-      z[4]=z[0]-z[1]; z[5]=z[0]-z[2];
-      x[6]=y[4]*z[5]-y[5]*z[4];
-      y[6]=x[5]*z[4]-x[4]*z[5];
-      z[6]=x[4]*y[5]-x[5]*y[4];
+	  out << c->red << " " << c->green << " " << c->blue << " setrgbcolor "
+	      << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
+	      << c->vertices[1].x << " " << c->vertices[1].y << " lineto "
+	      << c->vertices[2].x << " " << c->vertices[2].y << " lineto "
+	      << c->vertices[3].x << " " << c->vertices[3].y << " lineto "
+	      << " closepath fill" << endl;
+	};
 
-      color =  fabs((-x[6] - y[6] +z[6])/sqrt(3*(x[6]*x[6]+y[6]*y[6]+z[6]*z[6])));
-
-      out << color << " setgray "
-	  << (x[0]-xmin)*scale << " " << (c->vertices[0].y-ymin)*scale << " moveto "
-	  << (x[1]-xmin)*scale << " " << (c->vertices[1].y-ymin)*scale << " lineto "
-	  << (x[2]-xmin)*scale << " " << (c->vertices[2].y-ymin)*scale << " lineto "
-	  << (x[3]-xmin)*scale << " " << (c->vertices[3].y-ymin)*scale << " lineto "
-	  << (x[0]-xmin)*scale << " " << (c->vertices[0].y-ymin)*scale << " lineto "
-	  << " closepath fill" << endl;
+      if (EOD.cell_boundary_type == EOD.Black || 
+	  EOD.cell_boundary_type == EOD.White) 
+	{
+	  switch (EOD.cell_boundary_type)
+	    {
+	      case EOD.Black: 
+		    out << "0";
+		    break;
+	      case EOD.White:
+		    out << "1";
+		    break;
+	      default:
+		    break;
+	    };
+	  out << " setgray " 
+	      << c->vertices[0].x << " " << c->vertices[0].y << " moveto "
+	      << c->vertices[1].x << " " << c->vertices[1].y << " lineto "
+	      << c->vertices[2].x << " " << c->vertices[2].y << " lineto "
+	      << c->vertices[3].x << " " << c->vertices[3].y << " lineto closepath stroke" << endl;
+	};
     };
   out << "showpage" << endl;     
 
-  AssertThrow (out, ExcIO());
 };
 
 #endif
@@ -1240,6 +1350,9 @@ void DataOut<3>::write_eps (ostream &/*out*/) const {
 template <int dim>
 void DataOut<dim>::write (ostream &out,
 			  const OutputFormat output_format) const {
+
+  eps_output_data EOD;
+  
   switch (output_format) 
     {
     case ucd:
@@ -1255,7 +1368,7 @@ void DataOut<dim>::write (ostream &out,
       write_povray_mesh (out);
       break;
     case eps:
-      write_eps(out);
+      write_eps(out,EOD);
       break;
     case epsgrid:
       write_epsgrid(out);
@@ -1316,7 +1429,6 @@ DataOut<dim>::parse_output_format (const string format_name) {
 };
 
 
-
 template <int dim>
 string DataOut<dim>::get_output_format_names () {
   return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid";
@@ -1349,9 +1461,9 @@ void DataOut<dim>::eps_vertex_data::turn(double azi, double ele)
 
   double cx=cos(ele), cz=cos(azi), sx=sin(ele), sz=sin(azi);
 
-  nx = cz*x-sz*cx*y-sz*sx*z;
-  ny = sz*x+cz*sx*y-cz*sx*z;
-  nz =         sx*y+   cx*z;
+  nx = -   cz*x+   sz*y;
+  ny = -cx*sz*x-cx*cz*y-sx*z;
+  nz = -sx*sz*x-sx*cz*y+cx*z;
 
   x=nx; z=ny; y=nz;
 };
@@ -1381,6 +1493,95 @@ void DataOut<dim>::eps_cell_data::turn(double azi, double ele)
     vertices[i].turn(azi,ele);
 };
 
+
+eps_output_data::eps_output_data()
+		: height_type(None),
+		  cell_type(None),
+		  cell_boundary_type (Black),
+                  height_vector(0),
+		  cell_vector(0),
+		  azimuth(0.2),
+		  elevation(0.2)
+{ 
+  light[0]=-1;
+  light[1]=-1;
+  light[2]=1;
+};
+
+// A difficult color scale:
+//     xmin          = black  (1)
+// 3/4*xmin+1/4*xmax = blue   (2)
+// 1/2*xmin+1/2*xmax = green  (3)
+// 1/4*xmin+3/4*xmax = red    (4)
+//              xmax = white  (5)
+// Makes the following color functions:
+//
+// red      green    blue
+//       __
+//      /      /\  /  /\    /
+// ____/    __/  \/  /  \__/
+
+//     { 0                                (1) - (3)
+// r = { ( 4*x-2*xmin+2*xmax)/(xmax-xmin) (3) - (4)
+//     { 1                                (4) - (5)
+//
+//     { 0                                (1) - (2)
+// g = { ( 4*x-3*xmin-  xmax)/(xmax-xmin) (2) - (3)
+//     { (-4*x+  xmin+3*xmax)/(xmax-xmin) (3) - (4)
+//     { ( 4*x-  xmin-3*xmax)/(xmax-xmin) (4) - (5)
+//
+//     { ( 4*x-4*xmin       )/(xmax-xmin) (1) - (2)
+// b = { (-4*x+2*xmin+2*xmax)/(xmax-xmin) (2) - (3)
+//     { 0                                (3) - (4)
+//     { ( 4*x-  xmin-3*xmax)/(xmax-xmin) (4) - (5)
+
+void eps_output_data::color(const float x, const float xmax, const float xmin, 
+			    float &r, float &g, float &b) const
+{
+  float sum   =   xmax+  xmin;
+  float sum13 =   xmin+3*xmax;
+  float sum22 = 2*xmin+2*xmax;
+  float sum31 = 3*xmin+  xmax;
+  float dif = xmax-xmin;
+  float rezdif = 1.0/dif;
+
+  int where;
+
+  if (x<(sum31)/4)
+    where = 0;
+  else if (x<(sum22)/4)
+    where = 1;
+  else if (x<(sum13)/4)
+    where = 2;
+  else
+    where = 3;
+
+  if (dif!=0)
+    {
+      switch (where)
+	{
+	  case 0:
+		r=0;		      g=0;		          b=(x-xmin)*4.*rezdif;
+		break;
+	  case 1:
+		r=0;                  g=(4*x-3*xmin-xmax)*rezdif; b=(sum22-4.*x)*rezdif;
+		break;
+	  case 2:
+		r=(4*x-2*sum)*rezdif; g=(xmin+3*xmax-4*x)*rezdif; b=0;
+		break;
+	  case 3:
+		r=1;                  g=(4*x-xmin-3*xmax)*rezdif; b=(4.*x-sum13)*rezdif;
+	  default:
+		break;
+	};
+    }
+  else // White 
+    {
+      r=1;
+      g=1;
+      b=1;
+    };
+};
 
 
 //explicit instantiations
