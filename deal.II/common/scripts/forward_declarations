@@ -21,8 +21,8 @@
 $(forward-declarations): $(filter-out %forward-declarations%,$(h-files)) \
                          $D/common/scripts/forward_declarations.pl
 	@echo ============================ Remaking $(@F)
-	@touch $@.old
-	@-cp $@ $@.old > /dev/null 2>&1
+	@-touch $@.old
+	@if test -r $@ ; then cp $@ $@.old > /dev/null 2>&1 ; fi
 	@$(PERL) $D/common/scripts/forward_declarations.pl   \
               $(filter-out %$(notdir $(forward-declarations)),$(h-files)) \
             > $@.new
