@@ -2877,7 +2877,7 @@ namespace Threads
                                         * so if the configure script
                                         * decided that this is safe.
                                         */
-#ifdef DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
+#if defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) || defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
     public:
 #endif
       Thread (const boost::shared_ptr<internal::thread_description<RT> > &td)
@@ -2957,8 +2957,8 @@ namespace Threads
                                         */
       boost::shared_ptr<internal::thread_description<RT> > thread_descriptor;
 
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG2
-      template <typename RT_> friend struct Threads::internal::wrapper_base;
+#if !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) && !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
+      template <typename RT_> friend struct internal::wrapper_base;
 #endif
   };
 
