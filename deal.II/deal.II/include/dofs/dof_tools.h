@@ -262,6 +262,9 @@ class DoFTools
 				      * the normal couplings and these
 				      * extra matrix entries are
 				      * considered.
+				      *
+				      * This function uses the user
+				      * flags of the triangulation.
 				      */
     template<int dim>
     static void
@@ -295,10 +298,6 @@ class DoFTools
 				      * This function does not close the object
 				      * since you may want to enter other
 				      * constraints later on yourself.
-				      *
-				      * This function uses the user flags for
-				      * the faces. If you need the user flags,
-				      * store them beforehand.
 				      */
     template <int dim>
     static void
