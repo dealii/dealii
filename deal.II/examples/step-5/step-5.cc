@@ -837,6 +837,12 @@ void LaplaceProblem<dim>::run ()
 					   // what not to do, after
 					   // all.
 	  
+					   // We can now actually read
+					   // the grid. It is in UCD
+					   // (unstructured cell data)
+					   // format, as supported by
+					   // AVS Explorer, for
+					   // example:
 	  ifstream input_file("circle-grid.inp");
 	  grid_in.read_ucd (input_file);
 
