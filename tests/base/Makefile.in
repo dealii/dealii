@@ -137,6 +137,8 @@ quadrature_test.testcase: $(quadrature_test-o-files) $(libraries)
 	@$(CXX) $(flags) -o $@ $^
 
 
+############################################################
+
 
 timer-cc-files = timer.cc
 
@@ -149,6 +151,23 @@ endif
 timer.testcase: $(timer-o-files) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+
+
+polynomial_test-cc-files = polynomial_test.cc
+
+ifeq ($(debug-mode),on)
+polynomial_test-o-files = $(polynomial_test-cc-files:.cc=.go)
+else
+polynomial_test-o-files = $(polynomial_test-cc-files:.cc=.o)
+endif
+
+polynomial_test.testcase: $(polynomial_test-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
+
 
 ############################################################
 # Continue with other targets if needed
