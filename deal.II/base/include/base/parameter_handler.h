@@ -1015,6 +1015,19 @@ namespace Patterns
  */
 class ParameterHandler
 {
+  private:
+				     /**
+				      * Inhibit automatic
+				      * CopyConstructor.
+				      */
+    ParameterHandler(const ParameterHandler&);
+
+				     /**
+				      * Inhibit automatic
+				      * assignment operator.
+				      */
+    ParameterHandler& operator=(const ParameterHandler&);
+    
   public:
 				     /**
 				      * List of possible output
