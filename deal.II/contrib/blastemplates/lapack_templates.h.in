@@ -1,9 +1,9 @@
 // General Matrix
 // Matrix vector product
-void dgemv_ (char* trans, int* m, int* n,
-	     double* alpha, double* A, int* lda,
-	     double* x, int* incx,
-	     double* b, double* y, int* incy);
+void dgemv_ (const char* trans, const int* m, const int* n,
+	     const double* alpha, const double* A, const int* lda,
+	     const double* x, const int* incx,
+	     const double* b, double* y, const int* incy);
 // Compute eigenvalues and vectors
 void dgeev_ (char* jobvl, char* jobvr,
 	     int* n, double* A, int* lda,

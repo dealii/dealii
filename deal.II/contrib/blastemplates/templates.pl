@@ -21,6 +21,7 @@ print << 'EOT'
 //    Version: $Name$
 //
 //    This file was automatically generated from blas.h.in
+//    See blastemplates in the deal.II contrib directory
 //
 //    Copyright (C) 2005 by the deal authors
 //
@@ -31,8 +32,8 @@ print << 'EOT'
 //
 //---------------------------------------------------------------------------
 
-#ifndef __BLAS_TEMPLATES_H
-#define __BLAS_TEMPLATES_H
+#ifndef __LAPACK_TEMPLATES_H
+#define __LAPACK_TEMPLATES_H
 
 extern "C"
 {
@@ -66,6 +67,8 @@ while(<>)
 	$args =~ s/\s+/ /g;
 	$args2 = $args;
 	$args2 =~ s/\w+\*//g;
+	$args2 =~ s/const//g;
+	$args2 =~ s/\s//g;
 	
 	$templates .= "\n\ninline $type\n$name ($args)\n{\n  d$name\_ ($args2);\n}\n";
 	$args =~ s/double/float/g;
