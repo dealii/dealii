@@ -5,7 +5,7 @@ include ../common/Make.global_options
 
 
 # by default make sublibs
-default: hsl umfpack
+default: hsl umfpack functionparser
 
 
 ifeq ($(USE_CONTRIB_HSL),yes)
@@ -27,7 +27,12 @@ else
 umfpack:
 endif
 
+
+functionparser:
+	@cd functionparser ; $(MAKE)
+
+
 # generic targets
 clean: hsl-clean
 
-.PHONY: default hsl clean umfpack
+.PHONY: default hsl clean umfpack functionparser
