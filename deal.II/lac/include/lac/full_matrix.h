@@ -356,7 +356,7 @@ class FullMatrix : public Subscriptor
 				      * This norm is compatible with the l2
 				      * vector norm. But it is not a natural
 				      * matrix norm (cf Rannacher Numeric0),
-				      * therefore it is not called l2_norm.
+				      * therefore it is not called $l_2$-norm.
 				      */
     number norm2 () const;
     
