@@ -1221,7 +1221,7 @@ AC_DEFUN(DEAL_II_CHECK_IBM_XLC_ERROR, dnl
       AC_MSG_RESULT(no)
     ],
     [
-      AC_MSG_RESULT(yes. trying to work around)
+      AC_MSG_RESULT(yes. using workaround)
       AC_DEFINE(XLC_WORK_AROUND_STD_BUG, 1, 
                 [Define if we have to work around a bug in IBM's xlC compiler.
 See the aclocal.m4 file in the top-level directory for a description
@@ -1276,7 +1276,7 @@ AC_DEFUN(DEAL_II_CHECK_LOCAL_TYPEDEF_COMP, dnl
       AC_MSG_RESULT(no)
     ],
     [
-      AC_MSG_RESULT(yes. trying to work around)
+      AC_MSG_RESULT(yes. using workaround)
       AC_DEFINE(DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND, 1, 
                 [Define if we have to work around a bug in Sun's Forte compiler.
                  See the aclocal.m4 file in the top-level directory for a
@@ -1341,7 +1341,7 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
       AC_MSG_RESULT(no)
     ],
     [
-      AC_MSG_RESULT(yes. trying to work around)
+      AC_MSG_RESULT(yes. using workaround)
       AC_DEFINE(DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND, 1, 
                 [Define if we have to work around a bug in Sun's Forte compiler.
                  See the aclocal.m4 file in the top-level directory for a
@@ -1397,12 +1397,64 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
       x=""
     ],
     [
-      AC_MSG_RESULT(yes. trying to work around)
+      AC_MSG_RESULT(yes. using workaround)
       x="template"
     ])
   AC_DEFINE_UNQUOTED(DEAL_II_MEMBER_OP_TEMPLATE_INST, $x, 
                      [Define if we have to work around a bug in gcc with
                       explicitly instantiating template member operators.
+                      See the aclocal.m4 file in the top-level directory
+                      for a description of this bug.])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Versions of GCC before 3.0 had a problem with the following
+dnl code:
+dnl 
+dnl /* ----------------------------------------------- */
+dnl namespace NS {
+dnl   template <typename T>  class C  {
+dnl       template <typename N> friend class C;
+dnl   };
+dnl };
+dnl /* ---------------------------------------------------------- */
+dnl
+dnl The compiler gets an internal error here. Since we need this
+dnl construct at verious places, we check for it and if the compiler
+dnl dies, we use a workaround that is non-ISO C++ but works for these
+dnl compilers.
+dnl
+dnl Usage: DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
+[
+  AC_MSG_CHECKING(for template friend in namespace bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	namespace NS {
+	  template <typename T>  class C  {
+	      template <typename N> friend class C;
+	  };
+	};
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+      x=""
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      x="template"
+    ])
+  AC_DEFINE_UNQUOTED(DEAL_II_NAMESP_TEMPL_FRIEND_BUG, $x, 
+                     [Define if we have to work around a bug in gcc with
+                      marking all instances of a template class as friends
+		      to this class if the class is inside a namespace.
                       See the aclocal.m4 file in the top-level directory
                       for a description of this bug.])
 ])

@@ -563,7 +563,28 @@ namespace BlockVectorIterators
 					*/
       void move_backward ();
 
+      
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+				       /**
+					* Mark all other instances of
+					* this template as friends. In
+					* fact, we only need the
+					* inverse constness iterator
+					* as friend, but this is
+					* something that ISO C++ does
+					* not allow to specify. If we
+					* have detected a compiler bug
+					* during configuration of the
+					* library, use a workaround
+					* that works for this
+					* particular compiler, but is
+					* not ISO C++ conforming.
+					*/
+      template <typename N, bool C>
+      friend class Iterator;
+#else
       friend class InverseConstnessIterator;
+#endif
   };
 };
 
