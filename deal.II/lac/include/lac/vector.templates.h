@@ -51,7 +51,7 @@ Vector<Number>::Vector (const Vector<Number>& v)
 		maxdim(v.size()),
 		val(0)
 {
-  if (dim)
+  if (dim != 0)
     {
       val = new Number[maxdim];
       Assert (val != 0, ExcOutOfMemory());
@@ -69,7 +69,7 @@ Vector<Number>::Vector (const Vector<Number>& v)
 // 		maxdim(v.size()),
 // 		val(0)
 // {
-//   if (dim)
+//   if (dim != 0)
 //     {
 //       val = new Number[maxdim];
 //       Assert (val != 0, ExcOutOfMemory());
@@ -87,7 +87,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 		maxdim(v.size()),
 		val(0)
 {
-  if (dim)
+  if (dim != 0)
     {
       val = new Number[maxdim];
       Assert (val != 0, ExcOutOfMemory());
@@ -112,11 +112,11 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
                 :
-		dim(v.size()),
-		maxdim(v.size()),
+		dim(0),
+		maxdim(0),
 		val(0)
 {
-  if (dim)
+  if (v.size() != 0)
     {
                                        // do this in a two-stage process:
                                        // first convert to a sequential petsc
@@ -638,7 +638,7 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
 {
   if (v.size() != dim)
     reinit (v.size(), true);
-  if (dim)
+  if (dim != 0)
     {
                                        // get a representation of the vector
                                        // and copy it
