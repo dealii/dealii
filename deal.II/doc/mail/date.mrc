@@ -15,6 +15,7 @@ deal.II Mailinglist
     <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
     <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
     <meta name="keywords" content="deal.II">
+    <meta name="robots" content="nofollow">.
   </HEAD>
   <BODY style="background-image:url(../pictures/title-background.jpg);" lang="en">
     <H1>$IDXTITLE$</H1>
