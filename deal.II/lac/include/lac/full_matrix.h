@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,7 +103,7 @@ class FullMatrix : public Table<2,number>
 				      * as @p{std::vector}. The
 				      * responsibility to check
 				      * performance of programs must
-				      * therefore remains with the
+				      * therefore remain with the
 				      * user of this class.
 				      */
     FullMatrix (const FullMatrix&);
@@ -128,6 +128,17 @@ class FullMatrix : public Table<2,number>
 				      */
     template<typename number2>
     FullMatrix<number>& operator = (const FullMatrix<number2>&);
+
+				     /**
+				      * Assignment from different
+				      * matrix classes. This
+				      * assignment operator uses
+				      * iterators of the class
+				      * @p{MATRIX}. Therefore, sparse
+				      * matrices are possible sources.
+				      */
+    template <class MATRIX>
+    FullMatrix<number>& operator = (const MATRIX&);
     
 				     /**
 				      * Comparison operator. Be
@@ -756,7 +767,17 @@ void FullMatrix<number>::fill (const number2* src)
   Table<2,number>::fill(src);
 }
 
-
+template <typename number>
+template <class MATRIX>
+FullMatrix<number>&
+FullMatrix<number>::operator = (const MATRIX& M)
+{
+  reinit (M.m(), M.n());
+  typename MATRIX::const_iterator entry;
+  const typename MATRIX::const_iterator end = M.end();
+  for (entry = M.begin();entry != end;++entry)
+    el(entry->row(), entry->column()) = entry->value();
+}
 
 /*----------------------------   fullmatrix.h     ---------------------------*/
 
