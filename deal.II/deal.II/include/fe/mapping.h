@@ -189,64 +189,42 @@ class Mapping : public Subscriptor
     
 				     /**
 				      * Tranform a field of covariant
-				      * vectors.  There must be one
-				      * vector for each quadrature
-				      * point. Alternatively, for
-				      * faces and subfaces, the number
-				      * of the first quadrature point
-				      * can be given as additional
-				      * argument.
+				      * vectors. The vector spanned by
+				      * @p{begin} and @p{end} must
+				      * have as many elements as there
+				      * are quadrature points (not
+				      * tested inside the function).
+				      *
+				      * The vector @p{src} must
+				      * contain at least as many
+				      * elements.
 				      */
-    virtual void transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
-				      const typename std::vector<Tensor<1,dim> > &src,
-				      const InternalDataBase                     &internal,
-				      const unsigned int                          src_offset) const = 0;
+    virtual
+    void
+    transform_covariant (Tensor<1,dim>* begin,
+			 const Tensor<1,dim>* end,
+			 const Tensor<1,dim>* src,
+			 const InternalDataBase& internal) const = 0;
     
 				     /**
 				      * Tranform a field of
-				      * contravariant vectors.  There
-				      * must be one vector for each
-				      * quadrature
-				      * point. Alternatively, for
-				      * faces and subfaces, the number
-				      * of the first quadrature point
-				      * can be given as additional
-				      * argument.
+				      * contravariant vectors. The
+				      * vector spanned by @p{begin}
+				      * and @p{end} must have as many
+				      * elements as there are
+				      * quadrature points (not tested
+				      * inside the function).
+				      *
+				      * The vector @p{src} must
+				      * contain at least as many
+				      * elements.
 				      */
     virtual
     void
-    transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
-			     const typename std::vector<Tensor<1,dim> > &src,
-			     const InternalDataBase                     &internal,
-			     const unsigned int                          src_offset) const = 0;
-    
-				     /**
-				      * Tranform a field of covariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
-				      */
-    virtual
-    void
-    transform_covariant (typename std::vector<Point<dim> >       &dst,
-			 const typename std::vector<Point<dim> > &src,
-			 const InternalDataBase                  &internal,
-			 const unsigned int                       src_offset) const = 0;
-    
-				     /**
-				      * Tranform a field of contravariant vectors.
-				      * There must be one vector for each quadrature
-				      * point. Alternatively, for faces and subfaces,
-				      * the first quadrature point can be
-				      * given as additional argument.
-				      */
-    virtual
-    void
-    transform_contravariant (typename std::vector<Point<dim> >       &dst,
-			     const typename std::vector<Point<dim> > &src,
-			     const InternalDataBase                  &internal,
-			     const unsigned int                       src_offset) const = 0;
+    transform_contravariant (Tensor<1,dim>* begin,
+			     const Tensor<1,dim>* end,
+			     const Tensor<1,dim>* src,
+			     const InternalDataBase& internal) const = 0;
 
 				     /**
 				      * Indicate fields to be updated in the

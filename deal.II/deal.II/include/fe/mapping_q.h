@@ -83,40 +83,20 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
-			 const typename std::vector<Tensor<1,dim> > &src,
-			 const typename Mapping<dim>::InternalDataBase &mapping_data,
-			 const unsigned int src_offset) const;
+    transform_covariant (Tensor<1,dim>* begin,
+			 const Tensor<1,dim>* end,
+			 const Tensor<1,dim>* src,
+			 const typename Mapping<dim>::InternalDataBase &mapping_data) const;
     
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
-			     const typename std::vector<Tensor<1,dim> > &src,
-			     const typename Mapping<dim>::InternalDataBase &mapping_data,
-			     const unsigned int src_offset) const;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    transform_covariant (typename std::vector<Point<dim> >       &dst,
-			 const typename std::vector<Point<dim> > &src,
-			 const typename Mapping<dim>::InternalDataBase &mapping_data,
-			 const unsigned int src_offset) const;
-    
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    transform_contravariant (typename std::vector<Point<dim> >       &dst,
-			     const typename std::vector<Point<dim> > &src,
-			     const typename Mapping<dim>::InternalDataBase &mapping_data,
-			     const unsigned int src_offset) const;
+    transform_contravariant (Tensor<1,dim>* begin,
+			 const Tensor<1,dim>* end,
+			 const Tensor<1,dim>* src,
+			 const typename Mapping<dim>::InternalDataBase &mapping_data) const;    
 
 				     /**
 				      * Return the degree of the

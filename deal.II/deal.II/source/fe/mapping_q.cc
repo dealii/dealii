@@ -1068,113 +1068,67 @@ MappingQ<dim>::fill_quad_support_points_simple (const typename Triangulation<dim
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
-				    const typename std::vector<Tensor<1,dim> > &src,
-				    const typename Mapping<dim>::InternalDataBase &mapping_data,
-				    const unsigned int src_offset) const
+MappingQ<dim>::transform_covariant (
+  Tensor<1,dim>* begin,
+  const Tensor<1,dim>* end,
+  const Tensor<1,dim>* src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
-  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
+  const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
-  Assert(q1_data_ptr!=0, ExcInternalError());
-  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
+  Assert(q1_data!=0, ExcInternalError());
+  
+  typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
-  if (q1_data.is_mapping_q1_data)
-    covariant_transformation(dst, src, q1_data, src_offset);
+  if (q1_data->is_mapping_q1_data)
+    tensor = q1_data->covariant.begin();
   else
     {
-      const InternalData *data_ptr = dynamic_cast<const InternalData *> (q1_data_ptr);
-      Assert(data_ptr!=0, ExcInternalError());
-      const InternalData &data=*data_ptr;
+      const InternalData *data = dynamic_cast<const InternalData *> (q1_data);
+      Assert(data!=0, ExcInternalError());
 
-      if (data.use_mapping_q1_on_current_cell)
-	covariant_transformation(dst, src, data.mapping_q1_data, src_offset);
+      if (data->use_mapping_q1_on_current_cell)
+	tensor = data->mapping_q1_data.covariant.begin();
       else
-	covariant_transformation(dst, src, data, src_offset);    
+	tensor = data->covariant.begin();    
+    }
+    while (begin!=end)
+    {
+      contract (*(begin++), *(src++), *(tensor++));
     }
 }
 
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (typename std::vector<Point<dim> >       &dst,
-				    const typename std::vector<Point<dim> > &src,
-				    const typename Mapping<dim>::InternalDataBase &mapping_data,
-				    const unsigned int src_offset) const
+MappingQ<dim>::transform_contravariant (
+  Tensor<1,dim>* begin,
+  const Tensor<1,dim>* end,
+  const Tensor<1,dim>* src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
-  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
+  const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
-  Assert(q1_data_ptr!=0, ExcInternalError());
-  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
+  Assert(q1_data!=0, ExcInternalError());
+  
+  typename std::vector<Tensor<2,dim> >::const_iterator tensor;
 
-  if (q1_data.is_mapping_q1_data)
-    covariant_transformation(dst, src, q1_data, src_offset);
+  if (q1_data->is_mapping_q1_data)
+    tensor = q1_data->contravariant.begin();
   else
     {
-      const InternalData *data_ptr = dynamic_cast<const InternalData *> (q1_data_ptr);
-      Assert(data_ptr!=0, ExcInternalError());
-      const InternalData &data=*data_ptr;
+      const InternalData *data = dynamic_cast<const InternalData *> (q1_data);
+      Assert(data!=0, ExcInternalError());
 
-      if (data.use_mapping_q1_on_current_cell)
-	covariant_transformation(dst, src, data.mapping_q1_data, src_offset);
+      if (data->use_mapping_q1_on_current_cell)
+	tensor = data->mapping_q1_data.contravariant.begin();
       else
-	covariant_transformation(dst, src, data, src_offset);    
-    }  
-}
-
-
-template <int dim>
-void
-MappingQ<dim>::transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
-					const typename std::vector<Tensor<1,dim> > &src,
-					const typename Mapping<dim>::InternalDataBase &mapping_data,
-					const unsigned int src_offset) const
-{
-  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
-    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
-  Assert(q1_data_ptr!=0, ExcInternalError());
-  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
-
-  if (q1_data.is_mapping_q1_data)
-    contravariant_transformation(dst, src, q1_data, src_offset);
-  else
-    {
-      const InternalData *data_ptr = dynamic_cast<const InternalData *> (q1_data_ptr);
-      Assert(data_ptr!=0, ExcInternalError());
-      const InternalData &data=*data_ptr;
-
-      if (data.use_mapping_q1_on_current_cell)
-	contravariant_transformation(dst, src, data.mapping_q1_data, src_offset);
-      else
-	contravariant_transformation(dst, src, data, src_offset);    
+	tensor = data->contravariant.begin();    
     }
-}
-
-
-template <int dim>
-void
-MappingQ<dim>::transform_contravariant (typename std::vector<Point<dim> >       &dst,
-					const typename std::vector<Point<dim> > &src,
-					const typename Mapping<dim>::InternalDataBase &mapping_data,
-					const unsigned int src_offset) const
-{
-  const typename MappingQ1<dim>::InternalData *q1_data_ptr =
-    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
-  Assert(q1_data_ptr!=0, ExcInternalError());
-  const typename MappingQ1<dim>::InternalData &q1_data=*q1_data_ptr;
-
-  if (q1_data.is_mapping_q1_data)
-    contravariant_transformation(dst, src, q1_data, src_offset);
-  else
+    while (begin!=end)
     {
-      const InternalData *data_ptr = dynamic_cast<const InternalData *> (q1_data_ptr);
-      Assert(data_ptr!=0, ExcInternalError());
-      const InternalData &data=*data_ptr;
-
-      if (data.use_mapping_q1_on_current_cell)
-	contravariant_transformation(dst, src, data.mapping_q1_data, src_offset);
-      else
-	contravariant_transformation(dst, src, data, src_offset);    
-    }  
+      contract (*(begin++), *(tensor++), *(src++));
+    }
 }
 
 

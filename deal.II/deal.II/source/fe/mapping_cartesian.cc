@@ -438,47 +438,56 @@ MappingCartesian<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator 
 
 template <int dim>
 void
-MappingCartesian<dim>::transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
-					    const typename std::vector<Tensor<1,dim> > &src,
-					    const typename Mapping<dim>::InternalDataBase &mapping_data,
-					    const unsigned int src_offset) const
+MappingCartesian<dim>::transform_covariant (
+  Tensor<1,dim>* begin,
+  const Tensor<1,dim>* end,
+  const Tensor<1,dim>* src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
-  covariant_transformation(dst, src, mapping_data, src_offset);
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
+
+  Assert (data.update_flags & update_covariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+  
+				   // simply scale by inverse Jacobian
+				   // (which is diagonal here)
+  while (begin!=end)
+    {
+      for (unsigned int d=0;d<dim;++d)
+	(*begin)[d] = (*src)[d]/data.length[d];
+      begin++;
+      src++;
+    }
 }
 
 
 template <int dim>
 void
-MappingCartesian<dim>::transform_covariant (typename std::vector<Point<dim> >       &dst,
-					    const typename std::vector<Point<dim> > &src,
-					    const typename Mapping<dim>::InternalDataBase &mapping_data,
-					    const unsigned int src_offset) const
+MappingCartesian<dim>::transform_contravariant (
+  Tensor<1,dim>* begin,
+  const Tensor<1,dim>* end,
+  const Tensor<1,dim>* src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
-  covariant_transformation(dst, src, mapping_data, src_offset);
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
+
+  Assert (data.update_flags & update_contravariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+				   // simply scale by Jacobian
+				   // (which is diagonal here)
+  while (begin!=end)
+    {
+      for (unsigned int d=0; d<dim; ++d)
+	(*begin)[d] = (*src)[d]*data.length[d];
+      ++begin;
+      ++src;
+    }
 }
-
-template <int dim>
-void
-MappingCartesian<dim>::transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
-						const typename std::vector<Tensor<1,dim> > &src,
-						const typename Mapping<dim>::InternalDataBase &mapping_data,
-						const unsigned int src_offset) const
-{
-  contravariant_transformation(dst, src, mapping_data, src_offset);
-}
-
-
-
-template <int dim>
-void
-MappingCartesian<dim>::transform_contravariant (typename std::vector<Point<dim> >       &dst,
-						const typename std::vector<Point<dim> > &src,
-						const typename Mapping<dim>::InternalDataBase &mapping_data,
-						const unsigned int src_offset) const
-{
-  contravariant_transformation(dst, src, mapping_data, src_offset);
-}
-
 
 
 template <int dim>
@@ -545,110 +554,7 @@ Point<dim> MappingCartesian<dim>::transform_real_to_unit_cell (
 }
 
 
-
-template <int dim>
-template <typename tensor_>
-void
-MappingCartesian<dim>::
-contravariant_transformation (typename std::vector<tensor_>       &dst,
-			      const typename std::vector<tensor_> &src,
-			      const typename Mapping<dim>::InternalDataBase &mapping_data,
-			      const unsigned int src_offset) const
-{
-  Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
-
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
-
-  Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-
-  typename std::vector<tensor_>::const_iterator vec    = src.begin() + src_offset;
-  typename std::vector<tensor_>::iterator       result = dst.begin();
-  typename std::vector<tensor_>::const_iterator end    = dst.end();
-  
-				   // simply scale by Jacobian
-				   // (which is diagonal here)
-  while (result!=end)
-    {
-      for (unsigned int d=0; d<dim; ++d)
-	(*result)[d] = (*vec)[d]*data.length[d];
-      ++vec;
-      ++result;
-    }
-}
-
-
-
-template <int dim>
-template <typename tensor_>
-void
-MappingCartesian<dim>::
-covariant_transformation (typename std::vector<tensor_>       &dst,
-			  const typename std::vector<tensor_> &src,
-			  const typename Mapping<dim>::InternalDataBase &mapping_data,
-			  const unsigned int src_offset) const
-{
-  Assert(tensor_::dimension==dim && tensor_::rank==1, ExcInvalidData());
-
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
-
-  Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  
-  typename std::vector<tensor_>::const_iterator vec    = src.begin() + src_offset;
-  typename std::vector<tensor_>::iterator       result = dst.begin();
-  typename std::vector<tensor_>::const_iterator end    = dst.end();
-
-				   // simply scale by inverse Jacobian
-				   // (which is diagonal here)
-  while (result!=end)
-    {
-      for (unsigned int d=0;d<dim;++d)
-	(*result)[d] = (*vec)[d]/data.length[d];
-      vec++;
-      result++;
-    }
-}
-
-
-
 //----------------------------------------------------------------------//
 // explicit instantiations
 
 template class MappingCartesian<deal_II_dimension>;
-
-template void MappingCartesian<deal_II_dimension>::
-contravariant_transformation<Tensor<1,deal_II_dimension> > (
-  std::vector<Tensor<1,deal_II_dimension> >       &dst,
-  const std::vector<Tensor<1,deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;
-
-template void MappingCartesian<deal_II_dimension>::
-contravariant_transformation<Point<deal_II_dimension> > (
-  std::vector<Point<deal_II_dimension> >       &dst,
-  const std::vector<Point<deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;
-
-template void MappingCartesian<deal_II_dimension>::
-covariant_transformation<Tensor<1,deal_II_dimension> > (
-  std::vector<Tensor<1,deal_II_dimension> >       &dst,
-  const std::vector<Tensor<1,deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;
-
-template void MappingCartesian<deal_II_dimension>::
-covariant_transformation<Point<deal_II_dimension> > (
-  std::vector<Point<deal_II_dimension> >       &dst,
-  const std::vector<Point<deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;

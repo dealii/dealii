@@ -95,7 +95,7 @@ echo "BUILDING LIBRARY AT " `date '+%Y-%m-%d %T'` | tee -a log
 
 (if ($MAKE all -k 2>&1) ; then
 	echo "CLEANING OBJECT FILES AT " `date '+%Y-%m-%d %T'` | tee -a log
-	$MAKE clean
+	$MAKE clean -k 2>&1
 	echo "BUILDING EXAMPLES AT " `date '+%Y-%m-%d %T'` | tee -a log
         if (cd examples ; $MAKE -k 2>&1) ; then
 		result=succeeded ;

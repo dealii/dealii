@@ -602,9 +602,10 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 		ExcDimensionMismatch(JxW_values.size(), npts));
       
       
-      transform_contravariant(data.aux[0],
-			      data.unit_tangentials[face_no],
-			      data, 0);
+      transform_contravariant(data.aux[0].begin(),
+			      data.aux[0].end(),
+			      data.unit_tangentials[face_no].begin(),
+			      data);
 
       typename std::vector<Tensor<1,dim> >::iterator
 	result = boundary_forms.begin();
@@ -624,10 +625,11 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 
 	  case 3:
 	  {
-	    transform_contravariant(data.aux[1],
+	    transform_contravariant(data.aux[1].begin(),
+				    data.aux[1].end(),
 				    data.unit_tangentials[
-				      face_no+GeometryInfo<dim>::faces_per_cell],
-				    data, 0);
+				      face_no+GeometryInfo<dim>::faces_per_cell].begin(),
+				    data);
 	    typename std::vector<Tensor<1,dim> >::const_iterator
 	      tang2 = data.aux[1].begin();
 	    for (;result != end; ++result, ++tang1, ++tang2)
@@ -777,47 +779,54 @@ MappingQ1<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-				     const std::vector<Tensor<1,dim> > &src,
-				     const typename Mapping<dim>::InternalDataBase &mapping_data,
-				     const unsigned int src_offset) const
+MappingQ1<dim>::transform_covariant (
+  Tensor<1,dim>* begin,
+  const Tensor<1,dim>* end,
+  const Tensor<1,dim>* src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
-  covariant_transformation(dst, src, mapping_data, src_offset);
+  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
+  Assert(data_ptr!=0, ExcInternalError());
+  const InternalData &data=*data_ptr;
+
+  Assert (data.update_flags & update_covariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+//TODO: [GK] Can we do a similar assertion?  
+//  Assert (dst.size() == data.contravariant.size(),
+//	  ExcDimensionMismatch(dst.size() + src_offset, data.contravariant.size()));
+
+  typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.covariant.begin();
+  
+  while (begin!=end)
+    {
+      contract (*(begin++), *(src++), *(tensor++));
+    }
 }
 
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
-				     const std::vector<Point<dim> > &src,
-				     const typename Mapping<dim>::InternalDataBase &mapping_data,
-				     const unsigned int src_offset) const
+MappingQ1<dim>::transform_contravariant (
+  Tensor<1,dim>* begin,
+  const Tensor<1,dim>* end,
+  const Tensor<1,dim>* src,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
-  covariant_transformation(dst, src, mapping_data, src_offset);
+  const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
+  Assert(data_ptr!=0, ExcInternalError());
+  const InternalData &data=*data_ptr;
+
+  Assert (data.update_flags & update_contravariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+  typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.contravariant.begin();
+  
+  while (begin!=end)
+    {
+      contract (*(begin++), *(tensor++), *(src++));
+    }
 }
-
-template <int dim>
-void
-MappingQ1<dim>::transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-					 const std::vector<Tensor<1,dim> > &src,
-					 const typename Mapping<dim>::InternalDataBase &mapping_data,
-					 const unsigned int src_offset) const
-{
-  contravariant_transformation(dst, src, mapping_data, src_offset);
-}
-
-
-template <int dim>
-void
-MappingQ1<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
-					 const std::vector<Point<dim> > &src,
-					 const typename Mapping<dim>::InternalDataBase &mapping_data,
-					 const unsigned int src_offset) const
-{
-  contravariant_transformation(dst, src, mapping_data, src_offset);
-}
-
-
 
 template <int dim>
 Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
@@ -965,103 +974,6 @@ void MappingQ1<dim>::transform_real_to_unit_cell_internal (
     }
 }
 
-
-
-template <int dim>
-template <typename tensor_>
-void
-MappingQ1<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
-					      const std::vector<tensor_> &src,
-					      const typename Mapping<dim>::InternalDataBase &mapping_data,
-					      const unsigned int src_offset) const
-{
-  Assert(tensor_::dimension==dim && tensor_::rank==1, Mapping<dim>::ExcInvalidData());
-  const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
-
-  Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  
-  Assert (src.size() + src_offset >= data.contravariant.size(),
-	  ExcDimensionMismatch(src.size(), data.contravariant.size()));
-  Assert (dst.size() == data.contravariant.size(),
-	  ExcDimensionMismatch(dst.size(), data.contravariant.size()));
-
-  typename std::vector<tensor_>::const_iterator vec = src.begin()+src_offset;
-  typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.contravariant.begin();
-  typename std::vector<tensor_>::iterator result = dst.begin();
-  typename std::vector<tensor_>::const_iterator end = dst.end();
-  
-  while (result!=end)
-    {
-      contract (*(result++), *(tensor++), *(vec++));
-    }
-}
-
-
-template <int dim>
-template <typename tensor_>
-void
-MappingQ1<dim>::covariant_transformation (std::vector<tensor_>       &dst,
-					  const std::vector<tensor_> &src,
-					  const typename Mapping<dim>::InternalDataBase &mapping_data,
-					  const unsigned int src_offset) const
-{
-  Assert(tensor_::dimension==dim && tensor_::rank==1, Mapping<dim>::ExcInvalidData());
-  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
-
-  Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  
-  Assert (src.size() + src_offset >= data.contravariant.size(),
-	  ExcDimensionMismatch(src.size() + src_offset, data.contravariant.size()));
-  Assert (dst.size() == data.contravariant.size(),
-	  ExcDimensionMismatch(dst.size() + src_offset, data.contravariant.size()));
-
-  typename std::vector<tensor_>::const_iterator vec = src.begin() + src_offset;
-  typename std::vector<Tensor<2,dim> >::const_iterator tensor = data.covariant.begin();
-  typename std::vector<tensor_>::iterator result = dst.begin();
-  const typename std::vector<tensor_>::const_iterator end = dst.end();
-  
-  while (result!=end)
-    {
-      contract (*(result++), *(vec++), *(tensor++));
-    }
-}
-
-
-
 //----------------------------------------------------------------------//
 
 template class MappingQ1<deal_II_dimension>;
-
-template void MappingQ1<deal_II_dimension>::
-contravariant_transformation<Tensor<1,deal_II_dimension> > (
-  std::vector<Tensor<1,deal_II_dimension> >       &dst,
-  const std::vector<Tensor<1,deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;
-
-template void MappingQ1<deal_II_dimension>::
-contravariant_transformation<Point<deal_II_dimension> > (
-  std::vector<Point<deal_II_dimension> >       &dst,
-  const std::vector<Point<deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;
-
-template void MappingQ1<deal_II_dimension>::
-covariant_transformation<Tensor<1,deal_II_dimension> > (
-  std::vector<Tensor<1,deal_II_dimension> >       &dst,
-  const std::vector<Tensor<1,deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;
-
-template void MappingQ1<deal_II_dimension>::
-covariant_transformation<Point<deal_II_dimension> > (
-  std::vector<Point<deal_II_dimension> >       &dst,
-  const std::vector<Point<deal_II_dimension> > &src,
-  const Mapping<deal_II_dimension>::InternalDataBase& internal,
-  const unsigned int src_offset) const;

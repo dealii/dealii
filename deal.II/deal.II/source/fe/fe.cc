@@ -465,8 +465,9 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				       // cell
       for (unsigned int d=0; d<dim; ++d)
 	{
-	  mapping.transform_covariant (diff_quot2, diff_quot[d],
-				       mapping_internal, offset);
+	  mapping.transform_covariant (diff_quot2.begin(), diff_quot2.end(),
+				       &diff_quot[d][offset],
+				       mapping_internal);
 
 	  for (unsigned int q=0; q<n_q_points; ++q)
 	    for (unsigned int d1=0; d1<dim; ++d1)
