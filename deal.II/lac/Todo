@@ -29,10 +29,3 @@ Someone should take a look at the handling of the sparsity variable
   in the sparse matrix: it is subscribed to twice (explicitely and 
   through the subscriptor); the explicit subscription is redundant,
   but I don't have the time to look into that now.
-
-
-The fullmatrix should, as all other containers, acquire no memory
-  by default construction, i.e. the default argument for the
-  constructor should be zero rather than one. init then would
-  need to release all memory on request.
-
