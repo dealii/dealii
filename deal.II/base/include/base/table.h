@@ -1639,7 +1639,7 @@ const T &
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j) const
 {
-  return this->val[i*this->table_size[0]+j];
+  return this->val[i*this->table_size[1]+j];
 };
 
 
@@ -1650,7 +1650,7 @@ T &
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j)
 {
-  return this->val[i*this->table_size[0]+j];
+  return this->val[i*this->table_size[1]+j];
 };
 
 
