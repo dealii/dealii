@@ -14,7 +14,7 @@
 
 #include <numeric>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 
 
