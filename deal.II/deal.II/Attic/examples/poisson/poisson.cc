@@ -15,7 +15,7 @@ int main (int argc, char **argv) {
       return 1;
     };
 
-  PoissonProblem<2> poisson;
+  PoissonProblem<3> poisson;
   MultipleParameterLoop input_data;
 
   poisson.declare_parameters(input_data);

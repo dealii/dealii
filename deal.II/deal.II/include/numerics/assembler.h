@@ -59,7 +59,7 @@ class Equation {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
 
 				     /**
 				      * Virtual function which only assembles
@@ -76,7 +76,7 @@ class Equation {
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
 
 				     /**
 				      * Virtual function which only assembles
@@ -93,7 +93,7 @@ class Equation {
 				      */
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
 
 				     /**
 				      * Return number of equations for this

@@ -45,13 +45,13 @@ class PoissonEquation :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
   protected:
     const Function<dim> &right_hand_side;
 };

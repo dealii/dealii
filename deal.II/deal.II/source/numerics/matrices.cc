@@ -543,7 +543,7 @@ MassMatrix<dim>::MassMatrix (const Function<dim> * const rhs,
 template <int dim>
 void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				const FEValues<dim> &fe_values,
-				const typename Triangulation<dim>::cell_iterator &) const {
+				const typename DoFHandler<dim>::cell_iterator &) const {
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
@@ -585,7 +585,7 @@ template <int dim>
 void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				dVector             &rhs,
 				const FEValues<dim> &fe_values,
-				const Triangulation<dim>::cell_iterator &) const {
+				const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
   const unsigned int total_dofs = fe_values.total_dofs,
@@ -642,7 +642,7 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 template <int dim>
 void MassMatrix<dim>::assemble (dVector             &rhs,
 				const FEValues<dim> &fe_values,
-				const Triangulation<dim>::cell_iterator &) const {
+				const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
   const unsigned int total_dofs = fe_values.total_dofs,
@@ -679,7 +679,7 @@ template <int dim>
 void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<dim> &fe_values,
-				   const Triangulation<dim>::cell_iterator &) const {
+				   const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
   
   const unsigned int total_dofs = fe_values.total_dofs,
@@ -738,7 +738,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 template <int dim>
 void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 				   const FEValues<dim> &fe_values,
-				   const Triangulation<dim>::cell_iterator &) const {
+				   const DoFHandler<dim>::cell_iterator &) const {
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
 
@@ -778,7 +778,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 template <int dim>
 void LaplaceMatrix<dim>::assemble (dVector             &rhs,
 				   const FEValues<dim> &fe_values,
-				   const Triangulation<dim>::cell_iterator &) const {
+				   const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
 
   const unsigned int total_dofs = fe_values.total_dofs,

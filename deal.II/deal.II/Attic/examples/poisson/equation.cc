@@ -13,7 +13,7 @@ template <>
 void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<1>   &fe_values,
-				   const Triangulation<1>::cell_iterator &) const {
+				   const DoFHandler<1>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
     for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
       {
@@ -31,14 +31,14 @@ void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 
 
 
-#if deal_II_dimension == 2
+//#if deal_II_dimension >= 2
 
-template <>
-void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
-				   const FEValues<2>   &fe_values,
-				   const Triangulation<2>::cell_iterator &) const {
-  const vector<vector<Tensor<1,2> > >&gradients = fe_values.get_shape_grads ();
+template <int dim>
+void PoissonEquation<dim>::assemble (dFMatrix            &cell_matrix,
+				     dVector             &rhs,
+				     const FEValues<dim> &fe_values,
+				     const DoFHandler<dim>::cell_iterator &) const {
+  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
   const dFMatrix       &values    = fe_values.get_shape_values ();
   vector<double>        rhs_values (fe_values.n_quadrature_points);
   const vector<double> &weights   = fe_values.get_JxW_values ();
@@ -58,14 +58,14 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
       };
 };
 
-#endif
+//#endif
 
 
 
 template <int dim>
 void PoissonEquation<dim>::assemble (dFMatrix            &,
 				     const FEValues<dim> &,
-				     const Triangulation<dim>::cell_iterator &) const {
+				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -74,7 +74,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &,
 template <int dim>
 void PoissonEquation<dim>::assemble (dVector             &,
 				     const FEValues<dim> &,
-				     const Triangulation<dim>::cell_iterator &) const {
+				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -83,4 +83,4 @@ void PoissonEquation<dim>::assemble (dVector             &,
 
 
 
-template class PoissonEquation<2>;
+template class PoissonEquation<3>;

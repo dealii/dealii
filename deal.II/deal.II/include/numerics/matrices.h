@@ -527,7 +527,7 @@ class MassMatrix :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &) const;
+			   const typename DoFHandler<dim>::cell_iterator &) const;
 
 				     /**
 				      * Construct the cell matrix for this cell.
@@ -536,7 +536,7 @@ class MassMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &) const;
+			   const typename DoFHandler<dim>::cell_iterator &) const;
 
 				     /**
 				      * Only construct the right hand side
@@ -547,7 +547,7 @@ class MassMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &) const;
+			   const typename DoFHandler<dim>::cell_iterator &) const;
     
 				     /**
 				      * Exception
@@ -630,7 +630,7 @@ class LaplaceMatrix :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &) const;
+			   const typename DoFHandler<dim>::cell_iterator &) const;
 
 				     /**
 				      * Construct the cell matrix for this cell.
@@ -639,7 +639,7 @@ class LaplaceMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &) const;
+			   const typename DoFHandler<dim>::cell_iterator &) const;
 
 				     /**
 				      * Only construct the right hand side
@@ -650,7 +650,7 @@ class LaplaceMatrix :  public Equation<dim> {
 				      */
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const typename Triangulation<dim>::cell_iterator &) const;
+			   const typename DoFHandler<dim>::cell_iterator &) const;
 
 				     /**
 				      * Exception

@@ -48,13 +48,13 @@ class PoissonEquation :  public Equation<dim> {
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
     virtual void assemble (dFMatrix            &cell_matrix,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
     virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
-			   const Triangulation<dim>::cell_iterator &cell) const;
+			   const DoFHandler<dim>::cell_iterator &cell) const;
   protected:
     const bool           use_coefficient;
     const Function<dim> &right_hand_side;
@@ -259,7 +259,7 @@ template <>
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,
-				   const Triangulation<2>::cell_iterator &) const {
+				   const DoFHandler<2>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point) 
     {
       const double c = (use_coefficient ?
@@ -284,7 +284,7 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 template <int dim>
 void PoissonEquation<dim>::assemble (dFMatrix            &,
 				     const FEValues<dim> &,
-				     const Triangulation<dim>::cell_iterator &) const {
+				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -293,7 +293,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &,
 template <int dim>
 void PoissonEquation<dim>::assemble (dVector             &,
 				     const FEValues<dim> &,
-				     const Triangulation<dim>::cell_iterator &) const {
+				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 

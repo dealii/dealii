@@ -21,7 +21,7 @@ template <int dim>
 void Equation<dim>::assemble (dFMatrix          &,
 			      dVector           &,
 			      const FEValues<dim> &,
-			      const typename Triangulation<dim>::cell_iterator &) const {
+			      const typename DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -30,7 +30,7 @@ void Equation<dim>::assemble (dFMatrix          &,
 template <int dim>
 void Equation<dim>::assemble (dFMatrix          &,
 			      const FEValues<dim> &,
-			      const typename Triangulation<dim>::cell_iterator &) const {
+			      const typename DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 
@@ -39,7 +39,7 @@ void Equation<dim>::assemble (dFMatrix          &,
 template <int dim>
 void Equation<dim>::assemble (dVector           &,
 			      const FEValues<dim> &,
-			      const typename Triangulation<dim>::cell_iterator &) const {
+			      const typename DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
 

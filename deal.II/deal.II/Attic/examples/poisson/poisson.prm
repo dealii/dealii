@@ -1,5 +1,5 @@
 set Test run          = { zoom in | ball | curved line | random | jump | L-region}
-set Global refinement = {{ 2 | 5 | 6 | 0 | 2 | 5 }}
+set Global refinement = {{ 1 | 3 | 3 | 0 | 3 | 3 }} #{{ 2 | 3 | 3 | 1 | 3 | 3 }}
 set Right hand side   = {{ zero | zero | trigpoly | constant | zero | zero }}
 set Boundary values   = {{ sine | sine | zero | zero | jump | sine }}
-set Output file       = gnuplot.{{ zoom_in | ball | curved_line | random | jump | L-region }}
+set Output file       = results/{{ zoom_in | ball | curved_line | random | jump | L-region }}.inp
