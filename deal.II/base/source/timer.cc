@@ -45,7 +45,7 @@ double Timer::stop () {
 
 
 
-double Timer::operator() () {
+double Timer::operator() () const {
   if (running)
     {
       const double dtime =  static_cast<double>(clock()) / CLOCKS_PER_SEC - start_time;

@@ -55,7 +55,7 @@ public:
   // (which is now nearly every 30 minutes on UNIX machines) in long-time
   // measurements.
   //
-    double operator() ();
+    double operator() () const;
 
   private:
 
@@ -81,7 +81,7 @@ public:
 				      * number of seconds after which an
 				      * overflow occurs.
 				      */
-    unsigned int        overflow;
+    mutable unsigned int overflow;
 
 				     /**
 				      * Store whether the timer is presently
