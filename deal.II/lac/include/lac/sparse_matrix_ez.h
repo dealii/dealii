@@ -786,7 +786,7 @@ class SparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry.
+				      * first existing entry.
 				      */
     const_iterator begin () const;
 
@@ -797,12 +797,17 @@ class SparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * STL-like iterator with the
-				      * first entry of row @p{r}.
+				      * first entry of row @p{r}. If
+				      * this row is empty, the result
+				      * is @p{end(r)}, which does NOT
+				      * point into row @p{r}..
 				      */
     const_iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Final iterator of row @p{r}.
+				      * Final iterator of row
+				      * @p{r}. The result may be
+				      * different from @p{end()}!
 				      */
     const_iterator end (const unsigned int r) const;
     
@@ -1166,7 +1171,31 @@ const_iterator(const SparseMatrixEZ<number> *matrix,
                const unsigned short          i)
 		:
 		accessor(matrix, r, i)
-{}
+{
+				   // Finish if this is the end()
+  if (r==accessor.matrix->m() && i==0) return;
+
+				   // Make sure we never construct an
+				   // iterator pointing to a
+				   // non-existing entry
+
+				   // If the index points beyond the
+				   // end of the row, try the next
+				   // row.
+  if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
+    {
+     do
+	{
+	  ++accessor.a_row;
+	}
+				      // Beware! If the next row is
+				      // empty, iterate until a
+				      // non-empty row is found or we
+				      // hit the end of the matrix.
+      while (accessor.a_row < accessor.matrix->m()
+	     && accessor.matrix->row_info[accessor.a_row].length == 0);
+    }
+}
 
 
 template <typename number>
@@ -1175,12 +1204,15 @@ typename SparseMatrixEZ<number>::const_iterator&
 SparseMatrixEZ<number>::const_iterator::operator++ ()
 {
   Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-  
+
+				   // Increment column index
   ++(accessor.a_index);
+				   // If index exceeds number of
+				   // entries in this row, proceed
+				   // with next row.
   if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
       accessor.a_index = 0;
-
 				       // Do this loop to avoid
 				       // elements in empty rows
       do
@@ -1463,7 +1495,8 @@ inline
 typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin () const
 {
-  return const_iterator(this, 0, 0);
+  const_iterator result(this, 0, 0);
+  return result;
 }
 
 template <typename number>
@@ -1480,7 +1513,8 @@ typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return const_iterator(this, r, 0);
+  const_iterator result (this, r, 0);
+  return result;
 }
 
 template <typename number>
@@ -1489,19 +1523,7 @@ typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-
-				   // Usually, we should return the
-				   // first element of the next row.
   const_iterator result(this, r+1, 0);
-
-				   // If r was the last row, this is
-				   // always true. Otherwise, we have
-				   // to make sure that there IS an
-				   // entry in the next row. If not,
-				   // we advance to the next valid
-				   // entry or end().
-  if (r+1 < row_info.size() && row_info[r+1].length == 0)
-    ++result;
   return result;
 }
 
