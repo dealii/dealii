@@ -32,6 +32,14 @@ DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :
 
 
 template <int dim>
+DoFHandler<dim>::DoFHandler (Triangulation<dim> &tria) :
+		tria(&tria),
+		used_dofs (0)
+{};
+
+
+
+template <int dim>
 DoFHandler<dim>::~DoFHandler ()
 {};
 

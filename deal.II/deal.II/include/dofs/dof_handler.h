@@ -312,6 +312,17 @@ class DoFHandler  :  public Subscriptor,
     DoFHandler (Triangulation<dim> *tria);
 
 				     /**
+				      * Constructor. Does the same
+				      * thing as the one above, but
+				      * takes a reference instead of a
+				      * pointer. The pointer form is
+				      * the older one, but the one
+				      * encouraged for use now is this
+				      * one.
+				      */
+    DoFHandler (Triangulation<dim> &tria);
+    
+				     /**
 				      * Destructor.
 				      */
     virtual ~DoFHandler ();
