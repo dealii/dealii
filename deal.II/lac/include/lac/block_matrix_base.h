@@ -127,11 +127,6 @@ namespace internal
 	unsigned int col_block;
 	
 					 /**
-					  * First column of block.
-					  */
-	unsigned int col_start;
-	
-					 /**
 					  * Index in whole row.
 					  */
 	unsigned int a_index;
@@ -792,7 +787,6 @@ namespace internal
                     base_iterator(matrix->block(0,0).begin()),
                     row_block(0),
                     col_block(0),
-                    col_start(0),
                     a_index(0)
     {
       Assert (i==0, ExcNotImplemented());
@@ -839,7 +833,14 @@ namespace internal
     unsigned int
     Accessor<BlockMatrix>::column() const
     {
-      return col_start + base_iterator->column();
+                                       // note: the block column should always
+                                       // be valid, in contrast to the block
+                                       // row, which may be past the end of
+                                       // the matrix. thus, unlike in the
+                                       // row() function, we do not have to
+                                       // if-else here
+      return (matrix->column_block_indices.local_to_global(col_block,0) +
+              base_iterator->column());
     }
 
 
@@ -912,16 +913,12 @@ namespace internal
                                                // row
 //TODO: what if this row in that block is empty?          
               ++accessor.col_block;
-              accessor.col_start =
-                accessor.matrix->column_block_indices
-                .local_to_global(accessor.col_block, 0);
             }
           else
             {
                                                // Advance to first block
                                                // in next row
               accessor.col_block = 0;
-              accessor.col_start = 0;
               accessor.a_index = 0;
               ++local_row;
               if (local_row >=
