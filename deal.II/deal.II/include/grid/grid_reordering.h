@@ -67,7 +67,7 @@ class GridReorderingInfo<2>
 /**
  * Class declaring some dimension dependent numbers which are needed
  * for the grid reordering class. This is the specialization for the
- * 2d case.
+ * 3d case.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -76,9 +76,27 @@ class GridReorderingInfo<3>
 {
   public:
 				     /**
-				      * ???
+				      * Number of possible
+				      * orientations of a cell in 3d,
+				      * i.e. in how many ways can we
+				      * arrange the eight vertices of
+				      * a cube such that the numbering
+				      * conventions of deal.II are
+				      * satisfied. Since we can put
+				      * the cube on each of its six
+				      * faces and rotate it into four
+				      * ways on each of these faces,
+				      * the total number is 24.
 				      */
-    static const unsigned int rotational_states_of_cells = static_cast<unsigned int>(-1);
+    static const unsigned int rotational_states_of_cells = 24;
+
+				     /**
+				      * Number of possible
+				      * orientations of a face in
+				      * 2d. It is the quadrilateral
+				      * rotated in all four
+				      * orientations.
+				      */
     static const unsigned int rotational_states_of_faces = 4;
 };
 
@@ -381,63 +399,91 @@ class GridReorderingInfo<3>
  * neighbor of N with the largest cell index and which has already
  * been added.
  *
- * Unfortunately, this method can fail to yield a valid path through
+ * Unfortunately, this method can fail to yield a valid path through the
  * tree if not applied with care. Consider the following situation,
  * initially extracted from a mesh of 950 cells generated
  * automatically by the program BAMG (this program usually generates
- * meshes that are quite badly balanced, often have many -- somtimes
+ * meshes that are quite badly balanced, often have many -- sometimes
  * 10 or more -- neighbors of one vertex, and exposed several problems
  * in the initial algorithm):
  * @begin{verbatim}
- * 12----13----14----15
+ * 13----------14----15
+ * | \         |     |
+ * |  \    4   |  5  |
+ * |   \       |     |
+ * |    12-----10----11
  * |     |     |     |
- * |  5  |  7  |  6  |
+ * |     |     |  7  |
  * |     |     |     |
- * 8-----9-----10----11
+ * |  3  |     8-----9
  * |     |     |     |
- * |  3  |     |  4  |
+ * |     |     |  6  |
  * |     |     |     |
  * 4-----5-----6-----7
  * |     |     |     |
- * |  0  |  1  |  2  |
+ * |  2  |  1  |  0  |
  * |     |     |     |
  * 0-----1-----2-----3
  * @end{verbatim}
- */
-/*
  * Note that there is a hole in the middle. Assume now that the user
- * described the first cell 0 by the vertex numbers @p{0 1 5 4}, cell
- * 5 by @p{12 8 9 13}, and cell 6 by @p{10 11 15 14}. All other cells
- * are numbered in the usual way, i.e. starting at the bottom left and
- * counting counterclockwise. Cell 5 therefore is the only one that
- * does not follow this order; however, note that the bottom line of
- * cell 5 given by this order of cell 5 does match with the top line
- * of cell 4 in that orientation. Given this description of cells, the
- * algorithm will start with cell zero and add one cell after the
- * other, up until the sixth one. Then the situation will be the
- * following:
+ * described the first cell 0 by the vertex numbers @p{2 3 7 6}, and
+ * cell 5 by @p{15 14 10 11}, and assume that cells 1, 2, 3, and 4 are
+ * numbered such that 5 can be added in initial rotation. All other
+ * cells are numbered in the usual way, i.e. starting at the bottom
+ * left and counting counterclockwise. Given this description of
+ * cells, the algorithm will start with cell zero and add one cell
+ * after the other, up until the sixth one. Then the situation will be
+ * the following:
  * @begin{verbatim}
- * 12->--13----14->--15
+ * 13----->---14--<--15
+ * | \         |     |
+ * |  >    4   v  5  v
+ * |   \       |     |
+ * |    12->--10--<--11
  * |     |     |     |
- * v  5  v  7  ^  6  ^
+ * ^     |     |  7  |
  * |     |     |     |
- * 8-->--9-----10->--11
+ * |  3  ^     8-->--9
  * |     |     |     |
- * ^  3  ^     ^  4  ^
+ * |     |     ^  6  ^
  * |     |     |     |
  * 4-->--5-->--6-->--7
  * |     |     |     |
- * ^  0  ^  1  ^  2  ^
+ * ^  2  ^  1  ^  0  ^
  * |     |     |     |
  * 0-->--1-->--2-->--3
  * @end{verbatim}
+ * Coming now to cell 7, we see that the two opposite lines at its top
+ * and bottom have different directions; we will therefore find no
+ * orientation of cell 7 in which it can be added without violation of
+ * the consistency of the triangulation. According to the rule stated
+ * above, we track back to the neighbor with greatest index, which is
+ * cell 6, but since its bottom line is to the right, its top line
+ * must be to the right as well, so we won't be able to find an
+ * orientation of cell 6 such that 7 will fit into the
+ * triangulation. Then, if we have finished all possible orientations
+ * of cell 6, we track back to the neighbor of 6 with the largest
+ * index and which has been added already. This would be cell
+ * 0. However, we know that the orientation of cell 0 can't be
+ * important, so we conclude that there is no possible way to orient
+ * all the lines of the given cells such that they satisfy the
+ * requirements if deal.II triangulations. We know that this can't be,
+ * so it results in an exception be thrown.
  *
- * Coming now to cell 7, we see that the two
- * opposite lines to its left and right have different directions; we
- * will therefore find no orientation of cell 7 in which it can be
- * added without violation of the consistency of the
- * triangulation. According to the rule stated above, we track back to
- * the neighbor with greatest index, which is cell 6......
+ * The bottom line of this example is that when we looked at all
+ * possible orientations of cell 6, we couldn't find one such that
+ * cell 7 could be added, and then decided to track back to cell 0. We
+ * did not even attempt to turn cell 5, after which it would be simple
+ * to add cell 7. Thus, the algorithm described above has to be
+ * modified: we are only allowed to track back to that neighbor that
+ * has already been added, with the largest cell index, if we fail to
+ * add a cell in any orientation. If we track back further because we
+ * have exhausted all possible orientations but could add the cell
+ * (i.e. we track back since another cell, further down the road
+ * couldn't be added, irrespective of the orientation of the cell
+ * which we are presently considering), then we are not allowed to
+ * track back to one of its neighbors, but have to track back only one
+ * cell index.
  *
  * The second method to prune the tree is that usually we cannot add a
  * new cell since the orientation of one of its neighbors that have
@@ -455,7 +501,7 @@ class GridReorderingInfo<3>
  *
  * These two methods have proven extremely efficient. We have been
  * able to read very large grids (several ten thousands of cells)
- * without the need to backtrack much. In particular, the time to find
+ * without the need to track back much. In particular, the time to find
  * an ordering of the cells was found to be mostly linear in the
  * number of cells, and the time to reorder them is usually much
  * smaller (for example by one order of magnitude) than the time
@@ -716,6 +762,12 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * comparison.
 					  */
 	bool operator < (const Face &face) const;
+
+					 /**
+					  * Check for equality of
+					  * vertex indices.
+					  */
+	bool operator == (const Face &face) const;
     };
 
 

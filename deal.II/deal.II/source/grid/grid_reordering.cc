@@ -13,6 +13,7 @@
 
 
 #include <algorithm>
+#include <base/thread_management.h>
 #include <grid/grid_reordering.h>
 
 
@@ -277,11 +278,165 @@ GridReordering<3>::Cell::insert_faces (map<Face,FaceData> &global_faces)
 	  new_faces_ptr[rot][face]->second.adjacent_cells[1] = cell_no;
 	};
 
-				   // still have to link cell in
-				   // different orientations to the
-				   // faces
+				   // we still have to link cell in
+				   // its 24 different orientations to
+				   // the 6 faces in their
+				   // orientations. now, there we
+				   // could hardcode which faces in
+				   // which rotation belong to the
+				   // cell in each direction, but
+				   // there a good reasons not to do
+				   // so:
+				   //
+				   // first, this depends on that we
+				   // know which orientation of the
+				   // cell has which number, but this
+				   // knowledge is hardcoded in the
+				   // function CellData::rotate, so
+				   // hardcoding it here again would
+				   // mean redundancy, and would above
+				   // that mean that we have to update
+				   // two very different place if we
+				   // chose to change one.
+				   //
+				   // second, finding out which face
+				   // belongs to which cell is error
+				   // prone, and one might get it
+				   // wrong.
+				   //
+				   // the solution is: compute it once
+				   // this function is first called
+				   // based on the information from
+				   // CellData::rotate and use that
+				   // data in following calls to this
+				   // function. the computed data has,
+				   // of course, to be a static member
+				   // function, and we store whether
+				   // the data has been initialized
+				   // already by checking the value of
+				   // a special flag. furthermore, we
+				   // guard the initialization by a
+				   // thread mutex to make it
+				   // thread-safe (in case someone
+				   // wanted to read in two grids at
+				   // the same time, for whatever
+				   // reason).
+  Threads::ThreadMutex initialization_lock;
+  initialization_lock.acquire ();
+
+  static bool already_initialized = false;
   
-  Assert (false, ExcNotImplemented());
+				   // for each orientation of the
+				   // cell, store in which orientation
+				   // each of the six faces build the
+				   // cell (store which face and which
+				   // orientation):
+  static pair<unsigned int, unsigned int>
+    cell_orientation_faces[rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
+
+  if (already_initialized == false)
+    {
+      for (unsigned int rot=0; rot<rotational_states_of_cells; ++rot)
+	{
+					   // initialize a standard
+					   // cell with the vertex
+					   // numbers of the present
+					   // cell we are working on
+	  CellData<dim> standard_cell;
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	    standard_cell.vertices[v] = vertices[v];
+
+					   // then rotate it the given
+					   // number of times
+	  standard_cell.rotate (rot);
+
+					   // then create the six
+					   // faces of the thus
+					   // rotated cell
+	  const Face standard_faces[GeometryInfo<dim>::faces_per_cell]
+	    = { { { standard_cell.vertices[0], standard_cell.vertices[1],
+		    standard_cell.vertices[2], standard_cell.vertices[3] } },
+		{ { standard_cell.vertices[4], standard_cell.vertices[5],
+		    standard_cell.vertices[6], standard_cell.vertices[7] } },
+		{ { standard_cell.vertices[0], standard_cell.vertices[1],
+		    standard_cell.vertices[5], standard_cell.vertices[4] } },
+		{ { standard_cell.vertices[1], standard_cell.vertices[5],
+		    standard_cell.vertices[6], standard_cell.vertices[2] } },
+		{ { standard_cell.vertices[3], standard_cell.vertices[2],
+		    standard_cell.vertices[6], standard_cell.vertices[7] } },
+		{ { standard_cell.vertices[0], standard_cell.vertices[4],
+		    standard_cell.vertices[7], standard_cell.vertices[3] } } };
+
+					   // then try to identify
+					   // these faces in the ones
+					   // we have already created
+	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    {
+	      unsigned int f, r;
+	      for (f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+		for (r=0; r<rotational_states_of_cells; ++r)
+		  if (standard_faces[face] == new_faces[f][r])
+		    {
+		      cell_orientation_faces[rot][face] = make_pair(f,r);
+		      break;
+		    };
+
+					       // make sure that we
+					       // have found something
+					       // indeed
+	      Assert ( ! ((f == GeometryInfo<dim>::faces_per_cell) &&
+			  (r == rotational_states_of_cells)),
+		       ExcInternalError());
+	    };
+
+					   // more checks: make sure
+					   // that each of the
+					   // original faces appears
+					   // in one rotation or other
+					   // as face of the present
+					   // cell in its orientation
+					   // we currently check. as
+					   // we don't call this part
+					   // of the program too
+					   // often, don't make
+					   // differences between
+					   // debug and optimized mode
+	  vector<bool> face_used(GeometryInfo<dim>::faces_per_cell, false);
+	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    {
+					       // ups, face already
+					       // used? can't be!
+	      Assert (face_used[face] == false, ExcInternalError());
+	      face_used[face] = true;
+	    };
+					   // since we have checked
+					   // that each face has not
+					   // been used previously, we
+					   // also know that all faces
+					   // have been used exactly
+					   // once, so no more checks
+					   // necessary
+	};
+				       // that's it: we now know which
+				       // faces build up this cell in
+				       // each of its possible
+				       // orientations
+      already_initialized = true;
+    };
+				   // initialization is done, so
+				   // release the lock and let other
+				   // threads run
+  initialization_lock.release ();
+
+				   // now we can use the information:
+				   // link the faces in their
+				   // directions to the cell in each
+				   // of its orientations
+  for (unsigned int rot=0; rotational_states_of_cells; ++rot)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      faces[rot][face] = new_faces_ptr
+			 [cell_orientation_faces[rot][face].second]
+			 [cell_orientation_faces[rot][face].first];
 };
 
 #endif
@@ -442,6 +597,17 @@ bool GridReordering<dim>::Face::operator < (const Face &face) const
 
 				   // if all indices are equal:
   return false;
+};
+
+
+
+template <int dim>
+bool GridReordering<dim>::Face::operator == (const Face &face) const
+{
+  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+    if (vertices[v] != face.vertices[v])
+      return false;
+  return true;
 };
 
 

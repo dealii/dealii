@@ -32,7 +32,7 @@
 
 
 template <>
-void CellData<1>::rotate (unsigned int)
+void CellData<1>::rotate (const unsigned int)
 {
   Assert (false, ExcNotPossible());
 };
@@ -40,26 +40,66 @@ void CellData<1>::rotate (unsigned int)
 
 
 template <>
-void CellData<2>::rotate (unsigned int times)
+void CellData<2>::rotate (const unsigned int times)
 {
-  while (times != 0)
+  Assert (times < 4, ExcInvalidRotation(times));
+  
+  for (unsigned int i=0; i<times; ++i)
     {
       const unsigned int x = vertices[0];
       vertices[0] = vertices[1];
       vertices[1] = vertices[2];
       vertices[2] = vertices[3];
       vertices[3] = x;
-
-      --times;
     };
 };
 
 
 
 template <>
-void CellData<3>::rotate (unsigned int)
+void CellData<3>::rotate (const unsigned int times)
 {
-  Assert (false, ExcNotImplemented());
+  Assert (times < 24, ExcInvalidRotation(times));
+  
+				   // list the 24 ways to rotate a
+				   // cell, by the ways by which the
+				   // vertices are then permuted
+  static unsigned int rotations[24][GeometryInfo<3>::vertices_per_cell]
+    = {   {0,1,2,3,4,5,6,7},
+	  {1,5,6,2,0,4,7,3},
+	  {5,4,7,6,1,0,3,2},
+	  {4,0,3,7,5,1,2,6},
+	  {2,3,0,1,6,7,4,5},
+	  {3,7,4,0,2,6,5,1},
+	  {7,6,5,4,3,2,1,0},
+	  {6,2,1,5,7,3,0,4},
+	  {0,3,7,4,1,2,6,5},
+	  {3,2,6,7,0,1,5,4},
+	  {2,1,6,5,3,0,7,4},
+	  {1,0,4,5,2,3,7,6},
+	  {1,2,3,0,5,6,7,4},
+	  {2,6,7,3,1,5,4,0},
+	  {6,5,4,7,2,1,0,3},
+	  {5,1,0,4,6,2,3,7},
+	  {5,6,2,1,4,7,3,0},
+	  {6,7,3,2,5,4,0,1},
+	  {7,4,0,3,6,5,1,2},
+	  {4,5,1,0,7,6,2,3},
+	  {3,0,1,2,7,4,5,6},
+	  {0,4,5,1,3,7,6,2},
+	  {4,7,6,5,0,3,2,1},
+	  {7,3,2,6,4,0,1,5}  };
+
+				   // first copy over the old vertex
+				   // numbers
+  const unsigned int old_vertices[GeometryInfo<3>::vertices_per_cell]
+    = { vertices[0], vertices[1], vertices[2], vertices[3],
+	vertices[4], vertices[5], vertices[6], vertices[7]  };
+
+				   // then copy them back in the new
+				   // order
+  for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+    vertices[i] = old_vertices[rotations[times][i]];
 };
 
 

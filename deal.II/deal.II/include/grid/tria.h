@@ -59,9 +59,9 @@ struct CellData
 				      * in 1d, and that there are four
 				      * possible orientations of a
 				      * cell in 2d, which are numbered
-				      * counter-clockwise. The
-				      * function is presently not
-				      * implemented for 3d.
+				      * counter-clockwise. In 3d, a
+				      * cell can be rotated in 24
+				      * ways.
 				      *
 				      * Note that in general the
 				      * result will be different if
@@ -75,7 +75,8 @@ struct CellData
     void rotate (const unsigned int times);
 
 				     /**
-				      * Rotations are not possible in 1d.
+				      * Rotations are not possible in
+				      * 1d.
 				      */
     DeclException0 (ExcNotPossible);
 				     /**
