@@ -39,6 +39,14 @@ class Quadrature {
     Quadrature (const unsigned int n_quadrature_points);
     
 				     /**
+				      * Virtual destructor needed, since someone
+				      * may want to use pointers to this class
+				      * though the object pointed to is a derived
+				      * class.
+				      */
+    virtual ~Quadrature ();
+    
+				     /**
 				      * Return the #i#th quadrature point.
 				      */
     const Point<dim> & quad_point (const unsigned int i) const;

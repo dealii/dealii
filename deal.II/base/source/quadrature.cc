@@ -12,6 +12,11 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 
 
 template <int dim>
+Quadrature<dim>::~Quadrature () {};
+
+
+
+template <int dim>
 const Point<dim> & Quadrature<dim>::quad_point (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
   return quadrature_points[i];
