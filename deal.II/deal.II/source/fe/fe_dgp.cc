@@ -42,9 +42,6 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
       this->prolongation[i].reinit(0,0);
   
-//  				   // same as above: copy over matrix
-//  				   // from predefined values and
-//  				   // generate all others by rotation
 //    if ((degree < Matrices::n_projection_matrices) &&
 //        (Matrices::projection_matrices[degree] != 0))
 //      {
