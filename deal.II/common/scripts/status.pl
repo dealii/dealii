@@ -66,7 +66,7 @@ while(<CVS>)
 	my $stick = $tag . $date . $opt;
 	$stick = "Stick $stick" unless ($stick eq '');
 	$status .= $stick;
-	printf "%-30s %-40s %s\n", $file, $status,
+	printf "%-40s %-20s %s\n", $file, $status,
 	(($short) ? '' : $rep_file)
 	    unless ($compress && ($status eq 'OK '));
     }
