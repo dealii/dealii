@@ -107,7 +107,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
 
 				   // initialize with zero
   for (unsigned i=0;i<values.size();++i)
-    fill_n (values[i].begin(), n_quadrature_points, 0);
+    fill_n (values[i].begin(), values[i].size(), 0);
 
 				   // add up contributions of trial
 				   // functions
