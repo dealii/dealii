@@ -177,7 +177,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 					   mass_matrix, vec, tmp);
 
   SolverControl                    control(1000,1e-16);
-  PrimitiveVectorMemory<dVector>   memory(tmp.size());
+  PrimitiveVectorMemory<dVector>   memory;
   SolverCG<dSMatrix,dVector>       cg(control,memory);
 
 				   // solve
@@ -331,7 +331,7 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   dVector boundary_projection (rhs.size());
 
   SolverControl                    control(1000, 1e-16);
-  PrimitiveVectorMemory<dVector>   memory(rhs.size());
+  PrimitiveVectorMemory<dVector>   memory;
   SolverCG<dSMatrix,dVector>       cg(control,memory);
 
 				   // solve

@@ -36,11 +36,11 @@ delete-files = *gnuplot *.eps *ucd *history
 ###############################################################################
 # Internals
 
-include ../../Make.global_options
-
-
 #deal include base path
 D = ../../..
+
+include ../../Make.global_options
+
 
 # get lists of files we need
 cc-files    = $(wildcard *.cc)
@@ -50,9 +50,8 @@ h-files     = $(wildcard *.h)
 lib-h-files = $(wildcard ../../include/*/*.h)
 
 # list of libraries needed to link with
-libs     = ./Obj.a   ../../lib/libdeal_II.a   ../../../lac/lib/liblac.a
-libs.g   = ./Obj.g.a ../../lib/libdeal_II.g.a ../../../lac/lib/liblac.g.a
-
+libs     = ./Obj.a   -ldeal_II  -llac -lbase
+libs.g   = ./Obj.g.a -ldeal_II.g -llac.g -lbase.g
 
 # check whether we use debug mode or not
 ifeq ($(debug-mode),on)
@@ -70,7 +69,7 @@ endif
 # make rule for the target
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) $(flags) -o $@ $(libraries) $(user-libs)
+	@$(CXX) $(flags) -o $@ $^ $(user-libs)
 
 # rule how to run the program
 run: $(target)

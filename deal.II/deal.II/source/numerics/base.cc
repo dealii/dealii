@@ -136,7 +136,7 @@ void ProblemBase<dim>::solve () {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   SolverControl                    control(4000, 1e-16);
-  PrimitiveVectorMemory<dVector>   memory(right_hand_side.size());
+  PrimitiveVectorMemory<dVector>   memory;
   SolverCG<dSMatrix,dVector>       cg(control,memory);
 
 				   // solve

@@ -11,9 +11,9 @@
 
 deal_II_dimension=2
 
-vpath %.a: $D/base/lib
-vpath %.a: $D/lac/lib
-vpath %.a: $D/deal.II/lib
+vpath %.a $D/base/lib
+vpath %.a $D/lac/lib
+vpath %.a $D/deal.II/lib
 
 CXX       = c++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
