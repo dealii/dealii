@@ -74,7 +74,7 @@ Vector<Number>::Vector (const Vector<OtherNumber>& v)
     {
       val = new Number[maxdim];
       Assert (val != 0, ExcOutOfMemory());
-      copy (v.begin(), v.end(), begin());
+      std::copy (v.begin(), v.end(), begin());
     }
 }
 
