@@ -38,7 +38,7 @@ MGTransferPrebuilt<number>::copy_to_mg (const MGDoFHandler<dim>        &mg_dof_h
 {
 				   // forward to the correct
 				   // specialization
-  copy_to_mg (mg_dof_handler, dst, src, is_1d<dim==1>());
+  copy_to_mg (mg_dof_handler, dst, src, is_1d<(dim==1)>());
 }
 
 
@@ -266,7 +266,7 @@ copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
 {
 				   // forward to the correct
 				   // specialization
-  copy_to_mg (mg_dof_handler, dst, src, is_1d<dim==1>());
+  copy_to_mg (mg_dof_handler, dst, src, is_1d<(dim==1)>());
 }
 
 
@@ -536,7 +536,7 @@ copy_to_mg (const MGDoFHandler<dim>             &mg_dof_handler,
 {
 				   // forward to the correct
 				   // specialization
-  copy_to_mg (mg_dof_handler, dst, src, is_1d<dim==1>());
+  copy_to_mg (mg_dof_handler, dst, src, is_1d<(dim==1)>());
 }
 
 
