@@ -18,7 +18,9 @@
 #include <base/exceptions.h>
 #include <base/function.h>
 #include <base/multithread_info.h>
+#include <base/quadrature.h>
 #include <dofs/dof_handler.h>
+#include <fe/mapping.h>
 #include <map>
 
 

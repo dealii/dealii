@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/point.h>
 #include <dofs/dof_handler.h>
 #include <multigrid/mg_dof_handler.h>
 
