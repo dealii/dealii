@@ -43,14 +43,16 @@ void PreconditionBlock<number,inverse_type>::clear ()
   if (_inverse.size()!=0)
     _inverse.erase(_inverse.begin(), _inverse.end());
   blocksize     = 0;
-  same_diagonal = false;  
+  same_diagonal = false;
+  A = 0;
 }
 
 
 template <typename number, typename inverse_type>
-void PreconditionBlock<number,inverse_type>
-::initialize (const SparseMatrix<number> &M, unsigned int bsize)
+void PreconditionBlock<number,inverse_type>::initialize (const SparseMatrix<number> &M,
+							 unsigned int bsize)
 {
+  clear();
   Assert (M.m() == M.n(), ExcMatrixNotSquare());
   A = &M;
   Assert (bsize>0, ExcIndexRange(bsize, 1, M.m()));
