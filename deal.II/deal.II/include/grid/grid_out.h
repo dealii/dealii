@@ -35,6 +35,30 @@ template <int dim> class Mapping;
 namespace GridOutFlags
 {
 				   /**
+				    * Flags for grid output in OpenDX format.
+				    */
+  struct DX
+  {
+				     /**
+				      * Write faces instead of
+				      * cells. Defaults to false.
+				      */
+    bool write_faces;
+				     /**
+				      * Write all faces, including
+				      * interior faces. Default is to
+				      * write boundary faces only.
+				      */
+    bool write_all_faces;
+    
+				     /**
+				      * Constructor.
+				      */
+    DX (bool write_faces = false,
+	bool write_all_faces = false);  
+  };			   
+    
+				   /**
 				    * Flags describing the details of
 				    * output in UCD format.
 				    */
@@ -386,7 +410,19 @@ class GridOut
 				      * Declaration of a name for each of the
 				      * different output formats.
 				      */
-    enum OutputFormat { gnuplot, eps, ucd };
+    enum OutputFormat { dx, gnuplot, eps, ucd };
+
+				   /**
+				    * Write triangulation in OpenDX format.
+				    *
+				    * Cells or faces are written
+				    * together with their level and
+				    * their material id or boundary
+				    * indicator, resp.
+				    */
+    template <int dim>
+    void write_dx (const Triangulation<dim> &tria,
+		   std::ostream             &out);
 
 				     /**
 				      * Write the triangulation in the
@@ -583,34 +619,37 @@ class GridOut
 		const Mapping<dim>       *mapping=0);
 
 				     /**
-				      * Set the flags to be used for output
-				      * in UCD format.
+				      * Set flags for DX output
 				      */
-    void set_flags (const GridOutFlags::Ucd &ucd_flags);
-
-    				     /**
-				      * Set the flags to be used for output
-				      * in GNUPLOT format.
-				      */
-    void set_flags (const GridOutFlags::Gnuplot &gnuplot_flags);
-
-    				     /**
-				      * Set the flags to be used for output
-				      * in 1d EPS output.
-				      */
-    void set_flags (const GridOutFlags::Eps<1> &eps_flags);
+    void set_flags (const GridOutFlags::DX &flags);
 
 				     /**
-				      * Set the flags to be used for output
-				      * in 2d EPS output.
+				      * Set flags for UCD output
 				      */
-    void set_flags (const GridOutFlags::Eps<2> &eps_flags);
+    void set_flags (const GridOutFlags::Ucd &flags);
 
-				     /**
-				      * Set the flags to be used for output
-				      * in 3d EPS output.
+    				     /**
+				      * Set flags for GNUPLOT output
 				      */
-    void set_flags (const GridOutFlags::Eps<3> &eps_flags);
+    void set_flags (const GridOutFlags::Gnuplot &flags);
+
+    				     /**
+				      * Set flags for EPS output of a
+				      * one-dimensional triangulation
+				      */
+    void set_flags (const GridOutFlags::Eps<1> &flags);
+
+    				     /**
+				      * Set flags for EPS output of a
+				      * two-dimensional triangulation
+				      */
+    void set_flags (const GridOutFlags::Eps<2> &flags);
+
+    				     /**
+				      * Set flags for EPS output of a
+				      * three-dimensional triangulation
+				      */
+    void set_flags (const GridOutFlags::Eps<3> &flags);
 
 				     /**
 				      * Provide a function which tells us which
@@ -618,6 +657,7 @@ class GridOut
 				      * usually has. At present the following
 				      * formats are defined:
 				      * @begin{itemize}
+				      * @item @p{OpenDX}: @p{.dx}
 				      * @item @p{gnuplot}: @p{.gnuplot}
 				      * @item @p{ucd}: @p{.inp}
 				      * @item @p{eps}: @p{.eps}.
@@ -674,10 +714,14 @@ class GridOut
     DeclException0 (ExcInvalidState);
 
   private:
-
+				   /**
+				    * Flags for OpenDX output.
+				    */
+  GridOutFlags::DX dx_flags;
+  
 				     /**
-				      * Flags to be used upon output of UCD
-				      * data. Can be changed by using the
+				      * Flags for UCD output. Can be
+				      * changed by using the
 				      * @p{set_flags} function.
 				      */
     GridOutFlags::Ucd     ucd_flags;

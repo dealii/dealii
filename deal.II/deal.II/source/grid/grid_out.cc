@@ -28,6 +28,94 @@
 
 
 template <int dim>
+void GridOut::write_dx (const Triangulation<dim> &tria,
+			std::ostream             &out) 
+{
+  AssertThrow (out, ExcIO());
+
+				   // get the positions of the
+				   // vertices and whether they are
+				   // used.
+  const std::vector<Point<dim> > &vertices    = tria.get_vertices();
+  const std::vector<bool>        &vertex_used = tria.get_used_vertices();
+  
+  const unsigned int n_vertices = tria.n_used_vertices();
+
+  typename Triangulation<dim>::active_cell_iterator       cell=tria.begin_active();
+  const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
+
+				   // start with ucd data
+  out << n_vertices << ' '
+      << tria.n_active_cells() + (ucd_flags.write_faces ?
+				  n_boundary_faces(tria) :
+				  0)
+      << " 0 0 0"                  // no data
+      << std::endl;
+
+				   // actually write the vertices.
+				   // note that we shall number them
+				   // with first index 1 instead of 0
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    if (vertex_used[i])
+      {
+	out << i+1                 // vertex index
+	    << "  "
+	    << vertices[i];
+	for (unsigned int d=dim+1; d<=3; ++d)
+	  out << " 0";             // fill with zeroes
+	out << std::endl;
+      };
+	
+				   // write cells. Enumerate cells
+				   // consecutively, starting with 1
+  unsigned int cell_index=1;
+  for (cell=tria.begin_active();
+       cell!=endc; ++cell, ++cell_index)
+    {
+      out << cell_index << ' '
+	  << static_cast<unsigned int>(cell->material_id())
+	  << " ";
+      switch (dim) 
+	{
+	  case 1:  out << "line    "; break;
+	  case 2:  out << "quad    "; break;
+	  case 3:  out << "hex     "; break;
+	  default:
+		Assert (false, ExcNotImplemented());
+	};
+
+				       // it follows a list of the
+				       // vertices of each cell. in 1d
+				       // this is simply a list of the
+				       // two vertices, in 2d its counter
+				       // clockwise, as usual in this
+				       // library. in 3d, the same applies
+				       // (special thanks to AVS for
+				       // numbering their vertices in a
+				       // way compatible to deal.II!)
+				       //
+				       // technical reference:
+				       // AVS Developer's Guide, Release 4,
+				       // May, 1992, p. E6
+				       //
+				       // note: vertex numbers are 1-base
+      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+	   ++vertex)
+	out << cell->vertex_index(vertex)+1 << ' ';
+      out << std::endl;
+    };
+
+				   // write faces with non-zero boundary
+				   // indicator
+  if (ucd_flags.write_faces)
+    write_ucd_faces (tria, cell_index, out);
+    
+  AssertThrow (out, ExcIO());
+};
+
+
+
+template <int dim>
 void GridOut::write_ucd (const Triangulation<dim> &tria,
 			 std::ostream             &out) 
 {
@@ -806,6 +894,10 @@ void GridOut::write (const Triangulation<dim> &tria,
 {
   switch (output_format)
     {
+      case dx:
+	    write_dx (tria, out);
+	    return;
+
       case ucd:
 	    write_ucd (tria, out);
 	    return;

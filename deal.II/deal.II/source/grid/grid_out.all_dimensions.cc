@@ -17,6 +17,14 @@
 
 namespace GridOutFlags
 {
+  DX::DX (const bool write_faces,
+	  const bool write_all_faces) :
+    write_faces (write_faces),
+    write_all_faces (write_all_faces)
+  {};
+
+  
+  
   Ucd::Ucd (const bool write_preamble,
 	    const bool write_faces) :
 		  write_preamble (write_preamble),
@@ -91,6 +99,13 @@ namespace GridOutFlags
 
 
 
+void GridOut::set_flags (const GridOutFlags::DX &flags) 
+{
+  dx_flags = flags;
+};
+
+
+
 void GridOut::set_flags (const GridOutFlags::Ucd &flags) 
 {
   ucd_flags = flags;
@@ -131,6 +146,8 @@ GridOut::default_suffix (const OutputFormat output_format)
 {
   switch (output_format) 
     {
+      case dx:
+        return ".dx";
       case gnuplot: 
 	    return ".gnuplot";
 
@@ -151,6 +168,9 @@ GridOut::default_suffix (const OutputFormat output_format)
 GridOut::OutputFormat
 GridOut::parse_output_format (const std::string &format_name)
 {
+  if (format_name == "dx")
+    return dx;
+
   if (format_name == "ucd")
     return ucd;
 
@@ -169,7 +189,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names () 
 {
-  return "gnuplot|eps|ucd";
+  return "dx|gnuplot|eps|ucd";
 };
 
 
