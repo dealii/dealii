@@ -22,6 +22,22 @@
 #include <list>
 #include <typeinfo>
 
+
+// this is a weird hack: on newer linux systems, some system headers
+// include /usr/include/linux/compiler.h which explicitly checks which
+// gcc is in use. in that file is also a comment that explains that
+// the check for gcc version also applies to icc since icc identifies
+// itself as gcc via __GNUC__; if the gcc major version is not >=2, it
+// aborts.
+//
+// now, only icc8 and later identify themselves as gcc, so older icc
+// versions fail to compile this file on such systems. to avoid this
+// failure, we allow icc to identify itself as gcc if it doesn't
+// already do so by itself:
+#if defined(__INTEL_COMPILER) && !defined(__GNUC__)
+#  define __GNUC__ 3
+#endif
+
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <signal.h>
