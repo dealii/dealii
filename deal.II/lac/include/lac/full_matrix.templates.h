@@ -458,6 +458,16 @@ void FullMatrix<number>::fill (const FullMatrix<number2>& src,
 
 
 template <typename number>
+template <typename number2>
+void FullMatrix<number>::fill (const number2* entries)
+{
+    if (dim_range*dim_image != 0)
+    std::copy (entries, entries+dim_image*dim_range, val);
+}
+
+
+
+template <typename number>
 void FullMatrix<number>::add_row (const unsigned int i,
 				  const number s,
 				  const unsigned int j)

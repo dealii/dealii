@@ -156,6 +156,15 @@ class FullMatrix : public Subscriptor
 	       const unsigned int         i=0,
 	       const unsigned int         j=0);
     
+
+                                     /**
+				      * Fill matrix with an array of numbers.
+				      * The array is arranged line by line. No
+				      * range checking is performed.
+				      */
+    template<typename number2>
+      void fill (const number2* entries);
+    
 				     /**
 				      * Set dimension to $m\times n$ and
 				      * allocate memory if necessary. Forget

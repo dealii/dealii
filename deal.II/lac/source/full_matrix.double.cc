@@ -34,6 +34,7 @@ template void FullMatrix<TYPEMAT>::add_diag (const TYPEMAT, const FullMatrix<TYP
 #define TYPEVEC double
 #define TYPERES double
 
+template void FullMatrix<TYPEMAT>::fill (const TYPEVEC*);
 template void FullMatrix<TYPEMAT>::vmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template void FullMatrix<TYPEMAT>::Tvmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template double FullMatrix<TYPEMAT>::residual(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
@@ -47,6 +48,7 @@ template double FullMatrix<TYPEMAT>::least_squares(Vector<TYPEVEC>&, Vector<TYPE
 #undef TYPEVEC
 #define TYPEVEC float
 
+template void FullMatrix<TYPEMAT>::fill (const TYPEVEC*);
 template void FullMatrix<TYPEMAT>::vmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template void FullMatrix<TYPEMAT>::Tvmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const bool) const;
 template double FullMatrix<TYPEMAT>::residual(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
