@@ -457,7 +457,8 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension(support_points.size(), dofs_per_face));
   
-  vector<Point<dim> > dummy(total_dofs);
+				   // size not checked since not used
+  static vector<Point<dim> > dummy(0);
   fill_fe_values (cell, global_unit_points,
 		  jacobians, compute_jacobians,
 		  jacobians_grad, compute_jacobians_grad,
@@ -505,7 +506,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
   Assert (global_unit_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(global_unit_points.size(), unit_points.size()));
 
-  vector<Point<dim> > dummy(total_dofs);
+  static vector<Point<dim> > dummy(0); // size not checked since not used
   fill_fe_values (cell, global_unit_points,
 		  jacobians, compute_jacobians,
 		  jacobians_grad, compute_jacobians_grad,
