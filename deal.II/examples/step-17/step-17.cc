@@ -809,45 +809,19 @@ unsigned int ElasticProblem<dim>::solve ()
                                    // nodes:
   hanging_node_constraints.distribute (localized_solution);
 
-                                   // The next step is a little more
-                                   // convoluted: we need to get the result
-                                   // back into the global, distributed
-                                   // vector. The problematic part is that on
-                                   // each process, we can only efficiently
-                                   // write to the elements we own ourselves,
-                                   // despite the fact that all processors
-                                   // have just computed the complete solution
-                                   // vector locally. If we write to elements
-                                   // that we do not own, this may be
-                                   // expensive since they will have to be
-                                   // communicated to the other processors
-                                   // later on. So what we do is to ask the
-                                   // library to which subdomain each degree
-                                   // of freedom belongs (or, in other words:
-                                   // which process has them stored locally,
-                                   // since we identify subdomains with
-                                   // processes), and only write to these. For
-                                   // this, let us first get the subdomain for
-                                   // each DoF:
-  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
-  DoFTools::get_subdomain_association (dof_handler,
-                                       subdomain_association);
-
-                                   // Then loop over all degrees of freedom
-                                   // and transfer the newly computed value
-                                   // for a constrained degree of freedom into
-                                   // the global solution if a) this is really
-                                   // a constrained DoF, all other vector
-                                   // entries should not have been changed
-                                   // anyway, and b) we are the owner of this
-                                   // degree of freedom, i.e. the subdomain
-                                   // the DoF belongs to equals the present
-                                   // process's number.
-  for (unsigned int i=0; i<localized_solution.size(); ++i)
-    if (hanging_node_constraints.is_constrained (i)
-        &&
-        (subdomain_association[i] == this_mpi_process))
-      solution(i) = localized_solution(i);
+                                   // Then transfer everything back
+                                   // into the global vector. The
+                                   // following operation copies those
+                                   // elements of the localized
+                                   // solution that we store locally
+                                   // in the distributed solution, and
+                                   // does not touch the other
+                                   // ones. Since we do the same
+                                   // operation on all processors, we
+                                   // end up with a distributed vector
+                                   // that has all the constrained
+                                   // nodes fixed.
+  solution = localized_solution;
 
                                    // After this has happened, flush the PETSc
                                    // buffers. This may or may not be strictly
@@ -1249,7 +1223,7 @@ void ElasticProblem<dim>::run ()
       if (this_mpi_process == 0)
         std::cout << "   Solver converged in " << n_iterations
                   << " iterations." << std::endl;
-
+      
       output_results (cycle);
     }
 }
