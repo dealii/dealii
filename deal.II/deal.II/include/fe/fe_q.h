@@ -105,6 +105,7 @@ template <int dim> class MappingQ;
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     0-------1        0-------1
+ *   @end{verbatim}
  *
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
