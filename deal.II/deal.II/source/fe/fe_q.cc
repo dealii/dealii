@@ -1400,11 +1400,11 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
                     Assert (false, ExcNotImplemented());
             };
         }
-      else if (shape_index < first_quad_index)
+      else if (shape_index < this->first_quad_index)
                                          // ok, dof is on a line
         {
           const unsigned int line_index
-            = (shape_index - first_line_index) / this->dofs_per_line;
+            = (shape_index - this->first_line_index) / this->dofs_per_line;
           Assert (line_index < GeometryInfo<dim>::lines_per_cell,
                   ExcInternalError());
 
@@ -1431,11 +1431,11 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
           else
             Assert (false, ExcNotImplemented());
         }
-      else if (shape_index < first_hex_index)
+      else if (shape_index < this->first_hex_index)
                                          // dof is on a quad
         {
           const unsigned int quad_index 
-            = (shape_index - first_quad_index) / this->dofs_per_quad;
+            = (shape_index - this->first_quad_index) / this->dofs_per_quad;
           Assert (static_cast<signed int>(quad_index) <
                   static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
                   ExcInternalError());

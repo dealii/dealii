@@ -146,15 +146,16 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl ()
                                        // get the global index of the first
                                        // non-diagonal element in this row
       const unsigned int rowstart
-        = get_sparsity_pattern().get_rowstart_indices()[row] + 1;
+        = this->get_sparsity_pattern().get_rowstart_indices()[row] + 1;
       number * const diagonal_element = &this->global_entry(rowstart-1);
 
       number rowsum = 0;
       for (unsigned int global_index=rowstart;
            global_index<rowstart+rowlength; ++global_index)
-        rowsum += std::fabs(global_entry(global_index));
+        rowsum += std::fabs(this->global_entry(global_index));
 
-      *diagonal_element += get_strengthen_diagonal (rowsum, row)  * rowsum;
+      *diagonal_element += this->get_strengthen_diagonal (rowsum, row)  *
+                           rowsum;
     }
 }
 

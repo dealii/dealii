@@ -117,7 +117,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   inner_sums.resize (this->m());
 
                                    // precalc sum(j=k+1, N, a[k][j]))
-  for(unsigned int row=0; row<m(); row++) {
+  for(unsigned int row=0; row<this->m(); row++) {
     inner_sums[row] = get_rowsum(row);
   }
 
