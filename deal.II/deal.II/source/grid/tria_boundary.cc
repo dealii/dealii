@@ -112,10 +112,15 @@ StraightBoundary<dim>::get_intermediate_points_on_line (
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
+  
   const double dx=1./(n+1);
   double x=dx;
+
+  const Point<dim> vertices[2] = { line->vertex(0),
+				   line->vertex(1) };
+  
   for (unsigned int i=0; i<n; ++i, x+=dx)
-    points[i]=(1-x)*line->vertex(0) + x*line->vertex(1);
+    points[i] = (1-x)*vertices[0] + x*vertices[1];
 };
 
 #endif
@@ -145,14 +150,23 @@ StraightBoundary<dim>::get_intermediate_points_on_quad (
 		     m=static_cast<unsigned int>(sqrt(n));
 				   // is n a square number
   Assert(m*m==n, ExcInternalError());
+
   const double ds=1./(m+1);
   double y=ds;
+
+  const Point<dim> vertices[4] = { line->vertex(0),
+				   line->vertex(1),
+				   line->vertex(2),
+				   line->vertex(3) };
+
   for (unsigned int i=0; i<n; ++i, y+=ds)
     {
       double x=ds;
       for (unsigned int j=0; j<n; ++j, x+=ds)
-	points[i*m+j]=((1-x)*quad->vertex(0) + x*quad->vertex(1))*(1-y)+
-		      ((1-x)*quad->vertex(3) + x*quad->vertex(2))*y;
+	points[i*m+j]=((1-x) * vertices[0] +
+		       x     * vertices[1]) * (1-y) +
+		      ((1-x) * vertices[3] +
+		       x     * vertices[2]) * y;
     }
 }
 
