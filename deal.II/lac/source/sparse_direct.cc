@@ -42,13 +42,12 @@
 #  include <hsl/hsl.h>
 #endif
 
-
-// include UMFPACK file. annoyingly the UMFPACK files don't seem to have
-// extern "C" wrapped around their headers...
+// include UMFPACK file.
+#ifdef HAVE_UMFPACK
 extern "C" {
 #  include <umfpack.h>
 }
-
+#endif
 
 // if the HSL functions are not there, define them empty and throw an
 // exception
@@ -1582,6 +1581,7 @@ call_ma47cd (const unsigned int *n_rows,           //scalar
 
 
 
+#ifdef HAVE_UMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
                 :
@@ -1808,7 +1808,7 @@ SparseDirectUMFPACK::solve (const SparseMatrix<double> &matrix,
   solve (rhs_and_solution);
 }
 
-
+#endif
 
 
 // explicit instantiations
