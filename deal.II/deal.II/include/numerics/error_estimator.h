@@ -61,6 +61,11 @@ class dVector;
  *  sum up the contributions of the faces (which are the integrated
  *  square of the jumps) of each cell and take the square root.
  *
+ *  The integration is done using a quadrature formula on the face.
+ *  For linear ansatz functions (#FELinear#), the #Gauss2# or even the
+ *  #Midpoint# rule will suffice. For higher order elements, it is
+ *  necessary to utilize higher order quadrature formulae as well.
+ *
  *  We store the contribution of each face in a #map#, as provided by the
  *  C++ standard library, with the iterator pointing to that face being the
  *  key into the map. In fact, we do not store the indicator per face, but
