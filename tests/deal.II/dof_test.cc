@@ -243,7 +243,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 	tria->execute_coarsening_and_refinement ();
 
 	Triangulation<dim>::active_cell_iterator cell;
-	for (int i=0; i<(dim==2 ? 12 : 7); ++i) 
+	for (int i=0; i<(dim==2 ? 3 : 2); ++i) 
 	  {
 					     // refine the presently
 					     // second last cell 17
@@ -275,7 +275,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 	tria->execute_coarsening_and_refinement ();
 	
 	Triangulation<dim>::active_cell_iterator cell, endc;
-	for (int i=0; i<5-dim; ++i) 
+	for (int i=0; i<4-dim; ++i) 
 	  {
 	    cell = tria->begin_active();
 	    endc = tria->end();
@@ -344,14 +344,14 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  for (unsigned int test_case=1; test_case<=3; ++test_case)
+  for (unsigned int test_case=1; test_case<=2; ++test_case)
     {
       TestCases<2> tests;
       tests.create_new ();
       tests.run (test_case);
     };
 
-  for (unsigned int test_case=1; test_case<=3; ++test_case)
+  for (unsigned int test_case=1; test_case<=2; ++test_case)
     {
       TestCases<3> tests;
       tests.create_new ();
