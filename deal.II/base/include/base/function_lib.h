@@ -64,6 +64,57 @@ class PillowFunction : public Function<dim>
 };
 
 /**
+ * Cosine-shaped pillow function.
+ * This is another function with zero boundary values on $[-1,1]^d$. In the interior
+ * it is the product of $\cos(\pi/2 x_i)$.
+ * @author Guido Kanschat, 1999
+ */
+template<int dim>
+class CosineFunction : public Function<dim>
+{
+  public:
+				     /**
+				      * The value at a single point.
+				      */
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+
+				     /**
+				      * Values at multiple points.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values,
+			     const unsigned int         component = 0) const;
+
+				     /**
+				      * Gradient at a single point.
+				      */
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+
+				     /**
+				      * Gradients at multiple points.
+				      */
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<Tensor<1,dim> >    &gradients,
+				const unsigned int         component = 0) const;
+
+				     /**
+				      * Laplacian at a single point.
+				      */
+    double laplacian(const Point<dim>   &p,
+		     const unsigned int  component = 0) const;
+
+				     /**
+				      * Laplacian at multiple points.
+				      */
+    void laplacian_list(const vector<Point<dim> > &points,
+			vector<double>            &values,
+			const unsigned int         component = 0) const;
+};
+
+
+/**
  * Singularity on the L-shaped domain in 2D.
  * @author Guido Kanschat, 1999
  */
