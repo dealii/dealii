@@ -38,6 +38,7 @@ threads.exe        : threads.g.$(OBJEXT)                            $(lib-base.g
 anisotropic_1.exe  : anisotropic_1.g.$(OBJEXT)                      $(lib-base.g)
 anisotropic_2.exe  : anisotropic_2.g.$(OBJEXT)                      $(lib-base.g)
 hierarchical.exe   : hierarchical.g.$(OBJEXT)                       $(lib-base.g)
+bdm.exe            : bdm.g.$(OBJEXT)                                $(lib-base.g)
 auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries) $(lib-base.g)
 
 tests =  logtest reference quadrature_test quadrature_selector table tensor \
