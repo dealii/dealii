@@ -683,6 +683,24 @@ MGDoFCellAccessor<3>::face (const unsigned int i) const
 #endif
 
 
+
+template <int dim>
+TriaIterator<dim,MGDoFCellAccessor<dim> >
+MGDoFCellAccessor<dim>::
+neighbor_child_on_subface (const unsigned int face,
+                           const unsigned int subface) const
+{
+  const TriaIterator<dim,CellAccessor<dim> > q
+    = CellAccessor<dim>::neighbor_child_on_subface (face, subface);
+  return TriaIterator<dim,MGDoFCellAccessor<dim> > (this->tria,
+						    q->level (),
+						    q->index (),
+						    this->mg_dof_handler);
+}
+
+
+
+
 // explicit instantiations
 
 template

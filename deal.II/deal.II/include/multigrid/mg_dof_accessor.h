@@ -660,6 +660,21 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
     face_iterator
     face (const unsigned int i) const;
 
+				     /**
+				      * Return the result of the
+				      * @p{neighbor_child_on_subface}
+				      * function of the base class,
+				      * but convert it so that one can
+				      * also access the MGDoF data (the
+				      * function in the base class
+				      * only returns an iterator with
+				      * access to the triangulation
+				      * data).
+				      */
+    TriaIterator<dim,MGDoFCellAccessor<dim> >
+    neighbor_child_on_subface (const unsigned int face_no,
+                               const unsigned int subface_no) const;
+
     				     /**
 				      *  Exception
 				      */

@@ -257,8 +257,20 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
-       New: There is now a function <code
-       class="member">CellAccessor::neighbor_child_on_subface</code> 
+       New: There is now also a function <code
+       class="member">MGDoFCellAccessor::neighbor_child_on_subface</code>
+       that returns the result of the <code
+       class="member">CellAccessor::neighbor_child_on_subface</code>
+       function but converts it so that one can also access MGDoF
+       data.
+       <br>
+       (RH 2003/10/22)
+       </p>
+
+  <li> <p>
+       New: There are now functions <code
+       class="member">CellAccessor::neighbor_child_on_subface</code> and <code
+       class="member">DoFCellAccessor::neighbor_child_on_subface</code>
        that should be called instead of using <code
        class="member">GeometryInfo::child_cell_on_face</code> in most cases.
        <br> 
