@@ -107,12 +107,19 @@ enum NormType {
  *   in each time step, it is necessary that we also project the boundary
  *   values of the initial values, before projecting them to the whole domain.
  *
+ *   Obviously, the results of the two schemes for projection are different.
+ *   Usually, when projecting to the boundary first, the $L_2$-norm of the
+ *   difference between original function and projection over the whole domain
+ *   will be larger (factors of five have been observed) while the $L_2$-norm
+ *   of the error integrated over the boundary should of course be less. The
+ *   reverse should also hold if no projection to the boundary is performed.
+ *
  *   The selection whether the projection to the boundary first is needed is
  *   done with the #project_to_boundary_first# flag passed to the function.
  *   If #false# is given, the additional quadrature formula for faces is
  *   ignored.
  *
- *   You should be aware of the fact that if no projection is to the boundary
+ *   You should be aware of the fact that if no projection to the boundary
  *   is requested, a function with zero boundary values may not have zero
  *   boundary values after projection. There is a flag for this especially
  *   important case, which tells the function to enforce zero boundary values
