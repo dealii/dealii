@@ -1,4 +1,15 @@
-/* $Id$ */
+//----------------------------  block_matrices.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  block_matrices.cc  ---------------------------
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 /* Program is based on /examples/step-3 
    Purpose: compare the results when using a normal matrix and
