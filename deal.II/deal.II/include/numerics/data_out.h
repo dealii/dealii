@@ -209,8 +209,20 @@ class DataOut_DoFData : public DataOutInterface<dim>
 			  const string         &name);
 
 				     /**
+				      * Release the pointers to the
+				      * data vectors. This allows
+				      * output of a new set of vectors
+				      * without supplying the DoF
+				      * handler again. Therefore, the
+				      * #DataOut# object can be used
+				      * in an algebraic context.
+				      */
+    void clear_data_vectors ();
+    
+				      
+				     /**
 				      * Release the pointers to the data
-				      * vectors. You have to set all data
+				      * vectors and the DoF handler. You have to set all data
 				      * entries again using the
 				      * #add_data_vector# function. The pointer
 				      * to the dof handler is cleared as well,

@@ -448,7 +448,12 @@ void __IssueError_Throw (const char *file,
  *   throw an exception
  *  @see ExceptionBase
  *  @author Wolfgang Bangerth, November 1997, extensions 1998
+ *
+ *  The configuration parameter NO_THROW can be used to disable this feature.
+ *  This should not be done on a regular basis, but gcc 2.95.2 on DEC Alpha
+ *  stops compiling here.
  */
+#ifndef NO_THROW
 #define AssertThrow(cond, exc)                                   \
   {                                                              \
     if (!(cond))                                                 \
@@ -456,7 +461,10 @@ void __IssueError_Throw (const char *file,
 			  __LINE__,                              \
 			  __PRETTY_FUNCTION__, #cond, #exc, exc);\
   }
-
+#else
+#define AssertThrow(cond, exc)                                   \
+   { abort(); }
+#endif
 
 /**
  * See the #ExceptionBase# class for a detailed description.

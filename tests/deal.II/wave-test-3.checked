@@ -4,364 +4,263 @@ DEAL::---------
 DEAL::  Primal problem: time=0.00, step=0, sweep=0. 256 cells, 289 dofsStarting 
 DEAL:cg::Convergence step 0 
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 14 
+DEAL:cg::Convergence step 15 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 0 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 0 
 DEAL::.
 DEAL::  Primal problem: time=0.02, step=1, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.05, step=2, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.08, step=3, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.11, step=4, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.14, step=5, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.16, step=6, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.19, step=7, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.22, step=8, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.25, step=9, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.28, step=10, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.30, step=11, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.33, step=12, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.36, step=13, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.39, step=14, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.42, step=15, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.44, step=16, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.47, step=17, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.50, step=18, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.53, step=19, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.56, step=20, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.58, step=21, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.61, step=22, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.64, step=23, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.67, step=24, sweep=0. 256 cells, 289 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.70, step=25, sweep=0. 256 cells, 289 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.70, step=25, sweep=0. 256 cells, 289 dofsStarting 
+DEAL:cg::Convergence step 10 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
 DEAL::.
 
 DEAL::  Dual problem: time=0.70, step=25, sweep=0. 256 cells, 1089 dofs.
 DEAL::  Dual problem: time=0.67, step=24, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 5 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 4 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.64, step=23, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.61, step=22, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.58, step=21, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.56, step=20, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.53, step=19, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.50, step=18, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.47, step=17, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.44, step=16, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.42, step=15, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.39, step=14, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.36, step=13, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.33, step=12, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.30, step=11, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.28, step=10, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.25, step=9, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.22, step=8, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.19, step=7, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.16, step=6, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.14, step=5, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.11, step=4, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.08, step=3, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.05, step=2, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.02, step=1, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.00, step=0, sweep=0. 256 cells, 1089 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 
 DEAL::  Postprocessing: time=0.00, step=0, sweep=0. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
@@ -1474,32 +1373,32 @@ DEAL::#    time
 #    Huyghens wave
 
 
-DEAL::0.00   256 289 0 0 0.00 0.00 0.00    256 1089 6 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.02   256 289 8 12 1.22 1.12 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.05   256 289 9 12 0.33 2.01 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.08   256 289 9 11 1.04 1.30 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.11   256 289 9 11 1.57 0.77 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.14   256 289 8 12 1.21 1.13 2.34    256 1089 6 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.16   256 289 9 12 1.00 1.34 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.19   256 289 9 11 1.10 1.24 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.22   256 289 9 12 1.28 1.06 2.34    256 1089 6 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.25   256 289 9 11 1.30 1.04 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.28   256 289 9 11 1.04 1.30 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.30   256 289 8 12 1.05 1.29 2.34    256 1089 6 9 0.00 0.00 0.00    0.00    0.01 
-DEAL::0.33   256 289 9 12 1.35 0.99 2.34    256 1089 6 9 0.00 0.00 0.00    -0.00    0.01 
-DEAL::0.36   256 289 9 11 1.22 1.12 2.34    256 1089 6 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.39   256 289 8 12 1.01 1.33 2.34    256 1089 6 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.42   256 289 8 12 1.19 1.15 2.34    256 1089 6 9 0.00 0.00 0.00    -0.00    -0.03 
-DEAL::0.44   256 289 8 11 1.24 1.10 2.34    256 1089 5 9 0.00 0.00 0.00    -0.00    -0.04 
-DEAL::0.47   256 289 8 12 1.17 1.17 2.34    256 1089 5 9 0.00 0.00 0.00    0.00    -0.03 
-DEAL::0.50   256 289 9 11 1.16 1.18 2.34    256 1089 5 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.53   256 289 9 11 1.10 1.24 2.34    256 1089 5 9 0.00 0.00 0.00    0.00    0.06 
-DEAL::0.56   256 289 9 11 1.20 1.14 2.34    256 1089 5 9 0.00 0.00 0.00    0.00    0.12 
-DEAL::0.58   256 289 9 11 1.29 1.05 2.34    256 1089 5 9 0.00 0.00 0.00    0.00    0.13 
-DEAL::0.61   256 289 8 12 1.12 1.22 2.34    256 1089 5 9 0.00 0.00 0.00    -0.00    0.08 
-DEAL::0.64   256 289 8 12 1.08 1.26 2.34    256 1089 5 9 0.00 0.00 0.00    -0.00    -0.01 
-DEAL::0.67   256 289 9 11 1.22 1.12 2.34    256 1089 4 9 0.00 0.00 0.00    0.00    -0.10 
-DEAL::0.70   256 289 9 12 1.20 1.14 2.34    256 1089 0 0 0.00 0.00 0.00    0.00    -0.14 
+DEAL::0.00   256 289 0 0 0.00 0.00 0.00    256 1089 7 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.02   256 289 9 13 1.22 1.12 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.05   256 289 10 13 0.33 2.01 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.08   256 289 10 12 1.04 1.30 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.11   256 289 10 12 1.57 0.77 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.14   256 289 9 13 1.21 1.13 2.34    256 1089 7 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.16   256 289 10 13 1.00 1.34 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.19   256 289 10 12 1.10 1.24 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.22   256 289 10 13 1.28 1.06 2.34    256 1089 7 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.25   256 289 10 12 1.30 1.04 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.28   256 289 10 12 1.04 1.30 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.30   256 289 9 13 1.05 1.29 2.34    256 1089 7 10 0.00 0.00 0.00    0.00    0.01 
+DEAL::0.33   256 289 10 13 1.35 0.99 2.34    256 1089 7 10 0.00 0.00 0.00    -0.00    0.01 
+DEAL::0.36   256 289 10 12 1.22 1.12 2.34    256 1089 7 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.39   256 289 9 13 1.01 1.33 2.34    256 1089 7 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.42   256 289 9 13 1.19 1.15 2.34    256 1089 7 10 0.00 0.00 0.00    -0.00    -0.03 
+DEAL::0.44   256 289 9 12 1.24 1.10 2.34    256 1089 6 10 0.00 0.00 0.00    -0.00    -0.04 
+DEAL::0.47   256 289 9 13 1.17 1.17 2.34    256 1089 6 10 0.00 0.00 0.00    0.00    -0.03 
+DEAL::0.50   256 289 10 12 1.16 1.18 2.34    256 1089 6 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.53   256 289 10 12 1.10 1.24 2.34    256 1089 6 10 0.00 0.00 0.00    0.00    0.06 
+DEAL::0.56   256 289 10 12 1.20 1.14 2.34    256 1089 6 10 0.00 0.00 0.00    0.00    0.12 
+DEAL::0.58   256 289 10 12 1.29 1.05 2.34    256 1089 6 10 0.00 0.00 0.00    0.00    0.13 
+DEAL::0.61   256 289 9 13 1.12 1.22 2.34    256 1089 6 10 0.00 0.00 0.00    -0.00    0.08 
+DEAL::0.64   256 289 9 13 1.08 1.26 2.34    256 1089 6 10 0.00 0.00 0.00    -0.00    -0.01 
+DEAL::0.67   256 289 10 12 1.22 1.12 2.34    256 1089 5 10 0.00 0.00 0.00    0.00    -0.10 
+DEAL::0.70   256 289 10 13 1.20 1.14 2.34    256 1089 0 0 0.00 0.00 0.00    0.00    -0.14 
 
 DEAL::    Writing summary.Summary of this sweep:
 ======================
@@ -1522,364 +1421,263 @@ DEAL::---------
 DEAL::  Primal problem: time=0.00, step=0, sweep=1. 163 cells, 201 dofsStarting 
 DEAL:cg::Convergence step 0 
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 14 
+DEAL:cg::Convergence step 15 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 0 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 0 
 DEAL::.
 DEAL::  Primal problem: time=0.02, step=1, sweep=1. 169 cells, 208 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.05, step=2, sweep=1. 202 cells, 242 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.08, step=3, sweep=1. 205 cells, 245 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL::.
-DEAL::  Primal problem: time=0.11, step=4, sweep=1. 202 cells, 243 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.14, step=5, sweep=1. 220 cells, 262 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.16, step=6, sweep=1. 238 cells, 282 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.19, step=7, sweep=1. 250 cells, 296 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.22, step=8, sweep=1. 226 cells, 270 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.25, step=9, sweep=1. 268 cells, 317 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.28, step=10, sweep=1. 265 cells, 313 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
-DEAL::  Primal problem: time=0.30, step=11, sweep=1. 241 cells, 283 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL::.
-DEAL::  Primal problem: time=0.33, step=12, sweep=1. 226 cells, 266 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 13 
 DEAL::.
-DEAL::  Primal problem: time=0.36, step=13, sweep=1. 202 cells, 241 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
+DEAL::  Primal problem: time=0.11, step=4, sweep=1. 202 cells, 243 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.14, step=5, sweep=1. 220 cells, 262 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.16, step=6, sweep=1. 238 cells, 282 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.19, step=7, sweep=1. 250 cells, 296 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.22, step=8, sweep=1. 226 cells, 270 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.25, step=9, sweep=1. 268 cells, 317 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.28, step=10, sweep=1. 265 cells, 313 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.30, step=11, sweep=1. 241 cells, 283 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
+DEAL::.
+DEAL::  Primal problem: time=0.33, step=12, sweep=1. 226 cells, 266 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 14 
+DEAL::.
+DEAL::  Primal problem: time=0.36, step=13, sweep=1. 202 cells, 241 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.39, step=14, sweep=1. 193 cells, 231 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.42, step=15, sweep=1. 190 cells, 228 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.44, step=16, sweep=1. 166 cells, 201 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.47, step=17, sweep=1. 154 cells, 189 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.50, step=18, sweep=1. 148 cells, 181 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.53, step=19, sweep=1. 145 cells, 178 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
+DEAL::.
+DEAL::  Primal problem: time=0.56, step=20, sweep=1. 130 cells, 163 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 12 
 DEAL::.
-DEAL::  Primal problem: time=0.56, step=20, sweep=1. 130 cells, 163 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL::.
 DEAL::  Primal problem: time=0.58, step=21, sweep=1. 124 cells, 155 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.61, step=22, sweep=1. 112 cells, 141 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.64, step=23, sweep=1. 106 cells, 137 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 10 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 11 
 DEAL::.
 DEAL::  Primal problem: time=0.67, step=24, sweep=1. 112 cells, 143 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.70, step=25, sweep=1. 109 cells, 138 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 
 DEAL::  Dual problem: time=0.70, step=25, sweep=1. 109 cells, 514 dofs.
 DEAL::  Dual problem: time=0.67, step=24, sweep=1. 112 cells, 534 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.64, step=23, sweep=1. 106 cells, 510 dofsStarting 
+DEAL:cg::Convergence step 6 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 5 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.61, step=22, sweep=1. 112 cells, 526 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 4 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL::.
-DEAL::  Dual problem: time=0.58, step=21, sweep=1. 124 cells, 579 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 4 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.56, step=20, sweep=1. 130 cells, 611 dofsStarting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 5 
 DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL::.
+DEAL::  Dual problem: time=0.58, step=21, sweep=1. 124 cells, 579 dofsStarting 
+DEAL:cg::Convergence step 5 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.56, step=20, sweep=1. 130 cells, 611 dofsStarting 
+DEAL:cg::Convergence step 6 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.53, step=19, sweep=1. 145 cells, 669 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.50, step=18, sweep=1. 148 cells, 681 dofsStarting 
+DEAL:cg::Convergence step 7 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 6 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.47, step=17, sweep=1. 154 cells, 713 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.44, step=16, sweep=1. 166 cells, 761 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.42, step=15, sweep=1. 190 cells, 867 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.39, step=14, sweep=1. 193 cells, 879 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.36, step=13, sweep=1. 202 cells, 920 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.33, step=12, sweep=1. 226 cells, 1019 dofsStarting 
+DEAL:cg::Convergence step 11 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 10 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 10 
+DEAL:cg::Convergence step 11 
 DEAL::.
 DEAL::  Dual problem: time=0.30, step=11, sweep=1. 241 cells, 1087 dofsStarting 
+DEAL:cg::Convergence step 11 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 10 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
 DEAL::.
 DEAL::  Dual problem: time=0.28, step=10, sweep=1. 265 cells, 1207 dofsStarting 
+DEAL:cg::Convergence step 11 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 10 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
 DEAL::.
 DEAL::  Dual problem: time=0.25, step=9, sweep=1. 268 cells, 1224 dofsStarting 
+DEAL:cg::Convergence step 11 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 10 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
 DEAL::.
 DEAL::  Dual problem: time=0.22, step=8, sweep=1. 226 cells, 1041 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.19, step=7, sweep=1. 250 cells, 1143 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.16, step=6, sweep=1. 238 cells, 1091 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.14, step=5, sweep=1. 220 cells, 1011 dofsStarting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.19, step=7, sweep=1. 250 cells, 1143 dofsStarting 
+DEAL:cg::Convergence step 12 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.16, step=6, sweep=1. 238 cells, 1091 dofsStarting 
+DEAL:cg::Convergence step 12 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.14, step=5, sweep=1. 220 cells, 1011 dofsStarting 
+DEAL:cg::Convergence step 11 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.11, step=4, sweep=1. 202 cells, 935 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.08, step=3, sweep=1. 205 cells, 945 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.05, step=2, sweep=1. 202 cells, 933 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.02, step=1, sweep=1. 169 cells, 797 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.00, step=0, sweep=1. 163 cells, 769 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
+DEAL:cg::Convergence step 9 
 DEAL::.
 
 DEAL::  Postprocessing: time=0.00, step=0, sweep=1. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
@@ -2512,32 +2310,32 @@ DEAL::#    time
 #    Huyghens wave
 
 
-DEAL::0.00   163 201 0 0 0.00 0.00 0.00    163 769 8 8 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.02   169 208 8 11 0.92 1.33 2.25    169 797 8 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.05   202 242 8 11 0.59 1.66 2.25    202 933 8 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.08   205 245 8 12 1.29 0.96 2.25    205 945 9 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.11   202 243 8 11 1.11 1.13 2.25    202 935 9 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.14   220 262 8 11 1.18 1.07 2.25    220 1011 10 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.16   238 282 8 11 1.06 1.19 2.26    238 1091 11 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.19   250 296 8 11 0.93 1.11 2.04    250 1143 11 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.22   226 270 8 11 0.89 0.76 1.65    226 1041 9 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.25   268 317 8 11 0.89 0.76 1.66    268 1224 10 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.28   265 313 8 11 0.80 0.74 1.54    265 1207 10 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.30   241 283 8 12 0.62 0.78 1.40    241 1087 10 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.33   226 266 8 13 0.62 0.59 1.22    226 1019 10 10 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.36   202 241 8 12 0.54 0.49 1.04    202 920 9 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.39   193 231 8 12 0.46 0.49 0.96    193 879 8 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.42   190 228 8 12 0.46 0.50 0.96    190 867 8 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.44   166 201 9 11 0.51 0.38 0.90    166 761 7 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.47   154 189 8 12 0.38 0.41 0.79    154 713 7 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.50   148 181 8 12 0.35 0.41 0.76    148 681 6 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.53   145 178 8 12 0.38 0.37 0.75    145 669 6 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.56   130 163 8 11 0.38 0.34 0.73    130 611 5 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.58   124 155 8 11 0.36 0.35 0.72    124 579 4 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.61   112 141 8 11 0.31 0.38 0.70    112 526 4 8 0.00 0.00 0.00    0.00    0.01 
-DEAL::0.64   106 137 9 10 0.34 0.31 0.66    106 510 5 9 0.00 0.00 0.00    -0.00    0.06 
-DEAL::0.67   112 143 9 11 0.35 0.30 0.66    112 534 5 9 0.00 0.00 0.00    -0.00    0.12 
-DEAL::0.70   109 138 9 11 0.30 0.35 0.65    109 514 0 0 0.00 0.00 0.00    -0.00    0.09 
+DEAL::0.00   163 201 0 0 0.00 0.00 0.00    163 769 9 9 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.02   169 208 9 12 0.92 1.33 2.25    169 797 9 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.05   202 242 9 12 0.59 1.66 2.25    202 933 9 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.08   205 245 9 13 1.29 0.96 2.25    205 945 10 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.11   202 243 9 12 1.11 1.13 2.25    202 935 10 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.14   220 262 9 12 1.18 1.07 2.25    220 1011 11 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.16   238 282 9 12 1.06 1.19 2.26    238 1091 12 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.19   250 296 9 12 0.93 1.11 2.04    250 1143 12 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.22   226 270 9 12 0.89 0.76 1.65    226 1041 10 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.25   268 317 9 12 0.89 0.76 1.66    268 1224 11 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.28   265 313 9 12 0.80 0.74 1.54    265 1207 11 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.30   241 283 9 13 0.62 0.78 1.40    241 1087 11 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.33   226 266 9 14 0.62 0.59 1.22    226 1019 11 11 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.36   202 241 9 13 0.54 0.49 1.04    202 920 10 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.39   193 231 9 13 0.46 0.49 0.96    193 879 9 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.42   190 228 9 13 0.46 0.50 0.96    190 867 9 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.44   166 201 10 12 0.51 0.38 0.90    166 761 8 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.47   154 189 9 13 0.38 0.41 0.79    154 713 8 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.50   148 181 9 13 0.35 0.41 0.76    148 681 7 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.53   145 178 9 13 0.38 0.37 0.75    145 669 7 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.56   130 163 9 12 0.38 0.34 0.73    130 611 6 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.58   124 155 9 12 0.36 0.35 0.72    124 579 5 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.61   112 141 9 12 0.31 0.38 0.70    112 526 5 9 0.00 0.00 0.00    0.00    0.01 
+DEAL::0.64   106 137 10 11 0.34 0.31 0.66    106 510 6 10 0.00 0.00 0.00    -0.00    0.06 
+DEAL::0.67   112 143 10 12 0.35 0.30 0.66    112 534 6 10 0.00 0.00 0.00    -0.00    0.12 
+DEAL::0.70   109 138 10 12 0.30 0.35 0.65    109 514 0 0 0.00 0.00 0.00    -0.00    0.09 
 
 DEAL::    Writing summary.Summary of this sweep:
 ======================
@@ -2560,364 +2358,263 @@ DEAL::---------
 DEAL::  Primal problem: time=0.00, step=0, sweep=2. 169 cells, 211 dofsStarting 
 DEAL:cg::Convergence step 0 
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 15 
+DEAL:cg::Convergence step 16 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 0 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 0 
 DEAL::.
 DEAL::  Primal problem: time=0.02, step=1, sweep=2. 211 cells, 257 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
+DEAL:cg::Convergence step 12 
 DEAL::.
 DEAL::  Primal problem: time=0.05, step=2, sweep=2. 310 cells, 366 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.08, step=3, sweep=2. 367 cells, 429 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.11, step=4, sweep=2. 439 cells, 504 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.14, step=5, sweep=2. 487 cells, 554 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.16, step=6, sweep=2. 502 cells, 573 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.19, step=7, sweep=2. 484 cells, 552 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.22, step=8, sweep=2. 508 cells, 576 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.25, step=9, sweep=2. 550 cells, 624 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.28, step=10, sweep=2. 550 cells, 625 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.30, step=11, sweep=2. 517 cells, 585 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.33, step=12, sweep=2. 493 cells, 560 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.36, step=13, sweep=2. 487 cells, 552 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
+DEAL:cg::Convergence step 15 
+DEAL::.
+DEAL::  Primal problem: time=0.39, step=14, sweep=2. 457 cells, 518 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 14 
 DEAL::.
-DEAL::  Primal problem: time=0.39, step=14, sweep=2. 457 cells, 518 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 13 
-DEAL::.
 DEAL::  Primal problem: time=0.42, step=15, sweep=2. 400 cells, 460 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 13 
+DEAL:cg::Convergence step 14 
 DEAL::.
 DEAL::  Primal problem: time=0.44, step=16, sweep=2. 337 cells, 393 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.47, step=17, sweep=2. 301 cells, 352 dofsStarting 
+DEAL:cg::Convergence step 9 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
+DEAL:cg::Convergence step 13 
 DEAL::.
 DEAL::  Primal problem: time=0.50, step=18, sweep=2. 286 cells, 335 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL::.
-DEAL::  Primal problem: time=0.53, step=19, sweep=2. 223 cells, 267 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL::.
-DEAL::  Primal problem: time=0.56, step=20, sweep=2. 199 cells, 242 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL::.
-DEAL::  Primal problem: time=0.58, step=21, sweep=2. 181 cells, 221 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL::.
-DEAL::  Primal problem: time=0.61, step=22, sweep=2. 154 cells, 192 dofsStarting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
+DEAL::.
+DEAL::  Primal problem: time=0.53, step=19, sweep=2. 223 cells, 267 dofsStarting 
+DEAL:cg::Convergence step 8 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
+DEAL::.
+DEAL::  Primal problem: time=0.56, step=20, sweep=2. 199 cells, 242 dofsStarting 
+DEAL:cg::Convergence step 8 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
+DEAL::.
+DEAL::  Primal problem: time=0.58, step=21, sweep=2. 181 cells, 221 dofsStarting 
+DEAL:cg::Convergence step 8 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 13 
+DEAL::.
+DEAL::  Primal problem: time=0.61, step=22, sweep=2. 154 cells, 192 dofsStarting 
+DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 12 
+DEAL::.
+DEAL::  Primal problem: time=0.64, step=23, sweep=2. 121 cells, 157 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 11 
 DEAL::.
-DEAL::  Primal problem: time=0.64, step=23, sweep=2. 121 cells, 157 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 10 
-DEAL::.
 DEAL::  Primal problem: time=0.67, step=24, sweep=2. 124 cells, 160 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 10 
+DEAL:cg::Convergence step 11 
 DEAL::.
 DEAL::  Primal problem: time=0.70, step=25, sweep=2. 115 cells, 149 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 10 
+DEAL:cg::Convergence step 11 
 DEAL::.
 
 DEAL::  Dual problem: time=0.70, step=25, sweep=2. 115 cells, 567 dofs.
 DEAL::  Dual problem: time=0.67, step=24, sweep=2. 124 cells, 608 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 8 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 9 
 DEAL::.
 DEAL::  Dual problem: time=0.64, step=23, sweep=2. 121 cells, 599 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 8 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 9 
 DEAL::.
 DEAL::  Dual problem: time=0.61, step=22, sweep=2. 154 cells, 734 dofsStarting 
+DEAL:cg::Convergence step 8 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 7 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.58, step=21, sweep=2. 181 cells, 850 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.56, step=20, sweep=2. 199 cells, 934 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.53, step=19, sweep=2. 223 cells, 1034 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.50, step=18, sweep=2. 286 cells, 1303 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 12 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.47, step=17, sweep=2. 301 cells, 1371 dofsStarting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 13 
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
-DEAL::  Dual problem: time=0.44, step=16, sweep=2. 337 cells, 1535 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 15 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.42, step=15, sweep=2. 400 cells, 1801 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 16 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.39, step=14, sweep=2. 457 cells, 2032 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 17 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.36, step=13, sweep=2. 487 cells, 2162 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 17 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.33, step=12, sweep=2. 493 cells, 2196 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 19 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.30, step=11, sweep=2. 517 cells, 2298 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 19 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.28, step=10, sweep=2. 550 cells, 2455 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 18 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.25, step=9, sweep=2. 550 cells, 2450 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 18 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.22, step=8, sweep=2. 508 cells, 2258 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 18 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.19, step=7, sweep=2. 484 cells, 2166 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 18 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.16, step=6, sweep=2. 502 cells, 2250 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 19 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.14, step=5, sweep=2. 487 cells, 2175 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 19 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.11, step=4, sweep=2. 439 cells, 1978 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 18 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL::.
-DEAL::  Dual problem: time=0.08, step=3, sweep=2. 367 cells, 1682 dofsStarting 
-DEAL:cg::Starting 
+DEAL::  Dual problem: time=0.47, step=17, sweep=2. 301 cells, 1371 dofsStarting 
 DEAL:cg::Convergence step 14 
 DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.44, step=16, sweep=2. 337 cells, 1535 dofsStarting 
+DEAL:cg::Convergence step 16 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.42, step=15, sweep=2. 400 cells, 1801 dofsStarting 
+DEAL:cg::Convergence step 17 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.39, step=14, sweep=2. 457 cells, 2032 dofsStarting 
+DEAL:cg::Convergence step 18 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.36, step=13, sweep=2. 487 cells, 2162 dofsStarting 
+DEAL:cg::Convergence step 18 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.33, step=12, sweep=2. 493 cells, 2196 dofsStarting 
+DEAL:cg::Convergence step 20 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.30, step=11, sweep=2. 517 cells, 2298 dofsStarting 
+DEAL:cg::Convergence step 20 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.28, step=10, sweep=2. 550 cells, 2455 dofsStarting 
+DEAL:cg::Convergence step 19 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.25, step=9, sweep=2. 550 cells, 2450 dofsStarting 
+DEAL:cg::Convergence step 19 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.22, step=8, sweep=2. 508 cells, 2258 dofsStarting 
+DEAL:cg::Convergence step 19 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.19, step=7, sweep=2. 484 cells, 2166 dofsStarting 
+DEAL:cg::Convergence step 19 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.16, step=6, sweep=2. 502 cells, 2250 dofsStarting 
+DEAL:cg::Convergence step 20 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.14, step=5, sweep=2. 487 cells, 2175 dofsStarting 
+DEAL:cg::Convergence step 20 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.11, step=4, sweep=2. 439 cells, 1978 dofsStarting 
+DEAL:cg::Convergence step 19 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
+DEAL::.
+DEAL::  Dual problem: time=0.08, step=3, sweep=2. 367 cells, 1682 dofsStarting 
+DEAL:cg::Convergence step 15 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.05, step=2, sweep=2. 310 cells, 1433 dofsStarting 
+DEAL:cg::Convergence step 12 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 11 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.02, step=1, sweep=2. 211 cells, 1001 dofsStarting 
+DEAL:cg::Convergence step 10 
 DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::.
 DEAL::  Dual problem: time=0.00, step=0, sweep=2. 169 cells, 817 dofsStarting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 8 
-DEAL:cg::Starting 
-DEAL:cg::Starting 
 DEAL:cg::Convergence step 9 
+DEAL:cg::Starting 
+DEAL:cg::Convergence step 10 
 DEAL::.
 
 DEAL::  Postprocessing: time=0.00, step=0, sweep=2. [ee][o]%!PS-Adobe-2.0 EPSF-1.2
@@ -3571,32 +3268,32 @@ DEAL::#    time
 #    Huyghens wave
 
 
-DEAL::0.00   169 211 0 0 0.00 0.00 0.00    169 817 8 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.02   211 257 7 11 0.94 1.24 2.18    211 1001 9 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.05   310 366 7 12 0.54 1.64 2.18    310 1433 11 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.08   367 429 7 12 1.19 0.99 2.18    367 1682 14 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.11   439 504 8 12 1.14 1.03 2.17    439 1978 18 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.14   487 554 9 12 1.11 1.04 2.15    487 2175 19 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.16   502 573 9 12 0.99 1.07 2.07    502 2250 19 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.19   484 552 9 12 0.83 0.95 1.79    484 2166 18 9 0.00 0.00 0.00    0.00    -0.00 
-DEAL::0.22   508 576 8 12 0.92 0.81 1.73    508 2258 18 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.25   550 624 8 12 0.90 0.70 1.60    550 2450 18 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.28   550 625 9 12 0.74 0.75 1.50    550 2455 18 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.30   517 585 9 12 0.61 0.74 1.35    517 2298 19 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.33   493 560 9 12 0.50 0.67 1.18    493 2196 19 9 0.00 0.00 0.00    -0.00    -0.00 
-DEAL::0.36   487 552 8 14 0.54 0.48 1.02    487 2162 17 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.39   457 518 8 13 0.51 0.45 0.96    457 2032 17 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.42   400 460 8 13 0.40 0.43 0.83    400 1801 16 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.44   337 393 8 12 0.37 0.39 0.77    337 1535 15 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.47   301 352 8 12 0.38 0.32 0.70    301 1371 13 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.50   286 335 7 12 0.26 0.27 0.54    286 1303 12 9 0.00 0.00 0.00    -0.00    0.00 
-DEAL::0.53   223 267 7 12 0.27 0.25 0.53    223 1034 8 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.56   199 242 7 12 0.24 0.24 0.49    199 934 8 9 0.00 0.00 0.00    0.00    0.00 
-DEAL::0.58   181 221 7 12 0.22 0.24 0.47    181 850 8 9 0.00 0.00 0.00    0.00    0.01 
-DEAL::0.61   154 192 8 11 0.21 0.18 0.39    154 734 7 9 0.00 0.00 0.00    0.00    0.02 
-DEAL::0.64   121 157 7 10 0.18 0.18 0.37    121 599 7 8 0.00 0.00 0.00    -0.00    0.03 
-DEAL::0.67   124 160 7 10 0.17 0.20 0.37    124 608 7 8 0.00 0.00 0.00    -0.00    0.03 
-DEAL::0.70   115 149 7 10 0.16 0.15 0.31    115 567 0 0 0.00 0.00 0.00    -0.00    0.04 
+DEAL::0.00   169 211 0 0 0.00 0.00 0.00    169 817 9 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.02   211 257 8 12 0.94 1.24 2.18    211 1001 10 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.05   310 366 8 13 0.54 1.64 2.18    310 1433 12 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.08   367 429 8 13 1.19 0.99 2.18    367 1682 15 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.11   439 504 9 13 1.14 1.03 2.17    439 1978 19 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.14   487 554 10 13 1.11 1.04 2.15    487 2175 20 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.16   502 573 10 13 0.99 1.07 2.07    502 2250 20 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.19   484 552 10 13 0.83 0.95 1.79    484 2166 19 10 0.00 0.00 0.00    0.00    -0.00 
+DEAL::0.22   508 576 9 13 0.92 0.81 1.73    508 2258 19 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.25   550 624 9 13 0.90 0.70 1.60    550 2450 19 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.28   550 625 10 13 0.74 0.75 1.50    550 2455 19 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.30   517 585 10 13 0.61 0.74 1.35    517 2298 20 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.33   493 560 10 13 0.50 0.67 1.18    493 2196 20 10 0.00 0.00 0.00    -0.00    -0.00 
+DEAL::0.36   487 552 9 15 0.54 0.48 1.02    487 2162 18 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.39   457 518 9 14 0.51 0.45 0.96    457 2032 18 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.42   400 460 9 14 0.40 0.43 0.83    400 1801 17 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.44   337 393 9 13 0.37 0.39 0.77    337 1535 16 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.47   301 352 9 13 0.38 0.32 0.70    301 1371 14 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.50   286 335 8 13 0.26 0.27 0.54    286 1303 13 10 0.00 0.00 0.00    -0.00    0.00 
+DEAL::0.53   223 267 8 13 0.27 0.25 0.53    223 1034 9 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.56   199 242 8 13 0.24 0.24 0.49    199 934 9 10 0.00 0.00 0.00    0.00    0.00 
+DEAL::0.58   181 221 8 13 0.22 0.24 0.47    181 850 9 10 0.00 0.00 0.00    0.00    0.01 
+DEAL::0.61   154 192 9 12 0.21 0.18 0.39    154 734 8 10 0.00 0.00 0.00    0.00    0.02 
+DEAL::0.64   121 157 8 11 0.18 0.18 0.37    121 599 8 9 0.00 0.00 0.00    -0.00    0.03 
+DEAL::0.67   124 160 8 11 0.17 0.20 0.37    124 608 8 9 0.00 0.00 0.00    -0.00    0.03 
+DEAL::0.70   115 149 8 11 0.16 0.15 0.31    115 567 0 0 0.00 0.00 0.00    -0.00    0.04 
 
 DEAL::    Writing summary.Summary of this sweep:
 ======================

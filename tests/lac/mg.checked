@@ -1,25 +1,19 @@
 
 DEAL::Level 0 size 3
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 0 
+DEAL:cg::Convergence step 1 
 DEAL::Level 1 size 6
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 4 
+DEAL:cg::Convergence step 5 
 DEAL::Level 2 size 12
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 9 
+DEAL:cg::Convergence step 10 
 DEAL::Level 3 size 24
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 18 
+DEAL:cg::Convergence step 19 
 DEAL::Level 4 size 48
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 44 
+DEAL:cg::Convergence step 45 
 DEAL::Level 5 size 96
 DEAL:cg::Starting 
-DEAL:cg::Starting 
-DEAL:cg::Convergence step 87 
+DEAL:cg::Convergence step 88 

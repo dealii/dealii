@@ -61,7 +61,8 @@
  * you will see more refined cells being raised against cells with
  * less refinement.  Also, if you draw a cut through a 3d grid, you
  * can extrude the refinement level in the direction orthogonal to the
- * cut plane.
+ * cut plane. The same can be done with the material id, which is plotted
+ * after the level.
  *
  * A more useful application of this feature is the following: if you use the
  * GNUPLOT command (for a 2d grid here)
@@ -91,8 +92,13 @@
  * changed. The line width is to be compared with the extension of the picture,
  * of which the default is 300.
  *
+ * The flag @p color_lines_on_user_flag# allows to draw lines with th
+ * #user_flag# set to be drawn in red. The colors black and red are
+ * defined as #b# and #r# in the preamble of the output file and can
+ * be changed there according to need.
+ *
  * Names and values of additional flags controlling the output can be found
- * in the documentation of the #GridOut::GnuplotFlags# class. Especially
+ * in the documentation of the #GridOut::EpsFlags# class. Especially
  * the viewpoint for three dimensional grids is of importance here.
  * 
  *
@@ -161,7 +167,8 @@
  * as usual.
  *
  *
- * @author Wolfgang Bangerth, 1999; postscript format based on an implementation by Stefan Nauber, 1999 */
+ * @author Wolfgang Bangerth, 1999; postscript format based on an implementation by Stefan Nauber, 1999
+ */
 class GridOut 
 {
   public:
@@ -246,12 +253,25 @@ class GridOut
 					  * Default: #false#.
 					  */
 	bool write_level;
+
+					 /**
+					  * Write the material of a cell as
+					  * an additional column after the
+					  * coordinates. See the general
+					  * documentation of this class
+					  * for an example of the use
+					  * of this feature.
+					  *
+					  * Default: #false#.
+					  */
+	bool write_material;
 	
 					 /**
 					  * Constructor.
 					  */
 	GnuplotFlags (const bool write_cell_number = false,
-		      const bool write_level       = false);
+		      const bool write_level       = false,
+		      const bool write_material    = false);
     };
 
 				     /**
@@ -303,13 +323,19 @@ class GridOut
 					  * units. Default is 0.5.
 					  */
 	double line_width;
+					 /**
+					  * Should lines with a set #user_flag#
+					  * be drawn in a different color?
+					  */
+	bool color_lines_on_user_flag;
 	
 					 /**
 					  * Constructor.
 					  */
 	EpsFlagsBase (const SizeType     size_type  = width,
 		      const unsigned int size       = 300,
-		      const double       line_width = 0.5);
+		      const double       line_width = 0.5,
+		      bool color_lines_on_user_flag = false);
     };
 
 
@@ -326,12 +352,12 @@ class GridOut
     {};
 
 //#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+//    template <>
 
 				     /**
 				      * Flags specific to the output of
 				      * grids in three space dimensions.
 				      */
-//    template <>
     struct EpsFlags<3> : public EpsFlagsBase
     {
 					 /**

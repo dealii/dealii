@@ -19,23 +19,27 @@ GridOut::UcdFlags::UcdFlags (const bool write_preamble,
 			     const bool write_faces) :
 		write_preamble (write_preamble),
 		write_faces (write_faces)
-{};
+{}
 
 
 GridOut::GnuplotFlags::GnuplotFlags (const bool write_cell_numbers,
-				     const bool write_level) :
+				     const bool write_level,
+				     const bool write_material) :
 		write_cell_numbers (write_cell_numbers),
-		write_level (write_level)
-{};
+		write_level (write_level),
+		write_material(write_material)
+{}
 
 
 GridOut::EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
 				     const unsigned int size,
-				     const double       line_width) :
+				     const double       line_width,
+				     bool color_lines_on_user_flag) :
 		size_type (size_type),
 		size (size),
-		line_width (line_width)
-{};
+		line_width (line_width),
+		color_lines_on_user_flag(color_lines_on_user_flag)
+{}
 
 
 // egcs 1.1.2 does not understand this, so I made it inlined in the

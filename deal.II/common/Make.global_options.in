@@ -47,26 +47,21 @@ vpath %.a $(lib-path-base)
 vpath %.a $(lib-path-lac)
 vpath %.a $(lib-path-deal2)
 
-ifeq ($(enable-shared),yes)
-  lib-suffix = .so
-else
-  lib-suffix = .a
-endif
+lib-suffix = @lib_suffix@
 
+lib-base.o     = $(lib-path-base)/libbase@lib_suffix@
+lib-base.g     = $(lib-path-base)/libbase.g@lib_suffix@
 
-lib-base.o     = $(lib-path-base)/libbase$(lib-suffix)
-lib-base.g     = $(lib-path-base)/libbase.g$(lib-suffix)
+lib-lac.o      = $(lib-path-lac)/liblac@lib_suffix@
+lib-lac.g      = $(lib-path-lac)/liblac.g@lib_suffix@
 
-lib-lac.o      = $(lib-path-lac)/liblac$(lib-suffix)
-lib-lac.g      = $(lib-path-lac)/liblac.g$(lib-suffix)
+lib-deal2-1d.o = $(lib-path-deal2)/libdeal_II_1d@lib_suffix@
+lib-deal2-2d.o = $(lib-path-deal2)/libdeal_II_2d@lib_suffix@
+lib-deal2-3d.o = $(lib-path-deal2)/libdeal_II_3d@lib_suffix@
 
-lib-deal2-1d.o = $(lib-path-deal2)/libdeal_II_1d$(lib-suffix)
-lib-deal2-2d.o = $(lib-path-deal2)/libdeal_II_2d$(lib-suffix)
-lib-deal2-3d.o = $(lib-path-deal2)/libdeal_II_3d$(lib-suffix)
-
-lib-deal2-1d.g = $(lib-path-deal2)/libdeal_II_1d.g$(lib-suffix)
-lib-deal2-2d.g = $(lib-path-deal2)/libdeal_II_2d.g$(lib-suffix)
-lib-deal2-3d.g = $(lib-path-deal2)/libdeal_II_3d.g$(lib-suffix)
+lib-deal2-1d.g = $(lib-path-deal2)/libdeal_II_1d.g@lib_suffix@
+lib-deal2-2d.g = $(lib-path-deal2)/libdeal_II_2d.g@lib_suffix@
+lib-deal2-3d.g = $(lib-path-deal2)/libdeal_II_3d.g@lib_suffix@
 
 
 # include paths. add library paths to existing variable
@@ -80,12 +75,14 @@ INCLUDE           += $(addprefix -I, $(include-path-base) \
 
 # compiler flags for debug and optimized mode
 
-CXXFLAGS.g   = -DDEBUG -ggdb -Wall -W -Wconversion \
+CXXFLAGS.g   = @DEFS@ @shared_libs@ \
+               -DDEBUG -ggdb -Wall -W -Wconversion \
                -Winline -Woverloaded-virtual\
 	       -ftemplate-depth-32\
                $(INCLUDE) \
 	       $(LIBPATH)
-CXXFLAGS.o   = -O2 -Wuninitialized \
+CXXFLAGS.o   = @DEFS@ @shared_libs@ @throw_opt@ \
+               -O2 -Wuninitialized \
                -felide-constructors -fnonnull-objects \
 	       -ftemplate-depth-32 \
                $(INCLUDE) \
@@ -115,7 +112,7 @@ endif
 
 # after egcs1.1, the optimization flag -fstrict-aliasing was
 # introduced, which enables better optimizations for well-written C++
-# code. we believe that deal.II falls into that category and thusly
+# code. we believe that deal.II falls into that category and thus
 # enable the flag
 ifneq ($(GXX-Version),egcs1.1)
   CXXFLAGS.o += -fstrict-aliasing
@@ -147,15 +144,4 @@ ifneq ($(with-multithreading),no)
   CXXFLAGS.o += -DDEAL_II_USE_MT
 
   vpath %.a $(ACE_ROOT)
-endif
-
-
-# when using shared libraries, we have to compile with -fPIC (note
-# that -fpic is not enough). On AIX, however, -fPIC is the default
-# and the compiler warns if we pass that flag to it.
-ifeq ($(enable-shared),yes)
-  ifneq ($(OS),AIX)
-    CXXFLAGS.g += -fPIC
-    CXXFLAGS.o += -fPIC
-  endif
 endif

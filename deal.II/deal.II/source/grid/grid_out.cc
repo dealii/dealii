@@ -231,53 +231,103 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
     {
       if (gnuplot_flags.write_cell_numbers)
 	out << "# cell " << cell << endl;
-      
+//TODO: plot level and material according to switches      
       switch (dim)
 	{
 	  case 1:
-		out << cell->vertex(0) << ' ' << cell->level() << endl
-		    << cell->vertex(1) << ' ' << cell->level() << endl
+		out << cell->vertex(0)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(1)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
 		break;
 
 	  case 2:
-		out << cell->vertex(0) << ' ' << cell->level() << endl
-		    << cell->vertex(1) << ' ' << cell->level() << endl
-		    << cell->vertex(2) << ' ' << cell->level() << endl
-		    << cell->vertex(3) << ' ' << cell->level() << endl
-		    << cell->vertex(0) << ' ' << cell->level() << endl
+		out << cell->vertex(0)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(1)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(2)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(3)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(0)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl  // double new line for gnuplot 3d plots
 		    << endl;
 		break;
 
 	  case 3:
 						 // front face
-		out << cell->vertex(0) << ' ' << cell->level() << endl
-		    << cell->vertex(1) << ' ' << cell->level() << endl
-		    << cell->vertex(2) << ' ' << cell->level() << endl
-		    << cell->vertex(3) << ' ' << cell->level() << endl
-		    << cell->vertex(0) << ' ' << cell->level() << endl
+		out << cell->vertex(0)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(1)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(2)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(3)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(0)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
 						 // back face
-		out << cell->vertex(4) << ' ' << cell->level() << endl
-		    << cell->vertex(5) << ' ' << cell->level() << endl
-		    << cell->vertex(6) << ' ' << cell->level() << endl
-		    << cell->vertex(7) << ' ' << cell->level() << endl
-		    << cell->vertex(4) << ' ' << cell->level() << endl
+		out << cell->vertex(4)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(5)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(6)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(7)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(4)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
 
 						 // now for the four connecting lines
-		out << cell->vertex(0) << ' ' << cell->level() << endl
-		    << cell->vertex(4) << ' ' << cell->level() << endl
+		out << cell->vertex(0)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(4)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
-		out << cell->vertex(1) << ' ' << cell->level() << endl
-		    << cell->vertex(5) << ' ' << cell->level() << endl
+		out << cell->vertex(1)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(5)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
-		out << cell->vertex(2) << ' ' << cell->level() << endl
-		    << cell->vertex(6) << ' ' << cell->level() << endl
+		out << cell->vertex(2)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(6)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
-		out << cell->vertex(3) << ' ' << cell->level() << endl
-		    << cell->vertex(7) << ' ' << cell->level() << endl
+		out << cell->vertex(3)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
+		    << cell->vertex(7)
+		    << ' ' << cell->level()
+		    << ' ' << (unsigned int) cell->material_id() << endl
 		    << endl;
 		break;
 	};
@@ -286,12 +336,23 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
   AssertThrow (out, ExcIO());
 };
 
+struct LineEntry
+{
+    Point<2> first;
+    Point<2> second;
+    bool colorize;
+    LineEntry(const Point<2>& f, const Point<2>& s, const bool c)
+		    :
+		    first(f), second(s), colorize(c)
+      {}
+};
 
 template <int dim>
 void GridOut::write_eps (const Triangulation<dim> &tria,
 			 ostream                  &out) 
 {
-  typedef list<pair<Point<2>,Point<2> > > LineList;
+  
+  typedef list<LineEntry> LineList;
 
 				   // get a pointer to the flags
 				   // common to all dimensions,
@@ -342,10 +403,12 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					   // know this. hopefully, the
 					   // compiler will optimize away
 					   // this little kludge
-	  line_list.push_back (make_pair(Point<2>(line->vertex(0)(0),
+	  line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
 						  line->vertex(0)(1)),
 					 Point<2>(line->vertex(1)(0),
-						  line->vertex(1)(1))));
+						  line->vertex(1)(1)),
+					 line->user_flag_set()));
+	
 	break;
       };
        
@@ -402,10 +465,11 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	const Point<dim> unit_vector2 = vector2 / sqrt(vector2.square());
 	
 	for (; line!=endline; ++line) 
-	  line_list.push_back (make_pair(Point<2>(line->vertex(0) * unit_vector2,
+	  line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
 						  line->vertex(0) * unit_vector1),
 					 Point<2>(line->vertex(1) * unit_vector2,
-						  line->vertex(1) * unit_vector1)));
+						  line->vertex(1) * unit_vector1),
+					 line->user_flag_set()));
 
 	break;
       };
@@ -481,8 +545,12 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				       // the output small:
 				       // m=move turtle to
 				       // x=execute line stroke
+				       // b=black pen
+				       // r=red pen
       out << "/m {moveto} bind def" << endl
-	  << "/x {lineto stroke} bind def" << endl;
+	  << "/x {lineto stroke} bind def" << endl
+	  << "/b {0 0 0 setrgbcolor} def" << endl
+	  << "/r {1 0 0 setrgbcolor} def" << endl;
       
       out << "%%EndProlog" << endl
 	  << endl;
@@ -496,8 +564,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   
   for (LineList::const_iterator line=line_list.begin();
        line!=line_list.end(); ++line)
-    out << (line->first  - offset) * scale << " m "
-	<< (line->second - offset) * scale << " x\n";
+    out << ((line->colorize && eps_flags_base.color_lines_on_user_flag) ? "r " : "b ")
+	<< (line->first  - offset) * scale << " m "
+	<< (line->second - offset) * scale << " x" << endl;
 
   out << "showpage" << endl;
   

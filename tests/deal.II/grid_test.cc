@@ -173,6 +173,8 @@ void test (const int test_case)
   
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
+
+  tria.begin_active()->set_material_id(3);
   
   if ((dim==1) && ((test_case==2) || (test_case==3)))
     {

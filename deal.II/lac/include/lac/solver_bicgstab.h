@@ -51,9 +51,14 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				     /**
 				      * Constructor.
 				      */
-    SolverBicgstab(SolverControl &cn,
-		   VectorMemory<Vector> &mem,
-		   const AdditionalData &data=AdditionalData());
+    SolverBicgstab (SolverControl &cn,
+		    VectorMemory<Vector> &mem,
+		    const AdditionalData &data=AdditionalData());
+
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~SolverBicgstab ();
 
 				     /**
 				      * Solve primal problem only.
@@ -70,6 +75,20 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				      * Computation of the stopping criterion.
 				      */
     virtual double criterion();
+
+				     /**
+				      * Interface for derived class.
+				      * This function gets the current
+				      * iteration vector, the residual
+				      * and the update vector in each
+				      * step. It can be used for a
+				      * graphical output of the
+				      * convergence history.
+				      */
+    virtual void print_vectors(const unsigned int step,
+			       const Vector& x,
+			       const Vector& r,
+			       const Vector& d) const;
 
 				     /**
 				      * Auxiliary vector.
@@ -166,10 +185,19 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 /*-------------------------Inline functions -------------------------------*/
 
 template<class Matrix, class Vector>
-SolverBicgstab<Matrix, Vector>::SolverBicgstab(SolverControl &cn,
+SolverBicgstab<Matrix, Vector>::SolverBicgstab (SolverControl &cn,
 					       VectorMemory<Vector> &mem,
-					       const AdditionalData &) :
-		Solver<Matrix,Vector>(cn,mem)  {}
+					       const AdditionalData &)
+		:
+		Solver<Matrix,Vector>(cn,mem)
+{}
+
+
+
+template<class Matrix, class Vector>
+SolverBicgstab<Matrix, Vector>::~SolverBicgstab ()
+{}
+
 
 
 template<class Matrix, class Vector>
@@ -179,6 +207,7 @@ SolverBicgstab<Matrix, Vector>::criterion()
   res = MA->residual(*Vt, *Vx, *Vb);
   return res;
 }
+
 
 
 template < class Matrix, class Vector >
@@ -192,6 +221,17 @@ SolverBicgstab<Matrix, Vector>::start()
   SolverControl::State state = control().check(step, res);
   return state;
 }
+
+
+
+template<class Matrix, class Vector>
+void
+SolverBicgstab<Matrix,Vector>::print_vectors(const unsigned int,
+					     const Vector&,
+					     const Vector&,
+					     const Vector&) const
+{}
+
 
 
 template<class Matrix, class Vector>
@@ -236,6 +276,7 @@ SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
       r.equ(1., s, -omega, t);
 
       state = control().check(++step, criterion());
+      print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
   if (state == SolverControl::success) return success;

@@ -109,12 +109,25 @@ class SolverQMRS : public Solver<Matrix,Vector>
 		       const Vector &b,
 		       const Preconditioner& precondition);
 
-  protected:
+				     /**
+				      * Interface for derived class.
+				      * This function gets the current
+				      * iteration vector, the residual
+				      * and the update vector in each
+				      * step. It can be used for a
+				      * graphical output of the
+				      * convergence history.
+				      */
+    virtual void print_vectors(const unsigned int step,
+			       const Vector& x,
+			       const Vector& r,
+			       const Vector& d) const;
+   protected:
 				     /**
 				      * Implementation of the computation of
 				      * the norm of the residual.
 				      */
-    virtual long double criterion();
+    virtual double criterion();
     
 				     /**
 				      * Temporary vectors, allocated through
@@ -182,11 +195,22 @@ SolverQMRS<Matrix,Vector>::SolverQMRS(SolverControl &cn,
 
 
 template<class Matrix, class Vector>
-long double
+double
 SolverQMRS<Matrix,Vector>::criterion()
 {
   return sqrt(res2);
-};
+}
+
+
+
+template<class Matrix, class Vector>
+void
+SolverQMRS<Matrix,Vector>::print_vectors(const unsigned int,
+					       const Vector&,
+					       const Vector&,
+					       const Vector&) const
+{}
+
 
 
 template<class Matrix, class Vector>
@@ -322,6 +346,8 @@ while (state == SolverControl::iterate)
 
       d.sadd(psi*theta_old, psi*alpha, p);
       x.add(d);
+
+      print_vectors(step,x,v,d);
 				       // Step 5
       if (additional_data.exact_residual)
 	res = A.residual(q,x,b);

@@ -135,6 +135,19 @@ void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 
 
 template <int dim>
+void DataOut_DoFData<dim>::clear_data_vectors ()
+{
+  dof_data.erase (dof_data.begin(), dof_data.end());
+  cell_data.erase (cell_data.begin(), cell_data.end());
+
+				   // delete patches
+  vector<DataOutBase::Patch<dim> > dummy;
+  patches.swap (dummy);
+}
+
+
+
+template <int dim>
 void DataOut_DoFData<dim>::clear ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());

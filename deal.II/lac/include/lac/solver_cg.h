@@ -63,22 +63,43 @@ class SolverCG : public Solver<Matrix,Vector>
 	      const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~SolverCG ();
+
+				     /**
 				      * Solver method.
 				      */
     template<class Preconditioner>
     typename Solver<Matrix,Vector>::ReturnState
     solve (const Matrix &A,
-		       Vector       &x,
-		       const Vector &b,
-		       const Preconditioner& precondition);
+	   Vector       &x,
+	   const Vector &b,
+	   const Preconditioner& precondition);
 
   protected:
 				     /**
 				      * Implementation of the computation of
-				      * the norm of the residual.
+				      * the norm of the residual. This can be
+				      * replaced by a more problem oriented
+				      * functional in a derived class.
 				      */
-    virtual long double criterion();
-    
+    virtual double criterion();
+
+				     /**
+				      * Interface for derived class.
+				      * This function gets the current
+				      * iteration vector, the residual
+				      * and the update vector in each
+				      * step. It can be used for a
+				      * graphical output of the
+				      * convergence history.
+				      */
+    virtual void print_vectors(const unsigned int step,
+			       const Vector& x,
+			       const Vector& r,
+			       const Vector& d) const;
+
 				     /**
 				      * Temporary vectors, allocated through
 				      * the #VectorMemory# object at the start
@@ -100,7 +121,7 @@ class SolverCG : public Solver<Matrix,Vector>
 				      * norm of the residual vector and thus
 				      * the square root of the #res2# value.
 				      */
-    long double res2;
+    double res2;
 };
 
 
@@ -110,16 +131,36 @@ class SolverCG : public Solver<Matrix,Vector>
 template<class Matrix, class Vector>
 SolverCG<Matrix,Vector>::SolverCG(SolverControl &cn,
 				  VectorMemory<Vector> &mem,
-				  const AdditionalData &) :
-		Solver<Matrix,Vector>(cn,mem) {};
+				  const AdditionalData &)
+		:
+		Solver<Matrix,Vector>(cn,mem)
+{}
+
 
 
 template<class Matrix, class Vector>
-long double
+SolverCG<Matrix,Vector>::~SolverCG ()
+{}
+
+
+
+template<class Matrix, class Vector>
+double
 SolverCG<Matrix,Vector>::criterion()
 {
   return sqrt(res2);
-};
+}
+
+
+
+template<class Matrix, class Vector>
+void
+SolverCG<Matrix,Vector>::print_vectors(const unsigned int,
+				       const Vector&,
+				       const Vector&,
+				       const Vector&) const
+{}
+
 
 
 template<class Matrix, class Vector>
@@ -177,6 +218,7 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
  
   while (conv == SolverControl::iterate)
     {
+      it++;
       A.vmult(Ad,d);
       
       alpha = d*Ad;
@@ -186,6 +228,8 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
       x.add(alpha,d );
       res = g.l2_norm();
 
+      print_vectors(it, x, g, d);
+      
       conv = control().check(it,res);
       if (conv) break;
       
@@ -196,7 +240,6 @@ SolverCG<Matrix,Vector>::solve (const Matrix &A,
       beta = gh/beta;
       
       d.sadd(beta,-1.,h);
-      it++;
     };
 
 

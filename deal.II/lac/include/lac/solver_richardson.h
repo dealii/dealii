@@ -84,6 +84,20 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * Default is 1., i.e. no damping.
 				      */
     void set_omega(double om=1.);
+
+				     /**
+				      * Interface for derived class.
+				      * This function gets the current
+				      * iteration vector, the residual
+				      * and the update vector in each
+				      * step. It can be used for a
+				      * graphical output of the
+				      * convergence history.
+				      */
+    virtual void print_vectors(const unsigned int step,
+			       const Vector& x,
+			       const Vector& r,
+			       const Vector& d) const;
     
   protected:
 				     /**
@@ -158,6 +172,7 @@ SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
 
       precondition(d,r);
       x.add(additional_data.omega,d);
+      print_vectors(iter,x,r,d);
     }
 
 				   // Deallocate Memory
@@ -171,6 +186,16 @@ SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
   else
     return success;
 }
+
+
+template<class Matrix, class Vector>
+void
+SolverRichardson<Matrix,Vector>::print_vectors(const unsigned int,
+					       const Vector&,
+					       const Vector&,
+					       const Vector&) const
+{}
+
 
 
 template<class Matrix,class Vector>

@@ -67,6 +67,11 @@ class SolverMinRes : public Solver<Matrix,Vector>
 		  const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Virtual destructor.
+				      */
+    ~SolverMinRes ();
+    
+				     /**
 				      * Solver method.
 				      */
     template<class Preconditioner>
@@ -87,8 +92,21 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				      * Implementation of the computation of
 				      * the norm of the residual.
 				      */
-    virtual long double criterion();
-    
+    virtual double criterion();
+				     /**
+				      * Interface for derived class.
+				      * This function gets the current
+				      * iteration vector, the residual
+				      * and the update vector in each
+				      * step. It can be used for a
+				      * graphical output of the
+				      * convergence history.
+				      */
+    virtual void print_vectors(const unsigned int step,
+			       const Vector& x,
+			       const Vector& r,
+			       const Vector& d) const;
+
 				     /**
 				      * Temporary vectors, allocated through
 				      * the #VectorMemory# object at the start
@@ -109,7 +127,7 @@ class SolverMinRes : public Solver<Matrix,Vector>
 				      * norm of the residual vector and thus
 				      * the square root of the #res2# value.
 				      */
-    long double res2;
+    double res2;
 };
 
 
@@ -117,18 +135,36 @@ class SolverMinRes : public Solver<Matrix,Vector>
 
 
 template<class Matrix, class Vector>
-SolverMinRes<Matrix,Vector>::SolverMinRes(SolverControl &cn,
+SolverMinRes<Matrix,Vector>::SolverMinRes (SolverControl &cn,
 					  VectorMemory<Vector> &mem,
-					  const AdditionalData &) :
-		Solver<Matrix,Vector>(cn,mem) {};
+					  const AdditionalData &)
+		:
+		Solver<Matrix,Vector>(cn,mem)
+{}
 
 
 template<class Matrix, class Vector>
-long double
+SolverMinRes<Matrix,Vector>::~SolverMinRes ()
+{}
+
+
+
+template<class Matrix, class Vector>
+double
 SolverMinRes<Matrix,Vector>::criterion()
 {
   return res2;
 };
+
+
+template<class Matrix, class Vector>
+void
+SolverMinRes<Matrix,Vector>::print_vectors(const unsigned int,
+					   const Vector&,
+					   const Vector&,
+					   const Vector&) const
+{}
+
 
 
 template<class Matrix, class Vector>

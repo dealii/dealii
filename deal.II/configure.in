@@ -22,10 +22,9 @@ DEAL2_DIR=`pwd`
 AC_SUBST(DEAL2_DIR)
 
 
-dnl    Check for the operating system
-OS=`uname`
-AC_SUBST(OS)
-
+dnl    Check for machine type operating system
+AC_CANONICAL_SYSTEM
+dnl AC_SUBST(target_os)
 
 dnl    Set the language for which subsequent tests shall be
 dnl    performed to C++
@@ -111,24 +110,15 @@ AC_SUBST(withmultithreading)
 
 
 
-dnl    Test whether shared libraries support is requested. Note:
-dnl    default is 'yes', if not on AIX
+dnl -------------------------------------------------------------
+dnl Test whether shared libraries support is requested.
+dnl Default is yes, but value will be adjusted to operating system
+dnl below.
+dnl -------------------------------------------------------------
 AC_ARG_ENABLE(shared,
 [  --enable-shared Set compiler flags to generate shared libraries],
     enableshared=$enableval,
-    if test $OS = AIX ; then
-      enableshared=no ;
-    else
-      enableshared=yes ;
-    fi)
-if test $enableshared = yes ; then
-   AC_MSG_RESULT(Configuring deal.II for shared libraries)
-else
-   AC_MSG_RESULT(Configuring deal.II for statically linked libraries)
-fi
-AC_SUBST(enableshared)
-
-
+    enableshared=yes)
 
 dnl -------------------------------------------------------------
 dnl Multigrid
@@ -161,7 +151,7 @@ dnl    doc/auto/scripts, but you might want a newer version.
 AC_ARG_WITH(kdoc,
 [  --with-kdoc=DIR use kdoc installed in DIR],
     kdocdir=$withval,
-    kdocdir=doc/auto/scripts/kdoc)
+    kdocdir=${DEAL2_DIR}/doc/auto/scripts/kdoc)
 AC_MSG_CHECKING(for kdoc)
 if test -r $kdocdir/kdoc ; then
   AC_MSG_RESULT(found)
@@ -197,7 +187,49 @@ else
 fi
 AC_SUBST(docxx)
 
+dnl -------------------------------------------------------------
+dnl Check for operating system
+dnl -------------------------------------------------------------
 
+case "$target" in
+
+   dnl This line should be replaced by proper handling of conditions in configure
+   dnl Right now Make.global_options needs this definition.
+
+   *-linux*) OS=Linux;;
+
+   dnl AIX does not allow shared libraries
+
+   *-aix*) enableshared=no ;;
+esac
+
+dnl -------------------------------------------------------------
+dnl Check for specific machine types
+dnl -------------------------------------------------------------
+
+case "$target" in
+   alpha*-linux*) throw_opt=-DNO_THROW enableshared=no ;;
+esac
+
+dnl -------------------------------------------------------------
+dnl Adjust option settings for OS / machine
+dnl -------------------------------------------------------------
+
+if test $enableshared = yes ; then
+  AC_MSG_RESULT(Configuring shared libraries)
+  shared_libs=-fPIC;
+  lib_suffix=.so;
+else
+  AC_MSG_RESULT(Configuring static libraries)
+  shared_libs='';
+  lib_suffix=.a;
+fi
+
+AC_SUBST(OS)
+AC_SUBST(enableshared)
+AC_SUBST(shared_libs)
+AC_SUBST(lib_suffix)
+AC_SUBST(throw_opt)
 
 dnl -------------------------------------------------------------
 dnl Configure other packages
