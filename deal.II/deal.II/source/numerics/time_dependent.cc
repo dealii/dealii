@@ -18,9 +18,13 @@ TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead
 
 
 
-TimeDependent::TimeDependent (const TimeSteppingData &data_primal):
+TimeDependent::TimeDependent (const TimeSteppingData &data_primal,
+			      const TimeSteppingData &data_dual,
+			      const TimeSteppingData &data_postprocess):
 		sweep_no (static_cast<unsigned int>(-1)),
-		timestepping_data_primal (data_primal)
+		timestepping_data_primal (data_primal),
+		timestepping_data_dual (data_dual),
+		timestepping_data_postprocess (data_postprocess)
 {};
 
 
@@ -124,50 +128,36 @@ void TimeDependent::delete_timestep (const unsigned int position)
 
 
 
+
 void
 TimeDependent::solve_primal_problem () 
 {
-  const unsigned int n_timesteps = timesteps.size();
-
-				   // initialize the time steps for
-				   // a round of primal problems
-  for (unsigned int step=0; step<n_timesteps; ++step)
-    timesteps[step]->init_for_primal_problem();
-
-				   // wake up the first few time levels
-  for (int step=-timestepping_data_primal.look_ahead; step<0; ++step)
-    for (int look_ahead=0;
-	 look_ahead<=static_cast<int>(timestepping_data_primal.look_ahead); ++look_ahead)
-      if (step+look_ahead >= 0)
-	timesteps[step+look_ahead]->wake_up(look_ahead);
-  
-  for (unsigned int step=0; step<n_timesteps; ++step)
-    {
-				       // first thing: wake up the
-				       // timesteps ahead as necessary
-      for (unsigned int look_ahead=0;
-	   look_ahead<=timestepping_data_primal.look_ahead; ++look_ahead)
-	if (step+look_ahead < n_timesteps)
-	  timesteps[step+look_ahead]->wake_up(look_ahead);
-      
-				       // actually do the work
-      timesteps[step]->solve_primal_problem ();
-      
-				       // let the timesteps behind sleep
-      for (unsigned int look_back=0;
-	   look_back<=timestepping_data_primal.look_back; ++look_back)
-	if (step>=look_back)
-	  timesteps[step-look_back]->sleep(look_back);
-    };
-
-				   // make the last few timesteps sleep
-  for (int step=n_timesteps;
-       step<static_cast<int>(n_timesteps+timestepping_data_primal.look_back); ++step)
-    for (int look_back=0;
-	 look_back<=static_cast<int>(timestepping_data_primal.look_back); ++look_back)
-      if ((step-look_back>=0) && (step-look_back<static_cast<int>(n_timesteps)))
-	timesteps[step-look_back]->sleep(look_back);
+  do_loop (&TimeStepBase::init_for_primal_problem,
+	   &TimeStepBase::solve_primal_problem,
+	   timestepping_data_primal);
 };
+
+
+
+void
+TimeDependent::solve_dual_problem () 
+{
+  do_loop (&TimeStepBase::init_for_dual_problem,
+	   &TimeStepBase::solve_dual_problem,
+	   timestepping_data_dual);
+};
+
+
+
+void
+TimeDependent::postprocess () 
+{
+  do_loop (&TimeStepBase::init_for_postprocessing,
+	   &TimeStepBase::postprocess_timestep,
+	   timestepping_data_postprocess);
+};
+
+
 
 
 
@@ -247,9 +237,25 @@ TimeStepBase::init_for_dual_problem ()
 
 
 
+void
+TimeStepBase::init_for_postprocessing () 
+{
+  next_action = postprocess;
+};
+
+
+
 
 void
 TimeStepBase::solve_dual_problem () 
+{
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+
+void
+TimeStepBase::postprocess_timestep () 
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
@@ -373,6 +379,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
 
   coarse_grid.unsubscribe();
 };
+
 
 
 template <int dim>

@@ -84,7 +84,9 @@ class TimeDependent
 				     /**
 				      * Constructor.
 				      */
-    TimeDependent (const TimeSteppingData &data_primal);
+    TimeDependent (const TimeSteppingData &data_primal,
+		   const TimeSteppingData &data_dual,
+		   const TimeSteppingData &data_postprocess);
     
     
 				     /**
@@ -143,9 +145,80 @@ class TimeDependent
 				      */
     void delete_timestep (const unsigned int position);
     
-
+				     /**
+				      * Solve the primal problem; uses the
+				      * functions #init_for_primal_problem#
+				      * and #solve_primal_problem# of the
+				      * #TimeStepBase# class through the
+				      * #do_loop# function of this class.
+				      *
+				      * Look ahead and look back are
+				      * determined by the #timestepping_data_primal#
+				      * object given to the constructor.
+				      */
     void solve_primal_problem ();
+
+				     /**
+				      * Solve the dual problem; uses the
+				      * functions #init_for_dual_problem#
+				      * and #solve_dual_problem# of the
+				      * #TimeStepBase# class through the
+				      * #do_loop# function of this class.
+				      *
+				      * Look ahead and look back are
+				      * determined by the #timestepping_data_dual#
+				      * object given to the constructor.
+				      */
+    void solve_dual_problem ();
+
+				     /**
+				      * Do a postprocessing round; uses the
+				      * functions #init_for_postprocessing#
+				      * and #postprocess# of the
+				      * #TimeStepBase# class through the
+				      * #do_loop# function of this class.
+				      *
+				      * Look ahead and look back are
+				      * determined by the #timestepping_data_postprocess#
+				      * object given to the constructor.
+				      */
+    void postprocess ();
     
+				     /**
+				      * Do a loop over all timesteps, call the
+				      * #init_function# at the beginning and
+				      * the #loop_function# of each time step.
+				      * The #timestepping_data# determine how
+				      * many timesteps in front and behind
+				      * the present one the #wake_up# and
+				      * #sleep# functions are called.
+				      *
+				      * To see how this function work, note that
+				      * the function #solve_primal_problem# only
+				      * consists of a call to
+				      * #  do_loop (&TimeStepBase::init_for_primal_problem,
+				      *	   &TimeStepBase::solve_primal_problem,
+				      *	   timestepping_data_primal);#.
+				      *
+				      * Note also, that the given class from which
+				      * the two functions are taken needs not
+				      * necessarily be a #TimeStepBase#, but it
+				      * should be a derived class, that is
+				      * #static_cast#able from a #TimeStepBase#.
+				      * The function may be a virtual function
+				      * (even a pure one) of that class, which
+				      * should help if the actual class where it
+				      * is implemented is one which is derived
+				      * through virtual base classes and thus
+				      * unreachable by #static_cast# from the
+				      * #TimeStepBase# class.
+				      */
+    template <class TimeStepClass>
+    void do_loop (void (TimeStepClass::*init_function) (),
+		  void (TimeStepClass::*loop_function) (),
+		  const TimeSteppingData &timestepping_data);
+    
+		  
 				     /**
 				      * Initialize the objects for the next
 				      * sweep. This function specifically does
@@ -203,8 +276,77 @@ class TimeDependent
 				      * do. See the documentation of this struct
 				      * for more information.
 				      */
-    TimeSteppingData timestepping_data_primal;  
+    TimeSteppingData timestepping_data_primal;
+
+				     /**
+				      * Some flags telling the
+				      * #solve_dual_problem# function what to
+				      * do. See the documentation of this struct
+				      * for more information.
+				      */
+    TimeSteppingData timestepping_data_dual;
+
+				     /**
+				      * Some flags telling the
+				      * #postprocess# function what to
+				      * do. See the documentation of this struct
+				      * for more information.
+				      */
+    TimeSteppingData timestepping_data_postprocess;  
+    
 };
+
+
+
+
+template <class TimeStepClass>
+void TimeDependent::do_loop (void (TimeStepClass::*init_function) (),
+			     void (TimeStepClass::*loop_function) (),
+			     const TimeSteppingData &timestepping_data)
+{
+  const unsigned int n_timesteps = timesteps.size();
+
+				   // initialize the time steps for
+				   // a round of primal problems
+  for (unsigned int step=0; step<n_timesteps; ++step)
+    (static_cast<TimeStepClass*>(timesteps[step])->*init_function) ();
+
+				   // wake up the first few time levels
+  for (int step=-timestepping_data.look_ahead; step<0; ++step)
+    for (int look_ahead=0;
+	 look_ahead<=static_cast<int>(timestepping_data.look_ahead); ++look_ahead)
+      if (step+look_ahead >= 0)
+	timesteps[step+look_ahead]->wake_up(look_ahead);
+  
+  for (unsigned int step=0; step<n_timesteps; ++step)
+    {
+				       // first thing: wake up the
+				       // timesteps ahead as necessary
+      for (unsigned int look_ahead=0;
+	   look_ahead<=timestepping_data.look_ahead; ++look_ahead)
+	if (step+look_ahead < n_timesteps)
+	  timesteps[step+look_ahead]->wake_up(look_ahead);
+      
+				       // actually do the work
+      (static_cast<TimeStepClass*>(timesteps[step])->*loop_function) ();
+      
+				       // let the timesteps behind sleep
+      for (unsigned int look_back=0;
+	   look_back<=timestepping_data.look_back; ++look_back)
+	if (step>=look_back)
+	  timesteps[step-look_back]->sleep(look_back);
+    };
+
+				   // make the last few timesteps sleep
+  for (int step=n_timesteps;
+       step<static_cast<int>(n_timesteps+timestepping_data.look_back); ++step)
+    for (int look_back=0;
+	 look_back<=static_cast<int>(timestepping_data.look_back); ++look_back)
+      if ((step-look_back>=0) && (step-look_back<static_cast<int>(n_timesteps)))
+	timesteps[step-look_back]->sleep(look_back);
+};
+
+
 
 
 
@@ -221,7 +363,8 @@ class TimeStepBase : public Subscriptor
 				      */
     enum NextAction {
 	  primal_problem,
-	  dual_problem
+	  dual_problem,
+	  postprocess
     };
     
 				     /**
@@ -327,7 +470,13 @@ class TimeStepBase : public Subscriptor
 				      * a round of dual problem solves.
 				      */
     virtual void init_for_dual_problem ();
-    
+
+    				     /**
+				      * Same as above, but called before
+				      * a round of postprocessing steps.
+				      */
+    virtual void init_for_postprocessing ();
+
 				     /**
 				      * This function is called by the
 				      * manager object when solving the
@@ -359,6 +508,26 @@ class TimeStepBase : public Subscriptor
 				      * should really overload the function.
 				      */
     virtual void solve_dual_problem ();
+
+				     /**
+				      * This function is called by the
+				      * manager object when postprocessing
+				      * this time level
+				      * is needed. It is called after
+				      * the #wake_up# function was
+				      * called and before the #sleep#
+				      * function will be called. There
+				      * is a default implementation
+				      * doing plain nothing since some
+				      * problems may not need doing a
+				      * postprocess step, e.g. if everything
+				      * was already done when solving the
+				      * primal problem. However, it
+				      * will abort the program when
+				      * being called anyway, since then you
+				      * should really overload the function.
+				      */
+    virtual void postprocess_timestep ();
     
 				     /**
 				      * Compute the time difference to the
