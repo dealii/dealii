@@ -199,6 +199,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: There is now a <code class="class">Patterns::List</code> pattern
+       that matches a list of elements each of which has to satisfy a pattern
+       that was given to the constructor.
+       <br>
+       (WB 2002/11/29)
+       </p>
+
+  <li> <p> 
        Changed: In POSIX mode, when the <code class="member">ThreadManager</code>
        class created a new thread through <code class="member">pthread_create</code>, 
        it only checked for the error code and aborted if it was non-zero. Now, it
@@ -364,6 +372,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: The interface for sparse decompositions has been abstracted, and
+       there is now an Modified Incomplete Cholesky (MIC) decomposition in
+       addition to the Imcomplete LU (ILU) decomposition.
+       <br>
+       (<a href="mailto:cheffo@riflexo.com">Stephen Kolaroff</a> 2002/11/27)
+       </p>
+ 
   <li> <p>
        Changed: In multithread mode, the <code
        class="class">SparseMatrix</code> would spawn
@@ -764,14 +780,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       New: For encapsulated postscript of 2d grids, it is now
-       possible to tell the <code class="class">GridOut</code> to
+       New: For encapsulated postscript output of 2d grids, it is now
+       possible to tell the <code class="class">GridOut</code> class to
        write the cell numbers into each cell, as well as the numbers
        of the vertices.
        <br>
        (WB 2002/06/04)
        </p>
-
 </ol>
 
 <hr>
