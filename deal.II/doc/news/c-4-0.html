@@ -48,6 +48,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>General</h3>
 
 <ol>
+  <li> <p> The elastic example program, step-8, had a bug in the way
+       the system matrix is assembled. In effect, we were solving the
+       wrong equation. This should now be fixed.
+       <br>
+       (WB 2003/09/11)
+       </p>
+
   <li> <p> When building with both sparse direct solver MA27 and the
        TECPLOT libraries, the <code>detached_ma27</code> would not
        link properly. This is now fixed.
