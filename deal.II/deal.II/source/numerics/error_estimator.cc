@@ -368,8 +368,6 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
   const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
   Assert (neighbor.state() == valid, ExcInternalError());
   Assert (neighbor->has_children(), ExcInternalError());
-  Assert (neighbor->child(0)->has_children()==false,
-	  ExcInternalError());
 				   // set up a vector of the gradients
 				   // of the finite element function
 				   // on this cell at the quadrature
@@ -399,6 +397,9 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 			  child_cell_on_face(neighbor_neighbor,subface_no));
       Assert (neighbor_child->face(neighbor_neighbor) ==
 	      cell->face(face_no)->child(subface_no),
+	      ExcInternalError());
+      Assert (!neighbor->child(GeometryInfo<dim>::
+			       child_cell_on_face(neighbor_neighbor,subface_no))->has_children(),
 	      ExcInternalError());
             
 				       // restrict the finite element on the
