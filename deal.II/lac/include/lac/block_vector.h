@@ -630,7 +630,7 @@ namespace BlockVectorIterators
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002
  */
 template <typename Number>
 class BlockVector
