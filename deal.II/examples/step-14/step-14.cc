@@ -2953,7 +2953,7 @@ namespace LaplaceSolver
     Vector<double> dual_weights (dual_solver.dof_handler.n_dofs());
     FETools::interpolation_difference (dual_solver.dof_handler,
 				       dual_hanging_node_constraints,
-				       primal_solver.solution,
+				       dual_solver.solution,
 				       primal_solver.dof_handler,
 				       primal_hanging_node_constraints,
 				       dual_weights);
