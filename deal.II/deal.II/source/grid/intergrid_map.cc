@@ -2,10 +2,10 @@
 
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <dofs/mg_dof_handler.h>
 #include <grid/tria_accessor.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/mg_dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
 

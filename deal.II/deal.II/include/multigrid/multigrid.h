@@ -8,8 +8,9 @@
 #include <base/smartpointer.h>
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
+#include <lac/sparse_matrix.h>
 #include <lac/vector.h>
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
 
 #include <vector>
 
@@ -17,14 +18,14 @@
 
 /**
  * Implementation of multigrid with matrices.
- * While #MGBase# was only an abstract framework for the v-cycle,
+ * While #MGBase# was only an abstract framework for the V-cycle,
  * here we have the implementation of the pure virtual functions defined there.
  * Furthermore, level information is obtained from a triangulation object.
  * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-template<int dim>
-class MG : public MGBase
+template <int dim>
+class Multigrid : public MGBase
 {
   public:
 				     /**
@@ -37,10 +38,12 @@ class MG : public MGBase
 				      * (for example for hanging
 				      * nodes), a set of matrices
 				      * which describe the equation
-				      * discretized on each level, and
-				      * an object mediating the
-				      * transfer of solutions between
-				      * different levels.
+				      * discretized on each level,
+				      * their respective sparsity
+				      * patterns, and an object
+				      * mediating the transfer of
+				      * solutions between different
+				      * levels.
 				      *
 				      * This function already
 				      * initializes the vectors which
@@ -51,12 +54,13 @@ class MG : public MGBase
 				      * this type as late as possible.
 				      */
 //TODO: minlevel, maxlevel?
-    MG(const MGDoFHandler<dim>               &mg_dof_handler,
-       ConstraintMatrix                      &constraints,
-       const MGMatrix<SparseMatrix<double> > &level_matrices,
-       const MGTransferBase                  &transfer,
-       const unsigned int                     minlevel = 0,
-       const unsigned int                     maxlevel = 1000000);
+    Multigrid(const MGDoFHandler<dim>                       &mg_dof_handler,
+	      const ConstraintMatrix                        &constraints,
+	      const MGLevelObject<SparsityPattern>       &level_sparsities,
+	      const MGLevelObject<SparseMatrix<double> > &level_matrices,
+	      const MGTransferBase                          &transfer,
+	      const unsigned int                             minlevel = 0,
+	      const unsigned int                             maxlevel = 1000000);
     
 				     /**
 				      * Transfer from a vector on the
@@ -76,7 +80,8 @@ class MG : public MGBase
 				      * the respective positions of a
 				      * #Vector<double>#. In order to
 				      * keep the result consistent,
-				      * constrained degrees of freedom are set to zero.
+				      * constrained degrees of freedom
+				      * are set to zero.
 				      */
     template<typename number>
     void copy_from_mg (Vector<number> &dst) const;
@@ -102,13 +107,20 @@ class MG : public MGBase
 				      */
     SmartPointer<const MGDoFHandler<dim> > mg_dof_handler;
 
+
 				     /**
-				      * Matrices for each level.
-				      * The matrices are prepared by
-				      * the constructor of #MG# and can
-				      * be accessed for assembling.
+				      * Sparsity patterns for each level.
 				      */
-    SmartPointer<const MGMatrix<SparseMatrix<double> > > level_matrices;
+    SmartPointer<const MGLevelObject<SparsityPattern> > level_sparsities;
+    
+				     /**
+				      * Matrices for each level. The
+				      * matrices are prepared by the
+				      * constructor of #Multigrid# and
+				      * can be accessed for
+				      * assembling.
+				      */
+    SmartPointer<const MGLevelObject<SparseMatrix<double> > > level_matrices;
 
 				     /**
 				      * Pointer to the object holding
@@ -193,21 +205,16 @@ class MGTransferPrebuilt : public MGTransferBase
 
   private:
 
-				     /**
-				      * Sparsity patterns for the
-				      * prolongation matrices on each
-				      * level.
-				      */
-    vector<SparsityPattern>      prolongation_sparsities;
+    vector<SparsityPattern>   prolongation_sparsities;
 
-				     /**
-				      * The actual prolongation matrix.
-				      * column indices belong to the
-				      * dof indices of the mother cell,
-				      * i.e. the coarse level.
-				      * while row indices belong to the
-				      * child cell, i.e. the fine level.
-				      */
+					 /**
+					  * The actual prolongation matrix.
+					  * column indices belong to the
+					  * dof indices of the mother cell,
+					  * i.e. the coarse level.
+					  * while row indices belong to the
+					  * child cell, i.e. the fine level.
+					  */
     vector<SparseMatrix<float> > prolongation_matrices;
 };
 
@@ -220,7 +227,7 @@ class MGTransferPrebuilt : public MGTransferBase
 template<int dim>
 inline
 const SparseMatrix<double>&
-MG<dim>::get_matrix(unsigned int level) const
+Multigrid<dim>::get_matrix (const unsigned int level) const
 {
   Assert((level>=minlevel) && (level<maxlevel),
 	 ExcIndexRange(level, minlevel, maxlevel));

@@ -15,19 +15,18 @@
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <dofs/mg_dof_handler.h>
+#include <multigrid/mg_dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/mg_dof_accessor.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <numerics/data_io.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>
-#include <numerics/multigrid.h>
-#include <numerics/mg_smoother.h>
-#include <numerics/multigrid.templates.h>
+#include <multigrid/multigrid.h>
+#include <multigrid/mg_smoother.h>
 #include <dofs/dof_tools.h>
-#include <dofs/mg_dof_tools.h>
+#include <multigrid/mg_dof_tools.h>
 
 #include <fstream>
 
@@ -130,8 +129,8 @@ int main()
 	  SolverControl control(20, 1.e-12, true);
 	  SolverRichardson<> solver(control, mem);
 	  
-	  vector<SparsityPattern> mgstruct(tr.n_levels());
-	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
+	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);
+	  MGLevelObject<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
 	  for (unsigned int i=0;i<tr.n_levels();++i)
 	    {
 	      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
@@ -159,8 +158,8 @@ int main()
 	  transfer.build_matrices(mgdof);
 	  
 	  
-	  MG<2> multigrid(mgdof, hanging_nodes, mgA, transfer, tr.n_levels()-2);
-	  PreconditionMG<MG<2> >
+	  Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, tr.n_levels()-2);
+	  PreconditionMG<Multigrid<2> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
 
 	   u = 0.;

@@ -15,20 +15,26 @@
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <dofs/mg_dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/mg_dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>
-#include <numerics/multigrid.h>
-#include <numerics/multigrid.templates.h>
-#include <numerics/mg_smoother.h>
 #include <dofs/dof_tools.h>
-#include <dofs/mg_dof_tools.h>
+
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_dof_tools.h>
+#include <multigrid/mg_base.h>
+#include <multigrid/mg_smoother.h>
+#include <multigrid/multigrid.h>
 
 #include "helmholtz.h"
+
+#include <fstream>
+
+
+
 
 template<int dim>
 class RHSFunction : public Function<dim>
@@ -42,9 +48,9 @@ class RHSFunction : public Function<dim>
 class MGSmootherLAC : public MGSmootherBase
 {
   private:
-    SmartPointer<MGMatrix<SparseMatrix<double> > >matrices;
+    SmartPointer<MGLevelObject<SparseMatrix<double> > >matrices;
   public:
-    MGSmootherLAC(MGMatrix<SparseMatrix<double> >&);
+    MGSmootherLAC(MGLevelObject<SparseMatrix<double> >&);
     
     virtual void smooth (const unsigned int level,
 			 Vector<double> &u,
@@ -115,8 +121,8 @@ int main()
 	  solver.solve(A,u,f,precondition);
 	  
 	  u = 0.;
-	  vector<SparsityPattern> mgstruct(tr.n_levels());
-	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
+	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);
+	  MGLevelObject<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
 	  for (unsigned int i=0;i<tr.n_levels();++i)
 	    {
 	      mgstruct[i].reinit(mgdof.n_dofs(i), mgdof.n_dofs(i),
@@ -140,8 +146,8 @@ int main()
 	  transfer.build_matrices(mgdof);
 	  
 	  
-	  MG<2> multigrid(mgdof, hanging_nodes, mgA, transfer);
-	  PreconditionMG<MG<2> >
+	  Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer);
+	  PreconditionMG<Multigrid<2> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
 	  
 	  solver.solve(A, u, f, mgprecondition);
@@ -158,7 +164,7 @@ RHSFunction<dim>::value (const Point<dim>&,
   return 1.;
 }
 
-MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<double> >& matrix)
+MGSmootherLAC::MGSmootherLAC(MGLevelObject<SparseMatrix<double> >& matrix)
 		:
 		matrices(&matrix)
 {}

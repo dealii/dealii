@@ -44,7 +44,7 @@ class MGDoFTools
 				      * #ConstraintMatrix::condense(1)#,
 				      * you have to compress the
 				      * matrix yourself, using
-				      * #SparsityPattern::compress()#.
+				      * #SparseMatrixStruct::compress()#.
 				      */
     template <int dim>
     static void

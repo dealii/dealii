@@ -2,7 +2,7 @@
 
 template<int dim, class MATRIX>
 void
-Helmholtz::build_mgmatrix(MGMatrix<MATRIX>& A,
+Helmholtz::build_mgmatrix(MGLevelObject<MATRIX>& A,
 			  const MGDoFHandler<dim>& dof,
 			  const Quadrature<dim>& quadrature)
 {

@@ -6,10 +6,83 @@
 
 
 #include <lac/forward_declarations.h>
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
 #include <grid/forward_declarations.h>
 #include <base/smartpointer.h>
 #include <vector>
+
+
+
+/**
+ * Abstract base class for multigrid smoothers.
+ * In fact, this class only provides the interface of the smoothing function.
+ * Using #deal.II# grid handling, #MGSmoother# is a good point to start.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ */
+class MGSmootherBase :  public Subscriptor 
+{  
+  public:
+				     /**
+				      * Virtual destructor. Does
+				      * nothing in particular, but
+				      * needs to be declared anyhow.
+				      */
+    virtual ~MGSmootherBase();
+    
+				     /**
+				      * Smooth the residual of #u# on
+				      * the given level. If $S$ is the
+				      * smoothing operator, then this
+				      * function should do the
+				      * following operation:
+				      * $u += S (rhs - Au)$, where #u# and
+				      * #rhs# are the input parameters.
+				      *
+				      * This function should keep the
+				      * interior level boundary
+				      * values, so you may want to
+				      * call #set_zero_interior_boundary#
+				      * in the derived class
+				      * #MGSmoother# somewhere in your
+				      * derived function, or another
+				      * function doing similar things.
+				      */
+    virtual void smooth (const unsigned int    level,
+			 Vector<double>       &u,
+			 const Vector<double> &rhs) const = 0;
+};
+
+
+
+
+
+/**
+ * Smoother doing nothing. This class is not useful for many applications other
+ * than for testing some multigrid procedures. Also some applications might
+ * get convergence without smoothing and then this class brings you the
+ * cheapest possible multigrid.
+ *
+ * @author Guido Kanschat, 1999
+ */
+class MGSmootherIdentity : public MGSmootherBase
+{
+  public:
+				     /**
+				      * Implementation of the
+				      * interface in #MGSmootherBase#.
+				      * This function does nothing,
+				      * which by comparison with the
+				      * definition of this function
+				      * means that the the smoothing
+				      * operator equals the null
+				      * operator.
+				      */
+    virtual void smooth (const unsigned int   level,
+			 Vector<double>       &u,
+			 const Vector<double> &rhs) const;
+};
+
 
 
 /**
@@ -111,6 +184,9 @@ class MGSmoother : public MGSmootherBase
     vector<vector<int> > interior_boundary_dofs;
 };
 
+
+
+
 /**
  * Implementation of a smoother using matrix builtin relaxation methods.
  * 
@@ -146,11 +222,11 @@ class MGSmootherRelaxation : public MGSmoother
 				      */
 
     template<int dim>
-    MGSmootherRelaxation(const MGDoFHandler<dim> &mg_dof,
-			 const MGMatrix<SparseMatrix<number> >& matrix,
-			 function_ptr function,
-			 unsigned int steps,
-			 double omega = 1.);
+    MGSmootherRelaxation(const MGDoFHandler<dim>                       &mg_dof,
+			 const MGLevelObject<SparseMatrix<number> > &matrix,
+			 const function_ptr                             function,
+			 const unsigned int                             steps,
+			 const double                                   omega = 1.);
     
 				     /**
 				      * Implementation of the interface in #MGSmootherBase#.
@@ -164,24 +240,32 @@ class MGSmootherRelaxation : public MGSmoother
 				     /**
 				      * Pointer to the matrices.
 				      */
-    SmartPointer< const MGMatrix< SparseMatrix<number> > > matrix;
+    SmartPointer<const MGLevelObject<SparseMatrix<number> > > matrix;
+    
 				     /**
 				      * Pointer to the relaxation function.
 				      */
     function_ptr relaxation;
+
 				     /**
 				      * Relaxation parameter.
 				      */
     double omega;
+    
 				     /**
 				      * Auxiliary vector.
 				      */
     mutable Vector<double> h1;
+    
 				     /**
 				      * Auxiliary vector.
 				      */
     mutable Vector<double> h2;
 };
+
+
+
+/* ------------------------------- Inline functions -------------------------- */
 
 inline
 void

@@ -2,7 +2,7 @@
 
 #include <lac/forward_declarations.h>
 #include <base/exceptions.h>
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
 
 /**
  * Finite difference matrix on uniform grid.

@@ -1,6 +1,7 @@
 // $Id$
 
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
+#include <multigrid/mg_smoother.h>
 #include <iostream>
 #include <cmath>
 
@@ -27,29 +28,11 @@ void print_vector(ostream& s, const VECTOR& v)
 
 
 
+//////////////////////////////////////////////////////////////////////
+
+
 MGBase::~MGBase () 
 {};
-
-
-//////////////////////////////////////////////////////////////////////
-
-
-MGSmootherBase::~MGSmootherBase()
-{};
-
-
-//////////////////////////////////////////////////////////////////////
-
-
-void
-MGSmootherIdentity::smooth (const unsigned int,
-			    Vector<double>       &,
-			    const Vector<double> &) const
-{};
-
-
-
-//////////////////////////////////////////////////////////////////////
 
 
 

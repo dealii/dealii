@@ -4,10 +4,10 @@
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
-#include <dofs/mg_dof_handler.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/mg_dof_accessor.h>
 #include <dofs/dof_constraints.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/fe_system.h>
 #include <dofs/dof_tools.h>

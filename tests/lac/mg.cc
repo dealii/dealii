@@ -15,7 +15,9 @@
 #include <lac/solver_bicgstab.h>
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
+#include <multigrid/mg_smoother.h>
+
 
 #define TYPE  double
 #define ACCURACY 1.e-5
@@ -44,9 +46,9 @@ class FDMG
 				     /**
 				      * Pointer to the level matrices.
 				      */
-    SmartPointer<MGMatrix<SparseMatrix<double> > >matrices;
+    SmartPointer<MGPerLevelObject<SparseMatrix<double> > >matrices;
   public:
-    FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<double> >& matrices,
+    FDMG(unsigned int maxlevel, MGPerLevelObject<SparseMatrix<double> >& matrices,
 	 FDMGTransfer& transfer);
     
     
@@ -64,9 +66,9 @@ class MGSmootherLAC
   public MGSmootherBase
 {
   private:
-    SmartPointer<MGMatrix<SparseMatrix<double> > >matrices;
+    SmartPointer<MGPerLevelObject<SparseMatrix<double> > >matrices;
   public:
-    MGSmootherLAC(MGMatrix<SparseMatrix<double> >&);
+    MGSmootherLAC(MGPerLevelObject<SparseMatrix<double> >&);
     
     virtual void smooth (const unsigned int level,
 			 Vector<double> &u,
@@ -113,7 +115,7 @@ int main()
 
 				       // Make matrix
       vector<SparsityPattern>  structure(maxlevel+1);
-      MGMatrix<SparseMatrix<double> > A(minlevel,maxlevel);
+      MGPerLevelObject<SparseMatrix<double> > A(minlevel,maxlevel);
 
       FDMatrix testproblem(size, size);
 
@@ -157,7 +159,7 @@ int main()
     }
 }
 
-FDMG::FDMG(unsigned int maxlevel, MGMatrix<SparseMatrix<double> >& matrices,
+FDMG::FDMG(unsigned int maxlevel, MGPerLevelObject<SparseMatrix<double> >& matrices,
 	   FDMGTransfer& transfer)
 		:
 		MGBase(transfer, 0, maxlevel),
@@ -193,7 +195,7 @@ FDMG::copy_from_mg(Vector<TYPE>& v)
 }
 
 
-MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<double> >& matrix)
+MGSmootherLAC::MGSmootherLAC(MGPerLevelObject<SparseMatrix<double> >& matrix)
 		:
 		matrices(&matrix)
 {}

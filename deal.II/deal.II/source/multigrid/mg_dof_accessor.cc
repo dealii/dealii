@@ -3,16 +3,16 @@
 
 
 
-#include <dofs/mg_dof_accessor.h>
-#include <dofs/mg_dof_handler.h>
 #include <dofs/dof_levels.h>
+#include <multigrid/mg_dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
 
 #include <lac/vector.h>
-
-
+#include <lac/full_matrix.h>
+#include <lac/sparse_matrix.h>
 
 
 
@@ -662,6 +662,7 @@ MGDoFCellAccessor<2>::face (const unsigned int i) const
 };
 
 #endif
+
 
 
 

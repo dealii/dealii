@@ -1,50 +1,46 @@
 // $Id$
-// Copyright Guido Kanschat, Universitaet Heidelberg, 1999
+
 
 #include <grid/tria.h>
-#include <dofs/mg_dof_handler.h>
-#include <dofs/mg_dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
-#include <numerics/multigrid.h>
-#include <numerics/multigrid.templates.h>
-#include <numerics/mg_smoother.h>
+#include <multigrid/multigrid.h>
+#include <multigrid/multigrid.templates.h>
+#include <multigrid/mg_smoother.h>
 #include <lac/vector.h>
-#include <lac/sparse_matrix.h>
+
 
 
 /* --------------------------------- MG ------------------------------------ */
 
 template <int dim>
-MG<dim>::MG(const MGDoFHandler<dim>               &mg_dof_handler,
-	    ConstraintMatrix                      &constraints,
-	    const MGMatrix<SparseMatrix<double> > &level_matrices,
-	    const MGTransferBase                  &transfer,
-	    unsigned int minl, unsigned int maxl)
+Multigrid<dim>::Multigrid (const MGDoFHandler<dim>                       &mg_dof_handler,
+			   const ConstraintMatrix                        &constraints,
+			   const MGLevelObject<SparsityPattern>       &level_sparsities,
+			   const MGLevelObject<SparseMatrix<double> > &level_matrices,
+			   const MGTransferBase                          &transfer,
+			   const unsigned int                             minlevel,
+			   const unsigned int                             maxlevel)
 		:
-		MGBase(transfer, minl,
-		       min(mg_dof_handler.get_tria().n_levels()-1, maxl)),
+		MGBase(transfer, minlevel,
+		       min(mg_dof_handler.get_tria().n_levels()-1,
+			   maxlevel)),
 		mg_dof_handler(&mg_dof_handler),
+		level_sparsities(&level_sparsities),
 		level_matrices(&level_matrices),
 		constraints(&constraints)
-{
-				   // initialize the objects with
-				   // their correct size
-  for (unsigned int level=minlevel; level<=maxlevel ; ++level)
-    {
-      solution[level].reinit(level_matrices[level].m());
-      defect[level].reinit(level_matrices[level].m());
-    };
-};
+{};
 
 
 
 template <int dim>
 void
-MG<dim>::level_vmult (const unsigned int    level,
-		      Vector<double>       &result,
-		      const Vector<double> &u,
-		      const Vector<double> &/* rhs */)
+Multigrid<dim>::level_vmult (const unsigned int    level,
+			     Vector<double>       &result,
+			     const Vector<double> &u,
+			     const Vector<double> &/* rhs */)
 {
   (*level_matrices)[level].vmult(result,u);
   result.scale(-1.);
@@ -91,7 +87,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				   // level which have children
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
-      prolongation_sparsities.push_back (SparsityPattern ());
+      prolongation_sparsities.push_back (SparsityPattern());
 				       // reset the dimension of the structure.
 				       // note that for the number of entries
 				       // per row, the number of mother dofs
@@ -201,7 +197,20 @@ void MGTransferPrebuilt::restrict_and_add (const unsigned int   from_level,
 
 
 // explicit instatations
-template class MG<deal_II_dimension>;
+template class Multigrid<deal_II_dimension>;
 template
 void MGTransferPrebuilt::build_matrices (const MGDoFHandler<deal_II_dimension> &mg_dof);
 
+template
+void Multigrid<deal_II_dimension>::copy_to_mg (const Vector<float>& src);
+
+template
+void Multigrid<deal_II_dimension>::copy_to_mg (const Vector<double>& src);
+
+template
+void Multigrid<deal_II_dimension>::copy_from_mg (Vector<float>& src) const;
+
+template
+void Multigrid<deal_II_dimension>::copy_from_mg (Vector<double>& src) const;
+
+  

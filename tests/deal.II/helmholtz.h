@@ -1,6 +1,6 @@
 // $Id$
 
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
 
 /**
  * Generator for system matrix and right hand side.
@@ -16,7 +16,7 @@ class Helmholtz
 		   const Function<dim>& rhs);
 
     template<int dim, class MATRIX>
-    void build_mgmatrix(MGMatrix<MATRIX>& A,
+    void build_mgmatrix(MGLevelObject<MATRIX>& A,
 		   const MGDoFHandler<dim>& dof,
 		   const Quadrature<dim>& quadrature);
 };

@@ -1,17 +1,104 @@
-/*----------------------------   mg_base.h     ---------------------------*/
+/*----------------------------   mgbase.h     ---------------------------*/
 /*      $Id$                 */
-#ifndef __mg_base_H
-#define __mg_base_H
-/*----------------------------   mg_base.h     ---------------------------*/
+#ifndef __mgbase_H
+#define __mgbase_H
+/*----------------------------   mgbase.h     ---------------------------*/
 
 
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-#include <lac/forward_declarations.h>
 #include <lac/vector.h>
 
+#include <lac/forward_declarations.h>
+#include <grid/forward_declarations.h>
+
 #include <vector>
+
+
+
+
+/**
+ * An array with an object for each level.  The purpose of this class
+ * is mostly to allow access by level number, even if the lower levels
+ * are not used and therefore have no object at all; this is done by
+ * simply shifting the given index by the minimum level we have
+ * stored.
+ *
+ * In most cases, the objects which are stored on each levels, are
+ * either matrices or vectors.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ */
+template<class Object>
+class MGLevelObject : public Subscriptor
+{
+  public:
+				     /**
+				      * Constructor allowing to
+				      * initialize the number of
+				      * levels. By default, the object
+				      * is created empty.
+				      */
+    MGLevelObject (const unsigned int minlevel = 0,
+		      const unsigned int maxlevel = 0);
+    
+				     /**
+				      * Access object on level #level#.
+				      */
+    Object & operator[] (const unsigned int level);
+    
+				     /**
+				      * Access object on level
+				      * #level#. Constant version.
+				      */
+    const Object & operator[] (const unsigned int level) const;
+
+				     /**
+				      * Delete all previous contents
+				      * of this object and reset its
+				      * size according to the values
+				      * of #new_minlevel# and
+				      * #new_maxlevel#.
+				      */
+    void resize (const unsigned int new_minlevel,
+		 const unsigned int new_maxlevel);
+    
+				     /**
+				      * Call #clear# on all objects
+				      * stored by this object. This
+				      * function is only implemented
+				      * for some #Object# classes,
+				      * most notably for vectors and
+				      * matrices. Note that if
+				      * #Object==Vector<T>#, #clear#
+				      * will set all entries to zero,
+				      * while if
+				      * #Object==std::vector<T>#,
+				      * #clear# deletes the elements
+				      * of the vectors. This class
+				      * might therefore not be useful
+				      * for STL vectors.
+				      */
+    void clear();
+
+				     //////
+    unsigned int get_minlevel () const;
+    unsigned int get_maxlevel () const;
+    
+  private:
+				     /**
+				      * Level of first component.
+				      */
+    unsigned int minlevel;
+
+				     /**
+				      * Array of the objects to be held.
+				      */
+    vector<Object> objects;
+};
+
+
 
 
 
@@ -50,76 +137,60 @@ class MGCoarseGridSolver : public Subscriptor
 
 
 
-
 /**
- * Abstract base class for multigrid smoothers.
- * In fact, this class only provides the interface of the smoothing function.
- * Using #deal.II# grid handling, #MGSmoother# is a good point to start.
+ * Coarse grid solver using LAC iterative methods.
+ * This is a little wrapper, transforming a triplet of iterative
+ * solver, matrix and preconditioner into a coarse grid solver.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
- */
-class MGSmootherBase :  public Subscriptor 
-{  
-  public:
-				     /**
-				      * Virtual destructor. Does
-				      * nothing in particular, but
-				      * needs to be declared anyhow.
-				      */
-    virtual ~MGSmootherBase();
-    
-				     /**
-				      * Smooth the residual of #u# on
-				      * the given level. If $S$ is the
-				      * smoothing operator, then this
-				      * function should do the
-				      * following operation:
-				      * $u += S (rhs - Au)$, where #u# and
-				      * #rhs# are the input parameters.
-				      *
-				      * This function should keep the
-				      * interior level boundary
-				      * values, so you may want to
-				      * call #set_zero_interior_boundary#
-				      * in the derived class
-				      * #MGSmoother# somewhere in your
-				      * derived function, or another
-				      * function doing similar things.
-				      */
-    virtual void smooth (const unsigned int    level,
-			 Vector<double>       &u,
-			 const Vector<double> &rhs) const = 0;
-};
-
-
-
-
-
-/**
- * Smoother doing nothing. This class is not useful for many applications other
- * than for testing some multigrid procedures. Also some applications might
- * get convergence without smoothing and then this class brings you the
- * cheapest possible multigrid.
+ * The type of the matrix (i.e. the template parameter #MATRIX#)
+ * should be derived from #Subscriptor# to allow for the use of a
+ * smart pointer to it.
  *
  * @author Guido Kanschat, 1999
  */
-class MGSmootherIdentity : public MGSmootherBase
+template<class SOLVER, class MATRIX, class PRECOND>
+class MGCoarseGridLACIteration :  public MGCoarseGridSolver
 {
   public:
 				     /**
-				      * Implementation of the
-				      * interface in #MGSmootherBase#.
-				      * This function does nothing,
-				      * which by comparison with the
-				      * definition of this function
-				      * means that the the smoothing
-				      * operator equals the null
-				      * operator.
+				      * Constructor.
+				      * Store solver, matrix and
+				      * preconditioning method for later
+				      * use.
 				      */
-    virtual void smooth (const unsigned int   level,
-			 Vector<double>       &u,
-			 const Vector<double> &rhs) const;
+    MGCoarseGridLACIteration (SOLVER        &,
+			      const MATRIX  &,
+			      const PRECOND &);
+    
+				     /**
+				      * Implementation of the abstract
+				      * function.
+				      * Calls the solver method with
+				      * matrix, vectors and
+				      * preconditioner.
+				      */
+    virtual void operator() (const unsigned int   level,
+			     Vector<double>       &dst,
+			     const Vector<double> &src) const;
+  private:
+				     /**
+				      * Reference to the solver.
+				      */
+    SOLVER& solver;
+    
+				     /**
+				      * Reference to the matrix.
+				      */
+    const SmartPointer<const MATRIX> matrix;
+    
+				     /**
+				      * Reference to the preconditioner.
+				      */
+    const PRECOND& precondition;
 };
+
+
+
 
 
 
@@ -190,154 +261,7 @@ class MGTransferBase : public Subscriptor
 
 
 
-/**
- * An array with a vector for each level.  The purpose of this class
- * is mostly to allow access by level number, even if the lower levels
- * are not used and therefore have no vector at all; this is done by
- * simply shifting the given index by the minimum level we have
- * stored.
- *
- * @author Guido Kanschat, 1999
- */
-template<class VECTOR = Vector<double> >
-class MGVector : public Subscriptor
-{
-  public:
-				     /**
-				      * Constructor allowing to
-				      * initialize the number of
-				      * levels.
-				      */
-    MGVector (const unsigned int minlevel,
-	      const unsigned int maxlevel);
-    
-				     /**
-				      * Access vector on level #level#.
-				      */
-    VECTOR & operator[] (const unsigned int level);
-    
-				     /**
-				      * Access vector on level
-				      * #level#. Constant version.
-				      */
-    const VECTOR & operator[] (const unsigned int level) const;
-    
-				     /**
-				      * Call #clear# on all vectors
-				      * stored by this object. Note
-				      * that if #VECTOR==Vector<T>#,
-				      * #clear# will set all entries
-				      * to zero, while if
-				      * #VECTOR==std::vector<T>#,
-				      * #clear# deletes the elements
-				      * of the vectors. This class
-				      * might therefore not be useful
-				      * for STL vectors.
-				      */
-    void clear();
-    
-  private:
-				     /**
-				      * Level of first component.
-				      */
-    const unsigned int minlevel;
 
-				     /**
-				      * Array of the vectors to be held.
-				      */
-    vector<VECTOR> vectors;
-};
-
-
-
-
-/**
- * An array of matrices for each level.
- * This class provides the functionality of #vector<MATRIX># combined
- * with a subscriptor for smart pointers.
- * @author Guido Kanschat, 1999
- */
-template <class MATRIX = SparseMatrix<double> >
-class MGMatrix : public Subscriptor,
-		 public vector<MATRIX>
-{
-  public:
-				     /**
-				      * Constructor allowing to initialize the number of levels.
-				      */
-    MGMatrix(unsigned int minlevel, unsigned int maxlevel);
-    
-				     /**
-				      * Safe access operator.
-				      */
-    MATRIX& operator[](unsigned int);
-    
-				     /**
-				      * Safe access operator.
-				      */
-    const MATRIX& operator[](unsigned int) const;
-    
-  private:
-				     /**
-				      * Level of first component.
-				      */
-    unsigned int minlevel;
-};
-
-
-
-
-/**
- * Coarse grid solver using LAC iterative methods.
- * This is a little wrapper, transforming a triplet of iterative
- * solver, matrix and preconditioner into a coarse grid solver.
- *
- * The type of the matrix (i.e. the template parameter #MATRIX#)
- * should be derived from #Subscriptor# to allow for the use of a
- * smart pointer to it.
- *
- * @author Guido Kanschat, 1999
- */
-template<class SOLVER, class MATRIX, class PRECOND>
-class MGCoarseGridLACIteration :  public MGCoarseGridSolver
-{
-  public:
-				     /**
-				      * Constructor.
-				      * Store solver, matrix and
-				      * preconditioning method for later
-				      * use.
-				      */
-    MGCoarseGridLACIteration (SOLVER        &,
-			      const MATRIX  &,
-			      const PRECOND &);
-    
-				     /**
-				      * Implementation of the abstract
-				      * function.
-				      * Calls the solver method with
-				      * matrix, vectors and
-				      * preconditioner.
-				      */
-    virtual void operator() (const unsigned int   level,
-			     Vector<double>       &dst,
-			     const Vector<double> &src) const;
-  private:
-				     /**
-				      * Reference to the solver.
-				      */
-    SOLVER& solver;
-    
-				     /**
-				      * Reference to the matrix.
-				      */
-    const SmartPointer<const MATRIX> matrix;
-    
-				     /**
-				      * Reference to the preconditioner.
-				      */
-    const PRECOND& precondition;
-};
 
 
 
@@ -432,12 +356,12 @@ class MGBase : public Subscriptor
 				     /**
 				      * Auxiliary vector.
 				      */
-    MGVector<Vector<double> > defect;
+    MGLevelObject<Vector<double> > defect;
 
 				     /**
 				      * Auxiliary vector.
 				      */
-    MGVector<Vector<double> > solution;
+    MGLevelObject<Vector<double> > solution;
     
 				     /**
 				      * Prolongation and restriction object.
@@ -549,74 +473,77 @@ class PreconditionMG
 
 /* ------------------------------------------------------------------- */
 
-template<class VECTOR>
-MGVector<VECTOR>::MGVector(const unsigned int min,
-			   const unsigned int max)
+
+template<class Object>
+MGLevelObject<Object>::MGLevelObject(const unsigned int min,
+				     const unsigned int max)
 		:
-		minlevel(min),
-		vectors(max-min+1)
-{};
-
-
-
-template<class VECTOR>
-VECTOR &
-MGVector<VECTOR>::operator[] (const unsigned int i)
+		minlevel(0)
 {
-  Assert((i>=minlevel) && (i<minlevel+vectors.size()),
-	 ExcIndexRange (i, minlevel, minlevel+vectors.size()));
-  return vectors[i-minlevel];
-}
-
-
-template<class VECTOR>
-const VECTOR &
-MGVector<VECTOR>::operator[] (const unsigned int i) const
-{
-  Assert((i>=minlevel) && (i<minlevel+vectors.size()),
-	 ExcIndexRange (i, minlevel, minlevel+vectors.size()));
-  return vectors[i-minlevel];
-}
-
-
-template<class VECTOR>
-void
-MGVector<VECTOR>::clear()
-{
-  typename vector<VECTOR>::iterator v;
-  for (v = vectors.begin(); v != vectors.end(); ++v)
-    v->clear();
-  
-}
-
-
-/* ------------------------------------------------------------------- */
-
-
-template<class MATRIX>
-MGMatrix<MATRIX>::MGMatrix(unsigned int min, unsigned int max)
-		:
-		vector<MATRIX>(max-min+1),
-		minlevel(min)
-{}
-
-
-template<class MATRIX>
-MATRIX&
-MGMatrix<MATRIX>::operator[](unsigned int i)
-{
-  Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
-  return vector<MATRIX>::operator[](i-minlevel);
+  resize (min, max);
 };
 
 
 
-template<class MATRIX>
-const MATRIX&
-MGMatrix<MATRIX>::operator[](unsigned int i) const
+template<class Object>
+Object &
+MGLevelObject<Object>::operator[] (const unsigned int i)
 {
-  Assert((i>=minlevel)&&(i<minlevel+size()),ExcIndexRange(i,minlevel,minlevel+size()));
-  return vector<MATRIX>::operator[](i-minlevel);
+  Assert((i>=minlevel) && (i<minlevel+objects.size()),
+	 ExcIndexRange (i, minlevel, minlevel+objects.size()));
+  return objects[i-minlevel];
+}
+
+
+template<class Object>
+const Object &
+MGLevelObject<Object>::operator[] (const unsigned int i) const
+{
+  Assert((i>=minlevel) && (i<minlevel+objects.size()),
+	 ExcIndexRange (i, minlevel, minlevel+objects.size()));
+  return objects[i-minlevel];
+}
+
+
+
+template<class Object>
+void
+MGLevelObject<Object>::resize (const unsigned int new_minlevel,
+			       const unsigned int new_maxlevel)
+{
+  Assert (new_minlevel <= new_maxlevel, ExcInternalError());
+  objects.clear ();
+
+  minlevel = new_minlevel;
+  objects.resize (new_maxlevel - new_minlevel + 1);
+};
+
+
+
+template<class Object>
+void
+MGLevelObject<Object>::clear ()
+{
+  typename vector<Object>::iterator v;
+  for (v = objects.begin(); v != objects.end(); ++v)
+    v->clear();  
+};
+
+
+template<class Object>
+unsigned int
+MGLevelObject<Object>::get_minlevel () const
+{
+  return minlevel;
+};
+
+
+
+template<class Object>
+unsigned int
+MGLevelObject<Object>::get_maxlevel () const
+{
+  return minlevel + objects.size() - 1;
 };
 
 
@@ -681,7 +608,7 @@ PreconditionMG<MG,VECTOR>::operator() (VECTOR       &dst,
 
 
 
-/*----------------------------   mg_base.h     ---------------------------*/
-/* end of #ifndef __mg_base_H */
+/*----------------------------   mgbase.h     ---------------------------*/
+/* end of #ifndef __mgbase_H */
 #endif
-/*----------------------------   mg_base.h     ---------------------------*/
+/*----------------------------   mgbase.h     ---------------------------*/

@@ -3,7 +3,8 @@
 // deal_II_libraries.g=-ldeal_II_2d.g
 // deal_II_libraries=-ldeal_II_2d
 
-#include <lac/mgbase.h>
+#include <multigrid/mg_base.h>
+#include <multigrid/mg_smoother.h>
 #include <base/logstream.h>
 
 #include <fstream>

@@ -6,17 +6,20 @@
 
 
 #include <dofs/dof_constraints.h>
-#include <numerics/multigrid.h>
+#include <multigrid/multigrid.h>
 #include <algorithm>
 #include <fstream>
 
+#include <lac/sparse_matrix.h>
 
 
+//TODO: This function needs to be specially implemented, since in 2d mode we use faces
+#if deal_II_dimension != 1
 
 template <int dim>
 template <typename number>
 void
-MG<dim>::copy_to_mg(const Vector<number>& src)
+Multigrid<dim>::copy_to_mg(const Vector<number>& src)
 {
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
   const unsigned int dofs_per_face = mg_dof_handler->get_fe().dofs_per_face;
@@ -27,8 +30,18 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 //  constraints->condense(src);
   
   vector<int> global_dof_indices (dofs_per_cell);
-  vector<int> level_dof_indices (dofs_per_cell);
+  vector<int> level_dof_indices  (dofs_per_cell);
   vector<int> level_face_indices (dofs_per_face);
+
+				   // initialize the objects with
+				   // their correct size
+  for (unsigned int level=minlevel; level<=maxlevel ; ++level)
+    {
+      const unsigned int system_size = (*level_matrices)[level].m();
+      
+      solution[level].reinit(system_size);
+      defect[level].reinit(system_size);
+    };
 
 				   // traverse the grid top-down
 				   // (i.e. starting with the most
@@ -88,12 +101,13 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
     };
 };
 
+#endif
 
 
 template <int dim>
 template <typename number>
 void
-MG<dim>::copy_from_mg(Vector<number> &dst) const
+Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 

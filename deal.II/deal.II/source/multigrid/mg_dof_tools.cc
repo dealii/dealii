@@ -1,10 +1,11 @@
 /* $Id$ */
 
+
 #include <lac/sparsity_pattern.h>
-#include <dofs/mg_dof_handler.h>
-#include <dofs/mg_dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <dofs/mg_dof_tools.h>
+#include <multigrid/mg_dof_tools.h>
 #include <fe/fe.h>
 
 

@@ -1,16 +1,37 @@
 /* $Id$ */
 
+
 #include <grid/tria.h>
-#include <dofs/mg_dof_handler.h>
-#include <dofs/mg_dof_accessor.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
-#include <numerics/multigrid.h>
-#include <numerics/mg_smoother.h>
+#include <multigrid/multigrid.h>
+#include <multigrid/mg_smoother.h>
+#include <multigrid/mg_smoother.templates.h>
 #include <lac/vector.h>
-#include <lac/sparse_matrix.h>
 
 #include <algorithm>
+
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+MGSmootherBase::~MGSmootherBase()
+{};
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+void
+MGSmootherIdentity::smooth (const unsigned int,
+			    Vector<double>       &,
+			    const Vector<double> &) const
+{};
+
+
 
 
 #if deal_II_dimension == 1
@@ -105,7 +126,6 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
 
 //////////////////////////////////////////////////////////////////////
 
-#include <numerics/mg_smoother.templates.h>
 
 // explicit instantiations
 // don't do the following instantiation in 1d, since there is a specialized
@@ -116,16 +136,17 @@ template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&, unsigne
 
 template
 MGSmootherRelaxation<float>
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension> &mg_dof,
-		       const MGMatrix<SparseMatrix<float> >& matrix,
-		       function_ptr relaxation,
-		       unsigned int steps,
-		       double omega);
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>        &mg_dof,
+		       const MGLevelObject<SparseMatrix<float> > &matrix,
+		       const function_ptr                            relaxation,
+		       const unsigned int                            steps,
+		       const double                                  omega);
+
 template
 MGSmootherRelaxation<double>
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension> &mg_dof,
-		       const MGMatrix<SparseMatrix<double> >& matrix,
-		       function_ptr relaxation,
-		       unsigned int steps,
-		       double omega);
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>         &mg_dof,
+		       const MGLevelObject<SparseMatrix<double> > &matrix,
+		       const function_ptr                             relaxation,
+		       const unsigned int                             steps,
+		       const double                                   omega);
 
