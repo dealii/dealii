@@ -844,13 +844,24 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   somenumber              *dst_ptr = dst.begin();
   const somenumber        *src_ptr = src.begin();
   const unsigned int *rowstart_ptr = &cols->rowstart[0];
-  
-  for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
-				     // note that for square matrices,
-				     // the diagonal entry is the first
-				     // in each row, i.e. at index
-				     // rowstart[i]
-    *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
+
+				   // optimize the following loop for
+				   // the case that the relaxation
+				   // factor is one. In that case, we
+				   // can save one FP multiplication
+				   // per row
+				   //
+				   // note that for square matrices,
+				   // the diagonal entry is the first
+				   // in each row, i.e. at index
+				   // rowstart[i]. and we do have a
+				   // square matrix by above assertion
+  if (om != 1.)
+    for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
+      *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
+  else
+    for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
+      *dst_ptr = *src_ptr / val[*rowstart_ptr];
 }
 
 
