@@ -1221,7 +1221,7 @@ void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
 
 template <>
 void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
-  Assert (new_number.size() == n_dofs(level), ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
   for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
     {
