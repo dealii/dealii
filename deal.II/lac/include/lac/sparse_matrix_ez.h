@@ -137,7 +137,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * the entries should happen to
 				      * be zero, it is counted anyway.
 				      */
-    unsigned int n_nonzero_elements () const;
+//    unsigned int n_nonzero_elements () const;
 
 				     /**
 				      * Return the number of actually
@@ -151,7 +151,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * sparsity pattern but only the
 				      * ones that are nonzero.
 				      */
-    unsigned int n_actually_nonzero_elements () const;
+//    unsigned int n_actually_nonzero_elements () const;
     
 				     /**
 				      * Set the element @p{(i,j)} to
@@ -714,13 +714,18 @@ class SparseMatrixEZ : public Subscriptor
 					 /*
 					  * Access to value.
 					  */
-	number& operator() (unsigned int column);
+//	number& operator() (unsigned int column);
 
 					 /**
 					  * Read-only access to value.
 					  */
 	const number& operator() (unsigned int column) const;
 
+					 /**
+					  * Number of entries.
+					  */
+	unsigned int size() const;
+	
 					 /**
 					  * Start of entry list.
 					  */
@@ -744,7 +749,10 @@ class SparseMatrixEZ : public Subscriptor
 	
 	private:
 					 /**
-					  * Actual data storage.
+					  * Actual data storage. This
+					  * vector contains the
+					  * entries of a row ordered
+					  * by column number.
 					  */
 	std::vector<Entry> values;
       };
@@ -908,6 +916,15 @@ std::vector<Entry>::iterator
 SparseMatrixEZ<number>::Row::begin()
 {
   return values.begin();
+}
+
+
+template <typename number>
+inline
+unsigned int
+SparseMatrixEZ<number>::Row::size() const
+{
+  return values.size();
 }
 
 
