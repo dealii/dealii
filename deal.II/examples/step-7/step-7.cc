@@ -868,7 +868,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // would to go other ways here, of
 				   // course.
   Solution<dim> exact_solution;
-
+  
 				   // Now for the main loop over all
 				   // cells. This is mostly unchanged
 				   // from previous examples, so we
@@ -1771,6 +1771,21 @@ int main ()
     {
       deallog.depth_console (0);
 
+                                       // Since we instantiate the
+                                       // several template classes
+                                       // below for two space
+                                       // dimensions, let us make this
+                                       // more generic by having a
+                                       // constant denoting the number
+                                       // of space dimensions. If you
+                                       // want to run the program in
+                                       // 1d or 2d, you will then only
+                                       // have to change this one
+                                       // instance, rather than all
+                                       // uses below:
+      const int dim = 2;
+      
+      
 				       // Now for the three calls to
 				       // the main class. Each call is
 				       // blocked into curly braces in
@@ -1786,8 +1801,8 @@ int main ()
 		  << "=============================================" << std::endl
 		  << std::endl;
 	
-	FE_Q<2> fe(1);
-	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
+	FE_Q<dim> fe(1);
+	LaplaceProblem<dim> laplace_problem_2d (fe, LaplaceProblem<dim>::adaptive_refinement);
 	laplace_problem_2d.run ();
 
 	std::cout << std::endl;
@@ -1798,8 +1813,8 @@ int main ()
 		  << "===========================================" << std::endl
 		  << std::endl;
 	
-	FE_Q<2> fe(1);
-	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
+	FE_Q<dim> fe(1);
+	LaplaceProblem<dim> laplace_problem_2d (fe, LaplaceProblem<dim>::global_refinement);
 	laplace_problem_2d.run ();
 
 	std::cout << std::endl;
@@ -1810,8 +1825,8 @@ int main ()
 		  << "===========================================" << std::endl
 		  << std::endl;
 	
-	FE_Q<2> fe(2);
-	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
+	FE_Q<dim> fe(2);
+	LaplaceProblem<dim> laplace_problem_2d (fe, LaplaceProblem<dim>::global_refinement);
 	laplace_problem_2d.run ();
 
 	std::cout << std::endl;
@@ -1844,3 +1859,22 @@ int main ()
 
   return 0;
 }
+
+
+                                 // What comes here is basically just
+                                 // an annoyance that you can ignore
+                                 // if you are not working on an AIX
+                                 // system: on this system, static
+                                 // member variables are not
+                                 // instantiated automatically when
+                                 // their enclosing class is
+                                 // instantiated. This leads to linker
+                                 // errors if these variables are not
+                                 // explicitly instantiated. As said,
+                                 // this is, strictly C++ standards
+                                 // speaking, not necessary, but it
+                                 // doesn't hurt either on other
+                                 // systems, and since it is necessary
+                                 // to get things running on AIX, why
+                                 // not do it:
+template double SolutionBase<2>::width;
