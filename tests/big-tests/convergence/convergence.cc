@@ -261,20 +261,6 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   cout << "    Solving..." << endl;
   solve ();
 
-  if (true) 
-    {
-      cout << "    Checking performance... " << flush;
-      dVector tmp(solution.size());
-      Timer timer;
-      const unsigned int n_loops=200;
-      for (unsigned int i=0; i<n_loops; ++i)
-	system_matrix.vmult (tmp, solution);
-      double time = timer.stop();
-      cout << 2.0*system_matrix.n_nonzero_elements()/time/1e6*n_loops
-	   << " MFlops (" << time << " seconds)."  << endl;
-    };
-  
-
   Solution<dim> sol;
   dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
   dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
