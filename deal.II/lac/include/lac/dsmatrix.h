@@ -96,7 +96,13 @@ public:
 		    int, int,
 		    << "The given index " << arg1
 		    << " should be less than " << arg2 << ".");
-
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcNotEnoughSpace,
+		    int,
+		    << "Upon entering a new entry to row " << arg1
+		    << ": there was no free entry any more.");
 };
 
 

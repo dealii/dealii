@@ -205,16 +205,23 @@ dSMatrixStruct::add (int i, int j)
   Assert ((i>=0) && (i<rows), ExcInvalidIndex(i,rows));
   Assert ((j>=0) && (j<cols), ExcInvalidIndex(j,cols));
 
-  int k;
-  for (k=rowstart[i]; k<rowstart[i+1]; k++)
+  for (int k=rowstart[i]; k<rowstart[i+1]; k++)
     {
+				       // entry already exists
       if (colnums[k] == j) return;
+				       // empty entry found, put new
+				       // entry here
       if (colnums[k] == -1)
 	{
 	  colnums[k] = j;
 	  return;
-	}
-    }
+	};
+    };
+
+				   // if we came thus far, something went
+				   // wrong: there was not enough space
+				   // in this line
+  Assert (false, ExcNotEnoughSpace(i));
 }
 
 void
