@@ -160,10 +160,14 @@ class Assembler : public DoFCellAccessor<dim> {
 	const DoFHandler<dim>  &dof;
 	
 					 /**
-					  * Flags whether to assemble the matrix
-					  * and right hand sides.
+					  * Flags to assemble the matrix.
 					  */
-	const bool              assemble_matrix, assemble_rhs;
+	const bool              assemble_matrix;
+
+					 /**
+					  * Flags whether to assemble the right hand sides.
+					  */
+	const bool              assemble_rhs;
 	
 					 /**
 					  * Pointer to the matrix to be assembled
