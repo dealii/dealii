@@ -65,22 +65,23 @@ class MGLevelObject : public Subscriptor
 				      */
     void resize (const unsigned int new_minlevel,
 		 const unsigned int new_maxlevel);
+
+				     /**
+				      * Call <tt>operator = (s)</tt>
+				      * on all objects stored by this
+				      * object.  This is particularly
+				      * useful for
+				      * e.g. <tt>Object==Vector@<T@></tt>
+				      */
+    MGLevelObject<Object> & operator = (const double d);
     
 				     /**
 				      * Call @p clear on all objects
 				      * stored by this object. This
 				      * function is only implemented
 				      * for some @p Object classes,
-				      * most notably for vectors and
-				      * matrices. Note that if
-				      * <tt>Object==Vector@<T@></tt>,
-				      * clear() will set all entries
-				      * to zero, while if
-				      * <tt>Object==vector@<T@></tt>,
-				      * clear() deletes the elements
-				      * of the vectors. This class
-				      * might therefore not be useful
-				      * for STL vectors.
+				      * e.g. the PreconditionBlockSOR
+				      * and similar classes.
 				      */
     void clear();
 
@@ -164,12 +165,23 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
 
 
 template<class Object>
+MGLevelObject<Object> &
+MGLevelObject<Object>::operator = (const double d)
+{
+  typename std::vector<boost::shared_ptr<Object> >::iterator v;
+  for (v = objects.begin(); v != objects.end(); ++v)
+    **v=d;
+  return *this;
+}
+
+
+template<class Object>
 void
 MGLevelObject<Object>::clear ()
 {
   typename std::vector<boost::shared_ptr<Object> >::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
-    **v = 0;
+    (*v)->clear();
 }
 
 
