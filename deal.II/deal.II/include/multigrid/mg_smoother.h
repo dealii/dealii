@@ -163,12 +163,12 @@ class MGSmootherContinuous : public MGSmoother<VECTOR>
 /**
  * Smoother using relaxation classes.
  *
- * This class performs smoothing on each level. The opreation can be
+ * This class performs smoothing on each level. The operation can be
  * controlled by several parameters. First, the relaxation parameter
  * @p{omega} is used in the underlying relaxation method. @p{steps} is
  * the number of relaxation steps on the finest level (on all levels
  * if @p{variable} is off). If @p{variable} is @p{true}, the number of
- * smoothing steps is doubled on each corser level. This results in a
+ * smoothing steps is doubled on each coarser level. This results in a
  * method having the complexity of the W-cycle, but saving grid
  * transfers. This is the method proposed by Bramble at al.
  *
@@ -186,7 +186,7 @@ class MGSmootherContinuous : public MGSmoother<VECTOR>
  * If you are using block matrices, the second @p{initialize} function
  * offers the possibility to extract a single block for smoothing. In
  * this case, the multigrid method must be used only with the vector
- * associated to that sinlge block.
+ * associated to that single block.
  *
  * The library contains instantiation for @p{SparseMatrix<.>} and
  * @p{Vector<.>}, where the template arguments are all combinations of
@@ -200,7 +200,8 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 {
   public:
 				     /**
-				      * Constructor. Sets memory and smoothing parameters.
+				      * Constructor. Sets memory and
+				      * smoothing parameters.
 				      */
     MGSmootherRelaxation(VectorMemory<VECTOR>& mem,
 			 const unsigned int steps = 1,
@@ -278,12 +279,14 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
     void set_steps (const unsigned int);
 
 				     /**
-				      * Switch on/off variable smoothing.
+				      * Switch on/off variable
+				      * smoothing.
 				      */
     void set_variable (const bool);
 
 				     /**
-				      * Switch on/off symmetric smoothing.
+				      * Switch on/off symmetric
+				      * smoothing.
 				      */
     void set_symmetric (const bool);
 
@@ -309,7 +312,8 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 			 const VECTOR&      rhs) const;
 
  				     /**
-				      * Object containing relaxation methods.
+				      * Object containing relaxation
+				      * methods.
 				      */
     MGLevelObject<RELAX> smoothers;
     
@@ -524,9 +528,13 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
     {
       if (T)
 	{
-					   // This is not really the transposed smoother,
-					   // but just Gauss-Seidel with reverse numbering.
-					   // For a symmetric matrix, it is the transpose, though.
+					   // This is not really the
+					   // transposed smoother, but
+					   // just Gauss-Seidel with
+					   // reverse numbering.  For
+					   // a symmetric matrix, it
+					   // is the transpose,
+					   // though.
 //	  cerr << 'T';
 	  matrices[level].vmult(*r,u);
 	  r->sadd(-1.,1.,rhs);
