@@ -35,7 +35,7 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 %.exe :
 	@echo =====linking======= $@
-	$(CXX) $(LDFLAGS) $(flags:-Kc++eh,) -o $@ $^ $(LIBS)
+	@$(CXX) $(LDFLAGS) $(flags:-Kc++eh,) -o $@ $^ $(LIBS)
 
 
 ############################################################
