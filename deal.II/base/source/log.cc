@@ -3,7 +3,7 @@
 #include <base/logstream.h>
 #include <base/job_identifier.h>
 
-#include <sys/rusage.h>
+//#include <sys/rusage.h>
 
 LogStream deallog;
 
