@@ -12,23 +12,91 @@
 
   <h1>The <acronym>deal.II</acronym> FAQ</h1>
 
+  <p>
+  This is a short list of questions that are asked frequently on the
+  <acronym>deal.II</acronym> mailing list, so we collect short answers
+  for them here.
+  </p>
+
   <ol>
   <li> <a href="#compiler">How do I change the compiler?</a>
-  <li> <a href="#triangles">Can I use/implement triangles/tetrahedra in <acronym>deal.II</acronym>?</a>
+  <li> <a href="#triangles">Can I use/implement triangles/tetrahedra
+       in <acronym>deal.II</acronym>?</a> 
+  <li> <a href="#problem-types">Can I solve problem XXX with
+       <acronym>deal.II</acronym>?</a>
   </ol>
+
 
   <h4><a name="compiler"></a>How do I change the compiler?</h4>
 
-  See the <a href="http:readme.html#choose-compiler">according
-  section</a> in the <a href="http:readme.html">readme file</a>
+  <p>
+  <acronym>deal.II</acronym> can be compiled by a number of compilers
+  without problems (see the section <a
+  href="readme.html#prerequisites">prerequisites</a> in the readme
+  file). If the ./configure script does not pick the right one,
+  selecting another is simple, and described in an
+  <a href="http:readme.html#choose-compiler">according
+  section</a> in the <a href="http:readme.html">readme file</a>.
+  </p>
+
 
   <h4><a name="triangles"></a>Can I use/implement
   triangles/tetrahedra in <acronym>deal.II</acronym>?</h4>
 
+  <p>
   No, you cannot do either. The basic data structures are too much
   tailored to quadrilaterals and hexahedra. Implementing other cells
   amounts to re-implementing nearly all grid and DoF classes from
-  scratch.
+  scratch. On the other hand, the restriction to quadrilaterals and
+  hexahedra avoids a large number of run-time computations and makes
+  the library as fast as it is.
+  <p>
+
+
+
+  <h4><a name="problem-types"></a>Can I solve problem XXX
+  with <acronym>deal.II</acronym>?</h4>
+
+  <p>
+  The simple answer is: if it can be written as a PDE, then this is
+  possible. The more complicated answer is: <acronym>deal.II</acronym>
+  is not a problem-solving environment, it is a toolbox that supports
+  you in solving a PDE by the method of finite elements. You will have
+  to implement assembling matrices and right hand side vectors
+  yourself, as well as nonlinear outer iterations, etc. However, you
+  will not need to care about programming a triangulation class that
+  can handle locally refined grids in one, two, and three dimensions,
+  linear algebra classes, linear solvers, different finite element
+  classes, etc.
+  </p>
+
+  <p>
+  To give only a very brief overview of what is possible, here is a
+  list of the nontrivial problems that were treated by the programs
+  that only the main authors wrote to date:
+  <ul>
+  <li> Time-dependent acoustic and elastic wave equation, including
+       nonlocal absorbing boundary conditions;
+  <li> Stokes flow discretized with the discontinous Galerkin finite
+       element method;
+  <li> General hyperbolic problems including Euler flow, using the
+       discontinous Galerkin finite element method;
+  <li> Distributed parameter estimation problems.
+  </ul>
+  </p>
+
+  <p>
+  Problems other users of <acronym>deal.II</acronym> have solved includ
+  <ul>
+  <li> Elastoplasticity;
+  <li> Porous media flow;
+  <li> Time dependent large deformation problems for metal forming;
+  <li> Eulerian coordinates problems in biomechanical modeling.
+  </ul>
+  Probably, many other problem types are solved by the many users
+  which we do not know of directly. If someone would like to have his
+  project added to this page, just contact us.
+  </p>
 
 </body>
 </html>
