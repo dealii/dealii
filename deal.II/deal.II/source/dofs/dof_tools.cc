@@ -1281,13 +1281,31 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // global (fine grid) parameter dof
 				   // indices to the columns
 				   //
-				   // note that the `weights' array
-				   // can take up huge amounts of
-				   // memory, and in particular is
-				   // roughly quadratic in the memory
-				   // consumption!
-  FullMatrix<float> weights (n_coarse_dofs,
-			     n_parameters_on_fine_grid);
+				   // in the original implementation,
+				   // the weights array was actually
+				   // of FullMatrix<double> type. this
+				   // wasted huge amounts of memory,
+				   // but was fast. nontheless, since
+				   // the memory consumption was
+				   // quadratic in the number of
+				   // degrees of freedom, this was not
+				   // very practical, so we now use a
+				   // vector of rows of the matrix,
+				   // and in each row a vector of
+				   // pairs (colnum,value). this seems
+				   // like the best tradeoff between
+				   // memory and speed, as it is now
+				   // linear in memory and still fast
+				   // enough.
+				   //
+				   // to save some memory and since
+				   // the weights are usually
+				   // (negative) powers of 2, we
+				   // choose the value type of the
+				   // matrix to be @p{float} rather
+				   // than @p{double}.
+  std::vector<std::map<unsigned int, float> > weights(n_coarse_dofs);
+
 				   // this is this mapping. there is one
 				   // entry for each dof on the fine grid;
 				   // if it is a parameter dof, then its
@@ -1362,11 +1380,12 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // a dof belongs to, but this at
 				   // least tests some errors
 #ifdef DEBUG
-  for (unsigned int col=0; col<weights.n(); ++col)
+  for (unsigned int col=0; col<n_parameters_on_fine_grid; ++col)
     {
       double sum=0;
-      for (unsigned int row=0; row<weights.m(); ++row)
-	sum += weights(row,col);
+      for (unsigned int row=0; row<n_coarse_dofs; ++row)
+	if (weights[row].find(col) != weights[row].end())
+	  sum += weights[row][col];
       Assert ((sum==1) ||
 	      ((coarse_fe.n_components()>1) && (sum==0)), ExcInternalError());
     };
@@ -1392,15 +1411,27 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // while all others will be
 				   // constrained to this dof (and
 				   // possibly others)
-  std::vector<int> representants(weights.m(), -1);
-  for (unsigned int parameter_dof=0; parameter_dof<weights.m(); ++parameter_dof)
+  std::vector<int> representants(n_coarse_dofs, -1);
+  for (unsigned int parameter_dof=0; parameter_dof<n_coarse_dofs;
+       ++parameter_dof)
     if (coarse_dof_is_parameter[parameter_dof] == true)
       {
-	unsigned int column=0;
-	for (; column<weights.n(); ++column)
-	  if (weights(parameter_dof,column) == 1)
+					 // if this is the line of a
+					 // parameter dof on the
+					 // coarse grid, then it
+					 // should have at least one
+					 // dependent node on the fine
+					 // grid
+	Assert (weights[parameter_dof].size() > 0, ExcInternalError());
+
+					 // find the column where the
+					 // representant is mentioned
+	map<unsigned int,float>::const_iterator i = weights[parameter_dof].begin();
+	for (; i!=weights[parameter_dof].end(); ++i)
+	  if (i->second == 1)
 	    break;
-	Assert (column < weights.n(), ExcInternalError());
+	Assert (i!=weights[parameter_dof].end(), ExcInternalError());
+	const unsigned int column = i->first;
 	
 					 // now we know in which column of
 					 // weights the representant is, but
@@ -1424,8 +1455,7 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 					 // coarse grid, then the
 					 // respective row must be
 					 // empty!
-	for (unsigned int col=0; col<weights.n(); ++col)
-	  Assert (weights(parameter_dof,col) == 0, ExcInternalError());
+	Assert (weights[parameter_dof].size() == 0, ExcInternalError());
       };
   
 
@@ -1457,30 +1487,45 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				       // to be unconstrained. otherwise,
 				       // all other dofs are constrained
       {
+	const unsigned int col = weight_mapping[global_dof];
+	Assert (col < n_coarse_dofs, ExcInternalError());
+	
 	unsigned int first_used_row=0;
-	for (; first_used_row<weights.m(); ++first_used_row)
-	  if (weights(first_used_row,weight_mapping[global_dof]) != 0)
-	    break;
+	if (true)
+	  {
+	    std::map<unsigned int,float>::const_iterator col_entry;
+	    for (; first_used_row<n_coarse_dofs; ++first_used_row)
+	      {
+		col_entry = weights[first_used_row].find(col);
+		if (col_entry != weights[first_used_row].end())
+		  break;
+	      };
+	    
+	    if ((col_entry->second == 1) &&
+		(representants[first_used_row] == static_cast<int>(global_dof)))
+					       // dof unconstrained or
+					       // constrained to itself
+					       // (in case this cell is
+					       // mapped to itself, rather
+					       // than to children of
+					       // itself)
+	      continue;
+	  };
 
-	if ((weights(first_used_row,weight_mapping[global_dof]) == 1) &&
-	    (representants[first_used_row] == static_cast<int>(global_dof)))
-					   // dof unconstrained or
-					   // constrained to itself
-					   // (in case this cell is
-					   // mapped to itself, rather
-					   // than to children of
-					   // itself)
-	  continue;
 
 					 // otherwise enter all constraints
 	constraints.add_line (global_dof);
 
 	constraint_line.clear ();
-	for (unsigned int row=first_used_row; row<weights.m(); ++row)
-	  if (weights(row,weight_mapping[global_dof]) != 0)
-	    constraint_line.push_back (std::make_pair(representants[row],
-						      weights(row,weight_mapping[global_dof])));
-
+	for (unsigned int row=first_used_row; row<n_coarse_dofs; ++row)
+	  {
+	    const std::map<unsigned int,float>::const_iterator
+	      j = weights[row].find(col);
+	    if ((j != weights[row].end()) && (j->second != 0))
+	      constraint_line.push_back (std::make_pair(representants[row],
+							j->second));
+	  };
+	
 	constraints.add_entries (global_dof, constraint_line);
       };
 };
@@ -1494,7 +1539,7 @@ DoFTools::compute_intergrid_weights (const DoFHandler<dim>              &coarse_
 				     const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				     const std::vector<Vector<double> > &parameter_dofs,
 				     const std::vector<int>             &weight_mapping,
-				     FullMatrix<float>                  &weights)
+				     std::vector<std::map<unsigned int,float> > &weights)
 {
 				   // simply distribute the range of
 				   // cells to different threads
@@ -1527,7 +1572,7 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 				       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				       const std::vector<Vector<double> > &parameter_dofs,
 				       const std::vector<int>             &weight_mapping,
-				       FullMatrix<float>                  &weights,
+				       std::vector<std::map<unsigned int, float> > &weights,
 				       const typename DoFHandler<dim>::active_cell_iterator &begin,
 				       const typename DoFHandler<dim>::active_cell_iterator &end)
 {
@@ -1668,6 +1713,18 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 					     // among the @p{i} for each @p{j}. this will
 					     // be done by simply taking the first
 					     // @p{i} for which @p{w_{ij}==1}.
+					     //
+					     // guard modification of
+					     // the weights array by a
+					     // Mutex. since it should
+					     // happen rather rarely
+					     // that there are several
+					     // threads operating on
+					     // different intergrid
+					     // weights, have only one
+					     // mutex for all of them
+	    static Threads::ThreadMutex mutex;
+	    mutex.acquire ();
 	    for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
 					       // set this weight if it belongs
 					       // to a parameter dof.
@@ -1680,12 +1737,14 @@ DoFTools::compute_intergrid_weights_1 (const DoFHandler<dim>              &coars
 		    {
 		      const unsigned int wi = parameter_dof_indices[local_dof],
 					 wj = weight_mapping[i];
-		      weights(wi,wj) = global_parameter_representation(i);
+		      weights[wi][wj] = global_parameter_representation(i);
 		    };
 		}
 	      else
 		Assert (global_parameter_representation(i) == 0,
 			ExcInternalError());
+	    
+	    mutex.release ();
 	  };
     };
 };
