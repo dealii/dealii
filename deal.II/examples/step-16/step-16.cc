@@ -400,7 +400,7 @@ void LaplaceProblem<dim>::solve ()
 				   // the transfer of functions
 				   // between different grid
 				   // levels.
-  MGTransferPrebuilt<double> mg_transfer;
+  MGTransferPrebuilt<Vector<double> > mg_transfer;
   mg_transfer.build_matrices(mg_dof_handler);
 
 				   // Next, we need a coarse grid
@@ -458,7 +458,8 @@ void LaplaceProblem<dim>::solve ()
 				mg_transfer,
 				mg_smoother,
 				mg_smoother);
-  PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<double> >
+  PreconditionMG<dim, Vector<double>,
+    MGTransferPrebuilt<Vector<double> > >
     preconditioner(mg_dof_handler, mg, mg_transfer);
   
 				   // Finally, create the solver
