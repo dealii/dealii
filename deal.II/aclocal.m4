@@ -219,8 +219,20 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-32"
     CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wmissing-prototypes -Winline -Woverloaded-virtual -Wstrict-prototypes -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-32"
-    CXXFLAGSPIC="-fPIC"  
-    LDFLAGSPIC="-fPIC"
+
+    dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
+    dnl anything to avoid a warning
+    case "$target" in
+      *aix* )
+	CXXFLAGSPIC=
+	LDFLAGSPIC=
+	;;
+
+      *)
+	CXXFLAGSPIC="-fPIC"
+	LDFLAGSPIC="-fPIC"
+	;;
+    esac
 
     dnl set some flags that are specific to some versions of the
     dnl compiler:
@@ -2612,7 +2624,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_ERROR_CODES_DEFINITION, dnl
 [
-  AC_MSG_CHECKING(for defintions of error codes in errno.h)
+  AC_MSG_CHECKING(for definitions of error codes in errno.h)
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_COMPILE(
