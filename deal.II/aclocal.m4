@@ -181,6 +181,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
   AC_MSG_CHECKING(whether isnan is declared with $1 flags)
   AC_REQUIRE([AC_LANG_CPLUSPLUS])
   CXXFLAGS=$2
+  deal_II_isnan_flag=""
   AC_TRY_COMPILE(
     [
 #include <cmath>
@@ -193,42 +194,78 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 	AC_MSG_RESULT("yes")
 	deal_II_isnan_flag="-DHAVE_ISNAN"
 	$3
-    ],
-    [
-	dnl We need to define something. Unfortunately, this is system 
-	dnl dependent (argh!)
-	deal_II_isnan_flag=""
-	for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
-	  CXXFLAGS="$2 $testflag"
-          AC_TRY_COMPILE(
-     	    [
-#include <cmath>
-	    ],
-	    [
-		double d=0;
-		isnan (d);
-	    ],
-	    [
-	  	dnl We found a flag by which isnan is defined; store
-		dnl this flag and exit the loop
-		deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
-		break;
-	    ],
-	    [
-                dnl The flag didn't work, don't do nothing.
-	    ])
-	done
-
-	dnl if no such flag was found, then abort ./configure since
-	dnl the library will not be compilable on this platform
-	dnl without knowledge of the right flag
-	if test "$deal_II_isnan_flag" = "" ; then
-	  AC_MSG_RESULT(no.)
-	else
-
-  	  dnl we found something, lets us it
-	  AC_MSG_RESULT(using $testflag)
-	  $3
-	fi
     ])
+
+
+  if test $deal_II_isnan_flag = "" ; then
+    dnl Simply using isnan doesn't work. On Microsoft Windows systems, the function
+    dnl is called _isnan, so check that
+    AC_TRY_COMPILE(
+      [
+#include <cmath>
+      ],
+      [
+	  double d=0;
+	  _isnan (d);
+      ],
+      [
+	  AC_MSG_RESULT("yes")
+	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN"
+	  $3
+      ])
+  fi
+
+
+  dnl Let's see whether we _now_ have found something
+  if test $deal_II_isnan_flag = "" ; then
+    dnl We need to define something. Unfortunately, this is system 
+    dnl dependent (argh!)
+    deal_II_isnan_flag=""
+    for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
+      CXXFLAGS="$2 $testflag"
+      AC_TRY_COMPILE(
+        [
+#include <cmath>
+	],
+	[
+	  double d=0;
+	  isnan (d);
+	],
+	[
+	  dnl We found a flag by which isnan is defined; store
+	  dnl this flag and exit the loop
+	  deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
+	  break;
+	])
+
+      dnl If that didn't work (and it didn't as we are still inside the
+      dnl loop), then try the _isnan function (maybe we are on a
+      dnl Microsoft Windows system)
+      AC_TRY_COMPILE(
+        [
+#include <cmath>
+	],
+	[
+	  double d=0;
+	  _isnan (d);
+	],
+	[
+	  dnl We found a flag by which isnan is defined; store
+	  dnl this flag and exit the loop
+	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN $testflag"
+	  break;
+	])
+    done
+
+    dnl if no such flag was found, then abort ./configure since
+    dnl the library will not be compilable on this platform
+    dnl without knowledge of the right flag
+    if test "$deal_II_isnan_flag" = "" ; then
+      AC_MSG_RESULT(no.)
+    else
+      dnl we found something, lets us it
+      AC_MSG_RESULT(using $testflag)
+      $3
+    fi
+  fi
 )      
