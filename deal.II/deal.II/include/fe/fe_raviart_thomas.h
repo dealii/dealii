@@ -632,5 +632,10 @@ template <>
 void
 FE_RaviartThomas<3>::initialize_restriction ();
 
+template <>
+void
+FE_RaviartThomas<1>::
+get_interpolation_matrix (const FiniteElementBase<1> &,
+			  FullMatrix<double>         &) const;
 
 #endif
