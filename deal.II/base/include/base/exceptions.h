@@ -910,6 +910,13 @@ namespace StandardExceptions
   DeclException0(ExcZero);
   
 				   /**
+				    * The object should have been
+				    * filled with something before
+				    * this member function is called.
+				    */
+  DeclException0(ExcEmptyObject);
+  
+				   /**
 				    * This exception is raised
 				    * whenever the sizes of two
 				    * objects were assumed to be
