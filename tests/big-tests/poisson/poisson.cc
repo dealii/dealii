@@ -34,7 +34,7 @@ class PoissonEquation :  public Equation<dim> {
 		    Equation<dim>(1) {};
 
     virtual void assemble (dFMatrix            &cell_matrix,
-			   vector<dVector>     &rhs,
+			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
 			   const Triangulation<dim>::cell_iterator &cell) const;
     double right_hand_side (const Point<dim> &) const;
@@ -59,6 +59,8 @@ double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
 		    - 3./2.*(p(0)*p(0)+p(1)*p(1))
 		    - 6*(p(0)+p(1))
 		    + 6);
+//	    return 1.;
+	    
       default:
 	    return 0;
     };
@@ -67,7 +69,7 @@ double PoissonEquation<dim>::right_hand_side (const Point<dim> &p) const {
 
 
 void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
-				   vector<dVector>     &rhs,
+				   dVector             &rhs,
 				   const FEValues<1>   &fe_values,
 				   const Triangulation<1>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -79,16 +81,16 @@ void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 			       fe_values.shape_value(i,point) *
 			       fe_values.shape_value(j,point)) *
 			      fe_values.JxW(point);
-	rhs[0](i) += fe_values.shape_value(i,point) *
-		     right_hand_side(fe_values.quadrature_point(point)) *
-		     fe_values.JxW(point);
+	rhs(i) += fe_values.shape_value(i,point) *
+		  right_hand_side(fe_values.quadrature_point(point)) *
+		  fe_values.JxW(point);
       };
 };
 
 
 
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
-				   vector<dVector>     &rhs,
+				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,
 				   const Triangulation<2>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -100,9 +102,9 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 			       fe_values.shape_value(i,point) *
 			       fe_values.shape_value(j,point)) *
 			      fe_values.JxW(point);
-	rhs[0](i) += fe_values.shape_value(i,point) *
-		     right_hand_side(fe_values.quadrature_point(point)) *
-		     fe_values.JxW(point);
+	rhs(i) += fe_values.shape_value(i,point) *
+		  right_hand_side(fe_values.quadrature_point(point)) *
+		  fe_values.JxW(point);
       };
 };
 
@@ -120,23 +122,25 @@ int main () {
 				   
 //  HyperBallBoundary<2> boundary(Point<2>(2,3), 4);
 
+  cout << "Making grid..." << endl;
+  
   tria.create_hypercube ();
 //  tria.create_hyper_ball(Point<2>(2,3),4);
 //  tria.set_boundary (&boundary);
   
 /*  tria.refine_global (1);
-  tria.begin_active()->set_refine_flag();
+  (--tria.last_active())->set_refine_flag();
   tria.execute_refinement ();
-  tria.refine_global (3);
+  tria.begin_active(2)->set_refine_flag();
+  tria.execute_refinement ();
+  tria.refine_global (2);
 */
 
-  cout << "Making grid..." << endl;
-  
   const unsigned int dim=2;
   tria.refine_global (1);
 	
   Triangulation<dim>::active_cell_iterator cell, endc;
-  for (int i=0; i<8; ++i) 
+  for (int i=0; i<12; ++i) 
     {
       int n_levels = tria.n_levels();
       cell = tria.begin_active();
@@ -157,8 +161,10 @@ int main () {
     };
   tria.refine_global (1);
   
-  cout << "Distributing dofs..." << endl; 
+
+  cout << "Distributing dofs... "; 
   dof.distribute_dofs (fe);
+  cout << dof.n_dofs() << " degrees of freedom." << endl;
 
   cout << "Assembling matrices..." << endl;
   problem.assemble (equation, quadrature, fe);

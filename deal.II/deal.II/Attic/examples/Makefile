@@ -6,8 +6,12 @@ CXXFLAGS.g= -DDEBUG -g -Wall $(INCPATH)
 CXXFLAGS  = -O3 $(INCPATH)
 
 LIBPATH   = -L../lib -L../../lac/lib
+LIBFILES.g= ../lib/libbasic.g.a ../lib/libgrid.g.a \
+            ../lib/libfe.g.a ../lib/libnumerics.g.a \
+            ../../lac/lib/liblac.g.a
+LIBFILES  = $(LIBFILES.g:.g.a=.a)
 LIBS.g    = $(LIBPATH) -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
-LIBS      = $(LIBPATH) -lbasic -lgrid -lfe -lnumerics 
+LIBS      = $(LIBS.g:.g=)
 
 ifeq ($(shell uname),SunOS)
 CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
@@ -25,15 +29,15 @@ examples: $(cc-files:.cc=)
 	@echo ================= Compiling $<
 	@$(CXX) $(CXXFLAGS.g) -o $@ -g -c $<
 
-grid/grid_test: grid/grid_test.o
+grid/grid_test: grid/grid_test.o $(LIBFILES)
 	@echo ================= Linking $@
 	@$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
 
-dof/dof_test: dof/dof_test.o
+dof/dof_test: dof/dof_test.o $(LIBFILES.g)
 	@echo ================= Linking $@
 	@$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
 
-poisson/poisson: poisson/poisson.o
+poisson/poisson: poisson/poisson.o $(LIBFILES.g)
 	@echo ================= Linking $@
 	@$(CXX) $(CXXFLAGS.g) -g -o $@ $< ../../mia/control.o $(LIBS.g) -lg++
 
