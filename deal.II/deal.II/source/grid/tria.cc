@@ -3654,6 +3654,23 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
 				   // In these case we arbitrarily reduce the
 				   // bottom threshold by one permille below
 				   // the top threshold
+				   //
+				   // Finally, in some cases
+				   // (especially involving symmetric
+				   // solutions) there are many cells
+				   // with the same error indicator
+				   // values. if there are many with
+				   // indicator equal to the top
+				   // threshold, no refinement will
+				   // take place below; to avoid this
+				   // case, we also lower the top
+				   // threshold if it equals the
+				   // largest indicator and the
+				   // top_fraction!=1
+  if ((top_threshold == *max_element(criteria.begin(), criteria.end())) &&
+      (top_fraction != 1))
+    top_threshold *= 0.999;
+  
   if (bottom_threshold>=top_threshold)
     bottom_threshold = 0.999*top_threshold;
   
