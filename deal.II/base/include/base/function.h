@@ -394,14 +394,16 @@ class ZeroFunction : public Function<dim>
 
 
 /**
- * Provide a function which always returns a constant value, which is
- * delivered upon construction. Obviously, the derivates of this
+ * Provide a function which always returns the constant value
+ * handed to the constructor.
+ *
+ * Obviously, the derivates of this
  * function are zero, which is why we derive this class from
- * @p{ZeroFunction}: we then only have to overload th value functions,
+ * @p{ZeroFunction}: we then only have to overload the value functions,
  * not all the derivatives. In some way, it would be more obvious to
  * do the derivation in the opposite direction, i.e. let
  * @p{ZeroFunction} be a more specialized version of @p{ConstantFunction};
- * however, this would be more inefficient, since we could not make
+ * however, this would be less efficient, since we could not make
  * use of the fact that the function value of the @p{ZeroFunction} is
  * known at compile time and need not be looked up somewhere in
  * memory.
