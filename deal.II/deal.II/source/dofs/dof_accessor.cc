@@ -102,14 +102,6 @@ DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 
 template <int dim, class BaseClass>
-double
-DoFLineAccessor<dim,BaseClass>::diameter () const {
-  return sqrt((vertex(1)-vertex(0)).square());
-};
-
-
-
-template <int dim, class BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,BaseClass> >
 DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
   TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > q (tria,
@@ -220,16 +212,6 @@ DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
   for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
     dof_indices.push_back (dof_index(d));
 };
-
-
-
-template <int dim, class BaseClass>
-double
-DoFQuadAccessor<dim,BaseClass>::diameter () const {
-  return sqrt(max((vertex(2)-vertex(0)).square(),
-		  (vertex(3)-vertex(1)).square()));
-};
-
 
 
 

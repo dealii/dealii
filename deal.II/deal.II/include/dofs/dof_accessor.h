@@ -209,15 +209,6 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
     void get_dof_indices (vector<int> &dof_indices) const;
 
 				     /**
-				      * Return the length of the line. If the
-				      * line describes part of the boundary
-				      * and is not a straight one, ask the
-				      * finite element class for the correct
-				      * length!
-				      */
-    double diameter () const;
-				      
-				     /**
 				      * Return the #i#th child as a DoF line
 				      * iterator. This function is needed since
 				      * the child function of the base
@@ -302,18 +293,6 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * the vector be empty beforehand.
 				      */
     void get_dof_indices (vector<int> &dof_indices) const;
-
-				     /**
-				      * Return the diameter of the quad. If the
-				      * quad describes part of the boundary
-				      * and is not a plane one, ask the
-				      * finite element class for the correct
-				      * length!
-				      *
-				      * The diameter of a quad is computed to
-				      * be the larger of the two diagonals.
-				      */
-    double diameter () const;
 
     				     /**
 				      *  Return a pointer to the #i#th line

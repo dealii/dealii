@@ -270,6 +270,15 @@ bool LineAccessor<dim>::at_boundary () const {
 
 
 
+template <int dim>
+double LineAccessor<dim>::diameter () const {
+  return sqrt((vertex(1)-vertex(0)).square());
+};
+
+
+
+
+
 
 template class LineAccessor<1>;
 template class LineAccessor<2>;
@@ -495,6 +504,18 @@ bool QuadAccessor<dim>::at_boundary () const {
 				   // in boundary_indicator()
   return (boundary_indicator() != 255);
 };
+
+
+
+template <int dim>
+double QuadAccessor<dim>::diameter () const {
+  return sqrt(max((vertex(2)-vertex(0)).square(),
+		  (vertex(3)-vertex(1)).square()));
+};
+
+
+
+
 
 
 template class QuadAccessor<2>;

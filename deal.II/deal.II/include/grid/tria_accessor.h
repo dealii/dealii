@@ -413,6 +413,15 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      * boundary or not.
 				      */
     bool at_boundary () const;
+
+    				     /**
+				      * Return the length of the line. If the
+				      * line describes part of the boundary
+				      * and is not a straight one, ask the
+				      * finite element class for the correct
+				      * length!
+				      */
+    double diameter () const;
     
   private:
     				     /**
@@ -637,7 +646,23 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * boundary or not.
 				      */
     bool at_boundary () const;
-
+				     /**
+				      * Return the diameter of the quad. If the
+				      * quad describes part of the boundary
+				      * and is not a plane one, ask the
+				      * finite element class for the correct
+				      * length!
+				      *
+				      * The diameter of a quad is computed to
+				      * be the larger of the two diagonals. You
+				      * should absolutely be clear about the
+				      * fact that this definitely is not the
+				      * diameter of all quadrilaterals; however
+				      * it may serve as an approximation and
+				      * is exact in many cases.
+				      */
+    double diameter () const;
+    
   private:
     				     /**
 				      *  Copy operator. This is normally
