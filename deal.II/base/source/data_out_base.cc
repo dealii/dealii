@@ -1126,7 +1126,7 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
   
   Assert (patches.size() > 0, ExcNoPatches());
 
-				   // Do ont allow volume rendering
+				   // Do not allow volume rendering
   Assert (dim<=2, ExcNotImplemented());
   
   switch (dim) 
