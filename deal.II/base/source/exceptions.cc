@@ -209,8 +209,12 @@ namespace deal_II_exceptions
 				       // not aborted due to this
 				       // reason.
       if (std::uncaught_exception() == true)
-	std::cerr << "******** Program is not aborted since another exception is active! ********"
-		  << std::endl;
+	{
+					   // only display message once
+	  if (n_treated_exceptions == 0)
+	    std::cerr << "******** Program is not aborted since another exception is active! ********"
+		      << std::endl;
+	}
       else
 	std::abort ();
     };
