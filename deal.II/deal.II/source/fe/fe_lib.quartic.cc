@@ -2766,7 +2766,7 @@ void FEQ4<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 
 template <>
 FEQ4<3>::FEQ4 () :
-		FEQ1Mapping<3> (1, 2, 4, 8, 1,
+		FEQ1Mapping<3> (1, 3, 9, 27, 1,
 				vector<bool> (1, false))
 {
   Assert (false, ExcNotImplemented());
