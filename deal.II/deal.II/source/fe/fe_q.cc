@@ -1327,6 +1327,8 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
   else
 				     // more dimensions
     {
+      Assert (dim<=3, ExcNotImplemented());
+      
       const unsigned int cell_start = (dim==2)
 				      ? first_quad_index
 				      : first_hex_index;
