@@ -3389,30 +3389,3 @@ AC_DEFUN(DEAL_II_CHECK_KDOC, dnl
     AC_MSG_RESULT(using default version $kdocversion)
   fi
 ])
-
-
-
-dnl -------------------------------------------------------------
-dnl Check for Doc++.
-dnl
-dnl Usage: DEAL_II_CHECK_DOCXX
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_DOCXX, dnl
-[
-  AC_ARG_WITH(docxx,
-  [  --with-docxx=PATH       use the doc++ executable pointed to by PATH],
-      docxx=$withval,
-      docxx=to-be-determined)
-  if test "$docxx" = to-be-determined ; then
-    AC_PATH_PROG(docxx,"doc++")
-  else
-    AC_MSG_CHECKING(for doc++)
-    if test -x "$docxx" ; then
-      AC_MSG_RESULT(yes)
-    else
-      AC_MSG_RESULT(no)
-      docxx=
-    fi
-  fi
-])
