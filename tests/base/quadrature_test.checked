@@ -1,8 +1,13 @@
 
-DEAL::Gauss2 is exact for polynomials of degree 3
-DEAL::Gauss3 is exact for polynomials of degree 5
-DEAL::Gauss4 is exact for polynomials of degree 7
-DEAL::Gauss5 is exact for polynomials of degree 9
-DEAL::Gauss6 is exact for polynomials of degree 11
-DEAL::Gauss7 is exact for polynomials of degree 13
-DEAL::Gauss8 is exact for polynomials of degree 0
+DEAL::Quadrature no.2 is exact for polynomials of degree 3
+DEAL::Quadrature no.3 is exact for polynomials of degree 5
+DEAL::Quadrature no.4 is exact for polynomials of degree 7
+DEAL::Quadrature no.5 is exact for polynomials of degree 9
+DEAL::Quadrature no.6 is exact for polynomials of degree 11
+DEAL::Quadrature no.7 is exact for polynomials of degree 13
+DEAL::Quadrature no.8 is exact for polynomials of degree 0
+DEAL::Quadrature no.9 is exact for polynomials of degree 1
+DEAL::Quadrature no.10 is exact for polynomials of degree 1
+DEAL::Quadrature no.11 is exact for polynomials of degree 3
+DEAL::Quadrature no.12 is exact for polynomials of degree 5
+DEAL::Quadrature no.13 is exact for polynomials of degree 7
