@@ -387,9 +387,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * patches are lost.
                                       *
 				      * The second parameter allows to
-				      * shift the patches in the
-				      * object passed in in the first
-				      * parameter by a certain
+				      * shift each node of the patches
+				      * in the object passed in in the
+				      * first parameter by a certain
 				      * amount. This is sometimes
 				      * useful to generated "exploded"
 				      * views of a collection of
