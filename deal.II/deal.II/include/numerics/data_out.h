@@ -386,12 +386,22 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * overwritten, and the merged-in
                                       * patches are lost.
                                       *
+				      * The second parameter allows to
+				      * shift the patches in the
+				      * object passed in in the first
+				      * parameter by a certain
+				      * amount. This is sometimes
+				      * useful to generated "exploded"
+				      * views of a collection of
+				      * blocks.
+				      *
                                       * This function will fail if
                                       * either this or the other
                                       * object did not yet set up any
                                       * patches.
                                       */
-    void merge_patches (const DataOut_DoFData &source);
+    void merge_patches (const DataOut_DoFData        &source,
+			const Point<patch_space_dim> &shift = Point<patch_space_dim>());
     
 				     /**
 				      * Release the pointers to the

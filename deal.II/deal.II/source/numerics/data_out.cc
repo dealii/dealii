@@ -260,7 +260,8 @@ clear_input_data_references ()
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
-merge_patches (const DataOut_DoFData &source)
+merge_patches (const DataOut_DoFData        &source,
+	       const Point<patch_space_dim> &shift)
 {
   const std::vector<Patch> source_patches = source.get_patches ();
   Assert (patches.size () != 0,        ExcNoPatches ());
@@ -285,9 +286,17 @@ merge_patches (const DataOut_DoFData &source)
   patches.insert (patches.end(),
                   source_patches.begin(),
                   source_patches.end());
+
+				   // perform shift, if so desired
+  if (shift != Point<patch_space_dim>())
+    for (unsigned int i=old_n_patches; i<patches.size(); ++i)
+      for (unsigned int v=0; v<GeometryInfo<patch_dim>::vertices_per_cell; ++v)
+	patches[i].vertices[v] += shift;
+  
                                    // adjust patch numbers
   for (unsigned int i=old_n_patches; i<patches.size(); ++i)
     patches[i].patch_index += old_n_patches;
+  
                                    // adjust patch neighbors
   for (unsigned int i=old_n_patches; i<patches.size(); ++i)
     for (unsigned int n=0; n<GeometryInfo<patch_dim>::faces_per_cell; ++n)
