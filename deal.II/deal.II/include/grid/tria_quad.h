@@ -11,7 +11,7 @@
 /**
  *   #Quad#s denote the fundamental entities of triangulations in two dimensions
  *   and the boundaries of hexaeders in three dimensions. They are
- *   characterized by the (global) indices of the corner points.
+ *   characterized by the (global) indices of the dour bounding lines.
  *
  *   A quad itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level
@@ -55,7 +55,7 @@ class Quad {
 				      */ 
     DeclException1 (ExcRange,
 		    int,
-		    << "Indices for the point number must be 0, 1, 2 or 3, "
+		    << "Indices for the line number must be 0, 1, 2 or 3, "
 		    << "but you gave " << arg1); 
   protected:
       int lines[4];
