@@ -584,7 +584,7 @@ MappingQ<dim>::compute_laplace_vector(std::vector<std::vector<double> > &lvs) co
 				   // compute the shape
 				   // gradients at the quadrature
 				   // points on the unit cell
-  const QGauss4<dim> quadrature;
+  const QGauss<dim> quadrature(degree+1);
   const unsigned int n_q_points=quadrature.n_quadrature_points;
   
   InternalData quadrature_data(n_shape_functions);
