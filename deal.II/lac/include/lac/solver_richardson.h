@@ -200,35 +200,44 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
   Vd  = this->memory.alloc(); VECTOR& d  = *Vd; d.reinit(x);
 
   deallog.push("Richardson");
-
-				   // Main loop
-  for(int iter=0; conv==SolverControl::iterate; iter++)
+  
+  try 
     {
-				       // Do not use residual,
-				       // but do it in 2 steps
-      A.vmult(r,x);
-      r.sadd(-1.,1.,b);
-
-      if (!additional_data.use_preconditioned_residual)
+				       // Main loop
+      for(int iter=0; conv==SolverControl::iterate; iter++)
 	{
-	  res = r.l2_norm();
-	  conv = this->control().check (iter, criterion());
-	  if (conv != SolverControl::iterate)
-	    break;
+					   // Do not use residual,
+					   // but do it in 2 steps
+	  A.vmult(r,x);
+	  r.sadd(-1.,1.,b);
+	  
+	  if (!additional_data.use_preconditioned_residual)
+	    {
+	      res = r.l2_norm();
+	      conv = this->control().check (iter, criterion());
+	      if (conv != SolverControl::iterate)
+		break;
+	    }
+	  
+	  precondition.vmult(d,r);
+	  if (additional_data.use_preconditioned_residual)
+	    {
+	      res = d.l2_norm();
+	      conv = this->control().check (iter, criterion());
+	      if (conv != SolverControl::iterate)
+		break;
+	    }
+	  x.add(additional_data.omega,d);
+	  print_vectors(iter,x,r,d);
 	}
-      
-      precondition.vmult(d,r);
-      if (additional_data.use_preconditioned_residual)
-	{
-	  res = d.l2_norm();
-	  conv = this->control().check (iter, criterion());
-	  if (conv != SolverControl::iterate)
-	    break;
-	}
-      x.add(additional_data.omega,d);
-      print_vectors(iter,x,r,d);
     }
-
+  catch (const ExceptionBase& e)
+    {
+      this->memory.free(Vr);
+      this->memory.free(Vd);
+      deallog.pop();
+      throw e;
+    }
 				   // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
@@ -260,24 +269,34 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 
   deallog.push("RichardsonT");
 
-				   // Main loop
-  for(int iter=0; conv==SolverControl::iterate; iter++)
+  try
     {
-				       // Do not use Tresidual,
-				       // but do it in 2 steps
-      A.Tvmult(r,x);
-      r.sadd(-1.,1.,b);
-      res=r.l2_norm();
-
-      conv = this->control().check (iter, criterion());
-      if (conv != SolverControl::iterate)
-	break;
-
-      precondition.Tvmult(d,r);
-      x.add(additional_data.omega,d);
-      print_vectors(iter,x,r,d);
+				       // Main loop
+      for(int iter=0; conv==SolverControl::iterate; iter++)
+	{
+					   // Do not use Tresidual,
+					   // but do it in 2 steps
+	  A.Tvmult(r,x);
+	  r.sadd(-1.,1.,b);
+	  res=r.l2_norm();
+	  
+	  conv = this->control().check (iter, criterion());
+	  if (conv != SolverControl::iterate)
+	    break;
+	  
+	  precondition.Tvmult(d,r);
+	  x.add(additional_data.omega,d);
+	  print_vectors(iter,x,r,d);
+	}
     }
-
+  catch (const ExceptionBase& e)
+    {
+      this->memory.free(Vr);
+      this->memory.free(Vd);
+      deallog.pop();
+      throw e;
+    }
+  
 				   // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
