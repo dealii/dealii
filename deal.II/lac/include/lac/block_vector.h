@@ -609,20 +609,15 @@ namespace BlockVectorIterators
  *
  * @sect3{Accessing individual blocks, and resizing vectors}
  *
- * Apart from using this object as a whole, you are free to access
- * each of the individual blocks using the @p{block} function for
- * separate operations, both for reading and writing. The only things
- * that is not allowed is to change the size of an individual block
- * through the @p{reinit} function of the @ref{Vector} class. This is
- * due to the fact that the @p{BlockVector} class keeps a cache of
- * sizes, and this will become invalid when you change one of the
- * blocks without giving the block vector object the chance to note
- * this in its internal tables.
+ * Apart from using this object as a whole, you can use each block
+ * separately as a @ref{Vector}, using the @p{block} function.  There
+ * is a single caveat: if you have changed the size of one of several
+ * block, you must call the function @ref{collect_sizes} of the block
+ * vector to update its internal structures.
  *
- * Therefore, changing the size of all, or some of the individual
- * blocks is only possible through the @p{reinit} function of this
- * block vector object.
- * 
+ * Warning: If you change the sizes of single blocks without calling
+ * @ref{collect_sizes}, results may be unpredictable. The debug
+ * version does not check consistency here for performance reasons!
  * 
  * @sect3{On template instantiations}
  *
@@ -641,7 +636,7 @@ template <typename Number>
 class BlockVector
 {
   public:
-				     /**
+				     /*
 				      * Declare standard types used in
 				      * all containers. These types
 				      * parallel those in the @p{C++}
@@ -748,21 +743,6 @@ class BlockVector
 				      *
 				      * If @p{fast==false}, the vector
 				      * is filled with zeros.
-				      *
-				      * Note that you must call this
-				      * (or the other @p{reinit}
-				      * functions) function, rather
-				      * than calling the @p{reinit}
-				      * functions of an individual
-				      * block, to allow the block
-				      * vector to update its caches of
-				      * vector sizes. If you call
-				      * @p{reinit} of one of the
-				      * blocks, then subsequent
-				      * actions of this object may
-				      * yield unpredictable results
-				      * since they may be routed to
-				      * the wrong block.
 				      */
     void reinit (const unsigned int num_blocks,
 		 const unsigned int block_size,
