@@ -13,8 +13,9 @@
 
 
 #include <lac/vector.h>
-#include <lac/petsc_vector.h>
 #include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
 #include <lac/sparse_matrix.h>
 
 #include <dofs/dof_accessor.h>
@@ -694,6 +695,23 @@ template
 void
 DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
+
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values<PETScWrappers::BlockVector,double>
+(const PETScWrappers::BlockVector &, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values<PETScWrappers::BlockVector,float>
+(const PETScWrappers::BlockVector &, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<PETScWrappers::BlockVector,double>
+(const Vector<double> &, PETScWrappers::BlockVector&) const;
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<PETScWrappers::BlockVector,float>
+(const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 
 #if deal_II_dimension >= 2
@@ -783,6 +801,23 @@ template
 void
 DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
+
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values<PETScWrappers::BlockVector,double>
+(const PETScWrappers::BlockVector &, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values<PETScWrappers::BlockVector,float>
+(const PETScWrappers::BlockVector &, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<PETScWrappers::BlockVector,double>
+(const Vector<double> &, PETScWrappers::BlockVector&) const;
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<PETScWrappers::BlockVector,float>
+(const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 #endif
 
@@ -876,6 +911,23 @@ template
 void
 DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
+
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<PETScWrappers::BlockVector,double>
+(const PETScWrappers::BlockVector &, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<PETScWrappers::BlockVector,float>
+(const PETScWrappers::BlockVector &, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<PETScWrappers::BlockVector,double>
+(const Vector<double>&, PETScWrappers::BlockVector &) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<PETScWrappers::BlockVector,float>
+(const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 #endif
 
@@ -996,6 +1048,27 @@ DoFCellAccessor<deal_II_dimension>::
 set_dof_values_by_interpolation<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
 
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values<PETScWrappers::BlockVector,double>
+(const PETScWrappers::BlockVector&, Vector<double>&) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation<PETScWrappers::BlockVector,double>
+(const Vector<double>&, PETScWrappers::BlockVector&) const;
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values<PETScWrappers::BlockVector,float>
+(const PETScWrappers::BlockVector&, Vector<float>&) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation<PETScWrappers::BlockVector,float>
+(const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 
 

@@ -17,13 +17,14 @@
 #include <fe/fe_values.h>
 #include <base/memory_consumption.h>
 #include <base/quadrature.h>
+#include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
 
 #include <iomanip>
 
@@ -911,6 +912,14 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::Vector>
 (const PETScWrappers::Vector &,
  std::vector<float>&) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
+ std::vector<double>&) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
+ std::vector<float>&) const;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -941,6 +950,10 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::Vector>
 (const PETScWrappers::Vector &,
  std::vector<Vector<double> >     &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_values<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
+ std::vector<Vector<double> >     &) const;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -967,6 +980,10 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::Vector>
 (const PETScWrappers::Vector &,
  std::vector<Tensor<1,deal_II_dimension> > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
+ std::vector<Tensor<1,deal_II_dimension> > &) const;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -993,6 +1010,11 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::Vector>
 (const PETScWrappers::Vector &,
  std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
+
+template
+void FEValuesBase<deal_II_dimension>::get_function_grads<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
+ std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -1015,6 +1037,10 @@ template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::Vector>
 (const PETScWrappers::Vector &,
  std::vector<Tensor<2,deal_II_dimension> > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
+ std::vector<Tensor<2,deal_II_dimension> > &) const;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -1036,5 +1062,10 @@ void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<BlockVector<d
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::Vector>
 (const PETScWrappers::Vector &,
+ std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
+
+template
+void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<PETScWrappers::BlockVector>
+(const PETScWrappers::BlockVector &,
  std::vector<std::vector<Tensor<2,deal_II_dimension> > > &) const;
 #endif

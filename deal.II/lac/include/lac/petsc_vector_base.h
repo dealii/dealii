@@ -213,8 +213,9 @@ namespace PETScWrappers
                                         * standard libraries <tt>vector<...></tt>
                                         * class.
                                         */
-      typedef PetscScalar       value_type;
-      typedef size_t            size_type;
+      typedef PetscScalar               value_type;
+      typedef size_t                    size_type;
+      typedef internal::VectorReference reference;
 
                                        /**
                                         * Default constructor. It doesn't do
@@ -325,7 +326,8 @@ namespace PETScWrappers
 					* a pair (i,i+n), where
 					* <tt>n=local_size()</tt>.
 					*/
-      std::pair<unsigned int, unsigned int> local_range () const;
+      std::pair<unsigned int, unsigned int>
+      local_range () const;
 
 				       /**
 					* Return whether @p index is
@@ -338,7 +340,7 @@ namespace PETScWrappers
                                         * Provide access to a given element,
                                         * both read and write.
                                         */
-      internal::VectorReference
+      reference
       operator () (const unsigned int index);
 
                                        /**
@@ -584,7 +586,6 @@ namespace PETScWrappers
                                         * to standard functions.
                                         */
       void swap (VectorBase &v);
-      
       
                                        /**
                                         * Conversion operator to gain access
@@ -865,7 +866,8 @@ namespace PETScWrappers
 					   &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     
-    return (index >= static_cast<unsigned int>(begin)) && (index < static_cast<unsigned int>(end));
+    return ((index >= static_cast<unsigned int>(begin)) &&
+            (index < static_cast<unsigned int>(end)));
   }
 
 

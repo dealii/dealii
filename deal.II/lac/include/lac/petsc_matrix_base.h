@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -280,7 +281,7 @@ namespace PETScWrappers
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
-  class MatrixBase 
+  class MatrixBase : public Subscriptor
   {
     public:
                                        /**
@@ -430,6 +431,47 @@ namespace PETScWrappers
                                         * matrix.
                                         */
       unsigned int n () const;
+
+                                       /**
+                                        * Return the local dimension of the
+                                        * matrix, i.e. the number of rows
+                                        * stored on the present MPI
+                                        * process. For sequential matrices,
+                                        * this number is the same as m(),
+                                        * but for parallel matrices it may be
+                                        * smaller.
+					*
+					* To figure out which elements
+					* exactly are stored locally,
+					* use local_range().
+                                        */
+      unsigned int local_size () const;
+
+                                       /**
+					* Return a pair of indices
+					* indicating which rows of
+					* this matrix are stored
+					* locally. The first number is
+					* the index of the first
+					* row stored, the second
+					* the index of the one past
+					* the last one that is stored
+					* locally. If this is a
+					* sequential matrix, then the
+					* result will be the pair
+					* (0,m()), otherwise it will be
+					* a pair (i,i+n), where
+					* <tt>n=local_size()</tt>.
+					*/
+      std::pair<unsigned int, unsigned int>
+      local_range () const;
+
+				       /**
+					* Return whether @p index is
+					* in the local range or not,
+					* see also local_range().
+					*/
+      bool in_local_range (const unsigned int index) const;
 
                                        /**
                                         * Return the number of nonzero
@@ -898,6 +940,22 @@ namespace PETScWrappers
     Assert (r < m(), ExcIndexRange(r, 0, m()));
     return const_iterator(this, r+1, 0);
   }
+
+
+  
+  inline
+  bool
+  MatrixBase::in_local_range (const unsigned int index) const
+  {
+    int begin, end;
+    const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
+					   &begin, &end);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    return ((index >= static_cast<unsigned int>(begin)) &&
+            (index < static_cast<unsigned int>(end)));
+  }
+
 /// @endif      
 }
 

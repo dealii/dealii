@@ -23,9 +23,7 @@
 template <typename number>
 BlockSparseMatrix<number>::BlockSparseMatrix ()
                 :
-		rows (0),
-		columns (0),
-		sparsity_pattern (0)
+                sparsity_pattern (0)
 {}
 
 
@@ -34,8 +32,7 @@ template <typename number>
 BlockSparseMatrix<number>::
 BlockSparseMatrix (const BlockSparsityPattern &sparsity)
                 :
-		rows (0),
-		columns (0)
+                sparsity_pattern (0)
 {
   reinit (sparsity);
 }
@@ -47,13 +44,15 @@ BlockSparseMatrix<number>::~BlockSparseMatrix ()
 {
   				   // delete previous content of
 				   // the subobjects array
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
       {
-	BlockType *p = sub_objects[r][c];
-	sub_objects[r][c] = 0;
+	BlockType *p = this->sub_objects[r][c];
+	this->sub_objects[r][c] = 0;
 	delete p;
       }
+
+  sparsity_pattern = 0;
 }
 
 
@@ -63,15 +62,18 @@ BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::
 operator = (const BlockSparseMatrix<number> &m) 
 {
-  Assert (rows == m.rows, ExcDimensionMismatch(rows, m.rows));
-  Assert (columns == m.columns, ExcDimensionMismatch(columns, m.columns));
-				   // this operator does not do
+  Assert (this->row_block_indices == m.row_block_indices,
+          ExcBlockDimensionMismatch());
+  Assert (this->column_block_indices == m.column_block_indices,
+          ExcBlockDimensionMismatch());
+
+                                   // this operator does not do
 				   // anything except than checking
 				   // whether the base objects want to
 				   // do something
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c) = m.block(r,c);
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      this->block(r,c) = m.block(r,c);
 
   return *this;
 }
@@ -84,9 +86,9 @@ BlockSparseMatrix<number>::operator = (const double d)
 {
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
   
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c) = 0;
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      block(r,c) = d;
 
   return *this;
 }
@@ -101,11 +103,11 @@ reinit (const BlockSparsityPattern &sparsity)
 				   // first delete previous content of
 				   // the subobjects array and delete
 				   // the table completely
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
       {
-	BlockType *p = sub_objects[r][c];
-	sub_objects[r][c] = 0;
+	BlockType *p = this->sub_objects[r][c];
+	this->sub_objects[r][c] = 0;
 	delete p;
       }
   sub_objects.reinit (0,0);
@@ -113,30 +115,21 @@ reinit (const BlockSparsityPattern &sparsity)
 				   // then associate new sparsity
 				   // pattern and resize
   sparsity_pattern = &sparsity;
-  rows = sparsity.n_block_rows();
-  columns = sparsity.n_block_cols();
-  sub_objects.reinit (rows, columns);
+  
+  this->row_block_indices    = sparsity.row_indices;
+  this->column_block_indices = sparsity.column_indices;
+
+  this->sub_objects.reinit (sparsity.n_block_rows(),
+                            sparsity.n_block_cols());
 
 				   // and reinitialize the blocks
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
       {
         BlockType *p = new SparseMatrix<number>();
         p->reinit (sparsity.block(r,c));
-	sub_objects[r][c] = p;
+	this->sub_objects[r][c] = p;
       }
-}
-
-
-
-template <typename number>
-void
-BlockSparseMatrix<number>::clear () 
-{
-  sparsity_pattern = 0;
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      block(r,c).clear ();
 }
 
 
@@ -145,9 +138,9 @@ template <typename number>
 bool
 BlockSparseMatrix<number>::empty () const
 {
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      if (block(r,c).empty () == false)
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      if (this->block(r,c).empty () == false)
 	return false;
 
   return true;
@@ -170,9 +163,9 @@ unsigned int
 BlockSparseMatrix<number>::n_actually_nonzero_elements () const
 {
   unsigned int count = 0;
-  for (unsigned int i=0; i<rows; ++i)
-    for (unsigned int j=0; j<columns; ++j)
-      count += sub_objects[i][j]->n_actually_nonzero_elements ();
+  for (unsigned int i=0; i<this->n_block_rows(); ++i)
+    for (unsigned int j=0; j<this->n_block_cols(); ++j)
+      count += this->sub_objects[i][j]->n_actually_nonzero_elements ();
 
   return count;
 }
@@ -198,12 +191,12 @@ print_formatted (std::ostream       &out,
                  const char         *zero_string,
                  const double        denominator) const
 {
-  for (unsigned int r=0;r<rows;++r)
-    for (unsigned int c=0;c<columns;++c)
+  for (unsigned int r=0;r<this->n_block_rows();++r)
+    for (unsigned int c=0;c<this->n_block_cols();++c)
       {
         out << "Component (" << r << "," << c << ")" << std::endl;
-        block(r,c).print_formatted (out, precision, scientific,
-                                    width, zero_string, denominator);
+        this->block(r,c).print_formatted (out, precision, scientific,
+                                          width, zero_string, denominator);
       }
 }
 
@@ -214,10 +207,10 @@ unsigned int
 BlockSparseMatrix<number>::memory_consumption () const
 {
   unsigned int mem = sizeof(*this);
-  mem += MemoryConsumption::memory_consumption (sub_objects);
-  for (unsigned int r=0; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
-      mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
+  mem += MemoryConsumption::memory_consumption (this->sub_objects);
+  for (unsigned int r=0; r<this->n_block_rows(); ++r)
+    for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      mem += MemoryConsumption::memory_consumption(*this->sub_objects[r][c]);
 
   return mem;
 }

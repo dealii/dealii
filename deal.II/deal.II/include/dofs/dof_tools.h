@@ -613,7 +613,7 @@ class DoFTools
 				      * @p dof. The size of
 				      * @p selected_dofs shall equal
 				      * <tt>dof_handler.n_dofs()</tt>. Previous
-				      * contents of this array or
+				      * contents of this array are
 				      * overwritten.
 				      *
 				      * If the finite element under

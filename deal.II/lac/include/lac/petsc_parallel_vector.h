@@ -24,6 +24,13 @@
 #include <lac/petsc_vector_base.h>
 
 
+// forward declaration
+template <typename> class Vector;
+
+
+/*! @addtogroup PETSc
+ *@{
+ */
 namespace PETScWrappers
 {
 /**
@@ -335,6 +342,13 @@ namespace PETScWrappers
         void reinit (const Vector &v,
                      const bool    fast = false);
 
+                                         /**
+                                          * Return a reference to the MPI
+                                          * communicator object in use with
+                                          * this vector.
+                                          */
+        const MPI_Comm & get_mpi_communicator () const;
+
       protected:
                                          /**
                                           * Create a vector of length
@@ -359,6 +373,21 @@ namespace PETScWrappers
 
 /// @if NoDoc
 // ------------------ template and inline functions -------------
+
+
+/**
+ * Global function @p swap which overloads the default implementation
+ * of the C++ standard library which uses a temporary object. The
+ * function simply exchanges the data of the two vectors.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+    inline
+    void swap (Vector &u, Vector &v)
+    {
+      u.swap (v);
+    }
+
 
 
     template <typename number>
@@ -459,7 +488,17 @@ namespace PETScWrappers
       compress ();
 
       return *this;
-    }    
+    }
+
+
+
+    inline
+    const MPI_Comm &
+    Vector::get_mpi_communicator () const
+    {
+      return communicator;
+    }
+
 /// @endif
   }
 }

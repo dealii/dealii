@@ -18,6 +18,7 @@
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
 #include <dofs/dof_handler.h>
@@ -1338,4 +1339,5 @@ INSTANTIATE(BlockVector<float>);
 
 #ifdef DEAL_II_USE_PETSC
 INSTANTIATE(PETScWrappers::Vector);
+INSTANTIATE(PETScWrappers::BlockVector);
 #endif

@@ -203,6 +203,19 @@ class LogStream
 				      * a line head the next time
 				      * something is written by this
 				      * stream.
+				      *
+				      * An overload of this function is needed
+				      * anyway, since the compiler can't bind
+				      * manipulators like @p std::endl
+				      * directly to template arguments @p T
+				      * like in the previous general
+				      * template. This is due to the fact that
+				      * @p std::endl is actually an overloaded
+				      * set of functions for @p std::ostream,
+				      * @p std::wostream, and potentially more
+				      * of this kind. This function is
+				      * therefore necessary to pick one
+				      * element from this overload set.
 				      */
     LogStream & operator<< (std::ostream& (*p) (std::ostream&));
 

@@ -39,6 +39,7 @@ tests_x = anna_? \
 	  parameter_handler_* \
 	  sparse_lu_decomposition_1 \
 	  block_sparse_matrix_* \
+	  block_vector_* \
 	  hyper_ball_3d cylinder coarsening_3d \
 	  mesh_3d_* \
 	  normals_* \

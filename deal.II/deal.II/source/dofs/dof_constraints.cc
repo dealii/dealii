@@ -19,13 +19,17 @@
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
+#include <lac/petsc_sparse_matrix.h>
+#include <lac/petsc_block_sparse_matrix.h>
+#include <lac/petsc_parallel_vector.h>
+#include <lac/petsc_parallel_block_vector.h>
+#include <lac/petsc_parallel_sparse_matrix.h>
+#include <lac/petsc_parallel_block_sparse_matrix.h>
 
 #include <algorithm>
 #include <numeric>
@@ -1272,7 +1276,9 @@ VECTOR_FUNCTIONS(BlockVector<float>);
 
 #ifdef DEAL_II_USE_PETSC
 VECTOR_FUNCTIONS(PETScWrappers::Vector);
+VECTOR_FUNCTIONS(PETScWrappers::BlockVector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::Vector);
+VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
 #endif
 
 
@@ -1319,5 +1325,7 @@ MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 
 #ifdef DEAL_II_USE_PETSC
 MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
+MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
+MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 #endif

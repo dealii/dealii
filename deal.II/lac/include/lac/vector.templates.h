@@ -60,23 +60,25 @@ Vector<Number>::Vector (const Vector<Number>& v)
 }
 
 
-// see the .h file for why this function was disabled
-//
-// template <typename Number>
-// template <typename OtherNumber>
-// Vector<Number>::Vector (const Vector<OtherNumber>& v) :
-// 		dim(v.size()),
-// 		maxdim(v.size()),
-// 		val(0)
-// {
-//   if (dim != 0)
-//     {
-//       val = new Number[maxdim];
-//       Assert (val != 0, ExcOutOfMemory());
-//       copy (v.begin(), v.end(), begin());
-//     }
-// }
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
+template <typename Number>
+template <typename OtherNumber>
+Vector<Number>::Vector (const Vector<OtherNumber>& v)
+                :
+		dim(v.size()),
+		maxdim(v.size()),
+		val(0)
+{
+  if (dim != 0)
+    {
+      val = new Number[maxdim];
+      Assert (val != 0, ExcOutOfMemory());
+      copy (v.begin(), v.end(), begin());
+    }
+}
+
+#endif
 
 #ifdef DEAL_II_USE_PETSC
 

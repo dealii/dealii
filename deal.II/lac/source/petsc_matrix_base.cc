@@ -239,6 +239,31 @@ namespace PETScWrappers
 
 
   unsigned int
+  MatrixBase::local_size () const
+  {
+    int n_rows, n_cols;
+    int ierr = MatGetLocalSize (matrix, &n_rows, &n_cols);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return n_rows;
+  }
+
+
+  
+  std::pair<unsigned int, unsigned int>
+  MatrixBase::local_range () const
+  {
+    int begin, end;
+    const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
+					   &begin, &end);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return std::make_pair (begin, end);
+  }
+
+
+
+  unsigned int
   MatrixBase::n_nonzero_elements () const
   {
     MatInfo mat_info;

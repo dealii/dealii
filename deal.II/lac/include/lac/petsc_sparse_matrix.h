@@ -20,6 +20,7 @@
 #ifdef DEAL_II_USE_PETSC
 
 #include <lac/petsc_matrix_base.h>
+#include <lac/compressed_sparsity_pattern.h>
 
 #include <vector>
 
@@ -110,6 +111,57 @@ namespace PETScWrappers
                     const bool                       is_symmetric = false);
 
                                        /**
+                                        * Initialize a sparse matrix using the
+                                        * given sparsity pattern.
+                                        *
+                                        * Note that PETSc can be very slow
+                                        * if you do not provide it with a
+                                        * good estimate of the lengths of
+                                        * rows. Using the present function
+                                        * is a very efficient way to do
+                                        * this, as it uses the exact number
+                                        * of nonzero entries for each row of
+                                        * the matrix by using the given
+                                        * sparsity pattern argument. If the
+                                        * @p preset_nonzero_locations flag
+                                        * is @p true, this function in
+                                        * addition not only sets the correct
+                                        * row sizes up front, but also
+                                        * pre-allocated the correct nonzero
+                                        * entries in the matrix.
+                                        *
+                                        * PETsc allows to later add
+                                        * additional nonzero entries to a
+                                        * matrix, by simply writing to these
+                                        * elements. However, this will then
+                                        * lead to additional memory
+                                        * allocations which are very
+                                        * inefficient and will greatly slow
+                                        * down your program. It is therefore
+                                        * significantly more efficient to
+                                        * get memory allocation right from
+                                        * the start.
+                                        *
+                                        * Despite the fact that it would
+                                        * seem to be an obvious win, setting
+                                        * the @p preset_nonzero_locations
+                                        * flag to @p true doesn't seem to
+                                        * accelerate program. Rather on the
+                                        * contrary, it seems to be able to
+                                        * slow down entire programs
+                                        * somewhat. This is suprising, since
+                                        * we can use efficient function
+                                        * calls into PETSc that allow to
+                                        * create multiple entries at once;
+                                        * nevertheless, given the fact that
+                                        * it is inefficient, the respective
+                                        * flag has a default value equal to
+                                        * @p false.
+                                        */
+      SparseMatrix (const CompressedSparsityPattern &sparsity_pattern,
+                    const bool                       preset_nonzero_locations = false);
+
+                                       /**
                                         * This operator assigns a scalar to
                                         * a matrix. Since this does usually
                                         * not make much sense (should we set
@@ -153,6 +205,57 @@ namespace PETScWrappers
                    const std::vector<unsigned int> &row_lengths,
                    const bool                       is_symmetric = false);
 
+                                       /**
+                                        * Initialize a sparse matrix using the
+                                        * given sparsity pattern.
+                                        *
+                                        * Note that PETSc can be very slow
+                                        * if you do not provide it with a
+                                        * good estimate of the lengths of
+                                        * rows. Using the present function
+                                        * is a very efficient way to do
+                                        * this, as it uses the exact number
+                                        * of nonzero entries for each row of
+                                        * the matrix by using the given
+                                        * sparsity pattern argument. If the
+                                        * @p preset_nonzero_locations flag
+                                        * is @p true, this function in
+                                        * addition not only sets the correct
+                                        * row sizes up front, but also
+                                        * pre-allocated the correct nonzero
+                                        * entries in the matrix.
+                                        *
+                                        * PETsc allows to later add
+                                        * additional nonzero entries to a
+                                        * matrix, by simply writing to these
+                                        * elements. However, this will then
+                                        * lead to additional memory
+                                        * allocations which are very
+                                        * inefficient and will greatly slow
+                                        * down your program. It is therefore
+                                        * significantly more efficient to
+                                        * get memory allocation right from
+                                        * the start.
+                                        *
+                                        * Despite the fact that it would
+                                        * seem to be an obvious win, setting
+                                        * the @p preset_nonzero_locations
+                                        * flag to @p true doesn't seem to
+                                        * accelerate program. Rather on the
+                                        * contrary, it seems to be able to
+                                        * slow down entire programs
+                                        * somewhat. This is suprising, since
+                                        * we can use efficient function
+                                        * calls into PETSc that allow to
+                                        * create multiple entries at once;
+                                        * nevertheless, given the fact that
+                                        * it is inefficient, the respective
+                                        * flag has a default value equal to
+                                        * @p false.
+                                        */
+      void reinit (const CompressedSparsityPattern &sparsity_pattern,
+                   const bool                       preset_nonzero_locations = false);
+
     private:
 
                                        /**
@@ -174,6 +277,12 @@ namespace PETScWrappers
                       const unsigned int               n,
                       const std::vector<unsigned int> &row_lengths,
                       const bool                       is_symmetric = false);
+
+                                       /**
+                                        * Same as previous function.
+                                        */
+      void do_reinit (const CompressedSparsityPattern &sparsity_pattern,
+                      const bool                       preset_nonzero_locations);
   };
 }
 

@@ -58,6 +58,10 @@
    */
 #undef DEAL_II_COMPAT_MAPPING
 
+/* Defined if the compiler does not honor the explicit keyword on template
+   constructors. */
+#undef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
+
 /* Defined if the compiler needs a workaround for certain problems with taking
    the address of template template functions. For the details, look at
    aclocal.m4 in the top-level directory. */

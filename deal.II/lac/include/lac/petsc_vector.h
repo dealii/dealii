@@ -77,11 +77,21 @@ namespace PETScWrappers
                                         * Copy-constructor the values from a
                                         * PETSc wrapper vector class.
                                         */
-      explicit Vector (const Vector &v);
+      Vector (const Vector &v);
 
                                        /**
-                                        * Copy-constructor the values from a
-                                        * PETSc wrapper parallel vector class.
+                                        * Copy-constructor: copy the values
+                                        * from a PETSc wrapper parallel vector
+                                        * class.
+                                        *
+                                        * Note that due to the communication
+                                        * model of MPI, @em all processes have
+                                        * to actually perform this operation,
+                                        * even if they do not use the
+                                        * result. It is not sufficient if only
+                                        * one processor tries to copy the
+                                        * elements from the other processors
+                                        * over to its own process space.
                                         */
       explicit Vector (const MPI::Vector &v);
 
@@ -93,7 +103,7 @@ namespace PETScWrappers
 
                                        /**
                                         * Copy all the elements of the
-                                        * parallel vector @arg v into this
+                                        * parallel vector @p v into this
                                         * local vector. Note that due to the
                                         * communication model of MPI, @em all
                                         * processes have to actually perform
@@ -183,6 +193,21 @@ namespace PETScWrappers
 
 /// @if NoDoc
 // ------------------ template and inline functions -------------
+
+
+/**
+ * Global function @p swap which overloads the default implementation
+ * of the C++ standard library which uses a temporary object. The
+ * function simply exchanges the data of the two vectors.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+  inline
+  void swap (Vector &u, Vector &v)
+  {
+    u.swap (v);
+  }
+
 
 
   template <typename number>

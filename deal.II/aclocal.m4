@@ -2987,6 +2987,56 @@ AC_DEFUN(DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Some older versions of gcc compile this, despite the 'explicit'
+dnl keyword:
+dnl ---------------------------------
+dnl struct X {
+dnl     template <typename T>
+dnl     explicit X(T);
+dnl };
+dnl 
+dnl void f(X);
+dnl 
+dnl int main () { f(1); }
+dnl ---------------------------------
+dnl 
+dnl Check for this misfeature.
+dnl 
+dnl Usage: DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG
+dnl 
+dnl --------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG, dnl
+[
+  AC_MSG_CHECKING(for explicit template constructor bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      struct X {
+        template <typename T>
+        explicit X(T);
+      };
+
+      void f(X);
+    ],
+    [
+      f(1);
+    ],
+    [
+      AC_MSG_RESULT(yes. disabling some functions)
+      AC_DEFINE(DEAL_II_EXPLICIT_CONSTRUCTOR_BUG, 1, 
+                     [Defined if the compiler does not honor the explicit
+                      keyword on template constructors.])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+
+dnl -------------------------------------------------------------
 dnl The boost::shared_ptr class has a templated assignment operator
 dnl but no assignment operator matching the default operator
 dnl signature (this if for boost 1.29 at least). So when using

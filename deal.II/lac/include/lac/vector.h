@@ -104,23 +104,32 @@ class Vector
     Vector (const Vector<Number> &v);
 
 
-// note: I disabled this function for the time being, since gcc2.95
-// does not respect the "explicit" keyword for template constructors.
-// this leads to unwanted conversions and in some places to automatically
-// generated temporaries, where this is not a good idea. [WB]
-// 				     /**
-// 				      * Copy constructor taking a vector of
-// 				      * another data type. This will fail if
-// 				      * there is no conversion path from
-// 				      * @p OtherNumber to @p Number. Note that
-// 				      * you may lose accuracy when copying
-// 				      * to a vector with data elements with
-// 				      * less accuracy.
-// 				      */
-//     template <typename OtherNumber>
-//     explicit
-//     Vector (const Vector<OtherNumber> &v);
-
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
+				     /**
+				      * Copy constructor taking a vector of
+				      * another data type. This will fail if
+				      * there is no conversion path from
+				      * @p OtherNumber to @p Number. Note that
+				      * you may lose accuracy when copying
+				      * to a vector with data elements with
+				      * less accuracy.
+				      *
+				      * Older versions of gcc did not honor
+				      * the @p explicit keyword on template
+				      * constructors. In such cases, it is
+				      * easy to accidentally write code that
+				      * can be very inefficient, since the
+				      * compiler starts performing hidden
+				      * conversions. To avoid this, this
+				      * function is disabled if we have
+				      * detected a broken compiler during
+				      * configuration.
+				      */
+    template <typename OtherNumber>
+    explicit
+    Vector (const Vector<OtherNumber> &v);
+#endif
+    
 #ifdef DEAL_II_USE_PETSC
                                      /**
                                       * Another copy constructor: copy the

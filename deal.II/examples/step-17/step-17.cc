@@ -446,12 +446,28 @@ void ElasticProblem<dim>::setup_system ()
                                    // vectors. Since they all need to work in
                                    // parallel, we have to pass them an MPI
                                    // communication object, as well as their
-                                   // global sizes, and also how many rows out
-                                   // of this global size are to be stored
-                                   // locally:
+                                   // global sizes (both dimensions are equal
+                                   // to the number of degrees of freedom),
+                                   // and also how many rows out of this
+                                   // global size are to be stored locally
+                                   // (``n_local_dofs''). In addition, PETSc
+                                   // needs to know how to partition the
+                                   // columns in the chunk of the matrix that
+                                   // is stored locally; for square matrices,
+                                   // the columns should be partitioned in the
+                                   // same way as the rows (indicated by the
+                                   // second ``n_local_dofs'' in the call) but
+                                   // in the case of rectangular matrices one
+                                   // has to partition the columns in the same
+                                   // way as vectors are partitioned with
+                                   // which the matrix is multiplied, while
+                                   // rows have to partitioned in the same way
+                                   // as destination vectors of matrix-vector
+                                   // multiplications:
   system_matrix.reinit (mpi_communicator,
                         dof_handler.n_dofs(),
                         dof_handler.n_dofs(),
+                        n_local_dofs,
                         n_local_dofs,
                         dof_handler.max_couplings_between_dofs());
 

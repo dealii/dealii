@@ -284,7 +284,7 @@ class DoFRenumbering
 				      * components are ordered in a
 				      * different way than suggested
 				      * by the @p FESystem object you
-				      * use. To this end, Set up the
+				      * use. To this end, set up the
 				      * vector @p target_component
 				      * such that the entry at index
 				      * @p i denotes the number of

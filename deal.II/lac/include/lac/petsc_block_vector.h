@@ -1,0 +1,489 @@
+//----------------------------  petsc_block_vector.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2004 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  petsc_block_vector.h  ---------------------------
+#ifndef __deal2__petsc_block_vector_h
+#define __deal2__petsc_block_vector_h
+
+
+#include <base/config.h>
+#include <base/exceptions.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_parallel_block_vector.h>
+#include <lac/block_indices.h>
+#include <lac/block_vector_base.h>
+
+#ifdef DEAL_II_USE_PETSC
+
+
+/*! @addtogroup PETScWrappers
+ *@{
+ */
+
+namespace PETScWrappers
+{
+
+/**
+ * An implementation of block vectors based on the vector class implemented in
+ * PETScWrappers. While the base class provides for most of the interface,
+ * this class handles the actual allocation of vectors and provides functions
+ * that are specific to the underlying vector type.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+  class BlockVector : public BlockVectorBase<Vector>
+  {
+    public:
+                                       /**
+                                        * Typedef the base class for simpler
+                                        * access to its own typedefs.
+                                        */
+      typedef BlockVectorBase<Vector> BaseClass;
+    
+                                       /**
+                                        * Typedef the type of the underlying
+                                        * vector.
+                                        */
+      typedef BaseClass::BlockType  BlockType;
+
+                                       /**
+                                        * Import the typedefs from the base
+                                        * class.
+                                        */
+      typedef BaseClass::value_type      value_type;
+      typedef BaseClass::pointer         pointer;
+      typedef BaseClass::const_pointer   const_pointer;
+      typedef BaseClass::reference       reference;
+      typedef BaseClass::const_reference const_reference;
+      typedef BaseClass::size_type       size_type;
+      typedef BaseClass::iterator        iterator;
+      typedef BaseClass::const_iterator  const_iterator;
+
+                                       /**
+                                        *  Constructor. There are three
+                                        *  ways to use this
+                                        *  constructor. First, without
+                                        *  any arguments, it generates
+                                        *  an object with no
+                                        *  blocks. Given one argument,
+                                        *  it initializes <tt>num_blocks</tt>
+                                        *  blocks, but these blocks have
+                                        *  size zero. The third variant
+                                        *  finally initializes all
+                                        *  blocks to the same size
+                                        *  <tt>block_size</tt>.
+                                        *
+                                        *  Confer the other constructor
+                                        *  further down if you intend to
+                                        *  use blocks of different
+                                        *  sizes.
+                                        */
+      explicit BlockVector (const unsigned int num_blocks = 0,
+                            const unsigned int block_size = 0);
+    
+                                       /**
+                                        * Copy-Constructor. Dimension set to
+                                        * that of V, all components are copied
+                                        * from V
+                                        */
+      BlockVector (const BlockVector  &V);
+
+                                       /**
+                                        * Copy-constructor: copy the values
+                                        * from a PETSc wrapper parallel block
+                                        * vector class.
+                                        * 
+                                        *
+                                        * Note that due to the communication
+                                        * model of MPI, @em all processes have
+                                        * to actually perform this operation,
+                                        * even if they do not use the
+                                        * result. It is not sufficient if only
+                                        * one processor tries to copy the
+                                        * elements from the other processors
+                                        * over to its own process space.
+                                        */
+      explicit BlockVector (const MPI::BlockVector &v);
+
+                                       /**
+                                        * Constructor. Set the number of
+                                        * blocks to <tt>n.size()</tt> and
+                                        * initialize each block with
+                                        * <tt>n[i]</tt> zero elements.
+                                        */
+      BlockVector (const std::vector<unsigned int> &n);
+
+                                       /**
+                                        * Constructor. Set the number of
+                                        * blocks to
+                                        * <tt>n.size()</tt>. Initialize the
+                                        * vector with the elements
+                                        * pointed to by the range of
+                                        * iterators given as second and
+                                        * third argument. Apart from the
+                                        * first argument, this
+                                        * constructor is in complete
+                                        * analogy to the respective
+                                        * constructor of the
+                                        * <tt>std::vector</tt> class, but the
+                                        * first argument is needed in
+                                        * order to know how to subdivide
+                                        * the block vector into
+                                        * different blocks.
+                                        */
+      template <typename InputIterator>
+      BlockVector (const std::vector<unsigned int> &n,
+                   const InputIterator              first,
+                   const InputIterator              end);
+    
+                                       /**
+                                        * Destructor. Clears memory
+                                        */
+      ~BlockVector ();
+
+                                       /**
+                                        * Copy operator: fill all components of
+                                        * the vector with the given scalar
+                                        * value.
+                                        */
+      BlockVector & operator = (const value_type s);
+
+                                       /**
+                                        * Copy operator for arguments of the
+                                        * same type.
+                                        */
+      BlockVector &
+      operator= (const BlockVector &V);
+
+                                       /**
+                                        * Copy all the elements of the
+                                        * parallel block vector @p v into this
+                                        * local vector. Note that due to the
+                                        * communication model of MPI, @em all
+                                        * processes have to actually perform
+                                        * this operation, even if they do not
+                                        * use the result. It is not sufficient
+                                        * if only one processor tries to copy
+                                        * the elements from the other
+                                        * processors over to its own process
+                                        * space.
+                                        */
+      BlockVector &
+      operator = (const MPI::BlockVector &v);
+
+                                       /**
+                                        * Reinitialize the BlockVector to
+                                        * contain <tt>num_blocks</tt> blocks of
+                                        * size <tt>block_size</tt> each.
+                                        *
+                                        * If <tt>fast==false</tt>, the vector
+                                        * is filled with zeros.
+                                        */
+      void reinit (const unsigned int num_blocks,
+                   const unsigned int block_size,
+                   const bool fast = false);
+  
+                                       /**
+                                        * Reinitialize the BlockVector such
+                                        * that it contains
+                                        * <tt>block_sizes.size()</tt>
+                                        * blocks. Each block is reinitialized
+                                        * to dimension
+                                        * <tt>block_sizes[i]</tt>.
+                                        *
+                                        * If the number of blocks is the
+                                        * same as before this function
+                                        * was called, all vectors remain
+                                        * the same and reinit() is
+                                        * called for each vector.
+                                        *
+                                        * If <tt>fast==false</tt>, the vector
+                                        * is filled with zeros.
+                                        *
+                                        * Note that you must call this
+                                        * (or the other reinit()
+                                        * functions) function, rather
+                                        * than calling the reinit()
+                                        * functions of an individual
+                                        * block, to allow the block
+                                        * vector to update its caches of
+                                        * vector sizes. If you call
+                                        * reinit() on one of the
+                                        * blocks, then subsequent
+                                        * actions on this object may
+                                        * yield unpredictable results
+                                        * since they may be routed to
+                                        * the wrong block.
+                                        */ 
+      void reinit (const std::vector<unsigned int> &N,
+                   const bool                       fast=false);
+    
+                                       /**
+                                        * Change the dimension to that
+                                        * of the vector <tt>V</tt>. The same
+                                        * applies as for the other
+                                        * reinit() function.
+                                        *
+                                        * The elements of <tt>V</tt> are not
+                                        * copied, i.e.  this function is
+                                        * the same as calling <tt>reinit
+                                        * (V.size(), fast)</tt>.
+                                        *
+                                        * Note that you must call this
+                                        * (or the other reinit()
+                                        * functions) function, rather
+                                        * than calling the reinit()
+                                        * functions of an individual
+                                        * block, to allow the block
+                                        * vector to update its caches of
+                                        * vector sizes. If you call
+                                        * reinit() of one of the
+                                        * blocks, then subsequent
+                                        * actions of this object may
+                                        * yield unpredictable results
+                                        * since they may be routed to
+                                        * the wrong block.
+                                        */
+      void reinit (const BlockVector &V,
+                   const bool         fast=false);
+    
+                                       /**
+                                        * Swap the contents of this
+                                        * vector and the other vector
+                                        * <tt>v</tt>. One could do this
+                                        * operation with a temporary
+                                        * variable and copying over the
+                                        * data elements, but this
+                                        * function is significantly more
+                                        * efficient since it only swaps
+                                        * the pointers to the data of
+                                        * the two vectors and therefore
+                                        * does not need to allocate
+                                        * temporary storage and move
+                                        * data around.
+                                        *
+                                        * Limitation: right now this
+                                        * function only works if both
+                                        * vectors have the same number
+                                        * of blocks. If needed, the
+                                        * numbers of blocks should be
+                                        * exchanged, too.
+                                        *
+                                        * This function is analog to the
+                                        * the swap() function of all C++
+                                        * standard containers. Also,
+                                        * there is a global function
+                                        * swap(u,v) that simply calls
+                                        * <tt>u.swap(v)</tt>, again in analogy
+                                        * to standard functions.
+                                        */
+      void swap (BlockVector &v);    
+    
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
+  };
+
+/*@}*/
+
+/*----------------------- Inline functions ----------------------------------*/
+
+
+
+  inline
+  BlockVector::BlockVector (const unsigned int n_blocks,
+                            const unsigned int block_size)
+  {
+    reinit (n_blocks, block_size);
+  }
+
+
+
+  inline
+  BlockVector::BlockVector (const std::vector<unsigned int> &n)
+  {
+    reinit (n, false);
+  }
+
+
+  inline
+  BlockVector::BlockVector (const BlockVector& v)
+                  :
+                  BlockVectorBase<Vector > ()
+  {
+    components.resize (v.num_blocks);
+    block_indices = v.block_indices;
+    num_blocks = v.num_blocks;
+  
+    for (unsigned int i=0; i<num_blocks; ++i)
+      components[i] = v.components[i];
+  }
+
+
+
+  inline
+  BlockVector::BlockVector (const MPI::BlockVector& v)
+                  :
+                  BlockVectorBase<Vector > ()
+  {
+    components.resize (v.get_block_indices().size());
+    block_indices = v.get_block_indices();
+    num_blocks = block_indices.size();
+  
+    for (unsigned int i=0; i<num_blocks; ++i)
+      components[i] = v.block(i);
+  }
+
+  
+
+  template <typename InputIterator>
+  BlockVector::BlockVector (const std::vector<unsigned int> &n,
+                            const InputIterator              first,
+                            const InputIterator              end)
+  {
+                                     // first set sizes of blocks, but
+                                     // don't initialize them as we will
+                                     // copy elements soon
+    reinit (n, true);
+    InputIterator start = first;
+    for (unsigned int b=0; b<n.size(); ++b)
+      {
+        InputIterator end = start;
+        std::advance (end, static_cast<signed int>(n[b]));
+        std::copy (start, end, this->block(b).begin());
+        start = end;
+      };
+    Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
+  }
+
+
+
+  inline
+  BlockVector &
+  BlockVector::operator = (const value_type s)
+  {
+    BaseClass::operator = (s);
+    return *this;
+  }
+
+
+
+  inline
+  BlockVector &
+  BlockVector::operator = (const BlockVector &v)
+  {
+    BaseClass::operator = (v);
+    return *this;
+  }
+
+
+
+  inline
+  BlockVector &
+  BlockVector::operator = (const MPI::BlockVector &v)
+  {
+    BaseClass::operator = (v);
+    return *this;
+  }
+
+
+
+  inline
+  BlockVector::~BlockVector ()
+  {}
+
+  
+  inline
+  void
+  BlockVector::reinit (const unsigned int n_bl,
+                       const unsigned int bl_sz,
+                       const bool         fast)
+  {
+    std::vector<unsigned int> n(n_bl, bl_sz);
+    reinit(n, fast);
+  }
+
+  
+
+  inline
+  void
+  BlockVector::reinit (const std::vector<unsigned int> &n,
+                       const bool                       fast)
+  {
+    block_indices.reinit (n);
+    num_blocks = n.size();
+    if (components.size() != num_blocks)
+      components.resize(num_blocks);
+  
+    for (unsigned int i=0; i<num_blocks; ++i)
+      components[i].reinit(n[i], fast);
+  }
+
+
+  inline
+  void
+  BlockVector::reinit (const BlockVector& v,
+                       const bool fast)
+  {
+    block_indices = v.get_block_indices();
+    num_blocks = v.n_blocks();
+    if (components.size() != num_blocks)
+      components.resize(num_blocks);
+  
+    for (unsigned int i=0;i<num_blocks;++i)
+      block(i).reinit(v.block(i), fast);
+  }
+
+  
+
+  inline
+  void
+  BlockVector::swap (BlockVector &v)
+  {
+    Assert (num_blocks == v.num_blocks,
+            ExcDimensionMismatch(num_blocks, v.num_blocks));
+  
+    for (unsigned int i=0; i<num_blocks; ++i)
+      components[i].swap (v.components[i]);
+    ::swap (block_indices, v.block_indices);
+  }
+
+
+  
+
+/*! @addtogroup PETScWrappers
+ *@{
+ */
+
+/**
+ * Global function which overloads the default implementation
+ * of the C++ standard library which uses a temporary object. The
+ * function simply exchanges the data of the two vectors.
+ *
+ * @relates BlockVector
+ * @author Wolfgang Bangerth, 2000
+ */
+  inline
+  void swap (BlockVector &u,
+             BlockVector &v)
+  {
+    u.swap (v);
+  }
+
+
+/*@}*/
+  
+}
+
+#endif  // DEAL_II_USE_PETSC
+
+#endif

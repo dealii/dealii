@@ -51,6 +51,15 @@ namespace PETScWrappers
 
 
 
+  SparseMatrix::
+  SparseMatrix (const CompressedSparsityPattern &sparsity_pattern,
+                const bool                       preset_nonzero_locations)
+  {
+    do_reinit (sparsity_pattern, preset_nonzero_locations);
+  }
+
+  
+
   SparseMatrix &
   SparseMatrix::operator = (const double d)
   {
@@ -91,7 +100,21 @@ namespace PETScWrappers
   }  
 
 
+  void
+  SparseMatrix::
+  reinit (const CompressedSparsityPattern &sparsity_pattern,
+          const bool                       preset_nonzero_locations)
+  {
+                                     // get rid of old matrix and generate a
+                                     // new one
+    const int ierr = MatDestroy (matrix);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));    
 
+    do_reinit (sparsity_pattern, preset_nonzero_locations);
+  }
+
+
+  
   void
   SparseMatrix::do_reinit (const unsigned int m,
                            const unsigned int n,
@@ -148,6 +171,53 @@ namespace PETScWrappers
           = MatSetOption (matrix, MAT_SYMMETRIC);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }    
+  }
+
+
+
+  void
+  SparseMatrix::do_reinit (const CompressedSparsityPattern &sparsity_pattern,
+                           const bool preset_nonzero_locations)
+  {
+    std::vector<unsigned int> row_lengths (sparsity_pattern.n_rows());
+    for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
+      row_lengths[i] = sparsity_pattern.row_length (i);
+
+    do_reinit (sparsity_pattern.n_rows(),
+               sparsity_pattern.n_cols(),
+               row_lengths, false);
+
+                                     // next preset the exact given matrix
+                                     // entries with zeros, if the user
+                                     // requested so. this doesn't avoid any
+                                     // memory allocations, but it at least
+                                     // avoids some searches later on. the
+                                     // key here is that we can use the
+                                     // matrix set routines that set an
+                                     // entire row at once, not a single
+                                     // entry at a time
+                                     //
+                                     // for the usefulness of this option
+                                     // read the documentation of this
+                                     // class.
+    if (preset_nonzero_locations == true)
+      {
+        std::vector<int> row_entries;
+        std::vector<PetscScalar> row_values;
+        for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
+          {
+            row_entries.resize (row_lengths[i]);
+            row_values.resize (row_lengths[i], 0.0);
+            for (unsigned int j=0; j<row_lengths[i]; ++j)
+              row_entries[j] = sparsity_pattern.column_number (i,j);
+              
+            const int int_row = i;
+            MatSetValues (matrix, 1, &int_row,
+                          row_lengths[i], &row_entries[0],
+                          &row_values[0], INSERT_VALUES);
+          }
+        compress ();
+      }
   }
 }
 

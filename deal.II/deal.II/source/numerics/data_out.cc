@@ -18,6 +18,7 @@
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
 #include <numerics/data_out.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -721,6 +722,13 @@ add_data_vector<PETScWrappers::Vector> (
   const PETScWrappers::Vector &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
+
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
+add_data_vector<PETScWrappers::BlockVector> (
+  const PETScWrappers::BlockVector &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
 #endif
 
 template void
@@ -742,6 +750,13 @@ template void
 DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
 add_data_vector<PETScWrappers::Vector> (
   const PETScWrappers::Vector &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
+add_data_vector<PETScWrappers::BlockVector> (
+  const PETScWrappers::BlockVector &vec,
   const std::string    &name,
   const DataVectorType  type);
 #endif
@@ -771,6 +786,13 @@ add_data_vector<PETScWrappers::Vector> (
   const PETScWrappers::Vector &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
+
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
+add_data_vector<PETScWrappers::BlockVector> (
+  const PETScWrappers::BlockVector &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
 #endif
 
 template void
@@ -792,6 +814,13 @@ template void
 DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
 add_data_vector<PETScWrappers::Vector> (
   const PETScWrappers::Vector &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
+add_data_vector<PETScWrappers::BlockVector> (
+  const PETScWrappers::BlockVector &vec,
   const std::string    &name,
   const DataVectorType  type);
 #endif
@@ -826,6 +855,13 @@ add_data_vector<PETScWrappers::Vector> (
   const PETScWrappers::Vector &vec,
   const std::vector<std::string>    &name,
   const DataVectorType  type);
+
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
+add_data_vector<PETScWrappers::BlockVector> (
+  const PETScWrappers::BlockVector &vec,
+  const std::vector<std::string>    &name,
+  const DataVectorType  type);
 #endif
 
 template void
@@ -847,6 +883,13 @@ template void
 DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
 add_data_vector<PETScWrappers::Vector> (
   const PETScWrappers::Vector &vec,
+  const std::string    &name,
+  const DataVectorType  type);
+
+template void
+DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
+add_data_vector<PETScWrappers::BlockVector> (
+  const PETScWrappers::BlockVector &vec,
   const std::string    &name,
   const DataVectorType  type);
 #endif
