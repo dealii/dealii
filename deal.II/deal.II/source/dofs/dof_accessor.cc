@@ -102,6 +102,14 @@ DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 
 template <int dim, class BaseClass>
+double
+DoFLineAccessor<dim,BaseClass>::diameter () const {
+  return sqrt((vertex(1)-vertex(0)).square());
+};
+
+
+
+template <int dim, class BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,BaseClass> >
 DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
   TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > q (tria,
@@ -215,6 +223,15 @@ DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 
 
+template <int dim, class BaseClass>
+double
+DoFQuadAccessor<dim,BaseClass>::diameter () const {
+  return sqrt(max((vertex(2)-vertex(0)).square(),
+		  (vertex(3)-vertex(1)).square()));
+};
+
+
+
 
 template <int dim, class BaseClass>
 TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
@@ -316,16 +333,17 @@ DoFCellAccessor<1>::get_dof_values (const dVector  &values,
 				    vector<double> &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_values.size() == 0, ExcVectorNotEmpty());
+  Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
+	  ExcVectorDoesNotMatch());
   Assert (values.n() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
-  
-  dof_values.reserve (dof_handler->get_selected_fe().total_dofs);
+
+  vector<double>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
-      dof_values.push_back (values(vertex_dof_index(vertex,d)));
+      *next_dof_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
-    dof_values.push_back (values(dof_index(d)));
+    *next_dof_value++ = values(dof_index(d));
 };
 
 
@@ -336,19 +354,20 @@ DoFCellAccessor<2>::get_dof_values (const dVector  &values,
 				    vector<double> &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_selected_fe() != 0, ExcInvalidObject());
-  Assert (dof_values.size() == 0, ExcVectorNotEmpty());
+  Assert (dof_values.size() == dof_handler->get_selected_fe().total_dofs,
+	  ExcVectorDoesNotMatch());
   Assert (values.n() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
-    
-  dof_values.reserve (dof_handler->get_selected_fe().total_dofs);
+
+  vector<double>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
-      dof_values.push_back (values(vertex_dof_index(vertex,d)));
+      *next_dof_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
-      dof_values.push_back (values(this->line(line)->dof_index(d)));
+      *next_dof_value++ = values(this->line(line)->dof_index(d));
   for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
-    dof_values.push_back (values(dof_index(d)));
+    *next_dof_value++ = values(dof_index(d));
 };
 
 
