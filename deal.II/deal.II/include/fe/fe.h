@@ -18,6 +18,7 @@
 #include <dofs/dof_handler.h>
 
 template <int dim> class FEValuesData;
+template <int dim> class FEValuesBase;
 template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
@@ -256,6 +257,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * Declare some other classes as
 				      * friends of this class.
 				      */
+    friend class FEValuesBase<dim>;
     friend class FEValues<dim>;
     friend class FEFaceValues<dim>;
     friend class FESubfaceValues<dim>;

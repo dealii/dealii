@@ -615,7 +615,25 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Internal data of finite element.
 				      */
     SmartPointer<typename Mapping<dim>::InternalDataBase> fe_data;
-    
+
+				     /**
+				      * Initialize some update
+				      * flags. Called from the
+				      * @p{initialize} functions of
+				      * derived classes, which are in
+				      * turn called from their
+				      * constructors.
+				      *
+				      * Basically, this function finds
+				      * out using the finite element
+				      * and mapping object already
+				      * stored which flags need to be
+				      * set to compute everything the
+				      * user wants, as expressed
+				      * through the flags passed as
+				      * argument.
+				      */
+    UpdateFlags compute_update_flags (const UpdateFlags update_flags) const;
 };
 
 
@@ -671,7 +689,13 @@ class FEValues : public FEValuesBase<dim>
 				     /**
 				      * Store the quadrature formula here.
 				      */
-    const Quadrature<dim> quadrature;    
+    const Quadrature<dim> quadrature;
+
+				     /**
+				      * Do work common to the two
+				      * constructors.
+				      */
+    void initialize (const UpdateFlags update_flags);
 };
 
 
@@ -825,6 +849,14 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      */
     void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no);
+
+  private:
+
+				     /**
+				      * Do work common to the two
+				      * constructors.
+				      */
+    void initialize (const UpdateFlags update_flags);    
 };
 
 
@@ -888,6 +920,14 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * Exception
 				      */
     DeclException0 (ExcFaceHasNoSubfaces);
+
+  private:
+
+				     /**
+				      * Do work common to the two
+				      * constructors.
+				      */
+    void initialize (const UpdateFlags update_flags);
 };
 
 

@@ -72,7 +72,7 @@ FEValuesData<dim>::initialize (const unsigned int n_quadrature_points,
   if (flags & update_normal_vectors)
     normal_vectors.resize(n_quadrature_points);
 
-//Todo: support points missing
+//Todo:[?] support points missing
 }
 
 
@@ -422,10 +422,33 @@ FEValuesBase<dim>::memory_consumption () const
 };
 
 
+
+template <int dim>
+UpdateFlags
+FEValuesBase<dim>::compute_update_flags (const UpdateFlags update_flags) const
+{
+  
+				   // first find out which objects
+				   // need to be recomputed on each
+				   // cell we visit. this we have to
+				   // ask the finite element and mapping.
+				   // elements are first since they
+				   // might require update in mapping
+  UpdateFlags flags = update_flags
+		      | fe->update_once (update_flags)
+		      | fe->update_each (update_flags);
+  flags |= mapping->update_once (flags)
+	   | mapping->update_each (flags);
+
+  return flags;
+};
+
+
+
 /*------------------------------- FEValues -------------------------------*/
 
 
-// TODO:[GK,WB] unify the two constructor bodies by calling a single function that does all the work
+
 template <int dim>
 FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 			 const FiniteElement<dim> &fe,
@@ -440,34 +463,7 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 				   fe),
 		quadrature (q)
 {
-				   // you can't compute normal vectors
-				   // on cells, only on faces
-  Assert ((update_flags & update_normal_vectors) == false,
-	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
-
-				   // first find out which objects
-				   // need to be recomputed on each
-				   // cell we visit. this we have to
-				   // ask the finite element and mapping.
-				   // elements are first since they
-				   // might require update in mapping
-  UpdateFlags flags = update_flags
-		      | fe.update_once (update_flags)
-		      | fe.update_each (update_flags);
-  flags |= mapping.update_once (flags)
-	   | mapping.update_each (flags);
-
-				   // then get objects into which the
-				   // FE and the Mapping can store
-				   // intermediate data used across
-				   // calls to reinit
-  mapping_data = mapping.get_data(flags, quadrature);
-  fe_data      = fe.get_data(flags, mapping, quadrature);
-
-				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points,
-				dofs_per_cell,
-				flags);
+  initialize (update_flags);
 };
 
 
@@ -485,35 +481,34 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				   fe),
                 quadrature (q)
 {
+  initialize (update_flags);
+};
+
+
+
+template <int dim>
+void
+FEValues<dim>::initialize (const UpdateFlags update_flags)
+{
 				   // you can't compute normal vectors
 				   // on cells, only on faces
   Assert ((update_flags & update_normal_vectors) == false,
-	  FEValuesBase<dim>::ExcInvalidUpdateFlag());
+	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
 
-				   // first find out which objects
-				   // need to be recomputed on each
-				   // cell we visit. this we have to
-				   // ask the finite element and mapping.
-				   // elements are first since they
-				   // might require update in mapping
-  UpdateFlags flags = update_flags
-		      | fe.update_once (update_flags)
-		      | fe.update_each (update_flags);
-  flags |= mapping->update_once (flags)
-	   | mapping->update_each (flags);
-
-			   // then get objects into which the
+  const UpdateFlags flags = compute_update_flags (update_flags);
+  
+				   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
   mapping_data = mapping->get_data(flags, quadrature);
-  fe_data      = fe.get_data(flags, *mapping, quadrature);
+  fe_data      = fe->get_data(flags, *mapping, quadrature);
 
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
 				flags);
-}
+};
 
 
 
@@ -602,7 +597,6 @@ FEFaceValuesBase<dim>::get_boundary_forms () const
 /*------------------------------- FEFaceValues -------------------------------*/
 
 
-// TODO:[GK,WB] unify the two constructor bodies by calling a single function that does all the work
 template <int dim>
 FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				 const FiniteElement<dim> &fe,
@@ -616,29 +610,7 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				       mapping,
 				       fe, quadrature)
 {
-				   // first find out which objects
-				   // need to be recomputed on each
-				   // cell we visit. this we have to
-				   // ask the finite element and mapping.
-				   // elements are first since they
-				   // might require update in mapping
-  UpdateFlags flags = update_flags
-		      | fe.update_once (update_flags)
-		      | fe.update_each (update_flags);
-  flags |= mapping.update_once (flags)
-	   | mapping.update_each (flags);
-
-				   // then get objects into which the
-				   // FE and the Mapping can store
-				   // intermediate data used across
-				   // calls to reinit
-  mapping_data = mapping.get_face_data(flags, quadrature);
-  fe_data      = fe.get_face_data(flags, mapping, quadrature);
-
-				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points,
-				dofs_per_cell,
-				flags);
+  initialize (update_flags);
 };
 
 
@@ -655,25 +627,24 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				       mapping_q1,
 				       fe, quadrature)
 {
-				   // first find out which objects
-				   // need to be recomputed on each
-				   // cell we visit. this we have to
-				   // ask the finite element and mapping.
-				   // elements are first since they
-				   // might require update in mapping
-  UpdateFlags flags = update_flags
-		      | fe.update_once (update_flags)
-		      | fe.update_each (update_flags);
-  flags |= mapping->update_once (flags)
-	   | mapping->update_each (flags);
+  initialize (update_flags);
+};
 
+
+
+template <int dim>
+void
+FEFaceValues<dim>::initialize (const UpdateFlags update_flags)
+{
+  const UpdateFlags flags = compute_update_flags (update_flags);
+  
 				   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
   mapping_data = mapping->get_face_data(flags, quadrature);
-  fe_data      = fe.get_face_data(flags, *mapping, quadrature);
-  
+  fe_data      = fe->get_face_data(flags, *mapping, quadrature);
+
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
@@ -717,8 +688,6 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 /*------------------------------- FESubFaceValues -------------------------------*/
 
 
-// TODO:[GK,WB] unify the two constructor bodies by calling a single function that does all the work
-// TODO:[GK,WB] FESubfaceValues constructors are exactly the same as FEFaceValues constructors with exception of calling fe_sub_face_data instead of fe_face_data. Merge!
 template <int dim>
 FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				       const FiniteElement<dim> &fe,
@@ -733,29 +702,7 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				       mapping,
 				       fe, quadrature)
 {
-				   // first find out which objects
-				   // need to be recomputed on each
-				   // cell we visit. this we have to
-				   // ask the finite element and mapping.
-				   // elements are first since they
-				   // might require update in mapping
-  UpdateFlags flags = update_flags
-		      | fe.update_once (update_flags)
-		      | fe.update_each (update_flags);
-  flags |= mapping.update_once (flags)
-	   | mapping.update_each (flags);
-
-				   // then get objects into which the
-				   // FE and the Mapping can store
-				   // intermediate data used across
-				   // calls to reinit
-  mapping_data = mapping.get_subface_data(flags, quadrature);
-  fe_data      = fe.get_subface_data(flags, mapping, quadrature);
-
-				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points,
-				dofs_per_cell,
-				flags);
+  initialize (update_flags);
 }
 
 
@@ -773,30 +720,29 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       mapping_q1,
 				       fe, quadrature)
 {
-				   // first find out which objects
-				   // need to be recomputed on each
-				   // cell we visit. this we have to
-				   // ask the finite element and mapping.
-				   // elements are first since they
-				   // might require update in mapping
-  UpdateFlags flags = update_flags
-		      | fe.update_once (update_flags)
-		      | fe.update_each (update_flags);
-  flags |= mapping->update_once (flags)
-	   | mapping->update_each (flags);
+  initialize (update_flags);
+};
 
+
+
+template <int dim>
+void
+FESubfaceValues<dim>::initialize (const UpdateFlags update_flags)
+{
+  const UpdateFlags flags = compute_update_flags (update_flags);
+  
 				   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
   mapping_data = mapping->get_subface_data(flags, quadrature);
-  fe_data      = fe.get_subface_data(flags, *mapping, quadrature);
-  
+  fe_data      = fe->get_subface_data(flags, *mapping, quadrature);
+
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
 				flags);
-}
+};
 
 
 
