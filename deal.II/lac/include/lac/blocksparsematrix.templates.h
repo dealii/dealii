@@ -7,6 +7,7 @@
 
 #include <lac/blocksparsematrix.h>
 #include <lac/vector.h>
+#include <lac/fullmatrix.h>
 
 
 template <typename number, typename inverse_type>

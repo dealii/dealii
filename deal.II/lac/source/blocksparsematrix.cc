@@ -10,9 +10,6 @@
 //#include <lac/vector.h>
 
 
-template <typename number, typename blocknumber>
-bool datatype_compatible ();
-
 
 // explicit instantiations for "float" BlockSparseMatrix
 template class BlockSparseMatrix<float, float>;
@@ -23,7 +20,7 @@ template void BlockSparseMatrix<float, float>::precondition_BlockSOR (
   Vector<double> &, const Vector<double> &, float) const;
 
 // the instantiation for class BlockSparseMatrix<float, double> is skipped
-// because it does not make sence to have inverse block matrices with
+// because it does not make sense to have inverse block matrices with
 // higher precision than the matrix itself
 
 // explicit instantiations for "double" BlockSparseMatrix

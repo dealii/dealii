@@ -7,15 +7,19 @@
 
 
 #include <lac/sparsematrix.h>
-#include <lac/fullmatrix.h>
-#include <vector.h>
+#include <lac/forward-declarations.h>
+
+#include <vector>
+
+
+
 
 /**
  * Block sparse matrix.
  * The block matrix assumes the matrix consisting of blocks on
  * the diagonal. These diagonal blocks and the elements 
  * (of arbitray structure) below the
- * diagonal blocks are used in the #precondition_BlockSOR#.
+ * diagonal blocks are used in the #precondition_BlockSOR# function.
  *
  * This block matrix structure is given e.g. for the DG method
  * for the transport equation and a downstream numbering.
@@ -26,8 +30,9 @@
  * matrix having blocks each of the same block size. Varying
  * block sizes within the matrix must still be implemented if needed.
  *
- * The first template parameter denotes the type of the matrix, the second
- * denotes the type of data in which the inverse diagonal block
+ * The first template parameter denotes the type of number representation in
+ * the sparse matrix, the second denotes the type of number representation in
+ * which the inverse diagonal block
  * matrices are stored by #invert_diagblocks()#.
  * 
  * @author Ralf Hartmann, 1999
