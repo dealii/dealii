@@ -54,9 +54,39 @@
  * the documentation of the members of the @ref{Options} class for a
  * description of these flags.
  *
+ *
+ * @sect3{Internals}
+ *
+ * To avoid a compiler error in Sun's Forte compiler, we derive
+ * privately from @ref{DataOutBase}. Since the base class
+ * @ref{DataOutInterface} does so as well, this does no harm, but
+ * calms the compiler which is suspecting an access control conflict
+ * otherwise. Testcase here:
+ * @begin{verbatim}
+ *    template <typename T> class V {};
+ *    
+ *    struct B1 { 
+ *        template <int dim> struct X { 
+ *    	int i[dim]; 
+ *        };
+ *    };
+ *    
+ *    struct B2 : private B1 {}; 
+ *    
+ *    struct D : public B2, private B1 {
+ *        ~D () {};
+ *        typedef B1::X<2> X;
+ *        V<X> x;
+ *    }; 
+ *    
+ *    D d;
+ * @end{verbatim} 
+ *
+ *
  * @author Wolfgang Bangerth, 2001
  */
-class MatrixOut : public DataOutInterface<2,2>
+class MatrixOut : public DataOutInterface<2,2>,
+                  private DataOutBase
 {
   public:
 				     /**
