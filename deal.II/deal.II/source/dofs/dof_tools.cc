@@ -44,7 +44,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
   vector<int> dofs_on_other_cell(total_dofs);
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
-  for (; cell!=endc; ++cell) 
+  for (; cell!=endc; ++cell)
     {
       cell->get_dof_indices (dofs_on_this_cell);
 				       // make sparsity pattern for this cell
@@ -58,7 +58,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  if (cell->face(face)->boundary_indicator() == 255)
+	  if (! cell->at_boundary(face) )
 	    {
 	      DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(face);
 	      neighbor->get_dof_indices (dofs_on_other_cell);
