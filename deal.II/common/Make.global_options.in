@@ -44,6 +44,8 @@ USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_PETSC    = @USE_CONTRIB_PETSC@
 DEAL_II_PETSC_DIR    = @DEAL_II_PETSC_DIR@
 DEAL_II_PETSC_ARCH   = @DEAL_II_PETSC_ARCH@
+USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
+DEAL_II_METIS_DIR    = @DEAL_II_METIS_DIR@
 TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
 TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
 TARGET               = @target@
@@ -104,6 +106,11 @@ lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARC
 lib-contrib-petsc.g = $(LIBDIR)/libpetsc_g$(lib-suffix)
 lib-contrib-petsc.o = $(LIBDIR)/libpetsc_o$(lib-suffix)
 
+# same for metis, except that there is only one library in that case
+lib-contrib-metis = $(DEAL_II_METIS_DIR)/libmetis.a
+
+
+
 
 # if HSL is used, always link it in conjunction with liblac
 ifeq ($(USE_CONTRIB_HSL),yes)
@@ -120,6 +127,14 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
 endif
 
 
+# If METIS was detected, add it to the lac libs, since this is where we call
+# them
+ifeq ($(USE_CONTRIB_METIS),yes)
+  lib-lac.g += $(lib-contrib-metis)
+  lib-lac.o += $(lib-contrib-metis)
+endif
+
+
 # include paths. do not take into account a possibly existing
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
@@ -133,6 +148,7 @@ include-path-tecplot       = $(TECIO_INCLUDE)
 include-path-petsc         = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
 include-path-petsc-mpi     = $(DEAL_II_PETSC_DIR)/src/sys/src/mpiuni
+include-path-metis         = $(DEAL_II_METIS_DIR)/Lib
 
 INCLUDE           = $(addprefix -I, $(include-path-base) \
                                     $(include-path-lac)  \
@@ -141,10 +157,13 @@ INCLUDE           = $(addprefix -I, $(include-path-base) \
 			            $(include-path-contrib-boost)\
 				    $(include-path-tecplot))
 
-# add PETSc include path if necessary
+# add PETSc and METIS include path if necessary
 ifeq ($(USE_CONTRIB_PETSC),yes)
   INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
              -I$(include-path-petsc-mpi)
+endif
+ifeq ($(USE_CONTRIB_METIS),yes)
+  INCLUDE += -I$(include-path-metis)
 endif
 
 # compiler flags for debug and optimized mode

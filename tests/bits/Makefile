@@ -56,6 +56,9 @@ tests_x = anna_? \
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*
 endif
+ifeq ($(USE_CONTRIB_METIS),yes)
+  tests_x += metis_*
+endif
 
 # from above list of regular expressions, generate the real set of
 # tests
