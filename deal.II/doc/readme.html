@@ -247,6 +247,15 @@
       call ./configure with the parameter
       <code>--disable-shared</code>. 
 
+      <p>
+
+      It is important to note that the actual size of the executable
+      program in memory will be larger than when linked statically,
+      since the dynamic linker does not remove symbols which are not
+      used, in contrast to the static linker. Therefore, more main
+      memory will be used when running your applications, but link
+      time is significantly reduced.      
+
     <li>
       <code>--enable-multithreading</code>: This sets compiler
       variables such that the resulting program supports
