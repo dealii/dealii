@@ -16,6 +16,7 @@
 
 
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
@@ -95,7 +96,7 @@
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
-class SparseDirectMA27
+class SparseDirectMA27 : public Subscriptor
 {
   public:
 				     /**
@@ -380,7 +381,7 @@ class SparseDirectMA27
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
-class SparseDirectMA47
+class SparseDirectMA47 : public Subscriptor
 {
   public:
 				     /**
