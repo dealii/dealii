@@ -865,14 +865,120 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 	    
 	    if (fe_is_system)
 	      {
-		function_map.find(boundary_component)->second->vector_value_list (dof_locations,
-										  dof_values_system);
+		function_map.find(boundary_component)->second
+                  ->vector_value_list (dof_locations, dof_values_system);
 		
-						 // enter into list
+						 // enter those dofs
+						 // into the list that
+						 // match the
+						 // component
+						 // signature. avoid
+						 // the usual
+						 // complication that
+						 // we can't just use
+						 // *_system_to_component_index
+						 // for non-primitive
+						 // FEs
 		for (unsigned int i=0; i<face_dofs.size(); ++i)
-		  if (component_mask[fe.face_system_to_component_index(i).first])
-		    boundary_values[face_dofs[i]]
-		      = dof_values_system[i](fe.face_system_to_component_index(i).first);
+                  {
+                    unsigned int component;
+                    if (fe.is_primitive())
+                      component = fe.face_system_to_component_index(i).first;
+                    else
+                      {
+                                                         // non-primitive
+                                                         // case. make
+                                                         // sure that
+                                                         // this
+                                                         // particular
+                                                         // shape
+                                                         // function
+                                                         // _is_
+                                                         // primitive,
+                                                         // and get at
+                                                         // it's
+                                                         // component. use
+                                                         // usual
+                                                         // trick to
+                                                         // transfer
+                                                         // face dof
+                                                         // index to
+                                                         // cell dof
+                                                         // index
+                        const unsigned int cell_i
+                          = (dim == 1 ?
+                             i
+                             :
+                             (dim == 2 ?
+                              (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                              :
+                              (dim == 3 ?
+                               (i<4*fe.dofs_per_vertex ?
+                                i
+                                :
+                                (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                 i+4*fe.dofs_per_vertex
+                                 :
+                                 i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                               :
+                               static_cast<unsigned int>(-1))));
+                        Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
+
+                                                         // make sure
+                                                         // that if
+                                                         // this is
+                                                         // not a
+                                                         // primitive
+                                                         // shape function,
+                                                         // then all
+                                                         // the
+                                                         // corresponding
+                                                         // components
+                                                         // in the
+                                                         // mask are
+                                                         // not set
+                        if (!fe.is_primitive(cell_i))
+                          for (unsigned int c=0; c<n_components; ++c)
+                            if (fe.get_nonzero_components(cell_i)[c])
+                              Assert (component_mask[c] == false,
+                                      ExcFENotPrimitive());
+
+                                                         // let's pick
+                                                         // the first
+                                                         // of
+                                                         // possibly
+                                                         // more than
+                                                         // one
+                                                         // non-zero
+                                                         // components. if
+                                                         // shape
+                                                         // function
+                                                         // is
+                                                         // non-primitive,
+                                                         // then we
+                                                         // will
+                                                         // ignore the
+                                                         // result in
+                                                         // the
+                                                         // following
+                                                         // anyway,
+                                                         // otherwise
+                                                         // there's
+                                                         // only one
+                                                         // non-zero
+                                                         // component
+                                                         // which we
+                                                         // will use
+                        component = (std::find (fe.get_nonzero_components(cell_i).begin(),
+                                                fe.get_nonzero_components(cell_i).end(),
+                                                true)
+                                     -
+                                     fe.get_nonzero_components(cell_i).begin());
+                      }
+                    
+                    if (component_mask[component] == true)
+                      boundary_values[face_dofs[i]] = dof_values_system[i](component);
+                  } 
 	      }
 	    else
 					       // fe has only one component,

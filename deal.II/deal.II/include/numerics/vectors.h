@@ -620,6 +620,20 @@ class VectorTools
 				      * of the finite element used by
 				      * @p{dof}.
 				      *
+				      * If the finite element used has
+				      * shape functions that are
+				      * non-zero in more than one
+				      * component (in deal.II speak:
+				      * they are non-primitive), then
+				      * these components can presently
+				      * not be used for interpolating
+				      * boundary values. Thus, the
+				      * elements in the component mask
+				      * corresponding to the
+				      * components of these
+				      * non-primitive shape functions
+				      * must be @p{false}.
+				      *
 				      * See the general doc for more
 				      * information.
 				      */
@@ -919,6 +933,10 @@ class VectorTools
 				      * Exception
 				      */
     DeclException0 (ExcInvalidFE);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFENotPrimitive);
 				     /**
 				      * Exception
 				      */

@@ -27,6 +27,7 @@ anna_2.exe              : anna_2.g.$(OBJEXT)              $(libraries)
 anna_3.exe              : anna_3.g.$(OBJEXT)              $(libraries)
 anna_4.exe              : anna_4.g.$(OBJEXT)              $(libraries)
 anna_5.exe              : anna_5.g.$(OBJEXT)              $(libraries)
+anna_6.exe              : anna_6.g.$(OBJEXT)              $(libraries)
 dof_tools_01a.exe       : dof_tools_01a.g.$(OBJEXT)       $(libraries)
 dof_tools_01b.exe       : dof_tools_01b.g.$(OBJEXT)       $(libraries)
 dof_tools_01c.exe       : dof_tools_01c.g.$(OBJEXT)       $(libraries)
@@ -52,7 +53,7 @@ denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
 unit_support_points.exe : unit_support_points.g.$(OBJEXT) $(libraries)
 parameter_handler_1.exe : parameter_handler_1.g.$(OBJEXT) $(libraries)
 
-tests = anna_1 anna_2 anna_3 anna_4 anna_5 \
+tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
         dof_tools_01a dof_tools_01b dof_tools_01c dof_tools_01d \
         dof_tools_02a dof_tools_02b dof_tools_02c dof_tools_02d \
 	dof_tools_03 dof_tools_04 dof_tools_05 dof_tools_06 \
