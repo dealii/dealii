@@ -27,6 +27,7 @@
 using namespace std;
 #endif
 
+//TODO: Remove obsolete data->compute_second_derivatives
 
 /* ----------------------- FESystem::InternalData ------------------- */
 
@@ -229,6 +230,7 @@ FESystem<dim>::clone() const
 }
 
 
+//TODO: remove update_second_derivatives from base elements
 
 template <int dim>
 UpdateFlags
@@ -272,11 +274,17 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 
 template <int dim>
 Mapping<dim>::InternalDataBase*
-FESystem<dim>::get_data (UpdateFlags            flags,
+FESystem<dim>::get_data (UpdateFlags      flags,
 			 const Mapping<dim>    &mapping,
 			 const Quadrature<dim> &quadrature) const
 {
   InternalData* data = new InternalData(n_base_elements());
+
+  data->update_once = update_once (flags);
+  data->update_each = update_each (flags);
+  flags = data->update_once | data->update_each;
+  
+  UpdateFlags sub_flags = flags;
 
 				   // if second derivatives through
 				   // finite differencing is required,
@@ -288,7 +296,7 @@ FESystem<dim>::get_data (UpdateFlags            flags,
 				       // delete
 				       // update_second_derivatives
 				       // from flags list
-      flags = UpdateFlags (flags ^ update_second_derivatives);
+      sub_flags = UpdateFlags (sub_flags ^ update_second_derivatives);
       data->initialize_2nd (this, mapping, quadrature);
     }
   
@@ -298,7 +306,7 @@ FESystem<dim>::get_data (UpdateFlags            flags,
   for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
     {
       typename Mapping<dim>::InternalDataBase *base_fe_data_base =
-	base_element(base_no).get_data(flags, mapping, quadrature);
+	base_element(base_no).get_data(sub_flags, mapping, quadrature);
 
       FiniteElementBase<dim>::InternalDataBase *base_fe_data =
 	dynamic_cast<typename FiniteElementBase<dim>::InternalDataBase *>
@@ -306,10 +314,13 @@ FESystem<dim>::get_data (UpdateFlags            flags,
       
       data->set_fe_data(base_no, base_fe_data);
 
-				       // collect requirements of base
-				       // elements
-      data->update_once |= base_fe_data->update_once;
-      data->update_each |= base_fe_data->update_each;
+				       // make sure that *we* compute
+				       // second derivatives, base
+				       // elements should not do it
+      Assert (!(base_fe_data->update_each & update_second_derivatives),
+	      ExcInternalError());
+      Assert (!(base_fe_data->update_once & update_second_derivatives),
+	      ExcInternalError());
       
 				       // The FEValuesData @p{data}
 				       // given to the
@@ -339,12 +350,7 @@ FESystem<dim>::get_data (UpdateFlags            flags,
       FEValuesData<dim> *base_data = new FEValuesData<dim>();
       data->set_fe_values_data(base_no, base_data);
     }
-  if (data->compute_second_derivatives)
-    data->update_each |= update_each (update_second_derivatives);
   data->update_flags=data->update_once | data->update_each;
-  Assert(data->update_once==update_once(flags), ExcInternalError());
-  Assert(data->update_each==update_each(flags), ExcInternalError());
-  
   return data;
 }
 
