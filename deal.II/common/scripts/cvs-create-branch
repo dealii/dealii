@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if (test ! -r configure -a ! -d deal.II); then
+	echo Please call in deal.II home directory
+	exit 1
+fi
+
+CVS='cvs'
+
+######################################################################
+# Create a branch for a new release.
+######################################################################
+# Invocation
+#  cvs-create-branch major minor
+#    where major and minor are the two leftmost release numbers
+######################################################################
+# 1. Create base tag
+######################################################################
+
+$CVS tag Base-$1-$2
+
+######################################################################
+# 2. Create branch tag
+######################################################################
+
+$CVS tag -r Base-$1-$2 -b Branch-$1-$2
+
+######################################################################
+# 3. Remove sensitive files and directories from branch
+######################################################################
+
+$CVS tag -d Branch-$1-$2 doc/RELEASE \
+   deal.II/include/multigrid deal.II/source/multigrid
