@@ -79,6 +79,8 @@ class SparseILU : public SparseLUDecomposition<number>
                                       * argument.
                                       */
     SparseILU (const SparsityPattern &sparsity);
+    
+    typedef SparseLUDecomposition<number>::AdditionalData AdditionalData;
 
 				     /**
 				      * Perform the incomplete LU
@@ -96,7 +98,8 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * decomposed.  Fill-in is thus
 				      * allowed.
 				      *
-				      * If @p{strengthen_diagonal}
+				      * If the
+				      * @p{AdditionalData::strengthen_diagonal}
 				      * parameter is greater than
 				      * zero, this method invokes
 				      * @p{get_strengthen_diagonal_impl
@@ -108,6 +111,16 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * management.
 				      */
     template <typename somenumber>
+    void initialize (const SparseMatrix<somenumber> &matrix,
+		     const AdditionalData parameters);
+
+				     /**
+				      * Same as @p{initialize}. This method
+				      * is deprecated, and left for
+				      * backward compability. It may
+				      * be removed in later versions.
+				      */
+    template <typename somenumber>
     void decompose (const SparseMatrix<somenumber> &matrix,
 		    const double                    strengthen_diagonal=0.);
 
@@ -116,7 +129,6 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * is deprecated, and left for
 				      * backward compability. It may
 				      * be removed in later versions.
-				      *
 				      */
     template <typename somenumber>
     void apply_decomposition (Vector<somenumber>       &dst,
@@ -174,5 +186,17 @@ SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 {
   vmult (dst, src);
 }
+
+
+
+template <typename number>
+template <typename somenumber>
+inline
+void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
+				   const double strengthen_diagonal)
+{
+  initialize(matrix, AdditionalData(strengthen_diagonal));
+}
+
 
 #endif // __deal2__sparse_ilu_h
