@@ -256,7 +256,7 @@ class DoFHandler  :  public Subscriptor,
 				      * Alias the @p{FunctionMap} type
 				      * declared elsewhere.
 				      */
-    typedef typename FunctionMap<dim>::type FunctionMap;
+    typedef typename ::FunctionMap<dim>::type FunctionMap;
     
 				     /**
 				      * When the arrays holding the
