@@ -767,8 +767,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // a quadrature rule for the faces:
 				   // it is simply a quadrature rule
 				   // for one dimension less!
-  QGauss3<dim>   quadrature_formula;
-  QGauss3<dim-1> face_quadrature_formula;
+  QGauss<dim>   quadrature_formula(3);
+  QGauss<dim-1> face_quadrature_formula(3);
 				   // For simpler use later on, we
 				   // alias the number of quadrature
 				   // points to local variables:
@@ -1114,7 +1114,7 @@ void LaplaceProblem<dim>::refine_grid ()
 
 	typename FunctionMap<dim>::type neumann_boundary;
 	KellyErrorEstimator<dim>::estimate (dof_handler,
-					    QGauss3<dim-1>(),
+					    QGauss<dim-1>(3),
 					    neumann_boundary,
 					    solution,
 					    estimated_error_per_cell);
@@ -1179,7 +1179,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     QGauss3<dim>(),
+				     QGauss<dim>(3),
 				     VectorTools::L2_norm);
 				   // Finally, we want to get the
 				   // global L2 norm. This can of
@@ -1198,7 +1198,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     QGauss3<dim>(),
+				     QGauss<dim>(3),
 				     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 

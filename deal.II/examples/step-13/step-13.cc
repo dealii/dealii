@@ -1766,7 +1766,7 @@ namespace LaplaceSolver
   {
     Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
     KellyErrorEstimator<dim>::estimate (this->dof_handler,
-					QGauss3<dim-1>(),
+					QGauss<dim-1>(3),
 					typename FunctionMap<dim>::type(),
 					this->solution,
 					estimated_error_per_cell);
@@ -2005,7 +2005,7 @@ void solve_problem (const std::string &solver_name)
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (2);
   const FE_Q<dim>          fe(1);
-  const QGauss4<dim>       quadrature;
+  const QGauss<dim>       quadrature(4);
   const RightHandSide<dim> rhs_function;
   const Solution<dim>      boundary_values;
 

@@ -1078,7 +1078,7 @@ namespace LaplaceSolver
   {
     Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
     KellyErrorEstimator<dim>::estimate (this->dof_handler,
-					QGauss3<dim-1>(),
+					QGauss<dim-1>(3),
 					typename FunctionMap<dim>::type(),
 					this->solution,
 					estimated_error_per_cell);
@@ -2051,7 +2051,7 @@ namespace DualFunctional
 				     // formula, have abbreviations
 				     // for the number of quadrature
 				     // points and shape functions...
-    QGauss4<dim> quadrature;
+    QGauss<dim> quadrature(4);
     FEValues<dim>  fe_values (dof_handler.get_fe(), quadrature,
 			      update_gradients |
 			      update_q_points  |

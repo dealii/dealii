@@ -593,7 +593,7 @@ void ElasticProblem<dim>::assemble_system ()
                                    // from step-8. Note that we still use the
                                    // deal.II full matrix and vector types for
                                    // the local systems.
-  QGauss2<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(2);
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
@@ -1157,7 +1157,7 @@ void ElasticProblem<dim>::refine_grid ()
                                    // (i.e. the one indicating the subdomain):
   Vector<float> local_error_per_cell (triangulation.n_active_cells());
   KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss2<dim-1>(),
+                                      QGauss<dim-1>(2),
                                       typename FunctionMap<dim>::type(),
                                       localized_solution,
                                       local_error_per_cell,

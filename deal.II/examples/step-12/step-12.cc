@@ -589,8 +589,8 @@ class DGMethod
 				     // formulae for the cell and the
 				     // face terms of the
 				     // discretization.
-    const QGauss4<dim>   quadrature;
-    const QGauss4<dim-1> face_quadrature;
+    const QGauss<dim>   quadrature;
+    const QGauss<dim-1> face_quadrature;
     
 				     // And there are two solution
 				     // vectors, that store the
@@ -620,8 +620,8 @@ DGMethod<dim>::DGMethod ()
 						 // different degrees.
                 fe (1),
 		dof_handler (triangulation),
-		quadrature (),
-		face_quadrature (),
+		quadrature (4),
+		face_quadrature (4),
 		dg ()
 {}
 

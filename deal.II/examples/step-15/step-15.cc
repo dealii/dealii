@@ -411,7 +411,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // is a polynomial of sixth order. Thus,
                                    // the appropriate quadrature formula is
                                    // the one we have chosen here.
-  QGauss4<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(4);
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
@@ -1265,7 +1265,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                                    // that the integrand is a polynomial of
                                    // degree six, so a 4-point Gauss formula
                                    // is appropriate:
-  QGauss4<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(4);
   FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |

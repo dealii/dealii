@@ -344,7 +344,7 @@ void LaplaceProblem::assemble_system ()
 				   // the matrix entries are quadratic
 				   // (in 1D), this is sufficient. The
 				   // same holds for 2D.
-  QGauss2<2>  quadrature_formula;
+  QGauss<2>  quadrature_formula(2);
 				   // And we initialize the object
 				   // which we have briefly talked
 				   // about above. It needs to be told

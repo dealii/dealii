@@ -453,7 +453,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // we use consist, a Gauss formula
 				   // with three points in each
 				   // direction is sufficient.
-  QGauss3<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(3);
 
 				   // The ``FEValues'' object
 				   // automatically adjusts the
@@ -735,7 +735,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // integrates polynomials up to
 				   // order 5 exactly.)
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss3<dim-1>(),
+				      QGauss<dim-1>(3),
 				      neumann_boundary,
 				      solution,
 				      estimated_error_per_cell);

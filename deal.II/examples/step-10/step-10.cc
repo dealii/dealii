@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -310,8 +310,8 @@ void compute_pi_by_area ()
 				   // For the numerical quadrature on
 				   // all cells we employ a quadrature
 				   // rule of sufficiently high
-				   // degree. We choose QGauss4 that
-				   // is of order 8, to be sure that
+				   // degree. We choose QGauss that
+				   // is of order 8 (4 points), to be sure that
 				   // the errors due to numerical
 				   // quadrature are of higher order
 				   // than the order (maximal 6) that
@@ -329,7 +329,7 @@ void compute_pi_by_area ()
 				   // computations, but could as well
 				   // have used any quadrature formula
 				   // of like order instead.
-  const QGauss4<dim> quadrature;
+  const QGauss<dim> quadrature(4);
 
 				   // Now start by looping over
 				   // polynomial mapping degrees=1..4:
@@ -550,7 +550,7 @@ void compute_pi_by_perimeter ()
 				   // as we will integrate over
 				   // (boundary) lines rather than
 				   // over cells.
-  const QGauss4<dim-1> quadrature;
+  const QGauss<dim-1> quadrature(4);
 
 				   // We loop over all degrees, create
 				   // the Triangulation, the Boundary,

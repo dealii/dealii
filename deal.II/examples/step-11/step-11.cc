@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -450,22 +450,6 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // formula above computing
 				   // ``gauss_degree''.
 				   //
-				   // Note also, that we have used a
-				   // class called ``QGauss''. By now,
-				   // we have only used ``QGauss4'',
-				   // or the like, which implement a
-				   // Gauss quadrature rule of fixed
-				   // order. The ``QGauss'' class is
-				   // more general, taking a parameter
-				   // which indicates of which degree
-				   // it shall be; for small degrees,
-				   // the object then parallels
-				   // objects of type ``QGaussR'' with
-				   // fixed R, but it also provides
-				   // quadrature rules of higher
-				   // degree which are no longer
-				   // hard-coded in the library.
-
 				   // Since the generation of the body
 				   // force contributions to the right
 				   // hand side vector was so simple,

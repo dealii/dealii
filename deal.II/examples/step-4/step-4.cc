@@ -339,7 +339,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  QGauss2<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(2);
 
 				   // We wanted to have a non-constant
 				   // right hand side, so we use an

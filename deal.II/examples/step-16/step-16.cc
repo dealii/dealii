@@ -194,7 +194,7 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  QGauss2<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(2);
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
@@ -301,7 +301,7 @@ void LaplaceProblem<dim>::assemble_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_multigrid () 
 {  
-  QGauss2<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(2);
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values |

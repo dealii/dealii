@@ -969,8 +969,8 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				   // elements, Gauss formulae with
 				   // two points in each space
 				   // direction are sufficient.
-  QGauss2<dim>   quadrature_formula;
-  QGauss2<dim-1> face_quadrature_formula;
+  QGauss<dim>   quadrature_formula(2);
+  QGauss<dim-1> face_quadrature_formula(2);
   
 				   // Finally, we need objects of type
 				   // ``FEValues'' and

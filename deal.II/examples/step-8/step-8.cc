@@ -434,7 +434,7 @@ void ElasticProblem<dim>::assemble_system ()
 				   // formula does not need
 				   // modification since we still deal
 				   // with bilinear functions.
-  QGauss2<dim>  quadrature_formula;
+  QGauss<dim>  quadrature_formula(2);
 				   // Also, the ``FEValues'' objects
 				   // takes care of everything for us
 				   // (or better: it does not really
@@ -802,7 +802,7 @@ void ElasticProblem<dim>::refine_grid ()
 
   typename FunctionMap<dim>::type neumann_boundary;
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss2<dim-1>(),
+				      QGauss<dim-1>(2),
 				      neumann_boundary,
 				      solution,
 				      estimated_error_per_cell);
@@ -944,8 +944,9 @@ void ElasticProblem<dim>::run ()
 					   // twice before we first
 					   // solve on it. The reason
 					   // is the following: we use
-					   // the ``Gauss2''
-					   // quadrature formula for
+					   // the ``Gauss''
+					   // quadrature formula with
+					   // two points in each direction for
 					   // integration of the right
 					   // hand side; that means
 					   // that there are four
