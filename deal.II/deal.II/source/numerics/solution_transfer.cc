@@ -288,8 +288,8 @@ interpolate (const vector<Vector<number> > &all_in,
   else
     {
       for (unsigned int i=0; i<all_in.size(); ++i)
-	if (all_out[i].size() != all_in[i].size())
-	  all_out[i].reinit (all_in[i].size());
+	if (all_out[i].size() != dof_handler->n_dofs())
+	  all_out[i].reinit (dof_handler->n_dofs());
     };
 
   
@@ -358,8 +358,10 @@ template<int dim, typename number>
 void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 						Vector<number>       &out) const
 {
-  vector<Vector<number> > all_in=vector<Vector<number> >(1, in);
-  vector<Vector<number> > all_out=vector<Vector<number> >(1, out);
+  vector<Vector<number> > all_in(1);
+  all_in[0] = in;
+  vector<Vector<number> > all_out(1);
+  all_out[0] = out;
   interpolate(all_in,
 	      all_out);
   out=all_out[0];
