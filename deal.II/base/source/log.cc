@@ -74,7 +74,8 @@ LogStream::push (const std::string& text)
 
 void LogStream::pop ()
 {
-  prefixes.pop();
+  if (prefixes.size() > 1)
+    prefixes.pop();
 };
 
 
@@ -110,6 +111,8 @@ LogStream::print_line_head()
       utime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
     }
   
+  const string& head = prefixes.top();
+
   if (prefixes.size() <= std_depth)
     {
       if (print_utime)
@@ -118,7 +121,7 @@ LogStream::print_line_head()
 	  *std_out << utime << ':';
 	  std_out->width(p);
 	}
-      *std_out << prefixes.top() << ':';
+      *std_out <<  head << ':';
     }
   
   if (file && (prefixes.size() <= file_depth))
@@ -129,7 +132,7 @@ LogStream::print_line_head()
 	  *file << utime << ':';
 	  file->width(p);
 	}  
-      *file << prefixes.top() << ':';
+      *file << head << ':';
     }
 }
 
