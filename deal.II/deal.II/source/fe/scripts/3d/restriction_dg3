@@ -1,0 +1,62 @@
+#  --------------------------------- For 3d ---------------------------------
+#  -- Use the following maple script to generate the restriction matrices
+#  -- for DG.
+#  -- Make sure that the files do not exists beforehand, since output
+#  -- is appended instead of overwriting previous contents.
+#  --
+#  -- You should only have to change the very first lines for polynomials
+#  -- of higher order.
+#  --------------------------------------------------------------------------
+#
+# $Id$
+# Author: Ralf Hartmann, 2000
+
+# for DG(3)
+
+  read lagrange_tools:
+
+  n_functions      := 64:
+
+  trial_function := ((a1 + a2*xi + a3*xi*xi + a4*xi*xi*xi) +
+                     (b1 + b2*xi + b3*xi*xi + b4*xi*xi*xi)*eta +
+                     (c1 + c2*xi + c3*xi*xi + c4*xi*xi*xi)*eta*eta +
+                     (d1 + d2*xi + d3*xi*xi + d4*xi*xi*xi)*eta*eta*eta) +
+                    ((e1 + e2*xi + e3*xi*xi + e4*xi*xi*xi) + 
+                     (f1 + f2*xi + f3*xi*xi + f4*xi*xi*xi)*eta +
+                     (g1 + g2*xi + g3*xi*xi + g4*xi*xi*xi)*eta*eta +
+                     (h1 + h2*xi + h3*xi*xi + h4*xi*xi*xi)*eta*eta*eta)*zeta +
+                    ((i1 + i2*xi + i3*xi*xi + i4*xi*xi*xi) + 
+                     (j1 + j2*xi + j3*xi*xi + j4*xi*xi*xi)*eta +
+                     (k1 + k2*xi + k3*xi*xi + k4*xi*xi*xi)*eta*eta +
+                     (l1 + l2*xi + l3*xi*xi + l4*xi*xi*xi)*eta*eta*eta)*zeta*zeta +
+                    ((m1 + m2*xi + m3*xi*xi + m4*xi*xi*xi) + 
+                     (n1 + n2*xi + n3*xi*xi + n4*xi*xi*xi)*eta +
+                     (o1 + o2*xi + o3*xi*xi + o4*xi*xi*xi)*eta*eta +
+                     (p1 + p2*xi + p3*xi*xi + p4*xi*xi*xi)*eta*eta*eta)*zeta*zeta*zeta:
+  # note: support_points[i] is a vector which is indexed from
+  # one and not from zero!
+  #   phi(i,support_points[j])=delta_ij
+  support_points := array(0..n_functions-1):
+
+
+  support_points_fill_vertices (0, support_points):
+  support_points_fill_lines (8, 2, support_points):
+  support_points_fill_quads (32, 2, support_points):
+  support_points_fill_hex (56, 2, support_points):
+
+  read restriction_dg;
+
+  print (`writing data to files`):
+  readlib(C):
+  C(restriction, filename=restriction_dg3_txt);
+
+
+
+
+
+
+
+
+
+
+

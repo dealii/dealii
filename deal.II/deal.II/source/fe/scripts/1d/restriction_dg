@@ -1,0 +1,100 @@
+  dim:=1;
+
+  print (`Computing basis functions`);
+  phi_polynom := array(0..n_functions-1);
+  for i from 0 to n_functions-1 do
+    print (i):
+    values := array(1..n_functions):
+    for j from 1 to n_functions do
+      values[j] := 0:
+    od:  
+    values[i+1] := 1:
+
+    shifted_support_points := array (1..n_functions);
+    for j from 1 to n_functions do
+      shifted_support_points[j] := support_points[j-1];
+    od;
+    
+    phi_polynom[i] := interp (shifted_support_points, values, xi);
+  od:
+
+  phi:= proc(i,x,y) subs(xi=x, phi_polynom[i]): end:
+
+
+
+  points[0] := array(0..n_functions-1);
+  points[1] := array(0..n_functions-1);
+  for i from 0 to n_functions-1 do
+    points[0][i] := support_points[i]/2;  
+    points[1][i] := support_points[i]/2+1/2;
+  od;  
+
+  # find the prolongation matrices such that
+  #  phi(k,x,y)|_K_i=prol[i,j,k] child_phi[i](j,x,y)
+  print (`Computing prolongation matrices`):
+  prolongation := array(0..1,0..n_functions-1, 0..n_functions-1);
+  for i from 0 to 1 do
+    for j from 0 to n_functions-1 do
+      for k from 0 to n_functions-1 do
+        prolongation[i,j,k] := phi(k, points[i][j]);
+      od;
+    od;
+  od;
+
+  # assemble the local mass matrix (on [0,1])
+  # m[i,j]=int_{0..1} phi[i]*phi[j] dx
+  m := array(1..n_functions, 1..n_functions):
+  print (`Assembling mass matrix`):
+  for i from 1 to n_functions do
+    for j from 1 to n_functions do
+      m[i,j] := int(phi_polynom[i-1] * phi_polynom[j-1], xi=0..1);	
+    od:
+  od:
+
+  print(`m=`, m);
+
+  # assemble the local mass matrix for child cell 0 
+  # m[i,j]=int_{0..0.5}child_phi[0]*child_phi[0] dx
+  child_m := array(1..n_functions, 1..n_functions):
+  child_m:=linalg[scalarmul](m, 1/2**dim);	
+
+  print(`Ausgabe=`);
+  print(`child_m=`,child_m);
+
+  # inverte the local mass matrix
+  inv_m := linalg[inverse](m):
+  print(`inv_m=`, inv_m);
+  
+  # assembling restriction matrices
+  restriction := array(0..1, 0..n_functions-1, 0..n_functions-1):
+  restr_child := array(1..n_functions, 1..n_functions):
+  prol_child:= array(1..n_functions, 1..n_functions):
+  for child from 0 to 1 do
+    print(`child=`, child);
+    # copy the prologation matrix with a shift 1 and take the transpose
+    for i from 1 to n_functions do
+      for j from 1 to n_functions do
+        prol_child[i,j] := prolongation[child,j-1,i-1]:
+      od:
+    od:
+    restr_child := linalg[multiply](inv_m, prol_child, child_m);
+    print(restr_child);
+    # copy the restriction of this child with a shift 1
+    for i from 1 to n_functions do
+      for j from 1 to n_functions do
+        restriction[child,i-1,j-1] := restr_child[i,j]:
+      od:
+    od:
+  od:
+
+
+
+
+
+
+
+
+
+
+
+

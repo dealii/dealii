@@ -1,0 +1,40 @@
+#  --------------------------------- For 1d ---------------------------------
+#  -- Use the following maple script to generate the restriction matrices
+#  -- for DG.
+#  -- Make sure that the files do not exists beforehand, since output
+#  -- is appended instead of overwriting previous contents.
+#  --
+#  -- You should only have to change the very first lines for polynomials
+#  -- of higher order.
+#  --------------------------------------------------------------------------
+#
+# $Id$
+# Author: Ralf Hartmann, 2000
+
+# for DG(1)
+
+  n_functions      := 2:
+
+  # note: support_points[i] is a vector which is indexed from
+  # one and not from zero!
+  #   phi(i,support_points[j])=delta_ij
+  support_points := array(0..n_functions-1):
+  support_points[0] := 0:
+  support_points[1] := 1:
+
+  read restriction_dg;
+
+  print (`writing data to files`):
+  readlib(C):
+  C(restriction, filename=restriction_dg1_txt);
+
+
+
+
+
+
+
+
+
+
+
