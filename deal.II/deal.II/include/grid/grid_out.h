@@ -31,76 +31,7 @@
  * with actual data vectors and that no #DoFHandler# object is needed to
  * write the pure geometrical information involved here.
  *
- *
- * \subsection{UCD format}
- * UCD (unstructured cell data) is the format used by AVS and some other
- * programs. It is described in the AVS developer's guide. Besides the usual
- * output of the grid only, you can decide through additional flags (see
- * below, and the documentation of the #GridOut::UcdFlags# class) whether
- * boundary faces with non-zero boundary indicator shall be written to the
- * file explicitely. This is useful, if you want to re-read the grid later
- * on, since #deal.II# sets the boundary indicator to zero by default;
- * therefore, to obtain the same triangulation as before, you have to specify
- * faces with differing boundary indicators explicitely, which is done by
- * this flag.
- *
- * Names and values of further flags controlling the output can be found
- * in the documentation of the #GridOut::UcdFlags# class.
- *
- *
- * \subsection{GNUPLOT format}
- * In GNUPLOT format, each cell is written as a sequence of lines. There is not
- * much more to be said here since the actual representation as well as the
- * viewing angle (for 3d plots) is done by GNUPLOT itself.
- *
- * One additional feature, however, is worth being mentioned: if
- * switched on by using the flags controlling GNUPLOT output (see
- * below on how to do this), after each point denoting one of the end
- * points of a line, the level of the respective cell is
- * written. Therefore, if you let GNUPLOT draw a 2d grid as a 3d plot,
- * you will see more refined cells being raised against cells with
- * less refinement.  Also, if you draw a cut through a 3d grid, you
- * can extrude the refinement level in the direction orthogonal to the
- * cut plane. The same can be done with the material id, which is plotted
- * after the level.
- *
- * A more useful application of this feature is the following: if you use the
- * GNUPLOT command (for a 2d grid here)
- * \begin{verbatim}
- *   splot [:][:][2.5:3.5] "grid_file.gnuplot"
- * \end{verbatim}
- * then the whole x- and y-range will be plotted, i.e. the whole grid, but
- * only those lines with a z-value between 2.5 and 3.5. Since the z-values
- * were chosen to be the level to which a cell belongs, this results in a
- * plot of those cells only that belong to level 3 in this example. This
- * way, it is easy to produce plots of the different levels of grid.
- *
- * Names and values of additional flags controlling the output can be found
- * in the documentation of the #GridOut::GnuplotFlags# class.
- *
- *
- * \subsection{Encapsulated postscript format}
- * In this format, each line of the triangulation is written separately. We
- * scale the picture such that either x-values or y-values range between zero and
- * a fixed size. The other axis is scaled by the same factor. Which axis is
- * taken to compute the scale and the size of the box it shall fit into is
- * determined by the output flags (see below, and the documentation of the
- * #GridOut::EpsFlags# class).
- *
- * The bounding box is close to the triangulation on all four sides, without an
- * extra frame. The line width is chosen to be 0.5 by default, but can be
- * changed. The line width is to be compared with the extension of the picture,
- * of which the default is 300.
- *
- * The flag @p color_lines_on_user_flag# allows to draw lines with th
- * #user_flag# set to be drawn in red. The colors black and red are
- * defined as #b# and #r# in the preamble of the output file and can
- * be changed there according to need.
- *
- * Names and values of additional flags controlling the output can be found
- * in the documentation of the #GridOut::EpsFlags# class. Especially
- * the viewpoint for three dimensional grids is of importance here.
- * 
+ * Available output formats can be found in the functions with names #write_...#
  *
  * \subsection{Usage}
  * Usage is simple: either you use the direct form
@@ -241,37 +172,10 @@ class GridOut
 					  * Default: #false#.
 					  */
 	bool write_cell_numbers;
-
-					 /**
-					  * Write the level of a cell as
-					  * an additional column after the
-					  * coordinates. See the general
-					  * documentation of this class
-					  * for an example of the use
-					  * of this feature.
-					  *
-					  * Default: #false#.
-					  */
-	bool write_level;
-
-					 /**
-					  * Write the material of a cell as
-					  * an additional column after the
-					  * coordinates. See the general
-					  * documentation of this class
-					  * for an example of the use
-					  * of this feature.
-					  *
-					  * Default: #false#.
-					  */
-	bool write_material;
-	
 					 /**
 					  * Constructor.
 					  */
-	GnuplotFlags (const bool write_cell_number = false,
-		      const bool write_level       = false,
-		      const bool write_material    = false);
+	GnuplotFlags (const bool write_cell_number = false);
     };
 
 				     /**
@@ -405,9 +309,56 @@ class GridOut
 
 				     /**
 				      * Write the triangulation in the
-				      * gnuplot format. See the general
-				      * documentation for a description
-				      * of what happens here.
+				      * gnuplot format.
+				      *
+				      * In GNUPLOT format, each cell
+				      * is written as a sequence of
+				      * its confining lines. Apart
+				      * from the coordinates of the
+				      * line's end points, the level
+				      * and the material of the cell
+				      * are appended to each line of
+				      * output. Therefore, if you let
+				      * GNUPLOT draw a 2d grid as a 3d
+				      * plot, you will see more
+				      * refined cells being raised
+				      * against cells with less
+				      * refinement.  Also, if you draw
+				      * a cut through a 3d grid, you
+				      * can extrude the refinement
+				      * level in the direction
+				      * orthogonal to the cut
+				      * plane. The same can be done
+				      * with the material id, which is
+				      * plotted after the level.
+				      *
+				      * A more useful application of
+				      * this feature is the following:
+				      * if you use the GNUPLOT
+				      * command (for a 2d grid here)
+				      * \begin{verbatim}
+				      * splot [:][:][2.5:3.5] "grid_file.gnuplot" *
+				      * \end{verbatim}
+				      * then the
+				      * whole x- and y-range will be
+				      * plotted, i.e. the whole grid,
+				      * but only those lines with a
+				      * z-value between 2.5 and
+				      * 3.5. Since the z-values were
+				      * chosen to be the level to
+				      * which a cell belongs, this
+				      * results in a plot of those
+				      * cells only that belong to
+				      * level 3 in this example. This
+				      * way, it is easy to produce
+				      * plots of the different levels
+				      * of grid.
+				      *
+				      * Names and values of additional
+				      * flags controlling the output
+				      * can be found in the
+				      * documentation of the
+				      * #GridOut::GnuplotFlags# class.
 				      */
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
@@ -415,9 +366,38 @@ class GridOut
 
 				     /**
 				      * Write the triangulation in the
-				      * ucd format. See the general
-				      * documentation for a description
-				      * of what happens here.
+				      * ucd format.
+				      *
+				      * UCD (unstructured cell data)
+				      * is the format used by AVS and
+				      * some other programs. It is
+				      * described in the AVS
+				      * developer's guide. Besides the
+				      * usual output of the grid
+				      * only, you can decide through
+				      * additional flags (see below,
+				      * and the documentation of the
+				      * #GridOut::UcdFlags# class)
+				      * whether boundary faces with
+				      * non-zero boundary indicator
+				      * shall be written to the file
+				      * explicitely. This is useful,
+				      * if you want to re-read the
+				      * grid later on, since
+				      * #deal.II# sets the boundary
+				      * indicator to zero by default;
+				      * therefore, to obtain the
+				      * same triangulation as before,
+				      * you have to specify faces
+				      * with differing boundary
+				      * indicators explicitely, which
+				      * is done by this flag.
+				      *
+				      * Names and values of further
+				      * flags controlling the output
+				      * can be found in the
+				      * documentation of the
+				      * #GridOut::UcdFlags# class.
 				      */
     template <int dim>
     void write_ucd (const Triangulation<dim> &tria,
@@ -425,9 +405,53 @@ class GridOut
 
 				     /**
 				      * Write the triangulation in the
-				      * encapsulated postscript format. See the
-				      * general documentation for a description
-				      * of what happens here.
+				      * encapsulated postscript format.
+				      *
+				      * In this format, each line of
+				      * the triangulation is written
+				      * separately. We scale the
+				      * picture such that either
+				      * x-values or y-values range
+				      * between zero and a fixed
+				      * size. The other axis is scaled
+				      * by the same factor. Which axis
+				      * is taken to compute the scale
+				      * and the size of the box it
+				      * shall fit into is determined
+				      * by the output flags (see
+				      * below, and the documentation
+				      * of the #GridOut::EpsFlags#
+				      * class).
+				      *
+				      * The bounding box is close to
+				      * the triangulation on all four
+				      * sides, without an extra
+				      * frame. The line width is
+				      * chosen to be 0.5 by default,
+				      * but can be changed. The line
+				      * width is to be compared with
+				      * the extension of the picture,
+				      * of which the default is 300.
+				      *
+				      * The flag @p
+				      * color_lines_on_user_flag#
+				      * allows to draw lines with the
+				      * #user_flag# set to be drawn in
+				      * red. The colors black and red
+				      * are defined as #b# and #r# in
+				      * the preamble of the output
+				      * file and can be changed there
+				      * according to need.
+				      *
+				      * Names and values of additional
+				      * flags controlling the output
+				      * can be found in the
+				      * documentation of the
+				      * #GridOut::EpsFlags#
+				      * class. Especially the
+				      * viewpoint for three
+				      * dimensional grids is of
+				      * importance here.
 				      */
     template <int dim>
     void write_eps (const Triangulation<dim> &tria,

@@ -22,12 +22,8 @@ GridOut::UcdFlags::UcdFlags (const bool write_preamble,
 {}
 
 
-GridOut::GnuplotFlags::GnuplotFlags (const bool write_cell_numbers,
-				     const bool write_level,
-				     const bool write_material) :
-		write_cell_numbers (write_cell_numbers),
-		write_level (write_level),
-		write_material(write_material)
+GridOut::GnuplotFlags::GnuplotFlags (const bool write_cell_numbers) :
+		write_cell_numbers (write_cell_numbers)
 {}
 
 
