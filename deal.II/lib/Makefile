@@ -43,6 +43,7 @@ ifeq ($(DEAL_II_PETSC_VERSION_MINOR),1)
 else
   xlib-ksp=libpetscksp
 endif
+
   xlib.g = $(lib-contrib-petsc-path.g)/$(xlib-ksp)$(lib-suffix) \
            $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix) \
            $(lib-contrib-petsc-path.g)/libpetscmat$(lib-suffix) \
@@ -57,11 +58,11 @@ endif
   ifeq ($(enable-shared),yes)
     external-links-petsc:
 	@echo Setting up libraries for PETSc
-	@echo "======================debug============= Linking library:   libpetsc.g$(lib-suffix)"
-	@$(CXX) -shared -o libpetsc.g$(lib-suffix) \
+	@echo "======================debug============= Linking library:   libpetsc.g$(shared-lib-suffix)"
+	@$(CXX) -shared -o libpetsc.g$(shared-lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
-	@echo "======================optimized========= Linking library:   libpetsc$(lib-suffix)"
-	@$(CXX) -shared -o libpetsc$(lib-suffix) \
+	@echo "======================optimized========= Linking library:   libpetsc$(shared-lib-suffix)"
+	@$(CXX) -shared -o libpetsc$(shared-lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
 else
 
@@ -70,22 +71,22 @@ else
   # single new archive. Do the same for debug and optimized mode.
   external-links-petsc:
 	@echo Setting up libraries for PETSc
-	@echo "======================debug============= Linking library:   libpetsc.g.a"
+	@echo "======================debug============= Linking library:   libpetsc.g$(static-lib-suffix)"
 	@mkdir ar_tmp; cd ar_tmp; \
 	 for arfile in $(xlib.g) ; do \
 	   $(AR) x $$arfile; \
 	 done
-	@$(AR) ru libpetsc.g.a ar_tmp/*
+	@$(AR) ru libpetsc.g$(static-lib-suffix) ar_tmp/*
 	@rm -r ar_tmp
-	@$(RANLIB) libpetsc.g.a
-	@echo "======================optimized========= Linking library:   libpetsc.a"
+	@$(RANLIB) libpetsc.g$(static-lib-suffix)
+	@echo "======================optimized========= Linking library:   libpetsc$(static-lib-suffix)"
 	@mkdir ar_tmp; cd ar_tmp; \
 	 for arfile in $(xlib.o) ; do \
 	   $(AR) x $$arfile; \
 	 done
-	@$(AR) ru libpetsc.a ar_tmp/*
+	@$(AR) ru libpetsc$(static-lib-suffix) ar_tmp/*
 	@rm -r ar_tmp
-	@$(RANLIB) libpetsc.a
+	@$(RANLIB) libpetsc$(static-lib-suffix)
 endif
 
 

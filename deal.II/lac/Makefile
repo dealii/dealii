@@ -33,15 +33,9 @@ $(LIBDIR)/lac/%.$(OBJEXT) :
 
 
 # rules
-ifeq ($(enable-shared),yes)
-  lib: $(LIBDIR)/liblac.g.so $(LIBDIR)/liblac.so
-  libg: $(LIBDIR)/liblac.g.so
-  libo: $(LIBDIR)/liblac.so
-else
-  lib: $(LIBDIR)/liblac.g.a $(LIBDIR)/liblac.a
-  libg: $(LIBDIR)/liblac.g.a
-  libo: $(LIBDIR)/liblac.a
-endif
+lib: $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac$(lib-suffix)
+libg: $(LIBDIR)/liblac.g$(lib-suffix)
+libo: $(LIBDIR)/liblac$(lib-suffix)
 
 # if we use HSL, then we need to link against libhsl.so. if we don't, then
 # don't set this variable
@@ -70,22 +64,22 @@ else
 endif
 
 
-$(LIBDIR)/liblac.a: $(o-files)
+$(LIBDIR)/liblac$(static-lib-suffix): $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files)
 	@$(RANLIB) $@
 
-$(LIBDIR)/liblac.g.a: $(go-files)
+$(LIBDIR)/liblac.g$(static-lib-suffix): $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/liblac.so: $(o-files)
+$(LIBDIR)/liblac$(shared-lib-suffix): $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(deplibs.o)
 
-$(LIBDIR)/liblac.g.so: $(go-files)
+$(LIBDIR)/liblac.g$(shared-lib-suffix): $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(deplibs.g)
 
@@ -115,4 +109,4 @@ Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 include Makefile.dep
 
 .PHONY: clean
-.PHONY: lib lib.a lib.g.a
+.PHONY: lib lib$(static-lib-suffix) lib.g$(static-lib-suffix)

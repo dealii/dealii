@@ -20,6 +20,7 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>SHLIBLD=$(SHLIBLD)</code>' >> $@
 	@echo '<li><code>OBJEXT=$(OBJEXT)</code>' >> $@
 	@echo '<li><code>EXEEXT=$(EXEEXT)</code>' >> $@
+	@echo '<li><code>enable-shared=$(enable-shared)</code>' >> $@
 	@echo '<li><code>PERL=$(PERL)</code>' >> $@
 	@echo '<li><code>DEAL_II_MAJOR=$(DEAL_II_MAJOR)</code>' >> $@
 	@echo '<li><code>DEAL_II_MINOR=$(DEAL_II_MINOR)</code>' >> $@
@@ -35,6 +36,9 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@
 	@echo '<li><code>LIBPATH=$(LIBPATH)</code>' >> $@
 	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
+	@echo '<li><code>static-lib-suffix=$(static-lib-suffix)</code>' >> $@
+	@echo '<li><code>shared-lib-suffix=$(shared-lib-suffix)</code>' >> $@
+	@echo '<li><code>lib-suffix=$(lib-suffix)</code>' >> $@
 	@echo '<li><code>lib-base.o=$(lib-base.o)</code>' >> $@
 	@echo '<li><code>lib-base.g=$(lib-base.g)</code>' >> $@
 	@echo '<li><code>lib-lac.o=$(lib-lac.o)</code>' >> $@

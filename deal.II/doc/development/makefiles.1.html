@@ -16,7 +16,7 @@
     The file <code>common/Make.global_options</code> exports several
     make variables to other Makefiles which 
     include it. You will want to include this file into the Makefiles of
-    your project to use the same compiler flags and to access the pathes
+    your project to use the same compiler flags and to access the paths
     to libraries. This page documents <a href="#flags">available
     flags</a>, documents the <a href="#values">values which are used
     in your local installation</a>, and shows 
@@ -139,6 +139,13 @@
            </p>
       </dd>
 
+      <dt> <code>enable-shared</code> </dt>
+      <dd> <p>
+           Determines whether shared or static libraries are used.
+           Set to <code>yes</code> if you want to use shared
+           libraries.
+           </p>
+      </dd>
 
       <dt> <code>PERL</code> </dt>
       <dd> <p>
@@ -304,6 +311,27 @@
     <li><h4>Paths and filenames of libraries</h4>
 
     <dl>
+      <dt> <code>static-lib-suffix</code> </dt>
+      <dd> <p>
+           File extension of static libraries. Usually set to .a
+           </p>
+      </dd>
+      <dt> <code>shared-lib-suffix</code> </dt>
+      <dd> <p>
+           File extension of shared libraries. If shared libraries
+           are supported, this suffix is usually .so, if shared
+           libraries are not supported, it is set to the same value
+           as <code>static-lib-suffix</code>.
+           </p>
+      </dd>
+      <dt> <code>lib-suffix</code> </dt>
+      <dd> <p>
+           File extension of libraries. Depending on the value of
+           <code>enable-shared</code>, it is either set to 
+           <code>static-lib-suffix</code> or to
+           <code>shared-lib-suffix</code>.
+           </p>
+      </dd>
       <dt> <code>lib-base.o</code> </dt>
       <dd> <p>
            Path and filename of the base library in optimized
@@ -369,7 +397,7 @@
 
 
 
-    <li><h4>Pathes to include files</h4>
+    <li><h4>Paths to include files</h4>
 
     <dl>
       <dt> <code>include-path-base</code> </dt>

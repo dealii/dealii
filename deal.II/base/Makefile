@@ -34,32 +34,26 @@ $(LIBDIR)/base/%.$(OBJEXT) :
 
 
 # rules
-ifeq ($(enable-shared),yes)
-  lib: $(LIBDIR)/libbase.g.so $(LIBDIR)/libbase.so
-  libg: $(LIBDIR)/libbase.g.so
-  libo: $(LIBDIR)/libbase.so
-else
-  lib: $(LIBDIR)/libbase.g.a $(LIBDIR)/libbase.a
-  libg: $(LIBDIR)/libbase.g.a
-  libo: $(LIBDIR)/libbase.a
-endif
+lib: $(LIBDIR)/libbase.g$(lib-suffix) $(LIBDIR)/libbase$(lib-suffix)
+libg: $(LIBDIR)/libbase.g$(lib-suffix)
+libo: $(LIBDIR)/libbase$(lib-suffix)
 
-$(LIBDIR)/libbase.a: $(o-files)
+$(LIBDIR)/libbase$(static-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files)
 	@$(RANLIB) $@
 
-$(LIBDIR)/libbase.g.a: $(go-files)
+$(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/libbase.so: $(o-files)
+$(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files)
 
-$(LIBDIR)/libbase.g.so: $(go-files)
+$(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files)
 
@@ -91,4 +85,4 @@ Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 include Makefile.dep
 
 .PHONY: clean
-.PHONY: lib lib.a lib.g.a
+.PHONY: lib lib$(static-lib-suffix) lib.g$(static-lib-suffix)

@@ -16,21 +16,12 @@ default: 2dg 2d
 all: 2dg 2d 3dg 3d 1dg 1d
 
 
-ifeq ($(enable-shared),yes)
-  1dg: $(LIBDIR)/libdeal_II_1d.g.so
-  1d : $(LIBDIR)/libdeal_II_1d.so
-  2dg: $(LIBDIR)/libdeal_II_2d.g.so 
-  2d : $(LIBDIR)/libdeal_II_2d.so
-  3dg: $(LIBDIR)/libdeal_II_3d.g.so 
-  3d : $(LIBDIR)/libdeal_II_3d.so
-else
-  1dg: $(LIBDIR)/libdeal_II_1d.g.a
-  1d : $(LIBDIR)/libdeal_II_1d.a
-  2dg: $(LIBDIR)/libdeal_II_2d.g.a
-  2d : $(LIBDIR)/libdeal_II_2d.a
-  3dg: $(LIBDIR)/libdeal_II_3d.g.a
-  3d : $(LIBDIR)/libdeal_II_3d.a
-endif
+1dg: $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
+1d : $(LIBDIR)/libdeal_II_1d$(lib-suffix)
+2dg: $(LIBDIR)/libdeal_II_2d.g$(lib-suffix) 
+2d : $(LIBDIR)/libdeal_II_2d$(lib-suffix)
+3dg: $(LIBDIR)/libdeal_II_3d.g$(lib-suffix) 
+3d : $(LIBDIR)/libdeal_II_3d$(lib-suffix)
 
 # create lists of file names
 cc-files     = $(shell echo source/*/*.cc)
@@ -102,59 +93,59 @@ endif
 
 
 # rules how to make the libraries themselves
-$(LIBDIR)/libdeal_II_1d.g.a: $(go-files-1d)
+$(LIBDIR)/libdeal_II_1d.g$(static-lib-suffix): $(go-files-1d)
 	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files-1d)
 	@$(RANLIB) $@
-$(LIBDIR)/libdeal_II_1d.a: $(o-files-1d)
+$(LIBDIR)/libdeal_II_1d$(static-lib-suffix): $(o-files-1d)
 	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files-1d)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/libdeal_II_2d.g.a: $(go-files-2d)
+$(LIBDIR)/libdeal_II_2d.g$(static-lib-suffix): $(go-files-2d)
 	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files-2d)
 	@$(RANLIB) $@
-$(LIBDIR)/libdeal_II_2d.a: $(o-files-2d)
+$(LIBDIR)/libdeal_II_2d$(static-lib-suffix): $(o-files-2d)
 	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files-2d)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/libdeal_II_3d.g.a: $(go-files-3d)
+$(LIBDIR)/libdeal_II_3d.g$(static-lib-suffix): $(go-files-3d)
 	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files-3d)
 	@$(RANLIB) $@
-$(LIBDIR)/libdeal_II_3d.a: $(o-files-3d)
+$(LIBDIR)/libdeal_II_3d$(static-lib-suffix): $(o-files-3d)
 	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files-3d)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/libdeal_II_1d.g.so: $(go-files-1d)
+$(LIBDIR)/libdeal_II_1d.g$(shared-lib-suffix): $(go-files-1d)
 	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-1d) $(deplibs.g)
 
-$(LIBDIR)/libdeal_II_1d.so: $(o-files-1d)
+$(LIBDIR)/libdeal_II_1d$(shared-lib-suffix): $(o-files-1d)
 	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-1d) $(deplibs.o)
 
 
-$(LIBDIR)/libdeal_II_2d.g.so: $(go-files-2d)
+$(LIBDIR)/libdeal_II_2d.g$(shared-lib-suffix): $(go-files-2d)
 	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-2d) $(deplibs.g)
 
-$(LIBDIR)/libdeal_II_2d.so: $(o-files-2d)
+$(LIBDIR)/libdeal_II_2d$(shared-lib-suffix): $(o-files-2d)
 	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-2d) $(deplibs.o)
 
 
-$(LIBDIR)/libdeal_II_3d.g.so: $(go-files-3d)
+$(LIBDIR)/libdeal_II_3d.g$(shared-lib-suffix): $(go-files-3d)
 	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-3d) $(deplibs.g)
 
-$(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
+$(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-3d) $(deplibs.o)
 

@@ -72,14 +72,19 @@ endif
 
 LIBPATH    += $(addprefix -L,$(LIBDIR))
 
+static-lib-suffix = @static_lib_suffix@
+shared-lib-suffix = @shared_lib_suffix@
+
+ifeq ($(enable-shared),yes)
+   lib-suffix = $(shared-lib-suffix)
+else
+   lib-suffix = $(static-lib-suffix)
+endif
 
 # add search path for libraries to make dependencies
-vpath %.a $(libdir)
-vpath %.so $(libdir)
+vpath %@static_lib_suffix@ $(libdir)
+vpath %@shared_lib_suffix@ $(libdir)
 
-
-
-lib-suffix = @lib_suffix@
 OBJEXT     = @OBJEXT@
 EXEEXT     = @EXEEXT@
 
