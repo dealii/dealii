@@ -46,12 +46,12 @@ template <int dim> class Quadrature;
  *
  *  It has support for the restriction of finite elements to faces of cells or
  *  even to subfaces (i.e. refined faces). For this purpose, it offers an array
- *  of matrices of ansatz function values, rather than one. Since the value of
+ *  of matrices of trial function values, rather than one. Since the value of
  *  a function at a quadrature point is an invariant under the transformation
  *  from the unit cell to the real cell, it is only evaluated once upon startup.
  *  However, when considering the restriction of a finite element to a face of
  *  a cell (using a given quadrature rule), we may be tempted to compute the
- *  restriction to all faces at startup (thus ending in four array of ansatz
+ *  restriction to all faces at startup (thus ending in four array of trial
  *  function values in two dimensions, one per face, and even more in higher
  *  dimensions) and let the respective #reinit# function of the derived classes
  *  set a number which of the fields is to be taken when the user requests the
@@ -65,10 +65,10 @@ template <int dim> class Quadrature;
  *  of the real location of a quadrature point from the location on the unit
  *  cell, the values are needed, while for the computation of the Jacobian
  *  matrix the gradient is needed. While for linear elements the transformation
- *  functions coincide with the ansatz functions, this does not hold for higher
+ *  functions coincide with the trial functions, this does not hold for higher
  *  order elements with subparametric mappings and for other types of elements
  *  such as non-conforming ones, etc, such that the precomputed values and
- *  gradients of the ansatz functions (#unit_shape_values# and
+ *  gradients of the trial functions (#unit_shape_values# and
  *  #unit_shape_grads#) cannot be used for the present purpose.
  *  In principle, these values could be computed each time the #fill_fe_*#
  *  function is called; however, this computation is highly redundant, since
@@ -119,12 +119,12 @@ template <int dim> class Quadrature;
  *   
  *  \item #get_shape_values#, #get_shape_grads#, etc: these return
  *    a reference to a whole field. Usually these fields contain
- *    the values of all ansatz functions at all quadrature points.
+ *    the values of all trial functions at all quadrature points.
  *
  *  \item #get_function_values#, #get_function_gradients#: these
  *    two functions offer a simple way to avoid the detour of the
- *    ansatz functions, if you have a finite solution (resp. the
- *    vector of values associated with the different ansatz functions.)
+ *    trial functions, if you have a finite solution (resp. the
+ *    vector of values associated with the different trial functions.)
  *    Then you may want to get information from the restriction of
  *    the finite element function to a certain cell, e.g. the values
  *    of the function at the quadrature points or the values of its
@@ -155,7 +155,7 @@ template <int dim> class Quadrature;
  * \subsection{Implementational issues}
  *
  * The #FEValues# object keeps track of those fields which really need to
- * be computed, since the computation of the gradients of the ansatz functions
+ * be computed, since the computation of the gradients of the trial functions
  * and of other values on each real cell can be quite an expensive thing
  * if it is not needed. The
  * object knows about which fields are needed by the #UpdateFlags# object
@@ -207,8 +207,8 @@ class FEValuesBase {
 				     /**
 				      * Constructor. Set up the array sizes
 				      * with #n_q_points# quadrature points,
-				      * #n_ansatz_points# ansatz points (on
-				      * the cell or face), #n_dof# ansatz
+				      * #n_support_points# support points (on
+				      * the cell or face), #n_dof# trial
 				      * functions per cell and with the
 				      * given pattern to update the fields
 				      * when the #reinit# function of the
@@ -219,7 +219,7 @@ class FEValuesBase {
 				      * are set correctly.
 				      */
     FEValuesBase (const unsigned int n_q_points,
-		  const unsigned int n_ansatz_points,
+		  const unsigned int n_support_points,
 		  const unsigned int n_dofs,
 		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
@@ -325,7 +325,7 @@ class FEValuesBase {
 
 				     /**
 				      * Return the point in real space where
-				      * the #i#th ansatz function is located
+				      * the #i#th trial function is located
 				      * (location is in the sense of where it
 				      * assumes its nominal properties, e.g. at
 				      * the vertex of a cell, at the center of
@@ -336,22 +336,22 @@ class FEValuesBase {
 				      * transfer a continuous function to a
 				      * finite element function by interpolation
 				      * we have to take the continuous
-				      * function's value at the ansatz function
+				      * function's value at the trial function
 				      * locations.
 				      *
 				      * For the evaluation of finite elements on
 				      * faces of cells, #i# is the number
-				      * of the ansatz function on the face, not
+				      * of the trial function on the face, not
 				      * on the cell.
 				      */
-    const Point<dim> & ansatz_point (const unsigned int i) const;
+    const Point<dim> & support_point (const unsigned int i) const;
 
 				     /**
 				      * Return a pointer to the vector of points
-				      * denoting the location of the ansatz
+				      * denoting the location of the trial
 				      * functions.
 				      */
-    const vector<Point<dim> > & get_ansatz_points () const;
+    const vector<Point<dim> > & get_support_points () const;
     
 				     /**
 				      * Return the Jacobi determinant times
@@ -423,7 +423,7 @@ class FEValuesBase {
 				      *
 				      * For cell values, the vector contains
 				      * only one entry, representing the
-				      * restriction of the finite element ansatz
+				      * restriction of the finite element trial
 				      * space to a cell. For face values, the
 				      * vector contains as many elements as
 				      * there are faces, for subfaces the same
@@ -484,12 +484,12 @@ class FEValuesBase {
 
     				     /**
 				      * Array of points denoting the off-point
-				      * of the ansatz functions. In real space
+				      * of the trial functions. In real space
 				      * (no-one seems to need the off-point
 				      * on the unit cell, so no function is
 				      * provided for this).
 				      */
-    vector<Point<dim> >  ansatz_points;
+    vector<Point<dim> >  support_points;
     
 				     /**
 				      * Store the jacobi matrices at the
@@ -688,7 +688,7 @@ class FEValues : public FEValuesBase<dim> {
  *
  *  However, while in the #FEValues# class the quadrature points are always the
  *  same, here we deal with more than one (sub)face. We therefore store the values
- *  and gradients of the ansatz functions on the unit cell in an array with as
+ *  and gradients of the trial functions on the unit cell in an array with as
  *  many elements as there are (sub)faces on a cell. The same applies for the
  *  quadrature points on the (sub)faces: for each (sub)face we store the position
  *  on the cell. This way we still need to evaluate unit gradients and function
@@ -745,7 +745,7 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 				      * per face.
 				      */
     FEFaceValuesBase (const unsigned int n_q_points,
-		      const unsigned int n_ansatz_points,
+		      const unsigned int n_support_points,
 		      const unsigned int n_dofs,
 		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
@@ -938,9 +938,9 @@ private:
  *   shouldn't we use them?
  *   
  * \item Use 'different' quadrature formulae: this second approach is the
- *   way we chose here. The idea is to evaluate the finite element ansatz
+ *   way we chose here. The idea is to evaluate the finite element trial
  *   functions on the two cells restricted to the face in question separately,
- *   by restricting the ansatz functions on the less refined cell to its
+ *   by restricting the trial functions on the less refined cell to its
  *   face and the functions on the more refined cell to its face as well,
  *   the second face being a child to the first one. Now, if we would use
  *   the same quadrature formula for both restrictions, we would end up with
@@ -976,16 +976,16 @@ private:
  *
  * \subsection{Other implementational subjects}
  *
- * It does not seem useful to ask for the off-points of the ansatz functions
- * (name #ansatz_points# in the #FEValuesBase# class) for subfaces. These are
+ * It does not seem useful to ask for the off-points of the trial functions
+ * (name #support_points# in the #FEValuesBase# class) for subfaces. These are
  * therefore not supported for this class and should throw an error if
- * accessed. Specifying #update_ansatz_points# for the #UpdateFlags# in the
+ * accessed. Specifying #update_support_points# for the #UpdateFlags# in the
  * constructor is disallowed.
  *
- * The values of the ansatz functions on the subfaces are stored as an array
- * of matrices, each matrix representing the values of the ansatz functions at
+ * The values of the trial functions on the subfaces are stored as an array
+ * of matrices, each matrix representing the values of the trial functions at
  * the quadrature points at one subface. The ordering is as follows: the values
- * of the ansatz functions at face #face#, subface #subface# are stored in
+ * of the trial functions at face #face#, subface #subface# are stored in
  * #shape_values[face*(1<<(dim-1))+subface]#. The same order applies for the
  * quadrature points on the unit cell, which are stored in the
  * #unit_quadrature_points# array. Note that #1<<(dim-1)# is the number of
@@ -1104,9 +1104,9 @@ FEValuesBase<dim>::get_quadrature_points () const {
 template <int dim>
 inline
 const vector<Point<dim> > &
-FEValuesBase<dim>::get_ansatz_points () const {
-  Assert (update_flags & update_ansatz_points, ExcAccessToUninitializedField());
-  return ansatz_points;
+FEValuesBase<dim>::get_support_points () const {
+  Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
+  return support_points;
 };
 
 
