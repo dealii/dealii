@@ -6,11 +6,11 @@
 
 
 #ifndef TIMER
-#define TIMER clock()
+#define TIMER static_cast<double>(clock())
 #endif
 
 #ifndef DIVIDE
-#define DIVIDE 1.e6
+#define DIVIDE CLOCKS_PER_SEC
 #endif
 #ifndef OVER_TIME
 #define OVER_TIME 4294967296./DIVIDE
