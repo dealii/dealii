@@ -96,13 +96,13 @@
   situations like this:
   <code>
     <pre>
-      template <int dim> struct Function {};
-      template <int dim> struct RHS : Function<dim> { RHS() {}; };
+      template &lt;int dim&gt; struct Function {};
+      template &lt;int dim&gt; struct RHS : Function<dim> { RHS() {}; };
 
-      template <int dim> void f () {
-        const RHS<dim> rhs;
+      template &lt;int dim&gt; void f () {
+        const RHS&lt;dim&gt; rhs;
       };
-      template void f<1> ();
+      template void f&lt;1&gt; ();
     </pre>
   </code>
   Here, the compiler reports
