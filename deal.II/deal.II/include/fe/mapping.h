@@ -201,9 +201,9 @@ class Mapping : public Subscriptor
 				      */
     virtual
     void
-    transform_covariant (Tensor<1,dim>* begin,
-			 const Tensor<1,dim>* end,
-			 const Tensor<1,dim>* src,
+    transform_covariant (typename std::vector<Tensor<1,dim> >::iterator begin,
+			 typename std::vector<Tensor<1,dim> >::const_iterator end,
+			 typename std::vector<Tensor<1,dim> >::const_iterator src,
 			 const InternalDataBase& internal) const = 0;
     
 				     /**
@@ -221,9 +221,9 @@ class Mapping : public Subscriptor
 				      */
     virtual
     void
-    transform_contravariant (Tensor<1,dim>* begin,
-			     const Tensor<1,dim>* end,
-			     const Tensor<1,dim>* src,
+    transform_contravariant (typename std::vector<Tensor<1,dim> >::iterator begin,
+			     typename std::vector<Tensor<1,dim> >::const_iterator end,
+			     typename std::vector<Tensor<1,dim> >::const_iterator src,
 			     const InternalDataBase& internal) const = 0;
 
 				     /**

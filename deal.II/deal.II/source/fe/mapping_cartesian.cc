@@ -439,9 +439,9 @@ MappingCartesian<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator 
 template <int dim>
 void
 MappingCartesian<dim>::transform_covariant (
-  Tensor<1,dim>* begin,
-  const Tensor<1,dim>* end,
-  const Tensor<1,dim>* src,
+  typename std::vector<Tensor<1,dim> >::iterator begin,
+  typename std::vector<Tensor<1,dim> >::const_iterator end,
+  typename std::vector<Tensor<1,dim> >::const_iterator src,
   const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
@@ -464,9 +464,9 @@ MappingCartesian<dim>::transform_covariant (
 template <int dim>
 void
 MappingCartesian<dim>::transform_contravariant (
-  Tensor<1,dim>* begin,
-  const Tensor<1,dim>* end,
-  const Tensor<1,dim>* src,
+  typename std::vector<Tensor<1,dim> >::iterator begin,
+  typename std::vector<Tensor<1,dim> >::const_iterator end,
+  typename std::vector<Tensor<1,dim> >::const_iterator src,
   const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
 				   // convert data object to internal

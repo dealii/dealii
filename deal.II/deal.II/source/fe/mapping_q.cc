@@ -1069,9 +1069,9 @@ MappingQ<dim>::fill_quad_support_points_simple (const typename Triangulation<dim
 template <int dim>
 void
 MappingQ<dim>::transform_covariant (
-  Tensor<1,dim>* begin,
-  const Tensor<1,dim>* end,
-  const Tensor<1,dim>* src,
+  typename std::vector<Tensor<1,dim> >::iterator begin,
+  typename std::vector<Tensor<1,dim> >::const_iterator end,
+  typename std::vector<Tensor<1,dim> >::const_iterator src,
   const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
@@ -1102,9 +1102,9 @@ MappingQ<dim>::transform_covariant (
 template <int dim>
 void
 MappingQ<dim>::transform_contravariant (
-  Tensor<1,dim>* begin,
-  const Tensor<1,dim>* end,
-  const Tensor<1,dim>* src,
+  typename std::vector<Tensor<1,dim> >::iterator begin,
+  typename std::vector<Tensor<1,dim> >::const_iterator end,
+  typename std::vector<Tensor<1,dim> >::const_iterator src,
   const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =

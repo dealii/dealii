@@ -1229,7 +1229,7 @@ FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
       if (flags & update_gradients)
 	mapping.transform_covariant(data.shape_gradients[k].begin(),
 				    data.shape_gradients[k].end(),
-				    &fe_data.shape_gradients[k][offset],
+				    fe_data.shape_gradients[k].begin()+offset,
 				    mapping_data);
     }
 
@@ -1275,7 +1275,7 @@ FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping
       if (flags & update_gradients)
 	mapping.transform_covariant(data.shape_gradients[k].begin(),
 				    data.shape_gradients[k].end(),
-				    &fe_data.shape_gradients[k][offset],
+				    fe_data.shape_gradients[k].begin()+offset,
 				    mapping_data);
     }
   
