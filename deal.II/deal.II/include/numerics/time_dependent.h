@@ -22,61 +22,61 @@ class TimeDependent
 					  * Constructor; see the different
 					  * fields for a description of the
 					  * meaning of the parameters.
-				      */
+					  */
 	TimeSteppingData (const unsigned int look_ahead,
 			  const unsigned int look_back);
-
+	
 					 /**
-				      * This denotes the number of timesteps
-				      * the timestepping algorithm needs to
-				      * look ahead. Usually, this number
-				      * will be zero, since algorithms
-				      * looking ahead can't act as
-				      * timestepping schemes since they
-				      * can't compute their data from knowledge
-				      * of the past only and are therefore
-				      * global in time.
-				      *
-				      * However, it may be necessary to look
-				      * ahead in other circumstances, when
-				      * not wanting to access the data of the
-				      * next time step(s), but for example
-				      * to know the next grid, the solution
-				      * of a dual problem on the next
-				      * time level, etc.
-				      *
-				      * Note that for a dual problem walking
-				      * back in time, "looking ahead" means
-				      * looking towards smaller time values.
-				      *
-				      * The value of this number determines,
-				      * how many time steps ahead the
-				      * time step manager start to call
-				      * the #wake_up# function for each
-				      * time step.
-				      */
+					  * This denotes the number of timesteps
+					  * the timestepping algorithm needs to
+					  * look ahead. Usually, this number
+					  * will be zero, since algorithms
+					  * looking ahead can't act as
+					  * timestepping schemes since they
+					  * can't compute their data from knowledge
+					  * of the past only and are therefore
+					  * global in time.
+					  *
+					  * However, it may be necessary to look
+					  * ahead in other circumstances, when
+					  * not wanting to access the data of the
+					  * next time step(s), but for example
+					  * to know the next grid, the solution
+					  * of a dual problem on the next
+					  * time level, etc.
+					  *
+					  * Note that for a dual problem walking
+					  * back in time, "looking ahead" means
+					  * looking towards smaller time values.
+					  *
+					  * The value of this number determines,
+					  * how many time steps ahead the
+					  * time step manager start to call
+					  * the #wake_up# function for each
+					  * time step.
+					  */
 	const unsigned int look_ahead;
-
+	
 					 /**
-				      * This is the opposite variable to the
-				      * above one. It denotes the number of
-				      * time steps behind the present one
-				      * for which we need to keep all data
-				      * in order to do the computations on
-				      * the present time level.
-				      *
-				      * For one step schemes (e.g. the
-				      * Euler schemes, or the Crank-Nicolson
-				      * scheme), this value will be one.
-				      *
-				      * The value of this number
-				      * determines, how many time
-				      * steps after having done
-				      * computations on a tim level
-				      * the time step manager will
-				      * call the #sleep# function for
-				      * each time step.
-				      */
+					  * This is the opposite variable to the
+					  * above one. It denotes the number of
+					  * time steps behind the present one
+					  * for which we need to keep all data
+					  * in order to do the computations on
+					  * the present time level.
+					  *
+					  * For one step schemes (e.g. the
+					  * Euler schemes, or the Crank-Nicolson
+					  * scheme), this value will be one.
+					  *
+					  * The value of this number
+					  * determines, how many time
+					  * steps after having done
+					  * computations on a tim level
+					  * the time step manager will
+					  * call the #sleep# function for
+					  * each time step.
+					  */
 	const unsigned int look_back;
     };
     
@@ -145,7 +145,7 @@ class TimeDependent
     
 
     void solve_primal_problem ();
-
+    
 				     /**
 				      * Initialize the objects for the next
 				      * sweep. This function specifically does
@@ -176,8 +176,8 @@ class TimeDependent
 				      */
     DeclException2 (ExcInvalidPosition,
 		    int, int,
-		    << "Can't insert time step at position " << arg1
-		    << " since there only " << arg2 << " positions at all.");
+		    << "Can\'t insert time step at position " << arg1
+                    << " since there only " << arg2 << " positions at all.");
     
   protected:
 				     /**
@@ -361,6 +361,28 @@ class TimeStepBase : public Subscriptor
     virtual void solve_dual_problem ();
     
 				     /**
+				      * Compute the time difference to the
+				      * last time step. If this timestep is
+				      * the first one, this function will
+				      * result in an exception. Though this
+				      * behaviour seems a bit drastic, it
+				      * is appropriate in most cases since
+				      * if there is no previous time step
+				      * you will need special treatment
+				      * anyway.
+				      */
+    double get_backward_timestep () const;
+
+				     /**
+				      * Return the time difference to the next
+				      * time step. With regard to the case
+				      * that there is no next time step,
+				      * the same applies as for the function
+				      * above.
+				      */
+    double get_forward_timestep () const;
+    
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcGridNotDeleted);
@@ -373,6 +395,10 @@ class TimeStepBase : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcPureVirtualFunctionCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcCantComputeTimestep);
     
   protected:
 				     /**				      
@@ -551,6 +577,14 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * this function rebuilds the triangulation
 				      * if the respective flag has been set to
 				      * destroy it in the #sleep# function.
+				      * It does so also the first time we
+				      * hit this function and #wakeup_level#
+				      * equals #flags.wakeup_level_to_build_grid#,
+				      * independently of the value of the
+				      * mentioned flag. (Actually, it does so
+				      * whenever the triangulation pointer
+				      * equals the Null pointer and the
+				      * value of #wakeup_level# is right.)
 				      *
 				      * Since this is an important task, you
 				      * should call this function from your
@@ -561,7 +595,7 @@ class TimeStepBase_Tria :  public TimeStepBase
 				      * can take effect of the triangulation
 				      * already existing.
 				      */
-    virtual void wake_up (const unsigned);
+    virtual void wake_up (const unsigned wakeup_level);
 
 				     /**
 				      * This is the opposite function
@@ -671,7 +705,7 @@ struct TimeStepBase_Tria<dim>::Flags
 				      * meaning of the parameters.
 				      */
     Flags (const unsigned int max_refinement_level,
-	   const bool delete_and_rebuild_tria,
+	   const bool         delete_and_rebuild_tria,
 	   const unsigned int wakeup_level_to_build_grid,
 	   const unsigned int sleep_level_to_delete_grid);
     
