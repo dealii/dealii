@@ -398,6 +398,25 @@ DeclException1 (ExcInvalidTensorIndex,
 
 
 /**
+ * Contract a tensor of rank 1 with a tensor of rank 1. The result is
+ * @p{sum_j src1[j] src2[j]}.
+ *
+ * @author Guido Kanschat, 2000
+ */
+template <int dim>
+inline
+double contract (const Tensor<1,dim> &src1,
+		 const Tensor<1,dim> &src2)
+{
+  double res = 0.;
+  for (unsigned int i=0; i<dim; ++i)
+    res += src1[i] * src2[i];
+
+  return res;
+}
+
+
+/**
  * Contract a tensor of rank 2 with a tensor of rank 1. The result is
  * @p{dest[i] = sum_j src1[i][j] src2[j]}.
  *
