@@ -9,21 +9,38 @@
 
 
 
+/**
+ * Provide a general tensor class with an arbitrary rank, i.e. with
+ * an arbitrary number of indices. The Tensor class provides an
+ * indexing operator and a bit of infrastructure, but most
+ * functionality is recursively handed down to tensors of rank 1 or
+ * put into external templated functions, e.g. the #contract# family.
+ *
+ * Using this tensor class for objects of rank to has advantages over
+ * matrices in many cases since the dimension is known to the compiler
+ * as well as the location of the data. It is therefore possible to
+ * produce far more efficient code than for matrices with
+ * runtime-dependant dimension.
+ */
 template <int rank_, int dim>
 class Tensor {
   public:
 				     /**
-				      * Provide a way to get the dimension of
-				      * an object without explicit knowledge
-				      * of it's data type. Implementation is
-				      * this way instead of providing a function
-				      * #dimension()# because now it is possible
-				      * to get the dimension at compile time
-				      * without the expansion and preevaluation
-				      * of an inlined function; the compiler may
-				      * therefore produce more efficient code
-				      * and you may use this value to declare
-				      * other data types.
+				      * Provide a way to get the
+				      * dimension of an object without
+				      * explicit knowledge of it's
+				      * data type. Implementation is
+				      * this way instead of providing
+				      * a function #dimension()#
+				      * because now it is possible to
+				      * get the dimension at compile
+				      * time without the expansion and
+				      * preevaluation of an inlined
+				      * function; the compiler may
+				      * therefore produce more
+				      * efficient code and you may use
+				      * this value to declare other
+				      * data types.
 				      */
     static const unsigned int dimension = dim;
 
@@ -44,10 +61,25 @@ class Tensor {
     const Tensor<rank_-1,dim> &operator [] (const unsigned int i) const;
 
 				     /**
+				      *  Assignment operator.
+				      */
+    Tensor & operator = (const Tensor<rank_,dim> &);
+
+				     /**
+				      *  Test for equality of two points.
+				      */
+    bool operator == (const Tensor<rank_,dim> &) const;
+
+    				     /**
+				      *  Test for inequality of two points.
+				      */
+    bool operator != (const Tensor<rank_,dim> &) const;
+
+				     /**
 				      * Reset all values to zero.
 				      */
     void clear ();
-    
+
     
 				     /**
 				      *  Exception
@@ -60,19 +92,18 @@ class Tensor {
 				      * Array of tensors holding the
 				      * subelements.
 				      */
-    Tensor<rank-1,dim> subtensor[dim];
+    Tensor<rank_-1,dim> subtensor[dim];
 };
-
 
 
 
 
 /*--------------------------- Inline functions -----------------------------*/
 
-template <int rank, int dim>
+template <int rank_, int dim>
 inline
-Tensor<rank-1,dim> &
-Tensor<rank,dim>::operator[] (const unsigned int i) {
+Tensor<rank_-1,dim> &
+Tensor<rank_,dim>::operator[] (const unsigned int i) {
   Assert (i<dim, ExcInvalidIndex(i));
   
   return subtensor[i];
@@ -80,10 +111,10 @@ Tensor<rank,dim>::operator[] (const unsigned int i) {
 
 
 
-template <int rank, int dim>
+template <int rank_, int dim>
 inline
-const Tensor<rank-1,dim> &
-Tensor<rank,dim>::operator[] (const unsigned int i) const {
+const Tensor<rank_-1,dim> &
+Tensor<rank_,dim>::operator[] (const unsigned int i) const {
   Assert (i<dim, ExcInvalidIndex(i));
   
   return subtensor[i];
@@ -91,9 +122,37 @@ Tensor<rank,dim>::operator[] (const unsigned int i) const {
 
 
 
-template <int rank, int dim>
+template <int rank_, int dim>
 inline
-void Tensor<rank,dim>::clear () {
+Tensor<rank_,dim> & Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t) {
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = t.values[i];
+  return *this;
+};
+
+
+
+template <int rank_, int dim>
+inline
+bool Tensor<rank_,dim>::operator == (const Tensor<rank_,dim> &p) const {
+  for (unsigned int i=0; i<dim; ++i)
+    if (values[i] != p.values[i]) return false;
+  return true;
+};
+
+
+
+template <int rank_, int dim>
+inline
+bool Tensor<rank_,dim>::operator != (const Tensor<rank_,dim> &p) const {
+  return !((*this) == p);
+};
+
+
+
+template <int rank_, int dim>
+inline
+void Tensor<rank_,dim>::clear () {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i].clear();
 };
