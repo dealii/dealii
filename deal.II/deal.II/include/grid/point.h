@@ -178,12 +178,12 @@ class Point {
     double coordinates[dim];
 };
 
-//				 /**
-//				  *  Prints the coordinates of this point in the
-//				  *  form #(x1,x2,x3,etc)#.
-//                                */
-//template <int dim>
-//ostream & operator << (ostream &out, const Point<dim> &p);
+				 /**
+				  *  Prints the coordinates of this point in the
+				  *  form #x1 x2 x3 etc#.
+				  */
+template <int dim>
+ostream & operator << (ostream &out, const Point<dim> &p);
 
 
 
@@ -205,6 +205,7 @@ Point<dim>::Point () {
 
 
 
+template <>
 inline
 Point<1>::Point (const double x) {
   coordinates[0] = x;
@@ -212,6 +213,7 @@ Point<1>::Point (const double x) {
 
 
 
+template <>
 inline
 Point<2>::Point (const double x, const double y) {
   coordinates[0] = x;
@@ -220,6 +222,7 @@ Point<2>::Point (const double x, const double y) {
 
 
 
+template <>
 inline
 Point<3>::Point (const double x, const double y, const double z) {
   coordinates[0] = x;
@@ -386,20 +389,11 @@ double Point<dim>::square () const {
 
 
 
+template <int dim>
 inline
-ostream & operator << (ostream &out, const Point<1> &p) {
-  out << p(0);
-  return out;
-};
-
-
-inline
-ostream & operator << (ostream &out, const Point<2> &p) {
-//  out << "(";
-//  for (unsigned int i=0; i<1; i++)
-//    out << p(i) << ",";
-//  out << p(1) << ")";
-  out << p(0) << " " << p(1);
+ostream & operator << (ostream &out, const Point<dim> &p) {
+  for (unsigned int i=0; i<dim; ++i)
+    out << p(i);
   return out;
 };
 
