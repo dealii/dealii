@@ -1005,7 +1005,6 @@ struct FEHelper {
     static const QGauss5<dim>        q_gauss_5;
     static const QGauss6<dim>        q_gauss_6;
     static const QGauss7<dim>        q_gauss_7;
-    static const QGauss8<dim>        q_gauss_8;
 
     static const QGauss2<dim-1>      q_gauss_2_face;
     static const QGauss3<dim-1>      q_gauss_3_face;
@@ -1013,7 +1012,6 @@ struct FEHelper {
     static const QGauss5<dim-1>      q_gauss_5_face;
     static const QGauss6<dim-1>      q_gauss_6_face;
     static const QGauss7<dim-1>      q_gauss_7_face;
-    static const QGauss8<dim-1>      q_gauss_8_face;
 
 				     /**
 				      * Return a reference to the finite
@@ -7622,7 +7620,6 @@ const QGauss4<2> FEHelper<2>::q_gauss_4;
 const QGauss5<2> FEHelper<2>::q_gauss_5;
 const QGauss6<2> FEHelper<2>::q_gauss_6;
 const QGauss7<2> FEHelper<2>::q_gauss_7;
-const QGauss8<2> FEHelper<2>::q_gauss_8;
 
 #if 2 > 1
 const QGauss2<2-1> FEHelper<2>::q_gauss_2_face;
@@ -7631,7 +7628,6 @@ const QGauss4<2-1> FEHelper<2>::q_gauss_4_face;
 const QGauss5<2-1> FEHelper<2>::q_gauss_5_face;
 const QGauss6<2-1> FEHelper<2>::q_gauss_6_face;
 const QGauss7<2-1> FEHelper<2>::q_gauss_7_face;
-const QGauss8<2-1> FEHelper<2>::q_gauss_8_face;
 #endif
 
 
