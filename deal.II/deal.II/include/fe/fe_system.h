@@ -445,6 +445,17 @@ class FESystem //<dim>
 				      * the #.h# file.
 				      */
     void initialize();
+
+				     /**
+				      * Used by #initialize#.
+				      */
+    void build_cell_table();
+    
+				     /**
+				      * Used by #initialize#.
+				      */
+    void build_face_table();
+    
 				     /**
 				      *Exception.
 				      */

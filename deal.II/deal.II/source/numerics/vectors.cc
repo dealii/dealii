@@ -241,7 +241,17 @@ void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 					     const FunctionMap &,
 					     const Boundary<1> &,
-					     map<int,double>   &) {
+					     map<int,double>   &)
+{
+  Assert (false, ExcNotImplemented());
+};
+
+template <>
+void VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
+						  const VectorFunctionMap&,
+						  const Boundary<1>&,
+						  map<int,double>&)
+{
   Assert (false, ExcNotImplemented());
 };
 
@@ -291,6 +301,56 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  boundary_values[face_dofs[i]] = dof_values[i];
       };
 };
+
+template <int dim>
+void
+VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
+					       const VectorFunctionMap     &dirichlet_bc,
+					       const Boundary<dim>      &boundary,
+					       map<int,double>   &boundary_values)
+{
+  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+	  ExcInvalidBoundaryIndicator());
+
+  const FiniteElement<dim> &fe = dof.get_fe();
+
+				   // use two face iterators, since we need
+				   // a DoF-iterator for the dof indices, but
+				   // a Tria-iterator for the fe object
+  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+					endf = dof.end_face();
+  
+  typename VectorFunctionMap::const_iterator function_ptr;
+
+				   // field to store the indices of dofs
+  vector<int>         face_dofs (fe.dofs_per_face);
+  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
+  vector< Vector<double> > dof_values (fe.dofs_per_face, Vector<double>(fe.n_components));
+	
+  for (; face!=endf; ++face)
+    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
+	dirichlet_bc.end()) 
+				       // face is subject to one of the
+				       // bc listed in #dirichlet_bc#
+      {
+					 // get indices, physical location and
+					 // boundary values of dofs on this
+					 // face
+	face->get_dof_indices (face_dofs);
+	fe.get_face_support_points (face, boundary, dof_locations);
+	function_ptr->second->value_list (dof_locations, dof_values);
+
+					 // enter into list
+
+	for (unsigned int i=0; i<face_dofs.size(); ++i)
+	  {
+	    pair<unsigned int, unsigned int>
+	      index = fe.face_system_to_component_index(i);
+						    
+	    boundary_values[face_dofs[i]] = dof_values[i](index.first);
+	  }
+      }
+}
 
 
 

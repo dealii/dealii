@@ -19,12 +19,10 @@ FESystem<dim>::~FESystem ()
 };
 
 
-
 template <int dim>
-void FESystem<dim>::initialize ()
+void
+FESystem<dim>::build_cell_table()
 {
-				   // Inintialize mapping from component
-				   // to base element
   unsigned total_index = 0;
   for (unsigned base=0 ; base < n_base_elements() ; ++base)
     for (unsigned m = 0; m < element_multiplicity(base); ++m)
@@ -35,7 +33,7 @@ void FESystem<dim>::initialize ()
 				   // to be thought of.
   
 				   // 1. Vertices
-      total_index = 0;
+  total_index = 0;
   for (unsigned vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_cell ;
        ++vertex_number)
     {
@@ -137,7 +135,8 @@ void FESystem<dim>::initialize ()
 	  
 	}
     }
-  
+				   // Inintialize mapping from component
+				   // to base element
 				   // Initialize mapping from components to
 				   // linear index. Fortunately, this is
 				   // the inverse of what we just did.
@@ -148,8 +147,120 @@ void FESystem<dim>::initialize ()
   for (unsigned sys=0 ; sys < total_dofs ; ++sys)
     component_to_system_table[system_to_component_table[sys].first]
       [system_to_component_table[sys].second] = sys;
-  
+}
 
+
+template <int dim>
+void
+FESystem<dim>::build_face_table()
+{
+  unsigned total_index = 0;
+  for (unsigned base=0 ; base < n_base_elements() ; ++base)
+    for (unsigned m = 0; m < element_multiplicity(base); ++m)
+      component_to_base_table[total_index++] = base;
+
+				   // Initialize index table
+				   // Multi-component base elements have
+				   // to be thought of.
+  
+				   // 1. Vertices
+  total_index = 0;
+  for (unsigned vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_face ;
+       ++vertex_number)
+    {
+      unsigned comp_start = 0;
+      for(unsigned base = 0; base < n_base_elements() ;
+	  ++base)
+	{
+	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	    {
+	      for (unsigned local_index = 0 ;
+		   local_index < base_element(base).dofs_per_vertex ;
+		   ++local_index)
+		{
+		  face_system_to_component_table[total_index++]
+		    = pair<unsigned,unsigned>
+		    (comp_start+m,
+		     vertex_number*base_element(base).dofs_per_vertex+local_index);
+		}
+	    }
+	  comp_start += element_multiplicity(base);
+	}
+    }
+  
+				   // 2. Lines
+  for (unsigned line_number= 0 ; ((line_number != GeometryInfo<dim>::lines_per_face) &&
+				  (GeometryInfo<dim>::lines_per_cell > 0));
+       ++line_number)
+    {
+      unsigned comp_start = 0;
+      for(unsigned base = 0; base < n_base_elements() ;
+	  ++base)
+	{
+	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	    {
+	      for (unsigned local_index = 0 ;
+		   local_index < base_element(base).dofs_per_line ;
+		   ++local_index)
+		{
+		  face_system_to_component_table[total_index++]
+		    = pair<unsigned,unsigned>
+		    (comp_start+m,
+		     line_number*base_element(base).dofs_per_line
+		     +local_index+base_element(base).first_face_line_index);
+		}
+	    }
+	  comp_start += element_multiplicity(base);
+	}
+    }
+  
+				   // 3. Quads
+  for (unsigned quad_number= 0 ; ((quad_number != GeometryInfo<dim>::quads_per_face) &&
+				  (GeometryInfo<dim>::quads_per_cell > 0));
+       ++quad_number)
+    {
+      unsigned comp_start = 0;
+      for(unsigned base = 0; base < n_base_elements() ;
+	  ++base)
+	{
+	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	    {
+	      for (unsigned local_index = 0 ;
+		   local_index < base_element(base).dofs_per_quad ;
+		   ++local_index)
+		{
+		  face_system_to_component_table[total_index++]
+		    = pair<unsigned,unsigned>
+		    (comp_start+m,
+		     quad_number*base_element(base).dofs_per_quad
+		     +local_index+base_element(base).first_face_quad_index);
+		}
+	    }
+	  comp_start += element_multiplicity(base);
+	}
+    }
+  
+				   // Inintialize mapping from component
+				   // to base element
+				   // Initialize mapping from components to
+				   // linear index. Fortunately, this is
+				   // the inverse of what we just did.
+  for (unsigned comp=0 ; comp<n_components ; ++comp)
+    face_component_to_system_table[comp]
+      .resize(base_element(component_to_base_table[comp]).total_dofs);
+
+  for (unsigned sys=0 ; sys < dofs_per_face ; ++sys)
+    face_component_to_system_table[face_system_to_component_table[sys].first]
+      [face_system_to_component_table[sys].second] = sys;
+}
+
+
+
+template <int dim>
+void FESystem<dim>::initialize ()
+{
+  build_cell_table();
+  build_face_table();
 				   // distribute the matrices of the base
 				   // finite element to the matrices of
 				   // this object
@@ -324,23 +435,31 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &/*
 
 
 template <int dim>
-void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterator &/*face*/,
-					     const Boundary<dim> &/*boundary*/,
-					     vector<Point<dim> > &/*support_points*/) const
+void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterator & face,
+					     const Boundary<dim> & boundary,
+					     vector<Point<dim> > & support_points) const
 {
-  Assert(false, ExcNotImplemented());
-/*
   Assert (support_points.size() == dofs_per_face,
 	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 
-  vector<Point<dim> > base_support_points (base_element->dofs_per_face);
-  base_element->get_face_support_points (face, boundary, base_support_points);
-  
-  for (unsigned int i=0; i<base_element->dofs_per_face; ++i) 
-    for (unsigned int n=0; n<n_sub_elements; ++n)
-      support_points[i*n_sub_elements+n] = base_support_points[i];
-*/
-};
+  vector<Point<dim> > base_support_points (base_element(0).dofs_per_face);
+  unsigned int comp = 0;
+  for (unsigned int base=0 ; base<n_base_elements(); ++base)
+    {
+      base_support_points.resize(base_element(base).dofs_per_face);
+      base_element(base).get_face_support_points (face, boundary, base_support_points);
+      for (unsigned int inbase = 0 ; inbase < element_multiplicity(base); ++inbase)
+	{
+	  for (unsigned int i=0; i<base_element(base).dofs_per_face; ++i)
+	    {
+	      support_points[face_component_to_system_index(comp,i)]
+		= base_support_points[i];
+	    }
+	  
+	      ++comp;
+	}
+    }
+}
 
 
 
@@ -358,15 +477,15 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 
 				   // first get the local mass matrix for
 				   // the base object
-  FullMatrix<double> base_mass_matrix (base_element->total_dofs,
-			     base_element->total_dofs);
-  base_element->get_local_mass_matrix (cell, boundary, base_mass_matrix);
+  FullMatrix<double> base_mass_matrix (base_element.total_dofs,
+			     base_element.total_dofs);
+  base_element.get_local_mass_matrix (cell, boundary, base_mass_matrix);
 
 
 				   // now distribute it to the mass matrix
 				   // of this object
-  for (unsigned int i=0; i<base_element->total_dofs; ++i)
-    for (unsigned int j=0; j<base_element->total_dofs; ++j)
+  for (unsigned int i=0; i<base_element.total_dofs; ++i)
+    for (unsigned int j=0; j<base_element.total_dofs; ++j)
       for (unsigned int n=0; n<n_sub_elements; ++n)
 					 // only fill diagonals of the blocks
 	local_mass_matrix (i*n_sub_elements + n,

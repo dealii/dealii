@@ -71,6 +71,16 @@ class FiniteElementData
     const unsigned int first_hex_index;
     
 				     /**
+				      * First index of dof on a line for face data.
+				      */
+    const unsigned int first_face_line_index;
+    
+				     /**
+				      * First index of dof on a quad for face data.
+				      */
+    const unsigned int first_face_quad_index;
+
+				     /**
 				      * Total number of degrees of freedom
 				      * on a cell. This information is
 				      * redundant to some fields in the
@@ -239,8 +249,8 @@ class FiniteElementBase :
 				     /**
 				      * Compute system index from components.
 				      */
-    unsigned component_to_system_index (unsigned component,
-					unsigned component_index) const;
+    unsigned int component_to_system_index (unsigned int component,
+					unsigned int component_index) const;
   
 				     /**
 				      * Compute component and index from system index.
@@ -249,7 +259,23 @@ class FiniteElementBase :
 				      * component and second index in
 				      * component.
 				      */
-    pair<unsigned,unsigned> system_to_component_index (unsigned index) const; 
+    pair<unsigned int,unsigned int> system_to_component_index (unsigned int index) const; 
+    
+				     /**
+				      * Compute system index from components on a face.
+				      */
+    unsigned int face_component_to_system_index (unsigned int component,
+						 unsigned int component_index) const;
+  
+				     /**
+				      * Compute component and index from system
+				      * index for a face.
+				      *
+				      * Return value contains first
+				      * component and second index in
+				      * component.
+				      */
+    pair<unsigned int,unsigned int> face_system_to_component_index (unsigned int index) const; 
     
 
 				     /**
@@ -430,12 +456,22 @@ class FiniteElementBase :
 				     /**
 				      * Map between linear dofs and component dofs.
 				      */
-    vector< pair<unsigned, unsigned> > system_to_component_table;
+    vector< pair<unsigned int, unsigned int> > system_to_component_table;
+
+				     /**
+				      * Map between linear dofs and component dofs on face.
+				      */
+    vector< pair<unsigned int, unsigned int> > face_system_to_component_table;
 
 				     /**
 				      * Map between component and linear dofs.
 				      */
-    vector< vector<unsigned> > component_to_system_table;
+    vector< vector<unsigned int> > component_to_system_table;
+
+				     /**
+				      * Map between component and linear dofs on a face.
+				      */
+    vector< vector<unsigned int> > face_component_to_system_table;
 };
 
 
@@ -1333,7 +1369,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * components of mixed
 				      * discretizations.
 				      */
-    virtual const FiniteElement<dim>& base_element(unsigned index) const;
+    virtual const FiniteElement<dim>& base_element(unsigned int index) const;
     
 				     /**
 				      * Exception
@@ -1362,9 +1398,9 @@ class FiniteElement : public FiniteElementBase<dim>
 };
 
 template <int dim>
-inline unsigned
-FiniteElementBase<dim>::component_to_system_index (unsigned component,
-						   unsigned component_index) const
+inline unsigned int
+FiniteElementBase<dim>::component_to_system_index (unsigned int component,
+						   unsigned int component_index) const
 {
   Assert(component<n_components, ExcInvalidIndex(component));
   Assert(component_index<component_to_system_table[component].size(),
@@ -1373,11 +1409,30 @@ FiniteElementBase<dim>::component_to_system_index (unsigned component,
 }
 
 template <int dim>  
-inline pair<unsigned,unsigned>
-FiniteElementBase<dim>::system_to_component_index (unsigned index) const
+inline pair<unsigned int,unsigned int>
+FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 {
   Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
   return system_to_component_table[index];
+}
+
+template <int dim>
+inline unsigned int
+FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
+							unsigned int component_index) const
+{
+  Assert(component<n_components, ExcInvalidIndex(component));
+  Assert(component_index<face_component_to_system_table[component].size(),
+	 ExcInvalidIndex(component_index));
+  return face_component_to_system_table[component][component_index];
+}
+
+template <int dim>  
+inline pair<unsigned int,unsigned int>
+FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) const
+{
+  Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
+  return face_system_to_component_table[index];
 }
 
 /*----------------------------   fe.h     ---------------------------*/

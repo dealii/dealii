@@ -243,7 +243,8 @@ enum NormType {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class VectorTools {
+class VectorTools //<dim>
+{
   public:
 				     /**
 				      *	Declare a data type which denotes a
@@ -259,6 +260,14 @@ class VectorTools {
 				      */
     typedef map<unsigned char,const Function<dim>*> FunctionMap;
 
+				     /**
+				      * Data type for vector valued boundary function map.
+				      */
+    typedef map<unsigned char,const VectorFunction<dim>*> VectorFunctionMap;
+
+//    typedef map<pair<unsigned char, unsigned int> ,const Function<dim>*>
+//    VectorFunctionMap;
+    
 				     /**
 				      * Compute the interpolation of
 				      * #function# at the support points to
@@ -329,10 +338,10 @@ class VectorTools {
 					Vector<double>           &rhs_vector);
     
 				     /**
-				      * Make up the list of node subject
+				      * Make up the list of nodes subject
 				      * to Dirichlet boundary conditions
-				      * and the values they are to be
-				      * assigned, by interpolation around
+				      * and the values to be
+				      * assigned to them, by interpolation around
 				      * the boundary. If the
 				      * #boundary_values# contained values
 				      * before, the new ones are added, or
@@ -347,7 +356,16 @@ class VectorTools {
 					     const FunctionMap     &dirichlet_bc,
 					     const Boundary<dim>   &boundary,
 					     map<int,double>       &boundary_values);
-    
+
+				     /**
+				      * Create boundary value information for vector
+				      * valued functions.
+				      * See the other #interpolate_boundary_values#.
+				      */
+    static void interpolate_boundary_values (const DoFHandler<dim> &dof,
+					     const VectorFunctionMap     &dirichlet_bc,
+					     const Boundary<dim>   &boundary,
+					     map<int,double>       &boundary_values);
 				     /**
 				      * Project #function# to the boundary
 				      * of the domain, using the given quadrature

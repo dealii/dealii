@@ -36,11 +36,19 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 		dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex+
 			      GeometryInfo<dim>::lines_per_face * dofs_per_line +
 			      dofs_per_quad),
-		first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex),
+		first_line_index(GeometryInfo<dim>::vertices_per_cell
+				 * dofs_per_vertex),
 		first_quad_index(first_line_index+
-				 12*dofs_per_line),
+				 GeometryInfo<dim>::lines_per_cell
+				 * dofs_per_line),
 		first_hex_index(first_quad_index+
-				GeometryInfo<dim>::faces_per_cell * dofs_per_quad),
+				GeometryInfo<dim>::faces_per_cell
+				* dofs_per_quad),
+		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
+				      * dofs_per_vertex),
+		first_face_quad_index(first_line_index+
+				      GeometryInfo<dim-1>::lines_per_cell
+				      * dofs_per_line),
 		total_dofs (first_hex_index+dofs_per_hex),
 		n_transform_functions (n_transform_functions),
 		n_components(n_components)
@@ -67,6 +75,11 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
 		first_hex_index(first_quad_index+
 				GeometryInfo<dim>::quads_per_cell*dofs_per_quad),
+		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
+				      * dofs_per_vertex),
+		first_face_quad_index(first_line_index+
+				      GeometryInfo<dim-1>::lines_per_cell
+				      * dofs_per_line),
 		total_dofs (first_quad_index+dofs_per_quad),
 		n_transform_functions (n_transform_functions),
 		n_components(n_components)
@@ -91,6 +104,11 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				 GeometryInfo<dim>::lines_per_cell * dofs_per_line),
 		first_hex_index(first_quad_index+
 				GeometryInfo<dim>::quads_per_cell*dofs_per_quad),
+		first_face_line_index(GeometryInfo<dim-1>::vertices_per_cell
+				      * dofs_per_vertex),
+		first_face_quad_index(first_line_index+
+				      GeometryInfo<dim-1>::lines_per_cell
+				      * dofs_per_line),
 		total_dofs (first_line_index+dofs_per_line),
 		n_transform_functions (n_transform_functions),
 		n_components(n_components)
@@ -120,7 +138,9 @@ template <int dim>
 FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data) :
 		FiniteElementData<dim> (fe_data),
 		system_to_component_table(total_dofs),
-		component_to_system_table(n_components, vector<unsigned>(total_dofs))
+		face_system_to_component_table(dofs_per_face),
+		component_to_system_table(n_components, vector<unsigned>(total_dofs)),
+		face_component_to_system_table(n_components, vector<unsigned>(dofs_per_face))
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
@@ -159,6 +179,11 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
     {
       system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
       component_to_system_table[0][j] = j;
+    }
+  for (unsigned int j=0 ; j<dofs_per_face ; ++j)
+    {
+      face_system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
+      face_component_to_system_table[0][j] = j;
     }
 };
 
