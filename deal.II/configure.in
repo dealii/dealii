@@ -258,7 +258,16 @@ if test "$GXX" = yes ; then
 	;;
   esac
 
+  dnl Some gcc compiler versions have a problem when using an unsigned count
+  dnl in the std::advance function. Unfortunately, this also happens 
+  dnl occasionally from within the standard library, so we can't prevent the
+  dnl warning messages. Since this is annoying, switch of the flag -W which
+  dnl causes this.
   DEAL_II_CHECK_ADVANCE_WARNING
+  if test "x$DEAL_II_ADVANCE_WARNING" = "xyes" ; then
+    CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W//g;'`"
+  fi
+
 else
 
   if test "x$GXX_VERSION" = "xibm_xlc" ; then
