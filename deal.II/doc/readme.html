@@ -445,15 +445,34 @@
     Since the ISO C++ standard is still quite new and compilers still
     change a lot, you might need to provide special options for the
     compiler. We have tried to automatize this process using the
-    ./configure script at least for the gcc compilers we use, but in
-    case something is not as you want it, change the file
+    ./configure script at least for the gcc compilers we use. If you need
+    additional flags, try the following two ways:
+
+    <ul>
+    <li> Set environment variables before configuring. If you want to add
+    a flag to produce <code>gprof</code> output, for instance, configure
+    the package using the following command sequence:
+    <pre>
+      setenv CXXFLAGS -pg
+      setenv LDFLAGS -pg
+      configure &lt;configure-options&gt;
+    </pre>
+    These are the commands for <tt>csh</tt>. They have to be changed
+    accordingly for <tt>bash</tt>
+
+    <li> If that does not work, edit the file
     common/Make.global_options.in and rerun ./configure in the
     top-level directory.
 
+    The first method is preferred, since it will be easier to
+    incorporate it into the configuration script later. Furthermore,
+    your version of <acronym>deal.II</acronym> will not be changed
+    from the original.
+
     <p>
 
-    We would like to hear about necessary modifications so that we can
-    include them into the distribution.
+    We would like to hear about necessary or useful modifications so
+    that we can include them into the distribution.
 
 
 
