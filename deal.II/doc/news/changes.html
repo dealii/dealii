@@ -73,6 +73,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The class <code>MGDoFHandler</code> had trouble when it
+       encountered a triangulation that had unused vertices, something
+       that happens when one coarsens an existing triangulation. In
+       that case, it would throw unjustified exceptions. This is now
+       fixed.
+       <br> 
+       (WB, 2005/03/01)
+       </p>
+
+  <li> <p>
        Fixed: The class <code>Triangulation::RefinementListener</code> had only
        virtual abstract functions but no virtual destructor. This caused
        warnings with some compilers, and is generally bad practice
