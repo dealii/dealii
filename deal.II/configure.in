@@ -1,8 +1,8 @@
 dnl $Id$
 dnl
 dnl    This is the input for the ./configure script of the deal.II
-dnl    libraries. The file is common/Make.global_options
-dnl    where all options and paths are stored.
+dnl    libraries. All options and paths are stored in
+dnl    the file common/Make.global_options.
 dnl
 dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
@@ -29,6 +29,8 @@ dnl AC_SUBST(target_os)
 dnl    Set the language for which subsequent tests shall be
 dnl    performed to C++
 AC_LANG_CPLUSPLUS
+
+
 
 
 
@@ -78,6 +80,61 @@ AC_PATH_PROG(PERL, perl)
 
 
 dnl -------------------------------------------------------------
+dnl Set compiler flags to their default values. They will be 
+dnl modified according to other options further down below
+dnl
+dnl CXXFLAGSO are the flags for optimized mode
+dnl CXXFLAGSG are the flags for debug mode
+dnl -------------------------------------------------------------
+
+if test $GXX = yes ; then
+  CXXFLAGSO="-O2 -Wuninitialized -felide-constructors -fnonnull-objects -ftemplate-depth-32"
+  CXXFLAGSG="-DDEBUG -ggdb -Wall -W -Wconversion -Winline -Woverloaded-virtual -ftemplate-depth-32"
+
+  dnl set some flags that are specific to some versions of the
+  dnl compiler:
+  dnl - egcs1.1 yielded incorrect code with some loop unrolling
+  dnl - after egcs1.1, the optimization flag -fstrict-aliasing was
+  dnl   introduced, which enables better optimizations for
+  dnl   well-written C++ code. we believe that deal.II falls into that
+  dnl   category and thus enable the flag 
+  dnl - egcs1.1 yielded incorrect code with vtable-thunks. thus disable
+  dnl   them for egcs1.1. however, if on Linux, disabling them
+  dnl   prevents programs from being linked, so take the risk of broken
+  dnl   thunks on this platform
+
+  case "$GXXVERSION" in
+    egcs1.1)
+        case "$target" in
+	  *linux*)
+	      ;;
+
+	  *)
+	      CXXFLAGSG = "$CXXFLAGSG -fno-vtable-thunks"
+	      CXXFLAGSO = "$CXXFLAGSO -fno-vtable-thunks"
+	      ;;
+	esac
+	;;
+
+    dnl All other gcc versions
+    *)
+	CXXFLAGSO="$CXXFLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
+	;;
+  esac
+else
+  dnl Other compiler
+  AC_MSG_ERROR(No compiler options for this C++ compiler
+               specified at present)
+  exit 1
+fi
+
+AC_SUBST(CXXFLAGSG)
+AC_SUBST(CXXFLAGSO)
+
+
+
+
+dnl -------------------------------------------------------------
 dnl Multithreading
 dnl -------------------------------------------------------------
 
@@ -89,6 +146,20 @@ AC_ARG_ENABLE(multithreading,
     enablemultithreading=$enableval,
     enablemultithreading=no)
 AC_SUBST(enablemultithreading)
+
+
+dnl Adjust compiler parameters if multithreading is desired:
+dnl - Use the right -threads/-pthread/-mthread option
+dnl - Set preprocessor directives if necessary
+dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
+if test $enablemultithreading = yes ; then
+  DEAL_II_GET_THREAD_FLAGS
+  DEAL_II_THREAD_CPPFLAGS
+
+  CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
+  CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
+fi
+
 
 
 dnl    Test whether the user wants the multithread code in the 
@@ -105,6 +176,9 @@ if test $withmultithreading != no ; then
     AC_MSG_RESULT(not found)
     AC_MSG_ERROR(Invalid ACE path)
   fi
+
+  CXXFLAGSG="$CXXFLAGSG -DDEAL_II_USE_MT"
+  CXXFLAGSO="$CXXFLAGSO -DDEAL_II_USE_MT"
 fi
 AC_SUBST(withmultithreading)
 
@@ -120,12 +194,45 @@ AC_ARG_ENABLE(shared,
     enableshared=$enableval,
     enableshared=yes)
 
+dnl On AIX and alpha, shared libs don't work for us at present, so 
+dnl disable them (we should probably use libtool there)
+case "$target" in
+   *-aix* | alpha*-linux* ) 
+	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
+	   enableshared=no 
+	   ;;
+esac
+
+
+dnl Set compile flags accordingly
+if test $enableshared = yes ; then
+  AC_MSG_RESULT(Configuring for shared libraries)
+  CXXFLAGSG="$CXXFLAGSG -fPIC"
+  CXXFLAGSO="$CXXFLAGSO -fPIC"
+
+  lib_suffix=.so;
+else
+  AC_MSG_RESULT(Configuring for static libraries)
+
+  lib_suffix=.a;
+fi
+
+
+AC_SUBST(enableshared)
+AC_SUBST(lib_suffix)
+
+
+
+
 dnl -------------------------------------------------------------
 dnl Multigrid
 dnl -------------------------------------------------------------
 
 dnl    Test if multigrid should be enabled
 dnl    default is no
+dnl
+dnl    ??Is this still the present state??
+dnl
 AC_ARG_ENABLE(multigrid,
 [  --enable-multigrid Include multigrid code in library],
     enablemultigrid=$enableval,
@@ -188,49 +295,62 @@ else
 fi
 AC_SUBST(docxx)
 
-dnl -------------------------------------------------------------
-dnl Check for operating system
-dnl -------------------------------------------------------------
 
-case "$target" in
 
-   dnl This line should be replaced by proper handling of conditions in configure
-   dnl Right now Make.global_options needs this definition.
-
-   *-linux*) OS=Linux;;
-
-   dnl AIX does not allow shared libraries
-
-   *-aix*) enableshared=no ;;
-esac
 
 dnl -------------------------------------------------------------
 dnl Check for specific machine types
 dnl -------------------------------------------------------------
 
 case "$target" in
-   alpha*-linux*) throw_opt=-DNO_THROW enableshared=no ;;
+   dnl On Alpha, there was an internal compiler error in exceptions.h.
+   dnl Disable "throw" for this platform
+   alpha*-linux*)
+	CXXFLAGSG="$CXXFLAGSG  -DNO_THROW"
+	CXXFLAGSO="$CXXFLAGSO  -DNO_THROW"
+	;;
 esac
 
-dnl -------------------------------------------------------------
-dnl Adjust option settings for OS / machine
-dnl -------------------------------------------------------------
 
-if test $enableshared = yes ; then
-  AC_MSG_RESULT(Configuring shared libraries)
-  shared_libs=-fPIC;
-  lib_suffix=.so;
-else
-  AC_MSG_RESULT(Configuring static libraries)
-  shared_libs='';
-  lib_suffix=.a;
-fi
 
-AC_SUBST(OS)
-AC_SUBST(enableshared)
-AC_SUBST(shared_libs)
-AC_SUBST(lib_suffix)
-AC_SUBST(throw_opt)
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Last check: test whether CXXFLAGS are ok
+dnl -------------------------------------------------------------
+AC_MSG_CHECKING(for consistency of CXXFLAGSG flags)
+CXXFLAGS="$CXXFLAGSG"
+AC_TRY_COMPILE(
+  [],
+  [;],
+  [
+    AC_MSG_RESULT(yes)
+  ],
+  [
+    AC_MSG_ERROR(invalid combination of flags!)
+    exit 1;
+  ])
+
+AC_MSG_CHECKING(for consistency of CXXFLAGSO flags)
+CXXFLAGS="$CXXFLAGSO"
+AC_TRY_COMPILE(
+  [],
+  [;],
+  [
+    AC_MSG_RESULT(yes)
+  ],
+  [
+    AC_MSG_ERROR(invalid combination of flags!)
+    exit 1;
+  ])
+
+
+
+
+
+
 
 dnl -------------------------------------------------------------
 dnl Configure other packages

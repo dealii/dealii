@@ -22,7 +22,6 @@ D                    = @DEAL2_DIR@
 CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
-OS                   = @OS@
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
 with-multithreading  = @withmultithreading@
@@ -74,61 +73,8 @@ INCLUDE           += $(addprefix -I, $(include-path-base) \
                                      $(include-path-deal2))
 
 # compiler flags for debug and optimized mode
-
-CXXFLAGS.g   = @DEFS@ @shared_libs@ \
-               -DDEBUG -ggdb -Wall -W -Wconversion \
-               -Winline -Woverloaded-virtual\
-	       -ftemplate-depth-32\
-               $(INCLUDE) \
-	       $(LIBPATH)
-CXXFLAGS.o   = @DEFS@ @shared_libs@ @throw_opt@ \
-               -O2 -Wuninitialized \
-               -felide-constructors -fnonnull-objects \
-	       -ftemplate-depth-32 \
-               $(INCLUDE) \
-	       $(LIBPATH)
-
-
-# if not egcs-1.1 we can use additional flags for which that compiler
-# had quirks
-ifneq ($(GXX-VERSION),egcs1.1)
-  CXXFLAGS.o += -funroll-loops -funroll-all-loops
-endif
-
-
-# if not on Linux and we use egcs-1.1: enable -fno-vtable-thunks,
-# since vtable-thunks are broken and yield incorrect code. in fact,
-# they are also broken on Linux, but we can't link programs compiled
-# with -fno-vtable-thunks unless the whole compiler is recompiled,
-# which we don't want to force on the users
-ifneq ($(OS),Linux)
-  ifeq ($(GXX-VERSION),egcs1.1)
-    CXXFLAGS.g += -fno-vtable-thunks 
-    CXXFLAGS.o += -fno-vtable-thunks 
-  endif
-endif
-
-
-
-# after egcs1.1, the optimization flag -fstrict-aliasing was
-# introduced, which enables better optimizations for well-written C++
-# code. we believe that deal.II falls into that category and thus
-# enable the flag
-ifneq ($(GXX-Version),egcs1.1)
-  CXXFLAGS.o += -fstrict-aliasing
-endif
-
-
-
-# if --enable-multithreading was given, then set the compiler flags
-# accordingly. note that this only sets the flags to generate programs
-# which use thread-safe allocation functions, include the right files,
-# etc, but the library won't use its multithread code. for this you
-# have to specify another flag.
-ifeq ($(enable-multithreading),yes)
-  CXXFLAGS.g += -threads -D__USE_MALLOC
-  CXXFLAGS.o += -threads -D__USE_MALLOC
-endif
+CXXFLAGS.g   = @CXXFLAGSG@  $(INCLUDE)  $(LIBPATH)
+CXXFLAGS.o   = @CXXFLAGSO@  $(INCLUDE)  $(LIBPATH)
 
 
 # if multithread support in the library is requested, then set the
@@ -139,9 +85,6 @@ ifneq ($(with-multithreading),no)
   LIBPATH    += -L$(ACE_ROOT)/ace
 
   lib-ACE     = $(ACE_ROOT)/ace/libACE.so
-
-  CXXFLAGS.g += -DDEAL_II_USE_MT
-  CXXFLAGS.o += -DDEAL_II_USE_MT
 
   vpath %.a $(ACE_ROOT)
 endif
