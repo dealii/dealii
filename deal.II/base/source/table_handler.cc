@@ -254,7 +254,7 @@ void TableHandler::write_text(std::ostream &out) const
       out.setf(std::ios::left);
       out << std::setw(column_string_size)
 //	  << setfill('*') 
-	  << key.c_str() << "\t";
+	  << key << "\t";
     }
   out << std::endl;
 
