@@ -231,12 +231,6 @@ class FiniteElementData
 				      * Comparison operator.
 				      */
     bool operator == (const FiniteElementData<dim> &) const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcSpaceDimensionMismatch, int, int,
-		    << "used " << arg1 << "-d function for " << arg2 << "-d object");
 };
 
 

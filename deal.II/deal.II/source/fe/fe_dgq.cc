@@ -418,8 +418,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 					     // Rotate yz-plane
 					     // counter-clockwise
 	  case 'x':
-	    Assert (dim>2,
-		    typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
+	    Assert (dim>2, ExcDimensionMismatch (dim,3));
 	    for (unsigned int iz=0;iz<n;++iz)
 	      for (unsigned int iy=0;iy<n;++iy)
 		for (unsigned int ix=0;ix<n;++ix)
@@ -431,8 +430,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 					     // Rotate yz-plane
 					     // clockwise
 	  case 'X':
-	    Assert (dim>2, 
-		    typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
+	    Assert (dim>2, ExcDimensionMismatch (dim,3));
 	    for (unsigned int iz=0;iz<n;++iz)
 	      for (unsigned int iy=0;iy<n;++iy)
 		for (unsigned int ix=0;ix<n;++ix)
