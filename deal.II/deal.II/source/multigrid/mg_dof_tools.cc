@@ -48,6 +48,8 @@ void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
     }
 }
 
+
+
 template<int dim>
 void
 MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
@@ -94,6 +96,59 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 		    {
 		      sparsity.add (dofs_on_this_cell[i],
 				    dofs_on_other_cell[j]);
+		    }
+		}
+	    }
+	} 
+    }
+}
+
+
+
+template<int dim>
+void
+MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
+					     SparsityPattern       &sparsity,
+					     const unsigned int level)
+{
+  Assert ((level>=1) && (level<dof.get_tria().n_levels()),
+	  ExcIndexRange(level, 1, dof.get_tria().n_levels()));
+
+  const unsigned int fine_dofs = dof.n_dofs(level);
+  const unsigned int coarse_dofs = dof.n_dofs(level-1);
+  
+  Assert (sparsity.n_rows() == coarse_dofs,
+	  ExcDimensionMismatch (sparsity.n_rows(), coarse_dofs));
+  Assert (sparsity.n_cols() == fine_dofs,
+	  ExcDimensionMismatch (sparsity.n_cols(), fine_dofs));
+
+  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+  vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+  MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+				   endc = dof.end(level);
+  for (; cell!=endc; ++cell)
+    {
+      cell->get_mg_dof_indices (dofs_on_this_cell);
+				       // Loop over all interior neighbors
+      for (unsigned int face = 0;
+	   face < GeometryInfo<dim>::faces_per_cell;
+	   ++face)
+	{
+	  if ( (! cell->at_boundary(face)) &&
+	       (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
+	    {
+	      MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
+
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    {
+		      sparsity.add (dofs_on_this_cell[i],
+				    dofs_on_other_cell[j]);
+		      sparsity.add (dofs_on_this_cell[j],
+				    dofs_on_other_cell[i]);
 		    }
 		}
 	    }
@@ -208,6 +263,10 @@ template void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dime
 template void MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
 						      SparsityPattern &,
 						      const unsigned int);
+
+template void MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<deal_II_dimension> &,
+							   SparsityPattern &,
+							   const unsigned int);
 
 #if deal_II_dimension > 1
 template void MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,

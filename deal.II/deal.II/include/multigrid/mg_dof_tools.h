@@ -27,7 +27,7 @@
  * All member functions are static, so there is no need to create an
  * object of class #MGDoFTools#.
  *
- * @author Wolfgang Bangerth and others, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000
  */
 class MGDoFTools 
 {
@@ -63,6 +63,19 @@ class MGDoFTools
     make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
 				SparsityPattern         &sparsity,
 				const unsigned int       level);
+
+				     /**
+				      * Create sparsity pattern for
+				      * the fluxes at refinement
+				      * edges. 
+				      * @see{make_flux_sparsity_pattern}
+				      * @see{DoFTools}
+				      */
+    template <int dim>
+    static void
+    make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof_handler,
+				     SparsityPattern         &sparsity,
+				     const unsigned int       level);
 
 				     /**
 				      * This function does the same as

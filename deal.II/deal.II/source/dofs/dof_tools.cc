@@ -406,13 +406,14 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		      for (unsigned int i=0; i<total_dofs; ++i)
 			{
 			  for (unsigned int j=0; j<total_dofs; ++j)
-			    if (flux_dof_mask[i][j])
-			      {
+			    {
+			      if (flux_dof_mask[i][j])
 				sparsity.add (dofs_on_this_cell[i],
 					      dofs_on_other_cell[j]);
+			      if (flux_dof_mask[j][i])
 				sparsity.add (dofs_on_other_cell[i],
 					      dofs_on_this_cell[j]);
-			      }
+			    }
 			}
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
@@ -421,10 +422,11 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		  for (unsigned int i=0; i<total_dofs; ++i)
 		    {
 		      for (unsigned int j=0; j<total_dofs; ++j)
-			if (flux_dof_mask[i][j])
-			  {
+			{
+			  if (flux_dof_mask[i][j])
 			    sparsity.add (dofs_on_this_cell[i],
 					  dofs_on_other_cell[j]);
+			  if (flux_dof_mask[j][i])
 			    sparsity.add (dofs_on_other_cell[i],
 					  dofs_on_this_cell[j]);
 			}
