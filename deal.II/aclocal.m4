@@ -97,51 +97,59 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           GXX_VERSION=intel_icc
         else
   
-          dnl Or DEC's cxx compiler?
-          is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
-          if test "x$is_dec_cxx" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Compaq cxx)
-            GXX_VERSION=compaq_cxx
+          dnl Intel's ECC C++ compiler for the Itanium?
+          is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
+          if test "x$is_intel_ecc" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is Intel Itanium ECC)
+            GXX_VERSION=intel_ecc
           else
   
-  	    dnl Sun Workshop?
-            is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
-            if test "x$is_sun_cc" != "x" ; then
-              AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
-              GXX_VERSION=sun_workshop
+            dnl Or DEC's cxx compiler?
+            is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
+            if test "x$is_dec_cxx" != "x" ; then
+              AC_MSG_RESULT(C++ compiler is Compaq cxx)
+              GXX_VERSION=compaq_cxx
             else
   
-  	      dnl Sun Forte?
-              is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
-              if test "x$is_sun_forte_cc" != "x" ; then
-                AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
-                GXX_VERSION=sun_forte
+      	      dnl Sun Workshop?
+              is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
+              if test "x$is_sun_cc" != "x" ; then
+                AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
+                GXX_VERSION=sun_workshop
               else
   
-  	      dnl KAI C++?
-  	      is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
-  	      if test "x$is_kai_cc" != "x" ; then
-  	        AC_MSG_RESULT(C++ compiler is KAI C++)
-  	        GXX_VERSION=kai_cc
-  	      else
+  	        dnl Sun Forte?
+                is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
+                if test "x$is_sun_forte_cc" != "x" ; then
+                  AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
+                  GXX_VERSION=sun_forte
+                else
   
-  	        dnl Portland Group C++?
-  	        is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-  	        if test "x$is_pgcc" != "x" ; then
-  	          AC_MSG_RESULT(C++ compiler is Portland Group C++)
-  	          GXX_VERSION=portland_group
-  	        else
-  
-  	          dnl HP aCC?
-  	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
-  	          if test "x$is_aCC" != "x" ; then
-  	            AC_MSG_RESULT(C++ compiler is HP aCC)
-  	            GXX_VERSION=hp_aCC
+  	          dnl KAI C++?
+  	          is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
+  	          if test "x$is_kai_cc" != "x" ; then
+  	            AC_MSG_RESULT(C++ compiler is KAI C++)
+  	            GXX_VERSION=kai_cc
   	          else
   
-                      dnl  Aw, nothing suitable found...
-                      AC_MSG_ERROR(Unrecognized compiler, sorry)
-                      exit 1
+  	            dnl Portland Group C++?
+  	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+  	            if test "x$is_pgcc" != "x" ; then
+  	              AC_MSG_RESULT(C++ compiler is Portland Group C++)
+  	              GXX_VERSION=portland_group
+  	            else
+  
+  	              dnl HP aCC?
+  	              is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
+  	              if test "x$is_aCC" != "x" ; then
+  	                AC_MSG_RESULT(C++ compiler is HP aCC)
+  	                GXX_VERSION=hp_aCC
+  	              else
+  
+                        dnl  Aw, nothing suitable found...
+                        AC_MSG_ERROR(Unrecognized compiler, sorry)
+                        exit 1
+                      fi	
                     fi
                   fi
                 fi
@@ -275,6 +283,30 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl segfault)
           CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
           CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424"
+          CXXFLAGSPIC="-KPIC"
+          LDFLAGSPIC="-KPIC -shared"
+          ;;
+  
+      intel_ecc)
+          dnl Disable some compiler warnings, as they often are wrong on
+          dnl our code:
+          dnl #175: `subscript out of range' (doesn't take into account that
+          dnl       some code is only reachable for some dimensions)
+          dnl #327: `NULL reference is not allowed' (this happens when we
+          dnl       write "*static_cast<double*>(0)" or some such thing,
+          dnl       which we do to create invalid references)
+          dnl #424: `extra ";" ignored'
+          dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
+          dnl       (allowed for compatibility)' (I don't understand what the
+          dnl       compiler means)
+	  dnl
+          dnl Note: we would really like to use  -ansi -Xc, since that
+	  dnl is _very_ picky about standard C++, and is thus very efficient
+          dnl in detecting slight standard violations, but these flags are
+          dnl also very efficient in crashing the compiler (it generates a
+          dnl segfault)
+          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC -shared"
           ;;
