@@ -290,14 +290,15 @@ class SparseMatrixStruct : public Subscriptor
 				     /**
 				      * Number of entries in a specific row.
 				      */
-    unsigned int row_length(unsigned int row) const;
+    unsigned int row_length (const unsigned int row) const;
 
 				     /**
 				      * Access to column nuber field.
 				      * Return the column number of
 				      * the #index#th entry in #row#.
 				      */
-    unsigned int column_number(unsigned int row, unsigned int index) const;
+    unsigned int column_number (const unsigned int row,
+				const unsigned int index) const;
 
 				     /**
 				      * Compute the bandwidth of the matrix
@@ -1202,7 +1203,7 @@ SparseMatrixStruct::get_column_numbers () const
 
 inline
 unsigned int
-SparseMatrixStruct::row_length(unsigned int row) const
+SparseMatrixStruct::row_length (const unsigned int row) const
 {
   Assert(row<rows, ExcIndexRange(row,0,rows));
   return rowstart[row+1]-rowstart[row];
@@ -1210,7 +1211,8 @@ SparseMatrixStruct::row_length(unsigned int row) const
 
 inline
 unsigned int
-SparseMatrixStruct::column_number(unsigned int row, unsigned int index) const
+SparseMatrixStruct::column_number (const unsigned int row,
+				   const unsigned int index) const
 {
   Assert(row<rows, ExcIndexRange(row,0,rows));
   Assert(index<row_length(row), ExcIndexRange(index,0,row_length(row)));
