@@ -33,9 +33,7 @@ else
 endif
 
 
-# create lists of file names. note that we need several output
-# files for data_out_base.cc, which is why we use the several
-# intermediate o-files-base* rules
+# create lists of file names
 cc-files     = $(shell echo source/*/*.cc)
 h-files      = $(sort $(shell echo include/*/*.h))
 
