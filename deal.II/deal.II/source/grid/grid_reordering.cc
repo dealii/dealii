@@ -1307,7 +1307,7 @@ namespace internal
 		    lsn0(static_cast<unsigned int>(-1)),
                     lsn1(static_cast<unsigned int>(-1)),
 		    Oriented(false)
-    {};
+    {}
 
     
     
