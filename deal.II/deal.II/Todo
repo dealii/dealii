@@ -170,3 +170,8 @@ Review DoFCellAccessor<dim>::get_interpolated_dof_values: it may be
   the corresponding row of the transfer (restriction) matrix
   has nonzero entries. This also catches those zeroes which should
   really be written but are not because the nodal value was zero.
+
+
+Move the exceptions in the Tensor package (tensor_base.h and tensor.h)
+  back into the Tensor class, if the compiler allows to do so. Also
+  rename them back (i.e. drop the initial Tensor* from the name).
