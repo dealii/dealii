@@ -34,6 +34,23 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: On CygWin, one header files has a <code>#define quad
+       quad_t</code>. This is annoying, since we have local variables and
+       member functions with the name <code>quad</code>, and in fact it breaks
+       compilation on those versions of CygWin that has this. Fortunately, the
+       define is only active if a preprocessor variable
+       <code>_POSIX_SOURCE</code> is not set. Thus, we now check for the define
+       when configuring the library, and if necessary set the preprocessor
+       variable. However, while this allows to compile the library on these
+       systems, it may otherwise affect your code, if you use functions or
+       other features of the system that are not available when the flag is
+       set.
+       <br>
+       (<a href="mailto:cheffo@riflexo.com">Stephen Kolaroff</a>, WB
+       2002/09/28) 
+       </p>
+
+  <li> <p> 
        New: Since <code>math.h</code> only defines the values of PI or E (as
        <code>M_PI</code> and <code>M_E</code>) when certain defines are set (on
        Linux, these are <code>__USE_BSD</code> or <code>__USE_XOPEN</code>),
@@ -143,6 +160,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> Changed: The class <code
+       class="member">Table&lt;2&gt;::fill</code> function, which is also
+       inherited from the <code class="class">FullMatrix</code> class, used to
+       work also when the size of the matrix was zero, by simply not copying
+       something. This led to difficult to detect errors. It is therefore no
+       more allowed to call this function when the matrix is empty. For all
+       other cases, the status of copying without checking the size of the
+       array copied from remains unchanged.
+       <br>
+       (WB 2002/09/28)
+       </p>
+
   <li> <p> New: The classes <code
        class="class">TableIndices&lt;N&gt;</code> and <code
        class="class">Table&lt;N,T&gt;</code> are now implemented also
@@ -326,21 +355,36 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       Changed (internals): Previously, the finite element base class
+       initialized the restriction, prolongation, and face constraints matrices
+       to their correct size. Derived classes had to fill these classes, and
+       should have set their size back to zero in case they chose not to
+       implement them. However, we found a class that forgot to resize it to
+       zero, so it is now the other way round: they remain at size zero, and a
+       class that chooses to implement these matrices has to set them to the
+       correct size, to avoid programs that run on data that as just been
+       forgotten to add. (This information only concerns programs that
+       implement some finite element class on their own.)
+       <br>
+       (WB 2002/09/28)
+       </p>
+
   <li> <p>Improved: The different transfer functions in <code
-  class="class">FETools</code> operate on template vector arguments.
-  <br>
-  (GK 2002/09/24)
-  </p>
+       class="class">FETools</code> operate on template vector arguments.
+       <br>
+       (GK 2002/09/24)
+       </p>
 
   <li> <p> New: the class <code
-  class="class">FE_DGPNonparametric</code> implements finite elements
-  where shape functions are polynomials of order <i>k</i> on the
-  actual grid cell. This is achieved by evaluating the polynomials at
-  the mapped quadrature points. No grid transfer matrices are
-  available for this class.
-  <br>
-  (GK 2002/09/19)
-  </p>
+       class="class">FE_DGPNonparametric</code> implements finite elements
+       where shape functions are polynomials of order <i>k</i> on the
+       actual grid cell. This is achieved by evaluating the polynomials at
+       the mapped quadrature points. No grid transfer matrices are
+       available for this class.
+       <br>
+       (GK 2002/09/19)
+       </p>
 
   <li> <p> 
        Fixed: Some of the various instances of the <code
