@@ -245,11 +245,10 @@ namespace Threads
     std::list<pthread_t> &tid_list
       = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
     
-    {
-      ThreadMutex::ScopedLock lock (list_mutex);
-      tid_list.push_back (pthread_t());
-      pthread_t *tid = &tid_list.back();
-    }
+    list_mutex.acquire ();
+    tid_list.push_back (pthread_t());
+    pthread_t *tid = &tid_list.back();
+    list_mutex.release ();
     
                                      // start new thread. retry until
                                      // we either succeed or get an
