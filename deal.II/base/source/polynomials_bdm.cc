@@ -14,18 +14,16 @@
 #include <base/polynomials_bdm.h>
 #include <base/quadrature_lib.h>
 #include <iostream>
+#include <iomanip>
 using namespace std;
 using namespace Polynomials;
 
 
-//TODO:[GK] Remove monomial_derivatives
-
 template <int dim>
 PolynomialsBDM<dim>::PolynomialsBDM (const unsigned int k)
 		:
-		polynomial_space (Polynomials::Monomial<double>::generate_complete_basis(k)),
+		polynomial_space (Polynomials::Legendre::generate_complete_basis(k)),
 		monomials(1),
-		monomial_derivatives(1),
 		n_pols(dim * polynomial_space.n()+2),
 		p_values(polynomial_space.n()),
 		p_grads(polynomial_space.n()),
@@ -33,8 +31,6 @@ PolynomialsBDM<dim>::PolynomialsBDM (const unsigned int k)
 {
   Assert (dim == 2, ExcNotImplemented());
   monomials[0] = Monomial<double> (k+1);
-  for (unsigned int i=0;i<monomials.size();++i)
-    monomial_derivatives[i] = monomials[i].derivative();
 }
 
 
@@ -132,13 +128,11 @@ template <int dim>
 void
 PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 {
-  std::vector<Polynomial<double> > legendre(2);
-  for (unsigned int i=0;i<legendre.size();++i)
-    legendre[i] = Legendre(i);
+  std::vector<Polynomial<double> > moment_weight(2);
+  for (unsigned int i=0;i<moment_weight.size();++i)
+    moment_weight[i] = Monomial<double>(i);
 
-  QGauss<1> qface(polynomial_space.degree()+1);
-
-  Table<2,double> integrals (n(), n());
+  QGauss<dim-1> qface(polynomial_space.degree()+1);
 
   std::vector<Tensor<1,dim> > values(n());
   std::vector<Tensor<2,dim> > grads;
@@ -164,12 +158,23 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
 	      p(1) = x;
 	      break;	      
 	  }
+//	std::cerr << p
+//		  << '\t' << moment_weight[0].value(x)
+//		  << '\t' << moment_weight[1].value(x)
+//	  ;
+	
 	compute (p, values, grads, grad_grads);
+
 	for (unsigned int i=0;i<n();++i)
 	  {
-	    for (unsigned int j=0;j<legendre.size();++j)
-	      A(2*face+j,i) += w * values[i][1-face%2] * legendre[j].value(x);
+//	    std::cerr << '\t' << std::setw(6) << values[i][1-face%2];
+					     // Integrate normal component.
+					     // This is easy on the unit square
+	    for (unsigned int j=0;j<moment_weight.size();++j)
+	      A(moment_weight.size()*face+j,i)
+		+= w * values[i][1-face%2] * moment_weight[j].value(x);
 	  }
+//	std::cerr << std::endl;
       }
 				   // Volume integrals are missing
 				   //

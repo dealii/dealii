@@ -209,11 +209,6 @@ class PolynomialsBDM
     std::vector<Polynomials::Polynomial<double> > monomials;
     
 				     /**
-				      * Storage for derivatives of monomials
-				      */
-    std::vector<Polynomials::Polynomial<double> > monomial_derivatives;
-    
-				     /**
 				      * Number of BDM
 				      * polynomials.
 				      */
