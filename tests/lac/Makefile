@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -25,15 +25,15 @@ block_vector.exe          : block_vector.g.$(OBJEXT)                    $(librar
 block_vector_iterator.exe : block_vector_iterator.g.$(OBJEXT)           $(libraries)
 full_matrix.exe           : full_matrix.g.$(OBJEXT)                     $(libraries)
 matrix_out.exe            : matrix_out.g.$(OBJEXT)                      $(libraries)
-solver.exe                : solver.g.$(OBJEXT)   testmatrix.g.$(OBJEXT) $(libraries)
-eigen.exe                 : eigen.g.$(OBJEXT)   testmatrix.g.$(OBJEXT) $(libraries)
-sparse_matrices.exe       : sparse_matrices.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
-sparse_matrices.opt.exe   : sparse_matrices.$(OBJEXT) testmatrix.$(OBJEXT) $(libraries_o)
-sparsity_pattern.exe      : sparsity_pattern.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
-sparse_ilu.exe            : sparse_ilu.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
+solver.exe                : solver.g.$(OBJEXT)                          $(libraries)
+eigen.exe                 : eigen.g.$(OBJEXT)                           $(libraries)
+sparse_matrices.exe       : sparse_matrices.g.$(OBJEXT)                 $(libraries)
+sparse_matrices.opt.exe   : sparse_matrices.$(OBJEXT)                   $(libraries_o)
+sparsity_pattern.exe      : sparsity_pattern.g.$(OBJEXT)                $(libraries)
+sparse_ilu.exe            : sparse_ilu.g.$(OBJEXT)                      $(libraries)
 vector-vector.exe         : vector-vector.g.$(OBJEXT)                   $(libraries)
 #mgbase.exe               : mgbase.g.$(OBJEXT)                          $(libraries)
-#mg.exe                   : mg.g.$(OBJEXT) testmatrix.g.$(OBJEXT)       $(libraries)
+#mg.exe                   : mg.g.$(OBJEXT)                              $(libraries)
 
 
 tests = $(sort \
