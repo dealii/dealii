@@ -41,7 +41,7 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
-all: show_transform show_shapes
+all: check
 
 ############################################################
 # Typical block for building a running program
@@ -84,8 +84,21 @@ show_transform: $(show_transform-o-files) $(libraries)
 # Continue with other targets if needed
 ############################################################
 
+check: show_transform show_shapes
+	@echo Running programs
+	@show_transform
+	@show_shapes
+	@echo Checking results
+	$(MAKE) dodiff
 
+%.check: %.dat
+	diff $@ $<
 
+dat = $(wildcard *.dat)
+check = $(dat:.dat=.check)
+
+dodiff: $(check)
+	@echo OK
 
 ############################################################
 # Cleanup targets
@@ -109,3 +122,5 @@ Make.depend: $(all-cc-files)
 	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
 include Make.depend
+
+.PHONY: clean veryclean check
