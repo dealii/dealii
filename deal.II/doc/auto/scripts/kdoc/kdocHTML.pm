@@ -204,8 +204,8 @@ sub makeReferencedText
 	$t =~ s/$pat/$repl/;
     }
 
-#    $t =~ s/</&lt;/g;
-#    $t =~ s/>/&gt;/g;
+    $t =~ s/</&lt;/g;
+    $t =~ s/>/&gt;/g;
     $t =~ s/&lt;\/p&gt;&lt;p&gt;/<\/p><p>/g;
     $t =~ s/\#([^\#]*)\#/<CODE>$1<\/CODE>/g;
     $t =~ s/\\begin\{verbatim\}/<pre>/g;
