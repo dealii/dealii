@@ -219,6 +219,20 @@ class SparseMatrix : public Subscriptor
 				      * be zero, it is counted anyway.
 				      */
     unsigned int n_nonzero_elements () const;
+
+				     /**
+				      * Return the number of actually
+				      * nonzero elements of this
+				      * matrix.
+				      *
+				      * Note, that this function does
+				      * (in contrary to the
+				      * @p{n_nonzero_elements}) NOT
+				      * count all entries of the
+				      * sparsity pattern but only the
+				      * ones that are nonzero.
+				      */
+    unsigned int n_actually_nonzero_elements () const;
     
 				     /**
 				      * Set the element @p{(i,j)} to @p{value}.

@@ -153,6 +153,16 @@ SparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
+unsigned int
+SparseMatrix<number>::n_actually_nonzero_elements () const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  return count_if(&val[0], &val[n_nonzero_elements ()],
+		  bind2nd(not_equal_to<double>(), 0));
+};
+
+
+template <typename number>
 template <typename somenumber>
 SparseMatrix<number> &
 SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
