@@ -116,6 +116,7 @@ class Solution : public Function<dim> {
 
 
 
+template <>
 double RHSPoly<2>::operator () (const Point<2> &p) const {
   const double x = p(0),
 	       y = p(1);
@@ -125,6 +126,7 @@ double RHSPoly<2>::operator () (const Point<2> &p) const {
 
 
 
+template <>
 double Solution<2>::operator () (const Point<2> &p) const {
   const double x = p(0),
 	       y = p(1);
@@ -133,6 +135,7 @@ double Solution<2>::operator () (const Point<2> &p) const {
 };
 
 
+template <>
 Tensor<1,2> Solution<2>::gradient (const Point<2> &p) const {
   const double x = p(0),
 	       y = p(1);
@@ -145,7 +148,7 @@ Tensor<1,2> Solution<2>::gradient (const Point<2> &p) const {
 
 
 
-
+template <>
 void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,
