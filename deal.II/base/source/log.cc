@@ -125,7 +125,7 @@ LogStream::print_line_head()
 	}
     }
   
-  const string& head = prefixes.top();
+  const std::string& head = prefixes.top();
 
   if (prefixes.size() <= std_depth)
     {
