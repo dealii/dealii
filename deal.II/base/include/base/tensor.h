@@ -23,7 +23,7 @@ template <int rank_, int dim> class Tensor;
  * runtime-dependent dimension.
  */
 template <int rank_, int dim>
-class Tensor //<rank_, dim>
+class Tensor
 {
   public:
 				     /**
