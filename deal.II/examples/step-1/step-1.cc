@@ -1,6 +1,17 @@
 /* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
+/*    $Id$       */
+/*    Version: $Name$                                          */
+/*                                                                */
+/*    Copyright (C) 1999, 2000, 2001, 2002 by the deal.II authors */
+/*                                                                */
+/*    This file is subject to QPL and may not be  distributed     */
+/*    without copyright and license information. Please refer     */
+/*    to the file deal.II/doc/license.html for the  text  and     */
+/*    further information on this license.                        */
+
+
                                  // The most fundamental class in the
                                  // library is the ``Triangulation''
                                  // class, which is declared here:
@@ -27,7 +38,6 @@
 				 // And this for the declarations of the
 				 // `sqrt' and `fabs' functions:
 #include <cmath>
-
 
 
                                  // In the following function, we
@@ -231,3 +241,4 @@ int main ()
   first_grid ();
   second_grid ();
 };
+

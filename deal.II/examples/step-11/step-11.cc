@@ -1,6 +1,16 @@
 /* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2001 */
 
+/*    $Id$       */
+/*    Version: $Name$                                          */
+/*                                                                */
+/*    Copyright (C) 2001, 2002 by the deal.II authors */
+/*                                                                */
+/*    This file is subject to QPL and may not be  distributed     */
+/*    without copyright and license information. Please refer     */
+/*    to the file deal.II/doc/license.html for the  text  and     */
+/*    further information on this license.                        */
+
 				 // As usual, the program starts with
 				 // a rather long list of include
 				 // files which you are probably
