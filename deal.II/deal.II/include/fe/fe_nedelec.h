@@ -417,12 +417,11 @@ class FE_Nedelec : public FiniteElement<dim>
 					 /**
 					  * Array with shape function
 					  * values in quadrature
-					  * points. There is one
-					  * vector for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point. Since the shape
-					  * functions are
+					  * points. There is one row
+					  * for each shape function,
+					  * containing values for each
+					  * quadrature point. Since
+					  * the shape functions are
 					  * vector-valued (with as
 					  * many components as there
 					  * are space dimensions), the
@@ -444,7 +443,7 @@ class FE_Nedelec : public FiniteElement<dim>
 					  * Array with shape function
 					  * gradients in quadrature
 					  * points. There is one
-					  * vector for each shape
+					  * row for each shape
 					  * function, containing
 					  * values for each quadrature
 					  * point.
