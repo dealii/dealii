@@ -59,10 +59,15 @@ namespace internal
 					  * accessors only for read
 					  * access, a const matrix
 					  * pointer is sufficient.
+					  *
+					  * Place the iterator at the
+					  * beginning of the given row of the
+					  * matrix, or create the end pointer
+					  * if @p row equals the total number
+					  * of rows in the matrix.
 					  */
 	Accessor (const BlockMatrix  *m,
-		  const unsigned int  row,
-		  const unsigned int  index);
+		  const unsigned int  row);
 	
 					 /**
 					  * Row number of the element
@@ -70,13 +75,6 @@ namespace internal
 					  * object.
 					  */
 	unsigned int row() const;
-	
-					 /**
-					  * Index in row of the element
-					  * represented by this
-					  * object.
-					  */
-	unsigned int index() const;
 	
 					 /**
 					  * Column number of the
@@ -103,7 +101,12 @@ namespace internal
 					  * this object.
 					  */
 	unsigned int block_column() const;
-	
+
+                                         /**
+                                          * Exception
+                                          */
+        DeclException0 (ExcDereferenceEndIterator);
+        
       protected:
 					 /**
 					  * The matrix accessed.
@@ -117,21 +120,28 @@ namespace internal
 	typename BlockMatrix::BlockType::const_iterator base_iterator;
 	
 					 /**
-					  * Number of block where row lies in.
+					  * Block row into which we presently
+					  * point.
 					  */
 	unsigned int row_block;
 	
 					 /**
-					  * Number of block column where
-					  * column lies in.
+					  * Block column into which we
+					  * presently point.
 					  */
 	unsigned int col_block;
-	
-					 /**
-					  * Index in whole row.
-					  */
-	unsigned int a_index;
 
+                                         /**
+                                          * Move ahead one element.
+                                          */
+        void advance ();
+
+                                         /**
+                                          * Compare this accessor with another
+                                          * one for equality.
+                                          */
+        bool operator == (const Accessor &a) const;
+        
                                          /**
                                           * Let the iterator class be a
                                           * friend.
@@ -149,10 +159,15 @@ namespace internal
       public:
                                          /**
                                           * Constructor.
+					  *
+					  * Place the iterator at the
+					  * beginning of the given row of the
+					  * matrix, or create the end pointer
+					  * if @p row equals the total number
+					  * of rows in the matrix.
                                           */ 
 	ConstIterator(const BlockMatrix  *matrix,
-                      const unsigned int  row,
-                      const unsigned int  index);
+                      const unsigned int  row);
 	  
                                          /**
                                           * Prefix increment.
@@ -786,28 +801,49 @@ namespace internal
     inline
     Accessor<BlockMatrix>::
     Accessor (const BlockMatrix  *matrix,
-              const unsigned int  r,
-              const unsigned int  i)
+              const unsigned int  row)
                     :
                     matrix(matrix),
                     base_iterator(matrix->block(0,0).begin()),
                     row_block(0),
-                    col_block(0),
-                    a_index(0)
+                    col_block(0)
     {
-      Assert (i==0, ExcNotImplemented());
-
-      if (r < matrix->m())
+                                       // check if this is a regular row or
+                                       // the end of the matrix
+      if (row < matrix->m())
         {
-          std::pair<unsigned int,unsigned int> indices
-            = matrix->row_block_indices.global_to_local(r);
-          row_block = indices.first;
-          base_iterator = matrix->block(indices.first, 0).begin(indices.second);
+          const std::pair<unsigned int,unsigned int> indices
+            = matrix->row_block_indices.global_to_local(row);
+
+                                           // find the first block that does
+                                           // have an entry in this row
+          for (unsigned int bc=0; bc<matrix->n_block_cols(); ++bc)
+            {
+              base_iterator
+                = matrix->block(indices.first, bc).begin(indices.second);
+              if (base_iterator !=
+                  matrix->block(indices.first, bc).end(indices.second))
+                {
+                  row_block = indices.first;
+                  col_block = bc;
+                  return;
+                }
+            }
+
+                                           // hm, there is no block that has
+                                           // an entry in this column. we need
+                                           // to take the next entry then,
+                                           // which may be the first entry of
+                                           // the next row, or recursively the
+                                           // next row, or so on
+          *this = Accessor (matrix, row+1);
         }
       else
         {
-          row_block = matrix->n_block_rows();
-          base_iterator = matrix->block(0, 0).begin();
+                                           // we were asked to create the end
+                                           // iterator for this matrix
+          row_block = deal_II_numbers::invalid_unsigned_int;
+          col_block = deal_II_numbers::invalid_unsigned_int;
         }
     }
 
@@ -817,20 +853,11 @@ namespace internal
     unsigned int
     Accessor<BlockMatrix>::row() const
     {
-      if (row_block < matrix->n_block_rows())
-        return (matrix->row_block_indices.local_to_global(row_block, 0) +
-                base_iterator->row());
-      else
-        return 0;
-    }
-
-
-    template <class BlockMatrix>
-    inline
-    unsigned int
-    Accessor<BlockMatrix>::index() const
-    {
-      return a_index;
+      Assert (row_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+      
+      return (matrix->row_block_indices.local_to_global(row_block, 0) +
+              base_iterator->row());
     }
 
 
@@ -839,12 +866,9 @@ namespace internal
     unsigned int
     Accessor<BlockMatrix>::column() const
     {
-                                       // note: the block column should always
-                                       // be valid, in contrast to the block
-                                       // row, which may be past the end of
-                                       // the matrix. thus, unlike in the
-                                       // row() function, we do not have to
-                                       // if-else here
+      Assert (col_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+
       return (matrix->column_block_indices.local_to_global(col_block,0) +
               base_iterator->column());
     }
@@ -855,6 +879,9 @@ namespace internal
     unsigned int
     Accessor<BlockMatrix>::block_row() const
     {
+      Assert (row_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+
       return row_block;
     }
 
@@ -864,6 +891,9 @@ namespace internal
     unsigned int
     Accessor<BlockMatrix>::block_column() const
     {
+      Assert (col_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+
       return col_block;
     }
 
@@ -873,9 +903,107 @@ namespace internal
     typename Accessor<BlockMatrix>::value_type
     Accessor<BlockMatrix>::value () const
     {
+      Assert (row_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+      Assert (col_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+
       return base_iterator->value();
     }
 
+
+
+    template <class BlockMatrix>
+    inline
+    void
+    Accessor<BlockMatrix>::advance ()
+    {      
+      Assert (row_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+      Assert (col_block != deal_II_numbers::invalid_unsigned_int,
+              ExcDereferenceEndIterator());
+
+                                       // Remember current row inside block
+      unsigned int local_row = base_iterator->row();
+
+                                       // Advance one element inside the
+                                       // current block
+      ++base_iterator;
+  
+                                       // while we hit the end of the row of a
+                                       // block (which may happen multiple
+                                       // times if rows inside a block are
+                                       // empty), we have to jump to the next
+                                       // block and take the
+      while (base_iterator ==
+             matrix->block(row_block,
+                           col_block).end(local_row))
+        {
+                                           // jump to next block in this block
+                                           // row, if possible, otherwise go
+                                           // to next row
+          if (col_block < matrix->n_block_cols()-1)
+            {
+              ++col_block;
+              base_iterator
+                = matrix->block(row_block, col_block).begin(local_row);
+            }
+          else
+            {
+                                               // jump back to next row in
+                                               // first block column
+              col_block = 0;
+              ++local_row;
+
+                                               // see if this has brought us
+                                               // past the number of rows in
+                                               // this block. if so see
+                                               // whether we've just fallen
+                                               // off the end of the whole
+                                               // matrix
+              if (local_row == matrix->block(row_block, col_block).m())
+                {
+                  local_row = 0;
+                  ++row_block;
+                  if (row_block == matrix->n_block_rows())
+                    {
+                      row_block = deal_II_numbers::invalid_unsigned_int;
+                      col_block = deal_II_numbers::invalid_unsigned_int;
+                      return;
+                    }
+                }
+              
+              base_iterator
+                = matrix->block(row_block, col_block).begin(local_row);
+            }
+        }
+    }
+    
+      
+
+    template <class BlockMatrix>
+    inline
+    bool
+    Accessor<BlockMatrix>::operator == (const Accessor &a) const
+    {      
+      if (matrix != a.matrix)
+        return false;
+
+      if (row_block == a.row_block
+          && col_block == a.col_block)
+                                         // end iterators do not necessarily
+                                         // have to have the same
+                                         // base_iterator representation, but
+                                         // valid iterators have to
+        return (((row_block == deal_II_numbers::invalid_unsigned_int)
+                 &&
+                 (col_block == deal_II_numbers::invalid_unsigned_int))
+                ||
+                (base_iterator == a.base_iterator));
+
+      return false;
+    }
+    
 
 //----------------------------------------------------------------------//
 
@@ -884,10 +1012,9 @@ namespace internal
     inline
     ConstIterator<BlockMatrix>::
     ConstIterator (const BlockMatrix *m,
-                   const unsigned int r,
-                   const unsigned int i)
+                   const unsigned int r)
                     :
-                    accessor (m, r, i)
+                    accessor (m, r)
     {}
 
 
@@ -897,61 +1024,7 @@ namespace internal
     ConstIterator<BlockMatrix> &
     ConstIterator<BlockMatrix>::operator++ ()
     {
-      Assert (accessor.row_block < accessor.matrix->n_block_rows(),
-              ExcIteratorPastEnd());
-
-                                       // Remember current row inside block
-      unsigned int local_row = accessor.base_iterator->row();
-
-                                       // Advance inside block
-      ++accessor.base_iterator;
-      ++accessor.a_index;
-  
-                                       // If end of row inside block,
-                                       // advance to next block
-      if (accessor.base_iterator ==
-          accessor.matrix->block(accessor.row_block,
-                                 accessor.col_block).end(local_row))
-        {
-          if (accessor.col_block < accessor.matrix->n_block_cols()-1)
-            {
-                                               // Advance to next block in
-                                               // row
-//TODO: what if this row in that block is empty?          
-              ++accessor.col_block;
-            }
-          else
-            {
-                                               // Advance to first block
-                                               // in next row
-              accessor.col_block = 0;
-              accessor.a_index = 0;
-              ++local_row;
-              if (local_row >=
-                  accessor.matrix->block(accessor.row_block,0).m())
-                {
-                                                   // If final row in
-                                                   // block, go to next
-                                                   // block row
-                  local_row = 0;
-                  ++accessor.row_block;
-                }
-            }
-                                           // Finally, set base_iterator
-                                           // to start of row determined
-                                           // above
-          if (accessor.row_block < accessor.matrix->n_block_rows())
-            accessor.base_iterator =
-              accessor.matrix->block(accessor.row_block, accessor.col_block)
-              .begin(local_row);
-          else
-                                             // Set base_iterator to a
-                                             // defined state for
-                                             // comparison. This is the
-                                             // end() state.
-//TODO: this is a particularly bad choice, since it is actually a valid iterator. it should rather be something like the end iterator of the last block!
-            accessor.base_iterator = accessor.matrix->block(0, 0).begin();
-        }
+      accessor.advance ();
       return *this;
     }
 
@@ -993,14 +1066,7 @@ namespace internal
     ConstIterator<BlockMatrix>::
     operator == (const ConstIterator& i) const
     {
-      if (accessor.matrix != i.accessor.matrix)
-        return false;
-  
-      if (accessor.row_block == i.accessor.row_block
-          && accessor.col_block == i.accessor.col_block
-          && accessor.base_iterator == i.accessor.base_iterator)
-        return true;
-      return false;
+      return (accessor == i.accessor);
     }
 
 
@@ -1029,8 +1095,7 @@ namespace internal
           if (accessor.base_iterator->row() < i.accessor.base_iterator->row())
             return true;
           if (accessor.base_iterator->row() == i.accessor.base_iterator->row())
-            if (accessor.a_index < i.accessor.a_index)
-              return true;
+            return (accessor.base_iterator < i.accessor.base_iterator);
         }
       return false;
     }
@@ -1592,7 +1657,7 @@ inline
 typename BlockMatrixBase<MatrixType>::const_iterator
 BlockMatrixBase<MatrixType>::begin () const
 {
-  return const_iterator(this, 0, 0);
+  return const_iterator(this, 0);
 }
 
 
@@ -1602,7 +1667,7 @@ inline
 typename BlockMatrixBase<MatrixType>::const_iterator
 BlockMatrixBase<MatrixType>::end () const
 {
-  return const_iterator(this, m(), 0);
+  return const_iterator(this, m());
 }
 
 
@@ -1613,7 +1678,7 @@ typename BlockMatrixBase<MatrixType>::const_iterator
 BlockMatrixBase<MatrixType>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return const_iterator(this, r, 0);
+  return const_iterator(this, r);
 }
 
 
@@ -1624,7 +1689,7 @@ typename BlockMatrixBase<MatrixType>::const_iterator
 BlockMatrixBase<MatrixType>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return const_iterator(this, r+1, 0);
+  return const_iterator(this, r+1);
 }
 
 
