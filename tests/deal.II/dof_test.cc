@@ -304,7 +304,8 @@ void TestCases<dim>::run (const unsigned int test_case) {
 				   // computing constraints
   cout << "    Computing constraints..." << endl;
   ConstraintMatrix constraints;
-  dof->make_constraint_matrix (constraints);
+  dof->make_hanging_node_constraints (constraints);
+  constraints.close ();
   constraints.condense (sparsity);
   
   cout << "    Writing condensed sparsity pattern..." << endl;

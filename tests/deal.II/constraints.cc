@@ -261,7 +261,8 @@ int main () {
 	  dof.distribute_dofs (*fe);
       
 	  ConstraintMatrix constraints;
-	  dof.make_constraint_matrix (constraints);
+	  dof.make_hanging_node_constraints (constraints);
+	  constraints.close ();
       
 	  constraints.print (cout);
       
