@@ -1609,12 +1609,16 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
       for (int row=0; row<n_dofs; ++row) 
 	{
 	  unsigned int j;
+
+					   // loop until we hit the end
+					   // of this row's entries
 	  for (j=sparsity.get_rowstart_indices()[row];
 	       j<sparsity.get_rowstart_indices()[row+1]; ++j)
 	    if (sparsity.get_column_numbers()[j] == -1)
 	      break;
 					   // post-condition after loop:
-					   // coordination is now
+					   // coordination, i.e. the number
+					   // of entries in this row is now
 					   // j-rowstart[row]
 	  if (j-sparsity.get_rowstart_indices()[row] <  min_coordination)
 	    {
@@ -1622,6 +1626,20 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 	      starting_point   = row;
 	    };
 	};
+      
+				       // now we still have to care for the
+				       // case that no dof has a coordination
+				       // number less than n_dofs. this rather
+				       // exotic case only happens if we only
+				       // have one cell, as far as I can see,
+				       // but there may be others as well.
+				       //
+				       // if that should be the case, we can
+				       // chose an arbitrary dof as starting
+				       // point, e.g. the one with number zero
+      if (starting_point == -1)
+	starting_point = 0;
+      
 				       // initialize the first dof
       last_round_dofs.push_back (starting_point);
     };
