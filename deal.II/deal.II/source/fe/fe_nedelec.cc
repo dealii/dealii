@@ -576,9 +576,10 @@ FE_Nedelec<dim>::shape_grad_grad_component (const unsigned int i,
 					     // first order Nedelec
 					     // elements. their second
 					     // derivatives on the
-					     // unit cell are zero
+					     // unit cell are linear
 	    case 1:
 	    {
+//TODO: not true. this is what presently fails our "shapes" testcase              
 	      return Tensor<2,dim>();
 	    };
 
