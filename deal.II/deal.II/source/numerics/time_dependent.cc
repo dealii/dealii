@@ -205,7 +205,7 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
 {
 #ifdef DEAL_II_USE_MT
   const unsigned int stride = timesteps.size() / n_threads;
-  ACE_Thread_Manager thread_manager;
+  Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
 		    Threads::encapsulate (&TimeDependent::end_sweep)

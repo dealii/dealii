@@ -45,7 +45,7 @@ GradientEstimator::estimate (const DoFHandler<dim> &dof_handler,
   vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
-  ACE_Thread_Manager thread_manager;
+  Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
 		    Threads::encapsulate (&GradientEstimator::

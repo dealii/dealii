@@ -466,7 +466,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
 				   // if multithreading is used
 #ifdef DEAL_II_USE_MT
 
-  ACE_Thread_Manager thread_manager;
+  Threads::ThreadManager thread_manager;
   for (unsigned int i=0;i<data.n_threads; ++i)
     Threads::spawn (thread_manager,
 		    Threads::encapsulate (&KellyErrorEstimator<dim>::estimate_some)

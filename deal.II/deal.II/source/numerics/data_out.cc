@@ -338,7 +338,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 
 #ifdef DEAL_II_USE_MT
 
-  ACE_Thread_Manager thread_manager;  
+  Threads::ThreadManager thread_manager;  
   for (unsigned int l=0;l<n_threads;++l)
     Threads::spawn (thread_manager,
 		    Threads::encapsulate (&DataOut<dim>::build_some_patches)
