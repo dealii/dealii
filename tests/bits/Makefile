@@ -138,6 +138,7 @@ find_cell_1.exe         : find_cell_1.g.$(OBJEXT)          $(libraries)
 find_cell_2.exe         : find_cell_2.g.$(OBJEXT)          $(libraries)
 find_cell_3.exe         : find_cell_3.g.$(OBJEXT)          $(libraries)
 sparse_matrix_01.exe    : sparse_matrix_01.g.$(OBJEXT)     $(libraries)
+sparse_matrix_01a.exe   : sparse_matrix_01a.g.$(OBJEXT)    $(libraries)
 sparse_matrix_02.exe    : sparse_matrix_02.g.$(OBJEXT)     $(libraries)
 sparse_matrix_03.exe    : sparse_matrix_03.g.$(OBJEXT)     $(libraries)
 sparse_matrix_04.exe    : sparse_matrix_04.g.$(OBJEXT)     $(libraries)
@@ -201,6 +202,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	mapping_cartesian_1 \
 	mapping_q4_3d \
 	q_points find_cell_1 find_cell_2 find_cell_3 \
+        sparse_matrix_01a \
         sparse_matrix_01 sparse_matrix_02 sparse_matrix_03 \
         sparse_matrix_04 sparse_matrix_05 sparse_matrix_05a \
 	sparse_matrix_06 \

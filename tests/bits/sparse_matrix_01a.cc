@@ -1,0 +1,105 @@
+//----------------------------  sparse_matrix_01a.cc  ---------------------------
+//    sparse_matrix_01.cc,v 1.4 2003/07/03 10:31:46 guido Exp
+//    Version: 
+//
+//    Copyright (C) 2004 by the deal.II authors and Anna Schneebeli
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_matrix_01a.cc  ---------------------------
+
+
+// check setting elements in a sparse matrix using SparseMatrix::set(). make
+// sure they are correct, and make sure that for the nonexisting entries
+// SparseMatrix::el() returns zero and operator() throws an exception
+
+#include "../tests.h"
+#include <lac/sparse_matrix.h>    
+#include <fstream>
+#include <iostream>
+
+
+void test ()
+{
+  SparsityPattern sp (5,5,3,false);
+  for (unsigned int i=0; i<5; ++i)
+    for (unsigned int j=0; j<5; ++j)
+      if ((i+2*j+1) % 3 == 0)
+        sp.add (i,j);
+  sp.compress ();
+
+  SparseMatrix<double> m(sp);
+  
+                                   // first set a few entries
+  for (unsigned int i=0; i<m.m(); ++i)
+    for (unsigned int j=0; j<m.m(); ++j)
+      if ((i+2*j+1) % 3 == 0)
+        m.set (i,j, i*j*.5+.5);
+
+                                   // then make sure we retrieve the same ones
+  for (unsigned int i=0; i<m.m(); ++i)
+    for (unsigned int j=0; j<m.m(); ++j)
+      if ((i+2*j+1) % 3 == 0)
+        {
+          Assert (m(i,j) == i*j*.5+.5, ExcInternalError());
+          Assert (m.el(i,j) == i*j*.5+.5, ExcInternalError());
+        }
+      else
+        {
+          Assert (m.el(i,j) == 0, ExcInternalError());
+          bool exc_thrown = false;
+          double d;
+          try
+            {
+              d = m(i,j);
+            }
+          catch (const std::exception &)
+            {
+              exc_thrown = true;
+            }
+          Assert (exc_thrown == true, ExcInternalError());
+        }
+
+  deallog << "OK" << std::endl;
+}
+
+
+
+int main ()
+{
+  std::ofstream logfile("sparse_matrix_01a.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
+  try
+    {
+      test ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      
+      return 1;
+    }
+  catch (...) 
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    };
+}
