@@ -97,15 +97,16 @@ void PreconditionBlock<number, inverse_type>::invert_diagblocks()
 //      try
 //	{
       if (blocksize <=4)
-//	{  
-	inverse[cell].invert(M_cell);
-//	}
-//      catch (ExcNotImplemented &)
+	{  
+	  inverse[cell].invert(M_cell);
+	}
       else
 	{
 	  M_cell.gauss_jordan();
 	  inverse[cell]=M_cell;
 	}
+//      }
+//      catch (ExcNotImplemented &)
     }
 				   // release the lock on A
   A=0;
