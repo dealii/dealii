@@ -1075,13 +1075,15 @@ template <typename number>
 bool
 FullMatrix<number>::operator == (const FullMatrix<number> &m) const
 {
-  Assert (val != 0, ExcEmptyMatrix());
-  
-  bool q = (dim_range==m.dim_range) && (dim_image==m.dim_image);
-  if (!q) return false;
-
-  return equal (&val[0], &val[dim_range*dim_image],
-		&m.val[0]);
+				   // the matrices may either be both
+				   // empty, or of same size and with
+				   // same values, if they shall be
+				   // equal
+  return ( ((val==0) && (m.val==0)) ||
+	   ((dim_range==m.dim_range) &&
+	    (dim_image==m.dim_image) &&
+	    equal (&val[0], &val[dim_range*dim_image],
+		   &m.val[0])));
 };
 
 
