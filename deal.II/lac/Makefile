@@ -3,8 +3,8 @@
 
 all: lac doc 
 
-clean: lib-clean doc-clean
-
+clean: doc-clean source-clean
+	rm -f *~ include/*~ include/*/*~ lib/lib*
 
 lac:
 	cd source ; make
@@ -13,12 +13,12 @@ doc:
 	cd doc ; make
 
 
-lib-clean:
-	cd lib ; rm lib*
-
 doc-clean:
 	cd doc ; make clean
 
+source-clean:
+	cd source ; make clean
+
 
 .PHONY: all deal.II doc
-.PHONY: clean lib-clean doc-clean
+.PHONY: clean doc-clean source-clean
