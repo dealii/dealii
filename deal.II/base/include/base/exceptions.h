@@ -565,6 +565,7 @@ class Exception5 : public ExceptionBase {                             \
 
 namespace StandardExceptions 
 {
+  DeclException0 (ExcDivideByZero);
   DeclException0 (ExcNotImplemented);
   DeclException0 (ExcInternalError);
   DeclException3 (ExcIndexRange, int, int, int,
