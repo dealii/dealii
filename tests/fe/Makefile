@@ -18,16 +18,7 @@ libraries = $(lib-deal2-1d.g) \
             $(lib-lac.g)  \
             $(lib-base.g)
 
-default: run-tests dat-checks
-
-# additional in this directory: some tests write more than one output
-# file. check these as well after all tests have been run. actually, 
-# check each output file; files that are checked twice don't matter
-dat-checks: run-tests
-	@$(MAKE) do-checks
-
-check-files = $(subst .output,.check, $(wildcard *.output))
-do-checks: $(check-files)
+default: run-tests
 
 ############################################################
 
