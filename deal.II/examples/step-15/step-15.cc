@@ -778,7 +778,14 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
 
 
 
-
+                                 // The next function is again a rather boring
+                                 // one: it does one nonlinear step, by
+                                 // calling the function that assembles the
+                                 // linear system, then solving it, computing
+                                 // a step length, and finally updating the
+                                 // solution vector. This should all be mostly
+                                 // self-explanatory, given that we have shown
+                                 // the solution of a linear system before.
 template <int dim>
 void MinimizationProblem<dim>::do_step ()
 {          
@@ -799,11 +806,17 @@ void MinimizationProblem<dim>::do_step ()
     hanging_node_constraints.distribute (update);
   }
 
-  present_solution.add (line_search (update), update);
+  const double step_length = line_search (update);
+  present_solution.add (step_length, update);
 }
 
 
 
+                                 // The same holds for the function that
+                                 // outputs the solution in gnuplot format
+                                 // into a file with a name that includes the
+                                 // number of the run we are presently
+                                 // performing.
 template <int dim>
 void
 MinimizationProblem<dim>::output_results () const
@@ -965,7 +978,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 {
   double energy = 0.;
 
-  QGauss3<dim>  quadrature_formula;
+  QGauss4<dim>  quadrature_formula;
   FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
