@@ -23,10 +23,9 @@ template <typename number> class Vector;
 
 template <int dim> class DoFHandler;
 
-// note: in non-debug mode, i.e. with optimizations, the file
-// dof_accessor.templates.h is included at the end of this file.
-// this includes a lot of templates and thus makes compilation
-// slower, but at the same time allows for more aggressive
+// note: the file dof_accessor.templates.h is included at the end of
+// this file.  this includes a lot of templates and thus makes
+// compilation slower, but at the same time allows for more aggressive
 // inlining and thus faster code.
 
 
@@ -1262,10 +1261,8 @@ template <> TriaIterator<2, DoFObjectAccessor<1,2> > DoFCellAccessor<2>::face (c
 template <> TriaIterator<3, DoFObjectAccessor<2,3> > DoFCellAccessor<3>::face (const unsigned int i) const;
 
 
-// if in optimized mode: include more templates
-#ifndef DEBUG
-#  include "dof_accessor.templates.h"
-#endif
+// include more templates
+#include "dof_accessor.templates.h"
 
 
 /*----------------------------   dof_iterator.h     ---------------------------*/
