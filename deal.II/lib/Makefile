@@ -45,16 +45,16 @@ ifeq ($(DEAL_II_PETSC_VERSION_MINOR),1)
 else
   xlib-ksp=libpetscksp
 endif
-  xlib.g = $(lib-contrib-petsc-path.g)/$(xlib-ksp).so \
-           $(lib-contrib-petsc-path.g)/libpetscdm.so \
-           $(lib-contrib-petsc-path.g)/libpetscmat.so \
-           $(lib-contrib-petsc-path.g)/libpetscvec.so \
-           $(lib-contrib-petsc-path.g)/libpetsc.so
-  xlib.o = $(lib-contrib-petsc-path.o)/$(xlib-ksp).so \
-           $(lib-contrib-petsc-path.o)/libpetscdm.so \
-           $(lib-contrib-petsc-path.o)/libpetscmat.so \
-           $(lib-contrib-petsc-path.o)/libpetscvec.so \
-           $(lib-contrib-petsc-path.o)/libpetsc.so
+  xlib.g = $(lib-contrib-petsc-path.g)/$(xlib-ksp)$(lib-suffix) \
+           $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix) \
+           $(lib-contrib-petsc-path.g)/libpetscmat$(lib-suffix) \
+           $(lib-contrib-petsc-path.g)/libpetscvec$(lib-suffix) \
+           $(lib-contrib-petsc-path.g)/libpetsc$(lib-suffix)
+  xlib.o = $(lib-contrib-petsc-path.o)/$(xlib-ksp)$(lib-suffix) \
+           $(lib-contrib-petsc-path.o)/libpetscdm$(lib-suffix) \
+           $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
+           $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
+           $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
   external-links-petsc:
 	@echo Setting up libraries for PETSc
 	@echo "======================debug============= Linking library:   libpetsc.g.so"
