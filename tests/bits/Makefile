@@ -104,6 +104,14 @@ hyper_ball_3d.exe       : hyper_ball_3d.g.$(OBJEXT)        $(libraries)
 cylinder.exe            : cylinder.g.$(OBJEXT)             $(libraries)
 coarsening_3d.exe       : coarsening_3d.g.$(OBJEXT)        $(libraries)
 mesh_3d_1.exe           : mesh_3d_1.g.$(OBJEXT)            $(libraries)
+mesh_3d_2.exe           : mesh_3d_2.g.$(OBJEXT)            $(libraries)
+mesh_3d_3.exe           : mesh_3d_3.g.$(OBJEXT)            $(libraries)
+mesh_3d_4.exe           : mesh_3d_4.g.$(OBJEXT)            $(libraries)
+mesh_3d_5.exe           : mesh_3d_5.g.$(OBJEXT)            $(libraries)
+mesh_3d_6.exe           : mesh_3d_6.g.$(OBJEXT)            $(libraries)
+mesh_3d_7.exe           : mesh_3d_7.g.$(OBJEXT)            $(libraries)
+mesh_3d_8.exe           : mesh_3d_8.g.$(OBJEXT)            $(libraries)
+mesh_3d_9.exe           : mesh_3d_9.g.$(OBJEXT)            $(libraries)
 
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
@@ -132,7 +140,9 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	parameter_handler_3 parameter_handler_4 \
 	parameter_handler_5 \
 	sparse_lu_decomposition_1 block_sparse_matrix_1 \
-	hyper_ball_3d cylinder coarsening_3d mesh_3d_1
+	hyper_ball_3d cylinder coarsening_3d \
+	mesh_3d_1 mesh_3d_2 mesh_3d_3 mesh_3d_4 mesh_3d_5 \
+	mesh_3d_6 mesh_3d_7
 
 ############################################################
 
