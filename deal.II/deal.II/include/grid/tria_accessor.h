@@ -66,7 +66,7 @@ class TriaAccessor
 		    tria (parent) {};
 
 
-/**
+				     /**
 				      *  Copy operator. Since this is only
 				      *  called from iterators, do not
 				      *  return anything, since the
@@ -933,7 +933,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     void operator = (const TriaObjectAccessor<1, dim> &);
 
 
-protected:
+  protected:
     
 				     /**@name Advancement of iterators*/
 				     /*@{*/
@@ -1818,7 +1818,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     void clear_refine_flag () const;
 
 
-/**
+				     /**
 				      *  Return whether the coarsen flag
 				      *  is set or not.
 				      */
