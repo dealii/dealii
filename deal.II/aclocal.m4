@@ -3796,8 +3796,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 	  AC_MSG_RESULT($DEAL_II_METIS_DIR)
 
           dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_METIS_DIR/include \
-               -o ! -d $DEAL_II_METIS_DIR/lib ; then
+          if test ! -d $DEAL_II_METIS_DIR/Lib ; then
             AC_MSG_ERROR([The path to Metis specified in the METIS_DIR
 	  		  environment variable does not
  			  point to a complete Metis installation])
