@@ -60,10 +60,10 @@ endif
 
 %.go : %.cc Makefile
 	@echo =====debug========= $<
-	@$(CXX) $(LDFLAGS) -g -c $< -o $@
+	@$(CXX) $(flags) -g -c $< -o $@
 %.o : %.cc Makefile
 	@echo =====optimized===== $<
-	@$(CXX) $(LDFLAGS) -g -c $< -o $@
+	@$(CXX) $(flags) -g -c $< -o $@
 
 
 all: check
@@ -91,7 +91,7 @@ endif
 
 fe_data_test.testcase: $(fe_data_test-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 
@@ -105,7 +105,7 @@ endif
 
 shapes.testcase: $(shapes-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 
@@ -119,7 +119,7 @@ endif
 
 derivatives.testcase: $(derivatives-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 
@@ -160,7 +160,7 @@ endif
 
 mapping.testcase: $(mapping-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 
@@ -174,7 +174,7 @@ endif
 
 mapping_c1.testcase: $(mapping_c1-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 
@@ -188,7 +188,7 @@ endif
 
 internals: $(internals-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 
@@ -202,7 +202,7 @@ endif
 
 performance: $(performance-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 ############################################################
 # Continue with other targets if needed
