@@ -10,7 +10,6 @@
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
 
-#include <math.h>
 #ifndef __lac_dvector_h
 #include <lac/dvector.h>
 #endif
