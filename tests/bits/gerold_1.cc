@@ -11,6 +11,7 @@
 // disabled, since we cannot read the file, and this will not be fixed
 // in the near future.
 
+#include "../tests.h"
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>

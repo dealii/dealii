@@ -1,6 +1,6 @@
 //----------------------------  q_points.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    q_points.cc,v 1.2 2003/10/16 14:18:17 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // basically the same as the mesh_3d_7 test, except that we leave out
 // the complication of mis-oriented faces
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

@@ -1,6 +1,6 @@
 //----------------------------  anna_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    anna_1.cc,v 1.4 2003/07/03 10:31:46 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors and Anna Schneebeli
 //
@@ -21,6 +21,7 @@
 // this program is a modified version of one by Anna Schneebeli,
 // University of Basel
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

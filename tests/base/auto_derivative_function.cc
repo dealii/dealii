@@ -1,6 +1,6 @@
 //----------------------------  polynomial_test.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    auto_derivative_function.cc,v 1.6 2003/04/09 15:49:50 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // finite differencing
 
 
+#include "../tests.h"
 #include <base/point.h>
 #include <base/auto_derivative_function.h>
 #include <base/convergence_table.h>

@@ -1,6 +1,6 @@
 //----------------------------  testmatrix.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    testmatrix.cc,v 1.22 2003/09/09 16:09:15 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  testmatrix.cc  ---------------------------
 
 
+#include "../tests.h"
 #include "testmatrix.h"
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>

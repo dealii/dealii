@@ -1,6 +1,6 @@
 //----------------------------  anisotropic_2.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    anisotropic_2.cc,v 1.3 2003/05/12 22:02:56 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // check AnisotropicPolynomials
 
 
+#include "../tests.h"
 #include <fstream>
 #include <cmath>
 

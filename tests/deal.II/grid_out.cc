@@ -1,6 +1,6 @@
 //----------------------------  constraints.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    grid_out.cc,v 1.4 2003/04/09 15:49:53 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  constraints.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>

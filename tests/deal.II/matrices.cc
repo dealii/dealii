@@ -1,6 +1,6 @@
 //----------------------------  matrices.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    matrices.cc,v 1.9 2003/04/09 15:49:53 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 
 
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <base/function_lib.h>

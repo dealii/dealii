@@ -1,8 +1,9 @@
-// $Id$
+// derivatives.cc,v 1.7 2002/06/26 12:28:54 guido Exp
 // (c) Guido Kanschat
 //
 // Show the shape functions implemented.
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

@@ -1,6 +1,6 @@
 //----------------------------  grid_in_3d.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    grid_in_3d.cc,v 1.2 2003/10/18 19:18:52 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // significant number of cells. this tests Mike's reorienting
 // algorithm
 
+#include "../tests.h"
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>

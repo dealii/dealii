@@ -17,6 +17,7 @@
 // until which they integrate exactly
 
 
+#include "../tests.h"
 #include <iostream>
 #include <fstream>
 

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-// $Id$
-// Version: $Name$
+// filtered_matrix.cc,v 1.7 2003/04/09 15:49:53 wolf Exp
+// Version: 
 //
 // (c) 2001 the deal.II authors
 //
@@ -18,6 +18,7 @@
 
 
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/function_lib.h>
 #include <lac/vector.h>

@@ -1,6 +1,6 @@
 //----------------------------  point_inside_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    point_inside_1.cc,v 1.2 2003/09/24 15:24:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // this program is a modified version of one by Joerg Weimar,
 // TU Braunschweig
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>

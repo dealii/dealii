@@ -1,6 +1,6 @@
 //----------------------------  system_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    system_1.cc,v 1.3 2003/06/09 21:55:00 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -19,6 +19,7 @@
 // that does it's job by calling the respective function in the base
 // elements and then munging the results
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>

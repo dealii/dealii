@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_16.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_16.cc,v 1.1 2003/10/19 22:30:05 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // (distorted or not) should yield a zero vector. (To prove this, use
 // the divergence theorem.)
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

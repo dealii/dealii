@@ -1,6 +1,6 @@
 //----------------------------  block_matrices.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    block_matrices.cc,v 1.16 2003/04/09 15:49:52 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
    a block matrix
 */
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

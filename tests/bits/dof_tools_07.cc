@@ -1,6 +1,6 @@
 //----------------------------  dof_tools_7.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    dof_tools_07.cc,v 1.1 2003/02/16 23:55:56 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //----------------------------  dof_tools_7.cc  ---------------------------
 
+#include "../tests.h"
 #include "dof_tools_common.cc"
 
 // check

@@ -1,6 +1,6 @@
 //----------------------------  anisotropic_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    anisotropic_1.cc,v 1.4 2003/05/12 22:02:56 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // class happen to be the same for all coordinate directions
 
 
+#include "../tests.h"
 #include <fstream>
 #include <cmath>
 

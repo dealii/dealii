@@ -1,8 +1,9 @@
-// $Id$
+// performance.cc,v 1.6 2002/06/26 12:28:54 guido Exp
 // (c) Guido Kanschat
 //
 // Check performance of finite elements
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

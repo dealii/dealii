@@ -1,4 +1,4 @@
-// $Id$
+// up_and_down.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
 // (c) Wolfgang Bangerth
 //
 // Try something remarkably simple: take some arbitrary (discrete)
@@ -10,6 +10,7 @@
 // composed and vector valued ones, to stress test their embedding and
 // restriction matrices.
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

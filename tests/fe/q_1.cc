@@ -1,6 +1,6 @@
 //----------------------------  q_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    q_1.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // precomputing them for a number of elements and storing them in a
 // table
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_q.h>
 

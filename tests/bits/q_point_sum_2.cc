@@ -18,6 +18,7 @@
 // same as q_point_sum_1, but with different mappings
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

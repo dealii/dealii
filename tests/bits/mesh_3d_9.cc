@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_9.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_9.cc,v 1.1 2003/09/29 14:34:26 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // make sure that each cell has 8 distinct vertices if looking at the
 // vertices of the edges
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

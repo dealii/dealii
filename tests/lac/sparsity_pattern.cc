@@ -1,6 +1,6 @@
-//----------------------------  $RCSfile$  ---------------------------
-//    $Id$
-//    Version: $Name$
+//----------------------------  sparsity_pattern.cc,v  ---------------------------
+//    sparsity_pattern.cc,v 1.9 2003/04/30 23:08:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2001, 2002, 2003 by the deal.II authors
 //
@@ -9,9 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  $RCSfile$  ---------------------------
+//----------------------------  sparsity_pattern.cc,v  ---------------------------
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/sparsity_pattern.h>
 #include "testmatrix.h"

@@ -1,6 +1,6 @@
 //----------------------------  rt_5.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    rt_5.cc,v 1.1 2003/06/09 15:59:07 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // Just output the restriction matrices of the RT element
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_raviart_thomas.h>
 

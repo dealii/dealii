@@ -1,6 +1,6 @@
 //----------------------------  data_out_faces_02.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    data_out_faces_02.cc,v 1.1 2003/04/03 23:22:14 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -13,6 +13,7 @@
 
 // same as the the test with number _01, but check for block vectors
 
+#include "../tests.h"
 #include "data_out_common.cc"
 #include <lac/sparsity_pattern.h>
 #include <numerics/data_out_faces.h>

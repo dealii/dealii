@@ -1,6 +1,6 @@
 //----------------------------  dof_test.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    dof_test.cc,v 1.27 2003/07/03 10:31:47 guido Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  dof_test.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

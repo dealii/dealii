@@ -1,6 +1,6 @@
 //----------------------------  dof_tools_common.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    dof_tools_common.cc,v 1.3 2003/02/24 15:48:02 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // common framework for the various dof_tools_*.cc tests
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>

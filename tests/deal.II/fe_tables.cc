@@ -1,6 +1,6 @@
 //----------------------------  fe_tables.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    fe_tables.cc,v 1.22 2003/04/09 15:49:52 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  fe_tables.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <base/exceptions.h>
 #include <base/point.h>
 #include <lac/vector.h>

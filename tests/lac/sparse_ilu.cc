@@ -1,6 +1,6 @@
 //----------------------------  sparse_ilu.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    sparse_ilu.cc,v 1.10 2003/04/30 23:08:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2001, 2002, 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // make sure that the SparseILU applied with infinite fill-in
 // generates the exact inverse matrix
 
+#include "../tests.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

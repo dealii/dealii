@@ -22,6 +22,7 @@
 // this used to fail in 3d, since there were assumptions on face
 // orientations present that had to be weeded out
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

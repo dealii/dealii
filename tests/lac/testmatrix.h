@@ -1,5 +1,6 @@
 // testmatrix.h,v 1.15 2002/10/03 22:41:22 wolf Exp
 
+#include "../tests.h"
 #include <base/exceptions.h>
 #include <iostream>
 

@@ -1,9 +1,10 @@
-/* $Id$ */
+/* intergrid_map.cc,v 1.6 2003/04/09 15:49:53 wolf Exp */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 /* 
    Purpose: check some things with the intergrid map
 */
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

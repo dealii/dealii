@@ -1,6 +1,6 @@
 //----------------------------  coarsening_3d.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    coarsening_3d.cc,v 1.13 2003/09/29 21:35:22 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // this test failed with an internal error somewhere in the coarsening
 // functions
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

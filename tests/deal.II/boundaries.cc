@@ -1,6 +1,6 @@
 //----------------------------  boundaries.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    boundaries.cc,v 1.6 2003/04/29 19:35:32 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function_lib.h>
 #include <base/quadrature_lib.h>

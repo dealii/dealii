@@ -1,6 +1,6 @@
 //----------------------------  support_point_map.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    support_point_map.cc,v 1.6 2003/04/09 15:49:54 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
    map_support_points_to_dofs functions.                     */
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function_lib.h>
 #include <lac/vector.h>

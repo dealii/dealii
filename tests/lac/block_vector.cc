@@ -12,6 +12,7 @@
 //--------------------------------------------------------------------
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/block_sparse_matrix.h>

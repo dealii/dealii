@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_8.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_8.cc,v 1.2 2003/09/29 15:16:48 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // non-standard case when refining the mesh. thus make sure that each
 // edge only appears once in the list of edges of every cell.
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

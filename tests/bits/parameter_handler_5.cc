@@ -1,6 +1,6 @@
 //----------------------------  parameter_handler_5.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    parameter_handler_5.cc,v 1.1 2003/09/03 15:54:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // ParameterHandler::declare_entry did not allow to redeclare an
 // entry. make sure this works now
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/parameter_handler.h>
 #include <fstream>

@@ -1,6 +1,6 @@
 //----------------------------  derivative_approximation.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    derivative_approximation.cc,v 1.7 2001/07/19 07:24:00 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function_lib.h>
 #include <lac/vector.h>

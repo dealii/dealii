@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_14.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_14.cc,v 1.1 2003/10/16 14:16:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // correct. it is thus also similar to mesh_3d_7, but checks for faces
 // and subfaces
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

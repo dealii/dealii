@@ -1,6 +1,6 @@
 //----------------------------  non_primitive_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    non_primitive_1.cc,v 1.6 2003/04/21 07:31:15 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2001, 2002, 2003 by the deal.II authors
 //
@@ -20,6 +20,7 @@
 // and compare again whether the matrices are the same
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <lac/sparse_matrix.h>

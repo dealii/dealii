@@ -19,6 +19,7 @@
 // it was fixed around 203-05-22
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/smartpointer.h>
 #include <lac/sparse_ilu.h>

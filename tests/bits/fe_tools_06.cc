@@ -1,6 +1,6 @@
 //----------------------------  fe_tools_06.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    fe_tools_06.cc,v 1.1 2003/02/24 15:48:04 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //----------------------------  fe_tools_06.cc  ---------------------------
 
+#include "../tests.h"
 #include "fe_tools_common.cc"
 #include <lac/sparsity_pattern.h>
 

@@ -1,6 +1,6 @@
 //----------------------------  grid_in.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    grid_in.cc,v 1.6 2003/09/23 21:42:44 mike Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  grid_in.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -13,6 +13,7 @@
 
 // Test the cell matrices generated in FETools.
 
+#include "../tests.h"
 #include <iostream>
 #include <fstream>
 

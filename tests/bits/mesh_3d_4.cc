@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_4.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_4.cc,v 1.2 2003/10/16 14:18:17 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // check that face orientation flags are properly inherited by
 // counting them
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

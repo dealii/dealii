@@ -1,6 +1,6 @@
 //----------------------------  find_cell_2.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    find_cell_2.cc,v 1.2 2003/10/30 17:20:51 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // same as find_cell_2_1, but in 3d
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>

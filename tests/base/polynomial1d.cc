@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    polynomial1d.cc,v 1.19 2003/12/16 11:29:21 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // 1d-polynomials, to make sure that all changes we make to these classes
 // do not change the results of these classes.
 
+#include "../tests.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>

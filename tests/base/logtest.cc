@@ -1,6 +1,6 @@
 //----------------------------  logtest.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    logtest.cc,v 1.10 2003/01/08 17:58:17 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // popping levels, etc
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
 #include <iostream>

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    bdm.cc,v 1.1 2004/01/04 19:07:59 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 
+#include "../tests.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>

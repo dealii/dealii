@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_5.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_5.cc,v 1.2 2003/10/16 14:18:17 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // check that face orientation flags are properly inherited by
 // looking at them and checking their children
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

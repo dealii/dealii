@@ -1,6 +1,6 @@
 //----------------------------  parameter_handler_2.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    parameter_handler_2.cc,v 1.1 2003/05/06 16:06:33 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors and Brent Bayley
 //
@@ -15,6 +15,7 @@
 // check the Patterns::List pattern. this particular test failed at
 // one point in time with an assertion due to a pretty stupid bug.
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/parameter_handler.h>
 #include <fstream>

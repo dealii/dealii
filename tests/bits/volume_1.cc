@@ -1,6 +1,6 @@
 //----------------------------  volume_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    volume_1.cc,v 1.1 2003/10/19 22:29:39 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // \vec x times the normal over the surface of any body should yield
 // the volume of this body times the space dimension
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

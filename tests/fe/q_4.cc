@@ -1,6 +1,6 @@
 //----------------------------  q_4.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    q_4.cc,v 1.1 2003/05/08 14:54:41 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // finite elements do that themselves, if they can. make sure the
 // result doesn't change
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_q.h>
 #include <fe/fe_tools.h>

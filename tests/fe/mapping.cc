@@ -1,8 +1,9 @@
-// $Id$
+// mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
 // Copyright (C) 2001, 2002, 2003, 2004 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

@@ -1,7 +1,8 @@
-// $Id$
+// mapping_q1_eulerian.cc,v 1.3 2002/06/26 12:28:54 guido Exp
 // Copyright (C) 2001, 2002 Michael Stadler, Wolfgang Bangerth
 //
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

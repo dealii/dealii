@@ -1,9 +1,10 @@
-// $Id$
+// mapping_c1.cc,v 1.5 2003/04/09 15:49:55 wolf Exp
 // Copyright (C) 2001, 2003 Wolfgang Bangerth
 //
 // Test the continuity of normal vectors at vertices, and thus the
 // C1-ness of the C1-mapping
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

@@ -1,6 +1,6 @@
 //----------------------------  find_cell_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    find_cell_1.cc,v 1.2 2003/10/30 17:20:51 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // take a 2d mesh and check that we can find an arbitrary point's cell
 // in it
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>

@@ -1,6 +1,6 @@
 //----------------------------  sparsity_pattern.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    sparsity_pattern.cc,v 1.3 2003/04/09 15:49:53 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // via the CompressedSparsityPattern result in the same
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>

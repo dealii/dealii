@@ -1,6 +1,6 @@
 //----------------------------  mapping_cartesian_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mapping_cartesian_1.cc,v 1.1 2003/10/19 22:29:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // of the quadrature points array to initialize something else. this
 // yielded a wrong result and after factoring out some code an abort
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

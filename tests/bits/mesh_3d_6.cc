@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_6.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_6.cc,v 1.2 2003/09/29 15:16:48 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // and check on all faces that if we look from both sides that normal
 // vectors point in opposite directions
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

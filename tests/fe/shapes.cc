@@ -1,8 +1,9 @@
-// $Id$
+// shapes.cc,v 1.18 2003/04/09 15:49:55 wolf Exp
 // (c) Guido Kanschat
 //
 // Show the shape functions implemented.
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

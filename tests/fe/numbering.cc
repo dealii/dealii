@@ -1,10 +1,11 @@
-// $Id$
+// numbering.cc,v 1.3 2003/04/21 16:22:31 wolf Exp
 // Author: Wolfgang Bangerth, 2001
 //
 // Check the numbering of continuous Lagrange finite elements. it
 // constructs and independent numbering and compares it with the
 // result of two functions from the library
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_q.h>
 #include <fe/fe_tools.h>

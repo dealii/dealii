@@ -1,6 +1,6 @@
 //----------------------------  full_matrix_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    full_matrix_1.cc,v 1.2 2003/09/24 15:24:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // FullMatrix::copy_from could not be compiled if we copied from a
 // sparse matrix. make sure this now works
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>
 #include <lac/full_matrix.h>

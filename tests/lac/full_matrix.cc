@@ -1,6 +1,6 @@
-//----------------------------  $RCSfile$  ---------------------------
-//    $Id$
-//    Version: $Name$
+//----------------------------  full_matrix.cc,v  ---------------------------
+//    full_matrix.cc,v 1.12 2003/07/18 12:16:47 guido Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -9,9 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  $RCSfile$  ---------------------------
+//----------------------------  full_matrix.cc,v  ---------------------------
 
 
+#include "../tests.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

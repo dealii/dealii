@@ -17,6 +17,7 @@
 // this program is a modified version of one by Anna Schneebeli,
 // University of Basel
 
+#include "../tests.h"
 #include <base/function.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

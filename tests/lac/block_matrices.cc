@@ -1,6 +1,6 @@
 //----------------------------  block_matrices.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    block_matrices.cc,v 1.15 2003/04/30 23:08:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  block_matrices.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/block_sparse_matrix.h>

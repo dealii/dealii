@@ -1,9 +1,10 @@
-/* $Id$ */
+/* intergrid_constraints.cc,v 1.9 2003/07/03 10:31:47 guido Exp */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 /* 
    Purpose: check some things with the intergrid map
 */
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

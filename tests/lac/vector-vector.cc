@@ -1,6 +1,6 @@
 //----------------------------  solver.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    vector-vector.cc,v 1.9 2003/04/30 23:08:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  solver.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <cmath>

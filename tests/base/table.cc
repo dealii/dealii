@@ -1,6 +1,6 @@
-//----------------------------  $RCSfile$  ---------------------------
-//    $Id$
-//    Version: $Name$
+//----------------------------  table.cc,v  ---------------------------
+//    table.cc,v 1.5 2003/04/09 15:49:50 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -9,11 +9,12 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  $RCSfile$  ---------------------------
+//----------------------------  table.cc,v  ---------------------------
 
 // check equivalence of operator[] and operator() on table objects
 
 
+#include "../tests.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

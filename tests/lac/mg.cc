@@ -1,6 +1,6 @@
 //----------------------------  mg.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mg.cc,v 1.23 2003/01/08 17:58:21 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  mg.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

@@ -1,6 +1,6 @@
 //----------------------------  rt_3.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    rt_3.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // Just output the constraint matrices of the RT element
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_raviart_thomas.h>
 

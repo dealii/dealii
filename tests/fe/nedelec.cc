@@ -1,10 +1,11 @@
-// $Id$
+// nedelec.cc,v 1.5 2003/04/21 16:22:48 wolf Exp
 // (c) Wolfgang Bangerth
 //
 // Show the shape functions of the Nedelec element on a grid with only
 // one cell. This cell is rotated, stretched, scaled, etc, and on each
 // of these cells each time we evaluate the shape functions.
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

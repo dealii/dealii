@@ -1,6 +1,6 @@
 //----------------------------  show_transfer.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    transfer.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 //
 //----------------------------  show_transfer.cc  ---------------------------
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>

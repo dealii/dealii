@@ -1,6 +1,6 @@
 //----------------------------  dof_tools_14.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    dof_tools_14.cc,v 1.1 2003/02/18 20:01:36 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //----------------------------  dof_tools_14.cc  ---------------------------
 
+#include "../tests.h"
 #include "dof_tools_common.cc"
 #include <lac/vector.h>
 

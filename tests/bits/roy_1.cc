@@ -1,6 +1,6 @@
 //----------------------------  roy_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    roy_1.cc,v 1.5 2003/09/24 15:24:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // this program is a modified version of one by Roy Stogner, 
 // University of Texas at Austin
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>

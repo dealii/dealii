@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    eigen.cc,v 1.5 2003/04/30 23:08:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //--------------------------------------------------------------------
 
 
+#include "../tests.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

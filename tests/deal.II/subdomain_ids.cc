@@ -1,6 +1,6 @@
 //----------------------------  subdomain_ids.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    subdomain_ids.cc,v 1.7 2003/04/09 15:49:54 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2001, 2002, 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 // check some things about subdomain_ids
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

@@ -1,6 +1,6 @@
 //----------------------------  gradients.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    gradients.cc,v 1.18 2003/04/09 15:49:53 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  gradients.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_handler.h>

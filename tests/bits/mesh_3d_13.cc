@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_13.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_13.cc,v 1.1 2003/10/16 14:16:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -19,6 +19,7 @@
 // were also considering the orientation flag of the present cell,
 // which we shouldn't have
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_12.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_12.cc,v 1.2 2003/10/16 14:16:40 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // refinements here to reduce run time; it is not limited there to the
 // same degree)
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

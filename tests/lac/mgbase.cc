@@ -1,6 +1,6 @@
 //----------------------------  mgbase.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mgbase.cc,v 1.13 2003/01/08 17:58:21 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  mgbase.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_smoother.h>
 #include <base/logstream.h>

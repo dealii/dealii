@@ -1,8 +1,9 @@
-// $Id$
+// internals.cc,v 1.12 2003/04/09 15:49:55 wolf Exp
 // (c) Guido Kanschat
 //
 // Compute support points
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

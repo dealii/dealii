@@ -1,9 +1,10 @@
-// $Id$
+// nedelec_3.cc,v 1.2 2003/04/09 15:49:55 wolf Exp
 // (c) Wolfgang Bangerth
 //
 // Some more tests with the Nedelec element, this time checking
 // whether embedding matrices work correctly
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

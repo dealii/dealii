@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_7.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_7.cc,v 1.3 2003/09/29 21:35:23 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // check that face orientation flags work by looping over all cells
 // and check on all faces that quadrature points match up
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

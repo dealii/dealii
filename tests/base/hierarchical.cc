@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    hierarchical.cc,v 1.2 2003/05/12 22:02:56 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // functions at equidistant points. (I needed this output at one point
 // in time, so why not make it a testcase -- WB)
 
+#include "../tests.h"
 #include <fstream>
 #include <cmath>
 

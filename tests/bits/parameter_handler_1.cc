@@ -1,6 +1,6 @@
 //----------------------------  parameter_handler_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    parameter_handler_1.cc,v 1.4 2003/05/06 15:50:55 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // check the Patterns::List pattern
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/parameter_handler.h>
 #include <fstream>

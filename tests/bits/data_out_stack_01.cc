@@ -1,6 +1,6 @@
 //----------------------------  data_out_stack_01.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    data_out_stack_01.cc,v 1.1 2003/03/03 15:24:15 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //----------------------------  data_out_stack_01.cc  ---------------------------
 
+#include "../tests.h"
 #include "data_out_common.cc"
 #include <lac/sparsity_pattern.h>
 #include <numerics/data_out_stack.h>

@@ -1,6 +1,6 @@
 //----------------------------  q_point_sum_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    q_point_sum_1.cc,v 1.1 2003/10/19 22:29:39 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // integrating \vec x over the surface of the [-1,1] hypercube and
 // hyperball in 2d and 3d should yield zero
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

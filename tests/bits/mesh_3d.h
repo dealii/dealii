@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d.h  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d.h,v 1.1 2003/09/28 14:27:33 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // match up for the standard orientation of the normals. we thus have
 // to store the face orientation in each cell
 
+#include "../tests.h"
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>

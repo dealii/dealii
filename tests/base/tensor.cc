@@ -1,6 +1,6 @@
 //----------------------------  tensor.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    tensor.cc,v 1.17 2003/04/09 15:49:50 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  tensor.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <base/tensor.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

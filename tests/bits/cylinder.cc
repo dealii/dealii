@@ -1,6 +1,6 @@
 //----------------------------  cylinder.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    cylinder.cc,v 1.1 2003/08/06 14:12:24 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // GridReordering class which would have cured the problem.
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>

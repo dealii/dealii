@@ -1,6 +1,6 @@
 //----------------------------  rt_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    rt_1.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // Show the shape functions of the Raviart-Thomas element on the unit cell
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_raviart_thomas.h>
 

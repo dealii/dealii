@@ -1,8 +1,8 @@
-/* $Id$ */
+/* fe_tools_test.cc,v 1.6 2003/04/09 15:49:54 wolf Exp */
 /* Author: Ralf Hartmann, University of Heidelberg, 1999 */
 
-/*    $Id$       */
-/*    Version: $Name$                                          */
+/*    fe_tools_test.cc,v 1.6 2003/04/09 15:49:54 wolf Exp       */
+/*    Version:                                           */
 /*                                                                */
 /*    Copyright (C) 1999, 2000, 2001, 2002, 2003 by the deal.II authors */
 /*                                                                */
@@ -12,6 +12,7 @@
 /*    further information on this license.                        */
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <base/function.h>

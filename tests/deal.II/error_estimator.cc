@@ -1,6 +1,6 @@
 //----------------------------  derivative_approximation.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    error_estimator.cc,v 1.6 2003/04/29 19:36:05 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function_lib.h>
 #include <base/quadrature_lib.h>

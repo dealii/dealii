@@ -1,10 +1,11 @@
-// $Id$
+// nedelec_2.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
 // (c) Wolfgang Bangerth
 //
 // Some more tests with the Nedelec element, basically using
 // multi-element triangulations and check whether interface conditions
 // are ok
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

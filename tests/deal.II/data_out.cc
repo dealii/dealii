@@ -1,6 +1,6 @@
 //----------------------------  data_out.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    data_out.cc,v 1.12 2003/04/09 15:49:52 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 /* adapted from step-4. */
 
 
+#include "../tests.h"
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>

@@ -1,6 +1,6 @@
 //----------------------------  solver.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    solver.cc,v 1.33 2003/05/30 19:19:16 guido Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  solver.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

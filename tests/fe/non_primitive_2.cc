@@ -1,6 +1,6 @@
 //----------------------------  non_primitive_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    non_primitive_2.cc,v 1.5 2003/04/21 07:31:15 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2001, 2002, 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // of course, it makes absolutely no sense to work the Stokes equation
 // with a Nedelec element, but this is just to test the library, no?
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <lac/sparse_matrix.h>

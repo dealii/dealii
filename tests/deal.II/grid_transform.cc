@@ -1,6 +1,6 @@
 //----------------------------  grid_transform.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    grid_transform.cc,v 1.6 2003/04/23 15:55:28 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -13,6 +13,7 @@
 
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>

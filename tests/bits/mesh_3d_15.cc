@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_15.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_15.cc,v 1.2 2003/12/15 14:25:00 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // call the tria accessors, and this way we catch both cases at the
 // same time
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

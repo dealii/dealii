@@ -1,6 +1,6 @@
 //----------------------------  q_point_sum_4.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    q_point_sum_4.cc,v 1.1 2003/10/19 22:29:39 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -18,6 +18,7 @@
 // same as q_point_sum_1, but with a Cartesian mapping
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

@@ -1,6 +1,6 @@
 //----------------------------  geometry_info_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    geometry_info_1.cc,v 1.2 2003/09/24 15:24:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // check GeometryInfo::cell_to_child and back
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/geometry_info.h>
 

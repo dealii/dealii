@@ -13,6 +13,7 @@
 
 //TODO:[WB] Figure out why postscript output changes output-precision.
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria_boundary_lib.h>
 #include <numerics/time_dependent.h>

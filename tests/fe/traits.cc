@@ -1,6 +1,6 @@
 //----------------------------  fe_traits_test.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    traits.cc,v 1.2 2004/01/23 16:34:24 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  fe_traits_test.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <iostream>
 #include <fstream>
 

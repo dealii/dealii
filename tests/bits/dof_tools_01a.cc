@@ -1,6 +1,6 @@
 //----------------------------  dof_tools_1a.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    dof_tools_01a.cc,v 1.1 2003/02/16 23:55:54 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //----------------------------  dof_tools_1a.cc  ---------------------------
 
+#include "../tests.h"
 #include "dof_tools_common.cc"
 #include <lac/sparsity_pattern.h>
 

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-// $Id$
-// Version: $Name$
+// derivatives.cc,v 1.9 2002/06/26 12:28:53 guido Exp
+// Version: 
 //
 // (c) 2001 the deal.II authors
 //
@@ -24,6 +24,7 @@
 const bool errors = false;
 
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/function_lib.h>
 #include <lac/vector.h>

@@ -16,6 +16,7 @@
 // arguments
 
 
+#include "../tests.h"
 #include <fstream>
 
 #include <base/logstream.h>

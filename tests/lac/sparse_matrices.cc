@@ -1,6 +1,6 @@
 //----------------------------  testmatrix.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    sparse_matrices.cc,v 1.21 2003/09/09 16:09:15 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2002, 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 //TODO: [GK] Produce some useful output!
 
+#include "../tests.h"
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>

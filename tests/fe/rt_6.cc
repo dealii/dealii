@@ -1,6 +1,6 @@
 //----------------------------  rt_6.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    rt_6.cc,v 1.1 2003/06/09 15:59:07 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -13,6 +13,7 @@
 
 // adaptation of up_and_down for RT elements
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

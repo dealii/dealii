@@ -1,6 +1,6 @@
 //----------------------------  denis_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    denis_1.cc,v 1.5 2003/09/24 15:24:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -21,6 +21,7 @@
 // Denis Danilov <danilovdenis@yandex.ru>, 
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function.h>
 #include <lac/vector.h>

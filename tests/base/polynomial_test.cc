@@ -1,6 +1,6 @@
 //----------------------------  polynomial_test.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    polynomial_test.cc,v 1.27 2003/05/12 22:02:56 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -17,6 +17,7 @@
 // do not change the results of these classes.
 
 
+#include "../tests.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>

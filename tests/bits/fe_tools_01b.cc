@@ -1,6 +1,6 @@
 //----------------------------  fe_tools_01b.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    fe_tools_01b.cc,v 1.1 2003/02/24 15:48:02 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // common framework for the various dof_tools_*.cc tests
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>

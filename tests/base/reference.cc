@@ -17,6 +17,7 @@
 // other tests.
 
 
+#include "../tests.h"
 #include <fstream>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>

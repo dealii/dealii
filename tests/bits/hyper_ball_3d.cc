@@ -1,6 +1,6 @@
 //----------------------------  hyper_ball_3d.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    hyper_ball_3d.cc,v 1.1 2003/08/06 14:12:24 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -20,6 +20,7 @@
 // leading to more external faces than one originally wanted
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>

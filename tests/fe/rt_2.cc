@@ -1,6 +1,6 @@
 //----------------------------  rt_2.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    rt_2.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // and on each of these cells each time we evaluate the shape
 // functions.
 
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

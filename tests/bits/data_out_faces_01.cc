@@ -1,6 +1,6 @@
 //----------------------------  data_out_faces_01.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    data_out_faces_01.cc,v 1.4 2003/02/27 16:31:35 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -11,6 +11,7 @@
 //
 //----------------------------  data_out_faces_01.cc  ---------------------------
 
+#include "../tests.h"
 #include "data_out_common.cc"
 #include <lac/sparsity_pattern.h>
 #include <numerics/data_out_faces.h>

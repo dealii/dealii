@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    block_vector_iterator.cc,v 1.5 2003/04/09 15:49:56 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //--------------------------------------------------------------------
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/block_vector.h>
 #include <fstream>

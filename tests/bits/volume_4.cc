@@ -1,6 +1,6 @@
 //----------------------------  volume_4.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    volume_4.cc,v 1.1 2003/10/19 22:29:39 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -19,6 +19,7 @@
 // in contrast to volume_1, do this with a cartesian mapping
 // associated with the geometry
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <grid/tria.h>

@@ -1,6 +1,6 @@
 //----------------------------  block_sparse_matrix_1.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    block_sparse_matrix_1.cc,v 1.1 2003/06/03 14:50:47 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors and Brian Carnes
 //
@@ -13,6 +13,7 @@
 
 // test by Brian: check some of the scaling operations on matrices
 
+#include "../tests.h"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>

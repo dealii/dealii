@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_2.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_2.cc,v 1.2 2003/10/16 14:18:17 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -20,6 +20,7 @@
 // this test just checks that such a mesh can be created. further
 // tests check that we are still producing consistent states with this
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

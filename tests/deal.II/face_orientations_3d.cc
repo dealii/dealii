@@ -1,6 +1,6 @@
 //----------------------------  face_orientations_3d.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    face_orientations_3d.cc,v 1.1 2003/10/18 19:18:26 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2002, 2003 by the deal.II authors
 //
@@ -15,6 +15,7 @@
 // just like grid_in_3d, but count the number of misoriented faces in
 // the meshes that can be oriented
 
+#include "../tests.h"
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>

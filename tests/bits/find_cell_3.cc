@@ -1,6 +1,6 @@
 //----------------------------  find_cell_3.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    find_cell_3.cc,v 1.2 2003/10/30 17:20:51 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -14,6 +14,7 @@
 
 // like find_cell_2, but with the strange meshes from the mesh_3d_* tests
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

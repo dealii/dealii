@@ -1,6 +1,6 @@
 //----------------------------  timer.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    timer.cc,v 1.11 2004/02/04 16:12:25 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
@@ -12,6 +12,7 @@
 //----------------------------  timer.cc  ---------------------------
 
 
+#include "../tests.h"
 #include <base/timer.h>
 #include <base/logstream.h>
 #include <fstream>

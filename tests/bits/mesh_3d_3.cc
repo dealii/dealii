@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_3.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_3.cc,v 1.1 2003/09/28 14:27:33 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -19,6 +19,7 @@
 //
 // for this grid, check that vertex numbers still match up
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>

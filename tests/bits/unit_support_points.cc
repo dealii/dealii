@@ -1,6 +1,6 @@
 //----------------------------  unit_support_points.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    unit_support_points.cc,v 1.4 2003/09/24 15:24:58 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -16,6 +16,7 @@
 // unit_support_point(), as well as the case where an element does not
 // have support points
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_system.h>		
 #include <fe/fe_q.h>

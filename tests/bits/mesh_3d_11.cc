@@ -1,6 +1,6 @@
 //----------------------------  mesh_3d_11.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    mesh_3d_11.cc,v 1.1 2003/09/30 14:45:51 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2003 by the deal.II authors
 //
@@ -19,6 +19,7 @@
 // also check that not only the neighborship is correctly set, but
 // that they indeed share a common face
 
+#include "../tests.h"
 #include "mesh_3d.h"
 
 #include <base/logstream.h>
