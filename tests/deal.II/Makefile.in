@@ -141,7 +141,7 @@ endif
 
 data_out.testcase: $(data_out-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
+	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
 
 
 ############################################################
