@@ -31,6 +31,16 @@ Function<dim>::~Function ()
 {}
 
 
+
+template <int dim>
+Function<dim> & Function<dim>::operator= (const Function &f)
+{
+  Assert (n_components == f.n_components,
+          ExcNumberOfComponents(n_components,f.n_components));
+  return *this;
+}
+
+
 template <int dim>
 double Function<dim>::value (const Point<dim> &,
 			     const unsigned int) const

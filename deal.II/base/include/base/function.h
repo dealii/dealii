@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -158,6 +158,20 @@ class Function : public FunctionTime,
       = 0
 #endif
     ;
+
+                                     /**
+                                      * Assignment operator. This is
+                                      * here only so that you can have
+                                      * objects of derived classes in
+                                      * containers, or assign them
+                                      * otherwise. It will raise an
+                                      * exception if the object from
+                                      * which you assign has a
+                                      * different number of components
+                                      * than the one being assigned
+                                      * to.
+                                      */
+    Function & operator= (const Function &f);
     
 				     /**
 				      * Return the value of the
@@ -311,6 +325,16 @@ class Function : public FunctionTime,
 				      * value.
 				      */
     unsigned int memory_consumption () const;
+
+                                     /**
+                                      * Exception
+                                      */
+    DeclException2 (ExcNumberOfComponents,
+                    int, int,
+                    << "You can only assign function objects with the same "
+                    << "number of components. However, here the left operand "
+                    << "has " << arg1 << " components, and the right operand "
+                    << arg2 << " components.");
 };
 
 

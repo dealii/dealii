@@ -283,6 +283,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The <code class="class">Function</code> class now has an assignment
+       operator. This way, you can put function objects into
+       containers. However, the assignment operator makes sure that only
+       objects can be assigned that have the same number of vector components.
+       <br>
+       (WB 2003/02/06)
+       </p>
+
+  <li> <p> 
        Fixed: The <code class="class">PosixThreadManager</code> called
        its <code class="member">wait</code> function in the
        destructor. If this had been called before already, then the
