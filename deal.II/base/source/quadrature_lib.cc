@@ -287,6 +287,21 @@ QMidpoint<1>::QMidpoint () :
 
 
 template <>
+QTrapez<1>::QTrapez () :
+		Quadrature<1> (2)
+{
+  static const double xpts[] = { 0.0, 1.0 };
+  static const double wts[]  = { 0.5, 0.5 };
+
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
+    };
+};
+
+
+template <>
 QSimpson<1>::QSimpson () :
 		Quadrature<1> (3)
 {
@@ -302,11 +317,11 @@ QSimpson<1>::QSimpson () :
 
 
 template <>
-QTrapez<1>::QTrapez () :
-		Quadrature<1> (2)
+QMilne<1>::QMilne () :
+		Quadrature<1> (5)
 {
-  static const double xpts[] = { 0.0, 1.0 };
-  static const double wts[]  = { 0.5, 0.5 };
+  static const double xpts[] = { 0.0, .25, .5, .75, 1.0 };
+  static const double wts[]  = { 7./90., 32./90., 12./90., 32./90., 7./90. };
 
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
@@ -314,6 +329,24 @@ QTrapez<1>::QTrapez () :
       weights[i] = wts[i];
     };
 };
+
+
+template <>
+QWeddle<1>::QWeddle () :
+		Quadrature<1> (7)
+{
+  static const double xpts[] = { 0.0, 1./6., 1./3., .5, 2./3., 5./6., 1.0 };
+  static const double wts[]  = { 41./840., 216./840., 27./840., 272./840.,
+				 27./840., 216./840., 41./840.
+  };
+
+  for (unsigned int i=0; i<n_quadrature_points; ++i) 
+    {
+      quadrature_points[i] = Point<1>(xpts[i]);
+      weights[i] = wts[i];
+    };
+};
+
 
 
 // construct the quadrature formulae in higher dimensions by
@@ -369,8 +402,10 @@ template class QGauss6<2>;
 template class QGauss7<2>;
 template class QGauss8<2>;
 template class QMidpoint<2>;
-template class QSimpson<2>;
 template class QTrapez<2>;
+template class QSimpson<2>;
+template class QMilne<2>;
+template class QWeddle<2>;
 
 template class QGauss2<3>;
 template class QGauss3<3>;
@@ -380,5 +415,7 @@ template class QGauss6<3>;
 template class QGauss7<3>;
 template class QGauss8<3>;
 template class QMidpoint<3>;
-template class QSimpson<3>;
 template class QTrapez<3>;
+template class QSimpson<3>;
+template class QMilne<3>;
+template class QWeddle<3>;
