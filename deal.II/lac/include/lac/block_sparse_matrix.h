@@ -23,11 +23,199 @@
 
 template <typename> class Vector;
 template <typename> class BlockVector;
+template <typename> class BlockSparseMatrix;
 
 
 /*! @addtogroup Matrix1
  *@{
  */
+
+
+namespace internal
+{
+
+/**
+ * Namespace in which iterators in block matrices are implemented.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+  namespace BlockMatrixIterators
+  {
+    template <typename> class ConstIterator;
+    
+    				     /**
+				      * Accessor class for iterators
+				      */
+    template <typename number>
+    class Accessor
+    {
+      public:
+                                         /**
+                                          * Typedef the value type of the
+                                          * matrix we point into.
+                                          */
+        typedef
+        typename BlockSparseMatrix<number>::value_type
+        value_type;
+        
+					 /**
+					  * Constructor. Since we use
+					  * accessors only for read
+					  * access, a const matrix
+					  * pointer is sufficient.
+					  */
+	Accessor (const BlockSparseMatrix<number> *m,
+		  const unsigned int               row,
+		  const unsigned int               index);
+	
+					 /**
+					  * Row number of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int row() const;
+	
+					 /**
+					  * Index in row of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int index() const;
+	
+					 /**
+					  * Column number of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int column() const;
+	
+					 /**
+					  * Value of this matrix entry.
+					  */
+	value_type value() const;
+
+					 /**
+					  * Block row of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int block_row() const;
+	
+					 /**
+					  * Block column of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int block_column() const;
+	
+      protected:
+					 /**
+					  * The matrix accessed.
+					  */
+	const BlockSparseMatrix<number>* matrix;
+	
+					 /**
+					  * Iterator of the underlying matrix
+					  * class.
+					  */
+	typename
+        BlockSparseMatrix<number>::BlockType::const_iterator
+        base_iterator;
+	
+					 /**
+					  * Number of block where row lies in.
+					  */
+	unsigned int row_block;
+	
+					 /**
+					  * First row of block.
+					  */
+	unsigned int row_start;	
+	
+					 /**
+					  * Number of block column where
+					  * column lies in.
+					  */
+	unsigned int col_block;
+	
+					 /**
+					  * First column of block.
+					  */
+	unsigned int col_start;
+	
+					 /**
+					  * Index in whole row.
+					  */
+	unsigned int a_index;
+
+                                         /**
+                                          * Let the iterator class be a
+                                          * friend.
+                                          */
+        template <typename>
+        friend class ConstIterator;
+    };
+    
+				     /**
+				      * STL conforming iterator.
+				      */
+    template <typename number>
+    class ConstIterator : private Accessor<number>
+    {
+      public:
+                                         /**
+                                          * Constructor.
+                                          */ 
+	ConstIterator(const BlockSparseMatrix<number>*,
+                      const unsigned int row,
+                      const unsigned int   index);
+	  
+                                         /**
+                                          * Prefix increment.
+                                          */
+	ConstIterator& operator++ ();
+
+                                         /**
+                                          * Postfix increment.
+                                          */
+	ConstIterator& operator++ (int);
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor<number> & operator* () const;
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor<number> * operator-> () const;
+
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
+	bool operator == (const ConstIterator&) const;
+                                         /**
+                                          * Inverse of operator==().
+                                          */
+	bool operator != (const ConstIterator&) const;
+
+                                         /**
+                                          * Comparison
+                                          * operator. Result is true
+                                          * if either the first row
+                                          * number is smaller or if
+                                          * the row numbers are
+                                          * equal and the first
+                                          * index is smaller.
+                                          */
+	bool operator < (const ConstIterator&) const;
+    };
+  }
+}
+
 
 /**
  * Blocked sparse matrix. The behaviour of objects of this type is
@@ -66,166 +254,24 @@ template <typename number>
 class BlockSparseMatrix : public Subscriptor
 {
   public:
+                                     /**
+                                      * Typedef the type of the underlying
+                                      * matrix.
+                                      */
+    typedef SparseMatrix<number>    BlockType;
+
 				     /**
 				      * Type of matrix entries. In analogy to
 				      * the STL container classes.
 				      */
-    typedef number value_type;
-
-    class const_iterator;
-    				     /**
-				      * Accessor class for iterators
-				      */
-    class Accessor
-    {
-      public:
-					 /**
-					  * Constructor. Since we use
-					  * accessors only for read
-					  * access, a const matrix
-					  * pointer is sufficient.
-					  */
-	Accessor (const BlockSparseMatrix<number> *m,
-		  const unsigned int               row,
-		  const unsigned short             index);
-	
-					 /**
-					  * Row number of the element
-					  * represented by this
-					  * object.
-					  */
-	unsigned int row() const;
-	
-					 /**
-					  * Index in row of the element
-					  * represented by this
-					  * object.
-					  */
-	unsigned short index() const;
-	
-					 /**
-					  * Column number of the
-					  * element represented by
-					  * this object.
-					  */
-	unsigned int column() const;
-	
-					 /**
-					  * Value of this matrix entry.
-					  */
-	number value() const;
-
-					 /**
-					  * Block row of the
-					  * element represented by
-					  * this object.
-					  */
-	unsigned int block_row() const;
-	
-					 /**
-					  * Block column of the
-					  * element represented by
-					  * this object.
-					  */
-	unsigned int block_column() const;
-	
-      protected:
-					 /**
-					  * The matrix accessed.
-					  */
-	const BlockSparseMatrix<number>* matrix;
-	
-					 /**
-					  * Iterator of the underlying matrix
-					  * class.
-					  */
-	typename SparseMatrix<number>::const_iterator base_iterator;
-	
-					 /**
-					  * Number of block where row lies in.
-					  */
-	unsigned int row_block;
-	
-					 /**
-					  * First row of block.
-					  */
-	unsigned int row_start;	
-	
-					 /**
-					  * Number of block column where
-					  * column lies in.
-					  */
-	unsigned int col_block;
-	
-					 /**
-					  * First column of block.
-					  */
-	unsigned int col_start;
-	
-					 /**
-					  * Index in whole row.
-					  */
-	unsigned int a_index;
-
-	friend class const_iterator;
-    };
-    
-				     /**
-				      * STL conforming iterator.
-				      */
-    class const_iterator : private Accessor
-    {
-      public:
-                                         /**
-                                          * Constructor.
-                                          */ 
-	const_iterator(const BlockSparseMatrix<number>*,
-		       unsigned int row,
-		       unsigned short index);
-	  
-                                         /**
-                                          * Prefix increment.
-                                          */
-	const_iterator& operator++ ();
-
-                                         /**
-                                          * Postfix increment.
-                                          */
-	const_iterator& operator++ (int);
-
-                                         /**
-                                          * Dereferencing operator.
-                                          */
-	const Accessor& operator* () const;
-
-                                         /**
-                                          * Dereferencing operator.
-                                          */
-	const Accessor* operator-> () const;
-
-                                         /**
-                                          * Comparison. True, if
-                                          * both iterators point to
-                                          * the same matrix
-                                          * position.
-                                          */
-	bool operator == (const const_iterator&) const;
-                                         /**
-                                          * Inverse of operator==().
-                                          */
-	bool operator != (const const_iterator&) const;
-
-                                         /**
-                                          * Comparison
-                                          * operator. Result is true
-                                          * if either the first row
-                                          * number is smaller or if
-                                          * the row numbers are
-                                          * equal and the first
-                                          * index is smaller.
-                                          */
-	bool operator < (const const_iterator&) const;
-    };
+    typedef typename BlockType::value_type value_type;
+    typedef value_type             *pointer;
+    typedef const value_type       *const_pointer;
+    typedef internal::BlockMatrixIterators::ConstIterator<number> iterator;
+    typedef internal::BlockMatrixIterators::ConstIterator<number> const_iterator;
+    typedef value_type             &reference;
+    typedef const value_type       &const_reference;
+    typedef size_t                  size_type;
 
 				     /**
 				      * Constructor; initializes the
@@ -333,7 +379,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * Access the block with the
 				      * given coordinates.
 				      */
-    SparseMatrix<number> &
+    BlockType &
     block (const unsigned int row,
 	   const unsigned int column);
     
@@ -343,7 +389,7 @@ class BlockSparseMatrix : public Subscriptor
 				      * given coordinates. Version for
 				      * constant objects.
 				      */
-    const SparseMatrix<number> &
+    const BlockType &
     block (const unsigned int row,
 	   const unsigned int column) const;    
 
@@ -825,12 +871,12 @@ class BlockSparseMatrix : public Subscriptor
 				      * STL-like iterator with the
 				      * first entry of row <tt>r</tt>.
 				      */
-    const_iterator begin (unsigned int r) const;
+    const_iterator begin (const unsigned int r) const;
 
 				     /**
 				      * Final iterator of row <tt>r</tt>.
 				      */
-    const_iterator end (unsigned int r) const;
+    const_iterator end (const unsigned int r) const;
     
 				     /**
 				      * Determine an estimate for the
@@ -885,10 +931,25 @@ class BlockSparseMatrix : public Subscriptor
 				     /**
 				      * Array of sub-matrices.
 				      */
-    Table<2,SmartPointer<SparseMatrix<number> > > sub_objects;
+    Table<2,SmartPointer<BlockType> > sub_objects;
 
+				     /**
+				      * Make the iterator class a
+				      * friend. We have to work around
+				      * a compiler bug here again.
+				      */
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+    template <typename>
+    friend class internal::BlockMatrixIterators::Accessor;
+
+    template <typename>
+    friend class internal::BlockMatrixIterators::ConstIterator;
+#else
+    typedef internal::BlockMatrixIterators::Accessor<number> Accessor;
     friend class Accessor;
+    
     friend class const_iterator;
+#endif
 };
 
 
@@ -896,179 +957,184 @@ class BlockSparseMatrix : public Subscriptor
 /*@}*/
 /* ------------------------- Template functions ---------------------- */
 
-template <typename number>
-inline
-BlockSparseMatrix<number>::Accessor::
-Accessor (const BlockSparseMatrix<number> *matrix,
-          const unsigned int               r,
-          const unsigned short             i)
-		:
-                matrix(matrix),
-                base_iterator(matrix->block(0,0).begin()),
-		row_block(0),
-		row_start(0),
-		col_block(0),
-		col_start(0),
-		a_index(0)
-{
-  Assert (i==0, ExcNotImplemented());
 
-  if (r < matrix->m())
+namespace internal
+{
+  namespace BlockMatrixIterators
+  {
+    template <typename number>
+    inline
+    Accessor<number>::
+    Accessor (const BlockSparseMatrix<number> *matrix,
+              const unsigned int               r,
+              const unsigned int               i)
+                    :
+                    matrix(matrix),
+                    base_iterator(matrix->block(0,0).begin()),
+                    row_block(0),
+                    row_start(0),
+                    col_block(0),
+                    col_start(0),
+                    a_index(0)
     {
-      std::pair<unsigned int,unsigned int> indices
-	= matrix->sparsity_pattern->get_row_indices().global_to_local(r);
-      row_block = indices.first;
-      base_iterator = matrix->block(indices.first, 0).begin(indices.second);
-      row_start = matrix->sparsity_pattern
-		  ->get_row_indices().local_to_global(row_block, 0);
+      Assert (i==0, ExcNotImplemented());
+
+      if (r < matrix->m())
+        {
+          std::pair<unsigned int,unsigned int> indices
+            = matrix->sparsity_pattern->get_row_indices().global_to_local(r);
+          row_block = indices.first;
+          base_iterator = matrix->block(indices.first, 0).begin(indices.second);
+          row_start = matrix->sparsity_pattern
+                      ->get_row_indices().local_to_global(row_block, 0);
+        }
+      else
+        {
+          row_block = matrix->n_block_rows();
+          base_iterator = matrix->block(0, 0).begin();
+        }
     }
-  else
+
+
+    template <typename number>
+    inline
+    unsigned int
+    Accessor<number>::row() const
     {
-      row_block = matrix->n_block_rows();
-      base_iterator = matrix->block(0, 0).begin();
+      return row_start + base_iterator->row();
     }
-}
 
 
-template <typename number>
-inline
-unsigned int
-BlockSparseMatrix<number>::Accessor::row() const
-{
-  return row_start + base_iterator->row();
-}
+    template <typename number>
+    inline
+    unsigned int
+    Accessor<number>::index() const
+    {
+      return a_index;
+    }
 
 
-template <typename number>
-inline
-short unsigned int
-BlockSparseMatrix<number>::Accessor::index() const
-{
-  return a_index;
-}
+    template <typename number>
+    inline
+    unsigned int
+    Accessor<number>::column() const
+    {
+      return col_start + base_iterator->column();
+    }
 
 
-template <typename number>
-inline
-unsigned int
-BlockSparseMatrix<number>::Accessor::column() const
-{
-  return col_start + base_iterator->column();
-}
+    template <typename number>
+    inline
+    unsigned int
+    Accessor<number>::block_row() const
+    {
+      return row_block;
+    }
 
 
-template <typename number>
-inline
-unsigned int
-BlockSparseMatrix<number>::Accessor::block_row() const
-{
-  return row_block;
-}
+    template <typename number>
+    inline
+    unsigned int
+    Accessor<number>::block_column() const
+    {
+      return col_block;
+    }
 
 
-template <typename number>
-inline
-unsigned int
-BlockSparseMatrix<number>::Accessor::block_column() const
-{
-  return col_block;
-}
-
-
-template <typename number>
-inline
-number
-BlockSparseMatrix<number>::Accessor::value () const
-{
-  return base_iterator->value();
-}
+    template <typename number>
+    inline
+    typename Accessor<number>::value_type
+    Accessor<number>::value () const
+    {
+      return base_iterator->value();
+    }
 
 
 //----------------------------------------------------------------------//
 
 
-template <typename number>
-inline
-BlockSparseMatrix<number>::const_iterator::
-const_iterator(const BlockSparseMatrix<number>* m,
-               unsigned int r,
-               unsigned short i)
-		:
-                BlockSparseMatrix<number>::Accessor(m, r, i)
-{}
+    template <typename number>
+    inline
+    ConstIterator<number>::
+    ConstIterator (const BlockSparseMatrix<number>* m,
+                   const unsigned int r,
+                   const unsigned int i)
+                    :
+                    Accessor<number>(m, r, i)
+    {}
 
 
 
-template <typename number>
-inline
-typename BlockSparseMatrix<number>::const_iterator&
-BlockSparseMatrix<number>::const_iterator::operator++ ()
-{
-  Assert (this->row_block<this->matrix->n_block_rows(), ExcIteratorPastEnd());
-
-				   // Remember current row inside block
-  unsigned int local_row = this->base_iterator->row();
-
-  				   // Advance inside block
-  ++this->base_iterator;
-  ++this->a_index;
-  
-				   // If end of row inside block,
-				   // advance to next block
-  if (this->base_iterator ==
-      this->matrix->block(this->row_block, this->col_block).end(local_row))
+    template <typename number>
+    inline
+    ConstIterator<number> &
+    ConstIterator<number>::operator++ ()
     {
-      if (this->col_block < this->matrix->n_block_cols()-1)
-	{
-					   // Advance to next block in
-					   // row
+      Assert (this->row_block<this->matrix->n_block_rows(), ExcIteratorPastEnd());
+
+                                       // Remember current row inside block
+      unsigned int local_row = this->base_iterator->row();
+
+                                       // Advance inside block
+      ++this->base_iterator;
+      ++this->a_index;
+  
+                                       // If end of row inside block,
+                                       // advance to next block
+      if (this->base_iterator ==
+          this->matrix->block(this->row_block, this->col_block).end(local_row))
+        {
+          if (this->col_block < this->matrix->n_block_cols()-1)
+            {
+                                               // Advance to next block in
+                                               // row
 //TODO: what if this row in that block is empty?          
-	  ++this->col_block;
-	  this->col_start = this->matrix->sparsity_pattern
-                            ->get_column_indices().local_to_global(this->col_block, 0);
-	}
-      else
-	{
-					   // Advance to first block
-					   // in next row
-	  this->col_block = 0;
-	  this->col_start = 0;
-	  this->a_index = 0;
-	  ++local_row;
-	  if (local_row >= this->matrix->block(this->row_block,0).m())
-	    {
-					       // If final row in
-					       // block, go to next
-					       // block row
-	      local_row = 0;
-	      ++this->row_block;
-	      if (this->row_block < this->matrix->n_block_rows())
-		this->row_start = this->matrix->sparsity_pattern
-                                  ->get_row_indices().local_to_global(this->row_block, 0);
-	    }
-	}
-				       // Finally, set base_iterator
-				       // to start of row determined
-				       // above
-      if (this->row_block < this->matrix->n_block_rows())
-	this->base_iterator = this->matrix->block(this->row_block, this->col_block).begin(local_row);
-      else
-					 // Set base_iterator to a
-					 // defined state for
-					 // comparison. This is the
-					 // end() state.
+              ++this->col_block;
+              this->col_start = this->matrix->sparsity_pattern
+                                ->get_column_indices().local_to_global(this->col_block, 0);
+            }
+          else
+            {
+                                               // Advance to first block
+                                               // in next row
+              this->col_block = 0;
+              this->col_start = 0;
+              this->a_index = 0;
+              ++local_row;
+              if (local_row >= this->matrix->block(this->row_block,0).m())
+                {
+                                                   // If final row in
+                                                   // block, go to next
+                                                   // block row
+                  local_row = 0;
+                  ++this->row_block;
+                  if (this->row_block < this->matrix->n_block_rows())
+                    this->row_start = this->matrix->sparsity_pattern
+                                      ->get_row_indices().local_to_global(this->row_block, 0);
+                }
+            }
+                                           // Finally, set base_iterator
+                                           // to start of row determined
+                                           // above
+          if (this->row_block < this->matrix->n_block_rows())
+            this->base_iterator = this->matrix->block(this->row_block, this->col_block).begin(local_row);
+          else
+                                             // Set base_iterator to a
+                                             // defined state for
+                                             // comparison. This is the
+                                             // end() state.
 //TODO: this is a particularly bad choice, since it is actually a valid iterator. it should rather be something like the end iterator of the last block!
-	this->base_iterator = this->matrix->block(0, 0).begin();
+            this->base_iterator = this->matrix->block(0, 0).begin();
+        }
+      return *this;
     }
-  return *this;
-}
 
 
 
 //  template <typename number>
 //  inline
 //  const_iterator&
-//  BlockSparseMatrix<number>::const_iterator::operator++ (int)
+//  ConstIterator::operator++ (int)
 //  {
 //    Assert (false, ExcNotImplemented());
 //  }
@@ -1076,73 +1142,76 @@ BlockSparseMatrix<number>::const_iterator::operator++ ()
 
 
 
-template <typename number>
-inline
-const typename BlockSparseMatrix<number>::Accessor&
-BlockSparseMatrix<number>::const_iterator::operator* () const
-{
-  return *this;
-}
-
-
-template <typename number>
-inline
-const typename BlockSparseMatrix<number>::Accessor*
-BlockSparseMatrix<number>::const_iterator::operator-> () const
-{
-  return this;
-}
-
-
-
-template <typename number>
-inline
-bool
-BlockSparseMatrix<number>::const_iterator::
-operator == (const const_iterator& i) const
-{
-  if (this->matrix != i->matrix)
-    return false;
-  
-  if (this->row_block == i->row_block
-      && this->col_block == i->col_block
-      && this->base_iterator == i->base_iterator)
-    return true;
-  return false;
-}
-
-
-
-template <typename number>
-inline
-bool
-BlockSparseMatrix<number>::const_iterator::
-operator != (const const_iterator& i) const
-{
-  return !(*this == i);
-}
-
-
-
-template <typename number>
-inline
-bool
-BlockSparseMatrix<number>::const_iterator::
-operator < (const const_iterator& i) const
-{
-  if (this->row_block < i->row_block)
-    return true;
-  if (this->row_block == i->row_block)
+    template <typename number>
+    inline
+    const Accessor<number> &
+    ConstIterator<number>::operator* () const
     {
-      if (this->base_iterator->row() < i->base_iterator->row())
-	return true;
-      if (this->base_iterator->row() == i->base_iterator->row())
-	{
-	  if (this->a_index < i->a_index)
-	    return true;
-	}
+      return *this;
     }
-  return false;
+
+
+    template <typename number>
+    inline
+    const Accessor<number> *
+    ConstIterator<number>::operator-> () const
+    {
+      return this;
+    }
+
+
+
+    template <typename number>
+    inline
+    bool
+    ConstIterator<number>::
+    operator == (const ConstIterator& i) const
+    {
+      if (this->matrix != i->matrix)
+        return false;
+  
+      if (this->row_block == i->row_block
+          && this->col_block == i->col_block
+          && this->base_iterator == i->base_iterator)
+        return true;
+      return false;
+    }
+
+
+
+    template <typename number>
+    inline
+    bool
+    ConstIterator<number>::
+    operator != (const ConstIterator& i) const
+    {
+      return !(*this == i);
+    }
+
+
+
+    template <typename number>
+    inline
+    bool
+    ConstIterator<number>::
+    operator < (const ConstIterator& i) const
+    {
+      if (this->row_block < i->row_block)
+        return true;
+      if (this->row_block == i->row_block)
+        {
+          if (this->base_iterator->row() < i->base_iterator->row())
+            return true;
+          if (this->base_iterator->row() == i->base_iterator->row())
+            {
+              if (this->a_index < i->a_index)
+                return true;
+            }
+        }
+      return false;
+    }
+
+  }
 }
 
 //----------------------------------------------------------------------//
@@ -1169,7 +1238,7 @@ BlockSparseMatrix<number>::n_block_rows () const
 
 template <typename number>
 inline
-SparseMatrix<number> &
+typename BlockSparseMatrix<number>::BlockType &
 BlockSparseMatrix<number>::block (const unsigned int row,
 				  const unsigned int column)
 {
@@ -1183,7 +1252,7 @@ BlockSparseMatrix<number>::block (const unsigned int row,
 
 template <typename number>
 inline
-const SparseMatrix<number> &
+const typename BlockSparseMatrix<number>::BlockType &
 BlockSparseMatrix<number>::block (const unsigned int row,
 				  const unsigned int column) const
 {
@@ -1705,7 +1774,7 @@ BlockSparseMatrix<number>::end () const
 template <typename number>
 inline
 typename BlockSparseMatrix<number>::const_iterator
-BlockSparseMatrix<number>::begin (unsigned int r) const
+BlockSparseMatrix<number>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r, 0);
@@ -1716,7 +1785,7 @@ BlockSparseMatrix<number>::begin (unsigned int r) const
 template <typename number>
 inline
 typename BlockSparseMatrix<number>::const_iterator
-BlockSparseMatrix<number>::end (unsigned int r) const
+BlockSparseMatrix<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r+1, 0);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,8 @@
 
 
 template <typename number>
-BlockSparseMatrix<number>::BlockSparseMatrix () :
+BlockSparseMatrix<number>::BlockSparseMatrix ()
+                :
 		rows (0),
 		columns (0),
 		sparsity_pattern (0)
@@ -31,7 +32,8 @@ BlockSparseMatrix<number>::BlockSparseMatrix () :
 
 template <typename number>
 BlockSparseMatrix<number>::
-BlockSparseMatrix (const BlockSparsityPattern &sparsity) :
+BlockSparseMatrix (const BlockSparsityPattern &sparsity)
+                :
 		rows (0),
 		columns (0)
 {
@@ -48,10 +50,10 @@ BlockSparseMatrix<number>::~BlockSparseMatrix ()
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       {
-	SparseMatrix<number> *p = sub_objects[r][c];
+	BlockType *p = sub_objects[r][c];
 	sub_objects[r][c] = 0;
 	delete p;
-      };
+      }
 }
 
 
@@ -70,6 +72,7 @@ operator = (const BlockSparseMatrix<number> &m)
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       block(r,c) = m.block(r,c);
+
   return *this;
 }
 
@@ -96,10 +99,11 @@ reinit (const BlockSparsityPattern &sparsity)
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       {
-	SparseMatrix<number> *p = sub_objects[r][c];
+	BlockType *p = sub_objects[r][c];
 	sub_objects[r][c] = 0;
 	delete p;
-      };
+      }
+  
   sub_objects.clear ();
 
 				   // then associate new sparsity
@@ -113,7 +117,7 @@ reinit (const BlockSparsityPattern &sparsity)
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       {
-        SparseMatrix<number> *p = new SparseMatrix<number>();
+        BlockType *p = new SparseMatrix<number>();
         p->reinit (sparsity.block(r,c));
 	sub_objects[r][c] = p;
       }
@@ -141,6 +145,7 @@ BlockSparseMatrix<number>::empty () const
     for (unsigned int c=0; c<columns; ++c)
       if (block(r,c).empty () == false)
 	return false;
+
   return true;
 }
 
@@ -164,6 +169,7 @@ BlockSparseMatrix<number>::n_actually_nonzero_elements () const
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
       count += sub_objects[i][j]->n_actually_nonzero_elements ();
+
   return count;
 }
 
@@ -177,24 +183,26 @@ BlockSparseMatrix<number>::get_sparsity_pattern () const
 }
 
 
+
 template <typename number>
 void 
-BlockSparseMatrix<number>::print_formatted (std::ostream       &out,
-					    const unsigned int  precision,
-					    const bool          scientific,
-					    const unsigned int  width,
-					    const char         *zero_string,
-					    const double        denominator) const
+BlockSparseMatrix<number>::
+print_formatted (std::ostream       &out,
+                 const unsigned int  precision,
+                 const bool          scientific,
+                 const unsigned int  width,
+                 const char         *zero_string,
+                 const double        denominator) const
 {
   for (unsigned int r=0;r<rows;++r)
-  {
     for (unsigned int c=0;c<columns;++c)
-    {
-      out << "Component (" << r << "," << c << ")" << std::endl;
-      block(r,c).print_formatted (out, precision, scientific, width, zero_string, denominator);
-    } 
-  } 
+      {
+        out << "Component (" << r << "," << c << ")" << std::endl;
+        block(r,c).print_formatted (out, precision, scientific,
+                                    width, zero_string, denominator);
+      }
 }
+
 
 
 template <typename number>
@@ -206,6 +214,7 @@ BlockSparseMatrix<number>::memory_consumption () const
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
+
   return mem;
 }
 
