@@ -184,10 +184,6 @@ class TriangulationLevel<0> {
 		    int, int,
 		    << "The containers have sizes " << arg1 << " and "
 		    << arg2 << ", which is not as expected.");
-				     /**
-				      *  Exception
-				      */
-    DeclException0 (ExcUnusedMemoryAtEnd);
 };
 
 
@@ -557,7 +553,7 @@ enum MeshSmoothing {
       smoothing_on_refinement            = (limit_level_difference_at_vertices |
 					    eliminate_unrefined_islands),
       smoothing_on_coarsening            = (eliminate_refined_islands),
-      maximum_smoothing                  = 0xffffffff
+      maximum_smoothing                  = 0xffff
 };
 
 				       
@@ -1182,10 +1178,18 @@ enum MeshSmoothing {
  *   You may write other information to the output file between different sets
  *   of refinement information, as long as you read it upon re-creation of the
  *   grid. You should make sure that the other information in the new
- *   triangulation which is to be created from the saves flags, matches that of
+ *   triangulation which is to be created from the saved flags, matches that of
  *   the old triangulation, for example the smoothing level; if not, the
  *   cells actually created from the flags may be other ones, since smoothing
- *   adds additional cells, but the number depending on the smoothing level.
+ *   adds additional cells, but their number may be depending on the smoothing
+ *   level.
+ *
+ *   There actually are two sets of #save_*_flags# and #load_*_flags# functions.
+ *   One takes a stream as argument and reads/writes the information from/to the
+ *   stream, thus enabling storing flags to files. The other set takes an
+ *   argument of type #vector<bool>#. This enables the user to temporarily store
+ *   some flags, e.g. if another function needs them, and restore them
+ *   afterwards.
  *
  *
  *   \subsection{User flags}
@@ -1210,6 +1214,10 @@ enum MeshSmoothing {
  *   #save_user_flags_line# and #load_user_flags_line# and the generalizations
  *   for quads, etc.
  *
+ *   As for the refinement and coarsening flags, there exist two versions of these
+ *   functions, one which reads/writes from a stream and one which does so from
+ *   a #vector<bool>#. The latter is used to store flags temporarily, while the
+ *   first is used to store them in a file.
  *
  *   It is convention to clear the user flags using the
  *   #Triangulation<>::clear_user_flags()# function before usage, since it is
@@ -1319,6 +1327,18 @@ enum MeshSmoothing {
  *       refinement. Since this may lead to cells on the same level which also
  *       will need refinement, we will need additional loops of regularisation
  *       and smoothing over all cells until nothing changes any more.
+ *
+ *     \item #eliminate_refined_islands#:
+ *       This one does much the same as the above one, but for coarsening. If
+ *       a cell is flagged for refinement or if all of its children are active
+ *       and if the number of neighbors which are either active and not flagged
+ *       for refinement, or not active but all children flagged for coarsening
+ *       exceeds the number of other neighbors, or the neighbor's refinement
+ *       level is less than the present cell's level, then this cell's children
+ *       are flagged for coarsening or (if this cell was flagged for refinement)
+ *       the refine flag is cleared.
+ *
+ *       The same applies as above: several loops may be necessary.
  *     \end{itemize}
  *   \end{itemize}
  *
@@ -1647,6 +1667,27 @@ class Triangulation : public TriaDimensionInfo<dim> {
     void execute_refinement ();
 
 				     /**
+				      *  Prepare the refinement process by
+				      *  fixing the
+				      *  closure of the refinement in #dim>=2#
+				      *  (make sure that no two cells are
+				      *  adjacent with a refinement level
+				      *  differing with more than one), etc.
+				      *  It performs some mesh smoothing if
+				      *  the according flag was given to the
+				      *  constructor of this class.
+				      *  The function returns whether additional
+				      *  cells have been flagged for refinement.
+				      *  
+				      *  See the general
+				      *  doc of this class for more information.
+				      *
+				      *  This function is mostly dimension
+				      *  independent.
+				      */
+    bool prepare_refinement ();
+
+				     /**
 				      * Coarsen all cells which were flagged for
 				      * coarsening, or rather: delete all
 				      * children of those cells of which all
@@ -1664,6 +1705,35 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
     void execute_coarsening ();
 
+    				     /**
+				      * This function does the analogue
+				      * of the #prepare_refinement# function:
+				      * flagging and deflagging cells in
+				      * preparation of the actual coarsening
+				      * step. This includes deleting coarsen
+                                      * flags from cells which may not be
+                                      * deleted (e.g. because one neighbor is
+                                      * more refined than the cell), doing
+                                      * some smoothing, etc.
+				      *
+				      * The effect is that only those cells
+				      * are flagged for coarsening which
+				      * will actually be coarsened. This
+				      * includes the fact that all flagged
+				      * cells belong to parent cells of which
+				      * all children are flagged.
+				      *
+				      * The function returns whether some
+				      * cells' flagging has been changed in
+				      * the process.
+				      *
+				      * This function uses the user flags, so
+				      * store them if you still need them
+				      * afterwards.
+                                      */
+    bool prepare_coarsening ();
+
+
 				     /**
 				      * Execute both refinement and coarsening
 				      * of the triangulation.
@@ -1678,23 +1748,16 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				     /**
 				      *  Save the addresses of the cells which
 				      *  are flagged for refinement to #out#.
-				      *  The addresses are stored in a binary
-				      *  format: for each active cell, a #1#
-				      *  bit is stored if the flag is flagged
-				      *  for refinement, a #0# bit otherwise.
-				      *  The bits are stored as #unsigned char#,
-				      *  thus avoiding endianess. They are
-				      *  written to #out# in plain text, thus
-				      *  amounting to 3.6 bits per active cell
-				      *  on the overage. Other information
-				      *  (three numbers) is stored as plain text
-				      *  as well. The format should therefore be
-				      *  interplatform compatible.
-				      *
 				      *  For usage, read the general
 				      *  documentation for this class.
 				      */
     void save_refine_flags (ostream &out) const;
+
+				     /**
+				      * Same as above, but store the flags to
+				      * a bitvector rather than to a file.
+				      */
+    void save_refine_flags (vector<bool> &v) const;
 
 				     /**
 				      *  Read the information stored by
@@ -1702,15 +1765,32 @@ class Triangulation : public TriaDimensionInfo<dim> {
 				      */
     void load_refine_flags (istream &in);
 
+    				     /**
+				      *  Read the information stored by
+				      *  #save_refine_flags#.
+				      */
+    void load_refine_flags (const vector<bool> &v);
+
 				     /**
 				      * Analogue to #save_refine_flags#.
 				      */
     void save_coarsen_flags (ostream &out) const;
 
+				     /**
+				      * Same as above, but store the flags to
+				      * a bitvector rather than to a file.
+				      */
+    void save_coarsen_flags (vector<bool> &v) const;
+
     				     /**
 				      * Analogue to #load_refine_flags#.
 				      */
     void load_coarsen_flags (istream &out);
+
+				     /**
+				      * Analogue to #load_refine_flags#.
+				      */
+    void load_coarsen_flags (const vector<bool> &v);
 
     				     /*@}*/
 
@@ -1734,10 +1814,22 @@ class Triangulation : public TriaDimensionInfo<dim> {
     void save_user_flags (ostream &out) const;
 
 				     /**
+				      * Same as above, but store the flags to
+				      * a bitvector rather than to a file.
+				      */
+    void save_user_flags (vector<bool> &v) const;
+
+				     /**
 				      *  Read the information stored by
 				      *  #save_user_flags#.
 				      */
     void load_user_flags (istream &in);
+
+    				     /**
+				      *  Read the information stored by
+				      *  #save_user_flags#.
+				      */
+    void load_user_flags (const vector<bool> &v);
 
 				     /**
 				      * Save the user flags on lines.
@@ -1745,9 +1837,20 @@ class Triangulation : public TriaDimensionInfo<dim> {
     void save_user_flags_line (ostream &out) const;
 
 				     /**
+				      * Same as above, but store the flags to
+				      * a bitvector rather than to a file.
+				      */
+    void save_user_flags_line (vector<bool> &v) const;
+
+				     /**
 				      * Load the user flags located on lines.
 				      */
     void load_user_flags_line (istream &in);
+
+    				     /**
+				      * Load the user flags located on lines.
+				      */
+    void load_user_flags_line (const vector<bool> &v);
 
     				     /**
 				      * Save the user flags on quads.
@@ -1755,9 +1858,20 @@ class Triangulation : public TriaDimensionInfo<dim> {
     void save_user_flags_quad (ostream &out) const;
 
 				     /**
+				      * Same as above, but store the flags to
+				      * a bitvector rather than to a file.
+				      */
+    void save_user_flags_quad (vector<bool> &v) const;
+
+				     /**
 				      * Load the user flags located on quads.
 				      */
     void load_user_flags_quad (istream &in);
+
+				     /**
+				      * Load the user flags located on quads.
+				      */
+    void load_user_flags_quad (const vector<bool> &v);
 				     /*@}*/
 
     
@@ -2423,38 +2537,43 @@ class Triangulation : public TriaDimensionInfo<dim> {
     DeclException0 (ExcInvalidParameterValue);
 				     //@}
   protected:
+
 				     /**
-				      *  Prepare the refinement process by
-				      *  allocating enough space, fixing the
-				      *  closure of the refinement in #dim>=2#
-				      *  (make sure that no two cells are
-				      *  adjacent with a refinement level
-				      *  differing with more than one), etc.
-				      *  It performs some mesh smoothing if
-				      *  the according flag was given to the
-				      *  constructor of this class.
-				      *  See the general
-				      *  doc of this class for more information.
+				      *  Write a bool vector to the given stream,
+				      *  writing a pre- and a postfix magica
+				      *  number. The vector is written in an
+				      *  almost binary format, i.e. the bool
+				      *  flags are packed but the data is written
+				      *  as ASCII text.
 				      *
-				      *  This function is mostly dimension
-				      *  independent.
+				      *  The flags are stored in a binary
+				      *  format: for each #true#, a #1#
+				      *  bit is stored, a #0# bit otherwise.
+				      *  The bits are stored as #unsigned char#,
+				      *  thus avoiding endianess. They are
+				      *  written to #out# in plain text, thus
+				      *  amounting to 3.6 bits per active cell
+				      *  on the overage. Other information
+				      *  (magic numbers ans number of elements)
+				      *  is stored as plain text
+				      *  as well. The format should therefore be
+				      *  interplatform compatible.
 				      */
-
-    void prepare_refinement ();
+    static void write_bool_vector (const unsigned int  magic_number1,
+				   const vector<bool> &v,
+				   const unsigned int  magic_number2,
+				   ostream            &out);
 
 				     /**
-				      * Prepare some flags for the actual
-				      * coarsening step. This includes setting
-                                      * user flags on all cells of which the
-                                      * children need to be deleted, clearing
-                                      * the coarsen flags, deleting coarsen
-                                      * flags from cells which may not be
-                                      * deleted (e.g. because one neighbor is
-                                      * more refined than the cell), doing
-                                      * some smoothing, etc.
-                                      */
-    void prepare_coarsening ();
-
+				      * Re-read a vector of bools previously
+				      * written by #write_bool_vector# and
+				      * compare with the magic numbers.
+				      */
+    static void read_bool_vector (const unsigned int  magic_number1,
+				  vector<bool>       &v,
+				  const unsigned int  magic_number2,
+				  istream            &in);
+    
 				     /**
 				      * Actually delete a cell, which is the
 				      * main step for the coarsening process.
