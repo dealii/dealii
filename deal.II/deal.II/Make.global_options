@@ -21,3 +21,16 @@ endif
 ifeq ($(shell uname),SunOS)
 CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
 endif
+
+
+%.go : %.cc Makefile
+	@echo ============================ Compiling with debugging information:   $<
+	@echo $(CXX) ... -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+%.o : %.cc Makefile
+	@echo ============================ Compiling with optimization:   $<
+	@echo $(CXX) ... -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+

@@ -108,6 +108,14 @@ Re-enable printing of a preamble to ucd files in data_io.cc.
 
 Implement coarsening of grids and update docs for that.
 
+Check all places where condensation of matrices/vectors and
+  application of boundary values takes place. I am not sure about
+  the right order in which they have to be applied, but in 2D there
+  is no difference since constrained dofs cannot be on the boundary.
+  Problems with the order will therefore not show up in 2D but may
+  become apparent in 3D, so keep this in mind for the implementation
+  of the 3D library.
+
 
 
 

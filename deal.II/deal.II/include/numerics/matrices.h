@@ -380,6 +380,14 @@ class MatrixTools : public MatrixCreator<dim> {
 				       dSMatrix              &matrix,
 				       dVector               &solution,
 				       dVector               &right_hand_side);
+
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcDimensionsDontMatch,
+		    int, int,
+		    << "The dimensions " << arg1 << " and " << arg2
+		    << " don't match.");
 };
 
 
