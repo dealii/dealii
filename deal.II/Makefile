@@ -39,13 +39,13 @@ baseg:
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
 
 baseo:
-	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libo
 
 lacg: 
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
 
 laco:
-	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) lib
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libo
 
 1dg:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
