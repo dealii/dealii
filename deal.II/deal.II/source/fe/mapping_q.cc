@@ -872,11 +872,24 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
                                        // for the present face
       const bool face_orientation = cell->face_orientation(face_no);
 
+                                       // work around a bug in older
+                                       // gcc versions (2.95) when an
+                                       // array in a conditional
+                                       // decays too quickly to a
+                                       // pointer
+#ifndef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG      
       const unsigned int (&face_vertex_to_cell_vertex)[vertices_per_face]
+#else
+      const unsigned int *face_vertex_to_cell_vertex
+#endif
         = (face_orientation ?
            face_vertex_to_cell_vertex1[face_no] :
            face_vertex_to_cell_vertex2[face_no]);
+#ifndef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG      
       const unsigned int (&face_line_to_cell_line)[lines_per_face]
+#else
+      const unsigned int *face_line_to_cell_line
+#endif
         = (face_orientation ?
            face_line_to_cell_line1[face_no] :
            face_line_to_cell_line2[face_no]);
