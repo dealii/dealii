@@ -34,8 +34,7 @@ s/line <\d+> of file <.*\//file </;
 s/-?\d\.\d+e-1\d+/0.00/g;
 
 # All doubles have two decimals
-
-s/(\.\d\d)\d+/\1/g;
+#s/(\.\d\d)\d+/\1/g;
 
 # Zeroes are zero
 
