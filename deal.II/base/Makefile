@@ -73,7 +73,7 @@ ifeq ($(enable-shared),yes)
 else
   lib: $(LIBDIR)/libbase.g.a $(LIBDIR)/libbase.a
   libg: $(LIBDIR)/libbase.g.a
-  libo: $(LIBDIR)/libbase.so
+  libo: $(LIBDIR)/libbase.a
 endif
 
 
