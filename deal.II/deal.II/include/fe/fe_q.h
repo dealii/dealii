@@ -403,71 +403,6 @@ class FE_Q : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-  protected:    
-				     /**
-				      * @p{clone} function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of @p{FESystem}.
-				      */
-    virtual FiniteElement<dim> * clone() const;
-  
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
-    virtual
-    typename Mapping<dim>::InternalDataBase *
-    get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
-	      const Quadrature<dim>& quadrature) const ;
-
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
-				      */
-    virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
-		    const typename DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase      &fe_internal,
-		    FEValuesData<dim>& data) const;
-    
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
-				      */
-    virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
-			 const typename DoFHandler<dim>::cell_iterator &cell,
-			 const unsigned int                    face_no,
-			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const ;
-    
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
-				      */
-    virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int                    face_no,
-			    const unsigned int                    sub_no,
-			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const ;
-
-  private:
-
 				     /**
 				      * Declare a nested class which
 				      * will hold static definitions of
@@ -535,6 +470,71 @@ class FE_Q : public FiniteElement<dim>
 					  */
 	static const unsigned int n_constraint_matrices;
     };
+
+  protected:    
+				     /**
+				      * @p{clone} function instead of
+				      * a copy constructor.
+				      *
+				      * This function is needed by the
+				      * constructors of @p{FESystem}.
+				      */
+    virtual FiniteElement<dim> * clone() const;
+  
+				     /**
+				      * Prepare internal data
+				      * structures and fill in values
+				      * independent of the cell.
+				      */
+    virtual
+    typename Mapping<dim>::InternalDataBase *
+    get_data (const UpdateFlags,
+	      const Mapping<dim>& mapping,
+	      const Quadrature<dim>& quadrature) const ;
+
+				     /**
+				      * Implementation of the same
+				      * function in
+				      * @ref{FiniteElement}.
+				      */
+    virtual void
+    fill_fe_values (const Mapping<dim> &mapping,
+		    const typename DoFHandler<dim>::cell_iterator &cell,
+		    const Quadrature<dim>                &quadrature,
+		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
+		    typename Mapping<dim>::InternalDataBase      &fe_internal,
+		    FEValuesData<dim>& data) const;
+    
+				     /**
+				      * Implementation of the same
+				      * function in
+				      * @ref{FiniteElement}.
+				      */
+    virtual void
+    fill_fe_face_values (const Mapping<dim> &mapping,
+			 const typename DoFHandler<dim>::cell_iterator &cell,
+			 const unsigned int                    face_no,
+			 const Quadrature<dim-1>                &quadrature,
+			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
+			 typename Mapping<dim>::InternalDataBase      &fe_internal,
+			 FEValuesData<dim>& data) const ;
+    
+				     /**
+				      * Implementation of the same
+				      * function in
+				      * @ref{FiniteElement}.
+				      */
+    virtual void
+    fill_fe_subface_values (const Mapping<dim> &mapping,
+			    const typename DoFHandler<dim>::cell_iterator &cell,
+			    const unsigned int                    face_no,
+			    const unsigned int                    sub_no,
+			    const Quadrature<dim-1>                &quadrature,
+			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
+			    typename Mapping<dim>::InternalDataBase      &fe_internal,
+			    FEValuesData<dim>& data) const ;
+
+  private:
     
 				     /**
 				      * Only for internal use. Its

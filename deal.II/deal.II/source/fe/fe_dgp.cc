@@ -29,18 +29,18 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
 				    std::vector<bool>(1,true),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-		degree(degree),
-		polynomial_space (Legendre<double>::generate_complete_basis(degree))
+								      degree(degree),
+								      polynomial_space (Legendre<double>::generate_complete_basis(degree))
 {
 				   // if defined, copy over matrices
 				   // from precomputed arrays
   if ((degree < Matrices::n_embedding_matrices) &&
       (Matrices::embedding[degree][0] != 0))
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      prolongation[c].fill (Matrices::embedding[degree][c]);
+      this->prolongation[c].fill (Matrices::embedding[degree][c]);
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
-      prolongation[i].reinit(0,0);
+      this->prolongation[i].reinit(0,0);
   
 //  				   // same as above: copy over matrix
 //  				   // from predefined values and
@@ -72,7 +72,7 @@ double
 FE_DGP<dim>::shape_value (const unsigned int i,
 			  const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_value(i, p);
 }
 
@@ -84,7 +84,7 @@ FE_DGP<dim>::shape_value_component (const unsigned int i,
 				    const Point<dim> &p,
 				    const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_value(i, p);
 }
@@ -96,7 +96,7 @@ Tensor<1,dim>
 FE_DGP<dim>::shape_grad (const unsigned int i,
 			 const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_grad(i, p);
 }
 
@@ -107,7 +107,7 @@ FE_DGP<dim>::shape_grad_component (const unsigned int i,
 				   const Point<dim> &p,
 				   const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad(i, p);
 }
@@ -119,7 +119,7 @@ Tensor<2,dim>
 FE_DGP<dim>::shape_grad_grad (const unsigned int i,
 			      const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_grad_grad(i, p);
 }
 
@@ -131,7 +131,7 @@ FE_DGP<dim>::shape_grad_grad_component (const unsigned int i,
 					const Point<dim> &p,
 					const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad_grad(i, p);
 }
@@ -219,15 +219,15 @@ FE_DGP<dim>::get_data (const UpdateFlags      update_flags,
 				   // allocate memory
   if (flags & update_values)
     {
-      values.resize (dofs_per_cell);
-      data->shape_values.resize(dofs_per_cell,
+      values.resize (this->dofs_per_cell);
+      data->shape_values.resize(this->dofs_per_cell,
 				std::vector<double>(n_q_points));
     }
 
   if (flags & update_gradients)
     {
-      grads.resize (dofs_per_cell);
-      data->shape_gradients.resize(dofs_per_cell,
+      grads.resize (this->dofs_per_cell);
+      data->shape_gradients.resize(this->dofs_per_cell,
 				   std::vector<Tensor<1,dim> >(n_q_points));
     }
 
@@ -250,7 +250,7 @@ FE_DGP<dim>::get_data (const UpdateFlags      update_flags,
       {
 	polynomial_space.compute(quadrature.point(i),
 				 values, grads, grad_grads);
-	for (unsigned int k=0; k<dofs_per_cell; ++k)
+	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	  {
 	    if (flags & update_values)
 	      data->shape_values[k][i] = values[k];
@@ -284,7 +284,7 @@ FE_DGP<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
   
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
 	for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
@@ -328,7 +328,7 @@ FE_DGP<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	if (flags & update_values)
@@ -374,7 +374,7 @@ FE_DGP<dim>::fill_fe_subface_values (const Mapping<dim>                   &mappi
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	if (flags & update_values)

@@ -38,7 +38,7 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 			       const FiniteElement<dim> &fe,
 			       const UpdateFlags         flags)
 {
-  update_flags = flags;
+  this->update_flags = flags;
 
 				   // initialize the table mapping
 				   // from shape function number to
@@ -48,11 +48,11 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 				   // the total number of non-zero
 				   // components accumulated over all
 				   // shape functions
-  shape_function_to_row_table.resize (fe.dofs_per_cell);
+  this->shape_function_to_row_table.resize (fe.dofs_per_cell);
   unsigned int row = 0;
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     {
-      shape_function_to_row_table[i] = row;
+      this->shape_function_to_row_table[i] = row;
       row += fe.n_nonzero_components (i);
     };
 	 
@@ -65,33 +65,33 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 				   // that we will need to their
 				   // correct size
   if (flags & update_values)
-    shape_values.reinit(n_nonzero_shape_components, n_quadrature_points);
+    this->shape_values.reinit(n_nonzero_shape_components, n_quadrature_points);
 
   if (flags & update_gradients)
     {
-      shape_gradients.resize(n_nonzero_shape_components);
+      this->shape_gradients.resize(n_nonzero_shape_components);
       for (unsigned int i=0; i<n_nonzero_shape_components; ++i)
-	shape_gradients[i].resize(n_quadrature_points);
+	this->shape_gradients[i].resize(n_quadrature_points);
     }
 
   if (flags & update_second_derivatives)
     {      
-      shape_2nd_derivatives.resize(n_nonzero_shape_components);
+      this->shape_2nd_derivatives.resize(n_nonzero_shape_components);
       for (unsigned int i=0; i<n_nonzero_shape_components; ++i)
-	shape_2nd_derivatives[i].resize(n_quadrature_points);
+	this->shape_2nd_derivatives[i].resize(n_quadrature_points);
     }
   
   if (flags & update_q_points)
-    quadrature_points.resize(n_quadrature_points);
+    this->quadrature_points.resize(n_quadrature_points);
 
   if (flags & update_JxW_values)
-    JxW_values.resize(n_quadrature_points);
+    this->JxW_values.resize(n_quadrature_points);
 
   if (flags & update_boundary_forms)
-    boundary_forms.resize(n_quadrature_points);
+    this->boundary_forms.resize(n_quadrature_points);
 
   if (flags & update_normal_vectors)
-    normal_vectors.resize(n_quadrature_points);
+    this->normal_vectors.resize(n_quadrature_points);
 }
 
 
@@ -112,7 +112,7 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		mapping_data(0),
 		fe_data(0)
 {
-  update_flags = flags;
+  this->update_flags = flags;
 }
 
 
@@ -147,7 +147,7 @@ template <class InputVector, typename number>
 void FEValuesBase<dim>::get_function_values (const InputVector            &fe_function,
 					     typename std::vector<number> &values) const
 {
-  Assert (update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (values.size() == n_quadrature_points,
@@ -175,7 +175,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector            &fe_fu
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       values[point] += (dof_values(shape_func) *
-			shape_value(shape_func, point));
+			this->shape_value(shape_func, point));
 };
 
 
@@ -192,7 +192,7 @@ void FEValuesBase<dim>::get_function_values (const InputVector                  
   for (unsigned i=0;i<values.size();++i)
     Assert (values[i].size() == n_components, ExcWrongNoOfComponents());
 
-  Assert (update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
     
@@ -231,8 +231,8 @@ template <int dim>
 const typename std::vector<Point<dim> > &
 FEValuesBase<dim>::get_quadrature_points () const
 {
-  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
-  return quadrature_points;
+  Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
+  return this->quadrature_points;
 };
 
 
@@ -241,8 +241,8 @@ template <int dim>
 const std::vector<double> &
 FEValuesBase<dim>::get_JxW_values () const
 {
-  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
-  return JxW_values;
+  Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  return this->JxW_values;
 }
 
 
@@ -254,7 +254,7 @@ FEValuesBase<dim>::
 get_function_grads (const InputVector                    &fe_function,
 		    typename std::vector<Tensor<1,dim> > &gradients) const
 {
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
 
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
@@ -283,7 +283,7 @@ get_function_grads (const InputVector                    &fe_function,
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	Tensor<1,dim> tmp = shape_grad(shape_func,point);
+	Tensor<1,dim> tmp = this->shape_grad(shape_func,point);
 	tmp *= dof_values(shape_func);
 	gradients[point] += tmp;
       };
@@ -305,7 +305,7 @@ get_function_grads (const InputVector                                           
   for (unsigned i=0; i<gradients.size(); ++i)
     Assert (gradients[i].size() == n_components, ExcWrongNoOfComponents());
 
-  Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
@@ -331,7 +331,7 @@ get_function_grads (const InputVector                                           
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       if (fe->is_primitive (shape_func))
 	{
-	  Tensor<1,dim> tmp = shape_grad(shape_func,point);
+	  Tensor<1,dim> tmp = this->shape_grad(shape_func,point);
 	  tmp *= dof_values(shape_func);
 	  gradients[point][fe->system_to_component_index(shape_func).first]
 	    += tmp;
@@ -339,7 +339,7 @@ get_function_grads (const InputVector                                           
       else
 	for (unsigned int c=0; c<n_components; ++c)
 	  {
-	    Tensor<1,dim> tmp = shape_grad_component(shape_func,point,c);
+	    Tensor<1,dim> tmp = this->shape_grad_component(shape_func,point,c);
 	    tmp *= dof_values(shape_func);
 	    gradients[point][c] += tmp;
 	  };
@@ -358,7 +358,7 @@ get_function_2nd_derivatives (const InputVector                    &fe_function,
 	  ExcWrongNoOfComponents());
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
-  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
@@ -382,7 +382,7 @@ get_function_2nd_derivatives (const InputVector                    &fe_function,
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	Tensor<2,dim> tmp = shape_2nd_derivative(shape_func,point);
+	Tensor<2,dim> tmp = this->shape_2nd_derivative(shape_func,point);
 	tmp *= dof_values(shape_func);
 	second_derivatives[point] += tmp;
       };
@@ -404,7 +404,7 @@ get_function_2nd_derivatives (const InputVector                                 
   for (unsigned i=0;i<second_derivs.size();++i)
     Assert (second_derivs[i].size() == n_components, ExcWrongNoOfComponents());
 
-  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
 	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
@@ -434,7 +434,7 @@ get_function_2nd_derivatives (const InputVector                                 
       else
 	for (unsigned int c=0; c<n_components; ++c)
 	  {
-	    Tensor<2,dim> tmp = shape_2nd_derivative_component(shape_func,point,c);
+	    Tensor<2,dim> tmp = this->shape_2nd_derivative_component(shape_func,point,c);
 	    tmp *= dof_values(shape_func);
 	    second_derivs[point][c] += tmp;
 	  };
@@ -446,10 +446,10 @@ template <int dim>
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 {
-  Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
-  Assert (i<quadrature_points.size(), ExcIndexRange(i, 0, quadrature_points.size()));
+  Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
+  Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
   
-  return quadrature_points[i];
+  return this->quadrature_points[i];
 };
 
 
@@ -458,10 +458,10 @@ FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 template <int dim>
 double FEValuesBase<dim>::JxW (const unsigned int i) const
 {
-  Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
-  Assert (i<JxW_values.size(), ExcIndexRange(i, 0, JxW_values.size()));
+  Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
   
-  return JxW_values[i];
+  return this->JxW_values[i];
 };
 
 
@@ -470,14 +470,14 @@ template <int dim>
 unsigned int
 FEValuesBase<dim>::memory_consumption () const
 {
-  return (MemoryConsumption::memory_consumption (shape_values) +
-	  MemoryConsumption::memory_consumption (shape_gradients) +
-	  MemoryConsumption::memory_consumption (shape_2nd_derivatives) +
-	  MemoryConsumption::memory_consumption (JxW_values) +
-	  MemoryConsumption::memory_consumption (quadrature_points) +
-	  MemoryConsumption::memory_consumption (normal_vectors) +
-	  MemoryConsumption::memory_consumption (boundary_forms) +
-	  sizeof(update_flags) +
+  return (MemoryConsumption::memory_consumption (this->shape_values) +
+	  MemoryConsumption::memory_consumption (this->shape_gradients) +
+	  MemoryConsumption::memory_consumption (this->shape_2nd_derivatives) +
+	  MemoryConsumption::memory_consumption (this->JxW_values) +
+	  MemoryConsumption::memory_consumption (this->quadrature_points) +
+	  MemoryConsumption::memory_consumption (this->normal_vectors) +
+	  MemoryConsumption::memory_consumption (this->boundary_forms) +
+	  sizeof(this->update_flags) +
 	  MemoryConsumption::memory_consumption (present_cell) +
 	  MemoryConsumption::memory_consumption (n_quadrature_points) +
 	  MemoryConsumption::memory_consumption (dofs_per_cell) +
@@ -487,7 +487,7 @@ FEValuesBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (*mapping_data) +
 	  MemoryConsumption::memory_consumption (fe_data) +
 	  MemoryConsumption::memory_consumption (*fe_data) +
-	  MemoryConsumption::memory_consumption (shape_function_to_row_table));
+	  MemoryConsumption::memory_consumption (this->shape_function_to_row_table));
 };
 
 
@@ -538,7 +538,7 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 				   update_default,
 				   mapping,
 				   fe),
-		quadrature (q)
+  quadrature (q)
 {
   initialize (update_flags);
 };
@@ -553,9 +553,9 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
 				   update_default,
-				   get_default_mapping(),
+				   this->get_default_mapping(),
 				   fe),
-                quadrature (q)
+  quadrature (q)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   initialize (update_flags);
@@ -572,17 +572,17 @@ FEValues<dim>::initialize (const UpdateFlags update_flags)
   Assert ((update_flags & update_normal_vectors) == false,
 	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
 
-  const UpdateFlags flags = compute_update_flags (update_flags);
+  const UpdateFlags flags = this->compute_update_flags (update_flags);
   
 				   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
-  mapping_data = mapping->get_data(flags, quadrature);
-  fe_data      = fe->get_data(flags, *mapping, quadrature);
+  this->mapping_data = this->mapping->get_data(flags, quadrature);
+  this->fe_data      = this->fe->get_data(flags, *this->mapping, quadrature);
 
 				   // set up objects within this class
-  FEValuesData<dim>::initialize (n_quadrature_points, *fe, flags);
+  FEValuesData<dim>::initialize (this->n_quadrature_points, *this->fe, flags);
 };
 
 
@@ -594,24 +594,24 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*fe) ==
+  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
-  present_cell = cell;
+  this->present_cell = cell;
 
-  get_mapping().fill_fe_values(cell,
-			       quadrature,
-			       *mapping_data,
-			       quadrature_points,
-			       JxW_values);
+  this->get_mapping().fill_fe_values(cell,
+				     quadrature,
+				     *this->mapping_data,
+				     this->quadrature_points,
+				     this->JxW_values);
   
-  get_fe().fill_fe_values(get_mapping(),
-			  cell,
-			  quadrature,
-			  *mapping_data,
-			  *fe_data,
-			  *this);
+  this->get_fe().fill_fe_values(this->get_mapping(),
+				cell,
+				quadrature,
+				*this->mapping_data,
+				*this->fe_data,
+				*this);
 }
 
 
@@ -641,7 +641,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 				   update_default,
 				   mapping,
 				   fe),
-                quadrature(quadrature)
+  quadrature(quadrature)
 {};
 
 
@@ -650,9 +650,9 @@ template <int dim>
 const typename std::vector<Point<dim> > &
 FEFaceValuesBase<dim>::get_normal_vectors () const
 {
-  Assert (update_flags & update_normal_vectors,
+  Assert (this->update_flags & update_normal_vectors,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-  return normal_vectors;
+  return this->normal_vectors;
 };
 
 
@@ -661,9 +661,9 @@ template <int dim>
 const typename std::vector<Tensor<1,dim> > &
 FEFaceValuesBase<dim>::get_boundary_forms () const
 {
-  Assert (update_flags & update_boundary_forms,
+  Assert (this->update_flags & update_boundary_forms,
 	  FEValuesBase<dim>::ExcAccessToUninitializedField());
-  return boundary_forms;
+  return this->boundary_forms;
 };
 
 
@@ -706,7 +706,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
 				       update_flags,
-				       get_default_mapping(),
+				       this->get_default_mapping(),
 				       fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -719,17 +719,17 @@ template <int dim>
 void
 FEFaceValues<dim>::initialize (const UpdateFlags update_flags)
 {
-  const UpdateFlags flags = compute_update_flags (update_flags);
+  const UpdateFlags flags = this->compute_update_flags (update_flags);
   
 				   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
-  mapping_data = mapping->get_face_data(flags, quadrature);
-  fe_data      = fe->get_face_data(flags, *mapping, quadrature);
+  this->mapping_data = this->mapping->get_face_data(flags, this->quadrature);
+  this->fe_data      = this->fe->get_face_data(flags, *this->mapping, this->quadrature);
 
 				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points, *fe, flags);
+  FEValuesData<dim>::initialize(this->n_quadrature_points, *this->fe, flags);
 };
 
 
@@ -742,27 +742,27 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*fe) ==
+  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
-  present_cell = cell;
-  present_face = cell->face(face_no);
+  this->present_cell = cell;
+  this->present_face = cell->face(face_no);
 
-  get_mapping().fill_fe_face_values(cell, face_no,
-				    quadrature,
-				    *mapping_data,
-				    quadrature_points,
-				    JxW_values,
-				    boundary_forms,
-				    normal_vectors);
+  this->get_mapping().fill_fe_face_values(cell, face_no,
+					  this->quadrature,
+					  *this->mapping_data,
+					  this->quadrature_points,
+					  this->JxW_values,
+					  this->boundary_forms,
+					  this->normal_vectors);
   
-  get_fe().fill_fe_face_values(get_mapping(),
-			       cell, face_no,
-			       quadrature,
-			       *mapping_data,
-			       *fe_data,
-			       *this);
+  this->get_fe().fill_fe_face_values(this->get_mapping(),
+				     cell, face_no,
+				     this->quadrature,
+				     *this->mapping_data,
+				     *this->fe_data,
+				     *this);
 };
 
 
@@ -794,7 +794,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
 				       update_flags,
-				       get_default_mapping(),
+				       this->get_default_mapping(),
 				       fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -807,17 +807,19 @@ template <int dim>
 void
 FESubfaceValues<dim>::initialize (const UpdateFlags update_flags)
 {
-  const UpdateFlags flags = compute_update_flags (update_flags);
+  const UpdateFlags flags = this->compute_update_flags (update_flags);
   
 				   // then get objects into which the
 				   // FE and the Mapping can store
 				   // intermediate data used across
 				   // calls to reinit
-  mapping_data = mapping->get_subface_data(flags, quadrature);
-  fe_data      = fe->get_subface_data(flags, *mapping, quadrature);
+  this->mapping_data = this->mapping->get_subface_data(flags, this->quadrature);
+  this->fe_data      = this->fe->get_subface_data(flags,
+						  *this->mapping,
+						  this->quadrature);
 
 				   // set up objects within this class
-  FEValuesData<dim>::initialize(n_quadrature_points, *fe, flags);
+  FEValuesData<dim>::initialize(this->n_quadrature_points, *this->fe, flags);
 };
 
 
@@ -831,7 +833,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
 				   // this cell, are the same
-  Assert (static_cast<const FiniteElementData<dim>&>(*fe) ==
+  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
@@ -839,23 +841,23 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
   
-  present_cell  = cell;
-  present_face  = cell->face(face_no);
+  this->present_cell  = cell;
+  this->present_face  = cell->face(face_no);
 
-  get_mapping().fill_fe_subface_values(cell, face_no, subface_no,
-				       quadrature,
-				       *mapping_data,
-				       quadrature_points,
-				       JxW_values,
-				       boundary_forms,
-				       normal_vectors);
+  this->get_mapping().fill_fe_subface_values(cell, face_no, subface_no,
+					     this->quadrature,
+					     *this->mapping_data,
+					     this->quadrature_points,
+					     this->JxW_values,
+					     this->boundary_forms,
+					     this->normal_vectors);
   
-  get_fe().fill_fe_subface_values(get_mapping(),
-				  cell, face_no, subface_no,
-				  quadrature,
-				  *mapping_data,
-				  *fe_data,
-				  *this);
+  this->get_fe().fill_fe_subface_values(this->get_mapping(),
+					cell, face_no, subface_no,
+					this->quadrature,
+					*this->mapping_data,
+					*this->fe_data,
+					*this);
 };
 
 

@@ -99,48 +99,6 @@ class MappingQ1 : public Mapping<dim>
 				      */
     virtual UpdateFlags update_each (const UpdateFlags) const;
 
-  protected:
-    
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>& quadrature,
-		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    typename std::vector<Point<dim> >       &quadrature_points,
-		    std::vector<double>             &JxW_values) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			 const unsigned int face_no,
-			 const Quadrature<dim-1>& quadrature,
-			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 typename std::vector<Point<dim> >        &quadrature_points,
-			 std::vector<double>             &JxW_values,
-			 typename std::vector<Tensor<1,dim> >        &boundary_form,
-			 typename std::vector<Point<dim> >        &normal_vectors) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int face_no,
-			    const unsigned int sub_no,
-			    const Quadrature<dim-1>& quadrature,
-			    typename Mapping<dim>::InternalDataBase &mapping_data,
-			    typename std::vector<Point<dim> >        &quadrature_points,
-			    std::vector<double>             &JxW_values,
-			    typename std::vector<Tensor<1,dim> >        &boundary_form,
-			    typename std::vector<Point<dim> >        &normal_vectors) const ;
-    
 				     /** 
 				      * Storage for internal data of
 				      * d-linear transformation.
@@ -282,6 +240,48 @@ class MappingQ1 : public Mapping<dim>
 					  */
 	unsigned int n_shape_functions;
     };
+    
+  protected:
+    
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
+		    const Quadrature<dim>& quadrature,
+		    typename Mapping<dim>::InternalDataBase &mapping_data,
+		    typename std::vector<Point<dim> >       &quadrature_points,
+		    std::vector<double>             &JxW_values) const ;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
+			 const unsigned int face_no,
+			 const Quadrature<dim-1>& quadrature,
+			 typename Mapping<dim>::InternalDataBase &mapping_data,
+			 typename std::vector<Point<dim> >        &quadrature_points,
+			 std::vector<double>             &JxW_values,
+			 typename std::vector<Tensor<1,dim> >        &boundary_form,
+			 typename std::vector<Point<dim> >        &normal_vectors) const ;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+			    const unsigned int face_no,
+			    const unsigned int sub_no,
+			    const Quadrature<dim-1>& quadrature,
+			    typename Mapping<dim>::InternalDataBase &mapping_data,
+			    typename std::vector<Point<dim> >        &quadrature_points,
+			    std::vector<double>             &JxW_values,
+			    typename std::vector<Tensor<1,dim> >        &boundary_form,
+			    typename std::vector<Point<dim> >        &normal_vectors) const ;
     
 				     /**
 				      * Compute shape values and/or

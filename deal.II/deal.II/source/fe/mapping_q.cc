@@ -35,10 +35,10 @@ template<int dim>
 MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
 		:
 		MappingQ1<dim>::InternalData(n_shape_functions),
-		use_mapping_q1_on_current_cell(false),
-		mapping_q1_data(1 << dim)
+				use_mapping_q1_on_current_cell(false),
+				mapping_q1_data(1 << dim)
 {
-  is_mapping_q1_data=false;
+  this->is_mapping_q1_data=false;
 }
 
 
@@ -525,7 +525,7 @@ MappingQ<3>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &lohvs)
 	}
     }
   else
-				   // not precomputed, then do so now
+				     // not precomputed, then do so now
     compute_laplace_vector(lohvs);
     
 				   // the sum of weights of the points
@@ -686,7 +686,7 @@ MappingQ<dim>::compute_mapping_support_points(
       a.resize(GeometryInfo<dim>::vertices_per_cell);
       
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	a[i] = cell->vertex(vertex_mapping[i]);
+	a[i] = cell->vertex(this->vertex_mapping[i]);
     }
 }
 
@@ -706,27 +706,27 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
     switch (dim)
       {
 	case 2:
-					       // in 2d, add the
-					       // points on the four
-					       // bounding lines to
-					       // the exterior (outer)
-					       // points
-	      add_line_support_points (cell, a);
-	      apply_laplace_vector (laplace_on_quad_vector,a);
-	      break;
+					   // in 2d, add the
+					   // points on the four
+					   // bounding lines to
+					   // the exterior (outer)
+					   // points
+	  add_line_support_points (cell, a);
+	  apply_laplace_vector (laplace_on_quad_vector,a);
+	  break;
 
 	case 3:
-					       // in 3d also add the
-					       // points located on
-					       // the boundary faces
-	      add_line_support_points (cell, a);
-	      add_quad_support_points (cell, a);
-              apply_laplace_vector (laplace_on_hex_vector, a);
-	      break;
+					   // in 3d also add the
+					   // points located on
+					   // the boundary faces
+	  add_line_support_points (cell, a);
+	  add_quad_support_points (cell, a);
+	  apply_laplace_vector (laplace_on_hex_vector, a);
+	  break;
 	      
 	default:
-	      Assert(false, ExcNotImplemented());
-	      break;
+	  Assert(false, ExcNotImplemented());
+	  break;
       };
 }
 
@@ -762,50 +762,50 @@ MappingQ<dim>::compute_support_points_simple(const typename Triangulation<dim>::
       switch (degree)
 	{
 	  case 2:
-	  {
-	    a.push_back(middle);
-	    break;
-	  };
+	{
+	  a.push_back(middle);
+	  break;
+	};
 
 	  case 3:
-	  {
-					     // The four points in the
-					     // cell are located at
-					     // the midpoint between
-					     // the middle point and
-					     // the 4 vertices
-	    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	      a.push_back(middle*2./3.+cell->vertex(vertex_mapping[i])/3.);
-	    break;
-	  };
+	{
+					   // The four points in the
+					   // cell are located at
+					   // the midpoint between
+					   // the middle point and
+					   // the 4 vertices
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	    a.push_back(middle*2./3.+cell->vertex(this->vertex_mapping[i])/3.);
+	  break;
+	};
 
 	  case 4:
-	  {
-	    Assert(a.size()==16, ExcInternalError());
-	    a.insert(a.end(), 9, Point<dim>());
+	{
+	  Assert(a.size()==16, ExcInternalError());
+	  a.insert(a.end(), 9, Point<dim>());
 	    
-	    const unsigned int inner_map[8]=
-	    { 0, 1, 2, 5, 8, 7, 6, 3 };
+	  const unsigned int inner_map[8]=
+	  { 0, 1, 2, 5, 8, 7, 6, 3 };
 	    
 	    
-					     // The nine points in the
-					     // cell are located at the
-					     // midpoint between the
-					     // middle point and (the 4
-					     // vertices and the face
-					     // midpoints)
+					   // The nine points in the
+					   // cell are located at the
+					   // midpoint between the
+					   // middle point and (the 4
+					   // vertices and the face
+					   // midpoints)
 	    
-	    a[16+4]=middle;
-	    for (unsigned int i=0, j=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	      {
-		a[16+inner_map[j++]]=(middle+cell->vertex(i))/2.;
-		a[16+inner_map[j++]]=(middle+(cell->vertex(i)+cell->vertex((i+1)%4))/2.)/2.;
-	      }
-	    break;
-	  };
+	  a[16+4]=middle;
+	  for (unsigned int i=0, j=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	    {
+	      a[16+inner_map[j++]]=(middle+cell->vertex(i))/2.;
+	      a[16+inner_map[j++]]=(middle+(cell->vertex(i)+cell->vertex((i+1)%4))/2.)/2.;
+	    }
+	  break;
+	};
 
 	  default:
-		Assert(false, ExcNotImplemented());
+	    Assert(false, ExcNotImplemented());
 	};
     };
   
@@ -1092,7 +1092,7 @@ MappingQ<dim>::transform_covariant (
       else
 	tensor = data->covariant.begin();    
     }
-    while (begin!=end)
+  while (begin!=end)
     {
       contract (*(begin++), *(src++), *(tensor++));
     }
@@ -1125,7 +1125,7 @@ MappingQ<dim>::transform_contravariant (
       else
 	tensor = data->contravariant.begin();    
     }
-    while (begin!=end)
+  while (begin!=end)
     {
       contract (*(begin++), *(tensor++), *(src++));
     }
@@ -1148,7 +1148,7 @@ Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
   Assert(mdata!=0, ExcInternalError());
   
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
-					     || cell->has_boundary_lines());
+					    || cell->has_boundary_lines());
 
   typename MappingQ1<dim>::InternalData *p_data=0;
   if (mdata->use_mapping_q1_on_current_cell)

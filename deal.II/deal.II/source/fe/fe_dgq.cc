@@ -31,8 +31,8 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 				    std::vector<bool>(1,true),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-		degree(degree),
-		polynomial_space (LagrangeEquidistant::generate_complete_basis(degree))
+								      degree(degree),
+								      polynomial_space (LagrangeEquidistant::generate_complete_basis(degree))
 {
 				   // generate permutation/rotation
 				   // index sets to generate some
@@ -50,45 +50,45 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   if ((degree < Matrices::n_embedding_matrices) &&
       (Matrices::embedding[degree] != 0))
     {
-      prolongation[0].fill (Matrices::embedding[degree]);
+      this->prolongation[0].fill (Matrices::embedding[degree]);
       switch (dim)
 	{
 	  case 1:
-		prolongation[1].fill_permutation (prolongation[0],
-						  right, right);
-		break;
+	    this->prolongation[1].fill_permutation (this->prolongation[0],
+						    right, right);
+	    break;
 	  case 2:
-		prolongation[1].fill_permutation (prolongation[0],
-						  right, right);
-		prolongation[2].fill_permutation (prolongation[1],
-						  right, right);
-		prolongation[3].fill_permutation (prolongation[2],
-						  right, right);
-		break;
+	    this->prolongation[1].fill_permutation (this->prolongation[0],
+						    right, right);
+	    this->prolongation[2].fill_permutation (this->prolongation[1],
+						    right, right);
+	    this->prolongation[3].fill_permutation (this->prolongation[2],
+						    right, right);
+	    break;
 	  case 3:
-		prolongation[1].fill_permutation (prolongation[0],
-						  right, right);
-		prolongation[5].fill_permutation (prolongation[1],
-						  right, right);
-		prolongation[4].fill_permutation (prolongation[5],
-						  right, right);
-		prolongation[7].fill_permutation (prolongation[4],
-						  top, top);
-		prolongation[3].fill_permutation (prolongation[7],
-						  top, top);
-		prolongation[6].fill_permutation (prolongation[5],
-						  top, top);
-		prolongation[2].fill_permutation (prolongation[6],
-						  top, top);
-		break;
+	    this->prolongation[1].fill_permutation (this->prolongation[0],
+						    right, right);
+	    this->prolongation[5].fill_permutation (this->prolongation[1],
+						    right, right);
+	    this->prolongation[4].fill_permutation (this->prolongation[5],
+						    right, right);
+	    this->prolongation[7].fill_permutation (this->prolongation[4],
+						    top, top);
+	    this->prolongation[3].fill_permutation (this->prolongation[7],
+						    top, top);
+	    this->prolongation[6].fill_permutation (this->prolongation[5],
+						    top, top);
+	    this->prolongation[2].fill_permutation (this->prolongation[6],
+						    top, top);
+	    break;
 	  default:
-		Assert (false, ExcNotImplemented());
+	    Assert (false, ExcNotImplemented());
 	}
     }
   else
 				     // matrix undefined, set size to zero
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      prolongation[i].reinit(0);
+      this->prolongation[i].reinit(0);
 
 				   // same as above: copy over matrix
 				   // from predefined values and
@@ -96,45 +96,45 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   if ((degree < Matrices::n_projection_matrices) &&
       (Matrices::projection_matrices[degree] != 0))
     {
-      restriction[0].fill (Matrices::projection_matrices[degree]);
+      this->restriction[0].fill (Matrices::projection_matrices[degree]);
       switch (dim)
 	{
 	  case 1:
-		restriction[1].fill_permutation (restriction[0],
-						 right, right);
-		break;
+	    this->restriction[1].fill_permutation (this->restriction[0],
+						   right, right);
+	    break;
 	  case 2:
-		restriction[1].fill_permutation (restriction[0],
-						 right, right);
-		restriction[2].fill_permutation (restriction[1],
-						 right, right);
-		restriction[3].fill_permutation (restriction[2],
-						 right, right);
-		break;
+	    this->restriction[1].fill_permutation (this->restriction[0],
+						   right, right);
+	    this->restriction[2].fill_permutation (this->restriction[1],
+						   right, right);
+	    this->restriction[3].fill_permutation (this->restriction[2],
+						   right, right);
+	    break;
 	  case 3:
-		restriction[1].fill_permutation (restriction[0],
-						 right, right);
-		restriction[5].fill_permutation (restriction[1],
-						 right, right);
-		restriction[4].fill_permutation (restriction[5],
-						 right, right);
-		restriction[7].fill_permutation (restriction[4],
-						 top, top);
-		restriction[3].fill_permutation (restriction[7],
-						 top, top);
-		restriction[6].fill_permutation (restriction[5],
-						 top, top);
-		restriction[2].fill_permutation (restriction[6],
-						 top, top);
-		break;
+	    this->restriction[1].fill_permutation (this->restriction[0],
+						   right, right);
+	    this->restriction[5].fill_permutation (this->restriction[1],
+						   right, right);
+	    this->restriction[4].fill_permutation (this->restriction[5],
+						   right, right);
+	    this->restriction[7].fill_permutation (this->restriction[4],
+						   top, top);
+	    this->restriction[3].fill_permutation (this->restriction[7],
+						   top, top);
+	    this->restriction[6].fill_permutation (this->restriction[5],
+						   top, top);
+	    this->restriction[2].fill_permutation (this->restriction[6],
+						   top, top);
+	    break;
 	  default:
-		Assert (false, ExcNotImplemented());
+	    Assert (false, ExcNotImplemented());
 	}
     }
   else
 				     // matrix undefined, set size to zero
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      restriction[i].reinit(0);
+      this->restriction[i].reinit(0);
 
   
 				   // finally fill in support points
@@ -142,9 +142,9 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
     {
 				       // constant elements, take
 				       // midpoint
-      unit_support_points.resize(1);
+      this->unit_support_points.resize(1);
       for (unsigned int i=0; i<dim; ++i)
-	unit_support_points[0](i) = 0.5;
+	this->unit_support_points[0](i) = 0.5;
     }
   else
     {
@@ -153,7 +153,7 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
       for (unsigned int i=1; i<dim; ++i)
 	n *= degree+1;
       
-      unit_support_points.resize(n);
+      this->unit_support_points.resize(n);
       
       const double step = 1./degree;
       Point<dim> p;
@@ -169,7 +169,7 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 	      if (dim>2)
 		p(2) = iz * step;
 	      
-	      unit_support_points[k++] = p;
+	      this->unit_support_points[k++] = p;
 	    };
     };
 
@@ -193,7 +193,7 @@ double
 FE_DGQ<dim>::shape_value (const unsigned int i,
 			  const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_value(i, p);
 }
 
@@ -205,7 +205,7 @@ FE_DGQ<dim>::shape_value_component (const unsigned int i,
 				    const Point<dim> &p,
 				    const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_value(i, p);
 }
@@ -217,7 +217,7 @@ Tensor<1,dim>
 FE_DGQ<dim>::shape_grad (const unsigned int i,
 			 const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_grad(i, p);
 }
 
@@ -228,7 +228,7 @@ FE_DGQ<dim>::shape_grad_component (const unsigned int i,
 				   const Point<dim> &p,
 				   const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad(i, p);
 }
@@ -240,7 +240,7 @@ Tensor<2,dim>
 FE_DGQ<dim>::shape_grad_grad (const unsigned int i,
 			      const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return polynomial_space.compute_grad_grad(i, p);
 }
 
@@ -252,7 +252,7 @@ FE_DGQ<dim>::shape_grad_grad_component (const unsigned int i,
 					const Point<dim> &p,
 					const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad_grad(i, p);
 }
@@ -331,51 +331,51 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 					   // Rotate xy-plane
 					   // counter-clockwise
 	  case 'z':
-		for (unsigned int iz=0;iz<((dim>2) ? n:1);++iz)
-		  for (unsigned int j=0;j<n;++j)
-		    for (unsigned int i=0;i<n;++i)
-		      {
-			unsigned int k = n*i-j+n-1 + n*n*iz;
-			numbers[l++] = k;
-		      }
-		break;
-						 // Rotate xy-plane
-						 // clockwise
+	    for (unsigned int iz=0;iz<((dim>2) ? n:1);++iz)
+	      for (unsigned int j=0;j<n;++j)
+		for (unsigned int i=0;i<n;++i)
+		  {
+		    unsigned int k = n*i-j+n-1 + n*n*iz;
+		    numbers[l++] = k;
+		  }
+	    break;
+					     // Rotate xy-plane
+					     // clockwise
 	  case 'Z':
-		for (unsigned int iz=0;iz<((dim>2) ? n:1);++iz)
-		  for (unsigned int iy=0;iy<n;++iy)
-		    for (unsigned int ix=0;ix<n;++ix)
-		      {
-			unsigned int k = n*ix-iy+n-1 + n*n*iz;
-			numbers[k] = l++;
-		      }
-		break;
-						 // Rotate yz-plane
-						 // counter-clockwise
+	    for (unsigned int iz=0;iz<((dim>2) ? n:1);++iz)
+	      for (unsigned int iy=0;iy<n;++iy)
+		for (unsigned int ix=0;ix<n;++ix)
+		  {
+		    unsigned int k = n*ix-iy+n-1 + n*n*iz;
+		    numbers[k] = l++;
+		  }
+	    break;
+					     // Rotate yz-plane
+					     // counter-clockwise
 	  case 'x':
-		Assert (dim>2,
-			typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
-		for (unsigned int iz=0;iz<n;++iz)
-		  for (unsigned int iy=0;iy<n;++iy)
-		    for (unsigned int ix=0;ix<n;++ix)
-		      {
-			unsigned int k = n*(n*iy-iz+n-1) + ix;
-			numbers[l++] = k;
-		      }
-		break;
-						 // Rotate yz-plane
-						 // clockwise
+	    Assert (dim>2,
+		    typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
+	    for (unsigned int iz=0;iz<n;++iz)
+	      for (unsigned int iy=0;iy<n;++iy)
+		for (unsigned int ix=0;ix<n;++ix)
+		  {
+		    unsigned int k = n*(n*iy-iz+n-1) + ix;
+		    numbers[l++] = k;
+		  }
+	    break;
+					     // Rotate yz-plane
+					     // clockwise
 	  case 'X':
-	        Assert (dim>2, 
-			typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
-		for (unsigned int iz=0;iz<n;++iz)
-		  for (unsigned int iy=0;iy<n;++iy)
-		    for (unsigned int ix=0;ix<n;++ix)
-		      {
-			unsigned int k = n*(n*iy-iz+n-1) + ix;
-			numbers[k] = l++;
-		      }
-		break;
+	    Assert (dim>2, 
+		    typename FiniteElementData<dim>::ExcSpaceDimensionMismatch (dim,3));
+	    for (unsigned int iz=0;iz<n;++iz)
+	      for (unsigned int iy=0;iy<n;++iy)
+		for (unsigned int ix=0;ix<n;++ix)
+		  {
+		    unsigned int k = n*(n*iy-iz+n-1) + ix;
+		    numbers[k] = l++;
+		  }
+	    break;
 	  default:
 	    Assert (false, ExcNotImplemented ());
 	}
@@ -419,15 +419,15 @@ FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
 				   // allocate memory
   if (flags & update_values)
     {
-      values.resize (dofs_per_cell);
-      data->shape_values.resize(dofs_per_cell,
+      values.resize (this->dofs_per_cell);
+      data->shape_values.resize(this->dofs_per_cell,
 				std::vector<double>(n_q_points));
     }
 
   if (flags & update_gradients)
     {
-      grads.resize (dofs_per_cell);
-      data->shape_gradients.resize(dofs_per_cell,
+      grads.resize (this->dofs_per_cell);
+      data->shape_gradients.resize(this->dofs_per_cell,
 				   std::vector<Tensor<1,dim> >(n_q_points));
     }
 
@@ -450,7 +450,7 @@ FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
       {
 	polynomial_space.compute(quadrature.point(i),
 				 values, grads, grad_grads);
-	for (unsigned int k=0; k<dofs_per_cell; ++k)
+	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	  {
 	    if (flags & update_values)
 	      data->shape_values[k][i] = values[k];
@@ -484,7 +484,7 @@ FE_DGQ<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
   
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
 	for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
@@ -528,7 +528,7 @@ FE_DGQ<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	if (flags & update_values)
@@ -574,7 +574,7 @@ FE_DGQ<dim>::fill_fe_subface_values (const Mapping<dim>                   &mappi
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	if (flags & update_values)
@@ -619,8 +619,8 @@ bool
 FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
 				  const unsigned int face_index) const
 {
-  Assert (shape_index < dofs_per_cell,
-	  ExcIndexRange (shape_index, 0, dofs_per_cell));
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
@@ -630,57 +630,57 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
   switch (dim)
     {
       case 1:
-      {
-					 // in 1d, things are simple. since
-					 // there is only one degree of
-					 // freedom per vertex in this
-					 // class, the first is on vertex 0
-					 // (==face 0 in some sense), the
-					 // second on face 1:
-	return (((shape_index == 0) && (face_index == 0)) ||
-		((shape_index == 1) && (face_index == 1)));
-      };
+    {
+				       // in 1d, things are simple. since
+				       // there is only one degree of
+				       // freedom per vertex in this
+				       // class, the first is on vertex 0
+				       // (==face 0 in some sense), the
+				       // second on face 1:
+      return (((shape_index == 0) && (face_index == 0)) ||
+	      ((shape_index == 1) && (face_index == 1)));
+    };
       
       case 2:
-      {
-	if (face_index==0 && shape_index < n)
-	  return true;
-	if (face_index==1 && (shape_index % n) == degree)
-	  return true;
-	if (face_index==2 && shape_index >= dofs_per_cell-n)
-	  return true;
-	if (face_index==3 && (shape_index % n) == 0)
-	  return true;
-	return false;
-      };
+    {
+      if (face_index==0 && shape_index < n)
+	return true;
+      if (face_index==1 && (shape_index % n) == degree)
+	return true;
+      if (face_index==2 && shape_index >= this->dofs_per_cell-n)
+	return true;
+      if (face_index==3 && (shape_index % n) == 0)
+	return true;
+      return false;
+    };
       
       case 3:
-      {
-	const unsigned int in2 = shape_index % n2;
+    {
+      const unsigned int in2 = shape_index % n2;
 	
-					 // y=0
-	if (face_index==0 && in2 < n )
-	  return true;
-					 // y=1
-	if (face_index==1 && in2 >= n2-n)
-	  return true;
-					 // z=0
-	if (face_index==2 && shape_index < n2)
-	  return true;
-					 // x=1
-	if (face_index==3 && (shape_index % n) == n-1)
-	  return true;
-					 // z=1
-	if (face_index==4 && shape_index >= dofs_per_cell - n2)
-	  return true;
-					 // x=0
-	if (face_index==5 && (shape_index % n) == 0)
-	  return true;
-	return false;
-      };
+				       // y=0
+      if (face_index==0 && in2 < n )
+	return true;
+				       // y=1
+      if (face_index==1 && in2 >= n2-n)
+	return true;
+				       // z=0
+      if (face_index==2 && shape_index < n2)
+	return true;
+				       // x=1
+      if (face_index==3 && (shape_index % n) == n-1)
+	return true;
+				       // z=1
+      if (face_index==4 && shape_index >= this->dofs_per_cell - n2)
+	return true;
+				       // x=0
+      if (face_index==5 && (shape_index % n) == 0)
+	return true;
+      return false;
+    };
 
       default:
-	    Assert (false, ExcNotImplemented());
+	Assert (false, ExcNotImplemented());
     }
   return true;
 }

@@ -83,7 +83,7 @@ MappingQ1<dim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
 template<>
 const unsigned int MappingQ1<deal_II_dimension>::vertex_mapping[2] =
 { 0, 1
-};
+    };
 
 
 template<>
@@ -121,7 +121,7 @@ template<> const unsigned int
 MappingQ1<2>::vertex_mapping[4] =
 {
   0, 1, 3, 2
-};
+    };
 
 
 template<>
@@ -168,7 +168,7 @@ template<>
 const unsigned int MappingQ1<deal_II_dimension>::vertex_mapping[8] =
 {
   0, 1, 4, 5, 3, 2, 7, 6
-};
+    };
 
 
 template<>
@@ -276,13 +276,13 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				   // ignored for the interior of a
 				   // cell.
   if (out & (update_JxW_values
-	    |update_normal_vectors))
+	     |update_normal_vectors))
     out |= update_boundary_forms;
   
   if (out & (update_covariant_transformation
-	    | update_JxW_values
-	    | update_boundary_forms
-	    | update_normal_vectors))
+	     | update_JxW_values
+	     | update_boundary_forms
+	     | update_normal_vectors))
     out |= update_contravariant_transformation;
 
   return out;
@@ -361,14 +361,14 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 					   // dim so we can subtract 1
 					   // without getting negative
 					   // values.
-	  unsigned int nindex = normal_directions[i]/2 + dim;
+	  unsigned int nindex = this->normal_directions[i]/2 + dim;
 
 					   // First tangential has a
 					   // non-zero in component
 					   // (i+1)%dim, if normal is
 					   // non-zero in i.
 	  Tensor<1,dim> tangential;
-	  tangential[(nindex+1)%dim] = (normal_directions[i]%2) ? -1 : 1;
+	  tangential[(nindex+1)%dim] = (this->normal_directions[i]%2) ? -1 : 1;
 	  data.unit_tangentials[i].resize(n_original_q_points);
 	  std::fill (data.unit_tangentials[i].begin(),
 		     data.unit_tangentials[i].end(),
@@ -561,8 +561,8 @@ MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &c
       Assert (JxW_values.size() == npts,
 	      ExcDimensionMismatch(JxW_values.size(), npts));
       for (unsigned int point=0; point<npts; ++point)
-       JxW_values[point]
-	 = determinant(data.contravariant[point])*weights[point];
+	JxW_values[point]
+	  = determinant(data.contravariant[point])*weights[point];
     }
 }
 
@@ -617,28 +617,28 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
       switch (dim)
 	{
 	  case 2:
-	  {
-	    for (; result != end; ++result, ++tang1)
-	      cross_product (*result, *tang1);
-	    break;
-	  };
+	{
+	  for (; result != end; ++result, ++tang1)
+	    cross_product (*result, *tang1);
+	  break;
+	};
 
 	  case 3:
-	  {
-	    transform_contravariant(data.aux[1].begin(),
-				    data.aux[1].end(),
-				    data.unit_tangentials[
-				      face_no+GeometryInfo<dim>::faces_per_cell].begin(),
-				    data);
-	    typename std::vector<Tensor<1,dim> >::const_iterator
-	      tang2 = data.aux[1].begin();
-	    for (;result != end; ++result, ++tang1, ++tang2)
-	      cross_product (*result, *tang1, *tang2);
-	    break;
-	  };
+	{
+	  transform_contravariant(data.aux[1].begin(),
+				  data.aux[1].end(),
+				  data.unit_tangentials[
+				    face_no+GeometryInfo<dim>::faces_per_cell].begin(),
+				  data);
+	  typename std::vector<Tensor<1,dim> >::const_iterator
+	    tang2 = data.aux[1].begin();
+	  for (;result != end; ++result, ++tang1, ++tang2)
+	    cross_product (*result, *tang1, *tang2);
+	  break;
+	};
 
 	  default:
-		Assert(false, ExcNotImplemented());
+	    Assert(false, ExcNotImplemented());
 	}
       
       if (update_flags & (update_normal_vectors

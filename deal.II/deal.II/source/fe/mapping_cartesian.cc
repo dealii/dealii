@@ -81,7 +81,7 @@ typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_data (const UpdateFlags      update_flags,
 				 const Quadrature<dim> &q) const
 {
-  //  Assert (flags & update_normal_vectors == 0, ExcNotImplemented());
+				   //  Assert (flags & update_normal_vectors == 0, ExcNotImplemented());
 
   InternalData* data = new InternalData (q);
 
@@ -231,38 +231,38 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 	{
 					   // 2D
 	  case 200:
-		n (1) = -1.;
-		break;
+	    n (1) = -1.;
+	    break;
 	  case 201:
-		n (0) = 1.;
-		break;
+	    n (0) = 1.;
+	    break;
 	  case 202:
-		n (1) = 1.;
-		break;
+	    n (1) = 1.;
+	    break;
 	  case 203:
-		n (0) = -1.;
-		break;
-					   // 3D
+	    n (0) = -1.;
+	    break;
+					     // 3D
 	  case 300:
-		n (1) = -1.;
-		break;
+	    n (1) = -1.;
+	    break;
 	  case 301:
-		n (1) = 1.;
-		break;
+	    n (1) = 1.;
+	    break;
 	  case 302:
-		n (2) = -1.;
-		break;
+	    n (2) = -1.;
+	    break;
 	  case 303:
-		n (0) = 1.;
-		break;
+	    n (0) = 1.;
+	    break;
 	  case 304:
-		n (2) = 1.;
-		break;
+	    n (2) = 1.;
+	    break;
 	  case 305:
-		n (0) = -1.;
-		break;
+	    n (0) = -1.;
+	    break;
 	  default:
-		Assert (false, ExcInternalError());
+	    Assert (false, ExcInternalError());
 	}
 				       // furthermore, all normal
 				       // vectors on a face are equal
@@ -339,7 +339,7 @@ MappingCartesian<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell
 				   // since the jacobian is diagonal
   double J = 1.;
   for (unsigned int d=0;d<dim;++d)
-    if (d != (normal_directions[face_no]/2))
+    if (d != (this->normal_directions[face_no]/2))
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)
@@ -359,14 +359,14 @@ MappingCartesian<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell
 template <int dim>
 void
 MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
-					const unsigned int       face_no,
-					const unsigned int       sub_no,
-					const Quadrature<dim-1> &q,
-					typename Mapping<dim>::InternalDataBase &mapping_data,
-					typename std::vector<Point<dim> >     &quadrature_points,
-					std::vector<double>          &JxW_values,
-					typename std::vector<Tensor<1,dim> >  &boundary_forms,
-					typename std::vector<Point<dim> >     &normal_vectors) const
+					       const unsigned int       face_no,
+					       const unsigned int       sub_no,
+					       const Quadrature<dim-1> &q,
+					       typename Mapping<dim>::InternalDataBase &mapping_data,
+					       typename std::vector<Point<dim> >     &quadrature_points,
+					       std::vector<double>          &JxW_values,
+					       typename std::vector<Tensor<1,dim> >  &boundary_forms,
+					       typename std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -385,7 +385,7 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::c
 				   // since the jacobian is diagonal
   double J = 1.;
   for (unsigned int d=0;d<dim;++d)
-    if (d != (normal_directions[face_no]/2))
+    if (d != (this->normal_directions[face_no]/2))
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)

@@ -191,6 +191,74 @@ class FE_Nedelec : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
+
+				     /**
+				      * Declare a nested class which
+				      * will hold static definitions of
+				      * various matrices such as
+				      * constraint and embedding
+				      * matrices. The definition of
+				      * the various static fields are
+				      * in the files @p{fe_nedelec_[23]d.cc}
+				      * in the source directory.
+				      */
+    struct Matrices
+    {
+					 /**
+					  * Embedding matrices. For
+					  * each element type (the
+					  * first index) there are as
+					  * many embedding matrices as
+					  * there are children per
+					  * cell. The first index
+					  * starts with linear
+					  * elements and goes up in
+					  * polynomial degree. The
+					  * array may grow in the
+					  * future with the number of
+					  * elements for which these
+					  * matrices have been
+					  * computed. If for some
+					  * element, the matrices have
+					  * not been computed then you
+					  * may use the element
+					  * nevertheless but can not
+					  * access the respective
+					  * fields.
+					  */
+	static const double * const
+	embedding[][GeometryInfo<dim>::children_per_cell];
+
+					 /**
+					  * Number of elements (first
+					  * index) the above field
+					  * has. Equals the highest
+					  * polynomial degree for
+					  * which the embedding
+					  * matrices have been
+					  * computed.
+					  */
+	static const unsigned int n_embedding_matrices;
+
+					 /**
+					  * As the
+					  * @p{embedding_matrices}
+					  * field, but for the
+					  * interface constraints. One
+					  * for each element for which
+					  * it has been computed.
+					  */
+	static const double * const constraint_matrices[];
+
+					 /**
+					  * Like
+					  * @p{n_embedding_matrices},
+					  * but for the number of
+					  * interface constraint
+					  * matrices.
+					  */
+	static const unsigned int n_constraint_matrices;
+    };
 				     /**
 				      * Exception
 				      */
@@ -260,74 +328,6 @@ class FE_Nedelec : public FiniteElement<dim>
 			    FEValuesData<dim>& data) const ;
 
   private:
-
-				     /**
-				      * Declare a nested class which
-				      * will hold static definitions of
-				      * various matrices such as
-				      * constraint and embedding
-				      * matrices. The definition of
-				      * the various static fields are
-				      * in the files @p{fe_nedelec_[23]d.cc}
-				      * in the source directory.
-				      */
-    struct Matrices
-    {
-					 /**
-					  * Embedding matrices. For
-					  * each element type (the
-					  * first index) there are as
-					  * many embedding matrices as
-					  * there are children per
-					  * cell. The first index
-					  * starts with linear
-					  * elements and goes up in
-					  * polynomial degree. The
-					  * array may grow in the
-					  * future with the number of
-					  * elements for which these
-					  * matrices have been
-					  * computed. If for some
-					  * element, the matrices have
-					  * not been computed then you
-					  * may use the element
-					  * nevertheless but can not
-					  * access the respective
-					  * fields.
-					  */
-	static const double * const
-	embedding[][GeometryInfo<dim>::children_per_cell];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree for
-					  * which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
-					 /**
-					  * As the
-					  * @p{embedding_matrices}
-					  * field, but for the
-					  * interface constraints. One
-					  * for each element for which
-					  * it has been computed.
-					  */
-	static const double * const constraint_matrices[];
-
-					 /**
-					  * Like
-					  * @p{n_embedding_matrices},
-					  * but for the number of
-					  * interface constraint
-					  * matrices.
-					  */
-	static const unsigned int n_constraint_matrices;
-    };
     
 				     /**
 				      * Only for internal use. Its

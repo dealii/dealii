@@ -33,7 +33,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 				    std::vector<bool> (dim,false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,
 								    std::vector<bool>(dim,true))),
-		degree(degree)
+								      degree(degree)
 {
   Assert (dim >= 2, ExcNotUsefulInThisDimension());
   
@@ -41,19 +41,19 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 				   // are defined. otherwise set them
 				   // to invalid size
   if (degree<Matrices::n_constraint_matrices+1)
-    interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
+    this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
   else
-    interface_constraints.reinit(0,0);
+    this->interface_constraints.reinit(0,0);
 
 				   // next copy over embedding
 				   // matrices if they are defined
   if ((degree < Matrices::n_embedding_matrices+1) &&
       (Matrices::embedding[degree-1][0] != 0))
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      prolongation[c].fill (Matrices::embedding[degree-1][c]);
+      this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
-      prolongation[i].reinit(0,0);
+      this->prolongation[i].reinit(0,0);
 
 				   // then fill restriction
 				   // matrices. they are hardcoded for
@@ -61,125 +61,125 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
   switch (dim)
     {
       case 2:   // 2d
-      {
-	switch (degree)
-	  {
-	    case 1:
-	    {
-					       // DoF on bottom line
-					       // of coarse cell will
-					       // be mean value of
-					       // bottom DoFs on the
-					       // two adjacent child
-					       // cells
-	      restriction[0](0,0) = 0.5;
-	      restriction[1](0,0) = 0.5;
-					       // same for other DoFs
-	      restriction[1](1,1) = 0.5;
-	      restriction[2](1,1) = 0.5;
+    {
+      switch (degree)
+	{
+	  case 1:
+	{
+					   // DoF on bottom line
+					   // of coarse cell will
+					   // be mean value of
+					   // bottom DoFs on the
+					   // two adjacent child
+					   // cells
+	  this->restriction[0](0,0) = 0.5;
+	  this->restriction[1](0,0) = 0.5;
+					   // same for other DoFs
+	  this->restriction[1](1,1) = 0.5;
+	  this->restriction[2](1,1) = 0.5;
 
-	      restriction[2](2,2) = 0.5;
-	      restriction[3](2,2) = 0.5;
+	  this->restriction[2](2,2) = 0.5;
+	  this->restriction[3](2,2) = 0.5;
 
-	      restriction[3](3,3) = 0.5;
-	      restriction[0](3,3) = 0.5;
+	  this->restriction[3](3,3) = 0.5;
+	  this->restriction[0](3,3) = 0.5;
 
-	      break;
-	    };
+	  break;
+	};
 	    
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
-					       // prevent the use of
-					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		restriction[i].reinit(0,0);
-	    };
-	  };
+	  default:
+	{
+					   // in case we don't
+					   // have the matrices
+					   // (yet), set them to
+					   // impossible
+					   // values. this does
+					   // not prevent the use
+					   // of this FE, but will
+					   // prevent the use of
+					   // these matrices
+	  for (unsigned int i=0;
+	       i<GeometryInfo<dim>::children_per_cell;
+	       ++i)
+	    this->restriction[i].reinit(0,0);
+	};
+	};
 	
-	break;
-      };
+      break;
+    };
 
 
       case 3:   // 3d
-      {
-	switch (degree)
-	  {
-	    case 1:
-	    {
-					       // same principle as in
-					       // 2d
-	      restriction[0](0,0) = 0.5;
-	      restriction[1](0,0) = 0.5;
+    {
+      switch (degree)
+	{
+	  case 1:
+	{
+					   // same principle as in
+					   // 2d
+	  this->restriction[0](0,0) = 0.5;
+	  this->restriction[1](0,0) = 0.5;
 
-	      restriction[1](1,1) = 0.5;
-	      restriction[2](1,1) = 0.5;
+	  this->restriction[1](1,1) = 0.5;
+	  this->restriction[2](1,1) = 0.5;
 
-	      restriction[2](2,2) = 0.5;
-	      restriction[3](2,2) = 0.5;
+	  this->restriction[2](2,2) = 0.5;
+	  this->restriction[3](2,2) = 0.5;
 
-	      restriction[3](3,3) = 0.5;
-	      restriction[0](3,3) = 0.5;
+	  this->restriction[3](3,3) = 0.5;
+	  this->restriction[0](3,3) = 0.5;
 
-	      restriction[4](4,4) = 0.5;
-	      restriction[5](4,4) = 0.5;
+	  this->restriction[4](4,4) = 0.5;
+	  this->restriction[5](4,4) = 0.5;
 
-	      restriction[5](5,5) = 0.5;
-	      restriction[6](5,5) = 0.5;
+	  this->restriction[5](5,5) = 0.5;
+	  this->restriction[6](5,5) = 0.5;
 
-	      restriction[6](6,6) = 0.5;
-	      restriction[7](6,6) = 0.5;
+	  this->restriction[6](6,6) = 0.5;
+	  this->restriction[7](6,6) = 0.5;
 
-	      restriction[7](7,7) = 0.5;
-	      restriction[4](7,7) = 0.5;
+	  this->restriction[7](7,7) = 0.5;
+	  this->restriction[4](7,7) = 0.5;
 
 
-	      restriction[1](8,8) = 0.5;
-	      restriction[5](8,8) = 0.5;
+	  this->restriction[1](8,8) = 0.5;
+	  this->restriction[5](8,8) = 0.5;
 
-	      restriction[2](9,9) = 0.5;
-	      restriction[6](9,9) = 0.5;
+	  this->restriction[2](9,9) = 0.5;
+	  this->restriction[6](9,9) = 0.5;
 
-	      restriction[3](10,10) = 0.5;
-	      restriction[7](10,10) = 0.5;
+	  this->restriction[3](10,10) = 0.5;
+	  this->restriction[7](10,10) = 0.5;
 
-	      restriction[0](11,11) = 0.5;
-	      restriction[5](11,11) = 0.5;
+	  this->restriction[0](11,11) = 0.5;
+	  this->restriction[5](11,11) = 0.5;
 	      
-	      break;
-	    };
+	  break;
+	};
 	    
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
-					       // prevent the use of
-					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		restriction[i].reinit(0,0);
-	    };
-	  };
+	  default:
+	{
+					   // in case we don't
+					   // have the matrices
+					   // (yet), set them to
+					   // impossible
+					   // values. this does
+					   // not prevent the use
+					   // of this FE, but will
+					   // prevent the use of
+					   // these matrices
+	  for (unsigned int i=0;
+	       i<GeometryInfo<dim>::children_per_cell;
+	       ++i)
+	    this->restriction[i].reinit(0,0);
+	};
+	};
 	
-	break;
-      };
+      break;
+    };
       
       default:
-	    Assert (false,ExcNotImplemented());
+	Assert (false,ExcNotImplemented());
     }
 
 				   // finally fill in support points
@@ -205,126 +205,126 @@ FE_Nedelec<dim>::shape_value_component (const unsigned int i,
 					const Point<dim> &p,
 					const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
   
   switch (dim)
     {
       case 2:    // 2D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
+    {
+      switch (degree)
+	{
+					   // first order Nedelec
+					   // elements
+	  case 1:
+	{
+	  switch (i)
 	    {
-	      switch (i)
-		{
-							 // (1-y, 0)
-		  case 0: return (component == 0 ? 1-p(1) : 0);
-							 // (0,x)
-		  case 1: return (component == 0 ? 0 : p(0));
-							 // (y, 0)
-		  case 2: return (component == 0 ? p(1) : 0);
-							 // (0, 1-x)
-		  case 3: return (component == 0 ? 0 : 1-p(0));
+					       // (1-y, 0)
+	      case 0: return (component == 0 ? 1-p(1) : 0);
+						 // (0,x)
+	      case 1: return (component == 0 ? 0 : p(0));
+						 // (y, 0)
+	      case 2: return (component == 0 ? p(1) : 0);
+						 // (0, 1-x)
+	      case 3: return (component == 0 ? 0 : 1-p(0));
 
-							 // there are
-							 // only four
-							 // shape
-							 // functions!?
-		  default:
-			Assert (false, ExcInternalError());
-			return 0;
-		};
+						 // there are
+						 // only four
+						 // shape
+						 // functions!?
+	      default:
+		Assert (false, ExcInternalError());
+		return 0;
 	    };
+	};
 
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
+					  // no other degrees
+					  // implemented
+	  default:
+	    Assert (false, ExcNotImplemented());
+	};
+    };
 
       case 3:    // 3D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
-	    {
-					       // note that the
-					       // degrees of freedom
-					       // on opposite faces
-					       // have a common vector
-					       // direction, so simply
-					       // that a little. these
-					       // directions are:
-					       //
-					       // for lines 0, 2, 4, 6:
-					       //    (1,0,0)
-					       // for lines 1, 3, 5, 7:
-					       //    (0,0,1)
-					       // for lines 8, 9, 10, 11:
-					       //    (0,1,0)
-					       //
-					       // thus, sort out all
-					       // those cases where
-					       // the component is
-					       // zero anyway, and
-					       // only otherwise
-					       // compute the
-					       // spatially dependent
-					       // part which is then
-					       // also the return
-					       // value
-	      if (((i<8) && (((i%2==0) && (component!=0)) ||
-			     ((i%2==1) && (component!=2)))) ||
-		  ((i>=8) && (component != 1)))
-		return 0;
+    {
+      switch (degree)
+	{
+					   // first order Nedelec
+					   // elements
+	  case 1:
+	{
+					   // note that the
+					   // degrees of freedom
+					   // on opposite faces
+					   // have a common vector
+					   // direction, so simply
+					   // that a little. these
+					   // directions are:
+					   //
+					   // for lines 0, 2, 4, 6:
+					   //    (1,0,0)
+					   // for lines 1, 3, 5, 7:
+					   //    (0,0,1)
+					   // for lines 8, 9, 10, 11:
+					   //    (0,1,0)
+					   //
+					   // thus, sort out all
+					   // those cases where
+					   // the component is
+					   // zero anyway, and
+					   // only otherwise
+					   // compute the
+					   // spatially dependent
+					   // part which is then
+					   // also the return
+					   // value
+	  if (((i<8) && (((i%2==0) && (component!=0)) ||
+			 ((i%2==1) && (component!=2)))) ||
+	      ((i>=8) && (component != 1)))
+	    return 0;
 
-					       // now we know that the
-					       // only non-zero
-					       // component is
-					       // requested:
+					   // now we know that the
+					   // only non-zero
+					   // component is
+					   // requested:
 //[Anna]:checked: OK	      
-	      const double x = p(0),
-			   y = p(1),
-			   z = p(2);
-	      switch (i)
-		{
-		  case  0: return (1-y)*(1-z);
-		  case  2: return (1-y)*z;
-		  case  1: return x*(1-y);
-		  case  3: return (1-x)*(1-y);
+	  const double x = p(0),
+		       y = p(1),
+		       z = p(2);
+	  switch (i)
+	    {
+	      case  0: return (1-y)*(1-z);
+	      case  2: return (1-y)*z;
+	      case  1: return x*(1-y);
+	      case  3: return (1-x)*(1-y);
 
-		  case  4: return y*(1-z);
-		  case  6: return y*z;
-		  case  5: return x*y;
-		  case  7: return (1-x)*y;
+	      case  4: return y*(1-z);
+	      case  6: return y*z;
+	      case  5: return x*y;
+	      case  7: return (1-x)*y;
 			
-		  case  8: return (1-x)*(1-z);
-		  case  9: return x*(1-z);
-		  case 10: return x*z;
-		  case 11: return (1-x)*z;
-		  default:
-			Assert (false, ExcInternalError());
-			return 0;
-		};
+	      case  8: return (1-x)*(1-z);
+	      case  9: return x*(1-z);
+	      case 10: return x*z;
+	      case 11: return (1-x)*z;
+	      default:
+		Assert (false, ExcInternalError());
+		return 0;
 	    };
+	};
 
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
-      
-				       // presently no other space
-				       // dimension implemented
-      default:
+					  // no other degrees
+					  // implemented
+	  default:
 	    Assert (false, ExcNotImplemented());
+	};
+    };
+      
+				      // presently no other space
+				      // dimension implemented
+      default:
+	Assert (false, ExcNotImplemented());
     };
   
   return 0;
@@ -338,54 +338,54 @@ FE_Nedelec<dim>::shape_grad_component (const unsigned int i,
 				       const Point<dim> &/*p*/,
 				       const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
 
   switch (dim)
     {
       case 2:    // 2D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements
-	    case 1:
-	    {
-					       // on the unit cell,
-					       // the gradients of
-					       // these shape
-					       // functions are
-					       // constant, so we pack
-					       // them into a table
-					       // for simpler lookup
-					       //
-					       // the format is: first
-					       // index=shape function
-					       // number; second
-					       // index=vector
-					       // component, thrid
-					       // index=component
-					       // within gradient
+    {
+      switch (degree)
+	{
+					   // first order Nedelec
+					   // elements
+	  case 1:
+	{
+					   // on the unit cell,
+					   // the gradients of
+					   // these shape
+					   // functions are
+					   // constant, so we pack
+					   // them into a table
+					   // for simpler lookup
+					   //
+					   // the format is: first
+					   // index=shape function
+					   // number; second
+					   // index=vector
+					   // component, thrid
+					   // index=component
+					   // within gradient
 //[Anna]: checked:OK	      
-	      static const double unit_gradients[4][2][2]
-		= { { {0.,-1.}, {0.,0.} },
-		    { {0.,0.},  {1.,0.} },
-		    { {0.,+1.}, {0.,0.} },
-		    { {0.,0.},  {-1.,0.} } };
-	      return Tensor<1,dim>(unit_gradients[i][component]);
-	    };
+	  static const double unit_gradients[4][2][2]
+	    = { { {0.,-1.}, {0.,0.} },
+		{ {0.,0.},  {1.,0.} },
+		{ {0.,+1.}, {0.,0.} },
+		{ {0.,0.},  {-1.,0.} } };
+	  return Tensor<1,dim>(unit_gradients[i][component]);
+	};
 
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
-
-				       // presently no other space
-				       // dimension implemented
-      default:
+					  // no other degrees
+					  // implemented
+	  default:
 	    Assert (false, ExcNotImplemented());
+	};
+    };
+
+				      // presently no other space
+				      // dimension implemented
+      default:
+	Assert (false, ExcNotImplemented());
     };
   
   return Tensor<1,dim>();
@@ -399,56 +399,56 @@ FE_Nedelec<dim>::shape_grad_grad_component (const unsigned int i,
 					    const Point<dim> &/*p*/,
 					    const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
 
   switch (dim)
     {
       case 2:    // 2D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements. their second
-					     // derivatives on the
-					     // unit cell are zero
-	    case 1:
-	    {
-	      return Tensor<2,dim>();
-	    };
+    {
+      switch (degree)
+	{
+					   // first order Nedelec
+					   // elements. their second
+					   // derivatives on the
+					   // unit cell are zero
+	  case 1:
+	{
+	  return Tensor<2,dim>();
+	};
 
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
+					  // no other degrees
+					  // implemented
+	  default:
+	    Assert (false, ExcNotImplemented());
+	};
+    };
 
       case 3:    // 3D
-      {
-	switch (degree)
-	  {
-					     // first order Nedelec
-					     // elements. their second
-					     // derivatives on the
-					     // unit cell are zero
-	    case 1:
-	    {
-	      return Tensor<2,dim>();
-	    };
+    {
+      switch (degree)
+	{
+					   // first order Nedelec
+					   // elements. their second
+					   // derivatives on the
+					   // unit cell are zero
+	  case 1:
+	{
+	  return Tensor<2,dim>();
+	};
 
-					     // no other degrees
-					     // implemented
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-      };
+					  // no other degrees
+					  // implemented
+	  default:
+	    Assert (false, ExcNotImplemented());
+	};
+    };
 	    
       
-				       // presently no other space
-				       // dimension implemented
+				      // presently no other space
+				      // dimension implemented
       default:
-	    Assert (false, ExcNotImplemented());
+	Assert (false, ExcNotImplemented());
     };
 
   return Tensor<2,dim>();
@@ -470,7 +470,7 @@ void FE_Nedelec<dim>::initialize_unit_support_points ()
 				   // all degrees of freedom are on
 				   // edges, and their order is the
 				   // same as the edges themselves
-  unit_support_points.resize(GeometryInfo<dim>::lines_per_cell * degree);
+  this->unit_support_points.resize(GeometryInfo<dim>::lines_per_cell * degree);
   unsigned int index = 0;
   for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
     {
@@ -486,7 +486,7 @@ void FE_Nedelec<dim>::initialize_unit_support_points ()
 				       // between the vertices of each
 				       // line
       for (unsigned int d=0; d<degree; ++d, ++index)
-	unit_support_points[index]
+	this->unit_support_points[index]
 	  = (vertex_0*(d+1) + vertex_1*(degree-d)) / (degree+1);
     };
 };
@@ -510,7 +510,7 @@ void FE_Nedelec<dim>::initialize_unit_face_support_points ()
 // is this correct? all DoFs on lines, none on faces or bubbles?
 				   // do this the same as above, but
 				   // for one dimension less
-  unit_face_support_points.resize(GeometryInfo<dim-1>::lines_per_cell * degree);
+  this->unit_face_support_points.resize(GeometryInfo<dim-1>::lines_per_cell * degree);
   unsigned int index = 0;
   for (unsigned int line=0; line<GeometryInfo<dim-1>::lines_per_cell; ++line)
     {
@@ -526,7 +526,7 @@ void FE_Nedelec<dim>::initialize_unit_face_support_points ()
 				       // between the vertices of each
 				       // line
       for (unsigned int d=0; d<degree; ++d, ++index)
-	unit_face_support_points[index]
+	this->unit_face_support_points[index]
 	  = (vertex_0*(d+1) + vertex_1*(degree-d)) / (degree+1);
     };
 };
@@ -823,8 +823,8 @@ bool
 FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const
 {
-  Assert (shape_index < dofs_per_cell,
-	  ExcIndexRange (shape_index, 0, dofs_per_cell));
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 	  

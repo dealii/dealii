@@ -95,12 +95,12 @@ MappingQ1Eulerian<dim>::compute_mapping_support_points(
 				       // are always numbered first,
 				       // we can access them easily
       for (unsigned int j=0; j<dim; ++j)
-	shift_vector[j] = mapping_values(vertex_mapping[i]*dim+j);
+	shift_vector[j] = mapping_values(this->vertex_mapping[i]*dim+j);
 
 				       // compute new support point by
 				       // old (reference) value and
 				       // added shift
-      a[i] = cell->vertex(vertex_mapping[i]) + shift_vector;
+      a[i] = cell->vertex(this->vertex_mapping[i]) + shift_vector;
     }
 }
 

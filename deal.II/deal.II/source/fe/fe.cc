@@ -113,31 +113,34 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 					   const std::vector<std::vector<bool> > &nonzero_components)
 		:
 		FiniteElementData<dim> (fe_data),
-                system_to_component_table(dofs_per_cell),
-                face_system_to_component_table(dofs_per_face),
-		system_to_base_table(dofs_per_cell),
-		face_system_to_base_table(dofs_per_face),		
-                component_to_system_table(components, std::vector<unsigned>(dofs_per_cell)),
-	        face_component_to_system_table(components, std::vector<unsigned>(dofs_per_face)),
-		component_to_base_table (components, std::make_pair(0U, 0U)),
-		restriction_is_additive_flags(restriction_is_additive_flags),
-		nonzero_components (nonzero_components),
-		n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
-		cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
-						  n_nonzero_components_table.end(),
-						  std::bind2nd(std::not_equal_to<unsigned int>(),
-							       1U))
-				    ==
-				    n_nonzero_components_table.end())
+  system_to_component_table(this->dofs_per_cell),
+  face_system_to_component_table(this->dofs_per_face),
+  system_to_base_table(this->dofs_per_cell),
+  face_system_to_base_table(this->dofs_per_face),		
+  component_to_system_table(this->components,
+			    std::vector<unsigned>(this->dofs_per_cell)),
+			      face_component_to_system_table(this->components,
+							     std::vector<unsigned>(this->dofs_per_face)),
+							       component_to_base_table (this->components,
+											std::make_pair(0U, 0U)),
+							       restriction_is_additive_flags(restriction_is_additive_flags),
+							       nonzero_components (nonzero_components),
+							       n_nonzero_components_table (compute_n_nonzero_components(nonzero_components)),
+							       cached_primitivity (std::find_if (n_nonzero_components_table.begin(),
+												 n_nonzero_components_table.end(),
+												 std::bind2nd(std::not_equal_to<unsigned int>(),
+													      1U))
+										   ==
+										   n_nonzero_components_table.end())
 {
   Assert (restriction_is_additive_flags.size()==fe_data.components,
 	  ExcDimensionMismatch(restriction_is_additive_flags.size(),
 			       fe_data.components));
-  Assert (nonzero_components.size() == dofs_per_cell,
+  Assert (nonzero_components.size() == this->dofs_per_cell,
 	  ExcInternalError());
   for (unsigned int i=0; i<nonzero_components.size(); ++i)
     {
-      Assert (nonzero_components[i].size() == n_components(),
+      Assert (nonzero_components[i].size() == this->n_components(),
 	      ExcInternalError());
       Assert (std::count (nonzero_components[i].begin(),
 			  nonzero_components[i].end(),
@@ -146,14 +149,14 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 	      ExcInternalError());
       Assert (n_nonzero_components_table[i] >= 1,
 	      ExcInternalError());
-      Assert (n_nonzero_components_table[i] <= n_components(),
+      Assert (n_nonzero_components_table[i] <= this->n_components(),
 	      ExcInternalError());      
     };
   
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {
-      restriction[i].reinit (dofs_per_cell, dofs_per_cell);
-      prolongation[i].reinit (dofs_per_cell, dofs_per_cell);
+      restriction[i].reinit (this->dofs_per_cell, this->dofs_per_cell);
+      prolongation[i].reinit (this->dofs_per_cell, this->dofs_per_cell);
     };
 
 				   // first set sizes of some
@@ -163,38 +166,39 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
   switch (dim)
     {
       case 1:
-	    Assert ((interface_constraints.m() == 0) &&
-		    (interface_constraints.n() == 0),
-		    ExcInternalError());
-	    break;
+	Assert ((interface_constraints.m() == 0) &&
+		(interface_constraints.n() == 0),
+		ExcInternalError());
+	break;
 	    
       case 2:
-	    interface_constraints.reinit (dofs_per_vertex+2*dofs_per_line,
-					  dofs_per_face);
-	    break;
+	interface_constraints.reinit (this->dofs_per_vertex
+				      +2*this->dofs_per_line,
+				      this->dofs_per_face);
+	break;
 
       case 3:
-	    interface_constraints.reinit (5*dofs_per_vertex +
-					  12*dofs_per_line  +
-					  4*dofs_per_quad,
-					  dofs_per_face);
-	    break;
+	interface_constraints.reinit (5*this->dofs_per_vertex +
+				      12*this->dofs_per_line  +
+				      4*this->dofs_per_quad,
+				      this->dofs_per_face);
+	break;
 
       default:
-	    Assert (false, ExcNotImplemented());
+	Assert (false, ExcNotImplemented());
     };
 	    
   				   // this is the default way, if there is only
 				   // one component; if there are several, then
 				   // the constructor of the derived class needs
 				   // to fill these arrays
-  for (unsigned int j=0 ; j<dofs_per_cell ; ++j)
+  for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
     {
       system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
       system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
       component_to_system_table[0][j] = j;
     }
-  for (unsigned int j=0 ; j<dofs_per_face ; ++j)
+  for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
     {
       face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
       face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
@@ -299,7 +303,7 @@ template <int dim>
 const FullMatrix<double> &
 FiniteElementBase<dim>::constraints () const
 {
-  Assert ((dofs_per_face  == 0) || (interface_constraints.m() != 0),
+  Assert ((this->dofs_per_face  == 0) || (interface_constraints.m() != 0),
 	  ExcConstraintsVoid());
   
   if (dim==1)
@@ -331,7 +335,7 @@ FiniteElementBase<dim>::get_unit_support_points () const
 				   // there are as many as there are
 				   // degrees of freedom
   Assert ((unit_support_points.size() == 0) ||
-	  (unit_support_points.size() == dofs_per_cell),
+	  (unit_support_points.size() == this->dofs_per_cell),
 	  ExcInternalError());
   return unit_support_points;
 };
@@ -356,7 +360,7 @@ FiniteElementBase<dim>::get_unit_face_support_points () const
 				   // there are as many as there are
 				   // degrees of freedom on a face
   Assert ((unit_face_support_points.size() == 0) ||
-	  (unit_face_support_points.size() == dofs_per_face),
+	  (unit_face_support_points.size() == this->dofs_per_face),
 	  ExcInternalError());
   return unit_face_support_points;
 };
@@ -411,7 +415,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_second_derivatives,
 	  ExcInternalError());
-  Assert (data.shape_2nd_derivatives.size() == dofs_per_cell,
+  Assert (data.shape_2nd_derivatives.size() == this->dofs_per_cell,
 	  ExcInternalError());
 				   // Number of quadrature points
   const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
@@ -435,7 +439,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				   // for all shape functions at all
 				   // quadrature points and difference
 				   // quotients in all directions:
-  for (unsigned int shape=0; shape<dofs_per_cell; ++shape)
+  for (unsigned int shape=0; shape<this->dofs_per_cell; ++shape)
     {
       for (unsigned int d1=0; d1<dim; ++d1)
 	for (unsigned int q=0; q<n_q_points; ++q)

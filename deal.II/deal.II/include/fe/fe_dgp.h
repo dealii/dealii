@@ -199,6 +199,53 @@ class FE_DGP : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
+
+				     /**
+				      * Declare a nested class which
+				      * will hold static definitions of
+				      * various matrices such as
+				      * constraint and embedding
+				      * matrices. The definition of
+				      * the various static fields are
+				      * in the files @p{fe_dgp_[123]d.cc}
+				      * in the source directory.
+				      */
+    struct Matrices
+    {
+					 /**
+					  * Pointers to the embedding
+					  * matrices, one for each
+					  * polynomial degree starting
+					  * from constant elements
+					  */
+	static const double * const embedding[][GeometryInfo<dim>::children_per_cell];
+
+					 /**
+					  * Number of elements (first
+					  * index) the above field
+					  * has. Equals the highest
+					  * polynomial degree plus one
+					  * for which the embedding
+					  * matrices have been
+					  * computed.
+					  */
+	static const unsigned int n_embedding_matrices;
+
+					 /**
+					  * As @p{embedding} but for
+					  * projection matrices.
+					  */
+	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
+
+					 /**
+					  * As
+					  * @p{n_embedding_matrices}
+					  * but for projection
+					  * matrices.
+					  */
+	static const unsigned int n_projection_matrices;
+    };
+
   protected:
 
 				     /**
@@ -264,53 +311,6 @@ class FE_DGP : public FiniteElement<dim>
 			    FEValuesData<dim>& data) const ;
 
   private:
-
-				     /**
-				      * Declare a nested class which
-				      * will hold static definitions of
-				      * various matrices such as
-				      * constraint and embedding
-				      * matrices. The definition of
-				      * the various static fields are
-				      * in the files @p{fe_dgp_[123]d.cc}
-				      * in the source directory.
-				      */
-    struct Matrices
-    {
-					 /**
-					  * Pointers to the embedding
-					  * matrices, one for each
-					  * polynomial degree starting
-					  * from constant elements
-					  */
-	static const double * const embedding[][GeometryInfo<dim>::children_per_cell];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree plus one
-					  * for which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
-					 /**
-					  * As @p{embedding} but for
-					  * projection matrices.
-					  */
-	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
-
-					 /**
-					  * As
-					  * @p{n_embedding_matrices}
-					  * but for projection
-					  * matrices.
-					  */
-	static const unsigned int n_projection_matrices;
-    };
-
     
 				     /**
 				      * Only for internal use. Its

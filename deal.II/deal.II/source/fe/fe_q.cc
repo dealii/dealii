@@ -30,11 +30,11 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 				    std::vector<bool> (1,false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
 								    std::vector<bool>(1,true))),
-		degree(degree),
-		renumber(dofs_per_cell, 0),
-		renumber_inverse(dofs_per_cell, 0),
-		face_renumber(dofs_per_face, 0),
-		polynomial_space(LagrangeEquidistant::generate_complete_basis(degree))
+								      degree(degree),
+								      renumber(this->dofs_per_cell, 0),
+								      renumber_inverse(this->dofs_per_cell, 0),
+								      face_renumber(this->dofs_per_face, 0),
+								      polynomial_space(LagrangeEquidistant::generate_complete_basis(degree))
 {
 				   // do some internal book-keeping on
 				   // cells and faces. if in 1d, the
@@ -44,26 +44,26 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
   
 				   // build inverse of renumbering
 				   // vector
-  for (unsigned int i=0; i<dofs_per_cell; ++i)
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     renumber_inverse[renumber[i]]=i;
 
 				   // copy constraint matrices if they
 				   // are defined. otherwise set them
 				   // to invalid size
   if ((dim>1) && (degree<Matrices::n_constraint_matrices+1))
-    interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
+    this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
   else
-    interface_constraints.reinit(0,0);
+    this->interface_constraints.reinit(0,0);
 
 				   // next copy over embedding
 				   // matrices if they are defined
   if ((degree < Matrices::n_embedding_matrices+1) &&
       (Matrices::embedding[degree-1][0] != 0))
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      prolongation[c].fill (Matrices::embedding[degree-1][c]);
+      this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
-      prolongation[i].reinit(0,0);
+      this->prolongation[i].reinit(0,0);
 
 				   // then fill restriction
 				   // matrices. they are hardcoded for
@@ -79,545 +79,545 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
   switch (dim)
     {
       case 1:  // 1d
-      {
-	switch (degree)
-	  {
-	    case 1:
-		  restriction[0](0,0) = 1;
-		  restriction[1](1,1) = 1;
-		  break;
-	    case 2:
-		  restriction[0](0,0) = 1;
-		  restriction[0](2,1) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](1,1) = 1;
-		  break;
-	    case 3:
-		  restriction[0](0,0) = 1;
-		  restriction[0](2,3) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](3,2) = 1;
-		  break;
-	    case 4:
-		  restriction[0](0,0) = 1;
-		  restriction[0](2,3) = 1;
-		  restriction[0](3,1) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](3,0) = 1;
-		  restriction[1](4,3) = 1;
-		  break;
+    {
+      switch (degree)
+	{
+	  case 1:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[1](1,1) = 1;
+	    break;
+	  case 2:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](2,1) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](1,1) = 1;
+	    break;
+	  case 3:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](2,3) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](3,2) = 1;
+	    break;
+	  case 4:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](2,3) = 1;
+	    this->restriction[0](3,1) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](3,0) = 1;
+	    this->restriction[1](4,3) = 1;
+	    break;
 		  
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
-					       // prevent the use of
-					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		restriction[i].reinit(0,0);
-	    };
-	  }
-	break;
-      };
+	  default:
+	{
+					   // in case we don't
+					   // have the matrices
+					   // (yet), set them to
+					   // impossible
+					   // values. this does
+					   // not prevent the use
+					   // of this FE, but will
+					   // prevent the use of
+					   // these matrices
+	  for (unsigned int i=0;
+	       i<GeometryInfo<dim>::children_per_cell;
+	       ++i)
+	    this->restriction[i].reinit(0,0);
+	};
+	}
+      break;
+    };
       
       case 2:  // 2d
-      {
-	switch (degree)
-	  {
-	    case 1:
-		  restriction[0](0,0) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[3](3,3) = 1;
-		  break;
-	    case 2:
-		  restriction[0](0,0) = 1;
-		  restriction[0](4,1) = 1;
-		  restriction[0](7,3) = 1;
-		  restriction[0](8,2) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](4,0) = 1;
-		  restriction[1](5,2) = 1;
-		  restriction[1](8,3) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[2](5,1) = 1;
-		  restriction[2](6,3) = 1;
-		  restriction[2](8,0) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[3](6,2) = 1;
-		  restriction[3](7,0) = 1;
-		  restriction[3](8,1) = 1;
-		  break;
-	    case 3:
-		  restriction[0](0,0) = 1;
-		  restriction[0](4,5) = 1;
-		  restriction[0](10,11) = 1;
-		  restriction[0](12,15) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](5,4) = 1;
-		  restriction[1](6,7) = 1;
-		  restriction[1](13,14) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[2](7,6) = 1;
-		  restriction[2](9,8) = 1;
-		  restriction[2](15,12) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[3](8,9) = 1;
-		  restriction[3](11,10) = 1;
-		  restriction[3](14,13) = 1;
-		  break;
-	    case 4:
-		  restriction[0](0,0) = 1;
-		  restriction[0](4,5) = 1;
-		  restriction[0](5,1) = 1;
-		  restriction[0](13,14) = 1;
-		  restriction[0](14,3) = 1;
-		  restriction[0](16,20) = 1;
-		  restriction[0](17,8) = 1;
-		  restriction[0](19,11) = 1;
-		  restriction[0](20,2) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](5,0) = 1;
-		  restriction[1](6,5) = 1;
-		  restriction[1](7,8) = 1;
-		  restriction[1](8,2) = 1;
-		  restriction[1](17,14) = 1;
-		  restriction[1](18,20) = 1;
-		  restriction[1](20,3) = 1;
-		  restriction[1](21,11) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[2](8,1) = 1;
-		  restriction[2](9,8) = 1;
-		  restriction[2](11,3) = 1;
-		  restriction[2](12,11) = 1;
-		  restriction[2](20,0) = 1;
-		  restriction[2](21,5) = 1;
-		  restriction[2](23,14) = 1;
-		  restriction[2](24,20) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[3](10,11) = 1;
-		  restriction[3](11,2) = 1;
-		  restriction[3](14,0) = 1;
-		  restriction[3](15,14) = 1;
-		  restriction[3](19,5) = 1;
-		  restriction[3](20,1) = 1;
-		  restriction[3](22,20) = 1;
-		  restriction[3](23,8) = 1;
-		  break;
+    {
+      switch (degree)
+	{
+	  case 1:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[3](3,3) = 1;
+	    break;
+	  case 2:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](4,1) = 1;
+	    this->restriction[0](7,3) = 1;
+	    this->restriction[0](8,2) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](4,0) = 1;
+	    this->restriction[1](5,2) = 1;
+	    this->restriction[1](8,3) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[2](5,1) = 1;
+	    this->restriction[2](6,3) = 1;
+	    this->restriction[2](8,0) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[3](6,2) = 1;
+	    this->restriction[3](7,0) = 1;
+	    this->restriction[3](8,1) = 1;
+	    break;
+	  case 3:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](4,5) = 1;
+	    this->restriction[0](10,11) = 1;
+	    this->restriction[0](12,15) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](5,4) = 1;
+	    this->restriction[1](6,7) = 1;
+	    this->restriction[1](13,14) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[2](7,6) = 1;
+	    this->restriction[2](9,8) = 1;
+	    this->restriction[2](15,12) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[3](8,9) = 1;
+	    this->restriction[3](11,10) = 1;
+	    this->restriction[3](14,13) = 1;
+	    break;
+	  case 4:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](4,5) = 1;
+	    this->restriction[0](5,1) = 1;
+	    this->restriction[0](13,14) = 1;
+	    this->restriction[0](14,3) = 1;
+	    this->restriction[0](16,20) = 1;
+	    this->restriction[0](17,8) = 1;
+	    this->restriction[0](19,11) = 1;
+	    this->restriction[0](20,2) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](5,0) = 1;
+	    this->restriction[1](6,5) = 1;
+	    this->restriction[1](7,8) = 1;
+	    this->restriction[1](8,2) = 1;
+	    this->restriction[1](17,14) = 1;
+	    this->restriction[1](18,20) = 1;
+	    this->restriction[1](20,3) = 1;
+	    this->restriction[1](21,11) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[2](8,1) = 1;
+	    this->restriction[2](9,8) = 1;
+	    this->restriction[2](11,3) = 1;
+	    this->restriction[2](12,11) = 1;
+	    this->restriction[2](20,0) = 1;
+	    this->restriction[2](21,5) = 1;
+	    this->restriction[2](23,14) = 1;
+	    this->restriction[2](24,20) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[3](10,11) = 1;
+	    this->restriction[3](11,2) = 1;
+	    this->restriction[3](14,0) = 1;
+	    this->restriction[3](15,14) = 1;
+	    this->restriction[3](19,5) = 1;
+	    this->restriction[3](20,1) = 1;
+	    this->restriction[3](22,20) = 1;
+	    this->restriction[3](23,8) = 1;
+	    break;
 
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
-					       // prevent the use of
-					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		restriction[i].reinit(0,0);
-	    };
-	  }
-	break;
-      };
+	  default:
+	{
+					   // in case we don't
+					   // have the matrices
+					   // (yet), set them to
+					   // impossible
+					   // values. this does
+					   // not prevent the use
+					   // of this FE, but will
+					   // prevent the use of
+					   // these matrices
+	  for (unsigned int i=0;
+	       i<GeometryInfo<dim>::children_per_cell;
+	       ++i)
+	    this->restriction[i].reinit(0,0);
+	};
+	}
+      break;
+    };
       
       case 3:  // 3d
-      {
-	switch (degree)
-	  {
-	    case 1:
-		  restriction[0](0,0) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[4](4,4) = 1;
-		  restriction[5](5,5) = 1;
-		  restriction[6](6,6) = 1;
-		  restriction[7](7,7) = 1;
-		  break;
-	    case 2:
-		  restriction[0](0,0) = 1;
-		  restriction[0](8,1) = 1;
-		  restriction[0](11,3) = 1;
-		  restriction[0](16,4) = 1;
-		  restriction[0](20,2) = 1;
-		  restriction[0](22,5) = 1;
-		  restriction[0](25,7) = 1;
-		  restriction[0](26,6) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](8,0) = 1;
-		  restriction[1](9,2) = 1;
-		  restriction[1](17,5) = 1;
-		  restriction[1](20,3) = 1;
-		  restriction[1](22,4) = 1;
-		  restriction[1](23,6) = 1;
-		  restriction[1](26,7) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[2](9,1) = 1;
-		  restriction[2](10,3) = 1;
-		  restriction[2](18,6) = 1;
-		  restriction[2](20,0) = 1;
-		  restriction[2](23,5) = 1;
-		  restriction[2](24,7) = 1;
-		  restriction[2](26,4) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[3](10,2) = 1;
-		  restriction[3](11,0) = 1;
-		  restriction[3](19,7) = 1;
-		  restriction[3](20,1) = 1;
-		  restriction[3](24,6) = 1;
-		  restriction[3](25,4) = 1;
-		  restriction[3](26,5) = 1;
-		  restriction[4](4,4) = 1;
-		  restriction[4](12,5) = 1;
-		  restriction[4](15,7) = 1;
-		  restriction[4](16,0) = 1;
-		  restriction[4](21,6) = 1;
-		  restriction[4](22,1) = 1;
-		  restriction[4](25,3) = 1;
-		  restriction[4](26,2) = 1;
-		  restriction[5](5,5) = 1;
-		  restriction[5](12,4) = 1;
-		  restriction[5](13,6) = 1;
-		  restriction[5](17,1) = 1;
-		  restriction[5](21,7) = 1;
-		  restriction[5](22,0) = 1;
-		  restriction[5](23,2) = 1;
-		  restriction[5](26,3) = 1;
-		  restriction[6](6,6) = 1;
-		  restriction[6](13,5) = 1;
-		  restriction[6](14,7) = 1;
-		  restriction[6](18,2) = 1;
-		  restriction[6](21,4) = 1;
-		  restriction[6](23,1) = 1;
-		  restriction[6](24,3) = 1;
-		  restriction[6](26,0) = 1;
-		  restriction[7](7,7) = 1;
-		  restriction[7](14,6) = 1;
-		  restriction[7](15,4) = 1;
-		  restriction[7](19,3) = 1;
-		  restriction[7](21,5) = 1;
-		  restriction[7](24,2) = 1;
-		  restriction[7](25,0) = 1;
-		  restriction[7](26,1) = 1;
-		  break;
-	    case 3:
-		  restriction[0](0,0) = 1;
-		  restriction[0](8,9) = 1;
-		  restriction[0](14,15) = 1;
-		  restriction[0](24,25) = 1;
-		  restriction[0](32,35) = 1;
-		  restriction[0](40,43) = 1;
-		  restriction[0](52,55) = 1;
-		  restriction[0](56,63) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](9,8) = 1;
-		  restriction[1](10,11) = 1;
-		  restriction[1](26,27) = 1;
-		  restriction[1](33,34) = 1;
-		  restriction[1](41,42) = 1;
-		  restriction[1](44,47) = 1;
-		  restriction[1](57,62) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[2](11,10) = 1;
-		  restriction[2](13,12) = 1;
-		  restriction[2](28,29) = 1;
-		  restriction[2](35,32) = 1;
-		  restriction[2](46,45) = 1;
-		  restriction[2](49,50) = 1;
-		  restriction[2](61,58) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[3](12,13) = 1;
-		  restriction[3](15,14) = 1;
-		  restriction[3](30,31) = 1;
-		  restriction[3](34,33) = 1;
-		  restriction[3](48,51) = 1;
-		  restriction[3](54,53) = 1;
-		  restriction[3](60,59) = 1;
-		  restriction[4](4,4) = 1;
-		  restriction[4](16,17) = 1;
-		  restriction[4](22,23) = 1;
-		  restriction[4](25,24) = 1;
-		  restriction[4](36,39) = 1;
-		  restriction[4](42,41) = 1;
-		  restriction[4](53,54) = 1;
-		  restriction[4](58,61) = 1;
-		  restriction[5](5,5) = 1;
-		  restriction[5](17,16) = 1;
-		  restriction[5](18,19) = 1;
-		  restriction[5](27,26) = 1;
-		  restriction[5](37,38) = 1;
-		  restriction[5](43,40) = 1;
-		  restriction[5](45,46) = 1;
-		  restriction[5](59,60) = 1;
-		  restriction[6](6,6) = 1;
-		  restriction[6](19,18) = 1;
-		  restriction[6](21,20) = 1;
-		  restriction[6](29,28) = 1;
-		  restriction[6](39,36) = 1;
-		  restriction[6](47,44) = 1;
-		  restriction[6](51,48) = 1;
-		  restriction[6](63,56) = 1;
-		  restriction[7](7,7) = 1;
-		  restriction[7](20,21) = 1;
-		  restriction[7](23,22) = 1;
-		  restriction[7](31,30) = 1;
-		  restriction[7](38,37) = 1;
-		  restriction[7](50,49) = 1;
-		  restriction[7](55,52) = 1;
-		  restriction[7](62,57) = 1;
-		  break;
-	    case 4:
-		  restriction[0](0,0) = 1;
-		  restriction[0](8,9) = 1;
-		  restriction[0](9,1) = 1;
-		  restriction[0](17,18) = 1;
-		  restriction[0](18,3) = 1;
-		  restriction[0](32,33) = 1;
-		  restriction[0](33,4) = 1;
-		  restriction[0](44,48) = 1;
-		  restriction[0](45,12) = 1;
-		  restriction[0](47,15) = 1;
-		  restriction[0](48,2) = 1;
-		  restriction[0](62,66) = 1;
-		  restriction[0](63,36) = 1;
-		  restriction[0](65,21) = 1;
-		  restriction[0](66,5) = 1;
-		  restriction[0](89,93) = 1;
-		  restriction[0](90,30) = 1;
-		  restriction[0](92,42) = 1;
-		  restriction[0](93,7) = 1;
-		  restriction[0](98,111) = 1;
-		  restriction[0](99,75) = 1;
-		  restriction[0](101,57) = 1;
-		  restriction[0](102,24) = 1;
-		  restriction[0](107,84) = 1;
-		  restriction[0](108,39) = 1;
-		  restriction[0](110,27) = 1;
-		  restriction[0](111,6) = 1;
-		  restriction[1](1,1) = 1;
-		  restriction[1](9,0) = 1;
-		  restriction[1](10,9) = 1;
-		  restriction[1](11,12) = 1;
-		  restriction[1](12,2) = 1;
-		  restriction[1](35,36) = 1;
-		  restriction[1](36,5) = 1;
-		  restriction[1](45,18) = 1;
-		  restriction[1](46,48) = 1;
-		  restriction[1](48,3) = 1;
-		  restriction[1](49,15) = 1;
-		  restriction[1](63,33) = 1;
-		  restriction[1](64,66) = 1;
-		  restriction[1](66,4) = 1;
-		  restriction[1](67,21) = 1;
-		  restriction[1](71,75) = 1;
-		  restriction[1](72,24) = 1;
-		  restriction[1](74,39) = 1;
-		  restriction[1](75,6) = 1;
-		  restriction[1](99,93) = 1;
-		  restriction[1](100,111) = 1;
-		  restriction[1](102,30) = 1;
-		  restriction[1](103,57) = 1;
-		  restriction[1](108,42) = 1;
-		  restriction[1](109,84) = 1;
-		  restriction[1](111,7) = 1;
-		  restriction[1](112,27) = 1;
-		  restriction[2](2,2) = 1;
-		  restriction[2](12,1) = 1;
-		  restriction[2](13,12) = 1;
-		  restriction[2](15,3) = 1;
-		  restriction[2](16,15) = 1;
-		  restriction[2](38,39) = 1;
-		  restriction[2](39,6) = 1;
-		  restriction[2](48,0) = 1;
-		  restriction[2](49,9) = 1;
-		  restriction[2](51,18) = 1;
-		  restriction[2](52,48) = 1;
-		  restriction[2](74,36) = 1;
-		  restriction[2](75,5) = 1;
-		  restriction[2](77,75) = 1;
-		  restriction[2](78,24) = 1;
-		  restriction[2](81,42) = 1;
-		  restriction[2](82,84) = 1;
-		  restriction[2](84,7) = 1;
-		  restriction[2](85,27) = 1;
-		  restriction[2](108,33) = 1;
-		  restriction[2](109,66) = 1;
-		  restriction[2](111,4) = 1;
-		  restriction[2](112,21) = 1;
-		  restriction[2](117,93) = 1;
-		  restriction[2](118,111) = 1;
-		  restriction[2](120,30) = 1;
-		  restriction[2](121,57) = 1;
-		  restriction[3](3,3) = 1;
-		  restriction[3](14,15) = 1;
-		  restriction[3](15,2) = 1;
-		  restriction[3](18,0) = 1;
-		  restriction[3](19,18) = 1;
-		  restriction[3](41,42) = 1;
-		  restriction[3](42,7) = 1;
-		  restriction[3](47,9) = 1;
-		  restriction[3](48,1) = 1;
-		  restriction[3](50,48) = 1;
-		  restriction[3](51,12) = 1;
-		  restriction[3](80,84) = 1;
-		  restriction[3](81,39) = 1;
-		  restriction[3](83,27) = 1;
-		  restriction[3](84,6) = 1;
-		  restriction[3](92,33) = 1;
-		  restriction[3](93,4) = 1;
-		  restriction[3](95,93) = 1;
-		  restriction[3](96,30) = 1;
-		  restriction[3](107,66) = 1;
-		  restriction[3](108,36) = 1;
-		  restriction[3](110,21) = 1;
-		  restriction[3](111,5) = 1;
-		  restriction[3](116,111) = 1;
-		  restriction[3](117,75) = 1;
-		  restriction[3](119,57) = 1;
-		  restriction[3](120,24) = 1;
-		  restriction[4](4,4) = 1;
-		  restriction[4](20,21) = 1;
-		  restriction[4](21,5) = 1;
-		  restriction[4](29,30) = 1;
-		  restriction[4](30,7) = 1;
-		  restriction[4](33,0) = 1;
-		  restriction[4](34,33) = 1;
-		  restriction[4](53,57) = 1;
-		  restriction[4](54,24) = 1;
-		  restriction[4](56,27) = 1;
-		  restriction[4](57,6) = 1;
-		  restriction[4](65,9) = 1;
-		  restriction[4](66,1) = 1;
-		  restriction[4](68,66) = 1;
-		  restriction[4](69,36) = 1;
-		  restriction[4](90,18) = 1;
-		  restriction[4](91,93) = 1;
-		  restriction[4](93,3) = 1;
-		  restriction[4](94,42) = 1;
-		  restriction[4](101,48) = 1;
-		  restriction[4](102,12) = 1;
-		  restriction[4](104,111) = 1;
-		  restriction[4](105,75) = 1;
-		  restriction[4](110,15) = 1;
-		  restriction[4](111,2) = 1;
-		  restriction[4](113,84) = 1;
-		  restriction[4](114,39) = 1;
-		  restriction[5](5,5) = 1;
-		  restriction[5](21,4) = 1;
-		  restriction[5](22,21) = 1;
-		  restriction[5](23,24) = 1;
-		  restriction[5](24,6) = 1;
-		  restriction[5](36,1) = 1;
-		  restriction[5](37,36) = 1;
-		  restriction[5](54,30) = 1;
-		  restriction[5](55,57) = 1;
-		  restriction[5](57,7) = 1;
-		  restriction[5](58,27) = 1;
-		  restriction[5](66,0) = 1;
-		  restriction[5](67,9) = 1;
-		  restriction[5](69,33) = 1;
-		  restriction[5](70,66) = 1;
-		  restriction[5](72,12) = 1;
-		  restriction[5](73,75) = 1;
-		  restriction[5](75,2) = 1;
-		  restriction[5](76,39) = 1;
-		  restriction[5](102,18) = 1;
-		  restriction[5](103,48) = 1;
-		  restriction[5](105,93) = 1;
-		  restriction[5](106,111) = 1;
-		  restriction[5](111,3) = 1;
-		  restriction[5](112,15) = 1;
-		  restriction[5](114,42) = 1;
-		  restriction[5](115,84) = 1;
-		  restriction[6](6,6) = 1;
-		  restriction[6](24,5) = 1;
-		  restriction[6](25,24) = 1;
-		  restriction[6](27,7) = 1;
-		  restriction[6](28,27) = 1;
-		  restriction[6](39,2) = 1;
-		  restriction[6](40,39) = 1;
-		  restriction[6](57,4) = 1;
-		  restriction[6](58,21) = 1;
-		  restriction[6](60,30) = 1;
-		  restriction[6](61,57) = 1;
-		  restriction[6](75,1) = 1;
-		  restriction[6](76,36) = 1;
-		  restriction[6](78,12) = 1;
-		  restriction[6](79,75) = 1;
-		  restriction[6](84,3) = 1;
-		  restriction[6](85,15) = 1;
-		  restriction[6](87,42) = 1;
-		  restriction[6](88,84) = 1;
-		  restriction[6](111,0) = 1;
-		  restriction[6](112,9) = 1;
-		  restriction[6](114,33) = 1;
-		  restriction[6](115,66) = 1;
-		  restriction[6](120,18) = 1;
-		  restriction[6](121,48) = 1;
-		  restriction[6](123,93) = 1;
-		  restriction[6](124,111) = 1;
-		  restriction[7](7,7) = 1;
-		  restriction[7](26,27) = 1;
-		  restriction[7](27,6) = 1;
-		  restriction[7](30,4) = 1;
-		  restriction[7](31,30) = 1;
-		  restriction[7](42,3) = 1;
-		  restriction[7](43,42) = 1;
-		  restriction[7](56,21) = 1;
-		  restriction[7](57,5) = 1;
-		  restriction[7](59,57) = 1;
-		  restriction[7](60,24) = 1;
-		  restriction[7](83,15) = 1;
-		  restriction[7](84,2) = 1;
-		  restriction[7](86,84) = 1;
-		  restriction[7](87,39) = 1;
-		  restriction[7](93,0) = 1;
-		  restriction[7](94,33) = 1;
-		  restriction[7](96,18) = 1;
-		  restriction[7](97,93) = 1;
-		  restriction[7](110,9) = 1;
-		  restriction[7](111,1) = 1;
-		  restriction[7](113,66) = 1;
-		  restriction[7](114,36) = 1;
-		  restriction[7](119,48) = 1;
-		  restriction[7](120,12) = 1;
-		  restriction[7](122,111) = 1;
-		  restriction[7](123,75) = 1;
-		  break;
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
-					       // prevent the use of
-					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		restriction[i].reinit(0,0);
-	    };
-	  }
-	break;
-      };
+    {
+      switch (degree)
+	{
+	  case 1:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[4](4,4) = 1;
+	    this->restriction[5](5,5) = 1;
+	    this->restriction[6](6,6) = 1;
+	    this->restriction[7](7,7) = 1;
+	    break;
+	  case 2:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](8,1) = 1;
+	    this->restriction[0](11,3) = 1;
+	    this->restriction[0](16,4) = 1;
+	    this->restriction[0](20,2) = 1;
+	    this->restriction[0](22,5) = 1;
+	    this->restriction[0](25,7) = 1;
+	    this->restriction[0](26,6) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](8,0) = 1;
+	    this->restriction[1](9,2) = 1;
+	    this->restriction[1](17,5) = 1;
+	    this->restriction[1](20,3) = 1;
+	    this->restriction[1](22,4) = 1;
+	    this->restriction[1](23,6) = 1;
+	    this->restriction[1](26,7) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[2](9,1) = 1;
+	    this->restriction[2](10,3) = 1;
+	    this->restriction[2](18,6) = 1;
+	    this->restriction[2](20,0) = 1;
+	    this->restriction[2](23,5) = 1;
+	    this->restriction[2](24,7) = 1;
+	    this->restriction[2](26,4) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[3](10,2) = 1;
+	    this->restriction[3](11,0) = 1;
+	    this->restriction[3](19,7) = 1;
+	    this->restriction[3](20,1) = 1;
+	    this->restriction[3](24,6) = 1;
+	    this->restriction[3](25,4) = 1;
+	    this->restriction[3](26,5) = 1;
+	    this->restriction[4](4,4) = 1;
+	    this->restriction[4](12,5) = 1;
+	    this->restriction[4](15,7) = 1;
+	    this->restriction[4](16,0) = 1;
+	    this->restriction[4](21,6) = 1;
+	    this->restriction[4](22,1) = 1;
+	    this->restriction[4](25,3) = 1;
+	    this->restriction[4](26,2) = 1;
+	    this->restriction[5](5,5) = 1;
+	    this->restriction[5](12,4) = 1;
+	    this->restriction[5](13,6) = 1;
+	    this->restriction[5](17,1) = 1;
+	    this->restriction[5](21,7) = 1;
+	    this->restriction[5](22,0) = 1;
+	    this->restriction[5](23,2) = 1;
+	    this->restriction[5](26,3) = 1;
+	    this->restriction[6](6,6) = 1;
+	    this->restriction[6](13,5) = 1;
+	    this->restriction[6](14,7) = 1;
+	    this->restriction[6](18,2) = 1;
+	    this->restriction[6](21,4) = 1;
+	    this->restriction[6](23,1) = 1;
+	    this->restriction[6](24,3) = 1;
+	    this->restriction[6](26,0) = 1;
+	    this->restriction[7](7,7) = 1;
+	    this->restriction[7](14,6) = 1;
+	    this->restriction[7](15,4) = 1;
+	    this->restriction[7](19,3) = 1;
+	    this->restriction[7](21,5) = 1;
+	    this->restriction[7](24,2) = 1;
+	    this->restriction[7](25,0) = 1;
+	    this->restriction[7](26,1) = 1;
+	    break;
+	  case 3:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](8,9) = 1;
+	    this->restriction[0](14,15) = 1;
+	    this->restriction[0](24,25) = 1;
+	    this->restriction[0](32,35) = 1;
+	    this->restriction[0](40,43) = 1;
+	    this->restriction[0](52,55) = 1;
+	    this->restriction[0](56,63) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](9,8) = 1;
+	    this->restriction[1](10,11) = 1;
+	    this->restriction[1](26,27) = 1;
+	    this->restriction[1](33,34) = 1;
+	    this->restriction[1](41,42) = 1;
+	    this->restriction[1](44,47) = 1;
+	    this->restriction[1](57,62) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[2](11,10) = 1;
+	    this->restriction[2](13,12) = 1;
+	    this->restriction[2](28,29) = 1;
+	    this->restriction[2](35,32) = 1;
+	    this->restriction[2](46,45) = 1;
+	    this->restriction[2](49,50) = 1;
+	    this->restriction[2](61,58) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[3](12,13) = 1;
+	    this->restriction[3](15,14) = 1;
+	    this->restriction[3](30,31) = 1;
+	    this->restriction[3](34,33) = 1;
+	    this->restriction[3](48,51) = 1;
+	    this->restriction[3](54,53) = 1;
+	    this->restriction[3](60,59) = 1;
+	    this->restriction[4](4,4) = 1;
+	    this->restriction[4](16,17) = 1;
+	    this->restriction[4](22,23) = 1;
+	    this->restriction[4](25,24) = 1;
+	    this->restriction[4](36,39) = 1;
+	    this->restriction[4](42,41) = 1;
+	    this->restriction[4](53,54) = 1;
+	    this->restriction[4](58,61) = 1;
+	    this->restriction[5](5,5) = 1;
+	    this->restriction[5](17,16) = 1;
+	    this->restriction[5](18,19) = 1;
+	    this->restriction[5](27,26) = 1;
+	    this->restriction[5](37,38) = 1;
+	    this->restriction[5](43,40) = 1;
+	    this->restriction[5](45,46) = 1;
+	    this->restriction[5](59,60) = 1;
+	    this->restriction[6](6,6) = 1;
+	    this->restriction[6](19,18) = 1;
+	    this->restriction[6](21,20) = 1;
+	    this->restriction[6](29,28) = 1;
+	    this->restriction[6](39,36) = 1;
+	    this->restriction[6](47,44) = 1;
+	    this->restriction[6](51,48) = 1;
+	    this->restriction[6](63,56) = 1;
+	    this->restriction[7](7,7) = 1;
+	    this->restriction[7](20,21) = 1;
+	    this->restriction[7](23,22) = 1;
+	    this->restriction[7](31,30) = 1;
+	    this->restriction[7](38,37) = 1;
+	    this->restriction[7](50,49) = 1;
+	    this->restriction[7](55,52) = 1;
+	    this->restriction[7](62,57) = 1;
+	    break;
+	  case 4:
+	    this->restriction[0](0,0) = 1;
+	    this->restriction[0](8,9) = 1;
+	    this->restriction[0](9,1) = 1;
+	    this->restriction[0](17,18) = 1;
+	    this->restriction[0](18,3) = 1;
+	    this->restriction[0](32,33) = 1;
+	    this->restriction[0](33,4) = 1;
+	    this->restriction[0](44,48) = 1;
+	    this->restriction[0](45,12) = 1;
+	    this->restriction[0](47,15) = 1;
+	    this->restriction[0](48,2) = 1;
+	    this->restriction[0](62,66) = 1;
+	    this->restriction[0](63,36) = 1;
+	    this->restriction[0](65,21) = 1;
+	    this->restriction[0](66,5) = 1;
+	    this->restriction[0](89,93) = 1;
+	    this->restriction[0](90,30) = 1;
+	    this->restriction[0](92,42) = 1;
+	    this->restriction[0](93,7) = 1;
+	    this->restriction[0](98,111) = 1;
+	    this->restriction[0](99,75) = 1;
+	    this->restriction[0](101,57) = 1;
+	    this->restriction[0](102,24) = 1;
+	    this->restriction[0](107,84) = 1;
+	    this->restriction[0](108,39) = 1;
+	    this->restriction[0](110,27) = 1;
+	    this->restriction[0](111,6) = 1;
+	    this->restriction[1](1,1) = 1;
+	    this->restriction[1](9,0) = 1;
+	    this->restriction[1](10,9) = 1;
+	    this->restriction[1](11,12) = 1;
+	    this->restriction[1](12,2) = 1;
+	    this->restriction[1](35,36) = 1;
+	    this->restriction[1](36,5) = 1;
+	    this->restriction[1](45,18) = 1;
+	    this->restriction[1](46,48) = 1;
+	    this->restriction[1](48,3) = 1;
+	    this->restriction[1](49,15) = 1;
+	    this->restriction[1](63,33) = 1;
+	    this->restriction[1](64,66) = 1;
+	    this->restriction[1](66,4) = 1;
+	    this->restriction[1](67,21) = 1;
+	    this->restriction[1](71,75) = 1;
+	    this->restriction[1](72,24) = 1;
+	    this->restriction[1](74,39) = 1;
+	    this->restriction[1](75,6) = 1;
+	    this->restriction[1](99,93) = 1;
+	    this->restriction[1](100,111) = 1;
+	    this->restriction[1](102,30) = 1;
+	    this->restriction[1](103,57) = 1;
+	    this->restriction[1](108,42) = 1;
+	    this->restriction[1](109,84) = 1;
+	    this->restriction[1](111,7) = 1;
+	    this->restriction[1](112,27) = 1;
+	    this->restriction[2](2,2) = 1;
+	    this->restriction[2](12,1) = 1;
+	    this->restriction[2](13,12) = 1;
+	    this->restriction[2](15,3) = 1;
+	    this->restriction[2](16,15) = 1;
+	    this->restriction[2](38,39) = 1;
+	    this->restriction[2](39,6) = 1;
+	    this->restriction[2](48,0) = 1;
+	    this->restriction[2](49,9) = 1;
+	    this->restriction[2](51,18) = 1;
+	    this->restriction[2](52,48) = 1;
+	    this->restriction[2](74,36) = 1;
+	    this->restriction[2](75,5) = 1;
+	    this->restriction[2](77,75) = 1;
+	    this->restriction[2](78,24) = 1;
+	    this->restriction[2](81,42) = 1;
+	    this->restriction[2](82,84) = 1;
+	    this->restriction[2](84,7) = 1;
+	    this->restriction[2](85,27) = 1;
+	    this->restriction[2](108,33) = 1;
+	    this->restriction[2](109,66) = 1;
+	    this->restriction[2](111,4) = 1;
+	    this->restriction[2](112,21) = 1;
+	    this->restriction[2](117,93) = 1;
+	    this->restriction[2](118,111) = 1;
+	    this->restriction[2](120,30) = 1;
+	    this->restriction[2](121,57) = 1;
+	    this->restriction[3](3,3) = 1;
+	    this->restriction[3](14,15) = 1;
+	    this->restriction[3](15,2) = 1;
+	    this->restriction[3](18,0) = 1;
+	    this->restriction[3](19,18) = 1;
+	    this->restriction[3](41,42) = 1;
+	    this->restriction[3](42,7) = 1;
+	    this->restriction[3](47,9) = 1;
+	    this->restriction[3](48,1) = 1;
+	    this->restriction[3](50,48) = 1;
+	    this->restriction[3](51,12) = 1;
+	    this->restriction[3](80,84) = 1;
+	    this->restriction[3](81,39) = 1;
+	    this->restriction[3](83,27) = 1;
+	    this->restriction[3](84,6) = 1;
+	    this->restriction[3](92,33) = 1;
+	    this->restriction[3](93,4) = 1;
+	    this->restriction[3](95,93) = 1;
+	    this->restriction[3](96,30) = 1;
+	    this->restriction[3](107,66) = 1;
+	    this->restriction[3](108,36) = 1;
+	    this->restriction[3](110,21) = 1;
+	    this->restriction[3](111,5) = 1;
+	    this->restriction[3](116,111) = 1;
+	    this->restriction[3](117,75) = 1;
+	    this->restriction[3](119,57) = 1;
+	    this->restriction[3](120,24) = 1;
+	    this->restriction[4](4,4) = 1;
+	    this->restriction[4](20,21) = 1;
+	    this->restriction[4](21,5) = 1;
+	    this->restriction[4](29,30) = 1;
+	    this->restriction[4](30,7) = 1;
+	    this->restriction[4](33,0) = 1;
+	    this->restriction[4](34,33) = 1;
+	    this->restriction[4](53,57) = 1;
+	    this->restriction[4](54,24) = 1;
+	    this->restriction[4](56,27) = 1;
+	    this->restriction[4](57,6) = 1;
+	    this->restriction[4](65,9) = 1;
+	    this->restriction[4](66,1) = 1;
+	    this->restriction[4](68,66) = 1;
+	    this->restriction[4](69,36) = 1;
+	    this->restriction[4](90,18) = 1;
+	    this->restriction[4](91,93) = 1;
+	    this->restriction[4](93,3) = 1;
+	    this->restriction[4](94,42) = 1;
+	    this->restriction[4](101,48) = 1;
+	    this->restriction[4](102,12) = 1;
+	    this->restriction[4](104,111) = 1;
+	    this->restriction[4](105,75) = 1;
+	    this->restriction[4](110,15) = 1;
+	    this->restriction[4](111,2) = 1;
+	    this->restriction[4](113,84) = 1;
+	    this->restriction[4](114,39) = 1;
+	    this->restriction[5](5,5) = 1;
+	    this->restriction[5](21,4) = 1;
+	    this->restriction[5](22,21) = 1;
+	    this->restriction[5](23,24) = 1;
+	    this->restriction[5](24,6) = 1;
+	    this->restriction[5](36,1) = 1;
+	    this->restriction[5](37,36) = 1;
+	    this->restriction[5](54,30) = 1;
+	    this->restriction[5](55,57) = 1;
+	    this->restriction[5](57,7) = 1;
+	    this->restriction[5](58,27) = 1;
+	    this->restriction[5](66,0) = 1;
+	    this->restriction[5](67,9) = 1;
+	    this->restriction[5](69,33) = 1;
+	    this->restriction[5](70,66) = 1;
+	    this->restriction[5](72,12) = 1;
+	    this->restriction[5](73,75) = 1;
+	    this->restriction[5](75,2) = 1;
+	    this->restriction[5](76,39) = 1;
+	    this->restriction[5](102,18) = 1;
+	    this->restriction[5](103,48) = 1;
+	    this->restriction[5](105,93) = 1;
+	    this->restriction[5](106,111) = 1;
+	    this->restriction[5](111,3) = 1;
+	    this->restriction[5](112,15) = 1;
+	    this->restriction[5](114,42) = 1;
+	    this->restriction[5](115,84) = 1;
+	    this->restriction[6](6,6) = 1;
+	    this->restriction[6](24,5) = 1;
+	    this->restriction[6](25,24) = 1;
+	    this->restriction[6](27,7) = 1;
+	    this->restriction[6](28,27) = 1;
+	    this->restriction[6](39,2) = 1;
+	    this->restriction[6](40,39) = 1;
+	    this->restriction[6](57,4) = 1;
+	    this->restriction[6](58,21) = 1;
+	    this->restriction[6](60,30) = 1;
+	    this->restriction[6](61,57) = 1;
+	    this->restriction[6](75,1) = 1;
+	    this->restriction[6](76,36) = 1;
+	    this->restriction[6](78,12) = 1;
+	    this->restriction[6](79,75) = 1;
+	    this->restriction[6](84,3) = 1;
+	    this->restriction[6](85,15) = 1;
+	    this->restriction[6](87,42) = 1;
+	    this->restriction[6](88,84) = 1;
+	    this->restriction[6](111,0) = 1;
+	    this->restriction[6](112,9) = 1;
+	    this->restriction[6](114,33) = 1;
+	    this->restriction[6](115,66) = 1;
+	    this->restriction[6](120,18) = 1;
+	    this->restriction[6](121,48) = 1;
+	    this->restriction[6](123,93) = 1;
+	    this->restriction[6](124,111) = 1;
+	    this->restriction[7](7,7) = 1;
+	    this->restriction[7](26,27) = 1;
+	    this->restriction[7](27,6) = 1;
+	    this->restriction[7](30,4) = 1;
+	    this->restriction[7](31,30) = 1;
+	    this->restriction[7](42,3) = 1;
+	    this->restriction[7](43,42) = 1;
+	    this->restriction[7](56,21) = 1;
+	    this->restriction[7](57,5) = 1;
+	    this->restriction[7](59,57) = 1;
+	    this->restriction[7](60,24) = 1;
+	    this->restriction[7](83,15) = 1;
+	    this->restriction[7](84,2) = 1;
+	    this->restriction[7](86,84) = 1;
+	    this->restriction[7](87,39) = 1;
+	    this->restriction[7](93,0) = 1;
+	    this->restriction[7](94,33) = 1;
+	    this->restriction[7](96,18) = 1;
+	    this->restriction[7](97,93) = 1;
+	    this->restriction[7](110,9) = 1;
+	    this->restriction[7](111,1) = 1;
+	    this->restriction[7](113,66) = 1;
+	    this->restriction[7](114,36) = 1;
+	    this->restriction[7](119,48) = 1;
+	    this->restriction[7](120,12) = 1;
+	    this->restriction[7](122,111) = 1;
+	    this->restriction[7](123,75) = 1;
+	    break;
+	  default:
+	{
+					   // in case we don't
+					   // have the matrices
+					   // (yet), set them to
+					   // impossible
+					   // values. this does
+					   // not prevent the use
+					   // of this FE, but will
+					   // prevent the use of
+					   // these matrices
+	  for (unsigned int i=0;
+	       i<GeometryInfo<dim>::children_per_cell;
+	       ++i)
+	    this->restriction[i].reinit(0,0);
+	};
+	}
+      break;
+    };
       
       default:
-	    Assert (false,ExcNotImplemented());
+	Assert (false,ExcNotImplemented());
     }
 
 				   // finally fill in support points
@@ -642,7 +642,7 @@ double
 FE_Q<dim>::shape_value (const unsigned int i,
 			const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return polynomial_space.compute_value(renumber_inverse[i], p);
 }
 
@@ -653,7 +653,7 @@ FE_Q<dim>::shape_value_component (const unsigned int i,
 				  const Point<dim> &p,
 				  const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_value(renumber_inverse[i], p);
 }
@@ -665,7 +665,7 @@ Tensor<1,dim>
 FE_Q<dim>::shape_grad (const unsigned int i,
 		       const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return polynomial_space.compute_grad(renumber_inverse[i], p);
 }
 
@@ -677,7 +677,7 @@ FE_Q<dim>::shape_grad_component (const unsigned int i,
 				 const Point<dim> &p,
 				 const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad(renumber_inverse[i], p);
 }
@@ -689,7 +689,7 @@ Tensor<2,dim>
 FE_Q<dim>::shape_grad_grad (const unsigned int i,
 			    const Point<dim> &p) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
 }
 
@@ -701,7 +701,7 @@ FE_Q<dim>::shape_grad_grad_component (const unsigned int i,
 				      const Point<dim> &p,
 				      const unsigned int component) const
 {
-  Assert (i<dofs_per_cell, ExcIndexRange(i,0,dofs_per_cell));
+  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
 }
@@ -721,7 +721,7 @@ void FE_Q<dim>::initialize_unit_support_points ()
   for (unsigned int i=1; i<dim; ++i)
     n *= degree+1;
   
-  unit_support_points.resize(n);
+  this->unit_support_points.resize(n);
   
   const double step = 1./degree;
   Point<dim> p;
@@ -737,7 +737,7 @@ void FE_Q<dim>::initialize_unit_support_points ()
 	  if (dim>2)
 	    p(2) = iz * step;
 	  
-	  unit_support_points[renumber[k++]] = p;
+	  this->unit_support_points[renumber[k++]] = p;
 	};
 };
 
@@ -763,7 +763,7 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
   for (unsigned int i=1; i<codim; ++i)
     n *= degree+1;
   
-  unit_face_support_points.resize(n);
+  this->unit_face_support_points.resize(n);
   
   const double step = 1./degree;
   Point<codim> p;
@@ -779,7 +779,7 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
 	  if (codim>2)
 	    p(2) = iz * step;
 	  
-	  unit_face_support_points[face_renumber[k++]] = p;
+	  this->unit_face_support_points[face_renumber[k++]] = p;
 	};
 };
 
@@ -844,34 +844,34 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	  switch (dim)
 	    {
 	      case 1:
-	      {
-		const unsigned int values[GeometryInfo<1>::vertices_per_cell]
-		  = { 0, degree };
-		index = values[i];
-		break;
-	      };
+	    {
+	      const unsigned int values[GeometryInfo<1>::vertices_per_cell]
+		= { 0, degree };
+	      index = values[i];
+	      break;
+	    };
 	     
 	      case 2:
-	      {
-		const unsigned int values[GeometryInfo<2>::vertices_per_cell]
-		  = { 0, degree, n*degree+degree, n*degree };
-		index = values[i];
-		break;
-	      };
+	    {
+	      const unsigned int values[GeometryInfo<2>::vertices_per_cell]
+		= { 0, degree, n*degree+degree, n*degree };
+	      index = values[i];
+	      break;
+	    };
 	     
 	      case 3:
-	      {
-		const unsigned int values[GeometryInfo<3>::vertices_per_cell]
-		  = { 0, degree,
-		      n*n*degree + degree, n*n*degree,
-		      n*degree, n*degree+degree,
-		      n*n*degree + n*degree+degree, n*n*degree + n*degree};
-		index = values[i];
-		break;
-	      };
+	    {
+	      const unsigned int values[GeometryInfo<3>::vertices_per_cell]
+		= { 0, degree,
+		    n*n*degree + degree, n*n*degree,
+		    n*degree, n*degree+degree,
+		    n*n*degree + n*degree+degree, n*n*degree + n*degree};
+	      index = values[i];
+	      break;
+	    };
 	     
 	      default:
-		    Assert(false, ExcNotImplemented());
+		Assert(false, ExcNotImplemented());
 	    }
 	
 	  renumber[index] = i;
@@ -903,19 +903,19 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	      case 100:
 	      case 200: case 202:
 	      case 300: case 302: case 304: case 306:
-		    incr = 1;
-		    break;
-						     // lines in y-direction
+		incr = 1;
+		break;
+						 // lines in y-direction
 	      case 201: case 203:
 	      case 308: case 309: case 310: case 311:
-		    incr = n;
-		    break;
-						     // lines in z-direction
+		incr = n;
+		break;
+						 // lines in z-direction
 	      case 301: case 303: case 305: case 307:
-		    incr = n*n;
-		    break;
+		incr = n*n;
+		break;
 	      default:
-		    Assert(false, ExcNotImplemented());
+		Assert(false, ExcNotImplemented());
 	    }
 	  switch (i+100*dim)
 	    {
@@ -923,36 +923,36 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	      case 100:
 	      case 200: case 203:
 	      case 300: case 303: case 308:
-		    tensorstart = 0;
-		    break;
-						     // x=1 y=z=0
+		tensorstart = 0;
+		break;
+						 // x=1 y=z=0
 	      case 201:
 	      case 301: case 309:
-		    tensorstart = degree;
-		    break;
-						     // y=1 x=z=0
+		tensorstart = degree;
+		break;
+						 // y=1 x=z=0
 	      case 202:
 	      case 304: case 307:
-		    tensorstart = n*degree;
-		    break;
-						     // x=z=1 y=0
+		tensorstart = n*degree;
+		break;
+						 // x=z=1 y=0
 	      case 310:
-		    tensorstart = n*n*degree+degree;
-		    break;
-						     // z=1 x=y=0
+		tensorstart = n*n*degree+degree;
+		break;
+						 // z=1 x=y=0
 	      case 302: case 311:
-		    tensorstart = n*n*degree;
-		    break;
-						     // x=y=1 z=0
+		tensorstart = n*n*degree;
+		break;
+						 // x=y=1 z=0
 	      case 305:
-		    tensorstart = n*degree+degree;
-		    break;
-						     // y=z=1 x=0
+		tensorstart = n*degree+degree;
+		break;
+						 // y=z=1 x=0
 	      case 306:
-		    tensorstart = n*n*n-n;
-		    break;
+		tensorstart = n*n*n-n;
+		break;
 	      default:
-		    Assert(false, ExcNotImplemented());	      
+		Assert(false, ExcNotImplemented());	      
 	    }
 	  
 	  for (unsigned int jx = 1; jx<degree ;++jx)
@@ -971,29 +971,29 @@ FE_Q<dim>::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &
 	  switch (i)
 	    {
 	      case 0:
-		    tensorstart = 0; incx = 1;
-		    if (dim==2)
-		      incy = n;
-		    else
-		      incy = n*n;
-		    break;
+		tensorstart = 0; incx = 1;
+		if (dim==2)
+		  incy = n;
+		else
+		  incy = n*n;
+		break;
 	      case 1:
-		    tensorstart = n*degree; incx = 1; incy = n*n;
-		    break;
+		tensorstart = n*degree; incx = 1; incy = n*n;
+		break;
 	      case 2:
-		    tensorstart = 0; incx = 1; incy = n;
-		    break;
+		tensorstart = 0; incx = 1; incy = n;
+		break;
 	      case 3:
-		    tensorstart = degree; incx = n; incy = n*n;
-		    break;
+		tensorstart = degree; incx = n; incy = n*n;
+		break;
 	      case 4:
-		    tensorstart = n*n*degree; incx = 1; incy = n;
-		    break;
+		tensorstart = n*n*degree; incx = 1; incy = n;
+		break;
 	      case 5:
-		    tensorstart = 0; incx = n; incy = n*n;
-		    break;
+		tensorstart = 0; incx = n; incy = n*n;
+		break;
 	      default:
-		    Assert(false, ExcNotImplemented());	      
+		Assert(false, ExcNotImplemented());	      
 	    }
 	  
 	  for (unsigned int jy = 1; jy<degree; jy++)
@@ -1109,15 +1109,15 @@ FE_Q<dim>::get_data (const UpdateFlags      update_flags,
 				   // allocate memory
   if (flags & update_values)
     {
-      values.resize (dofs_per_cell);
-      data->shape_values.resize(dofs_per_cell,
+      values.resize (this->dofs_per_cell);
+      data->shape_values.resize(this->dofs_per_cell,
 				std::vector<double>(n_q_points));
     }
 
   if (flags & update_gradients)
     {
-      grads.resize (dofs_per_cell);
-      data->shape_gradients.resize(dofs_per_cell,
+      grads.resize (this->dofs_per_cell);
+      data->shape_gradients.resize(this->dofs_per_cell,
 				   std::vector<Tensor<1,dim> >(n_q_points));
     }
 
@@ -1142,11 +1142,11 @@ FE_Q<dim>::get_data (const UpdateFlags      update_flags,
 				 values, grads, grad_grads);
 	
 	if (flags & update_values)
-	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	    data->shape_values[renumber[k]][i] = values[k];
 	
 	if (flags & update_gradients)
-	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
 	    data->shape_gradients[renumber[k]][i] = grads[k];
       }
   return data;
@@ -1176,7 +1176,7 @@ FE_Q<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
   
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
 	for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
@@ -1220,7 +1220,7 @@ FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	if (flags & update_values)
@@ -1266,7 +1266,7 @@ FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0; k<dofs_per_cell; ++k)
+  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
 	if (flags & update_values)
@@ -1311,8 +1311,8 @@ bool
 FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
 				const unsigned int face_index) const
 {
-  Assert (shape_index_ < dofs_per_cell,
-	  ExcIndexRange (shape_index_, 0, dofs_per_cell));
+  Assert (shape_index_ < this->dofs_per_cell,
+	  ExcIndexRange (shape_index_, 0, this->dofs_per_cell));
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
@@ -1333,11 +1333,11 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
       Assert (dim<=3, ExcNotImplemented());
       
       const unsigned int cell_start = (dim==2)
-				      ? first_quad_index
-				      : first_hex_index;
+				      ? this->first_quad_index
+				      : this->first_hex_index;
       const unsigned int face_start = (dim==2)
-				      ? first_line_index
-				      : first_quad_index;
+				      ? this->first_line_index
+				      : this->first_quad_index;
   
 				       // Interior degrees of
 				       // freedom correspond to
@@ -1352,13 +1352,13 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
 				       // equal to the face index.
       if (shape_index >= face_start)
 	{
-	  shape_index -= first_line_index;
-	  shape_index /=  dofs_per_face;
+	  shape_index -= this->first_line_index;
+	  shape_index /=  this->dofs_per_face;
 	  return (shape_index == face_index);
 	}
 				       // Only degrees of freedom on
 				       // a vertex are left.
-      shape_index /=  dofs_per_vertex;
+      shape_index /=  this->dofs_per_vertex;
 				       // Use a table to figure out
 				       // which face is neighbor to
 				       // which vertex.
@@ -1372,9 +1372,9 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
 	  case 314:	  case 324:	  case 354:	  case 315:
 	  case 325:	  case 335:	  case 316:	  case 336:
 	  case 346:	  case 317:	  case 347:	  case 357:
-		return true;
+	    return true;
 	  default:
-		return false;
+	    return false;
 	}
       return true;
     };
