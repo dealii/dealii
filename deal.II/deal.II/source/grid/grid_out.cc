@@ -779,7 +779,6 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	    const Triangulation<dim>::face_iterator
 	      face = cell->face(face_no);
 	    
-	    out << "#face" << face_no << std::endl;
 	    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
 	      out << face->vertex(v)
 		  << ' ' << cell->level()
