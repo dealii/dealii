@@ -3232,25 +3232,17 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * an optimal solution.
 				      */
     TriaNumberCache<dim>             number_cache;
-    
-				     // Friendship includes local classes.
-#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
-				     // this seems to be disallowed
-				     // by the standard, so gcc2.95
-				     // does not accept it
-    friend class TriaAccessor<dim>;
-    friend class TriaObjectAccessor<1, dim>;
-    friend class TriaObjectAccessor<2, dim>;
-    friend class TriaObjectAccessor<3, dim>;
-#else
-				     // this, however, may grant
-				     // access to too many classes,
-				     // but ...
+
+				     // make a couple of classes
+				     // friends
     template <int dim1> friend class TriaAccessor;
 
     template <int dim1, int dim2>
     friend class TriaObjectAccessor;
-#endif
+    
+    template <int N> friend class TriaObjectAccessor<1, N>;
+    template <int N> friend class TriaObjectAccessor<2, N>;
+    template <int N> friend class TriaObjectAccessor<3, N>;
     
     friend class CellAccessor<dim>;
     
