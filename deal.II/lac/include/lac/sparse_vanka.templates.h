@@ -51,10 +51,17 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
 				   // will be used quite often
   const SparseMatrixStruct &structure
     = matrix->get_sparsity_pattern();
-				   // space to be used for local systems
-  FullMatrix<float> local_matrix;
-  Vector<float> b;
-  Vector<float> x;
+  
+				   // space to be used for local
+				   // systems. allocate as much memory
+				   // as is the maximum. this
+				   // eliminates the need to
+				   // re-allocate memory inside the
+				   // loop.
+  FullMatrix<float> local_matrix (structure.max_row_length(),
+				  structure.max_row_length());
+  Vector<float> b (structure.max_row_length());
+  Vector<float> x (structure.max_row_length());
   
 				   // traverse all rows of the matrix
   for (unsigned int row=0; row< matrix->m() ; ++row)
