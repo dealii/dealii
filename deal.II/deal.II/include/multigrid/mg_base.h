@@ -1,20 +1,17 @@
-//----------------------------  mg_base.h  ---------------------------
+//--------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mg_base.h  ---------------------------
+//--------------------------------------------------------------------
 #ifndef __deal2__mg_base_h
 #define __deal2__mg_base_h
-
-
-/*----------------------------   mgbase.h     ---------------------------*/
 
 
 #include <base/config.h>
@@ -153,57 +150,6 @@ class MGMatrixBase : public Subscriptor
 				    */
   virtual void Tvmult_add(unsigned int level, VECTOR& dst,
 		     const VECTOR& src) const = 0;
-};
-
-
-/**
- * Multilevel matrix. This class implements the interface defined by
- * @ref{MGMatrixBase}, using @ref{MGLevelObject} of an arbitrary
- * matrix class.
- *
- * @author Guido Kanschat, 2002
- */
-template <class MATRIX, class VECTOR>
-class MGMatrix : public MGMatrixBase<VECTOR>,
-  public SmartPointer<MGLevelObject<MATRIX> >
-{
-  public:
-				     /**
-				      * Constructor. The argument is
-				      * handed over to the
-				      * @p{SmartPointer} constructor.
-				      */
-    MGMatrix (MGLevelObject<MATRIX>* = 0);
-    
-				     /**
-				      * Matrix-vector-multiplication on
-				      * a certain level.
-				      */
-    virtual void vmult(unsigned int level, VECTOR& dst,
-		       const VECTOR& src) const;
-    
-				   /**
-				    * Adding matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void vmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;
-
-				   /**
-				    * Transpose
-				    * matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void Tvmult(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;
-
-				   /**
-				    * Adding transpose
-				    * matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void Tvmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;    
 };
 
 
@@ -396,60 +342,6 @@ MGLevelObject<Object>::get_maxlevel () const
 {
   return minlevel + objects.size() - 1;
 }
-
-/*----------------------------------------------------------------------*/
-
-template <class MATRIX, class VECTOR>
-MGMatrix<MATRIX, VECTOR>::MGMatrix (MGLevelObject<MATRIX>* p)
-		:
-		SmartPointer<MGLevelObject<MATRIX> > (p)
-{}
-
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
-{
-  const MGLevelObject<MATRIX>& m = **this;
-  m[level].vmult(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::vmult_add (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
-{
-  const MGLevelObject<MATRIX>& m = **this;
-  m[level].vmult_add(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::Tvmult (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
-{
-  const MGLevelObject<MATRIX>& m = **this;
-  m[level].Tvmult(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::Tvmult_add (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
-{
-  const MGLevelObject<MATRIX>& m = **this;
-  m[level].Tvmult_add(dst, src);
-}
-
 
 /*----------------------------   mgbase.h     ---------------------------*/
 
