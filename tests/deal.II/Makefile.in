@@ -68,7 +68,8 @@ all: grid_test.check dof_test.check data_out.check \
      derivatives.check gradients.check \
      constraints.check mg.check mglocal.check \
      block_matrices.check second_derivatives.check \
-     derivative_approximation.check \
+     derivative_approximation.check matrices-check \
+     error_estimator.check \
      intergrid_constraints.check intergrid_map.check wave-test-3.check
 
 exe: $(all:.check=.testcase) benchmark
@@ -171,6 +172,34 @@ derivative_approximation-o-files = $(derivative_approximation-cc-files:.cc=.o)
 endif
 
 derivative_approximation.testcase: $(derivative_approximation-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+############################################################
+
+error_estimator-cc-files = error_estimator.cc 
+
+ifeq ($(debug-mode),on)
+error_estimator-o-files = $(error_estimator-cc-files:.cc=.go)
+else
+error_estimator-o-files = $(error_estimator-cc-files:.cc=.o)
+endif
+
+error_estimator.testcase: $(error_estimator-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+############################################################
+
+matrices-cc-files = matrices.cc 
+
+ifeq ($(debug-mode),on)
+matrices-o-files = $(matrices-cc-files:.cc=.go)
+else
+matrices-o-files = $(matrices-cc-files:.cc=.o)
+endif
+
+matrices.testcase: $(matrices-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
