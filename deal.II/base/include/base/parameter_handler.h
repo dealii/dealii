@@ -14,12 +14,6 @@
 #define __deal2__parameter_handler_h
 
 
-//TODO:[WB] (compiler) Use numeric_limits to designate the default values of bounds parameters
-// of Patterns::Integer and Patterns::Double. This would then allow to use half-open
-// intervals as well, among other advantages.
-
-
-
 #include <base/config.h>
 #include <map>
 #include <vector>
@@ -167,6 +161,36 @@ namespace Patterns
   {
     public:
 				       /**
+					* Minimal integer value. If
+					* the @p{numeric_limits} class
+					* is available, otherwise set
+					* it so that this class
+					* understands that all values
+					* are allowed.
+					*/
+      static const unsigned int min_int_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<int>::min();
+#else
+          1;
+#endif
+
+				       /**
+					* Maximal integer value. If
+					* the @p{numeric_limits} class
+					* is available, otherwise set
+					* it so that this class
+					* understands that all values
+					* are allowed.
+					*/
+      static const unsigned int max_int_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<int>::max();
+#else
+          0;
+#endif
+      
+				       /**
 					* Constructor. Bounds can be
 					* specified within which a
 					* valid parameter has to
@@ -178,8 +202,8 @@ namespace Patterns
 					* such that no bounds are
 					* enforced on parameters.
 					*/
-      Integer (const int lower_bound = 1,
-	       const int upper_bound = 0);
+      Integer (const int lower_bound = min_int_value,
+	       const int upper_bound = max_int_value);
 	
 				       /**
 					* Return @p{true} if the
@@ -277,6 +301,36 @@ namespace Patterns
   {
     public:
 				       /**
+					* Minimal double value. If
+					* the @p{numeric_limits} class
+					* is available, otherwise set
+					* it so that this class
+					* understands that all values
+					* are allowed.
+					*/
+      static const unsigned int min_double_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<double>::min();
+#else
+          1;
+#endif
+
+				       /**
+					* Maximal double value. If
+					* the @p{numeric_limits} class
+					* is available, otherwise set
+					* it so that this class
+					* understands that all values
+					* are allowed.
+					*/
+      static const unsigned int max_double_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<double>::max();
+#else
+          0;
+#endif
+      
+				       /**
 					* Constructor. Bounds can be
 					* specified within which a
 					* valid parameter has to
@@ -288,8 +342,8 @@ namespace Patterns
 					* such that no bounds are
 					* enforced on parameters.
 					*/
-      Double (const int lower_bound = 1,
-	      const int upper_bound = 0);
+      Double (const int lower_bound = min_double_value,
+	      const int upper_bound = max_double_value);
 	
 				       /**
 					* Return @p{true} if the
