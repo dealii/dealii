@@ -86,7 +86,10 @@ reinit (const unsigned int n_block_rows,
 				   // allocate new objects
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
-      sub_objects[i][j] = new SparsityPatternBase;
+      {
+        SparsityPatternBase *p = new SparsityPatternBase;
+        sub_objects[i][j] = p;
+      }
 }
 
 

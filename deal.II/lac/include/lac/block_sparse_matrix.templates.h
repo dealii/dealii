@@ -113,9 +113,10 @@ reinit (const BlockSparsityPattern &sparsity)
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       {
-	sub_objects[r][c] = new SparseMatrix<number>();
-	block(r,c).reinit (sparsity.block(r,c));
-      };
+        SparseMatrix<number> *p = new SparseMatrix<number>();
+        p->reinit (sparsity.block(r,c));
+	sub_objects[r][c] = p;
+      }
 }
 
 

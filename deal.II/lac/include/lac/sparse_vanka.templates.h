@@ -155,8 +155,10 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
     = matrix->get_sparsity_pattern();
 
   const unsigned int row_length = structure.row_length(row);
-  inverses[row] = new FullMatrix<float> (row_length,
-					 row_length); 
+
+  FullMatrix<float> &this_inverse = *new FullMatrix<float> (row_length,
+							    row_length);
+  inverses[row] = &this_inverse;
 
 				   // collect the dofs that couple
 				   // with @p row
@@ -178,11 +180,11 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
 	const unsigned int global_entry =
 	  structure(local_indices[i], local_indices[j]);
 	if (global_entry != SparsityPattern::invalid_entry)
-	  (*inverses[row])(i,j) = matrix->global_entry(global_entry);
+	  this_inverse(i,j) = matrix->global_entry(global_entry);
       };
   
 				   // Compute inverse
-  inverses[row]->gauss_jordan();
+  this_inverse.gauss_jordan();
 }
 
 
