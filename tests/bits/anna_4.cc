@@ -57,7 +57,7 @@ class VectorBoundaryValues :  public Function<dim>
 template <int dim>
 VectorBoundaryValues<dim>::VectorBoundaryValues () :
                 Function<dim> (2)
-{};
+{}
 
 template <int dim>
 inline

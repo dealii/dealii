@@ -165,7 +165,7 @@ void ImposeBC<dim>::get_ready ()
   n_u_dofs = dofs_per_comp[0];
   n_p_dofs = dofs_per_comp[2];
 	
-};
+}
 
 
 template <int dim>
