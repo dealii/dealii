@@ -844,6 +844,19 @@ class TriaDimensionInfo<2> {
  *   It is recommended that a functions using the flags states so in its
  *   documentation.
  *
+ *   There is another set of user data, namely a #void *#, for each line, quad,
+ *   etc. Just like the user flags, this field is not available for vertices,
+ *   which does no harm since the vertices have a unique and continuous number
+ *   unlike the structured objects lines and quads. You can access these user
+ *   pointers through the functions #user_pointer()#, #clear_user_pointer()#
+ *   and #set_user_pointer(p)# in the accessor classes.
+ *
+ *   You should not rely on any specific value for the user pointer if you
+ *   haven't set it yourself before. In special, the pointers are not inherited
+ *   upon refinement. In principle, all user pointers should be #NULL# pointers
+ *   at the time a line, quad, etc comes into life. #NULL# pointers are always
+ *   a good choice, since they raise an exception when being dereferenced.
+ *
  *
  *   \subsection{Boundary approximation}
  *
