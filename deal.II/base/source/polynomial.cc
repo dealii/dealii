@@ -678,8 +678,168 @@ namespace Polynomials
       v.push_back (Legendre<double>(i));
     return v;
   };
-  
+
+
+
+// ------------------ class Hierarchical --------------- //
+
+
+
+// Reserve space for polynomials up to degree 19. Should be sufficient
+// for the start.
+  template <typename number>
+  std::vector<const std::vector<number> *>
+  Hierarchical<number>::recursive_coefficients(
+     20, static_cast<const std::vector<number>*>(0));
+
+
+
+  template <typename number>
+  void
+  Hierarchical<number>::compute_coefficients (const unsigned int k_)
+  {
+    unsigned int k = k_;
+
+				   // first make sure that no other
+				   // thread intercepts the operation
+				   // of this function
+    coefficients_lock.acquire ();
+
+				          // The first 2 coefficients 
+                                          // are hard-coded
+    if (k==0)
+      k=1;
+				          // check: does the information
+				          // already exist?
+    if (  (recursive_coefficients.size() < k+1) ||
+	  ((recursive_coefficients.size() >= k+1) && (recursive_coefficients[k] == 0)) )
+				           // no, then generate the
+				           // respective coefficients
+      {
+	recursive_coefficients.resize (k+1, 0);
+      
+	if (k<=1)
+	  {
+					   // create coefficients
+					   // vectors for k=0 and k=1
+					   //
+					   // allocate the respective
+					   // amount of memory and
+					   // later assign it to the
+					   // coefficients array to
+					   // make it const
+	    std::vector<number> *c0 = new std::vector<number>(2);
+	    (*c0)[0] =  1.0;
+	    (*c0)[1] = -1.0;
+
+	    std::vector<number> *c1 = new std::vector<number>(2);
+	    (*c1)[0] = 0.0;
+	    (*c1)[1] = 1.0;
+
+					   // now make these arrays
+					   // const
+	    recursive_coefficients[0] = c0;
+	    recursive_coefficients[1] = c1;
+	  }
+	else if (k==2)
+	  {
+	    compute_coefficients(1);
+
+	    std::vector<number> *c2 = new std::vector<number>(3);
+	    
+	    (*c2)[0] =   0.;
+	    (*c2)[1] =  -4.;
+	    (*c2)[2] =   4.;
+	    
+	    recursive_coefficients[2] = c2;
+	  }
+	else
+	  {
+					   // for larger numbers,
+					   // compute the coefficients
+					   // recursively. to do so,
+					   // we have to release the
+					   // lock temporarily to
+					   // allow the called
+					   // function to acquire it
+					   // itself
+	    coefficients_lock.release ();
+	    compute_coefficients(k-1);
+	    coefficients_lock.acquire ();
+
+	    std::vector<number> *ck = new std::vector<number>(k+1);
+	    
+	    (*ck)[0] = -(*recursive_coefficients[k-1])[0];
+	    
+	    for (unsigned int i=1; i<=k-1; ++i)
+	      (*ck)[i] = ( 2.*(*recursive_coefficients[k-1])[i-1]
+			   - (*recursive_coefficients[k-1])[i] );
+	  
+	    (*ck)[k] = 2.*(*recursive_coefficients[k-1])[k-1];
+	                                  // for even degrees, we need
+	                                  // to add a multiple of
+	                                  // basis fcn phi_2
+	    if ( (k%2) == 0 )
+	      {
+		(*ck)[1] += (*recursive_coefficients[2])[1];
+		(*ck)[2] += (*recursive_coefficients[2])[2];
+	      }	  
+					   // finally assign the newly
+					   // created vector to the
+					   // const pointer in the
+					   // coefficients array
+	    recursive_coefficients[k] = ck;
+	  };
+      };
+
+				   // now, everything is done, so
+				   // release the lock again
+    coefficients_lock.release ();
+  };
+
+
+
+  template <typename number>
+  const typename std::vector<number> &
+  Hierarchical<number>::get_coefficients (const unsigned int k)
+  {
+				   // first make sure the coefficients
+				   // get computed if so necessary
+    compute_coefficients (k);
+
+				   // then get a pointer to the array
+				   // of coefficients.
+    const std::vector<number> *p = recursive_coefficients[k];
+
+				   // return the object pointed
+				   // to. since this object does not
+				   // change any more once computed,
+				   // this is MT safe
+    return *p;
+  };
+
+
+
+  template <typename number>
+  Hierarchical<number>::Hierarchical (const unsigned int k)
+                      :
+                      Polynomial<number> (get_coefficients(k))
+  {}
+
+
+
+  template <typename number>
+  std::vector<Polynomial<number> >
+  Hierarchical<number>::generate_complete_basis (const unsigned int degree)
+  {
+    std::vector<Polynomial<double> > v;
+    v.reserve(degree+1);
+    for (unsigned int i=0; i<=degree; ++i)
+      v.push_back (Hierarchical<double>(i));
+    return v;
+  };
 }
+
 
 
 // ------------------ explicit instantiations --------------- //
@@ -698,4 +858,5 @@ namespace Polynomials
   template void Polynomial<double>::shift(const long double offset);
 
   template class Legendre<double>;
+  template class Hierarchical<double>;
 }
