@@ -11,6 +11,7 @@ In order to use the deal.II library (and its sublibraries /base and
 /lac) you need to have the following programs installed:
   - A fairly complete C++ compiler. We use egcs1.1.2 but other
     compilers might work as well. egcs1.0 will not work, however.
+    gcc2.95 works.
   - Perl: any Perl 5.x version should work.
   - Make: we use GNU make, version 3.75. Other make programs are not standardized
     and will quite surely fail to work.
