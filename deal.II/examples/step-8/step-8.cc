@@ -30,7 +30,7 @@
 
 				 // In this example, we need
 				 // vector-valued finite elements. The
-				 // suuport for these can be found in
+				 // support for these can be found in
 				 // the following include file:
 #include <fe/fe_system.h>
 				 // We will compose the vector-valued
@@ -513,6 +513,11 @@ void ElasticProblem<dim>::assemble_system ()
 
       fe_values.reinit (cell);
 
+				       // As in previous examples, we
+				       // define some abbreviations
+				       // for the various data that
+				       // the ``FEValues'' class
+				       // offers:
       const FullMatrix<double> 
 	& shape_values = fe_values.get_shape_values();
       const vector<vector<Tensor<1,dim> > >
@@ -522,28 +527,135 @@ void ElasticProblem<dim>::assemble_system ()
       const vector<Point<dim> >
 	& q_points     = fe_values.get_quadrature_points();
       
+				       // Next we get the values of
+				       // the coefficients at the
+				       // quadrature points:
       lambda.value_list (q_points, lambda_values);
       mu.value_list     (q_points, mu_values);
 
+				       // Then assemble the entries of
+				       // the local stiffness matrix
+				       // and right hand side
+				       // vector. This follows almost
+				       // one-to-one the pattern
+				       // described in the
+				       // introduction of this example
+				       // and will not comment much on
+				       // this.
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-	  const unsigned int component_i = fe.system_to_component_index(i).first;
+					   // One of the few comments
+					   // in place is how we acces
+					   // the function ``comp(i)''
+					   // used in the
+					   // introduction. This is
+					   // possible as follows:
+	  const unsigned int 
+	    component_i = fe.system_to_component_index(i).first;
+					   // By accessing the
+					   // ``first'' variable of
+					   // the return value of the
+					   // ``system_to_component_index''
+					   // function, you might
+					   // already have guessed
+					   // that there is more in
+					   // it. In fact, the
+					   // function returns a
+					   // ``pair<unsigned int,
+					   // unsigned int>'', of
+					   // which the first element
+					   // is ``comp(i)'' and the
+					   // second is the value
+					   // ``base(i)'' also noted
+					   // in the text. You will
+					   // rather seldom need to
+					   // access this second
+					   // value, but the first is
+					   // important when using
+					   // vector valued elements.
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
 	    {
-	      const unsigned int component_j = fe.system_to_component_index(j).first;
+	      const unsigned int 
+		component_j = fe.system_to_component_index(j).first;
 	      
-	      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	      for (unsigned int q_point=0; q_point<n_q_points;
+		   ++q_point)
 		{
+						   // Now add up the
+						   // contribution of
+						   // this cell to the
+						   // local matrix:
 		  cell_matrix(i,j) 
 		    += 
-						     // (lambda d_i u_i, d_j v_j)
+						     // This first term is
+						     // ((lambda+mu) d_i u_i, d_j v_j).
+						     // Note that
+						     // ``shape_grads[i][q_point]''
+						     // returns the
+						     // gradient of
+						     // the ith shape
+						     // function at
+						     // quadrature
+						     // point
+						     // q_point. The
+						     // component
+						     // ``comp(i)'',
+						     // which is the
+						     // derivative of
+						     // the ith shape
+						     // function with
+						     // respect to the
+						     // comp(i)th
+						     // coordinate is
+						     // accessed by
+						     // the appended
+						     // brackets.
 		    (
 		      (shape_grads[i][q_point][component_i] *
 		       shape_grads[j][q_point][component_j] *
 		       (lambda_values[q_point] +
 			mu_values[q_point]))
-		      +                             // (mu d_i v_j, d_i v_j)
+		      +
+						       // The second term is
+						       // (mu nabla u_i, nabla v_j).
+						       // We need not
+						       // access a
+						       // specific
+						       // component of
+						       // the
+						       // gradient,
+						       // since we
+						       // only have to
+						       // compute the
+						       // scalar
+						       // product of
+						       // the two
+						       // gradients,
+						       // of which an
+						       // overloaded
+						       // version of
+						       // the
+						       // operator*
+						       // takes care,
+						       // as in
+						       // previous
+						       // examples.
+						       //
+						       // Note that by
+						       // using the ?:
+						       // operator, we
+						       // only do this
+						       // if comp(i)
+						       // equals
+						       // comp(j),
+						       // otherwise a
+						       // zero is
+						       // added (which
+						       // will be
+						       // optimized
+						       // away by the
+						       // compiler).
 		      ((component_i == component_j) ?
 		       (shape_grads[i][q_point] *
 			shape_grads[j][q_point] *
@@ -556,13 +668,19 @@ void ElasticProblem<dim>::assemble_system ()
 	    };
 	};
 
-
+				       // Assembling the right hand
+				       // side is also just as
+				       // discussed in the
+				       // introduction. We will
+				       // therefore not discuss it
+				       // further.
       right_hand_side.vector_value_list (q_points, rhs_values);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-	  const unsigned int component_i = fe.system_to_component_index(i).first;
+	  const unsigned int 
+	    component_i = fe.system_to_component_index(i).first;
 	  
-	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	    cell_rhs(i) += shape_values(i,q_point) *
 			   rhs_values[q_point](component_i) *
 			   JxW_values[q_point];
@@ -935,7 +1053,8 @@ int main ()
       cerr << endl << endl
 	   << "----------------------------------------------------"
 	   << endl;
-      cerr << "Exception on processing: " << exc.what() << endl
+      cerr << "Exception on processing: " << endl
+	   << exc.what() << endl
 	   << "Aborting!" << endl
 	   << "----------------------------------------------------"
 	   << endl;

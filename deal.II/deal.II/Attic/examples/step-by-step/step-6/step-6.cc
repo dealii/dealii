@@ -991,7 +991,8 @@ int main ()
       cerr << endl << endl
 	   << "----------------------------------------------------"
 	   << endl;
-      cerr << "Exception on processing: " << exc.what() << endl
+      cerr << "Exception on processing: " << endl
+	   << exc.what() << endl
 	   << "Aborting!" << endl
 	   << "----------------------------------------------------"
 	   << endl;
