@@ -884,9 +884,26 @@ class BlockVector
     get_block_indices () const;
     
 				     /**
-				      * $U(0-N) = s$: fill all components.
+                                      * Set all components of the vector to
+                                      * the given number @p s. Simply pass
+                                      * this down to the individual block
+                                      * objects, but we still need to declare
+                                      * this function to make the example
+                                      * given in the discussion about making
+                                      * the constructor explicit work.
+                                      *
+                                      *
+                                      * Since the semantics of assigning a
+                                      * scalar to a vector are not
+                                      * immediately clear, this operator
+                                      * should really only be used if you
+                                      * want to set the entire vector to
+                                      * zero. This allows the intuitive
+                                      * notation <tt>v=0</tt>. Assigning
+                                      * other values is deprecated and may
+                                      * be disallowed in the future.
 				      */
-    BlockVector<Number> & operator= (const Number s);
+    BlockVector<Number> & operator = (const Number s);
     
 				     /**
 				      *  $U = V$: copy all components.

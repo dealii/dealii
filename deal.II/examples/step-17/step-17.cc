@@ -564,7 +564,7 @@ void ElasticProblem<dim>::assemble_system ()
   for (; cell!=endc; ++cell)
     if (cell->subdomain_id() == this_mpi_process)
       {
-        cell_matrix.set_zero ();
+        cell_matrix = 0;
         cell_rhs = 0;
 
         fe_values.reinit (cell);

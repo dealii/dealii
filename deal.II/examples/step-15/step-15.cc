@@ -463,7 +463,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                        // First, clear the objects that hold
                                        // the local matrix and right hand side
                                        // contributions for this cell:
-      cell_matrix.set_zero ();
+      cell_matrix = 0;
       cell_rhs = 0;
 
                                        // Then initialize the values and

@@ -406,7 +406,7 @@ void LaplaceProblem<dim>::assemble_system ()
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
-      cell_matrix.set_zero ();
+      cell_matrix = 0;
       cell_rhs = 0;
 
 				       // Now we have to assemble the

@@ -70,7 +70,7 @@ create_stokes_matrix_2 (const DoFHandler<dim> &dof_handler,
   
   for (; cell!=endc; ++cell)
     {
-      local_matrix.set_zero ();
+      local_matrix = 0;
       fe_values.reinit (cell);
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	for (unsigned int comp_i=0; comp_i<fe.n_components(); ++comp_i)
@@ -146,7 +146,7 @@ create_stokes_matrix_3 (const DoFHandler<dim> &dof_handler,
   
   for (; cell!=endc; ++cell)
     {
-      local_matrix.set_zero ();
+      local_matrix = 0;
       fe_values.reinit (cell);
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	for (unsigned int comp_i=0; comp_i<fe.n_components(); ++comp_i)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -207,7 +207,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 					   // soon as possible
 	};
 
-      M_cell.set_zero ();
+      M_cell = 0;
       
       for (unsigned int cell=0; cell<nblocks; ++cell)
 	{

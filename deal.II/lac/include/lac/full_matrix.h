@@ -240,15 +240,33 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Assignment operator.
 				      */
-    FullMatrix<number>& operator = (const FullMatrix<number>&);
+    FullMatrix<number> &
+    operator = (const FullMatrix<number>&);
     
 				     /**
 				      * Variable assignment operator.
 				      */
     template<typename number2>
-    FullMatrix<number>& operator = (const FullMatrix<number2>&);
+    FullMatrix<number> &
+    operator = (const FullMatrix<number2>&);
 
 				     /**
+				      * This operator assigns a scalar to a
+				      * matrix. Since this does usually not
+				      * make much sense (should we set all
+				      * matrix entries to this value? Only the
+				      * nonzero entries of the sparsity
+				      * pattern?), this operation is only
+				      * allowed if the actual value to be
+				      * assigned is zero. This operator only
+				      * exists to allow for the obvious
+				      * notation <tt>matrix=0</tt>, which sets
+				      * all elements of the matrix to zero.
+				      */
+    FullMatrix<number> &
+    operator = (const double d);
+
+                                     /**
 				      * Assignment from different
 				      * matrix classes. This
 				      * assignment operator uses
@@ -373,13 +391,6 @@ class FullMatrix : public Table<2,number>
 				      * Final iterator of row <tt>r</tt>.
 				      */
     const_iterator end (const unsigned int r) const;
-
-				     /**
-				      * Set all entries to zero, but
-				      * do not change the size of the
-				      * matrix.
-				      */
-    void set_zero ();
     
 				     /**
 				      * Scale the entire matrix by a
@@ -970,6 +981,10 @@ class FullMatrix : public Table<2,number>
 		    << "Target region not in matrix: size in this direction="
 		    << arg1 << ", size of new matrix=" << arg2
 		    << ", offset=" << arg3);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
 				     /**
 				      * Exception
 				      */
@@ -1012,11 +1027,15 @@ FullMatrix<number>::n() const
 
 
 template <typename number>
-void
-FullMatrix<number>::set_zero ()
+FullMatrix<number> &
+FullMatrix<number>::operator = (const double d)
 {
+  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+
   if (this->n_elements() != 0)
     std::fill_n (this->val, this->n_elements(), number());
+
+  return *this;
 }
 
 

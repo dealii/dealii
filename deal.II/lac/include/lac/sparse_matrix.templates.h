@@ -101,14 +101,18 @@ SparseMatrix<number>::~SparseMatrix ()
 
 
 template <typename number>
-void
-SparseMatrix<number>::set_zero ()
+SparseMatrix<number> &
+SparseMatrix<number>::operator = (const double d)
 {
+  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+  
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->compressed || cols->empty(), ExcNotCompressed());
 
   if (val)
-    std::fill_n (&val[0], cols->n_nonzero_elements(), 0);
+    std::fill_n (&val[0], cols->n_nonzero_elements(), 0.);
+
+  return *this;
 }
 
 
@@ -250,7 +254,7 @@ void
 SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
 {
 				   // first delete previous content
-  set_zero ();
+  *this = 0;
 
 				   // then copy old matrix
   for (unsigned int row=0; row<matrix.m(); ++row)

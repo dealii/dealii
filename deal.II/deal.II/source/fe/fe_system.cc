@@ -519,7 +519,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
                                    // couple different bases (or
                                    // multiplicity indices) are really
                                    // zero. then assign entries
-  interpolation_matrix.set_zero ();
+  interpolation_matrix = 0;
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
       if (this->system_to_base_table[i].first ==

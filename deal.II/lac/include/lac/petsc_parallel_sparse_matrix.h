@@ -124,12 +124,22 @@ namespace PETScWrappers
                       const bool                       is_symmetric = false);
 
                                          /**
-                                          * Set all matrix entries to zero, but
-                                          * retain the sparsity pattern. This
-                                          * function simply calls the respective
-                                          * function of the base class.
+                                          * This operator assigns a scalar to
+                                          * a matrix. Since this does usually
+                                          * not make much sense (should we set
+                                          * all matrix entries to this value?
+                                          * Only the nonzero entries of the
+                                          * sparsity pattern?), this operation
+                                          * is only allowed if the actual
+                                          * value to be assigned is zero. This
+                                          * operator only exists to allow for
+                                          * the obvious notation
+                                          * <tt>matrix=0</tt>, which sets all
+                                          * elements of the matrix to zero,
+                                          * but keep the sparsity pattern
+                                          * previously used.
                                           */
-        void set_zero ();
+        SparseMatrix & operator = (const double d);
 
                                          /**
                                           * Throw away the present matrix and

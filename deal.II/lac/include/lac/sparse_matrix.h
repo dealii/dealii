@@ -491,11 +491,23 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
-				     /**
-				      * Set all elements to zero, but keep to
-				      * the sparsity pattern of the matrix.
-				      */
-    virtual void set_zero ();
+                                     /**
+                                      * This operator assigns a scalar to
+                                      * a matrix. Since this does usually
+                                      * not make much sense (should we set
+                                      * all matrix entries to this value?
+                                      * Only the nonzero entries of the
+                                      * sparsity pattern?), this operation
+                                      * is only allowed if the actual
+                                      * value to be assigned is zero. This
+                                      * operator only exists to allow for
+                                      * the obvious notation
+                                      * <tt>matrix=0</tt>, which sets all
+                                      * elements of the matrix to zero,
+                                      * but keep the sparsity pattern
+                                      * previously used.
+                                      */
+    SparseMatrix & operator = (const double d);
 
 				     /**
 				      * Reinitialize the sparse matrix
@@ -1492,6 +1504,10 @@ class SparseMatrix : public virtual Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcSourceEqualsDestination);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
     
   private:
 				     /**

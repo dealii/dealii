@@ -704,7 +704,7 @@ namespace LaplaceSolver
     for (typename DoFHandler<dim>::active_cell_iterator cell=begin_cell;
 	 cell!=end_cell; ++cell)
       {
-	cell_matrix.set_zero ();
+	cell_matrix = 0;
 
 	fe_values.reinit (cell);
 

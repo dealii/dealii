@@ -271,10 +271,26 @@ class Vector
     void swap (Vector<Number> &v);
     
 				     /**
-				      * Set all components of the vector to
-				      * the given number @p s.
+                                      * Set all components of the vector to
+                                      * the given number @p s. Simply pass
+                                      * this down to the individual block
+                                      * objects, but we still need to declare
+                                      * this function to make the example
+                                      * given in the discussion about making
+                                      * the constructor explicit work.
+                                      *
+                                      *
+                                      * Since the semantics of assigning a
+                                      * scalar to a vector are not
+                                      * immediately clear, this operator
+                                      * should really only be used if you
+                                      * want to set the entire vector to
+                                      * zero. This allows the intuitive
+                                      * notation <tt>v=0</tt>. Assigning
+                                      * other values is deprecated and may
+                                      * be disallowed in the future.
 				      */
-    Vector<Number> & operator= (const Number s);
+    Vector<Number> & operator = (const Number s);
     
 				     /**
 				      * Copy the given vector. Resize the

@@ -94,7 +94,7 @@ void test ()
        cell != dof_handler.end(); ++cell)
     {
       cell->get_dof_indices (local_dofs);
-      local_matrix.set_zero ();
+      local_matrix = 0;
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
           local_matrix(i,j) = (i+1.)*(j+1.)*(local_dofs[i]+1.)*(local_dofs[j]+1.);

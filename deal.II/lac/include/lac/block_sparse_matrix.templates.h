@@ -79,12 +79,16 @@ operator = (const BlockSparseMatrix<number> &m)
  
 
 template <typename number>
-void
-BlockSparseMatrix<number>::set_zero ()
+BlockSparseMatrix<number> &
+BlockSparseMatrix<number>::operator = (const double d)
 {
+  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+  
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
-      block(r,c).set_zero ();
+      block(r,c) = 0;
+
+  return *this;
 }
 
 

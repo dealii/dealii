@@ -12,7 +12,8 @@
 //----------------------------  petsc_63.cc  ---------------------------
 
 
-// PETScWrappers::SparseMatrix::set_zero () was declared but not defined
+// PETScWrappers::SparseMatrix::operator = (double) was declared but not
+// defined
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>
@@ -28,7 +29,7 @@ void test (PETScWrappers::MatrixBase &m)
   Assert (m.m() == 100, ExcInternalError());
   Assert (m.n() == 100, ExcInternalError());
 
-  m.set_zero ();
+  m = 0;
   
   Assert (m.m() == 100, ExcInternalError());
   Assert (m.n() == 100, ExcInternalError());

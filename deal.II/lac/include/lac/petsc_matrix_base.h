@@ -305,7 +305,23 @@ namespace PETScWrappers
                                         * can use pointers to this class.
                                         */
       virtual ~MatrixBase ();
-      
+                                       /**
+                                        * This operator assigns a scalar to a
+                                        * matrix. Since this does usually not
+                                        * make much sense (should we set all
+                                        * matrix entries to this value? Only
+                                        * the nonzero entries of the sparsity
+                                        * pattern?), this operation is only
+                                        * allowed if the actual value to be
+                                        * assigned is zero. This operator only
+                                        * exists to allow for the obvious
+                                        * notation <tt>matrix=0</tt>, which
+                                        * sets all elements of the matrix to
+                                        * zero, but keeps the sparsity pattern
+                                        * previously used.
+                                        */
+      MatrixBase &
+      operator = (const double d);      
                                        /**
                                         * Release all memory and return
                                         * to a state just like after
@@ -313,13 +329,6 @@ namespace PETScWrappers
                                         * constructor.
                                         */
       void clear ();
-
-                                       /**
-                                        * Set all matrix entries to zero, but
-                                        * retain the sparsity pattern and all
-                                        * the other properties of the matrix.
-                                        */
-      void set_zero ();
 
                                        /**
                                         * Set the element (<i>i,j</i>)
@@ -648,6 +657,10 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcMatrixNotSquare);
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
       
     protected:
                                        /**

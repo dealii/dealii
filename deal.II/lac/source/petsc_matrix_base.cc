@@ -132,11 +132,15 @@ namespace PETScWrappers
   
 
 
-  void
-  MatrixBase::set_zero ()
+  MatrixBase &
+  MatrixBase::operator = (const double d)
   {
+    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());    
+    
     const int ierr = MatZeroEntries (matrix);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));    
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return *this;
   }
     
 

@@ -836,7 +836,7 @@ void DGMethod<dim>::assemble_system1 ()
 				       // ``u_v_matrix'' and
 				       // ``cell_vector'' to zero,
 				       // before assembling the cell terms.
-      u_v_matrix.set_zero ();
+      u_v_matrix = 0;
       cell_vector = 0;
       
 				       // Now we reinit the ``FEValues''
@@ -869,7 +869,7 @@ void DGMethod<dim>::assemble_system1 ()
 					   // and clear the
 					   // ``un_v_matrix'' on each
 					   // face.
-	  un_v_matrix.set_zero();
+	  un_v_matrix = 0;
 		  
 					   // Now we distinguish the
 					   // four different cases in
@@ -992,7 +992,7 @@ void DGMethod<dim>::assemble_system1 ()
 						       // different
 						       // neighboring
 						       // cells.
-		      un_v_matrix.set_zero();
+		      un_v_matrix = 0;
 		      
 						       // As already
 						       // mentioned
@@ -1270,7 +1270,7 @@ void DGMethod<dim>::assemble_system2 ()
     endc = dof_handler.end();
   for (;cell!=endc; ++cell) 
     {
-      u_v_matrix.set_zero ();
+      u_v_matrix = 0;
       cell_vector = 0;
 
       fe_v.reinit (cell);
@@ -1317,9 +1317,9 @@ void DGMethod<dim>::assemble_system2 ()
 			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
 		      
-		      un_v_matrix.set_zero();
-		      u_vn_matrix.set_zero();
-		      un_vn_matrix.set_zero();
+		      un_v_matrix = 0;
+		      u_vn_matrix = 0;
+		      un_vn_matrix = 0;
 		      
 		      fe_v_subface.reinit (cell, face_no, subface_no);
 		      fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
@@ -1355,9 +1355,9 @@ void DGMethod<dim>::assemble_system2 ()
 		    {
 		      const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 		      
-		      un_v_matrix.set_zero();
-		      u_vn_matrix.set_zero();
-		      un_vn_matrix.set_zero();
+		      un_v_matrix = 0;
+		      u_vn_matrix = 0;
+		      un_vn_matrix = 0;
 		      
 		      fe_v_face.reinit (cell, face_no);
 		      fe_v_face_neighbor.reinit (neighbor, neighbor2);
@@ -1624,7 +1624,7 @@ void DGMethod<dim>::run ()
 				       // reinit the system matrix, the
 				       // right hand side vector and
 				       // the Timer object.
-      system_matrix.set_zero();
+      system_matrix = 0;
       right_hand_side = 0;
       assemble_timer.reset();
 
