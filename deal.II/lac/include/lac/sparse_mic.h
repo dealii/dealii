@@ -29,7 +29,7 @@
  * where X is a diagonal matrix, defined by the condition rowsum(A) =
  * rowsum(B).
  * 
- * @author Stephen "Cheffo" Kolaroff
+ * @author Stephen "Cheffo" Kolaroff, 2002.
  */
 template <typename number>
 class SparseMIC : public SparseLUDecomposition<number>
@@ -105,9 +105,9 @@ class SparseMIC : public SparseLUDecomposition<number>
 				      *
 				      * If @p{strengthen_diagonal}
 				      * parameter is greater than
-				      * zero, this method invokes
-				      * @p{get_strengthen_diagonal_impl
-				      * ()}.
+				      * zero, this method invokes the
+				      * @p{strengthen_diagonal_impl}
+				      * function of the base class.
 				      *
 				      * Refer to
 				      * @ref{SparseLUDecomposition}

@@ -107,7 +107,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
                                    // x[i] = a[i][i] - sum(k=1, i-1,
                                    //              a[i][k]/x[k]*sum(j=k+1, N, a[k][j]))
 	
-                                   // TODO: for sake of siplicity,
+                                   // TODO: for sake of simplicity,
                                    // those are placed here A better
                                    // implementation would store this
                                    // values in the underlying sparse

@@ -70,7 +70,7 @@
  * after its @p{decompose} method is invoked. The @p{decomposed}
  * state is indicated by true value returned by @p{is_decomposed}
  * method. It is legal to apply this decomposition (@p{vmult} method) in
- * decompoed state.
+ * decomposed state.
  *
  *
  * @sect2{Particular implementations}
@@ -91,7 +91,8 @@
  * @author Stephen "Cheffo" Kolaroff, 2002, based on SparseILU implementation by Wolfgang Bangerth
  */
 template <typename number>
-class SparseLUDecomposition : protected SparseMatrix<number>{
+class SparseLUDecomposition : protected SparseMatrix<number>
+{
   public:
 
     				     /**
@@ -179,7 +180,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>{
 				      * factorization of the given
 				      * matrix. After this method
 				      * invokation, and before
-				      * consequtive reinit invokation
+				      * consecutive reinit invokation
 				      * this object is in decomposed
 				      * state.
 				      *
