@@ -1140,8 +1140,10 @@ class SparsityPattern : public Subscriptor
 				      * read-only.
 				      *
 				      * Use of this function is highly
-				      * deprecated. Use @p{row_length}
-				      * and @p{column_number} instead.
+				      * deprecated. Use @p{row_length} and
+				      * @p{column_number} instead. Also, using
+				      * iterators may get you most of the
+				      * information you may want.
 				      *
 				      * Though the return value is declared
 				      * <tt>const</tt>, you should be aware that it
@@ -1157,12 +1159,15 @@ class SparsityPattern : public Subscriptor
 				      * If you change the layout yourself, you
 				      * should also rename this function to
 				      * avoid programs relying on outdated
-				      * information!  */
+				      * information!
+				      */
     const unsigned int * get_rowstart_indices () const;
 
 				     /**
-				      * @deprecated. Use @p{row_length}
-				      * and @p{column_number} instead.
+				      * @deprecated. Use @p{row_length} and
+				      * @p{column_number} instead. Also, using
+				      * iterators may get you most of the
+				      * information you may want.
 				      *
 				      * This is kind of an expert mode: get
 				      * access to the colnums array, but
