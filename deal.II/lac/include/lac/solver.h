@@ -19,83 +19,85 @@ class SolverControl;
 
 
 /**
- * Base class for iterative solvers.
- *
-//TODO:[?] * HAS TO BE UPDATED!
- *
- * This class defines possible
+ * Base class for iterative solvers.  This class defines possible
  * return states of linear solvers and provides interfaces to a memory
  * pool and the control object.
  *
  *
  * @sect3{Requirements for template classes}
  *
- * The class is templated to allow for different matrix and vector
- * classes, since iterative solvers do not rely on any special structure
- * of matrices or the format of storage. However, there are some common
- * requirements a matrix or vector type must fulfil to qualify as an
- * applicable type for the solvers in this hierarchy. These requirements
- * are listed following. The classes do not declare any concrete
- * class, they are rather intended to form a `signature' which a concrete
- * class has to conform to.
+ * Since iterative solvers do not rely on any special structure of
+ * matrices or the format of storage, but only require that matrices
+ * and vector define certain operations such as matrix-vector
+ * products, or scalar products between vectors, this class as well as
+ * the derived classes implementing concrete linear solvers are
+ * templated on the types of matrices and vectors. However, there are
+ * some common requirements a matrix or vector type must fulfill to
+ * qualify as an applicable type for the solvers in this
+ * hierarchy. These requirements are listed following. The listed
+ * classes are not any concrete class, they are rather intended to
+ * form a `signature' which a concrete class has to conform to. Note
+ * that the matrix and vector classes within this library of course
+ * conform to this interface.
  *
  * @begin{verbatim}
  * class Matrix
  * {
  *   public:
- *                        // Application to a Vector
- *     void vmult (Vector& dst, const Vector& src) const;
- *
- *                        // Application of a preconditioner to
- *                        // a Vector, i.e. $dst=\tilde A^(-1) src$,
- *                        // where $\tilde A^(-1)$ is an approximation
- *                        // to the inverse if the matrix stored in
- *                        // this object.
- *     void precondition (Vector& dst, const Vector& src) const;
+ *                        // Application of matrix to vector src.
+ *                        // write result into dst
+ *     void vmult (Vector &dst, const Vector &src) const;
  * 
  *                        // Application of transpose to a Vector.
- *                        // Only used by special iterative methods.
- *     void T_vmult (Vector& dst, const Vector& src) const;
- *
- *                        // Application of a transposed preconditioner
- *                        // to a Vector. Only used by special
- *                        // iterative methods
- *    
- *     void T_precondition (Vector& dst, const Vector& src) const;
+ *                        // Only used by certain iterative methods.
+ *     void Tvmult (Vector &dst, const Vector &src) const;
  * };
  *
  *
  * class Vector
  * {
  *   public:
+ *                        // resize and/or clear vector. note
+ *                        // that the second argument must have
+ *                        // a default value equal to false
+ *     void reinit (const unsigned int size,
+ *                  bool  leave_elements_uninitialized = false);
+ *
  *                        // scalar product
- *     double operator * (const Vector& v) const;
+ *     double operator * (const Vector &v) const;
  *
  *                        // addition of vectors
  *                        // $y = y + x$.
- *     void add (const Vector& x);
- *                        // $y = y + ax$.
- *     void add (double a, const Vector& x);
+ *     void add (const Vector &x);
  *
- *                        // scaled addition of vectors
- *                        // $y = ay + x$.
- *     void sadd (double a,
- *                const Vector& x);
+ *                        // $y = y + ax$.
+ *     void add (const double  a,
+ *               const Vector &x);
+ *
  *                        // $y = ay + bx$.
- *     void sadd (double a,
- *                double b, const Vector& x);
- *                        // $y = ay + bx + cz$.
- *     void sadd (double a,
- *                double b, const Vector& x,
- *                double c, const Vector& z);
+ *     void sadd (const double  a,
+ *                const double  b,
+ *                const Vector &x);
  * 
  *                        // $y = ax$.
- *     void equ (double a, const Vector& x);
- *                        // $y = ax + bz$.
- *     void equ (double a, const Vector& x,
- *               double b, const Vector& z);
+ *     void equ (const double  a,
+ *               const Vector &x);
+ *
+ *                        // scale the elements of the vector
+ *                        // by a fixed value
+ *     void scale (const double a);
+ *
+ *                        // return the l2 norm of the vector
+ *     double l2_norm () const;
  * };
  * @end{verbatim}
+ *
+ * In addition, for some solvers there has to be a global function
+ * @p{swap(vector &a, vector &b)} that exchanges the values of the two vectors.
+ *
+ * The preconditioners used must have the same interface as matrices,
+ * i.e. in particular they have to provide a member function @p{vmult}
+ * which denotes the application of the preconditioner.
  *
  *
  * @sect3{AdditionalData}

@@ -24,6 +24,9 @@
 /**
  * Preconditioned MinRes method.
  *
+ * For the requirements on matrices and vectors in order to work with
+ * this class, see the documentation of the @ref{Solver} base class.
+ *
  * Like all other solver classes, this class has a local structure called
  * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
@@ -74,14 +77,15 @@ class SolverMinRes : public Subscriptor, private Solver<VECTOR>
     virtual ~SolverMinRes ();
     
 				     /**
-				      * Solver method.
+				      * Solve the linear system $Ax=b$
+				      * for x.
 				      */
     template<class MATRIX, class PRECONDITIONER>
     void
-    solve (const MATRIX &A,
-	   VECTOR       &x,
-	   const VECTOR &b,
-	   const PRECONDITIONER& precondition);
+    solve (const MATRIX         &A,
+	   VECTOR               &x,
+	   const VECTOR         &b,
+	   const PRECONDITIONER &precondition);
 
 				     /**
 				      * Exception
@@ -172,10 +176,10 @@ SolverMinRes<VECTOR>::print_vectors(const unsigned int,
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 typename Solver<VECTOR>::ReturnState 
-SolverMinRes<VECTOR>::solve (const MATRIX &A,
-			     VECTOR       &x,
-			     const VECTOR &b,
-			     const PRECONDITIONER& precondition)
+SolverMinRes<VECTOR>::solve (const MATRIX         &A,
+			     VECTOR               &x,
+			     const VECTOR         &b,
+			     const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -246,21 +250,20 @@ SolverMinRes<VECTOR>::solve (const MATRIX &A,
   r_l2 = r0;
   
   
-  u[0].reinit(VS,0);
+  u[0].reinit(VS);
   delta[0] = 1.;
-  m[0].reinit(VS,0);
-  m[1].reinit(VS,0);
-  m[2].reinit(VS,0);
+  m[0].reinit(VS);
+  m[1].reinit(VS);
+  m[2].reinit(VS);
 				   
   conv = control().check(0,r_l2);
   
   while (conv==SolverControl::iterate)
-    {
-      
+    {      
       if (delta[1]!=0)
 	v.scale(1./sqrt(delta[1]));
       else
-	v.reinit(VS,0);
+	v.reinit(VS);
 
       A.vmult(u[2],v);
       u[2].add (-sqrt(delta[1]/delta[0]), u[0]);

@@ -25,6 +25,9 @@
 /**
  * Preconditioned cg method.
  *
+ * For the requirements on matrices and vectors in order to work with
+ * this class, see the documentation of the @ref{Solver} base class.
+ *
  * Like all other solver classes, this class has a local structure called
  * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
@@ -85,14 +88,15 @@ class SolverCG : public Subscriptor, private Solver<VECTOR>
     virtual ~SolverCG ();
 
 				     /**
-				      * Solver method.
+				      * Solve the linear system $Ax=b$
+				      * for x.
 				      */
     template<class MATRIX, class PRECONDITIONER>
     void
-    solve (const MATRIX &A,
-	   VECTOR       &x,
-	   const VECTOR &b,
-	   const PRECONDITIONER& precondition);
+    solve (const MATRIX         &A,
+	   VECTOR               &x,
+	   const VECTOR         &b,
+	   const PRECONDITIONER &precondition);
 
   protected:
 				     /**
@@ -189,10 +193,10 @@ SolverCG<VECTOR>::print_vectors(const unsigned int,
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverCG<VECTOR>::solve (const MATRIX &A,
-			 VECTOR       &x,
-			 const VECTOR &b,
-			 const PRECONDITIONER& precondition)
+SolverCG<VECTOR>::solve (const MATRIX         &A,
+			 VECTOR               &x,
+			 const VECTOR         &b,
+			 const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 

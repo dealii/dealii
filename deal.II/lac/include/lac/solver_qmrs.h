@@ -32,6 +32,9 @@
  * preconditioner is used: left preconditioning seems to require the
  * inverse.
  *
+ * For the requirements on matrices and vectors in order to work with
+ * this class, see the documentation of the @ref{Solver} base class.
+ *
  * Like all other solver classes, this class has a local structure called
  * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
@@ -106,14 +109,15 @@ class SolverQMRS : public Subscriptor, private Solver<VECTOR>
 	      const AdditionalData &data=AdditionalData());
 
 				     /**
-				      * Solver method.
+				      * Solve the linear system $Ax=b$
+				      * for x.
 				      */
     template<class MATRIX, class PRECONDITIONER>
     void
-    solve (const MATRIX &A,
-	   VECTOR       &x,
-	   const VECTOR &b,
-	   const PRECONDITIONER& precondition);
+    solve (const MATRIX         &A,
+	   VECTOR               &x,
+	   const VECTOR         &b,
+	   const PRECONDITIONER &precondition);
 
 				     /**
 				      * Interface for derived class.
@@ -218,10 +222,10 @@ SolverQMRS<VECTOR>::print_vectors(const unsigned int,
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverQMRS<VECTOR>::solve (const MATRIX &A,
-			   VECTOR       &x,
-			   const VECTOR &b,
-			   const PRECONDITIONER& precondition)
+SolverQMRS<VECTOR>::solve (const MATRIX         &A,
+			   VECTOR               &x,
+			   const VECTOR         &b,
+			   const PRECONDITIONER &precondition)
 {
   deallog.push("QMRS");
   
@@ -277,8 +281,8 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 bool
-SolverQMRS<VECTOR>::iterate(const MATRIX& A,
-			    const PRECONDITIONER& precondition)
+SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
+			    const PRECONDITIONER &precondition)
 {
 /* Remark: the matrix A in the article is the preconditioned matrix.
  * Therefore, we have to precondition x before we compute the first residual.
@@ -319,12 +323,9 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
   precondition.vmult(q,p);
  
   tau = v.norm_sqr();
-  //deallog << "tau:" << tau << std::endl;
   rho = q*v;
-  //deallog << "rho:" << rho << std::endl;
-
-
-while (state == SolverControl::iterate)
+  
+  while (state == SolverControl::iterate)
     {
       step++; it++;
 				       // Step 1
@@ -337,7 +338,6 @@ while (state == SolverControl::iterate)
 	return true;
 				       // Step 3
       alpha = rho/sigma;
-      //deallog << "alpha:" << alpha << std::endl;
 
       v.add(-alpha,t);
 				       // Step 4
@@ -345,10 +345,6 @@ while (state == SolverControl::iterate)
       theta = v*v/tau;
       psi = 1./(1.+theta);
       tau *= theta*psi;
-
-      //deallog << "psi:" << psi << std::endl;
-      //deallog << "theta:" << theta << std::endl;
-      //deallog << "tau:" << tau << std::endl;
 
       d.sadd(psi*theta_old, psi*alpha, p);
       x.add(d);

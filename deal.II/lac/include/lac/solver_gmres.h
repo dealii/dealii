@@ -69,6 +69,9 @@
  * of temporary vectors as commented upon above. By default, the number
  * of these vectors is set to 30.
  *
+ * For the requirements on matrices and vectors in order to work with
+ * this class, see the documentation of the @ref{Solver} base class.
+ *
  * @author Wolfgang Bangerth
  */
 template <class VECTOR = Vector<double> >
@@ -107,13 +110,15 @@ class SolverGMRES : public Subscriptor, private Solver<VECTOR>
 		 const AdditionalData &data=AdditionalData());
 
 				     /**
-				      * Solver method.
+				      * Solve the linear system $Ax=b$
+				      * for x.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    void solve (const MATRIX &A,
-		VECTOR       &x,
-		const VECTOR &b,
-		const PRECONDITIONER& precondition);
+    void
+    solve (const MATRIX         &A,
+	   VECTOR               &x,
+	   const VECTOR         &b,
+	   const PRECONDITIONER &precondition);
 
     DeclException1 (ExcTooFewTmpVectors,
 		    int,
@@ -205,10 +210,10 @@ SolverGMRES<VECTOR>::givens_rotation (Vector<double> &h,
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverGMRES<VECTOR>::solve (const MATRIX& A,
-				   VECTOR      & x,
-				   const VECTOR& b,
-				   const PRECONDITIONER& precondition)
+SolverGMRES<VECTOR>::solve (const MATRIX         &A,
+			    VECTOR               &x,
+			    const VECTOR         &b,
+			    const PRECONDITIONER &precondition)
 {
 				   // this code was written a very
 				   // long time ago by people not

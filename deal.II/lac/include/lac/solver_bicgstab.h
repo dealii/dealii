@@ -22,6 +22,9 @@
 /**
  * Bicgstab algorithm by van der Vorst.
  *
+ * For the requirements on matrices and vectors in order to work with
+ * this class, see the documentation of the @ref{Solver} base class.
+ *
  * Like all other solver classes, this class has a local structure called
  * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We

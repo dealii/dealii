@@ -22,6 +22,9 @@
  * Implementation of the richardson iteration method. The stopping criterion
  * is the norm of the residual.
  *
+ * For the requirements on matrices and vectors in order to work with
+ * this class, see the documentation of the @ref{Solver} base class.
+ *
  * Like all other solver classes, this class has a local structure called
  * @p{AdditionalData} which is used to pass additional parameters to the
  * solver, like damping parameters or the number of temporary vectors. We
@@ -76,22 +79,25 @@ class SolverRichardson : public Subscriptor, private Solver<VECTOR>
     virtual ~SolverRichardson ();
     
 				     /**
-				      * Solve $Ax=b$ for $x$.
+				      * Solve the linear system $Ax=b$
+				      * for x.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    void solve (const MATRIX &A,
-		VECTOR       &x,
-		const VECTOR &b,
-		const PRECONDITIONER& precondition);
+    void
+    solve (const MATRIX         &A,
+	   VECTOR               &x,
+	   const VECTOR         &b,
+	   const PRECONDITIONER &precondition);
 
 				     /**
 				      * Solve $A^Tx=b$ for $x$.
 				      */
     template<class MATRIX, class PRECONDITIONER>
-    void Tsolve (const MATRIX &A,
-		 VECTOR       &x,
-		 const VECTOR &b,
-		 const PRECONDITIONER& precondition);
+    void
+    Tsolve (const MATRIX         &A,
+	    VECTOR               &x,
+	    const VECTOR         &b,
+	    const PRECONDITIONER &precondition);
 
 				     /**
 				      * Set the damping-coefficient.
@@ -169,10 +175,10 @@ SolverRichardson<VECTOR>::~SolverRichardson()
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverRichardson<VECTOR>::solve (const MATRIX &A,
-				 VECTOR       &x,
-				 const VECTOR &b,
-				 const PRECONDITIONER& precondition)
+SolverRichardson<VECTOR>::solve (const MATRIX         &A,
+				 VECTOR               &x,
+				 const VECTOR         &b,
+				 const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -218,10 +224,10 @@ SolverRichardson<VECTOR>::solve (const MATRIX &A,
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
-SolverRichardson<VECTOR>::Tsolve (const MATRIX &A,
-				  VECTOR       &x,
-				  const VECTOR &b,
-				  const PRECONDITIONER& precondition)
+SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
+				  VECTOR               &x,
+				  const VECTOR         &b,
+				  const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
 
