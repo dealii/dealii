@@ -450,6 +450,14 @@ class SparseMatrix
     virtual void clear ();
     
 				     /**
+				      * Return whether the object is empty. It
+				      * is empty if either both dimensions
+				      * are zero or no #SparseMatrixStruct#
+				      * is associated.
+				      */
+    bool empty () const;
+
+				     /**
 				      * Return the dimension of the image space.
 				      * To remember: the matrix is of dimension
 				      * $m \times n$.

@@ -91,6 +91,18 @@ SparseMatrix<number>::clear () {
 
 
 template <typename number>
+bool
+SparseMatrix<number>::empty () const
+{
+  if (cols == 0)
+    return true;
+  else
+    return cols->empty();
+};
+
+
+
+template <typename number>
 unsigned int
 SparseMatrix<number>::n_nonzero_elements () const {
   Assert (cols != 0, ExcMatrixNotInitialized());
