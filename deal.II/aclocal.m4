@@ -1022,6 +1022,29 @@ AC_DEFUN(DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS, dnl
 	AC_MSG_ERROR(not found)
    ])
 
+  AC_MSG_CHECKING(for posix thread condition variable functions)
+  AC_LANG(C++)
+  AC_TRY_COMPILE(
+   [
+#	include <pthread.h>
+   ],
+   [
+	pthread_cond_t   pc;
+	pthread_cond_init (&pc, 0);
+	pthread_cond_signal (&pc);
+	pthread_cond_broadcast (&pc);
+
+        pthread_mutex_t pm;
+        pthread_cond_wait (&pc, &pm);
+	pthread_cond_destroy (&pc);
+   ],
+   [
+	AC_MSG_RESULT(ok)
+   ],
+   [
+	AC_MSG_ERROR(not found)
+   ])
+
   AC_MSG_CHECKING(for posix thread barrier functions)
   AC_LANG(C++)
   AC_TRY_COMPILE(
