@@ -452,9 +452,13 @@ namespace TableBaseAccessors
       template <int N1, typename T1> friend class Table;
       template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
-#else
-      friend class Accessor<N,T,C,P+1>;
+#  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class Table<N,T>;
+      friend class Accessor<N,T,C,P+1>;
+#  endif
+#else
+      friend class Table<N,T>;
+      friend class Accessor<N,T,C,P+1>;
 #endif
   };
 

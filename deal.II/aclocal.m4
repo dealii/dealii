@@ -1784,6 +1784,66 @@ AC_DEFUN(DEAL_II_CHECK_NAMESP_TEMPL_FRIEND_BUG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl In some cases, we would like to name partial specializations
+dnl as friends. However, the standard forbids us to do so. But
+dnl then, we can declare the general template as a friend, and
+dnl at least gcc extends the friendship to all specializations
+dnl of the templates, which is not what the standard says.
+dnl
+dnl With other compilers, most notably cxx, this does not work.
+dnl In this case, we can make individual specializations friends,
+dnl which in turn gcc rejects. So check, whether this is possible.
+dnl
+dnl The respective clause in the standard is 14.5.3.1, which gives
+dnl this example:
+dnl   template<class T> class task {
+dnl     friend class task<int>;
+dnl   };
+dnl
+dnl
+dnl Usage: DEAL_II_CHECK_TEMPL_SPEC_FRIEND_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TEMPL_SPEC_FRIEND_BUG, dnl
+[
+  AC_MSG_CHECKING(for template specialization friend bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+template <int N, typename T> class X;
+template <typename T>        class X<1,T>;
+
+template <typename P> class Y {
+    static int i;
+    template <int N, typename T> friend class X;
+    friend class X<1,P>;
+};
+
+template <typename T> class X<1,T> {
+    X () { Y<T>::i; };     // access private field
+};
+
+template class X<1,int>;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE_UNQUOTED(DEAL_II_TEMPL_SPEC_FRIEND_BUG, 1, 
+                         [Define if we have to work around a bug with some
+			  compilers that will not allow us to specify a
+			  fully specialized class of a template as a friend.
+                          See the aclocal.m4 file in the top-level directory
+                          for a description of this bug.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Intel's ICC 5.0.1 compiler has the following problem: it won't
 dnl compile this code:
 dnl ---------------------------------
