@@ -235,6 +235,14 @@ class ConstraintMatrix : public Subscriptor
     void condense (SparsityPattern &sparsity) const;
 
 				     /**
+				      * Same function as above, but
+				      * condenses square block sparsity
+				      * patterns.
+				      */
+    template <int blocks>
+    void condense (BlockSparsityPattern<blocks,blocks> &sparsity) const;
+    
+				     /**
 				      * Condense a given matrix. The associated
 				      * matrix struct should be condensed and
 				      * compressed. It is the user's
@@ -260,48 +268,93 @@ class ConstraintMatrix : public Subscriptor
     void condense (SparseMatrix<number> &matrix) const;
 
 				     /**
+				      * Same function as above, but
+				      * condenses square block sparse
+				      * matrices.
+				      */
+    template <typename number, int blocks>
+    void condense (BlockSparseMatrix<number,blocks,blocks> &sparsity) const;
+    
+				     /**
 				      * Condense the given vector #uncondensed#
 				      * into #condensed#. It is the user's
 				      * responsibility to guarantee that all
 				      * entries of #condensed# be zero!
-				      */
-    template<typename number>
-    void condense (const Vector<number> &uncondensed,
-		   Vector<number>       &condensed) const;
-
-				     /**
-				      * Condense the given vector in-place.
-				      */
-    template<typename number>
-    void condense (Vector<number> &vec) const;
-
-				     /**
-				      * Re-distribute the elements of the vector
-				      * #condensed# to #uncondensed#. It is the user's
-				      * responsibility to guarantee that all
-				      * entries of #uncondensed# be zero!
 				      *
-				      * This function undoes the action of
-				      * #condense# somehow, but it should be noted
-				      * that it is not the inverse of #condense#-
+				      * The #VectorType# may be a
+				      * #Vector<float>#,
+				      * #Vector<double>#,
+				      * #BlockVector<...>#, or any
+				      * other type having the same
+				      * interface.
 				      */
-    template<typename number>
-    void distribute (const Vector<number> &condensed,
-		     Vector<number>       &uncondensed) const;
+    template <class VectorType>
+    void condense (const VectorType &uncondensed,
+		   VectorType       &condensed) const;
 
 				     /**
-				      * Re-distribute the elements of the vector
-				      * in-place.
+				      * Condense the given vector
+				      * in-place. The #VectorType# may
+				      * be a #Vector<float>#,
+				      * #Vector<double>#,
+				      * #BlockVector<...>#, or any
+				      * other type having the same
+				      * interface.
 				      */
-    template<typename number>
-    void distribute (Vector<number> &vec) const;
+    template <class VectorType>
+    void condense (VectorType &vec) const;
+
+				     /**
+				      * Re-distribute the elements of
+				      * the vector #condensed# to
+				      * #uncondensed#. It is the
+				      * user's responsibility to
+				      * guarantee that all entries of
+				      * #uncondensed# be zero!
+				      *
+				      * This function undoes the
+				      * action of #condense# somehow,
+				      * but it should be noted that it
+				      * is not the inverse of
+				      * #condense#.
+				      *
+				      * The #VectorType# may be a
+				      * #Vector<float>#,
+				      * #Vector<double>#,
+				      * #BlockVector<...>#, or any
+				      * other type having the same
+				      * interface.
+				      */
+    template <class VectorType>
+    void distribute (const VectorType &condensed,
+		     VectorType       &uncondensed) const;
+
+				     /**
+				      * Re-distribute the elements of
+				      * the vector in-place. The
+				      * #VectorType# may be a
+				      * #Vector<float>#,
+				      * #Vector<double>#,
+				      * #BlockVector<...>#, or any
+				      * other type having the same
+				      * interface.
+				      */
+    template <class VectorType>
+    void distribute (VectorType &vec) const;
     
 				     /**
-				      * Delete hanging nodes in a vector.
-				      * Sets all hanging node values to zero.
+				      * Delete hanging nodes in a
+				      * vector.  Sets all hanging node
+				      * values to zero. The
+				      * #VectorType# may be a
+				      * #Vector<float>#,
+				      * #Vector<double>#,
+				      * #BlockVector<...>#, or any
+				      * other type having the same
+				      * interface.
 				      */
-    template<typename number>
-    void set_zero (Vector<number> &vec) const;
+    template <class VectorType>
+    void set_zero (VectorType &vec) const;
 
 
 				     /**

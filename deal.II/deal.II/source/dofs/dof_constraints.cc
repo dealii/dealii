@@ -13,8 +13,13 @@
 
 
 #include <dofs/dof_constraints.h>
+#include <dofs/dof_constraints.templates.h>
+
 #include <lac/sparsity_pattern.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 #include <iostream>
 #include <algorithm>
 #include <numeric>
@@ -28,11 +33,15 @@ ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 };
 
 
+
 ConstraintMatrix::ConstraintMatrix () :
-		lines(), sorted(false) {};
+		lines(),
+		sorted(false)
+{};
 
 
-void ConstraintMatrix::add_line (const unsigned int line) {
+void ConstraintMatrix::add_line (const unsigned int line)
+{
   Assert (sorted==false, ExcMatrixIsClosed());
 
 				   // check whether line already exists;
@@ -48,9 +57,11 @@ void ConstraintMatrix::add_line (const unsigned int line) {
 };
 
 
+
 void ConstraintMatrix::add_entry (const unsigned int line,
 				  const unsigned int column,
-				  const double       value) {
+				  const double       value)
+{
   Assert (sorted==false, ExcMatrixIsClosed());
 
   vector<ConstraintLine>::iterator line_ptr;
@@ -89,7 +100,9 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 };
 
 
-void ConstraintMatrix::close () {
+
+void ConstraintMatrix::close ()
+{
   Assert (sorted==false, ExcMatrixIsClosed());
 
 				   // sort the entries in the different lines
@@ -148,14 +161,18 @@ void ConstraintMatrix::close () {
 };
 
 
-void ConstraintMatrix::clear () {
+
+void ConstraintMatrix::clear ()
+{
   lines = vector<ConstraintLine>();
   sorted = false;
 };
 
 
+
 void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
-				 SparsityPattern       &condensed) const {
+				 SparsityPattern       &condensed) const
+{
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
@@ -262,10 +279,97 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 };
 
 
-void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
+
+void ConstraintMatrix::condense (SparsityPattern &sparsity) const
+{
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
+	  ExcMatrixNotSquare());
+  
+				   // store for each index whether it
+				   // must be distributed or not. If entry
+				   // is -1, no distribution is necessary.
+				   // otherwise, the number states which
+				   // line in the constraint matrix handles
+				   // this index
+  vector<int> distribute(sparsity.n_rows(), -1);
+  
+  for (unsigned int c=0; c<lines.size(); ++c)
+    distribute[lines[c].line] = static_cast<signed int>(c);
+
+  unsigned int n_rows = sparsity.n_rows();
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      if (distribute[row] == -1)
+					 // regular line. loop over cols
+	for (unsigned int j=sparsity.get_rowstart_indices()[row];
+	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
+	  {
+	    const unsigned int column = sparsity.get_column_numbers()[j];
+	    
+					     // end of row reached?
+	    if (column == SparsityPattern::invalid_entry)
+	      break;
+	    else
+	      if (distribute[column] != -1)
+		{
+						   // distribute entry at regular
+						   // row #row# and irregular column
+						   // sparsity.colnums[j]
+		  for (unsigned int q=0;
+		       q!=lines[distribute[column]].entries.size();
+		       ++q) 
+		    sparsity.add (row,
+				  lines[distribute[column]].entries[q].first);
+		};
+	  }
+      else
+					 // row must be distributed
+	for (unsigned int j=sparsity.get_rowstart_indices()[row];
+	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
+					   // end of row reached?
+	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+	    break;
+	  else
+	    {
+	      if (distribute[sparsity.get_column_numbers()[j]] == -1)
+						 // distribute entry at irregular
+						 // row #row# and regular column
+						 // sparsity.colnums[j]
+		for (unsigned int q=0;
+		     q!=lines[distribute[row]].entries.size(); ++q) 
+		  sparsity.add (lines[distribute[row]].entries[q].first,
+				sparsity.get_column_numbers()[j]);
+	      else
+						 // distribute entry at irregular
+						 // row #row# and irregular column
+						 // sparsity.get_column_numbers()[j]
+		for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+		  for (unsigned int q=0;
+		       q!=lines[distribute[sparsity.get_column_numbers()[j]]]
+				      .entries.size(); ++q)
+		    sparsity.add (lines[distribute[row]].entries[p].first,
+				  lines[distribute[sparsity.get_column_numbers()[j]]]
+				  .entries[q].first);
+	    };
+    };
+  
+  sparsity.compress();
+};
+
+
+
+template <int blocks>
+void ConstraintMatrix::condense (BlockSparsityPattern<blocks,blocks> &sparsity) const
+{
+  Assert (false, ExcInternalError());
+/*
+  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
+  Assert (sparsity.n_rows() == sparsity.n_cols(),
+	  ExcMatrixNotSquare());
+  Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcMatrixNotSquare());
   
 				   // store for each index whether it
@@ -337,13 +441,16 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const {
     };
   
   sparsity.compress();
+*/  
 };
+
 
 
 unsigned int ConstraintMatrix::n_constraints () const
 {
   return lines.size();
 };
+
 
 
 bool ConstraintMatrix::is_constrained (const unsigned int index) const 
@@ -397,32 +504,82 @@ void ConstraintMatrix::print (ostream &out) const {
   AssertThrow (out, ExcIO());
 };
 
-#include <dofs/dof_constraints.templates.h>
 
-#define number double
-template void ConstraintMatrix::condense(const SparseMatrix<number> &uncondensed,
-				  SparseMatrix<number>       &condensed) const;
-template void ConstraintMatrix::condense(SparseMatrix<number> &uncondensed) const;
-template void ConstraintMatrix::condense(const Vector<number> &uncondensed,
-			    Vector<number>       &condensed) const;
-template void ConstraintMatrix::condense(Vector<number> &vec) const;
-template void ConstraintMatrix::set_zero(Vector<number> &vec) const;
-template void ConstraintMatrix::distribute(const Vector<number> &condensed,
-				      Vector<number>       &uncondensed) const;
-template void ConstraintMatrix::distribute(Vector<number> &vec) const;
 
-#undef number
-#define number float
 
-template void ConstraintMatrix::condense(const SparseMatrix<number> &uncondensed,
-				  SparseMatrix<number>       &condensed) const;
-template void ConstraintMatrix::condense(SparseMatrix<number> &uncondensed) const;
-template void ConstraintMatrix::condense(const Vector<number> &uncondensed,
-			    Vector<number>       &condensed) const;
-template void ConstraintMatrix::condense(Vector<number> &vec) const;
-template void ConstraintMatrix::set_zero(Vector<number> &vec) const;
-template void ConstraintMatrix::distribute(const Vector<number> &condensed,
-				      Vector<number>       &uncondensed) const;
-template void ConstraintMatrix::distribute(Vector<number> &vec) const;
 
-#undef number
+// explicit instantiations
+//
+// define a list of functions for vectors and matrices, respectively,
+// where the vector/matrix can be replaced using a preprocessor
+// variable VectorType/MatrixType. note that we cannot do so by using
+// a preprocessor function with one arg, since
+// #vector_functions(BlockVector<2,double>)# is not recognized as one
+// arg, and putting parentheses around the arg yields incorrect
+// syntax...
+
+#define vector_functions \
+  template void ConstraintMatrix::condense(const VectorType &uncondensed,\
+					   VectorType       &condensed) const;\
+  template void ConstraintMatrix::condense(VectorType &vec) const;\
+  template void ConstraintMatrix::set_zero(VectorType &vec) const;\
+  template void ConstraintMatrix::distribute(const VectorType &condensed,\
+					     VectorType       &uncondensed) const;\
+  template void ConstraintMatrix::distribute(VectorType &vec) const;
+
+
+
+#define matrix_functions_1 \
+  template void ConstraintMatrix::condense(const MatrixType &uncondensed,\
+					   MatrixType       &condensed) const;
+#define matrix_functions_2 \
+  template void ConstraintMatrix::condense(MatrixType &uncondensed) const;
+
+
+
+#define VectorType Vector<float>
+vector_functions;
+#undef VectorType
+
+#define VectorType Vector<double>
+vector_functions;
+#undef VectorType
+
+#define VectorType BlockVector<2,double>
+vector_functions;
+#undef VectorType
+
+#define VectorType BlockVector<3,double>
+vector_functions;
+#undef VectorType
+
+
+
+#define MatrixType SparseMatrix<float>
+matrix_functions_1;
+matrix_functions_2;
+#undef MatrixType
+
+#define MatrixType SparseMatrix<double>
+matrix_functions_1;
+matrix_functions_2;
+#undef MatrixType
+
+// block sparse matrices are only implemented for one of the two matrix functions
+#define MatrixType BlockSparseMatrix<double,2,2>
+matrix_functions_2;
+#undef MatrixType
+
+#define MatrixType BlockSparseMatrix<double,3,3>
+matrix_functions_2;
+#undef MatrixType
+
+
+#define MatrixType BlockSparsityPattern<2,2>
+matrix_functions_2;
+#undef MatrixType
+
+#define MatrixType BlockSparsityPattern<3,3>
+matrix_functions_2;
+#undef MatrixType
+

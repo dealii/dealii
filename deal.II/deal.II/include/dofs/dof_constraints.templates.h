@@ -15,7 +15,6 @@
 
 
 #include <dofs/dof_constraints.h>
-#include <lac/sparse_matrix.h>
 
 
 template<typename number>
@@ -261,10 +260,160 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 
 
 
-template<typename number>
+template <typename number, int blocks>
 void
-ConstraintMatrix::condense (const Vector<number> &uncondensed,
-			    Vector<number>       &condensed) const
+ConstraintMatrix::condense (BlockSparseMatrix<number,blocks,blocks> &uncondensed) const
+{
+  const BlockSparsityPattern<blocks,blocks> &
+    sparsity = uncondensed.get_sparsity_pattern ();
+
+  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
+  Assert (sparsity.n_rows() == sparsity.n_cols(),
+	  ExcMatrixNotSquare());
+  Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
+	  ExcMatrixNotSquare());
+
+  const BlockIndices<blocks> &
+    index_mapping = sparsity.get_column_indices();
+  
+				   // store for each index whether it
+				   // must be distributed or not. If entry
+				   // is -1, no distribution is necessary.
+				   // otherwise, the number states which
+				   // line in the constraint matrix handles
+				   // this index
+  vector<int> distribute (sparsity.n_rows(), -1);
+  
+  for (unsigned int c=0; c<lines.size(); ++c)
+    distribute[lines[c].line] = static_cast<signed int>(c);
+
+  const unsigned int n_rows = sparsity.n_rows();
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      if (distribute[row] == -1)
+	{
+					   // get index of this row
+					   // within the blocks
+	  const pair<unsigned int,unsigned int>
+	    block_index = index_mapping.global_to_local(row);
+	  
+					   // regular line. loop over
+					   // all columns and see
+					   // whether this column must
+					   // be distributed
+	  for (unsigned int block_col=0; block_col<blocks; ++block_col)
+	    {
+	      const SparsityPattern &
+		block_sparsity = sparsity.block(block_index.first,block_col);
+	      
+	      const unsigned int
+		first = block_sparsity.get_rowstart_indices()[block_index.second],
+		last  = block_sparsity.get_rowstart_indices()[block_index.second+1];
+	      for (unsigned int j=first; j<last; ++j)
+						 // end of row reached?
+		if (block_sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+		  {
+						     // this should not happen, since
+						     // we only operate on compressed
+						     // matrices!
+		    Assert (false, ExcMatrixNotClosed());
+		    break;
+		  }
+		else
+		  {
+		    const unsigned int global_col
+		      =index_mapping.local_to_global(block_col,
+						     block_sparsity.get_column_numbers()[j]);
+		    
+		    if (distribute[global_col] != -1)
+						       // distribute entry at regular
+						       // row #row# and irregular column
+						       // global_col;
+						       // set old entry to zero
+		      {
+			const double old_value =
+			  uncondensed.block(block_index.first,block_col).global_entry(j);
+			
+			for (unsigned int q=0;
+			     q!=lines[distribute[global_col]]
+					    .entries.size(); ++q)
+			  uncondensed.add (row,
+					   lines[distribute[global_col]].entries[q].first,
+					   old_value *
+					   lines[distribute[global_col]].entries[q].second);
+			
+			uncondensed.block(block_index.first,block_col).global_entry(j)
+			  = 0.;
+		      };
+		  };
+	    };
+	}
+      else
+	{
+	}
+      
+//  					 // row must be distributed
+//  	for (unsigned int j=sparsity.get_rowstart_indices()[row];
+//  	     j<sparsity.get_rowstart_indices()[row+1]; ++j)
+//  					   // end of row reached?
+//  	  if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+//  	    {
+//  					       // this should not happen, since
+//  					       // we only operate on compressed
+//  					       // matrices!
+//  	      Assert (false, ExcMatrixNotClosed());
+//  	      break;
+//  	    }
+//  	  else
+//  	    {
+//  	      if (distribute[sparsity.get_column_numbers()[j]] == -1)
+//  						 // distribute entry at irregular
+//  						 // row #row# and regular column
+//  						 // sparsity.get_column_numbers()[j]. set old
+//  						 // entry to zero
+//  		{
+//  		  for (unsigned int q=0;
+//  		       q!=lines[distribute[row]].entries.size(); ++q) 
+//  		    uncondensed.add (lines[distribute[row]].entries[q].first,
+//  				     sparsity.get_column_numbers()[j],
+//  				     uncondensed.global_entry(j) *
+//  				     lines[distribute[row]].entries[q].second);
+		
+//  		  uncondensed.global_entry(j) = 0.;
+//  		}
+//  	      else
+//  						 // distribute entry at irregular
+//  						 // row #row# and irregular column
+//  						 // sparsity.get_column_numbers()[j]
+//  						 // set old entry to one if on main
+//  						 // diagonal, zero otherwise
+//  		{
+//  		  for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+//  		    for (unsigned int q=0;
+//  			 q!=lines[distribute[sparsity.get_column_numbers()[j]]]
+//  					.entries.size(); ++q)
+//  		      uncondensed.add (lines[distribute[row]].entries[p].first,
+//  				       lines[distribute[sparsity.get_column_numbers()[j]]]
+//  				       .entries[q].first,
+//  				       uncondensed.global_entry(j) *
+//  				       lines[distribute[row]].entries[p].second *
+//  				       lines[distribute[sparsity.get_column_numbers()[j]]]
+//  				       .entries[q].second);
+		
+//  		  uncondensed.global_entry(j) = (row == sparsity.get_column_numbers()[j] ?
+//  						 1. : 0. );
+//  		};
+//  	    };
+    };
+};
+
+
+
+template<class VectorType>
+void
+ConstraintMatrix::condense (const VectorType &uncondensed,
+			    VectorType       &condensed) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
@@ -335,9 +484,9 @@ ConstraintMatrix::condense (const Vector<number> &uncondensed,
 
 
 
-template<typename number>
+template <class VectorType>
 void
-ConstraintMatrix::condense (Vector<number> &vec) const
+ConstraintMatrix::condense (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
@@ -366,9 +515,9 @@ ConstraintMatrix::condense (Vector<number> &vec) const
 
 
 
-template<typename number>
+template <class VectorType>
 void
-ConstraintMatrix::set_zero (Vector<number> &vec) const
+ConstraintMatrix::set_zero (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
@@ -392,10 +541,10 @@ ConstraintMatrix::set_zero (Vector<number> &vec) const
 
 
 
-template<typename number>
+template<class VectorType>
 void
-ConstraintMatrix::distribute (const Vector<number> &condensed,
-			      Vector<number>       &uncondensed) const
+ConstraintMatrix::distribute (const VectorType &condensed,
+			      VectorType       &uncondensed) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
@@ -465,9 +614,9 @@ ConstraintMatrix::distribute (const Vector<number> &condensed,
 
 
 
-template<typename number>
+template<class VectorType>
 void
-ConstraintMatrix::distribute (Vector<number> &vec) const
+ConstraintMatrix::distribute (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
