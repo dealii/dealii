@@ -339,7 +339,8 @@ FESystem<dim>::get_data (UpdateFlags            flags,
       FEValuesData<dim> *base_data = new FEValuesData<dim>();
       data->set_fe_values_data(base_no, base_data);
     }
-  
+  if (data->compute_second_derivatives)
+    data->update_each |= update_each (update_second_derivatives);
   data->update_flags=data->update_once | data->update_each;
   Assert(data->update_once==update_once(flags), ExcInternalError());
   Assert(data->update_each==update_each(flags), ExcInternalError());
