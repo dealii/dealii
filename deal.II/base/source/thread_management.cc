@@ -89,6 +89,7 @@ namespace Threads
     return pthread_barrier_wait (&barrier);
 #else
     std::abort ();
+    return 1;
 #endif
   };
   
