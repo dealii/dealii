@@ -4,8 +4,6 @@
 #
 # Author: Wolfgang Bangerth, Guido Kanschat 2000, 2004
 
-#TODO: Th
-
 # set this to 1 if you want verbose output
 $debug = 0;
 
