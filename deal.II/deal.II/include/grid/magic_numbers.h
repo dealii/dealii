@@ -22,6 +22,8 @@ const unsigned int mn_tria_quad_user_flags_begin = 0xa110;
 const unsigned int mn_tria_quad_user_flags_end   = 0xa111;
 const unsigned int mn_tria_hex_user_flags_begin  = 0xa112;
 const unsigned int mn_tria_hex_user_flags_end    = 0xa113;
+const unsigned int mn_persistent_tria_flags_begin= 0xa200;
+const unsigned int mn_persistent_tria_flags_end  = 0xa201;
 
 
 
