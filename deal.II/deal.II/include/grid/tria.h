@@ -2058,12 +2058,12 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				     /**
 				      *  Clear all user pointers.
 				      */
-    void clear_user_pointers ();
+    void clear_user_pointers () const;
 
     				     /**
 				      *  Clear all user flags.
 				      */
-    void clear_user_flags ();
+    void clear_user_flags () const;
 
 				     /**
 				      *  Save all user flags. See the general
@@ -3288,12 +3288,12 @@ template <> void Triangulation<3>::create_triangulation (const std::vector<Point
 							 const SubCellData                          &subcelldata);
 template <> void Triangulation<1>::distort_random (const double factor,
 						   const bool   keep_boundary);
-template <> void Triangulation<1>::clear_user_pointers ();
-template <> void Triangulation<1>::clear_user_flags ();
-template <> void Triangulation<2>::clear_user_pointers ();
-template <> void Triangulation<2>::clear_user_flags ();
-template <> void Triangulation<3>::clear_user_pointers ();
-template <> void Triangulation<3>::clear_user_flags ();
+template <> void Triangulation<1>::clear_user_pointers () const;
+template <> void Triangulation<1>::clear_user_flags () const;
+template <> void Triangulation<2>::clear_user_pointers () const;
+template <> void Triangulation<2>::clear_user_flags () const;
+template <> void Triangulation<3>::clear_user_pointers () const;
+template <> void Triangulation<3>::clear_user_flags () const;
 template <> void Triangulation<1>::save_user_flags_quad (std::ostream &) const;
 template <> void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const;
 template <> void Triangulation<1>::load_user_flags_quad (std::istream &);

@@ -1886,7 +1886,7 @@ void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v)
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::clear_user_pointers ()
+void Triangulation<1>::clear_user_pointers () const
 {
   cell_iterator cell = begin(),
 		endc = end();
@@ -1897,7 +1897,7 @@ void Triangulation<1>::clear_user_pointers ()
 
 
 template <>
-void Triangulation<1>::clear_user_flags ()
+void Triangulation<1>::clear_user_flags () const
 {
   cell_iterator cell = begin(),
 		endc = end();
@@ -1911,7 +1911,7 @@ void Triangulation<1>::clear_user_flags ()
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::clear_user_pointers ()
+void Triangulation<2>::clear_user_pointers () const
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1927,7 +1927,7 @@ void Triangulation<2>::clear_user_pointers ()
 
 
 template <>
-void Triangulation<2>::clear_user_flags ()
+void Triangulation<2>::clear_user_flags () const
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1947,7 +1947,7 @@ void Triangulation<2>::clear_user_flags ()
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::clear_user_pointers ()
+void Triangulation<3>::clear_user_pointers () const
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1968,7 +1968,7 @@ void Triangulation<3>::clear_user_pointers ()
 
 
 template <>
-void Triangulation<3>::clear_user_flags ()
+void Triangulation<3>::clear_user_flags () const
 {
   line_iterator line = begin_line(),
 		endl = end_line();
