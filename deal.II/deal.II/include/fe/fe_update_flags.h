@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -119,18 +119,6 @@ enum UpdateFlags
 
 
 
-/**
- * Global operator which sets the bits from the second argument also
- * in the first one.
- */
-inline
-UpdateFlags &
-operator |= (UpdateFlags &f1, const UpdateFlags &f2)
-{
-  f1 = static_cast<UpdateFlags> (f1 | f2);
-  return f1;
-}
-
 
 
 /**
@@ -143,27 +131,27 @@ operator |= (UpdateFlags &f1, const UpdateFlags &f2)
  */
 inline
 UpdateFlags
-operator | (const UpdateFlags &f1, const UpdateFlags &f2)
+operator | (UpdateFlags f1, UpdateFlags f2)
 {
-  UpdateFlags result = f1;
-  result |= f2;
-  return result;
+  return static_cast<UpdateFlags> (
+    static_cast<unsigned int> (f1) |
+    static_cast<unsigned int> (f2));
 }
+
 
 
 
 /**
- * Global operator which clears all the bits in the first argument if
- * they are not also set in the second argument.
+ * Global operator which sets the bits from the second argument also
+ * in the first one.
  */
 inline
 UpdateFlags &
-operator &= (UpdateFlags &f1, const UpdateFlags &f2)
+operator |= (UpdateFlags &f1, UpdateFlags f2)
 {
-  f1 = static_cast<UpdateFlags> (f1 & f2);
+  f1 = f1 | f2;
   return f1;
 }
-
 
 
 /**
@@ -176,12 +164,27 @@ operator &= (UpdateFlags &f1, const UpdateFlags &f2)
  */
 inline
 UpdateFlags
-operator & (const UpdateFlags& f1, const UpdateFlags& f2)
+operator & (UpdateFlags f1, UpdateFlags f2)
 {
-  UpdateFlags result = f1;
-  result &= f2;
-  return result;
+  return static_cast<UpdateFlags> (
+    static_cast<unsigned int> (f1) &
+    static_cast<unsigned int> (f2));
 }
+
+
+/**
+ * Global operator which clears all the bits in the first argument if
+ * they are not also set in the second argument.
+ */
+inline
+UpdateFlags &
+operator &= (UpdateFlags &f1, UpdateFlags f2)
+{
+  f1 = f1 & f2;
+  return f1;
+}
+
+
 
 /*@}*/
 
