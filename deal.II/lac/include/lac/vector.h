@@ -830,6 +830,19 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
 
 template <typename Number>
 inline
+Vector<Number> & Vector<Number>::operator = (const Number s)
+{
+  if (s != 0.)
+    Assert (dim!=0, ExcEmptyVector());
+  if (dim!=0)
+    std::fill (begin(), end(), s);
+  return *this;
+}
+
+
+
+template <typename Number>
+inline
 unsigned int Vector<Number>::size () const
 {
   return dim;

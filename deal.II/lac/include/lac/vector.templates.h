@@ -630,18 +630,6 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 
 
 
-template <typename Number>
-Vector<Number> & Vector<Number>::operator = (const Number s)
-{
-  if (s != 0.)
-    Assert (dim!=0, ExcEmptyVector());
-  if (dim!=0)
-    std::fill (begin(), end(), s);
-  return *this;
-}
-
-
-
 #ifdef DEAL_II_USE_PETSC
 
 template <typename Number>
