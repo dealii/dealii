@@ -4461,15 +4461,27 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 
 
 dnl --------------------------------------------------
+dnl Include the LAPACK library
+dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
+[
+  if test "x$1" != "xyes" ; then
+    AC_CHECK_LIB($1, dgbsv_,[LIBS="-l$1 $LIBS"; AC_DEFINE(HAVE_LIBLAPACK)])
+dnl    fi
+  else
+    AC_CHECK_LIB(lapack, dgbsv_)
+  fi
+])
+
+dnl --------------------------------------------------
 dnl Include the BLAS library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
   if test "x$1" != "xyes" ; then
-    AC_CHECK_LIB($1, daxpy_,BLAS_LIB="-l$1",,$F77LIBS)
+    AC_CHECK_LIB($1, daxpy_,[LIBS="-l$1 $LIBS"; AC_DEFINE(HAVE_LIBBLAS)],,$F77LIBS)
   else
-    AC_CHECK_LIB(blas, daxpy_,BLAS_LIB="-lblas",,$F77LIBS)
+    AC_CHECK_LIB(blas, daxpy_,,,$F77LIBS)
   fi
-  AC_DEFINE(HAVE_BLAS)
   AC_SUBST(NEEDS_F77LIBS, "yes")
 ])

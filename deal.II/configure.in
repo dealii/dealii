@@ -329,14 +329,23 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring additional libs ----------------)
 
+dnl Make sure we configure for libraries used by other libraries
+
 if test "x$with_umfpack" != "x" ; then
   if test "x$with_blas" = "x" ; then
     with_blas="yes"
   fi
 fi
 
+if test "x$with_lapack" != "x" ; then
+  if test "x$with_blas" = "x" ; then
+    with_blas="yes"
+  fi
+fi
+
 dnl -------------------------------------------------------------
-dnl Actually include libraries here.
+dnl Actually include libraries here. Check for the libraries
+dnl    requiring FORTRAN support first.
 dnl -------------------------------------------------------------
 
 dnl Check for blas.
@@ -346,15 +355,25 @@ AC_ARG_WITH(blas,
    by the argument -lblaslib. If no argument is given, use -lblas.
    Default is to use -lblas only if required by other libraries.],
   DEAL_II_WITH_BLAS($withval))
-AC_SUBST(BLAS_LIB)
-
-
-DEAL_II_CONFIGURE_TECPLOT
-AC_SUBST(TECPLOT_LIB)
-AC_SUBST(TECPLOT_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_HSL
 AC_SUBST(USE_CONTRIB_HSL)
+
+dnl -------------------------------------------------------------
+dnl Now insert FORTRAN libs at the END of the library string if needed
+dnl -------------------------------------------------------------
+
+if test "x$NEEDS_F77LIBS" != "x" ; then
+   AC_MSG_RESULT(Adding FORTRAN libraries $F77LIBS)
+   LIBS="$LIBS $F77LIBS"
+fi
+
+dnl -------------------------------------------------------------
+dnl These libraries are straight forward now
+dnl -------------------------------------------------------------
+
+DEAL_II_CONFIGURE_TECPLOT
+AC_SUBST(TECPLOT_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_PETSC
 AC_SUBST(USE_CONTRIB_PETSC)
@@ -383,7 +402,12 @@ AC_SUBST(UMFPACK_INCLUDE_DIR)
 AC_SUBST(USE_CONTRIB_UMFPACK)
 
 dnl Check for LAPACK
-dnl AC_CHECK_LIB(lapack, degsl_)
+AC_ARG_WITH(lapack,
+  [  --with-lapack=lapacklib use the lapack library lapacklib. Make sure
+   the path to the libary is searched by ld, since it is included
+   by the argument -llapacklib. If no argument is given, use -llapack.
+   Default is not to use -llapack.],
+  DEAL_II_WITH_LAPACK($withval))
 
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags

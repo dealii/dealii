@@ -274,7 +274,7 @@ PACKAGE_BUGREPORT=
 
 ac_unique_file="deal.II"
 ac_subdirs_all="$ac_subdirs_all contrib tests"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD CC_VERSION enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared static_lib_suffix shared_lib_suffix AR RANLIB ac_ct_RANLIB NEEDS_F77LIBS BLAS_LIB TECPLOT_LIB TECPLOT_INCLUDE_DIR HSL_LIB HSL_INCLUDE_DIR USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR DEAL_II_DEFINE_DEAL_II_USE_PETSC USE_CONTRIB_METIS DEAL_II_METIS_DIR UMFPACK_LIB UMFPACK_INCLUDE_DIR USE_CONTRIB_UMFPACK DOXYGEN DOT DEAL_II_HAVE_DOT PERL subdirs LDFLAGSPIC LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD CC_VERSION enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared static_lib_suffix shared_lib_suffix AR RANLIB ac_ct_RANLIB NEEDS_F77LIBS HSL_LIB HSL_INCLUDE_DIR USE_CONTRIB_HSL TECPLOT_INCLUDE_DIR USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR DEAL_II_DEFINE_DEAL_II_USE_PETSC USE_CONTRIB_METIS DEAL_II_METIS_DIR UMFPACK_LIB UMFPACK_INCLUDE_DIR USE_CONTRIB_UMFPACK DOXYGEN DOT DEAL_II_HAVE_DOT PERL subdirs LDFLAGSPIC LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -846,6 +846,10 @@ Optional Packages:
       be the directory containing directories AMD and UMFPACK.
       The contributed UMFPack library is used if no argument is given.
       Default is not to use UMFPack
+  --with-lapack=lapacklib use the lapack library lapacklib. Make sure
+   the path to the libary is searched by ld, since it is included
+   by the argument -llapacklib. If no argument is given, use -llapack.
+   Default is not to use -llapack.
   --with-cpu=cpu          Optimize specifically for the given CPU type,
                           rather than just generating code for this
 		          processor family
@@ -3352,6 +3356,7 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias"
                                                   else if test "x$GXX_VERSION" = "xintel_icc8" ; then
+            CXXFLAGSG="$CXXFLAGSG -strict_ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
           fi fi
 
@@ -8777,7 +8782,14 @@ echo "${ECHO_T}" >&6
 echo "$as_me:$LINENO: result: ---------------- configuring additional libs ----------------" >&5
 echo "${ECHO_T}---------------- configuring additional libs ----------------" >&6
 
+
 if test "x$with_umfpack" != "x" ; then
+  if test "x$with_blas" = "x" ; then
+    with_blas="yes"
+  fi
+fi
+
+if test "x$with_lapack" != "x" ; then
   if test "x$with_blas" = "x" ; then
     with_blas="yes"
   fi
@@ -8856,11 +8868,15 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-  BLAS_LIB="-l$withval"
+  LIBS="-l$withval $LIBS"; cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBBLAS 1
+_ACEOF
+
 fi
 
   else
-    echo "$as_me:$LINENO: checking for daxpy_ in -lblas" >&5
+
+echo "$as_me:$LINENO: checking for daxpy_ in -lblas" >&5
 echo $ECHO_N "checking for daxpy_ in -lblas... $ECHO_C" >&6
 if test "${ac_cv_lib_blas_daxpy_+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -8925,19 +8941,66 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_blas_daxpy_" >&5
 echo "${ECHO_T}$ac_cv_lib_blas_daxpy_" >&6
 if test $ac_cv_lib_blas_daxpy_ = yes; then
-  BLAS_LIB="-lblas"
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBBLAS 1
+_ACEOF
+
+  LIBS="-lblas $LIBS"
+
 fi
 
   fi
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_BLAS 1
-_ACEOF
-
   NEEDS_F77LIBS="yes"
 
 
 fi;
 
+
+  echo "$as_me:$LINENO: checking for HSL subroutines" >&5
+echo $ECHO_N "checking for HSL subroutines... $ECHO_C" >&6
+  hsl_subroutines=""
+  if test -r contrib/hsl/source/ma27.f ; then
+    hsl_subroutines="$hsl_subroutines MA27"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_HSL_MA27 1
+_ACEOF
+
+  fi
+
+  if (test -r contrib/hsl/source/ma47.f && \
+      test -r contrib/hsl/source/ma47dep.f) ; then
+    hsl_subroutines="$hsl_subroutines MA47"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_HSL_MA47 1
+_ACEOF
+
+  fi
+
+  if test "x$hsl_subroutines" != "x" ; then
+    echo "$as_me:$LINENO: result: $hsl_subroutines" >&5
+echo "${ECHO_T}$hsl_subroutines" >&6
+    USE_CONTRIB_HSL=yes
+    HSL_LIB='$(LIBDIR)/libhsl$(lib-suffix)'
+
+    HSL_INCLUDE_DIR='-I$D/contrib/hsl/include'
+
+    NEEDS_F77LIBS="yes"
+
+  else
+    echo "$as_me:$LINENO: result: none found" >&5
+echo "${ECHO_T}none found" >&6
+  fi
+
+
+
+
+if test "x$NEEDS_F77LIBS" != "x" ; then
+   echo "$as_me:$LINENO: result: Adding FORTRAN libraries $F77LIBS" >&5
+echo "${ECHO_T}Adding FORTRAN libraries $F77LIBS" >&6
+   LIBS="$LIBS $F77LIBS"
+fi
 
 
 
@@ -9000,47 +9063,6 @@ cat >>confdefs.h <<\_ACEOF
 #define DEAL_II_HAVE_TECPLOT 1
 _ACEOF
 
-  fi
-
-
-
-
-
-  echo "$as_me:$LINENO: checking for HSL subroutines" >&5
-echo $ECHO_N "checking for HSL subroutines... $ECHO_C" >&6
-  hsl_subroutines=""
-  if test -r contrib/hsl/source/ma27.f ; then
-    hsl_subroutines="$hsl_subroutines MA27"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_HSL_MA27 1
-_ACEOF
-
-  fi
-
-  if (test -r contrib/hsl/source/ma47.f && \
-      test -r contrib/hsl/source/ma47dep.f) ; then
-    hsl_subroutines="$hsl_subroutines MA47"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_HSL_MA47 1
-_ACEOF
-
-  fi
-
-  if test "x$hsl_subroutines" != "x" ; then
-    echo "$as_me:$LINENO: result: $hsl_subroutines" >&5
-echo "${ECHO_T}$hsl_subroutines" >&6
-    USE_CONTRIB_HSL=yes
-    HSL_LIB='$(LIBDIR)/libhsl$(lib-suffix)'
-
-    HSL_INCLUDE_DIR='-I$D/contrib/hsl/include'
-
-    NEEDS_F77LIBS="yes"
-
-  else
-    echo "$as_me:$LINENO: result: none found" >&5
-echo "${ECHO_T}none found" >&6
   fi
 
 
@@ -9124,11 +9146,20 @@ echo "${ECHO_T}$DEAL_II_PETSC_ARCH" >&6
 
                 if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
              ; then
-          { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
-                        specified with --with-petsc-arch" >&5
-echo "$as_me: error: PETSc has not been compiled for the architecture
-                        specified with --with-petsc-arch" >&2;}
+          	            if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
+             ; then
+            { { echo "$as_me:$LINENO: error: PETSc has not been compiled for C++, but
+                          deal.II needs this" >&5
+echo "$as_me: error: PETSc has not been compiled for C++, but
+                          deal.II needs this" >&2;}
    { (exit 1); exit 1; }; }
+          else
+            { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
+                          specified with --with-petsc-arch" >&5
+echo "$as_me: error: PETSc has not been compiled for the architecture
+                          specified with --with-petsc-arch" >&2;}
+   { (exit 1); exit 1; }; }
+          fi
 	fi
 
 else
@@ -9140,11 +9171,20 @@ echo "${ECHO_T}$DEAL_II_PETSC_ARCH" >&6
 
                     if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
              ; then
-            { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
-                          specified in the PETSC_ARCH environment variable" >&5
-echo "$as_me: error: PETSc has not been compiled for the architecture
-                          specified in the PETSC_ARCH environment variable" >&2;}
+            	                if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
+               ; then
+              { { echo "$as_me:$LINENO: error: PETSc has not been compiled for C++, but
+                            deal.II needs this" >&5
+echo "$as_me: error: PETSc has not been compiled for C++, but
+                            deal.II needs this" >&2;}
    { (exit 1); exit 1; }; }
+            else
+              { { echo "$as_me:$LINENO: error: PETSc has not been compiled for the architecture
+                            specified with --with-petsc-arch" >&5
+echo "$as_me: error: PETSc has not been compiled for the architecture
+                            specified with --with-petsc-arch" >&2;}
+   { (exit 1); exit 1; }; }
+            fi
           fi
         else
     	  { { echo "$as_me:$LINENO: error: If PETSc is used, you must specify the architecture
@@ -9444,6 +9484,162 @@ fi;
 
 
 
+
+# Check whether --with-lapack or --without-lapack was given.
+if test "${with_lapack+set}" = set; then
+  withval="$with_lapack"
+
+  if test "x$withval" != "xyes" ; then
+    as_ac_Lib=`echo "ac_cv_lib_$withval''_dgbsv_" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for dgbsv_ in -l$withval" >&5
+echo $ECHO_N "checking for dgbsv_ in -l$withval... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Lib+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-l$withval  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char dgbsv_ ();
+int
+main ()
+{
+dgbsv_ ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_Lib=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_Lib=no"
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
+if test `eval echo '${'$as_ac_Lib'}'` = yes; then
+  LIBS="-l$withval $LIBS"; cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBLAPACK 1
+_ACEOF
+
+fi
+
+  else
+
+echo "$as_me:$LINENO: checking for dgbsv_ in -llapack" >&5
+echo $ECHO_N "checking for dgbsv_ in -llapack... $ECHO_C" >&6
+if test "${ac_cv_lib_lapack_dgbsv_+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llapack  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char dgbsv_ ();
+int
+main ()
+{
+dgbsv_ ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_lapack_dgbsv_=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_lapack_dgbsv_=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_lapack_dgbsv_" >&5
+echo "${ECHO_T}$ac_cv_lib_lapack_dgbsv_" >&6
+if test $ac_cv_lib_lapack_dgbsv_ = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBLAPACK 1
+_ACEOF
+
+  LIBS="-llapack $LIBS"
+
+fi
+
+  fi
+
+fi;
 
 
 echo "$as_me:$LINENO: result: " >&5
@@ -10421,12 +10617,10 @@ s,@AR@,$AR,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@NEEDS_F77LIBS@,$NEEDS_F77LIBS,;t t
-s,@BLAS_LIB@,$BLAS_LIB,;t t
-s,@TECPLOT_LIB@,$TECPLOT_LIB,;t t
-s,@TECPLOT_INCLUDE_DIR@,$TECPLOT_INCLUDE_DIR,;t t
 s,@HSL_LIB@,$HSL_LIB,;t t
 s,@HSL_INCLUDE_DIR@,$HSL_INCLUDE_DIR,;t t
 s,@USE_CONTRIB_HSL@,$USE_CONTRIB_HSL,;t t
+s,@TECPLOT_INCLUDE_DIR@,$TECPLOT_INCLUDE_DIR,;t t
 s,@USE_CONTRIB_PETSC@,$USE_CONTRIB_PETSC,;t t
 s,@DEAL_II_PETSC_DIR@,$DEAL_II_PETSC_DIR,;t t
 s,@DEAL_II_PETSC_ARCH@,$DEAL_II_PETSC_ARCH,;t t
