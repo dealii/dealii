@@ -502,9 +502,11 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
 	[
 	  dnl compilation succeeded, no warning occured for the above code
 	  AC_MSG_RESULT(no)
+          DEAL_II_ADVANCE_WARNING=no
 	],
 	[
 	  AC_MSG_RESULT(yes)
+          DEAL_II_ADVANCE_WARNING=yes
 	]
   )
 )
