@@ -14,7 +14,7 @@ EOT
 
 # ignore the first few lines
 $_ = <>;
-while ( m!^#\*\s*\$Id$!) {
+while ( m!^#\s*\$Id!) {
     $_ = <>;
 }
 
