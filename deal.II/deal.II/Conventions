@@ -39,3 +39,4 @@ Here are some conventions for source code of the deal.II library:
   finished by the author(s).
 
 9./ Each class has to have at least 200 pages of documentation ;-)
+
