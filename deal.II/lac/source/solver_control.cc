@@ -33,8 +33,10 @@ SolverControl::SolverControl (const unsigned int maxiter,
 {};
 
 
+
 SolverControl::~SolverControl() 
 {};
+
 
 
 SolverControl::State
@@ -48,18 +50,16 @@ SolverControl::check (const unsigned int step,
   lvalue = check_value;
 
   if ((step==0) && log_result)
-    {
-      deallog << "Starting value " << check_value << endl;
-    }
+    deallog << "Starting value " << check_value << endl;
 
-
-if (step>=maxsteps)
+  if (step >= maxsteps)
     {
       if (log_result)
 	deallog << "Failure step " << step
 		<< " value " << check_value << endl;
       return failure;
     }
+
   if (check_value <= tol)
     {
       if (log_result)
@@ -69,6 +69,7 @@ if (step>=maxsteps)
     }
   return iterate;
 };
+
 
 
 double
