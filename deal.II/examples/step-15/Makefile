@@ -1,4 +1,4 @@
-# $Id$
+# Makefile,v 1.7 2002/11/11 21:29:46 wolf Exp
 
 
 # For the small projects Makefile, you basically need to fill in only
@@ -14,7 +14,7 @@ target = $(basename $(shell echo step-*.cc))
 # run-time checking of parameters and internal states is performed, so
 # you should set this value to `on' while you develop your program,
 # and to `off' when running production computations.
-debug-mode = off
+debug-mode = on
 
 
 # As third field, we need to give the path to the top-level deal.II
@@ -51,7 +51,7 @@ include $D/common/Make.global_options
 # libraries which we want to link to the object file, and there need
 # to be two sets of libraries: one for the debug mode version of the
 # application and one for the optimized mode. Here we have selected
-# the versions for 2d. Note that the order in which the libraries are
+# the versions for 1d. Note that the order in which the libraries are
 # given here is important and that your applications won't link
 # properly if they are given in another order.
 #
