@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003 by the deal.II authors                   */
+/*    Copyright (C) 2002, 2003, 2004 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -18,7 +18,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
                                  //
-#include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
@@ -65,13 +64,17 @@ class MinimizationProblem
     
   private:
     void setup_system ();
-    void assemble_newton_step (const bool p);
-    void solve ();
+    void assemble_step (const bool p);
+    double line_search (const Vector<double> & update) const;
+    void do_step ();
     void initialize ();
     void refine_grid ();
-    double energy () const;
     void output_results (const unsigned int cycle) const;
 
+    static double energy (const DoFHandler<dim> &dof_handler,
+                          const Vector<double>  &function);
+ 
+    
     Triangulation<dim>   triangulation;
 
     FE_Q<dim>            fe;
@@ -80,11 +83,10 @@ class MinimizationProblem
     ConstraintMatrix     hanging_node_constraints;
     
     SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> newton_matrix;
+    SparseMatrix<double> matrix;
 
     Vector<double>       present_solution;
-    Vector<double>       newton_residual;
-    Vector<double>       newton_update;
+    Vector<double>       residual;
 };
 
 
@@ -103,7 +105,7 @@ class InitializationValues : public Function<1>
 double InitializationValues::value (const Point<1> &p,
                                     const unsigned int) const 
 {
-  return std::pow(p(0), 1./3.);
+  return std::pow(p(0), 1.);
 }
 
 
@@ -155,12 +157,11 @@ double gradient_power (const Tensor<1,dim> &v,
 
 
 template <int dim>
-void MinimizationProblem<dim>::assemble_newton_step (const bool p) 
+void MinimizationProblem<dim>::assemble_step (const bool p) 
 {
   if (p)
-    newton_matrix.reinit (sparsity_pattern);
-  newton_update.reinit (dof_handler.n_dofs());
-  newton_residual.reinit (dof_handler.n_dofs());
+    matrix.reinit (sparsity_pattern);
+  residual.reinit (dof_handler.n_dofs());
   
   QGauss3<dim>  quadrature_formula;
 
@@ -209,36 +210,41 @@ void MinimizationProblem<dim>::assemble_newton_step (const bool p)
               if (p)
               for (unsigned int j=0; j<dofs_per_cell; ++j)
                 {
-                  cell_matrix(i,j)
-                    += (30.* x_minus_u3 * x_minus_u3 *
-                        gradient_power (u_prime, 4) *
-                        (fe_values.shape_grad(i,q_point)    *
-                         fe_values.shape_grad(j,q_point))   *
-                        fe_values.JxW(q_point));
+//                   cell_matrix(i,j)
+//                     += (30.* x_minus_u3 * x_minus_u3 *
+//                         gradient_power (u_prime, 4) *
+//                         (fe_values.shape_grad(i,q_point)    *
+//                          fe_values.shape_grad(j,q_point))   *
+//                         fe_values.JxW(q_point));
 
-                  cell_matrix(i,j)
-                    += (-36. * x_minus_u3 * u * u
-                        *
-                        gradient_power(u_prime, 4)
-                        *                        
-                        (fe_values.shape_value(i,q_point)    *
-                         (fe_values.shape_grad(j,q_point)   *
-                          u_prime)
-                         +
-                         fe_values.shape_value(j,q_point)    *
-                         (fe_values.shape_grad(i,q_point)   *
-                          u_prime)
-                         )*
-                        fe_values.JxW(q_point));
+//                   cell_matrix(i,j)
+//                     += (-36. * x_minus_u3 * u * u
+//                         *
+//                         gradient_power(u_prime, 4)
+//                         *                        
+//                         (fe_values.shape_value(i,q_point)    *
+//                          (fe_values.shape_grad(j,q_point)   *
+//                           u_prime)
+//                          +
+//                          fe_values.shape_value(j,q_point)    *
+//                          (fe_values.shape_grad(i,q_point)   *
+//                           u_prime)
+//                          )*
+//                         fe_values.JxW(q_point));
 
+//                   cell_matrix(i,j)
+//                     += ((30.* std::pow(u,4.) - 12*x*u)
+//                          *
+//                          gradient_power(u_prime, 6)
+//                         *                        
+//                         (fe_values.shape_value(i,q_point)    *
+//                          fe_values.shape_value(j,q_point))   *
+//                         fe_values.JxW(q_point));
                   cell_matrix(i,j)
-                    += ((30.* std::pow(u,4.) - 12*x*u)
-                         *
-                         gradient_power(u_prime, 6)
-                        *                        
-                        (fe_values.shape_value(i,q_point)    *
-                         fe_values.shape_value(j,q_point))   *
-                        fe_values.JxW(q_point));
+                    += (fe_values.shape_grad(i,q_point) *
+                        fe_values.shape_grad(j,q_point)) *
+                    fe_values.JxW(q_point);
+                  
                 };
               
               cell_rhs(i) += -((6. * x_minus_u3 *
@@ -264,16 +270,16 @@ void MinimizationProblem<dim>::assemble_newton_step (const bool p)
 	{
           if (p)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    newton_matrix.add (local_dof_indices[i],
+	    matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
 	  
-	  newton_residual(local_dof_indices[i]) += cell_rhs(i);
+	  residual(local_dof_indices[i]) += cell_rhs(i);
 	};
     };
 
-  hanging_node_constraints.condense (newton_matrix);
-  hanging_node_constraints.condense (newton_residual);
+  hanging_node_constraints.condense (matrix);
+  hanging_node_constraints.condense (residual);
 
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
@@ -285,41 +291,67 @@ void MinimizationProblem<dim>::assemble_newton_step (const bool p)
                                               1,
                                               ZeroFunction<dim>(),
                                               boundary_values);
+  Vector<double> dummy (residual.size());
   MatrixTools::apply_boundary_values (boundary_values,
-				      newton_matrix,
-				      newton_update,
-				      newton_residual);
-//  std::cout << "  res=" << newton_residual.l2_norm() << std::endl;
+				      matrix,
+				      dummy,
+				      residual);
 }
 
 
 
 template <int dim>
-void MinimizationProblem<dim>::solve () 
+double
+MinimizationProblem<dim>::line_search (const Vector<double> &update) const
 {
-  SolverControl           solver_control (1000,
-                                          1e-3*newton_residual.l2_norm());
-  PrimitiveVectorMemory<> vector_memory;
-  SolverGMRES<>           gmres (solver_control, vector_memory);
-
-  PreconditionJacobi<> preconditioner;
-  preconditioner.initialize(newton_matrix, 1.2);
-
-//   std::cout << "------------------------------" << std::endl;
-//   newton_matrix.print_formatted(cout);
-//   std::cout << std::endl;
-//   for (unsigned int i=0; i<newton_residual.size(); ++i)
-//     std::cout << newton_residual(i) << " ";
-//   std::cout << std::endl;
+  double alpha = 0.01;
+  double optimal_energy = energy (dof_handler, present_solution);
+  Vector<double> tmp (present_solution.size());
   
-  
-  gmres.solve (newton_matrix, newton_update, newton_residual,
-               preconditioner);
+  for (double a=.01; a<=10; a*=1.5)
+    {
+      tmp = present_solution;
+      tmp.add (a, update);
+      const double e = energy(dof_handler, tmp);
 
-  present_solution += newton_update;
-  hanging_node_constraints.distribute (present_solution);
+      std::cout << "XX" << a << ' ' << e << std::endl;
+      if (e < optimal_energy)
+        {
+          optimal_energy = e;
+          alpha = a;
+        }
+    }
+
+  std::cout << "  Step length : " << alpha << ' ' << optimal_energy << std::endl;
+  
+  return alpha;
 }
 
+
+
+
+template <int dim>
+void MinimizationProblem<dim>::do_step ()
+{          
+  assemble_step (true);
+
+  Vector<double> update (present_solution.size());
+  {
+    SolverControl           solver_control (1000,
+                                            1e-3*residual.l2_norm());
+    PrimitiveVectorMemory<> vector_memory;
+    SolverCG<>              solver (solver_control, vector_memory);
+    
+    PreconditionSSOR<> preconditioner;
+    preconditioner.initialize(matrix, 1.2);
+
+    solver.solve (matrix, update, residual,
+                  preconditioner);
+    hanging_node_constraints.distribute (update);
+  }
+  
+  present_solution.add (line_search (update), update);
+}
 
 
 template <int dim>
@@ -360,17 +392,25 @@ void MinimizationProblem<dim>::refine_grid ()
   Vector<double> tmp (dof_handler.n_dofs());
   solution_transfer.interpolate (present_solution, tmp);
   present_solution = tmp;
+
+  hanging_node_constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
+  hanging_node_constraints.close ();  
+  hanging_node_constraints.distribute (present_solution);
 }
 
 
 
 template <int dim>
-double MinimizationProblem<dim>::energy () const
+double
+MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
+                                  const Vector<double>  &function)
 {
   double energy = 0.;
 
   QGauss3<dim>  quadrature_formula;
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
 				       update_q_points  |
@@ -387,9 +427,9 @@ double MinimizationProblem<dim>::energy () const
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
-      fe_values.get_function_values (present_solution,
+      fe_values.get_function_values (function,
                                      local_solution_values);
-      fe_values.get_function_grads (present_solution,
+      fe_values.get_function_grads (function,
                                     local_solution_grads);
       
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
@@ -440,10 +480,10 @@ template <int dim>
 void MinimizationProblem<dim>::run () 
 {
   GridGenerator::hyper_cube (triangulation, 0., 1.);
-  triangulation.refine_global (1);
+  triangulation.refine_global (4);
   initialize ();
 
-  for (unsigned int refinement_cycle=0; refinement_cycle<50;
+  for (unsigned int refinement_cycle=0; refinement_cycle<5;
        ++refinement_cycle)
     {
       std::cout << "Cycle " << refinement_cycle << ':' << std::endl;
@@ -455,12 +495,11 @@ void MinimizationProblem<dim>::run ()
       setup_system ();
 
       unsigned int iteration=0;
-      for (; iteration<1000; ++iteration)
+      for (; iteration<5; ++iteration)
         {
-          assemble_newton_step (true);
-          solve ();
+          do_step ();
 
-          if (newton_residual.l2_norm() < 1.e-12)
+          if (residual.l2_norm() < 1.e-4)
             break;
         };
       output_results (refinement_cycle);
@@ -469,7 +508,7 @@ void MinimizationProblem<dim>::run ()
 		<< iteration
                 << std::endl;
       std::cout << "   Energy                :       "
-		<< energy ()
+		<< energy (dof_handler, present_solution)
 		<< std::endl;
       
       refine_grid ();
