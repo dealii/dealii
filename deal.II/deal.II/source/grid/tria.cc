@@ -715,6 +715,35 @@ void Triangulation<dim>::distort_random (const double factor,
 				       // finally move the vertex
       vertices[vertex] += shift_vector;
     };
+
+  
+				   // finally correct hanging nodes
+				   // again. not necessary for 1D
+  if (dim==1)
+    return;
+  
+  active_cell_iterator cell = begin_active(),
+		       endc = end();
+  for (; cell!=endc; ++cell) 
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->face(face)->has_children() &&
+	  !cell->face(face)->at_boundary())
+					 // this lines has children,
+					 // thus there are restricted
+					 // nodes
+	{
+					   // not implemented at present
+					   // for dim=3 or higher
+	  Assert (dim<=2, ExcInternalError());
+
+					   // compute where the common
+					   // point of the two child lines
+					   // will lie and
+					   // reset it to the correct value
+	  vertices[cell->face(face)->child(0)->vertex_index(1)]
+	    = (cell->face(face)->vertex(0) +
+	       cell->face(face)->vertex(1)) / 2;
+	}
 };
 
 
