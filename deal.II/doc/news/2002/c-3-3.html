@@ -34,6 +34,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Added: The top-level Makefile now supports "optimized" as a
+       target that builds only optimized versions of the <code>base</code>,
+       <code>lac</code>, <code>1d</code>, <code>2d</code>, and <code>3d</code>
+       libraries. 
+       <br>
+       (BK 2002/02/19)
+       </p>
+
+  <li> <p> 
        Changed: The build system was entirely revised. Object
        files in debug mode now have the suffix <code>.g.o</code>
        instead of <code>.go</code>. All object files from the
@@ -43,14 +52,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <br>
        (WB 2002/02/11)
        </p>
-  <li> <p> 
-       Added: The top-level Makefile now supports "optimized" as a
-       target that builds only optimized versions of the <code>base</code>,
-       <code>lac</code>, <code>1d</code>, <code>2d</code>, and <code>3d</code>
-       libraries. 
-       <br>
-       (BK 2002/02/19)
-       </p>
 </ol>
 
 
@@ -59,6 +60,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p>
+       Changed: The function <code class="class">MultithreadInfo</code>::
+       <code class="member">get_n_cpus</code> now reports the proper number
+       of CPUs when running on Silicon Graphics.
+       <br>
+       (BK 2002/02/19)
+       </p> 
+
   <li> <p> 
        Changed: The quite logorrhoeic function name <code
        class="class">TensorProductPolynomials</code>::<code
@@ -94,14 +103,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <br>
        (BK 2002/02/11)
        </p>
-
-  <li> <p>
-       Changed: The function <code class="class">MultithreadInfo</code>::
-       <code class="member">get_n_cpus</code> now reports the proper number
-       of CPUs when running on Silicon Graphics.
-       <br>
-       (BK 2002/02/19)
-       </p> 
 </ol>
 
 
