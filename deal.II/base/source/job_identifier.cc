@@ -27,7 +27,9 @@ JobIdentifier::JobIdentifier()
   time_t t = time(0);
   id = std::string(program_id());
 
-#if HAVE_GETHOSTNAME
+//TODO:[GK] try to avoid this hack
+
+#if (HAVE_GETHOSTNAME && (!DEBUG))
   char name[100];
   gethostname(name,99);
   id += std::string(name) + std::string(" ");
