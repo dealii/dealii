@@ -23,8 +23,8 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 		:
 		matrix (&M),
 		selected (selected),
-		n_threads (n_threads),
 		conserve_mem (conserve_mem),
+		n_threads (n_threads),
 		inverses (M.m(), 0)
 {
   Assert (M.m() == M.n(),
