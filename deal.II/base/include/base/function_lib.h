@@ -837,12 +837,12 @@ namespace Functions
       				       /**
 					* Center of the integration ball.
 					*/
-      const Point<dim> center;
+      Point<dim> center;
 
 				       /**
 					* Radius of the ball.
 					*/
-      const double radius;
+      double radius;
 
 				       /**
 					* Component selected. If
