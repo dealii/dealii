@@ -281,6 +281,7 @@ FE_Nedelec<1>::shape_value_component (const unsigned int ,
 				     const unsigned int ) const
 {
   Assert (false, ExcNotImplemented());
+  return 0.;
 }
 
 #endif
@@ -428,6 +429,7 @@ FE_Nedelec<1>::shape_grad_component (const unsigned int ,
 				     const unsigned int ) const
 {
   Assert (false, ExcNotImplemented());
+  return 0.;
 }
 
 #endif
@@ -569,6 +571,7 @@ FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
 					  const unsigned int ) const
 {
   Assert (false, ExcNotImplemented());
+  return 0.;
 }
 
 #endif
