@@ -82,18 +82,33 @@ template <typename> class BlockVector;
  *   schur.postprocess (u, p);
  * @end{verbatim}
  *
- * @author Guido Kanschat, 2000, 2001
+ * @author Guido Kanschat, 2000, 2001, 2002
  */
 template <class MA_inverse, class MB, class MDt, class MC>
 class SchurMatrix :
   public Subscriptor
 {
   public:
+
+				   /**
+				    * Constructor. This constructor
+				    * receives all the matrices
+				    * needed. Furthermore, it gets a
+				    * reference to a memory structure
+				    * for obtaining block vectors.
+				    *
+				    * Optionally, the length of the
+				    * @p{u}-vector can be provided.
+				    *
+				    * For the meaning of the matrices
+				    * see the class documentation.
+				    */
   SchurMatrix(const MA_inverse& Ainv,
 	      const MB& B,
 	      const MDt& Dt,
 	      const MC& C,
-	      VectorMemory<BlockVector<double> >& mem);
+	      VectorMemory<BlockVector<double> >& mem,
+	      const std::vector<unsigned int>& signature = std::vector<unsigned int>(0));
 
 				   /**
 				    * Do block elimination of the
@@ -171,6 +186,11 @@ class SchurMatrix :
 				    * Auxiliary memory for vectors.
 				    */
   VectorMemory<BlockVector<double> >& mem;
+
+				   /**
+				    * Optional signature of the @p{u}-vector.
+				    */
+  std::vector<unsigned int> signature;
 };
 
 template <class MA_inverse, class MB, class MDt, class MC>
@@ -179,8 +199,11 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
 	      const MB& B,
 	      const MDt& Dt,
 	      const MC& C,
-	      VectorMemory<BlockVector<double> >& mem)
-  : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C), mem(mem)
+	      VectorMemory<BlockVector<double> >& mem,
+	      const std::vector<unsigned int>& signature)
+		: Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
+		  mem(mem),
+		  signature(signature)
 {
 }
 
@@ -193,7 +216,10 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
   deallog.push("Schur");
   C->vmult(dst, src);
   BlockVector<double>* h1 = mem.alloc();
-  h1->reinit(B->n_block_cols(), src.block(0).size());
+  if (signature.size()>0)
+    h1->reinit(signature);
+  else
+    h1->reinit(B->n_block_cols(), src.block(0).size());
   Dt->Tvmult(*h1,src);
   BlockVector<double>* h2 = mem.alloc();
   h2->reinit(*h1);
@@ -230,7 +256,10 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
   
   deallog.push("Schur-prepare");
   BlockVector<double>* h1 = mem.alloc();
-  h1->reinit(B->n_block_cols(), src.block(0).size());
+  if (signature.size()>0)
+    h1->reinit(signature);
+  else
+    h1->reinit(B->n_block_cols(), src.block(0).size());
   Ainv->vmult(*h1, src);
   B->vmult_add(dst, *h1);
   mem.free(h1);
@@ -253,7 +282,10 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
   
   deallog.push("Schur-post");
   BlockVector<double>* h1 = mem.alloc();
-  h1->reinit(B->n_block_cols(), src.block(0).size());
+  if (signature.size()>0)
+    h1->reinit(signature);
+  else
+    h1->reinit(B->n_block_cols(), src.block(0).size());
   Dt->Tvmult(*h1, src);
   h1->sadd(-1.,rhs);
   Ainv->vmult(dst,*h1);
