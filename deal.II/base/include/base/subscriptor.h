@@ -17,8 +17,8 @@ class Subscriptor
   unsigned counter;
 public:
 				   /// Object may not be deleted, since it is used.
-  DeclException1(InUse, unsigned, "Object is used " << counter << " times");
-  DeclException0(NotUsed, "Object cannot be unsubscribed, since it is not used");
+  DeclException0(InUse);//, unsigned, "Object is used " << counter << " times");
+  DeclException0(NotUsed);
   
 				   /// Constructor setting the counter to zero.
   Subscriptor()
@@ -27,7 +27,7 @@ public:
 				   /// Destructor, asserting that the counter is zero.
   ~Subscriptor()
       {
-	Assert(counter==0, InUse(counter));
+	Assert(counter==0, InUse());
       }
 				   /**
 				    * Copy-constructor.
@@ -52,13 +52,13 @@ public:
       }
 
 				   /// Subscribes a user of the object.
-  void subscribe() mutable
+  void subscribe() //mutable
       {
 	++counter;
       }
   
 				   /// Unsubscribes a user from the object.
-  void unsubscribe() mutable
+  void unsubscribe() //mutable
       {
 	Assert(counter>0, NotUsed());
 	--counter;
@@ -74,8 +74,8 @@ class SmartReference
   T& t;
 public:
 				   /// Constructor taking a normal reference.
-  SmartReference(T& t)
-		  : t(t) 
+  SmartReference(const T& tt)
+		  : t(/*const_cast<T&>*/ tt) 
       {
 	t.subscribe();
       }
@@ -95,6 +95,55 @@ public:
       {
 	return t;
       }
+};
+
+/**
+ * Smart pointers avoid destruction of an object in use.
+ */
+template<class T>
+class SmartPointer
+{
+  T* t;
+public:
+				   /// Constructor taking a normal pointer.
+  SmartPointer(const T* tt)
+		  : t(/*const_cast<T&>*/ tt) 
+      {
+	t->subscribe();
+      }
+				   /// Destructor, removing the subscription.
+      ~SmartPointer()
+      {
+	t->unsubscribe();
+      }
+  
+				   /// Conversion to normal pointer.
+      operator T* ()
+      {
+	return t;
+      }
+				   /// Conversion to normal const pointer.
+      operator const T* () const
+      {
+	return t;
+      }
+      T& operator* ()
+      {
+	return *t;
+      }
+      const T& operator* () const
+      {
+	return *t;
+      }
+      T* operator -> ()
+      {
+	return t;
+      }
+      const T* operator -> () const
+      {
+	return t;
+      }
+
 };
 
 
