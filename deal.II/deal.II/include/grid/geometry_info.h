@@ -109,24 +109,28 @@ struct GeometryInfo<2> {
 				      *
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
+				      * \begin{verbatim}
 				      *      2
-				      *   3-->--2
-				      *   |     |
-				      * 3 ^     ^ 1
-				      *   |     |
-				      *   0-->--1
-				      *      0
+				      * .   3-->--2
+				      * .   |     |
+				      * . 3 ^     ^ 1
+				      * .   |     |
+				      * .   0-->--1
+				      * .      0
+				      * \end{verbatim}
 				      * Vertices and faces are indicated
 				      * with their numbers, faces also with
 				      * their directions.
 				      *
 				      * Now, when refined, the layout is
 				      * like this:
+				      * \begin{verbatim}
 				      * *--*--*
 				      * | 3|2 |
 				      * *--*--*
 				      * | 0|1 |
 				      * *--*--*
+				      * \end{verbatim}
 				      *
 				      * Thus, the child cells on face zero
 				      * are (ordered in the direction of the
