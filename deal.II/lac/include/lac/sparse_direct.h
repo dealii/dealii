@@ -68,7 +68,7 @@
  * @p{MA27B}. The documentation of the MA27 functions gives ways to
  * obtain estimates for their values, e.g. by evaluating values
  * returned by functions called before. However, the documentation
- * only states that the values have to be @it{at least as large} as
+ * only states that the values have to be @em{at least as large} as
  * the estimates, a hint that is not very useful oftentimes (in my
  * humble opinion, the lack of dynamic memory allocation mechanism is
  * a good reason not to program in Fortran 77...).
