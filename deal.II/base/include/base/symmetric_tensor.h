@@ -1769,7 +1769,7 @@ double determinant (const SymmetricTensor<2,1> &t)
 inline
 double determinant (const SymmetricTensor<2,2> &t)
 {
-  return (t.data[0] * t.data[1] - 2*t.data[2]*t.data[2]);
+  return (t.data[0] * t.data[1] - t.data[2]*t.data[2]);
 }
 
 
