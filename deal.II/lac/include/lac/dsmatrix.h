@@ -27,38 +27,110 @@ template <int dim> class DoFHandler;
 /*
 CLASS
    dSMatrixStruct
+
+   @author Original version by Roland Becker, Guido Kanschat,
+      Franz-Theo Suttmeier; lots of enhancements, reorganisation
+      and documentation by Wolfgang Bangerth
    */
 class dSMatrixStruct
 {
-  friend class dSMatrix;
-  unsigned int max_dim;
-  unsigned int rows, cols;
-  unsigned int vec_len, max_vec_len;
-  unsigned int max_row_len;
-  unsigned int* rowstart;
-  int* colnums;
-  bool compressed;
-
-public:
-				     //////////
-    void reinit (const unsigned int m, const unsigned int n,
-		 const unsigned int max_per_row);
-				     //////////
-    dSMatrixStruct (const unsigned int m, const unsigned int n,
+  public:
+				     /**
+				      * Initialize a rectangular matrix with
+				      * #m# rows and #n# columns,
+				      * with at most #max_per_row#
+				      * nonzero entries per row.
+				      */
+    dSMatrixStruct (const unsigned int m,
+		    const unsigned int n,
 		    const unsigned int max_per_row);
     
-				     //////////
+				     /**
+				      * Initialize a square matrix of dimension
+				      * #n# with at most #max_per_row#
+				      * nonzero entries per row.
+				      */
     dSMatrixStruct (const unsigned int n, const unsigned int max_per_row);
-				     //////////
+
+				     /**
+				      * Destructor.
+				      */
     ~dSMatrixStruct ();
-				     //////////
+    
+				     /**
+				      * Reallocate memory and set up data
+				      * structures for a new matrix with
+				      * #m# rows and #n# columns,
+				      * with at most #max_per_row#
+				      * nonzero entries per row.
+				      */
+    void reinit (const unsigned int m,
+		 const unsigned int n,
+		 const unsigned int max_per_row);
+
+				     /**
+				      * This function compresses the sparsity
+				      * structure that this object represents.
+				      * It does so by eliminating unused
+				      * entries and sorting the remaining
+				      * ones to allow faster access by usage
+				      * of binary search algorithms. A special
+				      * sorting scheme is used for the diagonal
+				      * entry of square matrices, which is
+				      * always the first entry of each row.
+				      *
+				      * #dSMatrix# objects require the
+				      * #dSMatrixStruct# objects they are
+				      * initialized with to be compressed, to
+				      * reduce memory requirements.
+				      */
     void compress ();
-				     //////////
+
+				     /**
+				      * Return the index of the matrix
+				      * element with row number #i# and
+				      * column number #j#. If the matrix
+				      * element is not a nonzero one,
+				      * return -1.
+				      *
+				      * This function is usually called
+				      * by the #operator()# of the
+				      * #dSMatrix#. It shall only be
+				      * called for compressed sparsity
+				      * patterns, since in this case
+				      * searching whether the entry
+				      * exists can be done quite fast
+				      * with a binary sort algorithm
+				      * because the column numbers are
+				      * sorted.
+				      */
     int operator() (const unsigned int i, const unsigned int j) const;
-				     //////////
+
+				     /**
+				      * Add a nonzero entry to the matrix.
+				      * This function may only be called
+				      * for non-compressed sparsity patterns.
+				      *
+				      * If the entry already exists, nothing
+				      * bad happens.
+				      */
     void add (const unsigned int i, const unsigned int j);
-				     //////////
+    
+				     /**
+				      * This matrix adds a whole connectivity
+				      * list to the sparsity structure
+				      * respresented by this object. It assumes
+				      * the #rowcols# array to be a list of
+				      * indices which are all linked together,
+				      * i.e. all entries
+				      * #(rowcols[i], rowcols[j])# for all
+				      * #i,j=0...n# for this sparsity pattern
+				      * are created. #n# is assumed to be the
+				      * number of elements pointed to by
+				      * #rowcols#.
+				      */
     void add_matrix (const unsigned int n, const int* rowcols);
+
 				     //////////
     void add_matrix (const unsigned int m, const unsigned int n,
 		     const int* rows, const int* cols);
@@ -67,9 +139,54 @@ public:
 				     //////////
     void add_matrix (const iVector& rows, const iVector& cols);
 
-    void print_gnuplot (ostream &) const;
+				     /**
+				      * Print the sparsity of the matrix
+				      * in a format that #gnuplot# understands
+				      * and which can be used to plot the
+				      * sparsity pattern in a graphical
+				      * way. The format consists of pairs
+				      * #i j# of nonzero elements, each
+				      * representing one entry of this
+				      * matrix, one per line of the output
+				      * file. Indices are counted from
+				      * zero on, as usual. Since sparsity
+				      * patterns are printed in the same
+				      * way as matrices are displayed, we
+				      * print the negative of the column
+				      * index, which means that the
+				      * #(0,0)# element is in the top left
+				      * rather than in the bottom left
+				      * corner.
+				      *
+				      * Print the sparsity pattern in
+				      * gnuplot by setting the data style
+				      * to dots or points and use the
+				      * #plot# command.
+				      */
+    void print_gnuplot (ostream &out) const;
+
+				     /**
+				      * Return number of rows of this
+				      * matrix, which equals the dimension
+				      * of the image space.
+				      */
     unsigned int n_rows () const;
+
+				     /**
+				      * Return number of columns of this
+				      * matrix, which equals the dimension
+				      * of the range space.
+				      */
     unsigned int n_cols () const;
+
+				     /**
+				      * Compute the bandwidth of the matrix
+				      * represented by this structure. The
+				      * bandwidth is the maximum of
+				      * $|i-j|$ for which the index pair
+				      * $(i,j)$ represents a nonzero entry
+				      * of the matrix.
+				      */
     unsigned int bandwidth () const;
 
 				     /**
@@ -147,6 +264,34 @@ public:
 		    << ": there was no free entry any more. " << endl
 		    << "(Maximum number of entries for this row: "
 		    << arg2 << "; maybe the matrix is already compressed?)");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotCompressed);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcMatrixIsCompressed);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInternalError);
+
+  private:
+    unsigned int max_dim;
+    unsigned int rows, cols;
+    unsigned int vec_len, max_vec_len;
+    unsigned int max_row_len;
+    unsigned int* rowstart;
+    int* colnums;
+
+				     /**
+				      * Store whether the #compress# function
+				      * was called for this object.
+				      */
+    bool compressed;
+    
+    friend class dSMatrix;
 };
 
 
@@ -155,20 +300,27 @@ public:
 /*
 CLASS
    dSMatrix
+
+   @author Original version by Roland Becker, Guido Kanschat,
+   Franz-Theo Suttmeier; lots of enhancements, reorganisation
+   and documentation by Wolfgang Bangerth
    */
 class dSMatrix
 {
-    const dSMatrixStruct * cols;
-    double* val;
-    unsigned int max_len;
   public:
 
 				     /**
-				      * Constructor; initializes the matrix to be
-				      * empty, without any structure, i.e. the
-				      * matrix is not usable at all. This constructor
-				      * is therefore only useful for matrices which
-				      * are members of a class. You have to initialize
+				      * Constructor; initializes the matrix to
+				      * be empty, without any structure, i.e.
+				      * the matrix is not usable at all. This
+				      * constructor is therefore only useful
+				      * for matrices which are members of a
+				      * class. All other matrices should be
+				      * created at a point in the data flow
+				      * where all necessary information is
+				      * available.
+				      *
+				      * You have to initialize
 				      * the matrix before usage with
 				      * #reinit(dSMatrixStruct)#.
 				      */
@@ -426,6 +578,11 @@ class dSMatrix
 				      * Exception
 				      */
     DeclException0 (ExcDifferentSparsityPatterns);
+
+  private:
+    const dSMatrixStruct * cols;
+    double* val;
+    unsigned int max_len;
 };
 
 
@@ -474,6 +631,7 @@ const int * dSMatrixStruct::get_column_numbers () const {
 inline
 unsigned int dSMatrix::m () const
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->rows;
 };
 
@@ -482,6 +640,7 @@ unsigned int dSMatrix::m () const
 inline
 unsigned int dSMatrix::n () const
 {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   return cols->cols;
 };
 
@@ -490,6 +649,7 @@ unsigned int dSMatrix::n () const
 inline
 void dSMatrix::set (const unsigned int i, const unsigned int j,
 		    const double value) {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
   val[cols->operator()(i,j)] = value;
@@ -500,6 +660,7 @@ void dSMatrix::set (const unsigned int i, const unsigned int j,
 inline
 void dSMatrix::add (const unsigned int i, const unsigned int j,
 		    const double value) {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
   val[cols->operator()(i,j)] += value;
@@ -511,6 +672,7 @@ void dSMatrix::add (const unsigned int i, const unsigned int j,
 
 inline
 double dSMatrix::operator () (const unsigned int i, const unsigned int j) const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (cols->operator()(i,j) != -1,
 	  ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
@@ -520,6 +682,7 @@ double dSMatrix::operator () (const unsigned int i, const unsigned int j) const 
 
 inline
 double dSMatrix::diag_element (const unsigned int i) const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
   Assert (i<max_len, ExcInvalidIndex1(i));
   
@@ -533,6 +696,7 @@ double dSMatrix::diag_element (const unsigned int i) const {
 
 inline
 double dSMatrix::global_entry (const unsigned int j) const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   return val[j];
 };
 
@@ -540,6 +704,7 @@ double dSMatrix::global_entry (const unsigned int j) const {
 
 inline
 double & dSMatrix::global_entry (const unsigned int j) {
+  Assert (cols != 0, ExcMatrixNotInitialized());
   return val[j];
 };
 
