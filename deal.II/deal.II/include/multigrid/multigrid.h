@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -255,6 +255,11 @@ class PreconditionMG : public Subscriptor
     PreconditionMG(const MGDoFHandler<dim>&     mg_dof,
 		   Multigrid<VECTOR>&           mg,
 		   const TRANSFER& transfer);
+
+				     /**
+				      * Dummy function needed by other classes.
+				      */
+    bool empty () const;
     
 				     /**
 				      * Preconditioning operator.
@@ -370,6 +375,12 @@ PreconditionMG<dim, VECTOR, TRANSFER>
   transfer(&transfer)
 {}
 
+template<int dim, class VECTOR, class TRANSFER>
+bool
+PreconditionMG<dim, VECTOR, TRANSFER>::empty () const
+{
+  return false;
+}
 
 template<int dim, class VECTOR, class TRANSFER>
 void

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -121,6 +121,11 @@ class PreconditionBlock : public virtual Subscriptor
 				      * calling the constructor.
 				      */
     void clear();
+
+				     /**
+				      * Checks whether the object is empty.
+				      */
+    bool empty () const;
 
 				     /**
 				      * Use only the inverse of the
@@ -324,6 +329,11 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
+    PreconditionBlock<MATRIX, inverse_type>::empty;
+
+				     /**
+				      * Make function of base class public again.
+				      */
     PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
 
 				     /**
@@ -421,6 +431,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
+    PreconditionBlock<MATRIX, inverse_type>::empty;
+
+				     /**
+				      * Make function of base class public again.
+				      */
     PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
 
 				     /**
@@ -505,6 +520,11 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
+    PreconditionBlock<MATRIX, inverse_type>::empty;
+
+				     /**
+				      * Make function of base class public again.
+				      */
     PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
 
 				     /**
@@ -534,5 +554,15 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
 };
 
+//----------------------------------------------------------------------//
+
+template<class MATRIX, typename inverse_type>
+bool
+PreconditionBlock<MATRIX, inverse_type>::empty () const
+{
+  if (A == 0)
+    return true;
+  return A->empty();
+}
 
 #endif
