@@ -653,9 +653,11 @@ dnl IBM's xlC compiler has a problem with some kind of code that does not
 dnl "using namespace std;" Try to work around if necessary
 DEAL_II_CHECK_IBM_XLC_ERROR
 
-dnl See whether we can use the std::iterator and std::stringstream classes
+dnl See whether we can use the std::iterator, std::stringstream, 
+dnl and std::numeric_limits classes
 DEAL_II_HAVE_STD_ITERATOR
 DEAL_II_HAVE_STD_STRINGSTREAM
+DEAL_II_HAVE_STD_NUMERIC_LIMITS
 
 
 

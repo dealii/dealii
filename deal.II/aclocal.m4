@@ -271,6 +271,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 )      
 
 
+
 dnl rand_r is defined for some compiler flag combinations, but not for
 dnl others. check that. note that since these are C++ flags, we can't
 dnl just use AC_CHECK_FUNCS
@@ -296,6 +297,7 @@ int i=rand_r(&i);
 	]
   )
 )
+
 
 
 dnl On some systems (well, DEC Alphas are the only ones we know of),
@@ -469,7 +471,7 @@ dnl Up to early gcc2.95 releases, the i/ostringstream classes were not
 dnl available. check their availability, or whether we have to fall back
 dnl to the old strstream classes.
 dnl
-dnl Usage: DEAL_II_HAVE_STD_RINGSTREAM
+dnl Usage: DEAL_II_HAVE_STD_STRINGSTREAM
 dnl
 AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
   AC_MSG_CHECKING(for std::i/ostringstream classes)
@@ -493,6 +495,7 @@ AC_DEFUN(DEAL_II_HAVE_STD_STRINGSTREAM, dnl
       AC_MSG_RESULT(no)
     ])
 )
+
 
 
 dnl For gcc 2.95, when using the random_shuffle function with -ansi compiler flag,
@@ -617,4 +620,32 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
           DEAL_II_ADVANCE_WARNING=yes
 	]
   )
+)
+
+
+
+dnl Check whether the numeric_limits classes are available
+dnl
+dnl Usage: DEAL_II_HAVE_STD_NUMERIC_LIMITS
+dnl
+AC_DEFUN(DEAL_II_HAVE_STD_NUMERIC_LIMITS, dnl
+  AC_MSG_CHECKING(for std::numeric_limits classes)
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <limits>
+    ],
+    [
+	unsigned int i = std::numeric_limits<unsigned int>::eps;
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_STD_NUMERIC_LIMITS, 1, 
+                [Define if the compiler's library in use provides
+                 std::numeric_limits classes in the appropriate header file])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
 )
