@@ -82,9 +82,9 @@
  * approximation of the gradient, you will have to scale the results
  * of this class by an appropriate power of the mesh width. For
  * example, since
- * $\|u-u_h\|^2_{L_2} \le C h^2 \|\grad u\|^2_{L_2}$, it might be the
- * right thing to scale the indicators as $\eta_K = h \|\grad u\|_K$,
- * i.e. $\eta_K = h^{1+d/2} \|\grad u\|_{\infty;K}$, i.e. the right
+ * $\|u-u_h\|^2_{L_2} \le C h^2 \|\nabla u\|^2_{L_2}$, it might be the
+ * right thing to scale the indicators as $\eta_K = h \|\nabla u\|_K$,
+ * i.e. $\eta_K = h^{1+d/2} \|\nabla u\|_{\infty;K}$, i.e. the right
  * power is $1+d/2$.
  *
  * @author Wolfgang Bangerth, 2000
