@@ -108,7 +108,7 @@ class SolverSelector
 						      Vector &x,
 						      const Vector &b,
 						      const Preconditioner &precond) const;
-
+    
 				     /**
 				      * Set the additional data. For more
 				      * info see the #Solver# class.
@@ -150,12 +150,27 @@ class SolverSelector
 		    string, << "Solver " << arg1 << " does not exist. Use one of "
 		    << endl << get_solver_names());
 
-  private:
+  protected:
 				     /**
 				      * Stores the Name of the solver.
 				      */
     string solver_name;
+    
+				     /**
+				      * Stores the #SolverControl# that
+				      * is needed in the constructor of
+				      * each #Solver# class.
+				      */
+    SmartPointer<SolverControl> control;
 
+				     /**
+				      * Stores the #VectorMemory# that
+				      * is needed in the constructor of
+				      * each #Solver# class.
+				      */
+    SmartPointer<VectorMemory<Vector> > vector_memory;
+
+  private:
 				     /**
 				      * Stores the additional data.
 				      */
@@ -175,20 +190,6 @@ class SolverSelector
 				      * Stores the additional data.
 				      */
     typename SolverGMRES<Matrix,Vector>::AdditionalData gmres_data;
-
-				     /**
-				      * Stores the #SolverControl# that
-				      * is needed in the constructor of
-				      * each #Solver# class.
-				      */
-    SmartPointer<SolverControl> control;
-
-				     /**
-				      * Stores the #VectorMemory# that
-				      * is needed in the constructor of
-				      * each #Solver# class.
-				      */
-    SmartPointer<VectorMemory<Vector> > vector_memory;
 };
 
 
