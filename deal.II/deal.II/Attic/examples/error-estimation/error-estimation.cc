@@ -18,6 +18,7 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/error_estimator.h>
+#include <numerics/solutiontransfer.h>
 #include <lac/vector.h>
 
 #include <map.h>
@@ -405,11 +406,11 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 	    break;
     };
 
-  const unsigned int start_level = prm.get_integer("Initial refinement");
   cout << endl
        << "======================================="
        << "=======================================" << endl;
   cout << "Making initial grid... " << endl;
+  const unsigned int start_level(prm.get_integer("Initial refinement"));
   tria->set_boundary (boundary);
   tria->create_hyper_ball ();
   tria->refine_global (start_level);
@@ -443,10 +444,13 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   else
     equation = new PoissonEquation<dim>(*rhs);
 
+  SolutionTransfer<dim,double> solution_transfer (*dof_handler);
+
   unsigned int refine_step = 0;
   const unsigned int max_cells = prm.get_integer("Maximum cells");
   while (tria->n_active_cells() < max_cells)
     {
+      Vector<double> old_solution = solution;
       cout << "Refinement step " << refine_step
 	   << ", using " << tria->n_active_cells() << " active cells on "
 	   << tria->n_levels() << " levels."
@@ -464,8 +468,30 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       dirichlet_bc[0] = solution_function;
       assemble (*equation, quadrature, fe, update_flags, dirichlet_bc);
 
+				       // if we have an old solution lying
+				       // around, use it to preset the solution
+				       // vector. this reduced the quired
+				       // number of iterations by about
+				       // 10 per cent
+      if (refine_step != 0)
+	{
+	  solution.reinit (dof_handler->n_dofs());
+	  solution_transfer.interpolate (old_solution, solution);
+
+					   // if you don't want to preset
+					   // the solution vector,
+					   // uncomment the following
+					   // line and comment out the
+					   // preceding one
+//        solution.reinit (dof_handler->n_dofs());
+	  
+	  solution_transfer.clear ();
+	};
+
       cout << "    Solving..." << endl;
+
       solve ();
+
 
       Vector<float>       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
       Vector<float>       estimated_error_per_cell;
@@ -556,26 +582,29 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 	  out.write_gnuplot (outfile);
       
       outfile.close();
-
+      
       cout << "    Refining triangulation...";
       switch (refine_mode) 
 	{
 	  case global:
-		tria->refine_global (1);
+		tria->set_all_refine_flags ();
 		break;
 	  case true_error:
 		tria->refine_and_coarsen_fixed_number (h1_error_per_cell,
 						       prm.get_double("Refinement fraction"),
 						       prm.get_double("Coarsening fraction"));
-		tria->execute_coarsening_and_refinement ();
 		break;
 	  case error_estimator:
 		tria->refine_and_coarsen_fixed_number (estimated_error_per_cell,
 						       prm.get_double("Refinement fraction"),
 						       prm.get_double("Coarsening fraction"));
-		tria->execute_coarsening_and_refinement ();
 		break;
 	};
+
+      tria->prepare_coarsening_and_refinement ();
+      solution_transfer.prepare_for_coarsening_and_refinement (solution);
+      tria->execute_coarsening_and_refinement ();
+      
       cout << endl << endl;
       ++refine_step;
     };
