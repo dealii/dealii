@@ -93,6 +93,14 @@
        manages the conversion of global indices into a block
        vector/matrix/... to the indices local to each of the blocks. 
        </p>  
+
+  <li> <p>
+       New: <code class="class">SwappableVector</code>: Class that
+       allows to swap out the data of a vector to disk and reload it
+       later on. It also has a function to preload the data before its
+       use in a separate thread if the library is configured for
+       multi-threading.
+       </p>  
 </ol>
 
 
