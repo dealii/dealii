@@ -96,7 +96,7 @@ clean:
 #of this file.
 Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo ============================ Remaking lac/Makefile
-	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)/lac" $(cc-files) \
+	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" $(cc-files) \
 		> Makefile.dep
 
 # include all the dependencies
