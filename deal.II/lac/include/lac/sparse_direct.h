@@ -266,7 +266,8 @@ class SparseDirectMA27 : public Subscriptor
 				      * called at the beginning of
 				      * this function.
 				      */
-    void factorize (const SparseMatrix<double> &matrix);
+    template <typename number>
+    void factorize (const SparseMatrix<number> &matrix);
 
 				     /**
 				      * Solve for a certain right hand
@@ -293,7 +294,8 @@ class SparseDirectMA27 : public Subscriptor
 				      * called, since we have no
 				      * access to the actual matrix.
 				      */
-    void solve (Vector<double> &rhs_and_solution) const;
+    template <typename number>
+    void solve (Vector<number> &rhs_and_solution) const;
 
 				     /**
 				      * Call the three functions above
@@ -306,7 +308,8 @@ class SparseDirectMA27 : public Subscriptor
 				      * in place of the right hand
 				      * side vector.
 				      */
-    void solve (const SparseMatrix<double> &matrix,
+    template <typename number>
+    void solve (const SparseMatrix<number> &matrix,
 		Vector<double>             &rhs_and_solution);
 
 				     /**
@@ -510,7 +513,8 @@ class SparseDirectMA27 : public Subscriptor
 				      * symmetric part of the given
 				      * matrix.
 				      */
-    void fill_A (const SparseMatrix<double> &matrix);
+    template <typename number>    
+    void fill_A (const SparseMatrix<number> &matrix);
 
 				     /**
 				      * Call the respective function

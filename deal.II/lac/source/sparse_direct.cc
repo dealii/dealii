@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -702,8 +702,9 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 
 
 
+template <typename number>
 void
-SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
+SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
 {
 				   // if necessary, initialize process
   if (initialize_called == false)
@@ -850,6 +851,7 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
 
 
 
+template <>
 void
 SparseDirectMA27::solve (Vector<double> &rhs_and_solution) const
 {
@@ -863,8 +865,31 @@ SparseDirectMA27::solve (Vector<double> &rhs_and_solution) const
 
 
 
+template <>
 void
-SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
+SparseDirectMA27::solve (Vector<float> &rhs_and_solution) const
+{
+  Assert (factorize_called == true, ExcFactorizeNotCalled());
+
+                                   // first have to convert data type to
+                                   // doubles
+  Vector<double> tmp (rhs_and_solution.size());
+  tmp = rhs_and_solution;
+  
+  const unsigned int n_rows = rhs_and_solution.size();
+  call_ma27cd (&n_rows, &A[0], &LA,
+               &IW[0], &LIW, &MAXFRT,
+               &tmp(0), &IW1[0], &NSTEPS);
+
+                                   // then copy result back
+  rhs_and_solution = tmp;
+}
+
+
+
+template <typename number>
+void
+SparseDirectMA27::solve (const SparseMatrix<number> &matrix,
 			 Vector<double>             &rhs_and_solution)
 {
   initialize (matrix.get_sparsity_pattern());
@@ -899,8 +924,9 @@ SparseDirectMA27::get_synchronisation_lock () const
 
 
 
+template <typename number>
 void
-SparseDirectMA27::fill_A (const SparseMatrix<double> &matrix)
+SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
 {
   Assert (n_nonzero_elements <= A.size(), ExcInternalError());
 
@@ -1499,3 +1525,25 @@ call_ma47cd (const unsigned int *n_rows,           //scalar
 		     IW, LIW, &W[0],
 		     rhs_and_solution, IW1, ICNTL);  
 }
+
+
+
+// explicit instantiations
+template
+void
+SparseDirectMA27::factorize (const SparseMatrix<double> &matrix);
+
+template
+void
+SparseDirectMA27::factorize (const SparseMatrix<float> &matrix);
+
+template
+void
+SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
+			 Vector<double>             &rhs_and_solution);
+
+template
+void
+SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
+			 Vector<double>             &rhs_and_solution);
+
