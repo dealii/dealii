@@ -34,14 +34,14 @@ class Point {
 				      *  Constructor. Initialize all entries
 				      * to zero.
 				      */
-    Point ();
+    explicit Point ();
 				     /**
 				      *  Constructor for one dimensional points. This
 				      *  function is only implemented for #dim==1#
 				      *  since the usage is considered unsafe
 				      *  for points with #dim!=1#.
 				      */
-    Point (const double x);
+    explicit Point (const double x);
 
 				     /**
 				      *  Constructor for two dimensional points. This
