@@ -180,6 +180,12 @@
  *  not terminate the program to allow that the thrown exception
  *  propagates to some place where its message can be displayed.
  *
+ *  Since it is common that one failed assertion leads to a whole
+ *  chain of others, we only ever print the very first message. If the
+ *  program is then aborted, that is no problem. If it is not (since a
+ *  C++ exception is active), only the first is displayed and a
+ *  message about suppressed follow-up messages is shown.
+ *
  *
  *  @sect2{Use of run-time exceptions}
  *
@@ -394,6 +400,28 @@ class ExceptionBase : public std::exception
 				      * Name of the exception and call sequence.
 				      */
     const char  *exc;
+
+				     /**
+				      * Number of exceptions dealt
+				      * with so far. Zero at program
+				      * start. Messages are only
+				      * displayed if the value is
+				      * zero.
+				      */
+    static unsigned int n_treated_exceptions;
+
+				     /**
+				      * Make this function a friend
+				      * since it needs access to the
+				      * @p{n_treated_exceptions}
+				      * variable.
+				      */
+    template <class exc> friend void __IssueError_Assert (const char *file,
+							  int         line,
+							  const char *function,
+							  const char *cond,
+							  const char *exc_name,
+							  exc         e);
 };
 
 
@@ -413,16 +441,37 @@ void __IssueError_Assert (const char *file,
 			  const char *exc_name,
 			  exc         e)
 {
-				   // Fill the fields of the exception object
+				   // fill the fields of the exception object
   e.SetFields (file, line, function, cond, exc_name);
-  std::cerr << "--------------------------------------------------------"
-	    << std::endl;
-				   // print out general data
-  e.PrintExcData (std::cerr);
-				   // print out exception specific data
-  e.PrintInfo (std::cerr);
-  std::cerr << "--------------------------------------------------------"
-	    << std::endl;
+
+				   // if no other exception has been
+				   // displayed before, show this one
+  if (ExceptionBase::n_treated_exceptions == 0)
+    {
+      std::cerr << "--------------------------------------------------------"
+		<< std::endl;
+				       // print out general data
+      e.PrintExcData (std::cerr);
+				       // print out exception specific data
+      e.PrintInfo (std::cerr);
+      std::cerr << "--------------------------------------------------------"
+		<< std::endl;
+    }
+  else
+    {
+				       // if this is the first
+				       // follow-up message, display a
+				       // message that further
+				       // exceptions are suppressed
+      if (ExceptionBase::n_treated_exceptions == 1)
+	std::cerr << "******** More assertions fail but messages are suppressed! ********"
+		  << std::endl;
+    };
+
+				   // increase number of treated
+				   // exceptions by one
+  ExceptionBase::n_treated_exceptions++;
+      
 
 				   // abort the program now since
 				   // something has gone horribly
@@ -435,7 +484,7 @@ void __IssueError_Assert (const char *file,
 				   // see the original exception. in
 				   // that case indicate that the
 				   // program is not aborted due to
-				   // this reason
+				   // this reason.
   if (std::uncaught_exception() == true)
     std::cerr << "******** Program is not aborted since another exception is active! ********"
 	      << std::endl;

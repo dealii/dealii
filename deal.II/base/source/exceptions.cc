@@ -25,6 +25,9 @@
 #endif
 
 
+unsigned int ExceptionBase::n_treated_exceptions;
+
+
 ExceptionBase::ExceptionBase () :
 		file(""), line(0), function(""), cond(""), exc("")
 {};
