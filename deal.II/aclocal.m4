@@ -132,9 +132,17 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	          GXX_VERSION=portland_group
   	        else
   
-                    dnl  Aw, nothing suitable found...
-                    AC_MSG_ERROR(Unrecognized compiler, sorry)
-                    exit 1
+  	          dnl HP aCC?
+  	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
+  	          if test "x$is_aCC" != "x" ; then
+  	            AC_MSG_RESULT(C++ compiler is HP aCC)
+  	            GXX_VERSION=hp_aCC
+  	          else
+  
+                      dnl  Aw, nothing suitable found...
+                      AC_MSG_ERROR(Unrecognized compiler, sorry)
+                      exit 1
+                    fi
                   fi
                 fi
               fi
@@ -333,6 +341,13 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  CXXFLAGSG="$CXXFLAGS -A -Xa -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -A -Xa"
           CXXFLAGSPIC="-Kpic"
+          ;;
+
+      hp_aCC)
+          CXXFLAGSG="$CXXFLAGS -g1 +p +w -z -Aa -AA"
+          CXXFLAGSO="$CXXFLAGS -A -Xa -z +O2 -Aa -AA"
+          CXXFLAGSPIC="+Z"
+	  # for linking shared libs, -b is also necessary...
           ;;
   
       *)
