@@ -410,15 +410,40 @@ void ElasticProblem<dim>::refine_grid ()
                                    // XXX
   {
     PETScWrappers::Vector localized_solution (solution);
+    Vector<float> local_error_per_cell (triangulation.n_active_cells());
     
     typename FunctionMap<dim>::type neumann_boundary;
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss2<dim-1>(),
                                         neumann_boundary,
                                         localized_solution,
-                                        estimated_error_per_cell);
+                                        local_error_per_cell,
+                                        std::vector<bool>(),
+                                        0,
+                                        multithread_info.n_default_threads,
+                                        this_partition);
+    
+    const unsigned int local_cells
+      = (n_partitions == 1 ?
+         triangulation.n_active_cells() :
+         (this_partition != n_partitions-1 ?
+          triangulation.n_active_cells() / n_partitions :
+          triangulation.n_active_cells() - triangulation.n_active_cells() / n_partitions * (n_partitions-1)));
+    PETScWrappers::MPI::Vector
+      global_error_per_cell (mpi_communicator,
+                             triangulation.n_active_cells(),
+                             local_cells);
+
+
+    for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
+      if (local_error_per_cell(i) != 0)
+        global_error_per_cell(i) = local_error_per_cell(i);
+    global_error_per_cell.compress ();
+
+    estimated_error_per_cell = global_error_per_cell;
   }
 
+  
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
 						   0.3, 0.03);
