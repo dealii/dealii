@@ -408,7 +408,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
 				   // Generate an object where basis
 				   // vectors are stored.
-  internals::SolverGMRES::TmpVectors<VECTOR> tmp_vectors (n_tmp_vectors, this->memory);
+  internal::SolverGMRES::TmpVectors<VECTOR> tmp_vectors (n_tmp_vectors, this->memory);
   
 				   // number of the present iteration; this
 				   // number is not reset to zero upon a
