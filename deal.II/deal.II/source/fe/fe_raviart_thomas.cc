@@ -1928,6 +1928,9 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
+				   // Return computed values if we
+				   // know them easily. Otherwise, it
+				   // is always safe to return true.
   switch (degree)
     {
       case 0:
@@ -1946,14 +1949,15 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
                 = { 2, 3, 0, 1};
               
               return (face_index != opposite_faces[shape_index]);
-            };
+            }
             
-            default: Assert (false, ExcNotImplemented());
+            default:
+	      return true;
           };
       };
       
       default:  // other degree
-            Assert (false, ExcNotImplemented());
+	return true;
     };
   
   return true;

@@ -255,16 +255,13 @@ class FE_RaviartThomas : public FiniteElement<dim>
     virtual unsigned int element_multiplicity (const unsigned int index) const;
     
 				     /**
-				      * This function returns
-				      * @p{true}, if the shape
-				      * function @p{shape_index} has
-				      * non-zero values on the face
-				      * @p{face_index}. For the lowest
-				      * order Nedelec elements, this
-				      * is actually the case for the
-				      * one on which the shape
-				      * function is defined and all
-				      * neighboring ones.
+				      * Check whether a shape function
+				      * is non-zero on a face.
+				      *
+				      * Right now, this is only
+				      * implemented for RT0 in
+				      * 1D. Otherwise, returns always
+				      * @p{true}.
 				      *
 				      * Implementation of the
 				      * interface in
