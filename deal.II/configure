@@ -5405,7 +5405,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-#       include <boost_local/shared_ptr.hpp>
+#       include <boost/shared_ptr.hpp>
 
 int
 main ()
