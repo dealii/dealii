@@ -308,13 +308,8 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const double min_double_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<double>::min();
-#else
-          1;
-#endif
-
+      static const double min_double_value;
+      
 				       /**
 					* Maximal double value. If
 					* the @p{numeric_limits} class
@@ -323,12 +318,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const double max_double_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<double>::max();
-#else
-          0;
-#endif
+      static const double max_double_value;
       
 				       /**
 					* Constructor. Bounds can be
@@ -387,7 +377,7 @@ namespace Patterns
 					* bounds of the interval for
 					* a valid range.
 					*/
-      const int lower_bound;
+      const double lower_bound;
 
 				       /**
 					* Value of the upper
@@ -399,7 +389,7 @@ namespace Patterns
 					* bounds of the interval for
 					* a valid range.
 					*/
-      const int upper_bound;
+      const double upper_bound;
   };
     
 				   /**
