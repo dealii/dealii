@@ -209,6 +209,9 @@ class SparseMatrixStruct : public Subscriptor
 				      * entry of square matrices, which is
 				      * always the first entry of each row.
 				      *
+				      * The memory which is no more
+				      * needed is released.
+				      *
 				      * #SparseMatrix# objects require the
 				      * #SparseMatrixStruct# objects they are
 				      * initialized with to be compressed, to

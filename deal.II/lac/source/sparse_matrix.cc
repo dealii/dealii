@@ -309,6 +309,18 @@ SparseMatrixStruct::compress ()
 		next_row_start = 0,
 		    row_length = 0;
 
+				   // first find out how many non-zero
+				   // elements there are, in order to
+				   // allocate the right amount of
+				   // memory
+  const unsigned int
+    nonzero_elements = count_if (&colnums[rowstart[0]],
+				 &colnums[rowstart[rows]],
+				 bind2nd(not_equal_to<int>(), -1));
+				   // now allocate the respective memory
+  int *new_colnums = new int[nonzero_elements];
+
+  
 				   // reserve temporary storage to
 				   // store the entries of one row
   vector<int> tmp_entries (max_row_length);
@@ -337,10 +349,10 @@ SparseMatrixStruct::compress ()
       sort ((rows==cols) ? &tmp_entries[1] : &tmp_entries[0],
 	    &tmp_entries[row_length]);
 
-				       // Re-insert column numbers
-				       // into the field
+				       // insert column numbers
+				       // into the new field
       for (unsigned int j=0; j<row_length; ++j)
-	colnums[next_free_entry++] = tmp_entries[j];
+	new_colnums[next_free_entry++] = tmp_entries[j];
 
 				       // note new start of this and
 				       // the next row
@@ -349,7 +361,7 @@ SparseMatrixStruct::compress ()
 
 				       // some internal checks
       Assert ((rows!=cols) ||
-	      (colnums[rowstart[line]] == static_cast<signed int>(line)),
+	      (new_colnums[rowstart[line]] == static_cast<signed int>(line)),
 	      ExcInternalError());
 				       // assert that the first entry
 				       // does not show up in
@@ -358,18 +370,35 @@ SparseMatrixStruct::compress ()
 				       // among themselves (this handles
 				       // both cases, quadratic and
 				       // rectangular matrices)
-      Assert (find (&colnums[rowstart[line]+1],
-		    &colnums[next_row_start],
-		    colnums[rowstart[line]]) ==
-	      &colnums[next_row_start],
+      Assert (find (&new_colnums[rowstart[line]+1],
+		    &new_colnums[next_row_start],
+		    new_colnums[rowstart[line]]) ==
+	      &new_colnums[next_row_start],
 	      ExcInternalError());
-      Assert (adjacent_find(&colnums[rowstart[line]+1],
-			    &colnums[next_row_start]) ==
-	      &colnums[next_row_start],
+      Assert (adjacent_find(&new_colnums[rowstart[line]+1],
+			    &new_colnums[next_row_start]) ==
+	      &new_colnums[next_row_start],
 	      ExcInternalError());
     };
-  
+
+				   // assert that we have used all
+				   // allocated space, no more and no
+				   // less
+  Assert (next_free_entry == nonzero_elements,
+	  ExcInternalError());
+
+				   // set iterator-past-the-end
   rowstart[rows] = next_row_start;
+
+				   // set colnums to the newly
+				   // allocated array and delete the
+				   // old one
+  delete[] colnums;
+  colnums = new_colnums;
+
+				   // store the size
+  max_vec_len = nonzero_elements;
+  
   compressed = true;
 };
 

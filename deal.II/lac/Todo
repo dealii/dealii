@@ -10,17 +10,16 @@ Use unsigned integers for the colnums array in dSMatrixStruct. This
   eliminating the need for conversions.
 
 
-Let dSMatrixStruct::compress free the memory of colnums which is
-  no longer needed.
-
-
 Make ILU decomposition faster by following the comment in the
   innermost loop (about the better use of the index j).
+
 
 Change in-class defined SolverSelector functions out-of-class to
   conform to general style guide. (Ralf?)
 
+
 Why not replace Vector::scale by Vector::operator *= ?
+
 
 Use the commented-out version in PreconditionBlock::invert_diagblocks
   using the try-catch clauses
