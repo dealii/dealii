@@ -101,56 +101,56 @@ namespace internal
     };
     
     
+
+                                     /**
+                                      * Switch type to select a tensor of
+                                      * rank 2 and dimension <tt>dim</tt>,
+                                      * switching on whether the tensor
+                                      * should be constant or not.
+                                      */
+    template <int rank, int dim, bool constness>
+    struct AccessorTypes;
+
+                                     /**
+                                      * Switch type to select a tensor of
+                                      * rank 2 and dimension <tt>dim</tt>,
+                                      * switching on whether the tensor
+                                      * should be constant or not.
+                                      *
+                                      * Specialization for constant tensors.
+                                      */
+    template <int rank, int dim>
+    struct AccessorTypes<rank, dim,true>
+    {
+        typedef
+        const typename StorageType<rank,dim>::base_tensor_type
+        base_tensor_type;
+
+        typedef double reference;
+    };
+
+                                     /**
+                                      * Switch type to select a tensor of
+                                      * rank 2 and dimension <tt>dim</tt>,
+                                      * switching on whether the tensor
+                                      * should be constant or not.
+                                      *
+                                      * Specialization for non-constant
+                                      * tensors.
+                                      */
+    template <int rank, int dim>
+    struct AccessorTypes<rank,dim,false>
+    {
+        typedef
+        typename StorageType<rank,dim>::base_tensor_type
+        base_tensor_type;
+
+        typedef double &reference;
+    };
+
     
     namespace Rank2Accessors
     {
-
-                                       /**
-                                        * Switch type to select a tensor of
-                                        * rank 2 and dimension <tt>dim</tt>,
-                                        * switching on whether the tensor
-                                        * should be constant or not.
-                                        */
-      template <int dim, bool constness>
-      struct AccessorTypes;
-
-                                       /**
-                                        * Switch type to select a tensor of
-                                        * rank 2 and dimension <tt>dim</tt>,
-                                        * switching on whether the tensor
-                                        * should be constant or not.
-                                        *
-                                        * Specialization for constant tensors.
-                                        */
-      template <int dim>
-      struct AccessorTypes<dim,true>
-      {
-          typedef
-          const typename StorageType<2,dim>::base_tensor_type
-          base_tensor_type;
-
-          typedef double reference;
-      };
-
-                                       /**
-                                        * Switch type to select a tensor of
-                                        * rank 2 and dimension <tt>dim</tt>,
-                                        * switching on whether the tensor
-                                        * should be constant or not.
-                                        *
-                                        * Specialization for non-constant
-                                        * tensors.
-                                        */
-      template <int dim>
-      struct AccessorTypes<dim,false>
-      {
-          typedef
-          typename StorageType<2,dim>::base_tensor_type
-          base_tensor_type;
-
-          typedef double &reference;
-      };
-
 
                                        /**
                                         * Accessor class to access the
@@ -170,7 +170,7 @@ namespace internal
                                             * Import which tensor we work on.
                                             */
           typedef
-          typename AccessorTypes<dim,constness>::base_tensor_type
+          typename AccessorTypes<2,dim,constness>::base_tensor_type
           base_tensor_type;
 
                                            /**
@@ -180,7 +180,7 @@ namespace internal
                                             * is constant, we can only return
                                             * a value instead of a reference.
                                             */
-          typedef typename AccessorTypes<dim,constness>::reference reference;
+          typedef typename AccessorTypes<2,dim,constness>::reference reference;
 
                                            /**
                                             * Constructor. Take the tensor to
@@ -188,7 +188,7 @@ namespace internal
                                             * point to as arguments.
                                             */
           Accessor (base_tensor_type  &tensor,
-                       const unsigned int  row);
+                    const unsigned int  row);
 
                                            /**
                                             * Return a reference to an element
