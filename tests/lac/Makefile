@@ -105,6 +105,22 @@ mg: $(mg-o-files) $(libraries)
 ############################################################
 
 
+benchmark-cc-files = benchmark.cc
+
+ifeq ($(debug-mode),on)
+benchmark-o-files = $(benchmark-cc-files:.cc=.go)
+else
+benchmark-o-files = $(benchmark-cc-files:.cc=.o)
+endif
+
+benchmark: $(benchmark-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+############################################################
+# Continue with other targets if needed
+############################################################
+
+
 target1-cc-files = t1.cc t2.cc t3.cc
 
 ifeq ($(debug-mode),on)
@@ -132,7 +148,7 @@ veryclean: clean
 # Automatic generation of dependencies
 ############################################################
 
-all-cc-files = $(solver-cc-files) $(mgbase-cc-files) $(mg-cc-files) # $(target2-cc-files) ...
+all-cc-files = $(solver-cc-files) $(mgbase-cc-files) $(mg-cc-files) $(benchmark-cc-files)
 
 Make.depend: $(all-cc-files)
 	@echo =====Dependecies=== Make.depend
