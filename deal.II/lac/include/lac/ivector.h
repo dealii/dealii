@@ -1,12 +1,13 @@
-// $Id$
+/*----------------------------   ivector.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __ivector_H
+#define __ivector_H
+/*----------------------------   ivector.h     ---------------------------*/
+
 
 // This file is part of the DEAL Library
 // DEAL is Copyright(1995) by
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
-
-
-#ifndef __lac_ivector_h
-#define __lac_ivector_h
 
 #include <base/exceptions.h>
 
@@ -187,4 +188,9 @@ inline int& iVector::operator() (unsigned int i)
 }
 
 
+
+
+/*----------------------------   ivector.h     ---------------------------*/
+/* end of #ifndef __ivector_H */
 #endif
+/*----------------------------   ivector.h     ---------------------------*/

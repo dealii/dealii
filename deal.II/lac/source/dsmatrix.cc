@@ -5,6 +5,9 @@
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 
 #include <lac/dsmatrix.h>
+#include <lac/dvector.h>
+#include <lac/ivector.h>
+
 #include <iostream>
 #include <iomanip>
 #include <algorithm>

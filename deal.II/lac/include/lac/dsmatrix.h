@@ -11,19 +11,15 @@
 // Revised by Wolfgang Bangerth
 
 
-#ifndef __lac_dvector_h
-#include <lac/dvector.h>
-#endif
-#ifndef __lac_ivector_h
-#include <lac/ivector.h>
-#endif
-
 #include <base/exceptions.h>
 
 
-
+//forward declarations
+class dVector;
+class iVector;
 class ostream;
-template <int dim> class DoFHandler;
+
+
 
 /*
 CLASS

@@ -10,10 +10,12 @@
 // Revised by Wolfgang Bangerth
 
 
-#include <lac/dvector.h>
-#include <lac/ivector.h>
 #include <base/exceptions.h>
-#include <cstdio>
+
+
+// forward declarations
+class dVector;
+class iVector;
 
 
 

@@ -1,9 +1,12 @@
 // $Id$
 
+#include <lac/dvector.h>
+#include <lac/ivector.h>
+#include <lac/dfmatrix.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-#include <lac/dfmatrix.h>
 #include <iomanip>
 
 

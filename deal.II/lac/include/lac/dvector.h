@@ -9,8 +9,8 @@
 // Roland Becker, Guido Kanschat, Franz-Theo Suttmeier
 // Revised by Wolfgang Bangerth
 
-#include <cstdio>
 #include <base/exceptions.h>
+#include <cstdio>
 
 
 
