@@ -139,7 +139,7 @@
  * may be difficult, however, and in many cases will not justify the effort.
  *
  *
- * @sect2{Componentwise numbering}
+ * @sect2{Component-wise numbering}
  *
  * For finite elements composed of several base elements using the @p{FESystem}
  * class, or for elements which provide several components themselves, it
@@ -154,6 +154,20 @@
  * algorithm and afterwards renumbering component-wise. This will bring out the
  * matrix structure and additionally have a good numbering within each block.
  *
+ * @sect2{Cell-wise numbering for Discontinuous Galerkin FEM}
+ *
+ * One advantage of DGFEM is the fact, that it yields invertible
+ * blocks on the diagonal of the global matrix. these blocks are in
+ * fact the cell matrices and matrix elements outside these blocks are
+ * due to fluxes.
+ *
+ * Still, it may be necessary to apply a downstream numbering of the
+ * degrees of freedom. This renumbering may only exchange whole blocks
+ * and must not destroy the block structure.
+ *
+ * Given an ordered vector of cells, the function @p{cell_wise}
+ * accomplishes this. Inside the cells, the previous ordering will be
+ * preserved, so it may be useful to apply @component_wise} first.
  *
  * @sect2{Multigrid DoF numbering}
  *
@@ -161,7 +175,7 @@
  * to the actual function declarations to get more information on this.
  *
  *
- * @author Wolfgang Bangerth, 1998, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000
  */
 class DoFRenumbering 
 {
@@ -246,6 +260,31 @@ class DoFRenumbering
 		    const vector<unsigned int> &component_order = vector<unsigned int>());
 
 				     /**
+				      * Cell-wise renumbering for DG
+				      * elements.  This function takes
+				      * the ordered set of cells in
+				      * @p{cell_order}, and makes sure
+				      * that all degrees of freedom in
+				      * a cell with higher index are
+				      * behind all degrees of freedom
+				      * of a cell with lower
+				      * index. The order inside a cell
+				      * bloock will be the same as
+				      * before this renumbering.
+				      *
+				      * This function only works with
+				      * Discontinuous Galerkin Finite
+				      * Elements, i.e. all degrees of
+				      * freedom have to be associated
+				      * with the interior of the cell.
+				      */
+    template< int dim>
+    static void
+    cell_wise (DoFHandler<dim>                     &dof_handler,
+	       const vector<DoFCellAccessor<dim> > &cell_order);
+    
+
+				     /**
 				      * Sort those degrees of freedom
 				      * which are tagged with @p{true}
 				      * in the @p{selected_dofs} array
@@ -271,13 +310,13 @@ class DoFRenumbering
 				      * Exception
 				      */
     DeclException0 (ExcInvalidComponentOrder);
+
 				     /**
-				      * Exception
+				      * The function is only
+				      * implemented for Discontinuous
+				      * Galerkin Finite elements.
 				      */
-    DeclException2 (ExcInvalidArraySize,
-		    int, int,
-		    << "The array has size " << arg1 << " but should have "
-		    << arg2 << ".");
+    DeclException0 (ExcNotDGFEM);
 };
 
 

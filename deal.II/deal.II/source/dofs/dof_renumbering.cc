@@ -15,6 +15,7 @@
 #include <lac/sparsity_pattern.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
@@ -505,7 +506,7 @@ DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   Assert (selected_dofs.size() == n_dofs,
-	  ExcInvalidArraySize (selected_dofs.size(), n_dofs));
+	  ExcDimensionMismatch (selected_dofs.size(), n_dofs));
 
 				   // re-sort the dofs according to
 				   // their selection state
@@ -535,27 +536,75 @@ DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
 };
 
 
+template <int dim>
+void
+DoFRenumbering::cell_wise (DoFHandler<dim>& dof,
+			   const vector<DoFCellAccessor<dim> >& cells)
+{
+  Assert(cells.size() == dof.get_tria().n_active_cells(),
+	 ExcDimensionMismatch(cells.size(),
+			      dof.get_tria().n_active_cells()));
+  switch (dim)
+    {
+      case 3:
+	    Assert(dof.get_fe().n_dofs_per_quad()==0,
+		   ExcNotDGFEM());
+      case 2:
+	    Assert(dof.get_fe().n_dofs_per_line()==0,
+		   ExcNotDGFEM());
+      default:
+	    Assert(dof.get_fe().n_dofs_per_vertex()==0,
+		   ExcNotDGFEM());
+    }
+
+  unsigned int n_global_dofs = dof.n_dofs();
+  unsigned int n_cell_dofs = dof.get_fe().n_dofs_per_cell();
+
+  vector<unsigned int> new_order(n_global_dofs);
+  vector<unsigned int> cell_dofs(n_cell_dofs);
+
+  unsigned int global_index = 0;
+  
+  typename vector<DoFCellAccessor<dim> >::const_iterator cell;
+
+  for(cell = cells.begin(); cell != cells.end(); ++cell)
+    {
+      cell->get_dof_indices(cell_dofs);
+      sort(cell_dofs.begin(), cell_dofs.end());
+      
+      for (unsigned int i=0;i<n_cell_dofs;++i)
+	new_order[global_index++] = cell_dofs[i];
+    }
+  Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
+  dof.renumber_dofs(new_order);
+}
 
 
 
 // explicit instantiations
 template
-void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension> &dof_handler,
-				    const bool                     reversed_numbering,
-				    const bool                     use_constraints,
-				    const vector<unsigned int>    &starting_indices);
+void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension>&,
+				    const bool,
+				    const bool,
+				    const vector<unsigned int>&);
 
 template
-void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension> &dof_handler,
-				    const unsigned int               level,
-				    const bool                       reversed_numbering,
-				    const vector<unsigned int>      &starting_indices);
+void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension>&,
+				    const unsigned int,
+				    const bool,
+				    const vector<unsigned int>&);
 
 template
-void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension> &dof_handler,
-				     const vector<unsigned int>    &component_order_arg);
+void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension>&,
+				     const vector<unsigned int>&);
 
 
 template
-void DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
-					      DoFHandler<deal_II_dimension> &dof_handler);
+void DoFRenumbering::cell_wise (DoFHandler<deal_II_dimension>&,
+				const vector<DoFCellAccessor<deal_II_dimension> >&);
+
+
+
+template
+void DoFRenumbering::sort_selected_dofs_back (const vector<bool> &,
+					      DoFHandler<deal_II_dimension> &);
