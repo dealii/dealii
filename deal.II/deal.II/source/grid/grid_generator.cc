@@ -250,9 +250,9 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
 
 template <>
 void
-GridGenerator::hyper_cube_slit<> (Triangulation<2> &tria,
-				  const double left,
-				  const double right)
+GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
+				const double left,
+				const double right)
 {
   const double rl2=(right+left)/2;
   const Point<2> vertices[10] = { Point<2>(left, left ),
@@ -285,9 +285,9 @@ GridGenerator::hyper_cube_slit<> (Triangulation<2> &tria,
 
 template <>
 void
-GridGenerator::hyper_L<> (Triangulation<2> &tria,
-			  const double a,
-			  const double b)
+GridGenerator::hyper_L (Triangulation<2> &tria,
+			const double a,
+			const double b)
 {
   const unsigned int dim=2;
   const Point<dim> vertices[8] = { Point<dim> (a,a),
@@ -320,9 +320,9 @@ GridGenerator::hyper_L<> (Triangulation<2> &tria,
 
 template <>
 void
-GridGenerator::hyper_ball<> (Triangulation<2> &tria,
-			     const Point<2>    &p,
-			     const double      radius)
+GridGenerator::hyper_ball (Triangulation<2> &tria,
+			   const Point<2>    &p,
+			   const double      radius)
 {
 				   // equilibrate cell sizes at
 				   // transition from the inner part
@@ -360,11 +360,11 @@ GridGenerator::hyper_ball<> (Triangulation<2> &tria,
 
 
 template <>
-void GridGenerator::hyper_shell<> (Triangulation<2>   &tria,
-				   const Point<2>     &center,
-				   const double        inner_radius,
-				   const double        outer_radius,
-				   const unsigned int  n_cells)
+void GridGenerator::hyper_shell (Triangulation<2>   &tria,
+				 const Point<2>     &center,
+				 const double        inner_radius,
+				 const double        outer_radius,
+				 const unsigned int  n_cells)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
@@ -423,11 +423,11 @@ void GridGenerator::hyper_shell<> (Triangulation<2>   &tria,
 
 template <>
 void
-GridGenerator::half_hyper_shell<> (Triangulation<2>   &tria,
-				   const Point<2>     &center,
-				   const double        inner_radius,
-				   const double        outer_radius,
-				   const unsigned int  n_cells)
+GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
+				 const Point<2>     &center,
+				 const double        inner_radius,
+				 const double        outer_radius,
+				 const unsigned int  n_cells)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
@@ -497,9 +497,9 @@ GridGenerator::half_hyper_shell<> (Triangulation<2>   &tria,
 #if deal_II_dimension == 3
 
 template <>
-void GridGenerator::hyper_cube_slit<> (Triangulation<3> &,
-				       const double,
-				       const double) {
+void GridGenerator::hyper_cube_slit (Triangulation<3> &,
+				     const double,
+				     const double) {
   Assert (false, ExcNotImplemented());
 };
 
@@ -564,9 +564,9 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
 
 template <>
 void
-GridGenerator::hyper_L<> (Triangulation<3> &tria,
-			  const double a,
-			  const double b)
+GridGenerator::hyper_L (Triangulation<3> &tria,
+			const double a,
+			const double b)
 {
   const unsigned int dim=3;
 				   // we slice out the top back right
@@ -630,9 +630,9 @@ GridGenerator::hyper_L<> (Triangulation<3> &tria,
 
 template <>
 void
-GridGenerator::hyper_ball<> (Triangulation<3> &tria,
-			     const Point<3>   &p,
-			     const double radius)
+GridGenerator::hyper_ball (Triangulation<3> &tria,
+			   const Point<3>   &p,
+			   const double radius)
 {
 				   // this function used to be
 				   // implemented by the code below,
@@ -709,11 +709,11 @@ GridGenerator::hyper_ball<> (Triangulation<3> &tria,
 
 
 template <>
-void GridGenerator::hyper_shell<> (Triangulation<3>   &,
-				   const Point<3>     &,
-				   const double        ,
-				   const double        ,
-				   const unsigned int  )
+void GridGenerator::hyper_shell (Triangulation<3>   &,
+				 const Point<3>     &,
+				 const double        ,
+				 const double        ,
+				 const unsigned int  )
 {
   Assert (false, ExcNotImplemented());
 };
@@ -726,7 +726,8 @@ void GridGenerator::hyper_shell<> (Triangulation<3>   &,
 template void
 GridGenerator::hyper_rectangle (Triangulation<deal_II_dimension> &,
 				const Point<deal_II_dimension>&,
-				const Point<deal_II_dimension>&);
+				const Point<deal_II_dimension>&,
+				const bool);
 template void
 GridGenerator::hyper_cube (Triangulation<deal_II_dimension> &,
 			   const double,
