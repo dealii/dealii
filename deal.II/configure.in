@@ -18,6 +18,7 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_REVISION($Revision$)
 AC_INIT(base)
+AC_CONFIG_HEADER(base/include/base/config.h)
 
 dnl    Set the path to the deal.II libraries to `pwd`
 DEAL2_DIR=`pwd`
@@ -27,8 +28,10 @@ dnl    Set major and minor version numbers of the deal.II library,
 dnl    both as preprocessor variables and in Makefiles
 DEAL_II_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_II_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
-AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR)
-AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR)
+AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR, 
+                   [Major version number of deal.II])
+AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR, 
+                   [Minor version number of deal.II])
 AC_MSG_RESULT(Configuring deal.II version `cat Version`)
 AC_SUBST(DEAL_II_MAJOR)
 AC_SUBST(DEAL_II_MINOR)
@@ -254,7 +257,7 @@ if test "$GXX" = yes ; then
 
   case "$GXX_VERSION" in
     egcs1.1 | gcc2.95)
-	CXXFLAGSG="$CXXFLAGSG -DDEBUG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
+	CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
 	CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
 	;;
 
@@ -507,13 +510,20 @@ dnl - Set preprocessor directives if necessary
 dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
 dnl - _REENTRANT is a flag that is used in the standard UNIX
 dnl   headers to make reentrant functions (with suffix _r) declared
+dnl
+dnl Do not use AC_DEFINE when using these two flags, since that would
+dnl put them into config.h, instead of the compiler flags. Then, however,
+dnl it would be necessary to include config.h as _first_ file in all
+dnl files, since the flags change the things we include. It is therefore
+dnl better to put the flags into the command line, since then we have them
+dnl defined for all include files.
 if test "$enablemultithreading" = yes ; then
   if test "$GXX" = yes ; then
     DEAL_II_GET_THREAD_FLAGS
     DEAL_II_THREAD_CPPFLAGS
 
-    AC_DEFINE(__USE_MALLOC)
-    AC_DEFINE(_REENTRANT)
+    CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC -D_REENTRANT"
+    CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC -D_REENTRANT"
   else
     if test "x$GXX_VERSION" = "xibm_xlc" ; then
       CXXFLAGSG = "$CXXFLAGSG -threaded"  
@@ -545,7 +555,9 @@ if test "$withmultithreading" != no ; then
     AC_MSG_ERROR(Invalid ACE path)
   fi
 
-  AC_DEFINE(DEAL_II_USE_MT)
+  AC_DEFINE(DEAL_II_USE_MT, 1, 
+            [Flag indicating whether the library shall be compiler for
+             multithreaded applications])
 fi
 AC_SUBST(withmultithreading)
 
@@ -592,15 +604,29 @@ for i in $disable_compat ; do
   esac
 done
 dnl Now for each known feature, either disable it or enable it.
-dnl Default is to enable.
+dnl Default is to enable. In order to have these flags in config.h,
+dnl it is necessary to AC_DEFINE them actually by name, rather than
+dnl by some loop variable, since otherwise autoheader can't generate
+dnl an entry for config.h for this variable
 for i in mapping ; do
   uppercase=`echo $i | perl -pi -e 'tr/a-z/A-Z/;'`
-  flag=DEAL_II_COMPAT_$uppercase
   if test -n "`echo $disable_compat | grep $i`"  ; then
-    AC_DEFINE_UNQUOTED($flag,false)
+    compat_value=false
   else
-    AC_DEFINE_UNQUOTED($flag,true)
+    compat_value=true
   fi
+
+  case $i in
+    mapping)
+	AC_DEFINE_UNQUOTED(DEAL_II_COMPAT_MAPPING,$compat_value,
+			   [Backward compatibility support for functions
+                            and classes that do not take an explicit mapping
+                            variable, but rather use a default Q1 mapping instead])
+	;;
+    *)
+	AC_MSG_ERROR(Backward compatibility feature "$i" unknown)
+	;;
+  esac
 done
 
 
@@ -825,12 +851,12 @@ AC_MSG_CHECKING(for HSL subroutines)
 hsl_subroutines=""
 if test -r contrib/hsl/source/ma27.f ; then
   hsl_subroutines="$hsl_subroutines MA27"
-  AC_DEFINE(HAVE_HSL_MA27)
+  AC_DEFINE(HAVE_HSL_MA27, 1, [Availability of the MA27 algorithm from HSL])
 fi
 
 if test -r contrib/hsl/source/ma47.f -a -r contrib/hsl/source/ma47dep.f ; then
   hsl_subroutines="$hsl_subroutines MA47"
-  AC_DEFINE(HAVE_HSL_MA47)
+  AC_DEFINE(HAVE_HSL_MA47, 1, [Availability of the MA47 algorithm from HSL])
 fi
 
 
@@ -861,7 +887,8 @@ AC_ARG_ENABLE(multigrid,
     fi)
 if test "$enablemultigrid" = yes ; then
    AC_MSG_RESULT(configuring multigrid)
-   AC_DEFINE(ENABLE_MULTIGRID)
+   AC_DEFINE(ENABLE_MULTIGRID, 1, 
+             [Enable the multigrid components of the library])
 fi
 AC_SUBST(enablemultigrid)
 
