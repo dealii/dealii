@@ -26,6 +26,14 @@ documentation, etc</a>.
 <h3>General</h3>
 
 <ol>
+  <li> <p> New: configuration detects whether the compiler has the
+       include file <code>&lt;ostream&gt;</code>. Most files in the
+       library then include this file over
+       <code>&lt;iostream&gt;</code> to save compile time.
+       <br>
+       (WB 2002/01/25)
+       </p>
+
   <li> <p> Fixed: All example and test programs as well as a number of
        large applications have been checked against the memory checker
        "purify". Only three memory leaks were found and fixed. We
