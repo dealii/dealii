@@ -49,11 +49,11 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				      * Solve primal problem only.
 				      */
     template<class Preconditioner>
-				     /*typename*/
-    Solver<Matrix,Vector>::ReturnState solve (const Matrix &A,
-						       Vector       &x,
-						       const Vector &b,
-						       const Preconditioner& precondition);
+    typename Solver<Matrix,Vector>::ReturnState
+    solve (const Matrix &A,
+	   Vector       &x,
+	   const Vector &b,
+	   const Preconditioner& precondition);
 
   protected:
 				     /**
@@ -148,7 +148,8 @@ class SolverBicgstab : public Solver<Matrix,Vector>
 				      * The iteration loop itself.
 				      */
     template<class Preconditioner>
-    typename Solver<Matrix,Vector>::ReturnState iterate(const Preconditioner& precondition);
+    typename Solver<Matrix,Vector>::ReturnState 
+    iterate(const Preconditioner& precondition);
   
 };
 
@@ -186,7 +187,7 @@ SolverBicgstab<Matrix, Vector>::start()
 
 template<class Matrix, class Vector>
 template<class Preconditioner>
-/*typename*/ Solver<Matrix,Vector>::ReturnState
+typename Solver<Matrix,Vector>::ReturnState
 SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
 {
   SolverControl::State state = SolverControl::iterate;
