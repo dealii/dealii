@@ -1192,7 +1192,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 
 template <>
 void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
-  Assert (new_number.size() == n_dofs(level), ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
 				   // note that we can not use cell iterators
 				   // in this function since then we would

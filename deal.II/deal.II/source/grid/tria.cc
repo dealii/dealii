@@ -666,10 +666,84 @@ void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+void Triangulation<1>::distort_random (const double factor,
+				       const bool   keep_boundary) {
+				   // this function is mostly equivalent to
+				   // that for the general dimensional case
+				   // the only difference being the correction
+				   // for split faces which is not necessary
+				   // in 1D
+				   //
+				   // if you change something here, don't
+				   // forget to do so there as well
+
+  const unsigned int dim = 1;
+  
+				   // find the smallest length of the lines
+				   // adjacent to the vertex
+  vector<double>             minimal_length (vertices.size(), 1e308);
+				   // also note if a vertex is at
+				   // the boundary
+  vector<bool>               at_boundary (vertices.size(), false);
+  
+  for (active_line_iterator line=begin_active_line();
+       line != end_line(); ++line)
+    {
+      if (keep_boundary && line->at_boundary())
+	{
+	  at_boundary[line->vertex_index(0)] = true;
+	  at_boundary[line->vertex_index(1)] = true;
+	};
+      
+      minimal_length[line->vertex_index(0)]
+	= min(line->diameter(), minimal_length[line->vertex_index(0)]);
+      minimal_length[line->vertex_index(1)]
+	= min(line->diameter(), minimal_length[line->vertex_index(1)]);
+    };
+
+
+  const unsigned int n_vertices = vertices.size();
+  Point<dim> shift_vector;
+  
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+    {
+				       // ignore this vertex if we whall keep
+				       // the boundary and this vertex *is* at
+				       // the boundary
+      if (keep_boundary && at_boundary[vertex])
+	continue;
+      
+				       // first compute a random shift vector
+      for (unsigned int d=0; d<dim; ++d)
+	shift_vector(d) = rand()*1.0/RAND_MAX;
+
+      shift_vector *= factor * minimal_length[vertex] /
+		      sqrt(shift_vector.square());
+
+				       // finally move the vertex
+      vertices[vertex] += shift_vector;
+    };
+};
+
+#endif
+
+
 
 template <int dim>
 void Triangulation<dim>::distort_random (const double factor,
 					 const bool   keep_boundary) {
+				   // this function is mostly equivalent to
+				   // that for the general dimensional case
+				   // the only difference being the correction
+				   // for split faces which is not necessary
+				   // in 1D
+				   //
+				   // if you change something here, don't
+				   // forget to do so there as well
+  
 				   // find the smallest length of the lines
 				   // adjecent to the vertex
   vector<double>             minimal_length (vertices.size(), 1e308);
@@ -717,10 +791,8 @@ void Triangulation<dim>::distort_random (const double factor,
 
   
 				   // finally correct hanging nodes
-				   // again. not necessary for 1D
-  if (dim==1)
-    return;
-  
+				   // again. The following is not
+				   // necessary for 1D
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   for (; cell!=endc; ++cell) 

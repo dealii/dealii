@@ -14,10 +14,18 @@
  * Workaround for a bug in egcs snapshot 1998/08/03.
  */
 template <int dim> struct BoundaryHelper;
+
+template <> struct BoundaryHelper<1> {
+				     // actually, this does not make much
+				     // sense, but declaring a zero-sized
+				     // array is forbidden nowadays
+    typedef const Point<1> *PointArray[1];
+};
+
 template <> struct BoundaryHelper<2> {
     typedef const Point<2> *PointArray[GeometryInfo<2>::vertices_per_face];
 };
-    
+
 
 
 /**
@@ -74,7 +82,7 @@ class Boundary {
  *   arithmetic mean of the points.
  *
  *   This class does not really describe a boundary in the usual sense. By
- *   placing new points in teh middle of old ones, it rather assumes that the
+ *   placing new points in the middle of old ones, it rather assumes that the
  *   boundary of the domain is given by the polygon/polyhedron defined by the
  *   boundary of the initial coarse triangulation.
  */
