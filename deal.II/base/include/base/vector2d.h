@@ -76,6 +76,11 @@ class vector2d : public Subscriptor
     vector2d<T>& operator = (const vector2d<T>& src);
 
 				   /**
+				    * Destructor. Free allocated memory.
+				    */
+  ~vector2d ();
+  
+				   /**
 				    * Assignment operator.
 				    * Copy all elements of @p{src}
 				    * into the array. The size is
@@ -209,6 +214,15 @@ class vector2d : public Subscriptor
 				      * Number of Rows
 				      */
     unsigned int num_rows;
+};
+
+
+template <typename T>
+inline
+vector2d<T>::~vector2d ()
+{
+  if (val != 0)
+    delete[] val;
 };
 
 
