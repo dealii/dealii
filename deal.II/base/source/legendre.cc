@@ -46,6 +46,13 @@ namespace
 };
 
 
+// See polynomial.cc for an expalanation of this
+
+#if ((__GNUC__ == 3) && (__GNUC_MINOR__ == 1))
+#define SHIFT_TYPE double
+#else
+#define SHIFT_TYPE long double
+#endif
 
 template <typename number>
 void
@@ -97,9 +104,9 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
   	  c0 = new std::vector<number>(*c0);
   	  c1 = new std::vector<number>(*c1);
 	  
-    	  Polynomial<number>::shift(*c0, (long double) -1.);
+    	  Polynomial<number>::shift(*c0, (SHIFT_TYPE) -1.);
     	  Polynomial<number>::scale(*c0, 2.);
-    	  Polynomial<number>::shift(*c1, (long double) -1.);
+    	  Polynomial<number>::shift(*c1, (SHIFT_TYPE) -1.);
     	  Polynomial<number>::scale(*c1, 2.);
     	  Polynomial<number>::multiply(*c1, std::sqrt(3.));
   	  shifted_coefficients[0]=c0;
@@ -141,7 +148,7 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
 					   // and compute the
 					   // coefficients for [0,1]
   	  ck = new std::vector<number>(*ck);
-    	  shift(*ck,(long double) -1.);
+    	  shift(*ck,(SHIFT_TYPE) -1.);
     	  Polynomial<number>::scale(*ck, 2.);
     	  Polynomial<number>::multiply(*ck, std::sqrt(2.*k+1.));
   	  shifted_coefficients[k] = ck;
