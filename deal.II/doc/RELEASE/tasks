@@ -12,7 +12,7 @@ when a new release shall be issued:
 2/ adjust news.html. Crosslink changes file. If necessary link an
   announcement.
 
-3/ adjust download.html.
+3/ adjust download.html and files in doc/main.
 
 4/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
@@ -42,7 +42,10 @@ when a new release shall be issued:
 
 12/ put it on the web server
 
-13/ wait overnight
+13/ Log in as deal and execute "makedoc_version x.y.z"
+    Report errors!!!
 
-14/ announce the release
+14/ wait overnight
+
+15/ announce the release
        follow the instructions in ./announce.pl
