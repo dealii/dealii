@@ -1,4 +1,4 @@
-/* base/include/base/config.h.in.  Generated from configure.in by autoheader.  */
+/* base/include/base/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
 
 //----------------------------  config.h  ---------------------------
@@ -45,6 +45,10 @@
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
 #undef DEAL_II_HAVE_TECPLOT
+
+/* Defined if the compiler refuses to compile the definition of a function
+   that was previously declared abstract. */
+#undef DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG
 
 /* Define if we have to work around a bug in Sun's Forte compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.
@@ -101,7 +105,7 @@
 /* Define if the compiler provides __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
-/* Define to 1 if you have the `gethostname' function. */
+/* Define if you have the `gethostname' function. */
 #undef HAVE_GETHOSTNAME
 
 /* Availability of the MA27 algorithm from HSL */
@@ -137,21 +141,6 @@
    that use this function. The question whether we have to do so is controlled
    by the preprocessor variable. */
 #undef NO_HAVE_GETRUSAGE
-
-/* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
-
-/* Define to the full name of this package. */
-#undef PACKAGE_NAME
-
-/* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
-
-/* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
-
-/* Define to the version of this package. */
-#undef PACKAGE_VERSION
 
 /* Define if we have to work around a bug in IBM's xlC compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.

@@ -137,8 +137,27 @@ class Function : public FunctionTime,
 				      * the destructor is implemented
 				      * (despite it being pure
 				      * virtual).
+				      *
+				      * Note: Compaq's cxx compiler
+				      * does not allow defining a
+				      * function that was declared
+				      * pure. It simply refuses to
+				      * instantiate the function when
+				      * it later sees it, but also
+				      * does not generate a respective
+				      * function itself, which then
+				      * leads to linker errors
+				      * claiming that the destructor
+				      * of this class is missing. We
+				      * therefore only make the
+				      * function abstract if the
+				      * compiler can handle this.
 				      */
-    virtual ~Function () = 0;
+    virtual ~Function ()
+#ifndef DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG
+      = 0
+#endif
+    ;
     
 				     /**
 				      * Return the value of the

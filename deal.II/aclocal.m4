@@ -318,10 +318,6 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
   
-          dnl if necessary: -shared, -pthread 
-          dnl Should one use -compress? -distinguish_nested_enums?
-          dnl                -nousing_std? -pch? -noimplicit_include?
-
           CXXFLAGSPIC="-shared"
           LDFLAGSPIC="-shared"
           ;;
@@ -730,10 +726,15 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
         CXXFLAGSG = "$CXXFLAGSG -threaded"  
         CXXFLAGSO = "$CXXFLAGSO -threaded"
       else
-        dnl Other compiler
-        AC_MSG_ERROR(No threading compiler options for this C++ compiler
-                     specified at present)
-        exit 1
+        if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
+          CXXFLAGSG = "$CXXFLAGSG -pthread"  
+          CXXFLAGSO = "$CXXFLAGSO -pthread"
+        else
+          dnl Other compiler
+          AC_MSG_ERROR(No threading compiler options for this C++ compiler
+                       specified at present)
+          exit 1
+        fi
       fi
     fi
   fi
@@ -1712,6 +1713,59 @@ AC_DEFUN(DEAL_II_CHECK_CONST_MEM_FUN_PTR_BUG, dnl
                       attribute at a member function pointer with a constant class.
                       See the aclocal.m4 file in the top-level directory
                       for a description of this bug.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl DEC/Compaq's cxx compiler does not want us to implement
+dnl virtual functions that were declared abstract before. We do
+dnl this with the destructor of the Function class, since we want
+dnl to avoid people making objects of that class, but all functions
+dnl have default implementations, so the class is not abstract
+dnl without that. Since every derived class has a destructor, it
+dnl is sufficient to mark the destructor =0.
+dnl
+dnl Unfortunately, cxx refuses to grok that. It sees the respective
+dnl function in the .cc file, but does not instantiate it, leading
+dnl to linker errors. Thus, check this misfeature, and if present
+dnl simply do not mark the function abstract for this particular
+dnl compiler.
+dnl
+dnl Usage: DEAL_II_CHECK_IMPLEMENTED_PURE_FUNCTION_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_IMPLEMENTED_PURE_FUNCTION_BUG, dnl
+[
+  AC_MSG_CHECKING(for bug with implementing pure functions)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <int dim>
+	struct Function
+	{
+	  public:
+	    virtual ~Function () = 0;
+	};
+
+	template <int dim>
+	Function<dim>::~Function ()
+	{};
+
+	template class Function<1>;
+	template Function<1>::~Function();
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG, 1, 
+                     [Defined if the compiler refuses to compile the definition
+		      of a function that was previously declared abstract.])
     ])
 ])
 
