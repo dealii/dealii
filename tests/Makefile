@@ -16,9 +16,6 @@ fe:
 deal.II:
 	cd deal.II ; $(MAKE)
 
-big-tests:
-	cd big-tests ; $(MAKE)
-
 report:
 	@for i in base lac fe deal.II ; do \
 		echo =======Report: $$i ======= ; \
