@@ -1177,10 +1177,9 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 				   // Find position of entry
   while (i<end && data[i].column < col) ++i;
   
-  Entry* entry = &data[i];
 				   // entry found
-  if (entry->column == col)
-    return entry;
+  if (i != end && data[i].column == col)
+    return &data[i];
 
 				   // Now, we must insert the new
 				   // entry and move all successive
@@ -1195,7 +1194,6 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 	{
 					   // Insert new entries
 	  data.insert(data.begin()+end, increment, Entry());
-	  entry = &data[i];
 					   // Update starts of
 					   // following rows
 	  for (unsigned int rn=row+1;rn<row_info.size();++rn)
@@ -1208,9 +1206,9 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 					   // does not increase
 					   // performance.
 	  data.push_back(Entry());
-	  entry = &data[i];
 	}
     }
+  Entry* entry = &data[i];
 				   // Save original entry
   Entry temp = *entry;
 				   // Insert new entry here to
