@@ -34,6 +34,24 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       <strong>
+       Deprecated: The functions <code
+       class="member">FEValuesBase::get_shape_values</code>, <code
+       class="member">FEValuesBase::get_shape_grads</code>, and <code
+       class="member">FEValuesBase::get_shape_2nd_derivatives</code> are
+       now deprecated as they expose too much of the internal data
+       structure of their class, and interfere with plans for the
+       extension of this and related classes. The functions still
+       exist in this release of the library, but will be removed in
+       the next version. Use the <code
+       class="member">FEValuesBase::shape_value</code> and alike
+       functions as a replacement.
+       </strong>
+       <br>
+       (WB 2002/06/03)
+       </p>
+
+  <li> <p>
        Added: The <code>configure</code> script now recognizes Intel's ECC
        compiler when run on Itanium systems with this compiler present.
        The ECC compiler is similar to the ICC compiler but it acccepts some
@@ -153,7 +171,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p> 
        New: The <code class="class">vector2d</code> row accessor
        classes now have member functions <code
-       class="member">begin<code> and <code class="member">end<code>
+       class="member">begin</code> and <code class="member">end</code>
        which allow iterating over the elements of a row of such an
        object. 
        <br>
@@ -164,7 +182,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        New: The <code class="class">Legendre</code> and
        <code class="class">LagrangeEquidistant</code> classes now have
        static member functions <code
-       class="member">generate_complete_basis<code> which returns an
+       class="member">generate_complete_basis</code> which returns an
        array of polynomial objects spanning the complete space up to a
        specified order in 1d. This may be used to generate the
        respective polynomial spaces in higher space dimensions.
@@ -205,7 +223,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        uses <code class="member">__builtin_expect</code> if the
        compiler supports this. This indicates to the compiler that we
        expect the condition to be true and that throwing an exception
-       is a rare case.
+       is a rare case. By this information, the compiler can help the
+       branch prediction unit of modern processors to better predict
+       which direction a branch will take.
        <br>
        (WB 2002/03/13)
        </p>
