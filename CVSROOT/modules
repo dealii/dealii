@@ -26,3 +26,5 @@
 # spread out over the entire source repository.
 newdeal &common &base &lac &deal.II &doc
 mg reports/multigrid
+gk projects/gk
+base -i make
