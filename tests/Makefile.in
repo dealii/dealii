@@ -1,7 +1,7 @@
 # $Id$
 # Common Makefile for all test directories
 
-all: base lac fe deal.II big-test
+all: base lac fe deal.II big-tests
 
 base:
 	cd base ; $(MAKE) D=@DEAL2_DIR@
@@ -15,8 +15,8 @@ fe:
 deal.II:
 	cd deal.II ; $(MAKE) D=@DEAL2_DIR@
 
-big-test:
-	cd big-test ; $(MAKE) D=@DEAL2_DIR@
+big-tests:
+	cd big-tests ; $(MAKE) D=@DEAL2_DIR@
 
 
 clean: clean-base clean-lac clean-deal.II clean-fe
@@ -36,4 +36,4 @@ clean-deal.II:
 clean-big:
 	cd big-tests ; $(MAKE) clean
 
-.PHONY : all base lac fe deal.II big-test clean clean-base clean-lac clean-fe clean-deal.II clean-big
+.PHONY : all base lac fe deal.II big-tests clean clean-base clean-lac clean-fe clean-deal.II clean-big
