@@ -14,6 +14,7 @@ dnl
 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
+AC_REVISION($Revision$)
 AC_INIT(base)
 
 
