@@ -615,8 +615,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 
   const unsigned int n_additional_points=
     gnuplot_flags.n_boundary_face_points;
-  const unsigned int n_points=GeometryInfo<dim>::vertices_per_face+n_additional_points;
-
+  const unsigned int n_points=2+n_additional_points;
+  
   typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
   const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
 
@@ -626,15 +626,21 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 				   // used to probe boundary points at
 				   // curved faces
   Quadrature<dim> *q_projector=0;
+  std::vector<Point<1> > boundary_points;
   if (mapping!=0)
     {
-      std::vector<Point<dim-1> > boundary_points(n_points);
+      boundary_points.resize(n_points);
       boundary_points[0][0]=0;
       boundary_points[n_points-1][0]=1;      
       for (unsigned int i=1; i<n_points-1; ++i)
         boundary_points[i](0)= 1.*i/(n_points-1);
 
-      Quadrature<dim-1> quadrature(boundary_points);
+      std::vector<double> dummy_weights(n_points, 1./n_points);
+      Quadrature<1> quadrature1d(boundary_points, dummy_weights);
+
+				       // tensor product of points,
+				       // only one copy
+      QIterated<dim-1> quadrature(quadrature1d, 1);
       q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
     }
   
@@ -767,22 +773,97 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	   
 	  case 3:
 	  {
-//TODO:[RH] curved boundaries in 3d gnuplot not supported	    
-	    Assert (mapping == 0, ExcNotImplemented());	    
-            
-            for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-              {
-                const typename Triangulation<dim>::face_iterator
-                  face = cell->face(face_no);
+	    if (mapping==0 || n_points==2 || !cell->has_boundary_lines())
+	      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+		{
+		  const typename Triangulation<dim>::face_iterator
+		    face = cell->face(face_no);
 
-                for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-                  out << face->vertex(v)
-                      << ' ' << cell->level()
-                      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
-                out << std::endl;
-                out << std::endl;
-              }
-	    break;
+		  out << "#face" << face_no << std::endl;
+		  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+		    out << face->vertex(v)
+			<< ' ' << cell->level()
+			<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+		  out << face->vertex(0)
+		      << ' ' << cell->level()
+		      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;		  
+		  out << std::endl;
+		  out << std::endl;
+		}
+	    else
+	      {
+		for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+		  {
+		    const typename Triangulation<dim>::face_iterator
+		      face = cell->face(face_no);
+
+		    if (face->at_boundary())
+		      {
+			const unsigned int offset=face_no*n_points*n_points;
+			for (unsigned int i=0; i<n_points-1; ++i)
+			  for (unsigned int j=0; j<n_points-1; ++j)
+			    {
+			      const Point<dim> p0=mapping->transform_unit_to_real_cell(
+				cell, q_projector->point(offset+i*n_points+j));
+			      out << p0
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			      out << (mapping->transform_unit_to_real_cell(
+					cell, q_projector->point(offset+(i+1)*n_points+j)))
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			      out << (mapping->transform_unit_to_real_cell(
+					cell, q_projector->point(offset+(i+1)*n_points+j+1)))
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			      out << (mapping->transform_unit_to_real_cell(
+					cell, q_projector->point(offset+i*n_points+j+1)))
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			      out << p0
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			      out << std::endl << std::endl;
+			    }
+		      }
+		    else
+		      {
+			for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+			  {
+			    const typename Triangulation<dim>::line_iterator
+			      line=face->line(l);
+			    
+			    const Point<dim> &v0=line->vertex(0),
+					     &v1=line->vertex(1);
+			    if (line->at_boundary())
+			      {
+								 // transform_real_to_unit_cell
+								 // could be replaced by using
+								 // QProjector<3>::project_to_line
+								 // which is not yet implemented
+				const Point<dim> u0=mapping->transform_real_to_unit_cell(cell, v0),
+						 u1=mapping->transform_real_to_unit_cell(cell, v1);
+				
+				for (unsigned int i=0; i<n_points; ++i)
+				  out << (mapping->transform_unit_to_real_cell
+					  (cell, (1-boundary_points[i][0])*u0+boundary_points[i][0]*u1))
+				      << ' ' << cell->level()
+				      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			      }
+			    else
+			      out << v0
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+				  << v1
+				  << ' ' << cell->level()
+				  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			    out << std::endl << std::endl;
+			  }
+		      }
+		  }
+	      }
+	    
+ 	    break;
 	  };
 	};
     };
