@@ -82,6 +82,13 @@ int main()
       prec_sor.initialize(A, 1.2);
       PreconditionSSOR<> prec_ssor;
       prec_ssor.initialize(A, 1.2);
+
+      std::vector<unsigned int> permutation(dim);
+      for (unsigned int i=0;i<dim;++i)
+	permutation(i) = dim-i-1;
+      
+      PreconditionPSOR<> prec_psor;
+      prec_psor.initialize(A, permutation, 1.2);
       
       Vector<double>  f(dim);
       Vector<double>  u(dim);
@@ -136,6 +143,13 @@ int main()
 	  check_method(cg,A,u,f,prec_sor);
 	  check_method(bicgstab,A,u,f,prec_sor);
 	  check_method(gmres,A,u,f,prec_sor);
+	  
+	  deallog.push("psor");
+	  
+	  check_method(rich,A,u,f,prec_psor);
+	  check_method(cg,A,u,f,prec_psor);
+	  check_method(bicgstab,A,u,f,prec_psor);
+	  check_method(gmres,A,u,f,prec_psor);
 	  
 	  deallog.pop();
 	}
