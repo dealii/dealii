@@ -1,6 +1,6 @@
 //----------------------------  full_matrix_vector_07.cc  ---------------------------
-//    $Id$
-//    Version: $Name$ 
+//    full_matrix_vector_07.cc,v 1.3 2004/02/26 17:25:34 wolf Exp
+//    Version:  
 //
 //    Copyright (C) 2004 by the deal.II authors
 //
@@ -56,7 +56,7 @@ void test (Vector<double> &v,
       Assert (x(i) == result, ExcInternalError());
     }
 
-  Assert (s == x.l2_norm(), ExcInternalError());
+  Assert (std::fabs((s - x.l2_norm())/s) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
