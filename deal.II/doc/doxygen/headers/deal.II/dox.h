@@ -11,3 +11,24 @@
 //
 //-------------------------------------------------------------------------
 
+/**
+ * @defgroup grid Grid Handling
+ */
+
+/**
+ * @defgroup dofs Handling of degrees of freedom
+ */
+
+/**
+ * @defgroup febase Finite element access classes
+ */
+
+/**
+ * @defgroup fe Finite element shape functions
+ */
+
+/**
+ * @defgroup mg Multilevel support
+ */
+
+

@@ -22,6 +22,9 @@ template <int dim> class PolynomialSpace;
 template <int dim> class MappingQ;
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Discontinuous finite elements evaluated at the mapped quadrature points.
  *
@@ -437,6 +440,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
     friend class MappingQ<dim>;
 };
 
+/*@}*/
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)

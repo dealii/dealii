@@ -23,6 +23,9 @@ template <int dim> class PolynomialSpace;
 template <int dim> class MappingQ;
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Discontinuous finite elements based on Legendre polynomials.
  *
@@ -458,13 +461,14 @@ class FE_DGP : public FiniteElement<dim>
     template <int dim1> friend class FE_DGP;
 
 				     /**
-				      * Allows @p{MappingQ} class to
+				      * Allows @p{MappingQ} class
 				      * access to build_renumbering
 				      * function.
 				      */
     friend class MappingQ<dim>;
 };
 
+/*@}*/
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)

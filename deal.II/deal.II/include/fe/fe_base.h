@@ -28,6 +28,8 @@
 
 template<int dim> class FESystem;
 
+/*!@addtogroup febase */
+/*@{*/
 
 
 /**
@@ -1710,7 +1712,7 @@ class FiniteElementBase : public Subscriptor,
                                       */
     friend class InternalDataBase;
 };
-
+/*@}*/
 
 template <int dim>
 inline

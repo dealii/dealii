@@ -21,6 +21,8 @@
 template <int dim> class MappingQ;
 
 
+/*!@addtogroup fe */
+/*@{*/
 
 /**
  * Implementation of continuous Raviart-Thomas elements for the space
@@ -568,6 +570,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
     template <int dim1> friend class FE_RaviartThomas;
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

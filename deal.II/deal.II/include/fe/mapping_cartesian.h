@@ -20,6 +20,9 @@
 #include <fe/mapping.h>
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Mapping of an axis-parallel cell.
  *
@@ -261,7 +264,7 @@ class MappingCartesian : public Mapping<dim>
     static const unsigned int invalid_face_number = static_cast<unsigned int>(-1);    
 };
 
-
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

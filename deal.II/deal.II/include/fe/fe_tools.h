@@ -28,6 +28,9 @@ class ConstraintMatrix;
 #include <vector>
 #include <string>
 
+/*!@addtogroup febase */
+/*@{*/
+
 /**
  * This class performs interpolations and extrapolations of discrete
  * functions of one @p{FiniteElement} @p{fe1} to another @p{FiniteElement}
@@ -594,7 +597,7 @@ class FETools
     get_fe_from_name_aux (const std::string &name);    
 };
 
-
+/*@}*/
 
 /*----------------------------   fe_tools.h     ---------------------------*/
 /* end of #ifndef __deal2__fe_tools_H */

@@ -208,23 +208,53 @@ class TriaDimensionInfo<1>
 {
   public:
     typedef TriaRawIterator<1,CellAccessor<1> >    raw_line_iterator;
+				     /**
+				      * Iterator for lines.
+				      */
     typedef TriaIterator<1,CellAccessor<1> >       line_iterator;
+				     /**
+				      *	Iterator for active lines.
+				      */
     typedef TriaActiveIterator<1,CellAccessor<1> > active_line_iterator;
-
+    
     typedef void * raw_quad_iterator;
+				     /**
+				      * Iterator for quads. Void in 1D.
+				      */
     typedef void * quad_iterator;
+				     /**
+				      * Iterator for active quads. Void in 1D.
+				      */
     typedef void * active_quad_iterator;
 
     typedef void * raw_hex_iterator;
+				     /**
+				      * Iterator for hexahedra. Void in 1D.
+				      */
     typedef void * hex_iterator;
+				     /**
+				      * Iterator for active hexahedra. Void in 1D.
+				      */
     typedef void * active_hex_iterator;
 
     typedef raw_line_iterator    raw_cell_iterator;
+				     /**
+				      * Iterator for cells.
+				      */
     typedef line_iterator        cell_iterator;
+				     /**
+				      * Iterator active for cells.
+				      */
     typedef active_line_iterator active_cell_iterator;
 
     typedef void * raw_face_iterator;
+				     /**
+				      * Iterator for faces. Void in 1D.
+				      */
     typedef void * face_iterator;
+				     /**
+				      * Iterator for active faces. Void in 1D.
+				      */
     typedef void * active_face_iterator;
 };
 
@@ -269,23 +299,53 @@ class TriaDimensionInfo<2>
 {
   public:
     typedef TriaRawIterator<2,TriaObjectAccessor<1, 2> >    raw_line_iterator;
+    				     /**
+				      * Iterator for lines.
+				      */
     typedef TriaIterator<2,TriaObjectAccessor<1, 2> >       line_iterator;
+    				     /**
+				      * Iterator for active lines.
+				      */
     typedef TriaActiveIterator<2,TriaObjectAccessor<1, 2> > active_line_iterator;
     
     typedef TriaRawIterator<2,CellAccessor<2> >    raw_quad_iterator;
+    				     /**
+				      * Iterator for quadrilaterals.
+				      */
     typedef TriaIterator<2,CellAccessor<2> >       quad_iterator;
+    				     /**
+				      * Iterator for active quadrilaterals.
+				      */
     typedef TriaActiveIterator<2,CellAccessor<2> > active_quad_iterator;
 
     typedef void * raw_hex_iterator;
+    				     /**
+				      * Iterator for hexahedra. Void in 2D.
+				      */
     typedef void * hex_iterator;
+    				     /**
+				      * Iterator for active hexahedra. Void in 2D.
+				      */
     typedef void * active_hex_iterator;
 
     typedef raw_quad_iterator    raw_cell_iterator;
+    				     /**
+				      * Iterator for cells.
+				      */
     typedef quad_iterator        cell_iterator;
+    				     /**
+				      * Iterator for active cells.
+				      */
     typedef active_quad_iterator active_cell_iterator;
 
     typedef raw_line_iterator    raw_face_iterator;
+				     /**
+				      * Iterator for faces.
+				      */
     typedef line_iterator        face_iterator;
+				     /**
+				      * Iterator for active faces.
+				      */
     typedef active_line_iterator active_face_iterator;    
 };
 
@@ -315,23 +375,53 @@ class TriaDimensionInfo<3>
 {
   public:
     typedef TriaRawIterator<3,TriaObjectAccessor<1, 3> >    raw_line_iterator;
+				     /**
+				      * Iterator for lines.
+				      */
     typedef TriaIterator<3,TriaObjectAccessor<1, 3> >       line_iterator;
+				     /**
+				      * Iterator for active lines.
+				      */
     typedef TriaActiveIterator<3,TriaObjectAccessor<1, 3> > active_line_iterator;
     
     typedef TriaRawIterator<3,TriaObjectAccessor<2, 3> >    raw_quad_iterator;
+				     /**
+				      * Iterator for quadrilaterals.
+				      */
     typedef TriaIterator<3,TriaObjectAccessor<2, 3> >       quad_iterator;
+				     /**
+				      * Iterator for active quadrilaterals.
+				      */
     typedef TriaActiveIterator<3,TriaObjectAccessor<2, 3> > active_quad_iterator;
 
     typedef TriaRawIterator<3,CellAccessor<3> >    raw_hex_iterator;
+				     /**
+				      * Iterator for hexahedra.
+				      */
     typedef TriaIterator<3,CellAccessor<3> >       hex_iterator;
+				     /**
+				      * Iterator for active hexahedra.
+				      */
     typedef TriaActiveIterator<3,CellAccessor<3> > active_hex_iterator;
 
     typedef raw_hex_iterator    raw_cell_iterator;
+				     /**
+				      * Iterator for cells.
+				      */
     typedef hex_iterator        cell_iterator;
+				     /**
+				      * Iterator for active cells.
+				      */
     typedef active_hex_iterator active_cell_iterator;
 
     typedef raw_quad_iterator    raw_face_iterator;
+				     /**
+				      * Iterator for faces.
+				      */
     typedef quad_iterator        face_iterator;
+				     /**
+				      * Iterator for active faces.
+				      */
     typedef active_quad_iterator active_face_iterator;    
 };
 

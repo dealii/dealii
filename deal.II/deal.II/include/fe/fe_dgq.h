@@ -22,6 +22,9 @@ template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Discontinuous tensor product elements based on equidistant support points.
  *
@@ -512,6 +515,7 @@ class FE_DGQ : public FiniteElement<dim>
     template <int dim1> friend class MappingQ;
 };
 
+/*@}*/
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)

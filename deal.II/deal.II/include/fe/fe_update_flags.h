@@ -17,6 +17,9 @@
 #include <base/config.h>
 
 
+/*!@addtogroup febase */
+/*@{*/
+
 /**
  * Provide a set of flags which tells the @p{FEValues<>::reinit}
  * function, which fields are to be updated for each cell. E.g. if you
@@ -162,5 +165,7 @@ operator & (const UpdateFlags& f1, const UpdateFlags& f2)
   result &= f2;
   return result;
 }
+
+/*@}*/
 
 #endif

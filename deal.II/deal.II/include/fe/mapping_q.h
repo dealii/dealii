@@ -21,6 +21,8 @@
 template <int dim> class TensorProductPolynomials;
 
 
+/*!@addtogroup fe */
+/*@{*/
 
 /**
  * Mapping class that uses Qp-mappings on boundary cells. The mapping
@@ -511,6 +513,7 @@ class MappingQ : public MappingQ1<dim>
     static const bool use_mapping_q_on_all_cells = false;
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

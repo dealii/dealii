@@ -22,6 +22,9 @@
 #include <fe/mapping.h>
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Mapping of general quadrilateral/hexahedra by d-linear shape
  * functions.
@@ -586,6 +589,8 @@ class MappingQ1 : public Mapping<dim>
 				      */
     static const unsigned int n_shape_functions = GeometryInfo<dim>::vertices_per_cell;
 };
+
+/*@}*/
 
 /*----------------------------------------------------------------------*/
 

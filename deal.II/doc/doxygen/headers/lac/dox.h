@@ -12,13 +12,6 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup LAC The Linear Algebra Classes
- * @brief All the classes for linear algebra
- * Bla bla bla
- * @{
- */
-
-/**
  * @defgroup Solvers Linear Solver classes
  *
  * Here we collect iterative solvers and some control classes. All
@@ -33,11 +26,19 @@
 /**
  * @defgroup Matrices Matrix classes
  * @{
+ *
+ * All matrices in this library have a common minimal interface,
+ * defined through MATRIX. This interface consists of functions for
+ * multiplication with appropriate vectors.
+ *
  */
 
 /**
  * @defgroup Matrix1 Basic matrices
- */
+ *
+ * These are the actual matrix classes provided by deal.II. They all
+ * provide some interface for allocating memory and entering values.
+*/
 
 
 /**
@@ -46,10 +47,5 @@
 
 /**
  * @defgroup Preconditioners Preconditioners
- * @}
- */
-
-
-/**
  * @}
  */

@@ -24,6 +24,8 @@ template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 template <int dim> class FESystem;
 
+/*!@addtogroup febase */
+/*@{*/
 
 /**
  * Common interface of all finite elements. Here, the functions to
@@ -355,5 +357,6 @@ class FiniteElement : public FiniteElementBase<dim>
     friend class FESystem<dim>;
 };
 
+/*@}*/
 
 #endif

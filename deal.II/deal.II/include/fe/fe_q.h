@@ -22,6 +22,8 @@ template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
 
+/*!@addtogroup fe */
+/*@{*/
 
 /**
  * Implementation of Lagrange finite elements @p{Qp} that yield the
@@ -843,6 +845,7 @@ class FE_Q : public FiniteElement<dim>
     template <int dim1> friend class FE_Q;
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

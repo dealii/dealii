@@ -33,6 +33,8 @@
 
 template <int dim> class Quadrature;
 
+/*!@addtogroup febase */
+/*@{*/
 
 /**
  * Contains all data vectors for @p{FEValues}.
@@ -1180,7 +1182,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
     void initialize (const UpdateFlags update_flags);
 };
 
-
+/*@}*/
 
 /*------------------------ Inline functions: FEValuesBase ------------------------*/
 

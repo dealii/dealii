@@ -29,6 +29,9 @@ template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 
 
+/*!@addtogroup febase */
+/*@{*/
+
 /**
  * Abstract base class for mapping classes.
  *
@@ -524,6 +527,7 @@ class Mapping : public Subscriptor
   friend class FESubfaceValues<dim>;
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

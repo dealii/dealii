@@ -20,6 +20,8 @@
 template <int dim> class MappingQ;
 
 
+/*!@addtogroup fe */
+/*@{*/
 
 /**
  * Implementation of continuous Nedelec elements for the space
@@ -608,6 +610,7 @@ class FE_Nedelec : public FiniteElement<dim>
     template <int dim1> friend class FE_Nedelec;
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

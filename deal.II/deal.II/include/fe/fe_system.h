@@ -23,6 +23,9 @@
 #include <utility>
 
 
+/*!@addtogroup febase */
+/*@{*/
+
 /**
  * This class provides an interface to group several elements together
  * into one. To the outside world, the resulting object looks just
@@ -897,6 +900,7 @@ class FESystem : public FiniteElement<dim>
     };
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

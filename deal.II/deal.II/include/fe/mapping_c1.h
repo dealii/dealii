@@ -18,6 +18,9 @@
 #include <fe/mapping_q.h>
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Mapping class that uses C1 (continuously differentiable) cubic
  * mappings of the boundary. This class is built atop of
@@ -101,6 +104,7 @@ class MappingC1 : public MappingQ<dim>
 			    std::vector<Point<dim> > &a) const;
 };
 
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

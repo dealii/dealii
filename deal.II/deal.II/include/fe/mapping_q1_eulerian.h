@@ -18,6 +18,9 @@
 #include <fe/mapping_q1.h> 
 
 
+/*!@addtogroup fe */
+/*@{*/
+
 /**
  * Eulerian mapping of general unit cells by d-linear shape
  * functions. Each cell is thus shifted in space by values given to
@@ -148,5 +151,6 @@ class MappingQ1Eulerian : public MappingQ1<dim>
     
 };
 
+/*@}*/
 
 #endif
