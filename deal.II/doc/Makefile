@@ -1,6 +1,11 @@
 # $Id$
 
 
+D = ..
+include $D/common/Make.global_options
+
+
+
 # generic targets
 default: autogen-doc tutorial development glossary validate-xrefs
 
@@ -28,9 +33,11 @@ glossary:
 
 validate-xrefs:
 	@echo "Validating cross-references in HTML files."
+	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl *html
 	cd tutorial ; $(MAKE) validate-xrefs
 	cd development ; $(MAKE) validate-xrefs
 	cd glossary ; $(MAKE) validate-xrefs
+	cd publications ; $(MAKE) validate-xrefs
 
 
 clean:
