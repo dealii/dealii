@@ -121,7 +121,7 @@ class FEValuesData
 				      * derivatives.
 				      */
     typedef std::vector<std::vector<Tensor<2,dim> > > GradGradVector;
-    
+
 				     /**
 				      * Store the values of the shape
 				      * functions at the quadrature
@@ -366,6 +366,9 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * Destructor.
 				      */
     ~FEValuesBase ();
+				     /// @name ShapeAccess Access to shape function values
+				     //@{
+    
 				     /**
 				      * Value of a shape function at a
 				      * quadrature point on the cell,
@@ -433,6 +436,138 @@ class FEValuesBase : protected FEValuesData<dim>
 				  const unsigned int point_no,
 				  const unsigned int component) const;
 
+    				     /**
+				      * Compute the gradient of the
+				      * @p ith shape function at the
+				      * @p j quadrature point with
+				      * respect to real cell
+				      * coordinates.  If you want to
+				      * get the derivative in one of
+				      * the coordinate directions, use
+				      * the appropriate function of
+				      * the Tensor class to
+				      * extract one component. Since
+				      * only a reference to the
+				      * gradient's value is returned,
+				      * there should be no major
+				      * performance drawback.
+				      *
+				      * If the shape function is
+				      * vector-valued, then this
+				      * returns the only non-zero
+				      * component. If the shape
+				      * function has more than one
+				      * non-zero component (i.e. it is
+				      * not primitive), then throw an
+				      * exception of type
+				      * ExcShapeFunctionNotPrimitive. In
+				      * that case, use the
+				      * shape_grad_component()
+				      * function.
+				      */
+    const Tensor<1,dim> &
+    shape_grad (const unsigned int function,
+		const unsigned int quadrature_point) const;
+
+				     /**
+				      * Return one vector component of
+				      * the gradient of a shape function
+				      * at a quadrature point. If the
+				      * finite element is scalar, then
+				      * only component zero is allowed
+				      * and the return value equals
+				      * that of the shape_grad()
+				      * function. If the finite
+				      * element is vector valued but
+				      * all shape functions are
+				      * primitive (i.e. they are
+				      * non-zero in only one
+				      * component), then the value
+				      * returned by shape_grad()
+				      * equals that of this function
+				      * for exactly one
+				      * component. This function is
+				      * therefore only of greater
+				      * interest if the shape function
+				      * is not primitive, but then it
+				      * is necessary since the other
+				      * function cannot be used.
+				      */
+    Tensor<1,dim>
+    shape_grad_component (const unsigned int function_no,
+			  const unsigned int point_no,
+			  const unsigned int component) const;
+
+    				     /**
+				      * Second derivatives of
+				      * the @p function_noth shape function at
+				      * the @p point_noth quadrature point
+				      * with respect to real cell
+				      * coordinates. If you want to
+				      * get the derivatives in one of
+				      * the coordinate directions, use
+				      * the appropriate function of
+				      * the @p Tensor class to
+				      * extract one component. Since
+				      * only a reference to the
+				      * derivative values is returned,
+				      * there should be no major
+				      * performance drawback.
+				      *
+				      * If the shape function is
+				      * vector-valued, then this
+				      * returns the only non-zero
+				      * component. If the shape
+				      * function has more than one
+				      * non-zero component (i.e. it is
+				      * not primitive), then throw an
+				      * exception of type
+				      * @p ExcShapeFunctionNotPrimitive. In
+				      * that case, use the
+				      * shape_grad_grad_component()
+				      * function.
+				      */
+    const Tensor<2,dim> &
+    shape_2nd_derivative (const unsigned int function_no,
+			  const unsigned int point_no) const;
+
+
+				     /**
+				      * Return one vector component of
+				      * the gradient of a shape
+				      * function at a quadrature
+				      * point. If the finite element
+				      * is scalar, then only component
+				      * zero is allowed and the return
+				      * value equals that of the
+				      * @p shape_2nd_derivative
+				      * function. If the finite
+				      * element is vector valued but
+				      * all shape functions are
+				      * primitive (i.e. they are
+				      * non-zero in only one
+				      * component), then the value
+				      * returned by
+				      * @p shape_2nd_derivative
+				      * equals that of this function
+				      * for exactly one
+				      * component. This function is
+				      * therefore only of greater
+				      * interest if the shape function
+				      * is not primitive, but then it
+				      * is necessary since the other
+				      * function cannot be used.
+				      */
+    Tensor<2,dim>
+    shape_2nd_derivative_component (const unsigned int function_no,
+				    const unsigned int point_no,
+				    const unsigned int component) const;
+    
+
+				     //@}
+				     /// @name FunctionAccess Access to values of global finite element functions
+				     //@{
+    
 				     /**
 				      * Returns the values of the
 				      * finite element function
@@ -570,68 +705,6 @@ class FEValuesBase : protected FEValuesData<dim>
 			      const std::vector<unsigned int>& indices,
 			      std::vector<Vector<number> >& values) const;
 
-    				     /**
-				      * Compute the gradient of the
-				      * @p ith shape function at the
-				      * @p j quadrature point with
-				      * respect to real cell
-				      * coordinates.  If you want to
-				      * get the derivative in one of
-				      * the coordinate directions, use
-				      * the appropriate function of
-				      * the Tensor class to
-				      * extract one component. Since
-				      * only a reference to the
-				      * gradient's value is returned,
-				      * there should be no major
-				      * performance drawback.
-				      *
-				      * If the shape function is
-				      * vector-valued, then this
-				      * returns the only non-zero
-				      * component. If the shape
-				      * function has more than one
-				      * non-zero component (i.e. it is
-				      * not primitive), then throw an
-				      * exception of type
-				      * ExcShapeFunctionNotPrimitive. In
-				      * that case, use the
-				      * shape_grad_component()
-				      * function.
-				      */
-    const Tensor<1,dim> &
-    shape_grad (const unsigned int function,
-		const unsigned int quadrature_point) const;
-
-				     /**
-				      * Return one vector component of
-				      * the gradient of a shape function
-				      * at a quadrature point. If the
-				      * finite element is scalar, then
-				      * only component zero is allowed
-				      * and the return value equals
-				      * that of the shape_grad()
-				      * function. If the finite
-				      * element is vector valued but
-				      * all shape functions are
-				      * primitive (i.e. they are
-				      * non-zero in only one
-				      * component), then the value
-				      * returned by shape_grad()
-				      * equals that of this function
-				      * for exactly one
-				      * component. This function is
-				      * therefore only of greater
-				      * interest if the shape function
-				      * is not primitive, but then it
-				      * is necessary since the other
-				      * function cannot be used.
-				      */
-    Tensor<1,dim>
-    shape_grad_component (const unsigned int function_no,
-			  const unsigned int point_no,
-			  const unsigned int component) const;
-
 				     /**
 				      * Compute the gradients of the finite
 				      * element function characterized
@@ -712,71 +785,28 @@ class FEValuesBase : protected FEValuesData<dim>
     void get_function_grads (const InputVector               &fe_function,
 			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
-    				     /**
-				      * Second derivatives of
-				      * the @p function_noth shape function at
-				      * the @p point_noth quadrature point
-				      * with respect to real cell
-				      * coordinates. If you want to
-				      * get the derivatives in one of
-				      * the coordinate directions, use
-				      * the appropriate function of
-				      * the @p Tensor class to
-				      * extract one component. Since
-				      * only a reference to the
-				      * derivative values is returned,
-				      * there should be no major
-				      * performance drawback.
-				      *
-				      * If the shape function is
-				      * vector-valued, then this
-				      * returns the only non-zero
-				      * component. If the shape
-				      * function has more than one
-				      * non-zero component (i.e. it is
-				      * not primitive), then throw an
-				      * exception of type
-				      * @p ExcShapeFunctionNotPrimitive. In
-				      * that case, use the
-				      * shape_grad_grad_component()
-				      * function.
+				     /**
+				      * Function gradient access with
+				      * more flexibility. see
+				      * get_function_values() with
+				      * corresponding arguments.
 				      */
-    const Tensor<2,dim> &
-    shape_2nd_derivative (const unsigned int function_no,
-			  const unsigned int point_no) const;
-
+    template <class InputVector>
+    void get_function_grads (const InputVector& fe_function,
+			     const std::vector<unsigned int>& indices,
+			     std::vector<Tensor<1,dim> >& gradients) const;
 
 				     /**
-				      * Return one vector component of
-				      * the gradient of a shape
-				      * function at a quadrature
-				      * point. If the finite element
-				      * is scalar, then only component
-				      * zero is allowed and the return
-				      * value equals that of the
-				      * @p shape_2nd_derivative
-				      * function. If the finite
-				      * element is vector valued but
-				      * all shape functions are
-				      * primitive (i.e. they are
-				      * non-zero in only one
-				      * component), then the value
-				      * returned by
-				      * @p shape_2nd_derivative
-				      * equals that of this function
-				      * for exactly one
-				      * component. This function is
-				      * therefore only of greater
-				      * interest if the shape function
-				      * is not primitive, but then it
-				      * is necessary since the other
-				      * function cannot be used.
+				      * Function gradient access with
+				      * more flexibility. see
+				      * get_function_values() with
+				      * corresponding arguments.
 				      */
-    Tensor<2,dim>
-    shape_2nd_derivative_component (const unsigned int function_no,
-				    const unsigned int point_no,
-				    const unsigned int component) const;
-    
+    template <class InputVector>
+    void get_function_grads (const InputVector& fe_function,
+			     const std::vector<unsigned int>& indices,
+			     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
+
 				     /**
 				      * Compute the tensor of second
 				      * derivatives of the finite
@@ -855,6 +885,7 @@ class FEValuesBase : protected FEValuesData<dim>
     void
     get_function_2nd_derivatives (const InputVector      &fe_function,
                                   std::vector<std::vector<Tensor<2,dim> > > &second_derivatives) const;
+				     //@}
     
 				     /**
 				      * Position of the @p ith

@@ -598,6 +598,43 @@ get_function_grads (const InputVector           &fe_function,
 }
 
 
+template <int dim>
+template <class InputVector>
+void FEValuesBase<dim>::get_function_grads (
+  const InputVector& fe_function,
+  const std::vector<unsigned int>& indices,
+  std::vector<Tensor<1,dim> > &values) const
+{
+  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
+				   // This function fills a single
+				   // component only
+  Assert (fe->n_components() == 1,
+	  ExcWrongNoOfComponents());
+				   // One index for each dof
+  Assert (indices.size() == dofs_per_cell,
+	  ExcDimensionMismatch(indices.size(), dofs_per_cell));
+				   // This vector has one entry for
+				   // each quadrature point
+  Assert (values.size() == n_quadrature_points,
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+  
+				   // initialize with zero
+  std::fill_n (values.begin(), n_quadrature_points, Tensor<1,dim>());
+  
+				   // add up contributions of trial
+				   // functions. note that here we
+				   // deal with scalar finite
+				   // elements, so no need to check
+				   // for non-primitivity of shape
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+      values[point] += (fe_function(indices[shape_func]) *
+			this->shape_grad(shape_func, point));
+}
+
+
+
 
 template <int dim>
 template <class InputVector>
@@ -648,6 +685,71 @@ get_function_grads (const InputVector                         &fe_function,
 	    tmp *= dof_values(shape_func);
 	    gradients[point][c] += tmp;
 	  };
+}
+
+
+
+template <int dim>
+template <class InputVector>
+void FEValuesBase<dim>::get_function_grads (
+  const InputVector& fe_function,
+  const std::vector<unsigned int>& indices,
+  std::vector<std::vector<Tensor<1,dim> > >& values) const
+{
+				   // One value per quadrature point
+  Assert (n_quadrature_points == values.size(),
+	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+  
+  const unsigned int n_components = fe->n_components();
+  
+				   // Size of indices must be a
+				   // multiple of dofs_per_cell such
+				   // that an integer number of
+				   // function values is generated in
+				   // each point.
+  Assert (indices.size() % dofs_per_cell == 0,
+	  ExcNotMultiple(indices.size(), dofs_per_cell));
+
+				   // The number of components of the
+				   // result may be a multiple of the
+				   // number of components of the
+				   // finite element
+  const unsigned int result_components = indices.size() / dofs_per_cell;
+  
+  for (unsigned i=0;i<values.size();++i)
+    Assert (values[i].size() == result_components,
+	    ExcDimensionMismatch(values[i].size(), result_components));
+
+				   // If the result has more
+				   // components than the finite
+				   // element, we need this number for
+				   // loops filling all components
+  const unsigned int component_multiple = result_components / n_components;
+  
+  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+    
+				   // initialize with zero
+  for (unsigned i=0;i<values.size();++i)
+    std::fill_n (values[i].begin(), values[i].size(), Tensor<1,dim>());
+
+				   // add up contributions of trial
+				   // functions. now check whether the
+				   // shape function is primitive or
+				   // not. if it is, then set its only
+				   // non-zero component, otherwise
+				   // loop over components
+  for (unsigned int mc = 0; mc < component_multiple; ++mc)
+    for (unsigned int point=0; point<n_quadrature_points; ++point)
+      for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+	if (fe->is_primitive(shape_func))
+	  values[point][fe->system_to_component_index(shape_func).first
+			+mc * n_components]
+	    += fe_function(indices[shape_func+mc*dofs_per_cell])
+		* shape_grad(shape_func, point);
+	else
+	  for (unsigned int c=0; c<n_components; ++c)
+	    values[point][c] += (fe_function(indices[shape_func]) *
+				 shape_grad_component(shape_func, point, c));
 }
 
 

@@ -48,10 +48,18 @@ void FEValuesBase<deal_II_dimension>::get_function_values<IN>
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
 (const IN&, std::vector<Tensor<1,deal_II_dimension> > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
+(const IN&, const std::vector<unsigned int>&,
+ std::vector<Tensor<1,deal_II_dimension> > &) const;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
 (const IN&, std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
+(const IN&, const std::vector<unsigned int>&,
+ std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<IN>
