@@ -26,6 +26,7 @@ block_vector_iterator.exe : block_vector_iterator.g.$(OBJEXT)           $(librar
 full_matrix.exe           : full_matrix.g.$(OBJEXT)                     $(libraries)
 matrix_out.exe            : matrix_out.g.$(OBJEXT)                      $(libraries)
 solver.exe                : solver.g.$(OBJEXT)   testmatrix.g.$(OBJEXT) $(libraries)
+eigen.exe                 : eigen.g.$(OBJEXT)   testmatrix.g.$(OBJEXT) $(libraries)
 sparse_matrices.exe       : sparse_matrices.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
 sparse_matrices.opt.exe   : sparse_matrices.$(OBJEXT) testmatrix.$(OBJEXT) $(libraries_o)
 sparsity_pattern.exe      : sparsity_pattern.g.$(OBJEXT) testmatrix.g.$(OBJEXT) $(libraries)
