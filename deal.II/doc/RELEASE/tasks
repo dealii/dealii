@@ -9,9 +9,6 @@ when a new release shall be issued:
 
 3/ change the content of the `Version' file on both HEAD and branch
 
-8/ run `make validate-xrefs' on the branch to check that the changes
-  do not point to nirvana
-
 10/ cvs tag all files with Version-x-y-z
 
 11/ tell your friends to tag their programs
