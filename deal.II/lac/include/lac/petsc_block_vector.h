@@ -359,9 +359,10 @@ namespace PETScWrappers
       {
         InputIterator end = start;
         std::advance (end, static_cast<signed int>(n[b]));
-        std::copy (start, end, this->block(b).begin());
-        start = end;
-      };
+
+	for (unsigned int i=0; i<n[b]; ++i, ++start)
+	  this->block(b)(i) = *start;
+      }
     Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
   }
 
