@@ -762,15 +762,23 @@ void outer_product (Tensor<1,dim>       &dst,
 
 /**
  * Cross-product in 2d. This is just a rotation by 90 degrees
- * clockwise to compute the outer normal from a tangential vector.
+ * clockwise to compute the outer normal from a tangential
+ * vector. This function is defined for all space dimensions to allow
+ * for dimension independent programming (e.g. within switches over
+ * the space dimenion), but may only be called if the actual dimension
+ * of the arguments is two (e.g. from the @p{dim==2} case in the
+ * switch).
  *
  * @author Guido Kanschat, 2001
  */
+template <int dim>
 inline
 void
-cross_product (Tensor<1,2>& dst,
-	       const Tensor<1,2>& src)
+cross_product (Tensor<1,dim>       &dst,
+	       const Tensor<1,dim> &src)
 {
+  Assert (dim==2, ExcInternalError());
+  
   dst[0] = src[1];
   dst[1] = -src[0];
 }
@@ -778,16 +786,23 @@ cross_product (Tensor<1,2>& dst,
 
 
 /**
- * Cross-product of 2 vectors in 3d.
+ * Cross-product of 2 vectors in 3d. This function is defined for all
+ * space dimensions to allow for dimension independent programming
+ * (e.g. within switches over the space dimenion), but may only be
+ * called if the actual dimension of the arguments is three (e.g. from
+ * the @p{dim==3} case in the switch).
  *
  * @author Guido Kanschat, 2001
  */
+template <int dim>
 inline
 void
-cross_product (Tensor<1,3>& dst,
-	       const Tensor<1,3>& src1,
-	       const Tensor<1,3>& src2)
+cross_product (Tensor<1,dim>       &dst,
+	       const Tensor<1,dim> &src1,
+	       const Tensor<1,dim> &src2)
 {
+  Assert (dim==3, ExcInternalError());
+  
   dst[0] = src1[1]*src2[2] - src1[2]*src2[1];
   dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
   dst[2] = src1[0]*src2[1] - src1[1]*src2[0];
