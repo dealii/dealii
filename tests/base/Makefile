@@ -29,5 +29,32 @@ ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc/bin/c++
 endif
 
+
+test: run-reference run-logtest run-tensor
+
+
 reference: reference.go
 	$(CXX) -o $@ $^
+
+run-reference: reference
+	./reference
+
+logtest: logtest.go
+	$(CXX) -o $@ $^ $D/base/lib/libbase.g.a
+
+run-logtest: logtest
+	./logtest
+
+tensor: tensor.go
+	$(CXX) -o $@ $^
+
+run-tensor: tensor
+	./tensor
+
+
+clean:
+	-rm *.o *.go reference logtest tensor
+
+
+
+.PHONY: test run-reference run-logtest run-tensor clean

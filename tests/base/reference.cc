@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <base/subscriptor.h>
-
+#include <base/smartpointer.h>
 
 
 class Test : public Subscriptor
@@ -25,7 +25,8 @@ main()
   const Test b;
   SmartPointer<Test>       r=&a;
   SmartPointer<const Test> s=&a;
-  SmartPointer<Test>       t=&b;    // this one should give a warning
+//  SmartPointer<Test>       t=&b;    // this one should not work
+  SmartPointer<Test>       t=const_cast<Test*>(&b);
   SmartPointer<const Test> u=&b;
 
   a.f();            // should print "mutable", since #a# is not const

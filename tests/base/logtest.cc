@@ -1,6 +1,5 @@
-#include "../newdeal/base/include/base/logstream.h"
+#include <base/logstream.h>
 
-LogStream deallog;
 
 main()
 {
