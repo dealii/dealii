@@ -3814,23 +3814,29 @@ Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<number> &crite
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
-				   // refine at least one cell; algorithmic
-				   // simplification
-  const int refine_cells = max(static_cast<int>(top_fraction*criteria.size()),
-			       1);
-  const int coarsen_cells = max(static_cast<int>(bottom_fraction*criteria.size()),
-				1);
-  
-  Vector<number> tmp(criteria);  
-  nth_element (tmp.begin(), tmp.begin()+refine_cells,
-	       tmp.end(),
-	       greater<double>());
-  refine (criteria, *(tmp.begin() + refine_cells));
 
-  nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
-	       tmp.end(),
-	       greater<double>());
-  coarsen (criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
+  const int refine_cells=static_cast<int>(top_fraction*criteria.size());
+  const int coarsen_cells=static_cast<int>(bottom_fraction*criteria.size());
+
+  if (refine_cells || coarsen_cells)
+    {
+      Vector<number> tmp(criteria);
+      if (refine_cells)
+	{
+	  nth_element (tmp.begin(), tmp.begin()+refine_cells,
+		       tmp.end(),
+		       greater<double>());
+	  refine (criteria, *(tmp.begin() + refine_cells));
+	}
+
+      if (coarsen_cells)
+	{
+	  nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
+		       tmp.end(),
+		       greater<double>());
+	  coarsen (criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
+	}
+    }
 };
 
 
@@ -3904,8 +3910,10 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
     bottom_threshold = 0.999*top_threshold;
   
 				   // actually flag cells
-  refine (criteria, top_threshold);
-  coarsen (criteria, bottom_threshold);
+  if (top_threshold < *max_element(criteria.begin(), criteria.end()))
+    refine (criteria, top_threshold);
+  if (bottom_threshold > *min_element(criteria.begin(), criteria.end()))
+    coarsen (criteria, bottom_threshold);
 };
 
 
