@@ -48,7 +48,7 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
   
 				   // first find minimum and maximum value
 				   // in the indicators
-  number min_value, max_value;
+  number min_value=0, max_value=0;
   switch (interval_spacing)
     {
       case linear:
@@ -95,12 +95,13 @@ void Histogram::evaluate (const vector<Vector<number> > &values,
       default:
 	    Assert (false, ExcInternalError());
     };
-  
-  Assert (max_value >= min_value, ExcInvalidData());
 
 				   // move right bound arbitrarily if
-				   // necessary
-  if (max_value == min_value)
+				   // necessary. sometimes in logarithmic
+				   // mode, max_value may be larger than
+				   // min_value, but only up to rounding
+				   // precision.
+  if (max_value <= min_value)
     max_value = min_value+1;
   
 
