@@ -320,7 +320,22 @@ template <int dim>
 double LineAccessor<dim>::measure () const {
   return sqrt((vertex(1)-vertex(0)).square());
 };
-  
+
+
+
+template <int dim>
+unsigned int LineAccessor<dim>::number_of_children () const {
+  if (!has_children())
+    return 1;
+  else
+    {
+      unsigned int sum = 0;
+      for (unsigned int c=0; c<2; ++c)
+	sum += child(c)->number_of_children();
+      return sum;
+    };
+};
+
 
 
 
@@ -707,6 +722,21 @@ double QuadAccessor<2>::measure () const {
 
   return (-x[0]*y[3]/2.0-x[1]*y[0]/2.0+x[2]*y[3]/2.0+x[3]*y[0]/2.0+
 	  x[0]*y[1]/2.0-x[3]*y[2]/2.0+x[1]*y[2]/2.0-x[2]*y[1]/2.0);
+};
+
+
+
+template <int dim>
+unsigned int QuadAccessor<dim>::number_of_children () const {
+  if (!has_children())
+    return 1;
+  else
+    {
+      unsigned int sum = 0;
+      for (unsigned int c=0; c<4; ++c)
+	sum += child(c)->number_of_children();
+      return sum;
+    };
 };
 
 

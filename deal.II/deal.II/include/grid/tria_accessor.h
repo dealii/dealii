@@ -489,6 +489,22 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      */
     double measure () const;
 
+				     /**
+				      * Compute and return the number of
+				      * children of this line. Actually,
+				      * this function only counts the number
+				      * of active children, i.e. the number
+				      * if lines which are not further
+				      * refined. Thus, if both of the two
+				      * children of a line are further
+				      * refined exactly once, the returned
+				      * number will be four, not six.
+				      *
+				      * If the present cell is not refined,
+				      * one is returned.
+				      */
+    unsigned int number_of_children () const;
+    
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -508,6 +524,8 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      *  used anyway.
 				      */
     void operator = (const LineAccessor &);
+
+    
 
   public:
 //  protected:
@@ -805,6 +823,22 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * for the area of this quad.
 				      */
     double measure () const;
+
+				     /**
+				      * Compute and return the number of
+				      * children of this quad. Actually,
+				      * this function only counts the number
+				      * of active children, i.e. the number
+				      * if quads which are not further
+				      * refined. Thus, if all of the four
+				      * children of a quad are further
+				      * refined exactly once, the returned
+				      * number will be 16, not 20.
+				      *
+				      * If the present cell is not refined,
+				      * one is returned.
+				      */
+    unsigned int number_of_children () const;
 
   private:
     				     /**
