@@ -172,14 +172,12 @@ SparseMatrixStruct::operator = (const SparseMatrixStruct &s)
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
 
-				   // no need to free existing arrays, since we
-				   // should never get here.
-  max_dim = 0;
-  max_vec_len = 0;
-  rowstart = 0;
-  colnums = 0;
-  
-  reinit (0,0,0);
+  Assert (rowstart == 0, ExcInvalidConstructorCall());
+  Assert (colnums == 0, ExcInvalidConstructorCall());
+  Assert (rows == 0, ExcInvalidConstructorCall());
+  Assert (cols == 0, ExcInvalidConstructorCall());
+
+  return *this;
 };
 
 
