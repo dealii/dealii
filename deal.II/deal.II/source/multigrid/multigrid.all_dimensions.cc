@@ -17,6 +17,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <multigrid/mg_transfer.h>
+#include <multigrid/mg_smoother.h>
 #include <multigrid/mg_transfer.templates.h>
 #include <multigrid/multigrid.templates.h>
 
@@ -208,6 +209,21 @@ void MGTransferSelect<number>::restrict_and_add (
 }
 
 
+template <class VECTOR>
+void
+MGSmootherContinuous<VECTOR>::set_zero_interior_boundary (
+  const unsigned int level,
+  VECTOR&            u) const
+{
+  if (level==0)
+    return;
+  else
+    for (std::vector<unsigned int>::const_iterator p=interior_boundary_dofs[level-1].begin();
+	 p!=interior_boundary_dofs[level-1].end(); ++p)
+      u(*p) = 0;
+}
+
+
 // Explicit instantiations
 
 template class Multigrid<Vector<float> >;
@@ -223,3 +239,16 @@ template class MGTransferBlock<float>;
 template class MGTransferBlock<double>;
 template class MGTransferSelect<float>;
 template class MGTransferSelect<double>;
+
+template
+void MGSmootherContinuous<Vector<double> >::set_zero_interior_boundary (
+  const unsigned int, Vector<double>&) const;
+template
+void MGSmootherContinuous<Vector<float> >::set_zero_interior_boundary (
+  const unsigned int, Vector<float>&) const;
+template
+void MGSmootherContinuous<BlockVector<double> >::set_zero_interior_boundary (
+  const unsigned int, BlockVector<double>&) const;
+template
+void MGSmootherContinuous<BlockVector<float> >::set_zero_interior_boundary (
+  const unsigned int, BlockVector<float>&) const;
