@@ -232,8 +232,10 @@ FDMGTransfer::restrict (const unsigned int   from_level,
 }
 
 
+template void FDMatrix::laplacian(SparseMatrix<long double>&) const;
 template void FDMatrix::laplacian(SparseMatrix<double>&) const;
 template void FDMatrix::laplacian(SparseMatrix<float>&) const;
+template void FDMatrix::gnuplot_print(ostream& s, const Vector<long double>& V) const;
 template void FDMatrix::gnuplot_print(ostream& s, const Vector<double>& V) const;
 template void FDMatrix::gnuplot_print(ostream& s, const Vector<float>& V) const;
 

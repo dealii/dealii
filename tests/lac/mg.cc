@@ -17,6 +17,9 @@
 #include <lac/precondition.h>
 #include <lac/mgbase.h>
 
+#define TYPE  long double
+#define ACCURACY 1.e-19
+
 template<class VECTOR>
 void print_vector(ostream& s, const VECTOR& v)
 {
@@ -52,8 +55,8 @@ class FDMG
 				 const Vector<FLOAT>& src,
 				 const Vector<FLOAT>& rhs);
 
-    void copy_to_mg(const Vector<double>& rhs);
-    void copy_from_mg(Vector<double>& lsg);
+    void copy_to_mg(const Vector<TYPE>& rhs);
+    void copy_from_mg(Vector<TYPE>& lsg);
 };
 
 class MGSmootherLAC
@@ -89,7 +92,7 @@ class MGPrecondition
       {}
     
     
-    void operator () (Vector<double>& dst, const Vector<double>& src) const
+    void operator () (Vector<TYPE>& dst, const Vector<TYPE>& src) const
       {
 //	print_vector(cout, src);
 	
@@ -107,8 +110,8 @@ main()
   ofstream logfile("mg.output");
   deallog.attach(logfile);
   
-  PrimitiveVectorMemory<Vector<double>  > mem;
-  SolverControl control(100, 1.e-14, true);
+  PrimitiveVectorMemory<Vector<TYPE>  > mem;
+  SolverControl control(100, ACCURACY, true);
 
   const unsigned int base = 3;
   const unsigned int maxlevel = 8;
@@ -162,13 +165,14 @@ main()
       MGSmootherLAC smoother(A);
 //      MGSmootherIdentity smoother;
 
-      MGPrecondition precondition(multigrid, smoother, coarsegrid);
+      PreconditionMG<FDMG, Vector<TYPE> >
+	precondition(multigrid, smoother, smoother, coarsegrid);
 
-//      SolverRichardson<SparseMatrix<FLOAT> , Vector<double> > solver(control, mem);
-      SolverCG<SparseMatrix<FLOAT> , Vector<double> > solver(control, mem);
+//      SolverRichardson<SparseMatrix<FLOAT> , Vector<TYPE> > solver(control, mem);
+      SolverCG<SparseMatrix<FLOAT> , Vector<TYPE> > solver(control, mem);
 
-      Vector<double> u(dim);
-      Vector<double> f(dim);
+      Vector<TYPE> u(dim);
+      Vector<TYPE> f(dim);
       u = 0.;
       f = 1.;//(size*size);
 
@@ -202,13 +206,13 @@ FDMG::level_residual (unsigned int level,
 }
 
 void
-FDMG::copy_to_mg(const Vector<double>& v)
+FDMG::copy_to_mg(const Vector<TYPE>& v)
 {
   d[maxlevel] = v;
 }
 
 void
-FDMG::copy_from_mg(Vector<double>& v)
+FDMG::copy_from_mg(Vector<TYPE>& v)
 {
   v = s[maxlevel];
 }
