@@ -836,8 +836,8 @@ DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
   typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
   typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
   
-  copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::copy (begin, end, ordered_cells.begin());
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
   cell_wise_dg(dof, level, ordered_cells);
 }
