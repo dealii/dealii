@@ -252,24 +252,25 @@ template <int dim>
 class QProjector : public Quadrature<dim>
 {
   public:
-				   /**
-				    * Constructor for a quadrature rule on all (sub)faces.
-				    * The quadrature rule
-				    * @p{quadrature} is applied to
-				    * each face or subface , according
-				    * to the @{sub} flag.
-				    *
-				    * The weights of the new rule are
-				    * replications of the original
-				    * weights. This is not a proper
-				    * handling, but it is
-				    * consistent with later use. If
-				    * the (sub)face rule is applied to
-				    * the unity function, the result
-				    * is the number of (sub)faces.
-				    */
-  QProjector (const Quadrature<dim-1>& quadrature,
-	      const bool sub);
+//TODO: remove this constructor again and return to old state with static-only functions. move this function to something in the finite element classes which is the only place where it is used.    
+				     /**
+				      * Constructor for a quadrature rule on all (sub)faces.
+				      * The quadrature rule
+				      * @p{quadrature} is applied to
+				      * each face or subface, according
+				      * to the @{sub} flag.
+				      *
+				      * The weights of the new rule are
+				      * replications of the original
+				      * weights. This is not a proper
+				      * handling, but it is
+				      * consistent with later use. If
+				      * the (sub)face rule is applied to
+				      * the unity function, the result
+				      * is the number of (sub)faces.
+				      */
+    QProjector (const Quadrature<dim-1>& quadrature,
+		const bool sub);
 
 				     /**
 				      * Compute the quadrature points on the
