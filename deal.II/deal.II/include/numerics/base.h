@@ -43,8 +43,8 @@ template <int dim> class DataOut;
     \item Loop over all cells and assemble matrix and vectors using the given
       quadrature formula and the equation object which contains the weak
       formulation of the equation.
-    \item Condense the system matrix with the constraints induced by hanging
-      nodes.
+    \item Condense the system matrix and right hand side with the constraints
+      induced by hanging nodes.
   \end{itemize}
   */
 template <int dim>
@@ -55,12 +55,10 @@ class ProblemBase {
 				      * degree of freedom object during the
 				      * lifetime of this object. The dof
 				      * object must refer to the given
-				      * triangulation. The number of right hand
-				      * sides being assembled defaults to one.
+				      * triangulation.
 				      */
     ProblemBase (Triangulation<dim> *tria,
-		 DoFHandler<dim>    *dof_handler,
-		 const unsigned int  n_rhs=1);
+		 DoFHandler<dim>    *dof_handler);
 
 				     /**
 				      * Initiate the process of assemblage of
@@ -111,12 +109,9 @@ class ProblemBase {
     dSMatrix            system_matrix;
 
 				     /**
-				      * Pointers to the right hand sides to the
-				      * problem. Usually, one only needs one
-				      * right hand side, but simetimes one
-				      * wants more.
+				      * Vector storing the right hand side.
 				      */
-    vector<dVector*>    right_hand_sides;
+    dVector             right_hand_side;
 
 				     /**
 				      * Solution vector.

@@ -19,7 +19,7 @@ Equation<dim>::Equation (const unsigned int n_equations) :
 
 
 void Equation<1>::assemble (dFMatrix          &,
-			    vector<dVector>   &,
+			    dVector           &,
 			    const FEValues<1> &,
 			    const Triangulation<1>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -28,7 +28,7 @@ void Equation<1>::assemble (dFMatrix          &,
 
 
 void Equation<2>::assemble (dFMatrix          &,
-			    vector<dVector>   &,
+			    dVector           &,
 			    const FEValues<2> &,
 			    const Triangulation<2>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -52,7 +52,7 @@ void Equation<2>::assemble (dFMatrix          &,
 
 
 
-void Equation<1>::assemble (vector<dVector>   &,
+void Equation<1>::assemble (dVector           &,
 			    const FEValues<1> &,
 			    const Triangulation<1>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -60,7 +60,7 @@ void Equation<1>::assemble (vector<dVector>   &,
 
 
 
-void Equation<2>::assemble (vector<dVector>   &,
+void Equation<2>::assemble (dVector           &,
 			    const FEValues<2> &,
 			    const Triangulation<2>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -73,13 +73,14 @@ template <int dim>
 AssemblerData<dim>::AssemblerData (const DoFHandler<dim>   &dof,
 				   const bool               assemble_matrix,
 				   const bool               assemble_rhs,
-				   const unsigned int       n_rhs,
 				   ProblemBase<dim>         &problem,
 				   const Quadrature<dim>    &quadrature,
 				   const FiniteElement<dim> &fe) :
-		dof(dof), assemble_matrix(assemble_matrix),
-		assemble_rhs(assemble_rhs), n_rhs(n_rhs),
-		problem(problem), quadrature(quadrature),
+		dof(dof),
+		assemble_matrix(assemble_matrix),
+		assemble_rhs(assemble_rhs),
+		problem(problem),
+		quadrature(quadrature),
 		fe(fe) {};
 
 
@@ -93,8 +94,7 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 		DoFCellAccessor<dim> (tria,level,index,
 				      &((AssemblerData<dim>*)local_data)->dof),
 		cell_matrix (dof_handler->get_selected_fe().total_dofs),
-		cell_vectors (((AssemblerData<dim>*)local_data)->n_rhs,
-			      dVector(dof_handler->get_selected_fe().total_dofs)),
+		cell_vector (dVector(dof_handler->get_selected_fe().total_dofs)),
 		assemble_matrix (((AssemblerData<dim>*)local_data)->assemble_matrix),
 		assemble_rhs (((AssemblerData<dim>*)local_data)->assemble_rhs),
 		problem (((AssemblerData<dim>*)local_data)->problem),
@@ -102,21 +102,14 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 		fe_values (((AssemblerData<dim>*)local_data)->fe,
 			   ((AssemblerData<dim>*)local_data)->quadrature)
 {
-  Assert (((AssemblerData<dim>*)local_data)->n_rhs != 0,
-	  ExcInvalidData());
   Assert ((unsigned int)problem.system_matrix.m() == dof_handler->n_dofs(),
 	  ExcInvalidData());
   Assert ((unsigned int)problem.system_matrix.n() == dof_handler->n_dofs(),
 	  ExcInvalidData());
-  Assert (problem.right_hand_sides.size() == cell_vectors.size(),
-	  ExcInvalidData());
   Assert (((AssemblerData<dim>*)local_data)->fe == dof_handler->get_selected_fe(),
 	  ExcInvalidData());
-
-
-  for (unsigned int i=0; i<cell_vectors.size(); ++i)
-    Assert ((unsigned int)problem.right_hand_sides[i]->n() == dof_handler->n_dofs(),
-	    ExcInvalidData());
+  Assert ((unsigned int)problem.right_hand_side.n() == dof_handler->n_dofs(),
+	  ExcInvalidData());
 };
 
 
@@ -128,24 +121,22 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 						       present_level,
 						       present_index),
 		    fe);
-  
+
+				   // clear cell matrix
   if (assemble_matrix)
-				     // clear cell matrix
     for (unsigned int i=0; i<dof_handler->get_selected_fe().total_dofs; ++i)
       for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
 	cell_matrix(i,j) = 0;
   
 
+				   // clear cell vector
   if (assemble_rhs)
-				     // clear cell vector
-    for (unsigned int vec=0; vec<cell_vectors.size(); ++vec)
-      for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
-	cell_vectors[vec](j) = 0;
+    cell_vector.clear ();
   
 
 				   // fill cell matrix and vector if required
   if (assemble_matrix && assemble_rhs) 
-    equation.assemble (cell_matrix, cell_vectors, fe_values,
+    equation.assemble (cell_matrix, cell_vector, fe_values,
 		       Triangulation<dim>::cell_iterator(tria,
 							 present_level,
 							 present_index));
@@ -157,7 +148,7 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 							   present_index));
     else
       if (assemble_rhs)
-	equation.assemble (cell_vectors, fe_values,
+	equation.assemble (cell_vector, fe_values,
 			   Triangulation<dim>::cell_iterator(tria,
 							     present_level,
 							     present_index));
@@ -169,17 +160,16 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
   vector<int> dofs;
   dof_indices (dofs);
   
+				   // distribute cell matrix
   if (assemble_matrix)
-				     // distribute cell matrix
     for (unsigned int i=0; i<dof_handler->get_selected_fe().total_dofs; ++i)
       for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
 	problem.system_matrix.add(dofs[i], dofs[j], cell_matrix(i,j));
 
+				   // distribute cell vector
   if (assemble_rhs)
-				     // distribute cell vector
-    for (unsigned int vec=0; vec<cell_vectors.size(); ++vec)
-      for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
-	(*problem.right_hand_sides[vec])(dofs[j]) += cell_vectors[vec](j);
+    for (unsigned int j=0; j<dof_handler->get_selected_fe().total_dofs; ++j)
+      problem.right_hand_side(dofs[j]) += cell_vector(j);
 };
 
 		

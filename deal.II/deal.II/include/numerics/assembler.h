@@ -24,7 +24,7 @@ template <int dim> class ProblemBase;
   finite element discretisation of one or more equations.
 
   Equation objects need only provide functions which set up the cell
-  matrices and the right hand side(s). These are then automatically inserted
+  matrices and the cell right hand side. These are then automatically inserted
   into the global matrices and vectors.
   */
 template <int dim>
@@ -39,12 +39,11 @@ class Equation {
 
 				     /**
 				      * Virtual function which assembles the
-				      * cell matrix and a specific (user
-				      * selectable) number of right hand sides
+				      * cell matrix and the right hand side
 				      * on a given cell.
 				      */
     virtual void assemble (dFMatrix            &cell_matrix,
-			   vector<dVector>     &rhs,
+			   dVector             &rhs,
 			   const FEValues<dim> &fe_values,
 			   const Triangulation<dim>::cell_iterator &cell) const;
 
@@ -58,9 +57,9 @@ class Equation {
 
 				     /**
 				      * Virtual function which only assembles
-				      * the right hand side(s) on a given cell.
+				      * the right hand side on a given cell.
 				      */
-    virtual void assemble (vector<dVector>     &rhs,
+    virtual void assemble (dVector             &rhs,
 			   const FEValues<dim> &fe_values,
 			   const Triangulation<dim>::cell_iterator &cell) const;
 
@@ -104,7 +103,6 @@ struct AssemblerData {
     AssemblerData (const DoFHandler<dim>    &dof,
 		   const bool                assemble_matrix,
 		   const bool                assemble_rhs,
-		   const unsigned int        n_rhs,
 		   ProblemBase<dim>         &problem,
 		   const Quadrature<dim>    &quadrature,
 		   const FiniteElement<dim> &fe);
@@ -119,10 +117,6 @@ struct AssemblerData {
 				      * and right hand sides.
 				      */
     const bool              assemble_matrix, assemble_rhs;
-				     /**
-				      * How many right hand sides are there.
-				      */
-    const unsigned int      n_rhs;
 				     /**
 				      * Pointer to the #ProblemBase# object
 				      * of which the global matrices and
@@ -198,10 +192,9 @@ class Assembler : public DoFCellAccessor<dim> {
     dFMatrix          cell_matrix;
 
 				     /**
-				      * Have room for a certain number of
-				      * right hand sides.
+				      * Right hand side local to cell.
 				      */
-    vector<dVector>   cell_vectors;
+    dVector           cell_vector;
 
 				     /**
 				      * Store whether to assemble the
@@ -211,7 +204,7 @@ class Assembler : public DoFCellAccessor<dim> {
 
 				     /**
 				      * Store whether to assemble the
-				      * right hand sides.
+				      * right hand side.
 				      */
     bool              assemble_rhs;
 

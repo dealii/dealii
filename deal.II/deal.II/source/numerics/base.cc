@@ -6,10 +6,11 @@
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
 
-
-#include "../../../mia/vectormemory.h"
 #include "../../../mia/control.h"
+#include "../../../mia/vectormemory.h"
 #include "../../../mia/cg.h"
+
+
 
 extern TriaActiveIterator<1,CellAccessor<1> > __dummy1233; // for gcc2.7
 extern TriaActiveIterator<2,CellAccessor<2> > __dummy1234;
@@ -18,21 +19,13 @@ extern TriaActiveIterator<2,CellAccessor<2> > __dummy1234;
 
 template <int dim>
 ProblemBase<dim>::ProblemBase (Triangulation<dim> *tria,
-			       DoFHandler<dim>    *dof,
-			       const unsigned int  n_rhs) :
+			       DoFHandler<dim>    *dof) :
 		tria(tria),
 		dof_handler(dof),
 		system_sparsity(1,1,1),        // dummy initialisation, is later reinit'd
-		system_matrix(),               // dummy initialisation, is later reinit'd
-		right_hand_sides (n_rhs, (dVector*)0)	
+		system_matrix()               // dummy initialisation, is later reinit'd
 {
   Assert (tria == &dof->get_tria(), ExcDofAndTriaDontMatch());
-
-  for (unsigned int i=0; i<n_rhs; ++i) 
-    {
-      right_hand_sides[i] = new dVector;
-      Assert (right_hand_sides[i] != 0, ExcNoMemory());
-    };
 };
 
 
@@ -45,8 +38,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>   &equation,
   system_sparsity.reinit (dof_handler->n_dofs(),
 			  dof_handler->n_dofs(),
 			  dof_handler->max_couplings_between_dofs());
-  for (unsigned int i=0; i<right_hand_sides.size(); ++i)
-    right_hand_sides[i]->reinit (dof_handler->n_dofs());
+  right_hand_side.reinit (dof_handler->n_dofs());
   
 				   // make up sparsity pattern and
 				   // compress with constraints
@@ -62,7 +54,6 @@ void ProblemBase<dim>::assemble (const Equation<dim>   &equation,
 				   // create assembler
   AssemblerData<dim> data (*dof_handler,
 			   true, true, //assemble matrix and rhs
-			   right_hand_sides.size(),
 			   *this,
 			   quadrature,
 			   fe);
@@ -80,9 +71,9 @@ void ProblemBase<dim>::assemble (const Equation<dim>   &equation,
 
 				   // condense system matrix in-place
   constraints.condense (system_matrix);
-				   // condense right hand sides in-place
-  for (unsigned int i=0; i<right_hand_sides.size(); ++i)
-    constraints.condense (*right_hand_sides[i]);
+
+				   // condense right hand side in-place
+  constraints.condense (right_hand_side);
 };
 
 
@@ -94,11 +85,11 @@ void ProblemBase<dim>::solve () {
   double tolerance = 1.e-16;
   
   Control                          control1(max_iter,tolerance);
-  PrimitiveVectorMemory<dVector>   memory(right_hand_sides[0]->n());
+  PrimitiveVectorMemory<dVector>   memory(right_hand_side.n());
   CG<dSMatrix,dVector>             cg(control1,memory);
 
 				   // solve
-  cg (system_matrix, solution, *right_hand_sides[0]);
+  cg (system_matrix, solution, right_hand_side);
 				   // distribute solution
   constraints.distribute (solution);
 };
