@@ -344,7 +344,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p> Fixed: The constructor of the <code class="class">QGauss</code> class
        computed positions and weights of quadrature points in long double accuracy.
-       However, on machines where long double is the same as double, it therefore
+       However, on machines where long double is the same as double, it 
        never reached the requested accuracy, in effect leading to an infinite loop.
        This is now fixed.
        <br>
@@ -463,7 +463,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        (WB 2004/02/23)
        </p>
 
-  <li> <p> New:<code class="class">FullMatrix</code> has new functions <code
+  <li> <p> New: <code class="class">FullMatrix</code> has new functions <code
        class="member">add</code> and ,<code
        class="member">Tadd</code>
        allowing to add to a selected block of the matrix.
@@ -562,6 +562,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">GridIn::read_msh</code>.
        <br>
        (Luca Heltai 2004/04/21)
+       </p>
+              
+  <li> <p>
+       New: The function <code
+       class="member">GridGenerator::cylinder_shell</code> generates a domain
+       of the type which the name suggests.
+       <br>
+       (WB 2004/04/19)
        </p>
               
   <li> <p>
