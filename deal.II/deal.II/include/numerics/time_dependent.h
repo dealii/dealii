@@ -183,7 +183,8 @@ template <int dim> class Triangulation;
  * @sect3{Implementation}
  *
  * The main loop of a program using this class will usually look like
- * the following one, taken modified from the wave program:
+ * the following one, taken modified from an application program that
+ * isn't distributed as part of the library:
  * @begin{verbatim}
  *   template <int dim>
  *   void TimeDependent_Wave<dim>::run_sweep (const unsigned int sweep_no)
