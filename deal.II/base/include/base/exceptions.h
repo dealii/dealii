@@ -113,6 +113,7 @@
  *  <tt>Assert (i>m, ExcSomewhat());</tt>
  *
  *  @subsection ExceptionBaseInternal How it works internally
+ *
  *  If the <tt>DEBUG</tt> preprocessor directive is set, the call <tt>Assert
  *  (cond, exc);</tt> is basically converted by the preprocessor into the
  *  sequence (note that function names and exact calling sequences may
@@ -194,7 +195,7 @@
  *  message about suppressed follow-up messages is shown.
  *
  *
- *  @section ExceptionBaseUse Use of run-time exceptions
+ *  @section ExceptionBaseUse2 Use of run-time exceptions
  *
  *  For this mode, the standard <tt>C++</tt> <tt>throw</tt> and <tt>catch</tt> concept exists. We
  *  want to keep to this, but want to extend it a bit. In general, the
@@ -525,7 +526,7 @@ namespace deal_II_exceptions
 
 /**
  * Abort the program. This function is used so that we need not
- * include <cstdlib> into this file since it is included into all
+ * include <tt>cstdlib</tt> into this file since it is included into all
  * other files of the library and we would like to keep its include
  * list as short as possible.
  */
@@ -748,8 +749,10 @@ class Exception5 : public ExceptionBase {                             \
  * Declare some exceptions that occur over and over. This way, you can
  * simply use these exceptions, instead of having to declare them
  * locally in your class. The namespace in which these exceptions are
- * declared is later included into the global namespace by @p{using
- * namespace StandardExceptions;}.
+ * declared is later included into the global namespace by
+ * @code
+ * using namespace StandardExceptions;
+ * @endcode
  */
 namespace StandardExceptions 
 {
