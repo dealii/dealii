@@ -259,7 +259,8 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
   
   do 
     {
-      deallog << "Go!" << endl;
+      if (step)
+	deallog << "Restart step " << step << endl;
       if (start() == SolverControl::success) break;  
       state = iterate(precondition);
     }
