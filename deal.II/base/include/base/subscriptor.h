@@ -169,7 +169,18 @@ class SmartPointer
       {
 	t->unsubscribe();
       }
-    
+				   /**
+				    * Assignment operator. Change of
+				    * subscription is necessary.
+				    */
+  SmartPointer<T>& operator=(T* tt)
+      {
+	t->unsubscribe();
+	t = tt;
+	tt->subscribe();
+      }
+  
+
 				     /**
 				      * Conversion to normal pointer.
 				      */
