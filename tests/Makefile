@@ -111,7 +111,7 @@ distclean-bits:
 	cd bits ; $(MAKE) distclean
 
 abort.o: abort.cc
-	 @$(CXX) -ggdb -o $@ -c $<
+	 @$(CXX) $(CXXFLAGS.g) -o $@ -c $<
 
 .PHONY : all base lac fe deal.II bits \
 	clean clean-base clean-lac clean-fe clean-deal.II clean-bits \

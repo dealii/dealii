@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,8 @@
 // actually generates an assertion, which would otherwise be
 // impossible
 
+#include <base/logstream.h>
+
 namespace  deal_II_exceptions
 {
   namespace internals 
@@ -31,5 +33,6 @@ namespace  deal_II_exceptions
 extern "C"
 void abort()
 {
+  deallog << "Abort!!!" << std::endl;
   deal_II_exceptions::internals::n_treated_exceptions = 0;
 }
