@@ -87,9 +87,10 @@ flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 ############################################################
 # After all these general rules, here is the target to be
 # executed by make: for each entry in the list $(tests)
-# perform a check.
+# perform a check. Do it in alphabetical order for better
+# overview
 ############################################################
-run-tests: $(tests:%=%.check)
+run-tests: $sort($(tests:%=%.check))
 
 
 
