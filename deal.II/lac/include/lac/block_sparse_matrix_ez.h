@@ -17,8 +17,10 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/table.h>
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>
+#include <lac/sparse_matrix_ez.h>
 
 template <typename Number> class BlockVector;
 
@@ -191,7 +193,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      */
     void set (const unsigned int i,
 	      const unsigned int j,
-	      const number value);
+	      const Number value);
     
 				     /**
 				      * Add @p{value} to the element
@@ -202,7 +204,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * non-existent fields.
 				      */
     void add (const unsigned int i, const unsigned int j,
-	      const number value);
+	      const Number value);
 
     
 				     /**
@@ -276,50 +278,50 @@ class BlockSparseMatrixEZ : public Subscriptor
 /*----------------------------------------------------------------------*/
 
 
-template <typename number>
+template <typename Number>
 inline
 unsigned int
-BlockSparseMatrixEZ<number>::n_block_rows () const
+BlockSparseMatrixEZ<Number>::n_block_rows () const
 {
-  return row_indices.size()
+  return row_indices.size();
 }
 
 
 
-template <typename number>
+template <typename Number>
 inline
 unsigned int
-BlockSparseMatrixEZ<number>::n_rows () const
+BlockSparseMatrixEZ<Number>::n_rows () const
 {
-  return row_indices.total_size()
+  return row_indices.total_size();
 }
 
 
 
-template <typename number>
+template <typename Number>
 inline
 unsigned int
-BlockSparseMatrixEZ<number>::n_block_cols () const
+BlockSparseMatrixEZ<Number>::n_block_cols () const
 {
-  return column_indices.size()
+  return column_indices.size();
 }
 
 
 
-template <typename number>
+template <typename Number>
 inline
 unsigned int
-BlockSparseMatrixEZ<number>::n_cols () const
+BlockSparseMatrixEZ<Number>::n_cols () const
 {
-  return column_indices.total_size()
+  return column_indices.total_size();
 }
 
 
 
-template <typename number>
+template <typename Number>
 inline
-SparseMatrixEZ<number> &
-BlockSparseMatrixEZ<number>::block (const unsigned int row,
+SparseMatrixEZ<Number> &
+BlockSparseMatrixEZ<Number>::block (const unsigned int row,
 				  const unsigned int column)
 {
   Assert (row<n_rows(), ExcIndexRange (row, 0, n_rows()));
@@ -330,10 +332,10 @@ BlockSparseMatrixEZ<number>::block (const unsigned int row,
 
 
 
-template <typename number>
+template <typename Number>
 inline
-const SparseMatrixEZ<number> &
-BlockSparseMatrixEZ<number>::block (const unsigned int row,
+const SparseMatrixEZ<Number> &
+BlockSparseMatrixEZ<Number>::block (const unsigned int row,
 				  const unsigned int column) const
 {
   Assert (row<n_rows(), ExcIndexRange (row, 0, n_rows()));
@@ -344,32 +346,32 @@ BlockSparseMatrixEZ<number>::block (const unsigned int row,
 
 
 
-template <typename number>
+template <typename Number>
 inline
 unsigned int
-BlockSparseMatrixEZ<number>::m () const
+BlockSparseMatrixEZ<Number>::m () const
 {
   return n_rows();
 };
 
 
 
-template <typename number>
+template <typename Number>
 inline
 unsigned int
-BlockSparseMatrixEZ<number>::n () const
+BlockSparseMatrixEZ<Number>::n () const
 {
   return n_cols();
 };
 
 
 
-template <typename number>
+template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<number>::set (const unsigned int i,
+BlockSparseMatrixEZ<Number>::set (const unsigned int i,
 				  const unsigned int j,
-				  const number value)
+				  const Number value)
 {
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
@@ -381,12 +383,12 @@ BlockSparseMatrixEZ<number>::set (const unsigned int i,
 
 
 
-template <typename number>
+template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<number>::add (const unsigned int i,
+BlockSparseMatrixEZ<Number>::add (const unsigned int i,
 				  const unsigned int j,
-				  const number value)
+				  const Number value)
 {
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
@@ -397,10 +399,10 @@ BlockSparseMatrixEZ<number>::add (const unsigned int i,
 };
 
 
-template <typename number>
+template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrixEZ<number>::vmult (BlockVector<somenumber>       &dst,
+BlockSparseMatrixEZ<Number>::vmult (BlockVector<somenumber>       &dst,
 				    const BlockVector<somenumber> &src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
@@ -420,11 +422,12 @@ BlockSparseMatrixEZ<number>::vmult (BlockVector<somenumber>       &dst,
 
 
 
-template <typename number>
+template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
-				      const BlockVector<somenumber> &src) const
+BlockSparseMatrixEZ<Number>::vmult_add (
+  BlockVector<somenumber>       &dst,
+  const BlockVector<somenumber> &src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
@@ -442,11 +445,12 @@ BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
 
 
 
-template <typename number>
+template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>   &dst,
-				   const BlockVector<somenumber>& src) const
+BlockSparseMatrixEZ<Number>::Tvmult (
+  BlockVector<somenumber>   &dst,
+  const BlockVector<somenumber>& src) const
 {
   Assert (dst.n_blocks() == n_block_cols(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
@@ -465,11 +469,12 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>   &dst,
 
 
 
-template <typename number>
+template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number>::Tvmult_add (BlockVector<somenumber>    &dst,
-				       const BlockVector<somenumber> &src) const
+BlockSparseMatrixEZ<Number>::Tvmult_add (
+  BlockVector<somenumber>    &dst,
+  const BlockVector<somenumber> &src) const
 {
   Assert (dst.n_blocks() == n_block_cols(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
