@@ -119,8 +119,18 @@ class Function : public FunctionTime,
 				     /**
 				      * Virtual destructor; absolutely
 				      * necessary in this case.
+				      *
+				      * This destructor is declared
+				      * pure virtual, such that
+				      * objects of this class cannot
+				      * be created. Since all the
+				      * other virtual functions have a
+				      * pseudo-implementation to avoid
+				      * overhead in derived classes,
+				      * this is the best place to do
+				      * this.
 				      */
-    virtual ~Function ();
+    virtual ~Function () = 0;
     
 				     /**
 				      * Return the value of the
