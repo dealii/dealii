@@ -125,7 +125,8 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<2> &f) const
 template <>
 FiniteElementBase<1>::FiniteElementBase (const FiniteElementData<1> &fe_data) :
 		FiniteElementData<1> (fe_data),
-		system_to_component_table(total_dofs)
+		system_to_component_table(total_dofs),
+		component_to_system_table(n_components, vector<unsigned>(total_dofs))
 {
   const unsigned int dim=1;
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
@@ -137,7 +138,10 @@ FiniteElementBase<1>::FiniteElementBase (const FiniteElementData<1> &fe_data) :
   interface_constraints(0,0)=1.;
 
   for (unsigned int j=0 ; j<total_dofs ; ++j)
-    system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
+    {
+      system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
+      component_to_system_table[0][j] = j;
+    }
 };
 
 #endif
@@ -148,7 +152,8 @@ FiniteElementBase<1>::FiniteElementBase (const FiniteElementData<1> &fe_data) :
 template <>
 FiniteElementBase<2>::FiniteElementBase (const FiniteElementData<2> &fe_data) :
 		FiniteElementData<2> (fe_data),
-		system_to_component_table(total_dofs)
+		system_to_component_table(total_dofs),
+		component_to_system_table(n_components, vector<unsigned>(total_dofs))
 {
   const unsigned int dim=2;
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
@@ -159,7 +164,10 @@ FiniteElementBase<2>::FiniteElementBase (const FiniteElementData<2> &fe_data) :
   interface_constraints.reinit (dofs_per_vertex+2*dofs_per_line,
 				2*dofs_per_vertex+dofs_per_line);
   for (unsigned int j=0 ; j<total_dofs ; ++j)
-    system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
+    {
+      system_to_component_table[j] = pair<unsigned,unsigned>(0,j);
+      component_to_system_table[0][j] = j;
+    }
 };
 
 #endif

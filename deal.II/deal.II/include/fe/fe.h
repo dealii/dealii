@@ -435,6 +435,11 @@ class FiniteElementBase :
 				      * Map between linear dofs and component dofs.
 				      */
     vector< pair<unsigned, unsigned> > system_to_component_table;
+
+				     /**
+				      * Map between component and linear dofs.
+				      */
+    vector< vector<unsigned> > component_to_system_table;
 };
 
 
@@ -1130,11 +1135,13 @@ class FiniteElement : public FiniteElementBase<dim> {
 
 template <int dim>
 inline unsigned
-FiniteElementBase<dim>::component_to_system_index (unsigned /*component*/,
+FiniteElementBase<dim>::component_to_system_index (unsigned component,
 						   unsigned component_index) const
 {
-  Assert(false, ExcNotImplemented());
-  return component_index;
+  Assert(component<n_components, ExcInvalidIndex(component));
+  Assert(component_index<component_to_system_table[component].size(),
+	 ExcInvalidIndex(component_index));
+  return component_to_system_table[component][component_index];
 }
 
 template <int dim>  

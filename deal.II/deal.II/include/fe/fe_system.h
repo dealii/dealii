@@ -101,7 +101,7 @@ class FESystem : public FiniteElement<dim>
 				     /** 
 				      * Constructor for mixed
 				      * discretizations with two
-				      * components.
+				      * base elements.
 				      *
 				      * See the other constructor.
 				      */
@@ -317,7 +317,7 @@ class FESystem : public FiniteElement<dim>
 				     vector<Point<dim> >         &normal_vectors) const;
 
 				     /** 
-				      *Number of different composing
+				      * Number of different base
 				      * elements of this object.
 				      *
 				      * Since these objects can have
@@ -327,7 +327,7 @@ class FESystem : public FiniteElement<dim>
 				      * of finite elements composed
 				      * into this structure.
 				      */
-    unsigned n_component_elements() const;
+    unsigned n_base_elements() const;
 
 				     /**
 				      * How often is a composing element used.
@@ -372,6 +372,21 @@ class FESystem : public FiniteElement<dim>
 				      */
     vector< ElementPair > base_elements;
 
+				     /**
+				      * The base element establishing a
+				      * component.
+				      *
+				      * This table converts a
+				      * component number to the
+				      * #base_element# number. While
+				      * component information contains
+				      * multiplicity of base elements,
+				      * the result allows access to
+				      * shape functions of the base
+				      * element.
+				      *
+				      */
+    vector<unsigned> component_to_base_table;
     
 				     /**
 				      * Helper function used in the constructor:
@@ -382,8 +397,7 @@ class FESystem : public FiniteElement<dim>
 				      * multiplied by #n#. Don't touch the
 				      * number of functions for the
 				      * transformation from unit to real
-				      * cell.
-				      */
+				      * cell.  */
     static FiniteElementData<dim>
     multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
 			  const unsigned int            N);
@@ -421,7 +435,7 @@ class FESystem : public FiniteElement<dim>
 
 template<int dim>
 inline unsigned
-FESystem<dim>::n_component_elements() const
+FESystem<dim>::n_base_elements() const
 {
   return base_elements.size();
 }
@@ -447,7 +461,8 @@ template <int dim>
 template <class FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
 		FiniteElement (multiply_dof_numbers(fe, n_elements)),
-		base_elements(1)
+		base_elements(1),
+		component_to_base_table(n_components)
 {
   base_elements[0] = ElementPair(new FE, n_elements);
   base_elements[0].first -> subscribe ();
@@ -460,7 +475,8 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 			 const FE2 &fe2, const unsigned int n2)
 		:
 		FiniteElement (multiply_dof_numbers(fe1, n1, fe2, n2)),
-		base_elements(2)
+		base_elements(2),
+		component_to_base_table(n_components)
 {
   base_elements[0] = ElementPair(new FE1, n1);
   base_elements[0].first -> subscribe ();

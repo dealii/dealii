@@ -475,7 +475,8 @@ class dSMatrix
 				     /**
 				      * Set the element #(i,j)# to #value#.
 				      * Throws an error if the entry does
-				      * not exist.
+				      * not exist. Still, it is allowed to store
+				      * zero values in non-existent fields.
 				      */
     void set (const unsigned int i, const unsigned int j,
 	      const double value);
@@ -483,7 +484,8 @@ class dSMatrix
 				     /**
 				      * Add #value# to the element #(i,j)#.
 				      * Throws an error if the entry does
-				      * not exist.
+				      * not exist. Still, it is allowed to store
+				      * zero values in non-existent fields.
 				      */
     void add (const unsigned int i, const unsigned int j,
 	      const double value);
@@ -784,9 +786,12 @@ inline
 void dSMatrix::set (const unsigned int i, const unsigned int j,
 		    const double value) {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->operator()(i,j) != -1,
+  Assert ((cols->operator()(i,j) != -1) || (value == 0.),
 	  ExcInvalidIndex(i,j));
-  val[cols->operator()(i,j)] = value;
+
+  const int index = cols->operator()(i,j);
+
+  if (index >= 0) val[index] = value;
 };
 
 
@@ -795,9 +800,12 @@ inline
 void dSMatrix::add (const unsigned int i, const unsigned int j,
 		    const double value) {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->operator()(i,j) != -1,
+  Assert ((cols->operator()(i,j) != -1) || (value == 0.),
 	  ExcInvalidIndex(i,j));
-  val[cols->operator()(i,j)] += value;
+
+  const int index = cols->operator()(i,j);
+  
+  if (index >= 0) val[index] += value;
 };
 
 
