@@ -3366,6 +3366,16 @@ unsigned int Triangulation<dim>::n_levels () const {
 
 
 
+template <int dim>
+unsigned int
+Triangulation<dim>::n_used_vertices () const 
+{
+  return count_if (vertices_used.begin(), vertices_used.end(),
+		   bind2nd (equal_to<bool>(), true));
+};
+
+
+
 #if deal_II_dimension == 1
 
 template <>

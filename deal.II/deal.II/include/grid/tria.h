@@ -2744,6 +2744,13 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     unsigned int n_levels () const;
 
 				     /**
+				      * Return the number of vertices that are
+				      * presently in use, i.e. belong to at least
+				      * one used element.
+				      */
+    unsigned int n_used_vertices () const;
+    
+				     /**
 				      * Return the maximum number of cells
 				      * meeting at a common vertex. Since this
 				      * number is an invariant under refinement,
