@@ -1481,7 +1481,7 @@ AC_DEFUN(DEAL_II_CHECK_ABORT, dnl
 [
   AC_MSG_CHECKING([for exception specifications on abort()])
   AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG -Werror"
+  CXXFLAGS="-Werror $CXXFLAGSG"
   AC_TRY_COMPILE(
     [
 #include <cstdlib>
