@@ -16,7 +16,10 @@
  * encapsulated postscript format. There are also function to dispatch to
  * the different output functions based on a parameter given, e.g., through
  * a parameter file, thus making user programs invariant of the number and
- * names of the file formats implemented in this class.
+ * names of the file formats implemented in this class. The main advantage of
+ * this class over the #DataOut# class is that it does not have to mess around
+ * with actual data vectors and that no #DoFHandler# object is needed to
+ * write the pure geometrical information involved here.
  *
  *
  * \subsection{GNUPLOT format}
