@@ -117,6 +117,12 @@ class dVector : public VectorBase
 				      * squares of the elements.
 				      */
     double l2_norm () const;
+
+				     /**
+				      * Return the maximum absolute value of the
+				      * elements of this vector.
+				      */
+    double linfty_norm () const;
     
     
 				     /**

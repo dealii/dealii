@@ -6,6 +6,7 @@
 
 #include <lac/dvector.h>
 #include <math.h>
+#include <algo.h>
 
 dVector::dVector () :
 		dim(0),
@@ -223,6 +224,30 @@ double dVector::l2_norm () const
   
   return sqrt(sum0+sum1+sum2+sum3);
 };
+
+
+
+double dVector::linfty_norm () const {
+  double max0=0.,
+	 max1=0.,
+	 max2=0.,
+	 max3=0.;
+  for (unsigned int i=0; i<(dim/4); ++i) 
+    {
+      if (max0<fabs(val[4*i]))   max0=fabs(val[4*i]);
+      if (max1<fabs(val[4*i+1])) max1=fabs(val[4*i+1]);
+      if (max2<fabs(val[4*i+2])) max2=fabs(val[4*i+2]);
+      if (max3<fabs(val[4*i+3])) max3=fabs(val[4*i+3]);
+    };
+				   // add up remaining elements
+  for (unsigned int i=(dim/4)*4; i<dim; ++i)
+    if (max0<val[i])
+      max0 = val[i];
+
+  return max (max(max0, max1),
+	      max(max2, max3));
+};
+  
 
 
 
