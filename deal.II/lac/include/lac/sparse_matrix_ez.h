@@ -880,14 +880,14 @@ class SparseMatrixEZ : public Subscriptor
 				      * zero-pointer if the entry does
 				      * not exist.
 				      */
-    const Entry* locate (unsigned int row,
-			 unsigned int col) const;
+    const Entry* locate (const unsigned int row,
+			 const unsigned int col) const;
 
 				     /**
 				      * Find an entry or generate it.
 				      */
-    Entry* allocate (unsigned int row,
-		     unsigned int col);
+    Entry* allocate (const unsigned int row,
+		     const unsigned int col);
     
 				     /**
 				      * Version of @p{vmult} which only
@@ -1144,8 +1144,8 @@ unsigned int SparseMatrixEZ<number>::n () const
 template <typename number>
 inline
 const typename SparseMatrixEZ<number>::Entry*
-SparseMatrixEZ<number>::locate ( const unsigned int row,
-				 const unsigned int col) const
+SparseMatrixEZ<number>::locate (const unsigned int row,
+				const unsigned int col) const
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
@@ -1364,7 +1364,7 @@ template<typename number>
 template <class MATRIX>
 inline
 void
-SparseMatrixEZ<number>::add_scaled (number factor,
+SparseMatrixEZ<number>::add_scaled (const number factor,
 				    const MATRIX& M)
 {
   Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
