@@ -1330,15 +1330,14 @@ FE_Q<dim>::element_multiplicity (const unsigned int index) const
 
 template <int dim>
 bool
-FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
+FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
 				const unsigned int face_index) const
 {
-  Assert (shape_index_ < this->dofs_per_cell,
-	  ExcIndexRange (shape_index_, 0, this->dofs_per_cell));
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
-  unsigned int shape_index = shape_index_;
 
 				   // in 1d, things are simple. since
 				   // there is only one degree of
@@ -1352,71 +1351,105 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index_,
   else
 				     // more dimensions
     {
-      Assert (dim<=3, ExcNotImplemented());
-      
-      const unsigned int cell_start = (dim==2)
-				      ? this->first_quad_index
-				      : this->first_hex_index;
-      const unsigned int face_start = (dim==2)
-				      ? this->first_line_index
-				      : this->first_quad_index;
-      const unsigned int edge_start = this->first_line_index;
-      
-      const unsigned int dofs_per_face = (dim==2)
-					 ? this->dofs_per_line
-					 : this->dofs_per_quad;
-      const unsigned int dofs_per_edge = this->dofs_per_line;
-      
-				       // Interior degrees of
-				       // freedom correspond to
-				       // shape functions with
-				       // support inside the cell.
-      if (shape_index >= cell_start)
-	return false;
-				       // Shape functions are sorted
-				       // by face. If we divide by
-				       // the number of shapes per
-				       // face, the result must be
-				       // equal to the face index.
-      if (shape_index >= face_start)
-	{
-	  shape_index -= face_start;
-	  shape_index /=  dofs_per_face;
-	  return (shape_index == face_index);
-	}
-				       // In 3D, we must process edges
-				       // like faces.
-      if (shape_index >= edge_start)
-	{
-	  shape_index -= edge_start;
-	  shape_index /=  dofs_per_edge;
-	  return (shape_index == face_index);
-	}
-      
-				       // Only degrees of freedom on
-				       // a vertex are left.
-      shape_index /=  this->dofs_per_vertex;
-				       // Use a table to figure out
-				       // which face is neighbor to
-				       // which vertex. This seems to
-				       // be the most reasonable way,
-				       // considering the way how
-				       // edges and faces are numbered
-      switch (100*dim+10*face_index+shape_index)
-	{
-	  case 200:	  case 230:	  case 201:	  case 211:
-	  case 212:	  case 222:	  case 223:	  case 233:
-	  case 300:	  case 320:	  case 350:	  case 301:
-	  case 321:	  case 331:	  case 302:	  case 332:
-	  case 342:	  case 303:	  case 343:	  case 353:
-	  case 314:	  case 324:	  case 354:	  case 315:
-	  case 325:	  case 335:	  case 316:	  case 336:
-	  case 346:	  case 317:	  case 347:	  case 357:
-	    return true;
-	  default:
-	    return false;
-	}
-      return true;
+                                       // let's see whether this is a
+                                       // vertex
+      if (shape_index < first_line_index) 
+        {
+                                           // for Q elements, there is
+                                           // one dof per vertex, so
+                                           // shape_index==vertex_number. check
+                                           // whether this vertex is
+                                           // on the given face. thus,
+                                           // for each face, give a
+                                           // list of vertices
+          const unsigned int vertex_no = shape_index;
+          Assert (vertex_no < GeometryInfo<dim>::vertices_per_cell,
+                  ExcInternalError());
+          switch (dim)
+            {
+              case 2:
+              {
+                static const unsigned int face_vertices[4][2] =
+                  { {0,1},{1,2},{2,3},{0,3} };
+                return ((face_vertices[face_index][0] == vertex_no)
+                        ||
+                        (face_vertices[face_index][1] == vertex_no));
+              };
+
+              case 3:
+              {
+                static const unsigned int face_vertices[6][4] =
+                  { {0,1,2,3},{4,5,6,7},{0,1,5,4},
+                    {1,5,6,2},{3,2,6,7},{0,4,7,3} };
+                return ((face_vertices[face_index][0] == vertex_no)||
+                        (face_vertices[face_index][1] == vertex_no)||
+                        (face_vertices[face_index][2] == vertex_no)||
+                        (face_vertices[face_index][3] == vertex_no));
+              };
+
+              default:
+                    Assert (false, ExcNotImplemented());
+            };
+        }
+      else if (shape_index < first_quad_index)
+                                         // ok, dof is on a line
+        {
+          const unsigned int line_index
+            = (shape_index - first_line_index) / dofs_per_line;
+          Assert (line_index < GeometryInfo<dim>::lines_per_cell,
+                  ExcInternalError());
+
+                                           // in 2d, the line is the
+                                           // face, so get the line
+                                           // index
+          if (dim == 2)
+            return (line_index == face_index);
+          else if (dim == 3)
+            {
+                                               // see whether the
+                                               // given line is on the
+                                               // given face. use
+                                               // table technique
+                                               // again
+              static const unsigned int face_lines[6][4] =
+                { {0,1,2,3},{4,5,6,7},{0,8,9,4},
+                  {1,9,5,10},{2,10,6,11},{3,8,7,11} };
+              return ((face_lines[face_index][0] == line_index)||
+                      (face_lines[face_index][1] == line_index)||
+                      (face_lines[face_index][2] == line_index)||
+                      (face_lines[face_index][3] == line_index));
+            }
+          else
+            Assert (false, ExcNotImplemented());
+        }
+      else if (shape_index < first_hex_index)
+                                         // dof is on a quad
+        {
+          const unsigned int quad_index 
+            = (shape_index - first_quad_index) / dofs_per_quad;
+          Assert (quad_index < GeometryInfo<dim>::quads_per_cell,
+                  ExcInternalError());
+          
+                                           // in 2d, cell bubble are
+                                           // zero on all faces
+          if (dim == 2)
+            return false;
+                                           // in 3d,
+                                           // quad_index=face_index
+          else if (dim == 3)
+            return (quad_index == face_index);
+          else
+            Assert (false, ExcNotImplemented());
+        }
+      else
+                                         // dof on hex
+        {
+          Assert (dim == 3, ExcNotImplemented());
+                                           // in 3d, hex dofs are
+                                           // bubbles and are zero on
+                                           // the boundary
+          return false;
+        };
     };
 };
 
