@@ -758,7 +758,10 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
   for (; dof != endd; ++dof)
     {
       Assert (dof->first < n_dofs, ExcInternalError());
-      
+
+				       // get global index and index
+				       // in the block in which this
+				       // dof is located
       const unsigned int dof_number = dof->first;
       const pair<unsigned int,unsigned int>
 	block_index = index_mapping.global_to_local (dof_number);
@@ -773,6 +776,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 				       // we shall not set
 				       // matrix.global_entry(
 				       //     sparsity_rowstart[dof.first])
+				       // of the diagonal block
       for (unsigned int block_col=0; block_col<blocks; ++block_col)
 	{
 	  const SparsityPattern &
@@ -823,9 +827,8 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
       else
 	{
 	  matrix.block(block_index.first, block_index.first)
-	    .set (block_index.second,
-		  block_index.second,
-		  first_nonzero_diagonal_entry);
+	    .diag_element(block_index.second)
+	    = first_nonzero_diagonal_entry;
 	  new_rhs = dof->second * first_nonzero_diagonal_entry;
 	};
       right_hand_side.block(block_index.first)(block_index.second)
@@ -873,14 +876,23 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					   // transpose block
 	  for (unsigned int block_row=0; block_row<blocks; ++block_row)
 	    {
+					       // get pointers to the
+					       // sparsity patterns of
+					       // this block and of
+					       // the transpose one
+	      const SparsityPattern &this_sparsity
+		= sparsity_pattern.block (block_row, block_index.first);
 	      const SparsityPattern &transpose_sparsity
-		= sparsity_pattern.block (block_index.first,block_row);
+		= sparsity_pattern.block (block_index.first, block_row);
 	      
 					       // traverse the row of
 					       // the transpose block
 					       // to find the
 					       // interesting rows in
-					       // the present block
+					       // the present block.
+					       // don't use the
+					       // diagonal element of
+					       // the diagonal block
 	      const unsigned int
 		first = (block_index.first == block_row ?
 			 transpose_sparsity.get_rowstart_indices()[block_index.second]+1 :
@@ -889,16 +901,30 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 	      
 	      for (unsigned int j=first; j<last; ++j)
 		{
+						   // get the number
+						   // of the column in
+						   // this row in
+						   // which a nonzero
+						   // entry is. this
+						   // is also the row
+						   // of the transpose
+						   // block which has
+						   // an entry in the
+						   // interesting row
 		  const unsigned int row = transpose_sparsity.get_column_numbers()[j];
 
-						   // find the position of
+						   // find the
+						   // position of
 						   // element
 						   // (row,dof_number)
+						   // in this block
+						   // (not in the
+						   // transpose one)
 		  const unsigned int *
-		    p = lower_bound(&transpose_sparsity.get_column_numbers()
-				    [transpose_sparsity.get_rowstart_indices()[row]+1],
-				    &transpose_sparsity.get_column_numbers()
-				    [transpose_sparsity.get_rowstart_indices()[row+1]],
+		    p = lower_bound(&this_sparsity.get_column_numbers()
+				    [this_sparsity.get_rowstart_indices()[row]+1],
+				    &this_sparsity.get_column_numbers()
+				    [this_sparsity.get_rowstart_indices()[row+1]],
 				    block_index.second);
 
 						   // check whether this line has
@@ -911,16 +937,16 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 						   //
 						   // there should be such an entry!
 		  Assert ((*p == block_index.second) &&
-			  (p != &transpose_sparsity.get_column_numbers()
-			   [transpose_sparsity.get_rowstart_indices()[row+1]]),
+			  (p != &this_sparsity.get_column_numbers()
+			   [this_sparsity.get_rowstart_indices()[row+1]]),
 			  ExcInternalError());
 		  
 		  const unsigned int global_entry
 		    = (p
 		       -
-		       &transpose_sparsity.get_column_numbers()
-		       [transpose_sparsity.get_rowstart_indices()[0]]);
-		  
+		       &this_sparsity.get_column_numbers()
+		       [this_sparsity.get_rowstart_indices()[0]]);
+
 						   // correct right hand side
 		  right_hand_side.block(block_row)(row)
 		    -= matrix.block(block_row,block_index.first).global_entry(global_entry) /
