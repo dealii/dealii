@@ -1125,7 +1125,9 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
   Assert (out, ExcIO());
   
   Assert (patches.size() > 0, ExcNoPatches());
-  Assert (spacedim==dim, ExcNotImplemented());
+
+				   // Do ont allow volume rendering
+  Assert (dim<=2, ExcNotImplemented());
   
   switch (dim) 
     {
@@ -1153,6 +1155,11 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 					 // compiler; they are initialized later
 	double min_color_value=0, max_color_value=0;
 	
+					 // Array for z-coordinates of points.
+					 // The elevation determined by a function if spacedim=2
+					 // or the z-cooridate of the grid point if spacedim=3
+	double heights[4];
+
 					 // compute the cells for output and
 					 // enter them into the set above
 					 // note that since dim==2, we
@@ -1193,23 +1200,38 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 			    (patch->vertices[3] * (1-x_frac))) * y_frac1) 
 			  };
 
-		  Assert ((flags.height_vector < patch->data.n_rows()) ||
-			  patch->data.n_rows() == 0,
-			  ExcInvalidVectorNumber (flags.height_vector,
+		  switch (spacedim)
+		    {
+		    case 2:
+		      Assert ((flags.height_vector < patch->data.n_rows()) ||
+			      patch->data.n_rows() == 0,
+			      ExcInvalidVectorNumber (flags.height_vector,
 						  patch->data.n_rows()));
-		  const double heights[4]
-		    = { patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,i*(n_subdivisions+1) + j)       * flags.z_scaling : 0,
+		      heights[0] = patch->data.n_rows() != 0 ?
+			patch->data(flags.height_vector,i*(n_subdivisions+1) + j) * flags.z_scaling
+			: 0;
 			
-			patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j)   * flags.z_scaling : 0,
+		      heights[1] = patch->data.n_rows() != 0 ?
+			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j) * flags.z_scaling
+			: 0;
 			
-			patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling : 0,
+		      heights[2] = patch->data.n_rows() != 0 ?
+			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling
+			: 0;
 			
-			patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,i*(n_subdivisions+1) + j+1)     * flags.z_scaling : 0};
-
+		      heights[3] = patch->data.n_rows() != 0 ?
+			patch->data(flags.height_vector,i*(n_subdivisions+1) + j+1) * flags.z_scaling
+			: 0;
+		      break;
+		    case 3:
+						       // Copy z-coordinates into the height vector
+		      for (unsigned int i=0;i<4;++i)
+			heights[i] = points[i](2);
+		      break;
+		    default:
+		      Assert(false, ExcNotImplemented());
+		    }
+		  
 
 						   // now compute the projection of
 						   // the bilinear cell given by the
@@ -1240,8 +1262,8 @@ void DataOutBase::write_eps (const typename std::vector<Patch<dim,spacedim> > &p
 		  for (unsigned int vertex=0; vertex<4; ++vertex)
 		    {
 		      const double x = points[vertex](0),
-				   y = points[vertex](1),
-				   z = -heights[vertex];
+			y = points[vertex](1),
+			z = -heights[vertex];
 		      
 		      eps_cell.vertices[vertex](0) = -   cz*x+   sz*y;
 		      eps_cell.vertices[vertex](1) = -cx*sz*x-cx*cz*y-sx*z;
