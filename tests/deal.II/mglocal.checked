@@ -8,19 +8,3 @@ DEAL:cg::Convergence step 8
 DEAL::smoothing-steps2
 DEAL:cg::Starting 
 DEAL:cg::Convergence step 7 
-DEAL::DoFs 141
-DEAL::Levels: 4
-DEAL::smoothing-steps1
-DEAL:cg::Starting 
-DEAL:cg::Failure step 20 
-DEAL::smoothing-steps2
-DEAL:cg::Starting 
-DEAL:cg::Failure step 20 
-DEAL::DoFs 297
-DEAL::Levels: 4
-DEAL::smoothing-steps1
-DEAL:cg::Starting 
-DEAL:cg::Failure step 20 
-DEAL::smoothing-steps2
-DEAL:cg::Starting 
-DEAL:cg::Failure step 20 

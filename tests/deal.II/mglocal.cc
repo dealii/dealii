@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -74,7 +74,7 @@ int main()
   //  logfile.precision (3);
   deallog.attach(logfile);
 //  deallog.log_execution_time(true);
-  deallog.depth_console(0);
+//  deallog.depth_console(0);
 
   deallog << "Test" << std::endl;
   
@@ -82,7 +82,7 @@ int main()
   RHSFunction<2> rhs;
   QGauss5<2> quadrature;
   
-  for (unsigned int degree=1;degree<=3;degree++)
+  for (unsigned int degree=1;degree<=1;degree++)
     {
       Triangulation<2> tr;
       GridGenerator::hyper_cube(tr,-M_PI_2,M_PI_2);
@@ -138,7 +138,7 @@ int main()
 	  u.reinit(f);
 	  PrimitiveVectorMemory<> mem;
 
-	  SolverControl control(20, 1.e-12, false);
+	  SolverControl control(2000, 1.e-12, false);
 	  SolverCG<> solver(control, mem);
 	  
 	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);
