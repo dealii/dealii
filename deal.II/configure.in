@@ -11,7 +11,9 @@ dnl
 dnl author: Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001
 dnl
 
-
+dnl switch off caching, since that leads to insurmountable trouble if
+dnl you call ./configure subsequently on different systems without
+dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_REVISION($Revision$)
