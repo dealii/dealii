@@ -79,9 +79,9 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 				   // already have built.
   for (int level=maxlevel; level>=static_cast<int>(minlevel); --level)
     {
-      MGDoFHandler<dim>::active_cell_iterator
+      typename MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof_handler->begin_active(level);
-      const MGDoFHandler<dim>::active_cell_iterator
+      const typename MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler->end_active(level);
 
 //TODO:[?] Treat hanging nodes properly
@@ -108,7 +108,8 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 
 	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
 	    {
-	      const MGDoFHandler<dim>::face_iterator face = level_cell->face(face_n);
+	      const typename MGDoFHandler<dim>::face_iterator
+		face = level_cell->face(face_n);
 	      if (face->has_children())
 		{
 		  face->get_mg_dof_indices(level_face_indices);
@@ -147,9 +148,9 @@ Multigrid<dim>::copy_from_mg(Vector<number> &dst) const
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-  MGDoFHandler<dim>::active_cell_iterator
+  typename MGDoFHandler<dim>::active_cell_iterator
     level_cell = mg_dof_handler->begin_active();
-  const MGDoFHandler<dim>::active_cell_iterator
+  const typename MGDoFHandler<dim>::active_cell_iterator
     endc = mg_dof_handler->end();
 
 				   // traverse all cells and copy the
@@ -202,11 +203,11 @@ Multigrid<dim>::print_vector (const unsigned int level,
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-  DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
     global_cell = dof->begin_active(level);
-  MGDoFHandler<dim>::active_cell_iterator
+  typename MGDoFHandler<dim>::active_cell_iterator
     level_cell = mg_dof_handler->begin_active(level);
-  const MGDoFHandler<dim>::cell_iterator
+  const typename MGDoFHandler<dim>::cell_iterator
     endc = mg_dof_handler->end(level);
 
 				   // traverse all cells and copy the

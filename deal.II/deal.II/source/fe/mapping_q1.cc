@@ -552,9 +552,9 @@ MappingQ1<dim>::compute_mapping_support_points(
 
 template <int dim>
 void
-MappingQ1<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+MappingQ1<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 				const Quadrature<dim>                &q,
-				Mapping<dim>::InternalDataBase      &mapping_data,
+				typename Mapping<dim>::InternalDataBase      &mapping_data,
 				std::vector<Point<dim> >                  &quadrature_points,
 				std::vector<double>                       &JxW_values) const
 {

@@ -238,9 +238,9 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
 
 template <int dim>
 void
-MappingQ<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+MappingQ<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 			       const Quadrature<dim>                &q,
-			       Mapping<dim>::InternalDataBase       &mapping_data,
+			       typename Mapping<dim>::InternalDataBase       &mapping_data,
 			       std::vector<Point<dim> >             &quadrature_points,
 			       std::vector<double>                  &JxW_values) const
 {
@@ -861,7 +861,7 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
 
 template <int dim>
 void
-MappingQ<dim>::add_line_support_points (const Triangulation<dim>::cell_iterator &cell,
+MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
 					std::vector<Point<dim> > &a) const
 {
   static const StraightBoundary<dim> straight_boundary;
@@ -1090,7 +1090,7 @@ MappingQ<3>::fill_quad_support_points_simple (const Triangulation<3>::cell_itera
 
 template <int dim>
 void
-MappingQ<dim>::fill_quad_support_points_simple (const Triangulation<dim>::cell_iterator &,
+MappingQ<dim>::fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &,
 						std::vector<Point<dim> > &) const
 {}
 

@@ -1024,10 +1024,10 @@ FE_Q<dim>::get_data (const UpdateFlags      update_flags,
 template <int dim>
 void
 FE_Q<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-			   const DoFHandler<dim>::cell_iterator &cell,
+			   const typename DoFHandler<dim>::cell_iterator &cell,
 			   const Quadrature<dim>                &quadrature,
-			   Mapping<dim>::InternalDataBase       &mapping_data,
-			   Mapping<dim>::InternalDataBase       &fedata,
+			   typename Mapping<dim>::InternalDataBase &mapping_data,
+			   typename Mapping<dim>::InternalDataBase &fedata,
 			   FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
@@ -1061,11 +1061,11 @@ FE_Q<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 template <int dim>
 void
 FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				const DoFHandler<dim>::cell_iterator &cell,
+				const typename DoFHandler<dim>::cell_iterator &cell,
 				const unsigned int                    face,
 				const Quadrature<dim-1>              &quadrature,
-				Mapping<dim>::InternalDataBase       &mapping_data,
-				Mapping<dim>::InternalDataBase       &fedata,
+				typename Mapping<dim>::InternalDataBase       &mapping_data,
+				typename Mapping<dim>::InternalDataBase       &fedata,
 				FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
@@ -1104,12 +1104,12 @@ FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
 template <int dim>
 void
 FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				   const DoFHandler<dim>::cell_iterator &cell,
+				   const typename DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int                    face,
 				   const unsigned int                    subface,
 				   const Quadrature<dim-1>              &quadrature,
-				   Mapping<dim>::InternalDataBase       &mapping_data,
-				   Mapping<dim>::InternalDataBase       &fedata,
+				   typename Mapping<dim>::InternalDataBase       &mapping_data,
+				   typename Mapping<dim>::InternalDataBase       &fedata,
 				   FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal

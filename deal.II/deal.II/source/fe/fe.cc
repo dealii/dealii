@@ -296,9 +296,9 @@ template <int dim>
 void
 FiniteElementBase<dim>::
 compute_2nd (const Mapping<dim>                   &mapping,
-	     const DoFHandler<dim>::cell_iterator &cell,
+	     const typename DoFHandler<dim>::cell_iterator &cell,
 	     const unsigned int                    offset,
-	     Mapping<dim>::InternalDataBase       &mapping_internal,
+	     typename Mapping<dim>::InternalDataBase &mapping_internal,
 	     InternalDataBase                     &fe_internal,
 	     FEValuesData<dim>                    &data) const
 {

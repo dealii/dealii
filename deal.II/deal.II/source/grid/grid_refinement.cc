@@ -91,7 +91,7 @@ void GridRefinement::refine (Triangulation<dim>   &tria,
   if (threshold==0)
     return;
   
-  Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
@@ -111,7 +111,7 @@ void GridRefinement::coarsen (Triangulation<dim>   &tria,
   Assert (*std::min_element(criteria.begin(), criteria.end()) >= 0,
 	  ExcInvalidParameterValue());
 
-  Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)

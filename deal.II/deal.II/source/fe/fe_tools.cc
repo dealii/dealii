@@ -161,10 +161,10 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
   FETools::get_interpolation_matrix(dof1.get_fe(), dof2.get_fe(),
 				    interpolation_matrix);
   
-  DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
-					endc1 = dof1.end(),
-					cell2 = dof2.begin_active(),
-					endc2 = dof2.end();
+  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
+						 endc1 = dof1.end(),
+						 cell2 = dof2.begin_active(),
+						 endc2 = dof2.end();
 
   std::vector<unsigned int> index_multiplicity(dof2.n_dofs(),0);
   std::vector<unsigned int> dofs (dofs_per_cell2);
@@ -211,8 +211,8 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
   FETools::get_back_interpolation_matrix(dof1.get_fe(), fe2,
 					 interpolation_matrix);
 
-  DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
-					endc1 = dof1.end();
+  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
+						 endc1 = dof1.end();
   
   for (; cell1!=endc1; ++cell1) 
     {
@@ -245,8 +245,8 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
   FETools::get_interpolation_difference_matrix(dof1.get_fe(), fe2,
 					       difference_matrix);
   
-  DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
-					endc1 = dof1.end();
+  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
+						 endc1 = dof1.end();
   
   for (; cell1!=endc1; ++cell1) 
     {

@@ -593,7 +593,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * to the @p{get_function_*} functions
 				      * safer.
 				      */
-    DoFHandler<dim>::cell_iterator present_cell;
+    typename DoFHandler<dim>::cell_iterator present_cell;
 
 				     /**
 				      * Storage for the mapping object.

@@ -244,11 +244,11 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 
 template <int dim>
 void
-MappingCartesian<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator& cell,
-				const Quadrature<dim>& q, 
-				Mapping<dim>::InternalDataBase& mapping_data,
-				std::vector<Point<dim> >& quadrature_points,
-				std::vector<double>& JxW_values) const
+MappingCartesian<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator& cell,
+				       const Quadrature<dim>& q, 
+				       typename Mapping<dim>::InternalDataBase& mapping_data,
+				       std::vector<Point<dim> >& quadrature_points,
+				       std::vector<double>& JxW_values) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with

@@ -233,7 +233,7 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
 template <int dim>
 void
 HyperBallBoundary<dim>::get_intermediate_points_on_quad (
-  const Triangulation<dim>::quad_iterator &,
+  const typename Triangulation<dim>::quad_iterator &,
   typename std::vector<Point<dim> > &) const
 {
   Assert(false, Boundary<dim>::ExcFunctionNotUseful(dim));
@@ -258,7 +258,7 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 template <int dim>
 void
 HyperBallBoundary<dim>::
-get_normals_at_vertices (const Triangulation<dim>::face_iterator &face,
+get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)

@@ -207,7 +207,8 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator
+	 cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell)
     ++n_patches;
 

@@ -73,8 +73,8 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
   indices_on_cell=std::vector<std::vector<unsigned int> > (n_active_cells,
 						 std::vector<unsigned int> (dofs_per_cell));
 
-  DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
-				 endc = dof_handler->end();
+  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
+					  endc = dof_handler->end();
 
   for (unsigned int i=0; cell!=endc; ++cell) 
     {
@@ -112,8 +112,8 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
   unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
 
-  DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
-				 endc = dof_handler->end();
+  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
+					  endc = dof_handler->end();
 
   std::vector<unsigned int> *indexptr;  
 
@@ -177,8 +177,9 @@ prepare_for_coarsening_and_refinement(const typename std::vector<Vector<number> 
 				   // and that'll stay or be refined
   unsigned int n_cells_to_coarsen=0;
   unsigned int n_cells_to_stay_or_refine=0;
-  DoFHandler<dim>::active_cell_iterator act_cell = dof_handler->begin_active(),
-					    endc = dof_handler->end();
+  typename DoFHandler<dim>::active_cell_iterator
+    act_cell = dof_handler->begin_active(),
+    endc = dof_handler->end();
   for (; act_cell!=endc; ++act_cell) 
     {
       if (act_cell->coarsen_flag_set())
@@ -214,7 +215,7 @@ prepare_for_coarsening_and_refinement(const typename std::vector<Vector<number> 
 				   // and all the cells where a
 				   // @p{Pointerstruct} is needed 'n'
   unsigned int n_sr=0, n_cf=0, n=0;
-  DoFHandler<dim>::cell_iterator cell = dof_handler->begin();  
+  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin();  
   for (; cell!=endc; ++cell) 
     {
       if (cell->active() && !cell->coarsen_flag_set())
@@ -306,8 +307,8 @@ interpolate (const typename std::vector<Vector<number> > &all_in,
   std::vector<Vector<number> > *valuesptr;
   std::vector<unsigned int>     dofs(dofs_per_cell);
 
-  DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
-				 endc = dof_handler->end();
+  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
+					  endc = dof_handler->end();
   
   for (; cell!=endc; ++cell) 
     {

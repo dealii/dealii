@@ -54,8 +54,8 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim> &dof,
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
   for (; cell!=endc; ++cell) 
     {
       cell->get_dof_indices (dofs_on_this_cell);
@@ -100,8 +100,8 @@ DoFTools::make_sparsity_pattern (const DoFHandler<dim>                 &dof,
 
 
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
   for (; cell!=endc; ++cell) 
     {
       cell->get_dof_indices (dofs_on_this_cell);
@@ -301,8 +301,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
 
 				   // clear user flags for further use
   const_cast<Triangulation<dim>&>(dof.get_tria()).clear_user_flags();
@@ -321,13 +321,14 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  DoFHandler<dim>::face_iterator cell_face = cell->face(face);
+	  typename DoFHandler<dim>::face_iterator cell_face = cell->face(face);
 	  if (cell_face->user_flag_set ())
 	    continue;
 
 	  if (! cell->at_boundary (face) )
 	    {
-	      DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+	      typename DoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face);
 					       // Refinement edges are taken care of
 					       // by coarser cells
 	      if (neighbor->level() < cell->level())
@@ -341,7 +342,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		       sub_nr != GeometryInfo<dim>::subfaces_per_face;
 		       ++sub_nr)
 		    {
-		      DoFHandler<dim>::cell_iterator sub_neighbor
+		      typename DoFHandler<dim>::cell_iterator sub_neighbor
 			= neighbor->
 			child(GeometryInfo<dim>::child_cell_on_face(neighbor_face, sub_nr));
 
@@ -405,8 +406,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
 
 
   std::vector<std::vector<bool> > int_dof_mask(total_dofs,
@@ -442,13 +443,14 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  DoFHandler<dim>::face_iterator cell_face = cell->face(face);
+	  typename DoFHandler<dim>::face_iterator cell_face = cell->face(face);
 	  if (cell_face->user_flag_set ())
 	    continue;
 
 	  if (! cell->at_boundary (face) )
 	    {
-	      DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+	      typename DoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face);
 					       // Refinement edges are taken care of
 					       // by coarser cells
 	      if (neighbor->level() < cell->level())
@@ -462,7 +464,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		       sub_nr != GeometryInfo<dim>::subfaces_per_face;
 		       ++sub_nr)
 		    {
-		      DoFHandler<dim>::cell_iterator sub_neighbor
+		      typename DoFHandler<dim>::cell_iterator sub_neighbor
 			= neighbor->
 			child(GeometryInfo<dim>::child_cell_on_face(neighbor_face, sub_nr));
 
@@ -771,8 +773,9 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
 				   // in the sum for each dof
   std::vector<unsigned char> touch_count (dof_handler.n_dofs(), 0);
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   unsigned int present_cell = 0;
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> dof_indices (dofs_per_cell);
@@ -831,7 +834,7 @@ DoFTools::extract_dofs (const DoFHandler<dim>      &dof,
   
   std::vector<unsigned int> indices(fe.dofs_per_cell);
   
-  DoFHandler<dim>::active_cell_iterator c;
+  typename DoFHandler<dim>::active_cell_iterator c;
   for (c = dof.begin_active() ; c != dof.end() ; ++ c)
     {
       c->get_dof_indices(indices);
@@ -864,7 +867,7 @@ DoFTools::extract_level_dofs(const unsigned int       level,
 
   std::vector<unsigned int> indices(fe.dofs_per_cell);
   
-  MGDoFHandler<dim>::cell_iterator c;
+  typename MGDoFHandler<dim>::cell_iterator c;
   for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
     {
       c->get_mg_dof_indices(indices);
@@ -919,7 +922,8 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 				   // line is also part of a boundary
 				   // face which we will be visiting
 				   // sooner or later
-  for (DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator
+	 cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->at_boundary(face))
@@ -1282,7 +1286,8 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
       std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
       std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
       
-      for (DoFHandler<dim>::active_cell_iterator cell=fine_grid.begin_active();
+      for (typename DoFHandler<dim>::active_cell_iterator
+	     cell=fine_grid.begin_active();
 	   cell!=fine_grid.end(); ++cell)
 	{
 	  cell->get_dof_indices (local_dof_indices);

@@ -121,9 +121,9 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    Mapping<dim>::InternalDataBase       &mapping_data,
+		    typename Mapping<dim>::InternalDataBase       &mapping_data,
 		    std::vector<Point<dim> >             &quadrature_points,
 		    std::vector<double>                  &JxW_values) const ;
 
@@ -132,10 +132,10 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    fill_fe_face_values (const DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
-			 Mapping<dim>::InternalDataBase &mapping_data,
+			 typename Mapping<dim>::InternalDataBase &mapping_data,
 			 std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 std::vector<Tensor<1,dim> >        &exterior_form,
@@ -403,7 +403,7 @@ class MappingQ : public MappingQ1<dim>
 				      * @p{compute_support_points_simple}
 				      */
 //TODO:[RH] (later) remove this function altogether?    
-    void fill_quad_support_points_simple (const Triangulation<dim>::cell_iterator &cell,
+    void fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &cell,
 					  std::vector<Point<dim> > &a) const;
     
 				     /**

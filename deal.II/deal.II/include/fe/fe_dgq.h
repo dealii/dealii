@@ -93,10 +93,10 @@ class FE_DGQ : public FiniteElement<dim>
 				      */
     virtual void
     fill_fe_values (const Mapping<dim> &mapping,
-		    const DoFHandler<dim>::cell_iterator &cell,
+		    const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    Mapping<dim>::InternalDataBase      &mapping_internal,
-		    Mapping<dim>::InternalDataBase      &fe_internal,
+		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
+		    typename Mapping<dim>::InternalDataBase      &fe_internal,
 		    FEValuesData<dim>& data) const;
     
 				     /**
@@ -106,11 +106,11 @@ class FE_DGQ : public FiniteElement<dim>
 				      */
     virtual void
     fill_fe_face_values (const Mapping<dim> &mapping,
-			 const DoFHandler<dim>::cell_iterator &cell,
+			 const typename DoFHandler<dim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>                &quadrature,
-			 Mapping<dim>::InternalDataBase      &mapping_internal,
-			 Mapping<dim>::InternalDataBase      &fe_internal,
+			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
+			 typename Mapping<dim>::InternalDataBase      &fe_internal,
 			 FEValuesData<dim>& data) const ;
     
 				     /**
@@ -120,12 +120,12 @@ class FE_DGQ : public FiniteElement<dim>
 				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const DoFHandler<dim>::cell_iterator &cell,
+			    const typename DoFHandler<dim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>                &quadrature,
-			    Mapping<dim>::InternalDataBase      &mapping_internal,
-			    Mapping<dim>::InternalDataBase      &fe_internal,
+			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
+			    typename Mapping<dim>::InternalDataBase      &fe_internal,
 			    FEValuesData<dim>& data) const ;
 
   private:

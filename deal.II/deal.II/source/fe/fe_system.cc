@@ -358,10 +358,10 @@ FESystem<dim>::get_data (UpdateFlags      flags,
 template <int dim>
 void
 FESystem<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-			       const DoFHandler<dim>::cell_iterator &cell,
+			       const typename DoFHandler<dim>::cell_iterator &cell,
 			       const Quadrature<dim>                &quadrature,
-			       Mapping<dim>::InternalDataBase       &mapping_data,
-			       Mapping<dim>::InternalDataBase       &fe_data,
+			       typename Mapping<dim>::InternalDataBase       &mapping_data,
+			       typename Mapping<dim>::InternalDataBase       &fe_data,
 			       FEValuesData<dim>                    &data) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
@@ -373,11 +373,11 @@ FESystem<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 template <int dim>
 void
 FESystem<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				    const DoFHandler<dim>::cell_iterator &cell,
+				    const typename DoFHandler<dim>::cell_iterator &cell,
 				    const unsigned int                    face_no,
 				    const Quadrature<dim-1>              &quadrature,
-				    Mapping<dim>::InternalDataBase       &mapping_data,
-				    Mapping<dim>::InternalDataBase       &fe_data,
+				    typename Mapping<dim>::InternalDataBase       &mapping_data,
+				    typename Mapping<dim>::InternalDataBase       &fe_data,
 				    FEValuesData<dim>                    &data) const
 {
   compute_fill(mapping, cell, face_no, invalid_face_number,
@@ -390,12 +390,12 @@ FESystem<dim>::fill_fe_face_values (const Mapping<dim>                   &mappin
 template <int dim>
 void
 FESystem<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				       const DoFHandler<dim>::cell_iterator &cell,
+				       const typename DoFHandler<dim>::cell_iterator &cell,
 				       const unsigned int                    face_no,
 				       const unsigned int                    sub_no,
 				       const Quadrature<dim-1>              &quadrature,
-				       Mapping<dim>::InternalDataBase       &mapping_data,
-				       Mapping<dim>::InternalDataBase       &fe_data,
+				       typename Mapping<dim>::InternalDataBase       &mapping_data,
+				       typename Mapping<dim>::InternalDataBase       &fe_data,
 				       FEValuesData<dim>                    &data) const
 {
   compute_fill(mapping, cell, face_no, sub_no,
@@ -408,12 +408,12 @@ template <int dim>
 template <int dim_1>
 void
 FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
-			     const DoFHandler<dim>::cell_iterator &cell,
+			     const typename DoFHandler<dim>::cell_iterator &cell,
 			     const unsigned int                    face_no,
 			     const unsigned int                    sub_no,
 			     const Quadrature<dim_1>              &quadrature,
-			     Mapping<dim>::InternalDataBase       &mapping_data,
-			     Mapping<dim>::InternalDataBase       &fedata,
+			     typename Mapping<dim>::InternalDataBase       &mapping_data,
+			     typename Mapping<dim>::InternalDataBase       &fedata,
 			     FEValuesData<dim>                    &data) const
 {       
 				   // convert data object to internal

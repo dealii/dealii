@@ -852,7 +852,7 @@ class FiniteElementBase : public Subscriptor,
 				      * gradients.
 				      */
     void compute_2nd (const Mapping<dim>                      &mapping,
-		      const DoFHandler<dim>::cell_iterator    &cell,
+		      const typename DoFHandler<dim>::cell_iterator    &cell,
 		      const unsigned int                       offset,
 		      typename Mapping<dim>::InternalDataBase &mapping_internal,
 		      InternalDataBase                        &fe_internal,

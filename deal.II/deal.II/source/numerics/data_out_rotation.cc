@@ -347,7 +347,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (DoFHandler<dim>::cell_iterator cell=first_cell();
+  for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
        cell != dofs->end();
        cell = next_cell(cell))
     ++n_patches;

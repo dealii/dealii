@@ -121,9 +121,9 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+    fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
-		    Mapping<dim>::InternalDataBase &mapping_data,
+		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    std::vector<Point<dim> >        &quadrature_points,
 		    std::vector<double>             &JxW_values) const ;
 

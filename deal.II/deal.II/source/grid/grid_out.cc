@@ -554,8 +554,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
        
       case 2:
       {
-	Triangulation<dim>::active_line_iterator line   =tria.begin_active_line ();
-	Triangulation<dim>::active_line_iterator endline=tria.end_line ();
+	typename Triangulation<dim>::active_line_iterator
+	  line   =tria.begin_active_line (),
+	  endline=tria.end_line ();
 
 					 // first treat all interior
 					 // lines and make up a list
@@ -660,8 +661,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 //TODO:[RH] curved boundaries in eps for 3d	
 	Assert (mapping == 0, ExcNotImplemented());
 	
-	Triangulation<dim>::active_line_iterator line   =tria.begin_active_line ();
-	Triangulation<dim>::active_line_iterator endline=tria.end_line ();
+	typename Triangulation<dim>::active_line_iterator
+	  line   =tria.begin_active_line (),
+	  endline=tria.end_line ();
 	
 					 // loop over all lines and compute their
 					 // projection on the plane perpendicular

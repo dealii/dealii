@@ -88,7 +88,7 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
 				       // at the boundary of this level's
 				       // cells and if so add the dofs
 				       // to the interior boundary dofs
-      for (MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if ((cell->neighbor(face).state() == valid) &&

@@ -316,7 +316,7 @@ void DataOut<dim>::build_some_patches (Data data)
   
   unsigned int cell_number = 0;
   typename std::vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
-  DoFHandler<dim>::cell_iterator cell=first_cell();
+  typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != dofs->end()); ++i)
@@ -427,7 +427,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (DoFHandler<dim>::cell_iterator cell=first_cell();
+  for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
        cell != dofs->end();
        cell = next_cell(cell))
     ++n_patches;

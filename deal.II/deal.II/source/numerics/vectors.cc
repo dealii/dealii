@@ -73,8 +73,8 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
   const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
   
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
 
 				   // For FESystems many of the
 				   // unit_support_points will
@@ -249,9 +249,9 @@ VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
   std::vector<short unsigned int> touch_count (dof_2.n_dofs(), 0);
   std::vector<unsigned int>       local_dof_indices (dof_2.get_fe().dofs_per_cell);
   
-  DoFHandler<dim>::active_cell_iterator h = dof_1.begin_active();
-  DoFHandler<dim>::active_cell_iterator l = dof_2.begin_active();
-  const DoFHandler<dim>::cell_iterator endh = dof_1.end();
+  typename DoFHandler<dim>::active_cell_iterator h = dof_1.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator l = dof_2.begin_active();
+  const typename DoFHandler<dim>::cell_iterator endh = dof_1.end();
   
   for(; h != endh; ++h, ++l)
   {
@@ -986,8 +986,8 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
   std::vector<Tensor<1,dim> > tmp_gradients (fe_values.n_quadrature_points);
   
  				   // loop over all cells
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
- 					endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+						 endc = dof.end();
   for (unsigned int index=0; cell != endc; ++cell, ++index)
     {
       double diff=0;

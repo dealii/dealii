@@ -525,7 +525,7 @@ void TimeStepBase_Tria<dim>::restore_grid ()
 				       // desired so
 //       if (flags.max_refinement_level != 0)
 // 	{
-// 	  Triangulation<dim>::active_cell_iterator cell, endc;
+// 	  typename Triangulation<dim>::active_cell_iterator cell, endc;
 // 	  for (cell = tria->begin_active(),
 // 	       endc = tria->end();
 // 	       cell!=endc; ++cell)
@@ -698,11 +698,11 @@ adapt_grids (Triangulation<dim> &tria1,
 {
   bool grids_changed = false;
   
-  Triangulation<dim>::cell_iterator cell1 = tria1.begin(),
-				    cell2 = tria2.begin();
-  Triangulation<dim>::cell_iterator endc;
+  typename Triangulation<dim>::cell_iterator cell1 = tria1.begin(),
+					     cell2 = tria2.begin();
+  typename Triangulation<dim>::cell_iterator endc;
   endc = (tria1.n_levels() == 1 ?
-	  Triangulation<dim>::cell_iterator(tria1.end()) :
+	  typename Triangulation<dim>::cell_iterator(tria1.end()) :
 	  tria1.begin(1));
   for (; cell1!=endc; ++cell1, ++cell2)
     grids_changed |= adapt_grids<dim> (cell1, cell2);
@@ -853,7 +853,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					     // cells, we have to subtract 3/4 of
 					     // a cell for each flagged cell
 	double previous_cells = previous_tria->n_active_cells();
-	Triangulation<dim>::active_cell_iterator cell, endc;
+	typename Triangulation<dim>::active_cell_iterator cell, endc;
 	cell = previous_tria->begin_active();
 	endc = previous_tria->end();
 	for (; cell!=endc; ++cell)
@@ -1087,7 +1087,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	{
 	  adapt_grids (*previous_tria, *tria);
 
-	  Triangulation<dim>::cell_iterator old_cell, new_cell, endc;
+	  typename Triangulation<dim>::cell_iterator old_cell, new_cell, endc;
 	  old_cell = previous_tria->begin(0);
 	  new_cell = tria->begin(0);
 	  endc     = tria->end(0);

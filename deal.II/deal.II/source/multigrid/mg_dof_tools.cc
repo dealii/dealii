@@ -35,8 +35,8 @@ void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-  MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
-				   endc = dof.end(level);
+  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+					    endc = dof.end(level);
   for (; cell!=endc; ++cell) 
     {
       cell->get_mg_dof_indices (dofs_on_this_cell);
@@ -66,8 +66,8 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
-  MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
-				   endc = dof.end(level);
+  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+					    endc = dof.end(level);
   for (; cell!=endc; ++cell)
     {
       cell->get_mg_dof_indices (dofs_on_this_cell);
@@ -85,7 +85,8 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 	  if ( (! cell->at_boundary(face)) &&
 	       (static_cast<unsigned int>(cell->neighbor_level(face)) == level) )
 	    {
-	      MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+	      typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face);
 	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
 					       // only add one direction
 					       // The other is taken care of
@@ -127,8 +128,8 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
-  MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
-				   endc = dof.end(level);
+  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+					    endc = dof.end(level);
   for (; cell!=endc; ++cell)
     {
       cell->get_mg_dof_indices (dofs_on_this_cell);
@@ -142,7 +143,8 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 	  if ( (! cell->at_boundary(face)) &&
 	       (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
 	    {
-	      MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+	      typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face);
 	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
 
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -189,8 +191,8 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
   const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
-  MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
-				   endc = dof.end(level);
+  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+					    endc = dof.end(level);
 
 
   std::vector<std::vector<bool> > int_dof_mask(total_dofs,
@@ -226,13 +228,14 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  MGDoFHandler<dim>::face_iterator cell_face = cell->face(face);
+	  typename MGDoFHandler<dim>::face_iterator cell_face = cell->face(face);
 	  if (cell_face->user_flag_set ())
 	    continue;
 
 	  if (! cell->at_boundary (face) )
 	    {
-	      MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face);
+	      typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face);
 
 	      if (neighbor->level() < cell->level())
 		continue;
