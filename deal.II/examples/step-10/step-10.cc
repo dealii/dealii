@@ -21,6 +21,52 @@
 static const long double pi=3.141592653589793238462643;
 
 
+
+template <int dim>
+void gnuplot_output()
+{
+  cout << "Output of grids into gnuplot files:" << std::endl
+       << "===================================" << std::endl;
+  
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_ball (triangulation);
+  static const HyperBallBoundary<dim> boundary;
+  triangulation.set_boundary (0, boundary);
+  
+  GridOut grid_out;
+				   // on boundary faces plot 30
+				   // additional points per face.
+  GridOutFlags::Gnuplot gnuplot_flags(false, 30);
+  grid_out.set_flags(gnuplot_flags);
+  
+
+  for (unsigned int refinement=0; refinement<2;
+       ++refinement, triangulation.refine_global(1))
+    {
+      cout << "Pefinement level: " << refinement << std::endl;
+      string filename_base="ball";
+      filename_base += ('0'+refinement);
+      
+      for (unsigned int order=1; order<4; ++order)
+	{
+	  cout << "Order = " << order;
+	  
+	  const MappingQ<dim> mapping (order);
+	  string filename=filename_base+"_mapping_q";
+	  filename += ('0'+order);
+	  filename += ".dat";
+	  ofstream gnuplot_file(filename.c_str());
+
+	  cout << ".   Writing gnuplot file <"
+	       << filename << ">..." << std::endl;
+	  
+	  grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
+	}
+    }
+}
+
+
+
 template <int dim>
 void compute_pi_by_area ()
 {
@@ -138,48 +184,6 @@ void compute_pi_by_perimeter ()
       table.write_text(cout);
     };
 };
-
-
-template <int dim>
-void gnuplot_output()
-{
-  cout << "Output of grids as gnuplot file:" << std::endl;
-  
-  static const HyperBallBoundary<dim> boundary;
-  
-  GridOut grid_out;
-				   // on boundary faces plot 30
-				   // additional points per face.
-  GridOutFlags::Gnuplot gnuplot_flags(false, 30);
-  grid_out.set_flags(gnuplot_flags);
-  
-
-  for (unsigned int order=1; order<4; ++order)
-    {
-      cout << "Order = " << order << std::endl;
-
-      Triangulation<dim> triangulation;
-      GridGenerator::hyper_ball (triangulation);
-      triangulation.set_boundary (0, boundary);
-      
-      const MappingQ<dim> mapping (order);
-      string filename_base="ball_mapping_q";
-      filename_base += ('0'+order);
-
-      
-      for (unsigned int refinement=0; refinement<2;
-	   ++refinement, triangulation.refine_global(1))
-	{	  
-	  string filename=filename_base+"_ref";
-	  filename += ('0'+refinement);
-	  filename += ".dat";
-	  ofstream gnuplot_file(filename.c_str());
-
-	  grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
-	}
-    }
-}
-
 
 
 int main () 
