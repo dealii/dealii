@@ -50,11 +50,12 @@ namespace PETScWrappers
 
   void
   VectorBase::reinit (const unsigned int n,
-                      const bool         fast)
+                      const bool         fast,
+                      const unsigned int local_sz)
   {
                                      // only do something if the sizes
                                      // mismatch
-    if (size() != n)
+    if ((size() != n) || (local_size() != local_sz))
       {
                                          // FIXME: I'd like to use this here,
                                          // but somehow it leads to odd errors
@@ -68,7 +69,7 @@ namespace PETScWrappers
         ierr = VecDestroy (vector);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        create_vector (n);
+        create_vector (n, local_sz);
       }
 
                                      // finally clear the new vector if so

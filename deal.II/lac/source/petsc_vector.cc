@@ -46,8 +46,10 @@ namespace PETScWrappers
   
   void
   Vector::create_vector (const unsigned int n,
-                         const unsigned int /*local_size*/)
+                         const unsigned int local_size)
   {
+    Assert (local_size < n, ExcIndexRange (local_size, 0, n));
+    
     const int ierr
       = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

@@ -210,7 +210,7 @@ namespace PETScWrappers
 
                                        /**
                                         * Change the dimension of the vector
-                                        * to @p{N}. It is unspecified how
+                                        * to @arg N. It is unspecified how
                                         * resizing the vector affects the
                                         * memory allocation of this object;
                                         * i.e., it is not guaranteed that
@@ -220,13 +220,21 @@ namespace PETScWrappers
                                         * the same amount of memory is used
                                         * for less data.
                                         *
-                                        * On @p{fast==false}, the vector is
+                                        * On @arg fast is false, the vector is
                                         * filled by zeros. Otherwise, the
                                         * elements are left an unspecified
                                         * state.
+                                        *
+                                        * For parallel vectors, @arg
+                                        * local_size denotes how many of the
+                                        * @arg N values shall be stored
+                                        * locally on the present process. This
+                                        * argument is ignored for sequantial
+                                        * vectors.
                                         */ 
       void reinit (const unsigned int N,
-                   const bool         fast=false);
+                   const bool         fast=false,
+                   const unsigned int local_size = 0);
     
                                        /**
                                         * Change the dimension to that of the
