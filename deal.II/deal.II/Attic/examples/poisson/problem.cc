@@ -304,7 +304,7 @@ void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
     prm.declare_entry ("Test run", "zoom in",
 		       Patterns::Selection("tensor|zoom in|ball|curved line|"
-					  "random|jump|L-region"));
+					  "random|jump|L-region|slit domain"));
   else
     prm.declare_entry ("Test run", "zoom in",
 		       Patterns::Selection("tensor|zoom in|random"));
@@ -339,10 +339,12 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	    else
 	      if (test=="L-region") test_case = 7;
 	      else
-		{
-		  cerr << "This test seems not to be implemented!" << endl;
-		  return false;
-		};
+		if (test=="slit domain") test_case = 8;
+		else
+		  {
+		    cerr << "This test seems not to be implemented!" << endl;
+		    return false;
+		  };
 
   switch (test_case) 
     {
@@ -395,6 +397,11 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	    boundary = new StraightBoundary<dim>();
 	    tria->set_boundary (0, *boundary);
 	    GridGenerator::hyper_L (*tria);
+	    break;
+      case 8:
+	    boundary = new StraightBoundary<dim>();
+	    tria->set_boundary (0, *boundary);
+	    GridGenerator::hyper_cube_slit (*tria);	    
 	    break;
       default:
 	    return false;
