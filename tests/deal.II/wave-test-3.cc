@@ -2701,7 +2701,7 @@ fe_values.reinit (cell);
 				weights[point] *
 				density_values[point];
 
-      total_energy += 1./2. * cell_matrix.matrix_norm (local_v);
+      total_energy += 1./2. * cell_matrix.matrix_norm_square (local_v);
 
 				       // now for the part with the laplace
 				       // matrix
@@ -2715,7 +2715,7 @@ fe_values.reinit (cell);
 				 gradients[j][point]) *
 				weights[point] *
 				stiffness_values[point];
-      total_energy += 1./2. * cell_matrix.matrix_norm (local_u);
+      total_energy += 1./2. * cell_matrix.matrix_norm_square (local_u);
     };
 
   return total_energy;
@@ -4336,8 +4336,9 @@ void WaveParameters<2>::make_coarse_grid (const string &name) {
 
   const InitialMesh initial_mesh = initial_mesh_list[name];
 
-  coarse_grid = new Triangulation<dim>(MeshSmoothing(smoothing_on_refinement |
-						     eliminate_refined_inner_islands));
+  coarse_grid = new Triangulation<dim>
+		(Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+						   Triangulation<dim>::eliminate_refined_inner_islands));
   
   switch (initial_mesh) 
     {
@@ -5253,13 +5254,13 @@ unsigned int TimeStep_Wave<dim>::solve (const UserMatrix       &matrix,
 					const Vector<double>   &rhs) const {
   SolverControl            control(2000, 1.e-12);
   PrimitiveVectorMemory<>  memory;
-  SolverCG<UserMatrix>     pcg(control,memory);
+  SolverCG<>               pcg(control,memory);
 
 				   // solve
-  pcg.solve (matrix, solution, rhs,
-	     PreconditionUseMatrix<UserMatrix>
-	     (matrix,
-	      &UserMatrix::precondition));
+  pcg.template solve<UserMatrix> (matrix, solution, rhs,
+				  PreconditionUseMatrix<UserMatrix>
+				  (matrix,
+				   &UserMatrix::precondition));
 				   // distribute solution
   constraints.distribute (solution);
 
@@ -5467,13 +5468,13 @@ TimeStep_Wave<dim>::compute_energy () {
   switch (next_action)
     {
       case primal_problem:
-	    energy.first = 0.5*laplace_matrix.matrix_norm (u);
-	    energy.second = 0.5*mass_matrix.matrix_norm(v);
+	    energy.first = 0.5*laplace_matrix.matrix_norm_square (u);
+	    energy.second = 0.5*mass_matrix.matrix_norm_square(v);
 	    break;
 
       case dual_problem:
-	    energy.first = 0.5*laplace_matrix.matrix_norm (v);
-	    energy.second = 0.5*mass_matrix.matrix_norm(u);
+	    energy.first = 0.5*laplace_matrix.matrix_norm_square (v);
+	    energy.second = 0.5*mass_matrix.matrix_norm_square(u);
 	    break;
 
       default:
