@@ -94,7 +94,7 @@ endif
 # if you call it without arguments.
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS) 
 
 
 # To make running the application somewhat independent of the actual

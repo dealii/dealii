@@ -112,7 +112,7 @@ lib/$(deal_II_dimension)d/%.o :
 # Next define how to link the executable
 $(target) : $(libraries) Makefile
 	@echo =====waves=======$(deal_II_dimension)d==============$(MT)== Linking $(@F)
-	@$(CXX) $(LDFLAGS) -o $(target) $(libraries) $(LIBS)
+	@$(CXX) -o $(target) $(libraries) $(LIBS) $(LDFLAGS)
 
 
 
