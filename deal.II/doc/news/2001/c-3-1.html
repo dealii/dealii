@@ -35,14 +35,18 @@ documentation, etc</a>.
        (GK 2001/03/14)
        </p>
 
-  <li> <p> 
-       New: The finite element classes have been redesigned from
-       scratch to allow also elements that depend on the actual cell
-       shape, like Raviart-Thomas, BDM or edge elements. Presently, we
-       have implemented continuous and discontinous Lagrange elements,
-       that can be easily extended to higher degree. E.g. for
-       continuous FEs we've already implemented elements up to degree
-       four, for discontinuous FEs up to degree 10.
+  <li> <p>
+       <a name="new_fe_mapping_design"></a>
+       <h4> New Design of <code class="class">FiniteElements</code>
+       and <code class="class">Mappings</code></h4>
+
+       New: The finite element
+       classes have been redesigned from scratch to allow also
+       elements that depend on the actual cell shape, like
+       Raviart-Thomas, BDM or edge elements. We have implemented
+       continuous Lagrange elements up to degree four and discontinous
+       Lagrange elements up to degree 10. They can be easily extended
+       to higher degree.
        </p>
 
        <p> 
@@ -50,7 +54,7 @@ documentation, etc</a>.
        between unit and real cell.  In future we won't be restricted
        to Q<sub>1</sub> mapping any more, but we will have
        Q<sub>p</sub> mappings of arbitrary degree p. Presently
-       implemented are mappings up to degree four in 2d, and degree
+       implemented are mappings up to degree 10 in 2d, and degree
        three in 3d. This allows to approximate curved boundaries not
        only by straight lines (linear approximation) but also by
        quadratic, cubic, etc approximation. The finite elements will
@@ -61,13 +65,16 @@ documentation, etc</a>.
 
        <p>
        The new implementation uses a totally new structure of
-       communication between <code>FEValues</code>, the
-       <code>FiniteElements</code> and the Mappings. Despite of this,
-       the new structure will almost not be 'visible' to the user of
+       communication between <code class="class">FEValues</code>, the
+       <code class="class">FiniteElements</code> and the <code
+       class="class">Mappings</code>. Despite of this, the new
+       structure will almost not be 'visible' to the user of
        <acronym>deal.II</acronym> as we tried to retain the interface
-       to the user (mainly that of <code>FEValues</code>) as far as
-       possible.
+       to the user (mainly that of <code
+       class="class">FEValues</code>) as far as possible.
        <br>
+
+       <p>
        (RH & GK 2001/03/13)
        </p>
 
@@ -101,6 +108,39 @@ documentation, etc</a>.
 <h3>base</h3>
 
 <ol>
+  <li> <p>
+       New: The class <code
+       class="class">TensorProductPolynomials&lt;dim&gt;</code>
+       performs the tensor product of 1d polynomials, computes its
+       values, its first and second derivatives. If <code>n</code>
+       polynomials are given to the constructor of this class, it
+       constructs <code>n<sup>dim</sup></code> tensor product
+       polynomials.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
+  <li> <p>
+       New: <code class="class">LagrangeEquidistant</code> is a new
+       class derived from <code class="class">Polynomial</code>
+       providing the 1d Lagrange interpolation of degree
+       <code>n</code> of <code>n+1</code> equidistant support points
+       in <code>[0,1]</code>. It is implemented up to degree 10.
+       This class is used for the implementation of the continuous and
+       discontinuous Lagrange elements.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
+  <li> <p>
+       New: The new <code class="class">Polynomial</code> class can
+       be used as base class for all 1d polynomials. It stores the
+       coefficients of the polynomial and uses the Horner scheme to
+       evaluate values and all derivates.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
   <li> <p>
        New: function <code>contract</code> for two arguments of
        <code class="class">Tensor&lt;1,dim&gt;</code>
@@ -149,14 +189,16 @@ documentation, etc</a>.
 <h3>lac</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
+
        Removed: The explicite instantiations of <code
-       class="class">SparseMatrix<long double></code> are removed as a
-       prerelease of gcc3.0 fails to compile it. Now the user of
-       SparseMatrix<long double></code> needs to include
+       class="class">SparseMatrix&lt;long double&gt;</code> are
+       removed as a prerelease of gcc3.0 fails to compile it. A user
+       of <code class="class">SparseMatrix&lt;long double&gt;</code>
+       needs now to include
        <code>lac/include/lac/sparse_matrix.templates.h</code> into his
-       source file and to use a different compiler, e.g. gcc 2.95.2 or
-       a future version of gcc3.0 (that will then hopefully fixed).
+       source file and to use an appropriate compiler, e.g. gcc2.95.2 or
+       a future version of gcc3.0 (that will then hopefully be fixed).
        <br>
        (RH 2001/03/14)
        </p>
@@ -193,8 +235,81 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       Removed: The function <code
+       class="member">FiniteElemente<dim>::get_support_points</code>
+       is removed as the <code class="class">FiniteElement</code>
+       cannot know the position of the support points by itself. This is
+       because the support points depend on the unit support points
+       (known to the <code class="class">FiniteElement</code> class)
+       but they also depend on the mapping.
+
+       In future the support points can be computed using a <code
+       class="class">FEValues</code> object initialized with the <code
+       class="class">Mapping</code> and a <code
+       class="class">Quadrature</code> that uses the unit support
+       points as quadrature points.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
+  <li> <p> 
+       New: The class <code class="class">Boundary</code> has two new
+       functions <code
+       class="member">get_intermediate_points_on_line</code> and <code
+       class="member">get_intermediate_points_on_quad</code> that
+       needs to be implemented in derived classes only if <code
+       class="class">GridOut</code> is used with <code
+       class="class">MappingQ</code> of degree <code>p>2</code>.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
   <li> <p>
-       We now unconditionally include
+
+       New: The functions <code
+       class="member">GridOut::write_gnuplot</code> and <code
+       class="member">GridOut::write_eps</code> now take a pointer to
+       a <code class="class">Mapping</code> object as additional
+       argument. This allows to write grids in 2d whereby cells with a
+       curved boundary are transformed by the given <code
+       class="class">Mapping</code> class. The default mapping is
+       <code class="class">MappingQ1</code>. Note, that the grids do
+       not show the `original' domain with boundaries described by the
+       <code class="class">Boundary</code> classes but the
+       discretized domain whose boundary cells are transformed using the
+       given mapping.
+       </p>
+       There are also a new <code
+       class="member">GnuplotFlags::n_boundary_face_points</code> and
+       <code class="member">EpsFlags::n_boundary_face_points</code>
+       variables to set the number of additional points written
+       to represent the curved boundary faces.
+       <br>
+       (RH 2001/03/14)
+       </p>
+
+  <li> <p>
+       New: The constructor of the <code class="class">FEValues</code>
+       and <code class="class">FE(Sub)FaceValues</code> classes now
+       take a pointer to <code class="class">Mapping</code> object as
+       additional argument. This is the new possibility to combine a
+       <code class="class">FiniteElement</code> with an arbitrary
+       <code class="class">Mapping</code>, see also <a
+       href="#new_fe_mapping_design">New FE and Mapping Design</a>.
+       </p>
+
+       <p>
+       There still exists a constructor of <code
+       class="class">FEValues</code> without a <code
+       class="class">Mapping</code> argument that uses a <code
+       class="class">MappingQ1</code> by default.
+       <br>
+       (RH 2001/03/14)
+       </p>
+       
+  <li> <p>
+       Changed: We now unconditionally include
        <code>deal.II/include/grid/tria_accessor.templates.h</code>
        (which containts some inline functions for triangulation
        accessor classes) into 
@@ -207,7 +322,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       The class <code class="class">GridReordering::Cell</code> has
+       New: The class <code class="class">GridReordering::Cell</code> has
        now a copy constructor to work around a bug in a gcc3.0
        snapshot.
        <br>
