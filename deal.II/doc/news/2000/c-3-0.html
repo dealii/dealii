@@ -99,6 +99,14 @@
 
 <ol>
   <li> <p>
+       New: classes <code class="class">QMilne</code> and <code
+       class="class">QWeddle</code> for closed Newton-Cotes-formulæ of
+       orders 7 and 9, respectively.
+       <br>
+       (GK 2000/07/07)
+       </p>
+
+  <li> <p>
        New: There is now a function <code class="member">invert
        (Tensor<2,dim>)</code> that returns the inverse of a tensor of
        rank 2.
@@ -127,7 +135,33 @@
 <ol>
 
   <li> <p>
-       Improved: <code class="class">FullMatrix&lt;...&gt;</code><code
+
+       Improved: <code class="class">PreconditionBlockSOR</code><code
+       class="member">::Tvmult(...)</code> is implemented.
+       <br>
+       (GK 2000/07/07)
+       </p>
+
+  <li> <p>
+
+       Improved: The breakdown criterion of <code
+       class="class">SolverBicgstab</code> can be changed by the use
+       of <code class="class">SolverBicgstab::AdditionalData</code>.
+       <br>
+       (GK 2000/07/07)
+       </p>       
+
+  <li> <p>
+       New: <code class="class">SolverRichardson</code> has a
+       transposed solver <code class="member">Tsolve(...)</code>. It
+       uses the functions <code class="member">Tvmult(...)</code> of
+       the provided matrix and preconditioner.
+       <br>
+       (GK 2000/07/07)
+       </p>
+
+  <li> <p>
+       Improved: <code class="class">FullMatrix</code><code
        class="member">::invert(...)</code> now inverts matrices of all
        sizes. If there is no hardcoded inversion, <code
        class="member">gauss_jordan()</code> is used implicitly.
@@ -330,6 +364,15 @@
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p>
+       New: Function <code class="class">VectorTools</code><code
+       class="member">::compute_mean_value</code> integrates the mean
+       value of one component of a finite element function.
+       <br>
+       (GK 2000/07/12)
+       </p>
+       
   <li> <p>
        New: The new function <code class="member">get_face</code>
        of <code class="class">FEFaceValues</code> and <code
