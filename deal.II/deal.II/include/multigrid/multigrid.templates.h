@@ -14,12 +14,22 @@
 
 
 //TODO: This function needs to be specially implemented, since in 2d mode we use faces
-#if deal_II_dimension != 1
+#if deal_II_dimension == 1
 
 template <int dim>
 template <typename number>
 void
-Multigrid<dim>::copy_to_mg(const Vector<number>& src)
+Multigrid<dim>::copy_to_mg (const Vector<number>&)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#else
+
+template <int dim>
+template <typename number>
+void
+Multigrid<dim>::copy_to_mg (const Vector<number>& src)
 {
   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
   const unsigned int dofs_per_face = mg_dof_handler->get_fe().dofs_per_face;
