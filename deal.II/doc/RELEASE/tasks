@@ -13,12 +13,10 @@ when a new release shall be issued:
   used to show changes after last release. Crosslink changes file. If
   necessary link an announcement.
 
-3/ adjust download.html and files in doc/main.
+3/ obsolete
 
 4/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
-
-4a/ Remove branch tag again from step-16, since not ready
 
 5/  cvs update -P -r Branch-<x>-<y>
 	or
