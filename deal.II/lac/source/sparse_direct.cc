@@ -292,8 +292,8 @@ namespace CommunicationsLog
                              const unsigned int completed_bytes,
                              const std::string &descr)
   {
-    Record record = {child_pid, direction, &typeid(T), count,
-                     sizeof(T)*count, completed_bytes, descr};
+    const Record record = {child_pid, direction, &typeid(T), count,
+			   sizeof(T)*count, completed_bytes, descr};
     Threads::ThreadMutex::ScopedLock lock (list_access_lock);
     communication_log.push_back (record);
   }
