@@ -48,7 +48,7 @@
  *                                  //
  *                                  // generate a @p SolverSelector that
  *                                  // calls the @p SolverCG
- * SolverSelector<SparseMatrix<double>, Vector<double> > 
+ * SolverSelector<Vector<double> > 
  *   solver_selector("cg", control, memory);
  *                                  // generate e.g. a @p PreconditionRelaxation
  * PreconditionRelaxation<SparseMatrix<double>, Vector<double> >
