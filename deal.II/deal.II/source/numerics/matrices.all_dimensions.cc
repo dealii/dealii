@@ -534,6 +534,10 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
     return;
 
 
+                                   // we have to read and write from this
+                                   // matrix (in this order). this will only
+                                   // work if we compress the matrix first,
+                                   // done here:
   matrix.compress ();
   
   const unsigned int n_dofs = matrix.m();
