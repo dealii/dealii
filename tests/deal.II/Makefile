@@ -94,7 +94,7 @@ clean:
 #rather for libnumerics.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files) $(lib-h-files) Makefile
 	@echo ============================ Remaking Makefile
-	@perl ../../deal.II/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) | \
+	@perl ../../common/scripts/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) | \
 		perl -pi -e 's?^./Obj.a\((.*)\.o\):?$$1.testcase:?g;'   \
 		> Makefile.dep
 
