@@ -1,6 +1,6 @@
 /*----------------------------   tria.h     ---------------------------*/
 /*      $Id$                 */
-/*      Copyright W. Bangerth, University of Heidelberg, 1998 */
+/*      Copyright W. Bangerth, University of Heidelberg, 1998, 1999 */
 #ifndef __tria_H
 #define __tria_H
 /*----------------------------   tria.h     ---------------------------*/
@@ -734,8 +734,8 @@ class TriaDimensionInfo<3> {
  *
  *   Some degradation of approximation properties has been observed
  *   for grids which are too unstructured. Therefore, the
- *   #prepare_refinement# function which is automatically called by
- *   the #execute_coarsening_and_refinement# function can do some
+ *   #prepare_coarsening_and_refinement# function which is automatically called
+ *   by the #execute_coarsening_and_refinement# function can do some
  *   smoothing of the triangulation. Note that mesh smoothing is only
  *   done for two or more space dimensions, no smoothing is available
  *   at present for one spatial dimension. In the sequel, let
@@ -1067,7 +1067,7 @@ class TriaDimensionInfo<3> {
  *   further the assumptions also hold.
  *
  *   The regularisation and smoothing is done in the
- *   #prepare_refinement# function, which is called by
+ *   #prepare_coarsening_and_refinement# function, which is called by
  *   #execute_coarsening_and_refinement# at the very beginning.  It
  *   decides which additional cells to flag for refinement by looking
  *   at the old grid and the refinement flags for each cell.
@@ -1749,36 +1749,49 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
     void refine_and_coarsen_fixed_fraction (const Vector<number> &criteria,
 					    const double         top_fraction,
 					    const double         bottom_fraction);
+
+				     /**
+				      * Execute both refinement and coarsening
+				      * of the triangulation.
+				      *
+				      * The function resets all
+				      * refinement and coarsening
+				      * flags to false. It uses the
+				      * user flags.
+				      *
+                                      * See the general docs for more
+                                      * information.
+				      */
+    void execute_coarsening_and_refinement ();
     
 				     /**
-				      *  Prepare the refinement process by
-				      *  fixing the
-				      *  closure of the refinement in #dim>=2#
-				      *  (make sure that no two cells are
-				      *  adjacent with a refinement level
-				      *  differing with more than one), etc.
-				      *  It performs some mesh smoothing if
-				      *  the according flag was given to the
-				      *  constructor of this class.
-				      *  The function returns whether additional
-				      *  cells have been flagged for refinement.
-				      *  
-				      *  See the general
-				      *  doc of this class for more information.
+				      * Do both preparation for refinement and
+				      * coarsening as well as mesh smoothing.
 				      *
-				      *  This function is mostly dimension
-				      *  independent. However, for some
-				      *  dimension dependent things, it calls
-				      *  #prepare_refinement_dim_dependent#.
-				      */
-    bool prepare_refinement ();
-
-    				     /**
-				      * This function does the analogue
-				      * of the #prepare_refinement# function:
-				      * flagging and deflagging cells in
-				      * preparation of the actual coarsening
-				      * step. This includes deleting coarsen
+				      * Regarding the refinement process it fixes
+				      * the closure of the refinement in #dim>=2#
+				      * (make sure that no two cells are
+				      * adjacent with a refinement level
+				      * differing with more than one), etc.
+				      * It performs some mesh smoothing if
+				      * the according flag was given to the
+				      * constructor of this class.
+				      * The function returns whether additional
+				      * cells have been flagged for refinement.
+				      *  
+				      * See the general doc of this class for
+				      * more information on smoothing upon
+				      * refinement.
+				      *
+				      * This part of the function is mostly
+				      * dimension independent. However, for some
+				      * dimension dependent things, it calls
+				      * #prepare_refinement_dim_dependent#.
+				      *
+				      * Regarding the coarsening part, flagging
+				      * and deflagging cells in preparation 
+				      * of the actual coarsening step are
+				      * done. This includes deleting coarsen
                                       * flags from cells which may not be
                                       * deleted (e.g. because one neighbor is
                                       * more refined than the cell), doing
@@ -1798,23 +1811,9 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * This function uses the user flags, so
 				      * store them if you still need them
 				      * afterwards.
-                                      */
-    bool prepare_coarsening ();
-
-
-				     /**
-				      * Execute both refinement and coarsening
-				      * of the triangulation.
-				      *
-				      * The function resets all
-				      * refinement and coarsening
-				      * flags to false. It uses the
-				      * user flags.
-				      *
-                                      * See the general docs for more
-                                      * information.
 				      */
-    void execute_coarsening_and_refinement ();
+    bool prepare_coarsening_and_refinement ();
+    
 				     /*@}*/
 
 				     /**
@@ -2959,8 +2958,7 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 
 				     /**
 				      * Some dimension dependent stuff for
-				      * mesh smoothing. This function returns
-				      * whether some flags were changed.
+				      * mesh smoothing.
 				      *
 				      * At present, this function does nothing
 				      * in 1d and 2d, but makes sure no two
@@ -2975,7 +2973,14 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * complex, since these two steps of
 				      * interpolation do not commute.
 				      */
-    bool prepare_refinement_dim_dependent ();
+    void prepare_refinement_dim_dependent ();
+
+				     /**
+				      * Make sure that either all or none of
+				      * the children of a cell are tagged for
+				      * coarsening.
+				      */
+    void fix_coarsen_flags ();
     
 				     /**
 				      *  Array of pointers pointing to the

@@ -5,6 +5,7 @@
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
 #include <grid/tria_boundary.h>
+#include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
 #include <basic/magic_numbers.h>
@@ -3761,7 +3762,8 @@ void Triangulation<3>::print_gnuplot (ostream &out,
 
 
 
-template <int dim> template <typename number>
+template <int dim>
+template <typename number>
 void Triangulation<dim>::refine (const Vector<number> &criteria,
 				 const double         threshold)
 {
@@ -3786,7 +3788,8 @@ void Triangulation<dim>::refine (const Vector<number> &criteria,
 
 
 
-template <int dim> template <typename number>
+template <int dim>
+template <typename number>
 void Triangulation<dim>::coarsen (const Vector<number> &criteria,
 				  const double         threshold)
 {
@@ -3803,7 +3806,8 @@ void Triangulation<dim>::coarsen (const Vector<number> &criteria,
 
 
 
-template <int dim> template <typename number>
+template <int dim>
+template <typename number>
 void
 Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<number> &criteria,
 						     const double         top_fraction,
@@ -3849,7 +3853,8 @@ double sqr(double a) {
 
 
 
-template <int dim> template <typename number>
+template <int dim>
+template <typename number>
 void
 Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &criteria,
 						       const double         top_fraction,
@@ -3868,25 +3873,23 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
   const double total_error = tmp.l1_norm();
 
   Vector<float> partial_sums(criteria.size());
+  
+				   // sort the largest criteria to the
+				   // beginning of the vector
   sort (tmp.begin(), tmp.end(), greater<double>());
   partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
 
 				   // compute thresholds
-  Vector<float>::const_iterator p;
-  double top_threshold, bottom_threshold;
-  p = lower_bound (partial_sums.begin(), partial_sums.end(),
-		   top_fraction*total_error);
-  if (p==partial_sums.begin())
-    top_threshold = *p;
-  else
-    top_threshold = *p - *(p-1);
-
-  p = upper_bound (partial_sums.begin(), partial_sums.end(),
-		   total_error*(1-bottom_fraction));
-  if (p==partial_sums.end())
-    bottom_threshold = 0;
-  else
-    bottom_threshold = *p - *(p-1);
+  const Vector<float>::const_iterator
+    q = lower_bound (partial_sums.begin(), partial_sums.end(),
+		     top_fraction*total_error),
+    p = upper_bound (partial_sums.begin(), partial_sums.end(),
+		     total_error*(1-bottom_fraction));
+  
+  double bottom_threshold = tmp(p != partial_sums.end() ?
+				p-partial_sums.begin() :
+				criteria.size()-1),
+	 top_threshold    = tmp(q-partial_sums.begin());
 
 				   // in some rare cases it may happen that
 				   // both thresholds are the same (e.g. if
@@ -3914,6 +3917,8 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
     refine (criteria, top_threshold);
   if (bottom_threshold > *min_element(criteria.begin(), criteria.end()))
     coarsen (criteria, bottom_threshold);
+
+  prepare_coarsening_and_refinement ();
 };
 
 
@@ -3922,6 +3927,8 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<number> &cri
 
 template <int dim>
 void Triangulation<dim>::execute_coarsening_and_refinement () {
+  prepare_coarsening_and_refinement ();
+
   execute_coarsening();
   execute_refinement();
 };
@@ -3934,7 +3941,6 @@ void Triangulation<dim>::execute_coarsening_and_refinement () {
 template <>
 void Triangulation<1>::execute_refinement () {
   const unsigned int dim = 2;
-  prepare_refinement ();
   
 				   // check whether a new level is needed
 				   // we have to check for this on the
@@ -4155,7 +4161,6 @@ void Triangulation<1>::execute_refinement () {
 template <>
 void Triangulation<2>::execute_refinement () {
   const unsigned int dim = 2;
-  prepare_refinement ();
   
 				   // check whether a new level is needed
 				   // we have to check for this on the
@@ -4325,7 +4330,7 @@ void Triangulation<2>::execute_refinement () {
 				   //  index of next unused vertex
   unsigned int next_unused_vertex = 0;
   
-  for (int level=0; level<(int)levels.size()-1; ++level) 
+  for (int level=0; level<static_cast<int>(levels.size())-1; ++level) 
     {
       
       active_cell_iterator cell = begin_active(level),
@@ -4340,6 +4345,17 @@ void Triangulation<2>::execute_refinement () {
 					     // clear refinement flag
 	    cell->clear_refine_flag ();
 
+					     // do some additional checks.
+#ifdef DEBUG
+	    for (unsigned int neighbor=0;
+		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
+	      if (cell->neighbor(neighbor).state() == valid)
+		Assert (((cell->neighbor(neighbor)->level() == cell->level()) &&
+			 (cell->neighbor(neighbor)->coarsen_flag_set() == false))  ||
+			((cell->neighbor(neighbor)->level() == cell->level()-1) &&
+			 (cell->neighbor(neighbor)->refine_flag_set() == true)),
+			ExcInternalError());
+#endif
 	    
 /* For the refinement process: since we go the levels up from the lowest, there
    are (unlike above) only two possibilities: a neighbor cell is on the same
@@ -4763,9 +4779,6 @@ template <>
 void Triangulation<3>::execute_refinement () {
   const unsigned int dim = 3;
 
-				   // do some grid smoothing
-  prepare_refinement ();
-  
 				   // check whether a new level is needed
 				   // we have to check for this on the
 				   // highest level only (on this, all
@@ -5204,6 +5217,17 @@ void Triangulation<3>::execute_refinement () {
       for (; hex!=endh; ++hex)
 	if (hex->refine_flag_set())
 	  {
+					     // do some additional checks.
+#ifdef DEBUG
+	    for (unsigned int neighbor=0;
+		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
+	      if (hex->neighbor(neighbor).state() == valid)
+		Assert (((hex->neighbor(neighbor)->level() == hex->level()) &&
+			 (hex->neighbor(neighbor)->coarsen_flag_set() == false))  ||
+			((hex->neighbor(neighbor)->level() == hex->level()-1) &&
+			 (hex->neighbor(neighbor)->refine_flag_set() == true)),
+			ExcInternalError());
+#endif
 					     // this hex needs to be refined
 	    
 					     // clear flag indicating
@@ -5961,7 +5985,6 @@ void Triangulation<3>::execute_refinement () {
 
 template <int dim>
 void Triangulation<dim>::execute_coarsening () {
-  prepare_coarsening ();
   				   // loop over all cells. Flag all cells of
 				   // which all children are flagged for
 				   // coarsening and delete the childrens'
@@ -6026,172 +6049,16 @@ void Triangulation<dim>::execute_coarsening () {
 
 
 
-
 template <int dim>
-bool Triangulation<dim>::prepare_refinement () {
-  bool cells_changed = false;
-  
-				   // make sure no two adjacent active cells
-				   // have refinement levels differing
-				   // with more than one.
-				   // Precondition: on the old grid,
-				   // there are no such cells.
-  if (dim>=2) 
-    {
-				       // store whether some cells were flagged
-				       // or deflagged for refinement in this
-				       // loop and loop until everything is
-				       // settled.
-      bool mesh_changed_in_this_loop;
-      do
-	{
-	  mesh_changed_in_this_loop = false;
-
-					   // do some dimension dependent stuff
-	  mesh_changed_in_this_loop |= prepare_refinement_dim_dependent ();
-	  
-					   // store highest level one of the cells
-					   // adjacent to a vertex belongs to; do
-					   // so only if mesh smoothing is
-					   // required
-	  vector<int> vertex_level;
-	  if (smooth_grid & limit_level_difference_at_vertices) 
-	    {
-	      vertex_level.resize (vertices.size(), 0);
-	      active_cell_iterator cell = begin_active(),
-				   endc = end();
-	      for (; cell!=endc; ++cell)
-		for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-		     ++vertex)
-		  if (cell->refine_flag_set())
-		    vertex_level[cell->vertex_index(vertex)]
-		      = max (vertex_level[cell->vertex_index(vertex)],
-			     cell->level()+1);
-		  else
-		    vertex_level[cell->vertex_index(vertex)]
-		      = max (vertex_level[cell->vertex_index(vertex)],
-			     cell->level());
-	    };
-      
-	  active_cell_iterator cell = last_active(),
-			       endc = end();
-
-					   // loop over active cells
-	  for (; cell != endc; --cell)
-	    if (cell->refine_flag_set() == true) 
-	      {
-						 // loop over neighbors of cell
-		for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-		  if (cell->neighbor(i).state() == valid)
-		    {
-						       // regularisation?
-		      if ((cell->neighbor_level(i) == cell->level()-1)
-			  &&
-			  (cell->neighbor(i)->refine_flag_set() == false))
-			{
-			  if (cell->neighbor(i)->coarsen_flag_set())
-			    cell->neighbor(i)->clear_coarsen_flag();
-			  cell->neighbor(i)->set_refine_flag();
-			  mesh_changed_in_this_loop = true;
-			  cells_changed = true;
-			};
-		    };
-	      }
-	    else
-					       // smoothing?
-	      if (smooth_grid & limit_level_difference_at_vertices) 
-		for (unsigned int vertex=0;
-		     vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		  if (vertex_level[cell->vertex_index(vertex)] >
-		      cell->level()+1)
-		    {
-						       // if we did not make an
-						       // error, the level diff
-						       // should not be more than
-						       // two
-		      Assert (vertex_level[cell->vertex_index(vertex)] ==
-			      cell->level()+2,
-			      ExcInternalError());
-
-						       // refine cell and
-						       // update vertex levels
-		      cell->clear_coarsen_flag();
-		      cell->set_refine_flag();
-		      cells_changed = true;
-						       // note that we can only
-						       // enter this branch if the
-						       // cell is not yet flagged,
-						       // so we can't get into an
-						       // endless loop by setting
-						       // mesh_changed_in_...
-		      mesh_changed_in_this_loop = true;
-		      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
-			   ++v)
-			vertex_level[cell->vertex_index(v)]
-			  = max (vertex_level[cell->vertex_index(v)],
-				 cell->level()+1);
-		    };
-
-					   // additional smoothing
-	  if (smooth_grid & eliminate_unrefined_islands)
-	    {
-	      active_cell_iterator cell = begin_active(),
-				   endc = end();
-	      for (; cell!=endc; ++cell) 
-		{
-						   // if cell is already flagged
-						   // for refinement: nothing to
-						   // do anymore
-		  if (cell->refine_flag_set())
-		    continue;
-		  
-		  unsigned int refined_neighbors = 0,
-			     unrefined_neighbors = 0;
-		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-		    if (!cell->at_boundary(face))
-						       // neighbor may only be on
-						       // the same level or one
-						       // level below because of
-						       // the regularisation above
-		      if ((cell->neighbor_level(face) == cell->level()) &&
-			  (cell->neighbor(face)->refine_flag_set() ||
-			   cell->neighbor(face)->has_children()))
-			++refined_neighbors;
-		      else
-			++unrefined_neighbors;
-
-		  if (unrefined_neighbors < refined_neighbors)
-		    {
-		      if (cell->coarsen_flag_set())
-			cell->clear_coarsen_flag();
-		      cell->set_refine_flag ();
-		      cells_changed = true;
-		      mesh_changed_in_this_loop = true;
-		    };
-		};
-	    };
-	}
-      while (mesh_changed_in_this_loop == true);
-      
-    };
-  
-  return cells_changed;
-};
-
-
-
-template <int dim>
-bool Triangulation<dim>::prepare_refinement_dim_dependent () 
-{
-  return false;
-};
+void Triangulation<dim>::prepare_refinement_dim_dependent () 
+{};
 
 
 
 #if deal_II_dimension == 3
 
 template <>
-bool Triangulation<3>::prepare_refinement_dim_dependent () 
+void Triangulation<3>::prepare_refinement_dim_dependent () 
 {
   const unsigned int dim = 3;
   
@@ -6204,8 +6071,7 @@ bool Triangulation<3>::prepare_refinement_dim_dependent ()
 				   // variables to store whether the mesh was
 				   // changed in the present loop and in the
 				   // whole process
-  bool mesh_changed      = false,
-       mesh_changed_once = false;
+  bool mesh_changed      = false;
 
   do
     {
@@ -6221,7 +6087,7 @@ bool Triangulation<3>::prepare_refinement_dim_dependent ()
 	      cell->line(line)->set_user_flag();
 
 
-				       // now check whether there are cell with
+				       // now check whether there are cells with
 				       // lines that are more than once refined
 				       // or that will be more than once
 				       // refined. The first thing should never
@@ -6251,7 +6117,12 @@ bool Triangulation<3>::prepare_refinement_dim_dependent ()
 		  if (cell->line(line)->child(c)->user_flag_set () &&
 		      !cell->refine_flag_set())
 		    {
+						       // tag this cell for
+						       // refinement
 		      cell->set_refine_flag();
+
+						       // note that we have
+						       // changed the grid
 		      offending_line_found = true;
 
 						       // it may save us several
@@ -6277,15 +6148,8 @@ bool Triangulation<3>::prepare_refinement_dim_dependent ()
 		};
 	      
 	    };
-      
-		  
-
-      
-      mesh_changed_once |= mesh_changed;
     }
   while (mesh_changed == true);
-
-  return mesh_changed_once;
 };
 
 #endif
@@ -6293,17 +6157,7 @@ bool Triangulation<3>::prepare_refinement_dim_dependent ()
 
 
 template <int dim>
-bool Triangulation<dim>::prepare_coarsening () {
-				   // checking whether the coarsen flags
-				   // changed in this function is quite
-				   // a hard task, since we transform
-				   // from coarsen to user flags and back.
-				   // we do the check by saving the flags
-				   // before and after the operation and
-				   // comparing them
-  vector<bool> flags_before;
-  save_coarsen_flags (flags_before);
-  
+void Triangulation<dim>::fix_coarsen_flags () {
 				   // loop over all cells. Flag all cells of
 				   // which all children are flagged for
 				   // coarsening and delete the childrens'
@@ -6329,7 +6183,7 @@ bool Triangulation<dim>::prepare_coarsening () {
 				   // number of children of #cell# which are
 				   // flagged for coarsening
   unsigned int flagged_children;
-  
+      
   cell_iterator cell = begin(),
 		endc = end();
   for (; cell!=endc; ++cell) 
@@ -6344,7 +6198,7 @@ bool Triangulation<dim>::prepare_coarsening () {
 	    cell->clear_coarsen_flag();
 	  continue;
 	};
-      
+	  
       flagged_children = 0;
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
 	if (cell->child(child)->active() &&
@@ -6355,13 +6209,13 @@ bool Triangulation<dim>::prepare_coarsening () {
 					     // it anymore
 	    cell->child(child)->clear_coarsen_flag();
 	  };
-
+	  
 				       // flag this cell for coarsening if all
 				       // children were flagged
       if (flagged_children == GeometryInfo<dim>::children_per_cell)
 	cell->set_user_flag();
     };
-
+      
 				   // in principle no coarsen flags should be
 				   // set any more at this point
 #if DEBUG
@@ -6369,161 +6223,473 @@ bool Triangulation<dim>::prepare_coarsening () {
     Assert (cell->coarsen_flag_set() == false, ExcInternalError());
 #endif
 
-
-
-  
-				   // do some smoothing on the mesh if required
-  if (dim>1)
-    if (smooth_grid & (eliminate_refined_inner_islands |
-		       eliminate_refined_boundary_islands)) 
-      for (cell=begin(); cell!=endc; ++cell)
-	if (!cell->active() || (cell->active() && cell->refine_flag_set()))
-	  {
-					     // check whether all children are
-					     // active, i.e. not refined
-					     // themselves. This is a precondition
-					     // that the children may be coarsened
-					     // away. If the cell is only flagged
-					     // for refinement, then all future
-					     // children will be active
-	    bool all_children_active = true;
-	    if (!cell->active())
-	      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-		if (!cell->child(c)->active()) 
-		  {
-		    all_children_active = false;
-		    break;
-		  };
-
-	    if (all_children_active) 
-	      {
-						 // count number of refined and
-						 // unrefined neighbors of cell.
-						 // neighbors on lower levels
-						 // are counted as unrefined since
-						 // they can only get to the same
-						 // level as this cell by the
-				 // next refinement cycle
-                unsigned int unrefined_neighbors = 0,
-		                 total_neighbors = 0;
-
-		for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n) 
-		  {
-		    const cell_iterator neighbor = cell->neighbor(n);
-                    if (neighbor.state() == valid)
-                      ++total_neighbors;
-
-		    if (neighbor.state() == valid)
-		      if ((neighbor->active() &&
-			   !neighbor->refine_flag_set()) ||
-			  (!neighbor->active() &&
-			   neighbor->user_flag_set())    ||   // marked for coarsening
-			  (neighbor->level() == cell->level()-1))
-			++unrefined_neighbors;
-		  };
-		
-
-						 // if all neighbors unrefined:
-						 // mark this
-						 // cell for coarsening or don't
-						 // refine if marked for that
-						 //
-						 // also do the distinction
-						 // between the two versions of
-						 // the eliminate_refined_*_islands
-						 // flag
-		if ((unrefined_neighbors == total_neighbors) &&
-		    (((unrefined_neighbors==GeometryInfo<dim>::faces_per_cell) &&
-		      (smooth_grid & eliminate_refined_inner_islands)) ||
-		     ((unrefined_neighbors<GeometryInfo<dim>::faces_per_cell) &&
-		      (smooth_grid & eliminate_refined_boundary_islands)) ))
-		  if (!cell->active())
-		    cell->set_user_flag();
-		  else 
-		    cell->clear_refine_flag();
-	      };
-	  };
-  
-
-  
-				   // now delete again some of the user flags
-				   // those cells which should be refined but
-				   // for which some neighbors of the children
-				   // are refined even more and will not be
-				   // coarsened. This restriction does not
-				   // apply for one space dimension
-  if (dim>1) 
-    {
-      bool flags_changed_in_this_loop;
-
-				       // we may have to do the deleting of
-				       // in several loops since the deletion
-				       // of a flag may require the deletion
-				       // of other flags as well. Loop until
-				       // nothing more changes
-      do 
-	{
-	  flags_changed_in_this_loop = false;
-
-					   // loop over cells in reverse order
-					   // since this may save us some of the
-					   // outer loops (we always look at
-					   // the user flags of cells on
-					   // higher levels, so it is best to
-					   // treat them first). We may skip the
-					   // highest level since the user flags
-					   // are only set for refined flags
-					   // which do not exist on the
-					   // highest level.
-	  if (levels.size()>=2)
-	    for (cell=last(levels.size()-2); cell!=endc; --cell)
-	      if (cell->user_flag_set())
-						 // cell is flagged for coarsening
-		for (unsigned int child=0;
-		     child<GeometryInfo<dim>::children_per_cell; ++child)
-		  for (unsigned int neighbor=0;
-		       neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-						     // for all neighbors of all
-						     // children: if they are
-						     // refined more often than
-						     // the child and are not
-						     // flagged for coarsening,
-						     // we can't coarsen this cell
-		    {
-		      cell_iterator child_neighbor = cell->child(child)->
-						     neighbor(neighbor);
-		      if ((child_neighbor.state() == valid) &&
-			  (child_neighbor->level() == cell->level()+1) &&
-			  (child_neighbor->active() == false) &&
-			  (child_neighbor->user_flag_set() == false))
-			{
-			  cell->clear_user_flag();
-			  flags_changed_in_this_loop = true;
-			};
-		    };
-	}
-      while (flags_changed_in_this_loop);
-    };
-
 				   // revert change of flags: use coarsen
 				   // flags again and delete user flags
-  for (cell=begin(); cell!=endc; ++cell)
+  for (cell=last(); cell!=endc; --cell)
     if (cell->user_flag_set())
       {
 	cell->clear_user_flag();
+
+					 // find out whether the children
+					 // of this cell may be flagged
+					 // for refinement
+	bool coarsening_allowed = true;
 	for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	  {
-	    if (cell->child(c)->refine_flag_set())
-	      cell->child(c)->clear_refine_flag();
-	    cell->child(c)->set_coarsen_flag();
-	  };
+	  for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+	    {
+	      const cell_iterator child_neighbor = cell->child(c)->neighbor(n);
+	      if (child_neighbor.state() == valid)
+		if (child_neighbor->has_children() ||
+						     // neighbor has children,
+						     // then only allow coarsening
+						     // if this neighbor will be
+						     // coarsened as well. however,
+						     // I don't see the consequences
+						     // of this case, so simply
+						     // disallow coarsening if
+						     // any neighbor is more
+						     // refined. maybe someone
+						     // else will want to do this
+						     // some time
+		    child_neighbor->refine_flag_set())
+		  coarsening_allowed = false;
+	    };
+	
+					 // if allowed: tag the children
+					 // for coarsening
+	if (coarsening_allowed)
+	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+	    {
+	      Assert (cell->child(c)->refine_flag_set()==false,
+		    ExcInternalError());
+	      
+	      cell->child(c)->set_coarsen_flag();
+	    };
       };
+};
   
 
-  vector<bool> flags_after;
-  save_coarsen_flags (flags_after);
 
-  return flags_before != flags_after;
+
+template <int dim>
+bool Triangulation<dim>::prepare_coarsening_and_refinement () {
+      
+				   // save the flags to determine whether
+				   // something was changed in the course
+				   // of this function
+  vector<bool> flags_before[2];
+  save_coarsen_flags (flags_before[0]);
+  save_refine_flags (flags_before[1]);
+
+
+				   // do nothing in 1d, except setting the
+				   // coarsening flags correctly
+  if (dim == 1)
+    {
+      fix_coarsen_flags ();
+
+      vector<bool> flags_after[2];
+      save_coarsen_flags (flags_after[0]);
+      save_refine_flags (flags_after[1]);
+
+      return ((flags_before[0] != flags_after[0]) ||
+	      (flags_before[1] != flags_after[1]));
+    };
+
+				   // for all other dimensions
+
+				   // save the flags at the outset of
+				   // each loop. we do so in order to
+				   // find out whether something was
+				   // changed in the present loop, in
+				   // which case we would have to re-run
+				   // the loop. the other possibility to
+				   // find this out would be to set a
+				   // flag #something_changed# to true
+				   // each time we change something.
+				   // however, sometimes one change in
+				   // one of the parts of the loop is
+				   // undone by another one, so we might
+				   // end up in an endless loop. we
+				   // could be tempted to break this loop
+				   // at an arbitrary number of runs,
+				   // but that would not be a clean
+				   // solution, since we would either have
+				   // to
+				   // 1/ break the loop too early, in which
+				   //    case the promise that a second
+				   //    call to this function immediately
+				   //    after the first one does not
+				   //    change anything, would be broken,
+				   // or
+				   // 2/ we do as many loops as there are
+				   //    levels. we know that information
+				   //    is transported over one level
+				   //    in each run of the loop, so this
+				   //    is enough. Unfortunately, each
+				   //    loop is rather expensive, so
+				   //    we chose the way presented here
+  vector<bool> flags_before_loop[2] = {flags_before[0],
+				       flags_before[1]};
+
+				   // now for what is done in each loop: we
+				   // have to fulfill several tasks at the
+				   // same time, namely several mesh smoothing
+				   // algorithms and mesh regularisation, by
+				   // which we mean that the next mesh fulfills
+				   // several requirements such as no double
+				   // refinement at each face or line, etc.
+				   //
+				   // since doing these things at once seems
+				   // almost impossible (in the first year of
+				   // this library, they were done in two
+				   // functions, one for refinement and
+				   // one for coarsening, and most things
+				   // within these were done at once, so the
+				   // code was rather impossible to join into
+				   // this, only, function), we do them one
+				   // after each other. the order in which
+				   // we do them is such that the important
+				   // tasks, namely regularisation, are done
+				   // last and the least important things
+				   // are done the first. the following
+				   // order is chosen:
+				   //
+				   // 1/ eliminate refined islands in the
+				   //    interior and at the boundary. since
+				   //    they don't do much harm besides
+				   //    increasing the number of degrees of
+				   //    freedom, doing this has a rather low
+				   //    priority.
+  				   // 2/ limit the level difference of
+				   //    neighboring cells at each vertex.
+  				   // 3/ eliminate unrefined islands. this
+				   //    has higher priority since this
+				   //    diminishes the approximation
+				   //    properties not only of the unrefined
+				   //    island, but also of the surrounding
+				   //    patch.
+  				   // 4/ take care of the requirement that no
+				   //    double refinement is done at each face
+  				   // 5/ take care that no double refinement
+				   //    is done at each line in 3d or higher
+				   //    dimensions.
+				   // 6/ make sure that all children of each
+				   //    cell are either flagged for coarsening
+				   //    or none of the children is
+				   //
+				   // For some of these steps, it is known that
+				   // they interact. Namely, it is not possible
+				   // to guarantee that after step 5 another
+				   // step 4 would have no effect; the same
+				   // holds for the opposite order and also
+				   // when taking into account step 6. however,
+				   // it is important to guarantee that step
+				   // five or six do not undo something that
+				   // step 4 did, and step 6 not something of
+				   // step 5, otherwise the requirements will
+				   // not be satisfied even if the loop
+				   // terminates. this is accomplished by
+				   // the fact that steps 4 and 5 only *add*
+				   // refinement flags and delete coarsening
+				   // flags (therefore, step 5
+				   // can't undo something that step 4 already
+				   // did), and step 6 only deletes coarsening
+				   // flags, never adds some. step 6 needs also
+				   // take care that it won't tag cells for
+				   // refinement for which some neighbors
+				   // are more refined or will be refined.
+  bool mesh_changed_in_this_loop = false;
+  do
+    {
+				       //////////////////////////////////////
+				       // STEP 1:
+				       //    eliminate refined islands in the
+				       //    interior and at the boundary. since
+				       //    they don't do much harm besides
+				       //    increasing the number of degrees of
+				       //    freedom, doing this has a rather low
+				       //    priority.
+      if (smooth_grid & (eliminate_refined_inner_islands |
+			 eliminate_refined_boundary_islands)) 
+	{
+	  cell_iterator       cell;
+	  const cell_iterator endc = end();
+	  
+	  for (cell=begin(); cell!=endc; ++cell)
+	    if (!cell->active() || (cell->active() && cell->refine_flag_set()))
+	      {
+						 // check whether all children are
+						 // active, i.e. not refined
+						 // themselves. This is a precondition
+						 // that the children may be coarsened
+						 // away. If the cell is only flagged
+						 // for refinement, then all future
+						 // children will be active
+		bool all_children_active = true;
+		if (!cell->active())
+		  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+		    if (!cell->child(c)->active()) 
+		      {
+			all_children_active = false;
+			break;
+		      };
+
+		if (all_children_active) 
+		  {
+						     // count number of refined and
+						     // unrefined neighbors of cell.
+						     // neighbors on lower levels
+						     // are counted as unrefined since
+						     // they can only get to the same
+						     // level as this cell by the
+						     // next refinement cycle
+		    unsigned int unrefined_neighbors = 0,
+				     total_neighbors = 0;
+
+		    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n) 
+		      {
+			const cell_iterator neighbor = cell->neighbor(n);
+			if (neighbor.state() == valid)
+			  ++total_neighbors;
+
+			if (neighbor.state() == valid)
+			  if ((neighbor->active() &&
+			       !neighbor->refine_flag_set()) ||
+			      (neighbor->level() == cell->level()-1))
+			    ++unrefined_neighbors;
+			  else
+			    if (!neighbor->active())
+							       // maybe this cell's
+							       // children will be
+							       // coarsened
+			      {
+				unsigned int tagged_children = 0;
+				for (unsigned int c=0;
+				     c<GeometryInfo<dim>::children_per_cell;
+				     ++c)
+				  if (neighbor->child(c)->coarsen_flag_set())
+				    ++tagged_children;
+				if (tagged_children ==
+				    GeometryInfo<dim>::children_per_cell)
+				  ++unrefined_neighbors;
+			      };
+		      };
+		
+						     // if all neighbors unrefined:
+						     // mark this
+						     // cell for coarsening or don't
+						     // refine if marked for that
+						     //
+						     // also do the distinction
+						     // between the two versions of
+						     // the eliminate_refined_*_islands
+						     // flag
+		    if ((unrefined_neighbors == total_neighbors) &&
+			(((unrefined_neighbors==GeometryInfo<dim>::faces_per_cell) &&
+			  (smooth_grid & eliminate_refined_inner_islands)) ||
+			 ((unrefined_neighbors<GeometryInfo<dim>::faces_per_cell) &&
+			  (smooth_grid & eliminate_refined_boundary_islands)) ))
+		      if (!cell->active())
+			for (unsigned int c=0;
+			     c<GeometryInfo<dim>::children_per_cell; ++c)
+			  {
+			    cell->child(c)->clear_refine_flag ();
+			    cell->child(c)->set_coarsen_flag ();
+			  }
+		      else 
+			cell->clear_refine_flag();
+		  };
+	      };
+	};
+
+				       //////////////////////////////////////
+				       // STEP 2:
+				       //    limit the level difference of
+				       //    neighboring cells at each vertex.
+      if (smooth_grid & limit_level_difference_at_vertices) 
+	{
+					   // store highest level one of the cells
+					   // adjacent to a vertex belongs to
+	  vector<int> vertex_level (vertices.size(), 0);
+	  active_cell_iterator cell = begin_active(),
+			       endc = end();
+	  for (; cell!=endc; ++cell)
+	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		 ++vertex)
+	      if (cell->refine_flag_set())
+		vertex_level[cell->vertex_index(vertex)]
+		  = max (vertex_level[cell->vertex_index(vertex)],
+			 cell->level()+1);
+	      else
+		vertex_level[cell->vertex_index(vertex)]
+		  = max (vertex_level[cell->vertex_index(vertex)],
+			 cell->level());
+
+					   // loop over all cells in reverse
+					   // order. do so because we can then
+					   // update the vertex levels on the
+					   // and maybe already flag additional
+					   // cells in this loop
+	  for (cell=last_active(); cell != endc; --cell)
+	    if (!cell->refine_flag_set() == true) 
+	      for (unsigned int vertex=0;
+		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		if (vertex_level[cell->vertex_index(vertex)] >
+		    cell->level()+1)
+		  {
+						     // if we did not make an
+						     // error, the level diff
+						     // should not be more than
+						     // two
+		    Assert (vertex_level[cell->vertex_index(vertex)] ==
+			    cell->level()+2,
+			    ExcInternalError());
+
+						     // refine cell and
+						     // update vertex levels
+		    cell->clear_coarsen_flag();
+		    cell->set_refine_flag();
+
+		    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+			 ++v)
+		      vertex_level[cell->vertex_index(v)]
+			= max (vertex_level[cell->vertex_index(v)],
+				 cell->level()+1);
+		  };	  
+	};
+
+				       /////////////////////////////////////
+				       // STEP 3:
+				       //    eliminate unrefined islands. this
+				       //    has higher priority since this
+				       //    diminishes the approximation
+				       //    properties not only of the unrefined
+				       //    island, but also of the surrounding
+				       //    patch.
+      if (smooth_grid & eliminate_unrefined_islands)
+	{
+	  active_cell_iterator cell = begin_active(),
+			       endc = end();
+	  for (; cell!=endc; ++cell) 
+	    {
+					       // if cell is already flagged
+					       // for refinement: nothing to
+					       // do anymore
+	      if (cell->refine_flag_set())
+		continue;
+		  
+	      unsigned int refined_neighbors = 0,
+			 unrefined_neighbors = 0;
+	      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+		if (!cell->at_boundary(face))
+		  {
+						     // neighbor may only be on
+						     // the same level or one
+						     // level below because of
+						     // the regularisation above
+		    Assert ((cell->neighbor_level(face)==cell->level()) ||
+			    (cell->neighbor_level(face)==cell->level()-1),
+			    ExcInternalError());
+		    if ((cell->neighbor_level(face) == cell->level()) &&
+			(cell->neighbor(face)->refine_flag_set() ||
+			 cell->neighbor(face)->has_children()))
+		      ++refined_neighbors;
+		    else
+		      ++unrefined_neighbors;
+		  };
+
+	      if (unrefined_neighbors < refined_neighbors)
+		{
+		  if (cell->coarsen_flag_set())
+		    cell->clear_coarsen_flag();
+		  cell->set_refine_flag ();
+		};
+	    };
+	};
+
+				       /////////////////////////////////
+				       // STEP 4:
+				       //    take care of the requirement that no
+				       //    double refinement is done at each face
+      for (active_cell_iterator cell = last_active(); cell != end(); --cell)
+	if (cell->refine_flag_set() == true) 
+	  {
+					     // loop over neighbors of cell
+	    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+	      if (cell->neighbor(i).state() == valid)
+		{
+						   // regularisation?
+		  if ((cell->neighbor_level(i) == cell->level()-1)
+		      &&
+		      (cell->neighbor(i)->refine_flag_set() == false))
+		    {
+		      if (cell->neighbor(i)->coarsen_flag_set())
+			cell->neighbor(i)->clear_coarsen_flag();
+		      cell->neighbor(i)->set_refine_flag();
+		    }
+		  else
+		    if ((cell->neighbor_level(i) == cell->level())
+			&&
+			(cell->neighbor(i)->coarsen_flag_set() == true))
+						       // if this cell will
+						       // be refined and the
+						       // neighbor may or may
+						       // not be coarsened
+						       // (depending on whether
+						       // all children of its
+						       // mother cell are tagged
+						       // for coarsening), then
+						       // disallow coarsening.
+						       // to do so, it suffices
+						       // to delete the coarsen
+						       // flag from one child,
+						       // namely our present
+						       // neighbor
+		      cell->neighbor(i)->clear_coarsen_flag ();
+		};
+	  };
+      
+				       //////////////////////////////////////
+				       // STEP 5:
+				       //    take care that no double refinement
+				       //    is done at each line in 3d or higher
+				       //    dimensions.
+      prepare_refinement_dim_dependent ();
+      
+				       //////////////////////////////////////
+				       // STEP 6:
+				       //    make sure that all children of each
+				       //    cell are either flagged for coarsening
+				       //    or none of the children is
+      fix_coarsen_flags ();
+
+				       // get the refinement and coarsening
+				       // flags
+      vector<bool> flags_after_loop[2];
+      save_coarsen_flags (flags_after_loop[0]);
+      save_refine_flags (flags_after_loop[1]);
+
+				       // find out whether something was
+				       // changed in this loop
+      mesh_changed_in_this_loop
+	= ((flags_before_loop[0] != flags_after_loop[0]) ||
+	   (flags_before_loop[1] != flags_after_loop[1]));
+
+				       // set the flags for the next loop
+				       // already
+      flags_before_loop[0] = flags_after_loop[0];
+      flags_before_loop[1] = flags_after_loop[1];
+    }
+  while (mesh_changed_in_this_loop);
+
+				   // find out whether something was really
+				   // changed in this function. Note that
+				   // #flags_before_loop# represents the
+				   // state after the last loop, i.e.
+				   // the present state
+  return ((flags_before[0] != flags_before_loop[0]) ||
+	  (flags_before[1] != flags_before_loop[1]));
 };
 
 
