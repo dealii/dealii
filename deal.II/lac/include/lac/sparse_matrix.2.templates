@@ -43,6 +43,4 @@ template void SparseMatrix<TYPEMAT>::SOR_step (Vector<TYPE2> &, const Vector<TYP
 template void SparseMatrix<TYPEMAT>::TSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
 template void SparseMatrix<TYPEMAT>::SSOR_step (Vector<TYPE2> &, const Vector<TYPE2> &, TYPEMAT) const;
 
-template void SparseVanka<TYPEMAT>::forward(Vector<TYPE2>& dst, const Vector<TYPE2>& dst) const;
-template void SparseVanka<TYPEMAT>::backward(Vector<TYPE2>& dst, const Vector<TYPE2>& dst) const;
 

@@ -11,12 +11,10 @@
 
 #include <cmath>
 #include <lac/sparsematrix.templates.h>
-#include <lac/sparse_vanka.templates.h>
 
 #define TYPEMAT double
 
 template class SparseMatrix<TYPEMAT>;
-template class SparseVanka<TYPEMAT>;
 
 #define TYPE2 float
 
@@ -31,3 +29,6 @@ template class SparseVanka<TYPEMAT>;
 #define TYPE2 long double
 
 #include <lac/sparsematrix.2.templates>
+
+#undef TYPE2
+#undef TYPEMAT

@@ -117,36 +117,39 @@ class SparseVanka
 				      * if requested by #set_additive#.
 				      */
     template<typename number2>
-    void operator() (Vector<number2>& dst,
-		     const Vector<number2>& src) const;
+    void operator() (Vector<number2>       &dst,
+		     const Vector<number2> &src) const;
 
 				     /**
 				      * Application of the Vanka operator.
-				      * This function takes two vector
-				      * arguments, the residual in #src#
-				      * and the resulting update vector
-				      * in #dst#.
+				      * This function takes the residual
+				      * in #src# and returns the resulting
+				      * update vector in #dst#.
 				      */
     template<typename number2>
-    void forward(Vector<number2>& dst, const Vector<number2>& src) const;
+    void forward (Vector<number2>       &dst,
+		  const Vector<number2> &src) const;
+    
 				     /**
 				      * Application of the transpose
 				      * Vanka operator.
-				      * This function takes two vector
-				      * arguments, the residual in #src#
-				      * and the resulting update vector
-				      * in #dst#.
+				      * This function takes the residual
+				      * in #src# and returns the resulting
+				      * update vector in #dst#.
 				      */
     template<typename number2>
-    void backward(Vector<number2>& dst, const Vector<number2>& src) const;
+    void backward (Vector<number2>       &dst,
+		   const Vector<number2> &src) const;
+    
 				     /**
 				      * Minimize memory consumption.
 				      * Activating this option reduces
 				      * memory needs of the Vanka object
-				      * to nealy zero. You pay for this
+				      * to nearly zero. You pay for this
 				      * by a high increase of computing
 				      * time, since all local matrices
-				      * are built up and inverted every time.
+				      * are built up and inverted every
+				      * time the Vanka operator is applied.
 				      */
     void conserve_memory();
 
@@ -171,7 +174,10 @@ class SparseVanka
 				      */
     bool conserve_mem;
 				     /**
-				      * Array of inverse matrices.
+				      * Array of inverse matrices,
+				      * one for each degree of freedom.
+				      * Only those elements will be used
+				      * that are tagged in #selected#.
 				      */
     mutable vector<SmartPointer<FullMatrix<float> > > inverses;
 };

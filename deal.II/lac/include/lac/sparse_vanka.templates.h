@@ -3,6 +3,8 @@
 
 #include <lac/sparse_vanka.h>
 #include <lac/fullmatrix.h>
+#include <lac/sparsematrix.h>
+#include <lac/vector.h>
 
 #include <map>
 
