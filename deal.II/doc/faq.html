@@ -77,12 +77,19 @@
   <ul>
   <li> Time-dependent acoustic and elastic wave equation, including
        nonlocal absorbing boundary conditions;
-  <li> Stokes flow discretized with the discontinous Galerkin finite
+  <li> Stokes flow discretized with the discontinuous Galerkin finite
        element method;
   <li> General hyperbolic problems including Euler flow, using the
-       discontinous Galerkin finite element method;
+       discontinuous Galerkin finite element method;
   <li> Distributed parameter estimation problems.
   </ul>
+  To illustrate the complexity of the programs mentioned above we note
+  that most of them include adaptive mesh refinement tailored to the
+  efficient computation of specific quantities of physical interest
+  and error estimation measured in terms of these quantities. This
+  includes the solution of a so-called dual problems, that means
+  e.g. for the wave equation the solution of a wave equation solved
+  backward in time.
   </p>
 
   <p>
