@@ -969,7 +969,16 @@ class BlockVectorBase
 				      */
     void equ (const value_type a, const BlockVectorBase& V,
 	      const value_type b, const BlockVectorBase& W);
-
+      
+				     /** @addtogroup Exceptions
+				      * @{ */
+    
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcNotMatchingBlockSizes);
+				     //@}
+    
   protected:
 				     /**
 				      * Pointer to the array of components.
@@ -2056,7 +2065,7 @@ BlockVectorBase<VectorType>::
 operator == (const BlockVectorBase<VectorType2> &v) const
 {
   Assert (block_indices == v.block_indices,
-          ExcNotmatchingBlockSizes());
+          ExcNotMatchingBlockSizes());
   
   for (unsigned int i=0;i<n_blocks();++i)
     if ( ! (components[i] == v.components[i]))
