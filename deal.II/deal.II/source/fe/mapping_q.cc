@@ -1066,7 +1066,7 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 	    if (face->line(i)->at_boundary())
 	      ++lines_at_boundary;
 	  
-	  Assert(lines_at_boundary<lines_per_face, ExcInternalError());
+	  Assert(lines_at_boundary<=lines_per_face, ExcInternalError());
 
 					   // if at least one of the
 					   // lines bounding this quad
