@@ -1,9 +1,13 @@
 # $Id$
 
 CXX=c++
-INCPATH   = -I../include -I../../lac/include -I../../base/include
-CXXFLAGS.g= -DDEBUG -g -Wall $(INCPATH)
-CXXFLAGS  = -O3 $(INCPATH)
+INCLUDE   = -I../include -I../../lac/include -I../../base/include
+CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
+            -Winline -Woverloaded-virtual -fno-rtti -fno-exceptions \
+            $(INCLUDE)
+CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
+           -funroll-loops -felide-constructors -fnonnull-objects \
+           -fno-rtti -fno-exceptions $(INCLUDE)
 
 LIBPATH   = -L../lib -L../../lac/lib
 LIBFILES.g= ../lib/libbasic.g.a ../lib/libgrid.g.a \
@@ -13,14 +17,18 @@ LIBFILES  = $(LIBFILES.g:.g.a=.a)
 LIBS.g    = $(LIBPATH) -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
 LIBS      = $(LIBS.g:.g=)
 
+
+ifeq ($(shell uname),Linux)
+CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
+endif
+
+
 ifeq ($(shell uname),SunOS)
-#CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
-#CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
 INCLUDE2.8  =  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
                -I/usr/local/source/libstdc++-2.8.0/libstdc++/stl \
                -I/usr/local/source/libstdc++-2.8.0/libio
-CXXFLAGS  := $(CXXFLAGS) -fno-rtti -fno-exceptions $(INCLUDE2.8)
-CXXFLAGS.g:= $(CXXFLAGS.g) -W -fno-rtti -fno-exceptions $(INCLUDE2.8)
+CXXFLAGS  := $(CXXFLAGS) $(INCLUDE2.8)
+CXXFLAGS.g:= $(CXXFLAGS.g) $(INCLUDE2.8)
 endif
 
 
@@ -78,6 +86,6 @@ clean:
 #of this file.
 Makefile.dep: $(cc-files) $(h-files)
 	@echo ================= Making $@
-	@$(CXX) $(INCPATH) -M $(cc-files) > Makefile.dep
+	@$(CXX) $(INCLUDE) -M $(cc-files) > Makefile.dep
 
 include Makefile.dep

@@ -33,9 +33,60 @@ class BoundaryValuesSine : public Function<dim> {
 
 
 
+template <int dim>
+class BoundaryValuesJump : public Function<dim> {
+  public:
+    				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const {
+      switch (dim) 
+	{
+	  case 1:
+		return 0;
+	  default:
+		if (p(0) == p(1))
+		  return 0.5;
+		else
+		  return (p(0)>p(1) ? 0. : 1.);
+	};
+    };
+};
+
+
+
 
 template <int dim>
 class RHSTrigPoly : public Function<dim> {
+  public:
+    				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const;
+};
+
+
+
+/**
+  Right hand side constructed such that the exact solution is
+  $x(1-x)$ in 1d, $x(1-x)*y(1-y)$ in 2d, etc.
+  */
+template <int dim>
+class RHSPoly : public Function<dim> {
+  public:
+    				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const;
+};
+
+
+
+template <int dim>
+class Solution : public Function<dim> {
   public:
     				     /**
 				      * Return the value of the function
@@ -99,6 +150,25 @@ double RHSTrigPoly<dim>::operator () (const Point<dim> &p) const {
 
 
 
+template <int dim>
+double RHSPoly<dim>::operator () (const Point<dim> &p) const {
+  double ret_val = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    ret_val += 2*p(i)*(1.-p(i));
+  return ret_val;
+};
+
+
+template <int dim>
+double Solution<dim>::operator () (const Point<dim> &p) const {
+  double ret_val = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    ret_val *= p(i)*(1.-p(i));
+  return ret_val;
+};
+
+
+
 
 
 template <int dim>
@@ -154,16 +224,16 @@ template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
     prm.declare_entry ("Test run", "zoom in",
-		       "tensor\\|zoom in\\|ball\\|curved line\\|random");
+		       "tensor\\|zoom in\\|ball\\|curved line\\|random\\|jump\\|L-region");
   else
     prm.declare_entry ("Test run", "zoom in", "tensor\\|zoom in\\|random");
 
   prm.declare_entry ("Global refinement", "0",
 		     ParameterHandler::RegularExpressions::Integer);
   prm.declare_entry ("Right hand side", "zero",
-		     "zero\\|constant\\|trigpoly");
+		     "zero\\|constant\\|trigpoly\\|poly");
   prm.declare_entry ("Boundary values", "zero",
-		     "zero\\|sine");
+		     "zero\\|sine\\|jump");
   prm.declare_entry ("Output file", "gnuplot.1");
 };
 
@@ -184,10 +254,14 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	else
 	  if (test=="tensor") test_case = 5;
 	  else
-	    {
-	      cerr << "This test seems not to be implemented!" << endl;
-	      return false;
-	    };
+	    if (test=="jump") test_case = 6;
+	    else
+	      if (test=="L-region") test_case = 7;
+	      else
+		{
+		  cerr << "This test seems not to be implemented!" << endl;
+		  return false;
+		};
 
   switch (test_case) 
     {
@@ -217,6 +291,19 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	    break;
       case 5:
 	    tria->create_hypercube ();
+	    break;
+      case 6:
+	    tria->create_hypercube ();
+	    tria->refine_global (1);
+	    for (unsigned int i=0; i<5; ++i)
+	      {
+		tria->begin_active(tria->n_levels()-1)->set_refine_flag();
+		(--(tria->last_active()))->set_refine_flag();
+		tria->execute_refinement ();
+	      };
+	    break;
+      case 7:
+	    tria->create_hyper_L ();
 	    break;
       default:
 	    return false;
@@ -304,7 +391,10 @@ bool PoissonProblem<dim>::set_right_hand_side (ParameterHandler &prm) {
       if (rhs_name == "trigpoly")
 	rhs = new RHSTrigPoly<dim>();
       else
-	return false;
+	if (rhs_name == "poly")
+	  rhs = new RHSPoly<dim> ();
+	else
+	  return false;
 
   if (rhs != 0)
     return true;
@@ -324,7 +414,10 @@ bool PoissonProblem<dim>::set_boundary_values (ParameterHandler &prm) {
     if (bv_name == "sine")
       boundary_values = new BoundaryValuesSine<dim> ();
     else
-      return false;
+      if (bv_name == "jump")
+	boundary_values = new BoundaryValuesJump<dim> ();
+      else
+	return false;
 
   if (boundary_values != 0)
     return true;
@@ -340,9 +433,10 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << "Test case = " << prm.get ("Test run")
        << endl;
   
-  cout << "    Making grid..." << endl;
+  cout << "    Making grid... ";
   if (!make_grid (prm))
     return;
+  cout << tria->n_active_cells() << " active cells." << endl;
   
   if (!set_right_hand_side (prm))
     return;
@@ -352,7 +446,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
   FELinear<dim>                   fe;
   PoissonEquation<dim>            equation (*rhs);
-  QGauss4<dim>                    quadrature;
+  QGauss3<dim>                    quadrature;
   
   cout << "    Distributing dofs... "; 
   dof->distribute_dofs (fe);
@@ -371,14 +465,26 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   solve ();
 
   cout << "    Writing to file <" << prm.get("Output file") << ">..."
-       << endl
        << endl;
   
   DataOut<dim> out;
-  ofstream gnuplot(prm.get("Output file"));
+  String o_filename = prm.get ("Output file");
+  ofstream gnuplot(o_filename);
   fill_data (out); 
   out.write_gnuplot (gnuplot);
   gnuplot.close ();
+
+  cout << "    Calculation L2 error... ";
+  Solution<dim> sol;
+  vector<double> difference;
+  QGauss3<dim> q;
+  integrate_difference (sol, difference, q, fe, L2_norm);
+  double error = 0;
+  for (unsigned int i=0; i<difference.size(); ++i)
+    error += difference[i]*difference[i];
+  cout << sqrt(error) << endl;
+
+  cout << endl;
 };
 
 

@@ -22,4 +22,11 @@ splot "gnuplot.curved_line"
 set output "fig.random.eps"
 splot "gnuplot.random"
 
+!echo "  Making <fig.jump.eps>"
+set output "fig.jump.eps"
+splot "gnuplot.jump"
 
+!echo "  Making <fig.L-region.eps>"
+set view 52,115
+set output "fig.L-region.eps"
+splot "gnuplot.L-region"
