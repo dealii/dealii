@@ -47,7 +47,7 @@ template <int dim>
 Point<dim>
 StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, typename Boundary<dim>::ExcPureVirtualFunctionCalled());
   return Point<dim>();
 };
 

@@ -138,6 +138,15 @@ class TimeStep_Primal :  public TimeStep_Wave<dim>
     virtual void solve_primal_problem ();    
     virtual string branch_signature () const;
     virtual void wake_up (const unsigned int wakeup_level);
+    virtual void end_sweep ()
+      {
+	TimeStep_Wave<dim>::end_sweep();
+      };
+    virtual void sleep (const unsigned int sleep_level)
+      {
+	TimeStep_Wave<dim>::sleep (sleep_level);
+      };
+    
     
   private:
     void assemble_vectors (Vector<double> &right_hand_side1,
@@ -174,6 +183,16 @@ class TimeStep_Dual :  public TimeStep_Wave<dim>
     virtual void solve_dual_problem ();    
     virtual string branch_signature () const;
     virtual void wake_up (const unsigned int wakeup_level);
+
+    virtual void end_sweep ()
+      {
+	TimeStep_Wave<dim>::end_sweep();
+      };
+    virtual void sleep (const unsigned int sleep_level)
+      {
+	TimeStep_Wave<dim>::sleep (sleep_level);
+      };
+    
 
   private:
     void assemble_vectors (Vector<double> &right_hand_side1,
@@ -2804,7 +2823,7 @@ double EvaluateSeismicSignal<dim>::evaluate () {
   const unsigned int n_q_points = quadrature_face->n_quadrature_points;
 
   ofstream out((base_file_name + ".seismic").c_str());
-  AssertThrow (out, ExcIO());
+  AssertThrow (out, typename EvaluationBase<dim>::ExcIO());
   
   DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
 					endc = dof->end();
@@ -2847,7 +2866,7 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	      << endl
 	      << endl;
 	};
-  AssertThrow (out, ExcIO());
+  AssertThrow (out, typename EvaluationBase<dim>::ExcIO());
   out.close ();
   
   if (time!=0)
@@ -5596,16 +5615,16 @@ void TimeStep_Dual<dim>::do_initial_step () {
 	solver_steps1 = solve (system_matrix, u, tmp_u_bar),
 	solver_steps2 = solve (system_matrix, v, tmp_v_bar);
 
-      statistic_data = StatisticData (tria->n_active_cells(),
-				      dof_handler->n_dofs(),
-				      solver_steps1, solver_steps2,
-				      compute_energy ());
+      statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
+								   dof_handler->n_dofs(),
+								   solver_steps1, solver_steps2,
+								   compute_energy ());
     }
   else
-    statistic_data = StatisticData (tria->n_active_cells(),
-				    dof_handler->n_dofs(),
-				    0, 0,
-				    make_pair (0.0, 0.0));
+    statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
+								 dof_handler->n_dofs(),
+								 0, 0,
+								 make_pair (0.0, 0.0));
   deallog << "." << endl;
 };
 
@@ -5732,11 +5751,11 @@ void TimeStep_Dual<dim>::do_timestep ()
   
   const unsigned int solver_steps2 = solve (system_matrix, u, right_hand_side2);
 
-  statistic_data = StatisticData (tria->n_active_cells(),
-				  dof_handler->n_dofs(),
-				  solver_steps1,
-				  solver_steps2,
-				  compute_energy ());
+  statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
+							       dof_handler->n_dofs(),
+							       solver_steps1,
+							       solver_steps2,
+							       compute_energy ());
   
   deallog << "." << endl;
 };
@@ -5813,7 +5832,7 @@ void TimeStep_Dual<dim>::build_rhs (Vector<double> &right_hand_side1,
     = static_cast<const TimeStepBase_Wave<dim>*>(next_timestep)->get_timestep_dual();
 
   Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
-	  ExcCoarsestGridsDiffer());
+	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
 				   // convenience typedef
   typedef DoFHandler<dim>::cell_iterator cell_iterator;
@@ -7507,10 +7526,12 @@ void TimeStep<dim>::write_statistics_descriptions (ostream                   &ou
 						   const WaveParameters<dim> &parameters)
 {
   out << "#  Primal problem:" << endl;
-  TimeStep_Primal<dim>::StatisticData::write_descriptions (out);
+  typename TimeStep_Primal<dim>::StatisticData xp;
+  xp.write_descriptions (out);
 
   out << "#  Dual problem:" << endl;
-  TimeStep_Dual<dim>::StatisticData::write_descriptions (out);
+  typename TimeStep_Dual<dim>::StatisticData xd;
+  xd.write_descriptions (out);
 
   out << "#  Error estimation:" << endl;
   TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (out);
@@ -7593,7 +7614,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       deallog << "[o]";
 
       DataOut<dim> out;
-      DataOut<dim>::OutputFormat output_format
+      typename DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (parameters.output_format);
       
       string data_filename	= (parameters.output_directory +
@@ -7865,11 +7886,11 @@ void TimeStep_Primal<dim>::do_initial_step ()
 				   // set energy to zero since we
 				   // don't want to assemble the matrices
 				   // needed for this
-  statistic_data = StatisticData (tria->n_active_cells(),
-				  dof_handler->n_dofs(),
-				  0,
-				  0,
-				  make_pair (0.0, 0.0));
+  statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
+							       dof_handler->n_dofs(),
+							       0,
+							       0,
+							       make_pair (0.0, 0.0));
 
   deallog << "." << endl;
 };
@@ -7991,11 +8012,11 @@ if (parameters.extrapolate_old_solutions)
 
   const unsigned int solver_steps2 = solve (system_matrix, v, right_hand_side2);
 
-  statistic_data = StatisticData (tria->n_active_cells(),
-				  dof_handler->n_dofs(),
-				  solver_steps1,
-				  solver_steps2,
-				  compute_energy ());
+  statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
+							       dof_handler->n_dofs(),
+							       solver_steps1,
+							       solver_steps2,
+							       compute_energy ());
   
   deallog << "." << endl;
 };
@@ -8059,7 +8080,7 @@ void TimeStep_Primal<dim>::build_rhs (Vector<double> &right_hand_side1,
     = static_cast<const TimeStepBase_Wave<dim>*>(previous_timestep)->get_timestep_primal();
 
   Assert (previous_time_level.tria->n_cells(0) == tria->n_cells(0),
-	  ExcCoarsestGridsDiffer());
+	  typename TimeStep_Wave<dim>::ExcCoarsestGridsDiffer());
 
 				   // convenience typedef
   typedef DoFHandler<dim>::cell_iterator cell_iterator;

@@ -767,7 +767,9 @@ void FESystem<dim>::get_unit_support_points (
   vector<Point<dim> > &unit_support_points) const
 {
   Assert(unit_support_points.size() == dofs_per_cell,
-	 ExcWrongFieldDimension (unit_support_points.size(), dofs_per_cell));
+	 typename FiniteElementBase<dim>::
+	 ExcWrongFieldDimension (unit_support_points.size(),
+				 dofs_per_cell));
 
   vector<Point<dim> > base_unit_support_points (base_element(0).dofs_per_cell);
   unsigned int component = 0;
@@ -818,7 +820,9 @@ void FESystem<dim>::get_support_points (const DoFHandler<dim>::cell_iterator &ce
 					vector<Point<dim> > &support_points) const
 {
   Assert(support_points.size() == dofs_per_cell,
-	 ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
+	 typename FiniteElementBase<dim>::
+	 ExcWrongFieldDimension (support_points.size(),
+				 dofs_per_cell));
 
   vector<Point<dim> > base_support_points (base_element(0).dofs_per_cell);
   unsigned int component = 0;
@@ -847,7 +851,9 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 					     vector<Point<dim> > & support_points) const
 {
   Assert (support_points.size() == dofs_per_face,
-	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
+	  typename FiniteElementBase<dim>::
+	  ExcWrongFieldDimension (support_points.size(),
+				  dofs_per_face));
 
   vector<Point<dim> > base_support_points (base_element(0).dofs_per_face);
   unsigned int comp = 0;
@@ -874,9 +880,13 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 					   FullMatrix<double>  &local_mass_matrix) const
 {
   Assert (local_mass_matrix.n() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),dofs_per_cell));
+	  typename FiniteElementBase<dim>::
+	  ExcWrongFieldDimension(local_mass_matrix.n(),
+				 dofs_per_cell));
   Assert (local_mass_matrix.m() == dofs_per_cell,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),dofs_per_cell));
+	  typename FiniteElementBase<dim>::
+	  ExcWrongFieldDimension(local_mass_matrix.m(),
+				 dofs_per_cell));
 
 				   // track which component we are
 				   // presently working with, since we

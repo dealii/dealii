@@ -178,10 +178,12 @@ vector<string> DataOut_DoFData<dim>::get_dataset_names () const
   vector<string> names;
 				   // collect the names of dof
 				   // and cell data
-  for (vector<DataEntry>::const_iterator d=dof_data.begin(); d!=dof_data.end(); ++d)
+  for (typename vector<DataEntry>::const_iterator d=dof_data.begin();
+       d!=dof_data.end(); ++d)
     for (unsigned int i=0; i<d->names.size(); ++i)
       names.push_back (d->names[i]);
-  for (vector<DataEntry>::const_iterator d=cell_data.begin(); d!=cell_data.end(); ++d)
+  for (typename vector<DataEntry>::const_iterator d=cell_data.begin();
+       d!=cell_data.end(); ++d)
     {
       Assert (d->names.size() == 1, ExcInternalError());
       names.push_back (d->names[0]);
@@ -214,7 +216,7 @@ void DataOut<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int cell_number = 0;
-  vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
+  typename vector<DataOutBase::Patch<dim> >::iterator patch = patches.begin();
   DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
@@ -286,7 +288,7 @@ template <int dim>
 void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				  const unsigned int n_threads_) 
 {
-  Assert (dofs != 0, ExcNoDoFHandlerSelected());
+  Assert (dofs != 0, typename DataOut_DoFData<dim>::ExcNoDoFHandlerSelected());
 
 #ifdef DEAL_II_USE_MT
   const unsigned int n_threads = n_threads_;

@@ -441,15 +441,20 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 					      vector<Point<dim> > &normal_vectors,
 					      const bool           compute_normal_vectors,
 					      const FullMatrix<double>      &shape_values_transform,
-					      const vector<vector<Tensor<1,dim> > > &shape_gradients_transform) const {
+					      const vector<vector<Tensor<1,dim> > > &shape_gradients_transform) const
+{
   Assert (jacobians.size() == unit_points.size(),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
+								  unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(q_points.size(),
+								  unit_points.size()));
   Assert (global_unit_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(global_unit_points.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(global_unit_points.size(),
+								  unit_points.size()));
   Assert (support_points.size() == dofs_per_face,
-	  ExcWrongFieldDimension(support_points.size(), dofs_per_face));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(support_points.size(),
+								  dofs_per_face));
   
 				   // size not checked since not used
   static vector<Point<dim> > dummy(0);
@@ -490,13 +495,17 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 						 vector<Point<dim> > &normal_vectors,
 						 const bool           compute_normal_vectors,
 						 const FullMatrix<double>      &shape_values_transform,
-						 const vector<vector<Tensor<1,dim> > > &shape_gradients_transform) const {
+						 const vector<vector<Tensor<1,dim> > > &shape_gradients_transform) const
+{
   Assert (jacobians.size() == unit_points.size(),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
+								  unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(q_points.size(),
+								  unit_points.size()));
   Assert (global_unit_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(global_unit_points.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(global_unit_points.size(),
+								  unit_points.size()));
 
   static vector<Point<dim> > dummy(0); // size not checked since not used
   fill_fe_values (cell, global_unit_points,

@@ -546,13 +546,17 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 				       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
+								  unit_points.size()));
   Assert ((!compute_jacobians_grad) || (jacobians_grad.size() == unit_points.size()),
-	  ExcWrongFieldDimension(jacobians_grad.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians_grad.size(),
+								  unit_points.size()));
   Assert ((!compute_q_points) || (q_points.size() == unit_points.size()),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(q_points.size(),
+								  unit_points.size()));
   Assert ((!compute_support_points) || (support_points.size() == dofs_per_cell),
-	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(support_points.size(),
+								  dofs_per_cell));
 
 
   unsigned int n_points=unit_points.size();

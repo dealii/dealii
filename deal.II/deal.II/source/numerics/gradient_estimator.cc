@@ -181,7 +181,7 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 				       // now loop over all active
 				       // neighbors and collect the
 				       // data we need
-      vector<DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename vector<DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{

@@ -82,10 +82,21 @@ inline
 unsigned int
 DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (dof_handler != 0, typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_line,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_line));
 
@@ -100,8 +111,19 @@ unsigned int
 DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 					    const unsigned int i) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
@@ -118,11 +140,22 @@ inline
 void
 DoFObjectAccessor<1,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
   Assert (dof_indices.size() == (2*dof_handler->get_fe().dofs_per_vertex +
 				 dof_handler->get_fe().dofs_per_line),
-	  ExcVectorDoesNotMatch());
+	  typename BaseClass::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
@@ -169,10 +202,12 @@ template <int dim>
 inline
 unsigned int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_quad,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_quad));
 
@@ -187,8 +222,10 @@ unsigned int
 DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 					    const unsigned int i) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
@@ -205,12 +242,14 @@ inline
 void
 DoFObjectAccessor<2,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (4*dof_handler->get_fe().dofs_per_vertex +
 				 4*dof_handler->get_fe().dofs_per_line +
 				 dof_handler->get_fe().dofs_per_quad),
-	  ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
@@ -280,10 +319,12 @@ inline
 unsigned int
 DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_hex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_hex));
 
@@ -298,8 +339,10 @@ unsigned int
 DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 					    const unsigned int i) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
@@ -316,13 +359,15 @@ inline
 void
 DoFObjectAccessor<3,dim>::get_dof_indices (vector<unsigned int> &dof_indices) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (dof_indices.size() == (8*dof_handler->get_fe().dofs_per_vertex +
 				 12*dof_handler->get_fe().dofs_per_line +
 				 6*dof_handler->get_fe().dofs_per_quad +
 				 dof_handler->get_fe().dofs_per_hex),
-	  ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,

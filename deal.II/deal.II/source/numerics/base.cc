@@ -132,7 +132,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // in the docs
   map<unsigned int, double> boundary_value_list;
 
-  for (FunctionMap::const_iterator dirichlet = dirichlet_bc.begin() ;
+  for (typename FunctionMap::const_iterator dirichlet = dirichlet_bc.begin() ;
        dirichlet != dirichlet_bc.end() ; ++dirichlet)
     VectorTools::interpolate_boundary_values (*dof_handler,
 					      dirichlet->first,

@@ -867,7 +867,8 @@ void
 FEQ1<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				   vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension (support_points.size(), dofs_per_cell));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),
+								   dofs_per_cell));
   
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     support_points[vertex] = cell->vertex(vertex);
@@ -880,6 +881,7 @@ FEQ1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterato
 					vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
+	  typename FiniteElementBase<dim>::
 	  ExcWrongFieldDimension (support_points.size(),
 				  GeometryInfo<dim>::vertices_per_face));
 

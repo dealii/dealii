@@ -37,6 +37,15 @@
 #include <fstream>
 
 
+
+// in strict ANSI C mode, the following constants are not defined by
+// default, so we do it ourselves
+#ifndef M_PI
+#  define	M_PI		3.14159265358979323846
+#endif
+
+
+
 template <int dim>
 class AdvectionProblem 
 {
@@ -525,7 +534,7 @@ void AdvectionProblem<dim>::run ()
       output_results (cycle);
     };
 
-  DataOut<dim>::EpsFlags eps_flags;
+  typename DataOut<dim>::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
   
   DataOut<dim> data_out;

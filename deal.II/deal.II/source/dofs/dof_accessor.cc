@@ -51,9 +51,23 @@ template <int dim>
 void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
 						      const unsigned int index) const
+
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename BaseClass::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
@@ -69,14 +83,28 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 template <int dim>
 void DoFObjectAccessor<1, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
-			    Vector<double>       &global_destination) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+			    Vector<double>       &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename BaseClass::ExcInvalidObject());
   Assert (local_source.size() == (2*dof_handler->get_fe().dofs_per_vertex +
 				  dof_handler->get_fe().dofs_per_line),
-	  ExcVectorDoesNotMatch());
+	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (dof_handler->n_dofs() == global_destination.size(),
-	  ExcVectorDoesNotMatch());
+	  typename BaseClass::ExcVectorDoesNotMatch());
 
   const unsigned int n_dofs = local_source.size();
   
@@ -94,18 +122,32 @@ distribute_local_to_global (const Vector<double> &local_source,
 template <int dim>
 void DoFObjectAccessor<1, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
-			    SparseMatrix<double>     &global_destination) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+			    SparseMatrix<double>     &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename BaseClass::ExcInvalidObject());
   Assert (local_source.m() == (2*dof_handler->get_fe().dofs_per_vertex +
 			       dof_handler->get_fe().dofs_per_line),
-	  ExcVectorDoesNotMatch());
+	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
-	  ExcMatrixDoesNotMatch());
+	  typename BaseClass::ExcMatrixDoesNotMatch());
   Assert (dof_handler->n_dofs() == global_destination.m(),
-	  ExcMatrixDoesNotMatch());
+	  typename BaseClass::ExcMatrixDoesNotMatch());
   Assert (global_destination.m() == global_destination.n(),
-	  ExcMatrixDoesNotMatch());
+	  typename BaseClass::ExcMatrixDoesNotMatch());
 
   const unsigned int n_dofs = local_source.m();
 
@@ -135,7 +177,7 @@ DoFObjectAccessor<1,dim>::get_dof_values (const InputVector &values,
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
-  Assert (has_children() == false, ExcNotActive());
+  Assert (has_children() == false, DoFAccessor<1>::ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
@@ -166,7 +208,7 @@ DoFObjectAccessor<1,dim>::set_dof_values (const Vector<number> &local_values,
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<1>::ExcVectorDoesNotMatch());
-  Assert (has_children() == false, ExcNotActive());
+  Assert (has_children() == false, DoFAccessor<1>::ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
@@ -189,10 +231,12 @@ template <int dim>
 void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
 					       const unsigned int index) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_quad,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_quad));
 
@@ -208,8 +252,10 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 						 const unsigned int i,
 						 const unsigned int index) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
@@ -226,14 +272,16 @@ template <int dim>
 void DoFObjectAccessor<2, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.size() == (4*dof_handler->get_fe().dofs_per_vertex +
 				  4*dof_handler->get_fe().dofs_per_line +
 				  dof_handler->get_fe().dofs_per_quad),
-	  ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (dof_handler->n_dofs() == global_destination.size(),
-	  ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   const unsigned int n_dofs = local_source.size();
 
@@ -252,18 +300,20 @@ template <int dim>
 void DoFObjectAccessor<2, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.m() == (4*dof_handler->get_fe().dofs_per_vertex +
 			       4*dof_handler->get_fe().dofs_per_line +
 			       dof_handler->get_fe().dofs_per_quad),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (dof_handler->n_dofs() == global_destination.m(),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (global_destination.m() == global_destination.n(),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   
   const unsigned int n_dofs = local_source.m();
 
@@ -287,13 +337,16 @@ DoFObjectAccessor<2,dim>::get_dof_values (const InputVector &values,
 {
   Assert (dim==2, ExcInternalError());
   
-  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (has_children() == false, ExcNotActive());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
+  Assert (has_children() == false, typename DoFAccessor<dim>::
+	  ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
@@ -322,13 +375,16 @@ DoFObjectAccessor<2,dim>::set_dof_values (const Vector<number> &local_values,
 {
   Assert (dim==2, ExcInternalError());
   
-  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (has_children() == false, ExcNotActive());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
+  Assert (has_children() == false,
+	  typename DoFAccessor<dim>::ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
@@ -355,10 +411,12 @@ template <int dim>
 void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
 					       const unsigned int index) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_hex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_hex));
 
@@ -373,9 +431,12 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i,
 						      const unsigned int index) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
-  Assert (vertex<8, ExcIndexRange (i,0,8));
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (vertex<8,
+	  ExcIndexRange (i,0,8));
   Assert (i<dof_handler->selected_fe->dofs_per_vertex,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
 
@@ -391,15 +452,17 @@ template <int dim>
 void DoFObjectAccessor<3, dim>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.size() == (8*dof_handler->get_fe().dofs_per_vertex +
 				  12*dof_handler->get_fe().dofs_per_line +
 				  6*dof_handler->get_fe().dofs_per_quad +
 				  dof_handler->get_fe().dofs_per_hex),
-	  ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (dof_handler->n_dofs() == global_destination.size(),
-	  ExcVectorDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   const unsigned int n_dofs = local_source.size();
 
@@ -419,19 +482,21 @@ void DoFObjectAccessor<3, dim>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0,
+	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.m() == (8*dof_handler->get_fe().dofs_per_vertex +
 			       12*dof_handler->get_fe().dofs_per_line +
 			       6*dof_handler->get_fe().dofs_per_quad +
 			       dof_handler->get_fe().dofs_per_hex),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (dof_handler->n_dofs() == global_destination.m(),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (global_destination.m() == global_destination.n(),
-	  ExcMatrixDoesNotMatch());
+	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   
   const unsigned int n_dofs = local_source.m();
 
@@ -461,7 +526,8 @@ DoFObjectAccessor<3,dim>::get_dof_values (const InputVector &values,
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
-  Assert (has_children() == false, ExcNotActive());
+  Assert (has_children() == false,
+	  DoFAccessor<3>::ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
@@ -494,13 +560,16 @@ DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
 {
   Assert (dim==3, ExcInternalError());
 
-  Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, DoFAccessor<3>::ExcInvalidObject());
+  Assert (dof_handler != 0,
+	  DoFAccessor<3>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0,
+	  DoFAccessor<3>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().dofs_per_cell,
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
 	  DoFAccessor<3>::ExcVectorDoesNotMatch());
-  Assert (has_children() == false, ExcNotActive());
+  Assert (has_children() == false,
+	  DoFAccessor<3>::ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,

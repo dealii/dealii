@@ -265,7 +265,8 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 
 //TODO: Find better breakdown criterion (G)
 
-      if (fabs(alpha) > 1.e10) return ReturnState(breakdown);
+      if (fabs(alpha) > 1.e10)
+	return typename Solver<VECTOR>::ReturnState(breakdown);
     
       s.equ(1., r, -alpha, v);
       precondition(z,s);
@@ -307,7 +308,7 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 
   step = 0;
 
-  ReturnState state = breakdown;
+  typename Solver<VECTOR>::ReturnState state = breakdown;
   
   do 
     {

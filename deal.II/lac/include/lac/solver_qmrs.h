@@ -238,7 +238,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
 
   step = 0;
   
-  ReturnState state = breakdown;
+  typename Solver<VECTOR>::ReturnState state = breakdown;
 
   do 
     {
@@ -262,6 +262,8 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
  
   return state;
 };
+
+
 
 template<class VECTOR>
 template<class MATRIX, class Preconditioner>
@@ -299,7 +301,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX& A,
   res = A.residual(v, q, b);
 
   if (control().check(step, res) == SolverControl::success)
-    return ReturnState(success);
+    return success;
 
   p = v;
   
@@ -322,7 +324,7 @@ while (state == SolverControl::iterate)
 //TODO: Find a really good breakdown criterion
 // The absolute one detects breakdown instead of convergence
       if (fabs(sigma) < additional_data.breakdown)
-	return ReturnState(breakdown);
+	return breakdown;
 				       // Step 3
       alpha = rho/sigma;
       //deallog << "alpha:" << alpha << endl;
@@ -349,12 +351,12 @@ while (state == SolverControl::iterate)
 	res = sqrt((it+1)*tau);
       state = control().check(step,res);
       if (state == SolverControl::success)
-	return ReturnState(success);
+	return success;
       else if (state == SolverControl::failure)
-	return ReturnState(exceeded);
+	return exceeded;
 				       // Step 6
       if (fabs(rho) < additional_data.breakdown)
-	return ReturnState(breakdown);
+	return breakdown;
 				       // Step 7
       rho_old = rho;
       precondition(q,v);
@@ -364,7 +366,7 @@ while (state == SolverControl::iterate)
       p.sadd(beta,v);
       precondition(q,p);
     }
-  return ReturnState(exceeded);
+  return exceeded;
 }
 
 

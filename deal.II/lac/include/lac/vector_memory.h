@@ -172,8 +172,9 @@ template<typename Vector>
 GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size)
 		: pool(initial_size)
 {
-  for (vector<entry_type>::iterator i=pool.begin();i != pool.end()
-				      ;++i)
+  for (typename vector<entry_type>::iterator i=pool.begin();
+       i != pool.end();
+       ++i)
     {
       i->first = false;
       i->second = new Vector;
@@ -182,11 +183,14 @@ GrowingVectorMemory<Vector>::GrowingVectorMemory(const unsigned int initial_size
 }
 
 
+
 template<typename Vector>
 GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 {
   unsigned int n = 0;
-  for (vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
+  for (typename vector<entry_type>::iterator i=pool.begin();
+       i != pool.end();
+       ++i)
     {
       if (i->first == true)
 	++n;
@@ -202,12 +206,15 @@ GrowingVectorMemory<Vector>::~GrowingVectorMemory()
 }
 
 
+
 template<typename Vector>
 Vector*
 GrowingVectorMemory<Vector>::alloc()
 {
   ++n_alloc;
-  for (vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
+  for (typename vector<entry_type>::iterator i=pool.begin();
+       i != pool.end();
+       ++i)
     {
       if (i->first == false)
 	{
@@ -223,11 +230,12 @@ GrowingVectorMemory<Vector>::alloc()
 }
 
 
+
 template<typename Vector>
 void
 GrowingVectorMemory<Vector>::free(const Vector* const v)
 {
-  for (vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
+  for (typename vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
     {
       if (v == (i->second))
 	{
@@ -235,7 +243,7 @@ GrowingVectorMemory<Vector>::free(const Vector* const v)
 	  return;
 	}
     }
-  Assert(false, ExcNotAllocatedHere());
+  Assert(false, typename VectorMemory<Vector>::ExcNotAllocatedHere());
 }
 
 

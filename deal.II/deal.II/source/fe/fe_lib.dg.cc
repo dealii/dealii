@@ -4412,6 +4412,7 @@ FEDG_Q3<3>::FEDG_Q3():
 };
 
 
+
 template<>
 FEDG_Q4<3>::FEDG_Q4():
 		FEQ4<3>(1)
@@ -4427,36 +4428,43 @@ FEDG_Q4<3>::FEDG_Q4():
 template <int dim>
 void
 FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					  vector<Point<dim> >  &support_points) const {
+				       vector<Point<dim> >  &support_points) const
+{
   Assert ((support_points.size() == 0),
-	  ExcWrongFieldDimension (support_points.size(),0));
+	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
 };
+
 
 
 template <int dim>
 void
 FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-						vector<Point<dim> >  &support_points) const {
+						vector<Point<dim> >  &support_points) const
+{
   Assert ((support_points.size() == 0),
-	  ExcWrongFieldDimension (support_points.size(),0));
+	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
 };
+
 
 
 template <int dim>
 void
 FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					    vector<Point<dim> >  &support_points) const {
+				       vector<Point<dim> >  &support_points) const
+{
   Assert ((support_points.size() == 0),
-	  ExcWrongFieldDimension (support_points.size(),0));
+	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
 };
+
 
 
 template <int dim>
 void
 FEDG_Q4<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					      vector<Point<dim> >  &support_points) const {
+				       vector<Point<dim> >  &support_points) const
+{
   Assert ((support_points.size() == 0),
-	  ExcWrongFieldDimension (support_points.size(),0));
+	  FiniteElementBase<dim>::ExcWrongFieldDimension (support_points.size(),0));
 };
 
 

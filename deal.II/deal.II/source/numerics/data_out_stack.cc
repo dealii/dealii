@@ -39,10 +39,12 @@ void DataOutStack<dim>::new_parameter_value (const double p,
 				   //
 				   // this is to prevent serious waste of
 				   // memory
-  for (vector<DataVector>::const_iterator i=dof_data.begin(); i!=dof_data.end(); ++i)
+  for (typename vector<DataVector>::const_iterator i=dof_data.begin();
+       i!=dof_data.end(); ++i)
     Assert (i->data.size() == 0,
 	    ExcDataNotCleared ());
-  for (vector<DataVector>::const_iterator i=cell_data.begin(); i!=cell_data.end(); ++i)
+  for (typename vector<DataVector>::const_iterator i=cell_data.begin();
+       i!=cell_data.end(); ++i)
     Assert (i->data.size() == 0,
 	    ExcDataNotCleared ());
   
@@ -80,12 +82,12 @@ void DataOutStack<dim>::declare_data_vector (const vector<string> &names,
 				   // used twice
   for (vector<string>::const_iterator name=names.begin(); name!=names.end(); ++name)
     {
-      for (vector<DataVector>::const_iterator data_set=dof_data.begin();
+      for (typename vector<DataVector>::const_iterator data_set=dof_data.begin();
 	   data_set!=dof_data.end(); ++data_set)
 	for (unsigned int i=0; i<data_set->names.size(); ++i)
 	  Assert (*name != data_set->names[i], ExcNameAlreadyUsed(*name));
 
-      for (vector<DataVector>::const_iterator data_set=cell_data.begin();
+      for (typename vector<DataVector>::const_iterator data_set=cell_data.begin();
 	   data_set!=cell_data.end(); ++data_set)
 	for (unsigned int i=0; i<data_set->names.size(); ++i)
 	  Assert (*name != data_set->names[i], ExcNameAlreadyUsed(*name));
@@ -139,7 +141,7 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
   
   if (vec.size() == dof_handler->n_dofs())
     {
-      vector<DataVector>::iterator data_vector=dof_data.begin();
+      typename vector<DataVector>::iterator data_vector=dof_data.begin();
       for (; data_vector!=dof_data.end(); ++data_vector)
 	if (data_vector->names == names)
 	  {
@@ -153,7 +155,7 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
     }
   else
     {
-      vector<DataVector>::iterator data_vector=cell_data.begin();
+      typename vector<DataVector>::iterator data_vector=cell_data.begin();
       for (; data_vector!=cell_data.end(); ++data_vector)
 	if (data_vector->names == names)
 	  {
@@ -213,9 +215,9 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 
 				   // now loop over all cells and
 				   // actually create the patches
-  vector<DataOutBase::Patch<dim+1> >::iterator patch = &patches[patches.size()-n_patches];
-  unsigned int                           cell_number = 0;
-  for (DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
+  typename vector<DataOutBase::Patch<dim+1> >::iterator patch = &patches[patches.size()-n_patches];
+  unsigned int                                    cell_number = 0;
+  for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
       Assert (patch != patches.end(), ExcInternalError());
@@ -293,10 +295,12 @@ void DataOutStack<dim>::finish_parameter_value ()
 {
 				   // release lock on dof handler
   dof_handler = 0;
-  for (vector<DataVector>::iterator i=dof_data.begin(); i!=dof_data.end(); ++i)
+  for (typename vector<DataVector>::iterator i=dof_data.begin();
+       i!=dof_data.end(); ++i)
     i->data.reinit (0);
   
-  for (vector<DataVector>::iterator i=cell_data.begin(); i!=cell_data.end(); ++i)
+  for (typename vector<DataVector>::iterator i=cell_data.begin();
+       i!=cell_data.end(); ++i)
     i->data.reinit (0);
 };
 
@@ -313,10 +317,10 @@ template <int dim>
 vector<string> DataOutStack<dim>::get_dataset_names () const
 {
   vector<string> names;
-  for (vector<DataVector>::const_iterator dataset=dof_data.begin();
+  for (typename vector<DataVector>::const_iterator dataset=dof_data.begin();
        dataset!=dof_data.end(); ++dataset)
     names.insert (names.end(), dataset->names.begin(), dataset->names.end());
-  for (vector<DataVector>::const_iterator dataset=cell_data.begin();
+  for (typename vector<DataVector>::const_iterator dataset=cell_data.begin();
        dataset!=cell_data.end(); ++dataset)
     names.insert (names.end(), dataset->names.begin(), dataset->names.end());
   

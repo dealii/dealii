@@ -1259,6 +1259,8 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 };
 
 
+
+
 /*------------------------ Inline functions: FEValuesBase ------------------------*/
 
 
@@ -1273,6 +1275,7 @@ const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const
 };
 
 
+
 template <int dim>
 inline
 const vector<vector<Tensor<1,dim> > > &
@@ -1281,6 +1284,7 @@ FEValuesBase<dim>::get_shape_grads () const
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
+
 
 
 template <int dim>
@@ -1293,45 +1297,55 @@ FEValuesBase<dim>::get_shape_2nd_derivatives () const
 };
 
 
+
 template <int dim>
 inline
 const vector<Point<dim> > &
-FEValuesBase<dim>::get_quadrature_points () const {
+FEValuesBase<dim>::get_quadrature_points () const
+{
   Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
   return quadrature_points;
 };
 
 
+
 template <int dim>
 inline
 const vector<Point<dim> > &
-FEValuesBase<dim>::get_support_points () const {
+FEValuesBase<dim>::get_support_points () const
+{
   Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
   return support_points;
 };
 
 
+
 template <int dim>
 inline
 const vector<double> &
-FEValuesBase<dim>::get_JxW_values () const {
+FEValuesBase<dim>::get_JxW_values () const
+{
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
 };
 
 
+
 template <int dim>
 inline
 const FiniteElement<dim> & 
-FEValuesBase<dim>::get_fe () const {
+FEValuesBase<dim>::get_fe () const
+{
   return *fe;
 };
+
 
 
 template <int dim>
 inline
 const DoFHandler<dim>::cell_iterator &
-FEValuesBase<dim>::get_cell() const {
+FEValuesBase<dim>::get_cell() const
+{
   return present_cell;
 };
 
@@ -1341,8 +1355,10 @@ FEValuesBase<dim>::get_cell() const {
 template <int dim>
 inline
 const vector<Point<dim> > &
-FEFaceValuesBase<dim>::get_normal_vectors () const {
-  Assert (update_flags & update_normal_vectors, ExcAccessToUninitializedField());
+FEFaceValuesBase<dim>::get_normal_vectors () const
+{
+  Assert (update_flags & update_normal_vectors,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   return normal_vectors;
 };
 

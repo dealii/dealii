@@ -910,11 +910,14 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 					const FullMatrix<double>         &shape_values_transform,
 					const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const {
   Assert (jacobians.size() == unit_points.size(),
-	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(jacobians.size(),
+								  unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
-	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(q_points.size(),
+								  unit_points.size()));
   Assert (support_points.size() == dofs_per_cell,
-	  ExcWrongFieldDimension(support_points.size(), dofs_per_cell));
+	  typename FiniteElementBase<dim>::ExcWrongFieldDimension(support_points.size(),
+								  dofs_per_cell));
 
 
   unsigned int n_points=unit_points.size();

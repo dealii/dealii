@@ -66,7 +66,7 @@ template <int dim>
 void PoissonEquation<dim>::assemble (FullMatrix<double>  &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, typename Equation<dim>::ExcPureVirtualFunctionCalled());
 };
 
 
@@ -75,7 +75,7 @@ template <int dim>
 void PoissonEquation<dim>::assemble (Vector<double>      &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, typename Equation<dim>::ExcPureVirtualFunctionCalled());
 };
 
 

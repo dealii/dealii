@@ -338,7 +338,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		unit_quadrature_points(quadrature.get_points())
 {
   Assert ((update_flags & update_normal_vectors) == false,
-	  ExcInvalidUpdateFlag());
+	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
 
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
@@ -376,7 +376,7 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
   Assert (static_cast<const FiniteElementData<dim>&>(*fe)
 	  ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-	  ExcFEDontMatch());
+	  typename FEValuesBase<dim>::ExcFEDontMatch());
   
 				   // fill jacobi matrices and real
 				   // quadrature points
@@ -497,7 +497,7 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 {
   Assert (i<normal_vectors.size(), ExcIndexRange(i, 0, normal_vectors.size()));
   Assert (update_flags & update_normal_vectors,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   
   return normal_vectors[i];
 };
@@ -568,7 +568,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
   Assert (static_cast<const FiniteElementData<dim>&>(*fe)
 	  ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-	  ExcFEDontMatch());
+	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   
@@ -678,7 +678,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       fe)
 {
   Assert ((update_flags & update_support_points) == false,
-	  ExcInvalidUpdateFlag());
+	  typename FEValuesBase<dim>::ExcInvalidUpdateFlag());
   
   unit_face_quadrature_points = quadrature.get_points();
   weights = quadrature.get_weights ();  
@@ -752,7 +752,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   Assert (static_cast<const FiniteElementData<dim>&>(*fe)
 	  ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-	  ExcFEDontMatch());
+	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,

@@ -103,7 +103,8 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<1,dim>::used () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return tria->levels[present_level]->lines.used[present_index];
 };
 
@@ -112,7 +113,7 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<1,dim>::user_flag_set () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return tria->levels[present_level]->lines.user_flags[present_index];
 };
 
@@ -121,7 +122,7 @@ template <int dim>
 inline
 void
 TriaObjectAccessor<1,dim>::set_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->lines.user_flags[present_index] = true;
 };
 
@@ -130,7 +131,7 @@ template <int dim>
 inline
 void
 TriaObjectAccessor<1,dim>::clear_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->lines.user_flags[present_index] = false;
 };
 
@@ -145,7 +146,7 @@ TriaObjectAccessor<1,dim>::child (const unsigned int i) const {
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };
@@ -164,7 +165,7 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<1,dim>::has_children () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->lines.children[present_index] != -1);
 }
 
@@ -240,7 +241,8 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<2,dim>::used () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return tria->levels[present_level]->quads.used[present_index];
 };
 
@@ -249,7 +251,7 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<2,dim>::user_flag_set () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return tria->levels[present_level]->quads.user_flags[present_index];
 };
 
@@ -258,7 +260,7 @@ template <int dim>
 inline
 void
 TriaObjectAccessor<2,dim>::set_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = true;
 };
 
@@ -267,7 +269,7 @@ template <int dim>
 inline
 void
 TriaObjectAccessor<2,dim>::clear_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = false;
 };
 
@@ -306,7 +308,7 @@ TriaObjectAccessor<2,dim>::child (const unsigned int i) const {
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };
@@ -324,7 +326,7 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<2,dim>::has_children () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->quads.children[present_index] != -1);
 };
 
@@ -402,7 +404,8 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<3,dim>::used () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return tria->levels[present_level]->hexes.used[present_index];
 };
 
@@ -411,7 +414,7 @@ template <int dim>
 inline
 bool
 TriaObjectAccessor<3,dim>::user_flag_set () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_flags[present_index];
 };
 
@@ -420,7 +423,7 @@ template <int dim>
 inline
 void
 TriaObjectAccessor<3,dim>::set_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = true;
 };
 
@@ -428,7 +431,7 @@ TriaObjectAccessor<3,dim>::set_user_flag () const {
 template <int dim>
 inline
 void TriaObjectAccessor<3,dim>::clear_user_flag () const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = false;
 };
 
@@ -437,7 +440,7 @@ template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
 TriaObjectAccessor<3,dim>::line (const unsigned int i) const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   Assert (i<12, ExcIndexRange (i,0,12));
 
 				   // egcs 1.1.2 gets into trouble if we
@@ -474,7 +477,7 @@ template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
 TriaObjectAccessor<3,dim>::quad (const unsigned int i) const {
-  Assert (used(), ExcCellNotUsed());
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return
     TriaIterator<dim,TriaObjectAccessor<2,dim> >
     (
@@ -535,7 +538,7 @@ TriaObjectAccessor<3,dim>::child (const unsigned int i) const
   
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };
@@ -551,7 +554,7 @@ int TriaObjectAccessor<3,dim>::child_index (unsigned int i) const {
 
 template <int dim>
 bool TriaObjectAccessor<3,dim>::has_children () const {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
 
@@ -927,7 +930,7 @@ inline
 int
 CellAccessor<dim>::neighbor_index (const unsigned int i) const {
   Assert (i<GeometryInfo<dim>::faces_per_cell,
-	  ExcInvalidNeighbor(i));
+	  typename TriaAccessor<dim>::ExcInvalidNeighbor(i));
   return tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second;
 };
@@ -936,19 +939,22 @@ CellAccessor<dim>::neighbor_index (const unsigned int i) const {
 template <int dim>
 inline
 int
-CellAccessor<dim>::neighbor_level (const unsigned int i) const {
+CellAccessor<dim>::neighbor_level (const unsigned int i) const
+{
   Assert (i<GeometryInfo<dim>::faces_per_cell,
-	  ExcInvalidNeighbor(i));
+	  typename TriaAccessor<dim>::ExcInvalidNeighbor(i));
   return tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first;
 };
 
 
+
 template <int dim>
 inline
 bool
-CellAccessor<dim>::refine_flag_set () const {
-  Assert (used(), ExcCellNotUsed());
+CellAccessor<dim>::refine_flag_set () const
+{
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 				   // cells flagged for refinement must be active
 				   // (the #set_refine_flag# function checks this,
 				   // but activity may change when refinement is
@@ -960,31 +966,38 @@ CellAccessor<dim>::refine_flag_set () const {
 };
 
 
+
 template <int dim>
 inline
 void
-CellAccessor<dim>::set_refine_flag () const {
+CellAccessor<dim>::set_refine_flag () const
+{
   Assert (used() && active(), ExcRefineCellNotActive());
-  Assert (!coarsen_flag_set(), ExcCellFlaggedForCoarsening());
+  Assert (!coarsen_flag_set(),
+	  ExcCellFlaggedForCoarsening());
   
   tria->levels[present_level]->refine_flags[present_index] = true;
 };
 
 
+
 template <int dim>
 inline
 void
-CellAccessor<dim>::clear_refine_flag () const {
+CellAccessor<dim>::clear_refine_flag () const
+{
   Assert (used() && active(), ExcRefineCellNotActive());
   tria->levels[present_level]->refine_flags[present_index] = false;
 };
 
 
+
 template <int dim>
 inline
 bool
-CellAccessor<dim>::coarsen_flag_set () const {
-  Assert (used(), ExcCellNotUsed());
+CellAccessor<dim>::coarsen_flag_set () const
+{
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 				   // cells flagged for coarsening must be active
 				   // (the #set_refine_flag# function checks this,
 				   // but activity may change when refinement is
@@ -996,10 +1009,12 @@ CellAccessor<dim>::coarsen_flag_set () const {
 };
 
 
+
 template <int dim>
 inline
 void
-CellAccessor<dim>::set_coarsen_flag () const {
+CellAccessor<dim>::set_coarsen_flag () const
+{
   Assert (used() && active(), ExcRefineCellNotActive());
   Assert (!refine_flag_set(), ExcCellFlaggedForRefinement());
   
@@ -1007,47 +1022,55 @@ CellAccessor<dim>::set_coarsen_flag () const {
 };
 
 
+
 template <int dim>
 inline
 void
-CellAccessor<dim>::clear_coarsen_flag () const {
+CellAccessor<dim>::clear_coarsen_flag () const
+{
   Assert (used() && active(), ExcRefineCellNotActive());
   tria->levels[present_level]->coarsen_flags[present_index] = false;
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,CellAccessor<dim> >
-CellAccessor<dim>::neighbor (const unsigned int i) const {
+CellAccessor<dim>::neighbor (const unsigned int i) const
+{
   TriaIterator<dim,CellAccessor<dim> > q (tria, neighbor_level (i), neighbor_index (i));
 
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsNeighbor());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
 #endif
   return q;
 };
+
 
 
 template <int dim>
 inline
 TriaIterator<dim,CellAccessor<dim> >
-CellAccessor<dim>::child (const unsigned int i) const {
+CellAccessor<dim>::child (const unsigned int i) const
+{
   TriaIterator<dim,CellAccessor<dim> > q (tria, present_level+1, child_index (i));
 
 #ifdef DEBUG
   if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
 };
+
 
 
 template <int dim>
 inline
 bool
-CellAccessor<dim>::active () const {
+CellAccessor<dim>::active () const
+{
   return !has_children();
 };
 

@@ -92,7 +92,7 @@ KellyErrorEstimator<dim>::Data::Data(const DoFHandler<dim>   &dof,
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
   
-  for (FunctionMap::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
+  for (typename FunctionMap::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
   
 				   // the last cell, often needed

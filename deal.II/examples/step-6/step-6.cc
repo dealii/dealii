@@ -893,7 +893,7 @@ void LaplaceProblem<dim>::run ()
 				   // obtain a reasonable view on the
 				   // solution, we rescale the z-axis
 				   // by a factor of four.
-  DataOut<dim>::EpsFlags eps_flags;
+  typename DataOut<dim>::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
   
   DataOut<dim> data_out;
