@@ -106,6 +106,19 @@
    description of this bug. */
 #undef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
 
+/* Define if we have to work around a bug with some compilers that will not
+   allow us to specify a fully specialized class of a template as a friend.
+   See the aclocal.m4 file in the top-level directory for a description of
+   this bug. */
+#undef DEAL_II_TEMPL_SPEC_FRIEND_BUG
+
+/* Define if the compiler provides a <errno.g> header file which does not
+   define all error codes such as EINTR. In that case, use the system include
+   file at /usr/include instead. There is probably a better way to do this,
+   but it is not apparent by looking at the C/C++ compatibility header
+   provided by the compiler. */
+#undef DEAL_II_USE_DIRECT_ERRNO_H
+
 /* Flag indicating whether the library shall be compiled for multithreaded
    applications */
 #undef DEAL_II_USE_MT
