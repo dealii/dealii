@@ -322,7 +322,7 @@ class SolverFGMRES : public Solver<VECTOR>
 					  * (cf. class documentation).
 					  */
 	AdditionalData(const unsigned int max_basis_size = 30,
-		       bool use_default_residual = true)
+		       const bool /*use_default_residual*/ = true)
 			:
 			max_basis_size(max_basis_size)
 	  {};
