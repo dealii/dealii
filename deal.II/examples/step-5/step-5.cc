@@ -438,84 +438,6 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // constructor using the update
 				       // flags.
       fe_values.reinit (cell);
-				       // Now, these quantities are
-				       // stored in arrays in the
-				       // FEValues object. Usually,
-				       // the internals of how and
-				       // where they are stored is not
-				       // something that the outside
-				       // world should know, but since
-				       // this is a time critical
-				       // function we decided to
-				       // publicize these arrays a
-				       // little bit, and provide
-				       // facilities to export the
-				       // address where this data is
-				       // stored.
-				       //
-				       // For example, the values of
-				       // shape function j at
-				       // quadrature point q is stored
-				       // in a matrix, of which we can
-				       // get the address as follows
-				       // (note that this is a
-				       // reference to the matrix,
-				       // symbolized by the ampersand ``&'',
-				       // and that it must be a
-				       // constant reference, since
-				       // only read-only access is
-				       // granted):
-      const FullMatrix<double> 
-	& shape_values = fe_values.get_shape_values();
-				       // Instead of writing
-				       // fe_values.shape_value(j,q)
-				       // we can now write
-				       // shape_values[j][q], i.e. the
-				       // function call needed
-				       // previously for each access
-				       // will be optimized away.
-				       //
-				       // There are alike functions
-				       // for almost all data elements
-				       // in the FEValues class. The
-				       // gradient are accessed as
-				       // follows:
-      const std::vector<std::vector<Tensor<1,dim> > >
-	& shape_grads  = fe_values.get_shape_grads();
-				       // The data type looks a bit
-				       // unwieldy, since each entry
-				       // in the matrix (j,q) now
-				       // needs to be the gradient of
-				       // the shape function, which is
-				       // a tensor rather than a
-				       // scalar.
-				       //
-				       // Similarly, access to the
-				       // place where quadrature
-				       // points and the determinants
-				       // of the Jacobian matrices
-				       // times the weights of the
-				       // respective quadrature points
-				       // are stored, can be obtained
-				       // like this:
-      const std::vector<double>
-	& JxW_values   = fe_values.get_JxW_values();
-      const std::vector<Point<dim> >
-	& q_points     = fe_values.get_quadrature_points();
-				       // Admittedly, the declarations
-				       // above are not easily
-				       // readable, but they can save
-				       // many function calls in the
-				       // inner loops and can thus
-				       // make assemblage faster.
-				       //
-				       // An additional advantage is
-				       // that the inner loops are
-				       // simpler to read, since the
-				       // fe_values object is no more
-				       // explicitely needed to access
-				       // the different fields (see
-				       // below).
 
 				       // There is one more thing: in
 				       // this example, we want to use
@@ -529,7 +451,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // is a virtual function, so
 				       // calling it is relatively
 				       // expensive. Therefore, we use
-				       // a function of the Function
+				       // a function of the ``Function''
 				       // class which returns the
 				       // values at all quadrature
 				       // points at once; that
@@ -537,40 +459,17 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // but it needs to be computed
 				       // once per cell only, not once
 				       // in the inner loop:
-      coefficient.value_list (q_points, coefficient_values);
+      coefficient.value_list (fe_values.get_quadrature_points(),
+			      coefficient_values);
 				       // It should be noted that the
 				       // creation of the
 				       // coefficient_values object is
 				       // done outside the loop over
 				       // all cells to avoid memory
 				       // allocation each time we
-				       // visit a new cell. Contrary
-				       // to this, the other variables
-				       // above were created inside
-				       // the loop, but they were only
-				       // references to memory that
-				       // has already been allocated
-				       // (i.e. they are pointers to
-				       // that memory) and therefore,
-				       // no new memory needs to be
-				       // allocated; in particular, by
-				       // declaring the pointers as
-				       // close to their use as
-				       // possible, we give the
-				       // compiler a better choice to
-				       // optimize them away
-				       // altogether, something which
-				       // it definitely can't do with
-				       // the coefficient_values
-				       // object since it is too
-				       // complicated, but mostly
-				       // because it's address is
-				       // passed to a virtual function
-				       // which is not knows at
-				       // compile time.
+				       // visit a new cell.
       
-				       // Using the various
-				       // abbreviations, the loops
+				       // With all this, the loops
 				       // then look like this (the
 				       // parentheses around the
 				       // product of the two gradients
@@ -588,16 +487,16 @@ void LaplaceProblem<dim>::assemble_system ()
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += (coefficient_values[q_point] *
-				   (shape_grads[i][q_point]    *
-				    shape_grads[j][q_point])   *
-				   JxW_values[q_point]);
+				   (fe_values.shape_grad(i,q_point)    *
+				    fe_values.shape_grad(j,q_point))   *
+				   fe_values.JxW(q_point));
 
 					     // For the right hand
 					     // side, a constant value
 					     // is used again:
-	    cell_rhs(i) += (shape_values[i][q_point] *
+	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    1.0 *
-			    JxW_values[q_point]);
+			    fe_values.JxW(q_point));
 	  };
 
 
