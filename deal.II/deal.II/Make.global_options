@@ -14,9 +14,9 @@ CXX       = c++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
 CXXFLAGS.g= -ansi -DDEBUG -ggdb -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-builtin\
+            -Winline -Woverloaded-virtual -Wuninitialized -fno-builtin\
             $(INCLUDE)
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
+CXXFLAGS  =-O3 -finline-functions -ffast-math \
            -felide-constructors -fnonnull-objects \
            $(INCLUDE)
 
