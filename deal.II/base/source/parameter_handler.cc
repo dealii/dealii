@@ -123,8 +123,10 @@ namespace Patterns
 	
 	description << "[Integer range "
 		    << lower_bound << "..." << upper_bound
-		    << " (inclusive)]"
-		    << std::ends;
+		    << " (inclusive)]";
+#ifndef HAVE_STD_STRINGSTREAM
+	description << std::ends;
+#endif
 	return description.str();
       }
     else
@@ -205,8 +207,10 @@ namespace Patterns
 
 	description << "[Floating point range "
 		    << lower_bound << "..." << upper_bound
-		    << " (inclusive)]"
-		    << std::ends;
+		    << " (inclusive)]";
+#ifndef HAVE_STD_STRINGSTREAM	
+	description << std::ends;
+#endif
 	return description.str();
       }
     else

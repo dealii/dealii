@@ -170,7 +170,10 @@ LogStream::print_line_head()
   std::ostrstream statname;
 #endif
   
-  statname << "/proc/" << id << "/stat" << std::ends;
+  statname << "/proc/" << id << "/stat";
+#ifndef HAVE_STD_STRINGSTREAM
+  statname << std::ends;
+#endif
   static long size;
   static string dummy;
   ifstream stat(statname.str());

@@ -254,8 +254,10 @@ void TableHandler::write_text(std::ostream &out) const
 	else
 	  dummy_out.setf (std::ios::fixed, std::ios::floatfield);
 	column.entries[i]->write_text (dummy_out);
+#ifndef HAVE_STD_STRINGSTREAM
 	dummy_out << std::ends;
-
+#endif
+	
 					 // get size, note that we are
 					 // not interested in the
 					 // trailing \0

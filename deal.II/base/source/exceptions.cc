@@ -113,8 +113,10 @@ const char * ExceptionBase::what () const throw ()
   PrintInfo (converter);
   
   converter << "--------------------------------------------------------"
-	    << std::endl
-	    << std::ends;
+	    << std::endl;
+#ifndef HAVE_STD_STRINGSTREAM
+  converter << std::ends;
+#endif
 
   description = converter.str();
 

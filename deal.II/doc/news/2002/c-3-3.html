@@ -34,6 +34,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: For gcc versions that used <code
+       class="class">ostrstream</code> instead of <code
+       class="class">ostringstream</code>, it was necessary to append
+       a final <code class="member">std::ends</code> when piping text
+       into the string stream. This was not previously
+       conditionalized, but done for old and new classes.
+       <br>
+       (WB 2002/03/13)
+       </p>
+
+  <li> <p> 
        Changed: The configure machinery has been revamped
        significantly.
        <br>

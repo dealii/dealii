@@ -213,7 +213,10 @@ add_data_vector (const VECTOR         &vec,
 #else
 	  std::ostrstream namebuf;
 #endif
-	  namebuf << '_' << i << std::ends;
+	  namebuf << '_' << i;
+#ifndef HAVE_STD_STRINGSTREAM
+	  namebuf << std::ends;
+#endif
   	  names[i] = name + namebuf.str();
   	};
     };

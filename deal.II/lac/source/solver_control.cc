@@ -59,7 +59,10 @@ SolverControl::NoConvergence::what () const throw ()
 #endif
 
   out << "Iterative method reported convergence failure in step "
-      << last_step << " with residual " << last_residual << std::ends;
+      << last_step << " with residual " << last_residual;
+#ifndef HAVE_STD_STRINGSTREAM
+  out << std::ends;
+#endif
 
   description = out.str();
   return description.c_str();

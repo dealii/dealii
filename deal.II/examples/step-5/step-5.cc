@@ -837,11 +837,16 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   filename << "solution-"
 	   << cycle
 	   << ".eps";
-				   // In order to append the final
-				   // '\0', we have to put an ``ends''
-				   // to the end of the string:
-  filename << std::ends;
   
+				   // For the old string stream
+				   // classes, we have to append the
+				   // final '\0' that appears at the
+				   // end of ``char *''
+				   // variables. This is done by the
+				   // following construct:
+#ifndef HAVE_STD_STRINGSTREAM
+  filename << std::ends;
+#endif
 				   // We can get whatever we wrote to
 				   // the stream using the ``str()''
 				   // function. If the new
