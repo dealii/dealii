@@ -1970,7 +1970,8 @@ namespace internals
     Iterator<number,Constness>::
     operator == (const Iterator& other) const
     {
-      return (accessor.row() == other.accessor.row() &&
+      return (accessor.matrix  == other.accessor.matrix &&
+              accessor.row()   == other.accessor.row() &&
               accessor.index() == other.accessor.index());
     }
 
