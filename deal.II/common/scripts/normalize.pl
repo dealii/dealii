@@ -27,7 +27,7 @@ s/Time tag:.*//g;
 
 # Exceptions
 
-s/line <\d+> of\s?//;
+s/line <\d+> of file <.*\//file </;
 
 # Make small exponentials zero
 
