@@ -48,11 +48,17 @@ template <int dim> class MGDoFHandler;
 template <int dim>
 struct CellData
 {
-#if !((__GNUC__==2) && (__GNUC_MINOR__==95))
+				     /**
+				      * Indices of the vertices of
+				      * this cell.
+				      */
     int           vertices[GeometryInfo<dim>::vertices_per_cell];
-#else
-    int           vertices[1 << dim];
-#endif
+
+				     /**
+				      * Material indicator of this
+				      * cell. May be used to denote
+				      * different coefficients, etc.
+				      */
     unsigned char material_id;
 
 				     /**

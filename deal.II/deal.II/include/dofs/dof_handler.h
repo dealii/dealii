@@ -1149,20 +1149,10 @@ class DoFHandler  :  public Subscriptor,
 				      */
     std::vector<unsigned int>      vertex_dofs;
 
-
-#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
-				     // this seems to be disallowed
-				     // by the standard, so gcc2.95
-				     // does not accept it
-    friend class DoFObjectAccessor<1, dim>;
-    friend class DoFObjectAccessor<2, dim>;
-    friend class DoFObjectAccessor<3, dim>;
-#else
-				     // this, however, may grant
-				     // access to too many classes,
-				     // but ...
+				     /**
+				      * Make accessor objects friends.
+				      */
     template <int dim1, int dim2> friend class DoFObjectAccessor;
-#endif
 };
 
 

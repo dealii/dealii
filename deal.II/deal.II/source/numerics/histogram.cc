@@ -93,17 +93,7 @@ void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
       {
 	typedef bool (*comparator) (const number, const number);
 	const comparator logarithmic_less_function
-	  =
-#ifdef __GNU_CC
-#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
-	  &logarithmic_less<number>
-#else
-	  &Histogram::template logarithmic_less<number>
-#endif
-#else
-	  &Histogram::template logarithmic_less<number>	  
-#endif
-	  ;
+	  = &Histogram::template logarithmic_less<number>;
 	
 	min_value = *std::min_element(values[0].begin(),
 				      values[0].end(),

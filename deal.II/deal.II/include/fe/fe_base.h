@@ -808,11 +808,7 @@ class FiniteElementBase : public Subscriptor,
 				      * should be resized to zero
 				      * size.
 				      */
-#if !((__GNUC__==2) && (__GNUC_MINOR__==95))
     FullMatrix<double> restriction[GeometryInfo<dim>::children_per_cell];
-#else
-    FullMatrix<double> restriction[1 << dim];
-#endif
 
     				     /**
 				      * Array of embedding
@@ -827,11 +823,8 @@ class FiniteElementBase : public Subscriptor,
 				      * should be resized to zero
 				      * size.
 				      */
-#if ! ((__GNUC__==2) && (__GNUC_MINOR__==95))
     FullMatrix<double> prolongation[GeometryInfo<dim>::children_per_cell];
-#else
-    FullMatrix<double> prolongation[1 << dim];
-#endif
+
    				     /**
 				      * Specify the constraints which
 				      * the dofs on the two sides of a
