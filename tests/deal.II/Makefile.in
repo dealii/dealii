@@ -28,6 +28,7 @@ data_out.exe                 : data_out.go                           $(lib-2d) $
 derivative_approximation.exe : derivative_approximation.go $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 derivatives.exe              : derivatives.go              $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 dof_test.exe                 : dof_test.go                           $(lib-2d) $(lib-3d) $(libraries)
+dof_renumbering.exe          : dof_renumbering.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 error_estimator.exe          : error_estimator.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 gradients.exe                : gradients.go                          $(lib-2d)           $(libraries)
 grid_test.exe                : grid_test.go                          $(lib-2d) $(lib-3d) $(libraries)
@@ -44,7 +45,7 @@ wave-test-3.exe              : wave-test-3.go                        $(lib-2d)  
 tests = grid_test dof_test data_out derivatives gradients constraints mg \
         mglocal block_matrices second_derivatives derivative_approximation \
         matrices error_estimator intergrid_constraints intergrid_map \
-        wave-test-3
+        wave-test-3 dof_renumbering
 
 ############################################################
 
