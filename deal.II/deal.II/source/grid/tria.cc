@@ -811,25 +811,26 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
  * general Quad class.
  */
 struct QuadComparator {
-    bool operator () (const Quad &q1, const Quad &q2) {
-				       // here is room to optimize the
-				       // repeated equality test of
-				       // the previous lines, but I don't
-				       // care at present
-      if ((q1.line(0) < q2.line(0))          ||
-	  ((q1.line(0) == q2.line(0)) &&
-	   (q1.line(1) <  q2.line(1)))       ||
-	  ((q1.line(0) == q2.line(0)) &&
-	   (q1.line(1) == q2.line(1)) &&
-	   (q1.line(2) <  q2.line(2)))       ||
-	  ((q1.line(0) == q2.line(0)) &&
-	   (q1.line(1) == q2.line(1)) &&
-	   (q1.line(2) == q2.line(2)) &&
-	   (q1.line(3) <  q2.line(3))))
-	return true;
-      else
-	return false;
-    };
+    inline bool operator () (const Quad &q1, const Quad &q2) const
+      {
+					 // here is room to optimize the
+					 // repeated equality test of
+					 // the previous lines, but I don't
+					 // care at present
+	if ((q1.line(0) < q2.line(0))          ||
+	    ((q1.line(0) == q2.line(0)) &&
+	     (q1.line(1) <  q2.line(1)))       ||
+	    ((q1.line(0) == q2.line(0)) &&
+	     (q1.line(1) == q2.line(1)) &&
+	     (q1.line(2) <  q2.line(2)))       ||
+	    ((q1.line(0) == q2.line(0)) &&
+	     (q1.line(1) == q2.line(1)) &&
+	     (q1.line(2) == q2.line(2)) &&
+	     (q1.line(3) <  q2.line(3))))
+	  return true;
+	else
+	  return false;
+      };
 };
 
 
