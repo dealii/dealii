@@ -1449,19 +1449,6 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				   // set the right block size.
   preconditioner.initialize(system_matrix, fe.dofs_per_cell);
 
-				   // As the inverses of the diagonal
-				   // blocks are needed in each
-				   // preconditioner step, it is wise
-				   // to invert the diagonal blocks of
-				   // the matrix before starting the
-				   // solver. Otherwise, it takes less
-				   // memory, but the diagonal blocks
-				   // are inverted in each
-				   // preconditioner step,
-				   // significantly slowing down the
-				   // linear solving process.
-  preconditioner.invert_diagblocks();
-
 				   // After these preparations we are
 				   // ready to start the linear solver.
   solver.solve (system_matrix, solution, right_hand_side,
