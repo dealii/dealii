@@ -247,6 +247,7 @@ struct SparseDirectMA27::DetachedModeData
             if (ret < 0)
               {
                 std::cerr << "****** error " << ret << " on server side!"
+                          << " errno=" << errno
                           << std::endl;
                 abort ();
               }
