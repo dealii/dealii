@@ -544,11 +544,6 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 		    max_accesses = access_count[block][row];
 		    max_access_block = block;
 		  };
-					       // each dof should be
-					       // accessed by at least
-					       // one block!
-	      Assert (max_accesses > 0, ExcInternalError());
-	      
 	      dof_masks[max_access_block][row] = true;
 	    };
 
