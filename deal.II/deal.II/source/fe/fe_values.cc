@@ -101,8 +101,8 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 
 
 template <int dim>
-void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
-					    vector<Point<dim> > &gradients) const {
+void FEValuesBase<dim>::get_function_grads (const dVector          &fe_function,
+					    vector<Tensor<1,dim> > &gradients) const {
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
 
@@ -112,7 +112,7 @@ void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero
-  fill_n (gradients.begin(), n_quadrature_points, Point<dim>());
+  fill_n (gradients.begin(), n_quadrature_points, Tensor<1,dim>());
 
 				   // add up contributions of trial
 				   // functions
@@ -128,7 +128,8 @@ void FEValuesBase<dim>::get_function_grads (const dVector       &fe_function,
 
 
 template <int dim>
-const Point<dim> & FEValuesBase<dim>::quadrature_point (const unsigned int i) const {
+const Point<dim> &
+FEValuesBase<dim>::quadrature_point (const unsigned int i) const {
   Assert (i<quadrature_points.size(), ExcInvalidIndex(i,quadrature_points.size()));
   Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
   
@@ -138,7 +139,8 @@ const Point<dim> & FEValuesBase<dim>::quadrature_point (const unsigned int i) co
 
 
 template <int dim>
-const Point<dim> & FEValuesBase<dim>::support_point (const unsigned int i) const {
+const Point<dim> &
+FEValuesBase<dim>::support_point (const unsigned int i) const {
   Assert (i<support_points.size(), ExcInvalidIndex(i, support_points.size()));
   Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
   
@@ -176,7 +178,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		unit_shape_2nd_derivatives(fe.total_dofs,
 					   vector<Tensor<2,dim> >(quadrature.n_quadrature_points)),
 		unit_shape_gradients_transform(fe.n_transform_functions,
-					       vector<Point<dim> >(quadrature.n_quadrature_points)),
+					       vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
 		unit_quadrature_points(quadrature.get_quad_points())
 {
   Assert ((update_flags & update_normal_vectors) == false,
@@ -320,8 +322,8 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					   vector<vector<Tensor<2,dim> > >(n_dofs,
 									   vector<Tensor<2,dim> >(n_q_points))),
 		unit_shape_gradients_transform (n_faces_or_subfaces,
-						vector<vector<Point<dim> > >(n_transform_functions,
-									     vector<Point<dim> >(n_q_points))),
+						vector<vector<Tensor<1,dim> > >(n_transform_functions,
+										vector<Tensor<1,dim> >(n_q_points))),
 		unit_face_quadrature_points (n_q_points, Point<dim-1>()),
 		unit_quadrature_points (n_faces_or_subfaces,
 					vector<Point<dim> >(n_q_points, Point<dim>())),
@@ -332,7 +334,8 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 
 
 template <int dim>
-const Point<dim> & FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
+const Point<dim> &
+FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
   Assert (i<normal_vectors.size(), ExcInvalidIndex(i, normal_vectors.size()));
   Assert (update_flags & update_normal_vectors,
 	  ExcAccessToUninitializedField());
@@ -437,7 +440,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       {
 	fill_n (shape_gradients[i].begin(),
 		n_quadrature_points,
-		Point<dim>());
+		Tensor<1,dim>());
 	for (unsigned int j=0; j<n_quadrature_points; ++j) 
 	  for (unsigned int s=0; s<dim; ++s)
 					     // (grad psi)_s =
@@ -607,7 +610,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
       {
 	fill_n (shape_gradients[i].begin(),
 		n_quadrature_points,
-		Point<dim>());
+		Tensor<1,dim>());
 	for (unsigned int j=0; j<n_quadrature_points; ++j) 
 	  for (unsigned int s=0; s<dim; ++s)
 					     // (grad psi)_s =

@@ -25,12 +25,16 @@
 template <int dim>
 DoFHandler<dim>::DoFHandler (Triangulation<dim> *tria) :
 		tria(tria),
-		used_dofs (0) {};
+		used_dofs (0)
+{
+  tria->subscribe ();
+};
 
 
 template <int dim>
-DoFHandler<dim>::~DoFHandler ()
-{}
+DoFHandler<dim>::~DoFHandler () {
+  tria->unsubscribe ();
+}
 
 
 

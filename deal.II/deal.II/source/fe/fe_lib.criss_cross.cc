@@ -347,8 +347,8 @@ void FECrissCross<1>::get_unit_support_points (vector<Point<1> >&) const {
 
 template <>
 void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
-					 const Boundary<1> &,
-					 vector<Point<1> > &) const {
+					  const Boundary<1> &,
+					  vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -356,8 +356,8 @@ void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
 
 template <>
 void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
-					      const Boundary<1> &,
-					      vector<Point<1> > &) const {
+					       const Boundary<1> &,
+					       vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -382,8 +382,8 @@ double  FECrissCross<1>::shape_value_transform (const unsigned int,
 
 
 template <>
-Point<1> FECrissCross<1>::shape_grad_transform (const unsigned int,
-						const Point<1> &) const {
+Tensor<1,1> FECrissCross<1>::shape_grad_transform (const unsigned int,
+						   const Point<1> &) const {
   Assert (false, ExcNotUseful());
   return Point<1>();
 };
@@ -442,7 +442,7 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 				      vector<Point<1> > &,
 				      const bool,
 				      const dFMatrix      &,
-				      const vector<vector<Point<1> > > &,
+				      const vector<vector<Tensor<1,1> > > &,
 				      const Boundary<1> &) const {
   Assert (false, ExcNotUseful());
 };
@@ -594,8 +594,8 @@ void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) c
 
 template <>
 void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
-					 const Boundary<2> &,
-					 vector<Point<2> > &support_points) const {
+					  const Boundary<2> &,
+					  vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
   Assert (support_points.size() == total_dofs,
@@ -632,8 +632,8 @@ void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &ce
 
 template <>
 void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
-					      const Boundary<2> &,
-					      vector<Point<2> > &support_points) const {
+					       const Boundary<2> &,
+					       vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
   Assert ((support_points.size() == dofs_per_face) &&
@@ -793,7 +793,7 @@ void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator 
 template <>
 inline
 double FECrissCross<2>::shape_value_transform (const unsigned int i,
-						const Point<2> &p) const {
+					       const Point<2> &p) const {
 				   // use an isoparametric ansatz
   return shape_value(i,p);
 };
@@ -801,8 +801,8 @@ double FECrissCross<2>::shape_value_transform (const unsigned int i,
 
 
 template <>
-Point<2> FECrissCross<2>::shape_grad_transform (const unsigned int i,
-						const Point<2> &p) const {
+Tensor<1,2> FECrissCross<2>::shape_grad_transform (const unsigned int i,
+						   const Point<2> &p) const {
 				   // use an isoparametric ansatz
   return shape_grad(i,p);  
 };
@@ -934,7 +934,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 					vector<Point<dim> > &q_points,
 					const bool           compute_q_points,
 					const dFMatrix      &shape_values_transform,
-					const vector<vector<Point<dim> > > &/*shape_grad_transform*/,
+					const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
 					const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -999,40 +999,57 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
     vertices[l] = cell->vertex(l);
 
   if (compute_jacobians)
-    for (unsigned int point=0; point<n_points; ++point)
+    switch (dim)
       {
-	const double xi = unit_points[point](0);
-	const double eta= unit_points[point](1);
+	case 1:
+	      for (unsigned int point=0; point<n_points; ++point)
+		jacobians[point][0][0] = 1./(vertices[1](0)-vertices[0](0));
+	      break;
+		
+	case 2:
+	{
+	  for (unsigned int point=0; point<n_points; ++point)
+	    {	    
+	      const double xi = unit_points[point](0);
+	      const double eta= unit_points[point](1);
 	
-	const double t6 = vertices[0](0)*vertices[3](1);
-	const double t8 = vertices[2](0)*xi;
-	const double t10 = vertices[1](0)*eta;
-	const double t12 = vertices[3](0)*vertices[1](1);
-	const double t16 = vertices[3](0)*xi;
-	const double t20 = vertices[0](0)*vertices[1](1);
-	const double t22 = vertices[0](0)*vertices[2](1);
-	const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
-			   t12*eta-vertices[3](0)*vertices[2](1)*eta-
-			   t16*vertices[0](1)+t16*vertices[1](1)-t12+
-			   vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
-	const double t28 = vertices[1](0)*vertices[3](1);
-	const double t31 = vertices[2](0)*eta;
-	const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
-			   t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
-			   t31*vertices[3](1)+t20-t6-vertices[1](0)*
-			   vertices[0](1)+t28-t22*xi;
-	const double t38 = 1/(t24+t36);
+	      const double t6 = vertices[0](0)*vertices[3](1);
+	      const double t8 = vertices[2](0)*xi;
+	      const double t10 = vertices[1](0)*eta;
+	      const double t12 = vertices[3](0)*vertices[1](1);
+	      const double t16 = vertices[3](0)*xi;
+	      const double t20 = vertices[0](0)*vertices[1](1);
+	      const double t22 = vertices[0](0)*vertices[2](1);
+	      const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
+				 t12*eta-vertices[3](0)*vertices[2](1)*eta-
+				 t16*vertices[0](1)+t16*vertices[1](1)-t12+
+				 vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
+	      const double t28 = vertices[1](0)*vertices[3](1);
+	      const double t31 = vertices[2](0)*eta;
+	      const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
+				 t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
+				 t31*vertices[3](1)+t20-t6-vertices[1](0)*
+				 vertices[0](1)+t28-t22*xi;
+	      const double t38 = 1/(t24+t36);
 
-	jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
-				  vertices[1](1)*xi+vertices[2](1)*xi+
-				  vertices[3](1)-vertices[3](1)*xi)*t38;
-	jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
-				   vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
-	jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
-				   vertices[1](1)-vertices[1](1)*eta+
-				   vertices[2](1)*eta-vertices[3](1)*eta)*t38;
-	jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
-				  vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
+	      jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
+					vertices[1](1)*xi+vertices[2](1)*xi+
+					vertices[3](1)-vertices[3](1)*xi)*t38;
+	      jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
+					 vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
+	      jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
+					 vertices[1](1)-vertices[1](1)*eta+
+					 vertices[2](1)*eta-vertices[3](1)*eta)*t38;
+	      jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
+					vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
+	    };
+	  
+	  break;
+	};
+
+	default:
+					       // not implemented at present
+	      Assert (false, ExcNotImplemented());
       };
 };
 

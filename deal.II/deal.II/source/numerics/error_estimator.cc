@@ -246,7 +246,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				   //
 				   // let psi be a short name for
 				   // [a grad u_h]
-  vector<Point<dim> > psi(n_q_points);
+  vector<Tensor<1,dim> > psi(n_q_points);
   fe_face_values_cell.get_function_grads (solution, psi);
   
   
@@ -280,14 +280,14 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				       // get a list of the gradients of
 				       // the finite element solution
 				       // restricted to the neighbor cell
-      vector<Point<dim> > neighbor_psi (n_q_points);
+      vector<Tensor<1,dim> > neighbor_psi (n_q_points);
       fe_face_values_neighbor.get_function_grads (solution, neighbor_psi);
       
 				       // compute the jump in the gradients
       transform (psi.begin(), psi.end(),
 		 neighbor_psi.begin(),
 		 psi.begin(),
-		 minus<Point<dim> >());
+		 minus<Tensor<1,dim> >());
     };
   
   
@@ -397,7 +397,7 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 				   //
 				   // let psi be a short name for
 				   // [a grad u_h]
-  vector<Point<dim> > psi(n_q_points);
+  vector<Tensor<1,dim> > psi(n_q_points);
 
 				   // store which number #cell# has in the
 				   // list of neighbors of #neighbor#
@@ -434,7 +434,7 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 				       // restrict the finite element on the
 				       // neighbor cell to the common #subface#.
 				       // store the gradient in #neighbor_psi#
-      vector<Point<dim> > neighbor_psi (n_q_points);
+      vector<Tensor<1,dim> > neighbor_psi (n_q_points);
       fe_face_values.reinit (neighbor_child, neighbor_neighbor, boundary);
       fe_face_values.get_function_grads (solution, neighbor_psi);
       
@@ -442,7 +442,7 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
       transform (psi.begin(), psi.end(),
 		 neighbor_psi.begin(),
 		 psi.begin(),
-		 minus<Point<dim> >());
+		 minus<Tensor<1,dim> >());
 
 				       // next we have to multiply this with
 				       // the normal vector. Since we have

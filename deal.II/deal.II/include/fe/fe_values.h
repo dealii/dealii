@@ -297,7 +297,7 @@ class FEValuesBase {
 				      * function at the #j# quadrature point.
 				      * If you want to get the derivative in
 				      * one of the coordinate directions, use
-				      * the appropriate function of the #Point#
+				      * the appropriate function of the #Tensor#
 				      * class to extract one component. Since
 				      * only a reference to the gradient's value
 				      * is returned, there should be no major
@@ -327,8 +327,8 @@ class FEValuesBase {
 				      * #gradients# object already has the
 				      * right size.
 				      */
-    void get_function_grads (const dVector       &fe_function,
-			     vector<Point<dim> > &gradients) const;
+    void get_function_grads (const dVector          &fe_function,
+			     vector<Tensor<1,dim> > &gradients) const;
 
 				     /**
 				      * Return the position of the #i#th
@@ -704,7 +704,7 @@ class FEValues : public FEValuesBase<dim> {
 				      * Analogous to the #shape_values_transform#
 				      * array of the base class.
 				      */
-    vector<vector<Point<dim> > >   unit_shape_gradients_transform;
+    vector<vector<Tensor<1,dim> > > unit_shape_gradients_transform;
     
 				     /**
 				      * Array of quadrature points in the unit
@@ -861,7 +861,7 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 				      * Analogous to the #shape_values_transform#
 				      * array of the base class.
 				      */
-    vector<vector<vector<Point<dim> > > > unit_shape_gradients_transform;
+    vector<vector<vector<Tensor<1,dim> > > > unit_shape_gradients_transform;
 
     				     /**
 				      * Array of quadrature points on the

@@ -379,9 +379,10 @@ void FELinear<2>::get_unit_support_points (vector<Point<2> > &unit_points) const
 
 
 template <int dim>
-void FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
-				       const Boundary<dim>  &,
-				       vector<Point<dim> >  &support_points) const {
+void
+FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+				   const Boundary<dim>  &,
+				   vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
   
@@ -392,9 +393,10 @@ void FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_ite
 
 
 template <int dim>
-void FELinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
-					    const Boundary<dim>  &,
-					    vector<Point<dim> >  &support_points) const {
+void
+FELinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
+					const Boundary<dim>  &,
+					vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == dofs_per_face) &&
 	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
 	  ExcWrongFieldDimension (support_points.size(),

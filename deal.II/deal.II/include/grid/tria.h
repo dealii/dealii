@@ -8,7 +8,7 @@
 #include <vector>
 #include <base/point.h>
 #include <grid/geometry_info.h>
-
+#include <base/subscriptor.h>
 
 
 //forward declaration needed
@@ -1144,7 +1144,7 @@ class TriaDimensionInfo<2> {
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class Triangulation : public TriaDimensionInfo<dim> {
+class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
   public:
 				     // insert these definitions for gcc2.8,
 				     // since it can't inherit typedefs (I

@@ -210,16 +210,16 @@ class FECrissCross : public FiniteElement<dim> {
 				      * information on this function.
 				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     const Boundary<dim> &boundary,
+				     vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const;
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -248,8 +248,8 @@ class FECrissCross : public FiniteElement<dim> {
 				      * computation of the transformation from
 				      * unit cell to real space cell.
 				      */
-    virtual Point<dim> shape_grad_transform (const unsigned int i,
-					     const Point<dim> &p) const;
+    virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
+						const Point<dim> &p) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -339,7 +339,7 @@ class FECrissCross : public FiniteElement<dim> {
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const dFMatrix      &shape_values_transform,
-				 const vector<vector<Point<dim> > > &shape_grad_transform,
+				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
 
     DeclException0 (ExcNotUseful);

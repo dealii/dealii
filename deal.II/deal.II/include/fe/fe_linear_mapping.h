@@ -51,8 +51,8 @@ class FELinearMapping : public FiniteElement<dim> {
 				      * computation of the transformation from
 				      * unit cell to real space cell.
 				      */
-    virtual Point<dim> shape_grad_transform (const unsigned int i,
-					     const Point<dim> &p) const;
+    virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
+						const Point<dim> &p) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -142,7 +142,7 @@ class FELinearMapping : public FiniteElement<dim> {
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const dFMatrix      &shape_values_transform,
-				 const vector<vector<Point<dim> > > &shape_grad_transform,
+				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
 };
 

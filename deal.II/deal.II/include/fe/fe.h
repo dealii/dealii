@@ -578,8 +578,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * #i#th shape function for the mapping
 				      * from unit to real cell.
 				      */
-    virtual Point<dim> shape_grad_transform (const unsigned int i,
-					     const Point<dim> &p) const = 0;    
+    virtual Tensor<1,dim> shape_grad_transform (const unsigned int i,
+						const Point<dim> &p) const = 0;    
     
 				     /**
 				      * Compute the Jacobian matrix and the
@@ -646,7 +646,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const dFMatrix      &shape_values_transform,
-				 const vector<vector<Point<dim> > > &shape_grads_transform,
+				 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 				 const Boundary<dim> &boundary) const;
 
 				     /**
@@ -768,7 +768,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      vector<Point<dim> > &normal_vectors,
 				      const bool           compute_normal_vectors,
 				      const dFMatrix      &shape_values_transform,
-				      const vector<vector<Point<dim> > > &shape_grads_transform,
+				      const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 				      const Boundary<dim> &boundary) const;
 
 				     /**
@@ -813,7 +813,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 vector<Point<dim> > &normal_vectors,
 					 const bool           compute_normal_vectors,
 					 const dFMatrix      &shape_values_transform,
-					 const vector<vector<Point<dim> > > &shape_grads_transform,
+					 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 					 const Boundary<dim> &boundary) const;
 
 				     /**

@@ -36,7 +36,7 @@ FELinearMapping<1>::shape_value_transform (const unsigned int i,
 
 template <>
 inline
-Point<1>
+Tensor<1,1>
 FELinearMapping<1>::shape_grad_transform(const unsigned int i,
 					 const Point<1>&) const
 {
@@ -102,7 +102,7 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 					 vector<Point<1> > &q_points,
 					 const bool         compute_q_points,
 					 const dFMatrix      &shape_values_transform,
-					 const vector<vector<Point<1> > > &shape_gradients_transform,
+					 const vector<vector<Tensor<1,1> > > &shape_gradients_transform,
 					 const Boundary<1> &boundary) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
@@ -142,7 +142,7 @@ FELinearMapping<2>::shape_value_transform (const unsigned int i,
 
 template <>
 inline
-Point<2>
+Tensor<1,2>
 FELinearMapping<2>::shape_grad_transform (const unsigned int i,
 					  const Point<2>& p) const
 {
@@ -286,7 +286,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   vector<Point<dim> > &q_points,
 					   const bool           compute_q_points,
 					   const dFMatrix      &shape_values_transform,
-					   const vector<vector<Point<dim> > > &/*shape_grad_transform*/,
+					   const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
 					   const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -379,11 +379,19 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
   is multiplied to the unit cell gradient *from the right*! be very careful
   with these things.
 
-  The following little program tests the correct behaviour (you have to find
-  out the right include files, I tested it within a whole project with far
-  more include files than necessary):
+  The following little program tests the correct behaviour:
 
   -------------------------------------------
+  #include <grid/tria.h>
+  #include <grid/tria_boundary.h>
+  #include <grid/dof.h>
+  #include <fe/fe_values.h>
+  #include <fe/fe_lib.lagrange.h>
+  #include <base/quadrature_lib.h>
+  #include <grid/tria_iterator.h>
+  #include <grid/dof_accessor.h>
+  #include <lac/dvector.h>
+
   int main () {
     Triangulation<2> tria;
     tria.create_hypercube (0,1);
@@ -428,53 +436,58 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 */
 
   if (compute_jacobians)
-    for (unsigned int point=0; point<n_points; ++point)
-      switch (dim)
+    switch (dim)
+      {
+	case 1:
+	      for (unsigned int point=0; point<n_points; ++point)
+		jacobians[point][0][0] = 1./(vertices[1](0)-vertices[0](0));
+	      break;
+		
+	case 2:
 	{
-	  case 2:
-	  {
-	    
-	    const double xi = unit_points[point](0);
-	    const double eta= unit_points[point](1);
+	  for (unsigned int point=0; point<n_points; ++point)
+	    {	    
+	      const double xi = unit_points[point](0);
+	      const double eta= unit_points[point](1);
 	
-	    const double t6 = vertices[0](0)*vertices[3](1);
-	    const double t8 = vertices[2](0)*xi;
-	    const double t10 = vertices[1](0)*eta;
-	    const double t12 = vertices[3](0)*vertices[1](1);
-	    const double t16 = vertices[3](0)*xi;
-	    const double t20 = vertices[0](0)*vertices[1](1);
-	    const double t22 = vertices[0](0)*vertices[2](1);
-	    const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
-			       t12*eta-vertices[3](0)*vertices[2](1)*eta-
-			       t16*vertices[0](1)+t16*vertices[1](1)-t12+
-			       vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
-	    const double t28 = vertices[1](0)*vertices[3](1);
-	    const double t31 = vertices[2](0)*eta;
-	    const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
-			       t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
-			       t31*vertices[3](1)+t20-t6-vertices[1](0)*
-			       vertices[0](1)+t28-t22*xi;
-	    const double t38 = 1/(t24+t36);
+	      const double t6 = vertices[0](0)*vertices[3](1);
+	      const double t8 = vertices[2](0)*xi;
+	      const double t10 = vertices[1](0)*eta;
+	      const double t12 = vertices[3](0)*vertices[1](1);
+	      const double t16 = vertices[3](0)*xi;
+	      const double t20 = vertices[0](0)*vertices[1](1);
+	      const double t22 = vertices[0](0)*vertices[2](1);
+	      const double t24 = t6*xi-t8*vertices[1](1)-t10*vertices[3](1)+
+				 t12*eta-vertices[3](0)*vertices[2](1)*eta-
+				 t16*vertices[0](1)+t16*vertices[1](1)-t12+
+				 vertices[3](0)*vertices[0](1)-t20*eta+t22*eta;
+	      const double t28 = vertices[1](0)*vertices[3](1);
+	      const double t31 = vertices[2](0)*eta;
+	      const double t36 = t8*vertices[0](1)+vertices[1](0)*vertices[2](1)*xi-
+				 t28*xi+t10*vertices[0](1)-t31*vertices[0](1)+
+				 t31*vertices[3](1)+t20-t6-vertices[1](0)*
+				 vertices[0](1)+t28-t22*xi;
+	      const double t38 = 1/(t24+t36);
 
-	    jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
-				      vertices[1](1)*xi+vertices[2](1)*xi+
-				      vertices[3](1)-vertices[3](1)*xi)*t38;
-	    jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
-				       vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
-	    jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
-				       vertices[1](1)-vertices[1](1)*eta+
-				       vertices[2](1)*eta-vertices[3](1)*eta)*t38;
-	    jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
-				      vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
-	    
-	    break;
-	  };
-
-	  default:
-						 // not implemented at present,
-						 // because of the changes above
-		Assert (false, ExcNotImplemented());
+	      jacobians[point][0][0] = (-vertices[0](1)+vertices[0](1)*xi-
+					vertices[1](1)*xi+vertices[2](1)*xi+
+					vertices[3](1)-vertices[3](1)*xi)*t38;
+	      jacobians[point][0][1] = -(-vertices[0](0)+vertices[0](0)*xi-
+					 vertices[1](0)*xi+t8+vertices[3](0)-t16)*t38;
+	      jacobians[point][1][0] = -(-vertices[0](1)+vertices[0](1)*eta+
+					 vertices[1](1)-vertices[1](1)*eta+
+					 vertices[2](1)*eta-vertices[3](1)*eta)*t38;
+	      jacobians[point][1][1] = (-vertices[0](0)+vertices[0](0)*eta+
+					vertices[1](0)-t10+t31-vertices[3](0)*eta)*t38;
+	    };
+	  
+	  break;
 	};
+
+	default:
+					       // not implemented at present
+	      Assert (false, ExcNotImplemented());
+      };
   
   
     

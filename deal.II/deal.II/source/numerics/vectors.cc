@@ -32,8 +32,8 @@ inline double sqr (const double x) {
 
 
 template <int dim>
-inline double sqr_point (const Point<dim> &p) {
-  return p.square();
+inline double sqr_point (const Tensor<1,dim> &p) {
+  return p * p;
 };
 
 
@@ -507,7 +507,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     // same procedure as above, but now
 					     // psi is a vector of gradients
 	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<Point<dim> >   psi (n_q_points);
+	    vector<Tensor<1,dim> >   psi (n_q_points);
 
 					     // in praxi: first compute
 					     // exact fe_function vector
@@ -518,13 +518,13 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					     // fe_function
 	    if (true) 
 	      {
-		vector<Point<dim> > function_grads (n_q_points, Point<dim>());
+		vector<Tensor<1,dim> > function_grads (n_q_points, Tensor<1,dim>());
 		fe_values.get_function_grads (fe_function, function_grads);
 
 		transform (psi.begin(), psi.end(),
 			   function_grads.begin(),
 			   psi.begin(),
-			   minus<Point<dim> >());
+			   minus<Tensor<1,dim> >());
 	      };
 					     // take square of integrand
 	    vector<double> psi_square (psi.size(), 0.0);

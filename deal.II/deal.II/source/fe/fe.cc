@@ -185,7 +185,7 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       vector<Point<1> > &q_points,
 				       const bool         compute_q_points,
 				       const dFMatrix      &,
-				       const vector<vector<Point<1> > > &,
+				       const vector<vector<Tensor<1,1> > > &,
 				       const Boundary<1> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -235,7 +235,7 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    vector<Point<1> >       &,
 					    const bool,
 					    const dFMatrix          &,
-					    const vector<vector<Point<1> > > &,
+					    const vector<vector<Tensor<1,1> > > &,
 					    const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
 };
@@ -256,7 +256,7 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 					       vector<Point<1> >       &,
 					       const bool,
 					       const dFMatrix          &,
-					       const vector<vector<Point<1> > > &,
+					       const vector<vector<Tensor<1,1> > > &,
 					       const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
 };
@@ -323,7 +323,7 @@ void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 					 vector<Point<dim> > &,
 					 const bool,
 					 const dFMatrix      &,
-					 const vector<vector<Point<dim> > > &,
+					 const vector<vector<Tensor<1,dim> > > &,
 					 const Boundary<dim> &) const {
   Assert (false, ExcPureFunctionCalled());
 };
@@ -346,7 +346,7 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 					      vector<Point<dim> > &normal_vectors,
 					      const bool           compute_normal_vectors,
 					      const dFMatrix      &shape_values_transform,
-					      const vector<vector<Point<dim> > > &shape_gradients_transform,
+					      const vector<vector<Tensor<1,dim> > > &shape_gradients_transform,
 					      const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -395,7 +395,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 						 vector<Point<dim> > &normal_vectors,
 						 const bool           compute_normal_vectors,
 						 const dFMatrix      &shape_values_transform,
-						 const vector<vector<Point<dim> > > &shape_gradients_transform,
+						 const vector<vector<Tensor<1,dim> > > &shape_gradients_transform,
 						 const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
