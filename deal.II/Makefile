@@ -35,10 +35,10 @@ help:
 
 
 
-baseg:
+baseg: contrib-functionparser
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
 
-baseo:
+baseo: contrib-functionparser
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
 
 lacg: baseg contrib
@@ -83,7 +83,7 @@ lac: lacg laco
 $(LIBDIR):
 	@mkdir $@
 
-baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib : $(LIBDIR) deps
+baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib -functionparser : $(LIBDIR) deps
 
 all: deps
 	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d
@@ -100,6 +100,8 @@ optimized: deps
 contrib: $(subst no,,$(subst yes,base,$(USE_CONTRIB_HSL)))
 	cd $D/contrib && $(MAKE)
 
+contrib-functionparser:
+	@cd $D/contrib && $(MAKE) functionparser
 
 online-doc:
 	cd $D/doc && $(MAKE)
