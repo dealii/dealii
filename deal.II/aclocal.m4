@@ -500,10 +500,11 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
   v.insert (v.end(), m.begin(), m.end());
 	],
 	[
-	  AC_MSG_RESULT(yes)
+	  dnl compilation succeeded, no warning occured for the above code
+	  AC_MSG_RESULT(no)
 	],
 	[
-	  AC_MSG_RESULT(no)
+	  AC_MSG_RESULT(yes)
 	]
   )
 )
