@@ -8,16 +8,16 @@
 #include <base/exceptions.h>
 
 /**
-    #Quad#s denote the fundamental entities of triangulations in two dimensions
-    and the boundaries of hexaeders in three dimensions. They are
-    characterized by the (global) indices of the corner points.
-
-    A quad itself has one index, as far as the topological part handled in
-    the triangulation is concerned: the index in the level
-    it belongs to. The level index is implicitely given by the position
-    in the #quads.quads# list attached to the information of each level
-    of the triangulation.
-    */
+ *   #Quad#s denote the fundamental entities of triangulations in two dimensions
+ *   and the boundaries of hexaeders in three dimensions. They are
+ *   characterized by the (global) indices of the corner points.
+ *
+ *   A quad itself has one index, as far as the topological part handled in
+ *   the triangulation is concerned: the index in the level
+ *   it belongs to. The level index is implicitely given by the position
+ *   in the #quads.quads# list attached to the information of each level
+ *   of the triangulation.
+ */
 class Quad {
   public:
 

@@ -26,16 +26,16 @@ template <int dim> class Function;
 
 
 /**
-   Denote which norm/integral is to be computed. The following possibilities
-   are implemented:
-   \begin{itemize}
-   \item #mean#: the function or difference of functions is integrated
-     on each cell.
-   \item #L1_norm#: the absolute value of the function is integrated.
-   \item #L2_norm#: the square of the function is integrated on each
-     cell; afterwards the root is taken of this value.
-   \end{itemize}
-*/
+ *  Denote which norm/integral is to be computed. The following possibilities
+ *  are implemented:
+ *  \begin{itemize}
+ *  \item #mean#: the function or difference of functions is integrated
+ *    on each cell.
+ *  \item #L1_norm#: the absolute value of the function is integrated.
+ *  \item #L2_norm#: the square of the function is integrated on each
+ *    cell; afterwards the root is taken of this value.
+ *  \end{itemize}
+ */
 enum NormType {
       mean,
       L1_norm,
@@ -49,190 +49,190 @@ enum NormType {
 
 
 /**
-  Base class for user problems. This class stores the system matrix and right
-  hand side vectors as well as a solution vector. It initiates the assemblage
-  process of matrix and vectors and so on.
-
-  This class is not extremely versatile as could certainly be. For example
-  it presently only supports sparse matrices and has no multigrid features.
-  However, all these things depend strongly on the problem and it seems
-  best to implement many of these things yourself. Thus, this class is more
-  a display of concept haw to work with deal.II.
-
-
-  \subsection{Assemblage}
-
-  The #assemble# member function does the assemblage of the system matrix and
-  the given number of right hand sides. It does the following steps:
-  \begin{itemize}
-    \item Initialize solution vector with zero entries.
-    \item Create sparsity pattern of the system matrix and condense it with
-      the constraints induced by hanging nodes.
-    \item Initialize an assembler object.
-    \item Loop over all cells and assemble matrix and vectors using the given
-      quadrature formula and the equation object which contains the weak
-      formulation of the equation.
-    \item Apply Dirichlet boundary conditions. See the section on boundary
-      conditions for more details.
-    \item Condense the system matrix and right hand side with the constraints
-      induced by hanging nodes.
-  \end{itemize}
-
-  The #assemble# function needs an object describing the boundary of the domain,
-  since for higher order finite elements, we may be tempted to use curved faces
-  of cells for better approximation of the boundary. In this case, the
-  transformation from the unit cell to the real cell requires knowledge of
-  the exact boundary of the domain.
-  
-
-  \subsection{Solving}
-
-  Calling the #solve# function with a solver object, the system of equations
-  which results after having called the #assemble# function is solved. After
-  this, the solution vector is distributed again, i.e. the constrained nodes
-  are given their correct values.
-
-
-  \subsection{Boundary conditions}
-
-  During assemblage of matrices and right hand side, use is made of dirichlet
-  boundary conditions (in short: bc) specified to the #assemble# function. You
-  can specify a list of pairs of boundary indicators (of type #unsigned char#;
-  see the section in the documentation of the \Ref{Triangulation} class for more
-  details) and the according functions denoting the dirichlet boundary values
-  of the nodes on boundary faces with this boundary indicator.
-
-  Usually, all other boundary conditions, such as inhomogeneous Neumann values
-  or mixed boundary conditions are handled in the weak formulation. No attempt
-  is made to include these into the process of assemblage therefore.
-
-  The inclusion into the assemblage process is as follows: when the matrix and
-  vectors are set up, a list of nodes subject to dirichlet bc is made and
-  matrix and vectors are changed accordingly. This is done by deleting all
-  entries in the matrix in the line of this degree of freedom, setting the
-  main diagonal entry to one and the right hand side element to the
-  boundary value at this node. This forces this node's value to be as specified.
-  To decouple the remaining linear system of equations and to make the system
-  symmetric again (at least if it was before), one Gauss elimination
-  step is performed with this line, by adding this (now almost empty) line to
-  all other lines which couple with the given degree of freedom and thus
-  eliminating all coupling between this degree of freedom and others. Now
-  also the column consists only of zeroes, apart from the main diagonal entry.
-
-  It seems as if we had to make clear not to overwrite the lines of other
-  boundary nodes when doing the Gauss elimination step. However, since we
-  reset the right hand side when passing such a node, it is not a problem
-  to change the right hand side values of other boundary nodes not yet
-  processed. It would be a problem to change those entries of nodes already
-  processed, but since the matrix entry of the present column on the row
-  of an already processed node is zero, the Gauss step does not change
-  the right hand side. We need therefore not take special care of other
-  boundary nodes.
-  
-  To make solving faster, we preset the solution vector with the right boundary
-  values. Since boundary nodes can never be hanging nodes, and since all other
-  entries of the solution vector are zero, we need not condense the solution
-  vector if the condensation process is done in-place. If done by copying
-  matrix and vectors to smaller ones, it would also be necessary to condense
-  the solution vector to preserve the preset boundary values.
-  
-  It it not clear whether the deletion of coupling between the boundary degree
-  of freedom and other dofs really forces the corresponding entry in the
-  solution vector to have the right value when using iterative solvers,
-  since their search directions may contains components in the direction
-  of the boundary node. For this reason, we perform a very simple line
-  balancing by not setting the main diagonal entry to unity, but rather
-  to the value it had before deleting this line, or to the first nonzero
-  main diagonal entry if it is zero from a previous Gauss elimination
-  step. Of course we have to change
-  the right hand side appropriately. This is not a very good
-  strategy, but it at least should give the main diagonal entry a value
-  in the right order of dimension, which makes the solving process a bit
-  more stable. A refined algorithm would set the entry to the mean of the
-  other diagonal entries, but this seems to be too expensive.
-
-  Because of the mentioned question, whether or not a preset solution value
-  which does not couple with other degrees of freedom remains its value or
-  not during solving iteratively, it may or may not be necessary to set
-  the correct value after solving again. This question is an open one as of
-  now and may be answered by future experience.
-
-  At present, boundary values are interpolated, i.e. a node is given the
-  point value of the boundary function. In some cases, it may be necessary
-  to use the L2-projection of the boundary function or any other method.
-  This can be done by overloading the virtual function
-  #make_boundary_value_list# which must return a list of boundary dofs
-  and their corresponding values.
-
-  You should be aware that the boundary function may be evaluated at nodes
-  on the interior of faces. These, however, need not be on the true
-  boundary, but rather are on the approximation of the boundary represented
-  by teh mapping of the unit cell to the real cell. Since this mapping will
-  in most cases not be the exact one at the face, the boundary function is
-  evaluated at points which are not on the boundary and you should make
-  sure that the returned values are reasonable in some sense anyway.
-  
-
-  \subsection{Computing errors}
-
-  The function #integrate_difference# performs the calculation of the error
-  between the finite element solution and a given (continuous) reference
-  function in different norms. The integration is performed using a given
-  quadrature formulae and assumes that the given finite element objects equals
-  that used for the computation of the solution.
-  
-  The result ist stored in a vector (named #difference#), where each entry
-  equals the given norm of the difference on one cell. The order of entries
-  is the same as a #cell_iterator# takes when started with #begin_active# and
-  promoted with the #++# operator.
-  
-  You can use the #distribute_cell_to_dof_vector# function of the #DoFHandler#
-  class to convert cell based data to a data vector with values on the degrees
-  of freedom, which can then be attached to a #DataOut# object to be printed.
-  
-  Presently, there is the possibility to compute the following values from the
-  difference, on each cell: #mean#, #L1_norm#, #L2_norm#, #Linfty_norm#,
-  #H1_seminorm#.
-  For the mean difference value, the reference function minus the numerical
-  solution is computed, not the other way round.
-
-  The infinity norm of the difference on a given cell returns the maximum
-  absolute value of the difference at the quadrature points given by the
-  quadrature formula parameter. This will in some cases not be too good
-  an approximation, since for example the Gauss quadrature formulae do
-  not evaluate the difference at the end or corner points of the cells.
-  You may want to chose a quadrature formula with more quadrature points
-  or one with another distribution of the quadrature points in this case.
-  You should also take into account the superconvergence properties of finite
-  elements in some points: for example in 1D, the standard finite element
-  method is a collocation method and should return the exact value at nodal
-  points. Therefore, the trapezoidal rule should always return a vanishing
-  L-infinity error. Conversely, in 2D the maximum L-infinity error should
-  be located at the vertices or at the center of the cell, which would make
-  it plausible to use the Simpson quadrature rule. On the other hand, there
-  may be superconvergence at Gauss integration points. These examples are not
-  intended as a rule of thumb, rather they are though to illustrate that the
-  use of the wrong quadrature formula may show a significantly wrong result
-  and care should be taken to chose the right formula.
-
-  The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
-  full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
-  
-  To get the {\it global} L_1 error, you have to sum up the entries in
-  #difference#, e.g. using #dVector::l1_norm# function.
-  For the global L_2 difference, you have to sum up the squares of the
-  entries and take the root of the sum, e.g. using #dVector::l2_norm.
-  These two operations represent the
-  l_1 and l_2 norms of the vectors, but you need not take the absolute
-  value of each entry, since the cellwise norms are already positive.
-  
-  To get the global mean difference, simply sum up the elements as above.
-  To get the L_\infty norm, take the maximum of the vector elements, e.g.
-  using the #dVector::linfty_norm# function.
-
-  For the global $H_1$ norm and seminorm, the same rule applies as for the
-  $L_2$ norm: compute the $l_2$ norm of the cell error vector.
-  */
+ * Base class for user problems. This class stores the system matrix and right
+ * hand side vectors as well as a solution vector. It initiates the assemblage
+ * process of matrix and vectors and so on.
+ *
+ * This class is not extremely versatile as could certainly be. For example
+ * it presently only supports sparse matrices and has no multigrid features.
+ * However, all these things depend strongly on the problem and it seems
+ * best to implement many of these things yourself. Thus, this class is more
+ * a display of concept how to work with deal.II.
+ *
+ *
+ * \subsection{Assemblage}
+ *
+ * The #assemble# member function does the assemblage of the system matrix and
+ * the given number of right hand sides. It does the following steps:
+ * \begin{itemize}
+ *   \item Initialize solution vector with zero entries.
+ *   \item Create sparsity pattern of the system matrix and condense it with
+ *     the constraints induced by hanging nodes.
+ *   \item Initialize an assembler object.
+ *   \item Loop over all cells and assemble matrix and vectors using the given
+ *     quadrature formula and the equation object which contains the weak
+ *     formulation of the equation.
+ *   \item Apply Dirichlet boundary conditions. See the section on boundary
+ *     conditions for more details.
+ *   \item Condense the system matrix and right hand side with the constraints
+ *     induced by hanging nodes.
+ * \end{itemize}
+ *
+ * The #assemble# function needs an object describing the boundary of the domain,
+ * since for higher order finite elements, we may be tempted to use curved faces
+ * of cells for better approximation of the boundary. In this case, the
+ * transformation from the unit cell to the real cell requires knowledge of
+ * the exact boundary of the domain.
+ * 
+ *
+ * \subsection{Solving}
+ *
+ * Calling the #solve# function with a solver object, the system of equations
+ * which results after having called the #assemble# function is solved. After
+ * this, the solution vector is distributed again, i.e. the constrained nodes
+ * are given their correct values.
+ *
+ *
+ * \subsection{Boundary conditions}
+ *
+ * During assemblage of matrices and right hand side, use is made of dirichlet
+ * boundary conditions (in short: bc) specified to the #assemble# function. You
+ * can specify a list of pairs of boundary indicators (of type #unsigned char#;
+ * see the section in the documentation of the \Ref{Triangulation} class for more
+ * details) and the according functions denoting the dirichlet boundary values
+ * of the nodes on boundary faces with this boundary indicator.
+ *
+ * Usually, all other boundary conditions, such as inhomogeneous Neumann values
+ * or mixed boundary conditions are handled in the weak formulation. No attempt
+ * is made to include these into the process of assemblage therefore.
+ *
+ * The inclusion into the assemblage process is as follows: when the matrix and
+ * vectors are set up, a list of nodes subject to dirichlet bc is made and
+ * matrix and vectors are changed accordingly. This is done by deleting all
+ * entries in the matrix in the line of this degree of freedom, setting the
+ * main diagonal entry to one and the right hand side element to the
+ * boundary value at this node. This forces this node's value to be as specified.
+ * To decouple the remaining linear system of equations and to make the system
+ * symmetric again (at least if it was before), one Gauss elimination
+ * step is performed with this line, by adding this (now almost empty) line to
+ * all other lines which couple with the given degree of freedom and thus
+ * eliminating all coupling between this degree of freedom and others. Now
+ * also the column consists only of zeroes, apart from the main diagonal entry.
+ *
+ * It seems as if we had to make clear not to overwrite the lines of other
+ * boundary nodes when doing the Gauss elimination step. However, since we
+ * reset the right hand side when passing such a node, it is not a problem
+ * to change the right hand side values of other boundary nodes not yet
+ * processed. It would be a problem to change those entries of nodes already
+ * processed, but since the matrix entry of the present column on the row
+ * of an already processed node is zero, the Gauss step does not change
+ * the right hand side. We need therefore not take special care of other
+ * boundary nodes.
+ * 
+ * To make solving faster, we preset the solution vector with the right boundary
+ * values. Since boundary nodes can never be hanging nodes, and since all other
+ * entries of the solution vector are zero, we need not condense the solution
+ * vector if the condensation process is done in-place. If done by copying
+ * matrix and vectors to smaller ones, it would also be necessary to condense
+ * the solution vector to preserve the preset boundary values.
+ * 
+ * It it not clear whether the deletion of coupling between the boundary degree
+ * of freedom and other dofs really forces the corresponding entry in the
+ * solution vector to have the right value when using iterative solvers,
+ * since their search directions may contains components in the direction
+ * of the boundary node. For this reason, we perform a very simple line
+ * balancing by not setting the main diagonal entry to unity, but rather
+ * to the value it had before deleting this line, or to the first nonzero
+ * main diagonal entry if it is zero from a previous Gauss elimination
+ * step. Of course we have to change
+ * the right hand side appropriately. This is not a very good
+ * strategy, but it at least should give the main diagonal entry a value
+ * in the right order of dimension, which makes the solving process a bit
+ * more stable. A refined algorithm would set the entry to the mean of the
+ * other diagonal entries, but this seems to be too expensive.
+ *
+ * Because of the mentioned question, whether or not a preset solution value
+ * which does not couple with other degrees of freedom remains its value or
+ * not during solving iteratively, it may or may not be necessary to set
+ * the correct value after solving again. This question is an open one as of
+ * now and may be answered by future experience.
+ *
+ * At present, boundary values are interpolated, i.e. a node is given the
+ * point value of the boundary function. In some cases, it may be necessary
+ * to use the L2-projection of the boundary function or any other method.
+ * This can be done by overloading the virtual function
+ * #make_boundary_value_list# which must return a list of boundary dofs
+ * and their corresponding values.
+ *
+ * You should be aware that the boundary function may be evaluated at nodes
+ * on the interior of faces. These, however, need not be on the true
+ * boundary, but rather are on the approximation of the boundary represented
+ * by teh mapping of the unit cell to the real cell. Since this mapping will
+ * in most cases not be the exact one at the face, the boundary function is
+ * evaluated at points which are not on the boundary and you should make
+ * sure that the returned values are reasonable in some sense anyway.
+ * 
+ *
+ * \subsection{Computing errors}
+ *
+ * The function #integrate_difference# performs the calculation of the error
+ * between the finite element solution and a given (continuous) reference
+ * function in different norms. The integration is performed using a given
+ * quadrature formulae and assumes that the given finite element objects equals
+ * that used for the computation of the solution.
+ * 
+ * The result ist stored in a vector (named #difference#), where each entry
+ * equals the given norm of the difference on one cell. The order of entries
+ * is the same as a #cell_iterator# takes when started with #begin_active# and
+ * promoted with the #++# operator.
+ * 
+ * You can use the #distribute_cell_to_dof_vector# function of the #DoFHandler#
+ * class to convert cell based data to a data vector with values on the degrees
+ * of freedom, which can then be attached to a #DataOut# object to be printed.
+ * 
+ * Presently, there is the possibility to compute the following values from the
+ * difference, on each cell: #mean#, #L1_norm#, #L2_norm#, #Linfty_norm#,
+ * #H1_seminorm#.
+ * For the mean difference value, the reference function minus the numerical
+ * solution is computed, not the other way round.
+ *
+ * The infinity norm of the difference on a given cell returns the maximum
+ * absolute value of the difference at the quadrature points given by the
+ * quadrature formula parameter. This will in some cases not be too good
+ * an approximation, since for example the Gauss quadrature formulae do
+ * not evaluate the difference at the end or corner points of the cells.
+ * You may want to chose a quadrature formula with more quadrature points
+ * or one with another distribution of the quadrature points in this case.
+ * You should also take into account the superconvergence properties of finite
+ * elements in some points: for example in 1D, the standard finite element
+ * method is a collocation method and should return the exact value at nodal
+ * points. Therefore, the trapezoidal rule should always return a vanishing
+ * L-infinity error. Conversely, in 2D the maximum L-infinity error should
+ * be located at the vertices or at the center of the cell, which would make
+ * it plausible to use the Simpson quadrature rule. On the other hand, there
+ * may be superconvergence at Gauss integration points. These examples are not
+ * intended as a rule of thumb, rather they are though to illustrate that the
+ * use of the wrong quadrature formula may show a significantly wrong result
+ * and care should be taken to chose the right formula.
+ *
+ * The $H_1$ seminorm is the $L_2$ norm of the gradient of the difference. The
+ * full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
+ * 
+ * To get the {\it global} L_1 error, you have to sum up the entries in
+ * #difference#, e.g. using #dVector::l1_norm# function.
+ * For the global L_2 difference, you have to sum up the squares of the
+ * entries and take the root of the sum, e.g. using #dVector::l2_norm.
+ * These two operations represent the
+ * l_1 and l_2 norms of the vectors, but you need not take the absolute
+ * value of each entry, since the cellwise norms are already positive.
+ * 
+ * To get the global mean difference, simply sum up the elements as above.
+ * To get the L_\infty norm, take the maximum of the vector elements, e.g.
+ * using the #dVector::linfty_norm# function.
+ *
+ * For the global $H_1$ norm and seminorm, the same rule applies as for the
+ * $L_2$ norm: compute the $l_2$ norm of the cell error vector.
+ */
 template <int dim>
 class ProblemBase {
   public:

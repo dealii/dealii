@@ -35,9 +35,9 @@ template <int dim> class Triangulation;
 
 
 /**
-    The three states an iterator can be in: valid, past-the-end and
-    invalid.
-    */
+ *   The three states an iterator can be in: valid, past-the-end and
+ *   invalid.
+ */
 enum IteratorState { valid, past_the_end, invalid };
 
 
@@ -45,13 +45,13 @@ enum IteratorState { valid, past_the_end, invalid };
 
 
 /**
-    Implements the accessor class descibed in the documentation of
-    the iterator classes (see \Ref{TriaRawIterator}.
-
-    This class offers only the basic functionality (stores the necessary
-    data members, offers comparison operators and the like), but has no
-    functionality to actually dereference data. This is done in the derived
-    classes.
+ *   Implements the accessor class descibed in the documentation of
+ *   the iterator classes (see \Ref{TriaRawIterator}.
+ *
+ *   This class offers only the basic functionality (stores the necessary
+ *   data members, offers comparison operators and the like), but has no
+ *   functionality to actually dereference data. This is done in the derived
+ *   classes.
  */
 template <int dim>
 class TriaAccessor {
@@ -265,11 +265,11 @@ class TriaAccessor {
 
 
 /**
-    Accessor to dereference the data of lines. This accessor is used to
-    point to lines in #dim# space dimensions. There is a derived class
-    for lines in one space dimension, in which case a line is also a cell
-    and thus has much more functionality than in lower dimensions.
-    */
+ *   Accessor to dereference the data of lines. This accessor is used to
+ *   point to lines in #dim# space dimensions. There is a derived class
+ *   for lines in one space dimension, in which case a line is also a cell
+ *   and thus has much more functionality than in lower dimensions.
+ */
 template <int dim>
 class LineAccessor :  public TriaAccessor<dim> {
   public:
@@ -481,12 +481,12 @@ class LineAccessor :  public TriaAccessor<dim> {
 
 
 /**
-    Accessor to dereference the data of quads. This accessor is used to
-    point to quads in #dim# space dimensions (only #dim>=2# seems reasonable
-    to me). There is a derived class
-    for quads in two space dimension, in which case a quad is also a cell
-    and thus has much more functionality than in lower dimensions.
-    */
+ *   Accessor to dereference the data of quads. This accessor is used to
+ *   point to quads in #dim# space dimensions (only #dim>=2# seems reasonable
+ *   to me). There is a derived class
+ *   for quads in two space dimension, in which case a quad is also a cell
+ *   and thus has much more functionality than in lower dimensions.
+ */
 template <int dim>
 class QuadAccessor :  public TriaAccessor<dim> {
   public:
@@ -722,34 +722,34 @@ class QuadAccessor :  public TriaAccessor<dim> {
 
 
 /**
-  Intermediate, "typedef"-class, not for public use.
-  */
+ * Intermediate, "typedef"-class, not for public use.
+ */
 template <int dim>
 class TriaSubstructAccessor;
 
 
 
 /**
-  Intermediate, "typedef"-class, not for public use.
-
-  \subsection{Rationale}
-
-  This class is only a wrapper class used to do kind of a typedef
-  with template parameters. This class and #TriaSubstructAccessor<2>#
-  wrap the following names:
-  \begin{verbatim}
-    TriaSubstructAccessor<1> := LineAccessor<1>;
-    TriaSubstructAccessor<2> := QuadAccessor<2>;
-  \end{verbatim}
-  We do this rather complex (and needless, provided C++ the needed constructs!)
-  class hierarchy manipulation, since this way we can declare and implement
-  the \Ref{CellAccessor} dimension independent as an inheritance from
-  #TriaSubstructAccessor<dim>#. If we had not declared these
-  types, we would have to write two class declarations, one for
-  #CellAccessor<1>#, derived from #LineAccessor<1>#
-  and one for #CellAccessor<2>#, derived from
-  #QuadAccessor<2>#.
-  */
+ * Intermediate, "typedef"-class, not for public use.
+ *
+ * \subsection{Rationale}
+ *
+ * This class is only a wrapper class used to do kind of a typedef
+ * with template parameters. This class and #TriaSubstructAccessor<2>#
+ * wrap the following names:
+ * \begin{verbatim}
+ *   TriaSubstructAccessor<1> := LineAccessor<1>;
+ *   TriaSubstructAccessor<2> := QuadAccessor<2>;
+ * \end{verbatim}
+ * We do this rather complex (and needless, provided C++ the needed constructs!)
+ * class hierarchy manipulation, since this way we can declare and implement
+ * the \Ref{CellAccessor} dimension independent as an inheritance from
+ * #TriaSubstructAccessor<dim>#. If we had not declared these
+ * types, we would have to write two class declarations, one for
+ * #CellAccessor<1>#, derived from #LineAccessor<1>#
+ * and one for #CellAccessor<2>#, derived from
+ * #QuadAccessor<2>#.
+ */
 class TriaSubstructAccessor<1> :  public LineAccessor<1> {
   public:
     				     /**
@@ -773,9 +773,10 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
 
 
 /**
-  Intermediate, "typedef"-class, not for public use.
-  @see TriaSubstructAccessor<1>
-  */
+ * Intermediate, "typedef"-class, not for public use.
+ *
+ * @see TriaSubstructAccessor<1>
+ */
 class TriaSubstructAccessor<2> : public QuadAccessor<2> {
   public:
     				     /**
@@ -803,16 +804,16 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 
 
 /**
-  This class allows access to a cell: a line in one dimension, a quad
-  in two dimension, etc.
-
-  The following refers to any space dimension:
-  
-  This class allows access to a {\bf cell}, which is a line in 1D and a quad in
-  2D. Cells have more functionality than lines or quads by themselves, for
-  example they can be flagged for refinement, they have neighbors, they have
-  the possibility to check whether they are at the boundary etc. This class
-  offers access to all this data.
+ * This class allows access to a cell: a line in one dimension, a quad
+ * in two dimension, etc.
+ *
+ * The following refers to any space dimension:
+ * 
+ * This class allows access to a {\bf cell}, which is a line in 1D and a quad in
+ * 2D. Cells have more functionality than lines or quads by themselves, for
+ * example they can be flagged for refinement, they have neighbors, they have
+ * the possibility to check whether they are at the boundary etc. This class
+ * offers access to all this data.
  */
 template <int dim>
 class CellAccessor :  public TriaSubstructAccessor<dim> {

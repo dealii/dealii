@@ -9,10 +9,10 @@
 
 
 /**
-   Second order Gauss quadrature formula.
-
-   Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
-*/
+ *  Second order Gauss quadrature formula.
+ *
+ *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ */
 template <int dim>
 class QGauss2 : public Quadrature<dim> {
   public:
@@ -22,10 +22,10 @@ class QGauss2 : public Quadrature<dim> {
 
 
 /**
-   Third order Gauss quadrature formula.
-
-   Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
-*/
+ *  Third order Gauss quadrature formula.
+ *
+ *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ */
 template <int dim>
 class QGauss3 : public Quadrature<dim> {
   public:
@@ -35,10 +35,10 @@ class QGauss3 : public Quadrature<dim> {
 
 
 /**
-   Fourth order Gauss quadrature formula.
-
-   Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
-*/
+ * Fourth order Gauss quadrature formula.
+ *
+ *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ */
 template <int dim>
 class QGauss4 : public Quadrature<dim> {
   public:
@@ -49,10 +49,10 @@ class QGauss4 : public Quadrature<dim> {
 
 
 /**
-   Fifth order Gauss quadrature formula.
-
-   Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
-*/
+ *  Fifth order Gauss quadrature formula.
+ *
+ *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ */
 template <int dim>
 class QGauss5 : public Quadrature<dim> {
   public:
@@ -62,14 +62,14 @@ class QGauss5 : public Quadrature<dim> {
 
 
 /**
-   Sixth order Gauss quadrature formula. I have not found explicite
-   representations of the zeros of the Legendre functions of sixth
-   and higher degree. If anyone finds them, please replace the existing
-   numbers by these expressions.
-
-   Reference: J. E. Akin: Application and Implementation of Finite
-   Element Methods
-*/
+ *  Sixth order Gauss quadrature formula. I have not found explicite
+ *  representations of the zeros of the Legendre functions of sixth
+ *  and higher degree. If anyone finds them, please replace the existing
+ *  numbers by these expressions.
+ *
+ *  Reference: J. E. Akin: Application and Implementation of Finite
+ *  Element Methods
+ */
 template <int dim>
 class QGauss6 : public Quadrature<dim> {
   public:
@@ -79,14 +79,14 @@ class QGauss6 : public Quadrature<dim> {
 
 
 /**
-   Seventh order Gauss quadrature formula. I have not found explicite
-   representations of the zeros of the Legendre functions of sixth
-   and higher degree. If anyone finds them, please replace the existing
-   numbers by these expressions.
-
-   Reference: J. E. Akin: Application and Implementation of Finite
-   Element Methods
-*/
+ *  Seventh order Gauss quadrature formula. I have not found explicite
+ *  representations of the zeros of the Legendre functions of sixth
+ *  and higher degree. If anyone finds them, please replace the existing
+ *  numbers by these expressions.
+ *
+ *  Reference: J. E. Akin: Application and Implementation of Finite
+ *  Element Methods
+ */
 template <int dim>
 class QGauss7 : public Quadrature<dim> {
   public:
@@ -96,14 +96,14 @@ class QGauss7 : public Quadrature<dim> {
 
 
 /**
-   Eighth order Gauss quadrature formula. I have not found explicite
-   representations of the zeros of the Legendre functions of sixth
-   and higher degree. If anyone finds them, please replace the existing
-   numbers by these expressions.
-
-   Reference: J. E. Akin: Application and Implementation of Finite
-   Element Methods
-*/
+ *  Eighth order Gauss quadrature formula. I have not found explicite
+ *  representations of the zeros of the Legendre functions of sixth
+ *  and higher degree. If anyone finds them, please replace the existing
+ *  numbers by these expressions.
+ *
+ *  Reference: J. E. Akin: Application and Implementation of Finite
+ *  Element Methods
+ */
 template <int dim>
 class QGauss8 : public Quadrature<dim> {
   public:
@@ -115,8 +115,8 @@ class QGauss8 : public Quadrature<dim> {
 
 
 /**
-   First order midpoint quadrature rule.
-*/
+ * First order midpoint quadrature rule.
+ */
 template <int dim>
 class QMidpoint : public Quadrature<dim> {
   public:
@@ -126,8 +126,8 @@ class QMidpoint : public Quadrature<dim> {
 
 
 /**
-   Simpson quadrature rule.
-*/
+ * Simpson quadrature rule.
+ */
 template <int dim>
 class QSimpson : public Quadrature<dim> {
   public:
@@ -137,8 +137,8 @@ class QSimpson : public Quadrature<dim> {
 
 
 /**
-   Trapezoidal quadrature rule.
-*/
+ * Trapezoidal quadrature rule.
+ */
 template <int dim>
 class QTrapez : public Quadrature<dim> {
   public:

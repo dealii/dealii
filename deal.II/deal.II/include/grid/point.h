@@ -10,23 +10,23 @@
 
 
 /**
-    The #Point# class provides for a point or vector in a space with arbitrary
-    dimension #dim#.
-
-    It is the preferred object to be passed to functions which
-    operate on points in spaces of a priori unknown dimension: rather than
-    using functions like #double f(double x)# and #double f(double x, double y)#,
-    you use double #f(Point<dim> &p)#.
-
-    #Point# also serves as a starting point for the implementation of the
-    geometrical primitives like #Polyhedron#, #Triangle#, etc.
-
-    #Point#s can also be thought of as vectors, i.e. points in a vector space
-    without an obvious meaning. For instance, it may be suitable to let the
-    gradient of a function be a #point# vector:
-    #Point<dim> gradient_of_f (const Point<dim> &x)#. #Point#s have all
-    functionality for this, e.g. scalar products, addition etc.
-    */
+ * The #Point# class provides for a point or vector in a space with arbitrary
+ * dimension #dim#.
+ *
+ * It is the preferred object to be passed to functions which
+ * operate on points in spaces of a priori unknown dimension: rather than
+ * using functions like #double f(double x)# and #double f(double x, double y)#,
+ * you use double #f(Point<dim> &p)#.
+ *
+ * #Point# also serves as a starting point for the implementation of the
+ * geometrical primitives like #Polyhedron#, #Triangle#, etc.
+ *
+ * #Point#s can also be thought of as vectors, i.e. points in a vector space
+ * without an obvious meaning. For instance, it may be suitable to let the
+ * gradient of a function be a #point# vector:
+ * #Point<dim> gradient_of_f (const Point<dim> &x)#. #Point#s have all
+ * functionality for this, e.g. scalar products, addition etc.
+ */
 template <int dim>
 class Point {
   public:

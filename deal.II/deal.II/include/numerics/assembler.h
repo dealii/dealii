@@ -22,13 +22,13 @@ class dVector;
 
 
 /**
-  This is the base class for equation objects. Equations objects describe the
-  finite element discretisation of one or more equations.
-
-  Equation objects need only provide functions which set up the cell
-  matrices and the cell right hand side. These are then automatically inserted
-  into the global matrices and vectors.
-  */
+ * This is the base class for equation objects. Equations objects describe the
+ * finite element discretisation of one or more equations.
+ *
+ * Equation objects need only provide functions which set up the cell
+ * matrices and the cell right hand side. These are then automatically inserted
+ * into the global matrices and vectors.
+ */
 template <int dim>
 class Equation {
   public:
@@ -171,9 +171,9 @@ struct AssemblerData {
 
 
 /**
-  An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
-  functionality to assemble global matrices and vectors from cell base ones.
-  */
+ * An #Assembler# is a specialized version of a #DoFCellAccessor# which adds
+ * functionality to assemble global matrices and vectors from cell base ones.
+ */
 template <int dim>
 class Assembler : public DoFCellAccessor<dim> {
   public:

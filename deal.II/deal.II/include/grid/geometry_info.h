@@ -12,14 +12,14 @@ template <int dim> struct GeometryInfo;
 
 
 /**
-   Publish some information about geometrical interconnections to the
-   outside world, for one spacial dimension in this case. These are,
-   for example the numbers of children per cell, faces per cell, etc,
-   but also neighborship information, It is especially useful if you
-   want to loop over all faces in any space dimension, but don't want
-   to think about their number in a dimension independent expression.
-   This not only reduces thinking effort but also error possibilities.
-*/
+ *  Publish some information about geometrical interconnections to the
+ *  outside world, for one spacial dimension in this case. These are,
+ *  for example the numbers of children per cell, faces per cell, etc,
+ *  but also neighborship information, It is especially useful if you
+ *  want to loop over all faces in any space dimension, but don't want
+ *  to think about their number in a dimension independent expression.
+ *  This not only reduces thinking effort but also error possibilities.
+ */
 struct GeometryInfo<1> {
   public:
 				     /**
@@ -58,14 +58,14 @@ struct GeometryInfo<1> {
 
 
 /**
-   Publish some information about geometrical interconnections to the
-   outside world, for two spacial dimensions in this case. These are,
-   for example the numbers of children per cell, faces per cell, etc,
-   but also neighborship information, It is especially useful if you
-   want to loop over all faces in any space dimension, but don't want
-   to think about their number in a dimension independent expression.
-   This not only reduces thinking effort but also error possibilities.
-*/
+ *  Publish some information about geometrical interconnections to the
+ *  outside world, for two spacial dimensions in this case. These are,
+ *  for example the numbers of children per cell, faces per cell, etc,
+ *  but also neighborship information, It is especially useful if you
+ *  want to loop over all faces in any space dimension, but don't want
+ *  to think about their number in a dimension independent expression.
+ *  This not only reduces thinking effort but also error possibilities.
+ */
 struct GeometryInfo<2> {
   public:
 				     /**

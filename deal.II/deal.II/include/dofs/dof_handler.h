@@ -37,10 +37,10 @@ class ConstraintMatrix;
 
 
 /**
-  Store the indices of the degrees of freedom which are located on the lines.
-  Declare it to have a template parameter, but do not actually declare
-  other types than those explicitely instantiated.
-  */
+ * Store the indices of the degrees of freedom which are located on the lines.
+ * Declare it to have a template parameter, but do not actually declare
+ * other types than those explicitely instantiated.
+ */
 template <int N>
 class DoFLevel;
 
@@ -49,47 +49,47 @@ class DoFLevel;
 
 
 /**
-  Store the indices of the degrees of freedom which are located on the lines.
-
-  \subsection{Information for all #DoFLevel# classes}
-
-  The #DoFLevel<N># classes 
-  store the global indices of the degrees of freedom for each cell on a
-  certain level. The index or number of a degree of freedom is the zero-based
-  index of the according value in the solution vector and the row and column
-  index in the global matrix or the multigrid matrix for this level. These
-  indices refer to the unconstrained vectors and matrices, where we have not
-  taken account of the constraints introduced by hanging nodes. If more than
-  one value corresponds to one basis function, for example for vector equations
-  where the solution is vector valued and thus has several degrees of freedom
-  for each basis function, we nonetheless store only one index. This can then
-  be viewed as the index into a block vector, where each block contains the
-  different values according to a degree of freedom. It is left to the derived
-  classes, whether the values in a block are stored consecutively or distributed
-  (e.g. if the solution function is $u=(u_1, u_2)$, we could store the values
-  in the solution vector like
-  $\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots$ with $m$ denoting the
-  $m$th basis function, or $\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots,
-  u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots$, respectively). Likewise, the
-  constraint matrix returned by #DoFHandler::make_constraint_matrix ()# is then
-  to be understood as a block matrix.
-
-  The storage format of the degrees of freedom indices (short: DoF indices) is
-  somewhat like a mirror of the data structures of the triangulation classes.
-  There is a hierarchy of #DoFLevel<dim># classes for the different dimensions
-  which have objects named #line_dofs#, #quad_dofs# and so on, in which the
-  indices of DoFs located on lines and quads, respectively, are stored. The
-  indices are stored levelwise. The layout in
-  these arrays is as follows: if for a selected finite element (use
-  #DoFHandler::distribute_dofs()# to select a finite element) the number of
-  DoFs on each line (without those in the vertices) is #N#, then the length
-  of the #line_dofs# array is #N# times the number of lines on this level. The
-  DoF indices for the #i#th line are at the positions #N*i...(N+1)*i-1#.
-
-  The DoF indices for vertices are not stored this way, since they need
-  different treatment in multigrid environments. If no multigrid is used, the
-  indices are stored in the #vertex_dofs# array of the #DoFHandler# class.
-  */
+ * Store the indices of the degrees of freedom which are located on the lines.
+ *
+ * \subsection{Information for all #DoFLevel# classes}
+ *
+ * The #DoFLevel<N># classes 
+ * store the global indices of the degrees of freedom for each cell on a
+ * certain level. The index or number of a degree of freedom is the zero-based
+ * index of the according value in the solution vector and the row and column
+ * index in the global matrix or the multigrid matrix for this level. These
+ * indices refer to the unconstrained vectors and matrices, where we have not
+ * taken account of the constraints introduced by hanging nodes. If more than
+ * one value corresponds to one basis function, for example for vector equations
+ * where the solution is vector valued and thus has several degrees of freedom
+ * for each basis function, we nonetheless store only one index. This can then
+ * be viewed as the index into a block vector, where each block contains the
+ * different values according to a degree of freedom. It is left to the derived
+ * classes, whether the values in a block are stored consecutively or distributed
+ * (e.g. if the solution function is $u=(u_1, u_2)$, we could store the values
+ * in the solution vector like
+ * $\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots$ with $m$ denoting the
+ * $m$th basis function, or $\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots,
+ * u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots$, respectively). Likewise, the
+ * constraint matrix returned by #DoFHandler::make_constraint_matrix ()# is then
+ * to be understood as a block matrix.
+ *
+ * The storage format of the degrees of freedom indices (short: DoF indices) is
+ * somewhat like a mirror of the data structures of the triangulation classes.
+ * There is a hierarchy of #DoFLevel<dim># classes for the different dimensions
+ * which have objects named #line_dofs#, #quad_dofs# and so on, in which the
+ * indices of DoFs located on lines and quads, respectively, are stored. The
+ * indices are stored levelwise. The layout in
+ * these arrays is as follows: if for a selected finite element (use
+ * #DoFHandler::distribute_dofs()# to select a finite element) the number of
+ * DoFs on each line (without those in the vertices) is #N#, then the length
+ * of the #line_dofs# array is #N# times the number of lines on this level. The
+ * DoF indices for the #i#th line are at the positions #N*i...(N+1)*i-1#.
+ *
+ * The DoF indices for vertices are not stored this way, since they need
+ * different treatment in multigrid environments. If no multigrid is used, the
+ * indices are stored in the #vertex_dofs# array of the #DoFHandler# class.
+ */
 class DoFLevel<1> {
   public:
 				     /**
@@ -104,9 +104,9 @@ class DoFLevel<1> {
 
 
 /**
-  Store the indices of the degrees of freedom which are located on quads.
-  See \Ref{DoFLevel<1>} for more information.
-  */
+ * Store the indices of the degrees of freedom which are located on quads.
+ * See \Ref{DoFLevel<1>} for more information.
+ */
 class DoFLevel<2> : public DoFLevel<1> {
   public:
 				     /**
@@ -123,12 +123,12 @@ class DoFLevel<2> : public DoFLevel<1> {
 
 
 /**
-  Define some types which differ between the dimensions. This class
-  is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
-  
-  @see DoFDimensionInfo<1>
-  @see DoFDimensionInfo<2>
-  */
+ * Define some types which differ between the dimensions. This class
+ * is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
+ * 
+ * @see DoFDimensionInfo<1>
+ * @see DoFDimensionInfo<2>
+ */
 template <int dim>
 class DoFDimensionInfo;
 
@@ -137,10 +137,10 @@ class DoFDimensionInfo;
 
 
 /**
-  Define some types for the DoF handling in one dimension.
-
-  The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
-  */
+ * Define some types for the DoF handling in one dimension.
+ *
+ * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ */
 class DoFDimensionInfo<1> {
   public:
     typedef TriaRawIterator<1,DoFCellAccessor<1> >    raw_line_iterator;
@@ -166,10 +166,10 @@ class DoFDimensionInfo<1> {
 
 
 /**
-  Define some types for the DoF handling in two dimensions.
-
-  The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
-  */
+ * Define some types for the DoF handling in two dimensions.
+ *
+ * The types have the same meaning as those declared in \Ref{TriaDimensionInfo<2>}.
+ */
 class DoFDimensionInfo<2> {
   public:
     typedef TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >    raw_line_iterator;
@@ -195,20 +195,20 @@ class DoFDimensionInfo<2> {
 
 
 /**
-  Give names to the different possibilities of renumbering the degrees
-  of freedom.
-
-  \begin{itemize}
-  \item #Cuthill_McKee# and #reverse_Cuthill_McKee# traverse the triangulation
-    in a diagonal, advancing front like method and produce matrices with an
-    almost minimal bandwidth.
-  \item #reverse_Cuthill_McKey# does the same thing, but numbers the dofs in
-    the reverse order.
-  \end{itemize}
-
-  For a description of the algorithms see the book of Schwarz (H.R.Scharz:
-  Methode der finiten Elemente).
-  */
+ * Give names to the different possibilities of renumbering the degrees
+ * of freedom.
+ *
+ * \begin{itemize}
+ * \item #Cuthill_McKee# and #reverse_Cuthill_McKee# traverse the triangulation
+ *   in a diagonal, advancing front like method and produce matrices with an
+ *   almost minimal bandwidth.
+ * \item #reverse_Cuthill_McKey# does the same thing, but numbers the dofs in
+ *   the reverse order.
+ * \end{itemize}
+ *
+ * For a description of the algorithms see the book of Schwarz (H.R.Scharz:
+ * Methode der finiten Elemente).
+ */
 enum RenumberingMethod {
       Cuthill_McKee,
       reverse_Cuthill_McKee
@@ -219,212 +219,212 @@ enum RenumberingMethod {
 
 
 /**
-  Manage the distribution and numbering of the degrees of freedom for
-  non-multigrid algorithms.
-
-  We store a list of numbers for each cells
-  denoting the mapping between the degrees of freedom on this cell
-  and the global number of this degree of freedom; the number of a
-  degree of freedom lying on the interface of two cells is thus stored
-  twice, but is the same. The numbers refer to the unconstrained
-  matrices and vectors. The layout of storage of these indices is
-  described in the \Ref{DoFLevel} class documentation.
-
-  Additionally, the DoFHandler is able to generate the condensation
-  matrix which connects constrained and unconstrained matrices and
-  vectors.
-
-  Finally it offers a starting point for the assemblage of the matrices
-  by offering #begin()# and #end()# functions which return iterators
-  to walk on the DoF structures as well as the triangulation data.
-  These iterators work much like those described in the documentation
-  of the #Triangulation# class and of the iterator classes themselved,
-  but offer more functionality than pure triangulation iterators. The
-  order in which dof iterators are presented by the #++# and #--# operators
-  is the same as that for the alike triangulation iterators.
-  
-  
-  \subsection{Distribution of degrees of freedom}
-
-  The degrees of freedom (`dofs') are distributed on the given triangulation
-  by the function #distribute_dofs()#. It gets passed a finite element object
-  describing how many degrees of freedom are located on vertices, lines, etc.
-  It traverses the triangulation cell by cell and numbers the dofs of that
-  cell if not yet numbered. For non-multigrid algorithms, only active cells
-  are considered.
-
-  Since the triangulation is traversed starting with the cells of the coarsest
-  active level and going to more refined levels, the lowest numbers for dofs
-  are given to the largest cells as well as their bounding lines and vertices,
-  with the dofs of more refined cells getting higher numbers.
-
-  This numbering implies very large bandwiths of the resulting matrices and
-  is thus vastly suboptimal for some solution algorithms. For this reason,
-  the #DoFHandler# class offers the function #renumber_dofs# which reorders
-  the dof numbering according to some scheme. Presently available are the
-  Cuthill-McKey (CM) and the Reverse Cuthill-McKey algorithm. These algorithms
-  have one major drawback: they require a good starting point, i.e. the degree
-  of freedom index afterwards to be numbered zero. This can thus be given by
-  the user, e.g. by exploiting knowledge of the actual topology of the
-  domain. It is also possible to given several starting indices, which may
-  be used to simulate a simple upstream numbering (by giving the inflow
-  dofs as starting values) or to make preconditioning faster (by letting
-  the dirichlet boundary indices be starting points).
-
-  If no starting index is given, one is chosen by the program, namely one
-  with the smallest coordination number (the coordination number is the
-  number of other dofs this dof couples with). This dof is usually located
-  on the boundary of the domain. There is, however, large ambiguity in this
-  when using the hierarchical meshes used in this library, since in most
-  cases the computational domain is not approximated by tilting and deforming
-  elements and by plugging together variable numbers of elements at vertices,
-  but rather by hierarchical refinement. There is therefore a large number
-  of dofs with equal coordination numbers. The renumbering algorithms will
-  therefore not give optimal results.
-
-  In the book of Schwarz (H.R.Schwarz: Methode der finiten Elemente), it is
-  advised to test many starting points, if possible all with the smallest
-  coordination number and also those with slightly higher numbers. However,
-  this seems only possible for meshes with at most several dozen or a few
-  hundred elements found in small engineering problems of the early 1980s
-  (the second edition was published in 1984), but certainly not with those
-  used in this library, featuring several 10,000 to a few 100,000 elements.
-
-  On the other hand, the need to reduce the bandwidth has decreased since
-  with the mentioned number of cells, only iterative solution methods are
-  able to solve the resulting matrix systems. These, however, are not so
-  demanding with respect to the bandwidth as direct solvers used for
-  smaller problems. Things like upstream numbering become much more important
-  in recent times, so the suboptimality of the renumbering algorithms is
-  not that important any more.
-
-  
-  \subsection{Implementation of renumbering schemes}
-
-  The renumbering algorithms need quite a lot of memory, since they have
-  to store for each dof with which other dofs it couples. This is done
-  using a #dSMatrixStruct# object used to store the sparsity pattern. It
-  is not useful for the user to do anything between distributing the dofs
-  and renumbering, i.e. the calls to #DoFHandler::distribute_dofs# and
-  #DoFHandler::renumber_dofs# should follow each other immediately. If
-  you try to create a sparsity pattern or anything else in between, these
-  will be invalid afterwards.
-
-  The renumbering may take care of dof-to-dof couplings only induced by
-  eliminating constraints. In addition to the memory consumption mentioned
-  above, this also takes quite some computational time, but it may be
-  switched of upon calling the #renumber_dofs# function. This will then
-  give inferior results, since knots in the graph (representing dofs)
-  are not found to be neighbors even if they would be after condensation.
-  
-  The renumbering algorithms work on a purely algebraic basis, due to the
-  isomorphism between the graph theoretical groundwork underlying the
-  algorithms and binary matrices (matrices of which the entries are binary
-  values) represented by the sparsity patterns. In special, the algorithms
-  do not try to exploit topological knowledge (e.g. corner detection) to
-  find appropriate starting points. This way, however, they work in
-  arbitrary space dimension.
-
-  If you want to give starting points, you may give a list of dof indices
-  which will form the first step of the renumbering. The dofs of the list
-  will be consecutively numbered starting with zero, i.e. this list is not
-  renumbered according to the coordination number of the nodes. Indices not
-  in the allowed range are deleted. If no index is allowed, the algorithm
-  will search for its own starting point.
-
-  
-  \subsection{Results of renumbering}
-
-  The renumbering schemes mentioned above do not lead to optimal results.
-  However, after all there is no algorithm that accomplishes this within
-  reasonable time. There are situations where the lack of optimality even
-  leads to worse results than with the original, crude, levelwise numering
-  scheme; one of these examples is a mesh of four cells of which always
-  those cells are refined which are neighbors to the center (you may call
-  this mesh a `zoom in' mesh). In one such example the bandwidth was
-  increased by about 50 per cent.
-
-  In most other cases, the bandwith is reduced significantly. The reduction
-  is the better the less structured the grid is. With one grid where the
-  cells were refined according to a random driven algorithm, the bandwidth
-  was reduced by a factor of six.
-
-  Using the constraint information usually leads to reductions in bandwidth
-  of 10 or 20 per cent, but may for some very unstructured grids also lead
-  to an increase. You have to weigh the decrease in your case with the time
-  spent to use the constraint information, which usually is several times
-  longer than the `pure' renumbering algorithm.
-
-  In almost all cases, the renumbering scheme finds a corner to start with.
-  Since there is more than one corner in most grids and since even an
-  interior degree of freedom may be a better starting point, giving the
-  starting point by the user may be a viable way if you have a simple
-  scheme to derive a suitable point (e.g. by successively taking the
-  third child of the cell top left of the coarsest level, taking its
-  third vertex and the dof index thereof, if you want the top left corner
-  vertex). If you do not know beforehand what your grid will look like
-  (e.g. when using adaptive algorithms), searching a best starting point
-  may be difficult, however, and in many cases will not justify the effort.
-
-  \subsection{Data transfer between grids}
-
-  The #DoFHandler# class offers two functions #make_transfer_matrix# which create
-  a matrix to transform the data of one grid to another. The functions assumes the
-  coarsest mesh of the two grids to be the same. However there are few ways to
-  check this (only the number of cells on the coarsest grid is compared). Also,
-  the selected finite element type of the two degree of freedom handler objects
-  must be the same.
-
-  The algorithm goes recursively from the coarse mesh cells to their children
-  until the grids differ at this level. It then tries to prolong or restrict the
-  old cell(s) to the new cell(s) and makes up a matrix of these prolongations and
-  restrictions. This matrix multiplied with a vector on the old grid yields an
-  approximation of the projection of the function on the old grid to the new one.
-
-  Building and using the transfer matrix is usually a quite expensive operation,
-  since we have to perform two runs over all cells (one for building the sparsity
-  structure, one to build the entries) and because of the memory consumption.
-  It may, however, pay if you have many
-  equations, since then the entries in the matrix can be considered as block
-  entries which are then applied to all function values at a given degree of
-  freedom.
-
-  To build the matrix, you have to call first
-  #make_transfer_matrix (old_dof_object, sparsity_pattern);#, then create a
-  sparse matrix out of this pattern, e.g. by #dSMatrix m(sparsity_pattern);#
-  and finally give this to the second run:
-  #make_transfer_matrix (old_dof_object, m);#. The spasity pattern created
-  by the first run is automatically compressed.
-
-  When creating the #dSMatrixStruct# sparsity pattern, you have to give the
-  dimension and the maximum number of entries per row. Obviously the image
-  dimension is the number of dofs on the new grid (you can get this using the
-  #n_dofs()# function), while the range dimension is the number of dofs on the
-  old grid. The maximum number of entries per row is determined by the maximum
-  number of levels $d$ which we have to cross upon transferring from one cell to
-  another (presently, transfer of one cell is only possible for #d=0,1#, i.e.
-  the two cells match or one is refined once more than the other, the
-  number of degrees of freedom per per vertex $d_v$, those on lines $d_l$, those
-  on quads $d_q$ and the number of subcells a cell is
-  refined to, which is $2**dim$. The maximum number of entries per row in one
-  dimension is then given by $(2*d_l+d_v)*2+1$ if $d=1$. For example, a one
-  dimensional linear element would need two entries per row.
-  In two dimensions, the maxmimum number is $(4*d_q+12*d_l+5*d_v)*4+1$ if $d=1$.
-  You can get these numbers by drawing little pictures and counting, there is
-  no mystique behind this. You can also get the right number by calling the
-  #max_transfer_entries (max_level_difference)# function. The actual number
-  depends on the finite element selected and may be much less, especially in
-  higher dimensions.
-  
-  If you do not have multiple equations and do not really use the matrix but still
-  have to transfer an arbitrary number of vectors to transfer, you can use the
-  #transfer()# function, which is able to transfer any number of vectors in only
-  one loop over all cells and without the memory consumption of the matrix. The
-  matrix seems only useful when trying to transfer whole matrices instead of
-  rebuilding them on the new grid.
-  
-  @author Wolfgang Bangerth, February 1998
-  */
+ * Manage the distribution and numbering of the degrees of freedom for
+ * non-multigrid algorithms.
+ *
+ * We store a list of numbers for each cells
+ * denoting the mapping between the degrees of freedom on this cell
+ * and the global number of this degree of freedom; the number of a
+ * degree of freedom lying on the interface of two cells is thus stored
+ * twice, but is the same. The numbers refer to the unconstrained
+ * matrices and vectors. The layout of storage of these indices is
+ * described in the \Ref{DoFLevel} class documentation.
+ *
+ * Additionally, the DoFHandler is able to generate the condensation
+ * matrix which connects constrained and unconstrained matrices and
+ * vectors.
+ *
+ * Finally it offers a starting point for the assemblage of the matrices
+ * by offering #begin()# and #end()# functions which return iterators
+ * to walk on the DoF structures as well as the triangulation data.
+ * These iterators work much like those described in the documentation
+ * of the #Triangulation# class and of the iterator classes themselved,
+ * but offer more functionality than pure triangulation iterators. The
+ * order in which dof iterators are presented by the #++# and #--# operators
+ * is the same as that for the alike triangulation iterators.
+ * 
+ * 
+ * \subsection{Distribution of degrees of freedom}
+ *
+ * The degrees of freedom (`dofs') are distributed on the given triangulation
+ * by the function #distribute_dofs()#. It gets passed a finite element object
+ * describing how many degrees of freedom are located on vertices, lines, etc.
+ * It traverses the triangulation cell by cell and numbers the dofs of that
+ * cell if not yet numbered. For non-multigrid algorithms, only active cells
+ * are considered.
+ *
+ * Since the triangulation is traversed starting with the cells of the coarsest
+ * active level and going to more refined levels, the lowest numbers for dofs
+ * are given to the largest cells as well as their bounding lines and vertices,
+ * with the dofs of more refined cells getting higher numbers.
+ *
+ * This numbering implies very large bandwiths of the resulting matrices and
+ * is thus vastly suboptimal for some solution algorithms. For this reason,
+ * the #DoFHandler# class offers the function #renumber_dofs# which reorders
+ * the dof numbering according to some scheme. Presently available are the
+ * Cuthill-McKey (CM) and the Reverse Cuthill-McKey algorithm. These algorithms
+ * have one major drawback: they require a good starting point, i.e. the degree
+ * of freedom index afterwards to be numbered zero. This can thus be given by
+ * the user, e.g. by exploiting knowledge of the actual topology of the
+ * domain. It is also possible to given several starting indices, which may
+ * be used to simulate a simple upstream numbering (by giving the inflow
+ * dofs as starting values) or to make preconditioning faster (by letting
+ * the dirichlet boundary indices be starting points).
+ *
+ * If no starting index is given, one is chosen by the program, namely one
+ * with the smallest coordination number (the coordination number is the
+ * number of other dofs this dof couples with). This dof is usually located
+ * on the boundary of the domain. There is, however, large ambiguity in this
+ * when using the hierarchical meshes used in this library, since in most
+ * cases the computational domain is not approximated by tilting and deforming
+ * elements and by plugging together variable numbers of elements at vertices,
+ * but rather by hierarchical refinement. There is therefore a large number
+ * of dofs with equal coordination numbers. The renumbering algorithms will
+ * therefore not give optimal results.
+ *
+ * In the book of Schwarz (H.R.Schwarz: Methode der finiten Elemente), it is
+ * advised to test many starting points, if possible all with the smallest
+ * coordination number and also those with slightly higher numbers. However,
+ * this seems only possible for meshes with at most several dozen or a few
+ * hundred elements found in small engineering problems of the early 1980s
+ * (the second edition was published in 1984), but certainly not with those
+ * used in this library, featuring several 10,000 to a few 100,000 elements.
+ *
+ * On the other hand, the need to reduce the bandwidth has decreased since
+ * with the mentioned number of cells, only iterative solution methods are
+ * able to solve the resulting matrix systems. These, however, are not so
+ * demanding with respect to the bandwidth as direct solvers used for
+ * smaller problems. Things like upstream numbering become much more important
+ * in recent times, so the suboptimality of the renumbering algorithms is
+ * not that important any more.
+ *
+ * 
+ * \subsection{Implementation of renumbering schemes}
+ *
+ * The renumbering algorithms need quite a lot of memory, since they have
+ * to store for each dof with which other dofs it couples. This is done
+ * using a #dSMatrixStruct# object used to store the sparsity pattern. It
+ * is not useful for the user to do anything between distributing the dofs
+ * and renumbering, i.e. the calls to #DoFHandler::distribute_dofs# and
+ * #DoFHandler::renumber_dofs# should follow each other immediately. If
+ * you try to create a sparsity pattern or anything else in between, these
+ * will be invalid afterwards.
+ *
+ * The renumbering may take care of dof-to-dof couplings only induced by
+ * eliminating constraints. In addition to the memory consumption mentioned
+ * above, this also takes quite some computational time, but it may be
+ * switched of upon calling the #renumber_dofs# function. This will then
+ * give inferior results, since knots in the graph (representing dofs)
+ * are not found to be neighbors even if they would be after condensation.
+ * 
+ * The renumbering algorithms work on a purely algebraic basis, due to the
+ * isomorphism between the graph theoretical groundwork underlying the
+ * algorithms and binary matrices (matrices of which the entries are binary
+ * values) represented by the sparsity patterns. In special, the algorithms
+ * do not try to exploit topological knowledge (e.g. corner detection) to
+ * find appropriate starting points. This way, however, they work in
+ * arbitrary space dimension.
+ *
+ * If you want to give starting points, you may give a list of dof indices
+ * which will form the first step of the renumbering. The dofs of the list
+ * will be consecutively numbered starting with zero, i.e. this list is not
+ * renumbered according to the coordination number of the nodes. Indices not
+ * in the allowed range are deleted. If no index is allowed, the algorithm
+ * will search for its own starting point.
+ *
+ * 
+ * \subsection{Results of renumbering}
+ *
+ * The renumbering schemes mentioned above do not lead to optimal results.
+ * However, after all there is no algorithm that accomplishes this within
+ * reasonable time. There are situations where the lack of optimality even
+ * leads to worse results than with the original, crude, levelwise numering
+ * scheme; one of these examples is a mesh of four cells of which always
+ * those cells are refined which are neighbors to the center (you may call
+ * this mesh a `zoom in' mesh). In one such example the bandwidth was
+ * increased by about 50 per cent.
+ *
+ * In most other cases, the bandwith is reduced significantly. The reduction
+ * is the better the less structured the grid is. With one grid where the
+ * cells were refined according to a random driven algorithm, the bandwidth
+ * was reduced by a factor of six.
+ *
+ * Using the constraint information usually leads to reductions in bandwidth
+ * of 10 or 20 per cent, but may for some very unstructured grids also lead
+ * to an increase. You have to weigh the decrease in your case with the time
+ * spent to use the constraint information, which usually is several times
+ * longer than the `pure' renumbering algorithm.
+ *
+ * In almost all cases, the renumbering scheme finds a corner to start with.
+ * Since there is more than one corner in most grids and since even an
+ * interior degree of freedom may be a better starting point, giving the
+ * starting point by the user may be a viable way if you have a simple
+ * scheme to derive a suitable point (e.g. by successively taking the
+ * third child of the cell top left of the coarsest level, taking its
+ * third vertex and the dof index thereof, if you want the top left corner
+ * vertex). If you do not know beforehand what your grid will look like
+ * (e.g. when using adaptive algorithms), searching a best starting point
+ * may be difficult, however, and in many cases will not justify the effort.
+ *
+ * \subsection{Data transfer between grids}
+ *
+ * The #DoFHandler# class offers two functions #make_transfer_matrix# which create
+ * a matrix to transform the data of one grid to another. The functions assumes the
+ * coarsest mesh of the two grids to be the same. However there are few ways to
+ * check this (only the number of cells on the coarsest grid is compared). Also,
+ * the selected finite element type of the two degree of freedom handler objects
+ * must be the same.
+ *
+ * The algorithm goes recursively from the coarse mesh cells to their children
+ * until the grids differ at this level. It then tries to prolong or restrict the
+ * old cell(s) to the new cell(s) and makes up a matrix of these prolongations and
+ * restrictions. This matrix multiplied with a vector on the old grid yields an
+ * approximation of the projection of the function on the old grid to the new one.
+ *
+ * Building and using the transfer matrix is usually a quite expensive operation,
+ * since we have to perform two runs over all cells (one for building the sparsity
+ * structure, one to build the entries) and because of the memory consumption.
+ * It may, however, pay if you have many
+ * equations, since then the entries in the matrix can be considered as block
+ * entries which are then applied to all function values at a given degree of
+ * freedom.
+ *
+ * To build the matrix, you have to call first
+ * #make_transfer_matrix (old_dof_object, sparsity_pattern);#, then create a
+ * sparse matrix out of this pattern, e.g. by #dSMatrix m(sparsity_pattern);#
+ * and finally give this to the second run:
+ * #make_transfer_matrix (old_dof_object, m);#. The spasity pattern created
+ * by the first run is automatically compressed.
+ *
+ * When creating the #dSMatrixStruct# sparsity pattern, you have to give the
+ * dimension and the maximum number of entries per row. Obviously the image
+ * dimension is the number of dofs on the new grid (you can get this using the
+ * #n_dofs()# function), while the range dimension is the number of dofs on the
+ * old grid. The maximum number of entries per row is determined by the maximum
+ * number of levels $d$ which we have to cross upon transferring from one cell to
+ * another (presently, transfer of one cell is only possible for #d=0,1#, i.e.
+ * the two cells match or one is refined once more than the other, the
+ * number of degrees of freedom per per vertex $d_v$, those on lines $d_l$, those
+ * on quads $d_q$ and the number of subcells a cell is
+ * refined to, which is $2**dim$. The maximum number of entries per row in one
+ * dimension is then given by $(2*d_l+d_v)*2+1$ if $d=1$. For example, a one
+ * dimensional linear element would need two entries per row.
+ * In two dimensions, the maxmimum number is $(4*d_q+12*d_l+5*d_v)*4+1$ if $d=1$.
+ * You can get these numbers by drawing little pictures and counting, there is
+ * no mystique behind this. You can also get the right number by calling the
+ * #max_transfer_entries (max_level_difference)# function. The actual number
+ * depends on the finite element selected and may be much less, especially in
+ * higher dimensions.
+ * 
+ * If you do not have multiple equations and do not really use the matrix but still
+ * have to transfer an arbitrary number of vectors to transfer, you can use the
+ * #transfer()# function, which is able to transfer any number of vectors in only
+ * one loop over all cells and without the memory consumption of the matrix. The
+ * matrix seems only useful when trying to transfer whole matrices instead of
+ * rebuilding them on the new grid.
+ * 
+ * @author Wolfgang Bangerth, February 1998
+ */
 template <int dim>
 class DoFHandler : public DoFDimensionInfo<dim> {
   public:

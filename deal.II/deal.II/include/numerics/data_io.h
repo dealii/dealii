@@ -19,10 +19,10 @@ class dVector;
 
 
 /**
-   Structure which is passed to the #Triangulation<dim>::create_triangulation#
-   function. It contains all data needed to construct a cell, namely the
-   indices of the vertices and the material indicator.
-*/
+ *  Structure which is passed to the #Triangulation<dim>::create_triangulation#
+ *  function. It contains all data needed to construct a cell, namely the
+ *  indices of the vertices and the material indicator.
+ */
 template <int dim>
 struct CellData {
     int           vertices[2<<dim];
@@ -34,28 +34,28 @@ struct CellData {
 
 
 /**
-   Structure to be passed to the #Triangulation<dim>::create_triangulation#
-   function to describe boundary information.
-
-   This structure is the same for all dimensions, since we use an input
-   function which is the same for all dimensions. The content of objects
-   of this structure varies with the dimensions, however.
-
-   Since in one space dimension, there is no boundary information apart
-   from the two end points of the interval, this structure does not contain
-   anything and exists only for consistency, to allow a common interface
-   for all space dimensions. All fields should always be empty.
-
-   Boundary data in 2D consists
-   of a list of lines which belong to a given boundary component. A
-   boundary component is a list of lines which are given a common
-   number describing the boundary condition to hold on this part of the
-   boundary. The triangulation creation function gives lines not in this
-   list either the boundary indicator zero (if on the boundary) or 255
-   (if in the interior). Explicitely giving a line the indicator 255
-   will result in an error, as well as giving an interior line a boundary
-   indicator.
-*/
+ *  Structure to be passed to the #Triangulation<dim>::create_triangulation#
+ *  function to describe boundary information.
+ *
+ *  This structure is the same for all dimensions, since we use an input
+ *  function which is the same for all dimensions. The content of objects
+ *  of this structure varies with the dimensions, however.
+ *
+ *  Since in one space dimension, there is no boundary information apart
+ *  from the two end points of the interval, this structure does not contain
+ *  anything and exists only for consistency, to allow a common interface
+ *  for all space dimensions. All fields should always be empty.
+ *
+ *  Boundary data in 2D consists
+ *  of a list of lines which belong to a given boundary component. A
+ *  boundary component is a list of lines which are given a common
+ *  number describing the boundary condition to hold on this part of the
+ *  boundary. The triangulation creation function gives lines not in this
+ *  list either the boundary indicator zero (if on the boundary) or 255
+ *  (if in the interior). Explicitely giving a line the indicator 255
+ *  will result in an error, as well as giving an interior line a boundary
+ *  indicator.
+ */
 struct SubCellData {
 				     /**
 				      * Each record of this vector describes
@@ -92,108 +92,108 @@ struct SubCellData {
 
 
 /**
-  This class implements an input mechanism for grid data. It allows to
-  read a grid structure into a triangulation object. Future versions
-  will also allow to read data on this grid into vectors.
-
-  At present, only UCD (unstructured cell data) is supported as input
-  format for grid data. Any numerical data after the block of topological
-  information is ignored.
-
-  To read grid data, the triangulation to be fed with has to be empty.
-  When giving a file which does not contain the assumed information or
-  which does not keep to the right format, the state of the triangulation
-  will be undefined afterwards. Upon input, only lines in one dimension
-  and line and quads in two dimensions are accepted. All other cell types
-  (e.g. triangles in two dimensions, quads and hexes in 3d) are rejected.
-  The vertex and cell numbering in the UCD file, which
-  need not be consecutively, is lost upon transfer to the triangulation
-  object, since this one needs consecutively numbered elements.
-
-  Material indicators are accepted to denote the material id of cells and
-  to denote boundary part indication for lines in 2D. Read the according
-  sections in the documentation of the \Ref{Triangulation} class for
-  further details.
-
-
-  \subsection{Structure of input grid data}
-  
-  It is your duty to use a correct numbering of vertices in the cell list,
-  i.e. for lines, you have to first give the vertex with the lower coordinate
-  value, then that with the higher coordinate value. For quadrilaterals in
-  two dimensions, the vertex indices in the #quad# list have to be such that
-  the vertices are numbered in counter-clockwise sense.
-
-  In two dimensions, another difficulty occurs, which has to do with the sense
-  of a quadrilateral. A quad consists of four lines which have a direction,
-  which is per definitionem as follows:
-  \begin{verbatim}
-    3-->--2
-    |     |
-    ^     ^
-    |     |
-    0-->--1
-  \end{verbatim}
-  Now, two adjacent cells must have a vertex numbering such that the direction
-  of the common side is the same. For example, the following two quads
-  \begin{verbatim}
-    3---4---5
-    |   |   |
-    0---1---2
-  \end{verbatim}
-  may be characterised by the vertex numbers (0 1 4 3) and (1 2 5 4), since
-  the middle line would get the direction #1->4# when viewed from both cells.
-  The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
-  quad would give the common line the direction #1->4#, while the right one
-  would want to use #4->1#, leading to ambiguity. The #Triangulation# object
-  is capable of detecting this special case, which can be eliminated by
-  rotating the indices of the right quad by two. However, it would not
-  know what to do if you gave the vertex indices (4 1 2 5), since then it
-  would have to rotate by one element or three, the decision which to take is
-  not yet implemented.
-
-  There are more ambiguous cases, where the triangulation may not know what
-  to do at all without the use of very sophisticated algorithms. On such example
-  is the following:
-  \begin{verbatim}
-    9---10-----11
-    |   |    / |
-    6---7---8  |
-    |   |   |  |
-    3---4---5  |
-    |   |    \ |
-    0---1------2
-  \end{verbatim}
-  Assume that you had numbered the vertices in the cells at the left boundary
-  in a way, that the following line directions are induced:
-  \begin{verbatim}
-    9->-10-----11
-    ^   ^    / |
-    6->-7---8  |
-    ^   ^   |  |
-    3->-4---5  |
-    ^   ^    \ |
-    0->-1------2
-  \end{verbatim}
-  (This could for example be done by using the indices (0 1 4 3), (3 4 7 6),
-  (6 7 10 9) for the three cells). Now, you will not find a way of giving
-  indices for the right cells, without introducing either ambiguity for
-  one line or other, or without violating that within each cells, there must be
-  one vertex from which both lines are directed away and the opposite one to
-  which both adjacent lines point to.
-
-  The solution in this case is to renumber one of the three left cells, e.g.
-  by reverting the sense of the line between vertices 7 and 10 by numbering
-  the top left cell by (9 6 7 10).
-
-  But this is a thing that the triangulation
-  object can't do for you, since it would involve backtracking to cells
-  already created when we find that we can't number the indices of one of
-  the rightmost cells consistently. It is neither clear how to do this
-  backtracking nor whether it can be done with a stopping algorithm, if
-  possible within polynomial time. This kind of numbering must be made
-  upon construction of the coarse grid, unfortunately.
-  */
+ * This class implements an input mechanism for grid data. It allows to
+ * read a grid structure into a triangulation object. Future versions
+ * will also allow to read data on this grid into vectors.
+ *
+ * At present, only UCD (unstructured cell data) is supported as input
+ * format for grid data. Any numerical data after the block of topological
+ * information is ignored.
+ *
+ * To read grid data, the triangulation to be fed with has to be empty.
+ * When giving a file which does not contain the assumed information or
+ * which does not keep to the right format, the state of the triangulation
+ * will be undefined afterwards. Upon input, only lines in one dimension
+ * and line and quads in two dimensions are accepted. All other cell types
+ * (e.g. triangles in two dimensions, quads and hexes in 3d) are rejected.
+ * The vertex and cell numbering in the UCD file, which
+ * need not be consecutively, is lost upon transfer to the triangulation
+ * object, since this one needs consecutively numbered elements.
+ *
+ * Material indicators are accepted to denote the material id of cells and
+ * to denote boundary part indication for lines in 2D. Read the according
+ * sections in the documentation of the \Ref{Triangulation} class for
+ * further details.
+ *
+ *
+ * \subsection{Structure of input grid data}
+ * 
+ * It is your duty to use a correct numbering of vertices in the cell list,
+ * i.e. for lines, you have to first give the vertex with the lower coordinate
+ * value, then that with the higher coordinate value. For quadrilaterals in
+ * two dimensions, the vertex indices in the #quad# list have to be such that
+ * the vertices are numbered in counter-clockwise sense.
+ *
+ * In two dimensions, another difficulty occurs, which has to do with the sense
+ * of a quadrilateral. A quad consists of four lines which have a direction,
+ * which is per definitionem as follows:
+ * \begin{verbatim}
+ *   3-->--2
+ *   |     |
+ *   ^     ^
+ *   |     |
+ *   0-->--1
+ * \end{verbatim}
+ * Now, two adjacent cells must have a vertex numbering such that the direction
+ * of the common side is the same. For example, the following two quads
+ * \begin{verbatim}
+ *   3---4---5
+ *   |   |   |
+ *   0---1---2
+ * \end{verbatim}
+ * may be characterised by the vertex numbers (0 1 4 3) and (1 2 5 4), since
+ * the middle line would get the direction #1->4# when viewed from both cells.
+ * The numbering (0 1 4 3) and (5 4 1 2) would not be allowed, since the left
+ * quad would give the common line the direction #1->4#, while the right one
+ * would want to use #4->1#, leading to ambiguity. The #Triangulation# object
+ * is capable of detecting this special case, which can be eliminated by
+ * rotating the indices of the right quad by two. However, it would not
+ * know what to do if you gave the vertex indices (4 1 2 5), since then it
+ * would have to rotate by one element or three, the decision which to take is
+ * not yet implemented.
+ *
+ * There are more ambiguous cases, where the triangulation may not know what
+ * to do at all without the use of very sophisticated algorithms. On such example
+ * is the following:
+ * \begin{verbatim}
+ *   9---10-----11
+ *   |   |    / |
+ *   6---7---8  |
+ *   |   |   |  |
+ *   3---4---5  |
+ *   |   |    \ |
+ *   0---1------2
+ * \end{verbatim}
+ * Assume that you had numbered the vertices in the cells at the left boundary
+ * in a way, that the following line directions are induced:
+ * \begin{verbatim}
+ *   9->-10-----11
+ *   ^   ^    / |
+ *   6->-7---8  |
+ *   ^   ^   |  |
+ *   3->-4---5  |
+ *   ^   ^    \ |
+ *   0->-1------2
+ * \end{verbatim}
+ * (This could for example be done by using the indices (0 1 4 3), (3 4 7 6),
+ * (6 7 10 9) for the three cells). Now, you will not find a way of giving
+ * indices for the right cells, without introducing either ambiguity for
+ * one line or other, or without violating that within each cells, there must be
+ * one vertex from which both lines are directed away and the opposite one to
+ * which both adjacent lines point to.
+ *
+ * The solution in this case is to renumber one of the three left cells, e.g.
+ * by reverting the sense of the line between vertices 7 and 10 by numbering
+ * the top left cell by (9 6 7 10).
+ *
+ * But this is a thing that the triangulation
+ * object can't do for you, since it would involve backtracking to cells
+ * already created when we find that we can't number the indices of one of
+ * the rightmost cells consistently. It is neither clear how to do this
+ * backtracking nor whether it can be done with a stopping algorithm, if
+ * possible within polynomial time. This kind of numbering must be made
+ * upon construction of the coarse grid, unfortunately.
+ */
 template <int dim>
 class DataIn {
   public:
@@ -249,74 +249,74 @@ class DataIn {
 
 
 /**
-  This class implements an output mechanism for grid and simulation data
-  in several formats.
-  At present it supports output in UCD (unstructured cell data) and
-  partly in GNUPLOT format.
-
-  It allows the user to attach a degree of freedom handler object
-  (#DoFHandler#) which also gives access to the geometry data of the
-  underlying triangulation and to add data vectors of which the values
-  are to be written.
-
-
-  \subsection{Limitations}
-  
-  At present, no grouping of components to vectors is implemented, i.e.
-  you can only write each component independent of the others. Also, it
-  is not possible to output calculations which were performed on elements
-  with more or less than one degree of freedom per vertex.
-
-  
-  \subsection{UCD format}
-
-  The UCD format is described in the AVS developer's guide. Due to
-  limitations in the present format, only node based data can be output,
-  so higher order elements are only written with their node values, no
-  interior or line values are used. No use is made of the possibility
-  to give cell and model data since these are not supported by all
-  UCD aware programs.
-
-  The ASCII UCD format is used. In future versions, a binary version may
-  follow up.
-
-  Note that to enumerate the vertices, not the vertex index is used but
-  the index of the degree of freedom located on this vertex. This makes
-  the mapping between the vertices and the entries in the data vectors
-  much easier.
-
-
-  \subsection{GNUPLOT format}
-
-  The GNUPLOT format is not able to handle data on unstructured grids
-  directly. Directly would mean that you only give the vertices and
-  the solution values thereon and the program constructs its own grid
-  to represent the data. This is only possible for a structured tensor
-  product grid in two dimensions.
-
-  In one dimension, the format is obviously #x v1 v2 ...#, where #x#
-  is the coordinate value of a grid point, while the #vi# are the
-  vector elements referring to the present node. Within GNUPLOT,
-  call #plot "filename" using 1:x#. #x# denotes the number of the data set you
-  want to see plus one. For example #using 1:4# would mean to plot the
-  third data vector.
-
-  For more than one dimension, the #DataOut<dim>::write_gnuplot()# somehow
-  duplicates the functionality of the #Triangulation<dim>::print_gnuplot()#
-  functions. These, however, offer more functionality in some respect.
-  The grid is represented as a sequence of lines, where each cell is
-  a sequence of five vertices (the first one is appended to close the
-  contour of the cell) with the data appended after each vertex. Each cell
-  is therefore a sequence of five lines #x y v1 v2 ...# forming together
-  the bounding line of this cell. After each cell, two newlines are inserted
-  to prevent GNUPLOT from joining the lines bounding two cells.
-
-  To view the results in two dimensions, use #set data style lines#
-  within gnuplot and call #plot "filename"# to see the grid. Use
-  #set parametric# and #splot "filename" using 1:2:x# to get a 3d surface
-  plot of the (#x-2#)th data set. For example, using #x=4# would mean to
-  plot the second data set.
-  */
+ * This class implements an output mechanism for grid and simulation data
+ * in several formats.
+ * At present it supports output in UCD (unstructured cell data) and
+ * partly in GNUPLOT format.
+ *
+ * It allows the user to attach a degree of freedom handler object
+ * (#DoFHandler#) which also gives access to the geometry data of the
+ * underlying triangulation and to add data vectors of which the values
+ * are to be written.
+ *
+ *
+ * \subsection{Limitations}
+ * 
+ * At present, no grouping of components to vectors is implemented, i.e.
+ * you can only write each component independent of the others. Also, it
+ * is not possible to output calculations which were performed on elements
+ * with more or less than one degree of freedom per vertex.
+ *
+ * 
+ * \subsection{UCD format}
+ *
+ * The UCD format is described in the AVS developer's guide. Due to
+ * limitations in the present format, only node based data can be output,
+ * so higher order elements are only written with their node values, no
+ * interior or line values are used. No use is made of the possibility
+ * to give cell and model data since these are not supported by all
+ * UCD aware programs.
+ *
+ * The ASCII UCD format is used. In future versions, a binary version may
+ * follow up.
+ *
+ * Note that to enumerate the vertices, not the vertex index is used but
+ * the index of the degree of freedom located on this vertex. This makes
+ * the mapping between the vertices and the entries in the data vectors
+ * much easier.
+ *
+ *
+ * \subsection{GNUPLOT format}
+ *
+ * The GNUPLOT format is not able to handle data on unstructured grids
+ * directly. Directly would mean that you only give the vertices and
+ * the solution values thereon and the program constructs its own grid
+ * to represent the data. This is only possible for a structured tensor
+ * product grid in two dimensions.
+ *
+ * In one dimension, the format is obviously #x v1 v2 ...#, where #x#
+ * is the coordinate value of a grid point, while the #vi# are the
+ * vector elements referring to the present node. Within GNUPLOT,
+ * call #plot "filename" using 1:x#. #x# denotes the number of the data set you
+ * want to see plus one. For example #using 1:4# would mean to plot the
+ * third data vector.
+ *
+ * For more than one dimension, the #DataOut<dim>::write_gnuplot()# somehow
+ * duplicates the functionality of the #Triangulation<dim>::print_gnuplot()#
+ * functions. These, however, offer more functionality in some respect.
+ * The grid is represented as a sequence of lines, where each cell is
+ * a sequence of five vertices (the first one is appended to close the
+ * contour of the cell) with the data appended after each vertex. Each cell
+ * is therefore a sequence of five lines #x y v1 v2 ...# forming together
+ * the bounding line of this cell. After each cell, two newlines are inserted
+ * to prevent GNUPLOT from joining the lines bounding two cells.
+ *
+ * To view the results in two dimensions, use #set data style lines#
+ * within gnuplot and call #plot "filename"# to see the grid. Use
+ * #set parametric# and #splot "filename" using 1:2:x# to get a 3d surface
+ * plot of the (#x-2#)th data set. For example, using #x=4# would mean to
+ * plot the second data set.
+ */
 template <int dim>  
 class DataOut {
   public:

@@ -17,9 +17,9 @@ template <int dim> struct FiniteElementData;
 
 
 /**
-  Dimension dependent data for finite elements. See the #FiniteElementBase#
-  class for more information.
-  */
+ * Dimension dependent data for finite elements. See the #FiniteElementBase#
+ * class for more information.
+ */
 struct FiniteElementData<1> {
 				     /**
 				      * Number of degrees of freedom on
@@ -87,9 +87,9 @@ struct FiniteElementData<1> {
 
 
 /**
-  Dimension dependent data for finite elements. See the #FiniteElementBase#
-  class for more information.
-  */
+ * Dimension dependent data for finite elements. See the #FiniteElementBase#
+ * class for more information.
+ */
 struct FiniteElementData<2> {
 				     /**
 				      * Number of degrees of freedom on
@@ -169,23 +169,23 @@ struct FiniteElementData<2> {
 
 
 /**
-  Base class for finite elements in arbitrary dimensions. This class provides
-  several fields which describe a specific finite element and which are filled
-  by derived classes. It more or less only offers the fields and access
-  functions which makes it possible to copy finite elements without knowledge
-  of the actual type (linear, quadratic, etc).
-
-  The implementation of this base class is split into two parts: those fields
-  which are not common to all dimensions (#dofs_per_quad# for example are only
-  useful for #dim>=2#) are put into the #FiniteElementData<dim># class which
-  is explicitely specialized for all used dimensions, while those fields which
-  may be formulated in a dimension-independent way are put into the present
-  class.
-
-  The different matrices are initialized with the correct size, such that in
-  the derived (concrete) finite element classes, their entries must only be
-  filled in; no resizing is needed.
-  */
+ * Base class for finite elements in arbitrary dimensions. This class provides
+ * several fields which describe a specific finite element and which are filled
+ * by derived classes. It more or less only offers the fields and access
+ * functions which makes it possible to copy finite elements without knowledge
+ * of the actual type (linear, quadratic, etc).
+ *
+ * The implementation of this base class is split into two parts: those fields
+ * which are not common to all dimensions (#dofs_per_quad# for example are only
+ * useful for #dim>=2#) are put into the #FiniteElementData<dim># class which
+ * is explicitely specialized for all used dimensions, while those fields which
+ * may be formulated in a dimension-independent way are put into the present
+ * class.
+ *
+ * The different matrices are initialized with the correct size, such that in
+ * the derived (concrete) finite element classes, their entries must only be
+ * filled in; no resizing is needed.
+ */
 template <int dim>
 struct FiniteElementBase : public FiniteElementData<dim> {
   public:
@@ -333,54 +333,54 @@ struct FiniteElementBase : public FiniteElementData<dim> {
 
 
 /**
-  Finite Element in any dimension. This class declares the functionality
-  to fill the fields of the #FiniteElementBase# class. Since this is
-  something that depends on the actual finite element, the functions are
-  declared virtual if it is not possible to provide a reasonable standard
-  implementation.
-
-
-  \subsection{Finite Elements in one dimension}
-
-  Finite elements in one dimension need only set the #restriction# and
-  #prolongation# matrices in #FiniteElementBase<1>#. The constructor of
-  this class in one dimension presets the #interface_constraints# matrix
-  by the unit matrix with dimension one. Changing this behaviour in
-  derived classes is generally not a reasonable idea and you risk getting
-  in terrible trouble.
-  
-  
-  \subsection{Finite elements in two dimensions}
-  
-  In addition to the fields already present in 1D, a constraint matrix
-  is needed in case two quads meet at a common line of which one is refined
-  once more than the other one. Then there are constraints referring to the
-  hanging nodes on that side of the line which is refined. These constraints
-  are represented by a $n\times m$-matrix #line_constraints#, where $n$ is the
-  number of degrees of freedom on the refined side (those dofs on the middle
-  vertex plus those on the two lines), and $m$ is that of the unrefined side
-  (those dofs on the two vertices plus those on the line). The matrix is thus
-  a rectangular one.
-
-  The mapping of the dofs onto the indices of the matrix is as follows:
-  let $d_v$ be the number of dofs on a vertex, $d_l$ that on a line, then
-  $m=0...d_v-1$ refers to the dofs on vertex zero of the unrefined line,
-  $m=d_v...2d_v-1$ to those on vertex one,
-  $m=2d_v...2d_v+d_l-1$ to those on the line.
-
-  Similarly, $n=0...d_v-1$ refers to the dofs on the middle vertex
-  (vertex one of child line zero, vertex zero of child line one),
-  $n=d_v...d_v+d_l-1$ refers to the dofs on child line zero,
-  $n=d_v+d_l...d_v+2d_l-1$ refers to the dofs on child line one.
-  Please note that we do not need to reserve space for the dofs on the
-  end vertices of the refined lines, since these must be mapped one-to-one
-  to the appropriate dofs of the vertices of the unrefined line.
-
-  It should be noted that it is not possible to distribute a constrained
-  degree of freedom to other degrees of freedom which are themselves
-  constrained. Only one level of indirection is allowed. It is not known
-  at the time of this writing whether this is a constraint itself.
-  */
+ * Finite Element in any dimension. This class declares the functionality
+ * to fill the fields of the #FiniteElementBase# class. Since this is
+ * something that depends on the actual finite element, the functions are
+ * declared virtual if it is not possible to provide a reasonable standard
+ * implementation.
+ *
+ *
+ * \subsection{Finite Elements in one dimension}
+ *
+ * Finite elements in one dimension need only set the #restriction# and
+ * #prolongation# matrices in #FiniteElementBase<1>#. The constructor of
+ * this class in one dimension presets the #interface_constraints# matrix
+ * by the unit matrix with dimension one. Changing this behaviour in
+ * derived classes is generally not a reasonable idea and you risk getting
+ * in terrible trouble.
+ * 
+ * 
+ * \subsection{Finite elements in two dimensions}
+ * 
+ * In addition to the fields already present in 1D, a constraint matrix
+ * is needed in case two quads meet at a common line of which one is refined
+ * once more than the other one. Then there are constraints referring to the
+ * hanging nodes on that side of the line which is refined. These constraints
+ * are represented by a $n\times m$-matrix #line_constraints#, where $n$ is the
+ * number of degrees of freedom on the refined side (those dofs on the middle
+ * vertex plus those on the two lines), and $m$ is that of the unrefined side
+ * (those dofs on the two vertices plus those on the line). The matrix is thus
+ * a rectangular one.
+ *
+ * The mapping of the dofs onto the indices of the matrix is as follows:
+ * let $d_v$ be the number of dofs on a vertex, $d_l$ that on a line, then
+ * $m=0...d_v-1$ refers to the dofs on vertex zero of the unrefined line,
+ * $m=d_v...2d_v-1$ to those on vertex one,
+ * $m=2d_v...2d_v+d_l-1$ to those on the line.
+ *
+ * Similarly, $n=0...d_v-1$ refers to the dofs on the middle vertex
+ * (vertex one of child line zero, vertex zero of child line one),
+ * $n=d_v...d_v+d_l-1$ refers to the dofs on child line zero,
+ * $n=d_v+d_l...d_v+2d_l-1$ refers to the dofs on child line one.
+ * Please note that we do not need to reserve space for the dofs on the
+ * end vertices of the refined lines, since these must be mapped one-to-one
+ * to the appropriate dofs of the vertices of the unrefined line.
+ *
+ * It should be noted that it is not possible to distribute a constrained
+ * degree of freedom to other degrees of freedom which are themselves
+ * constrained. Only one level of indirection is allowed. It is not known
+ * at the time of this writing whether this is a constraint itself.
+ */
 template <int dim>
 class FiniteElement : public FiniteElementBase<dim> {
   public:

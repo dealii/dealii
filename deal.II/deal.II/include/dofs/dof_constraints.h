@@ -18,81 +18,81 @@ class dVector;
 
 
 /**
-  This class represents the matrix denoting the distribution of the degrees
-  of freedom of hanging nodes.
-
-  The matrix is organized in lines (rows), but only those lines are stored
-  where constraints are present. Lines where only one entry (identity) is
-  present are not stored if not explicitely inserted.
-
-  Constraint matrices are used to handle hanging nodes and other constrained
-  degrees of freedom. When building the global system matrix and the right
-  hand sides, you normally build them without taking care of the constraints,
-  purely on a topological base, i.e. by a loop over cells. In order to do
-  actual calculations, you have to 'condense' these matrices: eliminate
-  constrained degrees of freedom and distribute the appropriate values to
-  the unconstrained dofs. This changes the sparsity pattern of the sparse
-  matrices used in finite element calculations und is thus a quite expensive
-  operation.
-
-  Condensation is done in four steps: first the large matrix sparsity pattern
-  is created (e.g. using #DoFHandler::create_sparsity_pattern#), then the
-  sparsity pattern of the condensed matrix is made out of the large sparsity
-  pattern and the constraints. After that the global matrix is assembled and
-  finally condensed. To do these steps, you have (at least) two possibilities:
-  \begin{itemize}
-  \item Use two different sparsity patterns and two different matrices: you
-    may eliminate the lines and rows connected with a constraint and create
-    a totally new sparsity pattern and a new system matrix. This has the
-    advantage that the resulting system of equations is free from artifacts
-    of the condensation process and is therefore faster in the solution process
-    since no unnecessary multiplications occur (see below). However, there are
-    two major drawbacks: keeping two matrices at the same time can be quite
-    unacceptable in many cases, since these matrices may be several 10 or even
-    100 MB large. Secondly, the condensation process is quite expensive, since
-    {\it all} entries of the matrix have to be copied, not only those which are
-    subject to constraints.
-
-  \item Use only one sparsity pattern and one matrix: doing it this way, the
-    condense functions add nonzero entries to the sparsity pattern of the
-    large matrix (with constrained nodes in it) where the condensation process
-    of the matrix will create additional nonzero elements. In the condensation
-    process itself, lines and rows subject to constraints are distributed to
-    the lines and rows of unconstrained nodes. The constrained lines remain in
-    place, however, unlike in the first possibility described above. In order
-    not to disturb the solution process, these lines and rows are filled with
-    zeros and identity on the main diagonal; the appropriate value in the right
-    hand sides is set to zero. This way, the constrained node will always get
-    the value zero upon solution of the equation system and will not couple to
-    other nodes any more.
-
-    This method has the advantage that only one matrix and sparsity pattern is
-    needed thus using less memory. Additionally, the condensation process is
-    less expensive, since not all but only constrained values in the matrix
-    have to be copied. On the other hand, the solution process will take a bit
-    longer, since matrix vector multiplications will incur multiplications
-    with zeroes in the lines subject to constraints. Additionally, the vector
-    size is larger than in the first possibility, resulting in more memory
-    consumption for those iterative solution methods using a larger number of
-    auxiliary vectors (e.g. methods using explicite orthogonalization
-    procedures).
-  \end{verbatim}
-
-  Usually, the second way is chosen since memory consumption upon construction
-  of a second matrix rules out the first possibility.
-
-  This class provides two sets of #condense# functions: those taking two
-  arguments refer to the first possibility above, those taking only one do
-  their job in-place and refer to the second possibility.
-
-  Condensing vectors works exactly as described above for matrices.
-
-  After solving the condensed system of equations, the solution vector has to
-  be redistributed. This is done by the two #distribute# function, one working
-  with two vectors, one working in-place. The operation of distribution undoes
-  the condensation process in some sense, but it should be noted that it is not
-  the inverse operation.
-  */
+ * This class represents the matrix denoting the distribution of the degrees
+ * of freedom of hanging nodes.
+ *
+ * The matrix is organized in lines (rows), but only those lines are stored
+ * where constraints are present. Lines where only one entry (identity) is
+ * present are not stored if not explicitely inserted.
+ *
+ * Constraint matrices are used to handle hanging nodes and other constrained
+ * degrees of freedom. When building the global system matrix and the right
+ * hand sides, you normally build them without taking care of the constraints,
+ * purely on a topological base, i.e. by a loop over cells. In order to do
+ * actual calculations, you have to 'condense' these matrices: eliminate
+ * constrained degrees of freedom and distribute the appropriate values to
+ * the unconstrained dofs. This changes the sparsity pattern of the sparse
+ * matrices used in finite element calculations und is thus a quite expensive
+ * operation.
+ *
+ * Condensation is done in four steps: first the large matrix sparsity pattern
+ * is created (e.g. using #DoFHandler::create_sparsity_pattern#), then the
+ * sparsity pattern of the condensed matrix is made out of the large sparsity
+ * pattern and the constraints. After that the global matrix is assembled and
+ * finally condensed. To do these steps, you have (at least) two possibilities:
+ * \begin{itemize}
+ * \item Use two different sparsity patterns and two different matrices: you
+ *   may eliminate the lines and rows connected with a constraint and create
+ *   a totally new sparsity pattern and a new system matrix. This has the
+ *   advantage that the resulting system of equations is free from artifacts
+ *   of the condensation process and is therefore faster in the solution process
+ *   since no unnecessary multiplications occur (see below). However, there are
+ *   two major drawbacks: keeping two matrices at the same time can be quite
+ *   unacceptable in many cases, since these matrices may be several 10 or even
+ *   100 MB large. Secondly, the condensation process is quite expensive, since
+ *   {\it all} entries of the matrix have to be copied, not only those which are
+ *   subject to constraints.
+ *
+ * \item Use only one sparsity pattern and one matrix: doing it this way, the
+ *   condense functions add nonzero entries to the sparsity pattern of the
+ *   large matrix (with constrained nodes in it) where the condensation process
+ *   of the matrix will create additional nonzero elements. In the condensation
+ *   process itself, lines and rows subject to constraints are distributed to
+ *   the lines and rows of unconstrained nodes. The constrained lines remain in
+ *   place, however, unlike in the first possibility described above. In order
+ *   not to disturb the solution process, these lines and rows are filled with
+ *   zeros and identity on the main diagonal; the appropriate value in the right
+ *   hand sides is set to zero. This way, the constrained node will always get
+ *   the value zero upon solution of the equation system and will not couple to
+ *   other nodes any more.
+ *
+ *   This method has the advantage that only one matrix and sparsity pattern is
+ *   needed thus using less memory. Additionally, the condensation process is
+ *   less expensive, since not all but only constrained values in the matrix
+ *   have to be copied. On the other hand, the solution process will take a bit
+ *   longer, since matrix vector multiplications will incur multiplications
+ *   with zeroes in the lines subject to constraints. Additionally, the vector
+ *   size is larger than in the first possibility, resulting in more memory
+ *   consumption for those iterative solution methods using a larger number of
+ *   auxiliary vectors (e.g. methods using explicite orthogonalization
+ *   procedures).
+ * \end{verbatim}
+ *
+ * Usually, the second way is chosen since memory consumption upon construction
+ * of a second matrix rules out the first possibility.
+ *
+ * This class provides two sets of #condense# functions: those taking two
+ * arguments refer to the first possibility above, those taking only one do
+ * their job in-place and refer to the second possibility.
+ *
+ * Condensing vectors works exactly as described above for matrices.
+ *
+ * After solving the condensed system of equations, the solution vector has to
+ * be redistributed. This is done by the two #distribute# function, one working
+ * with two vectors, one working in-place. The operation of distribution undoes
+ * the condensation process in some sense, but it should be noted that it is not
+ * the inverse operation.
+ */
 class ConstraintMatrix {
   public:
 				     /**

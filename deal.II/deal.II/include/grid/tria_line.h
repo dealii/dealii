@@ -8,14 +8,14 @@
 
 
 /**
-    Lines denote the boundaries of quads and the edges of hexaeders. They are
-    characterized by the (global) indices of the endpoints.
-
-    A line itself has one index, as far as the topological part handled in
-    the triangulation is concerned: the index in the level
-    it belongs to. The level index is implicitely given by the position
-    in the #lines.lines# list attached to the information of each level.
-    */
+ *   Lines denote the boundaries of quads and the edges of hexaeders. They are
+ *   characterized by the (global) indices of the endpoints.
+ *
+ *   A line itself has one index, as far as the topological part handled in
+ *   the triangulation is concerned: the index in the level
+ *   it belongs to. The level index is implicitely given by the position
+ *   in the #lines.lines# list attached to the information of each level.
+ */
 class Line {
   public:
 				     /**

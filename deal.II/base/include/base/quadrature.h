@@ -11,20 +11,20 @@
 
 
 /**
-  Base class for quadrature formulae in arbitrary dimensions. This class
-  stores quadrature points and weights on the unit line [0,1], unit
-  square [0,1]x[0,1], etc. This information is used together with
-  objects of the \Ref{FiniteElement} class to compute the values stored
-  in the \Ref{FEValues} objects.
-
-  There are a number of derived classes, denoting concrete integration
-  formulae. These are named by a prefixed #Q#, the name of the formula
-  (e.g. #Gauss#) and finally the order of integration. For example,
-  #QGauss2<dim># denotes a second order Gauss integration formula in
-  any dimension. Second order means that it integrates polynomials of
-  third order exact. In general, a formula of order #n# exactly
-  integrates polynomials of order #2n-1#.
-*/
+ * Base class for quadrature formulae in arbitrary dimensions. This class
+ * stores quadrature points and weights on the unit line [0,1], unit
+ * square [0,1]x[0,1], etc. This information is used together with
+ * objects of the \Ref{FiniteElement} class to compute the values stored
+ * in the \Ref{FEValues} objects.
+ *
+ * There are a number of derived classes, denoting concrete integration
+ * formulae. These are named by a prefixed #Q#, the name of the formula
+ * (e.g. #Gauss#) and finally the order of integration. For example,
+ * #QGauss2<dim># denotes a second order Gauss integration formula in
+ * any dimension. Second order means that it integrates polynomials of
+ * third order exact. In general, a formula of order #n# exactly
+ * integrates polynomials of order #2n-1#.
+ */
 template <int dim>
 class Quadrature {
   public:
@@ -96,29 +96,29 @@ class Quadrature {
 
 
 /**
-   This class is a helper class to facilitate the usage of quadrature formulae
-   on faces or subfaces of cells. It computes the locations of quadrature
-   points on the unit cell from a quadrature object for a mannifold of
-   one dimension less than that of the cell and the number of the face.
-   For example, giving the Simpson rule in one dimension and using the
-   #project_to_face# function with face number 1, the returned points will
-   be $(1,0)$, $(1,0.5)$ and $(1,1)$. Note that faces have an orientation,
-   so when projecting to face 3, you will get $(0,0)$, $(0,0.5)$ and $(0,1)$,
-   which is in clockwise sense, while for face 1 the points were in
-   counterclockwise sense.
-
-   For the projection to subfaces (i.e. to the children of a face of the
-   unit cell), the same applies as above. Note the order in which the
-   children of a face are numbered, which in two dimensions coincides
-   with the orientation of the face.
-   
-   The different functions are grouped into a common class to avoid putting
-   them into global namespace (and to make documentation easier, since
-   presently the documentation tool can only handle classes, not global
-   functions). However, since they have no local data, all functions are
-   declared #static# and can be called without creating an object of this
-   class.
-*/
+ *  This class is a helper class to facilitate the usage of quadrature formulae
+ *  on faces or subfaces of cells. It computes the locations of quadrature
+ *  points on the unit cell from a quadrature object for a mannifold of
+ *  one dimension less than that of the cell and the number of the face.
+ *  For example, giving the Simpson rule in one dimension and using the
+ *  #project_to_face# function with face number 1, the returned points will
+ *  be $(1,0)$, $(1,0.5)$ and $(1,1)$. Note that faces have an orientation,
+ *  so when projecting to face 3, you will get $(0,0)$, $(0,0.5)$ and $(0,1)$,
+ *  which is in clockwise sense, while for face 1 the points were in
+ *  counterclockwise sense.
+ *
+ *  For the projection to subfaces (i.e. to the children of a face of the
+ *  unit cell), the same applies as above. Note the order in which the
+ *  children of a face are numbered, which in two dimensions coincides
+ *  with the orientation of the face.
+ *  
+ *  The different functions are grouped into a common class to avoid putting
+ *  them into global namespace (and to make documentation easier, since
+ *  presently the documentation tool can only handle classes, not global
+ *  functions). However, since they have no local data, all functions are
+ *  declared #static# and can be called without creating an object of this
+ *  class.
+ */
 template <int dim>
 class QProjector {
   public:

@@ -6,15 +6,15 @@
 
 
 /**
-  Provide a set of flags which tells the #FEValues<>::reinit# function, which
-  fields are to be updated for each cell. E.g. if you do not need the
-  gradients since you want to assemble the mass matrix, you can switch that
-  off. By default, all flags are off, i.e. no reinitialization will be done.
- 
-  A variable of this type has to be passed to the constructor of the
-  #FEValues# object. You can select more than one flag by concatenation
-  using the #|# (bitwise #or#) operator.
-  */
+ * Provide a set of flags which tells the #FEValues<>::reinit# function, which
+ * fields are to be updated for each cell. E.g. if you do not need the
+ * gradients since you want to assemble the mass matrix, you can switch that
+ * off. By default, all flags are off, i.e. no reinitialization will be done.
+ *
+ * A variable of this type has to be passed to the constructor of the
+ * #FEValues# object. You can select more than one flag by concatenation
+ * using the #|# (bitwise #or#) operator.
+ */
 enum UpdateFlags {
 				       /**
 					* Default: update nothing.

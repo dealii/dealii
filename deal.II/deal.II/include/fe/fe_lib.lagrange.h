@@ -10,18 +10,18 @@
 
 
 /**
-  Define a (bi-, tri-, etc)linear finite element in #dim# space dimensions,
-  along with (bi-, tri-)linear (therefore isoparametric) transforms from the
-  unit cell to the real cell.
-
-  The linear, isoparametric mapping from a point $\vec \xi$ on the unit cell
-  to a point $\vec x$ on the real cell is defined as
-  $$ \vec x(\vec \xi)  = \sum_j {\vec p_j} N_j(\xi) $$
-  where $\vec p_j$ is the vector to the $j$th corner point of the cell in
-  real space and $N_j(\vec \xi)$ is the value of the basis function associated
-  with the $j$th corner point, on the unit cell at point $\vec \xi$. The sum
-  over $j$ runs over all corner points.
-  */
+ * Define a (bi-, tri-, etc)linear finite element in #dim# space dimensions,
+ * along with (bi-, tri-)linear (therefore isoparametric) transforms from the
+ * unit cell to the real cell.
+ *
+ * The linear, isoparametric mapping from a point $\vec \xi$ on the unit cell
+ * to a point $\vec x$ on the real cell is defined as
+ * $$ \vec x(\vec \xi)  = \sum_j {\vec p_j} N_j(\xi) $$
+ * where $\vec p_j$ is the vector to the $j$th corner point of the cell in
+ * real space and $N_j(\vec \xi)$ is the value of the basis function associated
+ * with the $j$th corner point, on the unit cell at point $\vec \xi$. The sum
+ * over $j$ runs over all corner points.
+ */
 template <int dim>
 class FELinear : public FiniteElement<dim> {
   public:
@@ -146,10 +146,10 @@ class FELinear : public FiniteElement<dim> {
 
 
 /**
-  Define a (bi-, tri-, etc)quadratic finite element in #dim# space dimensions.
-  In one space dimension, a linear (subparametric) mapping from the unit cell
-  to the real cell is implemented.
-  */
+ * Define a (bi-, tri-, etc)quadratic finite element in #dim# space dimensions.
+ * In one space dimension, a linear (subparametric) mapping from the unit cell
+ * to the real cell is implemented.
+ */
 template <int dim>
 class FEQuadratic : public FiniteElement<dim> {
   public:
@@ -241,10 +241,10 @@ class FEQuadratic : public FiniteElement<dim> {
 
 
 /**
-  Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions.
-  In one space dimension, a linear (subparametric) mapping from the unit cell
-  to the real cell is implemented.
-  */
+ * Define a (bi-, tri-, etc)cubic finite element in #dim# space dimensions.
+ * In one space dimension, a linear (subparametric) mapping from the unit cell
+ * to the real cell is implemented.
+ */
 template <int dim>
 class FECubic : public FiniteElement<dim> {
   public:
