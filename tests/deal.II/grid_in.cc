@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,7 @@
 #include <base/logstream.h>
 
 #include <fstream>
-
+#include <string>
 
 std::ofstream logfile("grid_in.output");
 
@@ -36,7 +36,7 @@ void test1 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in.in");
+  std::ifstream in ("grid_in_2d.inp");
   gi.read_ucd (in);
   
   GridOut grid_out;
@@ -57,7 +57,7 @@ void test2 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in.in2");
+  std::ifstream in ("grid_in_2d.xda");
   gi.read_xda (in);
 
   int hash = 0;
@@ -70,6 +70,21 @@ void test2 ()
 }
 
 
+// void filename_resolution()
+// {
+//   Triangulation<2> tria;
+//   GridIn<2> gi;
+
+//   gi.attach_triangulation (tria);
+//   gi.read(std::string("grid_in_2d"), GridIn<2>::ucd);
+//   deallog << tria.n_vertices() << '\t' << tria.n_cells()
+// 	  << std::endl;
+//   gi.read(std::string("grid_in_2d"), GridIn<2>::xda);
+//   deallog << tria.n_vertices() << '\t' << tria.n_cells()
+// 	  << std::endl;
+// }
+
+
 int main ()
 {
   logfile.precision (2);
@@ -78,5 +93,7 @@ int main ()
 
   test1<2> ();
   test2<2> ();
+  
+//  filename_resolution();
 }
 
