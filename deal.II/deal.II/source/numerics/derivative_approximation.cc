@@ -110,6 +110,7 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
 };
 
 
+#if deal_II_dimension == 1
 
 template <>
 inline
@@ -120,7 +121,9 @@ derivative_norm (const Derivative &d)
   return fabs (d[0][0]);
 };
 
+#endif
 
+#if deal_II_dimension == 2
 
 template <>
 inline
@@ -145,6 +148,120 @@ derivative_norm (const Derivative &d)
 	      std::fabs (eigenvalues[1]));
 };
 
+#endif
+
+
+#if deal_II_dimension == 3
+
+template <>
+inline
+double
+DerivativeApproximation::SecondDerivative<3>::
+derivative_norm (const Derivative &d)
+{
+				   // compute the three eigenvalues of
+				   // the tensor @p{d} and take the
+				   // largest:
+  const double t1 = d[1][2]*d[1][2];
+  const double t2 = d[0][0]*t1;
+  const double t3 = d[0][1]*d[0][1];
+  const double t4 = t3*d[2][2];
+  const double t5 = d[0][2]*d[0][2];
+  const double t6 = t5*d[1][1];
+  const double t7 = d[0][0]*d[1][1];
+  const double t8 = t7*d[2][2];
+  const double t9 = d[0][1]*d[0][2];
+  const double t10 = t9*d[1][2];
+  const double t11 = t3*d[0][0];
+  const double t12 = t3*d[1][1];
+  const double t13 = d[0][0]*d[0][0];
+  const double t14 = t13*d[1][1];
+  const double t15 = d[1][1]*d[1][1];
+  const double t16 = d[0][0]*t15;
+  const double t17 = t13*d[2][2];
+  const double t19 = d[2][2]*d[2][2];
+  const double t24 = t5*d[2][2];
+  const double t25 = t1*d[2][2];
+  const double t27 = t13*d[0][0];
+  const double t28 = t19*d[2][2];
+  const double t29 = t15*d[1][1];
+  const double t30 = t1*t1;
+  const double t32 = d[1][1]*t28;
+  const double t35 = t15*t19;
+  const double t37 = t29*d[2][2];
+  const double t39 = t13*t15;
+  const double t41 = d[0][0]*d[2][2];
+  const double t43 = t19*t19;
+  const double t45 = t3*t1;
+  const double t47 = t3*t13;
+  const double t49 = t27*d[1][1];
+  const double t51 = t27*d[2][2];
+  const double t53 = t15*t15;
+  const double t57 = -3.0*t30*t15-6.0*t32*t5+6.0*t11*t29-6.0*t35*t5+24.0*t37*t5-6.0*t39*
+t5-24.0*t41*t30+6.0*t7*t43-6.0*t45*t15-24.0*t47*t15+24.0*t49*t1-6.0*t51*t15
+-12.0*t5*t53-36.0*t5*t30-3.0*t30*t19;
+  const double t59 = t13*t13;
+  const double t61 = t5*t5;
+  const double t64 = t3*t5;
+  const double t71 = d[0][0]*t29;
+  const double t78 = 24.0*t30*t13-12.0*t1*t59-3.0*t61*t19+6.0*t27*t28-6.0*t64*t13-60.0*
+t5*t13*t1-60.0*t64*t19-60.0*t45*t19-6.0*t39*t1+24.0*t71*t5-6.0*t49*t19-3.0*t13*
+t43+6.0*t29*t28-36.0*t61*t1-3.0*t61*t13;
+  const double t81 = t3*t3;
+  const double t82 = t81*d[0][0];
+  const double t95 = d[0][0]*t28;
+  const double t99 = 18.0*t39*t19-24.0*t82*d[2][2]-3.0*t59*t15+6.0*t27*t29+6.0*t59*d[1][1]*d[2][2]
+-6.0*t14*t28-6.0*t71*t19-6.0*t16*t28-3.0*t13*t53+24.0*t81*t19-36.0*t81*t5-3.0*
+t81*t13+6.0*t95*t5-6.0*t95*t1+30.0*t41*t61;
+  const double t105 = t13*t19;
+  const double t111 = d[1][1]*d[2][2];
+  const double t114 = t5*t1;
+  const double t119 = -3.0*t81*t15-12.0*t3*t43-6.0*t71*t1-24.0*t7*t61-24.0*t7*t30-6.0*
+t105*t1+24.0*t51*t1-24.0*t105*t5-6.0*t17*t29+6.0*t51*t5-24.0*t111*t61+30.0*t111
+*t30-6.0*t114*t19-60.0*t114*t15+6.0*t37*t1+6.0*t41*t114;
+  const double t140 = 30.0*t7*t1*t19+114.0*t7*t114+30.0*t7*t5*t19+30.0*t16*t25+30.0*t14*
+t24-60.0*t7*t3*t19+30.0*t16*t4-60.0*t14*t25+30.0*t14*t4-60.0*t16*t24+6.0*t12*
+t25-12.0*t81*t3+6.0*t11*t24+6.0*t12*t2+114.0*t4*t2;
+  const double t141 = t1*d[1][2];
+  const double t163 = -216.0*d[0][0]*t141*t9+6.0*t11*t6+114.0*t4*t6+24.0*t61*t15+6.0*t32*t1
+-3.0*t53*t19+6.0*d[0][0]*t53*d[2][2]-6.0*t49*t5-3.0*t15*t43-3.0*t59*t19-24.0*t81*d[1][1]*
+d[2][2]-36.0*t3*t30-36.0*t3*t61-36.0*t81*t1+24.0*t9*d[1][2]*t27+24.0*t9*d[1][2]*t28;
+  const double t169 = t5*d[0][2];
+  const double t170 = d[0][1]*t169;
+  const double t173 = d[1][2]*d[0][0];
+  const double t182 = d[1][2]*d[1][1];
+  const double t187 = d[1][2]*t13;
+  const double t191 = t3*d[0][1];
+  const double t192 = t191*d[0][2];
+  const double t198 = 24.0*t9*d[1][2]*t29+108.0*t9*t141*d[1][1]+108.0*t170*d[1][2]*d[2][2]+108.0*t170*
+t173+108.0*t9*t141*d[2][2]-36.0*t9*d[1][2]*t15*d[2][2]-36.0*t9*t173*t19-36.0*t9*t182*t19
+-36.0*t9*t173*t15-36.0*t9*t187*d[2][2]-60.0*t47*t1+108.0*t192*t182-36.0*t9*t187*d[1][1]
++108.0*t192*t173+144.0*t8*t10;
+  const double t209 = t3*t27;
+  const double t222 = -216.0*t169*d[1][1]*d[0][1]*d[1][2]-216.0*t191*d[2][2]*d[0][2]*d[1][2]-12.0*t30*t1-12.0*
+t61*t5+6.0*t111*t114-6.0*t47*t19+6.0*t209*d[1][1]-60.0*t64*t15+30.0*t82*d[1][1]-6.0*
+t209*d[2][2]-6.0*t3*t15*t19-24.0*t35*t1+24.0*t11*t28+24.0*t12*t28-6.0*t3*t29*d[2][2]+
+252.0*t64*t1;
+  const double t226 = sqrt(t57+t78+t99+t119+t140+t163+t198+t222);
+  const double t227 = -12.0*d[0][0]*t19-12.0*d[1][1]*t19-12.0*t15*d[2][2]+36.0*t5*d[0][0]+36.0*t24+36.0*
+t25+36.0*t1*d[1][1]+8.0*t27+8.0*t28+8.0*t29+12.0*t226;
+  const double t229 = pow(-72.0*t2-72.0*t4-72.0*t6+48.0*t8+216.0*t10+36.0*t11+36.0*t12
+-12.0*t14-12.0*t16-12.0*t17+t227,1.0/3.0);
+  const double t232 = (-t3/3+t7/9+t41/9+t111/9-t5/3-t1/3-t13/9-t19/9-t15/9)/t229;
+  const double t234 = sqrt(3.0);
+  const double t236 = t234*(t229/6+6.0*t232);
+
+  const double eigenvalues[3]
+  = { t229/6-6.0*t232+d[0][0]/3+d[2][2]/3+d[1][1]/3,
+      -t229/12+3.0*t232+d[0][0]/3+d[2][2]/3+d[1][1]/3+sqrt(-1.0)*t236/2,
+      -t229/12+3.0*t232+d[0][0]/3+d[2][2]/3+d[1][1]/3-sqrt(-1.0)*t236/2 };
+  
+  return std::max (std::fabs (eigenvalues[0]),
+		   std::max (std::fabs (eigenvalues[1]),
+			     std::fabs (eigenvalues[2])));
+};
+
+#endif
 
 
 template <int dim>
@@ -155,15 +272,17 @@ derivative_norm (const Derivative &)
 {
 				   // computing the spectral norm is
 				   // not so simple in general. it is
-				   // feasible for dim==3, since then
-				   // there are still closed form
-				   // expressions of the roots of the
-				   // third order characteristic
+				   // feasible for dim==3 as shown
+				   // above, since then there are
+				   // still closed form expressions of
+				   // the roots of the characteristic
 				   // polynomial, and they can easily
 				   // be computed using
 				   // maple. however, for higher
 				   // dimensions, some other method
-				   // needs to be employed.
+				   // needs to be employed. maybe some
+				   // steps of the power method would
+				   // suffice?
   Assert (false, ExcNotImplemented());
   return 0;
 };
