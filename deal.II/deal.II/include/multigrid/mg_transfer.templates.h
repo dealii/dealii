@@ -365,7 +365,7 @@ copy_to_mg (const MGDoFHandler<dim>        &mg_dof_handler,
 					   // into the level-wise one
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
-	      if (fe.system_to_component_index(i).first == selected)
+	      if (target_component[fe.system_to_component_index(i).first] == selected)
 		dst[level](level_dof_indices[i] - level_start)
 		  = src(global_dof_indices[i] - start);
 	    }
@@ -450,7 +450,7 @@ copy_from_mg (const MGDoFHandler<dim>              &mg_dof_handler,
 				       // copy level-wise data to
 				       // global vector
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	if (fe.system_to_component_index(i).first == selected)
+	if (target_component[fe.system_to_component_index(i).first] == selected)
 	  dst(global_dof_indices[i]-start)
 	    = src[level](level_dof_indices[i]-level_start);
     };
@@ -512,7 +512,7 @@ copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof_handler,
 				       // copy level-wise data to
 				       // global vector
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	if (fe.system_to_component_index(i).first == selected)
+	if (target_component[fe.system_to_component_index(i).first] == selected)
 	  dst(global_dof_indices[i]-start)
 	    += src[level](level_dof_indices[i]-level_start);
     };

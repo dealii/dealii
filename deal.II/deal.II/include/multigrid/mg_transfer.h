@@ -270,22 +270,27 @@ class MGTransferBlockBase
 				      * default, all matrices are
 				      * built.
 				      *
-				      * The last argument
-				      * @p{target_component} allows
-				      * grouping of components the
-				      * same way as in
-				      * @p{DoFRenumbering::component_wise}.
+				      * This function is only called
+				      * by derived classes. These can
+				      * also set the member variable
+				      * @p{target_component} for
+				      * re-ordering and grouping of
+				      * components.
 				      */
     template <int dim>
     void build_matrices (const MGDoFHandler<dim>& mg_dof,
-			 const std::vector<bool>& selected,
-			 const std::vector<unsigned int>& target_component);
+			 const std::vector<bool>& selected);
 
 				   /**
 				    * Flag of selected components.
 				    */
     std::vector<bool> selected;
 
+				     /**
+				      * Target component if renumbering is required.
+				      */
+    std::vector<unsigned int> target_component;
+    
 				   /**
 				    * Sizes of the multi-level vectors.
 				    */
@@ -372,13 +377,21 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * default, all matrices are
 				      * built.
 				      *
+				      * The last argument
+				      * @p{target_component} allows
+				      * grouping of components the
+				      * same way as in
+				      * @p{DoFRenumbering::component_wise}.
+				      * 
 				      * This function is a front-end
 				      * for the same function in
 				      * @ref{MGTransferBlockBase}.
 				      */
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
-			 std::vector<bool> selected = std::vector<bool>());
+			 std::vector<bool> selected = std::vector<bool>(),
+			 const std::vector<unsigned int>& target_component
+			 =std::vector<unsigned int>());
 
 				     /**
 				      * Prolongate a vector from level
@@ -543,22 +556,12 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     
 				     /**
 				      * Actually build the prolongation
-				      * matrices for each level.
-				      *
-				      * Select the component you want
-				      * to apply multigrid to.
-				      *
-				      * This function is a front-end
-				      * for the same function in
-				      * @ref{MGTransferBlockBase}.
-				      */
-    template <int dim>
-    void build_matrices (const MGDoFHandler<dim> &mg_dof,
-			 unsigned int selected);
-
-				     /**
-				      * Actually build the prolongation
 				      * matrices for grouped components.
+				      *
+				      * @p{selected} is the number of
+				      * the component for which the
+				      * transfer matrices should be
+				      * built.
 				      *
 				      * The argument
 				      * @p{target_component}
@@ -577,7 +580,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
 			 unsigned int selected,
-			 const std::vector<unsigned int>& target_component);
+			 const std::vector<unsigned int>& target_component
+			 = std::vector<unsigned int>());
 
 				     /**
 				      * Prolongate a vector from level

@@ -532,18 +532,12 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   if (symmetric && (steps2 % 2 == 0))
     T = false;
 //  cerr << 'S' << level;
+//  cerr << '(' << matrices[level]->m() << ',' << matrices[level]->n() << ')';
   
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
 	{
-					   // This is not really the
-					   // transposed smoother, but
-					   // just Gauss-Seidel with
-					   // reverse numbering.  For
-					   // a symmetric matrix, it
-					   // is the transpose,
-					   // though.
 //	  cerr << 'T';
 	  matrices[level].vmult(*r,u);
 	  r->sadd(-1.,1.,rhs);

@@ -30,9 +30,27 @@
 template <int dim>
 void MGTransferBlockBase::build_matrices (
   const MGDoFHandler<dim>& mg_dof,
-  const std::vector<bool>& select,
-  const std::vector<unsigned int>& /*target_component*/)
+  const std::vector<bool>& select)
 {
+  if (target_component.size() == 0)
+    {
+      target_component.resize(mg_dof.get_fe().n_components());
+      for (unsigned int i=0;i<target_component.size();++i)
+	target_component[i] = i;
+    } else {
+      Assert (target_component.size() == mg_dof.get_fe().n_components(),
+	      ExcDimensionMismatch(target_component.size(),
+				   mg_dof.get_fe().n_components()));
+//      unsigned int previous = 0;
+      for (unsigned int i=0;i<target_component.size();++i)
+	{
+	  Assert(i<target_component.size(),
+		 ExcIndexRange(i,0,target_component.size()));
+//	  Assert(previous<=i,ExcIndexRange(i,previous,previous+1));
+//	  Assert(i<=previous+1,ExcIndexRange(i,previous,previous+1));
+	}
+    }
+  
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;  
@@ -44,7 +62,7 @@ void MGTransferBlockBase::build_matrices (
 	  ExcDimensionMismatch(selected.size(), n_components))
 
   sizes.resize(n_levels);
-  MGTools::count_dofs_per_component(mg_dof, sizes);
+  MGTools::count_dofs_per_component(mg_dof, sizes, target_component);
   
 				   // reset the size of the array of
 				   // matrices. call resize(0) first,
@@ -158,9 +176,11 @@ void MGTransferBlockBase::build_matrices (
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (prolongation(i,j) != 0)
 		      {
-			const unsigned int icomp = fe.system_to_component_index(i).first;
-			const unsigned int jcomp = fe.system_to_component_index(j).first;
-			if ((icomp==jcomp) && selected[icomp])
+			const unsigned int icomp
+			  = fe.system_to_component_index(i).first;
+			const unsigned int jcomp
+			  = fe.system_to_component_index(j).first;
+			if ((icomp==jcomp) && selected[target_component[icomp]])
 			  prolongation_sparsities[level]->add(dof_indices_child[i],
 							      dof_indices_parent[j]);
 		      };
@@ -196,7 +216,7 @@ void MGTransferBlockBase::build_matrices (
 		      {
 			const unsigned int icomp = fe.system_to_component_index(i).first;
 			const unsigned int jcomp = fe.system_to_component_index(j).first;
-			if ((icomp==jcomp) && selected[icomp])
+			if ((icomp==jcomp) && selected[target_component[icomp]])
 			  prolongation_matrices[level]->set(dof_indices_child[i],
 							    dof_indices_parent[j],
 							    prolongation(i,j));
@@ -249,15 +269,15 @@ template <typename number>
 template <int dim>
 void MGTransferBlock<number>::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
-  std::vector<bool> select)
+  std::vector<bool> select,
+  const std::vector<unsigned int>& t_component)
 {
   if (select.size() == 0)
     select = std::vector<bool> (mg_dof.get_fe().n_components(), true);
-  std::vector<unsigned int> target_component(mg_dof.get_fe().n_components());
-  for (unsigned int i=0;i<target_component.size();++i)
-    target_component[i] = i;
-  
-  MGTransferBlockBase::build_matrices (mg_dof, select, target_component);
+
+  target_component = t_component;
+
+  MGTransferBlockBase::build_matrices (mg_dof, select);
 }
 
 
@@ -265,16 +285,24 @@ template <typename number>
 template <int dim>
 void MGTransferSelect<number>::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
-  unsigned int select)
+  unsigned int select,
+  const std::vector<unsigned int>& t_component)
 {
+  unsigned int ncomp = mg_dof.get_fe().n_components();
+  
   selected = select;
-  std::vector<bool> s(mg_dof.get_fe().n_components(), false);
+  std::vector<bool> s(ncomp, false);
   s[select] = true;
-  std::vector<unsigned int> target_component(mg_dof.get_fe().n_components());
-  for (unsigned int i=0;i<target_component.size();++i)
-    target_component[i] = i;
 
-  MGTransferBlockBase::build_matrices (mg_dof, s, target_component);
+  target_component = t_component;
+  if (target_component.size() == 0)
+    {
+      target_component.resize(ncomp);
+      for (unsigned int i=0;i<ncomp;++i)
+	target_component[i] = i;
+    }
+  
+  MGTransferBlockBase::build_matrices (mg_dof, s);
 }
 
 
@@ -284,22 +312,22 @@ void MGTransferSelect<number>::build_matrices (
 template
 void MGTransferBlock<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- std::vector<bool>);
+ std::vector<bool>, const std::vector<unsigned int>&);
 
 template
 void MGTransferSelect<float>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- unsigned int);
+ unsigned int, const std::vector<unsigned int>&);
 
 template
 void MGTransferBlock<double>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- std::vector<bool>);
+ std::vector<bool>, const std::vector<unsigned int>&);
 
 template
 void MGTransferSelect<double>::build_matrices<deal_II_dimension>
 (const MGDoFHandler<deal_II_dimension> &mg_dof,
- unsigned int);
+ unsigned int, const std::vector<unsigned int>&);
 
 
 template void

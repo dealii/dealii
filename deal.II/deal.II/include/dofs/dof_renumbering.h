@@ -317,7 +317,8 @@ class DoFRenumbering
     template <int dim>
     static void
     component_wise (DoFHandler<dim>                 &dof_handler,
-		    const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
+		    const std::vector<unsigned int> &target_component
+		    = std::vector<unsigned int>());
 
 				     /**
 				      * Sort the degrees of freedom by

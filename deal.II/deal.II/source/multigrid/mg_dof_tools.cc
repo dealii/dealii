@@ -320,7 +320,8 @@ MGTools::count_dofs_per_component (
   for (unsigned int l=0;l<nlevels;++l)
     {
       result[l].resize (n_components);
-      
+      fill (result[l].begin(),result[l].end(), 0U);
+  
 				       // special case for only one
 				       // component. treat this first
 				       // since it does not require any
@@ -356,7 +357,7 @@ MGTools::count_dofs_per_component (
 					   // next count what we got
 	  for (unsigned int i=0; i<n_components; ++i)
 	      result[l][target_component[i]]
-		= std::count(dofs_in_component[i].begin(),
+		+= std::count(dofs_in_component[i].begin(),
 			     dofs_in_component[i].end(),
 			     true);
 	  
