@@ -77,7 +77,18 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
 			 const dVector            &high,
 			 dVector                  &low)
 {
+  dVector cell_high(high_dof.get_fe().total_dofs);
+  dVector cell_low(low_dof.get_fe().total_dofs);
   
+  DoFHandler<dim>::active_cell_iterator h = high_dof.begin_active();
+  DoFHandler<dim>::active_cell_iterator l = low_dof.begin_active();
+  
+  for(; h != high_dof.end(); ++h, ++l)
+  {
+    h->get_dof_values(high, cell_high);
+    transfer.vmult(cell_low, cell_high);
+    l->distribute_local_to_global(cell_low, low);
+  }
 }
 
 #if deal_II_dimension == 1
