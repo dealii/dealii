@@ -15,6 +15,7 @@
 #include <base/logstream.h>
 
 #include <iostream>
+#include <algorithm>
 
 //TODO:[GK] Clean up open functions, reuse code!
 
