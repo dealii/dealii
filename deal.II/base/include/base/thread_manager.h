@@ -253,7 +253,21 @@
  * \end{verbatim}
  *
  * Note that in this example, there is no need for the #thread_entry#
- * function and the structure encapsulating parameters.
+ * function and the structure encapsulating parameters. Often,
+ * functions will not have a return value, i.e. their return type is
+ * #void#. In this case, the interface above would force us to declare
+ * them as returning a #void*# anyway. Therefore, this class also
+ * allows for functions without a return type; a Null pointer will
+ * then be returned to the caller.
+ *
+ * Usage is exactly as above, but that the #threaded_function# may
+ * also be a #void# function. This is done by a second constructor of
+ * the #Mem_Fun_Data# structures, where either a pointer to a #void#
+ * function or a pointer to a #void*# function is set. The other
+ * pointer is always set to zero. If the function returns no value,
+ * then the #thread_entry# function of this class returns a Null
+ * pointer instead.
+ *
  *
  * \subsection{Using this class on global functions}
  *
@@ -287,7 +301,7 @@
  *     thread_manager.wait ();
  *  };
  * \end{verbatim}
- * @author Wolfgang Bangerth, 1999
+ * @author Wolfgang Bangerth, 1999, 2000. Extensions by Thomas Richter, 2000
  */
 class ThreadManager : public ACE_Thread_Manager 
 {
@@ -313,11 +327,26 @@ class ThreadManager : public ACE_Thread_Manager
     struct Mem_Fun_Data1
     {
 					 /**
-					  * Convenience #typedef# for the
-					  * member functions data type.
+					  * Convenience #typedef# for
+					  * the member functions data
+					  * type. This is for member
+					  * functions that return a
+					  * #void *#, which is
+					  * returned to the caller.
 					  */
 	typedef void * (Class::*MemFun) (Arg);
 
+					 /**
+					  * Convenience #typedef# for
+					  * the member functions data
+					  * type. This is for member
+					  * functions without return
+					  * value. A #(void*)0# is
+					  * then returned to the
+					  * caller.
+					  */
+	typedef void (Class::*VoidMemFun) (Arg);
+	
 					 /**
 					  * Pointer to the object for which
 					  * the member function is to be
@@ -331,16 +360,47 @@ class ThreadManager : public ACE_Thread_Manager
 	Arg    arg;
 	
 					 /**
-					  * Pointer to the member function.
+					  * Pointer to the member
+					  * function if that returns a
+					  * #void*#. If the function
+					  * has no return value, then
+					  * this pointer is zero.
 					  */
-	MemFun mem_fun;
+	MemFun     mem_fun;
 
+					 /**
+					  * If the function has no
+					  * return value, then this
+					  * pointer is used. If the
+					  * function has a return
+					  * value, then this pointer
+					  * is zero.
+					  */
+	VoidMemFun void_mem_fun;
+
+					 /**
+					  * Constructor for functions
+					  * with a return value.
+					  */
 	Mem_Fun_Data1 (Class *object,
 		       Arg    arg,
 		       MemFun mem_fun) :
 			object (object),
 			arg (arg),
-			mem_fun (mem_fun) {};
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+
+					 /**
+					  * Constructor for functions
+					  * without a return value.
+					  */
+	Mem_Fun_Data1 (Class *object,
+		       Arg    arg,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			arg (arg),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
     };
 
 				     /**
@@ -358,10 +418,15 @@ class ThreadManager : public ACE_Thread_Manager
     struct Mem_Fun_Data2
     {
 	typedef void * (Class::*MemFun) (Arg1, Arg2);
-	Class *object;
-	Arg1   arg1;
-	Arg2   arg2;
-	MemFun mem_fun;
+
+	typedef void (Class::*VoidMemFun) (Arg1, Arg2);
+
+	Class     *object;
+	Arg1       arg1;
+	Arg2       arg2;
+
+	MemFun     mem_fun;
+	VoidMemFun void_mem_fun;
 
 	Mem_Fun_Data2 (Class *object,
 		       Arg1   arg1,
@@ -370,7 +435,18 @@ class ThreadManager : public ACE_Thread_Manager
 			object (object),
 			arg1 (arg1),
 			arg2 (arg2),
-			mem_fun (mem_fun) {};
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+
+	Mem_Fun_Data2 (Class     *object,
+		       Arg1       arg1,
+		       Arg2       arg2,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			arg1 (arg1),
+			arg2 (arg2),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
     };
 
 
@@ -389,11 +465,14 @@ class ThreadManager : public ACE_Thread_Manager
     struct Mem_Fun_Data3
     {
 	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3);
-	Class *object;
-	Arg1   arg1;
-	Arg2   arg2;
-	Arg3   arg3;
-	MemFun mem_fun;
+	typedef void   (Class::*VoidMemFun) (Arg1, Arg2, Arg3);
+
+	Class     *object;
+	Arg1       arg1;
+	Arg2       arg2;
+	Arg3       arg3;
+	MemFun     mem_fun;
+	VoidMemFun void_mem_fun;
 
 	Mem_Fun_Data3 (Class *object,
 		       Arg1   arg1,
@@ -404,7 +483,20 @@ class ThreadManager : public ACE_Thread_Manager
 			arg1 (arg1),
 			arg2 (arg2),
 			arg3 (arg3),
-			mem_fun (mem_fun) {};
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+
+	Mem_Fun_Data3 (Class     *object,
+		       Arg1       arg1,
+		       Arg2       arg2,
+		       Arg3       arg3,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			arg1 (arg1),
+			arg2 (arg2),
+			arg3 (arg3),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
     };
     
 
@@ -425,12 +517,15 @@ class ThreadManager : public ACE_Thread_Manager
     struct Mem_Fun_Data4
     {
 	typedef void * (Class::*MemFun) (Arg1, Arg2, Arg3, Arg4);
-	Class *object;
-	Arg1   arg1;
-	Arg2   arg2;
-	Arg3   arg3;
-	Arg4   arg4;
-	MemFun mem_fun;
+	typedef void   (Class::*VoidMemFun) (Arg1, Arg2, Arg3, Arg4);
+	
+	Class     *object;
+	Arg1       arg1;
+	Arg2       arg2;
+	Arg3       arg3;
+	Arg4       arg4;
+	MemFun     mem_fun;
+	VoidMemFun void_mem_fun;
 
 	Mem_Fun_Data4 (Class *object,
 		       Arg1   arg1,
@@ -443,7 +538,22 @@ class ThreadManager : public ACE_Thread_Manager
 			arg2 (arg2),
 			arg3 (arg3),
 			arg4 (arg4),
-			mem_fun (mem_fun) {};
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+	
+	Mem_Fun_Data4 (Class     *object,
+		       Arg1       arg1,
+		       Arg2       arg2,
+		       Arg3       arg3,
+		       Arg4       arg4,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			arg1 (arg1),
+			arg2 (arg2),
+			arg3 (arg3),
+			arg4 (arg4),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
     };
 
 				     /**
@@ -2122,7 +2232,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with one parameters.
 				      */
-    template < typename Arg1>
+    template <typename Arg1>
     static void * thread_entry_point_1 (void *_arg);
 
     				     /**
@@ -2132,7 +2242,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with two parameters.
 				      */
-    template < typename Arg1, typename Arg2>
+    template <typename Arg1, typename Arg2>
     static void * thread_entry_point_2 (void *_arg);
 
     				     /**
@@ -2142,7 +2252,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with three parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3>
     static void * thread_entry_point_3 (void *_arg);
 
@@ -2153,7 +2263,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with four parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4>
     static void * thread_entry_point_4 (void *_arg);
 
@@ -2164,7 +2274,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with five parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4,
       typename Arg5>
     static void * thread_entry_point_5 (void *_arg);
@@ -2176,7 +2286,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with six parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4,
       typename Arg5, typename Arg6>
     static void * thread_entry_point_6 (void *_arg);
@@ -2188,7 +2298,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with seven parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4,
       typename Arg5, typename Arg6,
       typename Arg7>
@@ -2201,7 +2311,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with eight parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4,
       typename Arg5, typename Arg6,
       typename Arg7, typename Arg8>
@@ -2214,7 +2324,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with nine parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4,
       typename Arg5, typename Arg6,
       typename Arg7, typename Arg8,
@@ -2228,7 +2338,7 @@ class ThreadManager : public ACE_Thread_Manager
 				      * information necessary to call a
 				      * member function with ten parameters.
 				      */
-    template < typename Arg1, typename Arg2,
+    template <typename Arg1, typename Arg2,
       typename Arg3, typename Arg4,
       typename Arg5, typename Arg6,
       typename Arg7, typename Arg8,
@@ -3304,7 +3414,13 @@ void * ThreadManager::thread_entry_point1 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->object->*(arg->mem_fun))(arg->arg);
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))(arg->arg);
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))(arg->arg);
+      return 0;
+    };
 };
 
 
@@ -3322,7 +3438,13 @@ void * ThreadManager::thread_entry_point2 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->object->*(arg->mem_fun))(arg->arg1, arg->arg2);
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))(arg->arg1, arg->arg2);
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))(arg->arg1, arg->arg2);
+      return 0;
+    };
 };
 
 
@@ -3340,9 +3462,17 @@ void * ThreadManager::thread_entry_point3 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->object->*(arg->mem_fun))(arg->arg1,
-					arg->arg2,
-					arg->arg3);
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3);
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3);
+      return 0;
+    };
 };
 
 
@@ -3360,10 +3490,19 @@ void * ThreadManager::thread_entry_point4 (void *_arg)
 				   // extract function pointer, object
 				   // and argument and dispatch the
 				   // call
-  return (arg->object->*(arg->mem_fun))(arg->arg1,
-					arg->arg2,
-					arg->arg3,
-					arg->arg4);
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3,
+					  arg->arg4);
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))(arg->arg1,
+					  arg->arg2,
+					  arg->arg3,
+					  arg->arg4);
+      return 0;
+    };
 };
 
 
