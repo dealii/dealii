@@ -1296,8 +1296,8 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                                                // defined on
               const unsigned int
                 opposite_faces[GeometryInfo<3>::lines_per_cell][2]
-                = { {1,4}, {1,5}, {1,2}, {1,3}, {0,4}, {1,5},
-                    {1,2}, {1,3}, {3,4}, {4,5}, {2,5}, {2,3}};
+                = { {1,4}, {1,5}, {1,2}, {1,3}, {0,4}, {0,5},
+                    {0,2}, {0,3}, {3,4}, {4,5}, {2,5}, {2,3}};
               
               return ((face_index != opposite_faces[shape_index][0])
                       &&
