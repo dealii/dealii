@@ -17,7 +17,6 @@
 #include <base/exceptions.h>
 #include <base/function.h>
 #include <base/multithread_info.h>
-#include <grid/forward_declarations.h>
 #include <dofs/dof_handler.h>
 #include <map>
 

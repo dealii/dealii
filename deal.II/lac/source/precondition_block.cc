@@ -29,6 +29,32 @@ template class PreconditionBlock<double, float>;
 template class PreconditionBlock<double, double>;
 
 
+/*--------------------- PreconditionBlockJacobi -----------------------*/
+
+
+// explicit instantiations for "float" PreconditionBlock
+template class PreconditionBlockJacobi<float, float>;
+
+template void PreconditionBlockJacobi<float, float>::operator() (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<float, float>::operator() (
+  Vector<double> &, const Vector<double> &) const;
+
+
+template class PreconditionBlockJacobi<double, float>;
+
+template void PreconditionBlockJacobi<double, float>::operator() (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<double, float>::operator() (
+  Vector<double> &, const Vector<double> &) const;
+
+template class PreconditionBlockJacobi<double, double>;
+
+template void PreconditionBlockJacobi<double, double>::operator() (
+  Vector<float> &, const Vector<float> &) const;
+template void PreconditionBlockJacobi<double, double>::operator() (
+  Vector<double> &, const Vector<double> &) const;
+
 /*--------------------- PreconditionBlockGaussSeidel -----------------------*/
 
 

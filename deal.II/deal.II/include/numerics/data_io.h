@@ -15,11 +15,12 @@
 
 
 #include <base/exceptions.h>
-#include <grid/forward_declarations.h>
-#include <lac/forward_declarations.h>
 #include <vector>
 #include <string>
 
+template <typename number> class Vector;
+template <int dim> class DoFHandler;
+class EpsOutputData;
 
 /**
  * This class is deprecated. Use the #DataOut# class instead.

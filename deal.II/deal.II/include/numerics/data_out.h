@@ -14,12 +14,11 @@
 #define __deal2__data_out_h
 
 
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <base/data_out_base.h>
 #include <base/multithread_info.h>
 
 
+template <int dim> class DoFHandler;
 
 /**
  * This is an abstract class which provides the functionality to generate

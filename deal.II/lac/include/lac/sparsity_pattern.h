@@ -16,7 +16,8 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <lac/forward_declarations.h>
+
+template <typename number> class SparseMatrix;
 
 #include <vector>
 

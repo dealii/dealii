@@ -72,6 +72,7 @@ int main()
 //  logfile.setf(ios::fixed);
 //  logfile.precision (3);
   deallog.attach(logfile);
+  deallog.log_execution_time(true);
 //  deallog.depth_console(0);
 
   Helmholtz equation;
@@ -82,7 +83,7 @@ int main()
   FEQ2<2> fe2;
   FEQ3<2> fe3;
   FEQ4<2> fe4;
-  for (unsigned int degree=1;degree<=4;degree++)
+  for (unsigned int degree=1;degree<=3;degree++)
     {
       Triangulation<2> tr;
       MGDoFHandler<2> mgdof(tr);
@@ -104,12 +105,12 @@ int main()
       cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
-      tr.refine_global(2);
+      tr.refine_global(1);
       dof.distribute_dofs(*fe);
       const unsigned int size = dof.n_dofs();
       deallog << "DoFs " << size << endl;
       deallog << "Levels: " << tr.n_levels() << endl;
-      for (unsigned int step=14;step < 15; ++step)
+      for (unsigned int step=1;step < 3; ++step)
 	{
 	  deallog << "smoothing-steps" << step << endl;
 	  SparsityPattern structure(size, dof.max_couplings_between_dofs());
@@ -143,7 +144,8 @@ int main()
 	  Vector<double> u;
 	  u.reinit(f);
 	  PrimitiveVectorMemory<> mem;
-	  SolverControl control(20, 1.e-8, true);
+
+	  SolverControl control(20, 1.e-12, true);
 	  SolverCG<> solver(control, mem);
 	  
 	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);

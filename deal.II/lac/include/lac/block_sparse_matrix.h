@@ -17,7 +17,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 
-
+template <int n_blocks, typename Number> class BlockVector;
 
 /**
  * Blocked sparse matrix. The behaviour of objects of this type is

@@ -24,6 +24,8 @@
 #include <map>
 #include <string>
 
+template <int dim> class DataOut;
+
 
 /**
  * The use of this class is now deprecated!

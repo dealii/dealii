@@ -14,7 +14,6 @@
 #define __deal2__eigen_h
 
 
-#include <lac/forward_declarations.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/solver_cg.h>

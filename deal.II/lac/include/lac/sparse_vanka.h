@@ -19,11 +19,13 @@
 
 #include <base/smartpointer.h>
 #include <base/multithread_info.h>
-#include <lac/forward_declarations.h>
 
 #include <vector>
 #include <map>
 
+template <typename number> class FullMatrix;
+template <typename number> class SparseMatrix;
+template <typename number> class Vector;
 
 /**
  * Point-wise Vanka preconditioning.

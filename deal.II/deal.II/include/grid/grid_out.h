@@ -14,10 +14,10 @@
 #define __deal2__grid_out_h
 
 
-#include <grid/forward_declarations.h>
 #include <base/exceptions.h>
 #include <string>
 
+template <int dim> class Triangulation;
 
 /**
  * This class provides a means to output a triangulation to a file in different

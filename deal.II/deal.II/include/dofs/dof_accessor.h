@@ -18,9 +18,13 @@
 
 
 #include <grid/tria_accessor.h>
-#include <lac/forward_declarations.h>
 #include <vector>
 
+template <typename number> class FullMatrix;
+template <typename number> class SparseMatrix;
+template <typename number> class Vector;
+
+template <int dim> class DoFHandler;
 
 // note: in non-debug mode, i.e. with optimizations, the file
 // dof_accessor.templates.h is included at the end of this file.

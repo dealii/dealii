@@ -22,6 +22,7 @@
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
 
+template<typename number> class Vector;
 
 /**
  * Sparse matrix.

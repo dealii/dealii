@@ -25,7 +25,6 @@
 #include <lac/vector_memory.h>
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
-#include <lac/forward_declarations.h>
 
 
 /**

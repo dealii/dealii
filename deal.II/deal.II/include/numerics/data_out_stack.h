@@ -15,13 +15,12 @@
 
 
 #include <base/data_out_base.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <base/smartpointer.h>
 
 #include <string>
 #include <vector>
 
+template <int dim> class DoFHandler;
 
 /**
  * This class is used to stack the output from several computations

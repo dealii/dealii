@@ -16,11 +16,11 @@
 
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
-#include <grid/forward_declarations.h>
 #include <iostream>
 #include <vector>
 #include <string>
 
+template <int dim> class Triangulation;
 
 /**
  * This class implements an input mechanism for grid data. It allows to

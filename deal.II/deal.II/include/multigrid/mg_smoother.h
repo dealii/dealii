@@ -16,10 +16,10 @@
 
 #include <lac/forward_declarations.h>
 #include <multigrid/mg_base.h>
-#include <grid/forward_declarations.h>
 #include <base/smartpointer.h>
 #include <vector>
 
+template <int dim> class MGDoFHandler;
 
 /**
  * Abstract base class for multigrid smoothers.

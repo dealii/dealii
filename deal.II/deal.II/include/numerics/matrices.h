@@ -17,6 +17,16 @@
 #include <base/exceptions.h>
 #include <map>
 
+template <int dim> class Quadrature;
+
+template<typename number> class Vector;
+template<typename number> class FullMatrix;
+template<typename number> class SparseMatrix;
+
+template <typename number, int rows, int columns  >  class BlockSparseMatrix;
+template <int n_blocks, typename Number> class BlockVector;
+template <int dim> class FEValues;
+template <int dim> class Equation;
 
 /**
  * Provide a class which assembles certain standard matrices for a given

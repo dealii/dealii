@@ -15,12 +15,20 @@
 
 
 #include <vector>
-#include <grid/forward_declarations.h>
-#include <lac/forward_declarations.h>
-#include <base/forward_declarations.h>
 #include <base/point.h>
 #include <grid/geometry_info.h>
 #include <base/subscriptor.h>
+
+template <int dim> class Boundary;
+template <int dim> class StraightBoundary;
+template <int dim> class CellAccessor;
+template<int celldim, int dim> class TriaObjectAccessor;
+template <int dim, typename Accessor> class TriaRawIterator;
+template <int dim, typename Accessor> class TriaIterator;
+template <int dim, typename Accessor> class TriaActiveIterator;
+template <int dim> class TriangulationLevel;
+template <int dim> class DoFHandler;
+template <int dim> class MGDoFHandler;
 
 /*------------------------------------------------------------------------*/
 

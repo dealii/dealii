@@ -19,11 +19,18 @@
 #include <vector>
 #include <map>
 #include <base/exceptions.h>
-#include <base/forward_declarations.h>
 #include <base/smartpointer.h>
-#include <grid/forward_declarations.h>
-#include <lac/forward_declarations.h>
 
+template <int dim> class Function;
+
+template <int dim> class DoFCellAccessor;
+template <int dim> class DoFLevel;
+template<int celldim, int dim> class DoFObjectAccessor;
+template <int dim> class FiniteElement;
+template <int dim, typename Accessor> class TriaRawIterator;
+template <int dim, typename Accessor> class TriaIterator;
+template <int dim, typename Accessor> class TriaActiveIterator;
+template <int dim> class Triangulation;
 
 /**
  * Define some types which differ between the dimensions. This class

@@ -18,10 +18,10 @@
 
 
 #include <base/exceptions.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <vector>
 
+template <int dim> class MGDoFHandler;
+template <template <int> class GridClass, int dim> class InterGridMap;
 
 /**
  * This is a collection of functions operating on, and manipulating

@@ -13,8 +13,9 @@
 #ifndef __deal2__solver_h
 #define __deal2__solver_h
 
-
-#include <lac/forward_declarations.h>
+template<typename number> class Vector;
+template<class VECTOR>  class VectorMemory;
+class SolverControl;
 
 
 /**

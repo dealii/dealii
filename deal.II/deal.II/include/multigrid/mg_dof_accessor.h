@@ -16,6 +16,7 @@
 
 #include <dofs/dof_accessor.h>
 
+template <int dim> class MGDoFHandler;
 
 /**
  * Define the basis for accessors to the degrees of freedom for

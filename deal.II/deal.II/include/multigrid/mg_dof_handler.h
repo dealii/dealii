@@ -19,6 +19,8 @@
 
 #include <dofs/dof_handler.h>
 
+template <int dim> class MGDoFCellAccessor;
+template <int celldim, int dim> class MGDoFObjectAccessor;
 
 /**
  * Define some types which differ between the dimensions. This class

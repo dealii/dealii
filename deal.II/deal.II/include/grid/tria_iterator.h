@@ -22,8 +22,8 @@
 #include <base/exceptions.h>
 #include <base/point.h>
 #include <grid/tria_iterator_base.h>
-#include <grid/forward_declarations.h>
 
+template <int dim> class Triangulation;
 
 // note: in non-debug mode, i.e. with optimizations, the file
 // tria_iterator.templates.h is included at the end of this file.

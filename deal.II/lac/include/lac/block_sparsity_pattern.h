@@ -16,7 +16,6 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <lac/forward_declarations.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_indices.h>
 

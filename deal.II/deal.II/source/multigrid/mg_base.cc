@@ -53,18 +53,21 @@ MGBase::level_mgstep(const unsigned int        level,
 		     const MGSmootherBase     &post_smooth,
 		     const MGCoarseGridSolver &coarse_grid_solver)
 {
+#ifdef MG_DEBUG
   char *name = new char[100];
-
   sprintf(name, "MG%d-defect",level);
   print_vector(level, defect[level], name);
-  
+#endif
+
   solution[level] = 0.;
   
   if (level == minlevel)
     {
       coarse_grid_solver(level, solution[level], defect[level]);
+#ifdef MG_DEBUG
       sprintf(name, "MG%d-solution",level);
       print_vector(level, solution[level], name);
+#endif
       return;
     }
 
@@ -72,8 +75,10 @@ MGBase::level_mgstep(const unsigned int        level,
   pre_smooth.smooth(level, solution[level], defect[level]);
 				   // t = d-As
 
+#ifdef MG_DEBUG
   sprintf(name, "MG%d-pre",level);
   print_vector(level, solution[level], name);
+#endif
   
   t.reinit(solution[level].size());
   level_vmult(level, t, solution[level], defect[level]);
@@ -96,8 +101,10 @@ MGBase::level_mgstep(const unsigned int        level,
 
   transfer->prolongate(level, t, solution[level-1]);
 
+#ifdef MG_DEBUG
   sprintf(name, "MG%d-cgc",level);
   print_vector(level, t, name);
+#endif
 
   solution[level] += t;
   
@@ -105,10 +112,12 @@ MGBase::level_mgstep(const unsigned int        level,
 
   post_smooth.smooth(level, solution[level], defect[level]);
 
+#ifdef MG_DEBUG
   sprintf(name, "MG%d-post",level);
   print_vector(level, solution[level], name);
 
   delete[] name;
+#endif
 }
 
 

@@ -23,6 +23,8 @@
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
 
+template <int dim> class Quadrature;
+
 
 /**
  *  This class offers a multitude of arrays and other fields which are used by

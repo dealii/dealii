@@ -124,6 +124,71 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 }
 
 
+/*--------------------- PreconditionBlockJacobi -----------------------*/
+
+
+template <typename number, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<number,inverse_type>
+::operator() (Vector<number2>       &dst,
+	      const Vector<number2> &src) const
+{
+  Assert(A!=0, ExcNoMatrixGivenToUse());
+  const SparseMatrix<number> &M=*A;
+  Assert (M.m() == M.n(), ExcMatrixNotSquare());
+  Assert (blocksize!=0, ExcBlockSizeNotSet());
+  Assert (M.m()%blocksize==0, ExcWrongBlockSize(blocksize, M.m()));
+  const unsigned int n_cells=M.m()/blocksize;
+  Assert (inverse.size()==0 || inverse.size()==n_cells,
+	  ExcWrongNumberOfInverses(inverse.size(), n_cells));
+
+  Vector<number2> b_cell(blocksize), x_cell(blocksize);
+
+				       // cell_row, cell_column are the
+				       // numbering of the blocks (cells).
+				       // row_cell, column_cell are the local
+				       // numbering of the unknowns in the
+				       // blocks.
+				       // row, column are the global numbering
+				       // of the unkowns.
+  unsigned int row, row_cell, begin_diag_block=0;
+
+  if (inverse.size()==0)
+    {
+      FullMatrix<number> M_cell(blocksize);
+      for (unsigned int cell=0; cell<n_cells; ++cell)
+	{
+	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	    {
+	      b_cell(row_cell)=src(row);
+	      for (unsigned int column_cell=0, column=cell*blocksize;
+		   column_cell<blocksize; ++column_cell, ++column)
+		M_cell(row_cell,column_cell)=M(row,column);
+	    }
+	  M_cell.householder(b_cell);
+	  M_cell.backward(x_cell,b_cell);
+					   // distribute x_cell to dst
+	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	    dst(row)=x_cell(row_cell);
+	  
+	  begin_diag_block+=blocksize;
+	}
+    }
+  else
+    for (unsigned int cell=0; cell<n_cells; ++cell)
+      {
+	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  {
+	    b_cell(row_cell)=src(row);
+	  }
+	inverse[cell].vmult(x_cell, b_cell);
+					 // distribute x_cell to dst
+	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  dst(row)=x_cell(row_cell);
+	
+	begin_diag_block+=blocksize;
+      }
+}
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
 template<typename number, typename inverse_type>

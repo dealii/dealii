@@ -15,9 +15,17 @@
 
 
 #include <base/exceptions.h>
-#include <base/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <grid/tria_iterator_base.h>
+
+template <int dim> class Point;
+
+template <int dim> class Triangulation;
+template <int dim, typename Accessor> class TriaRawIterator;
+template <int dim, typename Accessor> class TriaIterator;
+template <int dim, typename Accessor> class TriaActiveIterator;
+class Line;
+class Quad;
+class Hexahedron;
 
 
 // note: in non-debug mode, i.e. with optimizations, the file
@@ -64,7 +72,6 @@ class TriaAccessor
 		    present_level (level),
 		    present_index (index),
 		    tria (parent) {};
-
 
 				     /**
 				      *  Copy operator. Since this is only

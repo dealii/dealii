@@ -15,7 +15,6 @@
 
 
 #include <base/exceptions.h>
-#include <grid/forward_declarations.h>
 
 
 /**

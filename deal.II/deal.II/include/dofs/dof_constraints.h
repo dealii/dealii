@@ -18,8 +18,12 @@
 #include <utility>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <lac/forward_declarations.h>
 
+class SparsityPattern;
+template <int rows, int columns> class BlockSparsityPattern;
+template <typename number> class SparseMatrix;
+template <typename number, int rows, int columns> class BlockSparseMatrix;
+template <int n_blocks> class BlockIndices;
 
 /**
  * This class represents the matrix denoting the distribution of the degrees

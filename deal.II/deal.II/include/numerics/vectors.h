@@ -14,12 +14,18 @@
 #define __deal2__vectors_h
 
 
-#include <base/forward_declarations.h>
 #include <base/exceptions.h>
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <map>
 #include <vector>
+
+template <int dim> class Function;
+template <int dim> class Quadrature;
+template <int dim> class QGauss2;
+
+template <typename number> class Vector;
+template <typename number> class FullMatrix;
+template <int dim> class DoFHandler;
+class ConstraintMatrix;
 
 
 /**

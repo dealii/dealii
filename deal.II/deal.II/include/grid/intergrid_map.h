@@ -13,6 +13,7 @@
 #ifndef __deal2__intergrid_map_h
 #define __deal2__intergrid_map_h
 
+template <class T> class SmartPointer;
 
 /**
  * This class provides a map between two grids which are derived from

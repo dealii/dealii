@@ -14,9 +14,10 @@
 #define __deal2__grid_generator_h
 
 
-#include <base/forward_declarations.h>
-#include <grid/forward_declarations.h>
 #include <base/exceptions.h>
+
+template <int dim> class Point;
+template <int dim> class Triangulation;
 
 
 /**

@@ -14,9 +14,6 @@
 #define __deal2__mg_dof_tools_h
 
 
-#include <lac/forward_declarations.h>
-#include <grid/forward_declarations.h>
-
 //TODO: Consider incorporating these functions in DoFTools
 
 /**

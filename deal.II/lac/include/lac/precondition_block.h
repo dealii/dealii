@@ -14,12 +14,15 @@
 #define __deal2__precondition_block_h
 
 
-#include <lac/forward_declarations.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 
 #include <vector>
+
+template <typename number> class FullMatrix;
+template <typename number> class SparseMatrix;
+template <typename number> class Vector;
 
 
 /**
@@ -210,6 +213,33 @@ class PreconditionBlock: public Subscriptor
 				      * derived classes.
 				      */
     SmartPointer<const SparseMatrix<number> > A;
+};
+
+
+/**
+ * Block Jacobi preconditioning.
+ */
+template<typename number,
+         typename inverse_type = number>
+class PreconditionBlockJacobi : public PreconditionBlock<number,inverse_type>
+{
+  public:
+				     /**
+				      * Execute block Jacobi preconditioning.
+				      * Make sure that the right
+				      * block size
+				      * of the matrix is set by
+				      * #set_block_size#
+				      * before calling this function.
+				      *
+				      * This function will automatically use the
+				      * inverse matrices if they exist, if not
+				      * then BlockJacobi will need much time
+				      * inverting the diagonal block
+				      * matrices in each preconditioning step.
+				      */
+    template <typename number2>
+    void operator() (Vector<number2>&, const Vector<number2>&) const;
 };
 
 

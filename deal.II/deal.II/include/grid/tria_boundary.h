@@ -19,8 +19,8 @@
 #include <base/point.h>
 #include <base/subscriptor.h>
 #include <grid/geometry_info.h>
-#include <grid/forward_declarations.h>
 
+template <int dim> class Triangulation;
 
 /**
  *   This class is used to represent a boundary to a triangulation.
