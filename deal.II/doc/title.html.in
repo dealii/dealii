@@ -11,14 +11,8 @@
 
 <!-- Page Body -->
 <body style="background-image:url(pictures/title-background.jpg);">
-  <h1 class="head">The Homepage of deal.II $Name$</h1>
+  <h1 class="head">deal.II Documentation $Name$</h1>
 </body>
 </html>
-
-
-
-
-
-
 
 
