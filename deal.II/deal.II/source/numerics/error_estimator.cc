@@ -921,6 +921,13 @@ integrate_over_regular_face (Data                       &data,
 	for (unsigned int p=0; p<n_q_points; ++p)
 	  face_integral[n] += ::sqr(data.phi[n][p][component]) *
 			      data.JxW_values[p];
+
+				   // double check that the element
+				   // already exists and that it was
+				   // not already written to
+  Assert (data.face_integrals.find (face) != data.face_integrals.end(),
+	  ExcInternalError());
+  Assert (data.face_integrals[face][0] < 0, ExcInternalError());
   
   data.face_integrals[face] = face_integral;
 };
