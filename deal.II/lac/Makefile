@@ -33,8 +33,15 @@ lib/o/%.o :
 
 
 # rules
-lib: lib/liblac.g.a lib/liblac.a
-libg: lib/liblac.g.a
+ifeq ($(enable-shared),yes)
+  lib: lib/liblac.g.so lib/liblac.so
+  libg: lib/liblac.g.so
+else
+  lib: lib/liblac.g.a lib/liblac.a
+  libg: lib/liblac.g.a
+endif
+
+
 
 lib/liblac.a: $(forward-declarations) $(o-files)
 	@echo =====lac==============optimized===== Updating library:   $@
@@ -43,6 +50,16 @@ lib/liblac.a: $(forward-declarations) $(o-files)
 lib/liblac.g.a: $(forward-declarations) $(go-files)
 	@echo =====lac==============debug========= Updating library:   $@
 	@ar ruv $@ $(go-files)
+
+
+lib/liblac.so: $(forward-declarations) $(o-files)
+	@echo =====lac==============optimized===== Updating library:   $@
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
+
+lib/liblac.g.so: $(forward-declarations) $(go-files)
+	@echo =====lac==============debug========= Updating library:   $@
+	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
+
 
 
 clean:

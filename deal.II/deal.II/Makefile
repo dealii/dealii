@@ -9,12 +9,21 @@ D=..
 # top level targets
 default: 2dg 2d
 
-1dg: lib/libdeal_II_1d.g.a 
-1d : lib/libdeal_II_1d.a
-2dg: lib/libdeal_II_2d.g.a 
-2d : lib/libdeal_II_2d.a
-3dg: lib/libdeal_II_3d.g.a 
-3d : lib/libdeal_II_3d.a
+ifeq ($(enable-shared),yes)
+  1dg: lib/libdeal_II_1d.g.so
+  1d : lib/libdeal_II_1d.so
+  2dg: lib/libdeal_II_2d.g.so 
+  2d : lib/libdeal_II_2d.so
+  3dg: lib/libdeal_II_3d.g.so 
+  3d : lib/libdeal_II_3d.so
+else
+  1dg: lib/libdeal_II_1d.g.so
+  1d : lib/libdeal_II_1d.so
+  2dg: lib/libdeal_II_2d.g.so
+  2d : lib/libdeal_II_2d.so
+  3dg: lib/libdeal_II_3d.g.so 
+  3d : lib/libdeal_II_3d.so
+endif
 
 
 # create lists of file names. note that we need several output
@@ -85,6 +94,7 @@ lib/libdeal_II_1d.a: $(o-files-1d)
 	@echo =====deal.II====1d====optimized===== Updating library:   $(@F)
 	@ar ruv $@ $(o-files-1d)
 
+
 lib/libdeal_II_2d.g.a: $(go-files-2d)
 	@echo =====deal.II====2d====debug========= Updating library:   $(@F)
 	@ar ruv $@ $(go-files-2d)
@@ -92,12 +102,42 @@ lib/libdeal_II_2d.a: $(o-files-2d)
 	@echo =====deal.II====2d====optimized===== Updating library:   $(@F)
 	@ar ruv $@ $(o-files-2d)
 
+
 lib/libdeal_II_3d.g.a: $(go-files-3d)
 	@echo =====deal.II====3d====debug========= Updating library:   $(@F)
 	@ar ruv $@ $(go-files-3d)
 lib/libdeal_II_3d.a: $(o-files-3d)
 	@echo =====deal.II====3d====optimized===== Updating library:   $(@F)
 	@ar ruv $@ $(o-files-3d)
+
+
+lib/libdeal_II_1d.g.so: $(go-files-1d)
+	@echo =====deal.II====1d====debug========= Updating library:   $(@F)
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-1d)
+
+lib/libdeal_II_1d.so: $(o-files-1d)
+	@echo =====deal.II====1d====optimized===== Updating library:   $(@F)
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-1d)
+
+
+lib/libdeal_II_2d.g.so: $(go-files-2d)
+	@echo =====deal.II====2d====debug========= Updating library:   $(@F)
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-2d)
+
+lib/libdeal_II_2d.so: $(o-files-2d)
+	@echo =====deal.II====2d====optimized===== Updating library:   $(@F)
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-2d)
+
+
+lib/libdeal_II_3d.g.so: $(go-files-3d)
+	@echo =====deal.II====3d====debug========= Updating library:   $(@F)
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-3d)
+
+lib/libdeal_II_3d.so: $(o-files-3d)
+	@echo =====deal.II====3d====optimized===== Updating library:   $(@F)
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-3d)
+
+
 
 
 

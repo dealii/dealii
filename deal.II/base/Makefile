@@ -60,8 +60,14 @@ lib/o/%.o :
 
 
 # rules
-lib: lib/libbase.g.a lib/libbase.a
-libg: lib/libbase.g.a
+ifeq ($(enable-shared),yes)
+  lib: lib/libbase.g.so lib/libbase.so
+  libg: lib/libbase.g.so
+else
+  lib: lib/libbase.g.a lib/libbase.a
+  libg: lib/libbase.g.a
+endif
+
 
 lib/libbase.a: $(forward-declarations) $(o-files)
 	@echo =====base=============debug========= Updating library:   $@
@@ -70,6 +76,17 @@ lib/libbase.a: $(forward-declarations) $(o-files)
 lib/libbase.g.a: $(forward-declarations) $(go-files)
 	@echo =====base=============optimized===== Updating library:   $@
 	@ar ruv $@ $(go-files)
+
+
+lib/libbase.so: $(forward-declarations) $(o-files)
+	@echo =====base=============optimized===== Updating library:   $@
+	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
+
+lib/libbase.g.so: $(forward-declarations) $(go-files)
+	@echo =====base=============debug========= Updating library:   $@
+	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
+
+
 
 
 clean:

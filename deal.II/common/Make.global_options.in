@@ -8,26 +8,58 @@
 # to libraries. The following symbols defined in this file may be of
 # interest:
 #
-# CXX                -- path and filename of the compiler
-# PERL               -- path and filename of the 'perl' program
 #
-# lib-path-base      -- path to the library files of the /base library
-# lib-path-lac       -- same for the /lac library
-# lib-path-deal2     -- same for the /deal.II library
-# LIBPATH            -- all the library pathes prefixed by -L, i.e. the
-#                       flags needed by the compiler to find the libraries
-#                       when they are linked in using -lbase -llac -ldeal_II_2d
-#                       (for example). These -L paths are appended to what
-#                       was in $(LIBPATH) before
+# General
+# -------
+#   CXX                -- executable name of the C++ compiler
+#   CC                 -- executable name of the C compiler, which
+#                         is used to generate shared libraries
+#   PERL               -- executable name of the 'perl' program
 #
-# include-path-base  -- same as for lib-path-base, but contains the paths
-#                       to the include files of the /base library
-# include-path-lac   -- same for the /lac library
-# include-path-deal2 -- same for the /deal.II library
-# INCLUDE            -- all the include pathes prefixed by -I
 #
-# CXXFLAGS.g         -- compiler flags for debug mode
-# CXXFLAGS.o         -- compiler flags for optimized mode
+# Paths to libraries
+# -------------------
+#   lib-path-base      -- path to the library files of the /base library
+#   lib-path-lac       -- same for the /lac library
+#   lib-path-deal2     -- same for the /deal.II library
+#   LIBPATH            -- all the library pathes prefixed by -L, i.e. the
+#                         flags needed by the compiler to find the libraries
+#                         when they are linked in using -lbase -llac -ldeal_II_2d
+#                         (for example). These -L paths are appended to what
+#                         was in $(LIBPATH) before
+#
+#
+# Paths and filenames of libraries
+# --------------------------------
+#   lib-base.o         -- path and filename of the base library in optimized
+#                         mode. depending on whether shared libraries were
+#                         or were not enabled, the suffix of the value of this
+#                         variable is either .so or .a
+#   lib-base.g         -- same, for the library in debug mode
+#
+#   lib-lac.o          -- same for the lac libraries
+#   lib-lac.g 
+#
+#   lib-deal2-1d.o lib-deal2-1d.g  -- same for the deal.II libraries in the various
+#   lib-deal2-2d.o lib-deal2-2d.g     dimensions
+#   lib-deal2-3d.o lib-deal2-3d.g
+#
+#
+#
+# Pathes to include files
+# -----------------------
+#   include-path-base  -- same as for lib-path-base, but contains the paths
+#                         to the include files of the /base library
+#   include-path-lac   -- same for the /lac library
+#   include-path-deal2 -- same for the /deal.II library
+#   INCLUDE            -- all the include pathes prefixed by -I
+#
+#
+# Compiler flags
+# --------------
+#   CXXFLAGS.g         -- compiler flags for debug mode
+#   CXXFLAGS.o         -- compiler flags for optimized mode
+#
 #
 #
 # If --with-multithreading was given to ./configure, $(INCLUDE) and
@@ -51,13 +83,14 @@
 # of ./configure
 
 D                    = @DEAL2_DIR@
+CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
 OS                   = @OS@
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
 with-multithreading  = @withmultithreading@
-
+enable-shared        = @enableshared@
 
 
 ######################################################
@@ -77,6 +110,27 @@ LIBPATH       += $(addprefix -L,$(lib-path-base) $(lib-path-lac) $(lib-path-deal
 vpath %.a $(lib-path-base)
 vpath %.a $(lib-path-lac)
 vpath %.a $(lib-path-deal2)
+
+ifeq ($(enable-shared),yes)
+  lib-suffix = .so
+else
+  lib-suffix = .a
+endif
+
+
+lib-base.o     = $(lib-path-base)/libbase$(lib-suffix)
+lib-base.g     = $(lib-path-base)/libbase.g$(lib-suffix)
+
+lib-lac.o      = $(lib-path-lac)/liblac$(lib-suffix)
+lib-lac.g      = $(lib-path-lac)/liblac.g$(lib-suffix)
+
+lib-deal2-1d.o = $(lib-path-deal2)/libdeal_II_1d$(lib-suffix)
+lib-deal2-2d.o = $(lib-path-deal2)/libdeal_II_2d$(lib-suffix)
+lib-deal2-3d.o = $(lib-path-deal2)/libdeal_II_3d$(lib-suffix)
+
+lib-deal2-1d.g = $(lib-path-deal2)/libdeal_II_1d.g$(lib-suffix)
+lib-deal2-2d.g = $(lib-path-deal2)/libdeal_II_2d.g$(lib-suffix)
+lib-deal2-3d.g = $(lib-path-deal2)/libdeal_II_3d.g$(lib-suffix)
 
 
 # include paths. add library paths to existing variable
@@ -145,3 +199,8 @@ ifneq ($(with-multithreading),no)
   vpath %.a $(ACE_ROOT)
 endif
 
+
+ifeq ($(enable-shared),yes)
+  CXXFLAGS.g += -fPIC
+  CXXFLAGS.o += -fPIC
+endif

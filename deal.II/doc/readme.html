@@ -239,6 +239,15 @@
     You can give several flags to ./configure:
     <ul>
     <li>
+      <code>--enable-shared</code>: Compile the files of deal.II
+      into shared libraries, rather than statically linked
+      libraries. Enabling this option saves disk space, link time and
+      start-up time, so this is the default. However, some systems
+      might not support shared libraries, in which case you should
+      call ./configure with the parameter
+      <code>--disable-shared</code>. 
+
+    <li>
       <code>--enable-multithreading</code>: This sets compiler
       variables such that the resulting program supports
       multithreading. Basically, for this different system include
