@@ -425,6 +425,15 @@ class DataOut {
 				      * Exception
 				      */
     DeclException0 (ExcNoDoFHandlerSelected);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidVectorSize,
+		    int, int,
+		    << "The vector has size " << arg1
+		    << " but the DoFHandler objects says there are " << arg2
+		    << " degrees of freedom.");
+    
   private:
 
 				     /**

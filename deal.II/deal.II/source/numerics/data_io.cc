@@ -212,6 +212,9 @@ template <int dim>
 void DataOut<dim>::add_data_vector (const dVector &vec,
 				    const string  &name,
 				    const string  &units) {
+  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
+  Assert (vec.size() == dofs->n_dofs(),
+	  ExcInvalidVectorSize (vec.size(), dofs->n_dofs()));
   DataEntry new_entry (&vec, name, units);
   data.push_back (new_entry);
 };

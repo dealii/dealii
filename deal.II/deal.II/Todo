@@ -103,6 +103,9 @@ Remove the this-> coding in tria_iterator.templates.h. These were
   egcs  snapshot.
 
 
+Re-enable printing of a preamble to ucd files in data_io.cc.
+
+
 
 
 DEAL:
