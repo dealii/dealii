@@ -18,6 +18,14 @@
 #  include <list>
 #endif
 
+#ifndef DEAL_II_USE_DIRECT_ERRNO_H
+#  include <errno.h>
+#else
+#  include </usr/include/errno.h>
+#endif
+#include <sys/errno.h>
+
+
 
 namespace Threads 
 {
@@ -227,9 +235,15 @@ namespace Threads
 
     tid_list.push_back (pthread_t());
 
-                                     // start new thread
-    const int error
-      = pthread_create (&tid_list.back(), 0, fun_ptr, fun_data);
+                                     // start new thread. retry until
+                                     // we either succeed or get an
+                                     // error other than EAGAIN
+    int error = 0;
+    do 
+      {
+	error = pthread_create (&tid_list.back(), 0, fun_ptr, fun_data);
+      }
+    while ( ! ((error == 0) || (error != EAGAIN)));
 
     Assert (error == 0, ExcInternalError());
   };

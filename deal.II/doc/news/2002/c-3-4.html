@@ -180,7 +180,21 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
-  <li> <p> Fixed: The <code class="member">write_text</code> and <code
+  <li> <p> 
+       Changed: In POSIX mode, when the <code class="member">ThreadManager</code>
+       class created a new thread through <code class="member">pthread_create</code>, 
+       it only checked for the error code and aborted if it was non-zero. Now, it
+       checks whether the error code is <code class="member">EAGAIN</code> and simply 
+       retries the call if this is the case. This may, in rare cases, lead to a
+       deadlock or an infinite loop, but will usually just wait until the respective
+       resources for thread creation are available from the operating system and will
+       then succeed.
+       <br>
+       (WB 2002/11/13)
+       </p>
+
+  <li> <p> 
+       Fixed: The <code class="member">write_text</code> and <code
        class="member">write_tex</code> functions of the <code
        class="class">TableHandler</code> class now check whether their
        <code>ofstream</code> arguments are in a proper state before
