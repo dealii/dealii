@@ -250,8 +250,6 @@ SparsityPattern::reinit (const unsigned int               m,
 			 const unsigned int               n,
 			 const std::vector<unsigned int> &row_lengths)
 {
-  Assert (((m==0) && (n==0)) || (*max_element(row_lengths.begin(), row_lengths.end()) > 0),
-	  ExcInvalidNumber(*max_element(row_lengths.begin(), row_lengths.end())));
   Assert (row_lengths.size() == m, ExcInvalidNumber (m));
 	  
   rows = m;
@@ -285,6 +283,16 @@ SparsityPattern::reinit (const unsigned int               m,
   for (unsigned int i=0; i<m; ++i)
     vec_len += std::min(row_lengths[i], n);
 
+				   // sometimes, no entries are
+				   // requested in the matrix (this
+				   // most often happens when blocks
+				   // in a block matrix are simply
+				   // zero). in that case, allocate
+				   // exactly one element, to have a
+				   // valid pointer to some memory
+  if (vec_len == 0)
+    vec_len = 1;
+  
   max_row_length = (row_lengths.size() == 0 ?
 		    0 :
 		    std::min (*std::max_element(row_lengths.begin(), row_lengths.end()),
@@ -313,7 +321,10 @@ SparsityPattern::reinit (const unsigned int               m,
   rowstart[0] = 0;
   for (unsigned int i=1; i<=rows; ++i)
     rowstart[i] = rowstart[i-1]+std::min(row_lengths[i-1],n);
-  Assert (rowstart[rows]==vec_len, ExcInternalError());
+  Assert ((rowstart[rows]==vec_len)
+	  ||
+	  ((vec_len == 1) && (rowstart[rows] == 0)),
+	  ExcInternalError());
 
 				   // preset the column numbers by a
 				   // value indicating it is not in
