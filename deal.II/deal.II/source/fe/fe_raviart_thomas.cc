@@ -128,9 +128,9 @@ template <int dim>
 FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),
-							   dim),
+							   dim, degree+1),
 				    get_ria_vector (degree),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim,degree+1).dofs_per_cell,
 								    std::vector<bool>(dim,true))),
 		degree(degree),
                 polynomials (create_polynomials(degree)),

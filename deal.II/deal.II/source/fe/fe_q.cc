@@ -431,10 +431,10 @@ namespace FE_Q_Helper
 template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1, degree),
+				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
                                                        false),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
 								    std::vector<bool>(1,true))),
                 degree(degree),
                 renumber(lexicographic_to_hierarchic_numbering (*this, degree)),

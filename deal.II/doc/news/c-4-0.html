@@ -303,10 +303,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p>
+  Improved: <code class="class">FiniteElementData</code> has a function
+  <class="member">tensor_degree()</code>, returning the degree of the
+  polynomial space suitable for choosing a tensor product quadrature formula.
+  <br>
+  (GK 2003/11/28)
+  </p>
+
   <li> <p>
        New: Long requested but never implemented before in the
        library: there is now a function <code
-       <class="member">GridTool::find_active_cell_around_point</code>
+       <class="class">GridTool</code>::<class="member">find_active_cell_around_point</code>
        that, given a point, finds the active cell in which this point
        lies.
        <br>

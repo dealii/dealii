@@ -18,7 +18,8 @@
 
 template <int dim>
 FiniteElementData<dim>::FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
-					   const unsigned int n_components) :
+					   const unsigned int n_components,
+					   const unsigned int degree) :
 		dofs_per_vertex(dofs_per_object[0]),
 		dofs_per_line(dofs_per_object[1]),
 		dofs_per_quad(dim>1? dofs_per_object[2]:0),
@@ -45,7 +46,8 @@ FiniteElementData<dim>::FiniteElementData (const std::vector<unsigned int> &dofs
 			       GeometryInfo<dim>::lines_per_cell * dofs_per_line +
 			       GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
 			       GeometryInfo<dim>::hexes_per_cell * dofs_per_hex),
-		components(n_components)
+		components(n_components),
+		degree(degree)
 {
   Assert(dofs_per_object.size()==dim+1, ExcDimensionMismatch(dofs_per_object.size()-1,dim));
 }

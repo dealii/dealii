@@ -45,7 +45,7 @@ template<int dim> class FESystem;
  * @ref{FiniteElementBase} should be private base classes of
  * @ref{FiniteElement}.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003
  */
 template<int dim>
 class FiniteElementData
@@ -137,6 +137,13 @@ class FiniteElementData
 				      */
     const unsigned int components;
 
+				     /**
+				      * Maximal polynomial degree of a
+				      * shape function in a single
+				      * coordinate direction.
+				      */
+    const unsigned int degree;
+    
     				     /**
 				      * Default
 				      * constructor. Constructs an
@@ -162,9 +169,17 @@ class FiniteElementData
 				      *
 				      * Hence this constructor requires
 				      * @p{dofs_per_object.size()==dim+1}.
+				      *
+				      * @param n_components Number of
+				      * vector components of the
+				      * element.
+				      * @param degree
+				      * Maximal polynomial degree in a
+				      * single direction.
 				      */
     FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
-		       const unsigned int n_components);
+		       const unsigned int n_components,
+		       const unsigned int degree = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Return the @p{dofs_per_vertex}.
@@ -201,6 +216,17 @@ class FiniteElementData
 				      */
     unsigned int n_components () const;
 
+				     /**
+				      * Maximal polynomial degree of a
+				      * shape function in a single
+				      * coordinate direction.
+				      *
+				      * This function can be used to
+				      * determine the optimal
+				      * quadrature rule.
+				      */
+    unsigned int tensor_degree () const;
+    
 				     /**
 				      * Comparison operator.
 				      */
@@ -1774,6 +1800,16 @@ unsigned int
 FiniteElementData<dim>::n_components () const
 {
   return components;
+}
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::tensor_degree () const
+{
+  return degree;
 }
 
 

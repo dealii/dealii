@@ -45,7 +45,7 @@ namespace
 				   // given an integer N, compute its
 				   // integer square root (if it
 				   // exists, otherwise give up)
-  unsigned int int_sqrt (const unsigned int N)
+  inline unsigned int int_sqrt (const unsigned int N)
   {
     for (unsigned int i=0; i<=N; ++i)
       if (i*i == N)
@@ -58,7 +58,7 @@ namespace
 				   // given an integer N, compute its
 				   // integer cube root (if it
 				   // exists, otherwise give up)
-  unsigned int int_cuberoot (const unsigned int N)
+  inline unsigned int int_cuberoot (const unsigned int N)
   {
     for (unsigned int i=0; i<=N; ++i)
       if (i*i*i == N)
@@ -71,7 +71,7 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the
 				   // interior of the interval [0,1]
-  Point<1>
+  inline Point<1>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
 		       const int2type<1>  )
@@ -90,7 +90,7 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the domain
 				   // [0,1]^2
-  Point<2>
+  inline Point<2>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
 		       const int2type<2>  )
@@ -116,7 +116,7 @@ namespace
 				   // given N, generate i=0...N-1
 				   // equidistant points in the domain
 				   // [0,1]^3
-  Point<3>
+  inline Point<3>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
 		       const int2type<3>  )
@@ -144,10 +144,10 @@ namespace
 template <int dim>
 FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
+				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
                                                       true),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
 								    std::vector<bool>(1,true))),
                 degree(degree),
                 polynomial_space (Polynomials::LagrangeEquidistant::generate_complete_basis(degree))

@@ -95,7 +95,8 @@ void test_fe_datas()
       deallog << "first_face_quad_index=" << fe_data->first_face_quad_index << std::endl;
       deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
-      deallog << "components=" << fe_data->components << std::endl;
+      deallog << "components=" << fe_data->components << std::endl
+	      << "degree=" << fe_data->tensor_degree() << std::endl;
 
       for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
@@ -105,6 +106,7 @@ void test_fe_datas()
 	      deallog << '\t' << s;
 	  deallog << std::endl;
 	}
+      deallog << std::endl;
     }
 
 				   // delete all FiniteElementDatas

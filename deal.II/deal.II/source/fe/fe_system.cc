@@ -20,7 +20,7 @@
 #include <fe/mapping.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
-
+#include <iostream>
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
@@ -1732,7 +1732,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
   if (dim>1) dpo.push_back(fe_data.dofs_per_quad * N);
   if (dim>2) dpo.push_back(fe_data.dofs_per_hex * N);
   
-  return FiniteElementData<dim> (dpo, fe_data.n_components() * N);
+  return FiniteElementData<dim> (dpo, fe_data.n_components() * N, fe_data.tensor_degree());
 }
 
 
@@ -1843,10 +1843,17 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
   dpo.push_back(fe1.dofs_per_line * N1 + fe2.dofs_per_line * N2);
   if (dim>1) dpo.push_back(fe1.dofs_per_quad * N1 + fe2.dofs_per_quad * N2);
   if (dim>2) dpo.push_back(fe1.dofs_per_hex * N1 + fe2.dofs_per_hex * N2);
-  
+
+  				   // degree is the maximal degree of
+				   // the components.  max also makes
+				   // sure that one unknown degree
+				   // makes the degree of the system
+				   // unknown.
+  unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
   return FiniteElementData<dim> (dpo,
 				 fe1.n_components() * N1 +
-				 fe2.n_components() * N2);
+				 fe2.n_components() * N2,
+				 degree);
 }
 
 
@@ -1873,11 +1880,13 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
   if (dim>2) dpo.push_back(fe1.dofs_per_hex * N1 +
 			   fe2.dofs_per_hex * N2 +
 			   fe3.dofs_per_hex * N3);
-  
+				   // degree is the maximal degree of the components
+  unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
+  degree = std::max(degree, fe3.tensor_degree());
   return FiniteElementData<dim> (dpo,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2 +
-				 fe3.n_components() * N3);
+				 fe3.n_components() * N3, degree);
 }
 
 

@@ -30,9 +30,9 @@
 template <int dim>
 FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
-				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,true),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
+				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
 								    std::vector<bool>(1,true))),
                 degree(degree),
                 polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
