@@ -33,6 +33,27 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 
 
 
+void DataOutBase::DXFlags::declare_parameters (ParameterHandler &/*prm*/)
+{};
+
+
+
+void DataOutBase::DXFlags::parse_parameters (ParameterHandler &/*prm*/)
+{};
+
+
+
+unsigned int
+DataOutBase::DXFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+};
+
+
+
+
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Write preamble", "true", Patterns::Bool());

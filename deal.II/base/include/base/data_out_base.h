@@ -103,6 +103,17 @@ class ParameterHandler;
  *
  * @sect2{Supported output formats}
  *
+ * @sect3{OpenDX (IBM Open Visualization Data Explorer}
+ *
+ * Since Data Explorer (DX) is distributed as OpenSource, there is a
+ * well-accessible visualization tool for all (at least Unix-based)
+ * platforms. Therefore, output in its natural file format is
+ * included. Right now, this output is very basic, since the
+ * functionality of @p{DataOutBase} and derived classes has to be
+ * enhanced to use all of its features. Still, using some
+ * sophisticated networks, most can be recovered.
+ *
+ * 
  * @sect3{UCD format}
  *
  * The UCD format is described in the AVS developer's guide. Due to
@@ -455,6 +466,52 @@ class DataOutBase
 			<< " space " << arg2);
     };
 
+
+    				     /**
+				      * Flags describing the details of
+				      * output in OpenDX format. At
+				      * present no flags are implemented.
+				      */
+    struct DXFlags 
+    {
+      private:
+					 /**
+					  * Dummy entry to suppress compiler
+					  * warnings when copying an empty
+					  * structure. Remove this member
+					  * when adding the first flag to
+					  * this structure (and remove the
+					  * @p{private} as well).
+					  */
+	int dummy;
+
+      public:
+					 /**
+					  * Declare all flags with name
+					  * and type as offered by this
+					  * class, for use in input files.
+					  */
+	static void declare_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Read the parameters declared in
+					  * @p{declare_parameters} and set the
+					  * flags for this output format
+					  * accordingly.
+					  *
+					  * The flags thus obtained overwrite
+					  * all previous contents of this object.
+					  */
+	void parse_parameters (ParameterHandler &prm);
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this
+					  * object.
+					  */
+	unsigned int memory_consumption () const;
+    };
 
 				     /**
 				      * Flags describing the details of
@@ -1081,6 +1138,19 @@ class DataOutBase
 
 				     /**
 				      * Write the given list of patches
+				      * to the output stream in OpenDX
+				      * format. See the general
+				      * documentation for more information
+				      * on the parameters.
+				      */
+    template <int dim, int spacedim>
+    static void write_dx (const typename std::vector<Patch<dim,spacedim> > &patches,
+			  const std::vector<std::string>          &data_names,
+			  const DXFlags                          &flags,
+			  std::ostream                            &out);
+    
+				     /**
+				      * Write the given list of patches
 				      * to the output stream in ucd
 				      * format. See the general
 				      * documentation for more information
@@ -1406,7 +1476,15 @@ class DataOutInterface : private DataOutBase
 				      * the presently supported output
 				      * formats.
 				      */
-    enum OutputFormat { default_format, ucd, gnuplot, povray, eps, gmv, vtk };
+    enum OutputFormat { default_format, dx, ucd, gnuplot, povray, eps, gmv, vtk };
+
+				     /**
+				      * Obtain data through the
+				      * @p{get_patches} function and
+				      * write it to @p{out} in OpenDX
+				      * format.
+				      */
+    void write_dx (std::ostream &out) const;
 
 				     /**
 				      * Obtain data through the
@@ -1484,6 +1562,12 @@ class DataOutInterface : private DataOutBase
 
 				     /**
 				      * Set the flags to be used for
+				      * output in OpenDX format.
+				      */
+    void set_flags (const DXFlags &dx_flags);
+
+				     /**
+				      * Set the flags to be used for
 				      * output in UCD format.
 				      */
     void set_flags (const UcdFlags &ucd_flags);
@@ -1525,6 +1609,7 @@ class DataOutInterface : private DataOutBase
 				      * usually has. At present the following
 				      * formats are defined:
 				      * @begin{itemize}
+				      * @item @p{dx}: @p{.dx}
 				      * @item @p{ucd}: @p{.inp}
 				      * @item @p{gnuplot}: @p{.gnuplot}
 				      * @item @p{povray}: @p{.pov}
@@ -1683,6 +1768,14 @@ class DataOutInterface : private DataOutBase
 				      */
     OutputFormat default_fmt;
     
+				     /**
+				      * Flags to be used upon output
+				      * of OpenDX data. Can be changed by
+				      * using the @p{set_flags}
+				      * function.
+				      */
+    DXFlags     dx_flags;
+
 				     /**
 				      * Flags to be used upon output
 				      * of UCD data. Can be changed by
