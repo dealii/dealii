@@ -15,9 +15,12 @@
 
 
 /**
- *  Vector of data. 
+ *  Numerical Vector of data.
  *
- * @author Roland Becker, Guido Kanschat, Franz-Theo Suttmeier, revised and extended by Wolfgang Bangerth, documented by Klaus Mampel and Wolfgang Bangerth
+ * As opposed to the array of the C++ standard library called #vector#, this class implements
+ * an element of a vector space suitable for numerical computations.
+ *
+ * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
 class Vector {
@@ -413,13 +416,6 @@ class Vector {
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The given index " << arg1
-		    << " should be less than " << arg2 << ".");
-				     /**
-				      * Exception
-				      */
     DeclException1 (ExcInvalidNumber,
 		    int,
 		    << "The provided number is invalid here: " << arg1);
@@ -515,7 +511,7 @@ template <typename Number>
 inline
 Number Vector<Number>::operator() (const unsigned int i) const
 {
-  Assert (i<dim, ExcInvalidIndex(i,dim));
+  Assert (i<dim, ExcIndexRange(i,0,dim));
   return val[i];
 }
 
@@ -525,7 +521,7 @@ template <typename Number>
 inline
 Number& Vector<Number>::operator() (const unsigned int i)
 {
-  Assert (i<dim, ExcInvalidIndex(i,dim));
+  Assert (i<dim, ExcIndexRange(i,0,dim));
   return val[i];
 }
 

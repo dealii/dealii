@@ -154,12 +154,6 @@ class Tensor
 //     DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
 // 		   << " entries, but vector has size " << arg2);
     
-// 				     /**
-// 				      *  Exception
-// 				      */
-//     DeclException1 (ExcInvalidIndex,
-// 		    int,
-// 		    << "Invalid index " << arg1);
   private:
 				     /**
 				      * Array of tensors holding the
