@@ -50,7 +50,7 @@ maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dim
 lib/go/%.go :
 	@echo =================== Compiling with debugging information:   $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(CXXFLAGS.g) $(maybe-define-dimension) -c $< -o $@
 lib/o/%.o :
 	@echo =================== Compiling with optimization:   $(<F) \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
