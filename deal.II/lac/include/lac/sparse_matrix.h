@@ -121,6 +121,72 @@ namespace internals
     template <typename number>
     class Accessor<number,false> : public SparsityPatternIterators::Accessor
     {
+        class Reference 
+        {
+          private:
+                                             /**
+                                              * Constructor. Made private so
+                                              * as to only allow friend
+                                              * classes access to it.
+                                              */
+            Reference (const Accessor *accessor);
+          public:
+
+                                             /**
+                                              * Conversion operator to the
+                                              * data type of the matrix.
+                                              */
+            operator number () const;
+
+                                             /**
+                                              * Set the element of the matrix
+                                              * we presently point to to @p n.
+                                              */
+            const Reference & operator = (const number n) const;
+            
+                                             /**
+                                              * Add @p n to the element of the
+                                              * matrix we presently point to.
+                                              */
+            const Reference & operator += (const number n) const;
+            
+                                             /**
+                                              * Subtract @p n from the element
+                                              * of the matrix we presently
+                                              * point to.
+                                              */
+            const Reference & operator -= (const number n) const;
+            
+                                             /**
+                                              * Multiply the element of the
+                                              * matrix we presently point to
+                                              * by @p n.
+                                              */
+            const Reference & operator *= (const number n) const;
+            
+                                             /**
+                                              * Divide the element of the
+                                              * matrix we presently point to
+                                              * by @p n.
+                                              */
+            const Reference & operator /= (const number n) const;
+            
+          private:
+                                             /**
+                                              * Pointer to the accessor that
+                                              * denotes which element we
+                                              * presently point to.
+                                              */
+            const Accessor *accessor;
+
+                                             /**
+                                              * Make the accessor class a
+                                              * friend so as to allow it to
+                                              * generate objects of this type.
+                                              */
+            friend class Accessor;
+        };
+            
       public:
                                          /**
                                           * Typedef for the type (including
@@ -141,7 +207,7 @@ namespace internals
                                           * returned as a read- and writable
                                           * reference.
                                           */
-        number & value() const;
+        Reference value() const;
         
       private:
                                          /**
@@ -1713,6 +1779,90 @@ namespace internals
     
     template <typename number>
     inline
+    Accessor<number, false>::Reference::
+    Reference (const Accessor *accessor)
+                    :
+                    accessor (accessor)
+    {}
+    
+
+    
+    template <typename number>
+    inline
+    Accessor<number, false>::Reference::operator number() const
+    {
+      return accessor->matrix->raw_entry(accessor->a_row,
+                                         accessor->a_index);
+    }
+    
+
+    
+    template <typename number>
+    inline
+    const typename Accessor<number, false>::Reference &
+    Accessor<number, false>::Reference::operator = (const number n) const
+    {
+//TODO: one could optimize this by not going again through the mapping from row/col index to global index
+      accessor->matrix->set (accessor->row(), accessor->column(), n);
+      return *this;
+    }
+    
+
+    
+    template <typename number>
+    inline
+    const typename Accessor<number, false>::Reference &
+    Accessor<number, false>::Reference::operator += (const number n) const
+    {
+//TODO: one could optimize this by not going again through the mapping from row/col index to global index
+      accessor->matrix->set (accessor->row(), accessor->column(),
+                             static_cast<number>(*this) + n);
+      return *this;
+    }
+    
+
+    
+    template <typename number>
+    inline
+    const typename Accessor<number, false>::Reference &
+    Accessor<number, false>::Reference::operator -= (const number n) const
+    {
+//TODO: one could optimize this by not going again through the mapping from row/col index to global index
+      accessor->matrix->set (accessor->row(), accessor->column(),
+                             static_cast<number>(*this) - n);
+      return *this;
+    }
+
+
+
+    template <typename number>
+    inline
+    const typename Accessor<number, false>::Reference &
+    Accessor<number, false>::Reference::operator *= (const number n) const
+    {
+//TODO: one could optimize this by not going again through the mapping from row/col index to global index
+      accessor->matrix->set (accessor->row(), accessor->column(),
+                             static_cast<number>(*this)*n);
+      return *this;
+    }
+    
+
+    
+    template <typename number>
+    inline
+    const typename Accessor<number, false>::Reference &
+    Accessor<number, false>::Reference::operator /= (const number n) const
+    {
+//TODO: one could optimize this by not going again through the mapping from row/col index to global index
+      accessor->matrix->set (accessor->row(), accessor->column(),
+                             static_cast<number>(*this)/n);
+      return *this;
+    }
+    
+
+    
+    template <typename number>
+    inline
     Accessor<number,false>::
     Accessor (MatrixType         *matrix,
               const unsigned int  row,
@@ -1727,14 +1877,15 @@ namespace internals
 
     template <typename number>
     inline
-    number &
+    typename Accessor<number, false>::Reference
     Accessor<number, false>::value() const
     {
-      return matrix->raw_entry(a_row, a_index);
+      return this;
     }
-    
 
-    
+
+
+          
     template <typename number, bool Constness>
     inline
     Iterator<number, Constness>::
