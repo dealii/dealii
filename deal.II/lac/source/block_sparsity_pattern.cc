@@ -40,10 +40,13 @@ BlockSparsityPatternBase (const unsigned int r,
 
 template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase (
-  const BlockSparsityPatternBase<SparsityPatternBase>&)
+  const BlockSparsityPatternBase<SparsityPatternBase>& s)
 {
-//TODO: Find out if this is really needed
-  abort();
+  Assert(s.rows==0, ExcInvalidConstructorCall());
+  Assert(s.columns==0, ExcInvalidConstructorCall());
+
+  rows = 0;
+  columns=0;
 };
 
 
