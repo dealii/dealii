@@ -168,8 +168,8 @@ struct GeometryInfo
 				      * laid down in the documentation of
 				      * the @ref{Triangulation} class.
 				      */
-    static unsigned int child_cell_on_face (unsigned int face,
-					    unsigned int subface);
+    static unsigned int child_cell_on_face (const unsigned int face,
+					    const unsigned int subface);
 };
 
 

@@ -2245,9 +2245,11 @@ void DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write (std::ostream &out,
-					    OutputFormat output_format) const
+void
+DataOutInterface<dim,spacedim>::write (std::ostream &out,
+				       const OutputFormat output_format_) const
 {
+  OutputFormat output_format = output_format_;
   if (output_format == default_format)
     output_format = default_fmt;
   
@@ -2285,7 +2287,7 @@ void DataOutInterface<dim,spacedim>::write (std::ostream &out,
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::set_default_format(OutputFormat fmt)
+void DataOutInterface<dim,spacedim>::set_default_format(const OutputFormat fmt)
 {
   Assert(fmt != default_format, ExcNotImplemented());
   default_fmt = fmt;
@@ -2342,8 +2344,10 @@ void DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags)
 
 
 template <int dim, int spacedim>
-std::string DataOutInterface<dim,spacedim>::default_suffix (OutputFormat output_format) const
+std::string
+DataOutInterface<dim,spacedim>::default_suffix (const OutputFormat output_format_) const
 {
+  OutputFormat output_format = output_format_;
   if (output_format == default_format)
     output_format = default_fmt;
   
