@@ -267,14 +267,19 @@ FESystem<dim>::shape_value_component (const unsigned int i,
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component < this->n_components(),
 	  ExcIndexRange (component, 0, this->n_components()));
+
+                                   // if this value is supposed to be
+                                   // zero, then return right away...
+  if (nonzero_components[i][component] == false)
+    return 0;
   
-				   // first find out to which of the
-				   // base elements this desired
-				   // component belongs, and which
-				   // component within this base
+                                   // ...otherwise: first find out to
+				   // which of the base elements this
+				   // desired component belongs, and
+				   // which component within this base
 				   // element it is
-  const unsigned int base              = this->component_to_base(i).first;
-  const unsigned int component_in_base = this->component_to_base(i).second;
+  const unsigned int base              = this->component_to_base(component).first;
+  const unsigned int component_in_base = this->component_to_base(component).second;
 
 				   // then get value from base
 				   // element. note that that will
@@ -315,13 +320,18 @@ FESystem<dim>::shape_grad_component (const unsigned int i,
   Assert (component < this->n_components(),
 	  ExcIndexRange (component, 0, this->n_components()));
   
-				   // first find out to which of the
-				   // base elements this desired
-				   // component belongs, and which
-				   // component within this base
-				   // element it is
-  const unsigned int base              = this->component_to_base(i).first;
-  const unsigned int component_in_base = this->component_to_base(i).second;
+                                   // if this value is supposed to be
+                                   // zero, then return right away...
+  if (nonzero_components[i][component] == false)
+    return Tensor<1,dim>();
+
+                                   // ...otherwise: first find out to
+    				   // which of the base elements this
+    				   // desired component belongs, and
+    				   // which component within this base
+    				   // element it is
+  const unsigned int base              = this->component_to_base(component).first;
+  const unsigned int component_in_base = this->component_to_base(component).second;
   
 				   // then get value from base
 				   // element. note that that will
@@ -362,13 +372,18 @@ FESystem<dim>::shape_grad_grad_component (const unsigned int i,
   Assert (component < this->n_components(),
 	  ExcIndexRange (component, 0, this->n_components()));
   
-				   // first find out to which of the
-				   // base elements this desired
-				   // component belongs, and which
-				   // component within this base
+                                   // if this value is supposed to be
+                                   // zero, then return right away...
+  if (nonzero_components[i][component] == false)
+    return Tensor<2,dim>();
+
+                                   // ...otherwise: first find out to
+				   // which of the base elements this
+				   // desired component belongs, and
+				   // which component within this base
 				   // element it is
-  const unsigned int base              = this->component_to_base(i).first;
-  const unsigned int component_in_base = this->component_to_base(i).second;
+  const unsigned int base              = this->component_to_base(component).first;
+  const unsigned int component_in_base = this->component_to_base(component).second;
   
 				   // then get value from base
 				   // element. note that that will
