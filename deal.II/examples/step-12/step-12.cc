@@ -11,16 +11,16 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector_memory.h>
 #include <grid/tria.h>
-#include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
-#include <numerics/data_out.h>
 #include <grid/grid_out.h>
 #include <grid/grid_refinement.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <fe/fe_values.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <numerics/data_out.h>
 
 				 // This is the first new file. It
 				 // declares the MappingQ1 class that
@@ -33,12 +33,10 @@
 				 // pre-knowledge of the actual
 				 // polynomial degree 1.
 #include <fe/mapping_q1.h>
-
 				 // Here the discontinuous finite
 				 // elements are defined. They are
 				 // used as all other finite elements.
 #include <fe/fe_dgq.h>
-
 				 // We are going to use the simplest
 				 // possible solver, called richardson
 				 // iteration, that represents a simple
@@ -51,12 +49,9 @@
 				 // discretizations.
 #include <lac/solver_richardson.h>
 #include <lac/precondition_block.h>
-
 				 // We are going to use gradients as
 				 // refinement indicator.
 #include <numerics/derivative_approximation.h>
-
-
 				 // Finally we do some time comparison
 				 // using the ``Timer'' class.
 #include <base/timer.h>
@@ -138,6 +133,7 @@ void RHS<dim>::value_list(const std::vector<Point<dim> > &,
     values[i]=0;
 }
 
+
 				 // The flow field is chosen to be
 				 // circular, anticlockwise, and with
 				 // the origin as midpoint.
@@ -158,6 +154,7 @@ void Beta<2>::value_list(const std::vector<Point<2> > &points,
       beta/=sqrt(beta*beta);
     }
 }
+
 
 				 // Hence the inflow boundary of the
 				 // unit square [0,1]^2 are the right
@@ -184,6 +181,7 @@ void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
 	values[i]=0.;
     }
 }
+
 
 				 // @sect3{Class: DGTransportEquation}
 				 //
@@ -228,6 +226,7 @@ class DGTransportEquation
     RHS<dim> rhs_function;
     BoundaryValues<dim> boundary_function;
 };
+
 
 				 // @sect4{Function: assemble_cell_term}
 				 //
@@ -279,6 +278,7 @@ void DGTransportEquation<dim>::assemble_cell_term(
 	cell_vector(i) += rhs[point] *v(i,point) * JxW[point];
       }
 }
+
 
 				 // @sect4{Function: assemble_boundary_term}
 				 //
@@ -347,6 +347,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 			    JxW[point];
     }
 }
+
 
 				 // @sect4{Function: assemble_face_term1}
 				 //
@@ -436,6 +437,7 @@ void DGTransportEquation<dim>::assemble_face_term1(
 				JxW[point];
     }
 }
+
 
 				 // @sect4{Function: assemble_face_term2}
 				 //
@@ -589,7 +591,6 @@ class DGMethod
 };
 
 
-
 				 // Now for the implementation of the
 				 // main class. Constructor and
 				 // destructor follow the same
@@ -608,7 +609,6 @@ DGMethod<dim>::~DGMethod ()
 {
   dof_handler.clear ();
 };
-
 
 
 template <int dim>
