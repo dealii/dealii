@@ -38,7 +38,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	;;
       *2.96*)
   	AC_MSG_RESULT(C++ compiler is gcc-2.96)
-  	GXX_VERSION=gcc2.96
+  	dnl gcc 2.96 is so broken that there is no way to support it.
+	dnl thus, kick out user and ask him to up- or downgrade to
+	dnl some other gcc version
+	AC_MSG_ERROR(gcc 2.96 is not supported. Please read the deal.II FAQs.)
   	;;
       *2.97*)
   	AC_MSG_RESULT(C++ compiler is gcc-2.97)
