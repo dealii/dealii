@@ -6655,8 +6655,39 @@ Triangulation<3>::execute_refinement ()
 							 // to swap
 							 // subfaces
 							 // to account
-							 // for that
-                        const bool orient = neighbor->get_face_orientation(face);
+							 // for
+							 // that. the
+							 // same
+							 // happens if
+							 // our own
+							 // face is
+							 // swapped
+                                                         //
+                                                         // (?? I
+                                                         // actually
+                                                         // don't
+                                                         // understand
+                                                         // why we
+                                                         // need to
+                                                         // ask the
+                                                         // present
+                                                         // face as
+                                                         // well, but
+                                                         // it fixes
+                                                         // the
+                                                         // mesh_3d_7
+                                                         // and
+                                                         // mesh_3d_11
+                                                         // testcases,
+                                                         // so it
+                                                         // can't be
+                                                         // all
+                                                         // wrong...)
+                        const bool orient
+                          = (neighbor->get_face_orientation(nb_nb)
+                             &&
+                             hex->get_face_orientation(face));
+                        
                         static const unsigned int
                           child_switch_table[GeometryInfo<dim>::subfaces_per_face]
                           = { 0, 3, 2, 1 };
