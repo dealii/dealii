@@ -58,11 +58,11 @@ MatrixCreator::IteratorRange<dim>::IteratorRange (const iterator_pair &ip)
 
 
 
-template <int dim>
+template <int dim, typename number>
 void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 					const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
-					SparseMatrix<double>     &matrix,
+					SparseMatrix<number>     &matrix,
 					const Function<dim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
@@ -88,11 +88,11 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
   typedef void (*create_mass_matrix_1_t) (const Mapping<dim>       &mapping,
 					  const DoFHandler<dim>    &dof,
 					  const Quadrature<dim>    &q,
-					  SparseMatrix<double>     &matrix,
+					  SparseMatrix<number>     &matrix,
 					  const Function<dim> * const coefficient,
 					  const IteratorRange<dim>  range,
 					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim>;
+  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim,number>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
                                   thread_ranges[thread], mutex);
@@ -101,11 +101,11 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 
-template <int dim>
+template <int dim, typename number>
 void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 					  const DoFHandler<dim>    &dof,
 					  const Quadrature<dim>    &q,
-					  SparseMatrix<double>     &matrix,
+					  SparseMatrix<number>     &matrix,
 					  const Function<dim> * const coefficient,
 					  const IteratorRange<dim>  range,
 					  Threads::ThreadMutex     &mutex)
@@ -125,7 +125,7 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 	 coefficient->n_components==1 ||
 	 coefficient->n_components==n_components, ExcComponentMismatch());
   
-  FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<number>  cell_matrix (dofs_per_cell, dofs_per_cell);
   std::vector<double> coefficient_values (n_q_points);
   std::vector<Vector<double> > coefficient_vector_values (n_q_points,
 							  Vector<double> (n_components));
@@ -222,10 +222,10 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 }
 
 
-template <int dim>
+template <int dim, typename number>
 void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
-					SparseMatrix<double>     &matrix,
+					SparseMatrix<number>     &matrix,
 					const Function<dim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -234,11 +234,11 @@ void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
 }
 
 
-template <int dim>
+template <int dim, typename number>
 void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 					const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
-					SparseMatrix<double>     &matrix,
+					SparseMatrix<number>     &matrix,
 					const Function<dim>      &rhs,
 					Vector<double>           &rhs_vector,
 					const Function<dim> * const coefficient)
@@ -266,13 +266,13 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
   typedef void (*create_mass_matrix_2_t) (const Mapping<dim>       &mapping,
 					  const DoFHandler<dim>    &dof,
 					  const Quadrature<dim>    &q,
-					  SparseMatrix<double>     &matrix,
+					  SparseMatrix<number>     &matrix,
 					  const Function<dim>      &rhs,
 					  Vector<double>           &rhs_vector,
 					  const Function<dim> * const coefficient,
 					  const IteratorRange<dim>  range,
 					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim>;
+  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim,number>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
                                   rhs_vector, coefficient,
@@ -282,12 +282,12 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 
-template <int dim>
+template <int dim, typename number>
 void
 MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 				     const DoFHandler<dim>    &dof,
 				     const Quadrature<dim>    &q,
-				     SparseMatrix<double>     &matrix,
+				     SparseMatrix<number>     &matrix,
 				     const Function<dim>      &rhs,
 				     Vector<double>           &rhs_vector,
 				     const Function<dim> * const coefficient,
@@ -311,7 +311,7 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 	 coefficient->n_components==1 ||
 	 coefficient->n_components==n_components, ExcComponentMismatch());
   
-  FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<number>  cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>      local_rhs (dofs_per_cell);
   std::vector<double> rhs_values (fe_values.n_quadrature_points);
   std::vector<double> coefficient_values (n_q_points);
@@ -418,10 +418,10 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 }
 
 
-template <int dim>
+template <int dim, typename number>
 void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
 					const Quadrature<dim>    &q,
-					SparseMatrix<double>     &matrix,
+					SparseMatrix<number>     &matrix,
 					const Function<dim>      &rhs,
 					Vector<double>           &rhs_vector,
 					const Function<dim> * const coefficient)
@@ -1296,6 +1296,39 @@ void MatrixCreator::create_mass_matrix<deal_II_dimension>
  const Function<deal_II_dimension>      &rhs,
  Vector<double>           &rhs_vector,
  const Function<deal_II_dimension> * const coefficient);
+
+
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const Mapping<deal_II_dimension>       &mapping,
+ const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension> * const coefficient);
+
 
 #if deal_II_dimension != 1
 template

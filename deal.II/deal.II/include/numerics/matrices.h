@@ -203,11 +203,11 @@ class MatrixCreator
 				      * See the general doc of this class
 				      * for more information.
 				      */
-    template <int dim>
+    template <int dim, typename number>
     static void create_mass_matrix (const Mapping<dim>       &mapping,
 				    const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
-				    SparseMatrix<double>     &matrix,
+				    SparseMatrix<number>     &matrix,
 				    const Function<dim> * const a = 0);
 
 				     /**
@@ -215,10 +215,10 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
+    template <int dim, typename number>
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
-				    SparseMatrix<double>     &matrix,
+				    SparseMatrix<number>     &matrix,
 				    const Function<dim> * const a = 0);
 
     				     /**
@@ -234,11 +234,11 @@ class MatrixCreator
 				      * See the general doc of this
 				      * class for more information.
 				      */
-    template <int dim>
+    template <int dim, typename number>
     static void create_mass_matrix (const Mapping<dim>       &mapping,
 				    const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
-				    SparseMatrix<double>     &matrix,
+				    SparseMatrix<number>     &matrix,
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
 				    const Function<dim> * const a = 0);
@@ -248,10 +248,10 @@ class MatrixCreator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    template <int dim>
+    template <int dim, typename number>
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
-				    SparseMatrix<double>     &matrix,
+				    SparseMatrix<number>     &matrix,
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
 				    const Function<dim> * const a = 0);
@@ -445,12 +445,12 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
-    template <int dim>
+    template <int dim, typename number>
     static
     void create_mass_matrix_1 (const Mapping<dim>       &mapping,
 			       const DoFHandler<dim>    &dof,
 			       const Quadrature<dim>    &q,
-			       SparseMatrix<double>     &matrix,
+			       SparseMatrix<number>     &matrix,
 			       const Function<dim> * const a,
 			       const IteratorRange<dim>  range,
 			       Threads::ThreadMutex     &mutex);
@@ -465,12 +465,12 @@ class MatrixCreator
 				      * used to synchronise access to
 				      * the matrix.
 				      */
-    template <int dim>
+    template <int dim, typename number>
     static
     void create_mass_matrix_2 (const Mapping<dim>       &mapping,
 			       const DoFHandler<dim>    &dof,
 			       const Quadrature<dim>    &q,
-			       SparseMatrix<double>     &matrix,
+			       SparseMatrix<number>     &matrix,
 			       const Function<dim>      &rhs,
 			       Vector<double>           &rhs_vector,
 			       const Function<dim> * const a,

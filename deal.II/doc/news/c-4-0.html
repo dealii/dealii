@@ -257,6 +257,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Improved: The <code
+       class="member">MatrixCreator::create_mass_matrix</code>
+       functions are now templatized also on the template argument of
+       the <code class="class">SparseMatrix</code> class. This allows
+       invoking this function for <code
+       class="class">SparseMatrix&lt;double&gt;</code> and <code
+       class="class">SparseMatrix&lt;float&gt;</code> objects.
+       <br>
+       (RH 2003/10/22)
+       </p>
+
+  <li> <p>
        New: There is now also a function <code
        class="member">MGDoFCellAccessor::neighbor_child_on_subface</code>
        that returns the result of the <code
