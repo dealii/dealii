@@ -5,14 +5,7 @@
 
 D=../..
 
-CXX       = c++
-INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
-            -I$D/base/include
-
-CXXFLAGS  = -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual  \
-            $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
-
+include $D/deal.II/Make.global_options
 
 %.go : %.cc
 	@echo ============================ Compiling with debugging information:   $<
@@ -26,11 +19,6 @@ vpath %.a: $D/base/lib
 vpath %.a: $D/lac/lib
 vpath %.a: $D/deal.II/lib
 
-ifeq ($(shell uname),Linux)
-CXX       = /home/wolf/bin/gcc/bin/c++
-endif
-
-
 test: run-reference run-logtest run-tensor
 
 
@@ -38,19 +26,19 @@ reference: reference.go
 	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
 
 run-reference: reference
-	./reference
+	-./reference
 
 logtest: logtest.go
 	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
 
 run-logtest: logtest
-	./logtest
+	-./logtest
 
 tensor: tensor.go
 	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
 
 run-tensor: tensor
-	./tensor
+	-./tensor
 
 
 clean:
