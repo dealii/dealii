@@ -14,7 +14,6 @@ class MultipleParameterLoop;
 #include <vector.h>
 #include <base/exceptions.h>
 
-#include <iomanip.h>
 
 #ifdef DEBUG
 #  define _G_NO_NRV     // don't use GNU's named return values in debug modes
