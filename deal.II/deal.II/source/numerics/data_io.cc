@@ -327,8 +327,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
     };
 
 				   // write cells. Enumerate cells
-				   // consecutively (doesn't matter since
-				   // we do not use cell data)
+				   // consecutively
   if (true)
     {
       unsigned int index;
