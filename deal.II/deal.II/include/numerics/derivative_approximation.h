@@ -75,7 +75,7 @@
  * the values of the finite element field at the centers of the cells
  * are taken. It might therefore only be useful to use this class for
  * discontinuous, piecewise constant elements (i.e. using the
- * @ref{FEDG_Q0} class), since all other finite elements can approximate
+ * FEDG_Q0 class), since all other finite elements can approximate
  * gradients themselves.
  *
  *

@@ -514,7 +514,7 @@ struct TriaNumberCache<1>
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
  * specialization stores the numbers of quads. Due to the inheritance
- * from the base class @ref{TriaNumberCache<1>}, the numbers of lines
+ * from the base class TriaNumberCache<1>, the numbers of lines
  * are also within this class.
  *
  * In the old days, whenever one wanted to access one of these
@@ -574,7 +574,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
  * specialization stores the numbers of hexes. Due to the inheritance
- * from the base class @ref{TriaNumberCache<2>}, the numbers of lines
+ * from the base class TriaNumberCache<2>, the numbers of lines
  * and quads are also within this class.
  *
  * In the old days, whenever one wanted to access one of these
@@ -1688,7 +1688,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   <li> Face 4: children 3, 2, 6, 7;
  *   <li> Face 5: children 0, 4, 7, 3.
  *   </ul>
- *   You can get these numbers using the @ref{GeometryInfo<3>}@p ::child_cell_on_face
+ *   You can get these numbers using the GeometryInfo<3>@p ::child_cell_on_face
  *   function. Each child is adjacent to the vertex with the same number.
  *
  *   Note that, again, the above list only holds for faces in their

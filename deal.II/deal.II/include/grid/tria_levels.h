@@ -36,7 +36,7 @@ class TriangulationLevel
 /**
  *  Store all information which belongs to one level of the multilevel hierarchy.
  *
- *  In @ref{TriangulationLevel<0>} all data is stored which is not
+ *  In TriangulationLevel<0> all data is stored which is not
  *  dependent on the dimension, e.g. a field to store the
  *  refinement flag for the cells (what a cell actually is
  *  is declared elsewhere), etc. Actually, it is only cell-based
@@ -322,7 +322,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
 				      *  between the number of new quads and
 				      *  the number of new lines, etc.). Also
 				      *  don't forget to call the
-				      *  @ref{TriangulationLevel<0>}@p ::reserve_space
+				      *  TriangulationLevel<0>@p ::reserve_space
 				      *  function.
 				      */
     void reserve_space (const unsigned int new_lines);
@@ -355,7 +355,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
  *  information about the children of these lines and quads.
  *
  *  The vector of lines and their children is derived from
- *  @ref{TriangulationLevel<1>}.
+ *  TriangulationLevel<1>.
  *
  *  @author Wolfgang Bangerth, 1998
  */
@@ -368,7 +368,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 				      *  level.
 				      *
 				      *  It is fully analogous to the
-				      *  @ref{TriangulationLevel<1>::LinesData} structure inherited from
+				      *  TriangulationLevel<1>::LinesData structure inherited from
 				      *  Triangulation<tt><1></tt>.
 				      */
     struct QuadsData
@@ -379,7 +379,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 	std::vector<Quad> quads;
 					 /**
 					  *  Same as for the
-					  *  @ref{TriangulationLevel<1>::LinesData}@p ::chilren
+					  *  TriangulationLevel<1>::LinesData@p ::chilren
 					  *  array, but since there
 					  *  are four children, the
 					  *  index points to the first
@@ -391,13 +391,13 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
+					  *  TriangulationLevel<1>::LinesData@p ::used.
 					  */
 	std::vector<bool> used;
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
+					  *  TriangulationLevel<1>::LinesData@p ::used.
 					  */
 	std::vector<bool> user_flags;
 
@@ -477,7 +477,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
  *  Triangulation class) or in the opposite direction.
  *
  *  The vectors of lines and quads and their children are derived from
- *  @ref{TriangulationLevel<2>}.
+ *  TriangulationLevel<2>.
  *
  *  @author Wolfgang Bangerth, 1998, 2003
  */
@@ -491,9 +491,9 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 				      *  level.
 				      *
 				      *  It is fully analogous to the
-				      *  @ref{TriangulationLevel<1>::LinesData}
+				      *  TriangulationLevel<1>::LinesData
 				      *  structure inherited from
-				      *  @ref{Triangulation<1>}.
+				      *  Triangulation<1>.
 				      */
     struct HexesData
     {
@@ -504,7 +504,7 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
         
 					 /**
 					  *  Same as for the
-					  *  @ref{TriangulationLevel<1>::LinesData}@p ::chilren
+					  *  TriangulationLevel<1>::LinesData@p ::chilren
 					  *  array, but since there
 					  *  are four children, the
 					  *  index points to the first
@@ -516,13 +516,13 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
+					  *  TriangulationLevel<1>::LinesData@p ::used.
 					  */
 	std::vector<bool> used;
 
 					 /**
 					  *  Same as for
-					  *  @ref{TriangulationLevel<1>::LinesData}@p ::used.
+					  *  TriangulationLevel<1>::LinesData@p ::used.
 					  */
 	std::vector<bool> user_flags;
 

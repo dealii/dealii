@@ -112,7 +112,7 @@ class DoFLevel<1>
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * quads.  See @ref{DoFLevel<1>} for more information.
+ * quads.  See DoFLevel<1> for more information.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -140,7 +140,7 @@ class DoFLevel<2> : public DoFLevel<1>
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * hexhedra.  See @ref{DoFLevel<1>} for more information.
+ * hexhedra.  See DoFLevel<1> for more information.
  *
  * @author Wolfgang Bangerth, 1998
  */

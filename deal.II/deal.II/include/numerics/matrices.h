@@ -56,10 +56,10 @@ namespace PETScWrappers
  *
  * There exist two versions of each function. One with a Mapping
  * argument and one without. If a code uses a mapping different from
- * @ref{MappingQ1} the functions <em>with</em> mapping argument should
- * be used. Code that uses only @ref{MappingQ1} may also use the
+ * MappingQ1 the functions <em>with</em> mapping argument should
+ * be used. Code that uses only MappingQ1 may also use the
  * functions <em>without</em> Mapping argument. Each of these
- * latter functions create a @ref{MappingQ1} object and just call the
+ * latter functions create a MappingQ1 object and just call the
  * respective functions with that object as mapping argument. The
  * functions without Mapping argument still exist to ensure
  * backward compatibility. Nevertheless it is advised to change the
@@ -67,7 +67,7 @@ namespace PETScWrappers
  * the functions that take this @p Mapping object as argument. This
  * gives the possibility to easily extend the user codes to work also
  * on mappings of higher degree, this just by exchanging
- * @ref{MappingQ1} by, for example, a MappingQ or another
+ * MappingQ1 by, for example, a MappingQ or another
  * Mapping object of interest.
  *
  * All functions take a sparse matrix object to hold the matrix to be

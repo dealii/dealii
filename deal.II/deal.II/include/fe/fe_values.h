@@ -961,7 +961,7 @@ class FEValues : public FEValuesBase<dim>
 	      const UpdateFlags         update_flags);
 
                                      /**
-				      * Constructor. Uses @ref{MappingQ1}
+				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
     FEValues (const FiniteElement<dim> &fe,
@@ -1139,7 +1139,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 		  const UpdateFlags update_flags);
 
                                      /**
-				      * Constructor. Uses @ref{MappingQ1}
+				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
     FEFaceValues (const FiniteElement<dim>& fe,
@@ -1199,7 +1199,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 		     const UpdateFlags update_flags);
 
                                      /**
-				      * Constructor. Uses @ref{MappingQ1}
+				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
     FESubfaceValues (const FiniteElement<dim>& fe,

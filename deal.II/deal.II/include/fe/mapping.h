@@ -363,7 +363,7 @@ class Mapping : public Subscriptor
 				      * further information.
 				      *
 				      * Example: refer to the same
-				      * function in @ref{MappingQ1}.
+				      * function in MappingQ1.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags) const = 0;
     

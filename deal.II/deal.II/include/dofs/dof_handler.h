@@ -57,7 +57,7 @@ class DoFDimensionInfo
 /**
  * Define some types for the DoF handling in one dimension.
  *
- * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in TriaDimensionInfo<2>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -91,7 +91,7 @@ class DoFDimensionInfo<1>
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
+ * The types have the same meaning as those declared in TriaDimensionInfo<2>.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -125,7 +125,7 @@ class DoFDimensionInfo<2>
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in @ref{TriaDimensionInfo<3>}.
+ * The types have the same meaning as those declared in TriaDimensionInfo<3>.
  *
  * @author Wolfgang Bangerth, 1998
  */
