@@ -2038,6 +2038,6 @@ template class DataOutBase::Patch<data_out_dimension, data_out_dimension>;
 
 // also enable plotting surfaces of 3d objects
 #if data_out_dimension == 3
-template class DataOutInterface<data_out_dimension,data_out_dimension-1>;
-template class DataOutBase::Patch<data_out_dimension, data_out_dimension-1>;
+template class DataOutInterface<data_out_dimension-1,data_out_dimension>;
+template class DataOutBase::Patch<data_out_dimension-1, data_out_dimension>;
 #endif
