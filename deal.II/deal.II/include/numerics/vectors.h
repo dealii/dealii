@@ -572,6 +572,10 @@ class VectorTools
 				      * Exception
 				      */
     DeclException0 (ExcComponentMismatch);
+				     /**
+				      * Exception
+				      */
+  DeclException0 (ExcNonInterpolatingFE);
 };
 
 
