@@ -71,14 +71,14 @@ esac
 
 dnl Set compile flags accordingly
 if test $enableshared = yes ; then
-  AC_MSG_RESULT(Configuring for shared libraries)
+  AC_MSG_RESULT(configuring for shared libraries)
   CFLAGS="$CFLAGS -fPIC"
   CXXFLAGS="$CXXFLAGS -fPIC"
   LDFLAGS="$LDFLAGS -fPIC"
 
   lib_suffix=.so;
 else
-  AC_MSG_RESULT(Configuring for static libraries)
+  AC_MSG_RESULT(configuring for static libraries)
 dnl Define these variables so they are not filled with default values later
   CFLAGS="$CFLAGS "
   CXXFLAGS="$CXXFLAGS "
@@ -114,29 +114,29 @@ if test $GXX = yes ; then
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
   case "$GXX_VERSION_STRING" in
     *"egcs-1.1"*)
-	AC_MSG_RESULT(Compiler is egcs-1.1)
+	AC_MSG_RESULT(compiler is egcs-1.1)
 	GXX_VERSION=egcs1.1
 	;;
     *2.95*)
-	AC_MSG_RESULT(Compiler is gcc-2.95)
+	AC_MSG_RESULT(compiler is gcc-2.95)
 	GXX_VERSION=gcc2.95
 	;;
     *2.96*)
-	AC_MSG_RESULT(Compiler is gcc-2.96)
+	AC_MSG_RESULT(compiler is gcc-2.96)
 	GXX_VERSION=gcc2.96
 	;;
     *2.97*)
-	AC_MSG_RESULT(Compiler is gcc-2.97)
+	AC_MSG_RESULT(compiler is gcc-2.97)
 	GXX_VERSION=gcc2.97
 	;;
     *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
 	dnl These compilers are too old to support a useful subset
 	dnl of modern C++, so we don't support them
-	AC_MSG_RESULT(Compiler is $GXX_VERSION_STRING)
-	AC_MSG_ERROR(Compiler is not supported)
+	AC_MSG_RESULT(compiler is $GXX_VERSION_STRING)
+	AC_MSG_ERROR(compiler is not supported)
 	;;
     *)
-	AC_MSG_RESULT(Compiler is unknown but accepted gcc version)
+	AC_MSG_RESULT(compiler is unknown but accepted gcc version)
 	GXX_VERSION=other
 	;;
   esac
@@ -394,7 +394,7 @@ AC_ARG_ENABLE(multigrid,
       enablemultigrid=no ;
     fi)
 if test $enablemultigrid = yes ; then
-   AC_MSG_RESULT(Configuring multigrid)
+   AC_MSG_RESULT(configuring multigrid)
    AC_DEFINE(ENABLE_MULTIGRID)
 fi
 AC_SUBST(enablemultigrid)
