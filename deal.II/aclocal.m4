@@ -428,7 +428,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl ??? disable warning 655 (about all-inlined functions) which
 	  dnl triggers for each and every of our DeclExceptionX calls ???
           CXXFLAGSG="$CXXFLAGS -g1 +p +w -z -Aa -AA"
-          CXXFLAGSO="$CXXFLAGS -A -Xa -z +O2 -Aa -AA"
+          CXXFLAGSO="$CXXFLAGS -z +O2 -Aa -AA"
           CXXFLAGSPIC="+Z"
 	  # for linking shared libs, -b is also necessary...
           ;;
