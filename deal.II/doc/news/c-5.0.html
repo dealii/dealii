@@ -69,6 +69,18 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Removed: The <code
+       class="class">ParameterHandler</code> class contained a remnant from
+       back in 1997 when it was modeled after a similar class in DiffPack: it
+       had a <code>status</code> flag that one could obtain via the <code
+       class="member">ok</code> function. It was never really used for
+       anything, and has thus finally been removed. The <code
+       class="member">ok</code> is consequently gone as well.
+       <br> 
+       (WB 2004/06/06)
+       </p>
+
+  <li> <p>
        New: An object of the new <code
        class="class">ConditionalOStream</code> class allows to print
        to an output stream depending on a condition, which is active

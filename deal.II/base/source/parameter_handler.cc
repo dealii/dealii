@@ -31,7 +31,6 @@
 # include <limits>
 #endif
 
-//TODO[WB]: Remove the "status" flag -- it's only a remnant of the DiffPack past of this class and doesn't really serve any useful purpose any more
 
 namespace Patterns
 {  
@@ -542,11 +541,6 @@ namespace Patterns
 
 
 
-ParameterHandler::ParameterHandler ()
-                :
-		status(true) {}
-
-
 
 ParameterHandler::~ParameterHandler ()
 {}
@@ -559,13 +553,15 @@ bool ParameterHandler::read_input (std::istream &input)
 
   std::string line;
   int lineno=0;
+  bool status = true;
+  
   while (input) 
     {
       ++lineno;
       getline (input, line);
       if (!scan_line (line, lineno)) 
 	status = false;
-    };
+    }
 
   return status;
 }
@@ -608,7 +604,8 @@ bool ParameterHandler::read_input_from_string (const char *s)
 				   // to make all lines equal
   if (input[input.length()-1] != '\n')
     input += '\n';
-  
+
+  bool status = true;
   while (input.size() != 0) 
     {
 				       // get one line from Input (=s)
@@ -629,8 +626,6 @@ bool ParameterHandler::read_input_from_string (const char *s)
 
 void ParameterHandler::clear ()
 {
-  status = true;
-
   subsection_path.clear ();
   defaults.entries.clear ();
   changed_entries.entries.clear ();
@@ -1283,7 +1278,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
     {
       sec = sec->subsections[*SecName];
       ++SecName;
-    };
+    }
 
   return sec;
 }
@@ -1293,8 +1288,7 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
 unsigned int 
 ParameterHandler::memory_consumption () const
 {
-  return (MemoryConsumption::memory_consumption (status) +
-	  MemoryConsumption::memory_consumption (subsection_path) +
+  return (MemoryConsumption::memory_consumption (subsection_path) +
 	  MemoryConsumption::memory_consumption (defaults) +
 	  MemoryConsumption::memory_consumption (changed_entries));
 }

@@ -1288,14 +1288,7 @@ class ParameterHandler
     virtual bool read_input_from_string (const char *s);
 
 				     /**
-				      * Return status of this object:
-				      * <tt>true</tt>=clean or
-				      * <tt>false</tt>=error occured.
-				      */
-    bool ok () const;
-
-				     /**
-				      * clear status bit and contents.
+				      * Clear all contents.
 				      */
     void clear ();
 
@@ -1504,11 +1497,6 @@ class ParameterHandler
 		    << "Error when trying to convert the following string: " << arg1);
     
   private:
-				     /**
-				      * ok bit
-				      */
-    bool status;
-
 				     /**
 				      * Whatever is in a section:
 				      * map of entry names together with
@@ -2058,15 +2046,6 @@ class MultipleParameterLoop : public ParameterHandler
     void fill_entry_values (const unsigned int run_no);
 };
 
-
-/*------------------------------ Inline functions ------------------------------*/
-
-inline
-bool
-ParameterHandler::ok() const
-{
-  return status;
-}
 
 
 #endif
