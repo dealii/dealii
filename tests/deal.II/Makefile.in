@@ -297,7 +297,7 @@ endif
 
 intergrid_map.testcase: $(intergrid_map-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS) $(lib-deal2-1d.g) $(lib-deal2-3d.g)
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(lib-deal2-1d.g) $(lib-deal2-3d.g) $(LIBS)
 
 
 ############################################################
@@ -313,7 +313,7 @@ endif
 
 intergrid_constraints.testcase: $(intergrid_constraints-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS) $(lib-deal2-1d.g) $(lib-deal2-3d.g)
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(lib-deal2-1d.g) $(lib-deal2-3d.g) $(LIBS)
 
 
 ############################################################
