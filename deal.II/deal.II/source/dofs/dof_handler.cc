@@ -1064,7 +1064,7 @@ void DoFHandler<1>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
 
 				   // set up an array which dofs are used
 				   // on a specific cell
-  unsigned int      *dofs_on_this_cell = new unsigned int[selected_fe->total_dofs];
+  unsigned int *dofs_on_this_cell = new unsigned int[selected_fe->total_dofs];
   
   for (; cell!=endc; ++cell) 
     {

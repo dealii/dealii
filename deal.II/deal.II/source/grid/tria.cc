@@ -5,6 +5,7 @@
 #include <grid/tria.h>
 #include <basic/magic_numbers.h>
 #include <basic/data_io.h>
+#include <lac/dvector.h>
 #include <iostream>
 #include <algorithm>
 #include <map>
@@ -1718,6 +1719,39 @@ void Triangulation<2>::print_gnuplot (ostream &out,
       << endl  // double new line for gnuplot 3d plots
       << endl;
 };
+
+
+
+
+template <int dim>
+void Triangulation<dim>::refine (const dVector &criteria,
+				 const double   threshold) {
+  Assert (criteria.n() == n_active_cells(),
+	  ExcInvalidVectorSize(criteria.n(), n_active_cells()));
+
+  active_cell_iterator cell = begin_active();
+  const unsigned int n_cells = criteria.n();
+  
+  for (unsigned int index=0; index<n_cells; ++cell, ++index)
+    if (criteria(index) > threshold)
+      cell->set_refine_flag();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
+					      const double   fraction) {
+  dVector tmp(criteria);
+  nth_element (tmp.begin(),
+	       tmp.begin()+static_cast<int>(fraction*tmp.n()),
+	       tmp.end(),
+	       greater<double>());
+
+  refine (criteria, *(tmp.begin() +
+		      static_cast<int>(fraction*tmp.n())));
+};
+
 
 
 
