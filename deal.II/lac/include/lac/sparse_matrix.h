@@ -394,6 +394,14 @@ class SparseMatrix : public Subscriptor
     template <typename somenumber>
     somenumber matrix_norm (const Vector<somenumber> &v) const;
 
+				     /**
+				      * Compute the matrix scalar
+				      * product $\left(u,Mv\right)$.
+				      */
+    template <typename somenumber>
+    somenumber matrix_scalar_product (const Vector<somenumber> &u,
+				      const Vector<somenumber> &v) const;
+    
     				     /**
 				      * Return the l1-norm of the matrix, that is
 				      * $|M|_1=max_{all columns j}\sum_{all 
