@@ -1,5 +1,8 @@
 #  Use the following perl scripts to convert the output into a
 #  suitable format.
+#
+#  $Id$
+#  Wolfgang Bangerth, 1998
   
 perl -pi -e 's/phi_polynom\[(\d+)\] =/case $1: return/g;' *2d.shape_value
 perl -pi -e 's/([^;])\n/$1/g;' *2d.shape_grad
