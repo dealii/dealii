@@ -526,7 +526,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
 
 template <>
 void KellyErrorEstimator<1>::integrate_over_regular_face (Data &,
-							  int ,
+							  const unsigned int,
 							  const active_cell_iterator &,
 							  const unsigned int      ,
 							  FEFaceValues<1>        &,
@@ -540,7 +540,7 @@ void KellyErrorEstimator<1>::integrate_over_regular_face (Data &,
 template <>
 void KellyErrorEstimator<1>::
 integrate_over_irregular_face (Data &,
-			       int,
+			       const unsigned int,
 			       const active_cell_iterator &,
 			       const unsigned int          ,
 			       FEFaceValues<1>            &,
