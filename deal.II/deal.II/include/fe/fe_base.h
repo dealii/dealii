@@ -1225,12 +1225,22 @@ class FiniteElementBase : public Subscriptor,
 				      * only be zero, and the inner
 				      * index is equal to the stored
 				      * value.
+				      *
+				      * If the element is not
+				      * primitive, i.e. there are
+				      * shape functions that are
+				      * non-zero in more than one
+				      * vector-component, then this
+				      * function is obviously useless,
+				      * and all entries will be
+				      * invalid.
 				      */
     std::vector< std::vector<unsigned int> > component_to_system_table;
 
 				     /**
 				      * Map between component and
-				      * linear dofs on a face.
+				      * linear dofs on a face. Same
+				      * applies as above.
 				      */
     std::vector< std::vector<unsigned int> > face_component_to_system_table;
     

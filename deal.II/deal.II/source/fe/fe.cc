@@ -189,10 +189,11 @@ FiniteElementBase (const FiniteElementData<dim> &fe_data,
 	Assert (false, ExcNotImplemented());
     };
 	    
-  				   // this is the default way, if there is only
-				   // one component; if there are several, then
-				   // the constructor of the derived class needs
-				   // to fill these arrays
+  				   // this is the default way, if
+				   // there is only one component; if
+				   // there are several, then the
+				   // constructor of the derived class
+				   // needs to overwrite these arrays
   for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
     {
       system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
