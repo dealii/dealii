@@ -187,8 +187,8 @@ MGTools::make_flux_sparsity_pattern (
   const MGDoFHandler<dim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
-  const FullMatrix<double>& int_mask,
-  const FullMatrix<double>& flux_mask)
+  const FullMatrix<double> &int_mask,
+  const FullMatrix<double> &flux_mask)
 {
   const unsigned int n_dofs = dof.n_dofs(level);
   const unsigned int n_comp = dof.get_fe().n_components();
@@ -296,8 +296,8 @@ MGTools::make_flux_sparsity_pattern (
 template <int dim>
 void
 MGTools::count_dofs_per_component (
-  const MGDoFHandler<dim>& dof_handler,
-  std::vector<std::vector<unsigned int> >& result,
+  const MGDoFHandler<dim> &dof_handler,
+  std::vector<std::vector<unsigned int> > &result,
   std::vector<unsigned int> target_component)
 {
   const unsigned int nlevels = dof_handler.get_tria().n_levels();
@@ -375,8 +375,8 @@ MGTools::count_dofs_per_component (
 
 template<int dim, typename number>
 void
-MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
-			MGLevelObject<Vector<number> >& v)
+MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
+			MGLevelObject<Vector<number> > &v)
 {
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
@@ -390,8 +390,8 @@ MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
 
 template<int dim, typename number>
 void
-MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
-                        MGLevelObject<BlockVector<number> >& v,
+MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
+                        MGLevelObject<BlockVector<number> > &v,
                         const std::vector<bool> &sel,
 			const std::vector<unsigned int> &target_comp)
 {
