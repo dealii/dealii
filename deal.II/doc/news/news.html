@@ -54,6 +54,21 @@
       </dd>
 
       <dt>
+          <strong>2001/01/16: Correct namespace <code>std::</code>
+          scoping</strong>  
+      </dt>
+      <dd>
+          All identifiers that the C++ standard (see
+          <a href="http://www.cygnus.com/misc/wp/dec96pub/"
+          target="_top">this page</a> for the public draft -- the
+          standard itself is not available online for copyright reasons)
+          mandates to be in namespace <code>std::</code> are correctly
+          prefixed by the namespace name. While previous gcc compilers
+          accepted these names also without the prefix, gcc 3.0 will
+          require them, as do some commercial compilers.
+      </dd>
+
+      <dt>
           <strong>2000/11/27: Memory consumption monitoring</strong> 
       </dt>
       <dd>
