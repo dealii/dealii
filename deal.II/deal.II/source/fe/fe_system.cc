@@ -1009,8 +1009,8 @@ FESystem<dim>::build_cell_tables()
 				   // non-primitive shape functions,
 				   // have a special invalid index.
   const std::pair<unsigned int, unsigned int>
-    non_primitive_index (static_cast<unsigned int>(-1),
-			 static_cast<unsigned int>(-1));
+    non_primitive_index (deal_II_numbers::invalid_unsigned_int,
+			 deal_II_numbers::invalid_unsigned_int);
   
 				   // First enumerate vertex indices,
 				   // where we first enumerate all
@@ -1183,8 +1183,8 @@ FESystem<dim>::build_face_tables()
 				   // functions, have a special
 				   // invalid index
   const std::pair<unsigned int, unsigned int>
-    non_primitive_index (static_cast<unsigned int>(-1),
-			 static_cast<unsigned int>(-1));
+    non_primitive_index (deal_II_numbers::invalid_unsigned_int,
+			 deal_II_numbers::invalid_unsigned_int);
   
 				   // 1. Vertices
   unsigned int total_index = 0;

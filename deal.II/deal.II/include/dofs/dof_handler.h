@@ -273,7 +273,7 @@ class DoFHandler  :  public Subscriptor,
 				      * certain value, but rather take
 				      * its symbolic name.
 				      */
-    static const unsigned int invalid_dof_index = static_cast<unsigned int>(-1);
+    static const unsigned int invalid_dof_index = deal_II_numbers::invalid_unsigned_int;
     
 				     /**
 				      * Constructor. Take @p{tria} as the

@@ -141,11 +141,11 @@ namespace
 	else
 	  {
 	    Assert (false, ExcNotImplemented());
-	    return std::make_pair (-1, static_cast<unsigned int>(-1));
+	    return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
 	  }
       }
     else
-      return std::make_pair (-1, static_cast<unsigned int>(-1));
+      return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
   }
 
 

@@ -37,7 +37,7 @@ TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead
 TimeDependent::TimeDependent (const TimeSteppingData &data_primal,
 			      const TimeSteppingData &data_dual,
 			      const TimeSteppingData &data_postprocess):
-		sweep_no (static_cast<unsigned int>(-1)),
+		sweep_no (deal_II_numbers::invalid_unsigned_int),
 		timestepping_data_primal (data_primal),
 		timestepping_data_dual (data_dual),
 		timestepping_data_postprocess (data_postprocess)
@@ -252,8 +252,8 @@ unsigned int TimeDependent::memory_consumption () const
 TimeStepBase::TimeStepBase (const double time) :
 		previous_timestep(0),
 		next_timestep (0),
-		sweep_no (static_cast<unsigned int>(-1)),
-		timestep_no (static_cast<unsigned int>(-1)),
+		sweep_no (deal_II_numbers::invalid_unsigned_int),
+		timestep_no (deal_II_numbers::invalid_unsigned_int),
 		time (time)
 {}
 

@@ -66,7 +66,7 @@ template <typename number>
 void
 MeanValueFilter::filter(BlockVector<number>& v) const
 {
-  Assert (component != static_cast<unsigned int>(-1),
+  Assert (component != deal_II_numbers::invalid_unsigned_int,
 	  ExcNotInitialized());
   
   for (unsigned int i=0;i<v.n_blocks();++i)
@@ -83,7 +83,7 @@ void
 MeanValueFilter::vmult(BlockVector<number>& dst,
 			   const BlockVector<number>& src) const
 {
-  Assert (component != static_cast<unsigned int>(-1),
+  Assert (component != deal_II_numbers::invalid_unsigned_int,
 	  ExcNotInitialized());
   
   Assert (dst.n_blocks() == src.n_blocks(),
@@ -103,7 +103,7 @@ void
 MeanValueFilter::vmult_add(BlockVector<number>& dst,
 			   const BlockVector<number>& src) const
 {
-  Assert (component != static_cast<unsigned int>(-1),
+  Assert (component != deal_II_numbers::invalid_unsigned_int,
 	  ExcNotInitialized());
   
   Assert (dst.n_blocks() == src.n_blocks(),

@@ -65,7 +65,7 @@ namespace
       if (i*i == N)
 	return i;
     Assert (false, ExcInternalError());
-    return static_cast<unsigned int>(-1);
+    return deal_II_numbers::invalid_unsigned_int;
   }
 
 
@@ -78,7 +78,7 @@ namespace
       if (i*i*i == N)
 	return i;
     Assert (false, ExcInternalError());
-    return static_cast<unsigned int>(-1);
+    return deal_II_numbers::invalid_unsigned_int;
   }
 
 
@@ -279,7 +279,7 @@ namespace
       }
     
     Assert (false, ExcInternalError());
-    return static_cast<unsigned int>(-1);
+    return deal_II_numbers::invalid_unsigned_int;
   }
 
 
@@ -310,7 +310,7 @@ namespace
   {
     Assert (false, ExcNotImplemented());
 //    const unsigned int N1d = 2+fe_data.dofs_per_line;
-    return static_cast<unsigned int>(-1);
+    return deal_II_numbers::invalid_unsigned_int;
   }
 
 

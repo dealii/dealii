@@ -920,7 +920,7 @@ face (const unsigned int face_no,
       default:
             Assert (false, ExcInternalError());
     }
-  return static_cast<unsigned int>(-1);
+  return deal_II_numbers::invalid_unsigned_int;
 }
 
 
@@ -963,7 +963,7 @@ sub_face (const unsigned int face_no,
       default:
             Assert (false, ExcInternalError());
     }
-  return static_cast<unsigned int>(-1);              
+  return deal_II_numbers::invalid_unsigned_int;              
 }
 
 
@@ -987,7 +987,7 @@ template <int dim>
 QProjector<dim>::DataSetDescriptor::
 DataSetDescriptor ()
                 :
-                dataset_offset (static_cast<unsigned int>(-1))
+                dataset_offset (deal_II_numbers::invalid_unsigned_int)
 {}
 
 

@@ -1380,7 +1380,7 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
                            :
                            i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
                          :
-                         static_cast<unsigned int>(-1))));
+                         deal_II_numbers::invalid_unsigned_int)));
                   if (fe.is_primitive (cell_index))
                     selected_dofs[face_dof_indices[i]]
                       = (component_select[fe.face_system_to_component_index(i).first]
@@ -2044,7 +2044,7 @@ compute_intergrid_transfer_representation (const DoFHandler<dim>              &c
       const unsigned int parameter_dof = weight_mapping[i];
 				       // if this global dof is a
 				       // parameter
-      if (parameter_dof != static_cast<unsigned int>(-1))
+      if (parameter_dof != deal_II_numbers::invalid_unsigned_int)
 	{
 	  Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
 	  Assert (inverse_weight_mapping[parameter_dof] == DoFHandler<dim>::invalid_dof_index,

@@ -516,7 +516,7 @@ class DataOutBase
 					 /**
 					  * Value for no neighbor.
 					  */
-	static const unsigned int no_neighbor = static_cast<unsigned int>(-1);
+	static const unsigned int no_neighbor = deal_II_numbers::invalid_unsigned_int;
 	
 					 /**
 					  * Exception

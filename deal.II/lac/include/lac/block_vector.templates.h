@@ -622,7 +622,7 @@ namespace internal
           current_block       = parent.n_blocks();
           index_within_block  = 0;
           next_break_backward = global_index;
-          next_break_forward  = static_cast<unsigned int>(-1);
+          next_break_forward  = deal_II_numbers::invalid_unsigned_int;
         };
     }
 
@@ -654,7 +654,7 @@ namespace internal
                                              // then move the next
                                              // boundary arbitrarily far
                                              // away
-            next_break_forward = static_cast<unsigned int>(-1);
+            next_break_forward = deal_II_numbers::invalid_unsigned_int;
         };
   
       ++global_index;
@@ -689,7 +689,7 @@ namespace internal
                                            // get into unspecified terrain
           {
             --current_block;
-            index_within_block = static_cast<unsigned int>(-1);
+            index_within_block = deal_II_numbers::invalid_unsigned_int;
             next_break_forward = 0;
             next_break_backward = 0;
           };

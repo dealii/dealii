@@ -852,7 +852,7 @@ namespace Functions
 					* that no component is
 					* selected.
 					*/
-      static const unsigned int no_component = static_cast<unsigned int>(-1);
+      static const unsigned int no_component = deal_II_numbers::invalid_unsigned_int;
 
   				       /**
 					* Constructor. Arguments are the

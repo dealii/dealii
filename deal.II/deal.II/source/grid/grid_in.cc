@@ -591,7 +591,7 @@ GridIn<dim>::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
 				   // then renumber the vertices that
 				   // are actually used in the same
 				   // order as they were beforehand
-  const unsigned int invalid_vertex = static_cast<unsigned int>(-1);
+  const unsigned int invalid_vertex = deal_II_numbers::invalid_unsigned_int;
   std::vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
   unsigned int next_free_number = 0;
   for (unsigned int i=0; i<vertices.size(); ++i)

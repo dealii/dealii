@@ -246,7 +246,7 @@ class MappingCartesian : public Mapping<dim>
 				      * face or subface number is
 				      * invalid.
 				      */
-    static const unsigned int invalid_face_number = static_cast<unsigned int>(-1);    
+    static const unsigned int invalid_face_number = deal_II_numbers::invalid_unsigned_int;    
 };
 
 /*@}*/

@@ -922,7 +922,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
                                  :
                                  i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
                                :
-                               static_cast<unsigned int>(-1))));
+                               deal_II_numbers::invalid_unsigned_int)));
                         Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
                                                          // make sure

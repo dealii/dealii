@@ -135,7 +135,7 @@ class SparseMatrixEZ : public Subscriptor
 					 /**
 					  * Non-existent column number.
 					  */
-	static const unsigned int invalid = static_cast<unsigned int>(-1);
+	static const unsigned int invalid = deal_II_numbers::invalid_unsigned_int;
     };
 
 				     /**

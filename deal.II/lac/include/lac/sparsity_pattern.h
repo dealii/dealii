@@ -135,7 +135,7 @@ class SparsityPattern : public Subscriptor
 				      * but the actual value of the
 				      * variable may change over time.
 				      */
-    static const unsigned int invalid_entry = static_cast<unsigned int>(-1);
+    static const unsigned int invalid_entry = deal_II_numbers::invalid_unsigned_int;
     
 				     /**
 				      * Initialize the matrix empty,

@@ -324,8 +324,8 @@ FiniteElementBase<dim>::interface_constraints_size () const
       default:
             Assert (false, ExcNotImplemented());
     };
-  return TableIndices<2> (static_cast<unsigned int>(-1),
-                          static_cast<unsigned int>(-1));
+  return TableIndices<2> (deal_II_numbers::invalid_unsigned_int,
+                          deal_II_numbers::invalid_unsigned_int);
 }
 
 
