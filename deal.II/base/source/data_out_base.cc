@@ -3084,7 +3084,11 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 
 #ifdef DEAL_II_HAVE_TECPLOT
 
-namespace
+#ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+  namespace TEC
+#else
+  namespace
+#endif
 {
   class TecplotMacros
   {
@@ -3242,7 +3246,11 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   const unsigned int vars_per_node  = (dim+n_data_sets),  
                      nodes_per_cell = GeometryInfo<dim>::vertices_per_cell;
   
+#ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+  TEC::TecplotMacros tm(n_nodes, vars_per_node, n_cells, nodes_per_cell);
+#else
   TecplotMacros tm(n_nodes, vars_per_node, n_cells, nodes_per_cell);
+#endif
   
   int is_double = 0,
       tec_debug = 0,
