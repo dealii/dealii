@@ -349,60 +349,34 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 					   // therein
 	  for (unsigned int block_col=0; block_col<blocks; ++block_col)
 	    {
-	      const SparsityPattern &
-		block_sparsity = sparsity.block(block_row, block_col);
-	      
-	      const unsigned int
-		first = block_sparsity.get_rowstart_indices()[block_index.second],
-		last  = block_sparsity.get_rowstart_indices()[block_index.second+1];
-	      for (unsigned int j=first; j<last; ++j)
-						 // end of row reached?
-		if (block_sparsity.get_column_numbers()[j] ==
-                    SparsityPattern::invalid_entry)
-		  {
-						     // this should
-						     // not happen,
-						     // since we only
-						     // operate on
-						     // compressed
-						     // matrices!
-		    Assert (false, ExcMatrixNotClosed());
-		    break;
-		  }
-		else
-		  {
-		    const unsigned int global_col
-		      = index_mapping.local_to_global(block_col,
-						      block_sparsity.get_column_numbers()[j]);
+              for (typename SparseMatrix<number>::iterator
+                     entry = uncondensed.block(block_row, block_col).begin(block_index.second);
+                   entry != uncondensed.block(block_row, block_col).end(block_index.second);
+                   ++entry)
+                {
+                  const unsigned int global_col
+                    = index_mapping.local_to_global(block_col,entry->column());
 		    
-		    if (distribute[global_col] != deal_II_numbers::invalid_unsigned_int)
-						       // distribute
-						       // entry at
-						       // regular row
-						       // @p{row} and
-						       // irregular
-						       // column
-						       // global_col;
-						       // set old
-						       // entry to
-						       // zero
-		      {
-			const double old_value =
-			  uncondensed.block(block_row,block_col).global_entry(j);
+                  if (distribute[global_col] != deal_II_numbers::invalid_unsigned_int)
+                                                     // distribute entry at
+                                                     // regular row @p{row}
+                                                     // and irregular column
+                                                     // global_col; set old
+                                                     // entry to zero
+                    {
+                      const double old_value = entry->value ();
 			
-			for (unsigned int q=0;
-			     q!=lines[distribute[global_col]]
-					    .entries.size(); ++q)
-			  uncondensed.add (row,
-					   lines[distribute[global_col]].entries[q].first,
-					   old_value *
-					   lines[distribute[global_col]].entries[q].second);
-			
-			uncondensed.block(block_row,block_col).global_entry(j)
-			  = 0.;
-		      };
-		  };
-	    };
+                      for (unsigned int q=0;
+                           q!=lines[distribute[global_col]].entries.size(); ++q)
+                        uncondensed.add (row,
+                                         lines[distribute[global_col]].entries[q].first,
+                                         old_value *
+                                         lines[distribute[global_col]].entries[q].second);
+
+                      entry->value() = 0.;
+                    }
+                }
+	    }
 	}
       else
 	{
@@ -413,91 +387,62 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 					   // blocks
 	  for (unsigned int block_col=0; block_col<blocks; ++block_col)
 	    {
-	      const SparsityPattern &
-		block_sparsity = sparsity.block(block_row,block_col);
-	      
-	      const unsigned int
-		first = block_sparsity.get_rowstart_indices()[block_index.second],
-		last  = block_sparsity.get_rowstart_indices()[block_index.second+1];
-      
-	      for (unsigned int j=first; j<last; ++j)
-						 // end of row reached?
-		if (block_sparsity.get_column_numbers()[j] ==
-                    SparsityPattern::invalid_entry)
-		  {
-						     // this should
-						     // not happen,
-						     // since we only
-						     // operate on
-						     // compressed
-						     // matrices!
-		    Assert (false, ExcMatrixNotClosed());
-		    break;
-		  }
-		else
-		  {
-		    const unsigned int global_col
-		      = index_mapping.local_to_global (block_col,
-						       block_sparsity.get_column_numbers()[j]);
+              for (typename SparseMatrix<number>::iterator
+                     entry = uncondensed.block(block_row, block_col).begin(block_index.second);
+                   entry != uncondensed.block(block_row, block_col).end(block_index.second);
+                   ++entry)
+                {
+                  const unsigned int global_col
+                    = index_mapping.local_to_global (block_col, entry->column());
 		    
-		    if (distribute[global_col] ==
-                        deal_II_numbers::invalid_unsigned_int)
-						       // distribute
-						       // entry at
-						       // irregular
-						       // row @p{row}
-						       // and regular
-						       // column
-						       // global_col. set
-						       // old entry to
-						       // zero
-		      {
-			const double old_value
-			  = uncondensed.block(block_row,block_col).global_entry(j);
+                  if (distribute[global_col] ==
+                      deal_II_numbers::invalid_unsigned_int)
+                                                     // distribute
+                                                     // entry at
+                                                     // irregular
+                                                     // row @p{row}
+                                                     // and regular
+                                                     // column
+                                                     // global_col. set
+                                                     // old entry to
+                                                     // zero
+                    {
+                      const double old_value = entry->value();
 			  
-			for (unsigned int q=0;
-			     q!=lines[distribute[row]].entries.size(); ++q) 
-			  uncondensed.add (lines[distribute[row]].entries[q].first,
-					   global_col,
-					   old_value *
-					   lines[distribute[row]].entries[q].second);
-			
-			uncondensed.block(block_row,block_col).global_entry(j) = 0.;
-		      }
-		    else
-						       // distribute
-						       // entry at
-						       // irregular
-						       // row @p{row}
-						       // and
-						       // irregular
-						       // column
-						       // @p{global_col}
-						       // set old
-						       // entry to one
-						       // if on main
-						       // diagonal,
-						       // zero
-						       // otherwise
-		      {
-			const double old_value
-			  = uncondensed.block(block_row,block_col).global_entry(j);
+                      for (unsigned int q=0;
+                           q!=lines[distribute[row]].entries.size(); ++q) 
+                        uncondensed.add (lines[distribute[row]].entries[q].first,
+                                         global_col,
+                                         old_value *
+                                         lines[distribute[row]].entries[q].second);
+
+                      entry->value() = 0.;
+                    }
+                  else
+                                                     // distribute entry at
+                                                     // irregular row @p{row}
+                                                     // and irregular column
+                                                     // @p{global_col} set old
+                                                     // entry to one if on
+                                                     // main diagonal, zero
+                                                     // otherwise
+                    {
+                      const double old_value = entry->value ();
 			  
-			for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
-			  for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
-			    uncondensed.add (lines[distribute[row]].entries[p].first,
-					     lines[distribute[global_col]].entries[q].first,
-					     old_value *
-					     lines[distribute[row]].entries[p].second *
-					     lines[distribute[global_col]].entries[q].second);
-		
-			uncondensed.block(block_row,block_col).global_entry(j)
-			  = (row == global_col ? average_diagonal : 0. );
-		      };
-		  };
-	    };
-	};
-    };
+                      for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+                        for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
+                          uncondensed.add (lines[distribute[row]].entries[p].first,
+                                           lines[distribute[global_col]].entries[q].first,
+                                           old_value *
+                                           lines[distribute[row]].entries[p].second *
+                                           lines[distribute[global_col]].entries[q].second);
+
+                      entry->value() = (row == global_col ? average_diagonal : 0. );
+                    }
+                }
+	    }
+	}
+    }
 }
 
 
