@@ -496,14 +496,15 @@ class BlockVector
 				      * different blocks.
 				      */
     BlockIndices block_indices;
+    
   private:
-				   /**
-				    * The number of blocks. This
-				    * number is redundant to
-				    * @p{components.size()} and stored
-				    * here for convenience.
-				    */
-  unsigned int num_blocks;
+				     /**
+				      * The number of blocks. This
+				      * number is redundant to
+				      * @p{components.size()} and stored
+				      * here for convenience.
+				      */
+    unsigned int num_blocks;
 };
 
 
@@ -526,6 +527,7 @@ unsigned int BlockVector<Number>::n_blocks () const
 }
 
 
+
 template <typename Number>
 inline
 Number BlockVector<Number>::operator() (const unsigned int i) const
@@ -534,6 +536,7 @@ Number BlockVector<Number>::operator() (const unsigned int i) const
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }
+
 
 
 template <typename Number>
