@@ -35,6 +35,9 @@
  * etc. It also manages allocation of the right amount of temporary
  * storage required by these functions.
  *
+ * For a description of the steps necessary for the installation of
+ * HSL subroutines, read the section on external libraries in the
+ * deal.II ReadMe file.
  *
  * @section3{Interface and Method}
  *

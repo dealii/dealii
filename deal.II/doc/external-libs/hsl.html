@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <title>The deal.II Readme</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Using and installing instructions for functions from the
+    Harwell Subroutine Library (HSL)</h1>
+
+    <p>
+    The <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
+    target="_top">Harwell Subroutine Library (HSL)</a> is a collection of
+    Fortran77 files that implement various methods to solve linear
+    systems of equations, but also cover various other aspects of
+    mathematical algorithms. <acronym>deal.II</acronym> is presently
+    able to use two of the sparse direct solvers implemented in that
+    library:
+    <ul>
+    <li> <p> MA27: A modified Gauss elimination method for sparse
+         symmetric indefinite systems.</p>
+    <li> <p> MA47: A frontal elimination method for sparse symmetric
+         indefinite systems.</p>
+    </ul>
+    Within <acronym>deal.II</acronym>, they are used by the classes 
+    <code>SparseDirectMA27</code> and <code>SparseDirectMA47</code>
+    (see the online reference in the LAC sublibrary for more
+    information).
+    </p>
+
+    <p>
+    With respect to the integration of these functions into
+    <acronym>deal.II</acronym>, there are two problems: Firstly, for
+    license reasons, we can not, however, include these solvers in the
+    standard distribution of the library, so you have to download them
+    yourself, if you want to use them. Secondly, these functions are
+    usually downloaded as single files, rather than as a complete
+    library, so one does not usually build up a whole library against which
+    a <acronym>deal.II</acronym> program could be linked, but is left
+    with the individual files.
+    </p>
+
+    <p>
+    Our solution to this problem is as follows:
+    <ul>
+    <li> <p>
+         If you want to use any of these subroutines, then you have to
+         download them from the <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
+	 target="_top">HSL server</a>. Note that the license is rather
+         restrictive.
+	 </p>
+
+	 <p>
+	 For MA27, you have to have the main file, while for MA47
+	 there are two files, one for the main algorithm and one with
+	 support functions.
+	 </p>
+
+    <li> <p>
+         Drop these files into the directory
+         <code>deal.II/contrib/hsl/source</code>, with names
+	 <code>ma27.f</code> (for MA27), and <code>ma47.f</code> and
+         <code>ma47dep.f</code> (for MA47). There should already be a
+         file called <code>ma27sup.f</code>. Note that the exact names
+         (including letter case) of the files matter.
+	 </p>
+
+    <li> <p>
+         Run (or re-run) the <code>./configure</code> script in the
+         top level directory of <acronym>deal.II</acronym>. It should,
+         at one point, print a message which functions from HSL it has
+         found. This sets some flags for subsequent compilations 
+	 (preprocessor defines <code>HAVE_HSL_MA27,
+         HAVE_HSL_MA47</code> and Makefile variable
+         <code>USE_CONTRIB_HSL=yes</code>) that 
+         these functions have been found and can be used, rather than
+         dummy functions that only display an error and abort the
+         program if called.
+	 <p>
+
+    <li> <p>
+         Compile the library (a description of how to do so is found
+         in the <a href="../readme.html" target="body">ReadMe</a>
+         file). If you had already made it, first clean the directory
+         by calling <code>make clean</code> in the top level directory.
+	 </p>
+    </ul>
+    </p>
+
+    <p>
+    Note that if the respective functions have not been found at
+    configure time, then the classes using them are still available to
+    programs, but when called will issue an error message and abort
+    the program with an exception.
+    </p>
+
+    <p>
+    If HSL functions have been found, then we also have some Fortran77
+    code in the system. Of course, the requires that some F77 compiler
+    has been found at configure time, but note that this also changes
+    the libraries that need to be linked to the program. For example,
+    on Sun, these are the libraries <code>-lF77 -lsunmath
+    -lM77</code>. Usually, the right set of additional libraries
+    should be detected automatically at configure time, and the
+    respective flags should also be set correctly without user
+    interaction.
+    </p>
+
+    <hr>
+    
+    <address>
+      <a href="mail.html">The deal.II mailing list</a>
+      $Date$
+    </address>
+  </body>
+</html>
