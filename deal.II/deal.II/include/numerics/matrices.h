@@ -277,7 +277,7 @@ class MatrixCreator
 				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<dim>      *a = 0);
+				      const Function<dim> * const a = 0);
 
 				     /**
 				      * Calls the
@@ -292,7 +292,7 @@ class MatrixCreator
 				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<dim>      *a = 0);
+				      const Function<dim> * const a = 0);
 
 				     /**
 				      * Assemble the Laplace
@@ -311,7 +311,7 @@ class MatrixCreator
 				       const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
-				       const Function<dim>      *a = 0);
+				       const Function<dim> * const a = 0);
     
 				     /**
 				      * Calls the @p{create_laplace_matrix}
@@ -321,7 +321,7 @@ class MatrixCreator
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
-				       const Function<dim>      *a = 0);
+				       const Function<dim> * const a = 0);
 
 				     /**
 				      * Generate Laplace matrix for a
@@ -368,7 +368,7 @@ class MatrixCreator
 				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      &rhs,
 				       Vector<double>           &rhs_vector,
-				       const Function<dim>      *a = 0);
+				       const Function<dim> * const a = 0);
 
 				     /**
 				      * Exception

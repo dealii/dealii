@@ -518,7 +518,8 @@ PreconditionIdentity::Tvmult (VECTOR& dst, const VECTOR& src) const
 
 template <class MATRIX>
 inline void
-PreconditionRelaxation<MATRIX>::initialize (const MATRIX& rA, double o)
+PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
+					    const double  o)
 {
   A = &rA;
   omega = o;
@@ -597,8 +598,8 @@ PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 
 
 template<class MATRIX, class VECTOR>
-PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX& M,
-							    function_ptr method)
+PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX       &M,
+							    const function_ptr  method)
 		:
 		matrix(M), precondition(method)
 {}

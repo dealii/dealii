@@ -55,7 +55,7 @@ class VectorMemory : public Subscriptor
 				      * Return a vector into the pool
 				      * for later use.
 				      */
-    virtual void free(const Vector*) = 0;
+    virtual void free (const Vector * const) = 0;
 				     /**
 				      * No more available vectors.
 				      */
