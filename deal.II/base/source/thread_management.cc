@@ -89,7 +89,7 @@ namespace Threads
   };
   
 
-#ifdef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
 					  const char         *,
 					  void               *)
@@ -346,17 +346,12 @@ namespace Threads
 			  0);    
 #  endif
     
-                                     // if truly in MT mode, increase
-                                     // thread number counter
-    ++n_existing_thread_counter;
-
 #else
                                      // if not in MT mode, then simply
                                      // call the respective
                                      // serializing function, that
                                      // executes the given function
-                                     // and return. don't have to
-                                     // adjust the number of threads
+                                     // and return
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,
 			  0);
