@@ -722,6 +722,9 @@ void Vector<Number>::print (std::ostream      &out,
   Assert (dim!=0, ExcEmptyVector());
   AssertThrow (out, ExcIO());
 
+  std::ios::fmtflags old_flags = out.flags();
+  unsigned int old_precision = out.precision (precision);
+  
   out.precision (precision);
   if (scientific)
     out.setf (std::ios::scientific, std::ios::floatfield);
@@ -737,6 +740,9 @@ void Vector<Number>::print (std::ostream      &out,
   out << std::endl;
   
   AssertThrow (out, ExcIO());
+                                   // reset output format
+  out.flags (old_flags);
+  out.precision(old_precision);
 }
 
 
