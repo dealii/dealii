@@ -26,7 +26,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		weights(quadrature.n_quadrature_points, 0),
 		JxW_values(quadrature.n_quadrature_points, 0),
 		quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
-		unit_quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
+		unit_quadrature_points(quadrature.get_quad_points()),
 		ansatz_points (fe.total_dofs, Point<dim>()),
 		jacobi_matrices (quadrature.n_quadrature_points,
 				 dFMatrix(dim,dim)),
@@ -43,7 +43,6 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
   for (unsigned int i=0; i<n_quadrature_points; ++i) 
     {
       weights[i] = quadrature.weight(i);
-      unit_quadrature_points[i] = quadrature.quad_point(i);
     };
 };
 
@@ -176,7 +175,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		weights(quadrature.n_quadrature_points, 0),
 		JxW_values(quadrature.n_quadrature_points, 0),
 		quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
-		unit_quadrature_points(quadrature.n_quadrature_points, Point<dim-1>()),
+		unit_quadrature_points(quadrature.get_quad_points()),
 		ansatz_points (fe.dofs_per_face, Point<dim>()),
 		jacobi_matrices (quadrature.n_quadrature_points,dFMatrix(dim,dim)),
 		face_jacobi_determinants (quadrature.n_quadrature_points,0),
@@ -210,6 +209,13 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		case 0:
 		      global_unit_quadrature_points[face][p]
 			= Point<dim>(unit_quadrature_points[p](0),0);
+		      cout << "  face=" << face << ", p=" << p
+			   << ",  uqp[p]=" << unit_quadrature_points[p]
+			   << ", guqp[face][p]="
+			   << global_unit_quadrature_points[face][p]
+			   << ", ??="
+			   << Point<dim>(unit_quadrature_points[p](0),0)
+			   << endl;
 		      break;	   
 		case 1:
 		      global_unit_quadrature_points[face][p]
@@ -318,12 +324,15 @@ double FEFaceValues<dim>::JxW (const unsigned int i) const {
 };
 
 
+#include <grid/dof_accessor.h>
 
 template <int dim>
 void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				const unsigned int                             face_no,
 				const FiniteElement<dim>                      &fe,
 				const Boundary<dim>                           &boundary) {
+  cout << "ATTENTION: update_flags all set to " << (update_flags=255) << endl;
+  
   selected_face = face_no;
 				   // fill jacobi matrices and real
 				   // quadrature points
@@ -381,6 +390,41 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       for (unsigned int i=0; i<n_quadrature_points; ++i)
 	JxW_values[i] = weights[i] * face_jacobi_determinants[i];
     };
+
+  cout << "----------------------------------------" << endl;
+  cout << "cell vertices: \n";
+  for (unsigned int i=0; i<2*dim; ++i)
+    cout << "  " << cell->vertex(i) << endl;
+  cout << "face no= " << face_no << endl;
+
+				   /*
+  cout << "----------------------------------------" << endl;
+  cout << "Unit face quadrature points:\n";
+  for (unsigned i=0; i<unit_quadrature_points.size(); ++i)
+    cout << "  " << unit_quadrature_points[i];
+  cout << endl;
+				   */
+  cout << "----------------------------------------" << endl;
+  cout << "Unit global quadrature points:\n";
+  for (unsigned int face=0; face<2*dim; ++face)
+    {
+      cout << "  face=" << face << endl;
+      for (unsigned int i=0; i<unit_quadrature_points.size(); ++i)
+	cout << global_unit_quadrature_points[face][i] << endl;
+    };
+				   /*
+  cout << "----------------------------------------" << endl;
+  cout << "shape values: \n";
+  for (unsigned int i=0; i<2*dim; ++i) 
+    {
+      cout << "face=" << i << endl;
+      shape_values[i].print_formatted(cout);
+    };
+  cout << endl;
+				   */
+  
+  cout << "----------------------------------------" << endl;
+  Assert (false,ExcAccessToUninitializedField());
 };
 
 

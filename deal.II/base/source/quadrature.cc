@@ -25,6 +25,13 @@ const Point<dim> & Quadrature<dim>::quad_point (const unsigned int i) const {
 
 
 template <int dim>
+const vector<Point<dim> > & Quadrature<dim>::get_quad_points () const {
+  return quadrature_points;
+};
+
+
+
+template <int dim>
 double Quadrature<dim>::weight (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
   return weights[i];

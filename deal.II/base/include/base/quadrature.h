@@ -52,6 +52,12 @@ class Quadrature {
     const Point<dim> & quad_point (const unsigned int i) const;
 
 				     /**
+				      * Return a reference to the whole array of
+				      * quadrature points.
+				      */
+    const vector<Point<dim> > & get_quad_points () const;
+    
+				     /**
 				      * Return the weight of the #i#th
 				      * quadrature point.
 				      */
