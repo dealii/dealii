@@ -333,6 +333,162 @@ CosineFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 
 //////////////////////////////////////////////////////////////////////
 
+template<int dim>
+double
+ExpFunction<dim>::value (const Point<dim>   &p,
+			    const unsigned int) const
+{
+  switch(dim)
+    {
+      case 1:
+	    return exp(p(0));
+      case 2:
+	    return exp(p(0)) * exp(p(1));
+      case 3:
+	    return exp(p(0)) * exp(p(1)) * exp(p(2));
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+  return 0.;
+}
+
+template<int dim>
+void
+ExpFunction<dim>::value_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      switch(dim)
+	{
+	  case 1:
+		values[i] = exp(p(0));
+		break;
+	  case 2:
+		values[i] = exp(p(0)) * exp(p(1));
+		break;
+	  case 3:
+		values[i] = exp(p(0)) * exp(p(1)) * exp(p(2));
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+	}
+    }
+}
+
+template<int dim>
+double
+ExpFunction<dim>::laplacian (const Point<dim>   &p,
+			    const unsigned int) const
+{
+  switch(dim)
+    {
+      case 1:
+	    return exp(p(0));
+      case 2:
+	    return 2 * exp(p(0)) * exp(p(1));
+      case 3:
+	    return 3 * exp(p(0)) * exp(p(1)) * exp(p(2));
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+  return 0.;
+}
+
+template<int dim>
+void
+ExpFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
+				     vector<double>            &values,
+				     const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      switch(dim)
+	{
+	  case 1:
+		values[i] = exp(p(0));
+		break;
+	  case 2:
+		values[i] = 2 * exp(p(0)) * exp(p(1));
+		break;
+	  case 3:
+		values[i] = 3 * exp(p(0)) * exp(p(1)) * exp(p(2));
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+	}
+    }
+}
+
+template<int dim>
+Tensor<1,dim>
+ExpFunction<dim>::gradient (const Point<dim>   &p,
+			       const unsigned int) const
+{
+  Tensor<1,dim> result;
+  switch(dim)
+    {
+      case 1:
+	    result[0] = exp(p(0));
+	    break;
+      case 2:
+	    result[0] = exp(p(0)) * exp(p(1));
+	    result[1] = exp(p(0)) * exp(p(1));
+	    break;
+      case 3:
+	    result[0] = exp(p(0)) * exp(p(1)) * exp(p(2));
+	    result[1] = exp(p(0)) * exp(p(1)) * exp(p(2));
+	    result[2] = exp(p(0)) * exp(p(1)) * exp(p(2));
+	    break;
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+  return result;
+}
+
+template<int dim>
+void
+ExpFunction<dim>::gradient_list (const vector<Point<dim> > &points,
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const
+{
+  Assert (gradients.size() == points.size(),
+	  ExcDimensionMismatch(gradients.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      switch(dim)
+	{
+	  case 1:
+		gradients[i][0] = exp(p(0));
+		break;
+	  case 2:
+		gradients[i][0] = exp(p(0)) * exp(p(1));
+		gradients[i][1] = exp(p(0)) * exp(p(1));
+		break;
+	  case 3:
+		gradients[i][0] = exp(p(0)) * exp(p(1)) * exp(p(2));
+		gradients[i][1] = exp(p(0)) * exp(p(1)) * exp(p(2));
+		gradients[i][2] = exp(p(0)) * exp(p(1)) * exp(p(2));
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+	}
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 
 double
 LSingularityFunction::value (const Point<2>   &p,
@@ -520,3 +676,6 @@ template PillowFunction<3>;
 template CosineFunction<1>;
 template CosineFunction<2>;
 template CosineFunction<3>;
+template ExpFunction<1>;
+template ExpFunction<2>;
+template ExpFunction<3>;
