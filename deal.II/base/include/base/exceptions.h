@@ -1,15 +1,15 @@
-//----------------------------  exceptions.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  exceptions.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__exceptions_h
 #define __deal2__exceptions_h
 
@@ -1016,7 +1016,53 @@ namespace StandardExceptions
 				    * cases, this exception is thrown.
 				    */
   DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
-				   //@}
+
+				   /**
+				    * This function requires the BLAS
+				    * library. Please reconfigure
+				    * using the option
+				    * <tt>--with-blas</tt> and check
+				    * if it is actually included.
+				    */
+  DeclException0 (ExcNeedsBLAS);
+  
+				   /**
+				    * This function requires the LAPACK
+				    * library. Please reconfigure
+				    * using the option
+				    * <tt>--with-lapack</tt> and check
+				    * if it is actually included.
+				    */
+  DeclException0 (ExcNeedsLAPACK);
+  
+				   /**
+				    * This function requires the UMFPack
+				    * library. Please reconfigure
+				    * using the option
+				    * <tt>--with-umfpack</tt> and check
+				    * if it is actually included.
+				    */
+  DeclException0 (ExcNeedsUMFPack);
+  
+				   /**
+				    * This function requires the METIS
+				    * library. Please reconfigure
+				    * using the option
+				    * <tt>--with-metis</tt> and check
+				    * if it is actually included.
+				    */
+  DeclException0 (ExcNeedsMETIS);
+  
+				   /**
+				    * This function requires the Petsc
+				    * library. Please reconfigure
+				    * using the option
+				    * <tt>--with-petsc</tt> and check
+				    * if it is actually included.
+				    */
+  DeclException0 (ExcNeedsPetsc);
+  
+//@}
 }
 
 
