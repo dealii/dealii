@@ -30,7 +30,6 @@
 #include <algorithm>
 
 
-//TODO[GK]: the following two functions need to be in mg_transfer_base.all_dimensions.cc
 
 template <int dim>
 void MGTransferBlockBase::build_matrices (
@@ -309,6 +308,8 @@ void MGTransferBlockBase::build_matrices (
 #endif  
 }
 
+
+//TODO[GK]: the following function needs to be in mg_transfer_base.all_dimensions.cc
 //TODO:[GK] Add all those little vectors.
 unsigned int
 MGTransferBlockBase::memory_consumption () const
