@@ -2020,12 +2020,25 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
 				      const TriaIterator<dim,CellAccessor<dim> > &pointer) const {
   Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaSubstructAccessor<dim>::ExcInvalidNeighbor(i));
-  tria->levels[present_level]->
-    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first
-    = pointer->present_level;
-  tria->levels[present_level]->
-    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second
-    = pointer->present_index;
+
+  if (pointer.state() == valid)
+    {
+      tria->levels[present_level]->
+	neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first
+	= pointer->present_level;
+      tria->levels[present_level]->
+	neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second
+	= pointer->present_index;
+    }
+  else
+    {
+      tria->levels[present_level]->
+	neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first
+	= -1;
+      tria->levels[present_level]->
+	neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second
+	= -1;
+    };
 };
 
 
