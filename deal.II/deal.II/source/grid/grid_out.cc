@@ -774,21 +774,72 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	out << "# cell " << cell << std::endl;
 
       if (mapping==0 || n_points==2 || !cell->has_boundary_lines())
-	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-	  {
-	    const Triangulation<dim>::face_iterator
-	      face = cell->face(face_no);
-	    
-	    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-	      out << face->vertex(v)
-		  << ' ' << cell->level()
-		  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
-	    out << face->vertex(0)
-		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;		  
-	    out << std::endl;
-	    out << std::endl;
-	  }
+	{	  	    
+					   // front face
+	  out << cell->vertex(0)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(1)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(2)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(3)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(0)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+					   // back face
+	  out << cell->vertex(4)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(5)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(6)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(7)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(4)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+	  
+					   // now for the four connecting lines
+	  out << cell->vertex(0)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(4)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+	  out << cell->vertex(1)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(5)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+	  out << cell->vertex(2)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(6)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+	  out << cell->vertex(3)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(7)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+	}
       else
 	{
 	  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
