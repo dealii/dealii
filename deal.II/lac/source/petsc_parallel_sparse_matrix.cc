@@ -115,15 +115,9 @@ namespace PETScWrappers
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
                                        // for all rows globally
-                                       //
-                                       // note that we partition the columns
-                                       // in the same way as we partition the
-                                       // rows, i.e. we assume that users
-                                       // specify the same number for
-                                       // local_rows as they do for local_size
-                                       // on parallel vectors
+//TODO[WB]: We should do better by providing ways to tell PETSc how to partition the columns
       const int ierr
-        = MatCreateMPIAIJ(communicator, local_rows, local_rows, m, n,
+        = MatCreateMPIAIJ(communicator, local_rows, PETSC_DECIDE, m, n,
                           n_nonzero_per_row, 0, 0, 0,
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -160,14 +154,9 @@ namespace PETScWrappers
       const std::vector<signed int> int_row_lengths (row_lengths.begin(),
                                                      row_lengths.end());
                                        
-                                       // note that we partition the columns
-                                       // in the same way as we partition the
-                                       // rows, i.e. we assume that users
-                                       // specify the same number for
-                                       // local_rows as they do for local_size
-                                       // on parallel vectors
+//TODO[WB]: We should do better by providing ways to tell PETSc how to partition the columns
       const int ierr
-        = MatCreateMPIAIJ(communicator, local_rows, local_rows, m, n,
+        = MatCreateMPIAIJ(communicator, local_rows, PETSC_DECIDE, m, n,
                           0, &int_row_lengths[0], 0, 0,
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
