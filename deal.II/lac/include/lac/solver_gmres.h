@@ -312,9 +312,10 @@ unsigned int dim = 0;
 	   ((inner_iteration < n_tmp_vectors-2)
 	    &&
 	    (iteration_state==SolverControl::iterate));
-	   ++inner_iteration, ++accumulated_iterations)
+	   ++inner_iteration)
 	{
-					   // yet another alias
+	  ++accumulated_iterations;
+	  // yet another alias
 	  VECTOR& vv = *tmp_vectors[inner_iteration+1];
 	  
 	  if (left_precondition)
