@@ -13,7 +13,248 @@
 /**
  * This class only wraps up some functionality not included in the
  * #ACE_Thread_Manager# class, namely the possibility to call member
- * functions when spawning threads.
+ * functions when spawning threads. Fuethermore, it provides ways to
+ * pass arguments to functions taking more than a single parameter.
+ *
+ * The basic problem with member functions is that they implicitely
+ * want to get a pointer to the object they are to work on. Therefore,
+ * a member function taking one parameter is in fact a binary
+ * function, since the #this# pointer is passed as well. This is
+ * reflected by the fact that member function pointers need to be
+ * called like this: #object_pointer->(*mem_fun_ptr) (args)#.
+ *
+ * On the other hand, the thread creation routines (in both the
+ * operating system and ACE) only accept unary, global functions as
+ * thread entry points. Their argument is a #void*#, which might be
+ * used to pass a pointer to a structure to the function; that may
+ * then include values of parameters, the address of the member
+ * function to be called, and finally the address upon which the
+ * function is to operate (i.e. what will be the function's #this#
+ * pointer).
+ *
+ * In practice, this usually leads to code like the following:
+ * \begin{verbatim}
+ *   class TestClass {
+ *            void   spawn_thread ();
+ *     static void * thread_entry (void *);
+ *            void * threaded_function (int arg1, double arg2);
+ *  };
+ *
+ *  struct ParametersForThreadEntry {
+ *    int    arg1;
+ *    double arg2;
+ *
+ *    TestClass * object;
+ *  };
+ *
+ *  void TestClass:spawn_thread () {
+ *    ParametersForThreadEntry params;
+ *    params.object = this;
+ *    params.arg1   = 1;
+ *    params.arg2   = 3.1415926;
+ *
+ *    spawn (..., &thread_entry, (void*)&params, ...);
+ *  };
+ *
+ *  void * TestClass::thread_entry (void * params_tmp) {
+ *                        // cast parameters object to the
+ *                        // type it really has
+ *    ParametersForThreadEntry * params =
+ *               (ParametersForThreadEntry*)params_tmp;
+ *                        // unpack entries of params
+ *                        // and call member function
+ *    void * return_value =
+ *         (params->object)->threaded_function (params.arg1, params.arg2);
+ *    return return_value;
+ *  };
+ *
+ *  void * TestClass::threaded_function (int arg1, double arg2) {
+ *    ... // do something in parallel to the main thread
+ *  };
+ * \end{verbatim}
+ *
+ * Note that the #static# in the declaration of #thread_entry# means
+ * that is not a true member function in that it does not take a
+ * #this# pointer and therefore is truely a unary function. However,
+ * due to this, it can't access member variables.
+ *
+ * This program above suffers from several problems:
+ * \begin{enumerate}
+ *   \item One has to have a different structure for passing arguments
+ *     to functions (if there would be another function taking two
+ *     integers instead of the argument list above, one would have to have
+ *     another parameter structure including two integers).
+ *
+ *   \item One would also need a different #thread_entry# function for
+ *     all functions to be called, since each of them can call only
+ *     one member function (one could include the address of the member
+ *     function into the structure wrapped around the parameter values;
+ *     then one would only need one #thread_entry# function for each
+ *     different parameter list of functions).
+ *
+ * \item The program has a bug: #params# in #spawn_thread# is a local
+ *     variable, which is destroyed at the end of the function. If now
+ *     the operating system returns after executing the #spawn# call,
+ *     but takes some time for internal actions before passing control
+ *     to the #thread_entry# function, then the pointer given to
+ *     #thread_entry# might not point to anything reasonable any more,
+ *     thus producing random results.
+ *
+ *     The problem gets even worse, if the parameters in
+ *     #ParametersForThreadEntry# contain not only values, but also
+ *     references of pointers to other data elements; one will then
+ *     have to guarantee that not only the #params# variable is
+ *     preserved until its values are copied by #thread_entry# to the
+ *     places where function parameters of #threaded_function# are
+ *     stored (i.e. usually on the stack), but also the lifetime of
+ *     the variables to which the elements of #params# point, have to
+ *     be long enough to guarantee that they still exist whenever
+ *     #threaded_function# uses them.
+ * \end{enumerate}
+ *
+ * The present class at leasts solves the first two problems:
+ * \begin{enumerate}
+ * \item By providing standardized templated class for parameter
+ *     transfer, it is no more necessary to declare parameter
+ *     structures one-by-one. For example, #ParametersForThreadEntry#
+ *     above could be replaced by
+ *     #ThreadManager::Mem_Fun_Data2<TestClass,int,double>#, with
+ *     template parameters representing the type of the class for
+ *     which a member function shall be called, and the parameters to
+ *     this function.
+ *
+ * \item The #thread_entry# function above was declared as a static
+ *     member function in order to not clutter up the global namespace
+ *     with thread entry functions for each and every purpose. It
+ *     could, however, also be a global function, or a static member
+ *     function of another class. This class provides a thread entry
+ *     function for each possible list of parameters for a member
+ *     function; these thread entry functions obviously are made
+ *     #static#, i.e. you need not create an object of class
+ *     #ThreadManager# to call them, and they satisfy the requirement
+ *     of #spawn# to be of data type (function pointer type) #void *
+ *     (*) (void *)#.
+ * \end{enumerate}
+ *
+ * The third problem mentioned above cannot be solved so easily,
+ * however. It is still up to the calling function to guarantee that
+ * the #params# structure exists long enough and that objects to which
+ * elements of #params# point exist long enough. There are at least
+ * two strategies for this problem:
+ * \begin{verbatim}
+ *
+ * \item Allocate the parameters object on the stack: one could modify
+ *     the example as follows:
+ *     \begin{verbatim}
+ *       void TestClass:spawn_thread () {
+ *         ParametersForThreadEntry *params = new ParametersForThreadEntry;
+ *         params->object = this;
+ *         params->arg1   = 1;
+ *         params->arg2   = 3.1415926;
+ *
+ *         spawn (..., &thread_entry, (void*)params, ...);
+ *       };
+ *     \end{verbatim}
+ *
+ *     Thus, the parameters object is on the heap instead of on the
+ *     stack, and its lifetime is until it is #delete#d some
+ *     time. Again, the #spawn_thread# function can't do that since it
+ *     does not exactly know at which point the second thread does not
+ *     need the data any more. However, the #thread_entry# function
+ *     could do that:
+ *     \begin{verbatim}
+ *       void * TestClass::thread_entry (void * params_tmp) {
+ *                             // cast parameters object to the
+ *                             // type it really has
+ *         ParametersForThreadEntry * params =
+ *                    (ParametersForThreadEntry*)params_tmp;
+ *                             // unpack entries of params
+ *                             // and call member function
+ *         void * return_value =
+ *              (params->object)->threaded_function (params.arg1, params.arg2);
+ *
+ *                             // delete parameters object
+ *         delete params;
+ * 
+ *         return return_value;
+ *       };
+ *     \end{verbatim}
+ *     This is safe, since the parameters object is deleted only after
+ *     the member function #threaded_function# returns; the parameters
+ *     are therefore no more needed.
+ *
+ *     The downside here is that there is another system function
+ *     which is commonly called: #spawn_n#, which creates #n# threads
+ *     at the same time, i.e. it jumps into #thread_entry# #n# times
+ *     at once. However, the #delete# operation must only be performed
+ *     once, namely by the thread which exits last; the code in
+ *     #thread_entry# would therefore have to synchronize which thread
+ *     calls the #delete# and when. This is feasible, but difficult.
+ *
+ * \item Blocking the first thread after spawning other threads: this would
+ *     yield an implementation of #spawn_thread# like this:
+ *     \begin{verbatim}
+ *       void TestClass:spawn_thread () {
+ *         ParametersForThreadEntry params;
+ *         params.object = this;
+ *         params.arg1   = 1;
+ *         params.arg2   = 3.1415926;
+ *
+ *         spawn (..., &thread_entry, (void*)&params, ...);
+ *
+ *         ... // some code which waits until the spawned thread returns
+ *       };
+ *     \end{verbatim}
+ *     Since execution of #spawn_treads# is suspended until the spawned
+ *     thread exits, so is the destruction of the #params# object. It is
+ *     therefore guaranteed that it exists longer than the lifetime of the
+ *     thread which might use it.
+ *
+ *     Obviously, the above function is useless as stated here, since
+ *     if we start a new threads and then stop the old one until the
+ *     new one returns, we could as well have called the member
+ *     function directly, without need to create a new thread. This
+ *     approach therefore is only useful, if the function creates more
+ *     than one thread and waits for them all to return. Thread
+ *     creation may happen using several #spawn# calls (and maybe
+ *     different parameter objects), as well as using the #spawn_n#
+ *     function. Destruction of the parameter object remains with the
+ *     calling function, as in the original example.
+ * \end{verbatim}
+ *
+ *
+ * \subsection{Example of use of this class}
+ *
+ * The following example shows how to use the elements of this class.
+ * \begin{verbatim}
+ *  void TestClass:spawn_thread () {
+ *                     // create ThreadManager object
+ *    ThreadManager thread_manager;
+ *                     // generate an object to pass
+ *                     // the two parameters
+ *    const ThreadManager::Mem_Fun_Data2<const SparseMatrix<number>,
+ *	                                 unsigned int,
+ *	                                 unsigned int> 
+ *	    mem_fun_data (this,     // object to operate on
+ *                        1,        // first parameter
+ *                        2,        // second parameter
+ *                                  // address of member function
+ *	 	          &TestClass::threaded_function 
+ *                       );
+ *
+ *                     // spawn a thread
+ *     thread_manager.spawn (&mem_fun_data);
+ *
+ *     ...             // do something more, start more threads, etc
+ *
+ *
+ *		       // ... and wait until they're finished:
+ *     thread_manager.wait ();
+ *  };
+ * \end{verbatim}
+ *
+ * Note that in this example, there is no need for the #thread_entry#
+ * function and the structure encapsulating parameters.
  *
  * @author Wolfgang Bangerth, 1999
  */
