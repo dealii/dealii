@@ -35,7 +35,7 @@ template <typename T> class Table<6,T>;
 
 /**
  * Base class for an array of indices of fixed size used for the
- * @ref{TableBase} class. Actually, this class serves a dual purpose,
+ * TableBase class. Actually, this class serves a dual purpose,
  * as it not only stores indices into said class, but also the sizes
  * of the table in its various coordinates.
  *
@@ -60,7 +60,7 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the general template, and has no implementation. There are
@@ -68,7 +68,7 @@ template <typename T> class Table<6,T>;
  * each used value of <tt>N</tt>), which only differ in the way they
  * implement their constructors (they take <tt>N</tt> arguments, something
  * that cannot be represented by a general template). Actual storage
- * of and access to data is done by the @ref{TableIndicesBase} base
+ * of and access to data is done by the TableIndicesBase base
  * class of a specializations.
  *
  * @author Wolfgang Bangerth, 2002
@@ -81,13 +81,13 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the specialization for a one-dimensional table, i.e. a
  * vector. This class only differs in the non-default constructors
  * from the other specializations. Actual storage of and access to
- * data is done by the @ref{TableIndicesBase} base class of a
+ * data is done by the TableIndicesBase base class of a
  * specializations.
  *
  * @author Wolfgang Bangerth, 2002
@@ -112,13 +112,13 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the specialization for a two-dimensional table. This class
  * only differs in the non-default constructors from the other
  * specializations. Actual storage of and access to data is done by
- * the @ref{TableIndicesBase} base class of a specializations.
+ * the TableIndicesBase base class of a specializations.
  *
  * @author Wolfgang Bangerth, 2002
  */
@@ -143,13 +143,13 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the specialization for a three-dimensional table. This class
  * only differs in the non-default constructors from the other
  * specializations. Actual storage of and access to data is done by
- * the @ref{TableIndicesBase} base class of a specializations.
+ * the TableIndicesBase base class of a specializations.
  *
  * @author Wolfgang Bangerth, 2002
  */
@@ -174,13 +174,13 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the specialization for a four-dimensional table. This class
  * only differs in the non-default constructors from the other
  * specializations. Actual storage of and access to data is done by
- * the @ref{TableIndicesBase} base class of a specializations.
+ * the TableIndicesBase base class of a specializations.
  *
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
@@ -206,13 +206,13 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the specialization for a five-dimensional table. This class
  * only differs in the non-default constructors from the other
  * specializations. Actual storage of and access to data is done by
- * the @ref{TableIndicesBase} base class of a specializations.
+ * the TableIndicesBase base class of a specializations.
  *
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
@@ -239,13 +239,13 @@ template <typename T> class Table<6,T>;
 
 
 /**
- * Array of indices of fixed size used for the @ref{TableBase}
+ * Array of indices of fixed size used for the TableBase
  * class.
  *
  * This is the specialization for a six-dimensional table. This class
  * only differs in the non-default constructors from the other
  * specializations. Actual storage of and access to data is done by
- * the @ref{TableIndicesBase} base class of a specializations.
+ * the TableIndicesBase base class of a specializations.
  *
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
@@ -652,7 +652,7 @@ namespace internal
  * Therefore, this data type was invented. Its implementation is
  * rather straightforward, with two exceptions. The first thing to
  * think about is how to pass the size in each of the coordinate
- * directions to the object; this is done using the @ref{TableIndices}
+ * directions to the object; this is done using the TableIndices
  * class. Second, how to access the individual elements. The basic
  * problem here is that we would like to make the number of arguments
  * to be passed to the constructor as well as the access functions
@@ -673,7 +673,7 @@ namespace internal
  * access function recursively until we were at the innermost
  * object. Emulating this behavior without losing the ability to do
  * index checks, and in particular without losing performance is
- * possible but nontrivial, and done in the @ref{TableBaseAccessors}
+ * possible but nontrivial, and done in the TableBaseAccessors
  * namespace.
  *
  *
@@ -787,12 +787,19 @@ class TableBase : public Subscriptor
                                       */
     void reinit (const TableIndices<N> &new_size);
 
+				     /**
+				      * Size of the table in direction
+				      * <tt>i</tt>.
+				      */
+    unsigned int size (unsigned int i) const;
+    
+				      */
                                      /**
                                       * Return the sizes of this
                                       * object in each direction.
                                       */
     const TableIndices<N> & size () const;
-
+    
                                      /**
                                       * Return the number of elements
                                       * stored in this object, which
@@ -951,7 +958,7 @@ class TableBase : public Subscriptor
 /**
  * A class representing a table with arbitrary but fixed number of
  * indices. This general template implements some additional functions
- * over those provided bythe @ref{TableBase} class, such as indexing
+ * over those provided bythe TableBase class, such as indexing
  * functions taking the correct number of arguments, etc.
  *
  * Rather than this general template, these functions are implemented
@@ -2011,6 +2018,16 @@ const TableIndices<N> &
 TableBase<N,T>::size () const
 {
   return table_size;
+}
+
+
+
+template <int N, typename T>
+unsigned int
+TableBase<N,T>::size (unsigned int i) const
+{
+  Assert (i<N, ExcIndexRange(i,0,N));
+  return table_size[i];
 }
 
 
