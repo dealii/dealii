@@ -602,11 +602,18 @@ void LaplaceProblem<dim>::solve ()
 				   // be done like this:
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
+				   // (Note that we did not have to
+				   // explicitely pass the address of
+				   // the SSOR function of the matrix
+				   // to this objects, rather it is
+				   // hardcoded into the object, thus
+				   // the name.)
+				   //
 				   // The default template parameters
-				   // of the PreconditionRelaxation
-				   // class are the matrix and the
-				   // vector type, which default to
-				   // the types used in this program.
+				   // of the ``PreconditionRelaxation''
+				   // class is the matrix type, which
+				   // defaults to the types used in
+				   // this program.
 
 				   // Calling the solver now looks
 				   // mostly like in the example
