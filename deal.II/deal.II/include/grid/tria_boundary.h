@@ -132,17 +132,26 @@ template <int dim>
 class StraightBoundary : public Boundary<dim> {
   public:
 				     /**
+				      * Let the new point be the arithmetic
+				      * mean of the two vertices of the line.
+				      *
 				      * Refer to the general documentation of
 				      * this class and the documentation of the
-				      * base class.
+				      * base class for more information.
 				      */
     virtual Point<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
 
 				     /**
+				      * Let the new point be the arithmetic mean
+				      * of the four vertices of this quad and
+				      * the four midpoints of the lines, which
+				      * are already created at the time of calling
+				      * this function.
+				      *
 				      * Refer to the general documentation of
 				      * this class and the documentation of the
-				      * base class.
+				      * base class for more information.
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;

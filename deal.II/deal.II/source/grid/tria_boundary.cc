@@ -55,7 +55,11 @@ Point<dim>
 StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const 
 {
   return (quad->vertex(0) + quad->vertex(1) +
-	  quad->vertex(2) + quad->vertex(3)) / 4;
+	  quad->vertex(2) + quad->vertex(3) +
+	  quad->line(0)->child(0)->vertex(1) +
+	  quad->line(1)->child(0)->vertex(1) +
+  	  quad->line(2)->child(0)->vertex(1) +
+  	  quad->line(3)->child(0)->vertex(1)) / 8;
 };
 
 #endif
