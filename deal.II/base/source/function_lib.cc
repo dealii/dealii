@@ -30,7 +30,116 @@
 
 
 
+template<int dim>
+double
+SquareFunction<dim>::value (const Point<dim>   &p,
+			    const unsigned int) const
+{
+  return p.square();
+}
 
+
+
+template<int dim>
+void
+SquareFunction<dim>::value_list (const vector<Point<dim> > &points,
+				 vector<double>            &values,
+				 const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      values[i] = p.square();
+    }
+}
+
+
+template<int dim>
+double
+SquareFunction<dim>::laplacian (const Point<dim>   &,
+			    const unsigned int) const
+{
+  return 2*dim;
+}
+
+
+template<int dim>
+void
+SquareFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
+				     vector<double>            &values,
+				     const unsigned int) const
+{
+  Assert (values.size() == points.size(),
+	  ExcDimensionMismatch(values.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    values[i] = 2*dim;
+}
+
+
+
+template<int dim>
+Tensor<1,dim>
+SquareFunction<dim>::gradient (const Point<dim>   &p,
+			       const unsigned int) const
+{
+  Tensor<1,dim> result;
+  switch(dim)
+    {
+      case 1:
+	    result[0] = 2.*p(0);
+	    break;
+      case 2:
+	    result[0] = 2.*p(0);
+	    result[1] = 2.*p(1);
+	    break;
+      case 3:
+	    result[0] = 2.*p(0);
+	    result[1] = 2.*p(1);
+	    result[2] = 2.*p(2);
+	    break;
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+  return result;
+}
+
+template<int dim>
+void
+SquareFunction<dim>::gradient_list (const vector<Point<dim> > &points,
+				    vector<Tensor<1,dim> >    &gradients,
+				    const unsigned int) const
+{
+  Assert (gradients.size() == points.size(),
+	  ExcDimensionMismatch(gradients.size(), points.size()));
+
+  for (unsigned int i=0;i<points.size();++i)
+    {
+      const Point<dim>& p = points[i];
+      switch(dim)
+	{
+	  case 1:
+		gradients[i][0] = 2.*p(0);
+		break;
+	  case 2:
+		gradients[i][0] = 2.*p(0);
+		gradients[i][1] = 2.*p(1);
+		break;
+	  case 3:
+		gradients[i][0] = 2.*p(0);
+		gradients[i][1] = 2.*p(1);
+		gradients[i][2] = 2.*p(2);
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+	}
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
 
 template<int dim>
 double
@@ -79,6 +188,8 @@ PillowFunction<dim>::value_list (const vector<Point<dim> > &points,
 	}
     }
 }
+
+
 
 template<int dim>
 double
@@ -685,6 +796,9 @@ SlitSingularityFunction::gradient_list (const vector<Point<2> > &points,
 
 //////////////////////////////////////////////////////////////////////
 
+template SquareFunction<1>;
+template SquareFunction<2>;
+template SquareFunction<3>;
 template PillowFunction<1>;
 template PillowFunction<2>;
 template PillowFunction<3>;
