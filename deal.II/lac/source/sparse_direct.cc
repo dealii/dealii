@@ -360,18 +360,22 @@ struct SparseDirectMA27::DetachedModeData
     template <typename T>
     void put (const T *t, const size_t N, const char *debug_info) const
       {
-                                         // repeat writing until syscall is
-                                         // not interrupted
-        int ret;
-        do
-          ret = write (server_client_pipe[1],
-                       reinterpret_cast<const char *> (t),
-                       sizeof(T) * N);
-        while ((ret<0) && (errno==EINTR));
-        if (ret < 0)
-          die ("error on client side in 'put'", ret, errno);
-        if (ret < static_cast<signed int>(sizeof(T)*N))
-          die ("not everything was written", ret, sizeof(T)*N);
+        unsigned int count = 0;
+        while (count < sizeof(T)*N)
+          {
+                                             // repeat writing until syscall is
+                                             // not interrupted
+            int ret;
+            do
+              ret = write (server_client_pipe[1],
+                           reinterpret_cast<const char *> (t),
+                           sizeof(T) * N);
+            while ((ret<0) && (errno==EINTR));
+            if (ret < 0)
+              die ("error on client side in 'put'", ret, errno);
+
+            count += ret;
+          };
         
         fflush (NULL);
         CommunicationsLog::
@@ -394,8 +398,8 @@ struct SparseDirectMA27::DetachedModeData
             
             if (ret < 0)
               die ("error on client side in 'get'", ret, errno);
-            else
-              count += ret;
+
+            count += ret;
           };
         
         CommunicationsLog::
