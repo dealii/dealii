@@ -36,13 +36,11 @@ template <int dim>
 class Point : public Tensor<1,dim> {
   public:
 				     /**
-				      * Default constructor.
-				      */
-    				     /**
 				      * Constructor. Initialize all entries
-				      * to zero.
+				      * to zero if #initialize==true#; this
+				      * is the default behaviour.
 				      */
-    explicit Point ();
+    explicit Point (const bool initialize = true);
 
 				     /**
 				      * Convert a tensor to a point. Since no
@@ -156,8 +154,8 @@ class Point : public Tensor<1,dim> {
 
 template <int dim>
 inline
-Point<dim>::Point () :
-		Tensor<1,dim>() {};
+Point<dim>::Point (const bool initialize) :
+		Tensor<1,dim>(initialize) {};
 
 
 template <int dim>

@@ -51,6 +51,25 @@ class Tensor {
     static const unsigned int rank      = rank_;
     
 				     /**
+				      * Declare an array type which can
+				      * be used to initialize statically
+				      * an object of this type.
+				      */
+    typedef typename Tensor<rank_-1,dim>::array_type array_type[dim];
+
+				     /**
+				      * Constructor. Initialize all entries
+				      * to zero.
+				      */
+    Tensor ();
+    
+				     /**
+				      * Copy constructor, where the data is
+				      * copied from a C-style array.
+				      */
+    Tensor (const array_type &initializer);
+    
+				     /**
 				      * Read-Write access operator.
 				      */
     Tensor<rank_-1,dim> &operator [] (const unsigned int i);
@@ -135,6 +154,27 @@ class Tensor {
 
 
 /*--------------------------- Inline functions -----------------------------*/
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim>::Tensor () {
+// default constructor. not specifying an initializer list calls
+// the default constructor of the subobjects, which initialize them
+// selves. therefore, the tensor is set to zero this way
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim>::Tensor (const array_type &initializer) {
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] =  Tensor<rank_-1,dim>(initializer[i]);
+};
+
+      
+
 
 template <int rank_, int dim>
 inline

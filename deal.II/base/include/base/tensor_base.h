@@ -58,10 +58,24 @@ class Tensor<1,dim> {
     static const unsigned int rank      = 1;
 
 				     /**
-				      * Constructor. Initialize all entries
-				      * to zero.
+				      * Declare an array type which can
+				      * be used to initialize statically
+				      * an object of this type.
 				      */
-    explicit Tensor ();
+    typedef double array_type[dim];
+
+				     /**
+				      * Constructor. Initialize all entries
+				      * to zero if #initialize==true#; this
+				      * is the default behaviour.
+				      */
+    explicit Tensor (const bool initialize = true);
+
+				     /**
+				      * Copy constructor, where the data is
+				      * copied from a C-style array.
+				      */
+    Tensor (const array_type &initializer);
     
     				     /**
 				      *  Copy constructor.
@@ -184,11 +198,21 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p);
 
 template <int dim>
 inline
-Tensor<1,dim>::Tensor () {
+Tensor<1,dim>::Tensor (const bool initialize) {
   Assert (dim>0, ExcDimTooSmall(dim));
 
+  if (initialize)
+    for (unsigned int i=0; i<dim; ++i)
+      values[i] = 0;
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim>::Tensor (const array_type &initializer) {
   for (unsigned int i=0; i<dim; ++i)
-    values[i] = 0;
+    values[i] = initializer[i];
 };
 
 
