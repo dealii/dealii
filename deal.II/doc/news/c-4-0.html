@@ -487,6 +487,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: The new function <code
+       class="member">MatrixTools::local_apply_boundary_values</code> folds
+       boundary value information into local matrices and vectors before they
+       are written into the global matrix and vector. This way, the final call
+       to  <code class="member">MatrixTools::apply_boundary_values</code> can
+       be avoided.
+       <br>
+       (WB 2004/03/16)
+       </p>
+
   <li> <p> New: There are now functions <code
        class="member">ConstraintMatrix::distribute_local_to_global</code> that
        take a local matrix or vector and distribute it to a global one, but
