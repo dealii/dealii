@@ -45,7 +45,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 				   // and cells for later use
   unsigned int n_cells = 0,
 	       n_nodes = 0;
-  for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
        patch!=patches.end(); ++patch)
     switch (dim)
       {
@@ -112,7 +112,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
     {
       unsigned int present_node = 1;
       
-      for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -211,7 +211,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
       unsigned int present_cell = 1;      
       unsigned int first_vertex_of_patch = 0;
       
-      for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1034,7 +1034,7 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 					 // note that since dim==2, we
 					 // have exactly four vertices per
 					 // patch and per cell
-	for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+	for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
 	     patch!=patches.end(); ++patch)
 	  {
 	    const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1352,7 +1352,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 				   // and cells for later use
   unsigned int n_cells = 0,
 	       n_nodes = 0;
-  for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
        patch!=patches.end(); ++patch)
     switch (dim)
       {
@@ -1389,7 +1389,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
   out << "nodes " << n_nodes << endl;
   for (unsigned int d=1; d<=3; ++d)
     {
-      for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1487,9 +1487,9 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
       out << "cells " << n_cells << endl;
 
 
-unsigned int first_vertex_of_patch = 0;
+      unsigned int first_vertex_of_patch = 0;
       
-      for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
