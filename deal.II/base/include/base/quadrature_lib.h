@@ -12,7 +12,9 @@
 /**
  *  2-Point-Gauss quadrature formula, exact for polynomials of degree 3.
  *
- *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
  */
 template <int dim>
 class QGauss2 : public Quadrature<dim>
@@ -26,7 +28,9 @@ class QGauss2 : public Quadrature<dim>
 /**
  *  3-Point-Gauss quadrature formula, exact for polynomials of degree 5.
  *
- *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
  */
 template <int dim>
 class QGauss3 : public Quadrature<dim>
@@ -40,7 +44,9 @@ class QGauss3 : public Quadrature<dim>
 /**
  * 4-Point-Gauss quadrature formula, exact for polynomials of degree 7.
  *
- *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
  */
 template <int dim>
 class QGauss4 : public Quadrature<dim>
@@ -55,7 +61,9 @@ class QGauss4 : public Quadrature<dim>
 /**
  *  5-Point-Gauss quadrature formula, exact for polynomials of degree 9.
  *
- *  Reference: Ward Cheney, David Kincaid: Numerical Mathematics and Computing.
+ *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
  */
 template <int dim>
 class QGauss5 : public Quadrature<dim>
@@ -73,8 +81,10 @@ class QGauss5 : public Quadrature<dim>
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
  *
- *  Reference: J. E. Akin: Application and Implementation of Finite
- *  Element Methods
+ *  Reference: J. E. Akin: "Application and Implementation of Finite
+ *  Element Methods"
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
  */
 template <int dim>
 class QGauss6 : public Quadrature<dim>
@@ -92,8 +102,10 @@ class QGauss6 : public Quadrature<dim>
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
  *
- *  Reference: J. E. Akin: Application and Implementation of Finite
- *  Element Methods
+ *  Reference: J. E. Akin: "Application and Implementation of Finite
+ *  Element Methods"
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
  */
 template <int dim>
 class QGauss7 : public Quadrature<dim>
@@ -111,8 +123,10 @@ class QGauss7 : public Quadrature<dim>
  *  and higher degree. If anyone finds them, please replace the existing
  *  numbers by these expressions.
  *
- *  Reference: J. E. Akin: Application and Implementation of Finite
- *  Element Methods
+ *  Reference: J. E. Akin: "Application and Implementation of Finite
+ *  Element Methods"
+ *  For a comprehensive list of Gaussian quadrature formulae, see also:
+ *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas" 
  */
 template <int dim>
 class QGauss8 : public Quadrature<dim>
