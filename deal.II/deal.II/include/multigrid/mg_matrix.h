@@ -76,7 +76,13 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 				    * a certain level.
 				    */
   virtual void Tvmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;    
+		     const VECTOR& src) const;
+    
+				     /**
+				      * Memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+    
 
 private:
   /**
@@ -243,6 +249,13 @@ MGMatrix<MATRIX, VECTOR>::Tvmult_add (unsigned int level,
   m[level].Tvmult_add(dst, src);
 }
 
+
+template <class MATRIX, class VECTOR>
+unsigned int
+MGMatrix<MATRIX, VECTOR>::memory_consumption () const
+{
+  return sizeof(*this) + matrix->memory_consumption();
+}
 
 /*----------------------------------------------------------------------*/
 

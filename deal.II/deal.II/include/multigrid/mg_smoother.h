@@ -321,7 +321,13 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 				      * methods.
 				      */
     MGLevelObject<RELAX> smoothers;
+
+    				     /**
+				      * Memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
     
+
  private:
 				     /**
 				      * Pointer to the matrices.
@@ -557,5 +563,19 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   mem.free(r);
   mem.free(d);
 }
+
+
+//TODO:[GK] Add other values
+template <class MATRIX, class RELAX, class VECTOR>
+inline unsigned int
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
+memory_consumption () const
+{
+  return sizeof(*this)
+    + matrices.memory_consumption()
+    + smoothers.memory_consumption();
+}
+
+
 
 #endif

@@ -299,6 +299,26 @@ void MGTransferBlockBase::build_matrices (
 #endif  
 }
 
+//TODO:[GK] Add all those little vectors.
+unsigned int
+MGTransferBlockBase::memory_consumption () const
+{
+  unsigned int result = sizeof(*this);
+  result += sizeof(unsigned int) * sizes.size();
+#ifdef DEAL_PREFER_MATRIX_EZ
+  std::vector<boost::shared_ptr<SparseMatrixEZ<double> > >::const_iterator m;
+  const std::vector<boost::shared_ptr<SparseMatrixEZ<double> > >::const_iterator end = prolongation_matrices.end();
+  for (m = prolongation_matrices.begin(); m != end ; ++m)
+    result += *m->memory_consumption();
+#else
+  for (unsigned int i=0;i<prolongation_matrices.size();++i)
+    result += prolongation_matrices[i]->memory_consumption()
+	      + prolongation_sparsities[i]->memory_consumption();
+#endif
+  return result;
+}
+
+
 
 template <typename number>
 template <int dim>

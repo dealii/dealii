@@ -164,6 +164,12 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      */
     DeclException0(ExcMatricesNotBuilt);
 
+    				     /**
+				      * Memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+    
+
   private:
 
 				   /**
@@ -257,6 +263,13 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
  */
 class MGTransferBlockBase
 {
+  public:
+    				     /**
+				      * Memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+    
+
   protected:  
 				     /**
 				      * Actually build the prolongation
@@ -307,7 +320,7 @@ class MGTransferBlockBase
     std::vector<unsigned int> component_start;
   
 				   /**
-				    * Start index of eah component on
+				    * Start index of each component on
 				    * all levels.
 				    */
     std::vector<std::vector<unsigned int> > mg_component_start;
@@ -500,6 +513,8 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 		      OutVector                                 &dst,
 		      const MGLevelObject<BlockVector<number> > &src) const;
 
+    MGTransferBlockBase::memory_consumption;
+    
   private:
 				     /**
 				      * Structure that is used to
@@ -765,6 +780,11 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 		      BlockVector<number2>                 &dst,
 		      const MGLevelObject<Vector<number> > &src) const;
 
+				     /**
+				      * Memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+    
   private:
 				     /**
 				      * Transfer from multi-level vector to
