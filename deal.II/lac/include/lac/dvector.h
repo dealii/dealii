@@ -152,6 +152,33 @@ class dVector : public VectorBase
 				      *             INLINE
 				      */
     unsigned int n () const;
+
+				     /**
+				      * Make the #dVector# class a bit like the
+				      * #vector<># class of the C++ standard
+				      * library by returning iterators to
+				      * the start and end of the elements of this
+				      * vector.
+				      */
+    double * begin ();
+
+				     /**
+				      * Return constant iterator to the start of
+				      * the vectors.
+				      */
+    const double * begin () const;
+
+				     /**
+				      * Return an iterator pointing to the
+				      * element past the end of the array.
+				      */
+    double * end ();
+
+    				     /**
+				      * Return a constant iterator pointing to
+				      * the element past the end of the array.
+				      */
+    const double * end () const;  
 				     //@}
     
     
@@ -366,11 +393,43 @@ inline unsigned int dVector::n () const
   return dim;
 }
 
+
+
+inline
+double * dVector::begin () {
+  return &val[0];
+};
+
+
+
+inline
+const double * dVector::begin () const {
+  return &val[0];
+};
+
+
+
+inline
+double * dVector::end () {
+  return &val[dim];
+};
+
+
+
+inline
+const double * dVector::end () const {
+  return &val[dim];
+};
+
+
+
 inline double dVector::operator() (const unsigned int i) const
 {
   Assert (i<dim, ExcInvalidIndex(i,dim));
   return val[i];
 }
+
+
 
 inline double& dVector::operator() (const unsigned int i)
 {
@@ -379,3 +438,4 @@ inline double& dVector::operator() (const unsigned int i)
 }
 
 #endif
+
