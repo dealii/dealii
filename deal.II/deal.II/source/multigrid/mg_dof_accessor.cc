@@ -230,7 +230,6 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) co
 
 
 template <int dim>
-inline
 void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
@@ -271,7 +270,6 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned in
 
 
 template <int dim>
-inline
 void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const unsigned int index) const
