@@ -11,9 +11,10 @@
 
 /**
  * Selects the preconditioner. The constructor of this class takes 
- * the name of the preconditioning as string, the matrix that is used
- * by the matrix-builtin precondition functions and a damping parameter 
- * #omega# of the preconditioning. Each time, the #operator()# function
+ * the name of the preconditioning and the damping parameter 
+ * #omega# of the preconditioning and the #use_matrix# function takes
+ * the matrix that is used
+ * by the matrix-builtin precondition functions. Each time, the #operator()# function
  * is called, this preselected preconditioner, this matrix and
  * this #omega# is used
  * for the preconditioning. This class is designed for being used as
@@ -61,6 +62,11 @@
  *
  * solver_selector.solve(A,x,b,preconditioning);
  * \end{verbatim}
+ * Now the use of the #SolverSelector# in combination with the #PreconditionSelector#
+ * allows the user to select both, the solver and the preconditioner, at the
+ * beginning of his program and each time the
+ * solver is started (that is several times e.g. in a nonlinear iteration) this
+ * preselected solver and preconditioner is called.
  *
  * @author Ralf Hartmann, 1999
  */
