@@ -41,6 +41,7 @@ SparseMatrix<number>::SparseMatrix () :
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
+		Subscriptor (m),
 		cols(0),
 		val(0),
 		max_len(0)
