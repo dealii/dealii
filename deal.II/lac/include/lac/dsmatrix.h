@@ -29,6 +29,19 @@ CLASS
    */
 class dSMatrixStruct
 {
+  private:
+				     /**
+				      * Copy constructor, made private in order to
+				      * prevent copying such an object which does
+				      * not make much sense because you can use
+				      * a structure like this for more than one
+				      * matrix.
+				      *
+				      * Because it is not needed, this function
+				      * is not implemented.
+				      */
+    dSMatrixStruct (const dSMatrixStruct &);
+    
   public:
 				     /**
 				      * Initialize the matrix empty, i.e. with
@@ -746,8 +759,6 @@ inline
 const int * dSMatrixStruct::get_column_numbers () const {
   return colnums;
 };
-
-
 
 
 
