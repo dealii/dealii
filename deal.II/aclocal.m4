@@ -818,9 +818,9 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
 [
   AC_ARG_WITH(multithreading,
-  [  --with-multithreading=name If name==posix, then use POSIX threads,
-                                otherwise assume use of ACE and use given
-                                argument as path to ACE],
+  [  --with-multithreading=name If name==posix, or no name given, then use
+                                POSIX threads, otherwise assume use of ACE 
+                                and use given argument as path to ACE],
       withmultithreading=$withval,
       withmultithreading=no)
 
