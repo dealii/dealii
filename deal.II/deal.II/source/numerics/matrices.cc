@@ -922,10 +922,32 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 						   // (row,dof_number)
 						   // in this block
 						   // (not in the
-						   // transpose one)
-		  const unsigned int *
+						   // transpose
+						   // one). note that
+						   // we have to take
+						   // care of special
+						   // cases with
+						   // square
+						   // sub-matrices
+		  const unsigned int *p = 0;
+		  if (this_sparsity.n_rows() == this_sparsity.n_cols())
+		    {
+		      if (this_sparsity.get_column_numbers()
+			  [this_sparsity.get_rowstart_indices()[row]]
+			  ==
+			  block_index.second)
+			p = &this_sparsity.get_column_numbers()
+			    [this_sparsity.get_rowstart_indices()[row]];
+		      else
+			p = lower_bound(&this_sparsity.get_column_numbers()
+					[this_sparsity.get_rowstart_indices()[row]+1],
+					&this_sparsity.get_column_numbers()
+					[this_sparsity.get_rowstart_indices()[row+1]],
+					block_index.second);
+		    }
+		  else
 		    p = lower_bound(&this_sparsity.get_column_numbers()
-				    [this_sparsity.get_rowstart_indices()[row]+1],
+				    [this_sparsity.get_rowstart_indices()[row]],
 				    &this_sparsity.get_column_numbers()
 				    [this_sparsity.get_rowstart_indices()[row+1]],
 				    block_index.second);
@@ -938,7 +960,15 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 						   // past-the-end pointer but points
 						   // to dof_number anyway...)
 						   //
-						   // there should be such an entry!
+						   // there should be
+						   // such an entry!
+						   // note, however,
+						   // that this
+						   // assertion will
+						   // fail sometimes
+						   // if the sparsity
+						   // pattern is not
+						   // symmetric!
 		  Assert ((*p == block_index.second) &&
 			  (p != &this_sparsity.get_column_numbers()
 			   [this_sparsity.get_rowstart_indices()[row+1]]),
