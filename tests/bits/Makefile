@@ -1,7 +1,7 @@
 # Generated automatically from Makefile.in by configure.
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -137,7 +137,31 @@ volume_4.exe            : volume_4.g.$(OBJEXT)             $(libraries)
 find_cell_1.exe         : find_cell_1.g.$(OBJEXT)          $(libraries)
 find_cell_2.exe         : find_cell_2.g.$(OBJEXT)          $(libraries)
 find_cell_3.exe         : find_cell_3.g.$(OBJEXT)          $(libraries)
+sparse_matrix_01.exe    : sparse_matrix_01.g.$(OBJEXT)     $(libraries)
+sparse_matrix_02.exe    : sparse_matrix_02.g.$(OBJEXT)     $(libraries)
+sparse_matrix_03.exe    : sparse_matrix_03.g.$(OBJEXT)     $(libraries)
+sparse_matrix_04.exe    : sparse_matrix_04.g.$(OBJEXT)     $(libraries)
+sparse_matrix_05.exe    : sparse_matrix_05.g.$(OBJEXT)     $(libraries)
+sparse_matrix_06.exe    : sparse_matrix_06.g.$(OBJEXT)     $(libraries)
+sparse_matrix_07.exe    : sparse_matrix_07.g.$(OBJEXT)     $(libraries)
+sparse_matrix_08.exe    : sparse_matrix_08.g.$(OBJEXT)     $(libraries)
+sparse_matrix_09.exe    : sparse_matrix_09.g.$(OBJEXT)     $(libraries)
+sparse_matrix_10.exe    : sparse_matrix_10.g.$(OBJEXT)     $(libraries)
+sparse_matrix_11.exe    : sparse_matrix_11.g.$(OBJEXT)     $(libraries)
+sparse_matrix_12.exe    : sparse_matrix_12.g.$(OBJEXT)     $(libraries)
 
+petsc_01.exe            : petsc_01.g.$(OBJEXT)             $(libraries)
+petsc_02.exe            : petsc_02.g.$(OBJEXT)             $(libraries)
+petsc_03.exe            : petsc_03.g.$(OBJEXT)             $(libraries)
+petsc_04.exe            : petsc_04.g.$(OBJEXT)             $(libraries)
+petsc_05.exe            : petsc_05.g.$(OBJEXT)             $(libraries)
+petsc_06.exe            : petsc_06.g.$(OBJEXT)             $(libraries)
+petsc_07.exe            : petsc_07.g.$(OBJEXT)             $(libraries)
+petsc_08.exe            : petsc_08.g.$(OBJEXT)             $(libraries)
+petsc_09.exe            : petsc_09.g.$(OBJEXT)             $(libraries)
+petsc_10.exe            : petsc_10.g.$(OBJEXT)             $(libraries)
+petsc_11.exe            : petsc_11.g.$(OBJEXT)             $(libraries)
+petsc_12.exe            : petsc_12.g.$(OBJEXT)             $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	geometry_info_1 point_inside_1 point_inside_2 \
@@ -175,7 +199,16 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	volume_1 volume_2 volume_3 volume_4 \
 	mapping_cartesian_1 \
 	mapping_q4_3d \
-	q_points find_cell_1 find_cell_2 find_cell_3
+	q_points find_cell_1 find_cell_2 find_cell_3 \
+        sparse_matrix_01 sparse_matrix_02 sparse_matrix_03 \
+        sparse_matrix_04 sparse_matrix_05 sparse_matrix_06 \
+        sparse_matrix_07 sparse_matrix_08 sparse_matrix_09 \
+        sparse_matrix_10 sparse_matrix_11 sparse_matrix_12
+
+ifeq ($(USE_CONTRIB_HSL),yes)
+  tests += petsc_01 petsc_02 petsc_03 petsc_04 petsc_05 petsc_06 \
+           petsc_07 petsc_08 petsc_09 petsc_10 petsc_11 petsc_12
+endif
 
 ############################################################
 
