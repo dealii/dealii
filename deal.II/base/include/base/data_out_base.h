@@ -283,6 +283,19 @@ class ParameterHandler;
  * (bi-,tri-)linear elements.
  *
  *
+ * @sect3{Tecplot format}
+ *
+ * The @p{write_tecplot} function and the @p{write} function through the @p{tecplot}
+ * parameter write the data in the Tecplot (http://www.amtec.com) FEBLOCK format. The
+ * program supports 1, 2, and 3D data and has features such as contouring, slicing,
+ * drawing streamlines, and animation. Patches are written as a collection of
+ * quadrilaterals in 2D or bricks in 3D, with the nodal values interpolated to
+ * (bi-,tri-) linear elements.
+ *
+ * Future work will write Tecplot binary files directly rather than the current
+ * ASCI text files provided the proper libraries are detected at compile time.
+ *
+ *
  * @sect3{VTK format}
  *
  * This is the file format used by the Visualization Toolkit (VTK, see
