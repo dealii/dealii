@@ -29,8 +29,8 @@ template <int dim> class MappingQ;
  * This is a discontinuous finite element based on tensor products of
  * Lagrangian polynomials. The shape functions are Lagrangian
  * interpolants of an equidistant grid of points on the unit cell. The
- * points are numbered in lexicographical order, with @p x running
- * fastest, then @p y, then @z (if these coordinates are present for a
+ * points are numbered in lexicographical order, with <i>x</i> running
+ * fastest, then <i>y</i>, then <i>z</i> (if these coordinates are present for a
  * given space dimension at all). For example, these are the node
  * orderings for <tt>FE_DGQ(1)</tt> in 3d:
  *  @verbatim
@@ -65,7 +65,7 @@ template <int dim> class MappingQ;
  * since there are no continuity requirements for these shape
  * functions across cell boundaries.
  *
- * @author Ralf Hartmann, 2001, 2004, Guido Kanschat 2001
+ * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
 template <int dim>
 class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
@@ -73,7 +73,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
   public:
 				     /**
 				      * Constructor for tensor product
-				      * polynomials of degree @p p.
+				      * polynomials of degree <tt>p</tt>.
 				      */
     FE_DGQ (const unsigned int p);
     
@@ -81,8 +81,8 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
-				      * @p FE_DGQ<dim>(degree) , with
-				      * @p dim and @p degree
+				      * <tt>FE_DGQ<dim>(degree)</tt> , with
+				      * <tt>dim</tt> and <tt>degree</tt>
 				      * replaced by appropriate
 				      * values.
 				      */
