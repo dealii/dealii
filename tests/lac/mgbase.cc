@@ -89,7 +89,7 @@ class MGTest
 
 int main()
 {
-  ofstream logfile("mgbase.output");
+  std::ofstream logfile("mgbase.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

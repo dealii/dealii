@@ -40,8 +40,8 @@ check_method( SOLVER& solver, const MATRIX& A,
 
 int main()
 {
-  ofstream logfile("solver.output");
-  logfile.setf(ios::fixed);
+  std::ofstream logfile("solver.output");
+  logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -118,9 +118,9 @@ int main()
 	    {
 	      check_method(cg,A,u,f,prec_sor);
 	    }
-	  catch (exception& e)
+	  catch (std::exception& e)
 	    {
-	      deallog << e.what() << endl;
+	      deallog << e.what() << std::endl;
 	    }
 	  
 	  check_method(bicgstab,A,u,f,prec_sor);
@@ -128,9 +128,9 @@ int main()
 	  
 	  deallog.pop();
 	}
-      catch (exception& e)
+      catch (std::exception& e)
 	{
-	  cerr << e.what() << endl;
+	  std::cerr << e.what() << std::endl;
 	}
     };
 };

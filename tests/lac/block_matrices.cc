@@ -24,8 +24,8 @@
 
 void test () 
 {
-  ofstream logfile("block_matrices.output");
-  logfile.setf(ios::fixed);
+  std::ofstream logfile("block_matrices.output");
+  logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -78,7 +78,7 @@ void test ()
     {
 				       // first count the number of
 				       // elements in each row
-      vector<bool> t(29, false);
+      std::vector<bool> t(29, false);
       for (unsigned int i=0; i<10; ++i)
 	t[(row*5+i*9)%29] = true;
 				       // if we are in the third block
@@ -145,13 +145,13 @@ void test ()
 				   // and see what we can get after
 				   // vmults:
   BlockVector<double> src;
-  vector<unsigned int> src_sizes (2);
+  std::vector<unsigned int> src_sizes (2);
   src_sizes[0] = 10;
   src_sizes[1] = 19;
   src.reinit (src_sizes);
 
   BlockVector<double> dst;
-  vector<unsigned int> dst_sizes (3);
+  std::vector<unsigned int> dst_sizes (3);
   dst_sizes[0] = 2;
   dst_sizes[1] = 7;
   dst_sizes[2] = 10;
@@ -164,7 +164,7 @@ void test ()
 				   // now check what came out
   for (unsigned int row=0; row<19; ++row)
     {
-      vector<double> t(29, 0);
+      std::vector<double> t(29, 0);
 				       // first check which elements
 				       // in this row exist
       for (unsigned int i=0; i<10; ++i)
@@ -200,12 +200,12 @@ int main ()
     {
       test ();
     }
-  catch (exception &e)
+  catch (std::exception &e)
     {
-      cerr << std::endl << std::endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;
-      cerr << "Exception on processing: " << e.what() << std::endl
+      std::cerr << "Exception on processing: " << e.what() << std::endl
 	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;
@@ -214,10 +214,10 @@ int main ()
     }
   catch (...) 
     {
-      cerr << std::endl << std::endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;
-      cerr << "Unknown exception!" << std::endl
+      std::cerr << "Unknown exception!" << std::endl
 	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;

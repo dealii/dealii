@@ -88,13 +88,13 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
 
   sum = 0.;
   for (unsigned int i=0;i<N;++i)
-    sum += fabs(2.-.5*i);
+    sum += std::fabs(2.-.5*i);
   deallog << d3.l1_norm() << '\t' << sum << std::endl;
 
   sum = 0.;
   for (unsigned int i=0;i<N;++i)
     {
-      double t = fabs(2.-.5*i);
+      double t = std::fabs(2.-.5*i);
       if (t>sum) sum = t;
     }
   deallog << d3.linfty_norm() << '\t' << sum << std::endl;
@@ -145,8 +145,8 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
 
 int main()
 {
-  ofstream logfile("vector-vector.output");
-  logfile.setf(ios::fixed);
+  std::ofstream logfile("vector-vector.output");
+  logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@ void test ()
 {
   deallog.push("BlockIndices");
   
-  vector<unsigned int> ivector(4);
+  std::vector<unsigned int> ivector(4);
   ivector[0] = 3;
   ivector[1] = 0;
   ivector[2] = 1;
@@ -109,23 +109,23 @@ void test ()
 
 int main ()
 {
-  ofstream logfile("block_vector.output");
-  logfile.setf(ios::fixed);
+  std::ofstream logfile("block_vector.output");
+  logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  cerr = logfile;
+  std::cerr = logfile;
   
   try
     {
       test ();
     }
-  catch (exception &e)
+  catch (std::exception &e)
     {
-      cerr << std::endl << std::endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;
-      cerr << "Exception on processing: " << e.what() << std::endl
+      std::cerr << "Exception on processing: " << e.what() << std::endl
 	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;
@@ -134,10 +134,10 @@ int main ()
     }
   catch (...) 
     {
-      cerr << std::endl << std::endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;
-      cerr << "Unknown exception!" << std::endl
+      std::cerr << "Unknown exception!" << std::endl
 	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
 	   << std::endl;

@@ -28,7 +28,7 @@ class FDMatrix
     void laplacian(SparseMatrix<number>&) const;
 
     template <typename number>
-    void gnuplot_print(ostream&, const Vector<number>&) const;
+    void gnuplot_print(std::ostream&, const Vector<number>&) const;
     
   private:
 				     /**

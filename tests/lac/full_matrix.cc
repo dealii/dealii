@@ -40,8 +40,8 @@ void random_matrix(FullMatrix<double>& A)
 int
 main ()
 {
-  ofstream logfile("full_matrix.output");
-  logfile.setf(ios::fixed);
+  std::ofstream logfile("full_matrix.output");
+  logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

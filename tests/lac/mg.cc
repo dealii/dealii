@@ -33,7 +33,7 @@
 #define ACCURACY 1.e-5
 
 // template<class VECTOR>
-// void print_vector(ostream& s, const VECTOR& v)
+// void print_vector(std::ostream& s, const VECTOR& v)
 // {
 //   const unsigned int n = (unsigned int)(sqrt(v.size())+.3);
 //   unsigned int k=0;
@@ -97,7 +97,7 @@ typedef MGCoarseGridLACIteration<SolverCG<>,
 
 int main()
 {
-  ofstream logfile("mg.output");
+  std::ofstream logfile("mg.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   
@@ -128,7 +128,7 @@ for (unsigned int level = 0; level <= maxlevel; ++level)
       deallog << "Level " << level << " size " << size << std::endl;
 
 				       // Make matrix
-      vector<SparsityPattern>  structure(maxlevel+1);
+      std::vector<SparsityPattern>  structure(maxlevel+1);
       MGLevelObject<SparseMatrix<double> > A(minlevel,maxlevel);
 
       FDMatrix testproblem(size, size);
@@ -168,7 +168,7 @@ for (unsigned int level = 0; level <= maxlevel; ++level)
       f = 1.;//(size*size);
 
       solver.solve(A[level], u, f, precondition);
-      ofstream out("T");
+      std::ofstream out("T");
       testproblem.gnuplot_print(out,u);
     }
 }

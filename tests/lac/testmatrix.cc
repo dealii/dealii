@@ -93,7 +93,7 @@ FDMatrix::laplacian(SparseMatrix<number>& A) const
 
 template<typename number>
 void
-FDMatrix::gnuplot_print(ostream& s, const Vector<number>& V) const
+FDMatrix::gnuplot_print(std::ostream& s, const Vector<number>& V) const
 {
    for(unsigned int i=0;i<=ny-2;i++)
     {
@@ -113,7 +113,7 @@ FDMatrix::gnuplot_print(ostream& s, const Vector<number>& V) const
 template void FDMatrix::laplacian(SparseMatrix<long double>&) const;
 template void FDMatrix::laplacian(SparseMatrix<double>&) const;
 template void FDMatrix::laplacian(SparseMatrix<float>&) const;
-template void FDMatrix::gnuplot_print(ostream& s, const Vector<long double>& V) const;
-template void FDMatrix::gnuplot_print(ostream& s, const Vector<double>& V) const;
-template void FDMatrix::gnuplot_print(ostream& s, const Vector<float>& V) const;
+template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<long double>& V) const;
+template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<double>& V) const;
+template void FDMatrix::gnuplot_print(std::ostream& s, const Vector<float>& V) const;
 
