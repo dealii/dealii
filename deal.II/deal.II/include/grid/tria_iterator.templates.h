@@ -67,7 +67,7 @@ template <int dim, typename Accessor>
 inline
 bool
 TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> &i) const {
-  return accessor != i.accessor;
+  return accessor.operator != (i.accessor);
 };
 
 

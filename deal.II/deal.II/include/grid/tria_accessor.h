@@ -97,33 +97,36 @@ class TriaAccessor {
 				      */
     TriaAccessor &operator = (const TriaAccessor &);
 
-  public:
+  protected:
+    
 				     /**
 				      *  Compare for equality.            
-				      *
-				      *  This method should be protected,
-				      *  since it is only to be called from
-				      *  the iterator class. Due to problems
-				      *  with the STL, we have to make it
-				      *  public, so don't use it from
-				      *  non-friend classes!
 				      */
     bool operator == (const TriaAccessor &) const;
 	
 				     /**
 				      *  Compare for inequality.
 				      *
-				      *  This method should be protected,
-				      *  since it is only to be called from
-				      *  the iterator class. Due to problems
-				      *  with the STL, we have to make it
-				      *  public, so don't use it from
-				      *  non-friend classes!
+				      * Note that at times, there is a problem
+				      * with egcs 1.1 that makes it choose
+				      * the global STL operator != (which
+				      * does only !(a==b)) over this
+				      * one, which then results in an
+				      * error because the operator == is
+				      * not made public. Strange...
 				      */
     bool operator != (const TriaAccessor &) const;
     
   public:
+				     /**
+				      * Data type to be used for passing
+				      * parameters from iterators to the
+				      * accessor classes in a unified
+				      * way, no matter what the type of
+				      * number of these parameters is.
+				      */
     typedef void* LocalData;
+    
 				     /**@ name Iterator address and state
 				      */
 				     /*@{*/
