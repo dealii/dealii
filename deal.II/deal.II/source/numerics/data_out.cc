@@ -268,10 +268,10 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
       thread_data[i].n_components   = n_components;
       thread_data[i].n_datasets     = n_datasets;
       thread_data[i].n_subdivisions = n_subdivisions;
-      thread_data[i].patch_values.resize(n_q_points);
-      thread_data[i].patch_values_system.resize(n_q_points);
+      thread_data[i].patch_values.resize (n_q_points);
+      thread_data[i].patch_values_system.resize (n_q_points);
       
-      for (unsigned int k=0;k<n_components;++k)
+      for (unsigned int k=0; k<n_q_points; ++k)
 	thread_data[i].patch_values_system[k].reinit(n_components);
     }
 
