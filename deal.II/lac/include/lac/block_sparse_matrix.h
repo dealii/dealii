@@ -21,7 +21,9 @@
 #include <cmath>
 
 
-template <typename Number> class BlockVector;
+template <typename> class Vector;
+template <typename> class BlockVector;
+
 
 /*! @addtogroup Matrix1
  *@{
@@ -530,6 +532,39 @@ class BlockSparseMatrix : public Subscriptor
     template <typename somenumber>
     void vmult (BlockVector<somenumber>       &dst,
 		const BlockVector<somenumber> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block column.
+				      */
+    template <typename somenumber>
+    void vmult (BlockVector<somenumber>  &dst,
+		const Vector<somenumber> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block row.
+				      */
+    template <typename somenumber>
+    void vmult (Vector<somenumber>            &dst,
+		const BlockVector<somenumber> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block.
+				      */
+    template <typename somenumber>
+    void vmult (Vector<somenumber>       &dst,
+		const Vector<somenumber> &src) const;
     
 				     /**
 				      * Matrix-vector multiplication:
@@ -543,6 +578,39 @@ class BlockSparseMatrix : public Subscriptor
     void Tvmult (BlockVector<somenumber>       &dst,
 		 const BlockVector<somenumber> &src) const;
   
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block row.
+				      */
+    template <typename somenumber>
+    void Tvmult (BlockVector<somenumber>  &dst,
+		 const Vector<somenumber> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block column.
+				      */
+    template <typename somenumber>
+    void Tvmult (Vector<somenumber>            &dst,
+		 const BlockVector<somenumber> &src) const;
+
+				     /**
+				      * Matrix-vector
+				      * multiplication. Just like the
+				      * previous function, but only
+				      * applicable if the matrix has
+				      * only one block.
+				      */
+    template <typename somenumber>
+    void Tvmult (Vector<somenumber>       &dst,
+		 const Vector<somenumber> &src) const;
+    
 				     /**
 				      * Adding Matrix-vector
 				      * multiplication. Add $M*src$ on
@@ -635,6 +703,33 @@ class BlockSparseMatrix : public Subscriptor
 			      const BlockVector<somenumber> &src,
 			      const number                   omega = 1.) const;
 
+				     /**
+				      * Apply the Jacobi
+				      * preconditioner, which
+				      * multiplies every element of
+				      * the @p{src} vector by the
+				      * inverse of the respective
+				      * diagonal element and
+				      * multiplies the result with the
+				      * relaxation parameter @p{omega}.
+				      *
+				      * All diagonal blocks must be
+				      * square matrices for this
+				      * operation.
+				      *
+				      * In contrast to the previous
+				      * function, input and output
+				      * vectors are not block
+				      * vectors. This operation is
+				      * thus only allowed if the block
+				      * matrix consists of only one
+				      * block.
+				      */
+    template <typename somenumber>
+    void precondition_Jacobi (Vector<somenumber>       &dst,
+			      const Vector<somenumber> &src,
+			      const number             omega = 1.) const;
+    
                                      /* Call print functions for 
 				      * the SparseMatrix blocks.
 				      */
@@ -1200,6 +1295,58 @@ BlockSparseMatrix<number>::vmult (BlockVector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
+BlockSparseMatrix<number>::vmult (Vector<somenumber>            &dst,
+				  const BlockVector<somenumber> &src) const
+{
+  Assert (rows == 1,
+	  ExcDimensionMismatch(1, rows));
+  Assert (src.n_blocks() == columns,
+	  ExcDimensionMismatch(src.n_blocks(), columns));
+
+  block(0,0).vmult (dst, src.block(0));
+  for (unsigned int col=1; col<columns; ++col)
+    block(0,col).vmult_add (dst, src.block(col));
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+BlockSparseMatrix<number>::vmult (BlockVector<somenumber>  &dst,
+				  const Vector<somenumber> &src) const
+{
+  Assert (dst.n_blocks() == rows,
+	  ExcDimensionMismatch(dst.n_blocks(), rows));
+  Assert (1 == columns,
+	  ExcDimensionMismatch(1, columns));
+
+  for (unsigned int row=0; row<rows; ++row)
+    block(row,0).vmult (dst.block(row),
+			src);
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+BlockSparseMatrix<number>::vmult (Vector<somenumber>       &dst,
+				  const Vector<somenumber> &src) const
+{
+  Assert (1 == rows,
+	  ExcDimensionMismatch(1, rows));
+  Assert (1 == columns,
+	  ExcDimensionMismatch(1, columns));
+
+  block(0,0).vmult (dst, src);
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
 BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
 				      const BlockVector<somenumber> &src) const
 {
@@ -1224,8 +1371,8 @@ BlockSparseMatrix<number>::vmult_add (BlockVector<somenumber>       &dst,
 template <typename number>
 template <typename somenumber>
 void
-BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>& dst,
-				   const BlockVector<somenumber>& src) const
+BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>       &dst,
+				   const BlockVector<somenumber> &src) const
 {
   Assert (dst.n_blocks() == n_block_cols(),
 	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
@@ -1240,6 +1387,60 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>& dst,
 	block(row,col).Tvmult_add (dst.block(col),
 				   src.block(row));
     };
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+BlockSparseMatrix<number>::Tvmult (BlockVector<somenumber>  &dst,
+				   const Vector<somenumber> &src) const
+{
+  Assert (dst.n_blocks() == n_block_cols(),
+	  ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  Assert (1 == n_block_rows(),
+	  ExcDimensionMismatch(1, n_block_rows()));
+
+  dst = 0.;
+  
+  for (unsigned int col=0; col<n_block_cols(); ++col)
+    block(0,col).Tvmult_add (dst.block(col), src);
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+BlockSparseMatrix<number>::Tvmult (Vector<somenumber>            &dst,
+				   const BlockVector<somenumber> &src) const
+{
+  Assert (1 == n_block_cols(),
+	  ExcDimensionMismatch(1, n_block_cols()));
+  Assert (src.n_blocks() == n_block_rows(),
+	  ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+
+  block(0,0).Tvmult (dst, src.block(0));
+  
+  for (unsigned int row=1; row<n_block_rows(); ++row)
+    block(row,0).Tvmult_add (dst, src.block(row));
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+BlockSparseMatrix<number>::Tvmult (Vector<somenumber>       &dst,
+				   const Vector<somenumber> &src) const
+{
+  Assert (1 == n_block_cols(),
+	  ExcDimensionMismatch(1, n_block_cols()));
+  Assert (1 == n_block_rows(),
+	  ExcDimensionMismatch(1, n_block_rows()));
+
+  block(0,0).Tvmult (dst, src);
 }
 
 
@@ -1380,6 +1581,25 @@ precondition_Jacobi (BlockVector<somenumber>       &dst,
     block(i,i).precondition_Jacobi (dst.block(i),
 				    src.block(i),
 				    omega);
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+BlockSparseMatrix<number>::
+precondition_Jacobi (Vector<somenumber>       &dst,
+		     const Vector<somenumber> &src,
+		     const number             omega) const
+{
+  Assert (rows == columns, ExcMatrixNotBlockSquare());
+  Assert (1 == rows,
+	  ExcDimensionMismatch(1, rows));
+  Assert (1 == columns,
+	  ExcDimensionMismatch(1, columns));
+  
+  block(0,0).precondition_Jacobi (dst, src, omega);
 }
 
 
