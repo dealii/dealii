@@ -12,6 +12,10 @@
 //----------------------------  logtest.cc  ---------------------------
 
 
+// some tests for the logstream class, writing output, pushing and
+// popping levels, etc
+
+
 #include <base/logstream.h>
 #include <fstream>
 #include <iostream>

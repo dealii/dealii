@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,16 +11,19 @@
 //
 //----------------------------  polynomial_test.cc  ---------------------------
 
-#include <iostream>
 
+// test the class that generates derivatives of function objects by
+// finite differencing
 
-#include <cmath>
 
 #include <base/point.h>
 #include <base/auto_derivative_function.h>
 #include <base/convergence_table.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
+
+#include <iostream>
+#include <cmath>
 
 
 template <int dim>

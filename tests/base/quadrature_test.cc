@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -10,6 +10,11 @@
 //    further information on this license.
 //
 //----------------------------  quadrature_test.cc  ---------------------------
+
+
+// check accuracy of various quadrature formulas by using them to
+// integrate polynomials of increasing degree, and finding the degree
+// until which they integrate exactly
 
 
 #include <iostream>
@@ -207,7 +212,9 @@ int main()
   deallog.pop();
 
 				   // delete objects again to avoid
-				   // messages about memory leaks
+				   // messages about memory leaks when
+				   // using purify or other memory
+				   // checkers
   for (unsigned int i=0; i<q1.size(); ++i)
     delete q1[i];
   for (unsigned int i=0; i<q2.size(); ++i)

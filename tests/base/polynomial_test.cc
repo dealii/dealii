@@ -11,6 +11,12 @@
 //
 //----------------------------  polynomial_test.cc  ---------------------------
 
+
+// just output a lot of information about various classes implementing
+// polynomials, to make sure that all changes we make to these classes
+// do not change the results of these classes.
+
+
 #include <iostream>
 #include <fstream>
 #include <cmath>
