@@ -246,35 +246,50 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: Since the MA27 sparse direct solver uses Fortran common blocks, it
+       was previously impossible to run several instances of this solver in
+       parallel, in a multihreaded environment. To solve this problem, the
+       <code class="class">SparseDirectMA27</code> class now has a detached
+       mode, in which it forks off a separate program that will do the
+       computations using this solver. The actual operations are therefore
+       distributed to distint programs that have separate address spaces. This
+       allows to have as many concurrent instances of this solver in parallel
+       as you want. For more information, read the documentation of the 
+       <code class="class">SparseDirectMA27</code> class.
+       <br>
+       (WB 2002/09/25)
+       </p>
+
   <li> <p> Changed: The classes <code
-  class="class">PreconditionBlock</code>, <code
-  class="class">PreconditionBlockJacobi</code>, <code
-  class="class">PreconditionBlockSOR</code>, and <code
-  class="class">PreconditionBlockSSOR</code> have changed their
-  template signature. The first template argument is now the matrix
-  type, not just a number type.
-  <br>
-  (GK 2002/09/18)
-  </p>
+       class="class">PreconditionBlock</code>, <code
+       class="class">PreconditionBlockJacobi</code>, <code
+       class="class">PreconditionBlockSOR</code>, and <code
+       class="class">PreconditionBlockSSOR</code> have changed their
+       template signature. The first template argument is now the matrix
+       type, not just a number type.
+       <br>
+       (GK 2002/09/18)
+       </p>
 
   <li> <p> New: class <code class="class">BlockVector</code> has a
-  function <code class="member">collect_sizes()</code>, very much as
-  <code class="class">BlockSparsityPattern</code>. This allows
-  updating internal structures after blocks have been resized.
-  <br>
-  (GK 2002/09/17)
-  </p>
+       function <code class="member">collect_sizes()</code>, very much as
+       <code class="class">BlockSparsityPattern</code>. This allows
+       updating internal structures after blocks have been resized.
+       <br>
+       (GK 2002/09/17)
+       </p>
 
   <li> <p> New: class <code class="class">SparseMatrix</code> has an
-  STL-conforming <code class="class">const_iterator</code> and
-  functions <code class="member">begin()</code> and <code
-  class="member">end()</code> for looping through all existing
-  entries. Furthermore, <code class="member">begin(row)</code> and
-  <code class="member">end(row)</code> allow looping through all
-  entries of a single line.
-  <br>
-  (GK 2002/09/11)
-  </p>
+       STL-conforming <code class="class">const_iterator</code> and
+       functions <code class="member">begin()</code> and <code
+       class="member">end()</code> for looping through all existing
+       entries. Furthermore, <code class="member">begin(row)</code> and
+       <code class="member">end(row)</code> allow looping through all
+       entries of a single line.
+       <br>
+       (GK 2002/09/11)
+       </p>
 
   <li> <p>
        New: Classes <code class="class">SparsityPattern</code> and <code
