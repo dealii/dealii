@@ -2615,17 +2615,7 @@ echo "${ECHO_T}C++ compiler is gcc-2.95" >&6
       *2.96*)
   	echo "$as_me:$LINENO: result: C++ compiler is gcc-2.96" >&5
 echo "${ECHO_T}C++ compiler is gcc-2.96" >&6
-  				echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6
-	echo "$as_me:$LINENO: result: --------------------------------------------------------" >&5
-echo "${ECHO_T}--------------------------------------------------------" >&6
-	echo "$as_me:$LINENO: result: gcc 2.96 is not supported. Please read the deal.II FAQs." >&5
-echo "${ECHO_T}gcc 2.96 is not supported. Please read the deal.II FAQs." >&6
-	echo "$as_me:$LINENO: result: --------------------------------------------------------" >&5
-echo "${ECHO_T}--------------------------------------------------------" >&6
-	echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6
-	exit 1
+  	GXX_VERSION=gcc2.96
   	;;
       *2.97*)
   	echo "$as_me:$LINENO: result: C++ compiler is gcc-2.97" >&5
@@ -3172,7 +3162,9 @@ rm -f conftest.$ac_objext conftest.$ac_ext
 
       CXXFLAGSG="$CXXFLAGSG -D_REENTRANT"
       CXXFLAGSO="$CXXFLAGSO -D_REENTRANT"
-      if test "$GXX_VERSION" = "gcc2.95" -o "$GXX_VERSION" = "gcc3.0" ; then
+      if test "$GXX_VERSION" = "gcc2.95" \
+              -o "$GXX_VERSION" = "gcc2.96" \
+	      -o "$GXX_VERSION" = "gcc3.0" ; then
         CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
         CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
       fi
@@ -6033,12 +6025,12 @@ if test "x$F77" != "x" ; then
             G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
       case "$G77_VERSION_STRING" in
         *"egcs-1.1"*)
-            echo "$as_me:$LINENO: result: F77 compiler is egcs-1.1" >&5
+          echo "$as_me:$LINENO: result: F77 compiler is egcs-1.1" >&5
 echo "${ECHO_T}F77 compiler is egcs-1.1" >&6
-            F77_VERSION=egcs1.1
-            ;;
+          F77_VERSION=egcs1.1
+          ;;
         *2.95*)
-            echo "$as_me:$LINENO: result: F77 compiler is gcc-2.95" >&5
+          echo "$as_me:$LINENO: result: F77 compiler is gcc-2.95" >&5
 echo "${ECHO_T}F77 compiler is gcc-2.95" >&6
   	  F77_VERSION=gcc2.95
   	  ;;
