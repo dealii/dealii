@@ -44,6 +44,7 @@ template <int dim>
 void GridOut::write_dx (const Triangulation<dim> &tria,
 			std::ostream             &out) 
 {
+//TODO:[GK] allow for boundary faces only  
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
   AssertThrow (out, ExcIO());
 				   // Copied and adapted from write_ucd
