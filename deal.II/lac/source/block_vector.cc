@@ -27,15 +27,3 @@ template void BlockVector<float>::reinit<double>(const BlockVector<double>&,
 template void BlockVector<float>::reinit<float>(const BlockVector<float>&,
 						const bool);
 
-namespace internal
-{
-  namespace BlockVectorIterators
-  {
-    template class Iterator<BlockVector<double>,false>;
-    template class Iterator<BlockVector<double>,true>;
-
-    template class Iterator<BlockVector<float>,false>;
-    template class Iterator<BlockVector<float>,true>;
-  }
-}
-
