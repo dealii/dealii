@@ -155,6 +155,30 @@
  * waiting. On the other hand, it will prevent that you call functions
  * of this object multiply in parallel at the same time, which is what
  * you probably wanted.
+ *
+ * 
+ * @sect4{Internals of the detached mode}
+ *
+ * The program that actually runs the detached solver is called
+ * @p{detached_ma27}, and will show up under this name in the process
+ * list. It communicates with the main program through a pipe.
+ *
+ * Since the solver and the main program are two separated processes,
+ * the solver program will not be notified if the main program dies,
+ * for example because it is aborted with Control-C, because an
+ * exception is raised and not caught, or some other reason. It will
+ * just not get any new jobs, but will happily wait until the end of
+ * times. For this reason, the detached solver has a second thread
+ * running in parallel that simply checks in regular intervals whether
+ * the main program is still alive, using the @p{ps} program. If this
+ * is no longer the case, the detached solver exits as well.
+ *
+ * Since the intervals between two such checks are a couple of second,
+ * it may happen that the detached solver survives the main program by
+ * some time. Presently, the check interval is once every 20
+ * seconds. After that time, the detached solver should have noticed
+ * the main programs demise.
+ * 
  * 
  * @author Wolfgang Bangerth, 2000, 2001, 2002
  */
