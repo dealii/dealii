@@ -4869,9 +4869,10 @@ void Triangulation<3>::execute_refinement ()
 					       // the mean value of
 					       // the 4 vertices of
 					       // the face, but rather
-					       // as the mean value of
-					       // the 8 vertices which
-					       // we already have (the
+					       // as a weighted mean
+					       // value of the 8
+					       // vertices which we
+					       // already have (the
 					       // four old ones, and
 					       // the four ones
 					       // inserted as middle
@@ -4883,13 +4884,26 @@ void Triangulation<3>::execute_refinement ()
 					       // whether one of the
 					       // lines is at the
 					       // boundary
+					       //
+					       // note that the exact
+					       // weights are chosen
+					       // such as to minimize
+					       // the distortion of
+					       // the four new quads
+					       // from the optimal
+					       // shape; their
+					       // derivation and
+					       // values is copied
+					       // over from the
+					       // @p{MappingQ::set_laplace_on_vector}
+					       // function
 	      vertices[next_unused_vertex]
 		= (quad->vertex(0) + quad->vertex(1) +
 		   quad->vertex(2) + quad->vertex(3) +
-		   quad->line(0)->child(0)->vertex(1) +
-		   quad->line(1)->child(0)->vertex(1) +
-		   quad->line(2)->child(0)->vertex(1) +
-		   quad->line(3)->child(0)->vertex(1)   ) / 8;
+		   3*(quad->line(0)->child(0)->vertex(1) +
+		      quad->line(1)->child(0)->vertex(1) +
+		      quad->line(2)->child(0)->vertex(1) +
+		      quad->line(3)->child(0)->vertex(1))   ) / 16;
 	  
 					     // now that we created the right
 					     // point, make up the four
@@ -5076,28 +5090,37 @@ void Triangulation<3>::execute_refinement ()
 		    ExcTooFewVerticesAllocated());
 	    vertices_used[next_unused_vertex] = true;
 	    
-					     // the new vertex is definitely in
-					     // the interior, so we need not
-					     // worry about the boundary.
-					     // let it be the average of
-					     // the 26 vertices surrounding
-					     // it
+					     // the new vertex is
+					     // definitely in the
+					     // interior, so we need
+					     // not worry about the
+					     // boundary.  let it be
+					     // the average of the 26
+					     // vertices surrounding
+					     // it. weight these
+					     // vertices in the same
+					     // way as they are
+					     // weighted in the
+					     // @p{MappingQ::set_laplace_on_hex_vector}
+					     // function, and like the
+					     // new vertex at the
+					     // center of the quad is
+					     // weighted (see above)
 	    vertices[next_unused_vertex] = Point<dim>();
 					     // first add corners of hex
 	    for (unsigned int vertex=0;
 		 vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	      vertices[next_unused_vertex] += hex->vertex(vertex);
+	      vertices[next_unused_vertex] += hex->vertex(vertex) / 128;
 					     // now add center of lines
-	    for (unsigned int line=0; line<12; ++line)
-	      vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1);
+	    for (unsigned int line=0;
+		 line<GeometryInfo<dim>::lines_per_cell; ++line)
+	      vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
+					      7./192.;
 					     // finally add centers of faces
 	    for (unsigned int face=0;
 		 face<GeometryInfo<dim>::faces_per_cell; ++face)
-	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(2);
-
-					     // compute average
-	    vertices[next_unused_vertex] /= 26;
-
+	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(2) *
+					      1./12.;
 
 					     // now that we created the right
 					     // point, make up the six

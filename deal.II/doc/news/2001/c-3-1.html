@@ -112,6 +112,17 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: when refining a hexahedron in 3d, the rules by which
+       the new vertices at the centers of the faces and at the center
+       of the cell are placed, are changed. They are changed in a way
+       as to minimize the distortion of the resulting cells from the
+       optimal shape and to make them look as much alike as possible
+       to generate a smoother grid.
+       <br>
+       (WB 2001/03/02)
+       </p>
+
+  <li> <p>
        Fix: the <code
        class="member">DoFTools::compute_intergrid_constraints</code>
        function took memory quadratic in the number of degrees of
