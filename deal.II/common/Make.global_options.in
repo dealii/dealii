@@ -95,7 +95,7 @@ CXXFLAGS.g   = -DDEBUG -ggdb -Wall -W -Wconversion \
 	       -ftemplate-depth-32\
                $(INCLUDE) \
 	       $(LIBPATH)
-CXXFLAGS.o   = -O2 -Wuninitialized -ffast-math \
+CXXFLAGS.o   = -O2 -Wuninitialized \
                -felide-constructors -fnonnull-objects \
 	       -ftemplate-depth-32 \
                $(INCLUDE) \
