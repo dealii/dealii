@@ -36,7 +36,7 @@ class SolverRichardson : public Solver<Matrix, Vector>
 			omega(omega) {};
 	
 					 /**
-					  * Damping parameter.
+					  * Relaxation parameter.
 					  */
 	double omega;
     };
