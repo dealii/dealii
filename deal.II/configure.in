@@ -140,9 +140,16 @@ else
           GXX_VERSION=compaq_cxx
         else
 
-          dnl  Aw, nothing suitable found...
-          AC_MSG_ERROR(Unrecognized compiler, sorry)
-          exit 1
+          is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
+          if test "x$is_sun_cc" != "x" ; then
+            AC_MSG_RESULT(compiler is Sun Workshop compiler)
+            GXX_VERSION=sun_workshop
+          else
+
+            dnl  Aw, nothing suitable found...
+            AC_MSG_ERROR(Unrecognized compiler, sorry)
+            exit 1
+	  fi
         fi
       fi
     fi
@@ -336,10 +343,17 @@ else
           dnl                -pch? -noimplicit_include?
         else
 
-          dnl Other compiler
-          AC_MSG_ERROR(No compiler options for this C++ compiler
-                       specified at present)
-          exit 1
+	  if test "x$GXX_VERSION" = "xsun_workshop" ; then
+	    CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	    CXXFLAGSO="$CXXFLAGS -fast"
+
+	  else
+
+            dnl Other compiler
+            AC_MSG_ERROR(No compiler options for this C++ compiler
+                         specified at present)
+            exit 1
+	  fi
         fi
       fi
     fi
@@ -447,6 +461,12 @@ if test $enableshared = yes ; then
                 CXXFLAGSO="$CXXFLAGSO -shared"
                 LDFLAGS="$LDFLAGS -shared"
                 ;;
+
+	sun_workshop)
+		CFLAGS="$CFLAGS -KPIC"
+                CXXFLAGSG="$CXXFLAGSG -KPIC"
+                CXXFLAGSO="$CXXFLAGSO -KPIC"
+		;;
 
         *)
                 AC_MSG_ERROR(No shared lib options for this compiler specified)
