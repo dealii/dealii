@@ -920,7 +920,8 @@ void SparseMatrix<number>::print_formatted (ostream &out,
 					    const unsigned int precision,
 					    bool scientific,
 					    unsigned int width,
-					    const char* zero_string) const
+					    const char* zero_string,
+					    const double denominator) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
@@ -942,7 +943,7 @@ void SparseMatrix<number>::print_formatted (ostream &out,
       for (unsigned int j=0; j<n(); ++j)
 	if ((*cols)(i,j) != SparsityPattern::invalid_entry)
 	  out << setw(width)
-	      << val[cols->operator()(i,j)] << ' ';
+	      << val[cols->operator()(i,j)] * denominator << ' ';
 	else
 	  out << setw(width) << zero_string << ' ';
       out << endl;

@@ -589,6 +589,12 @@ class SparseMatrix : public Subscriptor
 				      * an empty value may be
 				      * specified.
 				      *
+				      * Finally, the whole matrix can
+				      * be multiplied with a common
+				      * denominator to produce more
+				      * readable output, even
+				      * integers.
+				      *
 				      * This function
 				      * may produce {\bf large} amounts of
 				      * output if applied to a large matrix!
@@ -598,7 +604,8 @@ class SparseMatrix : public Subscriptor
 			  const unsigned int presicion=3,
 			  bool scientific=true,
 			  unsigned int width=0,
-			  const char * zero_string = " ") const;
+			  const char * zero_string = " ",
+			  const double denominator = 1.) const;
     
 				     /**
 				      * Exception
