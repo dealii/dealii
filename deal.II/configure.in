@@ -343,7 +343,6 @@ AC_ARG_WITH(umfpack,
       Default is not to use UMFPack],
   DEAL_II_WITH_UMFPACK($withval))
 AC_SUBST(UMFPACK_LIB)
-AC_SUBST(UMFPACK_LIBG)
 AC_SUBST(UMFPACK_INCLUDE_DIR)
 
 dnl Check for LAPACK
