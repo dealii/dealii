@@ -26,6 +26,7 @@
 #include <numerics/mg_smoother.h>
 MGSmoother* smoother_object;
 #include <numerics/multigrid.templates.h>
+#include <basic/dof_tools.h>
 
 #include <fstream>
 
@@ -97,7 +98,7 @@ int main()
 	{
 	  deallog << "smoothing-steps" << step << endl;
 	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
-	  dof.make_sparsity_pattern(structure);
+	  DoFTools::make_sparsity_pattern(dof, structure);
 
 	  ConstraintMatrix hanging_nodes;
 	  dof.make_hanging_node_constraints(hanging_nodes);

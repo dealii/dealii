@@ -16,6 +16,7 @@
 #include <lac/sparsematrix.h>
 #include <grid/dof_constraints.h>
 #include <numerics/dof_renumbering.h>
+#include <basic/dof_tools.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -302,7 +303,7 @@ void TestCases<dim>::run (const unsigned int test_case)
 			       dof->max_couplings_between_dofs());
   
   
-  dof->make_sparsity_pattern (sparsity);
+  DoFTools::make_sparsity_pattern (*dof, sparsity);
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   cout << "    Writing sparsity pattern..." << endl;

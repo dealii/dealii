@@ -152,7 +152,7 @@ target1: $(target1-o-files) $(libraries)
 ############################################################
 
 clean:
-	rm -f *.o *.go *.output
+	rm -f Make.depend *.o *.go *.output
 
 veryclean: clean
 	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot

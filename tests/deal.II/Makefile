@@ -77,7 +77,7 @@ check: $(executables) $(targets)
 
 
 clean:
-	-rm -f *.o *.go *~ Makefile.dep $(executables) $(output-files) tmp/*
+	-rm -f *.o *.go *~ Make.depend Makefile.dep $(executables) $(output-files) tmp/*
 
 
 

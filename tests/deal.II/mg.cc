@@ -24,6 +24,7 @@
 #include <numerics/multigrid.h>
 #include <numerics/multigrid.templates.h>
 #include <numerics/mg_smoother.h>
+#include <basic/dof_tools.h>
 
 #include "helmholtz.h"
 
@@ -90,7 +91,7 @@ int main()
 	  deallog << "Levels: " << tr.n_levels() << endl;
 	  
 	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
-	  dof.make_sparsity_pattern(structure);
+	  DoFTools::make_sparsity_pattern(dof, structure);
 	  structure.compress();
 	  
 	  SparseMatrix<double> A(structure);

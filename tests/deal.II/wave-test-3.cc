@@ -7,6 +7,8 @@
 #include <lac/forward-declarations.h>
 #include <basic/forward-declarations.h>
 #include <numerics/time-dependent.h>
+#include <grid/dof.h>
+#include <basic/dof_tools.h>
 
 #include <iostream>
 #include <string>
@@ -5503,7 +5505,7 @@ void TimeStep_Wave<dim>::create_matrices ()
 			  dof_handler->max_couplings_between_dofs());
 				   // build sparsity pattern and condense
 				   // with hanging nodes
-  dof_handler->make_sparsity_pattern (system_sparsity);
+  DoFTools::make_sparsity_pattern (*dof_handler, system_sparsity);
   constraints.condense (system_sparsity);
   system_sparsity.compress ();
       

@@ -147,13 +147,13 @@ target1: $(target1-o-files) $(libraries)
 	@perl -pi -e 's/JobId.*//;s/value.*//;' $@
 
 %.check:%.output
-	@diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
+	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
 ############################################################
 # Cleanup targets
 ############################################################
 
 clean:
-	rm -f *.o *.go *.output
+	rm -f Make.depend *.o *.go *.output
 
 veryclean: clean
 	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
