@@ -27,8 +27,6 @@ template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
 template <int dim> class Equation;
 
-//TODO: Update documentation on mass matrices
-
 /**
  * Provide a class which assembles certain standard matrices for a given
  * triangulation, using a given finite element and a quadrature formula.
@@ -61,15 +59,23 @@ template <int dim> class Equation;
  *   are the basis functions of the finite element space given.
  *   This function uses the @ref{MassMatrix} class.
  *
- *   The mass matrix is generated using a numerical quadrature rule
- *   and the @ref{MassMatrix} class. A coefficient may
- *   be specified to evaluate $m_{ij} = \int_\Omega a(x) \phi_i(x)
- *   \phi_j(x) dx$ instead.  This way of setting up the mass matrix is
- *   quite general, but has some drawbacks. See the documentation of
- *   the @ref{MassMatrix} class.
+ *   Two ways to create this matrix are offered. The first one uses
+ *   numerical quadrature and the @ref{MassMatrix} class. In this case,
+ *   a coefficient may be given to evaluate
+ *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
+ *   This way of setting up the mass matrix is quite general, but has
+ *   some drawbacks, see the documentation of the @ref{MassMatrix} class.
  *
- *   Update documentation on mass matrices for FESystem!!!
+ *   The other way uses exact integration, as offered by the finite
+ *   element class used. This way you can avoid quadrature errors and
+ *   the assemblage is much faster. However, no coefficient can be
+ *   given.
  *
+ *   Note that the effect of the two ways of setting up the mass
+ *   matrix is not the same if you use finite elements which are
+ *   composed of several subelements. In this case, using the
+ *   quadrature free way (without coefficient) results in a matrix
+ *   which does not couple the subelements, as described in the
  *   @ref{FESystem}@p{::get_local_mass_matrix} documentation, while the
  *   way using quadrature sets up the full matrix, i.e. with the
  *   cross coupling of shape functions belonging to different subelements.
@@ -168,7 +174,8 @@ template <int dim> class Equation;
  * @ref{DoFHandler} object the last time that the degrees of freedom were
  * distributed on the triangulation.
  *
- * @author Wolfgang Bangerth, 1998 */
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 class MatrixCreator
 {
@@ -191,6 +198,14 @@ class MatrixCreator
 				      * Assemble the mass matrix. If no 
 				      * coefficient is given, it is assumed
 				      * to be constant one.
+				      * 
+				      * If the coefficient is constant, it
+				      * may be more adequate to use the
+				      * functions assembling the mass matrix
+				      * without quadrature. However, the
+				      * two functions have different effects
+				      * for finite elements composed of
+				      * several subobjects.
 				      * 
 				      * See the general doc of this class
 				      * for more information.
@@ -224,6 +239,28 @@ class MatrixCreator
 				    Vector<double>           &rhs_vector,
 				    const Function<dim>      *a = 0);
 
+				     /**
+				      * Create the mass matrix by exact
+				      * evaluation without using a quadrature
+				      * formula.
+				      *
+				      * No right hand side may be created using
+				      * this function. See the general doc of
+				      * this class for more information.
+				      *
+				      * It is assumed that the matrix already
+				      * has the right size. The mass matrix
+				      * elements are summed up to the values
+				      * previously in the matrix, so if you want
+				      * the pure mass matrix, you have to clear
+				      * the matrix beforehand.
+				      * 
+				      * See the general doc of this class
+				      * for more information.
+				      */
+    static void create_mass_matrix (const DoFHandler<dim>    &dof,
+				    SparseMatrix<double>     &matrix);
+    
 				     /**
 				      * Assemble the mass matrix and a right
 				      * hand side vector along the boundary.
