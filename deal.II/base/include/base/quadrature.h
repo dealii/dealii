@@ -398,6 +398,22 @@ class QProjector
     Quadrature<dim>
     project_to_child (const Quadrature<dim>  &quadrature,
 		      const unsigned int      child_no);
+
+  private:
+                                     /**
+                                      * Given a quadrature object in
+                                      * 2d, reflect all quadrature
+                                      * points at the main diagonal
+                                      * and return them with their
+                                      * original weights.
+                                      *
+                                      * This function is necessary for
+                                      * projecting a 2d quadrature
+                                      * rule onto the faces of a 3d
+                                      * cube, since there we need both
+                                      * orientations.
+                                      */
+    static Quadrature<2> reflect (const Quadrature<2> &q);
 };
 
 

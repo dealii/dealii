@@ -238,7 +238,9 @@ Quadrature<dim>::memory_consumption () const
 
 
 
-Quadrature<2> revert (const Quadrature<2> &q) 
+template <int dim>
+Quadrature<2>
+QProjector<dim>::reflect (const Quadrature<2> &q) 
 {
   std::vector<Point<2> > q_points (q.n_quadrature_points);
   std::vector<double>    weights (q.n_quadrature_points);
@@ -657,7 +659,7 @@ QProjector<3>::project_to_all_faces (const SubQuadrature &quadrature)
 {
   const unsigned int dim = 3;
   
-  const SubQuadrature q_reverted = revert (quadrature);
+  const SubQuadrature q_reflected = reflect (quadrature);
   
   const unsigned int n_points = quadrature.n_quadrature_points,
 		     n_faces  = GeometryInfo<dim>::faces_per_cell;
@@ -688,13 +690,13 @@ QProjector<3>::project_to_all_faces (const SubQuadrature &quadrature)
                                    // orientation of faces
   for (unsigned int face=0; face<n_faces; ++face)
     {
-      project_to_face(q_reverted, face, help);
+      project_to_face(q_reflected, face, help);
       std::copy (help.begin(), help.end(),
                  std::back_inserter (q_points));
     }
   for (unsigned int face=0; face<n_faces; ++face)
-    std::copy (q_reverted.get_weights().begin(),
-               q_reverted.get_weights().end(),
+    std::copy (q_reflected.get_weights().begin(),
+               q_reflected.get_weights().end(),
                std::back_inserter (weights));
 
   Assert (q_points.size() == n_points * n_faces * 2,
@@ -767,7 +769,7 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
 {
   const unsigned int dim = 3;
   
-  const SubQuadrature q_reverted = revert (quadrature);
+  const SubQuadrature q_reflected = reflect (quadrature);
 
   const unsigned int n_points          = quadrature.n_quadrature_points,
 		     n_faces           = GeometryInfo<dim>::faces_per_cell,
@@ -802,14 +804,14 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
   for (unsigned int face=0; face<n_faces; ++face)
     for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
       {
-	project_to_subface(q_reverted, face, subface, help);
+	project_to_subface(q_reflected, face, subface, help);
 	std::copy (help.begin(), help.end(),
                    std::back_inserter (q_points));
       };
   for (unsigned int face=0; face<n_faces; ++face)
     for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-      std::copy (q_reverted.get_weights().begin(),
-                 q_reverted.get_weights().end(),
+      std::copy (q_reflected.get_weights().begin(),
+                 q_reflected.get_weights().end(),
                  std::back_inserter (weights));
 
   Assert (q_points.size() == n_points * n_faces * subfaces_per_face * 2,
