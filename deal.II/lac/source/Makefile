@@ -7,7 +7,7 @@ CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
             $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
-           -fno-rtti -fno-exceptions $(INCLUDE)
+           -fno-rtti -fno-exceptions -pg $(INCLUDE)
 
 ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc/bin/c++
@@ -24,11 +24,11 @@ go-files = $(cc-files:.cc=.go)
 h-files  = $(wildcard ../include/*/*.h)
 
 
-%.go : %.cc
+%.go : %.cc Makefile
 	@echo ============================ Compiling with debugging information:   $<
 	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc
+%.o : %.cc Makefile
 	@echo ============================ Compiling with optimization:   $<
 	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
