@@ -179,13 +179,20 @@ namespace PETScWrappers
                                           * the sub-objects.
                                           */
         void collect_sizes ();
-
+        
                                          /**
                                           * Return a reference to the MPI
                                           * communicator object in use with
                                           * this vector.
                                           */
         const MPI_Comm & get_mpi_communicator () const;
+
+                                         /**
+                                          * Make the clear() function in the
+                                          * base class visible, though it is
+                                          * protected.
+                                          */
+        BlockMatrixBase<SparseMatrix>::clear;
     };
 
 
