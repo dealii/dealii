@@ -12,9 +12,6 @@
 //----------------------------  petsc_63.cc  ---------------------------
 
 
-// PETScWrappers::SparseMatrix::operator = (double) was declared but not
-// defined
-
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>
 #include <lac/vector.h>
