@@ -70,6 +70,12 @@ Remove FiniteElementData<>::operator == and let it be generated
 Look at the fill_fe_values functions for possible optimizations.
 
 
+Try to find out what happens if DoFAccessor::get_dof_values is
+  called for a non-active object: what about dof numbers
+  on non-active lines/quads? Are they all zero? Can we check for
+  that.
+
+
 
 
 DEAL:
