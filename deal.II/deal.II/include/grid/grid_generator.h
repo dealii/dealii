@@ -99,7 +99,14 @@ template <typename number> class SparseMatrix;
  *      of the eight child-cubes from one of their neighbors.
  * @end{itemize}
  *
- * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan Nauber, 1999. Laplace transformation by Ralf Hartmann, 2001.
+ * Additionally this class provides a function
+ * (@p{laplace_transformation}) that smoothly transforms a grid
+ * according to given new boundary points. This can be used to
+ * transform (simple-shaped) grids to a more complicated ones, like a
+ * shell onto a grid of an airfoil, for example.
+ *
+ * @author Wolfgang Bangerth, 1998, 1999. Slit domain by Stefan
+ * Nauber, 1999. Laplace transformation by Ralf Hartmann, 2001.
  */
 class GridGenerator
 {
