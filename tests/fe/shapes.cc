@@ -162,21 +162,88 @@ void plot_face_shape_functions (Mapping<1>&,
 
 
 template<int dim>
+void test_compute_functions (const Mapping<dim> &mapping,
+			     const FiniteElement<dim> &fe,
+			     const char* name)
+{
+  Triangulation<dim> tr;
+  DoFHandler<dim> dof(tr);
+  GridGenerator::hyper_cube(tr, 0., 1.);
+  dof.distribute_dofs(fe);
+  const QGauss6<dim> q;
+  FEValues<dim> fe_values(mapping, fe, q, UpdateFlags(update_values|
+						      update_gradients|
+						      update_second_derivatives));
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+  fe_values.reinit(cell);
+
+  bool coincide=true;
+  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      if (fabs(fe_values.shape_value(i,x)-fe.shape_value(i,q.point(x)))>1e-14)
+	coincide=false;
+
+  if (!coincide)
+    deallog << "Error in fe.shape_value for " << name << endl;
+
+  coincide=true;
+  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      {
+	Tensor<1,dim> tmp=fe_values.shape_grad(i,x);
+	tmp-=fe.shape_grad(i,q.point(x));
+	if (sqrt(tmp*tmp)>1e-14)
+	  coincide=false;
+      }
+
+  if (!coincide)
+    deallog << "Error in fe.shape_grad for " << name << endl;
+  
+  coincide=true;
+  double max_diff=0.;
+  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      {
+	Tensor<2,dim> tmp=fe_values.shape_2nd_derivative(i,x);
+	tmp-=fe.shape_grad_grad(i,q.point(x));
+	for (unsigned int j=0; j<dim; ++j)
+	  for (unsigned int k=0; k<dim; ++k)
+	    {
+	      const double diff=fabs(tmp[j][k]);
+	      if (diff>max_diff) max_diff=diff;
+	      if (fabs(tmp[j][k])>1e-6)
+		coincide=false;
+	    }
+	
+      }
+
+  if (!coincide)  
+    deallog << "Error in fe.shape_grad_grad for " << name << endl
+	    << "max_diff=" << max_diff << endl;
+}
+
+
+
+template<int dim>
 void plot_FE_Q_shape_functions()
 {
   MappingQ1<dim> m;
   FE_Q<dim> q1(1);
   plot_shape_functions(m, q1, "Q1");
   plot_face_shape_functions(m, q1, "Q1");
+  test_compute_functions(m, q1, "Q1");
   FE_Q<dim> q2(2);
   plot_shape_functions(m, q2, "Q2");
   plot_face_shape_functions(m, q2, "Q2");
+  test_compute_functions(m, q2, "Q2");
   FE_Q<dim> q3(3);
   plot_shape_functions(m, q3, "Q3");
   plot_face_shape_functions(m, q3, "Q3");
+  test_compute_functions(m, q3, "Q3");
   FE_Q<dim> q4(4);
   plot_shape_functions(m, q4, "Q4");
   plot_face_shape_functions(m, q4, "Q4");
+  test_compute_functions(m, q4, "Q4");
 //    FE_Q<dim> q5(5);
 //    plot_shape_functions(m, q5, "Q5");
 //    FE_Q<dim> q6(6);
@@ -199,15 +266,19 @@ void plot_FE_DGQ_shape_functions()
   FE_DGQ<dim> q1(1);
   plot_shape_functions(m, q1, "DGQ1");
   plot_face_shape_functions(m, q1, "DGQ1");
+  test_compute_functions(m, q1, "DGQ1");
   FE_DGQ<dim> q2(2);
   plot_shape_functions(m, q2, "DGQ2");
   plot_face_shape_functions(m, q2, "DGQ2");
+  test_compute_functions(m, q2, "DGQ2");
   FE_DGQ<dim> q3(3);
   plot_shape_functions(m, q3, "DGQ3");
   plot_face_shape_functions(m, q3, "DGQ3");
+  test_compute_functions(m, q3, "DGQ3");
   FE_DGQ<dim> q4(4);
   plot_shape_functions(m, q4, "DGQ4");
   plot_face_shape_functions(m, q4, "DGQ4");
+  test_compute_functions(m, q4, "DGQ4");
 //    FE_DGQ<dim> q5(5);
 //    plot_shape_functions(m, q5, "DGQ5");
 //    FE_DGQ<dim> q6(6);
@@ -241,6 +312,7 @@ main()
   MappingQ1<2> m;
   FESystem<2> q2_q3(FE_Q<2>(2), 1,
 		    FE_Q<2>(3), 1);
+  test_compute_functions(m, q2_q3, "Q2_Q3");
 //  plot_shape_functions(m, q2_q3, "Q2_Q3");
   
   return 0;
