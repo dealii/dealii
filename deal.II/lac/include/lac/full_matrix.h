@@ -613,7 +613,10 @@ class FullMatrix : public vector2d<number>
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotRegular);
+    DeclException1 (ExcNotRegular,
+		    double,
+		    << "The maximal pivot is " << arg1
+		    << ", which is below the threshold. The matrix may be singular.");
 				     /**
 				      * Exception
 				      */

@@ -1340,17 +1340,33 @@ FullMatrix<number>::gauss_jordan()
   
 				   // Gauss-Jordan-Algorithmus
 				   // cf. Stoer I (4th Edition) p. 153
-  std::vector<unsigned int> p(n());
+  const unsigned int N = n();
 
-  for (unsigned int i=0; i<n(); ++i)
+				   // first get an estimate of the
+				   // size of the elements of this
+				   // matrix, for later checks whether
+				   // the pivot element is large
+				   // enough, or whether we have to
+				   // fear that the matrix is not
+				   // regular
+  double diagonal_sum = 0;
+  for (unsigned int i=0; i<N; ++i)
+    diagonal_sum += std::fabs(el(i,i));
+  const double typical_diagonal_element = diagonal_sum/N;
+  
+  std::vector<unsigned int> p(N);
+  for (unsigned int i=0; i<N; ++i)
     p[i] = i;
 
-  for (unsigned int j=0; j<n(); ++j)
+  for (unsigned int j=0; j<N; ++j)
     {
-				       // pivotsearch
+				       // pivot search: search that
+				       // part of the line on and
+				       // right of the diagonal for
+				       // the largest element
       number       max = std::fabs(el(j,j));
       unsigned int r   = j;
-      for (unsigned int i=j+1; i<n(); ++i)
+      for (unsigned int i=j+1; i<N; ++i)
 	{
 	  if (std::fabs(el(i,j)) > max)
 	    {
@@ -1358,11 +1374,15 @@ FullMatrix<number>::gauss_jordan()
 	      r = i;
 	    }
 	}
-      Assert(max>1.e-16, ExcNotRegular());
-				       // rowinterchange
+				       // check whether the pivot is
+				       // too small
+      Assert(max > 1.e-16*typical_diagonal_element,
+	     ExcNotRegular(max));
+      
+				       // row interchange
       if (r>j)
 	{
-	  for (unsigned int k=0; k<n(); ++k)
+	  for (unsigned int k=0; k<N; ++k)
 	    std::swap (el(j,k), el(r,k));
 
 	  std::swap (p[j], p[r]);
@@ -1371,29 +1391,29 @@ FullMatrix<number>::gauss_jordan()
 				       // transformation
       const number hr = 1./el(j,j);
       el(j,j) = hr;
-      for (unsigned int k=0; k<n(); ++k)
+      for (unsigned int k=0; k<N; ++k)
 	{
 	  if (k==j) continue;
-	  for (unsigned int i=0; i<n(); ++i)
+	  for (unsigned int i=0; i<N; ++i)
 	    {
 	      if (i==j) continue;
 	      el(i,k) -= el(i,j)*el(j,k)*hr;
 	    }
 	}
-      for (unsigned int i=0; i<n(); ++i)
+      for (unsigned int i=0; i<N; ++i)
 	{
 	  el(i,j) *= hr;
 	  el(j,i) *= -hr;
 	}
       el(j,j) = hr;
     }
-				   // columninterchange
-  std::vector<number> hv(n());
-  for (unsigned int i=0; i<n(); ++i)
+				   // column interchange
+  std::vector<number> hv(N);
+  for (unsigned int i=0; i<N; ++i)
     {
-      for (unsigned int k=0; k<n(); ++k)
+      for (unsigned int k=0; k<N; ++k)
 	hv[p[k]] = el(i,k);
-      for (unsigned int k=0; k<n(); ++k)
+      for (unsigned int k=0; k<N; ++k)
 	el(i,k) = hv[k];
     }
 }
