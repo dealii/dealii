@@ -89,7 +89,7 @@ endif
 
 logtest.testcase: $(logtest-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -105,7 +105,7 @@ endif
 
 tensor.testcase: $(tensor-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 
 
@@ -122,7 +122,7 @@ endif
 
 reference.testcase: $(reference-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -138,7 +138,7 @@ endif
 
 quadrature_test.testcase: $(quadrature_test-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -154,7 +154,7 @@ endif
 
 timer.testcase: $(timer-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -170,7 +170,7 @@ endif
 
 polynomial_test.testcase: $(polynomial_test-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 
 ############################################################
@@ -188,7 +188,7 @@ endif
 
 target1: $(target1-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 include ../Makefile.rules
 include Makefile.depend
