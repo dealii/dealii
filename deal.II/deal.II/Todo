@@ -2,6 +2,10 @@
 ====== Things to be done for the deal.II library ================
 =================================================================
 
+Reorganize GridOut class. Either templatize GridOut or remove template
+  from EpsFlags
+
+
 Remove the comment signs in the monitor_* functions in tria.cc
   as early as possible. These were inserted, since at home the
   program did some strange things in the reserve_memory
