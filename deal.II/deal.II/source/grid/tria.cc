@@ -275,7 +275,24 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					       // a node must have one
 					       // or two adjacent
 					       // lines
+
+					       // clear will only work if
+					       // there are no
+					       // subscriptions. however, this
+					       // is bogus here, as the
+					       // subscriptions were for the
+					       // initially empty grid, and we
+					       // want to clear it again now,
+					       // so temporarily disable
+					       // subscriptions, clear, and
+					       // then set them again
+	      const unsigned int n=n_subscriptions();
+	      for (unsigned int i=0; i<n; ++i)
+		unsubscribe();
 	      clear ();
+	      for (unsigned int i=0; i<n; ++i)
+		subscribe();
+
 	      AssertThrow (false, ExcInternalError());
       };
 
@@ -283,7 +300,23 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 				   // nodes
   if (boundary_nodes != 2)
     {
+				       // clear will only work if
+				       // there are no
+				       // subscriptions. however, this
+				       // is bogus here, as the
+				       // subscriptions were for the
+				       // initially empty grid, and we
+				       // want to clear it again now,
+				       // so temporarily disable
+				       // subscriptions, clear, and
+				       // then set them again
+      const unsigned int n=n_subscriptions();
+      for (unsigned int i=0; i<n; ++i)
+	unsubscribe();
       clear ();
+      for (unsigned int i=0; i<n; ++i)
+	subscribe();
+      
       AssertThrow (false, ExcInternalError());
     };
   
@@ -369,7 +402,23 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	if ( ! ((0<=cells[cell].vertices[vertex]) &&
 		(cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
 	  {
+					     // clear will only work if
+					     // there are no
+					     // subscriptions. however, this
+					     // is bogus here, as the
+					     // subscriptions were for the
+					     // initially empty grid, and we
+					     // want to clear it again now,
+					     // so temporarily disable
+					     // subscriptions, clear, and
+					     // then set them again
+	    const unsigned int n=n_subscriptions();
+	    for (unsigned int i=0; i<n; ++i)
+	      unsubscribe();
 	    clear ();
+	    for (unsigned int i=0; i<n; ++i)
+	      subscribe();
+	    
 	    Assert (false,
 		    ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex], vertices.size()));
 	  };
@@ -396,28 +445,28 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				       // this by rotating by one or three
 				       // vertices, but deciding this is
 				       // difficult and not implemented.
-      for (unsigned int line=0; line<4; ++line)
-	if (needed_lines.find(make_pair(line_vertices[line].second,
-					line_vertices[line].first))
-	    !=
-	    needed_lines.end())
-	  {
-					     // rotate vertex numbers
-	    swap (cells[cell].vertices[0], cells[cell].vertices[2]);
-	    swap (cells[cell].vertices[1], cells[cell].vertices[3]);
-					     // remake lines
-	    line_vertices[0]
-	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
-	    line_vertices[1]
-	      = make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
-	    line_vertices[2]
-	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
-	    line_vertices[3]
-	      = make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
-					     // allow for only one such
-					     // rotation
-	    break;
-	  };
+//        for (unsigned int line=0; line<4; ++line)
+//  	if (needed_lines.find(make_pair(line_vertices[line].second,
+//  					line_vertices[line].first))
+//  	    !=
+//  	    needed_lines.end())
+//  	  {
+//  					     // rotate vertex numbers
+//  	    swap (cells[cell].vertices[0], cells[cell].vertices[2]);
+//  	    swap (cells[cell].vertices[1], cells[cell].vertices[3]);
+//  					     // remake lines
+//  	    line_vertices[0]
+//  	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
+//  	    line_vertices[1]
+//  	      = make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
+//  	    line_vertices[2]
+//  	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
+//  	    line_vertices[3]
+//  	      = make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
+//  					     // allow for only one such
+//  					     // rotation
+//  	    break;
+//  	  };
 
 
       for (unsigned int line=0; line<4; ++line)
@@ -448,7 +497,23 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 		 ==
 		 needed_lines.end()))
 	    {
+					       // clear will only work if
+					       // there are no
+					       // subscriptions. however, this
+					       // is bogus here, as the
+					       // subscriptions were for the
+					       // initially empty grid, and we
+					       // want to clear it again now,
+					       // so temporarily disable
+					       // subscriptions, clear, and
+					       // then set them again
+	      const unsigned int n=n_subscriptions();
+	      for (unsigned int i=0; i<n; ++i)
+		unsubscribe();
 	      clear ();
+	      for (unsigned int i=0; i<n; ++i)
+		subscribe();
+	      
 	      AssertThrow (false,
 			   ExcGridHasInvalidCell(cell));
 	    };
@@ -481,7 +546,23 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       if ( ! (* (min_element(vertex_touch_count.begin(),
 			     vertex_touch_count.end())) >= 2))
 	{
+					   // clear will only work if
+					   // there are no
+					   // subscriptions. however, this
+					   // is bogus here, as the
+					   // subscriptions were for the
+					   // initially empty grid, and we
+					   // want to clear it again now,
+					   // so temporarily disable
+					   // subscriptions, clear, and
+					   // then set them again
+	  const unsigned int n=n_subscriptions();
+	  for (unsigned int i=0; i<n; ++i)
+	    unsubscribe();
 	  clear ();
+	  for (unsigned int i=0; i<n; ++i)
+	    subscribe();
+	  
 	  AssertThrow (false, ExcGridHasInvalidVertices());
 	};
     };
@@ -560,7 +641,23 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
       if (! ((n_adj_cells >= 1) &&
 	     (n_adj_cells <= 2)))
 	{
+					   // clear will only work if
+					   // there are no
+					   // subscriptions. however, this
+					   // is bogus here, as the
+					   // subscriptions were for the
+					   // initially empty grid, and we
+					   // want to clear it again now,
+					   // so temporarily disable
+					   // subscriptions, clear, and
+					   // then set them again
+	  const unsigned int n=n_subscriptions();
+	  for (unsigned int i=0; i<n; ++i)
+	    unsubscribe();
 	  clear ();
+	  for (unsigned int i=0; i<n; ++i)
+	    subscribe();
+	  
 	  AssertThrow (false, ExcInternalError());
 	};
 
@@ -597,7 +694,24 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 	  else 
 	    {
 					       // line does not exist
+	      
+					       // clear will only work if
+					       // there are no
+					       // subscriptions. however, this
+					       // is bogus here, as the
+					       // subscriptions were for the
+					       // initially empty grid, and we
+					       // want to clear it again now,
+					       // so temporarily disable
+					       // subscriptions, clear, and
+					       // then set them again
+	      const unsigned int n=n_subscriptions();
+	      for (unsigned int i=0; i<n; ++i)
+		unsubscribe();
 	      clear ();
+	      for (unsigned int i=0; i<n; ++i)
+		subscribe();
+
 	      AssertThrow (false, ExcLineInexistant(line_vertices.first,
 						    line_vertices.second));
 	    };
@@ -607,7 +721,23 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 				       // are given a boundary indicator
       if (! (line->boundary_indicator() == 0))
 	{
+					   // clear will only work if
+					   // there are no
+					   // subscriptions. however, this
+					   // is bogus here, as the
+					   // subscriptions were for the
+					   // initially empty grid, and we
+					   // want to clear it again now,
+					   // so temporarily disable
+					   // subscriptions, clear, and
+					   // then set them again
+	  const unsigned int n=n_subscriptions();
+	  for (unsigned int i=0; i<n; ++i)
+	    unsubscribe();
 	  clear ();
+	  for (unsigned int i=0; i<n; ++i)
+	    subscribe();
+	  
 	  AssertThrow (false, ExcInteriorLineCantBeBoundary());
 	};
 
@@ -718,7 +848,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 	if (! ((0<=cells[cell].vertices[vertex]) &&
 	       (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
 	  {
+					     // clear will only work if
+					     // there are no
+					     // subscriptions. however, this
+					     // is bogus here, as the
+					     // subscriptions were for the
+					     // initially empty grid, and we
+					     // want to clear it again now,
+					     // so temporarily disable
+					     // subscriptions, clear, and
+					     // then set them again
+	    const unsigned int n=n_subscriptions();
+	    for (unsigned int i=0; i<n; ++i)
+	      unsubscribe();
 	    clear ();
+	    for (unsigned int i=0; i<n; ++i)
+	      subscribe();
+	    
 	    AssertThrow (false,
 			 ExcInvalidVertexIndex (cell, cells[cell].vertices[vertex],
 						vertices.size()));
@@ -762,7 +908,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
 		 ==
 		 needed_lines.end()))
 	    {
+					       // clear will only work if
+					       // there are no
+					       // subscriptions. however, this
+					       // is bogus here, as the
+					       // subscriptions were for the
+					       // initially empty grid, and we
+					       // want to clear it again now,
+					       // so temporarily disable
+					       // subscriptions, clear, and
+					       // then set them again
+	      const unsigned int n=n_subscriptions();
+	      for (unsigned int i=0; i<n; ++i)
+		unsubscribe();
 	      clear ();
+	      for (unsigned int i=0; i<n; ++i)
+		subscribe();
+
 	      AssertThrow (false, ExcGridHasInvalidCell(cell));
 	    };
 		  
@@ -795,7 +957,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
       if (! (* (min_element(vertex_touch_count.begin(),
 			    vertex_touch_count.end())) >= 2))
 	{
+					   // clear will only work if
+					   // there are no
+					   // subscriptions. however, this
+					   // is bogus here, as the
+					   // subscriptions were for the
+					   // initially empty grid, and we
+					   // want to clear it again now,
+					   // so temporarily disable
+					   // subscriptions, clear, and
+					   // then set them again
+	  const unsigned int n=n_subscriptions();
+	  for (unsigned int i=0; i<n; ++i)
+	    unsubscribe();
 	  clear ();
+	  for (unsigned int i=0; i<n; ++i)
+	    subscribe();
+
 	  AssertThrow (false, ExcGridHasInvalidVertices());
 	};
     };
@@ -1093,7 +1271,23 @@ void Triangulation<3>::create_triangulation (const vector<Point<3> >    &v,
       if (! ((n_adj_cells >= 1) &&
 	     (n_adj_cells <= 2)))
 	{
+					   // clear will only work if
+					   // there are no
+					   // subscriptions. however, this
+					   // is bogus here, as the
+					   // subscriptions were for the
+					   // initially empty grid, and we
+					   // want to clear it again now,
+					   // so temporarily disable
+					   // subscriptions, clear, and
+					   // then set them again
+	  const unsigned int n=n_subscriptions();
+	  for (unsigned int i=0; i<n; ++i)
+	    unsubscribe();
 	  clear ();
+	  for (unsigned int i=0; i<n; ++i)
+	    subscribe();
+	  
 	  AssertThrow (false, ExcInternalError());
 	};
 
