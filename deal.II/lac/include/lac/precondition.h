@@ -94,7 +94,7 @@ class PreconditionIdentity : public Subscriptor
  *
  *    gmres.solve (matrix, solution, right_hand_side,
  *		   PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
- *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi));
+ *		   (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  * This creates an unnamed object to be passed as the fourth parameter to
  * the solver function of the SolverGMRES class. It assumes that the
@@ -110,7 +110,7 @@ class PreconditionIdentity : public Subscriptor
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
  *		   PreconditionUseMatrix<>
- *		     (matrix,&SparseMatrix<double>::template precondition_Jacobi));
+ *		     (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
