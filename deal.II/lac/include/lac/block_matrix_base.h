@@ -940,6 +940,8 @@ namespace internal
                     accessor.row_start =
                       accessor.matrix->row_block_indices
                       .local_to_global(accessor.row_block, 0);
+                  else
+                    accessor.row_start = 0;
                 }
             }
                                            // Finally, set base_iterator
