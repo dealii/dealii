@@ -161,7 +161,6 @@ class_index.html: $(shell echo $D/base/include/base/*.h \
 
 
 clean:
-	cd auto ; $(MAKE) clean
 	cd tutorial ; $(MAKE) clean
 	cd development ; $(MAKE) clean
 	cd glossary ; $(MAKE) clean
