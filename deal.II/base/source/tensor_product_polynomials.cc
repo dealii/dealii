@@ -239,8 +239,6 @@ void TensorProductPolynomials<dim>::shape_values_and_grads(
       
   if (update_grads)
     {
-				       // is Tensor<1,dim> &gradsi=grads[i]; grads[d];
-				       // faster than grads[i][d]??
       for (unsigned int i=0; i<n_tensor_pols; ++i)
 	for (unsigned int d=0; d<dim; ++d)
 	  grads[i][d]=1.;
@@ -253,9 +251,28 @@ void TensorProductPolynomials<dim>::shape_values_and_grads(
 
   if (update_grad_grads)
     {
-      Assert(false, ExcNotImplemented());
+      for (unsigned int i=0; i<n_tensor_pols; ++i)
+	for (unsigned int d1=0; d1<dim; ++d1)
+	  for (unsigned int d2=0; d2<dim; ++d2)
+	    grad_grads[i][d1][d2]=1.;
+
+      for (unsigned int x=0; x<dim; ++x)
+	for (unsigned int i=0; i<n_tensor_pols; ++i)
+	  for (unsigned int d1=0; d1<dim; ++d1)
+	    for (unsigned int d2=0; d2<dim; ++d2)
+	      {
+		unsigned int derivative=0;
+		if (d1==x || d2==x)
+		  {
+		    if (d1==d2)
+		      derivative=2;
+		    else
+		      derivative=1;
+		  } 
+		grad_grads[i][d1][d2]*=
+		  v[x][(i/n_pols_to[x])%n_pols][derivative];
+	      }
     }
-  
 }
 
 
