@@ -941,7 +941,7 @@ class DataOutBase
 
 					 /**
 					  * Flag to determine whether the cells
-					  * shall be colorized by one the data
+					  * shall be colorized by the data
 					  * set denoted by @p{color_vector}, or
 					  * simply be painted in white. This
 					  * flag only makes sense if
