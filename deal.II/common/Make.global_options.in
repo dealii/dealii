@@ -1,5 +1,51 @@
 # $Id$
 
+
+###############################################################################
+# This file exports several make variables to other Makefiles which
+# include it. You will want to include this file into the Makefiles of
+# your project to use the same compiler flags and to access the pathes
+# to libraries. The following symbols defined in this file may be of
+# interest:
+#
+# CXX                -- path and filename of the compiler
+# PERL               -- path and filename of the 'perl' program
+#
+# lib-path-base      -- path to the library files of the /base library
+# lib-path-lac       -- same for the /lac library
+# lib-path-deal2     -- same for the /deal.II library
+# LIBPATH            -- all the library pathes prefixed by -L, i.e. the
+#                       flags needed by the compiler to find the libraries
+#                       when they are linked in using -lbase -llac -ldeal_II_2d
+#                       (for example). These -L paths are appended to what
+#                       was in $(LIBPATH) before
+#
+# include-path-base  -- same as for lib-path-base, but contains the paths
+#                       to the include files of the /base library
+# include-path-lac   -- same for the /lac library
+# include-path-deal2 -- same for the /deal.II library
+# INCLUDE            -- all the include pathes prefixed by -I
+#
+# CXXFLAGS.g         -- compiler flags for debug mode
+# CXXFLAGS.o         -- compiler flags for optimized mode
+#
+#
+# If --with-multithreading was given to ./configure, $(INCLUDE) and
+# $(LIBPATH) are augmented by the ACE include and library paths, and
+# the following symbols are meaningful:
+#
+# ACE_ROOT           -- path to the ACE library as given to ./configure
+# with-multithreading-- this symbol is 'no' if the flag was not given
+#                       to ./configure and not 'no' (it actually equals
+#                       $(ACE_ROOT)) if -with-multithreading=... was
+#                       given
+###############################################################################
+
+
+
+
+
+
 ######################################################
 # the following lines will be replaced by the output 
 # of ./configure
@@ -23,7 +69,7 @@ lib-path-base  = $D/base/lib
 lib-path-lac   = $D/lac/lib
 lib-path-deal2 = $D/deal.II/lib
 
-LIBPATH        = -L$(lib-path-base) -L$(lib-path-lac) -L$(lib-path-deal2)
+LIBPATH       += $(addprefix -L,$(lib-path-base) $(lib-path-lac) $(lib-path-deal2))
 
 
 # add search path for libraries for make dependencies
@@ -35,10 +81,12 @@ vpath %.a $(lib-path-deal2)
 
 # include paths. add library paths to existing variable
 
-base-include = -I$D/base/include
-lac-include  = -I$D/lac/include
-deal-include = -I$D/deal.II/include
-INCLUDE     += $(base-include) $(lac-include) $(deal-include)
+include-path-base  = $D/base/include
+include-path-lac   = $D/lac/include
+include-path-deal2 = $D/deal.II/include
+INCLUDE           += $(addprefix -I, $(include-path-base) \
+                                     $(include-path-lac)  \
+                                     $(include-path-deal2))
 
 # compiler flags for debug and optimized mode
 
