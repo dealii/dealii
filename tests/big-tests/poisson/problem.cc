@@ -85,18 +85,6 @@ class RHSPoly : public Function<dim> {
 
 
 
-template <int dim>
-class Solution : public Function<dim> {
-  public:
-    				     /**
-				      * Return the value of the function
-				      * at the given point.
-				      */
-    virtual double operator () (const Point<dim> &p) const;
-};
-
-
-
 
 
 
@@ -155,15 +143,6 @@ double RHSPoly<dim>::operator () (const Point<dim> &p) const {
   double ret_val = 0;
   for (unsigned int i=0; i<dim; ++i)
     ret_val += 2*p(i)*(1.-p(i));
-  return ret_val;
-};
-
-
-template <int dim>
-double Solution<dim>::operator () (const Point<dim> &p) const {
-  double ret_val = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    ret_val *= p(i)*(1.-p(i));
   return ret_val;
 };
 
@@ -467,44 +446,12 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << "    Writing to file <" << prm.get("Output file") << ">..."
        << endl;
 
-  Solution<dim> sol;
-  dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
-  QGauss4<dim>  q;
-  
-  cout << "    Calculating L1 error... ";
-  integrate_difference (sol, l1_error_per_cell, q, fe, L1_norm);
-  cout << l1_error_per_cell.l1_norm() << endl;
-
-  cout << "    Calculating L2 error... ";
-  integrate_difference (sol, l2_error_per_cell, q, fe, L2_norm);
-  cout << l2_error_per_cell.l2_norm() << endl;
-
-  cout << "    Calculating L-infinity error... ";
-  integrate_difference (sol, linfty_error_per_cell, q, fe, Linfty_norm);
-  cout << linfty_error_per_cell.linfty_norm() << endl;
-
-  dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-  dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
-  dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
-  dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
-
   DataOut<dim> out;
   String o_filename = prm.get ("Output file");
   ofstream gnuplot(o_filename);
   fill_data (out);
-  out.add_data_vector (l1_error_per_dof, "L1-Error");
-  out.add_data_vector (l2_error_per_dof, "L2-Error");
-  out.add_data_vector (linfty_error_per_dof, "L3-Error");
   out.write_gnuplot (gnuplot);
   gnuplot.close ();
-
-  cout << "Errors: "
-       << dof->n_dofs() << "    "
-       << l1_error_per_cell.l1_norm() << " "
-       << l2_error_per_cell.l2_norm() << " "
-       << linfty_error_per_cell.linfty_norm() << endl;
-    
-
 
   cout << endl;
 };
