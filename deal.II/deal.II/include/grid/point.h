@@ -34,7 +34,22 @@ template <int dim>
 class Point {
   public:
 				     /**
-				      *  Constructor. Initialize all entries
+				      * Provide a way to get the dimension of
+				      * an object without explicit knowledge
+				      * of it's data type. Implementation is
+				      * this way instead of providing a function
+				      * #dimension()# because now it is possible
+				      * to get the dimension at compile time
+				      * without the expansion and preevaluation
+				      * of an inlined function; the compiler may
+				      * therefore produce more efficient code
+				      * and you may use this value to declare
+				      * other data types.
+				      */
+    static const unsigned int dimension = dim;
+    
+				     /**
+				      * Constructor. Initialize all entries
 				      * to zero.
 				      */
     explicit Point ();
@@ -67,12 +82,6 @@ class Point {
 				      */
     Point (const Point<dim> &);
 
-				     /**
-				      *  Return the dimension of the space this
-				      *  point is living in.
-				      */
-    unsigned int dimension() const { return dim; };
-    
 				     /**
 				      *  Read access to the #index#th coordinate.
 				      */
