@@ -483,3 +483,6 @@ BlockSparseMatrix<number>::Tvmult_add (BlockVector<somenumber>    &dst,
 				   src.block(row));
     };
 };
+
+
+#endif //__deal2__block_sparse_matrix_ez_h
