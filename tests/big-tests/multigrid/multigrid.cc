@@ -25,6 +25,7 @@
 #include <lac/sparsematrix.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
+#include <lac/precondition.h>
 
 #include <map>
 #include <fstream>
@@ -399,7 +400,8 @@ void PoissonProblem<dim>::solve () {
   SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
 				   // solve
-  cg.solve (system_matrix, solution, right_hand_side);
+  cg.solve (system_matrix, solution, right_hand_side,
+	    PreconditionIdentity<Vector<double> >());
 				   // distribute solution
   constraints.distribute (solution);
 };
