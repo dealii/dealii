@@ -1,19 +1,22 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
+# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002
 
 
-#Make a dependency file tree
-#usage: make_dep -Iinc_path1 -Iinc_path2 ... -Bbasepath files
+# Make a dependency file tree
+# usage: make_dep -Iinc_path1 -Iinc_path2 ... -Bbasepath files
 
-#This program makes for each of the given files a makefile dependency
-#list, also considering nested includes. It only considers included
-#files which are located in the given include pathes (you can give any
-#number of pathes). The output looks like this:
+# This program makes for each of the given files a makefile dependency
+# list, also considering nested includes. It only considers included
+# files which are located in the given include pathes (you can give any
+# number of pathes). The output looks like this:
 #
-#lib/o/.o-file: file included_files
-#lib/go/.g.o-file: file included_files
+#   $basepath/.o-file: file included_files
+#   $basepath/.g.o-file: file included_files
+#
+# $basepath is the dir where the object files are to be placed (as
+# given by the -B parameter to this script)
 
-#Author: Wolfgang Bangerth, 1998, 1999, 2000, 2001, 2002
+# Author: Wolfgang Bangerth, 1998, 1999, 2000, 2001, 2002
 
 
 

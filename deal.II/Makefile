@@ -148,7 +148,7 @@ clean-examples:
 	cd $D/examples ; $(MAKE) clean
 
 clean-lib:
-	-rm $(LIBDIR)/lib*
+	cd $D/lib ; $(MAKE) clean
 
 # if that directory exists, go into 'tests' and clean up there as well
 clean-tests:

@@ -1,5 +1,5 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998, 1999
+# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002
 
 
 # deal.II top level directory
