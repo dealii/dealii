@@ -153,17 +153,29 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * succeed if this object is
 				      * newly created or @p{clear()}
 				      * was called on it before.
+				      *
+				      * Multiply calles the
+				      * @p{restore(unsigned int)}
+				      * function in a loop over all
+				      * refinement steps.
 				      */
     void restore ();
 
 				     /**
 				      * Differential restore. Performs
-				      * the @p{step}th local
+				      * the @p{step_no}th local
 				      * refinement and coarsening step.
 				      * Step 0 stands for the copying
 				      * of the coarse grid.
+				      *
+				      * This function will only
+				      * succeed if the triangulation
+				      * is in just the state it were
+				      * if restore would have been
+				      * called from
+				      * @p{step=0...step_no-1} before.
 				      */
-    void restore (const unsigned int step);
+    void restore (const unsigned int step_no);
 
 				     /**
 				      * Returns the number of
