@@ -376,7 +376,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
           dnl       (allowed for compatibility)' (I don't understand what the
           dnl       compiler means)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -DDEBUG -inline_debug_info"
+	  dnl #734: `X::X(const X&), required for copy that was eliminated, is
+	  dnl       inaccessible'
+	  dnl       (valid, but annoying and sometimes hard to work around)
+          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -DDEBUG -inline_debug_info"
           CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -ip -unroll -w0 -wd424 -wd11"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC -shared"
