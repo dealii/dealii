@@ -125,7 +125,7 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 								    std::vector<bool>(1,true))),
 								      polynomial_space(degree)
 {
-  Assert(polynomial_space.n()==dofs_per_cell, ExcInternalError());
+  Assert(polynomial_space.n()==this->dofs_per_cell, ExcInternalError());
   
 				   // DG doesn't have constraints, so
 				   // leave them empty
