@@ -45,14 +45,26 @@ SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
 
 SparseMatrixStruct::SparseMatrixStruct (const unsigned int m,
 					const unsigned int n,
-					const unsigned int max_per_row,
-					const unsigned int long_rows) 
+					const unsigned int max_per_row) 
 		: max_dim(0),
 		  max_vec_len(0),
 		  rowstart(0),
 		  colnums(0)
 {
-  reinit (m,n,max_per_row,long_rows);
+  reinit (m,n,max_per_row);
+};
+
+
+
+SparseMatrixStruct::SparseMatrixStruct (const unsigned int          m,
+					const unsigned int          n,
+					const vector<unsigned int> &row_lengths) 
+		: max_dim(0),
+		  max_vec_len(0),
+		  rowstart(0),
+		  colnums(0)
+{
+  reinit (m, n, row_lengths);
 };
 
 
@@ -64,7 +76,19 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int n,
 		  rowstart(0),
 		  colnums(0)
 {
-  reinit (n,n,max_per_row,0);
+  reinit (n,n,max_per_row);
+};
+
+
+
+SparseMatrixStruct::SparseMatrixStruct (const unsigned int          m,
+					const vector<unsigned int> &row_lengths) 
+		: max_dim(0),
+		  max_vec_len(0),
+		  rowstart(0),
+		  colnums(0)
+{
+  reinit (m, m, row_lengths);
 };
 
 
@@ -186,14 +210,31 @@ SparseMatrixStruct::operator = (const SparseMatrixStruct &s)
 void
 SparseMatrixStruct::reinit (const unsigned int m,
 			    const unsigned int n,
-			    const unsigned int max_per_row,
-			    const unsigned int long_rows)
+			    const unsigned int max_per_row)
 {
+				   // simply map this function to the
+				   // other #reinit# function
+  vector<unsigned int> row_lengths (m, max_per_row);
+  reinit (m, n, row_lengths);
+};
+
+
+
+void
+SparseMatrixStruct::reinit (const unsigned int m,
+			    const unsigned int n,
+			    const vector<unsigned int> &row_lengths)
+{
+  Assert (((m==0) && (n==0)) || (*max_element(row_lengths.begin(), row_lengths.end()) > 0),
+	  ExcInvalidNumber(*max_element(row_lengths.begin(), row_lengths.end())));
+  Assert (row_lengths.size() == m, ExcInvalidNumber (m));
+	  
   rows = m;
   cols = n;
-  vec_len = m * max_per_row + (n-max_per_row) * long_rows;
-  max_row_len = max_per_row;
-  n_long_rows = long_rows;
+  vec_len = accumulate (row_lengths.begin(), row_lengths.end(), 0);
+  max_row_length = (row_lengths.size() == 0 ?
+		    0 :
+		    *max_element(row_lengths.begin(), row_lengths.end()));
 
 				   // delete empty matrices
   if ((m==0) || (n==0))
@@ -202,34 +243,46 @@ SparseMatrixStruct::reinit (const unsigned int m,
       if (colnums)   delete[] colnums;
       rowstart = 0;
       colnums = 0;
-      max_vec_len = vec_len = max_dim = rows = cols = max_row_len = n_long_rows = 0;
+      max_vec_len = vec_len = max_dim = rows = cols = 0;
+				       // if dimension is zero: ignore
+				       // max_per_row
+      max_row_length = 0;
       compressed = false;
       return;
     };
-  
+
+				   // allocate memory for the rowstart
+				   // values, if necessary
   if (rows > max_dim)
     {
       if (rowstart) delete[] rowstart;
       max_dim = rows;
       rowstart = new unsigned int[max_dim+1];
     };
-  
+
+				   // allocate memory for the column
+				   // numbers if necessary
   if (vec_len > max_vec_len)
     {
       if (colnums) delete[] colnums;
       max_vec_len = vec_len;
       colnums = new int[max_vec_len];
     };
-  
-  unsigned int start = 0;
-  for (unsigned int i=0; i<=rows; i++)
-    {
-      rowstart[i] = start;
-      start += (i<n_long_rows) ? n : max_per_row;
-    }
-  
+
+				   // set the rowstart array 
+  rowstart[0] = 0;
+  for (unsigned int i=1; i<=rows; i++)
+    rowstart[i] = rowstart[i-1]+row_lengths[i-1];
+  Assert (rowstart[rows]==vec_len, ExcInternalError());
+
+				   // preset the column numbers by a
+				   // value indicating it is not in
+				   // use
   fill_n (&colnums[0], vec_len, -1);
 
+				   // if the matrix is square: let the
+				   // first entry in each row be the
+				   // diagonal value
   if (rows == cols)
     for (unsigned int i=0;i<rows;i++)
       colnums[rowstart[i]] = i;
@@ -250,9 +303,8 @@ SparseMatrixStruct::compress ()
 
 				   // reserve temporary storage to
 				   // store the entries of one row
-  int safe_row_len = (n_long_rows != 0) ? n_cols() : max_row_len;
-  int *tmp_entries = new int[safe_row_len];
-
+  vector<int> tmp_entries (max_row_length);
+  
 				   // Traverse all rows
   for (unsigned int line=0; line<rows; ++line)
     {
@@ -311,8 +363,6 @@ SparseMatrixStruct::compress ()
   
   vec_len = rowstart[rows] = next_row_start;
   compressed = true;
-
-  delete[] tmp_entries;
 };
 
 
@@ -353,7 +403,7 @@ SparseMatrixStruct::max_entries_per_row () const
 				   // number of elements per row using
 				   // the stored value
   if (!compressed)
-    return max_row_len;
+    return max_row_length;
 
 				   // if compress() was called, we
 				   // use a better algorithm which

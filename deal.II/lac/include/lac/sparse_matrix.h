@@ -15,7 +15,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 
-#include <utility>
+#include <vector>
 
 
 //forward declarations
@@ -23,7 +23,7 @@ template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 class ostream;
 
-//TODO: Documentation on full rows
+
 
 /**
  * Structure representing the sparsity pattern of a sparse matrix.
@@ -74,22 +74,42 @@ class SparseMatrixStruct : public Subscriptor
 				      * Initialize a rectangular matrix with
 				      * #m# rows and #n# columns.
 				      * The matrix may contain at most #max_per_row#
-				      * nonzero entries per row, with the exception
-				      * of the first #n_long_rows# rows. These may even
-				      * be full.
+				      * nonzero entries per row.
 				      */
     SparseMatrixStruct (const unsigned int m,
 			const unsigned int n,
-			const unsigned int max_per_row,
-			const unsigned int n_long_rows = 0);
+			const unsigned int max_per_row);
+
+				     /**
+				      * Initialize a rectangular
+				      * matrix with #m# rows and #n#
+				      * columns.  The maximal number
+				      * of nonzero entries for each
+				      * row is given by the
+				      * #row_lengths# array.
+				      */
+    SparseMatrixStruct (const unsigned int          m,
+			const unsigned int          n,
+			const vector<unsigned int> &row_lengths);
     
 				     /**
 				      * Initialize a square matrix of dimension
-				      * #n# with at most #max_per_row#. There are
-				      * no full rows with this constructor
+				      * #n# with at most #max_per_row#
+				      * nonzero entries per row.
 				      */
     SparseMatrixStruct (const unsigned int n,
 			const unsigned int max_per_row);
+
+				     /**
+				      * Initialize a square
+				      * matrix with #m# rows and #m#
+				      * columns.  The maximal number
+				      * of nonzero entries for each
+				      * row is given by the
+				      * #row_lengths# array.
+				      */
+    SparseMatrixStruct (const unsigned int          m,
+			const vector<unsigned int> &row_lengths);
 
 				     /**
 				      * Copy operator. For this the same holds
@@ -149,13 +169,22 @@ class SparseMatrixStruct : public Subscriptor
 				      * with at most #max_per_row#
 				      * nonzero entries per row.
 				      *
-				      * This matrix also allows for
-				      * the first rows to have up to
-				      * #n# entries, if #n_long_rows#
-				      * is different from zero. This
-				      * is useful in the case of
-				      * globally coupling degrees of
-				      * freedom.
+				      * This function simply maps its
+				      * operations to the other
+				      * #reinit# function.
+				      */
+    void reinit (const unsigned int m,
+		 const unsigned int n,
+		 const unsigned int max_per_row);
+
+				     /**
+				      * Reallocate memory for a matrix
+				      * of size #m \times n#. The
+				      * number of entries for each row
+				      * is taken from the array
+				      * #row_lengths# which has to
+				      * give this number of each row
+				      * #i=1...m#.
 				      *
 				      * If #m*n==0# all memory is freed,
 				      * resulting in a total reinitialization
@@ -163,12 +192,12 @@ class SparseMatrixStruct : public Subscriptor
 				      * memory is only allocated if the new
 				      * size extends the old one. This is done
 				      * to save time and to avoid fragmentation
-				      * of the heap.  */
-    void reinit (const unsigned int m,
-		 const unsigned int n,
-		 const unsigned int max_per_row,
-		 const unsigned int n_long_rows = 0);
-
+				      * of the heap.
+				      */
+    void reinit (const unsigned int          m,
+		 const unsigned int          n,
+		 const vector<unsigned int> &row_lengths);
+    
 				     /**
 				      * This function compresses the sparsity
 				      * structure that this object represents.
@@ -487,23 +516,20 @@ class SparseMatrixStruct : public Subscriptor
 
 				     /**
 				      * Maximum number of elements per
-				      * row. This is set to the value given
-				      * to the #reinit# function (or to the
-				      * constructor). Its value is more
-				      * or less meaningsless after #compress()#
-				      * has been called.
+				      * row. This is set to the value
+				      * given to the #reinit# function
+				      * (or to the constructor), or to
+				      * the maximum row length
+				      * computed from the vectors in
+				      * case the more flexible
+				      * constructors or reinit
+				      * versions are called. Its value
+				      * is more or less meaningsless
+				      * after #compress()# has been
+				      * called.
 				      */
-    unsigned int max_row_len;
+    unsigned int max_row_length;
 
-				     /**
-				      * Number of full rows. This
-				      * value only has a meaning
-				      * before compression and allows
-				      * the first rows to have more
-				      * elements than #max_per_row#
-				      */
-    unsigned int n_long_rows;
-    
 				     /**
 				      * Array which hold for each row which
 				      * is the first element in #colnums#
@@ -524,7 +550,8 @@ class SparseMatrixStruct : public Subscriptor
 				      * allocated memory may be larger than
 				      * the region that is used. The actual
 				      * number of elements that was allocated
-				      * is stored in #max_dim#.  */
+				      * is stored in #max_dim#.
+				      */
     unsigned int *rowstart;
 
 				     /**
