@@ -68,7 +68,8 @@ dSMatrixStruct::reinit (const unsigned int m, const unsigned int n,
   vec_len = m * max_per_row;
   max_row_len = max_per_row;
 
-  if (m*n == 0)
+				   // delete empty matrices
+  if ((m==0) || (n==0))
     {
       if (rowstart)  delete[] rowstart;
       if (colnums)   delete[] colnums;
