@@ -28,7 +28,12 @@ template<typename number> class FullMatrix;
  */
 
 /**
- * Sparse matrix.
+ * Sparse matrix. This class implements the function to store values in the
+ * locations of a sparse matrix denoted by a @ref SparsityPattern. The
+ * separation of sparsity pattern and values is done since one can store data
+ * elements of different type in these locations without the SparsityPattern
+ * having to know this, and more importantly one can associate more than one
+ * matrix with the same sparsity pattern.
  *
  * @ref Instantiations some
  
