@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <lac/vector.h>
 #include <vector>
 #include <string>
 
