@@ -32,6 +32,7 @@ dof_renumbering.exe          : dof_renumbering.go          $(lib-1d) $(lib-2d) $
 error_estimator.exe          : error_estimator.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 gradients.exe                : gradients.go                          $(lib-2d)           $(libraries)
 grid_test.exe                : grid_test.go                          $(lib-2d) $(lib-3d) $(libraries)
+grid_transform.exe           : grid_transform.go                     $(lib-2d) $(lib-3d) $(libraries)
 intergrid_constraints.exe    : intergrid_constraints.go    $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 intergrid_map.exe            : intergrid_map.go            $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 matrices.exe                 : matrices.go                 $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
@@ -43,7 +44,7 @@ support_point_map.exe        : support_point_map.go        $(lib-1d) $(lib-2d) $
 filtered_matrix.exe          : filtered_matrix.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 boundaries.exe               : boundaries.go               $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 
-tests = grid_test dof_test data_out derivatives gradients constraints mg \
+tests = grid_test grid_transform dof_test data_out derivatives gradients constraints mg \
         mglocal block_matrices second_derivatives derivative_approximation \
         matrices error_estimator intergrid_constraints intergrid_map \
         wave-test-3 dof_renumbering support_point_map filtered_matrix \
