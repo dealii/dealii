@@ -58,7 +58,7 @@ int main ()
   
   for (unsigned int i=0;i<12;++i)
     {
-      p.push_back (Legendre<double>(i));
+      p.push_back (Legendre(i));
     }
   
   
@@ -119,7 +119,7 @@ int main ()
   p.clear ();
   for (unsigned int i=0;i<12;++i)
     {
-      p.push_back (Hierarchical<double>(i));
+      p.push_back (Hierarchical(i));
     }
 
   for (unsigned int i=0;i<p.size();++i)

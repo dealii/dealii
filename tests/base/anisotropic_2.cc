@@ -157,10 +157,10 @@ int main()
 //   deallog.pop();
 
 //   deallog.push("Legendre");
-//   check<Legendre<double> > ();
+//   check<Legendre> ();
 //   deallog.pop();
 
   deallog.push("Hierarchical");
-  check<Hierarchical<double> > ();
+  check<Hierarchical> ();
   deallog.pop();
 }
