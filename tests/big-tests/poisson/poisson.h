@@ -65,7 +65,8 @@ class PoissonProblem : public ProblemBase<dim>,
 		       public MultipleParameterLoop::UserClass {
   public:
     PoissonProblem ();
-
+    virtual ~PoissonProblem();
+    
     void clear ();
     
     virtual void create_new (const unsigned int run_no);
