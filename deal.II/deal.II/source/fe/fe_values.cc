@@ -402,7 +402,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       2*dim*(1<<(dim-1)),
 				       update_flags)
 {
-  Assert ((update_flags | update_ansatz_points) == false,
+  Assert ((update_flags & update_ansatz_points) == false,
 	  ExcInvalidUpdateFlag());
   
   unit_face_quadrature_points = quadrature.get_quad_points();
