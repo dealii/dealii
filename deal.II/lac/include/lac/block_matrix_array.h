@@ -493,7 +493,7 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
 {
   out << "\\begin{array}{"
       << string(n_block_cols(), 'c')
-      << "}" << endl;
+      << "}" << std::endl;
 
   vector2d<string> array(n_block_rows(), n_block_cols());
   typedef map<const MATRIX*, string> NameMap;
@@ -512,7 +512,7 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
 	      pair<const MATRIX*, string> (m->matrix, string("M")));
 	  STRINGSTREAM stream;
 	  stream << matrix_number++;
-	  stream << ends;
+	  stream << std::ends;
 	  x.first->second += stream.str();
 	}
 
@@ -522,16 +522,16 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
       stream << matrix_names.find(m->matrix)->second;
       if (m->transpose)
 	stream << "^T";
-      stream << ends;
+      stream << std::ends;
       array(m->row, m->col) += stream.str();
     }
   for (unsigned int i=0;i<n_block_rows();++i)
     for (unsigned int j=0;j<n_block_cols();++j)
-      cout << array(i,j) << '\t'
+      out << array(i,j) << '\t'
 	   << ((j==n_block_cols()-1)
 	       ? "\\\\\n"
 	       : "&\t");
-  cout << "\\end{array}" << endl;
+  out << "\\end{array}" << std::endl;
 }
 
 //----------------------------------------------------------------------//
