@@ -251,7 +251,7 @@ class dSMatrixStruct
 				      * readonly.
 				      *
 				      * Though the return value is declared
-				      * #const#, you shoudl be aware that it
+				      * #const#, you should be aware that it
 				      * may change if you call any nonconstant
 				      * function of objects which operate on
 				      * it.
