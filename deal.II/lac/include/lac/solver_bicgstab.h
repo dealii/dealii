@@ -213,9 +213,12 @@ SolverBicgstab<Matrix, Vector>::iterate(const Preconditioner& precondition)
       MA->vmult(v,y);
       rhobar = rbar * v;
 
-      if (fabs(rhobar) < 1.e-19) return ReturnState(breakdown);
-    
       alpha = rho/rhobar;
+
+//TODO: Find better breakdown criterion (G)
+
+      if (fabs(alpha) > 1.e10) return ReturnState(breakdown);
+    
       s.equ(1., r, -alpha, v);
       precondition(z,s);
       MA->vmult(t,z);
