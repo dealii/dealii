@@ -156,6 +156,18 @@ class InterGridMap
 				      * Delete all data of this class.
 				      */
     void clear ();
+
+				     /**
+				      * Return a pointer to the source
+				      * grid.
+				      */
+    const GridClass<dim> & get_source_grid () const;
+    
+				     /**
+				      * Return a pointer to the
+				      * destination grid.
+				      */
+    const GridClass<dim> & get_destination_grid () const;
     
 				     /**
 				      * Exception
@@ -175,6 +187,16 @@ class InterGridMap
 				      * for each cell on each level.
 				      */
     vector<vector<cell_iterator> > mapping;
+
+				     /**
+				      * Store a pointer to the source grid.
+				      */
+    SmartPointer<const GridClass<dim> > source_grid;
+
+				     /**
+				      * Likewise for the destination grid.
+				      */
+    SmartPointer<const GridClass<dim> > destination_grid;
 
 				     /**
 				      * Set the mapping for the pair of

@@ -823,6 +823,14 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 				   // test, but better than nothing
   Assert (coarse_grid.get_tria().n_cells(0) == fine_grid.get_tria().n_cells(0),
 	  ExcGridsDontMatch());
+
+				   // check whether the map correlates
+				   // the right objects
+  Assert (&coarse_to_fine_grid_map.get_source_grid() == &coarse_grid,
+	  ExcGridsDontMatch ());
+  Assert (&coarse_to_fine_grid_map.get_destination_grid() == &fine_grid,
+	  ExcGridsDontMatch ());
+  
   
 				   // check whether component numbers
 				   // are valid

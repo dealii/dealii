@@ -56,6 +56,9 @@ void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_gri
 				   // first delete all contents
   clear ();
 
+				   // next store pointers to grids
+  this->source_grid      = &source_grid;
+  this->destination_grid = &destination_grid;
 
 				   // then set up the containers from
 				   // scratch and fill them with end-iterators
@@ -102,6 +105,7 @@ void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_gri
 };
 
 
+
 template <template <int> class GridClass, int dim>
 void
 InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
@@ -130,6 +134,7 @@ InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
 				   // dst_cell is refined): no pointers
 				   // to be set
 };
+
 
 
 template <template <int> class GridClass, int dim>
@@ -164,13 +169,36 @@ InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) cons
 };
 
 
+
 template <template <int> class GridClass, int dim>
 void InterGridMap<GridClass,dim>::clear () 
 {
   mapping.clear ();
+  source_grid      = 0;
+  destination_grid = 0;
 };
 
 
+
+template <template <int> class GridClass, int dim>
+const GridClass<dim> &
+InterGridMap<GridClass,dim>::get_source_grid () const
+{
+  return *source_grid;
+};
+
+
+
+template <template <int> class GridClass, int dim>
+const GridClass<dim> &
+InterGridMap<GridClass,dim>::get_destination_grid () const
+{
+  return *destination_grid;
+};
+
+  
+
+  
 // explicit instantiations
 template class InterGridMap<Triangulation, deal_II_dimension>;
 template class InterGridMap<DoFHandler, deal_II_dimension>;
