@@ -647,7 +647,6 @@ void Vector<Number>::block_read (std::istream &in)
 				   //  in >> c;
   in.read (&c, 1);
   AssertThrow (c==']', ExcIO());
-  AssertThrow (in, ExcIO());
 }
 
 
