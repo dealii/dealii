@@ -1173,6 +1173,58 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
 
 
 template <typename number>
+void
+SparseMatrix<number>::block_write (ostream &out) const 
+{
+  AssertThrow (out, ExcIO());
+
+                                   // first the simple objects,
+                                   // bracketed in [...]
+  out << '[' << max_len << "][";
+                                   // then write out real data
+  out.write (reinterpret_cast<const char*>(&val[0]),
+	     reinterpret_cast<const char*>(&val[max_len])
+	     - reinterpret_cast<const char*>(&val[0]));
+  out << ']';
+  
+  AssertThrow (out, ExcIO());
+};
+
+
+
+template <typename number>
+void
+SparseMatrix<number>::block_read (istream &in)
+{
+  AssertThrow (in, ExcIO());
+
+  char c;
+
+                                   // first read in simple data
+  in >> c;
+  AssertThrow (c == '[', ExcIO());
+  in >> max_len;
+
+  in >> c;
+  AssertThrow (c == ']', ExcIO());
+  in >> c;
+  AssertThrow (c == '[', ExcIO());
+
+                                   // reallocate space
+  delete[] val;
+  val  = new number[max_len];
+  
+                                   // then read data
+  in.read (reinterpret_cast<char*>(&val[0]),
+           reinterpret_cast<char*>(&val[max_len])
+           - reinterpret_cast<char*>(&val[0]));
+  in >> c;
+  AssertThrow (c == ']', ExcIO());
+};
+
+
+
+template <typename number>
 unsigned int
 SparseMatrix<number>::memory_consumption () const
 {

@@ -775,6 +775,62 @@ class SparseMatrix : public Subscriptor
 			  const double        denominator = 1.) const;
 
 				     /**
+				      * Write the data of this object
+				      * en bloc to a file. This is
+				      * done in a binary mode, so the
+				      * output is neither readable by
+				      * humans nor (probably) by other
+				      * computers using a different
+				      * operating system of number
+				      * format.
+				      *
+				      * The purpose of this function
+				      * is that you can swap out
+				      * matrices and sparsity pattern
+				      * if you are short of memory,
+				      * want to communicate between
+				      * different programs, or allow
+				      * objects to be persistent
+				      * across different runs of the
+				      * program.
+				      */
+    void block_write (ostream &out) const;
+
+				     /**
+				      * Read data that has previously
+				      * been written by
+				      * @p{block_write} en block from
+				      * a file. This is done using the
+				      * inverse operations to the
+				      * above function, so it is
+				      * reasonably fast because the
+				      * bitstream is not interpreted
+				      * except for a few numbers up
+				      * front.
+				      *
+				      * The object is resized on this
+				      * operation, and all previous
+				      * contents are lost. Note,
+				      * however, that no checks are
+				      * performed whether new data and
+				      * the underlying
+				      * @ref{SparsityPattern} object
+				      * fit together. It is your
+				      * responsibility to make sure
+				      * that the sparsity pattern and
+				      * the data to be read match.
+				      *
+				      * A primitive form of error
+				      * checking is performed which
+				      * will recognize the bluntest
+				      * attempts to interpret some
+				      * data as a vector stored
+				      * bitwise to a file, but not
+				      * more.
+				      */
+    void block_read (std::istream &in);
+
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
@@ -849,14 +905,14 @@ class SparseMatrix : public Subscriptor
     number *val;
 
 				     /**
-				      * Allocated size of @p{val}. This
-				      * can be larger than the
-				      * actually used part if the size
-				      * of the matrix was reduced
-				      * somewhen in the past by
-				      * associating a sparsity pattern
-				      * with a smaller size to this
-				      * object somewhen, using the
+				      * Allocated size of
+				      * @p{val}. This can be larger
+				      * than the actually used part if
+				      * the size of the matrix was
+				      * reduced somewhen in the past
+				      * by associating a sparsity
+				      * pattern with a smaller size to
+				      * this object, using the
 				      * @p{reinit} function.
 				      */
     unsigned int max_len;
