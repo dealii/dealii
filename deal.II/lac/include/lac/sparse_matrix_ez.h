@@ -975,6 +975,16 @@ class SparseMatrixEZ : public Subscriptor
 				      * Increment when a row grows.
 				      */
     unsigned int increment;
+
+                                     /**
+                                      * Make member classes
+                                      * friends. Not strictly
+                                      * necessary according to the
+                                      * standard, but some compilers
+                                      * require this...
+                                      */
+    friend class const_iterator;
+    friend class const_iterator::Accessor;
 };
 
 
