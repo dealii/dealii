@@ -69,12 +69,13 @@ libs.o   = $(lib-deal2-2d.o) \
 # optimized mode to select the set of libraries to link with. Included
 # in the list of libraries is the name of the object file which we
 # will produce from the single C++ file. Note that by default we use
-# the extension .go for object files compiled in debug mode and .o for
-# object files in optimized mode.
+# the extension .g.o for object files compiled in debug mode and .o for
+# object files in optimized mode (or whatever the extension is on your
+# system, if .o is not appropriate)
 ifeq ($(debug-mode),on)
-  libraries = $(target).g.o $(libs.g)
+  libraries = $(target).g.$(OBJEXT) $(libs.g)
 else
-  libraries = $(target).o $(libs.o)
+  libraries = $(target).$(OBJEXT) $(libs.o)
 endif
 
 
@@ -82,7 +83,7 @@ endif
 # file produced from the single C++ file into the executable. Since
 # this is the first rule in the Makefile, it is the one `make' selects
 # if you call it without arguments.
-$(target) : $(libraries)
+$(target)$(EXEEXT) : $(libraries)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
@@ -93,9 +94,9 @@ $(target) : $(libraries)
 # useful if you want to call the executable with arguments which do
 # not change frequently. You may then want to add them to the
 # following rule:
-run: $(target)
+run: $(target)$(EXEEXT)
 	@echo ============================ Running $<
-	@./$(target)
+	@./$(target)$(EXEEXT)
 
 
 # As a last rule to the `make' program, we define what to do when
@@ -104,7 +105,7 @@ run: $(target)
 # backup files, and data files. Since the latter are not usually quite
 # diverse, you needed to declare them at the top of this file.
 clean:
-	-rm -f *.o *.go *~ Makefile.dep $(target) $(clean-up-files)
+	-rm -f *.$(OBJEXT) *~ Makefile.dep $(target) $(clean-up-files)
 
 
 # Since we have not yet stated how to make an object file from a C++
@@ -112,10 +113,10 @@ clean:
 # compiler are usually not of much interest, we suppress the actual
 # command line using the `at' sign in the first column of the rules
 # and write the string indicating what we do instead.
-./%.g.o :
+./%.g.$(OBJEXT) :
 	@echo ==============debug========= $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-./%.o :
+./%.$(OBJEXT) :
 	@echo ==============optimized===== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 

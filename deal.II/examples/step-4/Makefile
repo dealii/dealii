@@ -87,7 +87,7 @@ endif
 # if you call it without arguments.
 $(target) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
+	@$(CXX) -o $@$(EXEEXT) $^ $(LIBS) $(LDFLAGS)
 
 
 # To make running the application somewhat independent of the actual
@@ -98,7 +98,7 @@ $(target) : $(libraries)
 # following rule:
 run: $(target)
 	@echo ============================ Running $<
-	@./$(target)
+	@./$(target)$(EXEEXT)
 
 
 # As a last rule to the `make' program, we define what to do when
@@ -107,7 +107,7 @@ run: $(target)
 # backup files, and data files. Since the latter are not usually quite
 # diverse, you needed to declare them at the top of this file.
 clean:
-	-rm -f *.$(OBJEXT) *~ Makefile.dep $(target) $(clean-up-files)
+	-rm -f *.$(OBJEXT) *~ Makefile.dep $(target)$(EXEEXT) $(clean-up-files)
 
 
 # Since we have not yet stated how to make an object file from a C++

@@ -46,8 +46,8 @@ include $D/common/Make.global_options
 # in `source/'. Object files are placed into `lib/[123]d', using the
 # same base name as the `.cc' file.
 cc-files    = $(shell echo source/*.cc)
-o-files     = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.o)
-go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.o)
+o-files     = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.$(OBJEXT))
+go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.$(OBJEXT))
 h-files     = $(wildcard include/*.h)
 lib-h-files = $(shell echo $(include-path-base)/base/*.h    \
                            $(include-path-lac)/lac/*.h      \
@@ -93,25 +93,25 @@ flags += -Ddeal_II_dimension=$(deal_II_dimension)
 
 # The following two rules define how to compile C++ files into object
 # files:
-lib/$(deal_II_dimension)d/%.g.o :
+lib/$(deal_II_dimension)d/%.g.$(OBJEXT) :
 	@echo =====waves=======$(deal_II_dimension)d====debug=====$(MT)== $(<F)
 	@$(CXX) $(flags) -c $< -o $@
-lib/$(deal_II_dimension)d/%.o :
+lib/$(deal_II_dimension)d/%.$(OBJEXT) :
 	@echo =====waves=======$(deal_II_dimension)d====optimized=$(MT)== $(<F)
 	@$(CXX) $(flags) -c $< -o $@
 
 
 
 # Next define how to link the executable
-$(target) : $(libraries) Makefile
+$(target)$(EXEEXT) : $(libraries) Makefile
 	@echo =====waves=======$(deal_II_dimension)d==============$(MT)== Linking $(@F)
-	@$(CXX) -o $(target) $(libraries) $(LIBS) $(LDFLAGS)
+	@$(CXX) -o $@ $(libraries) $(LIBS) $(LDFLAGS)
 
 
 
 # Rule how to run the program
-run: $(target)
-	./$(target) $(run-parameters)
+run: $(target)$(EXEEXT)
+	./$(target)$(EXEEXT) $(run-parameters)
 
 
 # Rule how to clean up. This is split into several different rules to
@@ -120,7 +120,7 @@ clean: clean-lib clean-data
 	-rm -f *~ */*~ */*/*~ lib/Makefile.dep
 
 clean-lib:
-	-rm -f lib/?d/*.o lib/?d/*.g.o lib/$(target) lib/TAGS
+	-rm -f lib/?d/*.$(OBJEXT) lib/?d/*.g.$(OBJEXT) $(target)$(EXEEXT) lib/TAGS
 
 clean-data:
 	-rm -f $(clean-up-files)
