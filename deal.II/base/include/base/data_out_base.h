@@ -278,7 +278,7 @@ class DataOutBase
 				      * picture ist an example of
 				      * #n_subdivision# = 4 because
 				      * the number of cells is
-				      * egal to 2^#dim#.
+				      * equal to #2^dim#.
 				      * \begin{verbatim}
 				      *  __ __ __ __
 				      * |  |  |  |  |
