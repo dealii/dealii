@@ -23,6 +23,9 @@
 #include <fe/fe_values.h>
 #include <numerics/derivative_approximation.h>
 
+#include <cmath>
+
+
 
 template <typename T>
 static T sqr (const T t)
