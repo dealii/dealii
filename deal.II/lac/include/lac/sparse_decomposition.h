@@ -1,4 +1,7 @@
 //----------------------  sparse_decomposition.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
@@ -426,7 +429,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      * given to this class. Then, a
 				      * @p{SparsityPattern} is created
 				      * and is passed down to the
-				      * @{SparseMatrix} base class.
+				      * @p{SparseMatrix} base class.
 				      *
 				      * Nevertheless, the
 				      * @p{SparseLUDecomposition}
