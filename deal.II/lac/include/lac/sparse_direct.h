@@ -1000,16 +1000,23 @@ class SparseDirectMA47 : public Subscriptor
 /**
  * This class provides an interface to the sparse direct solver UMFPACK (see
  * <a href="http://www.cise.ufl.edu/research/sparse/umfpack">this
- * link</a>). UMFPACK is a set of routines for solving unsymmetric sparse
+ * link</a>). UMFPACK is a set of routines for solving non-symmetric sparse
  * linear systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and
  * direct sparse LU factorization. Matrices may have symmetric or unsymmetrix
  * sparsity patterns, and may have unsymmetric entries.
  *
  * @note This class only exists if support for <a
- * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPack</a>
- * was enabled during configure and if the <a
- * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPack</a>
- * library was configured.
+ * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPACK</a> was
+ * enabled during configure and if the <a
+ * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPACK</a> library
+ * was configured. The steps to do this are explained in the deal.II ReadMe
+ * file. If you do nothing at the time you configure deal.II, then this class
+ * will simply not work.
+ *
+ * @note UMFPACK has its own license, independent of that of deal.II. If you
+ * want to use the UMFPACK you have to accept that license. It is linked to
+ * from the deal.II ReadMe file. UMFPACK is included courtesy of its author,
+ * <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
  *
  * @author Wolfgang Bangerth, 2004
  */
