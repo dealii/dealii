@@ -17,6 +17,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/point.h>
 #include <string>
 
 template <int dim> class Triangulation;

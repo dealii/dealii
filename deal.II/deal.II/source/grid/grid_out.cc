@@ -370,8 +370,9 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 #if deal_II_dimension != 2
 
 template <int dim>
-void GridOut::write_xfig (const Triangulation<dim> &,
-			  std::ostream             &)
+void GridOut::write_xfig (const Triangulation<dim>&,
+			  std::ostream&,
+			  const Mapping<dim>*)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -379,10 +380,57 @@ void GridOut::write_xfig (const Triangulation<dim> &,
 #else
 
 template <int dim>
-void GridOut::write_xfig (const Triangulation<dim> &,
-			  std::ostream             &)
+void GridOut::write_xfig (const Triangulation<dim>& tria,
+			  std::ostream&             out,
+			  const Mapping<dim>*       mapping)
 {
-  Assert (false, ExcNotImplemented());
+				   // The following text was copied
+				   // from an existing XFig file.
+  out << "#FIG 3.2\nLandscape\nCenter\nInches" << std::endl
+      << "A4\n100.00\nSingle" << std::endl
+				     // Background is transparent
+      << "-3" << std::endl
+      << "1200 2" << std::endl;
+
+				   // We write all cells and cells on
+				   // coarser levels are behind cells
+				   // on finer levels. Level 0
+				   // corresponds to a depth of 900,
+				   // each level subtracting 1
+  typename Triangulation<dim>::cell_iterator cell = tria.begin();
+  const typename Triangulation<dim>::cell_iterator end = tria.end();
+
+  for (;cell != end; ++cell)
+    {
+				       // Code for polygon
+      out << "2 3 "
+					 // with solid black line thickness 1
+	  << " 0 1 0 ";
+					 // Fill color
+      out << " 6 ";
+				       // Depth, unused, solid fill
+      out << 900-cell->level() << " 0 20 0.0 "
+					 // some style parameters
+	  << " 0 0 -1 0 0 "
+					 // number of points
+	  << '5' << std::endl;
+
+				       // For each point, write scaled
+				       // and shifted coordinates
+				       // multiplied by 1200
+				       // (dots/inch)
+      const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
+      for (unsigned int k=0;k<=nv;++k)
+	{
+	  const Point<dim>& p = cell->vertex(k % nv);
+	  for (unsigned int d=0;d<dim;++d)
+	    {
+	      out << '\t'
+		  << 1200 * (p(d)-xfig_flags.offset(d)) * xfig_flags.scaling(d);
+	    }
+	  out << std::endl;
+	}
+    }
 }
 #endif
 
@@ -1220,7 +1268,11 @@ void GridOut::write (const Triangulation<dim> &tria,
       case eps:
 	    write_eps (tria, out, mapping);
 	    return;
-    };
+ 
+      case xfig:
+	    write_xfig (tria, out, mapping);
+	    return;
+   };
 
   Assert (false, ExcInternalError());
 }
