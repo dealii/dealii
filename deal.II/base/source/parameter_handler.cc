@@ -410,7 +410,7 @@ bool ParameterHandler::scan_line (String line, const unsigned int lineno) {
 				   // by ' '
   line.gsub (Regex(RegularExpressions::WhiteSpace), ' ');
 				   // now every existing whitespace
-				   // should be exactly on ' ';
+				   // should be exactly one ' ';
 				   // if at end or beginning: delete
   if ((line.length() != 0) && (line[0] == ' '))  line.del (' ');
 				   // if line is now empty: leave
