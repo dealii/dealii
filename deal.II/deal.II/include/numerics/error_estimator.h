@@ -248,7 +248,6 @@ class KellyErrorEstimator
 				      * only implemented in two and
 				      * three dimensions.
 				      */
-
     static void estimate (const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const FunctionMap       &neumann_bc,
