@@ -2098,7 +2098,7 @@ namespace DualFunctional
 					   // unit function for the
 					   // total area/volume.
 	  fe_values.reinit (cell);
-	  cell_rhs.clear ();
+	  cell_rhs = 0;
 	  
 	  for (unsigned int q=0; q<n_q_points; ++q)
 	    {
