@@ -118,7 +118,7 @@ void FEDG_P3<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 
 
 template <>
-void FEDG_P3<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
+void FEDG_P3<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &/*cell*/,
 					 FullMatrix<double> &local_mass_matrix) const
 {
   Assert(false, ExcNotImplemented());
