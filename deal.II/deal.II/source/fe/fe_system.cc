@@ -1215,6 +1215,9 @@ FESystem<dim>::build_face_tables()
 template <int dim>
 void FESystem<dim>::build_interface_constraints () 
 {
+  this->interface_constraints.
+    TableBase<2,double>::reinit (this->interface_constraints_size());
+  
 				   // the layout of the constraints
 				   // matrix is described in the
 				   // FiniteElement class. you may
@@ -1482,15 +1485,17 @@ void FESystem<dim>::initialize ()
 	do_prolongation = false;
     }
   
-				   // if we encountered void matrices,
-				   // disable them for the composite
-				   // element as well
-  if (!do_restriction)
+				   // if we did not encounter void
+				   // matrices, initialize the
+				   // respective matrix sizes
+  if (do_restriction)
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->restriction[i].reinit(0,0);
-  if (!do_prolongation)
+      this->restriction[i].reinit(this->dofs_per_cell,
+                                  this->dofs_per_cell);
+  if (do_prolongation)
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->prolongation[i].reinit(0,0);
+      this->prolongation[i].reinit(this->dofs_per_cell,
+                                   this->dofs_per_cell);
 	
 				   // distribute the matrices of the
 				   // base finite elements to the

@@ -57,14 +57,21 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   if ((degree < Matrices::n_embedding_matrices) &&
       (Matrices::embedding[degree] != 0))
     {
+      for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+        this->prolongation[i].reinit (this->dofs_per_cell,
+                                      this->dofs_per_cell);
       this->prolongation[0].fill (Matrices::embedding[degree]);
       switch (dim)
 	{
 	  case 1:
+          {
 	    this->prolongation[1].fill_permutation (this->prolongation[0],
 						    right, right);
 	    break;
+          };
+          
 	  case 2:
+          {
 	    this->prolongation[1].fill_permutation (this->prolongation[0],
 						    right, right);
 	    this->prolongation[2].fill_permutation (this->prolongation[1],
@@ -72,7 +79,10 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 	    this->prolongation[3].fill_permutation (this->prolongation[2],
 						    right, right);
 	    break;
+          };
+          
 	  case 3:
+          {
 	    this->prolongation[1].fill_permutation (this->prolongation[0],
 						    right, right);
 	    this->prolongation[5].fill_permutation (this->prolongation[1],
@@ -88,14 +98,16 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 	    this->prolongation[2].fill_permutation (this->prolongation[6],
 						    top, top);
 	    break;
+          };
+          
 	  default:
 	    Assert (false, ExcNotImplemented());
 	}
     }
   else
-				     // matrix undefined, set size to zero
-    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->prolongation[i].reinit(0, 0);
+				     // matrix undefined, leave matrix
+				     // at size zero
+    ;
 
 				   // same as above: copy over matrix
 				   // from predefined values and
@@ -103,14 +115,21 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
   if ((degree < Matrices::n_projection_matrices) &&
       (Matrices::projection_matrices[degree] != 0))
     {
+      for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+        this->restriction[i].reinit (this->dofs_per_cell,
+                                     this->dofs_per_cell);
       this->restriction[0].fill (Matrices::projection_matrices[degree]);
       switch (dim)
 	{
 	  case 1:
+          {
 	    this->restriction[1].fill_permutation (this->restriction[0],
 						   right, right);
 	    break;
+          };
+          
 	  case 2:
+          {
 	    this->restriction[1].fill_permutation (this->restriction[0],
 						   right, right);
 	    this->restriction[2].fill_permutation (this->restriction[1],
@@ -118,7 +137,10 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 	    this->restriction[3].fill_permutation (this->restriction[2],
 						   right, right);
 	    break;
+          };
+          
 	  case 3:
+          {
 	    this->restriction[1].fill_permutation (this->restriction[0],
 						   right, right);
 	    this->restriction[5].fill_permutation (this->restriction[1],
@@ -134,15 +156,16 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 	    this->restriction[2].fill_permutation (this->restriction[6],
 						   top, top);
 	    break;
+          };
+          
 	  default:
 	    Assert (false, ExcNotImplemented());
 	}
     }
   else
-				     // matrix undefined, set size to zero
-    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->restriction[i].reinit(0, 0);
-
+				     // matrix undefined, leave matrix
+				     // at size zero
+    ;
   
 				   // finally fill in support points
   if (degree == 0)

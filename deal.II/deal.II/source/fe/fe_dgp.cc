@@ -37,7 +37,11 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
   if ((degree < Matrices::n_embedding_matrices) &&
       (Matrices::embedding[degree][0] != 0))
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      this->prolongation[c].fill (Matrices::embedding[degree][c]);
+      {
+        this->prolongation[c].reinit (this->dofs_per_cell,
+                                      this->dofs_per_cell);
+        this->prolongation[c].fill (Matrices::embedding[degree][c]);
+      }
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
       this->prolongation[i].reinit(0,0);
@@ -50,6 +54,7 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
                                    //
                                    // if it were, then the following
                                    // snippet would be the right code
+//  this->restriction[i].reinit (this->dofs_per_cell, this->dofs_per_cell);
 //    if ((degree < Matrices::n_projection_matrices) &&
 //        (Matrices::projection_matrices[degree] != 0))
 //      {
@@ -59,10 +64,6 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
 //  				     // matrix undefined, set size to zero
 //      for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
 //        restriction[i].reinit(0, 0);
-                                   // since not implemented, set to
-                                   // "empty"
-  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-    restriction[i].reinit(0, 0);
 
                                    // note further, that these
                                    // elements have neither support

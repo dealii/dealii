@@ -18,6 +18,7 @@
 #include <base/subscriptor.h>
 #include <base/point.h>
 #include <base/tensor.h>
+#include <base/table.h>
 #include <grid/geometry_info.h>
 #include <lac/full_matrix.h>
 #include <fe/fe_update_flags.h>
@@ -1106,6 +1107,21 @@ class FiniteElementBase : public Subscriptor,
 				      */
     FullMatrix<double> interface_constraints;
 
+                                     /**
+                                      * Return the size of interface
+                                      * constraint matrices. Since
+                                      * this is needed in every
+                                      * derived finite element class
+                                      * when initializing their size,
+                                      * it is placed into this
+                                      * function, to avoid having to
+                                      * recomputed the
+                                      * dimension-dependent size of
+                                      * these matrices each time.
+                                      */
+    TableIndices<2>
+    interface_constraints_size () const;
+    
 				     /**
 				      * Store what
 				      * @p{system_to_component_index}

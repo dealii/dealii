@@ -12,8 +12,7 @@
 //----------------------------------------------------------------
 
 #include <base/quadrature.h>
-#include <base/polynomial.h>
-#include <base/tensor_product_polynomials.h>
+#include <base/table.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
@@ -36,12 +35,14 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
   Assert (dim >= 2, ExcNotUsefulInThisDimension());
   
 				   // copy constraint matrices if they
-				   // are defined. otherwise set them
-				   // to invalid size
+				   // are defined. otherwise leave them
+				   // at zero size
   if (degree<Matrices::n_constraint_matrices+1)
-    this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
-  else
-    this->interface_constraints.reinit(0,0);
+    {
+      this->interface_constraints.
+        TableBase<2,double>::reinit (this->interface_constraints_size());
+      this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
+    };
 
 				   // next copy over embedding
 				   // matrices if they are defined
@@ -50,6 +51,8 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
       {
                                          // copy
+        this->prolongation[c].reinit (this->dofs_per_cell,
+                                      this->dofs_per_cell);
         this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
                                          // and make sure that the row
                                          // sum is 0.5 (for usual
@@ -68,10 +71,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
             Assert (std::fabs(sum-.5) < 1e-14,
                     ExcInternalError());
           };
-      }
-  else
-    for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
-      this->prolongation[i].reinit(0,0);
+      };
 
 				   // then fill restriction
 				   // matrices. they are hardcoded for
@@ -165,6 +165,10 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
                                                // always, in the
                                                // canonical direction
                                                // of lines
+              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+                this->restriction[c].reinit (this->dofs_per_cell,
+                                             this->dofs_per_cell);
+              
 	      this->restriction[0](0,0) = 2.;
 	      this->restriction[1](1,1) = 2.;
 	      this->restriction[3](2,2) = 2.;
@@ -177,17 +181,13 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 	    {
 					       // in case we don't
 					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
+					       // (yet), leave them
+					       // empty. this does not
+					       // prevent the use of
+					       // this FE, but will
 					       // prevent the use of
 					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		this->restriction[i].reinit(0,0);
+              break;
 	    };
 	  };
 	
@@ -206,6 +206,9 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 					       // cell to get at the
 					       // values of each of
 					       // the 12 lines
+              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+                this->restriction[c].reinit (this->dofs_per_cell,
+                                             this->dofs_per_cell);
 	      this->restriction[0](0,0) = 2.;
 	      this->restriction[0](3,3) = 2.;
 	      this->restriction[1](1,1) = 2.;
@@ -228,17 +231,13 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 	    {
 					       // in case we don't
 					       // have the matrices
-					       // (yet), set them to
-					       // impossible
-					       // values. this does
-					       // not prevent the use
-					       // of this FE, but will
+					       // (yet), leave them
+					       // empty. this does not
+					       // prevent the use of
+					       // this FE, but will
 					       // prevent the use of
 					       // these matrices
-	      for (unsigned int i=0;
-		   i<GeometryInfo<dim>::children_per_cell;
-		   ++i)
-		this->restriction[i].reinit(0,0);
+              break;
 	    };
 	  };
 	
@@ -253,6 +252,14 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
+
+                                   // then make
+                                   // system_to_component_table
+                                   // invalid, since this has no
+                                   // meaning for the present element
+  std::vector<std::pair<unsigned,unsigned> > tmp1, tmp2;
+  this->system_to_component_table.swap (tmp1);
+  this->face_system_to_component_table.swap (tmp2);
 };
 
 

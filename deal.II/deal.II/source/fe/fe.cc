@@ -27,6 +27,9 @@
 #include <numeric>
 
 
+//TODO[GK]: in all FEs, somehow make the handling of first_cell more intuitive. presently, this flag is cleared at the end of the fill_fe_*_values function, but this leads to confusion, if for example in the FESystems class, we ask for the present values of the update flags, using update_current, because the element thinks it is already on the second cell and the FESystem does not want to do some actions it is supposed to do. thus, in the respective FESystem function, we store these update_values once before calling the fill_* functions of the subelements, and reuse the stored values. if we would request their values only after initializing the base element (i.e. requesting them at the point _where we actually need them_!), this would fail, and we would not copy the shape_values, for example.
+//TODO[GK]: the solution would probably to not set and clear the first_cell flag in the FEs themselves, but to have a function which sets or clears this flag, and call it from the FEValues object, which should always know what the present state is. this way, we could be more sure that this flag is actually consistent with the present state, and among the various elements that are involved in a FESystem.
+
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
@@ -151,43 +154,9 @@ FiniteElementBase (const FiniteElementData<dim> &fe_data,
 	      ExcInternalError());      
     };
   
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
-    {
-      restriction[i].reinit (this->dofs_per_cell, this->dofs_per_cell);
-      prolongation[i].reinit (this->dofs_per_cell, this->dofs_per_cell);
-    };
-
-				   // first set sizes of some
-				   // matrices. they will be filled by
-				   // derived classes, or re-set to
-				   // zero size of not defined
-  switch (dim)
-    {
-      case 1:
-	Assert ((interface_constraints.m() == 0) &&
-		(interface_constraints.n() == 0),
-		ExcInternalError());
-	break;
-	    
-      case 2:
-	interface_constraints.reinit (this->dofs_per_vertex
-				      +2*this->dofs_per_line,
-				      this->dofs_per_face);
-	break;
-
-      case 3:
-	interface_constraints.reinit (5*this->dofs_per_vertex +
-				      12*this->dofs_per_line  +
-				      4*this->dofs_per_quad,
-				      this->dofs_per_face);
-	break;
-
-      default:
-	Assert (false, ExcNotImplemented());
-    };
-	    
-  				   // this is the default way, if
-				   // there is only one component; if
+                                   // initialize some tables in the
+				   // default way, i.e. if there is
+				   // only one (vector-)component; if
 				   // there are several, then the
 				   // constructor of the derived class
 				   // needs to overwrite these arrays
@@ -311,6 +280,32 @@ FiniteElementBase<dim>::constraints () const
   return interface_constraints;
 };
 
+
+
+template <int dim>
+TableIndices<2>
+FiniteElementBase<dim>::interface_constraints_size () const 
+{
+  switch (dim)
+    {
+      case 1:
+            return TableIndices<2> (0U, 0U);
+      case 2:
+            return TableIndices<2> (this->dofs_per_vertex +
+                                    2*this->dofs_per_line,
+                                    this->dofs_per_face);
+      case 3:
+            return TableIndices<2> (5*this->dofs_per_vertex +
+                                    12*this->dofs_per_line  +
+                                    4*this->dofs_per_quad,
+                                    this->dofs_per_face);
+      default:
+            Assert (false, ExcNotImplemented());
+    };
+  return TableIndices<2> (-1, -1);
+};
+
+                                   
 
 
 template <int dim>
