@@ -26,6 +26,9 @@ template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
+template <typename number> class SparseVanka;
+template <typename number> class SparseBlockVanka;
+
 /**
  * Point-wise Vanka preconditioning.
  * This class does Vanka preconditioning  on a point-wise base.
@@ -341,6 +344,32 @@ class SparseVanka
     void compute_inverse (const unsigned int         row,
 			  std::vector<unsigned int> &local_indices);
 
+                                     /**
+                                      * Make the derived class a
+                                      * friend. This seems silly, but
+                                      * is actually necessary, since
+                                      * derived classes can only
+                                      * access non-public members
+                                      * through their @p{this}
+                                      * pointer, but not access these
+                                      * members as member functions of
+                                      * other objects of the type of
+                                      * this base class (i.e. like
+                                      * @p{x.f()}, where @p{x} is an
+                                      * object of the base class, and
+                                      * @p{f} one of it's non-public
+                                      * member functions).
+                                      *
+                                      * Now, in the case of the
+                                      * @p{SparseBlockVanka} class, we
+                                      * would like to take the address
+                                      * of a function of the base
+                                      * class in order to call it
+                                      * through the multithreading
+                                      * framework, so the derived
+                                      * class has to be a friend.
+                                      */
+    template <typename T> friend class SparseBlockVanka;
 };
 
 
