@@ -308,7 +308,7 @@ double Point<dim>::distance (const Point<dim> &p) const
       sum += diff*diff;
     }
   
-  return sqrt(sum);
+  return std::sqrt(sum);
 }
 
 
