@@ -379,7 +379,7 @@ class FEValuesBase : protected FEValuesData<dim>
 			const unsigned int point_no) const;
 
 				     /**
-				      * Return one vector component of
+				      * Compute one vector component of
 				      * the value of a shape function
 				      * at a quadrature point. If the
 				      * finite element is scalar, then
@@ -407,24 +407,26 @@ class FEValuesBase : protected FEValuesData<dim>
 				  const unsigned int component) const;
 
 				     /**
-				      * Values of the finite
-				      * element function characterized
-				      * by @p{fe_function} restricted to
-				      * the cell, face or subface selected
-				      * the last time the @p{reinit} function
-				      * of the derived class was called,
-				      * at the quadrature points.
+				      * Returns the values of the
+				      * finite element function
+				      * characterized by
+				      * @p{fe_function} restricted to
+				      * the cell, face or subface
+				      * selected the last time the
+				      * @p{reinit} function of the
+				      * derived class was called, at
+				      * the quadrature points.
 				      *
-				      * If the present cell is not an active
-				      * one the interpolated function values
-				      * are returned.
+				      * If the present cell is not an
+				      * active one the interpolated
+				      * function values are returned.
 				      *
 				      * To get values of
 				      * multi-component elements,
 				      * there is another
 				      * @p{get_function_values}
-				      * returning a vector of vectors of
-				      * results.
+				      * returning a vector of vectors
+				      * of results.
 				      *
 				      * The function assumes that the
 				      * @p{values} object already has the
@@ -461,14 +463,15 @@ class FEValuesBase : protected FEValuesData<dim>
 			      std::vector<Vector<number> > &values) const;
 
     				     /**
-				      * Gradient of the @p{i}th shape
-				      * function at the @p{j} quadrature
-				      * point with respect to real
-				      * cell coordinates.  If you want
-				      * to get the derivative in one
-				      * of the coordinate directions,
-				      * use the appropriate function
-				      * of the @ref{Tensor} class to
+				      * Compute the gradient of the
+				      * @p{i}th shape function at the
+				      * @p{j} quadrature point with
+				      * respect to real cell
+				      * coordinates.  If you want to
+				      * get the derivative in one of
+				      * the coordinate directions, use
+				      * the appropriate function of
+				      * the @ref{Tensor} class to
 				      * extract one component. Since
 				      * only a reference to the
 				      * gradient's value is returned,
@@ -522,7 +525,7 @@ class FEValuesBase : protected FEValuesData<dim>
 			  const unsigned int component) const;
 
 				     /**
-				      * Gradients of the finite
+				      * Compute the gradients of the finite
 				      * element function characterized
 				      * by @p{fe_function} restricted to
 				      * @p{cell} at the quadrature points.
@@ -546,7 +549,7 @@ class FEValuesBase : protected FEValuesData<dim>
 			     std::vector<Tensor<1,dim> > &gradients) const;
 
 				     /**
-				      * Return the gradients of the finite
+				      * Compute the gradients of the finite
 				      * element function characterized
 				      * by @p{fe_function} restricted to
 				      * @p{cell} at the quadrature points.
@@ -575,7 +578,7 @@ class FEValuesBase : protected FEValuesData<dim>
 			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
     				     /**
-				      * 2nd derivatives of
+				      * Second derivatives of
 				      * the @p{function_no}th shape function at
 				      * the @p{point_no}th quadrature point
 				      * with respect to real cell
@@ -640,11 +643,11 @@ class FEValuesBase : protected FEValuesData<dim>
 				    const unsigned int component) const;
     
 				     /**
-				      * Tensor of second derivatives
-				      * of the finite element function
-				      * characterized by
-				      * @p{fe_function} restricted to
-				      * @p{cell} at the quadrature
+				      * Compute the tensor of second
+				      * derivatives of the finite
+				      * element function characterized
+				      * by @p{fe_function} restricted
+				      * to @p{cell} at the quadrature
 				      * points.
 				      *
 				      * The function assumes that the
@@ -663,7 +666,7 @@ class FEValuesBase : protected FEValuesData<dim>
 
     
 				     /**
-				      * Return the tensor of second
+				      * Compute the tensor of second
 				      * derivatives of the finite
 				      * element function characterized
 				      * by @p{fe_function} restricted to
