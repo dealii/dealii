@@ -841,8 +841,11 @@ SparseDirectMA27::factorize (const SparseMatrix<double> &matrix)
   AssertThrow (call_succeeded, ExcMA27BFailed(IFLAG));
 
 				   // note that we have been here
-				   // already
+				   // already and release the sparsity
+				   // pattern object, since we won't
+				   // need it any more
   factorize_called = true;
+  sparsity_pattern = 0;
 }
 
 
