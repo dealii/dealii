@@ -10,8 +10,8 @@ class ParameterHandler;
 class MultipleParameterLoop;
 
 
-#include <map.h>
-#include <vector.h>
+#include <map>
+#include <vector>
 #include <base/exceptions.h>
 
 
@@ -214,7 +214,7 @@ enum OutputStyle {
     It is guaranteed that only entries matching the given regular expression are returned,
     i.e. an input entry value which does not match the regular expression is not stored.
 
-    You can use #get# to retreive the parameter in text form, #get_integer# to get an integer
+    You can use #get# to retrieve the parameter in text form, #get_integer# to get an integer
     or #get_double# to get a double. It will cause an internal error if
     the string could not be converted to an integer or a double. This should, though, not
     happen if you correctly specified the regular expression for this entry; you should not
@@ -222,6 +222,15 @@ enum OutputStyle {
     expression was set. The internal error is raised through the #Assert()# macro family
     which only works in debug mode.
 
+    If you want to print out all user selectable features, use the
+    #print_parameters# function. It is generally a good idea to print all parameters
+    at the beginning of a log file, since this way input and output are together in
+    one file which makes matching at a later time easier. Additionally, the function
+    also print those entries which have not been modified in the input file und are
+    thus set to default values; since default values may change in the process of
+    program development, you cannot know the values of parameters not specified in the
+    input file.
+    
     
     {\bf Style guide for data retrieval}
     

@@ -6,7 +6,7 @@
 
 
 #include <base/exceptions.h>
-#include <vector.h>
+#include <vector>
 #include <grid/point.h>
 
 

@@ -5,7 +5,7 @@
 /*----------------------------   io.h     ---------------------------*/
 
 #include <base/exceptions.h>
-#include <vector.h>
+#include <vector>
 #include <string>
 
 template <int dim> class Triangulation;
