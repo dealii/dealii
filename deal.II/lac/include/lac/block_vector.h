@@ -15,9 +15,11 @@
 
 
 #include <lac/vector.h>
+#include <lac/block_indices.h>
 #include <base/exceptions.h>
 #include <cstdio>
 #include <vector>
+
 
 /**
  * Several vectors of data. 
@@ -25,7 +27,7 @@
  * The BlockVector is a collection of normal LAC-#Vector#s. Each of
  * the vectors inside can have a different size.
  *
- * The functionality of #BlockVector# includes everything, a #Vector#
+ * The functionality of #BlockVector# includes everything a #Vector#
  * can do, plus the access to a single #Vector# inside the
  * #BlockVector# by #block(i)#.
  *
@@ -69,7 +71,7 @@ class BlockVector
 				      * Constructor. Set dimension to #n# and
 				      * initialize all elements with zero.
 				      */
-    BlockVector (const vector<unsigned int>& n);
+    BlockVector (const vector<unsigned int> &n);
 
                                      /**
 				      * Destructor. Clears memory
@@ -93,8 +95,8 @@ class BlockVector
 				      * On #fast==false#, the vector is filled by
 				      * zeros.
 				      */ 
-    void reinit (const vector<unsigned int>& N,
-		 const bool         fast=false);
+    void reinit (const vector<unsigned int> &N,
+		 const bool                  fast=false);
     
 				     /**
 				      * Change the dimension to that of the
@@ -106,7 +108,7 @@ class BlockVector
 				      * #reinit (V.size(), fast)#.
 				      */
     void reinit (const BlockVector<n_blocks,Number> &V,
-		 const bool            fast=false);
+		 const bool                          fast=false);
     
 				     /**
 				      * Set all entries to zero. Equivalent to
@@ -145,12 +147,12 @@ class BlockVector
 				     /**
 				      * Access to a single block.
 				      */
-    Vector<Number>& block(unsigned int i);
+    Vector<Number>& block (const unsigned int i);
     
 				     /**
 				      * Read-only access to a single block.
 				      */
-    const Vector<Number>& block(unsigned int i) const;
+    const Vector<Number>& block (const unsigned int i) const;
     
 				     /**
 				      * $U(0-N) = s$: fill all components.
@@ -456,12 +458,13 @@ class BlockVector
 				      */
     Vector<Number> components[n_blocks];
 
-                                     /**
-				      * Global starting index of each vector.
-				      * The last andredundant value is the total
-				      * number of entries.
+				     /**
+				      * Object managing the
+				      * transformation between global
+				      * indices and indices within the
+				      * different blocks.
 				      */
-    unsigned int start[n_blocks+1];
+    BlockIndices<n_blocks> block_indices;
 };
 
 
@@ -472,7 +475,7 @@ template <int n_blocks, typename Number>
 inline
 unsigned int BlockVector<n_blocks,Number>::size () const
 {
-  return start[n_blocks];
+  return block_indices.total_size();
 }
 
 
@@ -508,12 +511,9 @@ template <int n_blocks, typename Number>
 inline
 Number BlockVector<n_blocks,Number>::operator() (const unsigned int i) const
 {
-  //  Assert (i<start[n_blocks], ExcInvalidIndex(i,dim));
-
-  int j=n_blocks-1;
-    while ((start[j]>i) && (j!=0)) --j;
-
-  return components[j](i-start[j]);
+  const pair<unsigned int,unsigned int> local_index
+    = block_indices.global_to_local (i);
+  return components[local_index.first](local_index.second);
 }
 
 
@@ -521,13 +521,12 @@ template <int n_blocks, typename Number>
 inline
 Number& BlockVector<n_blocks,Number>::operator() (const unsigned int i)
 {
-  //  Assert (i<dim, ExcInvalidIndex(i,dim));
-
-  int j=n_blocks-1;
-    while ((start[j]>i) && (j!=0)) --j;
-
-  return components[j](i-start[j]);
+  const pair<unsigned int,unsigned int> local_index
+    = block_indices.global_to_local (i);
+  return components[local_index.first](local_index.second);
 }
+
+
 
 template <int n_blocks, typename Number>
 inline
@@ -559,7 +558,8 @@ BlockVector<n_blocks,Number>::block(unsigned int i) const
  */
 template <int n_blocks, typename Number>
 inline
-void swap (BlockVector<n_blocks,Number> &u, BlockVector<n_blocks,Number> &v)
+void swap (BlockVector<n_blocks,Number> &u,
+	   BlockVector<n_blocks,Number> &v)
 {
   u.swap (v);
 };
