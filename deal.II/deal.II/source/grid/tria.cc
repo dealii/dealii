@@ -6197,6 +6197,10 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   // are done the first. the following
 				   // order is chosen:
 				   //
+				   // 0/ do not coarsen a cell if 'most of
+				   //    the neighbors' will be refined after
+				   //    the step. This is to prevent occurence
+				   //    of unrefined islands.
 				   // 1/ eliminate refined islands in the
 				   //    interior and at the boundary. since
 				   //    they don't do much harm besides
@@ -6244,6 +6248,97 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
   bool mesh_changed_in_this_loop = false;
   do
     {
+
+				       //////////////////////////////////////
+				       // STEP 0:
+				       //    do not coarsen a cell if 'most of
+				       //    the neighbors' will be refined after
+				       //    the step. This is to prevent the
+				       //    occurence of unrefined islands.
+      if (smooth_grid & do_not_produce_unrefined_islands)
+	{
+	  cell_iterator       cell;
+	  const cell_iterator endc = end();
+	  
+	  for (cell=begin(); cell!=endc; ++cell)
+	    {
+	      if (!cell->active())
+		{
+						   // count the children whose
+						   // coarsen_flags are set
+		  unsigned int n_childrens_coarsen_flags_set=0;
+		  for (unsigned int c=0;
+		       c<GeometryInfo<dim>::children_per_cell; ++c)
+		    if (cell->child(c)->active() &&
+			cell->child(c)->coarsen_flag_set())
+		      ++n_childrens_coarsen_flags_set;
+
+						   // only do
+						   // something if all
+						   // children are
+						   // flagged for
+						   // coarsening since
+						   // only then are
+						   // they coarsened
+						   // anyway.
+		  if (n_childrens_coarsen_flags_set==
+		      GeometryInfo<dim>::children_per_cell)
+		    {
+		      unsigned int n_neighbors=0;
+						       // count all
+						       // neighbors
+						       // that will be
+						       // refined
+						       // after the
+						       // next step
+		      unsigned int count=0;
+		      for (unsigned int n=0;
+			   n<GeometryInfo<dim>::faces_per_cell; ++n)
+			{
+			  const cell_iterator neighbor = cell->neighbor(n);
+			  if (neighbor.state() == valid)
+			    {
+			      ++n_neighbors;
+
+			      bool not_active_neighbor_will_be_coarsened=false;
+			      unsigned int
+				n_neighbors_childrens_coarsen_flags_set=0;
+			      if (!neighbor->active())
+				{
+				  for (unsigned int c=0;
+				       c<GeometryInfo<dim>::children_per_cell; ++c)
+				    if (neighbor->child(c)->active() &&
+					neighbor->child(c)->coarsen_flag_set())
+				      ++n_neighbors_childrens_coarsen_flags_set;
+
+				  if (n_neighbors_childrens_coarsen_flags_set
+				      ==GeometryInfo<dim>::children_per_cell)
+				    not_active_neighbor_will_be_coarsened=true;
+				}
+			      
+				    
+			      if ((neighbor->active() &&
+				   neighbor->refine_flag_set()) ||
+				  !not_active_neighbor_will_be_coarsened)
+				++count;
+			    }
+			}
+		      
+		      if ((dim==1 && count==n_neighbors) ||
+			  (dim>1 && (count==n_neighbors ||
+				     (count>=n_neighbors-1 &&
+				      n_neighbors==
+				      GeometryInfo<dim>::faces_per_cell))))
+			for (unsigned int c=0;
+			     c<GeometryInfo<dim>::children_per_cell; ++c)
+			  cell->child(c)->clear_coarsen_flag();
+		    }
+		  
+		}  // if (!cell->active())
+	    }  // for (all cells)
+	} // if (smooth_grid & ...)
+      
+
 				       //////////////////////////////////////
 				       // STEP 1:
 				       //    eliminate refined islands in the
@@ -6506,7 +6601,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		      cell->neighbor(i)->clear_coarsen_flag ();
 		};
 	  };
-      
+
 				       //////////////////////////////////////
 				       // STEP 5:
 				       //    take care that no double refinement
@@ -7424,5 +7519,4 @@ template void Triangulation<deal_II_dimension>
 ::refine_and_coarsen_fixed_fraction (const Vector<float> &criteria,
 				     const double         top_fraction,
 				     const double         bottom_fraction);
-
 
