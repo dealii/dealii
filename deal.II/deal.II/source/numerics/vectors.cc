@@ -276,33 +276,33 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 
 
 template <int dim> void
-VectorTools::interpolate (const DoFHandler<dim>           &high_dof,
-			  const DoFHandler<dim>           &low_dof,
+VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
+			  const DoFHandler<dim>           &dof_2,
 			  const FullMatrix<double>        &transfer,
-			  const Vector<double>            &high,
-			  Vector<double>                  &low)
+			  const Vector<double>            &data_1,
+			  Vector<double>                  &data_2)
 {
-  Vector<double> cell_high(high_dof.get_fe().dofs_per_cell);
-  Vector<double> cell_low(low_dof.get_fe().dofs_per_cell);
+  Vector<double> cell_data_1(dof_1.get_fe().dofs_per_cell);
+  Vector<double> cell_data_2(dof_2.get_fe().dofs_per_cell);
 
-  vector <short unsigned int> touch_count (low_dof.n_dofs(), 0);
-  vector <int> local_dof_indices (low_dof.get_fe().dofs_per_cell);
+  vector <short unsigned int> touch_count (dof_2.n_dofs(), 0);
+  vector <int> local_dof_indices (dof_2.get_fe().dofs_per_cell);
   
-  DoFHandler<dim>::active_cell_iterator h = high_dof.begin_active();
-  DoFHandler<dim>::active_cell_iterator l = low_dof.begin_active();
-  const DoFHandler<dim>::cell_iterator endh = high_dof.end();
+  DoFHandler<dim>::active_cell_iterator h = dof_1.begin_active();
+  DoFHandler<dim>::active_cell_iterator l = dof_2.begin_active();
+  const DoFHandler<dim>::cell_iterator endh = dof_1.end();
   
   for(; h != endh; ++h, ++l)
   {
-    h->get_dof_values(high, cell_high);
-    transfer.vmult(cell_low, cell_high);
+    h->get_dof_values(data_1, cell_data_1);
+    transfer.vmult(cell_data_2, cell_data_1);
 
     l->get_dof_indices (local_dof_indices);
   
 				   // distribute cell vector
-    for (unsigned int j=0; j<low_dof.get_fe().dofs_per_cell; ++j) 
+    for (unsigned int j=0; j<dof_2.get_fe().dofs_per_cell; ++j) 
       {
-	low(local_dof_indices[j]) += cell_low(j);
+	data_2(local_dof_indices[j]) += cell_data_2(j);
 
 					 // count, how often we have
 					 // added to this dof
@@ -315,12 +315,12 @@ VectorTools::interpolate (const DoFHandler<dim>           &high_dof,
 				   // compute the mean value of the
 				   // sum which we have placed in each
 				   // entry of the output vector
-  for (unsigned int i=0; i<low_dof.n_dofs(); ++i)
+  for (unsigned int i=0; i<dof_2.n_dofs(); ++i)
     {
       Assert (touch_count[i] != 0,
 	      ExcInternalError());
       
-      low(i) /= touch_count[i];
+      data_2(i) /= touch_count[i];
     };
 }
 
