@@ -730,6 +730,15 @@ class SymmetricTensor
 				      * denoted by a "colon
 				      * multiplication" in the
 				      * mathematica literature.
+				      *
+				      * There are global functions
+				      * <tt>double_contract</tt> that
+				      * do the same work as this
+				      * operator, but rather than
+				      * returning the result as a
+				      * return value, they write it
+				      * into the first argument to the
+				      * function.
                                       */
     typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim>::type
     operator * (const SymmetricTensor<2,dim> &s) const;
@@ -828,6 +837,18 @@ class SymmetricTensor
 				      * Make all other symmetric tensors friends.
 				      */
     template <int, int> friend class SymmetricTensor;
+
+				     /**
+				      * Make a few more functions friends.
+				      */
+    template <int dim>
+    friend double trace (const SymmetricTensor<2,dim> &d);
+
+    friend double determinant (const SymmetricTensor<2,1> &t);
+    
+    friend double determinant (const SymmetricTensor<2,2> &t);
+
+    friend double determinant (const SymmetricTensor<2,3> &t);    
 };
 
 
@@ -1721,7 +1742,26 @@ SymmetricTensor<4,3>::norm () const
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
 /**
- * Compute the determinant of a tensor or rank 2, here for <tt>dim==2</tt>.
+ * Compute the determinant of a tensor or rank 2. The determinant is
+ * also commonly referred to as the second invariant of rank-2 tensors.
+ *
+ * For the present case of one-dimensional tensors, the determinant
+ * equals the only element and is therefore equivalent to the trace.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+inline
+double determinant (const SymmetricTensor<2,1> &t)
+{
+  return t[0][0];
+}
+
+
+
+/**
+ * Compute the determinant of a tensor or rank 2. The determinant is
+ * also commonly referred to as the second invariant of rank-2 tensors.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1729,14 +1769,15 @@ SymmetricTensor<4,3>::norm () const
 inline
 double determinant (const SymmetricTensor<2,2> &t)
 {
-  return (t[0][0] * t[1][1] - 2*t[0][1]*t[0][1]);
+  return (t.data[0] * t.data[1] - 2*t.data[2]*t.data[2]);
 }
 
 
 
 
 /**
- * Compute the determinant of a tensor or rank 2, here for <tt>dim==3</tt>.
+ * Compute the determinant of a tensor or rank 2. The determinant is
+ * also commonly referred to as the second invariant of rank-2 tensors.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1747,28 +1788,29 @@ double determinant (const SymmetricTensor<2,3> &t)
 				   // in analogy to general tensors, but
 				   // there's something to be simplified for
 				   // the present case
-  return ( t[0][0]*t[1][1]*t[2][2]
-	   -t[0][0]*t[1][2]*t[1][2]
-	   -t[1][1]*t[0][2]*t[0][2]
-	   -t[2][2]*t[0][1]*t[0][1]
-	   +2*t[0][1]*t[0][2]*t[1][2] );
+  return ( t.data[0]*t.data[1]*t.data[2]
+	   -t.data[0]*t.data[5]*t.data[5]
+	   -t.data[1]*t.data[4]*t.data[4]
+	   -t.data[2]*t.data[3]*t.data[3]
+	   +2*t.data[3]*t.data[4]*t.data[5] );
 }
 
 
 
 /**
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of
- * its diagonal entries.
+ * its diagonal entries. The trace is the first invariant of a rank-2
+ * tensor.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <int rank, int dim>
-double trace (const SymmetricTensor<rank,dim> &d)
+template <int dim>
+double trace (const SymmetricTensor<2,dim> &d)
 {
   double t=0;
   for (unsigned int i=0; i<dim; ++i)
-    t += d[i][i];
+    t += d.data[i];
   return t;
 }
 
