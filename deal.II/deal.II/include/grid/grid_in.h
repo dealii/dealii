@@ -86,7 +86,7 @@ class SubCellData;
  * incomplete, so we don't actually parse many of the fields of the
  * output since we don't know their meaning, but the data that is read
  * is enough to build up the mesh as intended by the mesh generator.
- * This format can be read by the @p read_dbmesh function.
+ * This format can be read by the read_dbmesh() function.
  *
  * <li> @p XDA format: this is a rather simple format used by the MGF
  * code. We don't have an exact specification of the format, but the reader
