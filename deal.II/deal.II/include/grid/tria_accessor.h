@@ -603,19 +603,73 @@ class QuadAccessor :  public TriaAccessor<dim> {
 
 
 /**
-  This class allows access to a {\bf cell}, which is a line in 1D and a quad in
-  2D. Declare it to have a template parameter, but do not actually declare
-  other types than those explicitely instantiated.
-   */
+  Intermediate, "typedef"-class, not for public use.
+  */
 template <int dim>
-class CellAccessor;
+class TriaSubstructAccessor;
+
+
+
+/**
+  Intermediate, "typedef"-class, not for public use.
+
+  {\bf Rationale}
+
+  This class is only a wrapper class used to do kind of a typedef
+  with template parameters. This class and #TriaSubstructAccessor<2>#
+  wrap the following names:
+  \begin{verbatim}
+    TriaSubstructAccessor<1> := LineAccessor<1>;
+    TriaSubstructAccessor<2> := QuadAccessor<2>;
+  \end{verbatim}
+  We do this rather complex (and needless, provided C++ the needed constructs!)
+  class hierarchy manipulation, since this way we can declare and implement
+  the \Ref{CellAccessor} dimension independent as an inheritance from
+  #TriaSubstructAccessor<dim>#. If we had not declared these
+  types, we would have to write two class declarations, one for
+  #CellAccessor<1>#, derived from #LineAccessor<1>#
+  and one for #CellAccessor<2>#, derived from
+  #QuadAccessor<2>#.
+  */
+class TriaSubstructAccessor<1> :  public LineAccessor<1> {
+  public:
+    				     /**
+				      * Constructor
+				      */
+    TriaSubstructAccessor (Triangulation<1> *tria,
+				 const int         level,
+				 const int         index,
+				 const void       *local_data) :
+		    LineAccessor<1> (tria,level,index,local_data) {};
+};
+
+
+
+/**
+  Intermediate, "typedef"-class, not for public use.
+  @see TriaSubstructAccessor<1>
+  */
+class TriaSubstructAccessor<2> : public QuadAccessor<2> {
+  public:
+    				     /**
+				      * Constructor
+				      */
+    TriaSubstructAccessor (Triangulation<2> *tria,
+				 const int         level,
+				 const int         index,
+				 const void       *local_data) :
+		    QuadAccessor<2> (tria,level,index,local_data) {};
+};
+
+
 
 
 
 
 
 /**
-  This class allows access to a cell, i.e. a line on the present dimension.
+  This class allows access to a cell, i.e. a line in one dimension, a quad
+  in two dimension, etc.
 
   The following refers to any space dimension:
   
@@ -624,23 +678,18 @@ class CellAccessor;
   example they can be flagged for refinement, they have neighbors, they have
   the possibility to check whether they are at the boundary etc. This class
   offers access to all this data.
-  
-  The are specialized versions, \Ref{CellAccessor<1>} and
-  \Ref{CellAccessor<2>}, which
-  offer access to cells and one and two dimensions respectively. They have
-  more or less the same functionality, but return different types in some
-  cases.
  */
-class CellAccessor<1> :  public LineAccessor<1> {
+template <int dim>
+class CellAccessor :  public TriaSubstructAccessor<dim> {
   public:
 				     /**
 				      *  Constructor.
 				      */
-    CellAccessor (Triangulation<1>   *parent     = 0,
+    CellAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
 		  const void         *local_data = 0) :
-		    LineAccessor<1> (parent, level, index, local_data) {};
+		    TriaSubstructAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
 				      *  Return a pointer to the #i#th
@@ -648,7 +697,7 @@ class CellAccessor<1> :  public LineAccessor<1> {
 				      *  If the neighbor does not exist, an
 				      *  invalid iterator is returned.
 				      */
-    TriaIterator<1,CellAccessor<1> > neighbor (const unsigned int i) const;
+    TriaIterator<dim,CellAccessor<dim> > neighbor (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th neighbor.
@@ -670,7 +719,7 @@ class CellAccessor<1> :  public LineAccessor<1> {
 				      *  This line must be used.
 				      */
     void set_neighbor (const unsigned int i,
-		       const TriaIterator<1,CellAccessor<1> > &pointer) const;
+		       const TriaIterator<dim,CellAccessor<dim> > &pointer) const;
 
 				     /**
 				      *  Return whether the #i#th vertex is
@@ -707,7 +756,7 @@ class CellAccessor<1> :  public LineAccessor<1> {
 				      *  child. Overloaded version which returns
 				      *  a more reasonable iterator class.
 				      */
-    TriaIterator<1,CellAccessor<1> > child (const unsigned int i) const;
+    TriaIterator<dim,CellAccessor<dim> > child (const unsigned int i) const;
 
 				     /**
 				      * Test whether the cell has children
@@ -734,121 +783,11 @@ class CellAccessor<1> :  public LineAccessor<1> {
 				      *  and will give a linker error if
 				      *  used anyway.
 				      */
-    void operator = (const CellAccessor<1> &);
+    void operator = (const CellAccessor<dim> &);
 };
 
 
 
-
-
-
-/**
-    Specialization of a #CellAccessor# for two space dimensions.
-    @see CellAccessor<1>
- */
-class CellAccessor<2> :  public QuadAccessor<2> {
-  public:
-				     /**
-				      *  Constructor.
-				      */
-    CellAccessor (Triangulation<2>   *parent     = 0,
-		  const int           level      = -1,
-		  const int           index      = -1,
-		  const void         *local_data = 0) :
-		    QuadAccessor<2> (parent, level, index, local_data) {};
-
-				     /**
-				      *  Return a pointer to the #i#th
-				      *  neighbor.
-				      */
-    TriaIterator<2,CellAccessor<2> > neighbor (const unsigned int i) const;
-
-				     /**
-				      *  Return the index of the #i#th neighbor.
-				      *  If the neighbor does not exist, its
-				      *  index is -1.
-				      */
-    int neighbor_index (const unsigned int i) const;
-
-    				     /**
-				      *  Return the level of the #i#th neighbor.
-				      *  If the neighbor does not exist, its
-				      *  level is -1.
-				      */
-    int neighbor_level (const unsigned int i) const;
-
-				     /**
-				      *  Set the neighbor #i# of this cell
-				      *  to the cell pointed to by
-				      *  #pointer#.
-				      */
-    void set_neighbor (const unsigned int i,
-		       const TriaIterator<2,CellAccessor<2> > &pointer) const;
-
-				     /**
-				      *  Return whether the #i#th side of this
-				      *  quad is part of the
-				      *  boundary. This is true, if the
-				      *  #i#th neighbor does not exist.
-				      */
-    bool at_boundary (const unsigned int i) const;
-
-				     /**
-				      *  Return whether the cell is at the
-				      *  boundary.
-				      */
-    bool at_boundary () const;
-
-				     /**
-				      *  Return whether the refinement flag
-				      *  is set or not.
-				      */
-    bool refine_flag_set () const;
-
-				     /**
-				      *  Flag the cell pointed to
-				      *  for refinement.
-				      */
-    void set_refine_flag () const;
-
-				     /**
-				      *  Clear the refinement flag.
-				      */
-    void clear_refine_flag () const;
-    
-				     /**
-				      *  Return a pointer to the #i#th
-				      *  child. Overloaded version which returns
-				      *  a more reasonable iterator class.
-				      */
-    TriaIterator<2,CellAccessor<2> > child (const unsigned int i) const;
-				     /**
-				      * Test whether the cell has children
-				      * (this is the criterion for activity
-				      * of a cell).
-				      */
-    bool active () const;
-
-  private:
-    				     /**
-				      *  Copy operator. This is normally
-				      *  used in a context like
-				      *  #iterator a,b;  *a=*b;#. Since
-				      *  the meaning is to copy the object
-				      *  pointed to by #b# to the object
-				      *  pointed to by #a# and since
-				      *  accessors are not real but
-				      *  virtual objects, this operation
-				      *  is not useful for iterators on
-				      *  triangulations. We declare this
-				      *  function here private, thus it may
-				      *  not be used from outside.
-				      *  Furthermore it is not implemented
-				      *  and will give a linker error if
-				      *  used anyway.
-				      */
-    void operator = (const CellAccessor<2> &);
-};
 
 
 
