@@ -320,6 +320,22 @@ class DataIn {
  * plot of the (#x-2#)th data set. For example, using #x=4# would mean to
  * plot the second data set.
  *
+ *
+ * \subsection{POVRAY format}
+ *
+ * POVRAY is a ray tracing tool in the public domain and poduces high quality
+ * images of three dimensional scenes. Since this tool can handle only one
+ * scene at a time, only the first data vector is output, but this may change
+ * in future versions of this library. For a reference of the data format
+ * and the usage of POVRAY see the extensive manual of that program.
+ *
+ * The POVRAY output format is presently only supported for two spatial
+ * dimensions. It displays every quadrilateral as two triangles, which clearly
+ * is not an optimal solution, but necessary since POVRAY presently does not
+ * support bilinear quadrilaterals and using polygons as vastly suboptimal in
+ * term of memory and speed to the triangle mesh supported by POVRAY.
+ *
+ *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>  
@@ -329,7 +345,7 @@ class DataOut {
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { ucd, gnuplot };
+    enum OutputFormat { ucd, gnuplot, povray };
     
 				     /**
 				      * Constructor
@@ -394,6 +410,12 @@ class DataOut {
     void write_gnuplot (ostream &out) const;
 
 				     /**
+				      * Write data of first vector and grid
+				      * in POVRAY format.
+				      */
+    void write_povray (ostream &out) const;
+
+				     /**
 				      * Write data and grid to #out# according
 				      * to the given data format. This function
 				      * simply calles the appropriate
@@ -409,6 +431,7 @@ class DataOut {
 				      * \begin{itemize}
 				      * \item UCD: #.inp#
 				      * \item GNUPLOT: #.gnuplot#
+				      * \item POVRAY: #.pov#
 				      * \end{itemize}
 				      *
 				      * Since this function does not need data
