@@ -198,6 +198,59 @@ FELinear<2>::FELinear () :
 };
 
 
+template <>
+FELinear<2>::FELinear (const int) :
+		FELinearMapping<2> (0, 0, 4)
+{
+  restriction[0](0,0) = 1.0;
+  restriction[1](1,1) = 1.0;
+  restriction[2](2,2) = 1.0;
+  restriction[3](3,3) = 1.0;
+
+  prolongation[0](0,0) = 1.0;
+  prolongation[0](1,0) = 1./2.;
+  prolongation[0](1,1) = 1./2.;
+  prolongation[0](3,0) = 1./2.;
+  prolongation[0](3,3) = 1./2.;
+  prolongation[0](2,0) = 1./4.;
+  prolongation[0](2,1) = 1./4.;
+  prolongation[0](2,2) = 1./4.;
+  prolongation[0](2,3) = 1./4.;
+
+  prolongation[1](1,1) = 1.0;
+  prolongation[1](0,0) = 1./2.;
+  prolongation[1](0,1) = 1./2.;
+  prolongation[1](2,1) = 1./2.;
+  prolongation[1](2,2) = 1./2.;
+  prolongation[1](3,0) = 1./4.;
+  prolongation[1](3,1) = 1./4.;
+  prolongation[1](3,2) = 1./4.;
+  prolongation[1](3,3) = 1./4.;
+
+  prolongation[2](2,2) = 1.0;
+  prolongation[2](1,2) = 1./2.;
+  prolongation[2](1,1) = 1./2.;
+  prolongation[2](3,2) = 1./2.;
+  prolongation[2](3,3) = 1./2.;
+  prolongation[2](0,0) = 1./4.;
+  prolongation[2](0,1) = 1./4.;
+  prolongation[2](0,2) = 1./4.;
+  prolongation[2](0,3) = 1./4.;
+
+  prolongation[3](3,3) = 1.0;
+  prolongation[3](0,0) = 1./2.;
+  prolongation[3](0,3) = 1./2.;
+  prolongation[3](2,2) = 1./2.;
+  prolongation[3](2,3) = 1./2.;
+  prolongation[3](1,0) = 1./4.;
+  prolongation[3](1,1) = 1./4.;
+  prolongation[3](1,2) = 1./4.;
+  prolongation[3](1,3) = 1./4.;
+};
+
+
+
+
 
 template <>
 inline
