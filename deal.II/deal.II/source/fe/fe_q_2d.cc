@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,12 +18,14 @@
 
 #include <fe/fe_q.h>
 
-// constraint matrices in 2d are now implemented by computing them on
-// the fly for all polynomial degrees
-
+// constraint matrices in 2d are now implemented by computing them on the fly
+// for all polynomial degrees. the array is thus empty. unfortunately, some
+// compilers dislike empty initializers for arrays of unknown size
+// (particularly the hp compiler), so we simply initialize a single element
+// with a null pointer
 template <>
 const double * const 
-FE_Q<2>::Matrices::constraint_matrices[] = {};
+FE_Q<2>::Matrices::constraint_matrices[] = { 0 };
 
 
 template <>
