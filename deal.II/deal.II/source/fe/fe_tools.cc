@@ -15,6 +15,7 @@
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <lac/full_matrix.h>
+#include <lac/householder.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <grid/tria.h>
@@ -535,6 +536,8 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
     for (unsigned int k=0;k<nq;++k)
       for (unsigned int j=0;j<n;++j)
 	A(k*nd+d,j) = fine.shape_value_component(j,k,d);
+
+  Householder<double> H(A);
   
   Vector<number> v_coarse(nq*nd);
   Vector<number> v_fine(n);
@@ -565,11 +568,9 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 	    for (unsigned int k=0;k<nq;++k)
 	      v_coarse(k*nd+d) = coarse.shape_value_component(i,k,d);
 
-					   // Copy the matrix and
 					   // solve the least squares
 					   // problem.
-	  FullMatrix<number> B = A;
-	  const double result = B.least_squares(v_fine, v_coarse);
+	  const double result = H.least_squares(v_fine, v_coarse);
 	  Assert (result < 1.e-10, ExcLeastSquaresError(result));
 	    
 					   // Finally copy into the
