@@ -805,7 +805,9 @@ class TableBase : public Subscriptor
                                       * @p{n_rows()*n_cols()}
                                       * elements, and that the layout
                                       * refers to the desired shape of
-                                      * this table.
+                                      * this table. The only check we
+                                      * do is that the present array
+                                      * is non-empty.
                                       *
                                       * Note also that the type of the
                                       * objects of the input array,
@@ -1914,8 +1916,9 @@ inline
 void
 TableBase<N,T>::clear ()
 {
-  if (val != 0)
-    std::fill_n (val, n_elements(), T());
+  Assert (size()[0]*size()[1] != 0,
+          ExcMessage("Trying to fill an empty matrix."));
+  std::fill_n (val, n_elements(), T());
 };
 
 
