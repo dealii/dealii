@@ -64,6 +64,30 @@ class MGDoFTools
 				SparsityPattern         &sparsity,
 				const unsigned int       level);
 
+				     /**
+				      * This function does the same as
+				      * the other with the same name,
+				      * but it gets two additional
+				      * coefficient matrices. A matrix
+				      * entry will only be generated
+				      * for two basis functions, if
+				      * there is a non-zero entry
+				      * linking their associated
+				      * components in the coefficient
+				      * matrix.
+				      *
+				      * There is one matrix for
+				      * couplings in a cell and one
+				      * for the couplings occuring in
+				      * fluxes.
+				      */
+    template <int dim>
+    static void
+    make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
+				SparsityPattern       &sparsity,
+				const unsigned int level,
+				const FullMatrix<double>& int_mask,
+				const FullMatrix<double>& flux_mask);
 
 };
 
