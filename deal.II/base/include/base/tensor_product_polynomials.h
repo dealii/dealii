@@ -20,7 +20,7 @@
 #include <base/polynomial.h>
 #include <base/smartpointer.h>
 
-#include <vector.h>
+#include <vector>
 
 
 /**
