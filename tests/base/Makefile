@@ -25,13 +25,14 @@ polynomial_test.exe: polynomial_test.go abort.go $(lib-base.g)
 polynomial1d.exe   : polynomial1d.go             $(lib-base.g)
 quadrature_test.exe: quadrature_test.go          $(libraries)
 reference.exe      : reference.go abort.go       $(libraries)
+table.exe          : table.go                    $(libraries)
 tensor.exe         : tensor.go                   $(libraries)
 timer.exe          : timer.go                    $(libraries)
-vector2d.exe       : vector2d.go                 $(libraries)
 auto_derivative_function.exe        : auto_derivative_function.go            $(libraries)
 
 
-tests = logtest reference quadrature_test tensor timer polynomial1d polynomial_test auto_derivative_function vector2d
+tests = logtest reference quadrature_test table tensor \
+        timer polynomial1d polynomial_test auto_derivative_function
 
 ############################################################
 

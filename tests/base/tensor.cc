@@ -32,6 +32,8 @@ int main ()
   Tensor<2,dim> t(a);
   Tensor<2,dim> tt;
   Tensor<2,dim> result(b);
+  Assert (transpose(transpose(t)) == t, ExcInternalError());
+  Assert (transpose(transpose(result)) == result, ExcInternalError());
 
   Vector<double> unrolled(9);
   
