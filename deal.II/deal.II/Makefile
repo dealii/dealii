@@ -177,5 +177,5 @@ clean:
 ###################
 
 .PHONY: all deal.II TAGS
-.PHONY: clean lib-clean source-clean
-.PHONY: default 1d 2d 3d all clean
+.PHONY: clean
+.PHONY: default 1d 2d 3d all
