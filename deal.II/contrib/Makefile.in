@@ -5,7 +5,7 @@ include ../common/Make.global_options
 
 
 # by default make sublibs
-default: hsl
+default: hsl umfpack
 
 
 # targets for the kdoc package
@@ -27,7 +27,10 @@ hsl-clean:
 endif
 
 
+umfpack:
+	cd umfpack ; $(MAKE)
+
 # generic targets
 clean: kdoc-clean hsl-clean
 
-.PHONY: default kdoc-install kdoc-clean hsl clean
+.PHONY: default kdoc-install kdoc-clean hsl clean umfpack
