@@ -55,10 +55,6 @@ Check all places where condensation of matrices/vectors and
   of the 3D library.
 
 
-Revert istrstream(p.c_str()) to istrstream(p) when possible
-  (parameter_handler.cc)
-
-
 I suppose the [mg_]get_dof_values really belongs to the
   [MG]Line/QuadAccessor classes, but now it is in the
   [MG]CellAccessor. Correct this some time.
