@@ -150,6 +150,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: The <code class="class">TriaAccessor</code>::<code
+       class="member">recursively_set_material_id</code> function sets
+       the material id of the present cell and of all its children,
+       grandchildren, etc to the given value.
+       <br>
+       (WB 2002/09/04)
+       </p>
+
   <li> <p> New: The new <code class="class">FETools</code>::<code
        class="member">get_fe_from_name</code> function can do the
        reverse of the <code class="class">FiniteElement</code>::<code

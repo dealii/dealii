@@ -2337,6 +2337,14 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     void set_material_id (const unsigned char new_material_id) const;
 
 				     /**
+				      * Set the material id of this
+				      * cell and all its children (and
+				      * grand-children, and so on) to
+				      * the given value.
+				      */
+    void recursively_set_material_id (const unsigned char new_material_id) const;
+
+				     /**
 				      * Return the subdomain id of
 				      * this cell.
 				      */
@@ -2423,14 +2431,17 @@ template <> Point<3> TriaObjectAccessor<3, 3>::barycenter () const;
 template <> bool CellAccessor<1>::at_boundary () const;
 template <> unsigned char CellAccessor<1>::material_id () const;
 template <> void CellAccessor<1>::set_material_id (const unsigned char mat_id) const;
+template <> void CellAccessor<1>::recursively_set_material_id (const unsigned char mat_id) const;
 template <> bool CellAccessor<1>::point_inside (const Point<1> &p) const;
 template <> bool CellAccessor<2>::at_boundary () const;
 template <> unsigned char CellAccessor<2>::material_id () const;
 template <> void CellAccessor<2>::set_material_id (const unsigned char mat_id) const;
+template <> void CellAccessor<2>::recursively_set_material_id (const unsigned char mat_id) const;
 template <> bool CellAccessor<2>::point_inside (const Point<2> &p) const;
 template <> bool CellAccessor<3>::at_boundary () const;
 template <> unsigned char CellAccessor<3>::material_id () const;
 template <> void CellAccessor<3>::set_material_id (const unsigned char mat_id) const;
+template <> void CellAccessor<3>::recursively_set_material_id (const unsigned char mat_id) const;
 template <> bool CellAccessor<3>::point_inside (const Point<3> &) const;
 
 template <> bool CellAccessor<1>::has_boundary_lines () const;

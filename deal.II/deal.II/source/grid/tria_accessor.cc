@@ -1657,11 +1657,25 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
 }
 
 
+
+template <>
+void CellAccessor<1>::recursively_set_material_id (const unsigned char mat_id) const
+{
+  set_material_id (mat_id);
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_set_material_id (mat_id);
+}
+
+
+
 template <>
 bool CellAccessor<1>::point_inside (const Point<1> &p) const
 {
   return (this->vertex(0)[0] <= p[0]) && (p[0] <= this->vertex(1)[0]);
 }
+
 
 
 template <>
@@ -1705,6 +1719,18 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const
   Assert (this->used(), TriaAccessor<2>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->quads.material_id[this->present_index]
     = mat_id;						 
+}
+
+
+
+template <>
+void CellAccessor<2>::recursively_set_material_id (const unsigned char mat_id) const
+{
+  set_material_id (mat_id);
+
+  if (has_children())
+    for (unsigned int c=0; c<4; ++c)
+      child(c)->recursively_set_material_id (mat_id);
 }
 
 
@@ -1782,8 +1808,6 @@ unsigned char CellAccessor<3>::material_id () const
   return this->tria->levels[this->present_level]->hexes.material_id[this->present_index];
 }
 
-
-
 template <>
 void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
 {
@@ -1794,7 +1818,19 @@ void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
 
 
 template <>
-bool CellAccessor<3>::point_inside (const Point<3> &) const
+void CellAccessor<3>::recursively_set_material_id (const unsigned char mat_id) const
+{
+  set_material_id (mat_id);
+
+  if (has_children())
+    for (unsigned int c=0; c<8; ++c)
+      child(c)->recursively_set_material_id (mat_id);
+}
+
+
+
+template <>
+bool CellAccessor<3>::point_inside (const Point<3> &p) const
 {
   Assert (false, ExcNotImplemented() );
   return false;
