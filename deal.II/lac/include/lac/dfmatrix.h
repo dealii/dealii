@@ -19,7 +19,7 @@ class dFMatrix
   double* val;
   int dim_range, dim_image, val_size;
   void init(int n, int m);
-  dFMatrix(const dFMatrix&);
+//  dFMatrix(const dFMatrix&);
 
   double& el(int i, int j)  { return val[i*dim_range+j]; }
   double el(int i, int j) const { return val[i*dim_range+j]; }
@@ -31,7 +31,8 @@ class dFMatrix
   int n() const { return dim_range; }
 
 
-  /// copy constructor  
+  /// copy constructor. Be very careful with this constructor, since
+  // it may take a hige amount of computing time for large matrices!!
   dFMatrix(const dFMatrix&);
   /// Constructor for quadratic n x n matrices
   dFMatrix(int n = 1) { init(n,n); }

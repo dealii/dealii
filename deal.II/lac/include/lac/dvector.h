@@ -87,13 +87,13 @@ inline int dVector::n() const
 
 inline double dVector::operator() (int i) const
 {
-  THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
+				   //THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
   return val[i];
 }
 
 inline double& dVector::operator() (int i)
 {
-  THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
+				   //THROW2( (i<0) || (i>=dim), IntError(IntError::Range,i));
   return val[i];
 }
 
