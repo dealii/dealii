@@ -308,8 +308,8 @@ template <int dim>
 void TransportProblem<dim>::assemble_system () 
 {
 				   // See Cockburn paper for the proper quadrature.
-  QGauss2<dim>  quadrature;
-  QGauss2<dim-1>  face_quadrature;
+  QGauss4<dim>  quadrature;
+  QGauss4<dim-1>  face_quadrature;
   
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   vector<unsigned int> dofs (dofs_per_cell);
