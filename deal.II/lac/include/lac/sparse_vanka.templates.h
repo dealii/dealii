@@ -593,14 +593,12 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
 				       // make it simpler for the
 				       // compiler by giving it the
 				       // correct type right away:
-      typedef
-	void (SparseVanka<number>::*mem_fun_p)
+      typedef void (SparseVanka<number>::*mem_fun_p)
 	(Vector<number2> &,
 	 const Vector<number2> &,
 	 const std::vector<bool> *) const;
       const mem_fun_p comp
-	= &(SparseVanka<number>::
-	    template apply_preconditioner<number2>);
+	= &SparseVanka<number>::template apply_preconditioner<number2>;
       Threads::ThreadManager thread_manager;
       for (unsigned int block=0; block<n_blocks; ++block)
 	Threads::spawn (thread_manager,
