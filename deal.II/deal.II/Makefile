@@ -13,6 +13,8 @@ include $D/common/Make.global_options
 
 # top level targets
 default: 2dg 2d
+all: 2dg 2d 3dg 3d 1dg 1d
+
 
 ifeq ($(enable-shared),yes)
   1dg: lib/libdeal_II_1d.g.so
