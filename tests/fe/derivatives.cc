@@ -19,7 +19,6 @@
 #include <fstream>
 #include <string>
 
-char fname[50];
 
 template<int dim>
 inline void
