@@ -238,7 +238,7 @@ class FEValuesData
  * called by the constructor and <tt>reinit</tt> functions of
  * <tt>FEValues*</tt>, respectively.
  *
- * @section FEValuesBaseGeneral General usage
+ * @sect3{FEValuesBaseGeneral General usage}
  *
  * Usually, an object of <tt>FEValues*</tt> is used in integration loops
  * over all cells of a triangulation. To take full advantage of the
