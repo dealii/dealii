@@ -89,7 +89,7 @@ debug: deps
 optimized: deps
 	$(MAKE) $(MAKEOPTIONS) contrib baseo laco 2do 1do 3do
 
-contrib: $(subst no,,$(subst yes,baseo,USE_CONTRIB_HSL))
+contrib: $(subst no,,$(subst yes,baseo,$(USE_CONTRIB_HSL)))
 	cd $D/contrib ; $(MAKE)
 
 
