@@ -156,16 +156,6 @@ class FEQ1Mapping : public FiniteElement<dim>
 				 const FullMatrix<double>         &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const;
 
-				     /**
-				      * Compute the jacobian matrices
-				      * of the mapping between unit
-				      * and real cell at the given
-				      * points on the unit cell.
-				      */
-    static void compute_jacobian_matrices (const DoFHandler<dim>::cell_iterator &cell,
-					   const vector<Point<dim> >            &unit_points,
-					   vector<Tensor<2,dim> >               &jacobians);
-
     				     /**
 				      * Compute the gradients of the jacobian
 				      * matrices of the mapping between unit

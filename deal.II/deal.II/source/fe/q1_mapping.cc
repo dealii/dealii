@@ -543,7 +543,7 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 				       vector<Point<dim> > &q_points,
 				       const bool           compute_q_points,
 				       const FullMatrix<double>      &shape_values_transform,
-				       const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/) const
+				       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
@@ -603,32 +603,6 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 
   However, we rewrite the loops to only compute the gradient once for
   each integration point and basis function.
-
-  Indeed, this was the old way we did it; the code is below. However, there
-  is a more efficient way, namely setting up M analytically, doing the
-  inversion analyically and only then doing the evaluation; a small Maple
-  script does this (it is part of the <lagrange> script in the <scripts>
-  subdirectory).
-  
-  if (compute_jacobians) 
-    {
-      FullMatrix<double> M(dim,dim);
-      for (unsigned int l=0; l<n_points; ++l) 
-	{
-	  M.clear ();
-	  for (unsigned int s=0; s<GeometryInfo<dim>::vertices_per_cell; ++s)
-	    {
-					       // we want the linear transform,
-					       // so use that function
-	      const Point<dim> gradient = shape_grad_transform[s][l];
-	      for (unsigned int i=0; i<dim; ++i)
-		for (unsigned int j=0; j<dim; ++j)
-		  M(i,j) += vertices[s](i) * gradient(j);
-	    };
-	  jacobians[l].invert(M);
-	};
-    };
-
 
   One last note regarding whether we have to invert M or M transposed: it is
   easy to try out, by computing the gradients of a function on a distorted
@@ -696,7 +670,34 @@ void FEQ1Mapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cel
 */
 
   if (compute_jacobians)
-    compute_jacobian_matrices (cell, unit_points, jacobians);
+    {
+      if (dim == 1)
+	{
+	  const double h = (cell->vertex(1)(0)-cell->vertex(0)(0));
+	  
+	  for (unsigned int point=0; point<n_points; ++point)
+	    jacobians[point][0][0] = 1./h;
+	}
+      else
+					 // 2d or 3d case
+	{ 
+	  Tensor<2,dim> M;
+	  for (unsigned int l=0; l<n_points; ++l) 
+	    {
+	      M.clear ();
+	      for (unsigned int s=0; s<GeometryInfo<dim>::vertices_per_cell; ++s)
+		{
+						   // we want the linear transform,
+						   // so use that function
+		  const Point<dim> gradient = shape_grad_transform[s][l];
+		  for (unsigned int i=0; i<dim; ++i)
+		    for (unsigned int j=0; j<dim; ++j)
+		      M[i][j] += vertices[s](i) * gradient(j);
+		};
+	      jacobians[l] = invert (M);
+	    };
+	};
+    };
   
   if (compute_jacobians_grad)
     compute_jacobian_gradients (cell, unit_points, jacobians_grad);
