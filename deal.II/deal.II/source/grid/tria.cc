@@ -1,6 +1,7 @@
 /* $Id$ */
 
 #include <grid/tria.h>
+#include <grid/tria_levels.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
