@@ -78,7 +78,15 @@ foreach $filename (@ARGV) {
 		die "---Local file `$link' not found in file `$filename'\n"
 		    unless ((-r $link) && (-f $link));
 	    }
-		}
-		}
+	}
+
+	# check whether references to images are valid
+	while ( /img\s+src=\"?(.*?)[\s\"]/gi ) {
+	    # check whether the file for the image is present
+	    $link = $1;
+	    die "---Local image `$link' not found in file `$filename'\n"
+		unless ((-r $link) && (-f $link));
+	}
+   }
 }
 
