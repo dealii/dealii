@@ -204,11 +204,10 @@ estimate (const Mapping<1>                    &mapping,
 	  (coefficient->n_components == 1),
 	  ExcInvalidCoefficient());
 
-  for (FunctionMap<1>::type::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
-    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
-
-
-  const unsigned int dim=1;
+  for (FunctionMap<1>::type::const_iterator i=neumann_bc.begin();
+       i!=neumann_bc.end(); ++i)
+    Assert (i->second->n_components == n_components,
+            ExcInvalidBoundaryFunction());
 
 				   // reserve one slot for each cell and set
 				   // it to zero
@@ -259,7 +258,7 @@ estimate (const Mapping<1>                    &mapping,
       for (unsigned int n=0; n<2; ++n)
 	{
 					   // find right active neighbor
-	  typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
+	  DoFHandler<1>::cell_iterator neighbor = cell->neighbor(n);
 	  if (neighbor.state() == IteratorState::valid)
 	    while (neighbor->has_children())
 	      neighbor = neighbor->child(n==0 ? 1 : 0);
