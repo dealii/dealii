@@ -71,7 +71,41 @@ template <typename> class Vector;
  * <tt>BlockVector<VECTOR></tt>. SparseMatrix is a possible entry
  * type.
  *
- * @include block_matrix_array.cc
+ * <h3>Example program</h3>
+ * We document the relevant parts of <tt>examples/doxygen/block_matrix_array.cc</tt>.
+ *
+ * @dontinclude block_matrix_array.cc
+ *
+ * Obviously, we have to include the header file contining the definition
+ * of BlockMatrixArray:
+ * @skipline block_matrix_array.h
+ *
+ * First, we set up some matrices to be entered into the blocks.
+ * @skip main
+ * @until C.fill
+ *
+ * Now, we are ready to build a <i>2x2</i> BlockMatrixArray.
+ * @line Block
+ * First, we enter the matrix <tt>A</tt> multiplied by 2 in the upper left block
+ * @line enter
+ * Now -1 times <tt>B1</tt> in the upper right block.
+ * @line enter
+ * We add the transpose of <tt>B2</tt> to the upper right block and
+ * continue in a similar fashion. In the end, the block matrix
+ * structure is printed into an LaTeX table.
+ * @until latex
+ *
+ * Now, we set up vectors to be multiplied with this matrix and do a
+ * multiplication.
+ * @until vmult
+ *
+ * Finally, we solve a linear system with BlockMatrixArray, using no
+ * preconditioning and the conjugate gradient method.
+ * @until Error
+ *
+ * The remaining code of this sample program concerns preconditioning
+ * and is described in the documentation of
+ * BlockTrianglePrecondition.
  *
  * @author Guido Kanschat, 2000 - 2005
  */
@@ -279,6 +313,38 @@ class BlockMatrixArray : public Subscriptor
  * The implementation may be a little clumsy, but it should be
  * sufficient as long as the block sizes are much larger than the
  * number of blocks.
+ *
+ * <h3>Example</h3>
+ * Here, we document the second part of
+ * <tt>examples/doxygen/block_matrix_array.cc</tt>. For the beginning
+ * of this file, see BlockMatrixArray.
+ *
+ * In order to set up the preconditioner, we have to compute the
+ * inverses of the diagonal blocks ourselves. Since we used FullMatrix
+ * objects, this is fairly easy.
+ * @dontinclude block_matrix_array.cc
+ * @skip Error
+ * @until Cinv.invert
+ *
+ * After creating a <i>2x2</i> BlockTrianglePrecondition object, we
+ * only fill its diagonals. The scaling factor <i>1/2</i> used for
+ * <tt>A</tt> is the reciprocal of the scaling factor used for the
+ * <tt>matrix</tt> itself. Remember, this preconditioner actually
+ * <b>multiplies</b> with the diagonal blocks.
+ * @until Cinv
+ *
+ * Now, we have a block Jacobi preconditioner, which is still
+ * symmetric, since the blocks are symmetric. Therefore, we can still
+ * use the preconditioned conjugate gradient method.
+ * @until Error
+ *
+ * Now, we enter the subdiagonal block. This is the same as in
+ * <tt>matrix</tt>.
+ * @until B2
+ *
+ * Since the preconditioner is not symmetric anymore, we use the GMRES
+ * method for solving.
+ * @until Error
  *
  * @author Guido Kanschat, 2001, 2005
  */
