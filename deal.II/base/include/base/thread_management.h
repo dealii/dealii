@@ -412,21 +412,17 @@ namespace Threads
       typedef RetType (Class::*type) ();
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class RetType>
   struct MemFunPtr0<const Class, RetType>
   {
       typedef RetType (Class::*type) () const;
   };
-#endif  
+
 				   /**
 				    * Given a class, argument types,
 				    * and the return type, generate a
@@ -439,21 +435,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class RetType>
   struct MemFunPtr1<const Class, Arg1, RetType>
   {
       typedef RetType (Class::*type) (Arg1) const;
   };
-#endif  
+
 				   /**
 				    * Given a class, argument types,
 				    * and the return type, generate a
@@ -466,21 +458,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class RetType>
   struct MemFunPtr2<const Class, Arg1, Arg2, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2) const;
   };
-#endif  
+
 
   				   /**
 				    * Given a class, argument types,
@@ -494,21 +482,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class RetType>
   struct MemFunPtr3<const Class, Arg1, Arg2, Arg3, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3) const;
   };
-#endif  
+
 
   				   /**
 				    * Given a class, argument types,
@@ -522,21 +506,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class RetType>
   struct MemFunPtr4<const Class, Arg1, Arg2, Arg3, Arg4, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4) const;
   };
-#endif  
+
 
   				   /**
 				    * Given a class, argument types,
@@ -550,21 +530,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class RetType>
   struct MemFunPtr5<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5) const;
   };
-#endif  
+
 
   				   /**
 				    * Given a class, argument types,
@@ -578,21 +554,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class RetType>
   struct MemFunPtr6<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const;
   };
-#endif  
+
 
   				   /**
 				    * Given a class, argument types,
@@ -606,21 +578,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class RetType>
   struct MemFunPtr7<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const;
   };
-#endif  
+
 
 
   				   /**
@@ -635,21 +603,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class RetType>
   struct MemFunPtr8<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const;
   };
-#endif  
+
 
 
 
@@ -665,21 +629,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class RetType>
   struct MemFunPtr9<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const;
   };
-#endif  
+
 
   
 
@@ -696,21 +656,17 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10);
   };
 
-#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}. This should not
-				    * really be necessary, but Intel's
-				    * compiler has a bug here so we
-				    * have to work around.
+				    * @p{const}.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class RetType>
   struct MemFunPtr10<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const;
   };
-#endif  
+
 
   
   
@@ -2352,12 +2308,10 @@ namespace Threads
       typename MemFunData0<Class_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)());
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_>
       friend
       typename MemFunData0<const Class_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)() const);
-#endif
   };
 
 
@@ -2494,12 +2448,10 @@ namespace Threads
       typename MemFunData1<Class_,Arg1_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_>
       friend
       typename MemFunData1<const Class_,Arg1_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_) const);
-#endif
   };
 
 
@@ -2640,12 +2592,10 @@ namespace Threads
       typename MemFunData2<Class_,Arg1_,Arg2_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_>
       friend
       typename MemFunData2<const Class_,Arg1_,Arg2_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_) const);
-#endif
   };
 
   
@@ -2789,12 +2739,10 @@ namespace Threads
       typename MemFunData3<Class_,Arg1_,Arg2_,Arg3_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_,Arg2_,Arg3_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_>
       friend 
       typename MemFunData3<const Class_,Arg1_,Arg2_,Arg3_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_,Arg2_,Arg3_) const);
-#endif
   };
 
 
@@ -2942,12 +2890,10 @@ namespace Threads
       typename MemFunData4<Class_,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
       friend
       typename MemFunData4<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_) const);
-#endif  
 };
 
 
@@ -3100,13 +3046,11 @@ namespace Threads
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
       friend 
       typename MemFunData5<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_) const);
-#endif
   };
   
 
@@ -3263,13 +3207,11 @@ namespace Threads
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
       friend 
       typename MemFunData6<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_) const);
-#endif  
   };
 
 
@@ -3430,13 +3372,11 @@ namespace Threads
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_, Arg7_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_>
       friend 
       typename MemFunData7<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_, Arg7_) const);
-#endif
   };
   
   
@@ -3601,14 +3541,12 @@ namespace Threads
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_>
       friend 
       typename MemFunData8<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_) const);
-#endif
   };
   
   
@@ -3777,14 +3715,12 @@ namespace Threads
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_, Arg9_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_>
       friend 
       typename MemFunData9<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_, Arg9_) const);
-#endif
   };
   
   
@@ -3957,14 +3893,12 @@ namespace Threads
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_, Arg9_, Arg10_));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
       friend 
       typename MemFunData10<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_, Arg9_, Arg10_) const);
-#endif
   };
   
   
@@ -4172,23 +4106,15 @@ namespace Threads
   typename MemFunData0<Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)());
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class>
   inline
   typename MemFunData0<const Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)() const);
-#endif
  
 				   /**
 				    * Encapsulate a member function
@@ -4207,23 +4133,15 @@ namespace Threads
   typename MemFunData1<Class,Arg1,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1>
   inline
   typename MemFunData1<const Class,Arg1,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1) const);
-#endif
  
 
 				   /**
@@ -4243,23 +4161,15 @@ namespace Threads
   typename MemFunData2<Class,Arg1,Arg2,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2>
   inline
   typename MemFunData2<const Class,Arg1,Arg2,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2) const);
-#endif
    
 
 				   /**
@@ -4279,23 +4189,15 @@ namespace Threads
   typename MemFunData3<Class,Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3>
   inline
   typename MemFunData3<const Class,Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3) const);
-#endif
    
 
 				   /**
@@ -4315,23 +4217,15 @@ namespace Threads
   typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   typename MemFunData4<const Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4) const);
-#endif
    
 
 				   /**
@@ -4351,23 +4245,15 @@ namespace Threads
   typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
   inline
   typename MemFunData5<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5) const);
-#endif
  
 
 				   /**
@@ -4387,23 +4273,15 @@ namespace Threads
   typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
   inline
   typename MemFunData6<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const);
-#endif
  
 				   /**
 				    * Encapsulate a member function
@@ -4422,23 +4300,15 @@ namespace Threads
   typename MemFunData7<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
   inline
   typename MemFunData7<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const);
-#endif
  
 				   /**
 				    * Encapsulate a member function
@@ -4457,23 +4327,15 @@ namespace Threads
   typename MemFunData8<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
   inline
   typename MemFunData8<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const);
-#endif
  
 				   /**
 				    * Encapsulate a member function
@@ -4492,23 +4354,15 @@ namespace Threads
   typename MemFunData9<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
   inline
   typename MemFunData9<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const);
-#endif
  
 				   /**
 				    * Encapsulate a member function
@@ -4527,23 +4381,15 @@ namespace Threads
   typename MemFunData10<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10));
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
                                    /**
 				    * Same as the previous function,
 				    * but for member functions marked
-				    * @p{const}. This function should
-				    * not be necessary, since the
-				    * compiler should deduce a
-				    * constant class as template
-				    * argument, but we have to work
-				    * around a bug in Intel's icc
-				    * compiler with this.  
+				    * @p{const}.
                                     */
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
   inline
   typename MemFunData10<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const);
-#endif
  
   
 				   /**
@@ -7813,14 +7659,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class>
   typename MemFunData0<const Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)() const)
   {
     return fun_ptr;
   }
-#endif
 
 
 
@@ -7831,14 +7675,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1>
   typename MemFunData1<const Class,Arg1,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1) const)
   {
     return fun_ptr;
   }
-#endif
   
 
   
@@ -7849,14 +7691,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2>
   typename MemFunData2<const Class,Arg1,Arg2,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2) const)
   {
     return fun_ptr;
   }
-#endif
   
 
   
@@ -7867,14 +7707,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3>
   typename MemFunData3<const Class,Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3) const)
   {
     return fun_ptr;
   }
-#endif
   
 
   
@@ -7885,14 +7723,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   typename MemFunData4<const Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4) const)
   {
     return fun_ptr;
   }
-#endif
 
 
   
@@ -7903,14 +7739,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
   typename MemFunData5<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5) const)
   {
     return fun_ptr;
   }
-#endif
 
 
   
@@ -7921,14 +7755,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
   typename MemFunData6<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const)
   {
     return fun_ptr;
   }
-#endif
 
 
   
@@ -7939,14 +7771,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
   typename MemFunData7<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const)
   {
     return fun_ptr;
   }
-#endif
 
 
   
@@ -7957,14 +7787,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
   typename MemFunData8<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const)
   {
     return fun_ptr;
   }
-#endif
 
 
 
@@ -7975,14 +7803,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9>
   typename MemFunData9<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const)
   {
     return fun_ptr;
   }
-#endif
   
 
   
@@ -7993,14 +7819,12 @@ namespace Threads
     return fun_ptr;
   }
 
-#ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8, typename Arg9, typename Arg10>
   typename MemFunData10<const Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9,Arg10,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const)
   {
     return fun_ptr;
   }
-#endif
   
 
   
