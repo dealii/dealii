@@ -384,6 +384,24 @@ class BlockSparseMatrix : public Subscriptor
 			 const BlockVector<rows,somenumber>    &b) const;
 
 				     /**
+				      * Apply the Jacobi
+				      * preconditioner, which
+				      * multiplies every element of
+				      * the #src# vector by the
+				      * inverse of the respective
+				      * diagonal element and
+				      * multiplies the result with the
+				      * damping factor #omega#.
+				      *
+				      * The matrix needs to be square
+				      * for this operation.
+				      */
+    template <typename somenumber>
+    void precondition_Jacobi (BlockVector<rows,somenumber>          &dst,
+			      const BlockVector<columns,somenumber> &src,
+			      const number                           omega = 1.) const;
+
+				     /**
 				      * Return a (constant) reference
 				      * to the underlying sparsity
 				      * pattern of this matrix.
@@ -710,6 +728,22 @@ residual (BlockVector<rows,somenumber>          &dst,
 };
 
 
+
+template <typename number, int  rows, int columns>
+template <typename somenumber>
+void
+BlockSparseMatrix<number,rows,columns>::
+precondition_Jacobi (BlockVector<rows,somenumber>          &dst,
+		     const BlockVector<columns,somenumber> &src,
+		     const number                           omega) const
+{
+  Assert (rows == columns, ExcMatrixNotBlockSquare());
+
+  for (unsigned int i=0; i<rows; ++i)
+    block(i,i).precondition_Jacobi (dst.block(i),
+				    src.block(i),
+				    omega);
+};
 
 
 
