@@ -551,7 +551,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		for (supp_pt = 0; supp_pt<points.n_quadrature_points; ++supp_pt) 
 		  {
 		    Point<dim> pt = fe.quadrature_point(supp_pt);
-		    out << pt << "\t";
+		    out << pt << "  ";
 		    for (unsigned int i=0; i!=data.size(); ++i)
 		      out << values[i][supp_pt]
 			  << ' ';
@@ -571,7 +571,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 		  for(unsigned ypt = 0; ypt <= accuracy; ++ypt, ++supp_pt)
 		  {
 		    Point<dim> pt = fe.quadrature_point(supp_pt);
-		    out << pt << "\t";
+		    out << pt << "  ";
 		    
 		    for (unsigned int i=0; i!=data.size(); ++i)
 		      out << values[i][supp_pt]
