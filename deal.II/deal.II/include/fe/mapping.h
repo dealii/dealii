@@ -162,10 +162,10 @@ class Mapping : public Subscriptor
 				      * can be given as additional
 				      * argument.
 				      */
-    virtual void transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-				      const std::vector<Tensor<1,dim> > &src,
-				      const InternalDataBase& internal,
-				      const unsigned int src_offset) const = 0;
+    virtual void transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
+				      const typename std::vector<Tensor<1,dim> > &src,
+				      const InternalDataBase                     &internal,
+				      const unsigned int                          src_offset) const = 0;
     
 				     /**
 				      * Tranform a field of
@@ -178,10 +178,12 @@ class Mapping : public Subscriptor
 				      * can be given as additional
 				      * argument.
 				      */
-    virtual void transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-					  const std::vector<Tensor<1,dim> > &src,
-					  const InternalDataBase& internal,
-					  const unsigned int src_offset) const = 0;
+    virtual
+    void
+    transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
+			     const typename std::vector<Tensor<1,dim> > &src,
+			     const InternalDataBase                     &internal,
+			     const unsigned int                          src_offset) const = 0;
     
 				     /**
 				      * Tranform a field of covariant vectors.
@@ -190,10 +192,12 @@ class Mapping : public Subscriptor
 				      * the first quadrature point can be
 				      * given as additional argument.
 				      */
-    virtual void transform_covariant (std::vector<Point<dim> >       &dst,
-				      const std::vector<Point<dim> > &src,
-				      const InternalDataBase& internal,
-				      const unsigned int src_offset) const = 0;
+    virtual
+    void
+    transform_covariant (typename std::vector<Point<dim> >       &dst,
+			 const typename std::vector<Point<dim> > &src,
+			 const InternalDataBase                  &internal,
+			 const unsigned int                       src_offset) const = 0;
     
 				     /**
 				      * Tranform a field of contravariant vectors.
@@ -202,10 +206,12 @@ class Mapping : public Subscriptor
 				      * the first quadrature point can be
 				      * given as additional argument.
 				      */
-    virtual void transform_contravariant (std::vector<Point<dim> >       &dst,
-					  const std::vector<Point<dim> > &src,
-					  const InternalDataBase& internal,
-					  const unsigned int src_offset) const = 0;
+    virtual
+    void
+    transform_contravariant (typename std::vector<Point<dim> >       &dst,
+			     const typename std::vector<Point<dim> > &src,
+			     const InternalDataBase                  &internal,
+			     const unsigned int                       src_offset) const = 0;
 
 				     /**
 				      * Indicate fields to be updated in the
@@ -315,10 +321,10 @@ class Mapping : public Subscriptor
 				      */
     virtual void
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>& quadrature,
-		    InternalDataBase& internal,
-		    std::vector<Point<dim> >        &quadrature_points,
-		    std::vector<double>             &JxW_values) const = 0;
+		    const Quadrature<dim>                         &quadrature,
+		    InternalDataBase                              &internal,
+		    typename std::vector<Point<dim> >             &quadrature_points,
+		    std::vector<double>                           &JxW_values) const = 0;
 
 				     /**
 				      * Performs the same as @p{fill_fe_values}
@@ -343,27 +349,27 @@ class Mapping : public Subscriptor
 				      */
     virtual void
     fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			 const unsigned int face_no,
-			 const Quadrature<dim-1>& quadrature,
-			 InternalDataBase& internal,
-			 std::vector<Point<dim> >        &quadrature_points,
-			 std::vector<double>             &JxW_values,
-			 std::vector<Tensor<1,dim> >        &boundary_form,
-			 std::vector<Point<dim> >        &normal_vectors) const = 0;
+			 const unsigned int                        face_no,
+			 const Quadrature<dim-1>                  &quadrature,
+			 InternalDataBase                         &internal,
+			 typename std::vector<Point<dim> >        &quadrature_points,
+			 std::vector<double>                      &JxW_values,
+			 typename std::vector<Tensor<1,dim> >     &boundary_form,
+			 typename std::vector<Point<dim> >        &normal_vectors) const = 0;
 
 				     /**
 				      * See above.
 				      */
     virtual void
     fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int face_no,
-			    const unsigned int sub_no,
-			    const Quadrature<dim-1>& quadrature,
-			    InternalDataBase& internal,
-			    std::vector<Point<dim> >        &quadrature_points,
-			    std::vector<double>             &JxW_values,
-			    std::vector<Tensor<1,dim> >        &boundary_form,
-			    std::vector<Point<dim> >        &normal_vectors) const = 0;
+			    const unsigned int                        face_no,
+			    const unsigned int                        sub_no,
+			    const Quadrature<dim-1>                  &quadrature,
+			    InternalDataBase                         &internal,
+			    typename std::vector<Point<dim> >        &quadrature_points,
+			    std::vector<double>                      &JxW_values,
+			    typename std::vector<Tensor<1,dim> >     &boundary_form,
+			    typename std::vector<Point<dim> >        &normal_vectors) const = 0;
 
 				     /**
 				      * Give class @p{FEValues} access

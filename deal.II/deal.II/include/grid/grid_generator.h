@@ -451,7 +451,7 @@ class GridGenerator
 				      */
     template <int dim>
     static void laplace_transformation (Triangulation<dim> &tria,
-					const std::map<unsigned int,Point<dim> > &new_points);
+					const typename std::map<unsigned int,Point<dim> > &new_points);
 
 				     /**
 				      * Declaration of same function

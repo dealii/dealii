@@ -828,7 +828,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					 // (there are more coming below then
 					 // also)
 	if (refinement_flags.adapt_grids)
-	  adapt_grids (*previous_tria, *tria);
+	  adapt_grids<dim> (*previous_tria, *tria);
 	
 					 // perform flagging of cells
 					 // needed to regularize the
@@ -1085,7 +1085,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // strange things may happen
       if (refinement_flags.mirror_flags_to_previous_grid)
 	{
-	  adapt_grids (*previous_tria, *tria);
+	  adapt_grids<dim> (*previous_tria, *tria);
 
 	  typename Triangulation<dim>::cell_iterator old_cell, new_cell, endc;
 	  old_cell = previous_tria->begin(0);
@@ -1103,7 +1103,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // cells to avoid the previous grid
 				       // to have cells refined twice more
 				       // than the present one and vica versa.
-      adapt_grids (*previous_tria, *tria);
+      adapt_grids<dim> (*previous_tria, *tria);
     };
 };
 
@@ -1159,7 +1159,7 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags (const bool delete_and_rebuild_tria,
 
 
 template <int dim>
-TimeStepBase_Tria_Flags::RefinementFlags<dim>::CorrectionRelaxations
+typename TimeStepBase_Tria_Flags::RefinementFlags<dim>::CorrectionRelaxations
 TimeStepBase_Tria_Flags::RefinementFlags<dim>::default_correction_relaxations 
   (1,    // one element, denoting the first and all subsequent sweeps
    std::vector<std::pair<unsigned int,double> >(1,    // one element, denoting the upper bound

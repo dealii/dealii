@@ -242,8 +242,10 @@ void AutoDerivativeFunction<dim>::gradient_list (const typename std::vector<Poin
 
 
 template <int dim>
-void AutoDerivativeFunction<dim>::vector_gradient_list (const typename std::vector<Point<dim> >            &points,
-							typename std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+void 
+AutoDerivativeFunction<dim>::
+vector_gradient_list (const typename std::vector<Point<dim> >            &points,
+		      typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -303,7 +305,7 @@ void AutoDerivativeFunction<dim>::vector_gradient_list (const typename std::vect
 
 
 template <int dim>
-AutoDerivativeFunction<dim>::DifferenceFormula
+typename AutoDerivativeFunction<dim>::DifferenceFormula
 AutoDerivativeFunction<dim>::get_formula_of_order(const unsigned int ord)
 {
   switch (ord)

@@ -109,10 +109,10 @@ GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 				   // defined by the order of vertices
 				   // in the cell object
   Face new_faces[GeometryInfo<dim>::faces_per_cell]
-    = { { {vertices[0], vertices[1]} },
-        { {vertices[1], vertices[2]} },
-	{ {vertices[3], vertices[2]} },
-	{ {vertices[0], vertices[3]} } };
+    = { { { vertices[0], vertices[1] } },
+        { { vertices[1], vertices[2] } },
+	{ { vertices[3], vertices[2] } },
+	{ { vertices[0], vertices[3] } } };
 
 				   // then insert them into the global
 				   // list and store iterators to

@@ -166,7 +166,7 @@ MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 
 template<int dim>
 void
-MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
+MappingQ<dim>::compute_shapes_virtual (const typename std::vector<Point<dim> > &unit_points,
 				       typename MappingQ1<dim>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
@@ -263,7 +263,7 @@ void
 MappingQ<dim>::fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 			       const Quadrature<dim>                &q,
 			       typename Mapping<dim>::InternalDataBase       &mapping_data,
-			       std::vector<Point<dim> >             &quadrature_points,
+			       typename std::vector<Point<dim> >             &quadrature_points,
 			       std::vector<double>                  &JxW_values) const
 {
 				   // convert data object to internal
@@ -301,10 +301,10 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
 				    const unsigned int       face_no,
 				    const Quadrature<dim-1> &q,
 				    typename Mapping<dim>::InternalDataBase &mapping_data,
-				    std::vector<Point<dim> >     &quadrature_points,
+				    typename std::vector<Point<dim> >     &quadrature_points,
 				    std::vector<double>          &JxW_values,
-				    std::vector<Tensor<1,dim> >  &exterior_forms,
-				    std::vector<Point<dim> >     &normal_vectors) const
+				    typename std::vector<Tensor<1,dim> >  &exterior_forms,
+				    typename std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -356,10 +356,10 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 				       const unsigned int       sub_no,
 				       const Quadrature<dim-1> &q,
 				       typename Mapping<dim>::InternalDataBase &mapping_data,
-				       std::vector<Point<dim> >     &quadrature_points,
+				       typename std::vector<Point<dim> >     &quadrature_points,
 				       std::vector<double>          &JxW_values,
-				       std::vector<Tensor<1,dim> >  &exterior_forms,
-				       std::vector<Point<dim> >     &normal_vectors) const
+				       typename std::vector<Tensor<1,dim> >  &exterior_forms,
+				       typename std::vector<Point<dim> >     &normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -649,7 +649,7 @@ MappingQ<dim>::compute_laplace_vector(std::vector<std::vector<double> > &lvs) co
 template <int dim>
 void
 MappingQ<dim>::apply_laplace_vector(const std::vector<std::vector<double> > &lvs,
-				    std::vector<Point<dim> > &a) const
+				    typename std::vector<Point<dim> > &a) const
 {
   Assert(lvs.size()!=0, ExcLaplaceVectorNotSet(degree));
   const unsigned int n_inner_apply=lvs.size();
@@ -680,7 +680,7 @@ template <int dim>
 void
 MappingQ<dim>::compute_mapping_support_points(
   const typename Triangulation<dim>::cell_iterator &cell,
-  std::vector<Point<dim> > &a) const
+  typename std::vector<Point<dim> > &a) const
 {
 				   // if this is a cell for which we
 				   // want to compute the full
@@ -712,7 +712,7 @@ MappingQ<dim>::compute_mapping_support_points(
 template <int dim>
 void
 MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>::cell_iterator &cell,
-					      std::vector<Point<dim> > &a) const
+					      typename std::vector<Point<dim> > &a) const
 {
 				   // in any case, we need the
 				   // vertices first
@@ -754,7 +754,7 @@ MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>:
 template <int dim>
 void
 MappingQ<dim>::compute_support_points_simple(const typename Triangulation<dim>::cell_iterator &cell,
-					     std::vector<Point<dim> > &a) const
+					     typename std::vector<Point<dim> > &a) const
 {
   Assert(a.size()==0, ExcInternalError());
 				   // the vertices first
@@ -851,7 +851,7 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
 template <int dim>
 void
 MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
-					std::vector<Point<dim> > &a) const
+					typename std::vector<Point<dim> > &a) const
 {
   static const StraightBoundary<dim> straight_boundary;
 				   // if we only need the midpoint,
@@ -1041,7 +1041,7 @@ MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell
 template<int dim>
 void
 MappingQ<dim>::add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
-				       std::vector<Point<dim> > &) const
+				       typename std::vector<Point<dim> > &) const
 {
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
@@ -1080,14 +1080,14 @@ MappingQ<3>::fill_quad_support_points_simple (const Triangulation<3>::cell_itera
 template <int dim>
 void
 MappingQ<dim>::fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &,
-						std::vector<Point<dim> > &) const
+						typename std::vector<Point<dim> > &) const
 {}
 
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-				    const std::vector<Tensor<1,dim> > &src,
+MappingQ<dim>::transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
+				    const typename std::vector<Tensor<1,dim> > &src,
 				    const typename Mapping<dim>::InternalDataBase &mapping_data,
 				    const unsigned int src_offset) const
 {
@@ -1114,8 +1114,8 @@ MappingQ<dim>::transform_covariant (std::vector<Tensor<1,dim> >       &dst,
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
-				    const std::vector<Point<dim> > &src,
+MappingQ<dim>::transform_covariant (typename std::vector<Point<dim> >       &dst,
+				    const typename std::vector<Point<dim> > &src,
 				    const typename Mapping<dim>::InternalDataBase &mapping_data,
 				    const unsigned int src_offset) const
 {
@@ -1142,8 +1142,8 @@ MappingQ<dim>::transform_covariant (std::vector<Point<dim> >       &dst,
 
 template <int dim>
 void
-MappingQ<dim>::transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-					const std::vector<Tensor<1,dim> > &src,
+MappingQ<dim>::transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
+					const typename std::vector<Tensor<1,dim> > &src,
 					const typename Mapping<dim>::InternalDataBase &mapping_data,
 					const unsigned int src_offset) const
 {
@@ -1170,8 +1170,8 @@ MappingQ<dim>::transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
 
 template <int dim>
 void
-MappingQ<dim>::transform_contravariant (std::vector<Point<dim> >       &dst,
-					const std::vector<Point<dim> > &src,
+MappingQ<dim>::transform_contravariant (typename std::vector<Point<dim> >       &dst,
+					const typename std::vector<Point<dim> > &src,
 					const typename Mapping<dim>::InternalDataBase &mapping_data,
 					const unsigned int src_offset) const
 {

@@ -1573,9 +1573,9 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * @ref{TimeStepBase_Tria_Flags}
 				      * namespace into local scope.
 				      */
-    typedef TimeStepBase_Tria_Flags::Flags<dim>           Flags;
-    typedef TimeStepBase_Tria_Flags::RefinementFlags<dim> RefinementFlags;
-    typedef TimeStepBase_Tria_Flags::RefinementData<dim>  RefinementData;
+    typedef typename TimeStepBase_Tria_Flags::Flags<dim>           Flags;
+    typedef typename TimeStepBase_Tria_Flags::RefinementFlags<dim> RefinementFlags;
+    typedef typename TimeStepBase_Tria_Flags::RefinementData<dim>  RefinementData;
     
     
 				     /**

@@ -671,7 +671,7 @@ namespace Functions
 					* coefficients in each space
 					* direction as argument.
 					*/
-      FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
+      FourierSineSum (const typename std::vector<Point<dim> > &fourier_coefficients,
 		      const std::vector<double>      &weights);
       
 				       /**
@@ -713,7 +713,7 @@ namespace Functions
 					* Stored Fourier coefficients
 					* and weights.
 					*/
-      const std::vector<Point<dim> > fourier_coefficients;
+      const typename std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
 
@@ -737,7 +737,7 @@ namespace Functions
 					* coefficients in each space
 					* direction as argument.
 					*/
-      FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
+      FourierCosineSum (const typename std::vector<Point<dim> > &fourier_coefficients,
 			const std::vector<double>      &weights);
       
 				       /**
@@ -779,7 +779,7 @@ namespace Functions
 					* Stored Fourier coefficients
 					* and weights.
 					*/
-      const std::vector<Point<dim> > fourier_coefficients;
+      const typename std::vector<Point<dim> > fourier_coefficients;
       const std::vector<double>      weights;
   };
   

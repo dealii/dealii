@@ -3691,7 +3691,7 @@ Triangulation<dim>::n_vertices () const
 
 
 template <int dim>
-const std::vector<Point<dim> > &
+const typename std::vector<Point<dim> > &
 Triangulation<dim>::get_vertices () const 
 {
   return vertices;

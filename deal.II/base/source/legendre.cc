@@ -19,9 +19,9 @@
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
 template <typename number>
-std::vector<const std::vector<number>*>
+typename std::vector<const typename std::vector<number> *>
 Legendre<number>::coefficients(20,
-			       static_cast<const std::vector<number>*>(0));
+			       static_cast<const typename std::vector<number>*>(0));
 
 
 // have a lock that guarantees that at most one thread is changing and
@@ -124,7 +124,7 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
 
 
 template <typename number>
-const std::vector<number> &
+const typename std::vector<number> &
 Legendre<number>::get_coefficients (const unsigned int k)
 {
 				   // first make sure the coefficients

@@ -487,7 +487,7 @@ class FilteredMatrix : public Subscriptor
 				      * the value to which it shall be
 				      * fixed.
 				      */
-    std::vector<IndexValuePair> constraints;
+    typename std::vector<IndexValuePair> constraints;
 
 				     /**
 				      * Vector to be used as temporary
@@ -556,7 +556,7 @@ class FilteredMatrix : public Subscriptor
 				      * matrix types.
 				      */
     void get_column_entries (const unsigned int           index,
-			     std::vector<IndexValuePair> &column_entries,
+			     typename std::vector<IndexValuePair> &column_entries,
 			     const bool                   matrix_is_symmetric) const;
 };
 

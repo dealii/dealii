@@ -903,7 +903,8 @@ int TriaObjectAccessor<celldim,dim>::child_index (const unsigned int i) const
 template<int celldim, int dim>
 bool TriaObjectAccessor<celldim,dim>::has_children () const
 {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
 

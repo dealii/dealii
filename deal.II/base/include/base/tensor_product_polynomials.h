@@ -43,8 +43,8 @@ class TensorProductPolynomials
 				      * and will be copied into the
 				      * member variable @p{polynomials}.
 				      */
-    template<class Pol>
-    TensorProductPolynomials(const std::vector<Pol> &pols);
+    template <class Pol>
+    TensorProductPolynomials(const typename std::vector<Pol> &pols);
 
 				     /**
 				      * Computes the value and the
@@ -210,7 +210,7 @@ class TensorProductPolynomials
 template <int dim>
 template <class Pol>
 TensorProductPolynomials<dim>::TensorProductPolynomials(
-  const std::vector<Pol> &pols):
+  const typename std::vector<Pol> &pols):
 		polynomials (pols.begin(), pols.end()),
 		n_tensor_pols(power(pols.size(), dim)),
 		n_pols_to(dim+1)

@@ -411,7 +411,7 @@ class SolutionTransfer
 				      * of all cells that'll be coarsened
 				      * will be stored in this vector.
 				      */
-    typename std::vector<std::vector<Vector<number> > > dof_values_on_cell;
+    typename std::vector<typename std::vector<Vector<number> > > dof_values_on_cell;
 };
 
 

@@ -106,21 +106,21 @@ class FEValuesData
 				      * real element, rather than on the
 				      * reference element.
 				      */
-    std::vector<Point<dim> >  quadrature_points;
+    typename std::vector<Point<dim> >  quadrature_points;
 
 				     /**
 				      * List of outward normal vectors at the
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    std::vector<Point<dim> >  normal_vectors;
+    typename std::vector<Point<dim> >  normal_vectors;
 
                                      /**
 				      * List of boundary forms at the
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    std::vector<Tensor<1,dim> >  boundary_forms;
+    typename std::vector<Tensor<1,dim> >  boundary_forms;
 
                                      /**
 				      * Original update flags handed
@@ -793,7 +793,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * Return the list of outward normal
 				      * vectors times quadrature weights.
 				      */
-    const std::vector<Tensor<1,dim> > & get_boundary_forms () const;
+    const typename std::vector<Tensor<1,dim> > & get_boundary_forms () const;
 
 				     /**
 				      * Return the present

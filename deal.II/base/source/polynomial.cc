@@ -15,7 +15,7 @@
 #include <base/polynomial.h>
 
 template <typename number>
-Polynomial<number>::Polynomial (const std::vector<number> &a):
+Polynomial<number>::Polynomial (const typename std::vector<number> &a):
 		coefficients(a)
 {}
 
@@ -49,7 +49,7 @@ Polynomial<number>::value (const number x) const
 template <typename number>
 void
 Polynomial<number>::value (const number         x,
-			std::vector<number> &values) const
+			typename std::vector<number> &values) const
 {
   Assert (coefficients.size() > 0, ExcVoidPolynomial());
   Assert (values.size() > 0, ExcEmptyArray());

@@ -35,7 +35,7 @@ template <int dim>
 void
 MappingQ1Eulerian<dim>::compute_mapping_support_points(
   const typename Triangulation<dim>::cell_iterator &cell,
-  std::vector<Point<dim> > &a) const
+  typename std::vector<Point<dim> > &a) const
 {
 
 				   // The assertions can not be in the

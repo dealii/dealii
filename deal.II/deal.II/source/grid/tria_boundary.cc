@@ -44,7 +44,7 @@ template <int dim>
 void
 Boundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
-				 std::vector<Point<dim> > &) const
+				 typename std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
@@ -55,7 +55,7 @@ template <int dim>
 void
 Boundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
-				 std::vector<Point<dim> > &) const
+				 typename std::vector<Point<dim> > &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
@@ -211,7 +211,7 @@ template <>
 void
 StraightBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
-			 FaceVertexNormals &) const
+			 Boundary<1>::FaceVertexNormals &) const
 {
   Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
 };

@@ -116,7 +116,7 @@ void Function<dim>::gradient_list (const typename std::vector<Point<dim> > &poin
 
 template <int dim>
 void Function<dim>::vector_gradient_list (const typename std::vector<Point<dim> >            &points,
-					  typename std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+					  typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));

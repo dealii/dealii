@@ -377,7 +377,7 @@ template <>
 void
 HyperBallBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
-			 FaceVertexNormals &) const;
+			 Boundary<1>::FaceVertexNormals &) const;
 template <>
 Point<1>
 HalfHyperBallBoundary<1>::

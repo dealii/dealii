@@ -5471,7 +5471,7 @@ namespace Threads
 
   
   template <typename ForwardIterator>
-  typename std::vector<std::pair<ForwardIterator,ForwardIterator> >
+  typename std::vector<typename std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
 	       const ForwardIterator &end,
 	       const unsigned int     n_intervals)

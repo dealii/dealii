@@ -80,7 +80,7 @@ class FunctionDerivative : public Function<dim>
 				      * values are accessed.
 				      */
     FunctionDerivative (const Function<dim>            &f,
-			const std::vector<Point<dim> > &direction,
+			const typename std::vector<Point<dim> > &direction,
 			const double                    h = 1.e-6);
     
 				     /**

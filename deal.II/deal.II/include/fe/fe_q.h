@@ -629,7 +629,7 @@ class FE_Q : public FiniteElement<dim>
 					  * vector for each shape function, containing
 					  * values for each quadrature point.
 					  */				      
-	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+	typename std::vector<typename std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
 				     /**

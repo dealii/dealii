@@ -2873,7 +2873,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * function
 				      * @ref{get_used_vertices}.
 				      */
-    const std::vector<Point<dim> > &
+    const typename std::vector<Point<dim> > &
     get_vertices () const;
     
 				     /**

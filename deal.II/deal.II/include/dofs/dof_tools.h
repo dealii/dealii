@@ -1048,9 +1048,9 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    map_dofs_to_support_points (const Mapping<dim>       &mapping,
-				const DoFHandler<dim>    &dof_handler,
-				std::vector<Point<dim> > &support_points);
+    map_dofs_to_support_points (const Mapping<dim>                &mapping,
+				const DoFHandler<dim>             &dof_handler,
+				typename std::vector<Point<dim> > &support_points);
 
 				     /**
 				      * This is the opposite function
@@ -1083,7 +1083,7 @@ class DoFTools
     static void
     map_support_points_to_dofs (const Mapping<dim>       &mapping,
 				const DoFHandler<dim>    &dof_handler,
-				std::map<Point<dim>, unsigned int, Comp> &point_to_index_map);
+				typename std::map<Point<dim>, unsigned int, Comp> &point_to_index_map);
     
 				     /**
 				      * Exception
@@ -1194,7 +1194,7 @@ void
 DoFTools::
 map_support_points_to_dofs (const Mapping<dim>       &mapping,
 			    const DoFHandler<dim>    &dof_handler,
-			    std::map<Point<dim>, unsigned int, Comp> &point_to_index_map)
+			    typename std::map<Point<dim>, unsigned int, Comp> &point_to_index_map)
 {
 				   // let the checking of arguments be
 				   // done by the function first

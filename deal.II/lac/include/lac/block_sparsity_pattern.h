@@ -347,7 +347,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    std::vector<std::vector<SmartPointer<SparsityPatternBase> > > sub_objects;
+    typename std::vector<typename std::vector<SmartPointer<SparsityPatternBase> > > sub_objects;
 
 				     /**
 				      * Object storing and managing
@@ -534,7 +534,7 @@ template <class SparsityPatternBase>
 inline
 void
 BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
-						const unsigned int j)
+						    const unsigned int j)
 {
 				   // if you get an error here, are
 				   // you sure you called

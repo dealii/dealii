@@ -49,7 +49,7 @@ class Polynomial : public Subscriptor
 				      * the @p{coefficient} array
 				      * minus one.
 				      */
-    Polynomial (const std::vector<number> &coefficients);
+    Polynomial (const typename std::vector<number> &coefficients);
 
                                      /**
 				      * Default-Constructor.
@@ -82,8 +82,8 @@ class Polynomial : public Subscriptor
 				      * scheme for numerical stability
 				      * of the evaluation.
 				      */
-    void value (const number         x,
-		std::vector<number> &values) const;
+    void value (const number                  x,
+		typename std::vector<number> &values) const;
 
 				     /**
 				      * Degree of the polynomial. This
@@ -116,7 +116,7 @@ class Polynomial : public Subscriptor
 				      * passed down by derived
 				      * classes.
 				      */
-    std::vector<number> coefficients;
+    typename std::vector<number> coefficients;
 };
 
 
@@ -205,7 +205,7 @@ class Legendre : public Polynomial<number>
 				      * vectors in order to simplify
 				      * programming multithread-safe.
 				      */
-    static std::vector<const std::vector<number>*> coefficients;
+    static typename std::vector<const typename std::vector<number> *> coefficients;
     
 				     /**
 				      * Compute coefficients recursively.
@@ -219,7 +219,7 @@ class Legendre : public Polynomial<number>
 				      * constructor of
 				      * @ref{Polynomial}.
 				      */
-    static const std::vector<number> &
+    static const typename std::vector<number> &
     get_coefficients (const unsigned int k);
 };
 

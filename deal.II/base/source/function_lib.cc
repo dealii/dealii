@@ -1220,7 +1220,7 @@ namespace Functions
   
   template <int dim>
   FourierSineSum<dim>::
-  FourierSineSum (const std::vector<Point<dim> > &fourier_coefficients,
+  FourierSineSum (const typename std::vector<Point<dim> > &fourier_coefficients,
 		  const std::vector<double>      &weights)
 		  :
 		  Function<dim> (1),
@@ -1291,12 +1291,12 @@ namespace Functions
   
   template <int dim>
   FourierCosineSum<dim>::
-  FourierCosineSum (const std::vector<Point<dim> > &fourier_coefficients,
-		  const std::vector<double>      &weights)
-		  :
-		  Function<dim> (1),
-    fourier_coefficients (fourier_coefficients),
-    weights (weights)
+  FourierCosineSum (const typename std::vector<Point<dim> > &fourier_coefficients,
+		    const std::vector<double>      &weights)
+                    :
+                    Function<dim> (1),
+                    fourier_coefficients (fourier_coefficients),
+                    weights (weights)
   {
     Assert (fourier_coefficients.size() > 0, ExcInvalidArraySize());
     Assert (fourier_coefficients.size() == weights.size(),

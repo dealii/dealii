@@ -82,8 +82,8 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-			 const std::vector<Tensor<1,dim> > &src,
+    transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
+			 const typename std::vector<Tensor<1,dim> > &src,
 			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
@@ -92,8 +92,8 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-			     const std::vector<Tensor<1,dim> > &src,
+    transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
+			     const typename std::vector<Tensor<1,dim> > &src,
 			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
@@ -102,8 +102,8 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (std::vector<Point<dim> >       &dst,
-			 const std::vector<Point<dim> > &src,
+    transform_covariant (typename std::vector<Point<dim> >       &dst,
+			 const typename std::vector<Point<dim> > &src,
 			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
@@ -112,8 +112,8 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (std::vector<Point<dim> >       &dst,
-			     const std::vector<Point<dim> > &src,
+    transform_contravariant (typename std::vector<Point<dim> >       &dst,
+			     const typename std::vector<Point<dim> > &src,
 			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
@@ -133,7 +133,7 @@ class MappingQ : public MappingQ1<dim>
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    std::vector<Point<dim> >             &quadrature_points,
+		    typename std::vector<Point<dim> >             &quadrature_points,
 		    std::vector<double>                  &JxW_values) const ;
 
 				     /**
@@ -145,10 +145,10 @@ class MappingQ : public MappingQ1<dim>
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 std::vector<Point<dim> >        &quadrature_points,
+			 typename std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
-			 std::vector<Tensor<1,dim> >        &exterior_form,
-			 std::vector<Point<dim> >        &normal_vectors) const ;
+			 typename std::vector<Tensor<1,dim> >        &exterior_form,
+			 typename std::vector<Point<dim> >        &normal_vectors) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -160,10 +160,10 @@ class MappingQ : public MappingQ1<dim>
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
 			    typename Mapping<dim>::InternalDataBase &mapping_data,
-			    std::vector<Point<dim> >        &quadrature_points,
+			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
-			    std::vector<Tensor<1,dim> >        &exterior_form,
-			    std::vector<Point<dim> >        &normal_vectors) const ;
+			    typename std::vector<Tensor<1,dim> >        &exterior_form,
+			    typename std::vector<Point<dim> >        &normal_vectors) const ;
 
 				     /** 
 				      * Storage for internal data of
@@ -197,7 +197,7 @@ class MappingQ : public MappingQ1<dim>
 					  * Filled (hardcoded) once in
 					  * @p{get_face_data}.
 					  */
-        std::vector<std::vector<Point<dim> > > unit_normals;
+        typename std::vector<typename std::vector<Point<dim> > > unit_normals;
 
 					 /**
 					  * Flag that is set by the
@@ -307,7 +307,7 @@ class MappingQ : public MappingQ1<dim>
 				      * derivatives.
 				      */
     virtual void
-    compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
+    compute_shapes_virtual (const typename std::vector<Point<dim> > &unit_points,
 			    typename MappingQ1<dim>::InternalData &data) const;
 
 				     /**
@@ -364,7 +364,7 @@ class MappingQ : public MappingQ1<dim>
 				      * points are appended.
 				      */
     void apply_laplace_vector(const std::vector<std::vector<double> > &lvs,
-			      std::vector<Point<dim> > &a) const;
+			      typename std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * Computes the support points of
@@ -372,7 +372,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      typename std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * Computes all support points of
@@ -390,7 +390,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     void compute_support_points_laplace(
       const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      typename std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * Simple version of the
@@ -414,7 +414,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     void compute_support_points_simple(
       const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;    
+      typename std::vector<Point<dim> > &a) const;    
     
 				     /**
 				      * For @p{dim=2} and 3. Simple
@@ -427,7 +427,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
 //TODO:[RH] (later) remove this function altogether?    
     void fill_quad_support_points_simple (const typename Triangulation<dim>::cell_iterator &cell,
-					  std::vector<Point<dim> > &a) const;
+					  typename std::vector<Point<dim> > &a) const;
     
 				     /**
 				      * Needed by the

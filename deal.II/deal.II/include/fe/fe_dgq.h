@@ -317,7 +317,7 @@ class FE_DGQ : public FiniteElement<dim>
 					  * values for each quadrature
 					  * point.
 					  */				      
-	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+	typename std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
     };
     
 				     /**

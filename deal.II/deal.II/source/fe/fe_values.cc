@@ -603,7 +603,7 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 
 
 template <int dim>
-const std::vector<Point<dim> > &
+const typename std::vector<Point<dim> > &
 FEFaceValuesBase<dim>::get_normal_vectors () const
 {
   Assert (update_flags & update_normal_vectors,
@@ -614,7 +614,7 @@ FEFaceValuesBase<dim>::get_normal_vectors () const
 
 
 template <int dim>
-const std::vector<Tensor<1,dim> > &
+const typename std::vector<Tensor<1,dim> > &
 FEFaceValuesBase<dim>::get_boundary_forms () const
 {
   Assert (update_flags & update_boundary_forms,

@@ -434,7 +434,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * Abbreviate the somewhat lengthy
 				      * name for the @p{Patch} class.
 				      */
-    typedef DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
+    typedef typename DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
 
 				     /**
 				      * Pointer to the dof handler object.

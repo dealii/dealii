@@ -71,8 +71,8 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (std::vector<Tensor<1,dim> >       &dst,
-			 const std::vector<Tensor<1,dim> > &src,
+    transform_covariant (typename std::vector<Tensor<1,dim> >       &dst,
+			 const typename std::vector<Tensor<1,dim> > &src,
 			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
@@ -81,8 +81,8 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (std::vector<Tensor<1,dim> >       &dst,
-			     const std::vector<Tensor<1,dim> > &src,
+    transform_contravariant (typename std::vector<Tensor<1,dim> >       &dst,
+			     const typename std::vector<Tensor<1,dim> > &src,
 			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
 
@@ -91,8 +91,8 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (std::vector<Point<dim> >       &dst,
-			 const std::vector<Point<dim> > &src,
+    transform_covariant (typename std::vector<Point<dim> >       &dst,
+			 const typename std::vector<Point<dim> > &src,
 			 const typename Mapping<dim>::InternalDataBase &mapping_data,
 			 const unsigned int src_offset) const;
     
@@ -101,8 +101,8 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (std::vector<Point<dim> >       &dst,
-			     const std::vector<Point<dim> > &src,
+    transform_contravariant (typename std::vector<Point<dim> >       &dst,
+			     const typename std::vector<Point<dim> > &src,
 			     const typename Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
     
@@ -129,7 +129,7 @@ class MappingQ1 : public Mapping<dim>
     fill_fe_values (const typename DoFHandler<dim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    std::vector<Point<dim> >        &quadrature_points,
+		    typename std::vector<Point<dim> >       &quadrature_points,
 		    std::vector<double>             &JxW_values) const ;
 
 				     /**
@@ -141,10 +141,10 @@ class MappingQ1 : public Mapping<dim>
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 std::vector<Point<dim> >        &quadrature_points,
+			 typename std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
-			 std::vector<Tensor<1,dim> >        &boundary_form,
-			 std::vector<Point<dim> >        &normal_vectors) const ;
+			 typename std::vector<Tensor<1,dim> >        &boundary_form,
+			 typename std::vector<Point<dim> >        &normal_vectors) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -156,18 +156,18 @@ class MappingQ1 : public Mapping<dim>
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
 			    typename Mapping<dim>::InternalDataBase &mapping_data,
-			    std::vector<Point<dim> >        &quadrature_points,
+			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
-			    std::vector<Tensor<1,dim> >        &boundary_form,
-			    std::vector<Point<dim> >        &normal_vectors) const ;
+			    typename std::vector<Tensor<1,dim> >        &boundary_form,
+			    typename std::vector<Point<dim> >        &normal_vectors) const ;
     
     				     /**
 				      * Implementation of the
 				      * covariant transformation.
 				      */
     template <typename tensor_>
-    void covariant_transformation (std::vector<tensor_>       &dst,
-				   const std::vector<tensor_> &src,
+    void covariant_transformation (typename std::vector<tensor_>       &dst,
+				   const typename std::vector<tensor_> &src,
 				   const typename Mapping<dim>::InternalDataBase &mapping_data,
 				   const unsigned int src_offset) const;
     
@@ -176,8 +176,8 @@ class MappingQ1 : public Mapping<dim>
 				      * contravariant transformation.
 				      */
     template <typename tensor_>
-    void contravariant_transformation (std::vector<tensor_>       &dst,
-				       const std::vector<tensor_> &src,
+    void contravariant_transformation (typename std::vector<tensor_>       &dst,
+				       const typename std::vector<tensor_> &src,
 				       const typename Mapping<dim>::InternalDataBase &mapping_data,
 				       const unsigned int src_offset) const;
 
@@ -251,7 +251,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed once.
 					  */
-	std::vector<Tensor<1,dim> > shape_derivatives;
+	typename std::vector<Tensor<1,dim> > shape_derivatives;
 	
 					 /**
 					  * Tensors of covariant
@@ -259,7 +259,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed on each cell.
 					  */
-	std::vector<Tensor<2,dim> > covariant;
+	typename std::vector<Tensor<2,dim> > covariant;
 	
 					 /**
 					  * Tensors of covariant
@@ -267,7 +267,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed on each cell.
 					  */
-	std::vector<Tensor<2,dim> > contravariant;
+	typename std::vector<Tensor<2,dim> > contravariant;
 	
 					 /**
 					  * Unit tangential vectors. Used
@@ -277,19 +277,19 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
+        typename std::vector<typename std::vector<Tensor<1,dim> > > unit_tangentials;
 	
 					 /**
 					  * Auxuliary vectors for internal use.
 					  */
-        std::vector<std::vector<Tensor<1,dim> > > aux;
+        typename std::vector<typename std::vector<Tensor<1,dim> > > aux;
 
 					 /**
 					  * Stores the support points of
 					  * the mapping shape functions on
 					  * the @p{cell_of_current_support_points}.
 					  */
-	std::vector<Point<dim> > mapping_support_points;
+	typename std::vector<Point<dim> > mapping_support_points;
 	
 					 /**
 					  * Stores the cell of which the
@@ -335,7 +335,7 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{data.is_mapping_q1_data}
 				      * equals @p{true} or @p{false}.
 				      */
-    void compute_shapes (const std::vector<Point<dim> > &unit_points,
+    void compute_shapes (const typename std::vector<Point<dim> > &unit_points,
 			 InternalData &data) const;
 
 				     /**
@@ -347,9 +347,9 @@ class MappingQ1 : public Mapping<dim>
 				      * and shape values are computed.
 				      */
     void compute_data (const UpdateFlags flags,
-		       const Quadrature<dim>& quadrature,
+		       const Quadrature<dim> &quadrature,
 		       const unsigned int n_orig_q_points,
-		       InternalData& data) const;
+		       InternalData &data) const;
 
 				     /**
 				      * Do the computations for the
@@ -376,7 +376,7 @@ class MappingQ1 : public Mapping<dim>
 		       const unsigned int   npts,
 		       const unsigned int   offset,
 		       InternalData        &data,
-		       std::vector<Point<dim> > &quadrature_points) const;
+		       typename std::vector<Point<dim> > &quadrature_points) const;
     
 				     /**
 				      * Do the computation for the
@@ -389,16 +389,16 @@ class MappingQ1 : public Mapping<dim>
 			    const unsigned int      offset,
 			    const std::vector<double>   &weights,
 			    InternalData           &mapping_data,
-			    std::vector<Point<dim> >    &quadrature_points,
+			    typename std::vector<Point<dim> >    &quadrature_points,
 			    std::vector<double>         &JxW_values,
-			    std::vector<Tensor<1,dim> > &boundary_form,
-			    std::vector<Point<dim> > &normal_vectors) const;
+			    typename std::vector<Tensor<1,dim> > &boundary_form,
+			    typename std::vector<Point<dim> > &normal_vectors) const;
     
 				     /**
 				      * Compute shape values and/or
 				      * derivatives.
 				      */
-    virtual void compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
+    virtual void compute_shapes_virtual (const typename std::vector<Point<dim> > &unit_points,
 					 InternalData &data) const;
 
 				     /**
@@ -511,7 +511,7 @@ class MappingQ1 : public Mapping<dim>
 				      */
     virtual void compute_mapping_support_points(
       const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      typename std::vector<Point<dim> > &a) const;
 
 				     /**
 				      * Number of shape functions. Is

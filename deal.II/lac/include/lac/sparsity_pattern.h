@@ -898,7 +898,7 @@ class SparsityPattern : public Subscriptor
 				      */
     template <typename value>
     unsigned int
-    get_column_index_from_iterator (const std::pair<unsigned int, value> &i);
+    get_column_index_from_iterator (const typename std::pair<unsigned int, value> &i);
 
 				     /**
 				      * Likewise, but sometimes needed
@@ -909,7 +909,7 @@ class SparsityPattern : public Subscriptor
 				      */
     template <typename value>
     unsigned int
-    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i);
+    get_column_index_from_iterator (const typename std::pair<const unsigned int, value> &i);
     
 				     /**
 				      * Make all sparse matrices
@@ -1099,7 +1099,7 @@ SparsityPattern::get_column_index_from_iterator (const unsigned int i)
 template <typename value>
 inline
 unsigned int
-SparsityPattern::get_column_index_from_iterator (const std::pair<unsigned int, value> &i)
+SparsityPattern::get_column_index_from_iterator (const typename std::pair<unsigned int, value> &i)
 {
   return i.first;
 };
@@ -1109,7 +1109,7 @@ SparsityPattern::get_column_index_from_iterator (const std::pair<unsigned int, v
 template <typename value>
 inline
 unsigned int
-SparsityPattern::get_column_index_from_iterator (const std::pair<const unsigned int, value> &i)
+SparsityPattern::get_column_index_from_iterator (const typename std::pair<const unsigned int, value> &i)
 {
   return i.first;
 };

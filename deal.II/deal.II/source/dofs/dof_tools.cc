@@ -2164,7 +2164,7 @@ template <int dim>
 void
 DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 				      const DoFHandler<dim>    &dof_handler,
-				      std::vector<Point<dim> > &support_points)
+				      typename std::vector<Point<dim> > &support_points)
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   
