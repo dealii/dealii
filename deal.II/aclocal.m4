@@ -163,25 +163,33 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	            GXX_VERSION=hp_aCC
   	          else
   
-  	            dnl KAI C++? It seems as if the documented options
-		    dnl -V and --version are not always supported, so give
-	            dnl the whole thing a second try by looking for /KCC/
-	 	    dnl somewhere in the paths that are output by -v. This
-	            dnl is risky business, since this combination of
-	            dnl characters might appear on other installations
-                    dnl of other compilers as well, so put this test to
-                    dnl the very end of the detection chain for the
-                    dnl various compilers
-  	            is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
-  	            is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
-  	            if test "x$is_kai_cc" != "x" ; then
-  	              AC_MSG_RESULT(C++ compiler is KAI C++)
-  	              GXX_VERSION=kai_cc
+  	            dnl Borland C++
+  	            is_bcc="`($CXX -h 2>&1) | grep 'Borland'`"
+  	            if test "x$is_bcc" != "x" ; then
+  	              AC_MSG_RESULT(C++ compiler is Borland C++)
+  	              GXX_VERSION=borland_bcc
   	            else
   
-                      dnl  Aw, nothing suitable found...
-                      AC_MSG_ERROR([Unrecognized compiler -- sorry])
-                      exit 1
+  	              dnl KAI C++? It seems as if the documented options
+		      dnl -V and --version are not always supported, so give
+	              dnl the whole thing a second try by looking for /KCC/
+	 	      dnl somewhere in the paths that are output by -v. This
+	              dnl is risky business, since this combination of
+	              dnl characters might appear on other installations
+                      dnl of other compilers as well, so put this test to
+                      dnl the very end of the detection chain for the
+                      dnl various compilers
+  	              is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
+  	              is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
+  	              if test "x$is_kai_cc" != "x" ; then
+  	                AC_MSG_RESULT(C++ compiler is KAI C++)
+  	                GXX_VERSION=kai_cc
+  	              else
+  
+                        dnl  Aw, nothing suitable found...
+                        AC_MSG_ERROR([Unrecognized compiler -- sorry])
+                        exit 1
+                      fi
                     fi
                   fi
                 fi
@@ -472,6 +480,13 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  # for linking shared libs, -b is also necessary...
           ;;
   
+      borland_bcc)
+          CXXFLAGSG="$CXXFLAGS -q -DDEBUG -w -w-use -w-amp"
+          CXXFLAGSO="$CXXFLAGS -q -O2"
+          CXXFLAGSPIC=""
+          LDFLAGSPIC=""
+          ;;
+
       *)
           AC_MSG_ERROR(No compiler options for this C++ compiler
                        specified at present)
@@ -558,8 +573,17 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
     esac
   
   else
-    dnl Non-gcc compilers use -g instead of -ggdb
-    CXXFLAGSG="-g $CXXFLAGSG"
+    dnl Non-gcc compilers use -g instead of -ggdb, except for Borland C++
+    dnl which wants something entirely different
+    case "$GXX_VERSION" in
+      borland_bcc)
+	CXXFLAGSG="-v -y $CXXFLAGSG"
+	;;
+
+      *)
+    	CXXFLAGSG="-g $CXXFLAGSG"
+	;;
+    esac
   fi
 ])
 
