@@ -847,7 +847,7 @@ LSingularityFunction::laplacian_list (const std::vector<Point<2> > &points,
 }
 
 
-//TODO: Implement derivatives
+//TODO:[GK] Implement derivatives
 
 Tensor<1,2>
 LSingularityFunction::gradient (const Point<2>   &p,
@@ -940,7 +940,7 @@ SlitSingularityFunction::laplacian_list (const std::vector<Point<2> > &points,
 }
 
 
-//TODO: Implement derivatives
+//TODO:[GK] Implement derivatives
 
 Tensor<1,2>
 SlitSingularityFunction::gradient (const Point<2>   &/*p*/,

@@ -223,7 +223,7 @@ QProjector<dim>::QProjector (const Quadrature<dim-1> &quadrature,
   const unsigned int n = GeometryInfo<dim>::faces_per_cell
     * (sub ? GeometryInfo<dim>::subfaces_per_face : 1);
 
-//TODO: Can we keep it that simple for non-symmetric formulae?
+//TODO:[GK] Can we keep it that simple for non-symmetric formulae?
 // Otherwise we'll have to include the weights in the project* functions.
 // This may pose a problem anyway, since we do not want to switch endpoints
 // in Gauss-Radau formulae.
