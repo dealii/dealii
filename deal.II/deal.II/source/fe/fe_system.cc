@@ -860,7 +860,7 @@ compute_fill (const Mapping<dim>                   &mapping,
 		 ? face_no * n_q_points
 		 :(face_no * GeometryInfo<dim>::subfaces_per_face
 		   + sub_no) * n_q_points;
-      compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
     }
 }
 

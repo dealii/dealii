@@ -45,9 +45,9 @@ MGSmootherRelaxation<MATRIX, VECTOR>
   for(unsigned i=0; i<this->get_steps(); ++i)
     {
       (*matrix)[level].residual(h1, u, rhs);
-      set_zero_interior_boundary(level,h1);
+      this->set_zero_interior_boundary(level,h1);
       ((*matrix)[level].*relaxation)(h2,h1,omega);
-      set_zero_interior_boundary(level,h2);
+      this->set_zero_interior_boundary(level,h2);
       u.add(h2);
     }
 }

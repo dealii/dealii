@@ -184,7 +184,7 @@ void
 MGDoFObjectAccessor<1, dim>::copy_from (const MGDoFObjectAccessor<1, dim> &a)
 {
   DoFObjectAccessor<1, dim>::copy_from (a);
-  set_mg_dof_handler (a.mg_dof_handler);
+  this->set_mg_dof_handler (a.mg_dof_handler);
 };
 
 
@@ -366,7 +366,7 @@ void
 MGDoFObjectAccessor<2, dim>::copy_from (const MGDoFObjectAccessor<2, dim> &a)
 {
   DoFObjectAccessor<2, dim>::copy_from (a);
-  set_mg_dof_handler (a.mg_dof_handler);
+  this->set_mg_dof_handler (a.mg_dof_handler);
 };
 
 
@@ -569,7 +569,7 @@ template <int dim>
 void
 MGDoFObjectAccessor<3, dim>::copy_from (const MGDoFObjectAccessor<3, dim> &a) {
   DoFObjectAccessor<3, dim>::copy_from (a);
-  set_mg_dof_handler (a.mg_dof_handler);
+  this->set_mg_dof_handler (a.mg_dof_handler);
 };
 
 
@@ -638,7 +638,7 @@ template <>
 MGDoFCellAccessor<3>::face_iterator
 MGDoFCellAccessor<3>::face (const unsigned int i) const
 {
-  return quad(i);
+  return this->quad(i);
 };
 
 #endif

@@ -580,15 +580,15 @@ mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_c
 
   if (old_cell->has_children() && new_cell->has_children()) 
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
+      ::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
 };
 
 
 
 template <int dim>
 static bool
-adapt_grids (const typename Triangulation<dim>::cell_iterator &cell1,
-	     const typename Triangulation<dim>::cell_iterator &cell2)
+adapt_grid_cells (const typename Triangulation<dim>::cell_iterator &cell1,
+                  const typename Triangulation<dim>::cell_iterator &cell2)
 {
 
   if (cell2->has_children() && cell1->has_children()) 
@@ -596,7 +596,8 @@ adapt_grids (const typename Triangulation<dim>::cell_iterator &cell1,
       bool grids_changed = false;
       
       for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
-	grids_changed |= adapt_grids<dim> (cell1->child(c), cell2->child(c));
+	grids_changed |= ::adapt_grid_cells<dim> (cell1->child(c),
+                                                  cell2->child(c));
       return grids_changed;
     };
 
@@ -703,7 +704,7 @@ adapt_grids (Triangulation<dim> &tria1,
 	  typename Triangulation<dim>::cell_iterator(tria1.end()) :
 	  tria1.begin(1));
   for (; cell1!=endc; ++cell1, ++cell2)
-    grids_changed |= adapt_grids<dim> (cell1, cell2);
+    grids_changed |= ::adapt_grid_cells<dim> (cell1, cell2);
 
   return grids_changed;
 };
@@ -826,7 +827,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					 // (there are more coming below then
 					 // also)
 	if (refinement_flags.adapt_grids)
-	  adapt_grids<dim> (*previous_tria, *tria);
+	  ::adapt_grids<dim> (*previous_tria, *tria);
 	
 					 // perform flagging of cells
 					 // needed to regularize the
@@ -1083,14 +1084,14 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // strange things may happen
       if (refinement_flags.mirror_flags_to_previous_grid)
 	{
-	  adapt_grids<dim> (*previous_tria, *tria);
+	  ::adapt_grids<dim> (*previous_tria, *tria);
 
 	  typename Triangulation<dim>::cell_iterator old_cell, new_cell, endc;
 	  old_cell = previous_tria->begin(0);
 	  new_cell = tria->begin(0);
 	  endc     = tria->end(0);
 	  for (; new_cell!=endc; ++new_cell, ++old_cell)
-	    mirror_refinement_flags<dim> (new_cell, old_cell);
+	    ::mirror_refinement_flags<dim> (new_cell, old_cell);
 	};
       
       tria->prepare_coarsening_and_refinement ();
@@ -1101,7 +1102,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // cells to avoid the previous grid
 				       // to have cells refined twice more
 				       // than the present one and vica versa.
-      adapt_grids<dim> (*previous_tria, *tria);
+      ::adapt_grids<dim> (*previous_tria, *tria);
     };
 };
 

@@ -318,7 +318,7 @@ FE_DGP<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
     }
   
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
 }
 
 
@@ -365,7 +365,7 @@ FE_DGP<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
     }
 
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 
@@ -414,7 +414,7 @@ FE_DGP<dim>::fill_fe_subface_values (const Mapping<dim>                   &mappi
     }
   
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 

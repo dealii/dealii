@@ -655,7 +655,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
   if (!this->has_children())
 				     // if this cell has no children: simply
 				     // return the exact values on this cell
-    get_dof_values (values, interpolated_values);
+    this->get_dof_values (values, interpolated_values);
   else
 				     // otherwise clobber them from the children
     {
@@ -759,7 +759,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
   if (!this->has_children())
                                      // if this cell has no children: simply
 				     // set the values on this cell
-    set_dof_values (local_values, values);
+    this->set_dof_values (local_values, values);
   else
 				     // otherwise distribute them to the children
     {

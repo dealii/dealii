@@ -114,10 +114,10 @@ GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 				   // defined by the order of vertices
 				   // in the cell object
   Face new_faces[GeometryInfo<dim>::faces_per_cell]
-    = { { { vertices[0], vertices[1] } },
-        { { vertices[1], vertices[2] } },
-	{ { vertices[3], vertices[2] } },
-	{ { vertices[0], vertices[3] } } };
+    = { { { this->vertices[0], this->vertices[1] } },
+        { { this->vertices[1], this->vertices[2] } },
+	{ { this->vertices[3], this->vertices[2] } },
+	{ { this->vertices[0], this->vertices[3] } } };
 
 				   // then insert them into the global
 				   // list and store iterators to
@@ -239,25 +239,31 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 				   // reversed here compared to the
 				   // Cell class, for simplicity
   const Face new_faces_tmp[GeometryInfo<dim>::faces_per_cell]
-    = { { { vertices[0], vertices[1], vertices[2], vertices[3] } },
-	{ { vertices[4], vertices[5], vertices[6], vertices[7] } },
-	{ { vertices[0], vertices[1], vertices[5], vertices[4] } },
-	{ { vertices[1], vertices[5], vertices[6], vertices[2] } },
-	{ { vertices[3], vertices[2], vertices[6], vertices[7] } },
-	{ { vertices[0], vertices[4], vertices[7], vertices[3] } } };
+    = { { { this->vertices[0], this->vertices[1],
+            this->vertices[2], this->vertices[3] } },
+	{ { this->vertices[4], this->vertices[5],
+            this->vertices[6], this->vertices[7] } },
+	{ { this->vertices[0], this->vertices[1],
+            this->vertices[5], this->vertices[4] } },
+	{ { this->vertices[1], this->vertices[5],
+            this->vertices[6], this->vertices[2] } },
+	{ { this->vertices[3], this->vertices[2],
+            this->vertices[6], this->vertices[7] } },
+	{ { this->vertices[0], this->vertices[4],
+            this->vertices[7], this->vertices[3] } } };
   Face new_faces[GeometryInfo<dim>::faces_per_cell][GridReorderingInfo<dim>::rotational_states_of_faces]
     = { { new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	    new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-      { new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+        { new_faces_tmp[1], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
 	  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
 	{ new_faces_tmp[2], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	    new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	  { new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-	      new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	    { new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-		new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
-	      { new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
-		  new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] }};
+          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+        { new_faces_tmp[3], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+        { new_faces_tmp[4], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] },
+        { new_faces_tmp[5], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0],
+          new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0], new_faces_tmp[0] }};
 
 				   // first do the faces in their
 				   // usual direction
@@ -446,7 +452,7 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 					   // cell we are working on
 	  CellData<dim> standard_cell;
 	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	    standard_cell.vertices[v] = vertices[v];
+	    standard_cell.vertices[v] = this->vertices[v];
 
 					   // then rotate it the given
 					   // number of times

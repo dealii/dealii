@@ -1552,6 +1552,14 @@ class FiniteElementBase : public Subscriptor,
 				      * not already initialized.
 				      */
     template <int dim_> friend class FESystem;
+
+                                     /**
+                                      * Make the inner class a
+                                      * friend. This is not strictly
+                                      * necessary, but the Intel
+                                      * compiler seems to want this.
+                                      */
+    friend class InternalDataBase;
 };
 
 

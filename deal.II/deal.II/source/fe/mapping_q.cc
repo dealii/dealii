@@ -210,11 +210,11 @@ MappingQ<dim>::get_data (const UpdateFlags update_flags,
 			 const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
-  compute_data (update_flags, quadrature,
-		quadrature.n_quadrature_points, *data);
+  this->compute_data (update_flags, quadrature,
+                      quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
-    compute_data (update_flags, quadrature,
-		  quadrature.n_quadrature_points, data->mapping_q1_data);
+    this->compute_data (update_flags, quadrature,
+                        quadrature.n_quadrature_points, data->mapping_q1_data);
   return data;
 }
 
@@ -227,12 +227,12 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(n_shape_functions);
   Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
-  compute_face_data (update_flags, q,
-		     quadrature.n_quadrature_points, *data);
+  this->compute_face_data (update_flags, q,
+                           quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
-    compute_face_data (update_flags, q,
-		       quadrature.n_quadrature_points,
-		       data->mapping_q1_data);
+    this->compute_face_data (update_flags, q,
+                             quadrature.n_quadrature_points,
+                             data->mapping_q1_data);
   return data;
 }
 
@@ -245,12 +245,12 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(n_shape_functions);
   Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
-  compute_face_data (update_flags, q,
-		     quadrature.n_quadrature_points, *data);
+  this->compute_face_data (update_flags, q,
+                           quadrature.n_quadrature_points, *data);
   if (!use_mapping_q_on_all_cells)
-    compute_face_data (update_flags, q,
-		       quadrature.n_quadrature_points,
-		       data->mapping_q1_data);
+    this->compute_face_data (update_flags, q,
+                             quadrature.n_quadrature_points,
+                             data->mapping_q1_data);
   return data;
 }
 
@@ -339,11 +339,11 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
   else
     p_data=&data;
 
-  compute_fill_face (cell, face_no, false,
-		     npts, offset, q.get_weights(),
-		     *p_data,
-		     quadrature_points, JxW_values,
-		     exterior_forms, normal_vectors);
+  this->compute_fill_face (cell, face_no, false,
+                           npts, offset, q.get_weights(),
+                           *p_data,
+                           quadrature_points, JxW_values,
+                           exterior_forms, normal_vectors);
 }
 
 
@@ -395,11 +395,11 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
   else
     p_data=&data;
 
-  compute_fill_face (cell, face_no, true,
-		     npts, offset, q.get_weights(),
-		     *p_data,
-		     quadrature_points, JxW_values,
-		     exterior_forms, normal_vectors);
+  this->compute_fill_face (cell, face_no, true,
+                           npts, offset, q.get_weights(),
+                           *p_data,
+                           quadrature_points, JxW_values,
+                           exterior_forms, normal_vectors);
 }
 
 
@@ -570,7 +570,7 @@ MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
   
   InternalData quadrature_data(n_shape_functions);
   quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);
-  compute_shapes(quadrature.get_points(), quadrature_data);
+  this->compute_shapes(quadrature.get_points(), quadrature_data);
   
 				   // Compute the stiffness matrix of
 				   // the inner dofs
@@ -1210,7 +1210,7 @@ Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
 
   compute_mapping_support_points(cell, p_data->mapping_support_points);
   
-  const Point<dim> q=transform_unit_to_real_cell_internal(*p_data);
+  const Point<dim> q=this->transform_unit_to_real_cell_internal(*p_data);
   delete mdata;
   return q;
 }
@@ -1240,7 +1240,7 @@ Point<dim> MappingQ<dim>::transform_real_to_unit_cell (
       std::vector<Point<dim> > &points=mdata->mapping_support_points;
       compute_mapping_support_points(cell, points);
 
-      transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
+      this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
   
       delete mdata;
     }

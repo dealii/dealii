@@ -937,7 +937,7 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
     }
 
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
 };
 
 
@@ -988,7 +988,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
       
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
 
-      Assert (data.shape_values.n_rows() == dofs_per_cell * dim,
+      Assert (data.shape_values.n_rows() == this->dofs_per_cell * dim,
 	      ExcInternalError());
       Assert (data.shape_values.n_cols() == n_q_points,
 	      ExcInternalError());
@@ -1078,7 +1078,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
     }
 
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 
@@ -1221,7 +1221,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
     }
 
   if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 };
 
 
