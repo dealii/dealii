@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,6 +69,8 @@ class MGSmootherLAC : public MGSmootherBase
 
 int main()
 {
+  try 
+    {
   ofstream logfile("mg.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -123,7 +125,7 @@ int main()
 	  Vector<double> u;
 	  u.reinit(f);
 	  PrimitiveVectorMemory<> mem;
-	  SolverControl control(100, 1.e-12);
+	  SolverControl control(1000, 1.e-10,false , true);
 	  SolverCG<>    solver(control, mem);
 	  
 	  u = 0.;
@@ -139,8 +141,8 @@ int main()
 	      mgA[i].reinit(mgstruct[i]);
 	    }
 	  equation.build_mgmatrix(mgA, mgdof, quadrature);
-	  
-	  SolverControl cgcontrol(10,0., false, false);
+
+	  SolverControl cgcontrol(1000,1.e-12, false, false);
 	  PrimitiveVectorMemory<> cgmem;
 	  SolverCG<> cgsolver(cgcontrol, cgmem);
 	  PreconditionIdentity cgprec;
@@ -159,6 +161,13 @@ Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer);
 	  solver.solve(A, u, f, mgprecondition);
 	}
       deallog.pop();
+    }
+
+    }
+  catch (const SolverControl::NoConvergence& e)
+    {
+      deallog << "Step " << e.last_step
+	      << " Residual " << e.last_residual << endl;
     }
 }
 
@@ -186,5 +195,11 @@ MGSmootherLAC::smooth (const unsigned int level,
   PreconditionSSOR<> prec;
   prec.initialize((*matrices)[level], 1.);
 
-  rich.solve((*matrices)[level], u, rhs, prec);
+  try
+    {
+      rich.solve((*matrices)[level], u, rhs, prec);
+    }
+  catch (const SolverControl::NoConvergence&)
+    {
+    }
 }

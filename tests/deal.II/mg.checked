@@ -2,36 +2,36 @@
 DEAL:Q1::DoFs 9
 DEAL:Q1::Levels: 2
 DEAL:Q1:cg::Starting 
-DEAL:Q1:cg::Convergence step 4 
+DEAL:Q1:cg::Convergence step 3 
 DEAL:Q1::DoFs 25
 DEAL:Q1::Levels: 3
 DEAL:Q1:cg::Starting 
-DEAL:Q1:cg::Convergence step 5 
+DEAL:Q1:cg::Convergence step 4 
 DEAL:Q1::DoFs 81
 DEAL:Q1::Levels: 4
 DEAL:Q1:cg::Starting 
-DEAL:Q1:cg::Convergence step 6 
+DEAL:Q1:cg::Convergence step 5 
 DEAL:Q2::DoFs 25
 DEAL:Q2::Levels: 2
 DEAL:Q2:cg::Starting 
-DEAL:Q2:cg::Convergence step 6 
+DEAL:Q2:cg::Convergence step 5 
 DEAL:Q2::DoFs 81
 DEAL:Q2::Levels: 3
 DEAL:Q2:cg::Starting 
-DEAL:Q2:cg::Convergence step 7 
+DEAL:Q2:cg::Convergence step 6 
 DEAL:Q2::DoFs 289
 DEAL:Q2::Levels: 4
 DEAL:Q2:cg::Starting 
-DEAL:Q2:cg::Convergence step 7 
+DEAL:Q2:cg::Convergence step 6 
 DEAL:Q3::DoFs 49
 DEAL:Q3::Levels: 2
 DEAL:Q3:cg::Starting 
-DEAL:Q3:cg::Convergence step 8 
+DEAL:Q3:cg::Convergence step 6 
 DEAL:Q3::DoFs 169
 DEAL:Q3::Levels: 3
 DEAL:Q3:cg::Starting 
-DEAL:Q3:cg::Convergence step 7 
+DEAL:Q3:cg::Convergence step 6 
 DEAL:Q3::DoFs 625
 DEAL:Q3::Levels: 4
 DEAL:Q3:cg::Starting 
-DEAL:Q3:cg::Convergence step 7 
+DEAL:Q3:cg::Convergence step 6 
