@@ -906,13 +906,13 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
     [
 	AC_MSG_RESULT(no)
 	AC_DEFINE(NO_HAVE_GETRUSAGE, 1, 
-                  [On SunOS 4.x, the `getrusage' function exists, but 
+                  [On SunOS 4.x, the getrusage() function exists, but 
 		   is not declared in the respective header file
-		   `resource.h', as one would think when reading the
+		   <resource.h>, as one would think when reading the
 		   man pages. Then we have to declare this function
 		   ourselves in those files that use this function.
 		   The question whether we have to do so is controlled
-		   by the preprocessor variable.)
+		   by the preprocessor variable.])
     ])
 ]
 )      

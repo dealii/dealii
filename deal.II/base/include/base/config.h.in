@@ -102,6 +102,13 @@
    classes (early gcc versions did not) */
 #undef HAVE_STD_STRINGSTREAM
 
+/* On SunOS 4.x, the getrusage() function exists, but is not declared in the
+   respective header file <resource.h>, as one would think when reading the
+   man pages. Then we have to declare this function ourselves in those files
+   that use this function. The question whether we have to do so is controlled
+   by the preprocessor variable. */
+#undef NO_HAVE_GETRUSAGE
+
 /* Define if we have to work around a bug in IBM's xlC compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.
    */
