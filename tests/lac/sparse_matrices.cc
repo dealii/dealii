@@ -12,6 +12,8 @@
 //----------------------------  testmatrix.cc  ---------------------------
 
 
+//TODO: [GK] Produce some useful output!
+
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>
@@ -71,11 +73,11 @@ int main()
 				   // and benchmark
 #ifdef DEBUG  
   deallog.depth_console(0);
+  const unsigned int size = 100;
+#else
   deallog.log_execution_time(true);
   deallog.log_time_differences(true);
   const unsigned int size = 1000;
-#else
-  const unsigned int size = 100;
 #endif
   
   FDMatrix testproblem (size, size);
