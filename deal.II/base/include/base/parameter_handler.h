@@ -41,7 +41,14 @@ namespace Patterns
 {
 				   /**
 				    * Base class to declare common
-				    * interface.
+				    * interface. The purpose of this
+				    * class is mostly to define the
+				    * interface of patterns, and to
+				    * force derived classes to have a
+				    * @p{clone} function. It is thus,
+				    * in the languages of the "Design
+				    * Patterns" book (Gamma et al.), a
+				    * "prototype".
                                     */
   class PatternBase
   {
