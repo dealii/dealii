@@ -26,53 +26,64 @@
 template <int dim>
 inline
 void
-TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a) {
+TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a)
+{
   present_level = a.present_level;
   present_index = a.present_index;
   tria = a.tria;
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const {
+TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const
+{
   Assert (tria == a.tria, ExcCantCompareIterators());
   return ((present_index == a.present_index) &&
 	  (present_level == a.present_level));
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const {
+TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const
+{
   Assert (tria == a.tria, ExcCantCompareIterators());
   return ((present_index != a.present_index) ||
 	  (present_level != a.present_level));
 };
 
 
+
 template <int dim>
 inline
 int
-TriaAccessor<dim>::level () const {
+TriaAccessor<dim>::level () const
+{
   return present_level;
 };
 
 
+
 template <int dim>
 inline
 int
-TriaAccessor<dim>::index () const {
+TriaAccessor<dim>::index () const
+{
   return present_index;
 };
+
 
 
 template <int dim>
 inline
 IteratorState
-TriaAccessor<dim>::state () const {
+TriaAccessor<dim>::state () const
+{
   if ((present_level>=0) && (present_index>=0))
     return valid;
   else
@@ -81,6 +92,7 @@ TriaAccessor<dim>::state () const {
     else
       return invalid;
 };
+
 
 
 template <int dim>
@@ -98,72 +110,87 @@ TriaAccessor<dim>::get_triangulation () const
 template <int dim>
 inline
 bool
-TriaObjectAccessor<1,dim>::used () const {
+TriaObjectAccessor<1,dim>::used () const
+{
   Assert (state() == valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return tria->levels[present_level]->lines.used[present_index];
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaObjectAccessor<1,dim>::user_flag_set () const {
+TriaObjectAccessor<1,dim>::user_flag_set () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return tria->levels[present_level]->lines.user_flags[present_index];
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<1,dim>::set_user_flag () const {
+TriaObjectAccessor<1,dim>::set_user_flag () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->lines.user_flags[present_index] = true;
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<1,dim>::clear_user_flag () const {
+TriaObjectAccessor<1,dim>::clear_user_flag () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->lines.user_flags[present_index] = false;
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
-TriaObjectAccessor<1,dim>::child (const unsigned int i) const {
+TriaObjectAccessor<1,dim>::child (const unsigned int i) const
+{
   Assert (i<2, ExcIndexRange(i,0,2));
   
-  TriaIterator<dim,TriaObjectAccessor<1,dim> > q (tria, present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<1,dim> >
+    q (tria, present_level+1, child_index (i));
   
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
+  Assert ((q.state() == past_the_end) || q->used(),
+	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+
   return q;
 };
+
 
 
 template <int dim>
 inline
 int
-TriaObjectAccessor<1,dim>::child_index (unsigned int i) const {
+TriaObjectAccessor<1,dim>::child_index (unsigned int i) const
+{
   Assert (i<2, ExcIndexRange(i,0,2));
   return tria->levels[present_level]->lines.children[present_index]+i;
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaObjectAccessor<1,dim>::has_children () const {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+TriaObjectAccessor<1,dim>::has_children () const
+{
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->lines.children[present_index] != -1);
 }
+
 
 
 template <int dim>
@@ -180,10 +207,12 @@ TriaObjectAccessor<1,dim>::max_refinement_depth () const
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<1,dim>::operator ++ () {
+TriaObjectAccessor<1,dim>::operator ++ ()
+{
   ++present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -206,10 +235,12 @@ TriaObjectAccessor<1,dim>::operator ++ () {
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<1,dim>::operator -- () {
+TriaObjectAccessor<1,dim>::operator -- ()
+{
   --present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -236,44 +267,53 @@ TriaObjectAccessor<1,dim>::operator -- () {
 template <int dim>
 inline
 bool
-TriaObjectAccessor<2,dim>::used () const {
+TriaObjectAccessor<2,dim>::used () const
+{
   Assert (state() == valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return tria->levels[present_level]->quads.used[present_index];
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaObjectAccessor<2,dim>::user_flag_set () const {
+TriaObjectAccessor<2,dim>::user_flag_set () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return tria->levels[present_level]->quads.user_flags[present_index];
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<2,dim>::set_user_flag () const {
+TriaObjectAccessor<2,dim>::set_user_flag () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = true;
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<2,dim>::clear_user_flag () const {
+TriaObjectAccessor<2,dim>::clear_user_flag () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->quads.user_flags[present_index] = false;
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
-TriaObjectAccessor<2,dim>::line (const unsigned int i) const {
+TriaObjectAccessor<2,dim>::line (const unsigned int i) const
+{
   return
     TriaIterator<dim,TriaObjectAccessor<1,dim> >
     (
@@ -284,47 +324,57 @@ TriaObjectAccessor<2,dim>::line (const unsigned int i) const {
 };
 
 
+
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<2,dim>::line_index (unsigned int i) const {
+TriaObjectAccessor<2,dim>::line_index (unsigned int i) const
+{
   Assert (i<4, ExcIndexRange(i,0,4));
 
   return tria->levels[present_level]->quads.quads[present_index].line(i);
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
-TriaObjectAccessor<2,dim>::child (const unsigned int i) const {
+TriaObjectAccessor<2,dim>::child (const unsigned int i) const
+{
   Assert (i<4, ExcIndexRange(i,0,4));
   
-  TriaIterator<dim,TriaObjectAccessor<2,dim> > q (tria, present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<2,dim> >
+    q (tria, present_level+1, child_index (i));
   
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
+  Assert ((q.state() == past_the_end) || q->used(),
+	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+
   return q;
 };
 
 
+
 template <int dim>
 inline
-int TriaObjectAccessor<2,dim>::child_index (unsigned int i) const {
+int TriaObjectAccessor<2,dim>::child_index (unsigned int i) const
+{
   Assert (i<4, ExcIndexRange(i,0,4));
   return tria->levels[present_level]->quads.children[present_index]+i;
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaObjectAccessor<2,dim>::has_children () const {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+TriaObjectAccessor<2,dim>::has_children () const
+{
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->quads.children[present_index] != -1);
 };
+
 
 
 template <int dim>
@@ -344,10 +394,12 @@ TriaObjectAccessor<2,dim>::max_refinement_depth () const
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<2,dim>::operator ++ () {
+TriaObjectAccessor<2,dim>::operator ++ ()
+{
   ++present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -369,10 +421,12 @@ TriaObjectAccessor<2,dim>::operator ++ () {
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<2,dim>::operator -- () {
+TriaObjectAccessor<2,dim>::operator -- ()
+{
   --present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -399,43 +453,52 @@ TriaObjectAccessor<2,dim>::operator -- () {
 template <int dim>
 inline
 bool
-TriaObjectAccessor<3,dim>::used () const {
+TriaObjectAccessor<3,dim>::used () const
+{
   Assert (state() == valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return tria->levels[present_level]->hexes.used[present_index];
 };
 
 
+
 template <int dim>
 inline
 bool
-TriaObjectAccessor<3,dim>::user_flag_set () const {
+TriaObjectAccessor<3,dim>::user_flag_set () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_flags[present_index];
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<3,dim>::set_user_flag () const {
+TriaObjectAccessor<3,dim>::set_user_flag () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = true;
 };
 
 
+
 template <int dim>
 inline
-void TriaObjectAccessor<3,dim>::clear_user_flag () const {
+void TriaObjectAccessor<3,dim>::clear_user_flag () const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = false;
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
-TriaObjectAccessor<3,dim>::line (const unsigned int i) const {
+TriaObjectAccessor<3,dim>::line (const unsigned int i) const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   Assert (i<12, ExcIndexRange (i,0,12));
 
@@ -469,10 +532,12 @@ TriaObjectAccessor<3,dim>::line (const unsigned int i) const {
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
-TriaObjectAccessor<3,dim>::quad (const unsigned int i) const {
+TriaObjectAccessor<3,dim>::quad (const unsigned int i) const
+{
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return
     TriaIterator<dim,TriaObjectAccessor<2,dim> >
@@ -484,10 +549,12 @@ TriaObjectAccessor<3,dim>::quad (const unsigned int i) const {
 };
 
 
+
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<3,dim>::line_index (unsigned int i) const {
+TriaObjectAccessor<3,dim>::line_index (unsigned int i) const
+{
   Assert (i<12, ExcIndexRange(i,0,12));
 
   if (i<4)
@@ -512,6 +579,7 @@ TriaObjectAccessor<3,dim>::line_index (unsigned int i) const {
 };
 
 
+
 template <int dim>
 inline
 unsigned int
@@ -523,6 +591,7 @@ TriaObjectAccessor<3,dim>::quad_index (unsigned int i) const
 };
 
 
+
 template <int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<3,dim> >
@@ -532,27 +601,32 @@ TriaObjectAccessor<3,dim>::child (const unsigned int i) const
   
   TriaIterator<dim,TriaObjectAccessor<3,dim> > q (tria, present_level+1, child_index (i));
   
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
+  Assert ((q.state() == past_the_end) || q->used(),
+	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+
   return q;
 };
 
 
+
 template <int dim>
 inline
-int TriaObjectAccessor<3,dim>::child_index (unsigned int i) const {
+int TriaObjectAccessor<3,dim>::child_index (unsigned int i) const
+{
   Assert (i<8, ExcIndexRange(i,0,8));
   return tria->levels[present_level]->hexes.children[present_index]+i;
 };
 
 
+
 template <int dim>
-bool TriaObjectAccessor<3,dim>::has_children () const {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+bool TriaObjectAccessor<3,dim>::has_children () const
+{
+  Assert (state() == valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
+
 
 
 template <int dim>
@@ -578,10 +652,12 @@ TriaObjectAccessor<3,dim>::max_refinement_depth () const
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<3,dim>::operator ++ () {
+TriaObjectAccessor<3,dim>::operator ++ ()
+{
   ++present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -603,10 +679,12 @@ TriaObjectAccessor<3,dim>::operator ++ () {
 };
 
 
+
 template <int dim>
 inline
 void
-TriaObjectAccessor<3,dim>::operator -- () {
+TriaObjectAccessor<3,dim>::operator -- ()
+{
   --present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -640,6 +718,7 @@ TriaObjectAccessor<celldim,dim>::used () const
 };
 
 
+
 template<int celldim, int dim>
 inline
 bool
@@ -648,6 +727,7 @@ TriaObjectAccessor<celldim,dim>::user_flag_set () const
   Assert (used(), ExcCellNotUsed());
   return tria->levels[present_level]->hexes.user_flags[present_index];
 };
+
 
 
 template<int celldim, int dim>
@@ -660,6 +740,7 @@ TriaObjectAccessor<celldim,dim>::set_user_flag () const
 };
 
 
+
 template<int celldim, int dim>
 inline
 void TriaObjectAccessor<celldim,dim>::clear_user_flag () const
@@ -667,6 +748,7 @@ void TriaObjectAccessor<celldim,dim>::clear_user_flag () const
   Assert (used(), ExcCellNotUsed());
   tria->levels[present_level]->hexes.user_flags[present_index] = false;
 };
+
 
 
 template<int celldim, int dim>
@@ -715,6 +797,7 @@ TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 };
 
 
+
 template<int celldim, int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
@@ -731,6 +814,7 @@ TriaObjectAccessor<celldim,dim>::quad (const unsigned int i) const
       quad_index (i)
     );
 };
+
 
 
 template<int celldim, int dim>
@@ -772,6 +856,7 @@ TriaObjectAccessor<celldim,dim>::line_index (unsigned int i) const
 };
 
 
+
 template<int celldim, int dim>
 inline
 unsigned int
@@ -784,6 +869,7 @@ TriaObjectAccessor<celldim,dim>::quad_index (unsigned int i) const
 };
 
 
+
 template<int celldim, int dim>
 inline
 TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
@@ -792,14 +878,15 @@ TriaObjectAccessor<celldim,dim>::child (const unsigned int i) const
   Assert (i < GeometryInfo<celldim>::children_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::children_per_cell));
   
-  TriaIterator<dim,TriaObjectAccessor<celldim,dim> > q (tria, present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
+    q (tria, present_level+1, child_index (i));
   
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), ExcUnusedCellAsChild());
-#endif
+  Assert ((q.state() == past_the_end) || q->used(),
+	  ExcUnusedCellAsChild());
+
   return q;
 };
+
 
 
 template<int celldim, int dim>
@@ -812,12 +899,14 @@ int TriaObjectAccessor<celldim,dim>::child_index (unsigned int i) const
 };
 
 
+
 template<int celldim, int dim>
 bool TriaObjectAccessor<celldim,dim>::has_children () const
 {
   Assert (state() == valid, ExcDereferenceInvalidObject());
   return (tria->levels[present_level]->hexes.children[present_index] != -1);
 };
+
 
 
 template<int celldim, int dim>
@@ -843,10 +932,12 @@ TriaObjectAccessor<celldim,dim>::max_refinement_depth () const
 };
 
 
+
 template<int celldim, int dim>
 inline
 void
-TriaObjectAccessor<celldim,dim>::operator ++ () {
+TriaObjectAccessor<celldim,dim>::operator ++ ()
+{
   ++present_index;
 				   // is index still in the range of
 				   // the vector?
@@ -866,6 +957,7 @@ TriaObjectAccessor<celldim,dim>::operator ++ () {
 	};
     };
 };
+
 
 
 template<int celldim, int dim>
@@ -937,6 +1029,7 @@ CellAccessor<dim>::neighbor_index (const unsigned int i) const
   return tria->levels[present_level]->
     neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second;
 };
+
 
 
 template <int dim>
@@ -1042,12 +1135,12 @@ inline
 TriaIterator<dim,CellAccessor<dim> >
 CellAccessor<dim>::neighbor (const unsigned int i) const
 {
-  TriaIterator<dim,CellAccessor<dim> > q (tria, neighbor_level (i), neighbor_index (i));
+  TriaIterator<dim,CellAccessor<dim> >
+    q (tria, neighbor_level (i), neighbor_index (i));
 
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
-#endif
+  Assert ((q.state() == past_the_end) || q->used(),
+	  typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
+
   return q;
 };
 
@@ -1058,12 +1151,12 @@ inline
 TriaIterator<dim,CellAccessor<dim> >
 CellAccessor<dim>::child (const unsigned int i) const
 {
-  TriaIterator<dim,CellAccessor<dim> > q (tria, present_level+1, child_index (i));
+  TriaIterator<dim,CellAccessor<dim> >
+    q (tria, present_level+1, child_index (i));
 
-#ifdef DEBUG
-  if (q.state() != past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
+  Assert ((q.state() == past_the_end) || q->used(),
+	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+
   return q;
 };
 
