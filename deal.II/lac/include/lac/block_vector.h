@@ -50,6 +50,187 @@
 template <typename Number>
 class BlockVector
 {
+    template <typename Pointee>
+    class Iterator
+    {
+      public:
+					 /**
+					  * Construct an iterator from
+					  * a vector to which we point
+					  * and the global index of
+					  * the element pointed to.
+					  */
+	Iterator (BlockVector<Number> &parent,
+		  const unsigned       global_index);
+	
+					 /**
+					  * Copy constructor.
+					  */
+	Iterator (const Iterator &c);
+
+					 /**
+					  * Copy operator.
+					  */
+	Iterator & operator = (const Iterator &c);
+
+					 /**
+					  * Dereferencing operator. If
+					  * the template argument
+					  * @p{Pointee} has a
+					  * @p{const} specification,
+					  * then no writing to the
+					  * result is possible, making
+					  * this a @p{const_iterator}.
+					  */
+	Pointee & operator * () const;
+
+					 /**
+					  * Prefix @p{++} operator:
+					  * @p{++i}. This operator
+					  * advances the iterator to
+					  * the next element and
+					  * returns a reference to
+					  * @p{*this}.
+					  */
+	Iterator & operator ++ ();
+
+					 /**
+					  * Postfix @p{++} operator:
+					  * @p{i++}. This operator
+					  * advances the iterator to
+					  * the next element and
+					  * returns a copy of the old
+					  * value of this iterator.
+					  */
+	Iterator operator ++ (int);
+
+					 /**
+					  * Prefix @p{--} operator:
+					  * @p{--i}. This operator
+					  * retracts the iterator to
+					  * the previous element and
+					  * returns a reference to
+					  * @p{*this}.
+					  */
+	Iterator & operator -- ();
+
+					 /**
+					  * Postfix @p{--} operator:
+					  * @p{i--}. This operator
+					  * retracts the iterator to
+					  * the previous element and
+					  * returns a copy of the old
+					  * value of this iterator.
+					  */
+	Iterator operator -- (int);
+
+					 /**
+					  * Compare for equality of
+					  * iterators. This operator
+					  * checks whether the vectors
+					  * pointed to are the same,
+					  * and if not it throws an
+					  * exception.					 
+					  */
+	bool operator == (const Iterator &i) const;
+
+					 /**
+					  * Compare for inequality of
+					  * iterators. This operator
+					  * checks whether the vectors
+					  * pointed to are the same,
+					  * and if not it throws an
+					  * exception.					 
+					  */
+	bool operator != (const Iterator &i) const;
+
+					 /**
+					  * Check whether this
+					  * iterators points to an
+					  * element previous to the
+					  * one pointed to by the
+					  * given argument. This
+					  * operator checks whether
+					  * the vectors pointed to are
+					  * the same, and if not it
+					  * throws an exception.
+					  */
+	bool operator < (const Iterator &i) const;
+
+					 /**
+					  * Comparison operator alike
+					  * to the one above.
+					  */
+	bool operator <= (const Iterator &i) const;
+
+					 /**
+					  * Comparison operator alike
+					  * to the one above.
+					  */
+	bool operator > (const Iterator &i) const;
+
+					 /**
+					  * Comparison operator alike
+					  * to the one above.
+					  */
+	bool operator >= (const Iterator &i) const;
+	
+					 /**
+					  * Exception.
+					  */
+	DeclException0 (ExcPointerToDifferentVectors);
+
+	
+      private:
+					 /**
+					  * Pointer to the block
+					  * vector object to which
+					  * this iterator points.
+					  */
+	BlockVector<Number> *parent;
+
+					 /**
+					  * Global index of the
+					  * element to which we
+					  * presently point.
+					  */
+	unsigned int         global_index;
+
+					 /**
+					  * Current block and index
+					  * within this block of the
+					  * element presently pointed
+					  * to.
+					  */
+	unsigned int current_block;
+	unsigned int index_within_block;
+
+					 /**
+					  * Indices of the global
+					  * element address at which
+					  * we have to move on to
+					  * another block when moving
+					  * forward and
+					  * backward. These indices
+					  * are kept as a cache since
+					  * this is much more
+					  * efficient than always
+					  * asking the parent object.
+					  */
+	unsigned int next_break_forward;
+	unsigned int next_break_backward;
+
+					 /**
+					  * Move forward one element.
+					  */
+	void move_forward ();
+
+					 /**
+					  * Move backward one element.
+					  */
+	void move_backward ();
+    };
+    
   public:
 				     /**
 				      * Declare standard types used in
@@ -63,12 +244,14 @@ class BlockVector
 				      * implemented that cycle through
 				      * the individual sub-vectors.
 				      */
-    typedef Number value_type;
-    typedef value_type* pointer;
-    typedef const value_type* const_pointer;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef size_t size_type;
+    typedef Number                  value_type;
+    typedef value_type             *pointer;
+    typedef const value_type       *const_pointer;
+    typedef Iterator<Number>        iterator;
+    typedef Iterator<const Number>  const_iterator;
+    typedef value_type             &reference;
+    typedef const value_type       &const_reference;
+    typedef size_t                  size_type;
 
 				     /**
 				      *  Constructor. There are three
@@ -355,6 +538,20 @@ class BlockVector
 				      * as a writeable reference.
 				      */
     Number& operator() (const unsigned int i);
+
+				     /**
+				      * Return an iterator pointing to
+				      * the first element.
+				      */
+    iterator begin ();
+
+				     /**
+				      * Return an iterator pointing to
+				      * the first element of a
+				      * constant block vector.
+				      */
+    const_iterator begin () const;
+    
 				     //@}
 
 
@@ -546,6 +743,12 @@ class BlockVector
 				      * here for convenience.
 				      */
     unsigned int num_blocks;
+
+				     /**
+				      * Make the iterator class a
+				      * friend.
+				      */
+    template <typename Pointee> friend class Iterator;
 };
 
 
