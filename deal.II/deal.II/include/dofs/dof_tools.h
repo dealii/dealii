@@ -616,6 +616,10 @@ class DoFTools
 				      * Exception
 				      */
     DeclException0 (ExcFiniteElementsDontMatch);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcGridNotCoarser);
 };
 
 
