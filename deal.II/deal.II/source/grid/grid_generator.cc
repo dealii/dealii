@@ -1235,15 +1235,15 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
   for (unsigned int j=0; j<N_z; ++j)
     for (unsigned int i=0; i<N_r; ++i) 
       {
-        cells[i+j*N_r].vertices[0] = i + j*2*N_r;
-        cells[i+j*N_r].vertices[1] = (i+1)%N_r + j*2*N_r;
-        cells[i+j*N_r].vertices[2] = N_r+((i+1)%N_r) + j*2*N_r;
-        cells[i+j*N_r].vertices[3] = N_r+i + j*2*N_r;
+        cells[i+j*N_r].vertices[0] = i + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[1] = (i+1)%N_r + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[2] = N_r+((i+1)%N_r) + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[3] = N_r+i + (j+1)*2*N_r;
         
-        cells[i+j*N_r].vertices[4] = i + (j+1)*2*N_r;
-        cells[i+j*N_r].vertices[5] = (i+1)%N_r + (j+1)*2*N_r;
-        cells[i+j*N_r].vertices[6] = N_r+((i+1)%N_r) + (j+1)*2*N_r;
-        cells[i+j*N_r].vertices[7] = N_r+i + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[4] = i + j*2*N_r;
+        cells[i+j*N_r].vertices[5] = (i+1)%N_r + j*2*N_r;
+        cells[i+j*N_r].vertices[6] = N_r+((i+1)%N_r) + j*2*N_r;
+        cells[i+j*N_r].vertices[7] = N_r+i + j*2*N_r;
         
         cells[i+j*N_r].material_id = 0;
       }
