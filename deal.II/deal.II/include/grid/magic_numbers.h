@@ -11,12 +11,14 @@
 // "mn_" denoting a magic number, then the library part follows
 // (e.g. "tria_" or "dof_") and finally the purpose.
 
-const unsigned int mn_tria_refine_flags_begin    = 0xabcc;
-const unsigned int mn_tria_refine_flags_end      = 0xabcd;
-const unsigned int mn_tria_line_user_flags_begin = 0xabce;
-const unsigned int mn_tria_line_user_flags_end   = 0xabcf;
-const unsigned int mn_tria_quad_user_flags_begin = 0xabce;
-const unsigned int mn_tria_quad_user_flags_end   = 0xabcf;
+const unsigned int mn_tria_refine_flags_begin    = 0xa000;
+const unsigned int mn_tria_refine_flags_end      = 0xa001;
+const unsigned int mn_tria_coarsen_flags_begin   = 0xa010;
+const unsigned int mn_tria_coarsen_flags_end     = 0xa011;
+const unsigned int mn_tria_line_user_flags_begin = 0xa100;
+const unsigned int mn_tria_line_user_flags_end   = 0xa101;
+const unsigned int mn_tria_quad_user_flags_begin = 0xa110;
+const unsigned int mn_tria_quad_user_flags_end   = 0xa111;
 
 
 
