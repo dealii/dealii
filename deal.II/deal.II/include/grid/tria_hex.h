@@ -25,21 +25,23 @@ class Hexahedron {
   public:
 
 				     /**
-				      *  Construct a Quad with line
-				      *  indices #i0# through #i3#. By default,
+				      *  Construct a Hex with quad
+				      *  indices #i0# through #i5#. By default,
 				      *  indices are set to -1, i.e. an
 				      *  invalid value.
 				      *
-				      *  By convention, the four lines must
-				      *  be numbered in counterclockwise sense!
+				      *  No convention is set as of now on the
+				      *  order of quads
 				      */
-    Quad (const int i0 = -1,
-	  const int i1 = -1,
-	  const int i2 = -1,
-	  const int i3 = -1);
+    Hexahedron (const int i0 = -1,
+		const int i1 = -1,
+		const int i2 = -1,
+		const int i3 = -1,
+		const int i4 = -1,
+		const int i5 = -1);
     
 				     /**
-				      *  Return the index of line #i#=0
+				      *  Return the index of quad #i#=0
 				      *  through 5.
 				      */
     int quad (const int i) const;
@@ -58,7 +60,7 @@ class Hexahedron {
 		    << "Indices for the quad number must be 0 through 5, "
 		    << "but you gave " << arg1); 
   protected:
-      int quads[6];
+    int quads[6];
 };
 
 
