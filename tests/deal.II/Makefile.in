@@ -68,6 +68,7 @@ all: grid_test.check dof_test.check data_out.check \
      derivatives.check gradients.check \
      constraints.check mg.check mglocal.check \
      block_matrices.check second_derivatives.check \
+     derivative_approximation.check \
      intergrid_constraints.check intergrid_map.check wave-test-3.check
 
 exe: $(all:.check=.testcase) benchmark
@@ -158,6 +159,20 @@ derivatives.testcase: $(derivatives-o-files) $(libdeal1d) $(libdeal3d) $(librari
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
+
+############################################################
+
+derivative_approximation-cc-files = derivative_approximation.cc 
+
+ifeq ($(debug-mode),on)
+derivative_approximation-o-files = $(derivative_approximation-cc-files:.cc=.go)
+else
+derivative_approximation-o-files = $(derivative_approximation-cc-files:.cc=.o)
+endif
+
+derivative_approximation.testcase: $(derivative_approximation-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 ############################################################
 
