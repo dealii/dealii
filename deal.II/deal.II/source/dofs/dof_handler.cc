@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,8 @@ const unsigned int DoFHandler<dim>::invalid_dof_index;
 
 template <int dim>
 DoFHandler<dim>::DoFHandler (const Triangulation<dim> &tria) :
-		tria(&tria),
+		tria(&tria, typeid(*this).name()),
+		selected_fe(0, typeid(*this).name())
 		used_dofs (0)
 {}
 
