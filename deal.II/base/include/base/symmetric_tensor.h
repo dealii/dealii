@@ -25,6 +25,49 @@ namespace internal
 {
   namespace SymmetricTensor
   {
+                                     /**
+                                      * Declaration of typedefs for the type
+                                      * of data structures which are used to
+                                      * store symmetric tensors. For example,
+                                      * for rank-2 symmetric tensors, we use a
+                                      * flat vector to store all the
+                                      * elements. On the other hand, symmetric
+                                      * rank-4 tensors are mappings from
+                                      * symmetric rank-2 tensors into
+                                      * symmetric rank-2 tensors, so they can
+                                      * be represented as matrices, etc.
+                                      */
+    template <int rank, int dim>
+    struct StorageType;
+
+    template <int dim>
+    struct StorageType<2,dim> 
+    {
+                                         /**
+                                          * Number of independent components of a
+                                          * symmetric tensor of rank 2. We store
+                                          * only the upper right half of it. This
+                                          * information is probably of little
+                                          * interest to all except the accessor
+                                          * classes that need it.
+                                          */
+        static const unsigned int
+        n_independent_tensor_components = (dim*dim + dim)/2;
+
+                                         /**
+                                          * Declare the type in which we actually
+                                          * store the data. This information is
+                                          * probably of little interest to all
+                                          * except the accessor classes that need
+                                          * it. In particular, you shouldn't make
+                                          * any assumptions about the storage
+                                          * format in your application programs.
+                                          */
+        typedef Tensor<1,n_independent_tensor_components> base_tensor_type;
+    };
+    
+    
+    
     namespace Rank2Accessors
     {
 
@@ -49,7 +92,7 @@ namespace internal
       struct Types<dim,true>
       {
           typedef
-          const typename ::SymmetricTensor<2,dim>::StorageType
+          const typename StorageType<2,dim>::base_tensor_type
           base_tensor_type;
 
           typedef double reference;
@@ -68,7 +111,7 @@ namespace internal
       struct Types<dim,false>
       {
           typedef
-          typename ::SymmetricTensor<2,dim>::StorageType
+          typename StorageType<2,dim>::base_tensor_type
           base_tensor_type;
 
           typedef double &reference;
@@ -190,29 +233,6 @@ class SymmetricTensor<2,dim>
 				      * the outside world.
 				      */
     static const unsigned int rank      = 2;
-
-                                     /**
-                                      * Number of independent components of a
-                                      * symmetric tensor of rank 2. We store
-                                      * only the upper right half of it. This
-                                      * information is probably of little
-                                      * interest to all except the accessor
-                                      * classes that need it.
-                                      */
-    static const unsigned int
-    n_independent_tensor_components = (dim*dim + dim)/2;
-
-                                     /**
-                                      * Declare the type in which we actually
-                                      * store the data. This information is
-                                      * probably of little interest to all
-                                      * except the accessor classes that need
-                                      * it. In particular, you shouldn't make
-                                      * any assumptions about the storage
-                                      * format in your application programs.
-                                      */
-    typedef Tensor<1,n_independent_tensor_components> StorageType;
-    
     
                                      /**
                                       * Default constructor. Creates a zero
@@ -359,7 +379,7 @@ class SymmetricTensor<2,dim>
                                      /**
                                       * Data storage for a symmetric tensor.
                                       */
-    StorageType data;
+    typename internal::SymmetricTensor::StorageType<2,dim>::base_tensor_type data;
 };
 
 
@@ -598,7 +618,7 @@ inline
 unsigned int
 SymmetricTensor<2,dim>::memory_consumption ()
 {
-  return StorageType::memory_consumption ();
+  return internal::SymmetricTensor::StorageType<2,dim>::memory_consumption ();
 }
 
 
@@ -612,7 +632,7 @@ SymmetricTensor<2,dim>::operator * (const SymmetricTensor &s) const
   for (; i<dim; ++i)
     t += data[i] * s.data[i];
 
-  for (; i<n_independent_tensor_components; ++i)
+  for (; i<internal::SymmetricTensor::StorageType<2,dim>::n_independent_tensor_components; ++i)
     t += 2 * data[i] * s.data[i];
 
   return t;
