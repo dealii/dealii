@@ -19,6 +19,9 @@
  *   in the #hexes.hexes# list attached to the information of each level
  *   of the triangulation.
  *
+ *   For conventions on the numbering of faces, lines and vertices within a
+ *   hexahedron, refer to the documentation of the #Triangulation# class.
+ *
  *   @author Wolfgang Bangerth, 1998
  */
 class Hexahedron {
