@@ -50,7 +50,27 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
   if ((degree < Matrices::n_embedding_matrices+1) &&
       (Matrices::embedding[degree-1][0] != 0))
     for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-      this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
+      {
+                                         // copy
+        this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
+                                         // and make sure that the row
+                                         // sum is 0.5 (for usual
+                                         // elements, the row sum must
+                                         // be 1, but here the shape
+                                         // function is multiplied by
+                                         // the inverse of the
+                                         // Jacobian, which introduces
+                                         // a factor of 1/2 when going
+                                         // from mother to child)
+        for (unsigned int row=0; row<this->dofs_per_cell; ++row)
+          {
+            double sum = 0;
+            for (unsigned int col=0; col<this->dofs_per_cell; ++col)
+              sum += this->prolongation[c](row,col);
+            Assert (std::fabs(sum-.5) < 1e-14,
+                    ExcInternalError());
+          };
+      }
   else
     for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
       this->prolongation[i].reinit(0,0);
@@ -66,6 +86,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 	  {
 	    case 1:
 	    {
+//TODO: check!              
 					       // DoF on bottom line
 					       // of coarse cell will
 					       // be mean value of
