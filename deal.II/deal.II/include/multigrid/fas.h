@@ -28,6 +28,8 @@
 /**
  * Implementation of the multigrid method.
  *
+ * Warning: methods of this class have not been implemented yet!
+ *
  * The function actually performing a multi-level cycle,
  * @p{level_mgstep}, as well as the function @p{vcycle}, calling it,
  * require several helper classes handed over as template parameters.
