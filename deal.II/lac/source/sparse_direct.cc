@@ -241,7 +241,7 @@ struct SparseDirectMA27::DetachedModeData
         if ((ret<0) && (errno==EINTR))
           goto try_write;
         
-        fflush (NULL);
+        std::fflush (NULL);
       };
 
     template <typename T>
@@ -356,7 +356,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
       pipe(detached_mode_data->client_server_pipe);      
                                        // fflush(NULL) is said to be a
                                        // good idea before fork()
-      fflush(NULL);
+      std::fflush(NULL);
 
                                        // now fork and create child
                                        // process
@@ -388,7 +388,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                            // herewith:
           AssertThrow (false,
                        ExcMessage ("execv returned, which it is not supposed to do!"));
-          exit(1);
+          std::exit(1);
         };
                                        // parent process continues here.
                                        // close unneeded end of pipe
