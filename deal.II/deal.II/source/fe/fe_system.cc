@@ -32,6 +32,36 @@ using namespace std;
 
 
 template <int dim>
+FESystem<dim>::InternalData::InternalData(const unsigned int n_base_elements):
+		base_fe_datas(n_base_elements),
+		base_fe_values_datas(n_base_elements)
+{}
+
+
+
+template <int dim>
+FESystem<dim>::InternalData::~InternalData()
+{
+				   // delete pointers and set them to
+				   // zero to avoid inadvertant use
+  for (unsigned int i=0; i<base_fe_datas.size(); ++i)
+    if (base_fe_datas[i])
+      {
+	delete base_fe_datas[i];
+	base_fe_datas[i] = 0;
+      };
+  
+  for (unsigned int i=0; i<base_fe_values_datas.size(); ++i)
+    if (base_fe_values_datas[i])
+      {
+	delete base_fe_values_datas[i];
+	base_fe_values_datas[i] = 0;
+      };
+};
+
+
+
+template <int dim>
 inline FiniteElementBase<dim>::InternalDataBase &
 FESystem<dim>::
 InternalData::get_fe_data (const unsigned int base_no) const
@@ -97,6 +127,10 @@ InternalData::delete_fe_values_data (const unsigned int base_no)
 
 
 /* ---------------------------------- FESystem ------------------- */
+
+
+template <int dim>
+const unsigned int FESystem<dim>::invalid_face_number;
 
 
 template <int dim>
@@ -214,6 +248,7 @@ get_unit_support_points (typename std::vector<Point<dim> > &unit_support_points)
 	base_element_dofs_per_cell = base_element(base_el).dofs_per_cell;
  
       base_element(base_el).get_unit_support_points (base_unit_support_points);
+      
 				       // if one of the base elements
 				       // has no support points, then
 				       // it makes no sense to define
@@ -228,9 +263,10 @@ get_unit_support_points (typename std::vector<Point<dim> > &unit_support_points)
 	}
 
 				       // otherwise distribute the
-				       // support of this base element
-				       // to all degrees of freedom
-				       // contributed by it
+				       // support points of this base
+				       // element to all degrees of
+				       // freedom contributed by this
+				       // base element
       Assert(base_unit_support_points.size()==base_element_dofs_per_cell,
 	     ExcInternalError());
       for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
@@ -243,26 +279,47 @@ get_unit_support_points (typename std::vector<Point<dim> > &unit_support_points)
 
 
 template <int dim>
-void FESystem<dim>::get_unit_face_support_points (
-  typename std::vector<Point<dim-1> > &unit_support_points) const
+void
+FESystem<dim>::
+get_unit_face_support_points (typename std::vector<Point<dim-1> > &unit_support_points) const
 {
+				   // generate unit face support points
+				   // from unit support points of sub
+				   // elements
   unit_support_points.resize(dofs_per_face);
   
-  typename std::vector<Point<dim-1> > base_unit_support_points (base_element(0).dofs_per_cell);
+  typename std::vector<Point<dim-1> >
+    base_unit_support_points (base_element(0).dofs_per_cell);
+  
   unsigned int comp = 0;
   for (unsigned int base_el=0 ; base_el<n_base_elements(); ++base_el)
     {
-      const unsigned int base_element_dofs_per_face
-	=base_element(base_el).dofs_per_face;
+      const unsigned int
+	base_element_dofs_per_face = base_element(base_el).dofs_per_face;
  
       base_element(base_el).get_unit_face_support_points (base_unit_support_points);
       
-				       // for elements that don't have
-				       // unit support points this
-				       // function is not implemented
+				       // if one of the base elements
+				       // has no support points, then
+				       // it makes no sense to define
+				       // support points for the
+				       // composed element, so return
+				       // an empty array to
+				       // demonstrate that fact
+      if (base_unit_support_points.size()==0)
+	{
+	  unit_support_points.resize(0);
+	  return;
+	}
+
+				       // otherwise distribute the
+				       // support points of this base
+				       // element to all degrees of
+				       // freedom contributed by this
+				       // base element
       Assert(base_unit_support_points.size()==base_element_dofs_per_face,
 	     ExcNotImplemented());
-      for (unsigned int n = 0 ; n < element_multiplicity(base_el); ++n, ++comp)
+      for (unsigned int n=0; n<element_multiplicity(base_el); ++n, ++comp)
 	for (unsigned int i=0; i<base_element_dofs_per_face; ++i)
 	  unit_support_points[face_component_to_system_index(comp,i)]
 	    = base_unit_support_points[i];
@@ -270,35 +327,37 @@ void FESystem<dim>::get_unit_face_support_points (
 }
 
 
+
 template <int dim>
 UpdateFlags
-FESystem<dim>::update_once (UpdateFlags flags) const
+FESystem<dim>::update_once (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
+				   // generate maximal set of flags
+				   // that are necessary
   for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
-    {
-      out |= base_element(base_no).update_once(flags);
-    }
+    out |= base_element(base_no).update_once(flags);
   return out;
 }
 
 
+
 template <int dim>
 UpdateFlags
-FESystem<dim>::update_each (UpdateFlags flags) const
+FESystem<dim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
+				   // generate maximal set of flags
+				   // that are necessary
   for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
-    {
-      out |= base_element(base_no).update_each(flags);
-    }
+    out |= base_element(base_no).update_each(flags);
   return out;
 }
 
 
 template <int dim>
 Mapping<dim>::InternalDataBase*
-FESystem<dim>::get_data ( UpdateFlags           flags,
+FESystem<dim>::get_data (UpdateFlags            flags,
 			 const Mapping<dim>    &mapping,
 			 const Quadrature<dim> &quadrature) const
 {
@@ -318,7 +377,9 @@ FESystem<dim>::get_data ( UpdateFlags           flags,
       data->initialize_2nd (this, mapping, quadrature);
     }
   
-  
+
+				   // get data objects from each of
+				   // the base elements and store them
   for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
     {
       typename Mapping<dim>::InternalDataBase *base_fe_data_base =
@@ -363,9 +424,11 @@ FESystem<dim>::get_data ( UpdateFlags           flags,
       FEValuesData<dim> *base_data = new FEValuesData<dim>();
       data->set_fe_values_data(base_no, base_data);
     }
+  
   data->update_flags=data->update_once | data->update_each;
   Assert(data->update_once==update_once(flags), ExcInternalError());
   Assert(data->update_each==update_each(flags), ExcInternalError());
+  
   return data;
 }
 
@@ -376,14 +439,14 @@ void
 FESystem<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 			       const DoFHandler<dim>::cell_iterator &cell,
 			       const Quadrature<dim>                &quadrature,
-			       Mapping<dim>::InternalDataBase      &mapping_data,
-			       Mapping<dim>::InternalDataBase      &fe_data,
+			       Mapping<dim>::InternalDataBase       &mapping_data,
+			       Mapping<dim>::InternalDataBase       &fe_data,
 			       FEValuesData<dim>                    &data) const
 {
-  const unsigned int minus_1=static_cast<unsigned int> (-1);
-  compute_fill(mapping, cell, minus_1, minus_1,
+  compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
 	       quadrature, mapping_data, fe_data, data);
-}
+};
+
 
 
 template <int dim>
@@ -392,15 +455,14 @@ FESystem<dim>::fill_fe_face_values (const Mapping<dim>                   &mappin
 				    const DoFHandler<dim>::cell_iterator &cell,
 				    const unsigned int                    face_no,
 				    const Quadrature<dim-1>              &quadrature,
-				    Mapping<dim>::InternalDataBase      &mapping_data,
-				    Mapping<dim>::InternalDataBase      &fe_data,
+				    Mapping<dim>::InternalDataBase       &mapping_data,
+				    Mapping<dim>::InternalDataBase       &fe_data,
 				    FEValuesData<dim>                    &data) const
 {
-  const unsigned int minus_1=static_cast<unsigned int> (-1);
-  compute_fill(mapping, cell, face_no, minus_1,
+  compute_fill(mapping, cell, face_no, invalid_face_number,
 	       quadrature, mapping_data, fe_data, data);
+};
 
-}
 
 
 
@@ -411,8 +473,8 @@ FESystem<dim>::fill_fe_subface_values (const Mapping<dim>                   &map
 				       const unsigned int                    face_no,
 				       const unsigned int                    sub_no,
 				       const Quadrature<dim-1>              &quadrature,
-				       Mapping<dim>::InternalDataBase      &mapping_data,
-				       Mapping<dim>::InternalDataBase      &fe_data,
+				       Mapping<dim>::InternalDataBase       &mapping_data,
+				       Mapping<dim>::InternalDataBase       &fe_data,
 				       FEValuesData<dim>                    &data) const
 {
   compute_fill(mapping, cell, face_no, sub_no,
@@ -429,11 +491,15 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 			     const unsigned int                    face_no,
 			     const unsigned int                    sub_no,
 			     const Quadrature<dim_1>              &quadrature,
-			     Mapping<dim>::InternalDataBase      &mapping_data,
-			     Mapping<dim>::InternalDataBase      &fedata,
+			     Mapping<dim>::InternalDataBase       &mapping_data,
+			     Mapping<dim>::InternalDataBase       &fedata,
 			     FEValuesData<dim>                    &data) const
 {       
-  InternalData& fe_data = dynamic_cast<InternalData&> (fedata);
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
+  InternalData & fe_data = dynamic_cast<InternalData&> (fedata);
   
 				   // Either dim_1==dim (fill_fe_values)
 				   // or dim_1==dim-1 (fill_fe_(sub)face_values)
@@ -494,8 +560,7 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 				       // Quadrature<dim-1>:
       const Subscriptor* quadrature_base_pointer = &quadrature;
 
-      const unsigned int minus_1=static_cast<unsigned int> (-1);  
-      if (face_no==minus_1)
+      if (face_no==invalid_face_number)
 	{
 	  Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
 	  cell_quadrature=dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer);
@@ -544,10 +609,10 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	  
 	  FEValuesData<dim> &base_data=fe_data.get_fe_values_data(base_no);
 
-	  if (face_no==minus_1)
+	  if (face_no==invalid_face_number)
 	    base_fe.fill_fe_values(mapping, cell,
 				   *cell_quadrature, mapping_data, base_fe_data, base_data);
-	  else if (sub_no==minus_1)
+	  else if (sub_no==invalid_face_number)
 	    base_fe.fill_fe_face_values(mapping, cell, face_no,
 					*face_quadrature, mapping_data, base_fe_data, base_data);
 	  else
@@ -601,11 +666,12 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	    }
 	}
     }
+  
   if (fe_data.compute_second_derivatives)
     {
       unsigned int offset = 0;
-      if (face_no != static_cast<unsigned int> (-1))
-	offset = (sub_no == static_cast<unsigned int> (-1))
+      if (face_no != invalid_face_number)
+	offset = (sub_no == invalid_face_number)
 		 ? face_no * quadrature.n_quadrature_points
 		 :(face_no * GeometryInfo<dim>::subfaces_per_face
 		   + sub_no) * quadrature.n_quadrature_points;  
@@ -732,7 +798,7 @@ FESystem<dim>::build_cell_table()
 	  
 	}
     }
-				   // Inintialize mapping from component
+				   // Initialize mapping from component
 				   // to base element
 				   // Initialize mapping from components to
 				   // linear index. Fortunately, this is
@@ -745,6 +811,7 @@ FESystem<dim>::build_cell_table()
     component_to_system_table[system_to_component_table[sys].first]
       [system_to_component_table[sys].second] = sys;
 }
+
 
 
 template <int dim>
@@ -843,7 +910,7 @@ FESystem<dim>::build_face_table()
   Assert (total_index <= face_system_to_component_table.size(),
 	  ExcInternalError());
   
-				   // Inintialize mapping from component
+				   // Initialize mapping from component
 				   // to base element
 				   // Initialize mapping from components to
 				   // linear index. Fortunately, this is
@@ -856,6 +923,7 @@ FESystem<dim>::build_face_table()
     face_component_to_system_table[face_system_to_component_table[sys].first]
       [face_system_to_component_table[sys].second] = sys;
 }
+
 
 
 template <int dim>
@@ -1052,18 +1120,19 @@ void FESystem<dim>::build_interface_constraints ()
 };
 
 
+
 template <int dim>
 void FESystem<dim>::initialize ()
 {
   build_cell_table();
   build_face_table();
   
-  // Check if matrices are void.
-
+				   // Check if some of the matrices of
+				   // the base elements are void.
   bool do_restriction = true;
   bool do_prolongation = true;
 
-  for (unsigned int i=0;i<n_base_elements(); ++i)
+  for (unsigned int i=0; i<n_base_elements(); ++i)
     {
       if (base_element(i).restriction[0].n() == 0)
 	do_restriction = false;
@@ -1071,8 +1140,9 @@ void FESystem<dim>::initialize ()
 	do_prolongation = false;
     }
   
-  // Void matrices if not defined for all base elements
-
+				   // if we encountered void matrices,
+				   // disable them for the composite
+				   // element as well
   if (!do_restriction)
     for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
       restriction[i].reinit(0,0);
@@ -1107,10 +1177,9 @@ void FESystem<dim>::initialize ()
 				   // this is kind'o hairy, so don't try
 				   // to do it dimension independent
 
-				   // TODO: there's an assertion thrown for
-				   // dim=3 and for FESystem(FE_Q<dim> (3), 2) and for
-				   // FESystem<dim>(FE_Q<dim> (1), 2, FE_Q<dim> (3), 1)
-				   // and for FESystem<dim>(FE_Q<dim> (4), 2))
+//TODO: there's an assertion thrown for dim=3 and for
+//FESystem(FE_Q<dim> (3), 2) and for FESystem<dim>(FE_Q<dim> (1), 2,
+//FE_Q<dim> (3), 1) and for FESystem<dim>(FE_Q<dim> (4), 2))
   build_interface_constraints ();
 };
 
@@ -1196,6 +1265,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 };
 
 
+
 template <int dim>
 std::vector<bool>
 FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
@@ -1212,6 +1282,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
       tmp.push_back (fe2.restriction_is_additive (component));
   return tmp;
 };
+
 
 
 template <int dim>
@@ -1237,6 +1308,7 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 };
 
 
+
 template <int dim>
 unsigned int
 FESystem<dim>::memory_consumption () const 
@@ -1248,41 +1320,11 @@ FESystem<dim>::memory_consumption () const
                                  // after all, considering the size
                                  // of the data of the subelements
   unsigned int mem = (FiniteElement<dim>::memory_consumption () +
-                    sizeof (base_elements));
+		      sizeof (base_elements));
   for (unsigned int i=0; i<base_elements.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*base_elements[i].first);
   return mem;
 };
-
-
-template <int dim>
-FESystem<dim>::InternalData::InternalData(const unsigned int n_base_elements):
-		base_fe_datas(n_base_elements),
-		base_fe_values_datas(n_base_elements)
-{}
-
-
-
-template <int dim>
-FESystem<dim>::InternalData::~InternalData()
-{
-				   // delete pointers and set them to
-				   // zero to avoid inadvertant use
-  for (unsigned int i=0; i<base_fe_datas.size(); ++i)
-    if (base_fe_datas[i])
-      {
-	delete base_fe_datas[i];
-	base_fe_datas[i] = 0;
-      };
-  
-  for (unsigned int i=0; i<base_fe_values_datas.size(); ++i)
-    if (base_fe_values_datas[i])
-      {
-	delete base_fe_values_datas[i];
-	base_fe_values_datas[i] = 0;
-      };
-};
-
 
 
 

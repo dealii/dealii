@@ -202,11 +202,13 @@ class FESystem : public FiniteElement<dim>
 				      * the @p{cell->get_dof_indices}
 				      * function, but:
 				      *
-				      * If the shape functions of one
-				      * of the base elements are not
-				      * Lagrangian interpolants at some
-				      * points, the size of the array
-				      * will be zero.
+				      * If one of the base elements
+				      * has no support points, then it
+				      * makes no sense to define
+				      * support points for the
+				      * composed element, so return an
+				      * empty array to demonstrate
+				      * that fact.
 				      */
     virtual void get_unit_face_support_points (typename std::vector<Point<dim-1> > &) const;    
   
@@ -312,6 +314,13 @@ class FESystem : public FiniteElement<dim>
   private:
 
 				     /**
+				      * Value to indicate that a given
+				      * face or subface number is
+				      * invalid.
+				      */
+    static const unsigned int invalid_face_number = static_cast<unsigned int>(-1);
+    
+				     /**
 				      * Pairs of multiplicity and
 				      * element type.
 				      */
@@ -404,17 +413,14 @@ class FESystem : public FiniteElement<dim>
 					   const unsigned int        N3);
     
 				     /**
-				      * This function is simply singled out of
-				      * the constructor. It sets up the
-				      * index table for the system as well as
-				      * @p{restriction} and @p{prolongation}
-				      * matrices. Since the operation of this
-				      * function can be done without explicit
-				      * knowledge of the data type of the
-				      * underlying finite element class, we
-				      * don't want to have this function in
-				      * the general template definition in
-				      * the @p{.h} file.
+				      * This function is simply
+				      * singled out of the
+				      * constructors since there are
+				      * several of them. It sets up
+				      * the index table for the system
+				      * as well as @p{restriction} and
+				      * @p{prolongation}
+				      * matrices.
 				      */
     void initialize();
 
