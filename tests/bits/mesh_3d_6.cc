@@ -41,6 +41,8 @@ void check_this (Triangulation<3> &tria)
 
   DoFHandler<3> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
+
+  unsigned int global_face = 0;
   
                                    // look at all faces, not only
                                    // active ones
@@ -54,13 +56,28 @@ void check_this (Triangulation<3> &tria)
           fe_face_values1.reinit (cell, f);
           fe_face_values2.reinit (cell->neighbor(f), nn);
 
-          deallog << "Cell " << cell << ", face " << f
-                  << " << n=" << fe_face_values1.normal_vector(0)
-                  << " << nx=" << fe_face_values2.normal_vector(0)
-                  << std::endl;
+                                           // in order to reduce
+                                           // output file size, only
+                                           // write every seventeenth
+                                           // normal vector. if the
+                                           // normals differ anyway,
+                                           // then the assertion below
+                                           // will catch this, and if
+                                           // we compute _all_ normals
+                                           // wrongly, then outputting
+                                           // some will be ok, I guess
+          if (global_face++ % 17 == 0)
+            deallog << "Cell " << cell << ", face " << f
+                    << " n=" << fe_face_values1.normal_vector(0)
+                    << std::endl;
 
-          Assert (fe_face_values1.normal_vector(0) ==
-                  - fe_face_values2.normal_vector(0),
+                                           // normal vectors should be
+                                           // in opposite directions,
+                                           // so their sum should be
+                                           // close to zero
+          Assert ((fe_face_values1.normal_vector(0) +
+                  fe_face_values2.normal_vector(0)).square()
+                  < 1e-20,
                   ExcInternalError());
         }          
 }

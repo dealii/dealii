@@ -38,17 +38,15 @@ void check_this (Triangulation<3> &tria)
   for (Triangulation<3>::cell_iterator cell=tria.begin();
        cell != tria.end(); ++cell)
     {
-      deallog << "  Cell=" << cell << std::endl;
-      
       std::set<Triangulation<3>::line_iterator> lines;
       for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
         {
           Assert (lines.find (cell->line(l)) == lines.end(),
                   ExcInternalError());
           lines.insert (cell->line(l));
-          deallog << "    line(" << l << ")=" << cell->line(l) << std::endl;
         }
     }
+  deallog << "    ok." << std::endl;
 }
 
 

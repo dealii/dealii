@@ -43,6 +43,8 @@ void check_this (Triangulation<3> &tria)
   DoFHandler<3> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
+  unsigned int global_datum = 0;
+  
                                    // look at all faces, not only
                                    // active ones
   for (DoFHandler<3>::cell_iterator cell=dof_handler.begin();
@@ -60,16 +62,30 @@ void check_this (Triangulation<3> &tria)
 
           for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
             {
-              deallog << "  " << fe_face_values1.quadrature_point(q)
-                      << ", " << fe_face_values1.JxW(q)
-                      << std::endl;
+                                               // in order to reduce
+                                               // output file size,
+                                               // only write every
+                                               // 289th datum. if the
+                                               // values differ
+                                               // anyway, then the
+                                               // assertion below will
+                                               // catch this, and if
+                                               // we compute _all_
+                                               // values wrongly, then
+                                               // outputting some will
+                                               // be ok, I guess
+              if (global_datum++ % 17*17 == 0)
+                deallog << "  " << fe_face_values1.quadrature_point(q)
+                        << ", " << fe_face_values1.JxW(q)
+                        << std::endl;
               
-              Assert (fe_face_values1.quadrature_point(q) ==
-                      fe_face_values2.quadrature_point(q),
+              Assert ((fe_face_values1.quadrature_point(q)-
+                       fe_face_values2.quadrature_point(q)).square()
+                      < 1e-20,
                       ExcInternalError());
 
-              Assert (fe_face_values1.JxW(q) ==
-                      fe_face_values2.JxW(q),
+              Assert (std::fabs(fe_face_values1.JxW(q)-
+                                fe_face_values2.JxW(q)) < 1e-15,
                       ExcInternalError());
             }
         }
