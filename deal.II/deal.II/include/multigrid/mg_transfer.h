@@ -212,7 +212,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      * @p{is_1d<true>} and the other
 				      * one of type @p{is_1d<false>}.
 				      */
-    template <bool> struct is_1d;
+    template <bool> struct is_1d {};
     
 				     /**
 				      * Implementation of the
@@ -475,7 +475,7 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * @p{is_1d<true>} and the other
 				      * one of type @p{is_1d<false>}.
 				      */
-    template <bool> struct is_1d;
+    template <bool> struct is_1d {};
 
 				     /**
 				      * Implementation of the
@@ -605,7 +605,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * @p{is_1d<true>} and the other
 				      * one of type @p{is_1d<false>}.
 				      */
-    template <bool> struct is_1d;
+    template <bool> struct is_1d {};
     
     				     /**
 				      * Transfer from a vector on the
