@@ -84,19 +84,36 @@
  */
 enum UpdateFlags
 {
+				       //! No update
       update_default                      = 0,
+				       //! Shape function values
       update_values                       = 0x0001,
+				       //! Shape function gradients
       update_gradients                    = 0x0002,
+				       //! Second derivatives of shape functions
       update_second_derivatives           = 0x0004,
+				       /*! Normal vector times surface
+					* element; may be more
+					* efficient than computing both.
+					*/
       update_boundary_forms               = 0x0008,
+				       //! Transformed quadrature points
       update_q_points                     = 0x0010,
+				       //! Transformed quadrature weights
       update_JxW_values                   = 0x0020,
+				       //! Transformed normal vectors
       update_normal_vectors               = 0x0040,
+				       //! Volume element
       update_jacobians                    = 0x0080,
+				       //! Gradient of volume element
       update_jacobian_grads               = 0x0100,
+				       //! Covariant transformation
       update_covariant_transformation     = 0x0200,
+				       //! Contravariant transformation
       update_contravariant_transformation = 0x0400,
+				       //! Shape function values of transformation
       update_transformation_values        = 0x0800,
+				       //! Shape function gradients of transformation
       update_transformation_gradients     = 0x1000
 };
 
