@@ -31,10 +31,6 @@ Look at the fill_fe_values functions for possible optimizations
   since this is one of the most often called functions.
 
 
-Change <iostream> to <ostream> in grid/point.h and
-  grid/tria_iterator.h when this becomes possible.
-
-
 Use a correct strategy to output the reduction rate for adaptively
   refined grids in examples/error-estimation
 
