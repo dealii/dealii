@@ -715,7 +715,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
                                        // are even weird finite
                                        // elements (for example the
                                        // Raviart-Thomas element)
-                                       // which has shape functions
+                                       // which have shape functions
                                        // that are additive (interior
                                        // ones) and others that are
                                        // overwriting (face degrees of
