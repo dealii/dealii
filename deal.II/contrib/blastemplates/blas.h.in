@@ -1,0 +1,34 @@
+// General Matrix
+// Matrix vector product
+void dgemv_ (char* trans, int* m, int* n,
+	     double* alpha, double* A, int* lda,
+	     double* x, int* incx,
+	     double* b, double* y, int* incy);
+// Compute eigenvalues and vectors
+void dgeev_ (char* jobvl, char* jobvr,
+	     int* n, double* A, int* lda,
+	     double* lambda_re, double* lambda_im,
+	     double* vl, int* ldvl,
+	     double* vr, int* ldva,
+	     double* work, int* lwork,
+	     int* info);
+// Compute eigenvalues and vectors (expert)
+void dgeevx_ (char* balanc, char* jobvl, char* jobvr, char* sense,
+	      int* n, double* A, int* lda,
+	      double* lambda_re, double* lambda_im,
+	      double* vl, int* ldvl,
+	      double* vr, int* ldvr,
+	      int* ilo, int* ihi,
+	      double* scale, double* abnrm,
+	      double* rconde, double* rcondv,
+	      double* work, int* lwork,
+	      int* iwork, int* info);
+// Compute singular value decomposition
+void dgesvd_ (int* jobu, int* jobvt,
+	      int* n, int* m, double* A, int* lda,
+	      double* s,
+	      double* u, int* ldu,
+	      double* vt, int* ldvt,
+	      double* work, int* lwork,
+	      int* info);
+
