@@ -305,10 +305,17 @@ class VectorTools
 				      *  absolute value of the
 				      *  function is integrated.
 				      * @item @p{L2_norm}: the square
-				      *    of the function is
-				      *    integrated on each cell;
-				      *    afterwards the root is
-				      *    taken of this value.
+				      * of the function is integrated
+				      * and the the square root of the
+				      * result is computed on each
+				      * cell.
+				      * @item @p{Lp_norm}: the
+				      * absolute value to the pth
+				      * power is integrated and the
+				      * pth root is computed on each
+				      * cell. The exponent @p{p} is
+				      * the last parameter of the
+				      * function.
 				      *  @item @p{Linfty_norm}: the
 				      *  maximum absolute value of the
 				      *  function.
@@ -316,8 +323,11 @@ class VectorTools
 				      *    square of the function
 				      *    gradient is integrated on
 				      *    each cell; afterwards the
-				      *    root is taken of this *
+				      *    root is taken of this
 				      *    value.
+				      * @item @p{W1p_seminorm}: this
+				      * is the @p{Lp_norm} of the
+				      * gradient.
 				      * @item @p{H1_norm}: the square
 				      *    of the function plus the
 				      *    square of the function
@@ -330,14 +340,21 @@ class VectorTools
 				      *    square of the
 				      *    @p{H1_seminorm}.
 				      *  @end{itemize}
-				      */
+				      * @item @p{W1p_norm}: like
+				      * @p{H1_norm}, but for
+				      * @p{Lp_norm} instead of
+				      * @p{L2_norm}
+				     */
     enum NormType {
 	  mean,
 	  L1_norm,
 	  L2_norm,
 	  Linfty_norm,
 	  H1_seminorm,
-	  H1_norm
+	  H1_norm,
+	  Lp_norm,
+	  W1p_seminorm,
+	  W1p_norm
     };
     
 				     /**
@@ -736,18 +753,13 @@ class VectorTools
 				      * Compute the error of the finite element solution.
 				      * Integrate the difference between
 				      * a finite element function and
-				      * the reference function, which
+				      * a reference function, which
 				      * is given as a continuous function
 				      * object.
 				      *
-				      * Note that this function returns
-				      * its results in a vector of @p{float}s,
-				      * rather than in a vector of @p{double}s,
-				      * since accuracy is not that important
-				      * here and to save memory. During
-				      * computation of the results, the full
-				      * accuracy of the @p{double} data type is
-				      * used.
+				      * The value of @p{exponent} is
+				      * used for computing $L^p$-norms
+				      * and $W^{1,p}$-norms.
 				      *
 				      * The additional argument
 				      * @p{weight} allows to evaluate
@@ -790,7 +802,8 @@ class VectorTools
 				      OutVector             &difference,
 				      const Quadrature<dim> &q,
 				      const NormType        &norm,
-				      const Function<dim>   *weight=0);
+				      const Function<dim>   *weight=0,
+				      const double exponent = 2.);
 
 				     /**
 				      * Calls the @p{integrate_difference}
@@ -804,7 +817,8 @@ class VectorTools
 				      OutVector             &difference,
 				      const Quadrature<dim> &q,
 				      const NormType        &norm,
-				      const Function<dim>   *weight=0);
+				      const Function<dim>   *weight=0,
+				      const double exponent = 2.);
 
 				     /**
 				      * Mean-value filter for Stokes.

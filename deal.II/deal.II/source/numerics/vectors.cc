@@ -1058,7 +1058,8 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 				   OutVector             &difference,
 				   const Quadrature<dim> &q,
 				   const NormType        &norm,
-				   const Function<dim>   *weight)
+				   const Function<dim>   *weight,
+				   double exponent)
 {
   const unsigned int        n_q_points   = q.n_quadrature_points;
   const FiniteElement<dim> &fe           = dof.get_fe();
@@ -1070,16 +1071,39 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
       Assert ((weight->n_components==1) || (weight->n_components==n_components),
 	      ExcDimensionMismatch(weight->n_components, n_components));
     }
-  
+
   difference.reinit (dof.get_tria().n_active_cells());
+  
+  switch (norm)
+    {
+      case L2_norm:
+      case H1_seminorm:
+      case H1_norm:
+	exponent = 2.;
+	break;
+      case L1_norm:
+	exponent = 1.;
+	break;
+      default:
+	break;
+    }
   
   UpdateFlags update_flags = UpdateFlags (update_q_points  |
  					  update_JxW_values);
-  if (norm != H1_seminorm)
-    update_flags = UpdateFlags(update_flags | update_values);
-  
-  if ((norm==H1_seminorm) || (norm==H1_norm))
-    update_flags = UpdateFlags (update_flags | update_gradients);
+  switch (norm)
+    {
+      case H1_seminorm:
+      case W1p_seminorm:
+	update_flags |= UpdateFlags (update_gradients);
+	break;
+      case H1_norm:
+      case W1p_norm:
+	update_flags |= UpdateFlags (update_gradients);
+					 // no break!
+      default:
+	update_flags |= UpdateFlags (update_values);
+	break;
+    }  
   
   FEValues<dim> fe_values(mapping, fe, q, update_flags);
 
@@ -1115,267 +1139,247 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 	{
 	  if (weight->n_components>1)
 	    weight->vector_value_list (fe_values.get_quadrature_points(),
-				      weight_vectors);
+				       weight_vectors);
 	  else
-	    weight->value_list (fe_values.get_quadrature_points(),
-			       weight_values);
+	    {
+	      weight->value_list (fe_values.get_quadrature_points(),
+				  weight_values);
+//	      for (unsigned int k=0;k<n_q_points;++k)
+//		weight_vectors[k] = weight_values[k];
+	    }
+	}
+      
+      if (update_flags & update_values)
+	{
+					   // first compute the exact solution
+					   // (vectors) at the quadrature points
+					   // try to do this as efficient as
+					   // possible by avoiding a second
+					   // virtual function call in case
+					   // the function really has only
+					   // one component
+	  if (fe_is_system)
+	    exact_solution.vector_value_list (fe_values.get_quadrature_points(),
+					      psi_values);
+	  else
+	    {
+	      exact_solution.value_list (fe_values.get_quadrature_points(),
+					 tmp_values);
+	      for (unsigned int i=0; i<n_q_points; ++i)
+		psi_values[i](0) = tmp_values[i];
+	    }
+	  
+					   // then subtract finite element
+					   // fe_function
+	  fe_values.get_function_values (fe_function, function_values);
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    psi_values[q] -= function_values[q];
+	}
+
+				       // Do the same for gradients, if required
+      if (update_flags & update_gradients)
+	{
+					   // try to be a little clever
+					   // to avoid recursive virtual
+					   // function calls when calling
+					   // @p{gradient_list} for functions
+					   // that are really scalar
+					   // functions
+	  if (fe_is_system)
+	    exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
+						 psi_grads);
+	  else
+	    {
+	      exact_solution.gradient_list (fe_values.get_quadrature_points(),
+					    tmp_gradients);
+	      for (unsigned int i=0; i<n_q_points; ++i)
+		psi_grads[i][0] = tmp_gradients[i];
+	    }      
+	  
+					   // then subtract finite element
+					   // function_grads
+	  fe_values.get_function_grads (fe_function, function_grads);
+	  for (unsigned int k=0; k<n_components; ++k)
+	    for (unsigned int q=0; q<n_q_points; ++q)
+	      psi_grads[q][k] -= function_grads[q][k];
 	}
       
       switch (norm)
- 	{
- 	  case mean:
- 	  case L1_norm:
- 	  case L2_norm:
- 	  case Linfty_norm:
- 	  case H1_norm:
- 	  {
- 					     // first compute the exact solution
-					     // (vectors) at the quadrature points
-					     // try to do this as efficient as
-					     // possible by avoiding a second
-					     // virtual function call in case
-					     // the function really has only
-					     // one component
-	    if (fe_is_system)
-	      exact_solution.vector_value_list (fe_values.get_quadrature_points(),
-						psi_values);
-	    else
+	{
+	  case mean:
+	    if (weight != 0)
 	      {
-		exact_solution.value_list (fe_values.get_quadrature_points(),
-					   tmp_values);
-		for (unsigned int i=0; i<n_q_points; ++i)
-		  psi_values[i](0) = tmp_values[i];
-	      };
-	    
- 					     // then subtract finite element
- 					     // fe_function
-	    fe_values.get_function_values (fe_function, function_values);
-	    for (unsigned int q=0; q<n_q_points; ++q)
-	      psi_values[q] -= function_values[q];
-
- 	    switch (norm)
-	      {
-		case mean:
-		      if (weight != 0)
-			{
-							   // Different weights for
-							   // each component?
-			  if (weight->n_components > 1)
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      {
-				psi_scalar[q] = 0;
-				// weighted mean value
-				for (unsigned int i=0; i<n_components; ++i)
-				  psi_scalar[q] += psi_values[q](i)
-						   * weight_vectors[q](i);
-			      }
-			  else // weight->n_components == 1
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      {
-				psi_scalar[q] = 0;
-				// weighted mean value
-				for (unsigned int i=0; i<n_components; ++i)
-				  psi_scalar[q] += psi_values[q](i)
-						   * weight_values[q];
-			      }
-			}
-		      else // no weight function
-			for (unsigned int q=0; q<n_q_points; ++q)
-			  {
-			    psi_scalar[q] = 0;
-				// mean value
-			    for (unsigned int i=0; i<n_components; ++i)
-			      psi_scalar[q] += psi_values[q](i);
-			  }
-
-						       // Integration on one cell
-		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-						 fe_values.get_JxW_values().begin(),
-						 0.0);
-		      break;
-						       // Compute (weighted) squares
-						       // in each quadrature point
- 		case L2_norm:
- 		case H1_norm:
-		      if (weight != 0)
-			{
-							   // Different weights for
-							   // each component?
-			  if (weight->n_components > 1)
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      {
-				psi_scalar[q] = 0;
-				// weighted scalar product
-				for (unsigned int i=0; i<n_components; ++i)
-				  psi_scalar[q] += psi_values[q](i)*psi_values[q](i)
-						   * weight_vectors[q](i);
-			      }
-			  else // weight->n_components == 1
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      psi_scalar[q] = psi_values[q].norm_sqr()
-					      * weight_values[q];
-			}
-		      else // no weight function
-			for (unsigned int q=0; q<n_q_points; ++q)
-			  psi_scalar[q] = psi_values[q].norm_sqr();
-
-						       // Integration on one cell
-		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-						 fe_values.get_JxW_values().begin(),
-						 0.0);
-		      if (norm == L2_norm)
-			diff=std::sqrt(diff);
- 		      break;
-		case L1_norm:
-		      if (weight != 0)
-			{
-							   // Different weights for
-							   // each component?
-			  if (weight->n_components > 1)
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      {
-				psi_scalar[q] = 0;
-				// weighted scalar product
-				for (unsigned int i=0; i<n_components; ++i)
-				  psi_scalar[q] += std::fabs(psi_values[q](i))
-						   * weight_vectors[q](i);
-			      }
-			  else // weight->n_components == 1
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      psi_scalar[q] = psi_values[q].l1_norm()
-					      * weight_values[q];
-			}
-		      else // no weight function
-			for (unsigned int q=0; q<n_q_points; ++q)
-			  psi_scalar[q] = psi_values[q].l1_norm();		      
-
-						       // Integration on one cell
-		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-						 fe_values.get_JxW_values().begin(),
-						 0.0);
-		      if (norm == L2_norm)
-			diff=std::sqrt(diff);
- 		      break;
- 		case Linfty_norm:
-		      if (weight != 0)
-			{
-							   // Different weights for
-							   // each component?
-			  if (weight->n_components > 1)
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      {
-				psi_scalar[q] = 0;
-				for (unsigned int i=0; i<n_components; ++i)
-				  {
-				    double newval = std::fabs(psi_values[q](i))
-						    * weight_vectors[q](i);
-				    if (psi_scalar[q]<newval)
-				      psi_scalar[q] = newval;
-				  }
-			      }
-			  else // weight->n_components == 1
-			    for (unsigned int q=0; q<n_q_points; ++q)
-			      psi_scalar[q] = psi_values[q].linfty_norm()
-					      * weight_values[q];
-			}
-		      else // no weight function
-			for (unsigned int q=0; q<n_q_points; ++q)
-			  psi_scalar[q] = psi_values[q].linfty_norm();
-
-						       // Maximum on one cell
- 		      diff = *std::max_element (psi_scalar.begin(), psi_scalar.end());
- 		      break;
- 		default:
- 		      Assert (false, ExcNotImplemented());
- 	      }
-
- 					     // note: the H1_norm uses the result
- 					     // of the L2_norm and control goes
- 					     // over to the next case statement!
- 	    if (norm != H1_norm)
- 	      break;
- 	  };
-
- 	  case H1_seminorm:
- 	  {
- 					     // note: the computation of the
- 					     // H1_norm starts at the previous
- 					     // case statement, but continues
- 					     // here!
-					     // Until now, @p{diff} includes the
-					     // square of the L2_norm.
-
- 					     // in praxi: first compute
- 					     // exact fe_function vector
-					     //
-					     // try to be a little clever
-					     // to avoid recursive virtual
-					     // function calls when calling
-					     // @p{gradient_list} for functions
-					     // that are really scalar
-					     // functions
-	    if (fe_is_system)
-	      exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
-						   psi_grads);
-	    else
-	      {
-		exact_solution.gradient_list (fe_values.get_quadrature_points(),
-					      tmp_gradients);
-		for (unsigned int i=0; i<n_q_points; ++i)
-		  psi_grads[i][0] = tmp_gradients[i];
-	      };
-
- 					     // then subtract finite element
- 					     // function_grads
-	    fe_values.get_function_grads (fe_function, function_grads);
-	    for (unsigned int k=0; k<n_components; ++k)
+						 // Different weights for
+						 // each component?
+		if (weight->n_components > 1)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    {
+		      psi_scalar[q] = 0;
+						       // weighted mean value
+		      for (unsigned int i=0; i<n_components; ++i)
+			psi_scalar[q] += psi_values[q](i)
+					 * weight_vectors[q](i);
+		    }
+		else // weight->n_components == 1
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    {
+		      psi_scalar[q] = 0;
+						       // weighted mean value
+		      for (unsigned int i=0; i<n_components; ++i)
+			psi_scalar[q] += psi_values[q](i)
+					 * weight_values[q];
+		    }
+	      }
+	    else // no weight function
 	      for (unsigned int q=0; q<n_q_points; ++q)
-		psi_grads[q][k] -= function_grads[q][k];
-
-					     // take square of integrand
-	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-
-	    for (unsigned int k=0; k<n_components; ++k)
-	      if (weight != 0)
 		{
-						   // Different weights for
-						   // each component?
-		  if (weight->n_components > 1)
-		    for (unsigned int q=0; q<n_q_points; ++q)
-		      {
-				// weighted scalar product
-			psi_scalar[q] += sqr_point(psi_grads[q][k])
-					 * weight_vectors[q](k);
-		      }
-		  else // weight->n_components == 1
-		    for (unsigned int q=0; q<n_q_points; ++q)
-		      psi_scalar[q] = sqr_point(psi_grads[q][k])
-				      * weight_values[q];
+		  psi_scalar[q] = 0;
+						   // mean value
+		  for (unsigned int i=0; i<n_components; ++i)
+		    psi_scalar[q] += psi_values[q](i);
 		}
-	      else // no weight function
-		for (unsigned int q=0; q<n_q_points; ++q)
-		  psi_scalar[q] += sqr_point(psi_grads[q][k]);
-
+	    
+					     // Integration on one cell
+	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+				       fe_values.get_JxW_values().begin(),
+				       0.0);
+	    break;
+					     // Compute (weighted) squares
+					     // in each quadrature point
+	  case L2_norm:
+	  case H1_norm:
+	    if (weight != 0)
+	      {
+						 // Different weights for
+						 // each component?
+		if (weight->n_components > 1)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    {
+		      psi_scalar[q] = 0;
+						       // weighted scalar product
+		      for (unsigned int i=0; i<n_components; ++i)
+			psi_scalar[q] += psi_values[q](i)*psi_values[q](i)
+					 * weight_vectors[q](i);
+		    }
+		else // weight->n_components == 1
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    psi_scalar[q] = psi_values[q].norm_sqr()
+				    * weight_values[q];
+	      }
+	    else // no weight function
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_scalar[q] = psi_values[q].norm_sqr();
+	    
+					     // Integration on one cell
+	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+				       fe_values.get_JxW_values().begin(),
+				       0.0);
+	    if (norm == L2_norm)
+	      diff=std::sqrt(diff);
+	    break;
+	  case L1_norm:
+	    if (weight != 0)
+	      {
+						 // Different weights for
+						 // each component?
+		if (weight->n_components > 1)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    {
+		      psi_scalar[q] = 0;
+						       // weighted scalar product
+		      for (unsigned int i=0; i<n_components; ++i)
+			psi_scalar[q] += std::fabs(psi_values[q](i))
+					 * weight_vectors[q](i);
+		    }
+		else // weight->n_components == 1
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    psi_scalar[q] = psi_values[q].l1_norm()
+				    * weight_values[q];
+	      }
+	    else // no weight function
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_scalar[q] = psi_values[q].l1_norm();		      
+	    
+					     // Integration on one cell
+	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+				       fe_values.get_JxW_values().begin(),
+				       0.0);
+	    if (norm == L2_norm)
+	      diff=std::sqrt(diff);
+	    break;
+	  case Linfty_norm:
+	    if (weight != 0)
+	      {
+						 // Different weights for
+						 // each component?
+		if (weight->n_components > 1)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    {
+		      psi_scalar[q] = 0;
+		      for (unsigned int i=0; i<n_components; ++i)
+			{
+			  double newval = std::fabs(psi_values[q](i))
+					  * weight_vectors[q](i);
+			  if (psi_scalar[q]<newval)
+			    psi_scalar[q] = newval;
+			}
+		    }
+		else // weight->n_components == 1
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    psi_scalar[q] = psi_values[q].linfty_norm()
+				    * weight_values[q];
+	      }
+	    else // no weight function
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_scalar[q] = psi_values[q].linfty_norm();
+	    
+					     // Maximum on one cell
+	    diff = *std::max_element (psi_scalar.begin(), psi_scalar.end());
+	    break;
+	  case H1_seminorm:
+	    break;
+	  default:
+	    Assert (false, ExcNotImplemented());
+	}
+      
+      if (norm == H1_seminorm || norm == H1_norm)
+	{
+					   // take square of integrand
+	  std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+	  
+	  for (unsigned int k=0; k<n_components; ++k)
+	    if (weight != 0)
+	      {
+						 // Different weights for
+						 // each component?
+		if (weight->n_components > 1)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    {
+						       // weighted scalar product
+		      psi_scalar[q] += sqr_point(psi_grads[q][k])
+				       * weight_vectors[q](k);
+		    }
+		else // weight->n_components == 1
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    psi_scalar[q] = sqr_point(psi_grads[q][k])
+				    * weight_values[q];
+	      }
+	    else // no weight function
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_scalar[q] += sqr_point(psi_grads[q][k]);
+	  
  					     // add seminorm to L_2 norm or
  					     // to zero
- 	    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-					fe_values.get_JxW_values().begin(),
-					0.0);
- 	    diff = std::sqrt(diff);
-
- 	    break;
- 	  };
-					     
- 	  default:
- 		Assert (false, ExcNotImplemented());
- 	};
-
-
+	  diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+				      fe_values.get_JxW_values().begin(),
+				      0.0);
+	  diff = std::sqrt(diff);	  
+ 	}
 				       // append result of this cell
  				       // to the end of the vector
       difference(index) = diff;
-    };
-};
+    }
+}
 
 
 template <int dim, class InVector, class OutVector>
@@ -1386,12 +1390,13 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 				   OutVector                &difference,
 				   const Quadrature<dim>    &q,
 				   const NormType           &norm,
-				   const Function<dim>      *weight)
+				   const Function<dim>      *weight,
+				   double exponent)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   integrate_difference(mapping, dof, fe_function, exact_solution,
-		       difference, q, norm, weight);
+		       difference, q, norm, weight, exponent);
 }
 
 
