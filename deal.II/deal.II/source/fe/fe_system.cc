@@ -986,25 +986,39 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 			       const FullMatrix<double>  &shape_values_transform,
 			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform) const
 {
-  vector<Point<dim> > supp(base_elements[0].first->dofs_per_cell);
+				   // if we are to compute the support
+				   // points, then we need to get them
+				   // from each base element. the
+				   // following variable is used as
+				   // temporary
+  vector<Point<dim> > supp(compute_support_points ?
+			   base_elements[0].first->dofs_per_cell :
+			   0);
 
   base_elements[0].first->fill_fe_values (cell, unit_points, jacobians, compute_jacobians,
 					  jacobians_grad, compute_jacobians_grad,
-					  support_points, compute_support_points,
+					  supp, compute_support_points,
 					  q_points, compute_q_points,
 					  shape_values_transform, shape_grad_transform);
   
   if (compute_support_points)
     {
-      unsigned component = 0;
-      
-      for (unsigned m=0 ; m < element_multiplicity(0) ; ++ m)
+				       // for the first base element, we
+				       // have obtained the support
+				       // points above already
+      unsigned int component = 0;
+      for (unsigned int m=0 ; m < element_multiplicity(0) ; ++ m)
 	{
-	  for (unsigned i=0 ; i < base_element(0).dofs_per_cell ; ++i)
+	  for (unsigned int i=0 ; i < base_element(0).dofs_per_cell ; ++i)
 	    support_points[component_to_system_index(component,i)] = supp[i];
 	  ++component;
 	}
-      for (unsigned base=1 ; base < n_base_elements() ; ++base)
+
+				       // if there are more base
+				       // elements, we still have to
+				       // get the support points from
+				       // them
+      for (unsigned int base=1 ; base < n_base_elements() ; ++base)
 	{
 	  supp.resize(base_elements[base].first->dofs_per_cell);
 	  base_elements[base].first->fill_fe_values (cell, unit_points, jacobians, false,
@@ -1013,9 +1027,9 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 						     q_points, false,
 						     shape_values_transform, shape_grad_transform);
 	  
-	  for (unsigned m=0 ; m < element_multiplicity(base) ; ++ m)
+	  for (unsigned int m=0 ; m < element_multiplicity(base) ; ++ m)
 	    {
-	      for (unsigned i=0 ; i < base_element(base).dofs_per_cell ; ++i)
+	      for (unsigned int i=0 ; i < base_element(base).dofs_per_cell ; ++i)
 		support_points[component_to_system_index(component,i)] = supp[i];
 	      ++component;
 	    }
