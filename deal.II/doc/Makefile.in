@@ -10,7 +10,7 @@ include $D/common/Make.global_options
 
 
 # generic targets
-default: autogen-doc tutorial development glossary validate-xrefs
+default: autogen-doc tutorial development glossary class_index.html validate-xrefs
 
 all: default autogen-doc-all
 
