@@ -699,16 +699,6 @@ class BlockVectorBase
                                       */
     void compress ();
 
-    				     /**
-				      * Set all entries to zero. Equivalent to
-				      * <tt>v=0</tt>, but more obvious and
-				      * faster.  Note that this function does
-				      * not change the size of the vector,
-				      * unlike the STL's
-				      * <tt>vector<>::clear</tt> function.
-				      */
-    void clear ();
-
 				     /**
 				      * Access to a single block.
 				      */
@@ -1668,18 +1658,6 @@ BlockVectorBase<VectorType>::compress ()
   for (unsigned int i=0; i<n_blocks(); ++i)
     block(i).compress ();
 }
-
-
-
-template <class VectorType>
-inline
-void
-BlockVectorBase<VectorType>::clear ()
-{
-  for (unsigned int i=0;i<n_blocks();++i)
-    components[i].clear();
-}
-
 
 
 
