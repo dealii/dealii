@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -156,6 +156,35 @@ void GridGenerator::hyper_cube (Triangulation<dim> &tria,
       p2(i) = right;
     }
   hyper_rectangle (tria, p1, p2);
+}
+
+
+template<int dim>
+void
+GridGenerator::parallelogram (
+  Triangulation<dim>&  tria,
+  const Tensor<2,dim>& corners,
+  const bool      colorize)
+{
+  Assert (dim==2, ExcNotImplemented());
+  
+  std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
+
+  vertices[1] = corners[0];
+  vertices[3] = corners[1];
+  vertices[2] = vertices[1];
+  vertices[2] += vertices[3];
+				   // Prepare cell data
+  std::vector<CellData<dim> > cells (1);
+  for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
+    cells[0].vertices[i] = i;
+  cells[0].material_id = 0;
+
+  tria.create_triangulation (vertices, cells, SubCellData());
+
+				   // Assign boundary indicators
+  if (colorize)
+    colorize_hyper_rectangle (tria);
 }
 
 
@@ -598,7 +627,7 @@ GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
 }
 
 
-
+//TODO: Colorize edges as circumference, left and right radius
 void
 GridGenerator::hyper_L (Triangulation<2> &tria,
 			const double a,
@@ -765,6 +794,7 @@ GridGenerator::cylinder (Triangulation<2> &tria,
 
 
 
+//TODO: Colorize edges as circumference and cut plane
 void
 GridGenerator::half_hyper_ball (Triangulation<2> &tria,
 				const Point<2>   &p,
@@ -1377,20 +1407,23 @@ void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 
 // explicit instantiations
 template void
-GridGenerator::hyper_rectangle<deal_II_dimension> (Triangulation<deal_II_dimension> &,
-						   const Point<deal_II_dimension>&,
-						   const Point<deal_II_dimension>&,
-						   const bool);
+GridGenerator::hyper_rectangle<deal_II_dimension> (
+  Triangulation<deal_II_dimension> &,
+  const Point<deal_II_dimension>&, const Point<deal_II_dimension>&,
+  const bool);
 template void
-GridGenerator::hyper_cube<deal_II_dimension> (Triangulation<deal_II_dimension> &,
-					      const double,
-					      const double);
+GridGenerator::hyper_cube<deal_II_dimension> (
+  Triangulation<deal_II_dimension> &, const double, const double);
+template void
+GridGenerator::parallelogram<deal_II_dimension> (
+  Triangulation<deal_II_dimension> &,
+  const Tensor<2,deal_II_dimension>&,
+  const bool);
 
 template void
-GridGenerator::subdivided_hyper_cube<deal_II_dimension> (Triangulation<deal_II_dimension> &,
-                                                         const unsigned int,
-                                                         const double,
-                                                         const double);
+GridGenerator::subdivided_hyper_cube<deal_II_dimension> (
+  Triangulation<deal_II_dimension> &,
+  const unsigned int, const double, const double);
 
 template void
 GridGenerator::subdivided_hyper_rectangle<deal_II_dimension> 

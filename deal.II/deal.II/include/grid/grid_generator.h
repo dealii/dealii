@@ -1,15 +1,15 @@
-//----------------------------  grid_generator.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  grid_generator.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__grid_generator_h
 #define __deal2__grid_generator_h
 
@@ -256,6 +256,28 @@ class GridGenerator
 				const Point<dim>                &p2,
 				const bool                       colorize=false);
 
+				     /**
+				      * A parallelogram. The first
+				      * corner point is the
+				      * origin. The <tt>dim</tt>
+				      * adjacent points are the
+				      * one-dimensional subtensors of
+				      * the tensor provided and
+				      * additional points will be sums
+				      * of these two vectors.
+				      * Colorizing is done according
+				      * to hyper_rectangle().
+				      *
+				      * @note This function is
+				      * implemented in 2d only.
+				      */
+    template <int dim>
+    static void
+    parallelogram(Triangulation<dim>&  tria,
+		  const Tensor<2,dim>& corners,
+		  const bool           colorize=false);
+		  
+			      
 				     /**
 				      * Hypercube with a layer of
 				      * hypercubes around it. The
