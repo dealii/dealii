@@ -101,11 +101,16 @@ namespace PETScWrappers
     protected:
                                        /**
                                         * Create a vector of length @p{n}. For
-                                        * this class, we create a sequential
+                                        * this class, we create a parallel
                                         * vector. @arg n denotes the total
-                                        * size of the vector to be created.
+                                        * size of the vector to be
+                                        * created. @arg local_size denotes how
+                                        * many of these elements shall be
+                                        * stored locally. The last argument is
+                                        * ignored for sequential vectors.
                                         */
-      virtual void create_vector (const unsigned int n);
+      virtual void create_vector (const unsigned int n,
+                                  const unsigned int local_size = 0);
   };
 
 
@@ -116,7 +121,7 @@ namespace PETScWrappers
   template <typename number>
   Vector::Vector (const ::Vector<number> &v)
   {
-    create_vector (v.size());
+    Vector::create_vector (v.size());
 
     VectorBase::operator = (v);
   }

@@ -293,10 +293,21 @@ namespace PETScWrappers
       bool operator != (const VectorBase &v) const;
 
                                        /**
-                                        * Return dimension of the vector.
+                                        * Return the global dimension of the vector.
                                         */
       unsigned int size () const;
 
+                                       /**
+                                        * Return the local dimension of the
+                                        * vector, i.e. the number of elements
+                                        * stored on the present MPI
+                                        * process. For sequential vectors,
+                                        * this number is the same as size(),
+                                        * but for parallel vectors it may be
+                                        * smaller.
+                                        */
+      unsigned int local_size () const;
+      
                                        /**
                                         * Provide access to a given element,
                                         * both read and write.
@@ -617,15 +628,21 @@ namespace PETScWrappers
       mutable LastAction::Values last_action;
 
                                        /**
-                                        * Create a vector of length
-                                        * @p{n}. Derived classes have to
-                                        * overload this function according to
-                                        * the type of vector they create
-                                        * (e.g. sequential or
-                                        * parallel/distributed vectors).
+                                        * Create a vector of length @p{n}. For
+                                        * this class, we create a parallel
+                                        * vector. @arg n denotes the total
+                                        * size of the vector to be
+                                        * created. @arg local_size denotes how
+                                        * many of these elements shall be
+                                        * stored locally. The last argument is
+                                        * ignored for sequential vectors.
                                         */
-      virtual void create_vector (const unsigned int n) = 0;
-      
+      virtual void create_vector (const unsigned int n,
+                                  const unsigned int local_size = 0) = 0;
+
+                                       /**
+                                        * Make the reference class a friend.
+                                        */
       friend class internal::VectorReference;
   };
 

@@ -25,35 +25,28 @@ namespace PETScWrappers
 
   Vector::Vector ()
   {
-    const int n = 0;
-    const int ierr
-      = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    Vector::create_vector (0);
   }
 
 
 
   Vector::Vector (const unsigned int n)
   {
-    const int ierr
-      = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    Vector::create_vector (n);
   }
 
   
 
   Vector::Vector (const VectorBase &v)
   {
-    int ierr
-      = VecCreateSeq (PETSC_COMM_SELF, v.size(), &vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
+    Vector::create_vector (v.size());
     VectorBase::operator = (v);
   }
 
   
   void
-  Vector::create_vector (const unsigned int n)
+  Vector::create_vector (const unsigned int n,
+                         const unsigned int /*local_size*/)
   {
     const int ierr
       = VecCreateSeq (PETSC_COMM_SELF, n, &vector);

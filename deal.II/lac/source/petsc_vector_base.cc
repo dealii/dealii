@@ -140,6 +140,7 @@ namespace PETScWrappers
   }
 
 
+  
   bool
   VectorBase::operator != (const VectorBase &v) const
   {
@@ -155,11 +156,24 @@ namespace PETScWrappers
   }
 
 
+  
   unsigned int
   VectorBase::size () const
   {
     int sz;
     const int ierr = VecGetSize (vector, &sz);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    return sz;
+  }
+
+
+
+  unsigned int
+  VectorBase::local_size () const
+  {
+    int sz;
+    const int ierr = VecGetLocalSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return sz;
