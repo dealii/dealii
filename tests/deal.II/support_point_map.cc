@@ -13,7 +13,8 @@
 
 
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2001 */
-
+/* Purpose: check the map_dofs_to_support_points and
+   map_support_points_to_dofs functions.                     */
 
 
 #include <base/logstream.h>
