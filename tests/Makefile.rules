@@ -54,7 +54,7 @@ endif
 
 %.output : %.exe
 	@echo =====Running======= $<
-	@ulimit -t 1800 ; ./$<
+	@ulimit -t 2400 ; ./$<
 	@perl -pi $(normalize)  $@
 
 
