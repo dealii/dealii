@@ -65,9 +65,9 @@ online-doc:
 	@echo
 	@echo =======================================================
 	@echo "The online documentation can now be found in"
-	@echo "  /doc/auto/kdoc/base/index.html"
-	@echo "  /doc/auto/kdoc/lac/index.html"
-	@echo "  /doc/auto/kdoc/deal.II/index.html"
+	@echo "  ../doc/auto/kdoc/base/index.html"
+	@echo "  ../doc/auto/kdoc/lac/index.html"
+	@echo "  ../doc/auto/kdoc/deal.II/index.html"
 	@echo =======================================================
 	@echo
 	@echo
@@ -78,7 +78,7 @@ printable-doc:
 	@echo
 	@echo =======================================================
 	@echo "The generated postscript file can be found here:"
-	@echo "  /doc/auto/latex/deal_II_technical_reference.ps"
+	@echo "  ../doc/auto/latex/deal_II_technical_reference.ps"
 	@echo =======================================================
 	@echo
 	@echo
@@ -89,7 +89,7 @@ tex-doc:
 	@echo
 	@echo =======================================================
 	@echo "The generated LaTeX file can be found here:"
-	@echo "  /doc/auto/latex/deal_II_technical_reference.tex"
+	@echo "  ../doc/auto/latex/deal_II_technical_reference.tex"
 	@echo =======================================================
 	@echo
 	@echo
