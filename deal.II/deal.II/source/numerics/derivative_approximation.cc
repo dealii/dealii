@@ -164,7 +164,7 @@ template <>
 inline
 double
 DerivativeApproximation::SecondDerivative<3>::
-derivative_norm (const Derivative &)
+derivative_norm (const Derivative &d)
 {
 /*
   compute the three eigenvalues of the tensor @p{d} and take the
@@ -179,19 +179,161 @@ derivative_norm (const Derivative &)
   C(EE);
 
   Unfortunately, with both optimized and non-optimized output, at some
-  places cthe code `sqrt(-1.0)' is emitted, and I don't know what
+  places the code `sqrt(-1.0)' is emitted, and I don't know what
   Maple intends to do with it. This happens both with Maple4 and
   Maple5.
 
-  So, if someone has a handy way to compute the three eigenvalues of a
-  3x3 matrix, send it to us. The trick is probably to tell Maple or
-  some other code generator that the matrix is symmetric and the
-  eigenvalues thus real, but how to do that?
-*/
-  
-  Assert (false, ExcNotImplemented());
+  Fortunately, Roger Young provided the following Fortran code, which
+  is transcribed below to C. The code uses an algorithm that uses the
+  invariants of a symmetric matrix. (The translated algorithm is
+  augmented by a test for R>0, since R==0 indicates that all three
+  eigenvalues are equal.)
 
-  const double EE[3] = { 0, 0, 0 };
+  
+      PROGRAM MAIN
+
+C FIND EIGENVALUES OF REAL SYMMETRIC MATRIX
+C (ROGER YOUNG, 2001)
+
+      IMPLICIT NONE
+
+      REAL*8 A11, A12, A13, A22, A23, A33
+      REAL*8 I1, J2, J3, AM
+      REAL*8 S11, S12, S13, S22, S23, S33
+      REAL*8 SS12, SS23, SS13
+      REAL*8 R,R3, XX,YY, THETA
+      REAL*8 A1,A2,A3
+      REAL*8 PI
+      PARAMETER (PI=3.141592653587932384D0)
+      REAL*8 A,B,C, TOL
+      PARAMETER (TOL=1.D-14)
+
+C DEFINE A TEST MATRIX
+
+      A11 = -1.D0
+      A12 = 5.D0
+      A13 = 3.D0
+      A22 = -2.D0
+      A23 = 0.5D0
+      A33 = 4.D0
+      
+
+      I1 = A11 + A22 + A33
+      AM = I1/3.D0
+
+      S11 = A11 - AM
+      S22 = A22 - AM
+      S33 = A33 - AM
+      S12 = A12
+      S13 = A13
+      S23 = A23
+
+      SS12 = S12*S12
+      SS23 = S23*S23
+      SS13 = S13*S13
+
+      J2 = S11*S11 + S22*S22 + S33*S33
+      J2 = J2 + 2.D0*(SS12 + SS23 + SS13)
+      J2 = J2/2.D0
+
+      J3 = S11**3 + S22**3 + S33**3
+      J3 = J3 + 3.D0*S11*(SS12 + SS13)
+      J3 = J3 + 3.D0*S22*(SS12 + SS23)
+      J3 = J3 + 3.D0*S33*(SS13 + SS23)
+      J3 = J3 + 6.D0*S12*S23*S13
+      J3 = J3/3.D0
+
+      R = SQRT(4.D0*J2/3.D0)
+      R3 = R*R*R
+      XX = 4.D0*J3/R3
+
+      YY = 1.D0 - DABS(XX)
+      IF(YY.LE.0.D0)THEN
+         IF(YY.GT.(-TOL))THEN
+            WRITE(6,*)'Equal roots: XX= ',XX
+            A = -(XX/DABS(XX))*SQRT(J2/3.D0)
+            B = AM + A
+            C = AM - 2.D0*A
+            WRITE(6,*)B,' (twice) ',C
+            STOP
+         ELSE
+            WRITE(6,*)'Error: XX= ',XX
+            STOP
+         ENDIF
+      ENDIF
+
+      THETA = (ACOS(XX))/3.D0
+      
+      A1 = AM + R*COS(THETA)
+      A2 = AM + R*COS(THETA + 2.D0*PI/3.D0)
+      A3 = AM + R*COS(THETA + 4.D0*PI/3.D0)
+
+      WRITE(6,*)A1,A2,A3
+
+      STOP
+      END
+  
+*/
+
+  const double pi = 3.141592653587932384;
+  const double am = trace(d) / 3.;
+
+				   // s := d - trace(d) I
+  Tensor<2,3> s = d;
+  for (unsigned int i=0; i<3; ++i)
+    s[i][i] -= am;
+  
+  const double ss01 = s[0][1] * s[0][1],
+	       ss12 = s[1][2] * s[1][2],
+	       ss02 = s[0][2] * s[0][2];
+
+  const double J2 = (s[0][0]*s[0][0] + s[1][1]*s[1][1] + s[2][2]*s[2][2]
+		     + 2 * (ss01 + ss02 + ss12))  / 2.;
+  const double J3 = (std::pow(s[0][0],3) + std::pow(s[1][1],3) + std::pow(s[2][2],3)
+		     + 3. * s[0][0] * (ss01 + ss02)
+		     + 3. * s[1][1] * (ss01 + ss12)
+		     + 3. * s[2][2] * (ss02 + ss12)
+		     + 6. * s[0][1] * s[0][2] * s[1][2]) / 3.;
+  
+  const double R  = std::sqrt (4. * J2 / 3.);
+
+  double EE[3] = { 0, 0, 0 };
+				   // the eigenvalues are away from
+				   // @p{am} in the order of R. thus,
+				   // if R<<AM, then we have
+				   // degenerate case with three
+				   // identical eigenvalues. check
+				   // this first
+  if (R < 1e-14*am)
+    EE[0] = EE[1] = EE[2] = am;
+  else
+    {
+				       // at least two eigenvalues are
+				       // distinct
+      const double R3 = R*R*R;
+      const double XX = 4. * J3 / R3;
+      const double YY = 1. - std::fabs(XX);
+      
+      Assert (YY > -1e-14, ExcInternalError());
+      
+      if (YY < 0)
+	{
+					   // two roots are equal
+	  const double a = (XX>0 ? -1. : 1.) * R / 2;
+	  EE[0] = EE[1] = am + a;
+	  EE[2] = am - 2.*a;
+	}
+      else
+	{
+	  const double theta = std::acos(XX) / 3.;
+	  EE[0] = am + R*std::cos(theta);
+	  EE[1] = am + R*std::cos(theta + 2./3.*pi);
+	  EE[2] = am + R*std::cos(theta + 4./3.*pi);
+	};
+    };
+
+  cout << "EE=" << EE[0] << ' ' << EE[1] << ' ' << EE[2] << endl;
+  
   return std::max (std::fabs (EE[0]),
 		   std::max (std::fabs (EE[1]),
 			     std::fabs (EE[2])));
