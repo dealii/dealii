@@ -56,7 +56,7 @@ template <typename number> class Vector;
  * \begin{verbatim}
  * [ A   B_D^T ] [x] = [b  ]
  * [ B_D 0     ] [l] = [g_D]
- * \begin{verbatim}
+ * \end{verbatim}
  *
  * The first equation then reads $B_D^T l = b-Ax$. On the other hand,
  * if we left-multiply the first equation by $B_D^T B_D$, we obtain
