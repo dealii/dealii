@@ -73,7 +73,7 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	  break
    	])
   done
-  if test $thread_flag = invalid_last_entry ; then
+  if test "$thread_flag" = invalid_last_entry ; then
 	AC_MSG_RESULT("no flag found!")
 	AC_MSG_ERROR("Could not determine multithreading flag for this platform. Aborting!")
   fi
@@ -197,7 +197,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
     ])
 
 
-  if test $deal_II_isnan_flag = "" ; then
+  if test "x$deal_II_isnan_flag" = "x" ; then
     dnl Simply using isnan doesn't work. On Microsoft Windows systems, the function
     dnl is called _isnan, so check that
     AC_TRY_COMPILE(
@@ -217,7 +217,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 
 
   dnl Let's see whether we _now_ have found something
-  if test $deal_II_isnan_flag = "" ; then
+  if test "x$deal_II_isnan_flag" = "x" ; then
     dnl We need to define something. Unfortunately, this is system 
     dnl dependent (argh!)
     deal_II_isnan_flag=""
@@ -260,7 +260,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
     dnl if no such flag was found, then abort ./configure since
     dnl the library will not be compilable on this platform
     dnl without knowledge of the right flag
-    if test "$deal_II_isnan_flag" = "" ; then
+    if test "x$deal_II_isnan_flag" = "x" ; then
       AC_MSG_RESULT(no.)
     else
       dnl we found something, lets us it
