@@ -50,20 +50,20 @@ endif
 
 
 $(LIBDIR)/liblac.a: $(forward-declarations) $(o-files)
-	@echo =====lac==============optimized==$(MT)== Linking library:   $@
+	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(o-files)
 
 $(LIBDIR)/liblac.g.a: $(forward-declarations) $(go-files)
-	@echo =====lac==============debug======$(MT)== Linking library:   $@
+	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(go-files)
 
 
 $(LIBDIR)/liblac.so: $(forward-declarations) $(o-files)
-	@echo =====lac==============optimized==$(MT)== Linking library:   $@
+	@echo =====lac==============optimized==$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
 
 $(LIBDIR)/liblac.g.so: $(forward-declarations) $(go-files)
-	@echo =====lac==============debug======$(MT)== Linking library:   $@
+	@echo =====lac==============debug======$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
 
 
