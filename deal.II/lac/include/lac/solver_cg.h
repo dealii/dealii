@@ -29,25 +29,39 @@
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the @ref{Solver} base class.
  *
- * Like all other solver classes, this class has a local structure called
- * @p{AdditionalData} which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p{SolverSelector} and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure
+ * called @p{AdditionalData} which is used to pass additional
+ * parameters to the solver, like damping parameters or the number of
+ * temporary vectors. For this class, there is a switch allowing for
+ * additional output for the computation of eigenvalues of the matrix.
  *
- * However, since the CG method does not need additional data, the respective
- * structure is empty and does not offer any functionality. The constructor
- * has a default argument, so you may call it without the additional
- * parameter.
+ * @section{Eigenvalue computation}
  *
- * This version of CG is taken from Braess: "Finite Elements" and is analogous
- * to the one in the SIAM Templates Book. It requires a symmetric preconditioner,
- * i.e. SOR is not sufficient.
+ * See Y. Saad: "Iterative methods for Sparse Linear Systems", section
+ * 6.7.3 for details.
  *
- * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
+ * The cg-method performs an orthogonal projection of the original
+ * preconditioned linear system to another system of smaller
+ * dimension. Furthermore, the projected matrix @p{T} is
+ * tri-diagonal. Since the projection is orthogonal, the eigenvalues
+ * of @p{T} approximate those of the original preconditioned matrix
+ * @p{PA}. In fact, after @p{n} steps, where @p{n} is the dimension of
+ * the original system, the eigenvalues of both matrices are
+ * equal. But, even for small numbers of iteration steps, the
+ * condition number of @p{T} is a good estimate for the one of @p{PA}.
+ *
+ * With the coefficients @p{alpha} and @p{beta} written to the log
+ * file if @p{AdditionalData::log_coefficients = true}, the matrix
+ * @p{T_m} after @p{m} steps is the tri-diagonal matrix with diagonal
+ * elements @p{1/alpha_0}, @p{1/alpha_1 + beta_0/alpha_0}, ...,
+ * @p{1/alpha_{m-1}+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
+ * @p{sqrt(beta_0)/alpha_0}, ..., @p{sqrt(beta_{m-2})/alpha_{m-2}}.
+ * The eigenvalues of this matrix can be computed by postprocessing.
+ *
+ * This version of CG is taken from Braess: "Finite Elements". It
+ * requires a symmetric preconditioner, i.e. SOR is not feasible.
+ *
+ * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
 template <class VECTOR = Vector<double> >
 class SolverCG : public Solver<VECTOR>
@@ -62,7 +76,8 @@ class SolverCG : public Solver<VECTOR>
     {
 				       /**
 					* Write coefficients alpha and
-					* beta to the log file for later use.
+					* beta to the log file for
+					later use in eigenvalue estimates.
 					*/
       bool log_coefficients;
 
