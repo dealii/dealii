@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,10 +40,10 @@ template <int dim> class MappingQ;
  * In some sense, the implementation of this element is not complete,
  * but you will rarely notice. Here is the fact: since the element is
  * vector-valued already on the unit cell, the Jacobian matrix (or its
- * inverse) is needed already to generate the @em{values} of the shape
+ * inverse) is needed already to generate the values of the shape
  * functions on the cells in real space. This is in contrast to most
  * other elements, where you only need the Jacobian for the
- * @em{gradients}. Thus, to generate the gradients of Nedelec shape
+ * gradients. Thus, to generate the gradients of Nedelec shape
  * functions, one would need to have the derivatives of the inverse of
  * the Jacobian matrix.
  *
@@ -612,6 +612,9 @@ class FE_Nedelec : public FiniteElement<dim>
 
 /*@}*/
 
+/// @if NoDoc
+
+
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
@@ -716,5 +719,5 @@ template <>
 const unsigned int FE_Nedelec<3>::Matrices::n_constraint_matrices;
 
 #endif
-
+/// @endif
 #endif

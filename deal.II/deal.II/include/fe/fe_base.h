@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,11 +39,10 @@ template<int dim> class FESystem;
  * element class.
  *
  * Remark on a change in implementation: it is now wrong to cast a
- * pointer to @ref{FiniteElement} to a pointer to
- * @p{FiniteElementData} and delete it. The virtual destructor has
- * been moved up. In a later version, @p{FiniteElementData} and
- * @ref{FiniteElementBase} should be private base classes of
- * @ref{FiniteElement}.
+ * pointer to FiniteElement to a pointer to FiniteElementData and
+ * delete it. The virtual destructor has been moved up. In a later
+ * version, FiniteElementData and FiniteElementBase should be private
+ * base classes of FiniteElement.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003
  */
@@ -147,29 +146,26 @@ class FiniteElementData
     				     /**
 				      * Default
 				      * constructor. Constructs an
-				      * element which is not so
-				      * useful. Checking
-				      * @p{dofs_per_cell} is therefore
+				      * element with no dofs. Checking
+				      * n_dofs_per_cell() is therefore
 				      * a good way to check if
 				      * something went wrong.
 				      */
     FiniteElementData ();
 
 				     /**
-				      * Constructor for
-				      * all-dimensional objects. The
-				      * numbers in @p{dofs_per_object}
-				      * represent the numbers of DoFs
-				      * of grid objects in
-				      * dim-ascending order. That is,
-				      * @p{dofs_per_object[0]=dofs_per_vertex},
-				      * @p{dofs_per_object[1]=dofs_per_line},
-				      * @p{dofs_per_object[2]=dofs_per_quad},
-				      * @p{dofs_per_object[3]=dofs_per_hex}.
+				      * Constructor, computing all
+				      * necessary values from the
+				      * distribution of dofs to
+				      * geometrcal objects.
 				      *
-				      * Hence this constructor requires
-				      * @p{dofs_per_object.size()==dim+1}.
-				      *
+				      * @param dofs_per_object Number
+				      * of dofs on geometrical objects
+				      * for each dimension. In this
+				      * vector, entry 0 refers to dofs
+				      * on vertices, entry 1 on lines
+				      * and so on. Its length must be
+				      * <i>dim+1</i>.
 				      * @param n_components Number of
 				      * vector components of the
 				      * element.
@@ -182,37 +178,41 @@ class FiniteElementData
 		       const unsigned int degree = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
-				      * Return the @p{dofs_per_vertex}.
+				      * Number of dofs per vertex.
 				      */
     unsigned int n_dofs_per_vertex () const;
 
 				     /**
-				      * Return the @p{dofs_per_line}.
+				      * Number of dofs per line.
 				      */
     unsigned int n_dofs_per_line () const;
 
     				     /**
-				      * Return the @p{dofs_per_quad}.
+				      * Number of dofs per quad.
 				      */
     unsigned int n_dofs_per_quad () const;
 
     				     /**
-				      * Return the @p{dofs_per_hex}.
+				      * Number of dofs per hex.
 				      */
     unsigned int n_dofs_per_hex () const;
 
     				     /**
-				      * Return the @p{dofs_per_face}.
+				      * Number of dofs per face,
+				      * which is one of the above
+				      * depending on the dimension.
 				      */
     unsigned int n_dofs_per_face () const;
 
     				     /**
-				      * Return the @p{dofs_per_cell}.
+				      * Number of dofs per cell, again
+				      * one of the above depending on
+				      * the dimension.
 				      */
     unsigned int n_dofs_per_cell () const;
 
     				     /**
-				      * Return the @p{components}.
+				      * Number of components.
 				      */
     unsigned int n_components () const;
 
@@ -250,14 +250,6 @@ class FiniteElementData
  * copy finite elements without knowledge of the actual type (linear,
  * quadratic, etc).
  *
- * The implementation of this base class is split into two parts:
- * those fields which are not common to all dimensions
- * (@p{dofs_per_quad} for example are only useful for @p{dim>=2}) are put
- * into the @p{FiniteElementData<dim>} class which is explicitly
- * specialized for all used dimensions, while those fields which may
- * be formulated in a dimension-independent way are put into the
- * present class.
- *
  * The different matrices are initialized with the correct size, such
  * that in the derived (concrete) finite element classes, their
  * entries only have to be filled in; no resizing is needed. If the
@@ -272,38 +264,38 @@ class FiniteElementData
  *
  * @sect3{Support points}
  *
- * Since a @ref{FiniteElement} does not have information on the actual
+ * Since a FiniteElement does not have information on the actual
  * grid cell, it can only provide support points on the unit
  * cell. Support points on the actual grid cell must be computed by
  * mapping these points. The class used for this kind of operation is
- * @ref{FEValues}. In most cases, code of the following type will
+ * FEValues. In most cases, code of the following type will
  * serve to provide the mapped support points.
  *
- * @begin{verbatim}
+ * @code
  * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
  * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
  *                            update_q_points);
  * fe_values.reinit (cell);
  * Point<dim>& mapped_point = fe_values.quadrature_point (i);
- * @end{verbatim}
+ * @endcode
  *
  * Alternatively, the points can be transformed one-by-one:
- * @begin{verbatim}
+ * @code
  * const vector<Point<dim> >& unit_points =
  *    fe.get_unit_support_points();
  *
  * Point<dim> mapped_point =
  *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
- * @end{verbatim}
+ * @endcode
  * This is a shortcut, and as all shortcuts should be used cautiously.
  * If the mapping of all support points is needed, the first variant should
  * be preferred for efficiency.
  *
  * @sect3{Finite elements in one dimension}
  *
- * Finite elements in one dimension need only set the @p{restriction}
- * and @p{prolongation} matrices. The constructor of this class in one
- * dimension presets the @p{interface_constraints} matrix to have
+ * Finite elements in one dimension need only set the #restriction
+ * and #prolongation matrices. The constructor of this class in one
+ * dimension presets the #interface_constraints matrix to have
  * dimension zero. Changing this behaviour in derived classes is
  * generally not a reasonable idea and you risk getting into trouble.
  * 
@@ -311,12 +303,13 @@ class FiniteElementData
  * 
  * In addition to the fields already present in 1D, a constraint
  * matrix is needed, if the finite element has node values located on
- * edges or vertices. These constraints are represented by a $m\times
- * n$-matrix @p{interface_constraints}, where $n$ is the number of
+ * edges or vertices. These constraints are represented by an $m\times
+ * n$-matrix #interface_constraints, where <i>n</i> is the number of
  * degrees of freedom on the refined side without the corner vertices
  * (those dofs on the middle vertex plus those on the two lines), and
- * $m$ is that of the unrefined side (those dofs on the two vertices
- * plus those on the line). The matrix is thus a rectangular one.
+ * <i>m</i> is that of the unrefined side (those dofs on the two
+ * vertices plus those on the line). The matrix is thus a rectangular
+ * one.
  *
  * The mapping of the dofs onto the indices of the matrix on the
  * unrefined side is as follows: let $d_v$ be the number of dofs on a
@@ -361,7 +354,7 @@ class FiniteElementData
  * The order of the twelve lines and the four child faces can be extracted
  * from the following sketch, where the overall order of the different
  * dof groups is depicted:
- * \begin{verbatim}
+ * @verbatim
  *    *--13--3--14--*
  *    |      |      |
  *    16 20  7  19  12
@@ -371,10 +364,10 @@ class FiniteElementData
  *    15 17  5  18  11
  *    |      |      |
  *    *--9---1--10--*
- * \end{verbatim}
+ * @endverbatim
  * The numbering of vertices and lines, as well as the numbering of
  * children within a line is consistent with the one described in
- * @ref{Triangulation}. Therefore, this numbering is seen from the
+ * Triangulation. Therefore, this numbering is seen from the
  * outside and inside, respectively, depending on the face.
  *
  * If of the cells adjacent to one line more than one is refined and
@@ -392,7 +385,7 @@ class FiniteElementData
  * line, not in terms of the other degrees of freedom on a face.
  *
  * Since the handling of constraints on degrees of freedom is mostly done
- * by the @p{ConstraintMatrix} class, this class checks whether the constraints
+ * by the ConstraintMatrix class, this class checks whether the constraints
  * introduced from the two sides are unique; it is able to handle the fact
  * that the constraints for some of the dofs are entered more than once.
  *

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -468,7 +468,9 @@ class FE_DGP : public FiniteElement<dim>
     friend class MappingQ<dim>;
 };
 
-/*@}*/
+/* @} */
+/// @if NoDoc
+
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
@@ -510,4 +512,5 @@ template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
 #endif
 
+/// @endif
 #endif
