@@ -441,14 +441,15 @@ class GridOut
 				      */
     enum OutputFormat { dx, gnuplot, eps, ucd };
 
-				   /**
-				    * Write triangulation in OpenDX format.
-				    *
-				    * Cells or faces are written
-				    * together with their level and
-				    * their material id or boundary
-				    * indicator, resp.
-				    */
+				     /**
+				      * Write triangulation in OpenDX
+				      * format.
+				      *
+				      * Cells or faces are written
+				      * together with their level and
+				      * their material id or boundary
+				      * indicator, resp.
+				      */
     template <int dim>
     void write_dx (const Triangulation<dim> &tria,
 		   std::ostream             &out);
