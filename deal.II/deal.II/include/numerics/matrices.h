@@ -151,7 +151,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class MatrixCreator {
+class MatrixCreator
+{
   public:
 				     /**
 				      *	Declare a data type which denotes a
@@ -269,6 +270,18 @@ class MatrixCreator {
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      *a = 0);
+
+				     /**
+				      * Generate Laplace matrix for a given level.
+				      * 
+				      * See the general doc of this class
+				      * for more information.
+				      */
+    static void create_level_laplace_matrix (unsigned int             level,
+					     const MGDoFHandler<dim>& dof,
+					     const Quadrature<dim>&   q,
+					     SparseMatrix<float>&     matrix,
+					     const Function<dim>*     a = 0);
 
 				     /**
 				      * Assemble the Laplace matrix and a right

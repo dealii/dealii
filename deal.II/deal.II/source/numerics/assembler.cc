@@ -12,41 +12,6 @@
 
 
 template <int dim>
-Equation<dim>::Equation (const unsigned int n_equations) :
-		n_eq(n_equations) {};
-
-
-
-template <int dim>
-void Equation<dim>::assemble (FullMatrix<double>          &,
-			      Vector<double>           &,
-			      const FEValues<dim> &,
-			      const typename DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-template <int dim>
-void Equation<dim>::assemble (FullMatrix<double>          &,
-			      const FEValues<dim> &,
-			      const typename DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-template <int dim>
-void Equation<dim>::assemble (Vector<double>           &,
-			      const FEValues<dim> &,
-			      const typename DoFHandler<dim>::cell_iterator &) const {
-  Assert (false, ExcPureVirtualFunctionCalled());
-};
-
-
-
-
-template <int dim>
 Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,
 					      const bool                assemble_matrix,
 					      const bool                assemble_rhs,

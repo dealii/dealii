@@ -8,9 +8,9 @@ MultiGrid::
 */
 
 template <int dim>
-MultiGrid<dim>::MultiGrid(const MGDoFHandler<dim>& dofs, const MGTransferBase& transfer)
+MG<dim>::MG(const MGDoFHandler<dim>& dofs, const MGTransferBase& transfer)
 		:
-		MultiGridBase(transfer, 0, dofs.get_tria().n_levels()-1),
+		MGBase(transfer, 0, dofs.get_tria().n_levels()-1),
 		dofs(&dofs),
 		matrix_structures(maxlevel-minlevel),
 		matrices(maxlevel-minlevel)
@@ -24,7 +24,7 @@ MultiGrid<dim>::MultiGrid(const MGDoFHandler<dim>& dofs, const MGTransferBase& t
 
 template <int dim> template <typename number>
 void
-MultiGrid<dim>::copy_to_mg(vector<Vector<float> >& dst,
+MG<dim>::copy_to_mg(vector<Vector<float> >& dst,
 			   const Vector<number>& src) const
 {
 
@@ -32,7 +32,7 @@ MultiGrid<dim>::copy_to_mg(vector<Vector<float> >& dst,
 
 template <int dim> template <typename number>
 void
-MultiGrid<dim>::copy_from_mg(Vector<number>& dst,
+MG<dim>::copy_from_mg(Vector<number>& dst,
 			     const vector<Vector<float> >& src) const
 {
 // active iterator
@@ -41,12 +41,12 @@ MultiGrid<dim>::copy_from_mg(Vector<number>& dst,
 
 /*
 template <int dim>
-MultiGrid::
+MG::
 template <int dim>
-MultiGrid::
+MG::
 template <int dim>
-MultiGrid::
+MG::
 template <int dim>
-MultiGrid::
+MG::
 
 */

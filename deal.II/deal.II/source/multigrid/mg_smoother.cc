@@ -109,9 +109,25 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
 
 //////////////////////////////////////////////////////////////////////
 
+
+template<int dim>
+MGSmootherIdentity::MGSmootherIdentity(const MGDoFHandler<dim> &mg_dof)
+		:
+		MGSmoother(mg_dof, 0)
+{}
+
+void
+MGSmootherIdentity::smooth (const unsigned int,
+		       Vector<float>       &,
+			    const Vector<float> &) const
+{}
+
+
+//////////////////////////////////////////////////////////////////////
+
 template<int dim>
 MGSmootherSOR::MGSmootherSOR(const MGDoFHandler<dim> &mg_dof,
-			     const MGMatrix& matrix,
+			     const MGMatrix<SparseMatrix<float> >& matrix,
 			     unsigned int steps)
 		:
 		MGSmoother(mg_dof, steps),
@@ -134,5 +150,8 @@ template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&, unsigne
 #endif
 
 template MGSmootherSOR::MGSmootherSOR(const MGDoFHandler<deal_II_dimension> &mg_dof,
-				      const MGMatrix& matrix, unsigned int steps);
+				      const MGMatrix<SparseMatrix<float> >& matrix,
+				      unsigned int steps);
+
+template MGSmootherIdentity::MGSmootherIdentity(const MGDoFHandler<deal_II_dimension> &mg_dof);
 

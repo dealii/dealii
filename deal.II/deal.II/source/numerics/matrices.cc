@@ -340,7 +340,39 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
   while ((++assembler).state() == valid);
 };
 
+/*
 
+template <int dim>
+void MatrixCreator<dim>::create_level_laplace_matrix (unsigned int level,
+						      const MGDoFHandler<dim>    &dof,
+						      const Quadrature<dim>    &q,
+						      SparseMatrix<float>     &matrix,
+						      const Function<dim> * const a)
+{
+  Vector<double> dummy;   // no entries, should give an error if accessed
+  UpdateFlags update_flags = UpdateFlags(update_gradients |
+					 update_JxW_values);
+  if (a != 0)
+    update_flags = UpdateFlags(update_flags | update_q_points);
+  const Assembler<dim>::AssemblerData data (dof,
+					    true, false,  // assemble matrix but not rhs
+					    matrix, dummy,
+					    q, update_flags);
+  TriaIterator<dim, Assembler<dim> >
+    assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
+	       dof.get_tria().begin(level)->level(),
+	       dof.get_tria().begin(level)->index(),
+	       &data);
+  LaplaceMatrix<dim> equation (0, a);
+  do 
+    {
+      assembler->assemble (equation);
+      ++assembler
+    }
+  while ( (assembler.state()==valid) && (assembler->level() == level) );
+};
+
+*/
 
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
@@ -348,7 +380,8 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						SparseMatrix<double>     &matrix,
 						const Function<dim>      &rhs,
 						Vector<double>           &rhs_vector,
-						const Function<dim> * const a) {
+						const Function<dim> * const a)
+{
   UpdateFlags update_flags = UpdateFlags(update_q_points  |
 					 update_gradients |
 					 update_JxW_values);

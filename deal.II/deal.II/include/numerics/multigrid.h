@@ -10,216 +10,25 @@
 #include <basic/forward-declarations.h>
 #include <lac/sparsematrix.h>
 #include <lac/vector.h>
+#include <lac/mgbase.h>
 
 #include <vector>
-class MGTransferBase;
-class MGSmootherBase;
-
-
-/**
- * Basic matrix class for multigrid preconditioning.
- *
- * This matrix may be used in the iterative methods of LAC, where the
- * functions #vmult# and #precondition# and possibly their transposed
- * versions are needed.
- *
- * The functionality of the multigrid method is restricted to defect
- * correction. It is <B>not</B> iterative and the start solution is
- * always zero. Since by this <I>u<SUP>E</SUP><SUB>l</SUB></I> and
- * <I>u<SUP>A</SUP><SUB>l</SUB></I> (see report on multigrid) are
- * always zero, restriction is simplified a lot and maybe even the
- * seam condition on grids is oblivious. Still, I am not sure that
- * these restrictions on the class might cause numerical
- * inefficiencies.
- *
- * The function #precondition# is the actual multigrid method and
- * makes use of several operations to be implemented in derived
- * classes. It takes a defect in #src# and the result is the multigrid
- * preconditioned defect in #dst#.
- *
- * @author Guido Kanschat, 1999
- * */
-class MultiGridBase
-{
-    MultiGridBase(const MultiGridBase&);
-    const MultiGridBase& operator=(const MultiGridBase&);
-    
-				     /**
-				      * Auxiliary vector, defect.
-				      */
-    vector<Vector<float> > d;
-
-				     /**
-				      * Auxiliary vector, solution.
-				      */
-    vector<Vector<float> > s;
-
-				     /**
-				      * Auxiliary vector.
-				      */
-    Vector<float> t;
-    
-				     /**
-				      * Prolongation and restriction object.
-				      */
-    SmartPointer<const MGTransferBase> transfer;
-    
-  protected:
-				     /**
-				      * Highest level of cells.
-				      */
-    unsigned int maxlevel;
-
-				     /**
-				      * Level for coarse grid solution.
-				      */
-    unsigned int minlevel;
-
-				     /**
-				      * The actual v-cycle multigrid method.
-				      * This function is called on the
-				      * highest level and recursively
-				      * invokes itself down to the
-				      * coarsest. There, it calls
-				      * #coarse_grid_solution# and
-				      * proceeds back up.
-				      */
-    void level_mgstep(unsigned int level,
-		      const MGSmootherBase& pre_smooth,
-		      const MGSmootherBase& post_smooth);  
-
-				     /**
-				      * Apply residual operator on all
-				      * cells of a level.
-				      * This is implemented in a
-				      * derived class.
-				      */
-    virtual void level_residual(unsigned int level,
-			     Vector<float>& dst,
-			     const Vector<float>& src,
-			     const Vector<float>& rhs) = 0;
-
-				     /**
-				      * Solve exactly on coarsest grid.
-				      * Usually, this function should
-				      * be overloaded by a more
-				      * sophisticated derived
-				      * class. Still, there is a
-				      * standard implementation doing
-				      * #10 * (n_pre_smooth +
-				      * n_post_smooth)#
-				      * smoothing steps of #pre_smooth#.
-				      */
-    virtual void coarse_grid_solution(unsigned int l,
-				      Vector<float>& dst,
-				      const Vector<float>& src);
-  
-
-  
-
-  
-  public:
-				     /**
-				      * Constructor, subject to change.
-				      */
-    MultiGridBase(const MGTransferBase& transfer,
-		  unsigned int maxlevel, unsigned int minlevel);
-    virtual ~MultiGridBase();
-    
-};
-
-
-
-/**
- * Base class used to declare the operations needed by a concrete class
- * implementing prolongation and restriction of vectors in the multigrid
- * context. This class is an abstract one and has no implementations of
- * possible algorithms for these operations.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
- */
-class MGTransferBase  :  public Subscriptor
-{
-  public:
-				     /**
-				      * Destructor. Does nothing here, but
-				      * needs to be declared virtual anyway.
-				      */
-    virtual ~MGTransferBase();
-
-				     /**
-				      * Prolongate a vector from level
-				      * #to_level-1# to level #to_level#.
-				      *
-				      * #src# is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the coarser level of
-				      * the two involved levels, while #src#
-				      * shall have as many elements as there
-				      * are degrees of freedom on the finer
-				      * level.
-				      */
-    virtual void prolongate (const unsigned int   to_level,
-			     Vector<float>       &dst,
-			     const Vector<float> &src) const = 0;
-
-				     /**
-				      * Restrict a vector from level
-				      * #from_level# to level
-				      * #from_level-1#.
-				      *
-				      * #src# is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the finer level of
-				      * the two involved levels, while #src#
-				      * shall have as many elements as there
-				      * are degrees of freedom on the coarser
-				      * level.
-				      */
-    virtual void restrict (const unsigned int   from_level,
-			   Vector<float>       &dst,
-			   const Vector<float> &src) const = 0;
-};
-
-/**
- * An array of matrices for each level.
- * This class provides the functionality of #vector<SparseMatrix<float> ># combined
- * with a subscriptor for smart pointers.
- * @author Guido Kanschat, 1999
- */
-class MGMatrix
-  :
-  public Subscriptor,
-  public Vector<SparseMatrix<float> >
-{
-  public:
-				     /**
-				      * Standard constructor.
-				      */
-    MGMatrix() 
-      {}
-				     /**
-				      * Constructor allowing to initialize the number of levels.
-				      */
-    MGMatrix(unsigned int n_levels);
-};
-
 
 /**
  * Implementation of multigrid with matrices.
- * While #MultiGridBase# was only an abstract framework for the v-cycle,
+ * While #MGBase# was only an abstract framework for the v-cycle,
  * here we have the implementation of the pure virtual functions defined there.
  * Furthermore, level information is obtained from a triangulation object.
  * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template<int dim>
-class MultiGrid
+class MG
   :
-  public MultiGridBase
+  public MGBase
 {
   public:
-    MultiGrid(const MGDoFHandler<dim>&, const MGTransferBase& transfer);
+    MG(const MGDoFHandler<dim>&, const MGTransferBase& transfer);
     
 				     /** Transfer from dVector to
 				      * MGVector.
@@ -277,7 +86,7 @@ class MultiGrid
 				     /**
 				      * Matrix structures for each level.
 				      * These are generated by the constructor
-				      * of #MultiGrid# and can be accessed
+				      * of #MG# and can be accessed
 				      * later.
 				      */
     vector<SparseMatrixStruct> matrix_structures;
@@ -285,7 +94,7 @@ class MultiGrid
 				     /**
 				      * Matrices for each level.
 				      * The matrices are prepared by
-				      * the constructor of #MultiGrid# and can
+				      * the constructor of #MG# and can
 				      * be accessed for assembling.
 				      */
     vector<SparseMatrix<float> > matrices;
@@ -365,10 +174,11 @@ class MGTransferPrebuilt : public MGTransferBase
     vector<SparseMatrix<float> > prolongation_matrices;
 };
 
+
 template<int dim>
 inline
 SparseMatrix<float>&
-MultiGrid<dim>::get_matrix(unsigned int level)
+MG<dim>::get_matrix(unsigned int level)
 {
   Assert((level>=minlevel) && (level<maxlevel), ExcIndexRange(level, minlevel, maxlevel));
   
@@ -378,13 +188,12 @@ MultiGrid<dim>::get_matrix(unsigned int level)
 template<int dim>
 inline
 const SparseMatrix<float>&
-MultiGrid<dim>::get_matrix(unsigned int level) const
+MG<dim>::get_matrix(unsigned int level) const
 {
   Assert((level>=minlevel) && (level<maxlevel), ExcIndexRange(level, minlevel, maxlevel));
   
   return matrices[level];
 }
-
 
 
 /*----------------------------   multigrid.h     ---------------------------*/

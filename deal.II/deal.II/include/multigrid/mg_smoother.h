@@ -6,43 +6,11 @@
 
 
 #include <lac/forward-declarations.h>
+#include <lac/mgbase.h>
 #include <basic/forward-declarations.h>
 #include <base/smartpointer.h>
 #include <vector>
 
-
-/**
- * Abstract base class for multigrid smoothers.
- * In fact, this class only provides the interface of the smoothing function.
- * Using deal.II grid handling, #MGSmoother# is a good point to start.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
- */
-class MGSmootherBase
-  :
-  public Subscriptor 
-{  
-  public:
-				     /**
-				      * Virtual destructor.
-				      */
-    virtual ~MGSmootherBase();
-    
-				     /**
-				      * Smoothen the residual of #u# on the given
-				      * level. This function should keep the interior
-				      * level boundary values, so you may want
-				      * to call #set_zero_interior_boundary#
-				      * in the derived class #MGSmoother#
-				      * somewhere in your derived function,
-				      * or another function doing similar
-				      * things.
-				      */
-    virtual void smooth (const unsigned int   level,
-			 Vector<float>       &u,
-			 const Vector<float> &rhs) const = 0;
-
-};
 
 /**
  * Base class for multigrid smoothers. It declares the interface
@@ -143,6 +111,29 @@ class MGSmoother
 };
 
 /**
+ * Smoother doing nothing.
+ * @author Guido Kanschat, 1999
+ */
+class MGSmootherIdentity
+  :
+  public MGSmoother
+{
+  public:
+				     /**
+				      * Constructor.
+				      */
+    template<int dim>
+    MGSmootherIdentity(const MGDoFHandler<dim> &mg_dof);
+				     /**
+				      * Implementation of the interface in #MGSmootherBase#.
+				      * This function does nothing.
+				      */
+    virtual void smooth (const unsigned int   level,
+			 Vector<float>       &u,
+			 const Vector<float> &rhs) const;
+};
+
+/**
  * Implementation of an SOR smoother.
  *
  * This class is an implementation of a smootin algorithm for multigrid. It
@@ -166,7 +157,7 @@ class MGSmootherSOR
 
     template<int dim>
     MGSmootherSOR(const MGDoFHandler<dim> &mg_dof,
-		  const MGMatrix& matrix,
+		  const MGMatrix<SparseMatrix<float> >& matrix,
 		  unsigned int steps);
     
 				     /**
@@ -181,7 +172,7 @@ class MGSmootherSOR
 				     /**
 				      * Pointer to the matrices.
 				      */
-    SmartPointer< const MGMatrix > matrix;
+    SmartPointer< const MGMatrix< SparseMatrix<float> > > matrix;
 };
 
 inline
@@ -197,7 +188,6 @@ MGSmoother::get_steps() const
 {
   return steps;
 }
-
 
 /*----------------------------   mg_smoother.h     ---------------------------*/
 /* end of #ifndef __mg_smoother_H */
