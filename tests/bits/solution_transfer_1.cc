@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,9 @@
 //
 // this was due to us computing the output vector size before we
 // resized the output vector
+//
+// reported by Brent Bailey (ailey@utias.utoronto.ca) on Wed Oct 22
+// 17:02:59 2003
 
 #include <base/logstream.h>
 #include <grid/tria.h>
