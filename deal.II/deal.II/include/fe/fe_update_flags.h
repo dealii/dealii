@@ -66,27 +66,31 @@ enum UpdateFlags {
 					*/
       update_default  = 0,
 				       /**
-					* Compute quadrature points in real
-					* space (not on unit cell).
+					* Compute quadrature points in
+					* real space (not on unit
+					* cell).
 					*/
       update_q_points = 0x0001,
 
 				       /**
-					* Compute the JxW values (Jacobian
-					* determinant at the quadrature point
-					* times the weight of this point).
+					* Compute the JxW values
+					* (Jacobian determinant at the
+					* quadrature point times the
+					* weight of this point).
 					*/
       update_JxW_values = 0x0002,
 
 				       /**
-					* Update boundary forms on the face.
-				        * This flag is only evaluated by
-				        * the #FEFaceValues# class.
+					* Update boundary forms on the
+				        * face.  This flag is only
+				        * evaluated by the
+				        * @ref{FEFaceValues} class.
 					*
 					* Giving this flag to the
-					* #FEValues# class will result in
-					* an error, since boundary
-					* forms only exist on the boundary.
+					* @ref{FEValues} class will
+					* result in an error, since
+					* boundary forms only exist on
+					* the boundary.
 					*/
       update_boundary_forms = 0x0004,
 
@@ -107,21 +111,24 @@ enum UpdateFlags {
 					*/
       update_values = 0x0010,
 				       /**
-					* Transform gradients on unit cell to
-					* gradients on real cell.
+					* Transform gradients on unit
+					* cell to gradients on real
+					* cell.
 					*/
       update_gradients = 0x0020,
 
 				       /**
-					* Update the second derivatives of the
-					* shape functions on the real cell.
+					* Update the second
+					* derivatives of the shape
+					* functions on the real cell.
 				        */
       update_second_derivatives = 0x0040,
 
 				       /**
-					* Compute jacobian matrices of the
-					* transform between unit and real cell
-					* in the evaluation points.
+					* Compute jacobian matrices of
+					* the transform between unit
+					* and real cell in the
+					* evaluation points.
 					*/
       update_jacobians = 0x0080,
 
@@ -146,9 +153,9 @@ enum UpdateFlags {
       update_contravariant_transformation = 0x0200,
 
 				       /**
-					* Update gradients of the jacobian.
-					* These are used to compute second
-					* derivatives.
+					* Update gradients of the
+					* jacobian.  These are used to
+					* compute second derivatives.
 					*/
       update_jacobian_grads = 0x0400,
 
@@ -159,34 +166,38 @@ enum UpdateFlags {
 
       update_transformation_values = 0x0800,
 
-				       /** Update gradients of
+				       /**
+					* Update gradients of
 					* transformation shape
 					* functions.
 					*/
       update_transformation_gradients = 0x1000,
 
 				       /**
-					* Compute the points on the real cell
-					* on which the trial functions are
-					* located.
+					* Compute the points on the
+					* real cell on which the trial
+					* functions are located.
 					*
 					* Giving this flag to the
-					* #FESubfaceValues# class will result
-					* in an error, since support points are
-					* not useful in that case.
+					* @ref{FESubfaceValues} class
+					* will result in an error,
+					* since support points are not
+					* useful in that case.
 					*/
       update_support_points = 0x2000,
 
 				       /**
-				        * Update the outward normal vectors
-				        * to the face relative to this cell.
-				        * This flag is only evaluated by
-				        * the #FEFaceValues# class.
+				        * Update the outward normal
+				        * vectors to the face relative
+				        * to this cell.  This flag is
+				        * only evaluated by the
+				        * @ref{FEFaceValues} class.
 					*
 					* Giving this flag to the
-					* #FEValues# class will result in
-					* an error, since normal vectors are
-					* not useful in that case.
+					* @ref{FEValues} class will
+					* result in an error, since
+					* normal vectors are not
+					* useful in that case.
 				        */
       update_normal_vectors = 0x4000
 };
