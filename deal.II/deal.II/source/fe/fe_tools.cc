@@ -35,6 +35,8 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
+  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
+  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());  
   Assert(interpolation_matrix.m()==fe2.dofs_per_cell &&
 	 interpolation_matrix.n()==fe1.dofs_per_cell,
 	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
@@ -74,6 +76,8 @@ void FETools::get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
+  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
+  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());  
   Assert(interpolation_matrix.m()==fe1.dofs_per_cell &&
 	 interpolation_matrix.n()==fe1.dofs_per_cell, 
 	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
@@ -100,6 +104,8 @@ void FETools::get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
 {
   Assert (fe1.n_components() == fe2.n_components(),
 	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
+  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
+  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());  
   Assert(difference_matrix.m()==fe1.dofs_per_cell &&
 	 difference_matrix.n()==fe1.dofs_per_cell, 
 	 ExcMatrixDimensionMismatch(difference_matrix.m(),
