@@ -47,7 +47,7 @@ template <>
 inline
 double
 FEQ1Mapping<1>::shape_value_transform (const unsigned int i,
-					   const Point<1>     &p) const
+				       const Point<1>     &p) const
 {
   Assert((i<2), ExcIndexRange(i,0,2));
   const double xi = p(0);
@@ -64,13 +64,13 @@ template <>
 inline
 Tensor<1,1>
 FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
-					 const Point<1>&) const
+				     const Point<1>&) const
 {
   Assert((i<2), ExcIndexRange(i,0,2));
   switch (i)
     {
-    case 0: return Point<1>(-1.);
-    case 1: return Point<1>(1.);
+      case 0: return Point<1>(-1.);
+      case 1: return Point<1>(1.);
     }
   return Point<1>();
 };
@@ -78,26 +78,26 @@ FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
 
 template <>
 void FEQ1Mapping<1>::get_face_jacobians (const DoFHandler<1>::face_iterator &,
-					     const vector<Point<0> > &,
-					     vector<double>      &) const {
+					 const vector<Point<0> > &,
+					 vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
 
 template <>
 void FEQ1Mapping<1>::get_subface_jacobians (const DoFHandler<1>::face_iterator &,
-						const unsigned int           ,
-						const vector<Point<0> > &,
-						vector<double>      &) const {
+					    const unsigned int           ,
+					    const vector<Point<0> > &,
+					    vector<double>      &) const {
   Assert (false, ExcInternalError());
 };
 
 
 template <>
 void FEQ1Mapping<1>::get_normal_vectors (const DoFHandler<1>::cell_iterator &,
-					     const unsigned int,
-					     const vector<Point<0> > &,
-					     vector<Point<1> > &) const {
+					 const unsigned int,
+					 const vector<Point<0> > &,
+					 vector<Point<1> > &) const {
   Assert (false, ExcInternalError());
 };
 
@@ -162,15 +162,15 @@ template <>
 inline
 double
 FEQ1Mapping<2>::shape_value_transform (const unsigned int i,
-					   const Point<2>& p) const
+				       const Point<2>& p) const
 {
   Assert((i<4), ExcIndexRange(i,0,4));
   switch (i)
     {
-    case 0: return (1.-p(0)) * (1.-p(1));
-    case 1: return p(0) * (1.-p(1));
-    case 2: return p(0) * p(1);
-    case 3: return (1.-p(0)) * p(1);
+      case 0: return (1.-p(0)) * (1.-p(1));
+      case 1: return p(0) * (1.-p(1));
+      case 2: return p(0) * p(1);
+      case 3: return (1.-p(0)) * p(1);
     }
   return 0.;
 };
@@ -180,15 +180,15 @@ template <>
 inline
 Tensor<1,2>
 FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
-					  const Point<2>& p) const
+				      const Point<2>& p) const
 {
   Assert((i<4), ExcIndexRange(i,0,4));
   switch (i)
     {
-    case 0: return Point<2> (p(1)-1., p(0)-1.);
-    case 1: return Point<2> (1.-p(1), -p(0));
-    case 2: return Point<2> (p(1), p(0));
-    case 3: return Point<2> (-p(1), 1.-p(0));
+      case 0: return Point<2> (p(1)-1., p(0)-1.);
+      case 1: return Point<2> (1.-p(1), -p(0));
+      case 2: return Point<2> (p(1), p(0));
+      case 3: return Point<2> (-p(1), 1.-p(0));
     }
   return Point<2> ();
 };
@@ -196,8 +196,8 @@ FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &face,
-					     const vector<Point<1> > &unit_points,
-					     vector<double> &face_jacobians) const {
+					 const vector<Point<1> > &unit_points,
+					 vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
@@ -216,9 +216,9 @@ void FEQ1Mapping<2>::get_face_jacobians (const DoFHandler<2>::face_iterator &fac
 
 template <>
 void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &face,
-						const unsigned int           ,
-						const vector<Point<1> > &unit_points,
-						vector<double> &face_jacobians) const {
+					    const unsigned int           ,
+					    const vector<Point<1> > &unit_points,
+					    vector<double> &face_jacobians) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == face_jacobians.size(),
@@ -239,9 +239,9 @@ void FEQ1Mapping<2>::get_subface_jacobians (const DoFHandler<2>::face_iterator &
 
 template <>
 void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
-					     const unsigned int       face_no,
-					     const vector<Point<1> > &unit_points,
-					     vector<Point<2> > &normal_vectors) const {
+					 const unsigned int       face_no,
+					 const vector<Point<1> > &unit_points,
+					 vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
   Assert (unit_points.size() == normal_vectors.size(),
@@ -269,10 +269,10 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
 
 template <>
 void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cell,
-					     const unsigned int       face_no,
-					     const unsigned int,
-					     const vector<Point<1> > &unit_points,
-					     vector<Point<2> > &normal_vectors) const {
+					 const unsigned int       face_no,
+					 const unsigned int,
+					 const vector<Point<1> > &unit_points,
+					 vector<Point<2> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
 				   // note, that in 2D the normal vectors to the
@@ -328,7 +328,7 @@ template <>
 inline
 double
 FEQ1Mapping<3>::shape_value_transform (const unsigned int i,
-					   const Point<3>& p) const
+				       const Point<3>& p) const
 {
   Assert((i<8), ExcIndexRange(i,0,8));
   switch (i)
@@ -350,7 +350,7 @@ template <>
 inline
 Tensor<1,3>
 FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
-					  const Point<3>& p) const
+				      const Point<3>& p) const
 {
   Assert((i<8), ExcIndexRange(i,0,8));
   switch (i)
@@ -386,8 +386,8 @@ FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
 
 template <>
 void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &face,
-					     const vector<Point<2> > &unit_points,
-					     vector<double> &face_jacobians) const {
+					 const vector<Point<2> > &unit_points,
+					 vector<double> &face_jacobians) const {
   Assert (unit_points.size() == face_jacobians.size(),
 	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
 
@@ -427,9 +427,9 @@ void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &fac
 				   // a maple script doing this computation is
 				   // in the <scripts> directory
   const Point<3> vertices[4] = { face->vertex(0),
-				 face->vertex(1),
-				 face->vertex(2),
-				 face->vertex(3)   };
+				   face->vertex(1),
+				   face->vertex(2),
+				   face->vertex(3)   };
 
   for (unsigned int point=0; point<unit_points.size(); ++point)
     {
@@ -457,9 +457,9 @@ void FEQ1Mapping<3>::get_face_jacobians (const DoFHandler<3>::face_iterator &fac
 
 template <>
 void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &/*face*/,
-						const unsigned int           ,
-						const vector<Point<2> > &unit_points,
-						vector<double> &face_jacobians) const {
+					    const unsigned int           ,
+					    const vector<Point<2> > &unit_points,
+					    vector<double> &face_jacobians) const {
   Assert (false,
 	  ExcWrongFieldDimension (unit_points.size(), face_jacobians.size()));
 };
@@ -467,9 +467,9 @@ void FEQ1Mapping<3>::get_subface_jacobians (const DoFHandler<3>::face_iterator &
 
 template <>
 void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cell,
-					     const unsigned int       face_no,
-					     const vector<Point<2> > &unit_points,
-					     vector<Point<3> > &normal_vectors) const {
+					 const unsigned int       face_no,
+					 const vector<Point<2> > &unit_points,
+					 vector<Point<3> > &normal_vectors) const {
   Assert (unit_points.size() == normal_vectors.size(),
 	  ExcWrongFieldDimension (unit_points.size(), normal_vectors.size()));
   
@@ -478,9 +478,9 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cel
 				   // determinant above
 
   const Point<3> vertices[4] = { cell->face(face_no)->vertex(0),
-				 cell->face(face_no)->vertex(1),
-				 cell->face(face_no)->vertex(2),
-				 cell->face(face_no)->vertex(3)   };
+				   cell->face(face_no)->vertex(1),
+				   cell->face(face_no)->vertex(2),
+				   cell->face(face_no)->vertex(3)   };
 
   for (unsigned int point=0; point<unit_points.size(); ++point)
     {
@@ -521,10 +521,10 @@ void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &cel
 
 template <>
 void FEQ1Mapping<3>::get_normal_vectors (const DoFHandler<3>::cell_iterator &/*cell*/,
-					     const unsigned int       /*face_no*/,
-					     const unsigned int,
-					     const vector<Point<2> > &unit_points,
-					     vector<Point<3> > &normal_vectors) const {
+					 const unsigned int       /*face_no*/,
+					 const unsigned int,
+					 const vector<Point<2> > &unit_points,
+					 vector<Point<3> > &normal_vectors) const {
 				   // more or less copied from the linear
 				   // finite element
 				   // note, that in 2D the normal vectors to the
