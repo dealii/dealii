@@ -26,7 +26,16 @@ documentation, etc</a>.
 <h3>General</h3>
 
 <ol>
-
+  <li> <p>
+       Changed: If available, the library now uses the C++ standard
+       classes <code class="class">istringstream</code> and <code
+       class="class">ostringstream</code> over the old classes
+       <code class="class">i/ostrstream</code>. The ./configure script
+       finds out whether the new classes exist, or whether the
+       backward compatibility classes are to be used.
+       <br>
+       (WB 2001/10/25)
+       </p>
 </ol>
 
 
@@ -44,6 +53,7 @@ documentation, etc</a>.
        <br>
        (GK 2001/10/24)
        </p>
+
   <li> <p>
        Fixed: The <code class="class">DataOutBase::EpsFlags</code>
        class forgot to declare the reverse grey scale function as one
@@ -121,6 +131,7 @@ documentation, etc</a>.
        <br>
        (GK 2001/10/01)
        </p>
+
   <li> <p>
        Fixed: the iterator category template base class of grid
        iterators was incorrectly set.
