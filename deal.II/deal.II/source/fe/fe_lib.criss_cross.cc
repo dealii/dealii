@@ -60,31 +60,7 @@
     od:
   od:
 
-  eq_sys := {(1-t)*x0 + t*x2 = (1-s)*x1 + s*x3,
-             (1-t)*y0 + t*y2 = (1-s)*y1 + s*y3}:
-  solution := solve (eq_sys, {s,t});
-
-  xs := subs (solution, (1-t)*x0 + t*x2):
-  ys := subs (solution, (1-t)*y0 + t*y2):
-  ps := array(1..2, [xs, ys]):
-
-  print ("writing data to files"):
-  readlib(C):
-  C(prolongation, filename=prolongation_2d):
-  C(ps, filename=crosspoint):
-
-  --------------------------------------------------------------------
-  
-  Postprocess the prolongation matrix by the commands
-  
-  perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' prolongation_2d
-  perl -pi -e 's/.*= 0.0;\n//g;' prolongation_2d
-
------------------------------------------------------------------------------*/
-
-
-/*--------------------------------------
-    # these are the basis functions differentiated with respect to
+  # these are the basis functions differentiated with respect to
   # xi and eta. we need them for the computation of the jacobi
   # matrix, since we can't just differentiate a function.
   phi_xi[0] := proc(x,y) if(y<1-x) then -1;  else 0; fi; end:
@@ -104,12 +80,13 @@
   # define an array of the ansatz points in real space; the first
   # four are the vertices, the last one is the crossing point of
   # the two diagonals
-  x := array(0..4);
-  y := array(0..4);
+  print ("Computing cross point"):
+  x := array(0..4):
+  y := array(0..4):
 
   eq_sys := {(1-t)*x[0] + t*x[2] = (1-s)*x[1] + s*x[3],
              (1-t)*y[0] + t*y[2] = (1-s)*y[1] + s*y[3]}:
-  solution := solve (eq_sys, {s,t});
+  solution := solve (eq_sys, {s,t}):
 
   # set last point in dependence of the first four
   x[4] := subs (solution, (1-t)*x[0] + t*x[2]):
@@ -118,8 +95,8 @@
   # this is the mapping from the unit cell to the real cell, only for
   # completeness; we can't use it here, since phi[i] can't be
   # differentiated
-  x_real := sum(x[s]*phi[s], s=0..4):
-  y_real := sum(y[s]*phi[s], s=0..4):
+  x_real := simplify(sum(x[s]*phi[s], s=0..4)):
+  y_real := simplify(sum(y[s]*phi[s], s=0..4)):
 
   # correct form of the jacobi determinant:
   #   detJ :=   diff(x_real,xi)*diff(y_real,eta)
@@ -133,7 +110,148 @@
              detJ1(xi,eta) * detJ2(xi,eta) -
 	     detJ3(xi,eta) * detJ4(xi,eta);
           end:
-----------------------------------------------------------*/
+
+
+  # Now for the mass matrix: we divide the entire cell into four
+  # sectors:
+  #
+  # *-------*
+  # |\     /|
+  # | \ 3 / |
+  # |  \ /  |
+  # |4  *  2|
+  # |  / \  |
+  # | / 1 \ |
+  # |/     \|
+  # *-------*
+  #
+  # In each of these sectors, the Jacobi determinant is constant
+  # so that we can assemble the local mass matrix by summation
+  # over these four sectors. Since the basis functions are as of
+  # now only expressed as if-then-else statements, we have to
+  # express them for each sector separately and name them
+  # phi_s[i]. detJ_s denotes the Jacobi determinant on this sector.
+
+  print ("Computing mass matrix"):
+
+  mass_matrix := array (0..n_functions-1, 0..n_functions-1):
+  for i from 0 to n_functions-1 do
+    for j from 0 to n_functions-1 do
+      mass_matrix[i,j] := 0:
+    od:
+  od:
+  
+  # sector 1
+  phi_s[0] := 1-x-y:
+  phi_s[1] := x-y:
+  phi_s[2] := 0:
+  phi_s[3] := 0:
+  phi_s[4] := 1 - phi_s[0] - phi_s[1] - phi_s[2] - phi_s[3]:
+
+  detJ_s := simplify(detJ(1/2, 1/4)):
+  
+  for i from 0 to n_functions-1 do
+    for j from 0 to n_functions-1 do
+      # split integral over sector into the two parts
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..x),
+			      x=0..1/2) * detJ_s:
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..1-x),
+			      x=1/2..1) * detJ_s:
+    od:
+  od:  
+  
+  # sector 2
+  phi_s[0] := 0:
+  phi_s[1] := x-y:
+  phi_s[2] := x+y-1:
+  phi_s[3] := 0:
+  phi_s[4] := 1 - phi_s[0] - phi_s[1] - phi_s[2] - phi_s[3]:
+
+  detJ_s := simplify(detJ(3/4, 1/2)):
+  
+  for i from 0 to n_functions-1 do
+    for j from 0 to n_functions-1 do
+      # split integral over sector into the two parts
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..x),
+			      x=0..1/2) * detJ_s:
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..1-x),
+			      x=1/2..1) * detJ_s:
+    od:
+  od:  
+
+  # sector 3
+  phi_s[0] := 0:
+  phi_s[1] := 0:
+  phi_s[2] := x+y-1:
+  phi_s[3] := y-x:
+  phi_s[4] := 1 - phi_s[0] - phi_s[1] - phi_s[2] - phi_s[3]:
+
+  detJ_s := simplify(detJ(1/2, 3/4)):
+  
+  for i from 0 to n_functions-1 do
+    for j from 0 to n_functions-1 do
+      # split integral over sector into the two parts
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..x),
+			      x=0..1/2) * detJ_s:
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..1-x),
+			      x=1/2..1) * detJ_s:
+    od:
+  od:  
+
+  # sector 4
+  phi_s[0] := 1-x-y:
+  phi_s[1] := 0:
+  phi_s[2] := 0:
+  phi_s[3] := y-x:
+  phi_s[4] := 1 - phi_s[0] - phi_s[1] - phi_s[2] - phi_s[3]:
+
+  detJ_s := simplify(detJ(1/4, 1/2)):
+  
+  for i from 0 to n_functions-1 do
+    for j from 0 to n_functions-1 do
+      # split integral over sector into the two parts
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..x),
+			      x=0..1/2) * detJ_s:
+      mass_matrix[i,j] := mass_matrix[i,j] +
+                          int(int(phi_s[i] * phi_s[j],
+                                  y=0..1-x),
+			      x=1/2..1) * detJ_s:
+    od:
+  od:  
+  
+  print ("writing data to files"):
+  readlib(C):
+  C(prolongation, filename=prolongation_2d):
+  C(array(1..2, [x[4], y[4]]), optimized, filename=crosspoint_2d):
+  C(mass_matrix, optimized, filename=massmatrix_2d):
+  
+  --------------------------------------------------------------------
+  
+  Postprocess the files by the commands
+  
+  perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' prolongation_2d
+  perl -pi -e 's/.*= 0.0;\n//g;' prolongation_2d
+  perl -pi -e 's/\[(\d+)\]\[(\d+)\]/($1,$2)/g;' massmatrix_2d
+  perl -pi -e 's/(t\d+) =/const double $1 =/g;' massmatrix_2d
+
+-----------------------------------------------------------------------------*/
+
+
+
 
 
 
@@ -451,22 +569,144 @@ void FECrissCross<2>::get_face_ansatz_points (const DoFHandler<2>::face_iterator
 
 
 template <>
-void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &,
+void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					     const Boundary<2> &,
-					     dFMatrix &local_mass_matrix) const {
-  Assert (local_mass_matrix.n() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
-  Assert (local_mass_matrix.m() == total_dofs,
-	  ExcWrongFieldDimension(local_mass_matrix.m(),total_dofs));
+					     dFMatrix &mass_matrix) const {
+  Assert (mass_matrix.n() == total_dofs,
+	  ExcWrongFieldDimension(mass_matrix.n(),total_dofs));
+  Assert (mass_matrix.m() == total_dofs,
+	  ExcWrongFieldDimension(mass_matrix.m(),total_dofs));
 
-				   // in this special element, some of the
-				   // entries are zero (which is not the
-				   // case for most other elements, so
-				   // we first reset all elements and only
-				   // fill in those that are nonzero
-  local_mass_matrix.clear ();
-  
-  Assert (false, ExcNotUseful());
+  const double x[4] = { cell->vertex(0)(0),
+			cell->vertex(1)(0),
+			cell->vertex(2)(0),
+			cell->vertex(3)(0)  };
+  const double y[4] = { cell->vertex(0)(1),
+			cell->vertex(1)(1),
+			cell->vertex(2)(1),
+			cell->vertex(3)(1)  };
+
+  const double t1 = x[3]*x[2];
+  const double t2 = y[1]*y[1];
+  const double t5 = x[0]*x[0];
+  const double t7 = t5*y[3]*y[2];
+  const double t8 = x[3]*x[1];
+  const double t9 = y[0]*y[0];
+  const double t10 = t8*t9;
+  const double t11 = t5*y[1];
+  const double t12 = t11*y[3];
+  const double t13 = t11*y[2];
+  const double t14 = x[1]*x[1];
+  const double t15 = t14*y[0];
+  const double t19 = x[2]*x[1]*t9;
+  const double t20 = t1*t9;
+  const double t24 = x[0]*x[2];
+  const double t25 = t24*t2;
+  const double t29 = t15*y[2];
+  const double t30 = x[3]*y[0];
+  const double t31 = x[1]*y[2];
+  const double t32 = t30*t31;
+  const double t33 = x[2]*y[3];
+  const double t34 = x[1]*y[0];
+  const double t35 = t33*t34;
+  const double t37 = x[2]*y[1];
+  const double t38 = t37*t34;
+  const double t39 = y[1]*x[1];
+  const double t42 = -2.0*t1*t2-t7+t10+t12+t13+2.0*t15*y[3]+t19-t20-2.0*t14*y[2]*y[3]+
+		     t25+2.0*x[0]*t2*x[3]+t29-t32-2.0*t35-t38-2.0*t39*t30;
+  const double t43 = y[3]*x[1];
+  const double t46 = x[3]*y[2];
+  const double t49 = t37*t30;
+  const double t51 = x[0]*y[1];
+  const double t52 = t51*t46;
+  const double t54 = t51*t33;
+  const double t55 = x[0]*y[0];
+  const double t56 = t55*t37;
+  const double t59 = t51*t30;
+  const double t60 = t51*t31;
+  const double t61 = t55*t31;
+  const double t62 = t55*t46;
+  const double t63 = x[0]*y[3];
+  const double t64 = t63*t34;
+  const double t65 = t55*t33;
+  const double t66 = t63*t31;
+  const double t72 = 2.0*t37*t43+2.0*t39*t46+3.0*t49-2.0*t52-t54-t56-2.0*t51*t43-t59-t60
+		     -t61+t62-t64+t65+3.0*t66-t14*t9-t5*t2+2.0*t51*t34;
+  const double t75 = 1/(t51-t63-t37+t33-t34+t31+t30-t46);
+  const double t76 = (t42+t72)*t75;
+  const double t77 = y[3]*y[3];
+  const double t81 = x[3]*x[3];
+  const double t82 = y[1]*t81;
+  const double t86 = t81*y[0]*y[2];
+  const double t90 = t24*t77;
+  const double t94 = -t7-t10-t12-2.0*x[0]*t77*x[1]+t13+t19+2.0*t82*y[2]-t86-t20+t81*t9
+		     -2.0*t82*y[0]-t90+t32-3.0*t35+2.0*t49-3.0*t52;
+  const double t96 = t63*t46;
+  const double t97 = t30*t33;
+  const double t98 = x[3]*y[3];
+  const double t114 = t54-t56+t59-t61+t62+t64+t65+2.0*t66+t96+t97+2.0*t51*t98-2.0*t63*
+		      t30-2.0*y[1]*x[3]*t33+2.0*t98*t34-2.0*t98*t31+2.0*t77*x[1]*x[2]+t5*t77;
+  const double t116 = (t94+t114)*t75;
+  const double t118 = t76/24.0;
+  const double t119 = t116/24.0;
+  const double t121 = -t118+t116/8.0;
+  const double t122 = x[0]*y[2];
+  const double t123 = t122*t37;
+  const double t124 = t122*t33;
+  const double t125 = y[2]*y[2];
+  const double t126 = x[0]*t125;
+  const double t127 = t126*x[1];
+  const double t128 = t126*x[3];
+  const double t129 = x[2]*x[2];
+  const double t131 = y[1]*t129;
+  const double t132 = t131*y[0];
+  const double t133 = t131*y[3];
+  const double t134 = -t25+t60+t123+t54-t52-t124-t127+t128+t129*t2-t132-t133;
+  const double t135 = t37*t46;
+  const double t139 = x[2]*y[0];
+  const double t140 = t139*t46;
+  const double t141 = t8*t125;
+  const double t143 = t129*y[0]*y[3];
+  const double t144 = t33*t31;
+  const double t145 = t139*t31;
+  const double t146 = t38+t135-2.0*t37*t31-t29+t14*t125-t140-t35-t141+t143+t144+t32+t145
+		      ;
+  const double t148 = (t134+t146)*t75;
+  const double t150 = t148/24.0;
+  const double t152 = -t118+t148/8.0;
+  const double t153 = t123-t54+t66+t128-t96-t124-t127+t90+t49-t132-t135;
+  const double t158 = t133+2.0*t33*t46+t86-t81*t125-t129*t77+t141-t97-t32-t144-t140+t143
+		      +t145;
+  const double t160 = (t153+t158)*t75;
+  const double t162 = t160/24.0;
+  const double t164 = 7.0/24.0*t160;
+  const double t165 = -5.0/24.0*t148+t164;
+  const double t168 = t164-5.0/24.0*t116;
+  mass_matrix(0,0) = -t76/12.0+t116/12.0;
+  mass_matrix(0,1) = -t118;
+  mass_matrix(0,2) = 0.0;
+  mass_matrix(0,3) = -t119;
+  mass_matrix(0,4) = t121;
+  mass_matrix(1,0) = -t118;
+  mass_matrix(1,1) = -t76/12.0+t148/12.0;
+  mass_matrix(1,2) = -t150;
+  mass_matrix(1,3) = 0.0;
+  mass_matrix(1,4) = t152;
+  mass_matrix(2,0) = 0.0;
+  mass_matrix(2,1) = -t150;
+  mass_matrix(2,2) = t148/12.0-t160/12.0;
+  mass_matrix(2,3) = -t162;
+  mass_matrix(2,4) = t165;
+  mass_matrix(3,0) = -t119;
+  mass_matrix(3,1) = 0.0;
+  mass_matrix(3,2) = -t162;
+  mass_matrix(3,3) = -t160/12.0+t116/12.0;
+  mass_matrix(3,4) = t168;
+  mass_matrix(4,0) = t121;
+  mass_matrix(4,1) = t152;
+  mass_matrix(4,2) = t165;
+  mass_matrix(4,3) = t168;
+  mass_matrix(4,4) = -t76/12.0+7.0/12.0*t148-17.0/12.0*t160+7.0/12.0*t116;
 };
 
 
