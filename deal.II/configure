@@ -1473,7 +1473,7 @@ cross_compiling=$ac_cv_prog_cxx_cross
 int main() {
 
       rusage *ru;
-      getrusage(0,ru);
+      getrusage(RUSAGE_SELF,ru);
     
 ; return 0; }
 EOF

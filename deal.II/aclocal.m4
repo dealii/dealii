@@ -99,7 +99,7 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
     ],
     [
       rusage *ru;
-      getrusage(0,ru);
+      getrusage(RUSAGE_SELF,ru);
     ],
     [
 	AC_MSG_RESULT("yes")
