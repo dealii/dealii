@@ -58,8 +58,8 @@ void ProblemBase<dim>::clear () {
   if (dof_handler) { delete dof_handler;  dof_handler = 0; };
   system_sparsity.reinit (0,0,1);
   system_matrix.clear ();
-  right_hand_side.reinit (1);
-  solution.reinit (1);
+  right_hand_side.reinit (0);
+  solution.reinit (0);
   constraints.clear ();
 };
 
