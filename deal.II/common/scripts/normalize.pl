@@ -31,7 +31,7 @@ s/line <\d+> of file <.*\//file </;
 
 # Make small exponentials zero
 
-s/-?\d\.\d+e-1\d+/0.00/g;
+s/-?\d?\.\d+e-[123456789]\d+/0.00/g;
 
 # All doubles have two decimals
 #s/(\.\d\d)\d+/\1/g;
