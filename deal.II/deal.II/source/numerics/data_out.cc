@@ -211,9 +211,13 @@ void DataOut<dim>::build_some_patches (Data data)
   DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
-  for (unsigned int i=0;i<data.this_thread;++i,++patch,++cell_number,
-		 cell=next_cell(cell));
-  
+  for (unsigned int i=0; (i<data.this_thread)&&(cell != dofs->end()); ++i)
+    {
+      ++patch;
+      ++cell_number;
+      cell=next_cell(cell);
+    }
+
   				   // now loop over all cells and
 				   // actually create the patches
   for (;cell != dofs->end();)
@@ -260,9 +264,13 @@ void DataOut<dim>::build_some_patches (Data data)
 	    };
 	};
       				       // next cell (patch) in this thread
-      for (unsigned int i=0;((i<data.n_threads)&&(cell != dofs->end()));
-	   ++i,++patch,++cell_number,cell=next_cell(cell));
-      
+      for (unsigned int i=0;
+	   (i<data.n_threads)&&(cell != dofs->end()); ++i)
+	{
+	  ++patch;
+	  ++cell_number;
+	  cell=next_cell(cell);
+	}
     };
 }
 
