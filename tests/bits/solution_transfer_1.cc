@@ -38,7 +38,6 @@ int main ()
 
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria);
-  tria.refine_global (2);
 
   FE_Q<2> fe(1);
   
