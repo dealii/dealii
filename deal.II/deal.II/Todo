@@ -64,6 +64,8 @@ Set dirichlet bc to the solution vector after solving (setting it
   components in the directions of these nodes, even if they are not
   coupled to the other dofs. Strange.)
 
+Update DataIO for ucd i/o of boundary flags and material values.
+Update DataIO for ucd i/o of boundary flags and material values.
 
 
 
@@ -86,4 +88,24 @@ Let all the reinit functions in /lac free their memory, if reinit
   is called with less requirements. Maybe give free all memory
   if the given dimension is zero. If so, check all deal.II files
   for use of reinit.
+Use unsigned integers for the colnums array in dSMatrixStruct. This
+  would enhance safety since colnum=-1 would no longer point to a
+  valid address. Additionally, add a break statement upon first
+  encounter of sorted colnums==-1 in dsmatrixstruct::compress (by
+  now, all -1's are sorted _first_, so we can't skip them if we want
+  to get to the other colnums. If it were MAXINT instead of -1, we
+  could skip all entries after finding the first MAXINT).
 
+Why are there all these unsafe casts from VectorBase to dVector
+  in dvector.cc?
+
+Use unsigned integers for the colnums array in dSMatrixStruct. This
+  would enhance safety since colnum=-1 would no longer point to a
+  valid address. Additionally, add a break statement upon first
+  encounter of sorted colnums==-1 in dsmatrixstruct::compress (by
+  now, all -1's are sorted _first_, so we can't skip them if we want
+  to get to the other colnums. If it were MAXINT instead of -1, we
+  could skip all entries after finding the first MAXINT).
+
+Why are there all these unsafe casts from VectorBase to dVector
+  in dvector.cc?
