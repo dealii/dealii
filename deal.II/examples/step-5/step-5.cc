@@ -740,6 +740,11 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   filename << "solution-"
 	   << cycle
 	   << ".eps";
+				   // In order to append the final
+				   // '\0', we have to put an ``ends''
+				   // to the end of the string:
+  filename << ends;
+  
 				   // We can get whatever we wrote to
 				   // the stream using the ``str()''
 				   // function. Use that as filename
