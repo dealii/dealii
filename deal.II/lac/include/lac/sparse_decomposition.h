@@ -179,8 +179,8 @@ class SparseLUDecomposition : protected SparseMatrix<number>
 				      * Perform the sparse LU
 				      * factorization of the given
 				      * matrix. After this method
-				      * invokation, and before
-				      * consecutive reinit invokation
+				      * invocation, and before
+				      * consecutive reinit invocation
 				      * this object is in decomposed
 				      * state.
 				      *
@@ -291,7 +291,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>
                                       * array contains a pointer
                                       * to the row's first
                                       * afterdiagonal entry. Becomes
-                                      * available after invokation of
+                                      * available after invocation of
                                       * @p{decompose}.
                                       */
     std::vector<const unsigned int*> prebuilt_lower_bound;

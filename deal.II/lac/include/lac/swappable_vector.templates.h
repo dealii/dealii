@@ -151,7 +151,7 @@ void SwappableVector<number>::alert ()
     return;
   
 				   // synchronise with possible other
-				   // invokations of this function and
+				   // invocations of this function and
 				   // other functions in this class
   lock.acquire ();
   
