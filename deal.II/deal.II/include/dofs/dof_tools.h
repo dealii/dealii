@@ -17,6 +17,7 @@
 #include <base/exceptions.h>
 #include <vector>
 #include <set>
+#include <map>
 
 class SparsityPattern;
 template <typename number> class Vector;
