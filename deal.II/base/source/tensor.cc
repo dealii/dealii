@@ -3,6 +3,14 @@
 #include <base/tensor.h>
 #include <cmath>
 
+template <int dim> void
+Tensor<1,dim>::unroll( vector<double>& result) const
+{
+  Assert(false,
+	 ExcWrongVectorSize(1,1));
+}
+
+
 template <int rank_, int dim> void
 Tensor<rank_, dim>::unroll( vector<double>& result) const
 {
