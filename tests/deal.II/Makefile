@@ -22,8 +22,8 @@ lib-h-files = $(wildcard ../../deal_II/include/*/*.h) \
 executables = $(cc-files:.cc=.testcase)
 
 # list of libraries needed to link with
-libs.g   = $D/deal.II/lib/libdeal_II.g.a $D/lac/lib/liblac.g.a $D/base/lib/libbase.g.a
-libs     = $D/deal.II/lib/libdeal_II.a   $D/lac/lib/liblac.a   $D/base/lib/libbase.a
+libs.g   = $D/deal.II/lib/libdeal_II_2d.g.a $D/lac/lib/liblac.g.a $D/base/lib/libbase.g.a
+libs     = $D/deal.II/lib/libdeal_II_2d.a   $D/lac/lib/liblac.a   $D/base/lib/libbase.a
 
 
 # check whether we use debug mode or not
