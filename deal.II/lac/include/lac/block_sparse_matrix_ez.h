@@ -73,7 +73,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * called for objects with empty
 				      * blocks only.
 				      */
-    BlockSparseMatrixEZ operator = (const BlockSparseMatrixEZ<Number>&);
+    BlockSparseMatrixEZ & operator = (const BlockSparseMatrixEZ<Number>&);
 
 				     /**
 				      * Initialize to given block
