@@ -273,8 +273,23 @@ class DataOutBase
 				      * documentation of the
 				      * #DataOutBase# class for more
 				      * information on its contents
-				      * and purposes.
-				      *
+				      * and purposes.  In the case of
+				      * two dimensions, the next
+				      * picture ist an example of
+				      * #n_subdivision# = 4 because
+				      * the number of cells is
+				      * egal to 2^#dim#.
+				      * \begin{verbatim}
+				      *  __ __ __ __
+				      * |  |  |  |  |
+				      * |__|__|__|__| 
+				      * |  |  |  |  |
+				      * |__|__|__|__|
+				      * |  |  |  |  |
+				      * |__|__|__|__| 
+				      * |  |  |  |  |
+				      * |__|__|__|__|
+				      * \end{verbatim}
 				      * @author Wolfgang Bangerth
 				      */
     template <int dim>
@@ -320,20 +335,56 @@ class DataOutBase
 					  *
 					  * Within each column,
 					  * #data(.,j)# are the data
-					  * values at the output point #j#,
-					  * where #j# runs first over the
-					  * last direction, then over the second
-					  * last one etc, just as if it was
+					  * values at the output point
+					  * #j#, where #j# runs first
+					  * over the last direction,
+					  * then over the second last
+					  * one etc, just as if it was
 					  * organized as an array
-					  * #double[x][y][z]#. This is also
-					  * the order of points as provided
-					  * by the #QIterated# class when used
-					  * with the #QTrapez# class as subquadrature.
-					  * Note that if #subdivisions==1#,
-					  * the elements of #data[i]# correspond
-					  * to vertices #(0,1)# in 1d,
-					  * #(0, 3, 1, 2)# in 2d, and
-					  * #(0, 4, 3, 7, 1, 5, 2, 6)# in 3d.
+					  * #double[x][y][z]#. This is
+					  * also the order of points
+					  * as provided by the
+					  * #QIterated# class when
+					  * used with the #QTrapez#
+					  * class as subquadrature.
+					  * Note that if
+					  * #subdivisions==1#, the
+					  * elements of #data[i]#
+					  * correspond to vertices
+					  * #(0,1)# in 1d, #(0, 3, 1,
+					  * 2)# in 2d, and #(0, 4, 3,
+					  * 7, 1, 5, 2, 6)# in 3d as
+					  * following:
+					  \begin{verbatim}
+					  *  
+					  *      7________6
+					  *      /       /|
+					  *     /       / |
+					  *   3/______2/  |   
+					  *   |   |   |   |
+					  |   |   4___|___5
+					  *   |  /    |  /
+					  *   | /     | /
+					  *  0|/______1/
+					  * \end{verbatim}
+					  * 
+					  * For exemple in 2d: If
+					  * #subdivisions==2# the
+					  * elements of #data[i]# are
+					  * given by the following
+					  * numeration:
+					  *
+					  * \begin{verbatim}
+					  *  2 ____5 ____8
+					  *   |     |     |
+					  *   |     |     | 
+					  *   |     |     | 
+					  *  1|____4|____7|
+					  *   |     |     |
+					  *   |     |     | 
+					  *   |     |     | 
+					  *  0|____3|____6|
+					  * \end{verbatim}
 					  *
 					  * Since the number of data vectors
 					  * is usually the same for all
@@ -581,6 +632,20 @@ class DataOutBase
 					  *
 					  * Default is the Gnuplot-default
 					  * of 30.
+					  *
+					  * \begin{verbatim}
+					  *  
+					  *          3________7
+					  *          /       /|
+					  *         /       / |
+					  *       2/______6/  |   
+					  *       |   |   |   |
+					  * O-->  |   0___|___4
+					  *       |  /    |  /
+					  *       | /     | /
+					  *      1|/______5/
+					  *
+					  * \end{verbatim}
 					  */
 	double turn_angle;
 
@@ -690,11 +755,11 @@ class DataOutBase
 					 /**
 					  * Default colorization function. This
 					  * one does what one usually wants:
-					  * it shifts colors from black (lowest
+					  * It shifts colors from black (lowest
 					  * value) through blue, green and red
 					  * to white (highest value). For the
 					  * exact defition of the color scale
-					  * refer to the impementation.
+					  * refer to the implementation.
 					  *
 					  * This function was originally written
 					  * by Stefan Nauber.
@@ -1120,7 +1185,7 @@ class DataOutInterface : private DataOutBase
 
     				     /**
 				      * Set the flags to be used for output
-				      * in 1d EPS output.
+				      * in EPS output.
 				      */
     void set_flags (const EpsFlags &eps_flags);
 

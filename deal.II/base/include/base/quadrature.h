@@ -174,7 +174,7 @@ class QIterated : public Quadrature<dim>
   public:
 				     /**
 				      * Constructor. Iterate the given
-				      * quadrature formula $n_copies$ times in
+				      * quadrature formula #n_copies# times in
 				      * each direction.
 				      */
     QIterated (const Quadrature<1> &base_quadrature,
@@ -191,10 +191,10 @@ class QIterated : public Quadrature<dim>
     
   private:
 				     /**
-				      * check whether the given
+				      * Check whether the given
 				      * quadrature formula has quadrature
 				      * points at the left and right end points
-				      * of the interval
+				      * of the interval.
 				      */
     static bool uses_both_endpoints (const Quadrature<1> &base_quadrature);
 };
