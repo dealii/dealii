@@ -109,7 +109,7 @@ class CompressedSparsityPattern;
  * 3</tt>.
  *
  *
- * @author Wolfgang Bangerth and others
+ * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPattern : public Subscriptor
 {
@@ -187,18 +187,18 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Initialize a rectangular
-				      * matrix with <tt>m</tt> rows
-				      * and <tt>n</tt> columns.  The
-				      * matrix may contain at most
-				      * <tt>max_per_row</tt> nonzero
-				      * entries per row.
+				      * matrix.
 				      *
-				      * If the matrix is quadratic,
-				      * then the last parameter
-				      * controls optimized storage of
-				      * diagonal elements for
-				      * relaxation methods of
-				      * SparseMatrix.
+				      * @arg m number of rows
+				      * @arg n number of columns
+				      * @arg max_per_row maximum
+				      * number of nonzero entries per row
+				      *
+				      * @arg optimize_diagonal store
+				      * diagonal entries first in row;
+				      * see optimize_diagonal(). This
+				      * takes effect for quadratic
+				      * matrices only.
 				      */
     SparsityPattern (const unsigned int m,
 		     const unsigned int n,
@@ -207,12 +207,21 @@ class SparsityPattern : public Subscriptor
 
 				     /**
 				      * Initialize a rectangular
-				      * matrix with <tt>m</tt> rows
-				      * and <tt>n</tt> columns.  The
-				      * maximal number of nonzero
-				      * entries for each row is given
-				      * by the <tt>row_lengths</tt>
-				      * array.
+				      * matrix.
+				      *
+				      * @arg m number of rows
+				      * @arg n number of columns
+				      *
+				      * @arg row_lengths possible
+				      * number of nonzero entries for
+				      * each row.  This vector must
+				      * have one entry for each row.
+				      *
+				      * @arg optimize_diagonal store
+				      * diagonal entries first in row;
+				      * see optimize_diagonal(). This
+				      * takes effect for quadratic
+				      * matrices only.
 				      */
     SparsityPattern (const unsigned int               m,
 		     const unsigned int               n,
@@ -220,8 +229,9 @@ class SparsityPattern : public Subscriptor
 		     const bool optimize_diagonal = true);
     
 				     /**
-				      * Initialize a quadratic matrix of dimension
-				      * <tt>n</tt> with at most <tt>max_per_row</tt>
+				      * Initialize a quadratic matrix
+				      * of dimension <tt>n</tt> with
+				      * at most <tt>max_per_row</tt>
 				      * nonzero entries per row.
 				      *
 				      * This constructor automatically
@@ -235,13 +245,18 @@ class SparsityPattern : public Subscriptor
 		     const unsigned int max_per_row);
 
 				     /**
-				      * Initialize a quadratic matrix
-				      * with <tt>m</tt> rows and
-				      * <tt>m</tt> columns.  The
-				      * maximal number of nonzero
-				      * entries for each row is given
-				      * by the <tt>row_lengths</tt>
-				      * array.
+				      * Initialize a quadratic matrix.
+				      *
+				      * @arg m number of rows and columns
+				      *
+				      * @arg row_lengths possible
+				      * number of nonzero entries for
+				      * each row.  This vector must
+				      * have one entry for each row.
+				      *
+				      * @arg optimize_diagonal store
+				      * diagonal entries first in row;
+				      * see optimize_diagonal().
 				      */
     SparsityPattern (const unsigned int               m,
 		     const std::vector<unsigned int> &row_lengths,
@@ -674,7 +689,7 @@ class SparsityPattern : public Subscriptor
 				      * Access to column number field.
 				      * Return the column number of
 				      * the <tt>index</tt>th entry in
-				      * <tt>row</tt>. Note that the if
+				      * <tt>row</tt>. Note that if
 				      * diagonal elements are
 				      * optimized, the first element
 				      * in each row is the diagonal
@@ -725,10 +740,25 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Determine whether the matrix
 				      * uses special convention for
-				      * quadratic matrices,
-				      * i.e. diagonal element first in
-				      * row.
-				      */
+				      * quadratic matrices.
+				      *
+				      * A return value <tt>true</tt>
+				      * means that diagonal elements
+				      * are stored first in each
+				      * row. This is required by
+				      * relaxation methods like
+				      * Jacobi() and SOR(). A side
+				      * effect of this scheme is that
+				      * each row contains at least one
+				      * element.
+				      *
+				      * A return value <tt>false</tt>
+				      * means that diagonal elements
+				      * are stored anywhere in the
+				      * row. In particular, a row or
+				      * even the whole matrix may be
+				      * empty.
+				     */
     bool optimize_diagonal () const;
     
                                      /**
@@ -977,7 +1007,13 @@ class SparsityPattern : public Subscriptor
 				      */
     DeclException0 (ExcNotQuadratic);
 				     /**
-				      * Exception
+				      * This exception is thrown if
+				      * the matrix does not follow the
+				      * convention of storing diagonal
+				      * elements first in row. Refer
+				      * to
+				      * SparityPattern::optimize_diagonal()
+				      * for more information.
 				      */
     DeclException0 (ExcDiagonalNotOptimized);
 				     /**
