@@ -409,7 +409,13 @@ class vector2d : public Subscriptor
 				      * Fill array with an array of
 				      * elements.  The array is
 				      * arranged line by line. No
-				      * range checking is performed.
+				      * range checking is performed,
+				      * i.e., it is assumed that the
+				      * input array @p{entries}
+				      * contains @p{n_rows()*n_cols()}
+				      * elements, and that the layout
+				      * refers to the desired shape of
+				      * this table.
 				      */
     template<typename T2>
     void fill (const T2 *entries);
