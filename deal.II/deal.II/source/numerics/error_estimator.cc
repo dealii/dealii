@@ -51,8 +51,6 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 
 				   // number of integration points per face
   const unsigned int n_q_points = quadrature.n_quadrature_points;
-				   // number of dofs per cell
-  const unsigned int n_dofs = fe.total_dofs;
   
 				   // make up a fe face values object for the
 				   // restriction of the finite element function
@@ -98,27 +96,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					 // let psi be a short name for
 					 // [grad u_h]
 	vector<Point<dim> > psi(n_q_points);
+	fe_face_values_cell.get_function_grads (solution, psi);
 	
-					 // get a list of the values of
-					 // the solution for the ansatz
-					 // functions on this cell
-	vector<double>   dof_values(fe.total_dofs, 0);
-	cell->get_dof_values (solution, dof_values);
-
-					 // get a list of the gradients of
-					 // the ansatz functions on this
-					 // cell at the quadrature points
-	const vector<vector<Point<dim> > > &shape_grads(fe_face_values_cell.
-							get_shape_grads());
-
-					 // compute the gradients of the solution
-					 // at the quadrature points by summing
-					 // over the ansatz functions.
-	for (unsigned int j=0; j<n_q_points; ++j) 
-	  for (unsigned int i=0; i<n_dofs; ++i)
-	    psi[j] += dof_values[i]*shape_grads[i][j];
-
-
 	
 					 // now compute over the other side of
 					 // the face
@@ -147,21 +126,17 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 	    fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
 					    fe, boundary);
 
-					     // get a list of the values of
-					     // the solution for the ansatz
-					     // functions on this neighbor
-	    neighbor->get_dof_values (solution, dof_values);
-					     // get a list of the gradients of the
-					     // 
-	    const vector<vector<Point<dim> > > &neighbor_grads (fe_face_values_cell.
-								get_shape_grads());
-					     // subtract the gradients of the
-					     // solution on the neigbor cell
-					     // at the quadrature points from
-					     // those of the present cell
-	    for (unsigned int j=0; j<n_q_points; ++j) 
-	      for (unsigned int i=0; i<n_dofs; ++i)
-		psi[j] -= dof_values[i]*neighbor_grads[i][j];	    
+					     // get a list of the gradients of
+					     // the finite element solution
+					     // restricted to the neighbor cell
+	    vector<Point<dim> > neighbor_psi (n_q_points);
+	    fe_face_values_neighbor.get_function_grads (solution, neighbor_psi);
+
+					     // compute the jump in the gradients
+	    transform (psi.begin(), psi.end(),
+		       neighbor_psi.begin(),
+		       psi.begin(),
+		       minus<Point<dim> >());
 	  };
 
 
@@ -188,6 +163,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 	vector<double> phi(n_q_points,0);
 	const vector<Point<dim> > &normal_vectors(fe_face_values_cell.
 						  get_normal_vectors());
+	
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  phi[point] = psi[point]*normal_vectors[point];
 	

@@ -101,7 +101,8 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 				   // re-init fe values for this cell
   fe_values.reinit (DoFHandler<dim>::cell_iterator (tria,
 						    present_level,
-						    present_index),
+						    present_index,
+						    dof_handler),
 		    fe,
 		    boundary);
   const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;

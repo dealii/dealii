@@ -211,12 +211,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					     // reference_function(x_j)-\psi_j
 					     // and assign that to the vector
 					     // \psi.
-	    const unsigned int n_dofs = fe.total_dofs;
 	    const unsigned int n_q_points = q.n_quadrature_points;
-	    const dFMatrix & shape_values = fe_values.get_shape_values();
-	    vector<double>   dof_values(fe.total_dofs, 0);
-	    cell->get_dof_values (solution, dof_values);
-	    
 	    vector<double>   psi;
 
 					     // in praxi: first compute
@@ -225,9 +220,17 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 				       psi);
 					     // then subtract finite element
 					     // solution
-	    for (unsigned int j=0; j<n_q_points; ++j) 
-	      for (unsigned int i=0; i<n_dofs; ++i)
-		psi[j] -= dof_values[i]*shape_values(i,j);
+	    if (true) 
+	      {
+		vector<double> function_values (n_q_points, 0);
+		fe_values.get_function_values (solution, function_values);
+
+		transform (psi.begin(), psi.end(),
+			   function_values.begin(),
+			   psi.begin(),
+			   minus<double>());
+	      };
+	    
 
 					     // for L1_norm and Linfty_norm:
 					     // take absolute
@@ -296,12 +299,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 
 					     // same procedure as above, but now
 					     // psi is a vector of gradients
-	    const unsigned int n_dofs = fe.total_dofs;
 	    const unsigned int n_q_points = q.n_quadrature_points;
-	    const vector<vector<Point<dim> > > & shape_grads = fe_values.get_shape_grads();
-	    vector<double>   dof_values(fe.total_dofs, 0);
-	    cell->get_dof_values (solution, dof_values);
-	    
 	    vector<Point<dim> >   psi;
 
 					     // in praxi: first compute
@@ -311,10 +309,16 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	    
 					     // then subtract finite element
 					     // solution
-	    for (unsigned int j=0; j<n_q_points; ++j) 
-	      for (unsigned int i=0; i<n_dofs; ++i)
-		psi[j] -= dof_values[i]*shape_grads[i][j];
+	    if (true) 
+	      {
+		vector<Point<dim> > function_grads (n_q_points, Point<dim>());
+		fe_values.get_function_grads (solution, function_grads);
 
+		transform (psi.begin(), psi.end(),
+			   function_grads.begin(),
+			   psi.begin(),
+			   minus<Point<dim> >());
+	      };
 					     // take square of integrand
 	    vector<double> psi_square (psi.size(), 0.0);
 	    for (unsigned int i=0; i<n_q_points; ++i)
