@@ -58,8 +58,9 @@ class PoissonProblem : public ProblemBase<dim> {
     PoissonProblem ();
 
     void clear ();
-    virtual void create_new ();
-    virtual void run (unsigned int level);
+    void create_new ();
+    void run (unsigned int level);
+    void print_history () const;
     
   protected:
     Triangulation<dim> *tria;
@@ -67,6 +68,9 @@ class PoissonProblem : public ProblemBase<dim> {
     
     Function<dim>      *rhs;
     Function<dim>      *boundary_values;
+
+    vector<double> l1_error, l2_error, linfty_error, h1_seminorm_error, h1_error;
+    vector<int>    n_dofs;
 };
 
 
@@ -97,30 +101,32 @@ class Solution : public Function<dim> {
 				      * at the given point.
 				      */
     virtual double operator () (const Point<dim> &p) const;
+				     /**
+				      * Return the gradient of the function
+				      * at the given point.
+				      */
+    virtual Point<dim> gradient (const Point<dim> &p) const;
 };
 
 
 
 
-template <int dim>
-double RHSPoly<dim>::operator () (const Point<dim> &p) const {
-  double ret_val = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    ret_val += 2*p(i)*(1.-p(i));
-  return ret_val;
-};
-
-
-template <int dim>
-double Solution<dim>::operator () (const Point<dim> &p) const {
-  double ret_val = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    ret_val *= p(i)*(1.-p(i));
-  return ret_val;
+double RHSPoly<2>::operator () (const Point<2> &p) const {
+  return 2*(p(0)*(1-p(0)) + p(1)*(1-p(1)));
 };
 
 
 
+double Solution<2>::operator () (const Point<2> &p) const {
+  return p(0)*(1-p(0))*p(1)*(1-p(1));
+};
+
+
+Point<2> Solution<2>::gradient (const Point<2> &p) const {
+  return Point<2> ((1-2*p(0))*p(1)*(1-p(1)), (1-2*p(1))*p(0)*(1-p(0)));
+};
+
+  
 
 
 
@@ -242,6 +248,7 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   cout << "    Distributing dofs... "; 
   dof->distribute_dofs (fe);
   cout << dof->n_dofs() << " degrees of freedom." << endl;
+  n_dofs.push_back (dof->n_dofs());
 
   cout << "    Assembling matrices..." << endl;
   FEValues<dim>::UpdateStruct update_flags;
@@ -257,24 +264,41 @@ void PoissonProblem<dim>::run (const unsigned int level) {
 
   Solution<dim> sol;
   dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
-  QGauss4<dim>  q;
+  dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
+  QGauss3<dim>  q;
   
   cout << "    Calculating L1 error... ";
   integrate_difference (sol, l1_error_per_cell, q, fe, L1_norm);
   cout << l1_error_per_cell.l1_norm() << endl;
+  l1_error.push_back (l1_error_per_cell.l1_norm());
 
   cout << "    Calculating L2 error... ";
   integrate_difference (sol, l2_error_per_cell, q, fe, L2_norm);
   cout << l2_error_per_cell.l2_norm() << endl;
+  l2_error.push_back (l2_error_per_cell.l2_norm());
 
   cout << "    Calculating L-infinity error... ";
   integrate_difference (sol, linfty_error_per_cell, q, fe, Linfty_norm);
   cout << linfty_error_per_cell.linfty_norm() << endl;
+  linfty_error.push_back (linfty_error_per_cell.linfty_norm());
+  
+  cout << "    Calculating H1-seminorm error... ";
+  integrate_difference (sol, h1_seminorm_error_per_cell, q, fe, H1_seminorm);
+  cout << h1_seminorm_error_per_cell.l2_norm() << endl;
+  h1_seminorm_error.push_back (h1_seminorm_error_per_cell.l2_norm());
+
+  cout << "    Calculating H1 error... ";
+  integrate_difference (sol, h1_error_per_cell, q, fe, H1_norm);
+  cout << h1_error_per_cell.l2_norm() << endl;
+  h1_error.push_back (h1_error_per_cell.l2_norm());
 
   dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
+  dVector h1_seminorm_error_per_dof, h1_error_per_dof;
   dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
   dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
   dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
+  dof->distribute_cell_to_dof_vector (h1_seminorm_error_per_cell, h1_seminorm_error_per_dof);
+  dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
 
   string filename = "gnuplot.";
   filename += ('0'+level);
@@ -285,7 +309,9 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   fill_data (out);
   out.add_data_vector (l1_error_per_dof, "L1-Error");
   out.add_data_vector (l2_error_per_dof, "L2-Error");
-  out.add_data_vector (linfty_error_per_dof, "L3-Error");
+  out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
+  out.add_data_vector (h1_seminorm_error_per_dof, "H1-seminorm-Error");
+  out.add_data_vector (h1_error_per_dof, "H1-Error");
   out.write_gnuplot (gnuplot);
   gnuplot.close ();
   
@@ -293,14 +319,59 @@ void PoissonProblem<dim>::run (const unsigned int level) {
 };
 
 
+template <int dim>
+void PoissonProblem<dim>::print_history () const {
+  ofstream out("gnuplot.history");
+  out << "# n_dofs    l1_error l2_error linfty_error h1_seminorm_error h1_error"
+      << endl;
+  for (unsigned int i=0; i<n_dofs.size(); ++i)
+    out << n_dofs[i]
+	<< "    "
+	<< l1_error[i] << "  "
+	<< l2_error[i] << "  "
+	<< linfty_error[i] << "  "
+	<< h1_seminorm_error[i] << "  "
+	<< h1_error[i] << endl;
+
+  double average_l1=0,
+	 average_l2=0,
+     average_linfty=0,
+    average_h1_semi=0,
+	 average_h1=0;
+  for (unsigned int i=1; i<n_dofs.size(); ++i) 
+    {
+      average_l1 += l1_error[i]/l1_error[i-1];
+      average_l2 += l2_error[i]/l2_error[i-1];
+      average_linfty += linfty_error[i]/linfty_error[i-1];
+      average_h1_semi += h1_seminorm_error[i]/h1_seminorm_error[i-1];
+      average_h1 += h1_error[i]/h1_error[i-1];
+    };
+
+  average_l1 /= (l1_error.size()-1);
+  average_l2 /= (l1_error.size()-1);
+  average_linfty /= (l1_error.size()-1);
+  average_h1_semi /= (l1_error.size()-1);
+  average_h1 /= (l1_error.size()-1);
+
+  cout << "Average error reduction rates for h->h/2:" << endl;
+  cout << "    L1 error         : " << 1./average_l1 << endl
+       << "    L2 error         : " << 1./average_l2 << endl
+       << "    Linfty error     : " << 1./average_linfty << endl
+       << "    H1 seminorm error: " << 1./average_h1_semi << endl
+       << "    H1 error         : " << 1./average_h1 << endl;
+};
+
 
 
 
 int main () {
   PoissonProblem<2> problem;
 
-  for (unsigned int level=1; level<5; ++level)
+  for (unsigned int level=1; level<8; ++level)
     problem.run (level);
+
+  cout << endl << "Printing convergence history to <gnuplot.history>..." << endl;
+  problem.print_history ();
 
   return 0;
 };
