@@ -6,6 +6,11 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 
+#ifdef DEAL_II_USE_MT
+#  include <base/thread_manager.h>
+#  include <algorithm>
+#endif
+
 #include <map>
 
 
@@ -46,11 +51,81 @@ template <typename number>
 void
 SparseVanka<number>::compute_inverses () 
 {
+#ifdef DEAL_II_USE_MT
+  const unsigned int n_threads  = 4;
+  const unsigned int n_inverses = count (selected.begin(),
+					 selected.end(),
+					 true);
+
+  const unsigned int n_inverses_per_thread = max(n_inverses / n_threads,
+						 1U);
+  
+				   // set up start and end index for
+				   // each of the threads. note that
+				   // we have to work somewhat to get
+				   // this appropriate, since the
+				   // indices for which inverses have
+				   // to be computed may not be evenly
+				   // distributed in the vector. as an
+				   // extreme example consider
+				   // numbering of DoFs by component,
+				   // then all indices for which we
+				   // have to do work will be
+				   // consecutive, with other
+				   // consecutive regions where we do
+				   // not have to do something
+  typedef ThreadManager::Mem_Fun_Data2<SparseVanka<number>,unsigned int,unsigned int> MemFunData;
+  vector<MemFunData> mem_fun_data (n_threads,
+				   MemFunData(this,
+					      0, 0,
+					      &compute_inverses));
+
+  unsigned int c       = 0;
+  unsigned int thread  = 0;
+  mem_fun_data[0].arg1 = 0;
+  
+  for (unsigned int i=0; (i<matrix->m()) && (thread+1<n_threads); ++i)
+    {
+      if (selected[i] == true)
+	++c;
+      if (c == n_inverses_per_thread)
+	{
+	  mem_fun_data[thread].arg2   = i;
+	  mem_fun_data[thread+1].arg1 = i;
+	  ++thread;
+
+	  c = 0;
+	};
+    };
+  mem_fun_data[n_threads-1].arg2 = matrix->m();
+
+				   // Now spawn the threads
+  ThreadManager thread_manager;
+  for (unsigned int i=0; i<n_threads; ++i)
+    thread_manager.spawn (&mem_fun_data[i], THR_SCOPE_SYSTEM | THR_DETACHED);
+
+  thread_manager.wait ();
+  
+#else
+  compute_inverses (0, matrix->m());
+#endif
+};
+
+
+
+template <typename number>
+void
+SparseVanka<number>::compute_inverses (const unsigned int begin,
+				       const unsigned int end) 
+{
+				   // set-up the map that will be used
+				   // by the functions which we call
+				   // below.
   map<unsigned int, unsigned int> local_index;
 
 				   // traverse all rows of the matrix
 				   // which are selected
-  for (unsigned int row=0; row< matrix->m() ; ++row)
+  for (unsigned int row=begin; row<end; ++row)
     if (selected[row] == true)
       compute_inverse (row, local_index);
 };

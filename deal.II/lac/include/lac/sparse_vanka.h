@@ -206,6 +206,20 @@ class SparseVanka
     void compute_inverses ();
 
 				     /**
+				      * Compute the inverses at
+				      * positions in the range
+				      * #[begin,end)#. In
+				      * non-multithreaded mode,
+				      * #compute_inverses()# calls
+				      * this function with the whole
+				      * range, but in multithreaded
+				      * mode, several copies of this
+				      * function are spawned.
+				      */
+    void compute_inverses (const unsigned int begin,
+			   const unsigned int end);
+    
+				     /**
 				      * Compute the inverse of the
 				      * block located at position
 				      * #row#. Since the map is used
