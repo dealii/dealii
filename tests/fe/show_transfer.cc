@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ char fname[50];
 
 template<int dim>
 inline void
-print_matrix(ostream& of,
+print_matrix(std::ostream& of,
 	     Triangulation<dim>& tr,
 	     unsigned int level,
 	     const FiniteElement<dim>& finel,
@@ -75,7 +75,7 @@ main()
   GridGenerator::hyper_cube(tr, -1., 1.);
   tr.refine_global(2);
 
-  ofstream of("transfer.dat");
+  std::ofstream of("transfer.dat");
   
   TEST(1,FEQ1<2>);
   TEST(1,FEQ2<2>);

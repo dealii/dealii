@@ -20,24 +20,22 @@
 
 template <int dim>
 inline void
-check_support (FiniteElement<dim>& finel, const char* name)
+check_support (const FiniteElement<dim>& finel, const char* name)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
   DoFHandler<dim> dof (tr);
   dof.distribute_dofs (finel);
 
-  cout << name << '<' << dim << '>' << " cell support points" << std::endl;
+  std::cout << name << '<' << dim << '>' << " cell support points" << std::endl;
   
-  vector<Point<dim> > cell_points (finel.dofs_per_cell);
-  finel.get_unit_support_points (cell_points);
+  const std::vector<Point<dim> > &cell_points = finel.get_unit_support_points ();
 
   for (unsigned int k=0;k<cell_points.size();++k)
-    cout << setprecision(3) << cell_points[k] << std::endl;
+    std::cout << std::setprecision(3) << cell_points[k] << std::endl;
   
-  vector<Point<dim-1> > face_points;
-  finel.get_unit_face_support_points (face_points);
-  const vector<double> dummy_weights (face_points.size());
+  const std::vector<Point<dim-1> > &face_points = finel.get_unit_face_support_points ();
+  const std::vector<double> dummy_weights (face_points.size());
   
   Quadrature<dim-1> q(face_points, dummy_weights);
   QProjector<dim> qp(q, false);
@@ -45,10 +43,10 @@ check_support (FiniteElement<dim>& finel, const char* name)
   unsigned int j=0;
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     {
-      cout << name << '<' << dim << '>' << " face " << i << " support points" << std::endl;
+      std::cout << name << '<' << dim << '>' << " face " << i << " support points" << std::endl;
         
       for (unsigned int k=0;k<face_points.size();++k)
-	cout << setprecision(3) << qp.point(j++)
+	std::cout << std::setprecision(3) << qp.point(j++)
 	     << std::endl;
     }
 }
@@ -57,15 +55,15 @@ template <int dim>
 inline void
 check_matrices (FiniteElement<dim>& fe, const char* name)
 {
-  cout << name << '<' << dim << '>' << " constraint " << std::endl;
-  fe.constraints().print_formatted (cout, 7, false, 10, "~");
+  std::cout << name << '<' << dim << '>' << " constraint " << std::endl;
+  fe.constraints().print_formatted (std::cout, 7, false, 10, "~");
 
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
     {
-      cout << name << '<' << dim << '>' << " restriction " << i << std::endl;
-      fe.restrict(i).print_formatted (cout, 3, false, 6, "~");
-      cout << name << '<' << dim << '>' << " embedding " << i << std::endl;
-      fe.prolongate(i).print_formatted (cout, 3, false, 6, "~");
+      std::cout << name << '<' << dim << '>' << " restriction " << i << std::endl;
+      fe.restrict(i).print_formatted (std::cout, 3, false, 6, "~");
+      std::cout << name << '<' << dim << '>' << " embedding " << i << std::endl;
+      fe.prolongate(i).print_formatted (std::cout, 3, false, 6, "~");
     }
 }
 

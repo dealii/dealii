@@ -49,22 +49,22 @@ void performance (Triangulation<dim>& tr,
 }
 
 template <int dim>
-void loop (vector<FiniteElement<dim> *> elements,
+void loop (std::vector<FiniteElement<dim> *> elements,
 	    const Mapping<dim>& mapping,
 	    Triangulation<dim>& tr)
 {
   QGauss<dim> gauss (4);
   
-  FiniteElement<dim>** elementp = elements.begin ();
-  FiniteElement<dim>** end = elements.end ();
+  typename std::vector<FiniteElement<dim> *>::iterator elementp = elements.begin ();
+  typename std::vector<FiniteElement<dim> *>::iterator end = elements.end ();
 
   for (;elementp != end; ++elementp)
     {
       const FiniteElement<dim>& element = **elementp;
 
       char dofs[20];
-      ostrstream ost (dofs, 19);
-      ost << element.n_dofs_per_cell() << ends;
+      std::ostrstream ost (dofs, 19);
+      ost << element.n_dofs_per_cell() << std::ends;
       
       deallog.push(dofs);
       
@@ -104,7 +104,7 @@ void loop (vector<FiniteElement<dim> *> elements,
 
 int main ()
 {
-  ofstream of ("performance.log");
+  std::ofstream of ("performance.log");
   deallog.attach (of);
   deallog.log_execution_time(true);
   deallog.log_time_differences(true);
@@ -116,7 +116,7 @@ int main ()
   MappingQ1<2> mapping;
   MappingQ<2> mappingq1(1);
   MappingQ<2> mappingq2(2);
-  vector<FiniteElement<2>*> el2d;
+  std::vector<FiniteElement<2>*> el2d;
   el2d.push_back (new FE_Q<2> (1));
   el2d.push_back (new FE_Q<2> (2));
   el2d.push_back (new FE_Q<2> (3));

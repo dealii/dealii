@@ -44,7 +44,7 @@ plot_shape_functions(Mapping<dim>& mapping,
   
   sprintf(fname, "Shapes%dd-%s.output", dim, name);
   std::ofstream gnuplot(fname);
-  gnuplot.setf(ios::fixed);
+  gnuplot.setf(std::ios::fixed);
   gnuplot.precision (PRECISION);
 
   unsigned int k=0;
@@ -99,8 +99,8 @@ plot_face_shape_functions(Mapping<dim>& mapping,
     | update_q_points));
 
   sprintf(fname, "ShapesFace%dd-%s.output", dim, name);
-  ofstream gnuplot(fname);
-  gnuplot.setf(ios::fixed);
+  std::ofstream gnuplot(fname);
+  gnuplot.setf(std::ios::fixed);
   gnuplot.precision (PRECISION);
   
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
@@ -184,7 +184,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
 	coincide=false;
 
   if (!coincide)
-    deallog << "Error in fe.shape_value for " << name << endl;
+    deallog << "Error in fe.shape_value for " << name << std::endl;
 
   coincide=true;
   for (unsigned int x=0; x<q.n_quadrature_points; ++x)
@@ -197,7 +197,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
       }
 
   if (!coincide)
-    deallog << "Error in fe.shape_grad for " << name << endl;
+    deallog << "Error in fe.shape_grad for " << name << std::endl;
   
   coincide=true;
   double max_diff=0.;
@@ -218,8 +218,8 @@ void test_compute_functions (const Mapping<dim> &mapping,
       }
 
   if (!coincide)  
-    deallog << "Error in fe.shape_grad_grad for " << name << endl
-	    << "max_diff=" << max_diff << endl;
+    deallog << "Error in fe.shape_grad_grad for " << name << std::endl
+	    << "max_diff=" << max_diff << std::endl;
 }
 
 
@@ -297,9 +297,9 @@ void plot_FE_DGQ_shape_functions()
 int
 main()
 {
-  ofstream logfile ("shapes.output");
+  std::ofstream logfile ("shapes.output");
   logfile.precision (PRECISION);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
   
