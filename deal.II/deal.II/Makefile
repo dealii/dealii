@@ -93,12 +93,12 @@ lib/3d/o/%.o :
 
 # special rules for exceptional files. they simply take too long to compile!
 lib/3d/o/q1_mapping.jacobians_3d.o:
-	@echo =====deal.II====3d====opt==special== $(<:source/%=%)
+	@echo =====deal.II====3d====opt==spec=$(MT)== $(<:source/%=%)
 	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=3 -c $< -o $@
 
 ifeq ($(GXX-Version),gcc2.95)
 lib/2d/o/fe_lib.quartic_2d.o:
-	@echo =====deal.II====2d====opt==special== $(<:source/%=%)
+	@echo =====deal.II====2d====opt==spec=$(MT)== $(<:source/%=%)
 	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS.o)) -Ddeal_II_dimension=2 -c $< -o $@
 endif
 
@@ -106,53 +106,53 @@ endif
 
 # rules how to make the libraries themselves
 lib/libdeal_II_1d.g.a: $(go-files-1d)
-	@echo =====deal.II====1d====debug========= Linking library:   $(@F)
+	@echo =====deal.II====1d====debug=====$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(go-files-1d)
 lib/libdeal_II_1d.a: $(o-files-1d)
-	@echo =====deal.II====1d====optimized===== Linking library:   $(@F)
+	@echo =====deal.II====1d====optimized=$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(o-files-1d)
 
 
 lib/libdeal_II_2d.g.a: $(go-files-2d)
-	@echo =====deal.II====2d====debug========= Linking library:   $(@F)
+	@echo =====deal.II====2d====debug=====$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(go-files-2d)
 lib/libdeal_II_2d.a: $(o-files-2d)
-	@echo =====deal.II====2d====optimized===== Linking library:   $(@F)
+	@echo =====deal.II====2d====optimized=$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(o-files-2d)
 
 
 lib/libdeal_II_3d.g.a: $(go-files-3d)
-	@echo =====deal.II====3d====debug========= Linking library:   $(@F)
+	@echo =====deal.II====3d====debug=====$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(go-files-3d)
 lib/libdeal_II_3d.a: $(o-files-3d)
-	@echo =====deal.II====3d====optimized===== Linking library:   $(@F)
+	@echo =====deal.II====3d====optimized=$(MT)== Linking library:   $(@F)
 	@ar ruv $@ $(o-files-3d)
 
 
 lib/libdeal_II_1d.g.so: $(go-files-1d)
-	@echo =====deal.II====1d====debug========= Linking library:   $(@F)
+	@echo =====deal.II====1d====debug=====$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-1d)
 
 lib/libdeal_II_1d.so: $(o-files-1d)
-	@echo =====deal.II====1d====optimized===== Linking library:   $(@F)
+	@echo =====deal.II====1d====optimized=$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-1d)
 
 
 lib/libdeal_II_2d.g.so: $(go-files-2d)
-	@echo =====deal.II====2d====debug========= Linking library:   $(@F)
+	@echo =====deal.II====2d====debug=====$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-2d)
 
 lib/libdeal_II_2d.so: $(o-files-2d)
-	@echo =====deal.II====2d====optimized===== Linking library:   $(@F)
+	@echo =====deal.II====2d====optimized=$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-2d)
 
 
 lib/libdeal_II_3d.g.so: $(go-files-3d)
-	@echo =====deal.II====3d====debug========= Linking library:   $(@F)
+	@echo =====deal.II====3d====debug=====$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-3d)
 
 lib/libdeal_II_3d.so: $(o-files-3d)
-	@echo =====deal.II====3d====optimized===== Linking library:   $(@F)
+	@echo =====deal.II====3d====optimized=$(MT)== Linking library:   $(@F)
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-3d)
 
 
