@@ -144,11 +144,8 @@ template <int dim>
 void gnuplot_output()
 {
   cout << "Output of grids as gnuplot file:" << std::endl;
-  Triangulation<dim> triangulation;
-  GridGenerator::hyper_ball (triangulation);
   
   static const HyperBallBoundary<dim> boundary;
-  triangulation.set_boundary (0, boundary);
   
   GridOut grid_out;
 				   // on boundary faces plot 30
@@ -156,20 +153,33 @@ void gnuplot_output()
   GridOutFlags::Gnuplot gnuplot_flags(false, 30);
   grid_out.set_flags(gnuplot_flags);
   
-  
+
   for (unsigned int order=1; order<4; ++order)
     {
       cout << "Order = " << order << std::endl;
+
+      Triangulation<dim> triangulation;
+      GridGenerator::hyper_ball (triangulation);
+      triangulation.set_boundary (0, boundary);
       
       const MappingQ<dim> mapping (order);
-      string filename="ball_mapping_q";
-      filename += ('0'+order);
-      filename += ".dat";
-      ofstream gnuplot_file(filename.c_str());
+      string filename_base="ball_mapping_q";
+      filename_base += ('0'+order);
+
       
-      grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);  
+      for (unsigned int refinement=0; refinement<2;
+	   ++refinement, triangulation.refine_global(1))
+	{	  
+	  string filename=filename_base+"_ref";
+	  filename += ('0'+refinement);
+	  filename += ".dat";
+	  ofstream gnuplot_file(filename.c_str());
+
+	  grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
+	}
     }
 }
+
 
 
 int main () 
