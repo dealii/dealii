@@ -214,7 +214,7 @@ add_data_vector (const VECTOR         &vec,
 	  std::ostrstream namebuf;
 #endif
 	  namebuf << '_' << i << std::ends;
-  	  names[i] = name + namebuf.str().c_str();
+  	  names[i] = name + namebuf.str();
   	};
     };
   
