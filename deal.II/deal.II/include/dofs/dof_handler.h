@@ -223,13 +223,16 @@ enum RenumberingMethod {
  * Manage the distribution and numbering of the degrees of freedom for
  * non-multigrid algorithms.
  *
- * We store a list of numbers for each cells
- * denoting the mapping between the degrees of freedom on this cell
- * and the global number of this degree of freedom; the number of a
- * degree of freedom lying on the interface of two cells is thus stored
- * twice, but is the same. The numbers refer to the unconstrained
- * matrices and vectors. The layout of storage of these indices is
- * described in the \Ref{DoFLevel} class documentation.
+ * We store a list of numbers for each vertex, line, quad, etc
+ * denoting the mapping between the degrees of freedom on this object
+ * and the global number of this degree of freedom. The numbers refer
+ * to the unconstrained degrees of freedom, i.e. constrained degrees
+ * of freedom are numbered in the same way as unconstrained ones.
+ * This leads to the fact that indices in global vectors and matrices
+ * also refer to all degrees of freedom and some kind of condensation
+ * is needed to restrict the systems of equations to the unconstrained
+ * degrees of freedom only. The actual layout of storage of the indices
+ * is described in the \Ref{DoFLevel} class documentation.
  *
  * Additionally, the DoFHandler is able to generate the condensation
  * matrix which connects constrained and unconstrained matrices and
@@ -243,16 +246,21 @@ enum RenumberingMethod {
  * but offer more functionality than pure triangulation iterators. The
  * order in which dof iterators are presented by the #++# and #--# operators
  * is the same as that for the alike triangulation iterators.
+ *
+ * This class also provides functions to create the sparsity patterns of
+ * global matrices as well as matrices living on (parts of) the boundary
+ * and handles some simple forms of transfer of data from one grid to another.
  * 
  * 
- * \subsection{Distribution of degrees of freedom}
+ * \subsection{Distribution of indices for degrees of freedom}
  *
  * The degrees of freedom (`dofs') are distributed on the given triangulation
  * by the function #distribute_dofs()#. It gets passed a finite element object
  * describing how many degrees of freedom are located on vertices, lines, etc.
  * It traverses the triangulation cell by cell and numbers the dofs of that
  * cell if not yet numbered. For non-multigrid algorithms, only active cells
- * are considered.
+ * are considered. Active cells are defined to be those cells which have no
+ * children, i.e. they are the most refined ones.
  *
  * Since the triangulation is traversed starting with the cells of the coarsest
  * active level and going to more refined levels, the lowest numbers for dofs
@@ -267,7 +275,7 @@ enum RenumberingMethod {
  * have one major drawback: they require a good starting point, i.e. the degree
  * of freedom index afterwards to be numbered zero. This can thus be given by
  * the user, e.g. by exploiting knowledge of the actual topology of the
- * domain. It is also possible to given several starting indices, which may
+ * domain. It is also possible to give several starting indices, which may
  * be used to simulate a simple upstream numbering (by giving the inflow
  * dofs as starting values) or to make preconditioning faster (by letting
  * the dirichlet boundary indices be starting points).
@@ -304,7 +312,8 @@ enum RenumberingMethod {
  *
  * The renumbering algorithms need quite a lot of memory, since they have
  * to store for each dof with which other dofs it couples. This is done
- * using a #dSMatrixStruct# object used to store the sparsity pattern. It
+ * using a #dSMatrixStruct# object used to store the sparsity pattern of
+ * matrices. It
  * is not useful for the user to do anything between distributing the dofs
  * and renumbering, i.e. the calls to #DoFHandler::distribute_dofs# and
  * #DoFHandler::renumber_dofs# should follow each other immediately. If
@@ -314,7 +323,7 @@ enum RenumberingMethod {
  * The renumbering may take care of dof-to-dof couplings only induced by
  * eliminating constraints. In addition to the memory consumption mentioned
  * above, this also takes quite some computational time, but it may be
- * switched of upon calling the #renumber_dofs# function. This will then
+ * switched off upon calling the #renumber_dofs# function. This will then
  * give inferior results, since knots in the graph (representing dofs)
  * are not found to be neighbors even if they would be after condensation.
  * 
@@ -367,6 +376,93 @@ enum RenumberingMethod {
  * (e.g. when using adaptive algorithms), searching a best starting point
  * may be difficult, however, and in many cases will not justify the effort.
  *
+ *
+ * \subsection{Setting up sparsity patterns}
+ *
+ * When assembling system matrices, the entries are usually of the form
+ * $a_{ij} = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an
+ * integral. When using sparse matrices, we therefore only need to reserve space
+ * for those $a_{ij}$ only, which are nonzero, which is the same as to say that
+ * that the basis functions $\phi_i$ and $\phi_j$ have a nonempty intersection of
+ * their support. Since the support of basis functions is bound only on cells
+ * on which they are located or to which they are adjacent, to determine the
+ * sparsity pattern it is sufficient to loop over all cells and connect all
+ * basis functions on each cell with all other basis functions on that cell.
+ * There may be finite elements for which not all basis functions on a cell
+ * connect with each other, but no use of this case is made since no examples
+ * where this occurs are known to the author.
+ *
+ * When setting up sparsity patterns for matrices on the boundary, the same
+ * procedure is done, except for the fact that the loop only goes over faces
+ * on the boundary and the basis functions thereon. It is assumed that all
+ * other basis functions on a cell adjacent to the boundary vanish at the
+ * boundary itself, except for those which are located on the boundary.
+ *
+ *
+ * \subsection{Boundaries}
+ *
+ * When projecting the traces of functions to the boundary or parts thereof, one
+ * needs to built matrices and vectors with the degrees of freedom on the
+ * boundary. What is needed in this case is a numbering of the boundary degrees
+ * of freedom, starting from zero on and not considering the degrees of freedom
+ * in the interior. The #map_dof_to_boundary_indices# function does exactly
+ * this, by providing a vector with as many entries as there are degrees of
+ * freedom on the whole domain, with each entry being the number in the
+ * numbering of the boundary or #-1# if the dof is not on the boundary. You
+ * should always use this function to get the mapping between local (boundary)
+ * and the global numbers, for example to build the mass matrix on the
+ * boundary, or to get the global index of a degree of freedom if we want to
+ * use the solution of the projection onto the boundary to eliminate the
+ * boundary degrees of freedom from the global matrix.
+ *
+ * The algorithm to provide this numbering mapping is simple, but you should
+ * not rely on it since it may be changed sometimes: we loop over all faces,
+ * check whether it is on the boundary, if so get the global numbers of the
+ * degrees of freedom on that face, and for each of these we give a
+ * subsequent boundary number if none has already been given to this dof.
+ * But it should be emphasized again that you should not try to use this
+ * internal knowledge about the used algorithm, you are better off if you
+ * just accept the mapping `as is'.
+ *
+ * Actually, there are two #map_dof_to_boundary_indices# functions, one
+ * producing a numbering for all boundary degrees of freedom and one producing
+ * a numbering for only parts of the boundary, namely those parts for which
+ * the boundary indicator is listed in a set of indicators given to the
+ * function. The latter case is needed if, for example, we would only want to
+ * project the boundary values for the Dirichlet part of the boundary, not for
+ * the other boundary conditions. You then give the function a list of boundary
+ * indicators referring to Dirichlet parts on which the projection is to be
+ * performed. The parts of the boundary on which you want to project need not
+ * be contiguous; however, it is not guaranteed that the indices of each of the
+ * boundary parts are continuous, i.e. the indices of degrees of freedom on
+ * different parts may be intermixed.
+ *
+ * Degrees of freedom on the boundary but not on one of the specified boundary
+ * parts are given the index #-1#, as if they were in the interior. If no
+ * boundary indicator was given or if no face of a cell has a boundary indicator
+ * contained in the given list, the vector of new indices consists solely of
+ * #-1#s.
+ *
+ * The question what a degree of freedom on the boundary is, is not so easy.
+ * It should really be a degree of freedom of which the respective basis
+ * function has nonzero values on the boundary. At least for Lagrange elements
+ * this definition is equal to the statement that the off-point of the ansatz
+ * function, i.e. the point where the function assumes its nominal value (for
+ * Lagrange elements this is the point where it has the function value #1#), is
+ * located on the boundary. We do not check this directly, the criterion is
+ * rather defined through the information the finite element class gives: the
+ * #FiniteElementBase# class defines the numbers of basis functions per vertex,
+ * per line, and so on and the basis functions are numbered after this
+ * information; a basis function is to be considered to be on the face of a
+ * cell (and thus on the boundary if the cell is at the boundary) according
+ * to its belonging to a vertex, line, etc but not to the cell. The finite
+ * element uses the same cell-wise numbering so that we can say that if a
+ * degree of freedom was numbered as one of the dofs on lines, we assume that
+ * it is located on the line. Where the off-point actually is, is a secret of
+ * the finite element (well, you can ask it, but we don't do it here) and not
+ * relevant in this context.
+ *
+ *
  * \subsection{Data transfer between grids}
  *
  * The #DoFHandler# class offers two functions #make_transfer_matrix# which create
@@ -382,7 +478,7 @@ enum RenumberingMethod {
  * restrictions. This matrix multiplied with a vector on the old grid yields an
  * approximation of the projection of the function on the old grid to the new one.
  *
- * Building and using the transfer matrix is usually a quite expensive operation,
+ * Building and using the transfer matrix is usually quite an expensive operation,
  * since we have to perform two runs over all cells (one for building the sparsity
  * structure, one to build the entries) and because of the memory consumption.
  * It may, however, pay if you have many
@@ -390,7 +486,7 @@ enum RenumberingMethod {
  * entries which are then applied to all function values at a given degree of
  * freedom.
  *
- * To build the matrix, you have to call first
+ * To build the matrix, you first have to call
  * #make_transfer_matrix (old_dof_object, sparsity_pattern);#, then create a
  * sparse matrix out of this pattern, e.g. by #dSMatrix m(sparsity_pattern);#
  * and finally give this to the second run:
@@ -405,9 +501,9 @@ enum RenumberingMethod {
  * number of levels $d$ which we have to cross upon transferring from one cell to
  * another (presently, transfer of one cell is only possible for #d=0,1#, i.e.
  * the two cells match or one is refined once more than the other, the
- * number of degrees of freedom per per vertex $d_v$, those on lines $d_l$, those
+ * number of degrees of freedom per vertex $d_v$, those on lines $d_l$, those
  * on quads $d_q$ and the number of subcells a cell is
- * refined to, which is $2**dim$. The maximum number of entries per row in one
+ * refined to, which is $2^{dim}$. The maximum number of entries per row in one
  * dimension is then given by $(2*d_l+d_v)*2+1$ if $d=1$. For example, a one
  * dimensional linear element would need two entries per row.
  * In two dimensions, the maxmimum number is $(4*d_q+12*d_l+5*d_v)*4+1$ if $d=1$.
@@ -416,15 +512,10 @@ enum RenumberingMethod {
  * #max_transfer_entries (max_level_difference)# function. The actual number
  * depends on the finite element selected and may be much less, especially in
  * higher dimensions.
- * 
- * If you do not have multiple equations and do not really use the matrix but still
- * have to transfer an arbitrary number of vectors to transfer, you can use the
- * #transfer()# function, which is able to transfer any number of vectors in only
- * one loop over all cells and without the memory consumption of the matrix. The
- * matrix seems only useful when trying to transfer whole matrices instead of
- * rebuilding them on the new grid.
- * 
- * @author Wolfgang Bangerth, February 1998
+ *
+ *
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class DoFHandler : public DoFDimensionInfo<dim> {
@@ -501,7 +592,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * class for more details.
 				      */
     void renumber_dofs (const RenumberingMethod method,
-			bool use_constraints               = false,
+			const bool use_constraints         = false,
 			const vector<int> &starting_points = vector<int>());
     
 				     /**
@@ -529,14 +620,17 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 
 				     /**
 				      * Write the sparsity structure of the
-				      * full matrix (including constrained
-				      * degrees of freedom) into the
-				      * matrix structure. The sparsity
+				      * full matrix including constrained
+				      * degrees of freedom into the
+				      * matrix structure. The sparsity pattern
+				      * does not include entries introduced by
+				      * the elimination of constrained nodes.
+				      * The sparsity
 				      * pattern is not compressed, since if
 				      * you want to call
 				      * #ConstraintMatrix::condense(1)#
 				      * afterwards, new entries have to be
-				      * added. However, if you want to call
+				      * added. However, if you don't want to call
 				      * #ConstraintMatrix::condense(1)#, you
 				      * have to compress the matrix yourself,
 				      * using #dSMatrixStruct::compress()#.
@@ -547,12 +641,15 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * Write the sparsity structure of the
 				      * matrix composed of the basis functions
 				      * on the boundary into the
-				      * matrix structure. The sparsity
+				      * matrix structure. The sparsity pattern
+				      * does not include entries introduced by
+				      * the elimination of constrained nodes.
+				      * The sparsity
 				      * pattern is not compressed, since if
 				      * you want to call
 				      * #ConstraintMatrix::condense(1)#
 				      * afterwards, new entries have to be
-				      * added. However, if you want to call
+				      * added. However, if you don't want to call
 				      * #ConstraintMatrix::condense(1)#, you
 				      * have to compress the matrix yourself,
 				      * using #dSMatrixStruct::compress()#.
@@ -603,7 +700,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * sparsity object. This function therefore
 				      * only makes up the sparsity pattern.
 				      *
-				      * The matrix given sparsity pattern is
+				      * The given sparsity pattern is
 				      * compressed at the end.
 				      *
 				      * In the matrix, row indices belong to
@@ -656,6 +753,12 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * number of cells meeting at a vertex.
 				      * The number holds for the constrained
 				      * matrix also.
+				      *
+				      * The determination of the number of
+				      * couplings can be done by simple
+				      * picture drawing. An example can be
+				      * found in the implementation of this
+				      * function.
 				      */
     unsigned int max_couplings_between_dofs () const;
 
@@ -718,17 +821,22 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * numbers of the ansatz functions local
 				      * to the boundary.
 				      *
-				      * Prior content of #mappin# is deleted.
+				      * Prior content of #mapping# is deleted.
 				      *
 				      * This function is not implemented for
-				      * one dimension.
-				      *
-				      * DOC FIXME: algorithm
+				      * one dimension. See the general doc
+				      * for more information on boundary
+				      * treatment.
 				      */
     void map_dof_to_boundary_indices (vector<int> &mapping) const;
 
 				     /**
-				      * DOC FIXME: algorithm
+				      * Same as the previous function, except
+				      * that only selected parts of the
+				      * boundary are considered.
+				      *
+				      * See the general doc of this class for
+				      * more information.
 				      */
     void map_dof_to_boundary_indices (const FunctionMap &boundary_indicators,
 				      vector<int> &mapping) const;
@@ -1215,17 +1323,27 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * #distribute_dofs#, which is copied
 				      * to #selected_fe#.
 				      *
+				      * This function is excluded from the
+				      * #distribute_dofs# function since
+				      * it can not be implemented dimension
+				      * independent.
 				      */
-    int distribute_dofs_on_cell (active_cell_iterator &cell,
-				 unsigned int next_free_dof);
+    unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
+					  unsigned int next_free_dof);
 
 				     /**
 				      * Actually do the renumbering prepared
 				      * by the #renumber_dofs# function. Since
 				      * this is dimension specific, we
 				      * need to have another function.
+				      *
+				      * #new_numbers# is an array of integers
+				      * with size equal to the number of dofs
+				      * on the present grid. It stores the new
+				      * indices after renumbering in the
+				      * order of the old indices.
 				      */
-    void do_renumbering (const vector<int> &);
+    void do_renumbering (const vector<int> &new_numbers);
 
 				     /**
 				      * Make up part of the sparsity pattern of
