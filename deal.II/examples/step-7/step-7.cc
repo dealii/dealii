@@ -1528,11 +1528,21 @@ void LaplaceProblem<dim>::run ()
 				   // output. For example, if you give
 				   // ``2'', this leads to 4 cells in
 				   // 2D and 8 cells in 3D. For
-				   // quadratic elements, two sub-cells
-				   // per space direction is obviously
-				   // the right choice, so this is
-				   // what we choose:
-  unsigned int n_subcells;
+				   // quadratic elements, two
+				   // sub-cells per space direction is
+				   // obviously the right choice, so
+				   // this is what we choose (note
+				   // that the variable is initialized
+				   // anyway to avoid an error message
+				   // about possible use without
+				   // initialization in optimized
+				   // mode, where the compiler does
+				   // not abort the program in the
+				   // second `else' clause; however,
+				   // the value in the initialization
+				   // is such that it should be
+				   // invalid):
+  unsigned int n_subcells = static_cast<unsigned int>(-1);
   if (typeid(*fe) == typeid(const FEQ1<dim>))
     n_subcells = 1;
   else
