@@ -312,6 +312,42 @@ class SparseMatrix : public Subscriptor
     copy_from (const SparseMatrix<somenumber> &source);
 
 				     /**
+				      * This function is complete
+				      * analogous to the
+				      * @ref{SparsityPattern}@p{::copy_from}
+				      * function in that it allows to
+				      * initialize a whole matrix in
+				      * one step. See there for more
+				      * information on argument types
+				      * and their meaning. You can
+				      * also find a small example on
+				      * how to use this function
+				      * there.
+				      *
+				      * The only difference to the
+				      * cited function is that the
+				      * objects which the inner
+				      * iterator points to need to be
+				      * of type @p{std::pair<unsigned int, value},
+				      * where @p{value}
+				      * needs to be convertible to the
+				      * element type of this class, as
+				      * specified by the @p{number}
+				      * template argument.
+				      *
+				      * Previous content of the matrix
+				      * is overwritten. Note that the
+				      * entries specified by the input
+				      * parameters need not
+				      * necessarily cover all elements
+				      * of the matrix. Elements not
+				      * covered remain untouched.
+				      */
+    template <typename ForwardIterator>
+    void copy_from (const ForwardIterator begin,
+		    const ForwardIterator end);    
+    
+				     /**
 				      * Add @p{matrix} scaled by
 				      * @p{factor} to this matrix. The
 				      * function throws an error if
@@ -773,6 +809,13 @@ class SparseMatrix : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcInvalidConstructorCall);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcIteratorRange,
+		    int, int,
+		    << "The iterators denote a range of " << arg1
+		    << " elements, but the given number of rows was " << arg2);
     
   private:
 				     /**
@@ -994,6 +1037,7 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const
 };
 
 
+
 template <typename number>
 inline
 number & SparseMatrix<number>::diag_element (const unsigned int i)
@@ -1007,6 +1051,7 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
 				   // diagonal
   return val[cols->rowstart[i]];
 };
+
 
 
 template <typename number>
@@ -1023,6 +1068,7 @@ SparseMatrix<number>::raw_entry (const unsigned int row,
 };
 
 
+
 template <typename number>
 inline
 number SparseMatrix<number>::global_entry (const unsigned int j) const
@@ -1035,6 +1081,7 @@ number SparseMatrix<number>::global_entry (const unsigned int j) const
 };
 
 
+
 template <typename number>
 inline
 number & SparseMatrix<number>::global_entry (const unsigned int j)
@@ -1045,6 +1092,32 @@ number & SparseMatrix<number>::global_entry (const unsigned int j)
 
   return val[j];
 };
+
+
+
+template <typename number>
+template <typename ForwardIterator>
+void
+SparseMatrix<number>::copy_from (const ForwardIterator begin,
+				 const ForwardIterator end)
+{
+  Assert (static_cast<unsigned int>(std::distance (begin, end)) == m(),
+	  ExcIteratorRange (std::distance (begin, end), m()));
+
+				   // for use in the inner loop, we
+				   // define a typedef to the type of
+				   // the inner iterators
+  typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
+  unsigned int row=0;
+  for (ForwardIterator i=begin; i!=end; ++i, ++row)
+    {
+      const inner_iterator end_of_row = i->end();
+      for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
+					 // write entries
+	set (row, j->first, j->second);
+    };
+};
+
 
 
 /*----------------------------   sparse_matrix.h     ---------------------------*/
