@@ -22,6 +22,8 @@ FiniteElementData<dim>::FiniteElementData ()
 };
 
 
+
+
 template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
@@ -115,6 +117,14 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 {
   Assert(dim==1, ExcDimensionMismatch(1,dim));
 };
+
+
+
+template <int dim>
+FiniteElementData<dim>::~FiniteElementData ()
+{};
+
+
 
 
 template<int dim>
