@@ -73,8 +73,8 @@ INCLUDE           += $(addprefix -I, $(include-path-base) \
                                      $(include-path-deal2))
 
 # compiler flags for debug and optimized mode
-CXXFLAGS.g   = @CXXFLAGSG@  $(INCLUDE)  $(LIBPATH)
-CXXFLAGS.o   = @CXXFLAGSO@  $(INCLUDE)  $(LIBPATH)
+CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)  $(LIBPATH)
+CXXFLAGS.o   = @DEFS@ @CXXFLAGSO@  $(INCLUDE)  $(LIBPATH)
 
 
 # if multithread support in the library is requested, then set the
