@@ -244,8 +244,8 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	  ExcIncorrectDofsPerVertex());
   Assert ((1<=dim) && (dim<=3), ExcNotImplemented());
   
-  DoFHandler<dim>::active_cell_iterator cell,
-					endc = dofs->end();
+  DoFHandler<dim>::active_cell_iterator       cell;
+  const DoFHandler<dim>::active_cell_iterator endc = dofs->end();
   unsigned int n_vertex_dofs = 0;
 
 				   // first loop over all cells to
