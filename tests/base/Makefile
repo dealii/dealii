@@ -29,6 +29,7 @@ polynomial1d.exe   : polynomial1d.g.$(OBJEXT)                       $(lib-base.g
 quadrature_test.exe: quadrature_test.g.$(OBJEXT)                    $(lib-base.g)
 quadrature_selector.exe: quadrature_selector.g.$(OBJEXT)            $(lib-base.g)
 reference.exe      : reference.g.$(OBJEXT)                          $(lib-base.g)
+slice_vector.exe   : slice_vector.g.$(OBJEXT)                       $(lib-base.g)
 table.exe          : table.g.$(OBJEXT)                              $(lib-base.g)
 tensor.exe         : tensor.g.$(OBJEXT)                             $(lib-base.g)
 timer.exe          : timer.g.$(OBJEXT)                              $(lib-base.g)
@@ -39,7 +40,8 @@ hierarchical.exe   : hierarchical.g.$(OBJEXT)                       $(lib-base.g
 bdm.exe            : bdm.g.$(OBJEXT)                                $(lib-base.g)
 auto_derivative_function.exe : auto_derivative_function.g.$(OBJEXT) $(libraries) $(lib-base.g)
 
-tests =  logtest reference quadrature_test quadrature_selector table tensor \
+tests =  logtest reference quadrature_test quadrature_selector \
+	  slice_vector table tensor \
           timer threads polynomial1d polynomial_test \
 	  auto_derivative_function anisotropic_1 anisotropic_2 \
           hierarchical data_out_base
