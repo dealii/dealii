@@ -1,2 +1,0 @@
-#extract symbols from libraries and sort them
-nm *.g.a | c++filt | grep " W " | perl -pi -e 's/.{8} . (.*)/$1/;' | sort
