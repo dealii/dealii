@@ -82,6 +82,7 @@ class PoissonProblem : public ProblemBase<dim>, public MultipleParameterLoop::Us
     };
     
     PoissonProblem ();
+    ~PoissonProblem ();
     
     void clear ();
     void create_new (const unsigned int);
@@ -335,6 +336,13 @@ PoissonProblem<dim>::PoissonProblem () :
 		solution_function(0), coefficient(0),
 		boundary(0) {};
 
+
+
+template <int dim>
+PoissonProblem<dim>::~PoissonProblem () 
+{
+  clear ();
+};
 
 
 
