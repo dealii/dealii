@@ -166,10 +166,15 @@ class dVector : public VectorBase
     
     
 				     /**
-				      * Change  Dimension. <p>
-				      * Set dimension to N <p>
-				      * ! reserved memory for This remains unchanged ! <p>
-				      * on fast==false vector is filled by 0.
+				      * Change the dimension of the vector to
+				      * #N#. The reserved memory for this vector
+				      * remains unchanged, however, to make
+				      * things faster, but this may waste some
+				      * memory, so take this in the back of your
+				      * head.
+				      *
+				      * On #fast==false#, the vector is filled by
+				      * zeros.
 				      */ 
     void reinit (const unsigned int N, const bool fast=false);
     
@@ -312,6 +317,23 @@ class dVector : public VectorBase
 				      */
     void equ (const double a, const dVector& V,
 	      const double b, const dVector& W);
+
+				     /**
+				      * Compute the elementwise ratio of the
+				      * two given vectors, that is let
+				      * #this[i] = a[i]/b[i]#. This is useful
+				      * for example if you want to compute
+				      * the cellwise ratio of true to estimated
+				      * error.
+				      *
+				      * This vector is appropriately scaled to
+				      * hold the result.
+				      *
+				      * If any of the #b[i]# is zero, the result
+				      * is undefined. No attempt is made to
+				      * catch such situations.
+				      */
+    void ratio (const dVector &a, const dVector &b);
 				     //@}
     
     
