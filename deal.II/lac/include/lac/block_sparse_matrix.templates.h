@@ -177,6 +177,26 @@ BlockSparseMatrix<number>::get_sparsity_pattern () const
 
 
 template <typename number>
+void 
+BlockSparseMatrix<number>::print_formatted (std::ostream       &out,
+					    const unsigned int  precision,
+					    const bool          scientific,
+					    const unsigned int  width,
+					    const char         *zero_string,
+					    const double        denominator) const
+{
+  for (unsigned int r=0;r<rows;++r)
+  {
+    for (unsigned int c=0;c<columns;++c)
+    {
+      out << "Component (" << r << "," << c << ")" << std::endl;
+      block(r,c).print_formatted (out, precision, scientific, width, zero_string, denominator);
+    } 
+  } 
+}
+
+
+template <typename number>
 unsigned int
 BlockSparseMatrix<number>::memory_consumption () const
 {
