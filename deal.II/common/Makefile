@@ -35,23 +35,14 @@ MAKEOPTIONS = $(PAR)
 baseg:
 	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) libg
 
-base:
+base: baseg
 	cd ../base/source ; $(MAKE) $(MAKEOPTIONS) libg lib
 
 lacg: baseg
 	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) libg
 
-lac: base
+lac: base lacg
 	cd ../lac/source ; $(MAKE) $(MAKEOPTIONS) libg lib
-
-1d: baseg lacg base lac
-	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1d
-
-2d: baseg lacg base lac
-	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 2d
-
-3d: baseg lacg base lac
-	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 3d
 
 1dg: baseg lacg
 	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1dg
@@ -61,6 +52,15 @@ lac: base
 
 3dg: baseg lacg
 	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 3dg
+
+1d: baseg lacg base lac 1dg
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 1d
+
+2d: baseg lacg base lac 2dg
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 2d
+
+3d: baseg lacg base lac 3dg
+	cd ../deal.II/source ; $(MAKE) $(MAKEOPTIONS) 3d
 
 all: base lac 2d 1d 3d
 
