@@ -23,7 +23,7 @@
 #include <fe/fe_values.h>
 
 #ifdef DEAL_II_USE_MT
-#include <base/thread_manager.h>
+#include <base/thread_management.h>
 #endif
 
 #include <strstream>
@@ -338,24 +338,11 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 
 #ifdef DEAL_II_USE_MT
 
-  ThreadManager thread_manager;
-  
-  typedef ThreadManager::Mem_Fun_Data1
-    <DataOut<dim>, Data> MemFunData;
-  
-				   // One struct of this type for every thread
-  vector<MemFunData> mem_fun_data (n_threads,
-				   MemFunData (this,
-					       thread_data[0],
-					       &DataOut<dim>::build_some_patches));
-  
-				   // get start cells for each thread
+  ACE_Thread_Manager thread_manager;  
   for (unsigned int l=0;l<n_threads;++l)
-    {
-      mem_fun_data[l].arg=thread_data[l];
-      thread_manager.spawn(&mem_fun_data[l],THR_SCOPE_SYSTEM | THR_DETACHED);
-    };
-				   // wait for all threads to return
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (&DataOut<dim>::build_some_patches)
+		    .collect_args (this, thread_data[l]));
   thread_manager.wait();
   
 				   // just one thread

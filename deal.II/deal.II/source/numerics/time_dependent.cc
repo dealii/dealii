@@ -19,8 +19,7 @@
 #include <lac/vector.h>
 
 #ifdef DEAL_II_USE_MT
-#  include <base/thread_manager.h>
-#  define NTHREADS 4
+#  include <base/thread_management.h>
 #endif
 
 #include <functional>
@@ -178,6 +177,7 @@ TimeDependent::postprocess ()
 };
 
 
+
 void TimeDependent::start_sweep (const unsigned int s) 
 {
   sweep_no = s;
@@ -200,29 +200,19 @@ void TimeDependent::start_sweep (const unsigned int s)
 };
 
 
+
 void TimeDependent::end_sweep (const unsigned int n_threads)
 {
 #ifdef DEAL_II_USE_MT
-				   // set up the data needed by each
-				   // thread
-  typedef ThreadManager::Mem_Fun_Data2<TimeDependent,unsigned int,unsigned int> MemFunData;
-  vector<MemFunData> mem_fun_data (n_threads,
-				   MemFunData(this, 0, 0, &TimeDependent::end_sweep));
   const unsigned int stride = timesteps.size() / n_threads;
+  ACE_Thread_Manager thread_manager;
   for (unsigned int i=0; i<n_threads; ++i)
-    {
-      mem_fun_data[i].arg1 = i*stride;
-      mem_fun_data[i].arg2 = (i+1)*stride;
-    };
-  mem_fun_data.back().arg2 = timesteps.size();
-
-				   // spawn the threads...
-  ThreadManager thread_manager;
-  for (unsigned int i=0; i<n_threads; ++i)
-    thread_manager.spawn (&mem_fun_data[i],
-			  THR_SCOPE_SYSTEM | THR_DETACHED);
-
-				   // ...and wait for their return
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (&TimeDependent::end_sweep)
+		    .collect_args (this, i*stride,
+				   (i == n_threads-1 ?
+				    timesteps.size() :
+				    (i+1)*stride)));
   thread_manager.wait();
   
 #else
@@ -557,7 +547,7 @@ adapt_grids (const Triangulation<dim>::cell_iterator &cell1,
     };
 
 
-if (!cell1->has_children() && !cell2->has_children())
+  if (!cell1->has_children() && !cell2->has_children())
 				     // none of the two have children, so
 				     // make sure that not one is flagged
 				     // for refinement and the other for
@@ -579,7 +569,7 @@ if (!cell1->has_children() && !cell2->has_children())
     };
 
 
-if (cell1->has_children() && !cell2->has_children())
+  if (cell1->has_children() && !cell2->has_children())
 				     // cell1 has children, cell2 has not
 				     // -> cell2 needs to be refined if any
 				     // of cell1's children is flagged
@@ -690,7 +680,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				p_coarsening_threshold=0;
 
 
-// if we are to do some cell number
+				   // if we are to do some cell number
 				   // correction steps, we have to find out
 				   // which further cells (beyond
 				   // refinement_threshold) to refine in case
@@ -720,7 +710,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
     };
 
 
-// actually flag cells the first time
+				   // actually flag cells the first time
   tria->refine (criteria, refinement_threshold);
   tria->coarsen (criteria, coarsening_threshold);
 
@@ -788,7 +778,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	previous_tria->prepare_coarsening_and_refinement ();
 
 
-// now count the number of elements
+					 // now count the number of elements
 					     // which will result on the previous
 					     // grid after it will be refined. The
 					     // number which will really result
@@ -1005,7 +995,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	  };
 
 
-// flag cells finally
+					 // flag cells finally
 	tria->refine (criteria, refinement_threshold);
 	tria->coarsen (criteria, coarsening_threshold);
       };
@@ -1023,7 +1013,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	= dynamic_cast<const TimeStepBase_Tria<dim>*>(previous_timestep)->tria;
 
 
-// if we used the dual estimator, we
+				       // if we used the dual estimator, we
 				       // computed the error information on
 				       // a time slab, rather than on a level
 				       // of its own. we then mirror the

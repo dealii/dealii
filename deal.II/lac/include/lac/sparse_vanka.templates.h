@@ -20,7 +20,7 @@
 #include <lac/vector.h>
 
 #ifdef DEAL_II_USE_MT
-#  include <base/thread_manager.h>
+#  include <base/thread_management.h>
 #endif
 
 #include <algorithm>
@@ -86,15 +86,11 @@ SparseVanka<number>::compute_inverses ()
 				   // consecutive, with other
 				   // consecutive regions where we do
 				   // not have to do something
-  typedef ThreadManager::Mem_Fun_Data2<SparseVanka<number>,unsigned int,unsigned int> MemFunData;
-  vector<MemFunData> mem_fun_data (n_threads,
-				   MemFunData(this,
-					      0, 0,
-					      &SparseVanka<number>::compute_inverses));
+  vector<pair<unsigned int, unsigned int> > blocking (n_threads);
 
   unsigned int c       = 0;
   unsigned int thread  = 0;
-  mem_fun_data[0].arg1 = 0;
+  blocking[0].first = 0;
   
   for (unsigned int i=0; (i<matrix->m()) && (thread+1<n_threads); ++i)
     {
@@ -102,20 +98,25 @@ SparseVanka<number>::compute_inverses ()
 	++c;
       if (c == n_inverses_per_thread)
 	{
-	  mem_fun_data[thread].arg2   = i;
-	  mem_fun_data[thread+1].arg1 = i;
+	  blocking[thread].second  = i;
+	  blocking[thread+1].first = i;
 	  ++thread;
 
 	  c = 0;
 	};
     };
-  mem_fun_data[n_threads-1].arg2 = matrix->m();
+  blocking[n_threads-1].second = matrix->m();
 
+  typedef void (SparseVanka<number>::*FunPtr)(unsigned int, unsigned int);
+  FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
+  
 				   // Now spawn the threads
-  ThreadManager thread_manager;
+  ACE_Thread_Manager thread_manager;
   for (unsigned int i=0; i<n_threads; ++i)
-    thread_manager.spawn (&mem_fun_data[i], THR_SCOPE_SYSTEM | THR_DETACHED);
-
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (fun_ptr)
+		    .collect_args (this, blocking[i].first, blocking[i].second));
+  
   thread_manager.wait ();
   
 #else
@@ -558,23 +559,12 @@ void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
 				     // otherwise: blocking requested
     {
 #ifdef DEAL_II_USE_MT
-      typedef ThreadManager::Mem_Fun_Data3
-	<const SparseVanka<number>, Vector<number2>&,
-	const Vector<number2> &, const vector<bool> *> MemFunData;
-      vector<MemFunData> mem_fun_data
-	(n_blocks,
-	 MemFunData (this,
-		     dst, src, 0,
-		     &SparseVanka<number>::template apply_preconditioner<number2>));
-      
-      ThreadManager thread_manager;
+      ACE_Thread_Manager thread_manager;
       for (unsigned int block=0; block<n_blocks; ++block)
-	{
-	  mem_fun_data[block].arg3 = &dof_masks[block];
-
-	  thread_manager.spawn (&mem_fun_data[block],
-				THR_SCOPE_SYSTEM | THR_DETACHED);
-	};
+	Threads::spawn (thread_manager,
+			Threads::encapsulate (&SparseVanka<number>::
+					      template apply_preconditioner<number2>)
+			.collect_args (this, dst, src, &dof_masks[block]));
 
       thread_manager.wait ();
 #else

@@ -26,7 +26,7 @@
 #  include <vector>
 #  include <numeric>
 
-#  include <base/thread_manager.h>
+#  include <base/thread_management.h>
 #  include <base/multithread_info.h>
 #endif
 
@@ -207,34 +207,14 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
-      ThreadManager thread_manager;
-      
-      const ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
-	                                 Vector<somenumber> &,
-	                                 const Vector<somenumber> &,
-	                                 unsigned int,
-	                                 unsigned int> 
-	mem_fun_data_all (this, dst, src, 0, 0,
-	 	          &SparseMatrix<number>::template threaded_vmult<somenumber>  );
-      vector<ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
-                                          Vector<somenumber> &,
-                                          const Vector<somenumber> &,
-                                          unsigned int,
-                                          unsigned int> >
-	mem_fun_data(n_threads, mem_fun_data_all);
-  
-				       // spawn some jobs...
+      ACE_Thread_Manager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
-	{
-					   // compute the range of rows
-					   // they are to serve
-	  mem_fun_data[i].arg3 = n_rows * i / n_threads;
-	  mem_fun_data[i].arg4 = n_rows * (i+1) / n_threads;
-	  
-	  thread_manager.spawn (&mem_fun_data[i], THR_SCOPE_SYSTEM | THR_DETACHED);
-	};
-      
-				       // ... and wait until they're finished
+	Threads::spawn (thread_manager,
+			Threads::encapsulate (&SparseMatrix<number>::
+					      template threaded_vmult<somenumber>)
+			.collect_args (this, dst, src,
+				       n_rows * i / n_threads,
+				       n_rows * (i+1) / n_threads));
       thread_manager.wait ();
 
       return;
@@ -373,38 +353,20 @@ SparseMatrix<number>::matrix_norm (const Vector<somenumber>& v) const
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
-      ThreadManager thread_manager;
-      
-      const ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
-	                                 const Vector<somenumber> &,
-	                                 unsigned int,
-	                                 unsigned int,
-	                                 somenumber *> 
-	mem_fun_data_all (this, v, 0, 0, 0,
-	 	          &SparseMatrix<number>::template threaded_matrix_norm<somenumber>  );
-      vector<ThreadManager::Mem_Fun_Data4<const SparseMatrix<number>,
-                                          const Vector<somenumber> &,
-                                          unsigned int,
-                                          unsigned int,
-	                                  somenumber *> >
-	mem_fun_data(n_threads, mem_fun_data_all);
-
 				       // space for the norms of
 				       // the different parts
       vector<somenumber> partial_sums (n_threads, 0);
-      
+      ACE_Thread_Manager thread_manager;
 				       // spawn some jobs...
       for (unsigned int i=0; i<n_threads; ++i)
-	{
-					   // compute the range of rows
-					   // they are to serve
-	  mem_fun_data[i].arg2 = n_rows * i / n_threads;
-	  mem_fun_data[i].arg3 = n_rows * (i+1) / n_threads;
-	  mem_fun_data[i].arg4 = &partial_sums[i];
-	  	  
-	  thread_manager.spawn (&mem_fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
-	};
-      
+	Threads::spawn (thread_manager,
+			Threads::encapsulate (&SparseMatrix<number>::
+					      template threaded_matrix_norm<somenumber>)
+			.collect_args (this, v,
+				       n_rows * i / n_threads,
+				       n_rows * (i+1) / n_threads,
+				       &partial_sums[i]));
+
 				       // ... and wait until they're finished
       thread_manager.wait ();
 				       // accumulate the partial results
@@ -522,43 +484,21 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
   if (n_rows/multithread_info.n_default_threads > 2000)
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
-
-      ThreadManager thread_manager;
-      
-      const ThreadManager::Mem_Fun_Data6<const SparseMatrix<number>,
- 	                                 Vector<somenumber> &,        // dst
-	                                 const Vector<somenumber> &,  // u
-	                                 const Vector<somenumber> &,  // b
-	                                 unsigned int,        // begin_row
-	                                 unsigned int,        // end_row
-	                                 somenumber *>            // partial norm
-	mem_fun_data_all (this, dst, u, b, 0, 0, 0,
-	 	          &SparseMatrix<number>::template threaded_residual<somenumber>  );
-      vector<ThreadManager::Mem_Fun_Data6<const SparseMatrix<number>,
-                                          Vector<somenumber> &,
-                                          const Vector<somenumber> &,
-                                          const Vector<somenumber> &,
-                                          unsigned int,
-                                          unsigned int,
-	                                  somenumber *> >
-	mem_fun_data(n_threads, mem_fun_data_all);
-
+ 
 				       // space for the square norms of
 				       // the different parts
       vector<somenumber> partial_norms (n_threads, 0);
-      
-				       // spawn some jobs...
+      ACE_Thread_Manager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
-	{
-					   // compute the range of rows
-					   // they are to serve
-	  mem_fun_data[i].arg4 = n_rows * i / n_threads;
-	  mem_fun_data[i].arg5 = n_rows * (i+1) / n_threads;
-	  mem_fun_data[i].arg6 = &partial_norms[i];
-	  	  
-	  thread_manager.spawn (&mem_fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
-	};
-      
+	Threads::spawn (thread_manager,
+			Threads::encapsulate (&SparseMatrix<number>::
+					      template threaded_residual<somenumber>)
+			.collect_args (this, dst, u, b,
+				       make_pair<unsigned int,unsigned int>
+				       (n_rows * i / n_threads,
+					n_rows * (i+1) / n_threads),
+				       &partial_norms[i]));
+
 				       // ... and wait until they're finished
       thread_manager.wait ();
 				       // accumulate the partial results
@@ -591,10 +531,12 @@ void
 SparseMatrix<number>::threaded_residual (Vector<somenumber>       &dst,
 					 const Vector<somenumber> &u,
 					 const Vector<somenumber> &b,
-					 const unsigned int        begin_row,
-					 const unsigned int        end_row,
+					 const pair<unsigned int, unsigned int> &interval,
 					 somenumber               *partial_norm) const
 {
+  const unsigned int begin_row = interval.first,
+		     end_row   = interval.second;
+  
 #ifdef DEAL_II_USE_MT
   somenumber norm=0.;   
   

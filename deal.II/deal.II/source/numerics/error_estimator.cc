@@ -33,8 +33,10 @@
 				 // if multithreaded include
 				 // ThreadManager
 #ifdef DEAL_II_USE_MT
-#include <base/thread_manager.h>
+#  include <base/thread_management.h>
 #endif
+
+
 
 #if deal_II_dimension == 1
 
@@ -175,7 +177,7 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>  &dof,
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
 
 
-const unsigned int dim=1;
+  const unsigned int dim=1;
 
 				   // reserve one slot for each cell and set
 				   // it to zero
@@ -274,7 +276,7 @@ const unsigned int dim=1;
 	    };
 
 
-for (unsigned int component=0; component<n_components; ++component)
+	  for (unsigned int component=0; component<n_components; ++component)
 	    if (component_mask[component] == true)
 	      {
 						 // get gradient
@@ -295,8 +297,7 @@ for (unsigned int component=0; component<n_components; ++component)
 };
 
 
-// #if deal_II_dimension !=1
-#else
+#else // #if deal_II_dimension !=1
 
 
 template <int dim>
@@ -330,7 +331,7 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 					  update_gradients);
 
 
-DoFHandler<dim>::active_cell_iterator cell=data.dof.begin_active();
+  DoFHandler<dim>::active_cell_iterator cell=data.dof.begin_active();
 
 				   // calculate the start cell for this
 				   // thread. the enumeration is choosen
@@ -354,7 +355,7 @@ DoFHandler<dim>::active_cell_iterator cell=data.dof.begin_active();
 	    continue;
 
 
-// if the neighboring cell is less
+					   // if the neighboring cell is less
 					   // refined than the present one, then
 					   // do nothing since we integrate
 					   // over the subfaces when we visit
@@ -465,30 +466,11 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
 				   // if multithreading is used
 #ifdef DEAL_II_USE_MT
 
-  ThreadManager thread_manager;
-  
-				   // all data needed to start
-				   // one thread is gathered
-				   // in this struct.
-  typedef ThreadManager::Fun_Data2
-    <class Data &, unsigned int > FunData;
-  
-				   // One struct of this type for every thread
-  vector<FunData>
-    fun_data (data.n_threads,
-	      FunData (data,0,&KellyErrorEstimator::estimate_some));
-
-
-				   // get start cells for each thread
-  for (unsigned int l=0;l<data.n_threads;++l)
-    fun_data[l].arg2=l;
-    
-    
-				   // now spawn the threads
+  ACE_Thread_Manager thread_manager;
   for (unsigned int i=0;i<data.n_threads; ++i)
-    thread_manager.spawn(&fun_data[i],THR_SCOPE_SYSTEM | THR_DETACHED);
-    
-				   // wait for all threads to return
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate (&KellyErrorEstimator<dim>::estimate_some)
+		    .collect_args (data, i));
   thread_manager.wait();
   
 				   // ... ifdef DEAL_II_USE_MT
@@ -500,7 +482,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof,
 #endif
 
 
-// finally add up the contributions of the
+				   // finally add up the contributions of the
 				   // faces for each cell
   
 				   // reserve one slot for each cell and set
@@ -612,7 +594,7 @@ integrate_over_regular_face (Data                       &data,
     };
 
 
-// now psi contains the following:
+				   // now psi contains the following:
 				   // - for an internal face, psi=[grad u]
 				   // - for a neumann boundary face,
 				   //   psi=grad u

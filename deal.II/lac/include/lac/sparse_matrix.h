@@ -634,18 +634,21 @@ class SparseMatrix : public Subscriptor
 			       somenumber               *partial_sum) const;
 
 				     /**
-				      * Version of #residual# which only
-				      * performs its actions on the region
-				      * defined by #[begin_row,end_row)#. This
-				      * function is called by #residual# in
-				      * the case of enabled multithreading.
+				      * Version of #residual# which
+				      * only performs its actions on
+				      * the region defined by
+				      * #[begin_row,end_row)# (these
+				      * numbers are the components of
+				      * #interval#). This function is
+				      * called by #residual# in the
+				      * case of enabled
+				      * multithreading.
 				      */
     template <typename somenumber>
     void threaded_residual (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &u,
 			    const Vector<somenumber> &b,
-			    const unsigned int        begin_row,
-			    const unsigned int        end_row,
+			    const pair<unsigned int,unsigned int> &interval,
 			    somenumber               *partial_norm) const;
 
 
