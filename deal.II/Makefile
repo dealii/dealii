@@ -65,11 +65,11 @@ laco:
 3do:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
-base: baseg baseo
-lac: lacg laco
-1d: 1dg 1do
-2d: 2dg 2do
-3d: 3dg 3do
+base: baseg baseo forward
+lac: lacg laco forward
+1d: 1dg 1do forward
+2d: 2dg 2do forward
+3d: 3dg 3do forward
 
 forward:
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) forward
