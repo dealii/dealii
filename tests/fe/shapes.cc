@@ -19,6 +19,8 @@
 #include <fstream>
 #include <string>
 
+#define PRECISION 2
+
 char fname[50];
 
 template<int dim>
@@ -41,9 +43,9 @@ plot_shape_functions(Mapping<dim>& mapping,
   fe.reinit(c);
   
   sprintf(fname, "Shapes%dd-%s.output", dim, name);
-  ofstream gnuplot(fname);
+  std::ofstream gnuplot(fname);
   gnuplot.setf(ios::fixed);
-  gnuplot.precision (2);
+  gnuplot.precision (PRECISION);
 
   unsigned int k=0;
   for (unsigned int mz=0;mz<=((dim>2) ? div : 0) ;++mz)
@@ -99,7 +101,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
   sprintf(fname, "ShapesFace%dd-%s.output", dim, name);
   ofstream gnuplot(fname);
   gnuplot.setf(ios::fixed);
-  gnuplot.precision (2);
+  gnuplot.precision (PRECISION);
   
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     {
@@ -225,7 +227,7 @@ int
 main()
 {
   ofstream logfile ("shapes.output");
-  logfile.precision (2);
+  logfile.precision (PRECISION);
   logfile.setf(ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);

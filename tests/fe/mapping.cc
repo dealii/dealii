@@ -22,7 +22,7 @@
 #include <string>
 #include <strstream>
 
-
+#define PRECISION 2
 
 char fname[50];
 
@@ -45,7 +45,8 @@ plot_transformation(Mapping<dim> &mapping,
   const std::vector<double> &JxW=fe_values.get_JxW_values();
   
   std::ofstream gnuplot(name);
-
+  gnuplot.precision(PRECISION);
+  
   unsigned int k=0;
   for (unsigned int nz=0; nz<=((dim>2) ? div : 0); ++nz)
     {
@@ -74,6 +75,7 @@ plot_faces(Mapping<dim> &mapping,
 	   const char* name)
 {
   std::ofstream gnuplot(name);
+  gnuplot.precision(PRECISION);
 
   QGauss4<dim-1> q;
   const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
@@ -117,6 +119,7 @@ plot_subfaces(Mapping<dim> &mapping,
 	      const char* name)
 {
   std::ofstream gnuplot(name);
+  gnuplot.precision(PRECISION);
 
   QGauss4<dim-1> q;
   const unsigned int nq = (unsigned int) (.01 + pow(q.n_quadrature_points, 1./(dim-1)));
@@ -479,7 +482,7 @@ void mapping_test()
 int main()
 {
   std::ofstream logfile ("mapping.output");
-  logfile.precision (2);
+  logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);

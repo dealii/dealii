@@ -115,7 +115,7 @@ report:
 # perform a check. Do it in alphabetical order for better
 # overview
 ############################################################
-run-tests: $(sort $(tests:%=%.check))
+run-tests: $(tests:%=%.check)
 
 
 

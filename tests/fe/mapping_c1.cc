@@ -17,10 +17,13 @@
 #include <algorithm>
 #include <fstream>
 
+#define PRECISION 2
+
 int main ()
 {
   std::ofstream logfile ("mapping_c1.output");
   logfile.setf(std::ios::fixed);  
+  logfile.precision (PRECISION);
   deallog.attach(logfile);
   deallog.depth_console(0);
   
