@@ -153,7 +153,7 @@ class BlockIndices
 /* ---------------------- template and inline functions ------------------- */
 
 inline
-BlockIndices::BlockIndices (unsigned int n_blocks)
+BlockIndices::BlockIndices (const unsigned int n_blocks)
 		:
 		n_blocks(n_blocks),
 		start_indices(n_blocks+1)

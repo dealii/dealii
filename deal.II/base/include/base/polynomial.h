@@ -200,7 +200,7 @@ class Legendre : public Polynomial<number>
 				     /**
 				      * Compute coefficients recursively.
 				      */
-    static void compute_coefficients (unsigned int k);
+    static void compute_coefficients (const unsigned int k);
     
 				     /**
 				      * Get coefficients for

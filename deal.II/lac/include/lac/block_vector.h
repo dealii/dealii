@@ -560,8 +560,8 @@ Number& BlockVector<Number>::operator() (const unsigned int i)
 
 template <typename Number>
 inline
-Vector<Number>&
-BlockVector<Number>::block(unsigned int i)
+Vector<Number> &
+BlockVector<Number>::block (const unsigned int i)
 {
   Assert(i<num_blocks, ExcIndexRange(i,0,num_blocks));
 
@@ -572,8 +572,8 @@ BlockVector<Number>::block(unsigned int i)
 
 template <typename Number>
 inline
-const Vector<Number>&
-BlockVector<Number>::block(unsigned int i) const
+const Vector<Number> &
+BlockVector<Number>::block (const unsigned int i) const
 {
   Assert(i<num_blocks, ExcIndexRange(i,0,num_blocks));
 

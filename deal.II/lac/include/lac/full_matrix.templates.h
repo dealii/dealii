@@ -1375,10 +1375,12 @@ void
 FullMatrix<number>::print_formatted (std::ostream       &out,
 				     const unsigned int  precision,
 				     const bool          scientific,
-				     unsigned int  width,
+				     const unsigned int  width_,
 				     const char         *zero_string,
 				     const double        denominator) const
 {
+  unsigned int width = width_;
+  
   Assert ((val != 0) || (dim_range+dim_image==0),
 	  ExcInternalError());
   

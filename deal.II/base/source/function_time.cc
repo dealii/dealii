@@ -15,7 +15,7 @@
 #include <base/function_time.h>
 
 
-FunctionTime::FunctionTime(double initial_time)
+FunctionTime::FunctionTime(const double initial_time)
 		:
 		time(initial_time)
 {}

@@ -191,7 +191,7 @@ void TableHandler::set_tex_format (const std::string &key,
 
 
 void TableHandler::set_precision (const std::string &key,
-				  unsigned int precision)
+				  const unsigned int precision)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].precision=precision;
@@ -199,7 +199,7 @@ void TableHandler::set_precision (const std::string &key,
 
 
 void TableHandler::set_scientific (const std::string &key,
-				   bool scientific)
+				   const bool scientific)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].scientific=scientific;
@@ -459,15 +459,15 @@ template class TableEntry<std::string>;
 
 
 template
-void TableHandler::add_value(const std::string &, double);
+void TableHandler::add_value(const std::string &, const double);
 
 template
-void TableHandler::add_value(const std::string &, int);
+void TableHandler::add_value(const std::string &, const int);
 
 template
-void TableHandler::add_value(const std::string &, unsigned int);
+void TableHandler::add_value(const std::string &, const unsigned int);
 
 template
-void TableHandler::add_value(const std::string &, std::string);
+void TableHandler::add_value(const std::string &, const std::string);
 
 
