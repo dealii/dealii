@@ -362,6 +362,8 @@ void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
 		     Patterns::Sequence("global|true error|estimated error"));
   prm.declare_entry ("Refinement fraction", "0.3",
 		     Patterns::Double());
+  prm.declare_entry ("Coarsening fraction", "0.1",
+		     Patterns::Double());
   prm.declare_entry ("Maximum cells", "3000",
 		     Patterns::Integer());
   prm.declare_entry ("Output base filename", "");
@@ -564,13 +566,13 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 	  case true_error:
 		tria->refine_and_coarsen_fixed_number (h1_error_per_cell,
 						       prm.get_double("Refinement fraction"),
-						       0);
+						       prm.get_double("Coarsening fraction"));
 		tria->execute_coarsening_and_refinement ();
 		break;
 	  case error_estimator:
 		tria->refine_and_coarsen_fixed_number (estimated_error_per_cell,
 						       prm.get_double("Refinement fraction"),
-						       0);
+						       prm.get_double("Coarsening fraction"));
 		tria->execute_coarsening_and_refinement ();
 		break;
 	};
