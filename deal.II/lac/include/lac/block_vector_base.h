@@ -970,15 +970,6 @@ class BlockVectorBase
     void equ (const value_type a, const BlockVectorBase& V,
 	      const value_type b, const BlockVectorBase& W);
       
-				     /** @addtogroup Exceptions
-				      * @{ */
-    
-				     /**
-				      * Exception.
-				      */
-    DeclException0 (ExcNotMatchingBlockSizes);
-				     //@}
-    
   protected:
 				     /**
 				      * Pointer to the array of components.
