@@ -247,7 +247,13 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * iterator classes.
 				      */
     typedef DoFHandler<dim> AccessorData;
-    
+
+				     /**
+				      * Declare base class as a local typedef
+				      * for simpler access.
+				      */
+    typedef typename DoFObjectAccessor_Inheritance<1,dim>::BaseClass BaseClass;
+
 				     /**
 				      * Default constructor, unused thus
 				      * not implemented.
@@ -364,6 +370,12 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * iterator classes.
 				      */
     typedef DoFHandler<dim> AccessorData;
+
+				     /**
+				      * Declare base class as a local typedef
+				      * for simpler access.
+				      */
+    typedef typename DoFObjectAccessor_Inheritance<2,dim>::BaseClass BaseClass;
     
 				     /**
 				      * Default constructor, unused thus
@@ -492,6 +504,12 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * iterator classes.
 				      */
     typedef DoFHandler<dim> AccessorData;
+
+				     /**
+				      * Declare base class as a local typedef
+				      * for simpler access.
+				      */
+    typedef typename DoFObjectAccessor_Inheritance<3,dim>::BaseClass BaseClass;
     
 				     /**
 				      * Default constructor, unused thus

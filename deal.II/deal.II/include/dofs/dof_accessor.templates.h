@@ -100,7 +100,7 @@ template <int dim>
 inline
 void
 DoFObjectAccessor<1, dim>::copy_from (const DoFObjectAccessor<1, dim> &a) {
-  DoFObjectAccessor_Inheritance<1,dim>::BaseClass::copy_from (a);
+  BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
 
@@ -209,7 +209,7 @@ template <int dim>
 inline
 void
 DoFObjectAccessor<2, dim>::copy_from (const DoFObjectAccessor<2, dim> &a) {
-  DoFObjectAccessor_Inheritance<2,dim>::BaseClass::copy_from (a);
+  BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
 
@@ -289,7 +289,7 @@ template <int dim>
 inline
 TriaIterator<dim,DoFObjectAccessor<1, dim> >
 DoFObjectAccessor<3, dim>::line (const unsigned int i) const {
-  TriaIterator<dim,TriaObjectAccessor<1, dim> > l = DoFObjectAccessor_Inheritance<3,dim>::BaseClass::line(i);
+  TriaIterator<dim,TriaObjectAccessor<1, dim> > l = BaseClass::line(i);
   return TriaIterator<dim,DoFObjectAccessor<1, dim> >
     (
       tria,
@@ -338,7 +338,7 @@ DoFObjectAccessor<3, dim>::child (const unsigned int i) const {
 
 template <int dim>
 void DoFObjectAccessor<3, dim>::copy_from (const DoFObjectAccessor<3, dim> &a) {
-  DoFObjectAccessor_Inheritance<3,dim>::BaseClass::copy_from (a);
+  BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
 
