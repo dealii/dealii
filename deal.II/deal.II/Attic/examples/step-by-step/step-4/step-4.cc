@@ -40,12 +40,23 @@
 
 
 
-
-
-	
-
-
-
+				 // This is again the same
+				 // LaplaceProblem class as in the
+				 // previous example. The only
+				 // difference is that we have now
+				 // declared it as a class with a
+				 // template parameter, and the
+				 // template parameter is of course
+				 // the spatial dimension in which we
+				 // would like to solve the Laplace
+				 // equation. Of course, several of
+				 // the member variables depend on
+				 // this dimension as well, in
+				 // particular the Triangulation
+				 // class, which has to represent
+				 // quadrilaterals or hexahedra,
+				 // respectively. Apart from this,
+				 // everything is as before.
 template <int dim>
 class LaplaceProblem 
 {
@@ -91,6 +102,27 @@ class LaplaceProblem
 				 // parameters and shall return the
 				 // value at that point as a `double'
 				 // variable.
+				 //
+				 // The `value' function takes a
+				 // second argument, which we have
+				 // here named `component': This is
+				 // only meant for vector valued
+				 // functions, where you may want to
+				 // access a certain component of the
+				 // vector at the point `p'. However,
+				 // our functions are scalar, so we
+				 // need not worry about this
+				 // parameter and we will not use it
+				 // in the implementation of the
+				 // functions. Note that in the base
+				 // class (Function), the declaration
+				 // of the `value' function has a
+				 // default value of zero for the
+				 // component, so we will access the
+				 // `value' function of the right hand
+				 // side with only one parameter,
+				 // namely the point where we want to
+				 // evaluate the function.
 template <int dim>
 class RightHandSide : public Function<dim> 
 {
@@ -131,8 +163,9 @@ class BoundaryValues : public Function<dim>
 				 // right away.
 				 //
 				 // Note that the different
-				 // coordinates of the point are
-				 // accessed using the () operator.
+				 // coordinates (i.e. `x', `y', ...)
+				 // of the point are accessed using
+				 // the () operator.
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
 				  const unsigned int) const 
@@ -468,8 +501,18 @@ void LaplaceProblem<dim>::output_results ()
 
 				   // Only difference to the previous
 				   // example: write output in GMV
-				   // format, rather than for gnuplot.
-  ofstream output ("solution.gmv");
+				   // format, rather than for
+				   // gnuplot. We use the dimension in
+				   // the filename to generate
+				   // distinct filenames for each run
+				   // (in a better program, one would
+				   // check whether `dim' can have
+				   // other values than 2 or 3, but we
+				   // neglect this here for the sake
+				   // of brevity).
+  ofstream output ((dim == 2 ?
+		    "solution-2d.gmv" :
+		    "solution-3d.gmv");
   data_out.write_gmv (output);
 };
 
