@@ -2,11 +2,27 @@
 #include <iostream>
 
 
+DeclException2 (Exc1,
+		int, int,
+		<< "arg1=" << arg1 << " arg2=" << arg2);
+
 
 int main () {
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
   double b[3][3] = {{25,31,37}, {45,57,69}, {75,96,117}};
+
+  try 
+    {
+      ThrowIfNot (1>2, Exc1(1,2));
+      cerr << "11111111111111111111";
+    }
+  catch (exception &e)
+    {
+      cerr << e.what();
+      cerr << "33333333333333333333";
+    };
   
+    
   const unsigned int dim=3;
   Tensor<2,dim> t(a);
   Tensor<2,dim> tt;
