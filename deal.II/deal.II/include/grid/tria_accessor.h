@@ -204,6 +204,10 @@ class TriaAccessor {
 				      *  Exception
 				      */
     DeclException0 (ExcNotUsefulForThisDimension);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcCantCompareIterators);
 				     /*@}*/
 	
   protected:

@@ -23,18 +23,18 @@ void TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a) {
 
 template <int dim>
 bool TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const {
+  Assert (tria == a.tria, ExcCantCompareIterators());
   return ((present_index == a.present_index) &&
-	  (present_level == a.present_level) &&
-	  (tria == a.tria));
+	  (present_level == a.present_level));
 };
 
 
 
 template <int dim>
 bool TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const {
+  Assert (tria == a.tria, ExcCantCompareIterators());
   return ((present_index != a.present_index) ||
-	  (present_level != a.present_level) ||
-	  (tria != a.tria));
+	  (present_level != a.present_level));
 };
 
 
