@@ -131,8 +131,7 @@ TAGS:
 
 clean: common/scripts/make_dependencies \
        clean-contrib clean-base clean-lac clean-dealII \
-       clean-doc clean-examples clean-lib clean-tests \
-       clean-common-scripts
+       clean-doc clean-examples clean-lib clean-tests
 	-rm -f TODO common/TAGS
 
 clean-contrib:
@@ -163,7 +162,8 @@ clean-tests:
 clean-common-scripts:
 	cd $D/common/scripts && $(MAKE) clean
 
-distclean: clean
+distclean: clean \
+           clean-common-scripts
 	cd lib && $(MAKE) distclean
 	-cd tests && $(MAKE) distclean
 
