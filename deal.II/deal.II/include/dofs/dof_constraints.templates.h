@@ -22,6 +22,7 @@
 #include <lac/block_sparse_matrix.h>
 
 
+//TODO[WB]: Some things could be accelerated on globally refined meshes if we didn't even enter the main loops of the condense functions when the 'lines' array is empty
 
 template<typename number>
 void
@@ -673,7 +674,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
     else
       {
 					 // line was condensed away,
-					 // create it newly first set
+					 // create it newly. first set
 					 // it to zero
 	uncondensed(line) = 0.;
 					 // then add the different
