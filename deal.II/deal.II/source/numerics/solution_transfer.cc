@@ -108,6 +108,9 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
   Assert(in.size()==n_dofs_old, ExcWrongVectorSize(in.size(),n_dofs_old));
   Assert(out.size()==dof_handler->n_dofs(),
 	 ExcWrongVectorSize(out.size(),dof_handler->n_dofs()));
+  Assert(&in != &out,
+         ExcMessage ("Vectors cannot be used as input and output"
+                     " at the same time!"));
 
   unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);
@@ -284,7 +287,8 @@ interpolate (const std::vector<Vector<number> > &all_in,
   for (unsigned int i=0; i<all_in.size(); ++i)
     Assert (all_in[i].size() == n_dofs_old,
 	    ExcWrongVectorSize(all_in[i].size(), n_dofs_old));
-			      
+
+  
   unsigned int out_size=all_out.size();
 
 				   // resize the output vector
@@ -298,6 +302,11 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	  all_out[i].reinit (dof_handler->n_dofs());
     };
 
+  for (unsigned int i=0; i<all_in.size(); ++i)
+    for (unsigned int j=0; j<all_in.size(); ++j)
+      Assert(&all_in[i] != &all_out[j],
+             ExcMessage ("Vectors cannot be used as input and output"
+                         " at the same time!"));
 
   const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
   Vector<number> local_values(dofs_per_cell);

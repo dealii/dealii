@@ -154,10 +154,10 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Improved: make knows a target <tt>veryclean</tt>
-       now. <tt>clean</tt> leaves the libraries now, removing
+       New: The top-level makefile now how a target <tt>distclean</tt>.
+       <tt>clean</tt> leaves the libraries now, removing
        everything that is not needed to use
-       <acronym>deal.II</acronym>. <tt>veryclean</tt> removes even the
+       <acronym>deal.II</acronym>. <tt>distclean</tt> removes even the
        libraries, leaving the directory more or less in the state like
        after <tt>configure</tt>.
        <br>
@@ -402,6 +402,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> 
+       Fixed: Vectors could not be given as input and output vectors to the
+       <code class="class">SolutionTransfer</code> class at the same time, but
+       this was not checked. An assertion has now been added to ensure this
+       requirement. 
+       <br>
+       (WB 2002/10/28)
+       </p>
+
   <li> <p> 
        Fixed: The <code
        class="member">DoFRenumbering::component_wise</code> function accepts a
