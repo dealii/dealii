@@ -178,6 +178,16 @@ class dVector : public VectorBase
 				      */
 				     //@{
 				     /**
+				      * Fast equivalent to #U.add(1, V)#.
+				      */
+    dVector & operator += (const dVector &V);
+
+    				     /**
+				      * Fast equivalent to #U.add(-1, V)#.
+				      */
+    dVector & operator -= (const dVector &V);
+
+				     /**
 				      *  U(0-DIM)+=s      . Addition of S to all components
 				      */
     void add (const double s);

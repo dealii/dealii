@@ -252,6 +252,27 @@ double dVector::linfty_norm () const {
 
 
 
+dVector& dVector::operator += (const dVector& v)
+{
+  if (v.dim != dim) reinit(v,1);
+
+  for (unsigned int i=0; i<dim; ++i)
+    val[i] += v.val[i];
+  return *this;
+}
+
+
+
+dVector& dVector::operator -= (const dVector& v)
+{
+  if (v.dim != dim) reinit(v,1);
+
+  for (unsigned int i=0; i<dim; ++i)
+    val[i] -= v.val[i];
+  return *this;
+}
+
+
 
 void dVector::add (const double v)
 {
