@@ -537,7 +537,7 @@ std::vector<unsigned int>
 FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree)
 {
 //TODO: fix for higher orders. correct now for lowest order, all dimensions  
-  std::vector<unsigned int> dpo(dim+1, 0);
+  std::vector<unsigned int> dpo(dim+1, 0U);
 // can this be done in a dimension independent and degree independent way?  
 // if DoFs are located only on lines, the the following is the correct way
 
