@@ -146,9 +146,15 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
       var_inverse[0].reinit(blocksize, blocksize);
 
       for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
-	for (unsigned int column_cell=0; column_cell<blocksize; ++column_cell)
-	  M_cell(row_cell,column_cell)=M.el(row_cell,column_cell);
-
+	{
+	  SparseMatrix<number>::const_iterator entry = M.begin(row_cell);
+	  const SparseMatrix<number>::const_iterator row_end = M.end(row_cell);
+	  while(entry != row_end && entry->column() < blocksize)
+	    {
+	      M_cell(row_cell, entry->column()) = entry->value();
+	      ++entry;
+	    }
+	}
       if (store_diagonals)
 	var_diagonal[0] = M_cell;
       var_inverse[0].invert(M_cell);
@@ -190,12 +196,26 @@ void PreconditionBlock<number,inverse_type>::invert_diagblocks()
 
       M_cell.clear ();
       
-      for (unsigned int cell=0, row=0; cell<n_cells; ++cell)
+      for (unsigned int cell=0; cell<n_cells; ++cell)
 	{
-	  for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	    for (unsigned int column_cell=0, column=cell*blocksize;
-		 column_cell<blocksize; ++column_cell, ++column)
-	      M_cell(row_cell,column_cell)=M.el(row,column);
+	  const unsigned int cell_start = cell*blocksize;
+	  for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+	    {
+	      const unsigned int row = row_cell + cell_start;
+	      SparseMatrix<number>::const_iterator entry = M.begin(row);
+	      const SparseMatrix<number>::const_iterator row_end = M.end(row);
+
+	      while (entry != row_end && entry->column()<cell_start)
+		++entry;
+	      while(entry != row_end)
+		{
+		  const unsigned int column_cell = entry->column()-cell_start;
+		  if (column_cell >= blocksize)
+		    break;
+		  M_cell(row_cell, column_cell) = entry->value();
+		  ++entry;
+		}
+	    }
 
 	  if (store_diagonals)
 	    var_diagonal[cell] = M_cell;
