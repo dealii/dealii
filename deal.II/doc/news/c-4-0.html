@@ -257,6 +257,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New: There is now a function <code
+       class="member">CellAccessor::neighbor_child_on_subface</code> 
        Fixed: The <code
        class="member">SolutionTransfer::interpolate</code>
        function did not compute all output vectors if the number of
@@ -265,6 +267,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        output vectors before resizing that array. This is now fixed.
        <br>
        (Brent Bailey, WB 2003/10/22)
+       </p>
+
+  <li> <p>
+       New: <code class="class">MGCoarseGridHouseholder</code>
+       implements a coarse grid solver using QR-factorization.
+       <br>
+       (GK 2003/10/17)
        </p>
 
   <li> <p>
@@ -302,6 +311,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        New: There are now functions <code
        class="member">CellAccessor::neighbor_child_on_subface</code> and <code
        class="member">DoFCellAccessor::neighbor_child_on_subface</code>
+>>>>>>> 1.41
        that should be called instead of using <code
        class="member">GeometryInfo::child_cell_on_face</code> in most cases.
        <br> 
@@ -309,6 +319,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p>
+>>>>>>> 1.36
        New: <code class="class">GridGenerator</code> has a new
        function <code class="member">subdivided_hyper_rectangle</code> 
        which generates a rectangle with given corner points and possibly 
