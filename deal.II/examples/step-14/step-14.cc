@@ -1226,7 +1226,7 @@ namespace LaplaceSolver
     Vector<float> error_indicators (triangulation->n_active_cells());
     estimate_error (error_indicators);
     DataOut<dim> data_out;
-    ofstream x("x");
+    std::ofstream x("x");
     Vector<double> xe (error_indicators.begin(),
 		       error_indicators.end());
     data_out.attach_dof_handler (DualSolver<dim>::dof_handler);
