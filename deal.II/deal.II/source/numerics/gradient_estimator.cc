@@ -13,6 +13,8 @@
 
 
 #include <base/quadrature_lib.h>
+#include <base/thread_management.h>
+#include <base/multithread_info.h>
 #include <lac/vector.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
@@ -21,26 +23,162 @@
 #include <fe/fe_values.h>
 #include <numerics/gradient_estimator.h>
 
-#ifdef DEAL_II_USE_MT
-#  include <base/thread_management.h>
-#  include <base/multithread_info.h>
-#endif
+
+template <typename T>
+static T sqr (const T t)
+{
+  return t*t;
+};
+
+
+
+
+
+template <int dim>
+inline
+typename DerivativeApproximation::Gradient<dim>::ProjectedDerivative
+DerivativeApproximation::Gradient<dim>::
+get_projected_derivative (const FEValues<dim>  &fe_values,
+			  const Vector<double> &solution) 
+{
+  vector<ProjectedDerivative> values (1);
+  fe_values.get_function_values (solution, values);
+  return values[0];
+};
+
+
+
+template <int dim>
+inline
+double
+DerivativeApproximation::Gradient<dim>::derivative_norm (const Derivative &d)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    s += d[i]*d[i];
+  return sqrt(s);
+};
+
+
+
+template <int dim>
+inline
+void
+DerivativeApproximation::Gradient<dim>::symmetrize (Derivative &)
+{
+				   // nothing to do here
+};
+
+
+
+template <int dim>
+inline
+typename DerivativeApproximation::SecondDerivative<dim>::ProjectedDerivative
+DerivativeApproximation::SecondDerivative<dim>::
+get_projected_derivative (const FEValues<dim>  &fe_values,
+			  const Vector<double> &solution) 
+{
+  vector<ProjectedDerivative> values (1);
+  fe_values.get_function_grads (solution, values);
+  return values[0];
+};
+
+
+
+template <>
+inline
+double
+DerivativeApproximation::SecondDerivative<1>::
+derivative_norm (const Derivative &d)
+{
+  return fabs (d[0][0]);
+};
+
+
+
+template <>
+inline
+double
+DerivativeApproximation::SecondDerivative<2>::
+derivative_norm (const Derivative &d)
+{
+				   // note that d should be a
+				   // symmetric 2x2 tensor, so the
+				   // eigenvalues are:
+				   //
+				   // 1/2(a+b\pm\sqrt((a-b)^2+4c^2))
+				   //
+				   // if the d_11=a, d_22=b,
+				   // d_12=d_21=c
+  const double radicand = sqr(d[0][0] - d[1][1]) + 4*sqr(d[0][1]);
+  const double eigenvalues[2]
+    = { 0.5*(d[0][0] + d[1][1] + sqrt(radicand)),
+	0.5*(d[0][0] + d[1][1] - sqrt(radicand))  };
+  
+  return max (fabs (eigenvalues[0]),
+	      fabs (eigenvalues[1]));
+};
+
+
+
+template <int dim>
+inline
+void
+DerivativeApproximation::SecondDerivative<dim>::symmetrize (Derivative &d)
+{
+				   // symmetrize non-diagonal entries
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i+1; j<dim; ++j)
+      {
+	const double s = (d[i][j] + d[j][i]) / 2;
+	d[i][j] = d[j][i] = s;
+      };
+};
+
 
 
 
 template <int dim>
 void 
-GradientEstimator::estimate (const DoFHandler<dim> &dof_handler,
-			     const Vector<double>  &solution,
-			     Vector<float>         &error_per_cell)
+DerivativeApproximation::
+approximate_gradient (const DoFHandler<dim> &dof_handler,
+		      const Vector<double>  &solution,
+		      Vector<float>         &derivative_norm)
 {
-  Assert (error_per_cell.size() == dof_handler.get_tria().n_active_cells(),
-	  ExcInvalidVectorLength (error_per_cell.size(),
+  approximate_derivative<Gradient<dim>,dim> (dof_handler,
+					     solution,
+					     derivative_norm);
+};
+
+
+
+template <int dim>
+void 
+DerivativeApproximation::
+approximate_second_derivative (const DoFHandler<dim> &dof_handler,
+			       const Vector<double>  &solution,
+			       Vector<float>         &derivative_norm)
+{
+  approximate_derivative<SecondDerivative<dim>,dim> (dof_handler,
+						     solution,
+						     derivative_norm);
+};
+
+
+
+template <class DerivativeDescription, int dim>
+void 
+DerivativeApproximation::
+approximate_derivative (const DoFHandler<dim> &dof_handler,
+			const Vector<double>  &solution,
+			Vector<float>         &derivative_norm)
+{
+  Assert (derivative_norm.size() == dof_handler.get_tria().n_active_cells(),
+	  ExcInvalidVectorLength (derivative_norm.size(),
 				  dof_handler.get_tria().n_active_cells()));
   Assert (dof_handler.get_fe().n_components() == 1,
 	  ExcInternalError());
 
-#ifdef DEAL_II_USE_MT
   const unsigned int n_threads = multithread_info.n_default_threads;
   vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
@@ -48,32 +186,28 @@ GradientEstimator::estimate (const DoFHandler<dim> &dof_handler,
   Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate (&GradientEstimator::
-					  template estimate_threaded<dim>)
-		    .collect_args (dof_handler, solution, index_intervals[i],
-				   error_per_cell));
+		    Threads::encapsulate
+		    (&DerivativeApproximation::
+		     template approximate<DerivativeDescription,dim>)
+		    .collect_args (dof_handler, solution,
+				   index_intervals[i],
+				   derivative_norm));
   thread_manager.wait ();
-  
-#else
-  estimate_threaded (dof_handler, solution,
-		     make_pair(0U, dof_handler.get_tria().n_active_cells()),
-		     error_per_cell);
-#endif
 };
 
 
 
-template <int dim>
+template <class DerivativeDescription, int dim>
 void 
-GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
+DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 				      const Vector<double>  &solution,
 				      const IndexInterval   &index_interval,
-				      Vector<float>         &error_per_cell)
+				      Vector<float>         &derivative_norm)
 {
   QMidpoint<dim> midpoint_rule;
   FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
 				    midpoint_rule,
-				    UpdateFlags(update_values |
+				    UpdateFlags(DerivativeDescription::update_flags |
 						update_q_points));
   
 				   // matrix Y=sum_i y_i y_i^T
@@ -83,9 +217,10 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 				   // respective entries in the output
 				   // vector:
   Vector<float>::iterator
-    error_on_this_cell = error_per_cell.begin() + index_interval.first;
+    derivative_norm_on_this_cell
+    = derivative_norm.begin() + index_interval.first;
   
-  DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
   cell = endc = dof_handler.begin_active();
 				   // (static_cast to avoid warnings
 				   // about unsigned always >=0)
@@ -96,25 +231,30 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 				   // active neighbors of a cell
 				   // reserve the maximal number of
 				   // active neighbors
-  vector<DoFHandler<dim>::active_cell_iterator> active_neighbors;
+  vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
 			    GeometryInfo<dim>::subfaces_per_face);
 
-  for (; cell!=endc; ++cell, ++error_on_this_cell)
+  for (; cell!=endc; ++cell, ++derivative_norm_on_this_cell)
     {
       Y.clear ();
-				       // vector g=sum_i y_i (f(x+y_i)-f(x))/|y_i|
-      Tensor<1,dim> projected_gradient;
+				       // vector
+				       // g=sum_i y_i (f(x+y_i)-f(x))/|y_i|
+				       // or related type for higher
+				       // derivatives
+      typename DerivativeDescription::Derivative projected_derivative;
 
 				       // reinit fe values object...
       fe_midpoint_value.reinit (cell);
 
 				       // ...and get the value of the
-				       // solution...
-      vector<double> this_midpoint_value(1);
-      fe_midpoint_value.get_function_values (solution, this_midpoint_value);
-				       // ...and the place where it lives
-      Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
+				       // projected derivative...
+      const typename DerivativeDescription::ProjectedDerivative
+	this_midpoint_value
+	= DerivativeDescription::get_projected_derivative (fe_midpoint_value,
+						    solution);
+      				       // ...and the place where it lives
+      const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
 
       
 				       // loop over all neighbors and
@@ -133,7 +273,8 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
       for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
 	if (! cell->at_boundary(n))
 	  {
-	    DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
+	    typename DoFHandler<dim>::cell_iterator
+	      neighbor = cell->neighbor(n);
 	    if (neighbor->active())
 	      active_neighbors.push_back (neighbor);
 	    else
@@ -157,7 +298,8 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 						 // present cell
 		if (dim == 1)
 		  {
-		    DoFHandler<dim>::cell_iterator neighbor_child = neighbor;
+		    typename DoFHandler<dim>::cell_iterator
+		      neighbor_child = neighbor;
 		    while (neighbor_child->has_children())
 		      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
 		    
@@ -181,11 +323,11 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 				       // now loop over all active
 				       // neighbors and collect the
 				       // data we need
-      typename vector<DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{
-	  const DoFHandler<dim>::active_cell_iterator
+	  const typename DoFHandler<dim>::active_cell_iterator
 	    neighbor = *neighbor_ptr;
 	    
 					   // reinit fe values object...
@@ -193,10 +335,14 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 	  
 					   // ...and get the value of the
 					   // solution...
-	  vector<double> neighbor_midpoint_value(1);
-	  fe_midpoint_value.get_function_values (solution, this_midpoint_value);
+	  const typename DerivativeDescription::ProjectedDerivative
+	    neighbor_midpoint_value
+	    = DerivativeDescription::get_projected_derivative (fe_midpoint_value,
+							solution);
+	  
 					   // ...and the place where it lives
-	  Point<dim> neighbor_center = fe_midpoint_value.quadrature_point(0);
+	  const Point<dim>
+	    neighbor_center = fe_midpoint_value.quadrature_point(0);
 	  
 	  
 					   // vector for the
@@ -208,6 +354,13 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 	  const double distance = sqrt(y.square());
 					   // normalize y
 	  y /= distance;
+					   // *** note that unlike in
+					   // the docs, y denotes the
+					   // normalized vector
+					   // connecting the centers
+					   // of the two cells, rather
+					   // than the normal
+					   // difference! ***
 	  
 					   // add up the
 					   // contribution of
@@ -216,13 +369,20 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 	    for (unsigned int j=0; j<dim; ++j)
 	      Y[i][j] += y[i] * y[j];
 	  
-					   // the update the sum
+					   // then update the sum
 					   // of difference
 					   // quotients
-	  projected_gradient += (neighbor_midpoint_value[0] -
-				 this_midpoint_value[0]) /
-				distance *
-				y;
+	  typename DerivativeDescription::ProjectedDerivative
+	    projected_finite_difference
+	    = (neighbor_midpoint_value -
+	       this_midpoint_value);
+	  projected_finite_difference /= distance;
+	  
+	  typename DerivativeDescription::Derivative projected_derivative_update;
+	  outer_product (projected_derivative_update,
+			 y,
+			 projected_finite_difference);
+	  projected_derivative += projected_derivative_update;
 	};
 
 				       // can we determine an
@@ -237,14 +397,17 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
       AssertThrow (determinant(Y) != 0,
 		   ExcInsufficientDirections());
 
-                                       // compute Y^-1 g
-      Point<dim> gradient;
-      Tensor<2,dim> Y_inverse = invert(Y);
+				       // first symmetrize g
+      DerivativeDescription::symmetrize (projected_derivative);
       
                                        // compute Y^-1 g
-      contract (gradient, Y_inverse, projected_gradient);
+      typename DerivativeDescription::Derivative derivative;
+      Tensor<2,dim> Y_inverse = invert(Y);
+      
+      contract (derivative, Y_inverse, projected_derivative);
 
-      *error_on_this_cell = sqrt(gradient.square());
+      *derivative_norm_on_this_cell
+	= DerivativeDescription::derivative_norm (derivative);
     };
 };
 
@@ -254,9 +417,17 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 // explicit instantiations
 template
 void 
-GradientEstimator::estimate (const DoFHandler<deal_II_dimension> &dof_handler,
-			     const Vector<double>  &solution,
-			     Vector<float>         &error_per_cell);
+DerivativeApproximation::
+approximate_gradient (const DoFHandler<deal_II_dimension> &dof_handler,
+		      const Vector<double>  &solution,
+		      Vector<float>         &derivative_norm);
+
+template
+void 
+DerivativeApproximation::
+approximate_second_derivative (const DoFHandler<deal_II_dimension> &dof_handler,
+			       const Vector<double>  &solution,
+			       Vector<float>         &derivative_norm);
 
 
 
