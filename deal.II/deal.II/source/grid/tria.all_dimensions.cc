@@ -244,6 +244,159 @@ void TriangulationLevel<0>::write_rle_vector (const unsigned int  magic_number1,
 
 
 
+template <typename T>
+void TriangulationLevel<0>::read_raw_vector (const unsigned int  magic_number1,
+					     vector<T>          &v,
+					     const unsigned int  magic_number2,
+					     istream            &in) 
+{
+  AssertThrow (out, ExcIO());
+
+  unsigned int magic_number;
+  in >> magic_number;
+  AssertThrow (magic_number==magic_number1, ExcIO());
+
+  unsigned int N;
+  in >> N;
+  v.resize (N);
+  
+  out.read (reinterpret_cast<const char*>(v.begin()),
+	    reinterpret_cast<const char*>(v.end())
+	    - reinterpret_cast<const char*>(v.begin()));
+
+  in >> magic_number;
+  AssertThrow (magic_number==magic_number2, ExcIO());
+
+  AssertThrow (out, ExcIO());
+};
+
+
+
+void
+TriangulationLevel<0>::read_raw_vector (const unsigned int  magic_number1,
+					vector<bool>       &v,
+					const unsigned int  magic_number2,
+					istream            &in) {
+  AssertThrow (in, ExcIO());
+
+  unsigned int magic_number;
+  in >> magic_number;
+  AssertThrow (magic_number==magic_number1, ExcIO());
+
+  unsigned int N;
+  in >> N;
+  v.resize (N);
+
+  vector<unsigned char> flags (N/8+1);
+  for (unsigned int i=0; i<N/8+1; ++i) 
+    {
+      in >> flags[i];
+    };
+
+  for (unsigned int position=0; position!=N; ++position)
+    v[position] = (flags[position/8] & (1<<(position%8)));
+
+  in >> magic_number;
+  AssertThrow (magic_number==magic_number2, ExcIO());
+
+  AssertThrow (in, ExcIO());
+};
+
+
+
+template <typename T>
+void TriangulationLevel<0>::read_rle_vector (const unsigned int magic_number1,
+					     vector<T>         &v,
+					     const unsigned int magic_number2,
+					     istream           &in) 
+{
+  AssertThrow (in, ExcIO());
+  
+  unsigned int magic_number;
+  in >> magic_number;
+  AssertThrow (magic_number==magic_number1, ExcIO());
+
+  unsigned int N;
+  in >> N;
+  v.resize (N);
+
+				   // index of the element presently read
+  typename vector<T>::iterator present_element = 0;
+
+				   // variable to store the number
+				   // of elements to be read next
+  unsigned int n_elements;
+
+				   // char to hold the '<' and
+				   // '>' chars which are used
+				   // as delimiters, also '[]'
+  char delimiter;
+
+  in >> delimiter;
+  AssertThrow (delimiter=='[', ExcIO());
+
+				   // read until we reach the end
+				   // of the vector's output
+  const typename vector<T>::const_iterator v_end = v.end();
+  while (present_element < v_end)
+    {
+				       // each block consists of two parts:
+				       // first some non-equal elements and
+				       // then one element which is repeated
+				       // several times. both lists can be
+				       // empty
+      in >> delimiter;
+      AssertThrow (delimiter=='<', ExcIO());
+
+				       // number of non-equal elements
+      in >> n_elements;
+      
+      in >> delimiter;
+      AssertThrow (delimiter=='>', ExcIO());
+
+      if (n_elements > 0)
+	{
+	  in.read (reinterpret_cast<char*> (present_element),
+		   reinterpret_cast<char*> (present_element + n_elements)
+		   - reinterpret_cast<char*> (present_element));
+	  present_element += n_elements;
+	};
+      
+				       // now for the element which is
+				       // to be repeated
+      in >> delimiter;
+      AssertThrow (delimiter=='<', ExcIO());
+
+				       // number of equal elements
+      in >> n_elements;
+      
+      in >> delimiter;
+      AssertThrow (delimiter=='>', ExcIO());
+
+				       // read this one element
+      if (n_elements > 0)
+	{
+	  in.read (reinterpret_cast<char*> (present_element),
+		   reinterpret_cast<char*> (present_element + 1)
+		   - reinterpret_cast<char*> (present_element));
+					   // repeat it
+	  for (unsigned int i=1; i<n_elements; ++i)
+	    *(present_element + i) = *present_element;
+      
+	  present_element += n_elements;
+	};
+    };
+
+  in >> delimiter;
+  AssertThrow (delimiter==']', ExcIO());
+  
+  in >> magic_number;
+  AssertThrow (magic_number==magic_number2, ExcIO());
+};
+
+      
+  
+
 void TriangulationLevel<0>::block_write (ostream &out) const
 {
   write_raw_vector (0, refine_flags, 0, out);
