@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------
 
+#include <lac/block_sparse_matrix_ez.h>
 #include <lac/block_sparse_matrix_ez.templates.h>
 
 // explicit instantiations
