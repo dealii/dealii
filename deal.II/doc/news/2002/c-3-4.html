@@ -34,6 +34,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: <acronym>deal.II</acronym> can be compiled with version 7.0 of
+       Intel's icc compiler, which was recently released. Since this compiler
+       finally supports the very restrictive flags <code>-Xc -ansi</code> that
+       check for close conformance with the C++ standard, we use them (previous
+       versions of icc would crash when these two flags are given). This
+       requires that we distinguish between these compiler versions, and the
+       corresponding Makefile variable <code>GXX-VERSION</code> now no longer
+       holds the non-versioned string <code>intel_icc</code> when icc is
+       detected, but rather either <code>intel_icc5</code>,
+       <code>intel_icc6</code>, or <code>intel_icc7</code>, depending on what
+       version of the compiler was detected.
+       <br>
+       (WB 2002/12/05)
+       </p>
+
+  <li> <p> 
        Changed: Previously, we just set the preprocessor variable
        <code>DEAL_II_USE_MT</code>, when <code>--with-multithreading</code> was
        given as argument to <code>./configure</code>. Tests in the code

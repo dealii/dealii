@@ -100,8 +100,22 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
         is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
 	is_intel_icc="$is_intel_icc1$is_intel_icc2"
         if test "x$is_intel_icc" != "x" ; then
-          AC_MSG_RESULT(C++ compiler is Intel ICC)
-          GXX_VERSION=intel_icc
+	  version5="`echo $is_intel_icc | grep 'Version 5'`"
+	  version6="`echo $is_intel_icc | grep 'Version 6'`"
+	  version7="`echo $is_intel_icc | grep 'Version 7'`"
+          if test "x$version5" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is Intel ICC 5)
+            GXX_VERSION=intel_icc5
+          else if test "x$version6" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is Intel ICC 6)
+            GXX_VERSION=intel_icc6
+          else if test "x$version7" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is Intel ICC 7)
+            GXX_VERSION=intel_icc7
+          else
+            AC_MSG_RESULT(C++ compiler is Intel ICC)
+            GXX_VERSION=intel_icc
+          fi fi fi
         else
   
           dnl Intel's ECC C++ compiler for the Itanium?
@@ -291,7 +305,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           LDFLAGSPIC="-KPIC"
           ;;
   
-      intel_icc)
+      intel_icc*)
           dnl Disable some compiler warnings, as they often are wrong on
           dnl our code:
           dnl #175: `subscript out of range' (doesn't take into account that
@@ -303,16 +317,26 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #525: `type "DataOutBase::DataOutBase" is an inaccessible type
           dnl       (allowed for compatibility)' (I don't understand what the
           dnl       compiler means)
-	  dnl
-          dnl Note: we would really like to use  -ansi -Xc, since that
+          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
+          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424 -opt_report_levelmin"
+          CXXFLAGSPIC="-KPIC"
+          LDFLAGSPIC="-KPIC -shared"
+
+
+          dnl We would really like to use  -ansi -Xc, since that
 	  dnl is _very_ picky about standard C++, and is thus very efficient
           dnl in detecting slight standard violations, but these flags are
           dnl also very efficient in crashing the compiler (it generates a
-          dnl segfault)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w0 -wd424"
-          CXXFLAGSPIC="-KPIC"
-          LDFLAGSPIC="-KPIC -shared"
+          dnl segfault), at least with versions prior to 7.0. So only
+          dnl use these flags with versions we know are safe
+          dnl
+          dnl Second thing: icc7 allows using alias information for 
+          dnl optimization. Use this.
+          if test "x$GXX_VERSION" != "xintel_icc5" -a \
+                  "x$GXX_VERSION" != "xintel_icc6" ; then
+            CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
+            CXXFLAGSO="$CXXFLAGSO -ansi_alias"
+          fi
           ;;
   
       intel_ecc)
@@ -857,7 +881,7 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
             CXXFLAGSO="$CXXFLAGSO -pthread"
 	    ;;
 
-        intel_icc)
+        intel_icc*)
             CXXFLAGSG="$CXXFLAGSG"  
             CXXFLAGSO="$CXXFLAGSO -parallel"
 	    ;;
