@@ -123,9 +123,6 @@ int main()
 	  SolverControl control(100, 1.e-12);
 	  SolverCG<>    solver(control, mem);
 	  
-	  PreconditionIdentity precondition;
-	  solver.solve(A,u,f,precondition);
-	  
 	  u = 0.;
 	  MGLevelObject<SparsityPattern> mgstruct(0, tr.n_levels()-1);
 	  MGLevelObject<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
