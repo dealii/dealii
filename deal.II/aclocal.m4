@@ -121,13 +121,21 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	      dnl KAI C++?
   	      is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
   	      if test "x$is_kai_cc" != "x" ; then
-  	        AC_MSG_RESULT(compile is KAI C++)
-  	        GXX_VERSSION=kai_cc
+  	        AC_MSG_RESULT(C++ compiler is KAI C++)
+  	        GXX_VERSION=kai_cc
   	      else
   
-                  dnl  Aw, nothing suitable found...
-                  AC_MSG_ERROR(Unrecognized compiler, sorry)
-                  exit 1
+  	        dnl Portland Group C++?
+  	        is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+  	        if test "x$is_pgcc" != "x" ; then
+  	          AC_MSG_RESULT(C++ compiler is Portland Group C++)
+  	          GXX_VERSION=portland_group
+  	        else
+  
+                    dnl  Aw, nothing suitable found...
+                    AC_MSG_ERROR(Unrecognized compiler, sorry)
+                    exit 1
+                  fi
                 fi
               fi
   	    fi
@@ -322,6 +330,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSG="$CXXFLAGS -DDEBUG"
           CXXFLAGSO="$CXXFLAGS"
           CXXFLAGSPIC="-KPIC"
+          ;;
+  
+      portland_group)
+	  CXXFLAGSG="$CXXFLAGS -A -Xa -DDEBUG"
+          CXXFLAGSO="$CXXFLAGS -A -Xa"
+          CXXFLAGSPIC="-Kpic"
           ;;
   
       *)
