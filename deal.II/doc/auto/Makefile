@@ -48,8 +48,8 @@ kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
 ifeq ($(shell uname),SunOS)
-#DOCPP = /home/people/wolf/Config/doc++/doc++
-DOCPP = /home/people/kanschat/bin/doc++
+DOCPP = /home/people/wolf/Config/doc++/doc++
+#DOCPP = /home/people/kanschat/bin/doc++
 else
 DOCPP = doc++
 endif
