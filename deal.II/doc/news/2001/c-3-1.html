@@ -323,6 +323,17 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: There are now functions <code
+       class="member">DoFTools::map_dofs_to_support_points</code> and 
+       <code
+       class="member">DoFTools::map_support_points_to_dofs</code> that
+       generate a map between DoF indices and the support points of
+       these DoFs, and the other way round.
+       <br>
+       (WB 2001/04/24)
+       </p>
+
+  <li> <p>
        New: Implement the <code
        class="member">VectorTools::interpolate_boundary_values</code>
        a second time, this time taking a <code
