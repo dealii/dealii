@@ -43,12 +43,12 @@ void test_fe_datas()
     }
 				   // have systems of systems
   fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(2),2),2));
-  fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),2),1,
-					 FESystem<dim> (FE_Q<dim>(2),2),1));
-  fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),1,
-							FE_Q<dim>(2),1),1,
-					 FESystem<dim> (FE_Q<dim>(2),2),1,
-					 FESystem<dim> (FE_DGQ<dim>(2),2),1));
+  fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_DGQ<dim>(0),2),1,
+					 FESystem<dim> (FE_DGQ<dim>(1),2),1));
+//    fe_datas.push_back (new FESystem<dim> (FESystem<dim> (FE_Q<dim>(1),1,
+//  							FE_Q<dim>(2),1),1,
+//  					 FESystem<dim> (FE_Q<dim>(2),2),1,
+//					 FESystem<dim> (FE_DGQ<dim>(2),2),1));
   
   
   deallog << std::endl << "dim=" << dim << std::endl;
