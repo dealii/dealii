@@ -447,7 +447,6 @@ void TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) c
 	  sel_columns.push_back(key);
 	}
     }
-  std::cout << std::endl;
 }
 
 
