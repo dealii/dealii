@@ -1061,10 +1061,12 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  ++vertex_touch_count[i->first.second];
 	};
 
-				       // assert minimum touch count
-				       // is at least two
+ 				       // assert minimum touch count
+ 				       // is at least three. if not so,
+				       // then clean triangulation and
+				       // exit with an exception
       if (! (* (std::min_element(vertex_touch_count.begin(),
-				 vertex_touch_count.end())) >= 2))
+				 vertex_touch_count.end())) >= 3))
 	{
 					   // clear will only work if
 					   // there are no
