@@ -76,8 +76,8 @@ sub parse_class_declarations {
 
 	if ( /^\s*((template\s*<
                      (
-                        ([-\w,_=\s]   |
-                         <([-\w_,=\s])+>  )*
+                        ([-\w,_=:\s]   |
+                         <([-\w_,=:\s])+>  )*
                      )>\s*)?
                    (class|struct))(.*)/x ) {
 	    # this is the declaration of a class, possibly a template
