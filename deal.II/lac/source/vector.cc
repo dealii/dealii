@@ -16,6 +16,9 @@
 
 // explicit instantiations
 template class Vector<double>;
+
+template Vector<double>::Vector (const Vector<float> &);
+
 template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(const Vector<float>&);
 template bool Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<double>(const Vector<double>&) const;
 template bool Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<float>(const Vector<float>&) const;
@@ -29,6 +32,9 @@ template void Vector<double>::scale<double>(const Vector<double>&);
 template void Vector<double>::scale<float>(const Vector<float>&);
 
 template class Vector<float>;
+
+template Vector<float>::Vector (const Vector<double> &);
+
 template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
 template bool Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<double>(const Vector<double>&) const;
 template bool Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<float>(const Vector<float>&) const;

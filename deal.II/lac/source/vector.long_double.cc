@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,12 @@
 
 // explicit instantiations
 template class Vector<long double>;
+
+template Vector<long double>::Vector (const Vector<double> &);
+template Vector<long double>::Vector (const Vector<float> &);
+
+template Vector<double>::Vector (const Vector<long double> &);
+template Vector<float>::Vector (const Vector<long double> &);
 
 template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
 template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(const Vector<float>&);
