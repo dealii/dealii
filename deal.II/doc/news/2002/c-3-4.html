@@ -42,7 +42,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        structure of their class, and interfere with plans for the
        extension of this and related classes. These functions, which
        had been deprecated in the previous version, are thus not
-       part of the release after version 3.3 any more. Use the <code
+       part of the release after version 3.4 any more. Use the <code
        class="member">FEValuesBase::shape_value</code> and alike
        functions as a replacement.
        <br>
@@ -105,6 +105,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> Fixed: In debug mode the <code
+       class="member">MappingQ1::transform_real_to_unit_cell</code>
+       function erroneously threw an assertion when used in 1 or 3
+       dimensions. This is now fixed.
+       <br>
+       (RH 2002/06/10)
+       </p>
+
   <li> <p> 
        Fixed: The <code class="member">get_dof_indices</code>
        functions of DoF accessor classes used to work also for
