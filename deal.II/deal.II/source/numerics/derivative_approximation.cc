@@ -125,7 +125,7 @@ template <int dim>
 inline
 double
 DerivativeApproximation::SecondDerivative<dim>::
-derivative_norm (const Derivative &d)
+derivative_norm (const Derivative &)
 {
 				   // computing the spectral norm is
 				   // not so simple in general. it is
