@@ -161,7 +161,7 @@ double
 SolverMinRes<VECTOR>::criterion()
 {
   return res2;
-};
+}
 
 
 template<class VECTOR>
@@ -361,7 +361,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
     throw SolverControl::NoConvergence (this->control().last_step(),
 					this->control().last_value());
 				   // otherwise exit as normal
-};
+}
 
 
 #endif
