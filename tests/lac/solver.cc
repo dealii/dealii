@@ -109,9 +109,6 @@ int main()
       for (unsigned int i=0;i<dim;++i)
 	inverse_permutation[permutation[i]] = i;
 
-      for (unsigned int i=0;i<dim;++i)
-	permutation[i] = dim-i-1;
-      
       PreconditionPSOR<> prec_psor;
       prec_psor.initialize(A, permutation, inverse_permutation, 1.2);
       
