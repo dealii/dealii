@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,8 +12,6 @@
 //----------------------------------------------------------------
 
 #include <base/quadrature.h>
-#include <base/polynomial.h>
-#include <base/tensor_product_polynomials.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
@@ -431,22 +429,21 @@ namespace FE_Q_Helper
 template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1, degree),
-				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
-                                                       false),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
-								    std::vector<bool>(1,true))),
-                degree(degree),
-                renumber(lexicographic_to_hierarchic_numbering (*this, degree)),
-		renumber_inverse(FE_Q_Helper::invert_numbering (renumber)),
-		face_renumber(face_lexicographic_to_hierarchic_numbering (degree)),
-		polynomial_space(Polynomials::LagrangeEquidistant::generate_complete_basis(degree))
+		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
+		  FiniteElementData<dim>(get_dpo_vector(degree),1, degree),
+		  std::vector<bool> (FiniteElementData<dim>(
+		    get_dpo_vector(degree),1, degree).dofs_per_cell, false),
+		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
+		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
+						    degree(degree),
+						    face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (degree)))
 {
-  
-				   // copy constraint and embedding
-				   // matrices if they are
-				   // defined. otherwise leave them at
-				   // invalid size
+  this->poly_space.set_numbering(FE_Q_Helper::invert_numbering(
+    lexicographic_to_hierarchic_numbering (*this, degree)));
+
+				   // compute constraint, embedding
+				   // and restriction matrices
   initialize_constraints ();
   initialize_embedding ();
   initialize_restriction ();
@@ -496,77 +493,6 @@ FE_Q<dim>::clone() const
 
 
 template <int dim>
-double
-FE_Q<dim>::shape_value (const unsigned int i,
-			const Point<dim> &p) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return polynomial_space.compute_value(renumber_inverse[i], p);
-}
-
-
-template <int dim>
-double
-FE_Q<dim>::shape_value_component (const unsigned int i,
-				  const Point<dim> &p,
-				  const unsigned int component) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_value(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-FE_Q<dim>::shape_grad (const unsigned int i,
-		       const Point<dim> &p) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return polynomial_space.compute_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-FE_Q<dim>::shape_grad_component (const unsigned int i,
-				 const Point<dim> &p,
-				 const unsigned int component) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<2,dim>
-FE_Q<dim>::shape_grad_grad (const unsigned int i,
-			    const Point<dim> &p) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
-Tensor<2,dim>
-FE_Q<dim>::shape_grad_grad_component (const unsigned int i,
-				      const Point<dim> &p,
-				      const unsigned int component) const
-{
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component == 0, ExcIndexRange (component, 0, 1));
-  return polynomial_space.compute_grad_grad(renumber_inverse[i], p);
-}
-
-
-
-template <int dim>
 void
 FE_Q<dim>::
 get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
@@ -592,7 +518,9 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
   Assert (interpolation_matrix.n() == source_fe.dofs_per_cell,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				source_fe.dofs_per_cell));
-  
+
+  const std::vector<unsigned int> &index_map=
+    this->poly_space.get_numbering();
   
 				   // compute the interpolation
 				   // matrices in much the same way as
@@ -610,15 +538,13 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
                                        // cell and evaluate the
                                        // shape functions there
       const Point<dim>
-	p = FE_Q_Helper::generate_unit_point (j, this->dofs_per_cell,
+	p = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
 					      FE_Q_Helper::int2type<dim>());
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-        cell_interpolation(renumber[j],renumber[i])
-          = polynomial_space.compute_value (i, p);
+        cell_interpolation(j,i) = this->poly_space.compute_value (i, p);
 
       for (unsigned int i=0; i<source_fe.dofs_per_cell; ++i)
-        source_interpolation(renumber[j],source_fe.renumber[i])
-          = source_fe.polynomial_space.compute_value (i, p);
+        source_interpolation(j,i) = source_fe.poly_space.compute_value (i, p);
     }
 
                                    // then compute the
@@ -667,6 +593,9 @@ void FE_Q<dim>::initialize_unit_support_points ()
     n *= degree+1;
   
   this->unit_support_points.resize(n);
+
+  const std::vector<unsigned int> &index_map_inverse=
+    this->poly_space.get_numbering_inverse();
   
   const double step = 1./degree;
   Point<dim> p;
@@ -682,7 +611,7 @@ void FE_Q<dim>::initialize_unit_support_points ()
 	  if (dim>2)
 	    p(2) = iz * step;
 	  
-	  this->unit_support_points[renumber[k++]] = p;
+	  this->unit_support_points[index_map_inverse[k++]] = p;
 	};
 }
 
@@ -709,6 +638,9 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
     n *= degree+1;
   
   this->unit_face_support_points.resize(n);
+
+  const std::vector<unsigned int> &face_index_map_inverse=
+    FE_Q_Helper::invert_numbering(face_index_map);
   
   const double step = 1./degree;
   Point<codim> p;
@@ -724,7 +656,7 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
 	  if (codim>2)
 	    p(2) = iz * step;
 	  
-	  this->unit_face_support_points[face_renumber[k++]] = p;
+	  this->unit_face_support_points[face_index_map_inverse[k++]] = p;
 	};
 }
 
@@ -1100,9 +1032,6 @@ FE_Q<2>::initialize_constraints ()
   
   FullMatrix<double> face_interpolation (n_small_functions, this->dofs_per_face);
   FullMatrix<double> subface_interpolation (n_small_functions, n_small_functions);
-
-  const std::vector<unsigned int>
-    face_renumber_inverse (FE_Q_Helper::invert_numbering(face_renumber));
   
   for (unsigned int i=0; i<n_small_functions; ++i)
     {
@@ -1145,13 +1074,13 @@ FE_Q<2>::initialize_constraints ()
 				       // them in the order of
 				       // interpolation points.
 				       //
-				       // face_renumber_inverse will
+				       // face_index_map_inverse will
 				       // get us over this little
 				       // conversion
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
 	{
 	  face_interpolation(i,j)
-	    = face_polynomials.compute_value(face_renumber_inverse[j], p_face);
+	    = face_polynomials.compute_value(face_index_map[j], p_face);
 					   // if the value is small up
 					   // to round-off, then
 					   // simply set it to zero to
@@ -1361,6 +1290,9 @@ FE_Q<dim>::initialize_embedding ()
 					 this->dofs_per_cell);
   FullMatrix<double> subcell_interpolation (this->dofs_per_cell,
 					    this->dofs_per_cell);
+  const std::vector<unsigned int> &index_map=
+    this->poly_space.get_numbering();
+  
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     this->prolongation[child].reinit (this->dofs_per_cell,
 				      this->dofs_per_cell);
@@ -1373,7 +1305,7 @@ FE_Q<dim>::initialize_embedding ()
 					   // evaluate the shape
 					   // functions there
 	  const Point<dim> p_subcell
-	    = FE_Q_Helper::generate_unit_point (j, this->dofs_per_cell,
+	    = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
 						FE_Q_Helper::int2type<dim>());
 	  const Point<dim> p_cell =
 	    GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child);
@@ -1381,8 +1313,8 @@ FE_Q<dim>::initialize_embedding ()
 	  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	    {
 	      const double
-		cell_value    = polynomial_space.compute_value (i, p_cell),
-		subcell_value = polynomial_space.compute_value (i, p_subcell);
+		cell_value    = this->poly_space.compute_value (i, p_cell),
+		subcell_value = this->poly_space.compute_value (i, p_subcell);
 
 					       // cut off values that
 					       // are too small. note
@@ -1417,16 +1349,16 @@ FE_Q<dim>::initialize_embedding ()
                                                // degree*dim, times a
                                                // small constant.
 	      if (std::fabs(cell_value) < 2e-14*degree*dim)
-		cell_interpolation(renumber[j], renumber[i]) = 0.;
+		cell_interpolation(j, i) = 0.;
 	      else
-		cell_interpolation(renumber[j], renumber[i]) = cell_value;
+		cell_interpolation(j, i) = cell_value;
 
 	      if (std::fabs(subcell_value) < 2e-14*degree*dim)
-		subcell_interpolation(renumber[j], renumber[i]) = 0.;
+		subcell_interpolation(j, i) = 0.;
 	      else
 		if (std::fabs(subcell_value-1) < 2e-14*degree*dim)
-		  subcell_interpolation(renumber[j], renumber[i]) = 1.;
-		else
+		  subcell_interpolation(j, i) = 1.;
+		else			
 						   // we have put our
 						   // evaluation
 						   // points onto the
@@ -1544,8 +1476,7 @@ FE_Q<dim>::initialize_restriction ()
       for (; mother_dof<this->dofs_per_cell; ++mother_dof)
         {
           const double val
-            = polynomial_space.compute_value(renumber_inverse[mother_dof],
-                                             p_cell);
+            = this->poly_space.compute_value(mother_dof, p_cell);
           if (std::fabs (val-1.) < 2e-14*degree*dim)
                                              // ok, this is the right
                                              // dof
@@ -1560,8 +1491,7 @@ FE_Q<dim>::initialize_restriction ()
                                        // check also the shape
                                        // functions after tat
       for (unsigned int j=mother_dof+1; j<this->dofs_per_cell; ++j)
-        Assert (std::fabs (polynomial_space.compute_value(renumber_inverse[j],
-                                                          p_cell))
+        Assert (std::fabs (this->poly_space.compute_value(j, p_cell))
                 < 2e-14*degree*dim,
                 ExcInternalError());
 
@@ -1593,8 +1523,7 @@ FE_Q<dim>::initialize_restriction ()
               for (; child_dof<this->dofs_per_cell; ++child_dof)
                 {
                   const double val
-                    = polynomial_space.compute_value(renumber_inverse[child_dof],
-                                                     p_subcell);
+                    = this->poly_space.compute_value(child_dof, p_subcell);
                   if (std::fabs (val-1.) < 2e-14*degree*dim)
                     break;
                   else
@@ -1602,8 +1531,7 @@ FE_Q<dim>::initialize_restriction ()
                             ExcInternalError());
                 }
               for (unsigned int j=child_dof+1; j<this->dofs_per_cell; ++j)
-                Assert (std::fabs (polynomial_space.compute_value(renumber_inverse[j],
-                                                                  p_subcell))
+                Assert (std::fabs (this->poly_space.compute_value(j, p_subcell))
                         < 2e-14*degree*dim,
                         ExcInternalError());
 
@@ -1618,293 +1546,9 @@ FE_Q<dim>::initialize_restriction ()
 }
 
 
-
-template <int dim>
-UpdateFlags
-FE_Q<dim>::update_once (const UpdateFlags flags) const
-{
-				   // for this kind of elements, only
-				   // the values can be precomputed
-				   // once and for all. set this flag
-				   // if the values are requested at
-				   // all
-  return (update_default | (flags & update_values));
-}
-
-
-
-template <int dim>
-UpdateFlags
-FE_Q<dim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-
-  if (flags & update_gradients)
-    out |= update_gradients | update_covariant_transformation;
-  if (flags & update_second_derivatives)
-    out |= update_second_derivatives | update_covariant_transformation;
-
-  return out;
-}
-
-
-
 //----------------------------------------------------------------------
 // Data field initialization
 //----------------------------------------------------------------------
-
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-FE_Q<dim>::get_data (const UpdateFlags      update_flags,
-		     const Mapping<dim>    &mapping,
-		     const Quadrature<dim> &quadrature) const
-{
-				   // generate a new data object and
-				   // initialize some fields
-  InternalData* data = new InternalData;
-
-				   // check what needs to be
-				   // initialized only once and what
-				   // on every cell/face/subface we
-				   // visit
-  data->update_once = update_once(update_flags);
-  data->update_each = update_each(update_flags);
-  data->update_flags = data->update_once | data->update_each;
-
-  const UpdateFlags flags(data->update_flags);
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
-
-				   // some scratch arrays
-  std::vector<double> values(0);
-  std::vector<Tensor<1,dim> > grads(0);
-  std::vector<Tensor<2,dim> > grad_grads(0);
-
-				   // initialize fields only if really
-				   // necessary. otherwise, don't
-				   // allocate memory
-  if (flags & update_values)
-    {
-      values.resize (this->dofs_per_cell);
-      data->shape_values.reinit (this->dofs_per_cell,
-				 n_q_points);
-    }
-
-  if (flags & update_gradients)
-    {
-      grads.resize (this->dofs_per_cell);
-      data->shape_gradients.reinit (this->dofs_per_cell,
-				    n_q_points);
-    }
-
-				   // if second derivatives through
-				   // finite differencing is required,
-				   // then initialize some objects for
-				   // that
-  if (flags & update_second_derivatives)
-    data->initialize_2nd (this, mapping, quadrature);
-
-				   // next already fill those fields
-				   // of which we have information by
-				   // now. note that the shape
-				   // gradients are only those on the
-				   // unit cell, and need to be
-				   // transformed when visiting an
-				   // actual cell
-  if (flags & (update_values | update_gradients))
-    for (unsigned int i=0; i<n_q_points; ++i)
-      {
-	polynomial_space.compute(quadrature.point(i),
-				 values, grads, grad_grads);
-	
-	if (flags & update_values)
-	  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	    data->shape_values[renumber[k]][i] = values[k];
-	
-	if (flags & update_gradients)
-	  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	    data->shape_gradients[renumber[k]][i] = grads[k];
-      }
-  return data;
-}
-
-
-
-
-//----------------------------------------------------------------------
-// Fill data of FEValues
-//----------------------------------------------------------------------
-
-template <int dim>
-void
-FE_Q<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-			   const typename DoFHandler<dim>::cell_iterator &cell,
-			   const Quadrature<dim>                &quadrature,
-			   typename Mapping<dim>::InternalDataBase &mapping_data,
-			   typename Mapping<dim>::InternalDataBase &fedata,
-			   FEValuesData<dim>                    &data) const
-{
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-  
-  const UpdateFlags flags(fe_data.current_update_flags());
-
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-    {
-      if (flags & update_values)
-	for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i];
-      
-      if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() <=
-		  fe_data.shape_gradients[k].size(),
-		  ExcInternalError());	  
-	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-				      data.shape_gradients[k].end(),
-				      fe_data.shape_gradients[k].begin(),
-				      mapping_data);
-	};
-    }
-
-  if (flags & update_second_derivatives)
-    this->compute_2nd (mapping, cell,
-                       QProjector<dim>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
-}
-
-
-
-template <int dim>
-void
-FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				const typename DoFHandler<dim>::cell_iterator &cell,
-				const unsigned int                    face,
-				const Quadrature<dim-1>              &quadrature,
-				typename Mapping<dim>::InternalDataBase       &mapping_data,
-				typename Mapping<dim>::InternalDataBase       &fedata,
-				FEValuesData<dim>                    &data) const
-{
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-
-				   // offset determines which data set
-				   // to take (all data sets for all
-				   // faces are stored contiguously)
-  const typename QProjector<dim>::DataSetDescriptor offset
-    = (QProjector<dim>::DataSetDescriptor::
-       face (face, cell->face_orientation(face),
-             quadrature.n_quadrature_points));
-  
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-    {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
-      
-      if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() + offset <=
-		  fe_data.shape_gradients[k].size(),
-		  ExcInternalError());
-	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-				      data.shape_gradients[k].end(),
-				      fe_data.shape_gradients[k].begin()+offset,
-				      mapping_data);
-	};
-    }
-
-  if (flags & update_second_derivatives)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-}
-
-
-
-template <int dim>
-void
-FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				   const typename DoFHandler<dim>::cell_iterator &cell,
-				   const unsigned int                    face,
-				   const unsigned int                    subface,
-				   const Quadrature<dim-1>              &quadrature,
-				   typename Mapping<dim>::InternalDataBase       &mapping_data,
-				   typename Mapping<dim>::InternalDataBase       &fedata,
-				   FEValuesData<dim>                    &data) const
-{
-				   // convert data object to internal
-				   // data for this class. fails with
-				   // an exception if that is not
-				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-
-				   // offset determines which data set
-				   // to take (all data sets for all
-				   // sub-faces are stored contiguously)
-  const typename QProjector<dim>::DataSetDescriptor offset
-    = (QProjector<dim>::DataSetDescriptor::
-       sub_face (face, subface, cell->face_orientation(face),
-                 quadrature.n_quadrature_points));
-
-  const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-    {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
-      
-      if (flags & update_gradients)
-	{
-	  Assert (data.shape_gradients[k].size() + offset <=
-		  fe_data.shape_gradients[k].size(),
-		  ExcInternalError());
-	  mapping.transform_covariant(data.shape_gradients[k].begin(),
-				      data.shape_gradients[k].end(),
-				      fe_data.shape_gradients[k].begin()+offset,
-				      mapping_data);
-	};
-    }
-  
-  if (flags & update_second_derivatives)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-}
-
-
-
-template <int dim>
-unsigned int
-FE_Q<dim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <int dim>
-const FiniteElement<dim> &
-FE_Q<dim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <int dim>
-unsigned int
-FE_Q<dim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
-
 
 
 template <int dim>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,12 +14,8 @@
 #define __deal2__fe_q_h
 
 #include <base/config.h>
-#include <base/polynomial.h>
 #include <base/tensor_product_polynomials.h>
-#include <fe/fe.h>
-
-template <int dim> class TensorProductPolynomials;
-template <int dim> class MappingQ;
+#include <fe/fe_poly.h>
 
 
 /*!@addtogroup fe */
@@ -237,10 +233,10 @@ template <int dim> class MappingQ;
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line.
  *
- * @author Wolfgang Bangerth, 1998, Ralf Hartmann, Guido Kanschat, 2001
+ * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001, Ralf Hartmann, 2001, 2004
  */
 template <int dim>
-class FE_Q : public FiniteElement<dim>
+class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 {
   public:
 				     /**
@@ -259,109 +255,6 @@ class FE_Q : public FiniteElement<dim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-
-				     /**
-				      * Return the value of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual double shape_value (const unsigned int i,
-			        const Point<dim> &p) const;
-    
-				     /**
-				      * Return the value of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
-				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      *
-				      * Since this element is scalar,
-				      * the returned value is the same
-				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
-				      * specified component is zero.
-				      */
-    virtual double shape_value_component (const unsigned int i,
-					  const Point<dim> &p,
-					  const unsigned int component) const;
-
-				     /**
-				      * Return the gradient of the
-				      * @p{i}th shape function at the
-				      * point @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-				      const Point<dim>   &p) const;
-
-				     /**
-				      * Return the gradient of the
-				      * @p{component}th vector
-				      * component of the @p{i}th shape
-				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      *
-				      * Since this element is scalar,
-				      * the returned value is the same
-				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
-				      * specified component is zero.
-				      */
-    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-						const Point<dim> &p,
-						const unsigned int component) const;
-
-				     /**
-				      * Return the tensor of second
-				      * derivatives of the @p{i}th
-				      * shape function at point @p{p}
-				      * on the unit cell. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-					   const Point<dim> &p) const;
-
-				     /**
-				      * Return the second derivative
-				      * of the @p{component}th vector
-				      * component of the @p{i}th shape
-				      * function at the point
-				      * @p{p}. See the
-				      * @ref{FiniteElementBase} base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      *
-				      * Since this element is scalar,
-				      * the returned value is the same
-				      * as if the function without the
-				      * @p{_component} suffix were
-				      * called, provided that the
-				      * specified component is zero.
-				      */
-    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-						     const Point<dim> &p,
-						     const unsigned int component) const;
 
 				     /**
 				      * Return the polynomial degree
@@ -390,34 +283,6 @@ class FE_Q : public FiniteElement<dim>
     virtual void
     get_interpolation_matrix (const FiniteElementBase<dim> &source,
 			      FullMatrix<double>           &matrix) const;
-
-                                     /**
-				      * Number of base elements in a
-				      * mixed discretization. Since
-				      * this is a scalar element,
-				      * return one.
-				      */
-    virtual unsigned int n_base_elements () const;
-    
-				     /**
-				      * Access to base element
-				      * objects. Since this element is
-				      * scalar, @p{base_element(0)} is
-				      * @p{this}, and all other
-				      * indices throw an error.
-				      */
-    virtual const FiniteElement<dim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * Multiplicity of base element
-                                      * @p{index}. Since this is a
-                                      * scalar element,
-                                      * @p{element_multiplicity(0)}
-                                      * returns one, and all other
-                                      * indices will throw an error.
-                                      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
     
 				     /**
 				      * Check for non-zero values on a face.
@@ -489,59 +354,6 @@ class FE_Q : public FiniteElement<dim>
 				      * constructors of @p{FESystem}.
 				      */
     virtual FiniteElement<dim> * clone() const;
-  
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
-    virtual
-    typename Mapping<dim>::InternalDataBase *
-    get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
-	      const Quadrature<dim>& quadrature) const ;
-
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
-				      */
-    virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
-		    const typename DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase      &fe_internal,
-		    FEValuesData<dim>& data) const;
-    
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
-				      */
-    virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
-			 const typename DoFHandler<dim>::cell_iterator &cell,
-			 const unsigned int                    face_no,
-			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const ;
-    
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * @ref{FiniteElement}.
-				      */
-    virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int                    face_no,
-			    const unsigned int                    sub_no,
-			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const ;
 
   private:
     
@@ -681,158 +493,18 @@ class FE_Q : public FiniteElement<dim>
     void initialize_unit_face_support_points ();
     
 				     /**
-				      * Determine the values that need
-				      * to be computed on the unit
-				      * cell to be able to compute all
-				      * values required by @p{flags}.
-				      *
-				      * For the purpuse of this
-				      * function, refer to the
-				      * documentation in
-				      * @p{FiniteElement}.
-				      *
-				      * The effect in this element is
-				      * as follows: if
-				      * @p{update_values} is set in
-				      * @p{flags}, copy it to the
-				      * result. All other flags of the
-				      * result are cleared, since
-				      * everything else must be
-				      * computed for each cell.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags flags) const;
-  
-				     /**
-				      * Determine the values that need
-				      * to be computed on every
-				      * cell to be able to compute all
-				      * values required by @p{flags}.
-				      *
-				      * For the purpuse of this
-				      * function, refer to the
-				      * documentation in
-				      * @p{FiniteElement}.
-				      *
-				      * The effect in this element is
-				      * as follows:
-				      * @begin{itemize}
-				      * @item if @p{update_gradients}
-				      * is set, the result will
-				      * contain @p{update_gradients}
-				      * and
-				      * @p{update_covariant_transformation}.
-				      * The latter is required to
-				      * transform the gradient on the
-				      * unit cell to the real
-				      * cell. Remark, that the action
-				      * required by
-				      * @p{update_covariant_transformation}
-				      * is actually performed by the
-				      * @p{Mapping} object used in
-				      * conjunction with this finite
-				      * element.
-				      * @item if
-				      * @p{update_second_derivatives}
-				      * is set, the result will
-				      * contain
-				      * @p{update_second_derivatives}
-				      * and
-				      * @p{update_covariant_transformation}.
-				      * The rationale is the same as
-				      * above and no higher
-				      * derivatives of the
-				      * transformation are required,
-				      * since we use difference
-				      * quotients for the actual
-				      * computation.
-				      * @end{itemize}
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags flags) const;
-    
-				     /**
 				      * Degree of the polynomials.
 				      */  
     const unsigned int degree;
-
-				     /**
-				      * Mapping from lexicographic to
-				      * shape function numbering.
-				      */
-    const std::vector<unsigned int> renumber;
-
-				     /**
-				      * Inverse renumber
-				      * vector. i.e. mapping from
-				      * shape function numbering to
-				      * lexicographic numbering.
-				      */
-    const std::vector<unsigned int> renumber_inverse;
              
 				     /**
-				      * Mapping from lexicographic to
-				      * shape function numbering on first face.
+				      * Mapping from hierarchic to
+				      * lexicographic numbering on
+				      * first face. Hierarchic is the
+				      * numbering of the shape
+				      * functions.
 				      */
-    const std::vector<unsigned int> face_renumber;
-
-				     /**
-				      * Pointer to the tensor
-				      * product polynomials.
-				      */
-    const TensorProductPolynomials<dim> polynomial_space;
-
-				     /**
-				      * Fields of cell-independent data.
-				      *
-				      * For information about the
-				      * general purpose of this class,
-				      * see the documentation of the
-				      * base class.
-				      */
-    class InternalData : public FiniteElementBase<dim>::InternalDataBase
-    {
-      public:
-					 /**
-					  * Array with shape function
-					  * values in quadrature
-					  * points. There is one
-					  * row for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point.
-					  *
-					  * In this array, we store
-					  * the values of the shape
-					  * function in the quadrature
-					  * points on the unit
-					  * cell. Since these values
-					  * do not change under
-					  * transformation to the real
-					  * cell, we only need to copy
-					  * them over when visiting a
-					  * concrete cell.
-					  */
-	Table<2,double> shape_values;
-
-					 /**
-					  * Array with shape function
-					  * gradients in quadrature
-					  * points. There is one
-					  * row for each shape
-					  * function, containing
-					  * values for each quadrature
-					  * point.
-					  *
-					  * We store the gradients in
-					  * the quadrature points on
-					  * the unit cell. We then
-					  * only have to apply the
-					  * transformation (which is a
-					  * matrix-vector
-					  * multiplication) when
-					  * visiting an actual cell.
-					  */      
-	Table<2,Tensor<1,dim> > shape_gradients;
-    };
+    const std::vector<unsigned int> face_index_map;
     
 				     /**
 				      * Allow access from other
@@ -845,6 +517,8 @@ class FE_Q : public FiniteElement<dim>
 				      */
     template <int dim1> friend class FE_Q;
 };
+
+
 
 /*@}*/
 
