@@ -171,13 +171,14 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator += (const Polynomial<number>& p)
   {
-//TODO:[GK] Is resize correct?    
-    if (p.degree() > degree())
-      coefficients.resize(p.coefficients.size());
-    typename std::vector<number>::const_iterator d = p.coefficients.begin();
-    for (typename std::vector<number>::iterator c = coefficients.begin();
-         c != coefficients.end(); ++c, ++d)
-      *c += *d;
+				     // if necessary expand the number
+				     // of coefficients we store
+    if (p.coefficients.size() > coefficients.size())
+      coefficients.resize (p.coefficients.size(), 0.);
+
+    for (unsigned int i=0; i<p.coefficients.size(); ++i)
+      coefficients[i] += p.coefficients[i];
+
     return *this;
   }
 
@@ -186,12 +187,14 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator -= (const Polynomial<number>& p)
   {
-    if (p.degree() > degree())
-      coefficients.resize(p.coefficients.size());
-    typename std::vector<number>::const_iterator d = p.coefficients.begin();
-    for (typename std::vector<number>::iterator c = coefficients.begin();
-         c != coefficients.end(); ++c, ++d)
-      *c -= *d;
+				     // if necessary expand the number
+				     // of coefficients we store
+    if (p.coefficients.size() > coefficients.size())
+      coefficients.resize (p.coefficients.size(), 0.);
+
+    for (unsigned int i=0; i<p.coefficients.size(); ++i)
+      coefficients[i] -= p.coefficients[i];
+
     return *this;
   }
 
