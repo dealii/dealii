@@ -93,7 +93,11 @@ class LogStream
 				      * prefixes for output to a file.
 				      */
     unsigned int file_depth;
-    
+
+                                     /**
+				      * Flag for printing execution time.
+				      */
+    bool print_utime;
   public:
 				     /**
 				      * Standard constructor, since we
@@ -157,6 +161,14 @@ class LogStream
 				      */
     void depth_file (unsigned int n);
 
+                                     /**
+				      * Set time printing flag. If this flag
+				      * is true, each output line will
+				      * be prepended by the user time used
+				      * by the running program so far.
+				      */
+  void log_execution_time(bool flag);
+
 				     /**
 				      * Output a constant something through
 				      * this stream.
@@ -187,6 +199,13 @@ class LogStream
 				      * Declare this function as a friend.
 				      */
     friend void endl (LogStream &);
+private:
+                                     /**
+				      * Print head of line. This prints
+				      * optional time information and
+				      * the contents of the prefix stack.
+				      */
+  void print_line_head();
 };
 
 
@@ -209,7 +228,12 @@ LogStream::push (const string& text)
   prefixes.push(pre);
 }
 
-
+inline
+void
+LogStream::log_execution_time(bool flag)
+{
+  print_utime = flag;
+}
 
 // sorry for the weird following declaration spanning 5 lines, but
 // doc++ gets confused if we be more compact :-(
@@ -225,12 +249,7 @@ operator<< (const T& t)
 				   // and a colon
   if (was_endl)
     {
-      if (prefixes.size() <= std_depth)
-	*std_out << prefixes.top() << ':';
-
-      if (file && (prefixes.size() <= file_depth))
-	*file << prefixes.top() << ':';
-
+      print_line_head();
       was_endl = false;
     };
 
