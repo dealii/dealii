@@ -174,31 +174,40 @@ class LagrangeEquidistant: public Polynomial<double>
 template <typename number>
 class Legendre : public Polynomial<number>
 {
-public:
-				   /**
-				    * Constructor for polynomial of
-				    * order @p{k}.
-				    */
-  Legendre (unsigned int k);
-private:
-				   /**
-				    * Vector with already computed
-				    * coefficients.
-				    */
-  static std::vector<std::vector<number> > coefficients;
+  public:
+				     /**
+				      * Constructor for polynomial of
+				      * order @p{k}.
+				      */
+    Legendre (const unsigned int k);
 
-				   /**
-				    * Compute coefficients recursively.
-				    */
-  static void compute_coefficients (unsigned int k);
-
-				   /**
-				    * Get coefficients for
-				    * constructor.  This way, it can
-				    * use the non-standard constructor
-				    * of @ref{Polynomial}.
-				    */
-  static const std::vector<number>& get_coefficients (unsigned int k);
+  private:
+				     /**
+				      * Vector with already computed
+				      * coefficients. For each degree
+				      * of the polynomial, we keep one
+				      * pointer to the list of
+				      * coefficients; we do so rather
+				      * than keeping a vector of
+				      * vectors in order to simplify
+				      * programming multithread-safe.
+				      */
+    static std::vector<const std::vector<number>*> coefficients;
+    
+				     /**
+				      * Compute coefficients recursively.
+				      */
+    static void compute_coefficients (unsigned int k);
+    
+				     /**
+				      * Get coefficients for
+				      * constructor.  This way, it can
+				      * use the non-standard
+				      * constructor of
+				      * @ref{Polynomial}.
+				      */
+    static const std::vector<number> &
+    get_coefficients (const unsigned int k);
 };
 
 
