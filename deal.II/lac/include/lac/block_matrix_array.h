@@ -65,6 +65,13 @@ class BlockMatrixArray : public Subscriptor
 {
   public:
 				     /**
+				      * Inherit the value_type from
+				      * the class over which we build
+				      * the array.
+				      */
+    typedef typename MATRIX::value_type value_type;
+    
+				     /**
 				      * Constructor fixing the
 				      * dimensions.
 				      */
@@ -74,11 +81,11 @@ class BlockMatrixArray : public Subscriptor
 				     /**
 				      * Add a block matrix entry.
 				      */
-    void enter (const MATRIX& matrix,
-		unsigned row,
-		unsigned int col,
-		double prefix = 1.,
-		bool transpose = false);
+    void enter (const MATRIX      &matrix,
+		const unsigned int row,
+		const unsigned int col,
+		const double       prefix = 1.,
+		const bool         transpose = false);
 
 				     /**
 				      * Delete all entries, i.e. reset

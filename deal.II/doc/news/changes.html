@@ -86,6 +86,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <code>BlockSparseMatrix</code> class had no local
+       typedef <code>value_type</code> like all other classes, which
+       made it a little awkward to use in some places. This has now
+       been fixed.
+       <br> 
+       (WB, 2005/03/03)
+       </p>
+
+  <li> <p>
        Fixed: The <code>PETScWrappers::MatrixBase</code> class
        documented that adding or setting a value that hasn't been in
        the sparsity pattern before will lead to an exception being
