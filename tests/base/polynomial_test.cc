@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -118,10 +118,10 @@ int main(int, char)
   deallog << "2D Example:" << std::endl;
   unsigned int p=3,
    n_tensor_pols=(p+1)*(p+1);
-  vector<SmartPointer<Polynomial> > pols;
+  vector<Polynomial<double> > pols;
   
   for (unsigned int i=0; i<=p; ++i)
-    pols.push_back(new LagrangeEquidistant(p, i));
+    pols.push_back(LagrangeEquidistant(p, i));
   
   TensorProductPolynomials<2> tp_pol(pols);
   vector<double> vs(n_tensor_pols);
