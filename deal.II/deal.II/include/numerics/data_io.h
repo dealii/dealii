@@ -399,6 +399,14 @@ class DataOut {
 		    << "The vector has size " << arg1
 		    << " but the DoFHandler objects says there are " << arg2
 		    << " degrees of freedom.");
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcInvalidCharacter,
+		    string,
+		    << "Please use only the characters [a-zA-Z0-9_] for" << endl
+		    << "description strings since AVS will only accept these." << endl
+		    << "The string you gave was <" << arg1 << ">.");
     
   private:
 

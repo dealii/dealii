@@ -211,6 +211,15 @@ void DataOut<dim>::add_data_vector (const dVector &vec,
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
   Assert (vec.size() == dofs->n_dofs(),
 	  ExcInvalidVectorSize (vec.size(), dofs->n_dofs()));
+  Assert (name.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+				 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				 "0123456789_") == string::npos,
+	  ExcInvalidCharacter (name));
+  Assert (units.find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+				  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				  "0123456789_") == string::npos,
+	  ExcInvalidCharacter (units));
+  
   DataEntry new_entry (&vec, name, units);
   data.push_back (new_entry);
 };
