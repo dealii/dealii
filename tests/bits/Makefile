@@ -66,7 +66,8 @@ tests_x = anna_? \
 	  umfpack_* \
 	  fe_q_3d* \
           rt_* \
-	  nedelec_*
+	  nedelec_* \
+	  block_matrix_array_*
 
 # tests for the hp branch:
 #	  fe_collection_*
