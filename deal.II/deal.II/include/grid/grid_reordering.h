@@ -91,6 +91,29 @@ namespace internal
  */
   namespace GridReordering2d
   {
+
+                                     /**
+                                      * Check whether a given
+                                      * arrangement of cells is
+                                      * already consisten. If this is
+                                      * the case, then we skip the
+                                      * reordering pass.
+                                      *
+                                      * This function works by looping
+                                      * over all cells, checking
+                                      * whether one of its faces
+                                      * already exists in a list of
+                                      * edges, and if it already
+                                      * exists in reverse order, then
+                                      * return @p{false}. If it is not
+                                      * already in the list, or in the
+                                      * correct direction, then go on
+                                      * with the next faces or cell.
+                                      */
+    bool
+    is_consistent (const std::vector<CellData<2> > &cells);
+    
+    
 /**
  * Defines a variety of variables related to the connectivity of a
  * simple quad element. This includes the nodes on each edge, which

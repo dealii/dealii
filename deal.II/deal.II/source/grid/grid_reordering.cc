@@ -14,6 +14,7 @@
 #include <base/thread_management.h>
 #include <grid/grid_reordering.h>
 
+#include <set>
 #include <algorithm>
 
 
@@ -1202,6 +1203,60 @@ namespace internal
     {{0,1},{1,2},{3,2},{0,3}};
 
 
+                                     /**
+                                      * Simple data structure denoting
+                                      * an edge, i.e. the ordered pair
+                                      * of its vertices. This is only
+                                      * used in the is_consistent
+                                      * function.
+                                      */
+    struct Edge 
+    {
+        unsigned int v0, v1;
+        bool operator < (const Edge &e) const
+          {
+            return ((v0 < e.v0) || ((v0 == e.v0) && (v1 < e.v1)));
+          }
+    };
+
+    
+    bool
+    is_consistent  (const std::vector<CellData<2> > &cells)
+    {
+      std::set<Edge> edges;
+
+      for (std::vector<CellData<2> >::const_iterator c = cells.begin();
+           c != cells.end(); ++c)
+        {
+                                           // construct the four edges
+          const Edge cell_edges[4] = { { c->vertices[0], c->vertices[1] },
+                                       { c->vertices[1], c->vertices[2] },
+                                       { c->vertices[3], c->vertices[2] },
+                                       { c->vertices[0], c->vertices[3] } };
+                                           // and the reverse edges
+          const Edge reverse_edges[4] = { { c->vertices[1], c->vertices[0] },
+                                          { c->vertices[2], c->vertices[1] },
+                                          { c->vertices[2], c->vertices[3] },
+                                          { c->vertices[3], c->vertices[0] } };
+                                           // for each of them, check
+                                           // whether they are already
+                                           // in the set
+          for (unsigned int i=0; i<4; ++i)
+            if (edges.find (reverse_edges[i]) != edges.end())
+              return false;
+                                           // ok, not. insert them
+                                           // (std::set eliminates
+                                           // duplicated by itself)
+          for (unsigned int i=0; i<4; ++i)
+            edges.insert (cell_edges[i]);
+                                           // then go on with next
+                                           // cell
+        }
+                                       // no conflicts found, so
+                                       // return true
+      return true;
+    }
+    
 
 
     struct MSide::SideRectify : public std::unary_function<MSide,void>
@@ -1639,6 +1694,13 @@ namespace internal
 
 void GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
 {
+                                   // check if grids are already
+                                   // consistent. if so, do
+                                   // nothing. if not, then do the
+                                   // reordering
+  if (internal::GridReordering2d::is_consistent (original_cells))
+    return;
+  
   internal::GridReordering2d::GridReordering().reorient(original_cells);
 }
 
