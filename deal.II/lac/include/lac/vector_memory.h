@@ -5,7 +5,7 @@
 /*----------------------------   vector_memory.h     ---------------------------*/
 
 
-
+#include <base/subscriptor.h>
 
 /**
  * Memory management for vectors. This class is used by all
@@ -20,8 +20,17 @@
  * applied by the user according to his needs.
  */
 template<class Vector>
-class VectorMemory {
+class VectorMemory : public Subscriptor
+{
   public:
+
+				     /**
+				      * Virtual destructor is needed
+				      * as there are virtual functions
+				      * in this class.
+				      */
+    virtual ~VectorMemory() {};
+
 				     /**
 				      * Return new vector from the pool.
 				      */

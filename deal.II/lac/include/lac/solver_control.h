@@ -5,6 +5,8 @@
 /*----------------------------   solver_control.h     ---------------------------*/
 
 
+#include <base/subscriptor.h>
+
 
 /**
  * Control class for iterative solvers.
@@ -22,7 +24,8 @@
  * #check()# can be replaced in derived classes to allow for more
  * sophisticated tests.
  */
-class SolverControl {
+class SolverControl : public Subscriptor
+{
   public:
 				     /**
 				      * Return states of the check
@@ -64,6 +67,13 @@ class SolverControl {
 				      */
     SolverControl (const unsigned int n, const double tol,
 		   const bool log_history = false);
+    
+				     /**
+				      * Virtual destructor is needed
+				      * as there are virtual functions
+				      * in this class.
+				      */
+    virtual ~SolverControl();
     
 				     /**
 				      * Decide about success or failure
@@ -155,6 +165,13 @@ class ReductionControl : public SolverControl {
     ReductionControl (const unsigned int maxiter,
 		      const double tolerance,
 		      const double reduce);
+
+				     /**
+				      * Virtual destructor is needed
+				      * as there are virtual functions
+				      * in this class.
+				      */
+    virtual ~ReductionControl();
     
 				     /**
 				      * Decide about success or failure
