@@ -118,9 +118,10 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * Return the first cell which we
 				      * want output for. The default
 				      * implementation returns the
-				      * first active cell, but you
-				      * might want to return other
-				      * cells in a derived class.
+				      * first \ref GlossActive "active cell",
+				      * but you might want to
+				      * return other cells in a
+				      * derived class.
 				      */
     virtual typename DoFHandler<dim>::cell_iterator
     first_cell ();
