@@ -63,7 +63,7 @@ namespace PETScWrappers
                                               */
             Accessor (const MatrixBase    *matrix,
                       const unsigned int   row,
-                      const unsigned short index);
+                      const unsigned int   index);
 
                                              /**
                                               * Row number of the element
@@ -77,7 +77,7 @@ namespace PETScWrappers
                                               * represented by this
                                               * object.
                                               */
-            unsigned short index() const;
+            unsigned int index() const;
 
                                              /**
                                               * Column number of the
@@ -100,7 +100,7 @@ namespace PETScWrappers
                                              /**
                                               * The matrix accessed.
                                               */
-            const MatrixBase *matrix;
+            mutable MatrixBase *matrix;
 
                                              /**
                                               * Current row number.
@@ -167,9 +167,9 @@ namespace PETScWrappers
                                           * into the matrix @p matrix for the
                                           * given row and the index within it.
                                           */ 
-        const_iterator (const MatrixBase    *matrix,
-                        const unsigned int   row,
-                        const unsigned short index);
+        const_iterator (const MatrixBase   *matrix,
+                        const unsigned int  row,
+                        const unsigned int  index);
           
                                          /**
                                           * Prefix increment.
@@ -358,6 +358,23 @@ namespace PETScWrappers
       PetscScalar el (const unsigned int i,
                       const unsigned int j) const;
 
+                                       /**
+                                        * Return the main diagonal
+                                        * element in the <i>i</i>th
+                                        * row. This function throws an
+                                        * error if the matrix is not
+                                        * quadratic.
+                                        *
+                                        * Since we do not have direct access
+                                        * to the underlying data structure,
+                                        * this function is no faster than the
+                                        * elementwise access using the el()
+                                        * function. However, we provide this
+                                        * function for compatibility with the
+                                        * SparseMatrix class.
+                                        */
+      PetscScalar diag_element (const unsigned int i) const;
+      
                                        /**
                                         * Return the number of rows in this
                                         * matrix.
@@ -592,6 +609,10 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcSourceEqualsDestination);
+                                       /**
+                                        * Exception
+                                        */
+      DeclException0 (ExcMatrixNotSquare);
       
     protected:
                                        /**
@@ -645,16 +666,17 @@ namespace PETScWrappers
 
     inline
     const_iterator::Accessor::
-    Accessor (const MatrixBase    *matrix,
-              const unsigned int   row,
-              const unsigned short index)
+    Accessor (const MatrixBase   *matrix,
+              const unsigned int  row,
+              const unsigned int  index)
                     :
-                    matrix(matrix),
+                    matrix(const_cast<MatrixBase*>(matrix)),
                     a_row(row),
                     a_index(index)
     {
       visit_present_row ();
-      Assert (index < colnum_cache->size(),
+      Assert ((row == matrix->m()) ||
+              (index < colnum_cache->size()),
               ExcInvalidIndexWithinRow (index, row));
     }
 
@@ -678,7 +700,7 @@ namespace PETScWrappers
 
 
     inline
-    unsigned short
+    unsigned int
     const_iterator::Accessor::index() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
@@ -697,9 +719,9 @@ namespace PETScWrappers
 
     inline
     const_iterator::
-    const_iterator(const MatrixBase    *matrix,
-                   const unsigned int   row,
-                   const unsigned short index)
+    const_iterator(const MatrixBase   *matrix,
+                   const unsigned int  row,
+                   const unsigned int  index)
                     :
                     accessor(matrix, row, index)
     {}
@@ -763,8 +785,8 @@ namespace PETScWrappers
     const_iterator::
     operator == (const const_iterator& other) const
     {
-      return (accessor.row() == other.accessor.row() &&
-              accessor.index() == other.accessor.index());
+      return (accessor.a_row == other.accessor.a_row &&
+              accessor.a_index == other.accessor.a_index);
     }
 
 

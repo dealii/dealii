@@ -26,24 +26,37 @@ namespace PETScWrappers
     MatrixBase::const_iterator::Accessor::
     visit_present_row ()
     {
-      const int a_row_int = this->a_row;  // need signed int for PETSc?
+                                       // if we are asked to visit the
+                                       // past-the-end line, then simply
+                                       // release all our caches and go on
+                                       // with life
+      if (this->a_row == matrix->m())
+        {
+          colnum_cache.reset ();
+          value_cache.reset ();
+
+          return;
+        }
+      
+                                       // otherwise first flush PETSc caches
+      matrix->compress ();
+      
+      const signed int a_row_int = this->a_row;
 
                                        // get a representation of the present
                                        // row
       int          ncols;
       int         *colnums;
       PetscScalar *values;
+
       int ierr;
       ierr = MatGetRow(*matrix, a_row_int, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
                                        // copy it into our caches
-      colnum_cache =
-        boost::shared_ptr<std::vector<unsigned int> >
-        ( new std::vector<unsigned int> (colnums, colnums+ncols));
-      value_cache =
-        boost::shared_ptr<std::vector<PetscScalar> >
-        ( new std::vector<PetscScalar> (values, values+ncols));
+      colnum_cache.reset (new std::vector<unsigned int> (colnums,
+                                                         colnums+ncols));
+      value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
 
                                        // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, a_row_int, &ncols, &colnums, &values);
@@ -149,6 +162,19 @@ namespace PETScWrappers
   }
 
 
+
+  PetscScalar
+  MatrixBase::diag_element (const unsigned int i) const
+  {
+    Assert (m() == n(), ExcMatrixNotSquare());
+    
+                                     // this doesn't seem to work any
+                                     // different than any other element
+    return el(i,i);
+  }
+  
+
+  
   void
   MatrixBase::compress ()
   {
