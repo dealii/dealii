@@ -662,7 +662,7 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
     dnl notably the IBM compilers have the bad habit of dumping
     dnl all of their helptexts here, so only consider the first
     dnl 10 lines. Otherwise we'll have a problem later on when
-    dnl we do things like "echo $F&&_VERSION_STRING | grep ..." and
+    dnl we do things like "echo $F77_VERSION_STRING | grep ..." and
     dnl the shell says that we exceeded the limit for the length of
     dnl command lines :-(
     F77_VERSION_STRING="`($F77 -v 2>&1) | head -10`"
