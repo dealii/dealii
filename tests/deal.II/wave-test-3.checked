@@ -819,7 +819,7 @@ DEAL::  Postprocessing: time=0.70000, step=25, sweep=0. [ee][o]%!PS-Adobe-2.0 EP
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 300 149
+%%BoundingBox: 0 0 300 150
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -2050,7 +2050,7 @@ DEAL::  Postprocessing: time=0.70000, step=25, sweep=1. [ee][o]%!PS-Adobe-2.0 EP
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 300 149
+%%BoundingBox: 0 0 300 150
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def
@@ -2999,7 +2999,7 @@ DEAL::  Postprocessing: time=0.70000, step=25, sweep=2. [ee][o]%!PS-Adobe-2.0 EP
 %%Title: deal.II Output
 %%Creator: the deal.II library
 
-%%BoundingBox: 0 0 300 149
+%%BoundingBox: 0 0 300 150
 /m {moveto} bind def
 /l {lineto} bind def
 /s {setrgbcolor} bind def

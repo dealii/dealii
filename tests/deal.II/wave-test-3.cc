@@ -11,6 +11,7 @@
 //
 //----------------------------  wave-test-3.cc  ---------------------------
 
+//TODO:[WB] Figure out why postscript output changes output-precision.
 
 #include <grid/tria_boundary_lib.h>
 #include <numerics/time_dependent.h>
