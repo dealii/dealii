@@ -199,8 +199,22 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * Abbreviate the somewhat
 				      * lengthy name for the @p{Patch}
 				      * class.
+				      *
+				      * Note that we have to indicate
+				      * the global scope using the
+				      * @p{::} in front of
+				      * @p{DataOutBase}, since
+				      * otherwise the C++ rules
+				      * specify that this here
+				      * indicates the @p{DataOutBase}
+				      * base class of this
+				      * class. Since that is a private
+				      * base class, we cannot access
+				      * its members, and so access to
+				      * the local @p{Patch} type would
+				      * be forbidden.
 				      */
-    typedef DataOutBase::Patch<2,2> Patch;
+    typedef ::DataOutBase::Patch<2,2> Patch;
 
 				     /**
 				      * This is a list of patches that
