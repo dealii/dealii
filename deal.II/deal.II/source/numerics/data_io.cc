@@ -1029,7 +1029,7 @@ void DataOut<2>::write_povray_mesh (ostream &out) const {
 #if deal_II_dimension == 3
 
 template <>
-void DataOut<3>::write_povray_mesh (ostream &out) const {
+void DataOut<3>::write_povray_mesh (ostream &) const {
   Assert (false, ExcNotImplemented());
 };
 
