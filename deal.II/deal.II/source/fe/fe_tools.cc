@@ -129,7 +129,9 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 			  const DoFHandler<dim> &dof2,
 			  Vector<number> &u2)
 {
-  interpolate(dof1, u1, dof2, ConstraintMatrix(), u2);
+  ConstraintMatrix dummy;
+  dummy.close();
+  interpolate(dof1, u1, dof2, dummy, u2);
 }
 
   
