@@ -459,23 +459,23 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 				       // vertices, but deciding this is
 				       // difficult and not implemented.
 //        for (unsigned int line=0; line<4; ++line)
-//  	if (needed_lines.find(make_pair(line_vertices[line].second,
-//  					line_vertices[line].first))
+//  	if (needed_lines.find(std::make_pair(line_vertices[line].second,
+//  				  	     line_vertices[line].first))
 //  	    !=
 //  	    needed_lines.end())
 //  	  {
 //  					     // rotate vertex numbers
-//  	    swap (cells[cell].vertices[0], cells[cell].vertices[2]);
-//  	    swap (cells[cell].vertices[1], cells[cell].vertices[3]);
+//  	    std::swap (cells[cell].vertices[0], cells[cell].vertices[2]);
+//  	    std::swap (cells[cell].vertices[1], cells[cell].vertices[3]);
 //  					     // remake lines
 //  	    line_vertices[0]
-//  	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
+//  	      = std::make_pair (cells[cell].vertices[0], cells[cell].vertices[1]);
 //  	    line_vertices[1]
-//  	      = make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
+//  	      = std::make_pair (cells[cell].vertices[1], cells[cell].vertices[2]);
 //  	    line_vertices[2]
-//  	      = make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
+//  	      = std::make_pair (cells[cell].vertices[0], cells[cell].vertices[3]);
 //  	    line_vertices[3]
-//  	      = make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
+//  	      = std::make_pair (cells[cell].vertices[3], cells[cell].vertices[2]);
 //  					     // allow for only one such
 //  					     // rotation
 //  	    break;
