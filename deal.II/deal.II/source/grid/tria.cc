@@ -4558,6 +4558,13 @@ Triangulation<2>::execute_refinement ()
     };
 
 
+				   // first clear user flags for
+				   // lines; we're going to use them
+				   // to flag which lines need
+				   // refinement
+  for (line_iterator line=begin_line(); line!=end_line(); ++line)
+    line->clear_user_flag();
+
 				   // check how much space is needed
 				   // on every level we need not check
 				   // the highest level since either
@@ -4575,10 +4582,10 @@ Triangulation<2>::execute_refinement ()
       				       // be needed
       unsigned int flagged_cells = 0;
       unsigned int needed_lines  = 0;
-      active_cell_iterator acell = begin_active(level),
-			   aendc = begin_active(level+1);
-      for (; acell!=aendc; ++acell) 
-	if (acell->refine_flag_set()) 
+      active_cell_iterator cell = begin_active(level),
+			   endc = begin_active(level+1);
+      for (; cell!=endc; ++cell) 
+	if (cell->refine_flag_set()) 
 	  {
 	    ++flagged_cells;
 
@@ -4590,78 +4597,37 @@ Triangulation<2>::execute_refinement ()
 					     //	lines
 	    needed_lines += 4;
 	    
-					     // for all neighbors of
-					     // this cell
-	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
+					     // mark all faces (lines)
+					     // for refinement;
+					     // checking locally
+					     // whether the neighbor
+					     // would also like to
+					     // refine them is rather
+					     // difficult for lines so
+					     // we only flag them and
+					     // after visiting all
+					     // cells, we decide which
+					     // lines need refinement;
+	    for (unsigned int line_no=0; line_no<GeometryInfo<dim>::faces_per_cell;
+		 ++line_no)
 	      {
-		const cell_iterator neighbor = acell->neighbor(nb);
-						 // if cell is at
-						 // boundary
-		if (neighbor.state() != IteratorState::valid) 
-		  {
-						     // new midpoint
-						     // vertex
-						     // necessary
-		    ++needed_vertices;
-						     // also two new
-						     // lines
-		    needed_lines += 2;
-		    
-		    continue;
-		  };
-						 // there is a neighbor. There
-						 // are three cases:
-						 // 1 nb is on same level and
-						 //   not refined (subcases:
-						 //   flagged for refinement
-						 //   or not)
-						 // 2 nb is on same level and
-						 //   refined (->no additional
-						 //   vertices and lines needed)
-						 // 3 nb is one level down
-						 //   (but will be refined)
-		if ((neighbor->level() == acell->level()) &&
-		    (neighbor->active() == true))
-		  {
-						     // case 1
-		    if (((neighbor->refine_flag_set() == true) &&
-			 (acell->index() < neighbor->index()))
-							 // case 1a
-
-							 // we need one more vertex
-							 // and two more lines, but
-							 // we must only count them
-							 // once. Convention: count
-							 // them for the cell with
-							 // the lower index
-			||
-			(neighbor->refine_flag_set() == false))
-						       // case 1b
-		      {
-			++needed_vertices;
-			needed_lines += 2;
-		      };
-
-		    continue;
-		  };
-
-		if ((neighbor->level() == acell->level()) &&
-		    (neighbor->active() == false))
-						   // case 2
-		  continue;
+		line_iterator line = cell->line(line_no);
 		
-		if (neighbor->level() == acell->level()-1)
-						   // case 3
-		  {
-		    ++needed_vertices;
-		    needed_lines += 2;
-		    
-		    continue;
-		  };
+		if (line->has_children() == false) 
+		  line->set_user_flag ();
+	      }
+	  }
 
-		Assert (false, ExcUncaughtState());
-	      };
+				       // now count the lines which
+				       // were flagged for refinement
+      for (line_iterator line=begin_line(level); line!=end_line(level); ++line)
+	if (line->user_flag_set())
+	  {
+	    Assert (line->has_children() == false, ExcInternalError());
+	    needed_lines    += 2;
+	    needed_vertices += 1;
 	  };
+      
       
       				       // count number of used cells
       				       // on the next higher level
@@ -4714,7 +4680,94 @@ Triangulation<2>::execute_refinement ()
 
 				   //  index of next unused vertex
   unsigned int next_unused_vertex = 0;
-  
+
+				   // first for lines
+  for (unsigned int level=0; level!=levels.size()-1; ++level)
+    {
+				       // only active objects can be
+				       // refined further; remember
+				       // that we won't operate on the
+				       // finest level, so
+				       // begin_*(level+1) is allowed
+      active_line_iterator line = begin_active_line(level),
+			   endl = begin_active_line(level+1);
+      raw_line_iterator next_unused_line = begin_raw_line (level+1);
+
+      for (; line!=endl; ++line)
+	if (line->user_flag_set())
+	  {
+					     // this line needs to be
+					     // refined
+
+					     // find the next unused
+					     // vertex and set it
+					     // appropriately
+	    while (vertices_used[next_unused_vertex] == true)
+	      ++next_unused_vertex;
+	    Assert (next_unused_vertex < vertices.size(),
+		    ExcTooFewVerticesAllocated());
+	    vertices_used[next_unused_vertex] = true;
+
+	    if (line->at_boundary())
+	      vertices[next_unused_vertex]
+		= boundary[line->boundary_indicator()]->get_new_point_on_line (line);
+	    else
+	      vertices[next_unused_vertex]
+		= (line->vertex(0) + line->vertex(1)) / 2;
+	  
+					     // now that we created
+					     // the right point, make
+					     // up the two child lines
+					     // (++ takes care of the
+					     // end of the vector)
+	    while (next_unused_line->used() == true)
+	      ++next_unused_line;
+					     // there should always be
+					     // two consecutive unused
+					     // lines, such that the
+					     // children of a line
+					     // will be consecutive.
+					     // then set the child
+					     // pointer of the present
+					     // line
+	    line->set_children (next_unused_line->index());
+	  
+					     // set the two new lines
+	    raw_line_iterator children[2] = { next_unused_line,
+					      ++next_unused_line };
+					     // some tests; if any of
+					     // the iterators should
+					     // be invalid, then
+					     // already dereferencing
+					     // will fail
+	    Assert (children[0]->used() == false, ExcCellShouldBeUnused());
+	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
+	  
+	    children[0]->set (Line(line->vertex_index(0),
+				   next_unused_vertex));
+	    children[1]->set (Line(next_unused_vertex,
+				   line->vertex_index(1)));
+    
+	    children[0]->set_used_flag();
+	    children[1]->set_used_flag();
+	    children[0]->clear_children();
+	    children[1]->clear_children();
+	    children[0]->clear_user_pointer();
+	    children[1]->clear_user_pointer();
+	    children[0]->clear_user_flag();
+	    children[1]->clear_user_flag();
+
+	    children[0]->set_boundary_indicator (line->boundary_indicator());
+	    children[1]->set_boundary_indicator (line->boundary_indicator());
+	    
+					     // finally clear flag
+					     // indicating the need
+					     // for refinement
+	    line->clear_user_flag ();
+	  };
+    };
+
+				   // Now set up the new cells
   for (int level=0; level<static_cast<int>(levels.size())-1; ++level) 
     {
       
@@ -4724,7 +4777,7 @@ Triangulation<2>::execute_refinement ()
       raw_line_iterator next_unused_line = begin_raw_line (level+1);
       raw_cell_iterator next_unused_cell = begin_raw (level+1);
 
-      for (; (cell!=endc) && (cell->level()==level); ++cell) 
+      for (; cell!=endc; ++cell) 
 	if (cell->refine_flag_set()) 
 	  {
 					     // clear refinement flag
@@ -4762,29 +4815,23 @@ Triangulation<2>::execute_refinement ()
    Set up an array of the new lines (the array consists of iterator pointers
    into the lines arrays)
    
-   .-5-.-4-.         The directions are:  .->-.->-.
-   6   9   3                              ^   ^   ^
+   .-4-.-5-.         The directions are:  .->-.->-.
+   7   9   3                              ^   ^   ^
    .-10.11- .                             .->-.->-.
-   7   8   2                              ^   ^   ^
+   6   8   2                              ^   ^   ^
    .-0-.-1-.                              .->-.->-.
 
-   Please note that since the children of line are created in the direction of
-   that line, the lines 4,5 and 6,7 are created in the wrong time order. This
-   has the consequence that if n be the next free line number before the
-   refinement process, the line numbered with 4 above will get index n+5,
-   while the line number 5 above will get the index n+4. The same applies
-   to the lines 6 and 7.
      
    Third:
    Set up an array of neighbors:
    
-   5   4
-   .--.--.
-   6|  |  |3
-   .--.--.
-   7|  |  |2
-   .--.--.
-   0   1
+      4  5
+    .--.--.
+   7|  |  |3
+    .--.--.
+   6|  |  |2
+    .--.--.
+     0   1
 
    We need this array for two reasons: first to get the lines which will
    bound the four subcells (if the neighboring cell is refined, these
@@ -4816,204 +4863,27 @@ Triangulation<2>::execute_refinement ()
    |0 | 1|
    .--.--.
 */
-
-	    int               new_vertices[9] = {cell->vertex_index(0), -1,
-						 cell->vertex_index(1), -1,
-						 cell->vertex_index(2), -1,
-						 cell->vertex_index(3), -1,
-						 -1};
-	    raw_line_iterator new_lines[12];
-	    cell_iterator     neighbors[8] = {cell->neighbor(0),
-					      cell->neighbor(0),
-					      cell->neighbor(1),
-					      cell->neighbor(1),
-					      cell->neighbor(2),
-					      cell->neighbor(2),
-					      cell->neighbor(3),
-					      cell->neighbor(3)};
-	    int               neighbors_neighbor[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
-
-					     // remember: the @p{i}th
-					     // line is the common
-					     // line to the @p{i}th
-					     // neighbor
-	    for (unsigned int nb=0; nb<4; ++nb)
-	      {
-		bool neighbor_refined=false;
-		if (cell->neighbor(nb).state() == IteratorState::valid)
-		  if (cell->neighbor(nb)->active() == false)
-						     // (ask in two
-						     // if-statements,
-						     // since
-						     // otherwise both
-						     // conditions
-						     // would be
-						     // executed, but
-						     // the second
-						     // will throw an
-						     // error if the
-						     // first fails!)
-		    neighbor_refined=true;
-		
-		if (neighbor_refined)
-		  {
-						     // neighbor
-						     // exists and is
-						     // refined ->the
-						     // common line
-						     // has two
-						     // children which
-						     // we can use.
-		    cell_iterator neighbor = cell->neighbor(nb);
-						     // this cell is
-						     // the nb_nb-th
-						     // neighbor or
-						     // neighbor(nb)
-		    const unsigned int nb_nb = cell->neighbor_of_neighbor (nb);
-
-		    neighbors_neighbor[2*nb] = neighbors_neighbor[2*nb+1] = nb_nb;
-						     // vertex 1 of
-						     // child 0 is
-						     // always the
-						     // interior one
-		    new_vertices[2*nb+1] = neighbor->line(nb_nb)
-					   ->child(0)->vertex_index(1);
-
-		    if (nb < 2) 
-		      {
-			new_lines[2*nb]  = neighbor->line(nb_nb)->child(0);
-			new_lines[2*nb+1]= neighbor->line(nb_nb)->child(1);
-		      } else {
-							 // lines 2
-							 // and 3 have
-							 // opposite
-							 // sense
-			new_lines[2*nb]  = neighbor->line(nb_nb)->child(1);
-			new_lines[2*nb+1]= neighbor->line(nb_nb)->child(0);
-		      };
-		    
-						     // finally find
-						     // out which are
-						     // the two
-						     // neighbor
-						     // subcells,
-						     // adjacent to
-						     // the two
-						     // sublines
-		    static const unsigned int child_mapping[4][2] = {{0,1},{1,2},{3,2},{0,3}};     
-		    if (nb < 2) 
-		      {
-			neighbors[2*nb]  = neighbor->child(child_mapping[nb_nb][0]);
-			neighbors[2*nb+1]= neighbor->child(child_mapping[nb_nb][1]);
-		      } else {
-			neighbors[2*nb]  = neighbor->child(child_mapping[nb_nb][1]);
-			neighbors[2*nb+1]= neighbor->child(child_mapping[nb_nb][0]);
-		      };
-		  }
-		else 
 	    
-						   // neighboring cell
-						   // either does not
-						   // exist or is not
-						   // refined -> we
-						   // need a new
-						   // vertex and two
-						   // new lines
-		  {
-						     // search for
-						     // next unused
-						     // vertex
-		    while (vertices_used[next_unused_vertex] == true)
-		      ++next_unused_vertex;
-		    Assert (next_unused_vertex < vertices.size(),
-			    ExcTooFewVerticesAllocated());
-
-						     // where shall we
-						     // put the new
-						     // vertex?
-		    Point<2> new_point;
-		    
-		    face_iterator face=cell->line(nb);
-		    
-		    if ( face->boundary_indicator() != 255 )
-		      {
-							 // boundary
-							 // vertex
-			new_point = boundary[face->boundary_indicator()]->
-				    get_new_point_on_line (face);
-		      } else {
-							 // vertex
-							 // between
-							 // two normal
-							 // cells
-			new_point = vertices[new_vertices[2*nb]];
-			new_point += vertices[new_vertices[(2*nb+2)%8]];
-			new_point /= 2.0;
-		      };
-		    
-		    new_vertices[nb*2+1] = next_unused_vertex;
-		    vertices[new_vertices[nb*2+1]] = new_point;
-		    vertices_used[new_vertices[nb*2+1]] = true;
-
-						     // search for
-						     // next unused
-						     // line (++ takes
-						     // care of the
-						     // end of the
-						     // vector)
-		    while (next_unused_line->used() == true)
-		      ++next_unused_line;
-
-		    cell->line(nb)->set_children (next_unused_line->index());
-		    
-		    if (nb<2) 
-		      {
-			new_lines[nb*2] = next_unused_line;
-			++next_unused_line;
-			Assert (next_unused_line->used() == false,
-				ExcCellShouldBeUnused());
-			new_lines[nb*2+1] = next_unused_line;
-
-			new_lines[nb*2]->set(Line(new_vertices[2*nb],
-						  new_vertices[2*nb+1]));
-			new_lines[nb*2]->set_used_flag ();
-			new_lines[nb*2]->clear_children ();
-			new_lines[nb*2]->clear_user_pointer ();
-			
-			new_lines[nb*2+1]->set(Line(new_vertices[2*nb+1],
-						    new_vertices[(2*nb+2)%8]));
-			new_lines[nb*2+1]->set_used_flag ();
-			new_lines[nb*2+1]->clear_children ();
-			new_lines[nb*2+1]->clear_user_pointer ();
-		      } else {
-			new_lines[nb*2+1] = next_unused_line;
-			++next_unused_line;
-			Assert (next_unused_line->used() == false,
-				ExcCellShouldBeUnused());
-			new_lines[nb*2] = next_unused_line;
-
-			new_lines[nb*2]->set(Line(new_vertices[2*nb+1],
-						  new_vertices[2*nb]));
-			new_lines[nb*2]->set_used_flag ();
-			new_lines[nb*2]->clear_children ();
-			new_lines[nb*2]->clear_user_pointer ();
-
-			new_lines[nb*2+1]->set(Line(new_vertices[(2*nb+2)%8],
-						    new_vertices[2*nb+1]));
-			new_lines[nb*2+1]->set_used_flag ();
-			new_lines[nb*2+1]->clear_children ();
-			new_lines[nb*2+1]->clear_user_pointer ();
-		      };
-		  };
-	      };
-	    
-					     // add new vertex in the
-					     // middle search for next
-					     // unused vertex
+					     // find the next unused
+					     // vertex and set it
+					     // appropriately
 	    while (vertices_used[next_unused_vertex] == true)
 	      ++next_unused_vertex;
 	    Assert (next_unused_vertex < vertices.size(),
 		    ExcTooFewVerticesAllocated());
+	    vertices_used[next_unused_vertex] = true;
+
+					     // collect the indices
+					     // all vertices
+	    int new_vertices[9] = {cell->vertex_index(0),
+				   cell->line(0)->child(0)->vertex_index(1),
+				   cell->vertex_index(1),
+				   cell->line(1)->child(0)->vertex_index(1),
+				   cell->vertex_index(2),
+				   cell->line(2)->child(0)->vertex_index(1),
+				   cell->vertex_index(3),
+				   cell->line(3)->child(0)->vertex_index(1),
+				   next_unused_vertex};
 
 					     // new vertex is placed
 					     // at the arithmetic mean
@@ -5024,70 +4894,55 @@ Triangulation<2>::execute_refinement ()
 	      new_point +=  vertices[new_vertices[i]];
 	    new_point /= 8.0;
 	    
-	    new_vertices[8] = next_unused_vertex;
 	    vertices[new_vertices[8]] = new_point;
-	    vertices_used[new_vertices[8]] = true;
-	    
-					     // add the 4 inner lines
-	    
-					     // search for next unused
-					     // line
-	    while (next_unused_line->used() == true)
-	      ++next_unused_line;
-	    new_lines[8] = next_unused_line;
-	    new_lines[8]->set(Line(new_vertices[1],
-				   new_vertices[8]));
-	    new_lines[8]->set_used_flag ();
-	    new_lines[8]->clear_children ();
-	    new_lines[8]->clear_user_pointer ();
-	    
-	    while (next_unused_line->used() == true)
-	      ++next_unused_line;
-	    new_lines[9] = next_unused_line;
-	    new_lines[9]->set(Line(new_vertices[8],
-				   new_vertices[5]));
-	    new_lines[9]->set_used_flag ();
-	    new_lines[9]->clear_children ();
-	    new_lines[9]->clear_user_pointer ();
 
-	    while (next_unused_line->used() == true)
-	      ++next_unused_line;
-	    new_lines[10] = next_unused_line;
-	    new_lines[10]->set(Line(new_vertices[7],
-				    new_vertices[8]));
-	    new_lines[10]->set_used_flag ();
-	    new_lines[10]->clear_children ();
-	    new_lines[10]->clear_user_pointer ();
-	    
-	    while (next_unused_line->used() == true)
-	      ++next_unused_line;
-	    new_lines[11] = next_unused_line;
-	    new_lines[11]->set(Line(new_vertices[8],
-				    new_vertices[3]));
-	    new_lines[11]->set_used_flag ();
-	    new_lines[11]->clear_children ();
-	    new_lines[11]->clear_user_pointer ();
-					     // set the boundary
-					     // indicators of the
-					     // outer cells.
-	    new_lines[0]->set_boundary_indicator (cell->line(0)->boundary_indicator());
-	    new_lines[1]->set_boundary_indicator (cell->line(0)->boundary_indicator());
-	    new_lines[2]->set_boundary_indicator (cell->line(1)->boundary_indicator());
-	    new_lines[3]->set_boundary_indicator (cell->line(1)->boundary_indicator());
-	    new_lines[4]->set_boundary_indicator (cell->line(2)->boundary_indicator());
-	    new_lines[5]->set_boundary_indicator (cell->line(2)->boundary_indicator());
-	    new_lines[6]->set_boundary_indicator (cell->line(3)->boundary_indicator());
-	    new_lines[7]->set_boundary_indicator (cell->line(3)->boundary_indicator());
-					     // inner cells have
-					     // boundary indicator 255
-	    new_lines[8]->set_boundary_indicator (255);
-	    new_lines[9]->set_boundary_indicator (255);
-	    new_lines[10]->set_boundary_indicator (255);
-	    new_lines[11]->set_boundary_indicator (255);
+					     // Now the lines:
 
+					     // lines 0-7 already
+					     // exist, create only the
+					     // four interior lines
+					     // 8-11
+	    raw_line_iterator new_lines[12];
+	    unsigned int l=0;
+	    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
+		 ++face_no)
+	      for (unsigned int child_no=0;
+		   child_no<GeometryInfo<dim>::subfaces_per_face; ++child_no, ++l)
+		new_lines[l]=cell->line(face_no)->child(child_no);
+	    Assert(l==8, ExcInternalError());
+					     // TODO: check whether
+					     // lines 4&5 and 6&7 will
+					     // be used in the right
+					     // ordering
+		
+	    for (; l<12; ++l)
+	      {
+		while (next_unused_line->used() == true)
+		  ++next_unused_line;
+		new_lines[l] = next_unused_line;
+		++next_unused_line;
 
-					     // finally add the four
-					     // new cells!
+		Assert (new_lines[l]->used() == false,
+                        ExcCellShouldBeUnused());
+	      };
+
+	    new_lines[8] ->set (Line(new_vertices[1], new_vertices[8]));
+	    new_lines[9] ->set (Line(new_vertices[8], new_vertices[5]));
+	    new_lines[10]->set (Line(new_vertices[7], new_vertices[8]));
+	    new_lines[11]->set (Line(new_vertices[8], new_vertices[3]));
+	
+	    for (l=8; l<12; ++l)
+	      {
+		new_lines[l]->set_used_flag();
+		new_lines[l]->clear_user_flag();
+		new_lines[l]->clear_user_pointer();
+		new_lines[l]->clear_children();
+						 // interior line
+		new_lines[l]->set_boundary_indicator(255);
+	      };
+
+					     // Now add the four new
+					     // cells!
 	    
 					     // search for next unused
 					     // cell the four children
@@ -5097,8 +4952,9 @@ Triangulation<2>::execute_refinement ()
 	    while (next_unused_cell->used() == true)
 	      ++next_unused_cell;
 
-	    raw_cell_iterator subcells[4];
-	    for (unsigned int i=0; i<4; ++i) 
+	    const unsigned int n_children=GeometryInfo<dim>::children_per_cell;
+	    raw_cell_iterator subcells[n_children];
+	    for (unsigned int i=0; i<n_children; ++i) 
 	      {
 		Assert (next_unused_cell->used() == false,
 			ExcCellShouldBeUnused());
@@ -5108,88 +4964,221 @@ Triangulation<2>::execute_refinement ()
 
 
 	    cell->set_children (subcells[0]->index());
-	    
-	    subcells[0]->set (Quad(new_lines[0]->index(),  new_lines[8]->index(),
-				   new_lines[10]->index(), new_lines[7]->index()));
-	    subcells[0]->set_used_flag();
-	    subcells[0]->clear_children();
-	    subcells[0]->clear_user_pointer ();
 
-	    subcells[1]->set (Quad(new_lines[1]->index(),  new_lines[2]->index(),
-				   new_lines[11]->index(), new_lines[8]->index()));
-	    subcells[1]->set_used_flag();
-	    subcells[1]->clear_children();
-	    subcells[1]->clear_user_pointer ();
-
-
+	    Assert(n_children==4, ExcNotImplemented());
+	    subcells[0]->set (Quad(new_lines[0]->index(),
+				   new_lines[8]->index(),
+				   new_lines[10]->index(),
+				   new_lines[6]->index()));
+	    subcells[1]->set (Quad(new_lines[1]->index(),
+				   new_lines[2]->index(),
+				   new_lines[11]->index(),
+				   new_lines[8]->index()));
 	    subcells[2]->set (Quad(new_lines[11]->index(),
                                    new_lines[3]->index(),
-				   new_lines[4]->index(),
+				   new_lines[5]->index(),
                                    new_lines[9]->index()));
-	    subcells[2]->set_used_flag();
-	    subcells[2]->clear_children();
-	    subcells[2]->clear_user_pointer ();
-
-
 	    subcells[3]->set (Quad(new_lines[10]->index(),
                                    new_lines[9]->index(),
-				   new_lines[5]->index(),
-                                   new_lines[6]->index()));
-	    subcells[3]->set_used_flag();
-	    subcells[3]->clear_children();
-	    subcells[3]->clear_user_pointer ();
-	    
-					     // finally set
-					     // neighborship info of
-					     // external cells
-					     // (neighbor_mapping is
-					     // the mapping between
-					     // the 8 neighbors and
-					     // the adjacent new cells
-					     // in the interior)
-	    const int neighbor_mapping[8] = {0,1, 1,2, 2,3, 3,0};
-	    
-	    for (unsigned int nb=0; nb<8; ++nb)
-	      if (neighbors[nb].state() == IteratorState::valid)
-		if (neighbors[nb]->level() == level+1)
-						   // neighbor is
-						   // refined cell
-		  neighbors[nb]->set_neighbor(neighbors_neighbor[nb],
-					      subcells[neighbor_mapping[nb]]);
+				   new_lines[4]->index(),
+                                   new_lines[7]->index()));
 
-					     // and neighbarship of
-					     // new cells
-	    subcells[0]->set_neighbor (0, neighbors[0]);
+	    for (unsigned int i=0; i<n_children; ++i)
+	      {
+		subcells[i]->set_used_flag();
+		subcells[i]->clear_user_flag();
+		subcells[i]->clear_user_pointer();
+		subcells[i]->clear_children();
+						 // inherit material
+						 // properties		
+		subcells[i]->set_material_id (cell->material_id());
+		subcells[i]->set_subdomain_id (cell->subdomain_id());
+	      }
+	    
+					     // now the only thing
+					     // still to be done is
+					     // setting neighborship
+					     // information.
+					     //
+					     // to do so, first
+					     // collect the iterators
+					     // pointing to the 6x4
+					     // neighbors of this
+					     // cell.
+					     //
+					     // note that in case the
+					     // neighboring cell is
+					     // not refined, the
+					     // neighbor iterators
+					     // point to the common
+					     // mother cell. the same
+					     // applies if there is no
+					     // neighbor: the
+					     // iterators are past the
+					     // end
+	    cell_iterator neighbor_cells[n_children][2];
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
+		 ++face)
+	      {
+		const cell_iterator neighbor = cell->neighbor(face);
+
+						 // if no neighbor
+		if (neighbor.state() != IteratorState::valid)
+		  for (unsigned int child_face=0;
+		       child_face<GeometryInfo<dim>::subfaces_per_face;
+		       ++child_face)
+		    neighbor_cells[face][child_face] = neighbor;
+		
+		else
+						   // neighbor exists
+		  {
+						     // neighbor's
+						     // level must not
+						     // be higher
+						     // (else
+						     // something went
+						     // wrong when
+						     // constructing
+						     // either of the
+						     // two cells) and
+						     // not lower
+						     // since then
+						     // this cell
+						     // should not
+						     // have been
+						     // refined.
+		    Assert (neighbor->level() == cell->level(),
+			    ExcInternalError());
+
+						     // now there are
+						     // two
+						     // possibilities:
+						     // either the
+						     // neighbor has
+						     // no children or
+						     // it has
+						     // children. these
+						     // must be
+						     // terminal then.
+		    if (!neighbor->has_children())
+		      for (unsigned int child_face=0;
+			   child_face<GeometryInfo<dim>::subfaces_per_face;
+			   ++child_face)
+			neighbor_cells[face][child_face] = neighbor;
+		    else
+						       // neighbor has
+						       // children
+		      {
+							 // first find
+							 // the face
+							 // of the
+							 // neighbor
+							 // adjacent
+							 // to which
+							 // the
+							 // present
+							 // cell is
+			const unsigned int nb_nb = cell->neighbor_of_neighbor(face);
+			Assert (nb_nb<GeometryInfo<dim>::faces_per_cell,
+				ExcInternalError());
+
+							 // and set
+							 // the
+							 // neighbors
+							 // accordingly
+			for (unsigned int c=0;
+			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
+			  {
+			    neighbor_cells[face][c]
+			      = neighbor->child(GeometryInfo<dim>::
+                                                child_cell_on_face(nb_nb, c));
+			    
+			    Assert (neighbor_cells[face][c].state() ==
+				    IteratorState::valid,
+				    ExcInternalError());
+			    Assert (!neighbor_cells[face][c]->has_children(),
+				    ExcInternalError());
+			  }
+		      }
+		  }
+	      }
+
+					     // now we've got all
+					     // neighbors, so set them
+					     // in the new cells
+	    subcells[0]->set_neighbor (0, neighbor_cells[0][0]);
 	    subcells[0]->set_neighbor (1, subcells[1]);
 	    subcells[0]->set_neighbor (2, subcells[3]);
-	    subcells[0]->set_neighbor (3, neighbors[7]);
+	    subcells[0]->set_neighbor (3, neighbor_cells[3][0]);
 
-	    subcells[1]->set_neighbor (0, neighbors[1]);
-	    subcells[1]->set_neighbor (1, neighbors[2]);
+	    subcells[1]->set_neighbor (0, neighbor_cells[0][1]);
+	    subcells[1]->set_neighbor (1, neighbor_cells[1][0]);
 	    subcells[1]->set_neighbor (2, subcells[2]);
 	    subcells[1]->set_neighbor (3, subcells[0]);
 
 	    subcells[2]->set_neighbor (0, subcells[1]);
-	    subcells[2]->set_neighbor (1, neighbors[3]);
-	    subcells[2]->set_neighbor (2, neighbors[4]);
+	    subcells[2]->set_neighbor (1, neighbor_cells[1][1]);
+	    subcells[2]->set_neighbor (2, neighbor_cells[2][1]);
 	    subcells[2]->set_neighbor (3, subcells[3]);
 
 	    subcells[3]->set_neighbor (0, subcells[0]);
 	    subcells[3]->set_neighbor (1, subcells[2]);
-	    subcells[3]->set_neighbor (2, neighbors[5]);
-	    subcells[3]->set_neighbor (3, neighbors[6]);
+	    subcells[3]->set_neighbor (2, neighbor_cells[2][0]);
+	    subcells[3]->set_neighbor (3, neighbor_cells[3][1]);
 
-	    subcells[0]->set_material_id (cell->material_id());
-	    subcells[1]->set_material_id (cell->material_id());
-	    subcells[2]->set_material_id (cell->material_id());
-	    subcells[3]->set_material_id (cell->material_id());
+					     // now we need to set the
+					     // neighbors' neighborship
+					     // information; this is
+					     // only necessary if the
+					     // neighboring cell is
+					     // refined, i.e. is on
+					     // the same level as the
+					     // new children of the
+					     // present cell
+	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb)
+	      for (unsigned int subface=0;
+		   subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
+		if ((neighbor_cells[nb][subface].state() ==
+		     IteratorState::valid) &&
+		    (neighbor_cells[nb][subface]->level() ==
+		     cell->level()+1))
+		  {
+						     // ok, the
+						     // neighbor is a
+						     // refined one
+						     // and we need to
+						     // set one of the
+						     // new children
+						     // as its
+						     // neighbor
+		    const cell_iterator neighbor = neighbor_cells[nb][subface];
 
-	    subcells[0]->set_subdomain_id (cell->subdomain_id());
-	    subcells[1]->set_subdomain_id (cell->subdomain_id());
-	    subcells[2]->set_subdomain_id (cell->subdomain_id());
-	    subcells[3]->set_subdomain_id (cell->subdomain_id());
-	  };
-    };
+						     // find which
+						     // neighbor
+						     // pointer is to
+						     // be reset; this
+						     // pointer still
+						     // points to the
+						     // present cell
+		    unsigned int face;
+		    for (face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+		      if (neighbor->neighbor(face) == cell)
+			break;
+
+		    Assert (face<GeometryInfo<dim>::faces_per_cell,
+			    ExcInternalError());
+
+		    neighbor->set_neighbor(face, subcells[
+		      GeometryInfo<dim>::child_cell_on_face(nb, subface)]);
+		  }
+
+					     // note that the
+					     // refinement flag was
+					     // already cleared at the
+					     // beginning of this loop
+	    
+	  }
+    }
 
 				   // re-compute number of lines and
 				   // quads
@@ -5209,6 +5198,11 @@ Triangulation<2>::execute_refinement ()
 				   // something went wrong since the
 				   // cell-accessors should have
 				   // caught this)
+  line_iterator line = begin_line(),
+		endl = end_line();
+  while (line != endl)
+    Assert (!(line++)->user_flag_set(), ExcInternalError ());
+
   cell_iterator cell = begin(),
 		endc = end();
   while (cell != endc)
