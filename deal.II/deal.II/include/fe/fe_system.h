@@ -62,7 +62,7 @@
  * coupled to @p{u} at the vertices and the line on the larger cell next to this
  * vertex, there is no interaction with @p{v} and @p{w} of this or the other cell.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, reimplementation Ralf Hartmann 2001.
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, partial reimplementation Ralf Hartmann 2001.
  */
 template <int dim>
 class FESystem : public FiniteElement<dim>
@@ -217,13 +217,13 @@ class FESystem : public FiniteElement<dim>
 				      * Compute flags for initial
 				      * update only.
 				      */
-    virtual UpdateFlags update_once (UpdateFlags flags) const;
+    virtual UpdateFlags update_once (const UpdateFlags flags) const;
   
 				     /**
 				      * Compute flags for update on
 				      * each cell.
 				      */
-    virtual UpdateFlags update_each (UpdateFlags flags) const;
+    virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
 				     /**
 				      * @p{clone} function instead of
@@ -232,7 +232,7 @@ class FESystem : public FiniteElement<dim>
 				      * This function is needed by the
 				      * constructors of @p{FESystem}.
 				      */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim> * clone() const;
   
 				     /**
 				      * Prepare internal data
@@ -486,7 +486,7 @@ class FESystem : public FiniteElement<dim>
 					  * @p{base_no}th base
 					  * element.
 					  */
-	void set_fe_data(unsigned int base_no,
+	void set_fe_data(const unsigned int                        base_no,
 			 typename FiniteElementBase<dim>::InternalDataBase *);
 
 					 /**
@@ -495,7 +495,8 @@ class FESystem : public FiniteElement<dim>
 					  * @p{InternalData} of the
 					  * @p{base_no}th base element.
 					  */	
-	typename FiniteElementBase<dim>::InternalDataBase &get_fe_data(unsigned int base_no) const;
+	typename FiniteElementBase<dim>::InternalDataBase &
+	get_fe_data (const unsigned int base_no) const;
 
 
 					 /**
@@ -505,8 +506,8 @@ class FESystem : public FiniteElement<dim>
 					  * @p{base_no}th base
 					  * element.
 					  */
-	void set_fe_values_data(unsigned int base_no,
-				FEValuesData<dim> *);
+	void set_fe_values_data (const unsigned int base_no,
+				 FEValuesData<dim> *);
 
 					 /**
 					  * Gives read-access to the
@@ -514,7 +515,7 @@ class FESystem : public FiniteElement<dim>
 					  * @p{FEValuesData} for the
 					  * @p{base_no}th base element.
 					  */	
-	FEValuesData<dim> &get_fe_values_data(unsigned int base_no) const;
+	FEValuesData<dim> & get_fe_values_data (const unsigned int base_no) const;
 
 					 /**
 					  * Deletes the
@@ -577,6 +578,7 @@ class FESystem : public FiniteElement<dim>
 	typename std::vector<FEValuesData<dim> *> base_fe_values_datas;
     };
 };
+
 
 
 /* ------------------------- inline functions ------------------------- */
