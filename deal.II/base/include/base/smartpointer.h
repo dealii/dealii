@@ -40,7 +40,8 @@ class SmartPointer
 
   public:
 				     /**
-				      * Constructor taking a normal pointer.  */
+				      * Constructor taking a normal pointer.
+				      */
     SmartPointer(T* tt) :
 		    t(tt) 
       {
