@@ -21,11 +21,10 @@ class ParameterHandler;
 /**
  * Control class for iterative solvers.
  *
- * Used by iterative methods to
- * determine whether the iteration should be continued. To this respect,
- * the virtual function @p{check()} is called in each iteration
- * with the current iteration
- * step and the value indicating convergence (usually the residual).
+ * Used by iterative methods to determine whether the iteration should
+ * be continued. To this respect, the virtual function @p{check()} is
+ * called in each iteration with the current iteration step and the
+ * value indicating convergence (usually the residual).
  *
  * After the iteration has terminated, the functions @p{last_value} and
  * @p{last_step} can be used to obtain information about the final state
@@ -36,8 +35,8 @@ class ParameterHandler;
  *
  *
  * @sect2{State}
- * The return states of the check function are of type @p{State}, which is an
- * enum local to this class. It indicates the state the
+ * The return states of the check function are of type @p{State},
+ * which is an enum local to this class. It indicates the state the
  * solver is in.
  *
  * The possible values of State are
@@ -296,7 +295,7 @@ class SolverControl : public Subscriptor
  * whatever criterion was chosen by the solver class) is reduced by a
  * given factor. This is useful in cases where you don't want to solve
  * exactly, but rather want to gain two digits or if the maximal
- * number of iterations is achived.  For exemple: The maximal number
+ * number of iterations is achieved.  For example: The maximal number
  * of iterations is 20, the reduction factor is 1% und the tolerance
  * is 0.1%. The initial residual is 2.5. The process will break if 20
  * iteration are comleted or the new residual is less then 2.5*1% or
