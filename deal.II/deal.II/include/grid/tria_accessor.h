@@ -2049,6 +2049,46 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      */
     unsigned int number_of_children () const;
 
+                                     /**
+                                      * Return whether the quad with
+                                      * index @p{face} has its normal
+                                      * pointing in the standard
+                                      * direction (@p{true}) or
+                                      * whether it is the opposite
+                                      * (@p{false}). Which is the
+                                      * standard direction is
+                                      * documented with the
+                                      * @ref{Triangulation} class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool get_face_orientation (const unsigned int face) const;
+
+                                     /**
+                                      * Set whether the quad with
+                                      * index @p{face} has its normal
+                                      * pointing in the standard
+                                      * direction (@p{true}) or
+                                      * whether it is the opposite
+                                      * (@p{false}). Which is the
+                                      * standard direction is
+                                      * documented with the
+                                      * @ref{Triangulation} class.
+                                      *
+                                      * This function is only for
+                                      * internal use in the
+                                      * library. Setting this flag to
+                                      * any other value than the one
+                                      * that the triangulation has
+                                      * already set is bound to bring
+                                      * you desaster.
+                                      */
+    void set_face_orientation (const unsigned int face,
+                               const bool         orientation) const;
+    
   private:
     				     /**
 				      *  Copy operator. This is normally

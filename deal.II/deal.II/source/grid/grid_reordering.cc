@@ -580,7 +580,7 @@ namespace internal
   {
     DeclException1 (GridOrientError,
 		    char *,
-		    <<  "Grid Orientation Error" << arg1);
+		    <<  "Grid Orientation Error: " << arg1);
 
 
     //Switched two ints so that v1<v2;
@@ -1319,7 +1319,6 @@ namespace internal
 	    }
 	}
     }
-
   }
 }
 
