@@ -401,6 +401,24 @@ SparseMatrixEZ<number>::compute_statistics(
 
 template <typename number>
 void
+SparseMatrixEZ<number>::print (std::ostream &out) const 
+{
+  AssertThrow (out, ExcIO());
+
+  const_iterator i = begin();
+  const const_iterator e = end();
+  while (i != e)
+    {
+      out << i->row() << '\t'
+	  << i->column() << '\t'
+	  <<i->value() << std::endl;
+      ++i;
+    }
+}
+
+
+template <typename number>
+void
 SparseMatrixEZ<number>::block_write (std::ostream &out) const 
 {
   AssertThrow (out, ExcIO());

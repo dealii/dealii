@@ -778,11 +778,21 @@ class SparseMatrixEZ : public Subscriptor
 				     /**
 				      * Add the matrix @p{A}
 				      * conjugated by @p{B}, that is,
-				      * $B A B^T$ to this object.
+				      * $B A B^T$ to this object. If
+				      * the parameter @p{transpose} is
+				      * true, compute $B^T A B$.
+				      *
+				      * This function requires that
+				      * @p{B} has a @p{const_iterator}
+				      * traversing all matrix entries
+				      * and that @p{A} has a function
+				      * @p{el(i,j)} for access to a
+				      * specific entry.
 				      */
     template <class MATRIXA, class MATRIXB>
     void conjugate_add (const MATRIXA& A,
-			const MATRIXB& B);
+			const MATRIXB& B,
+			const bool transpose = false);
     
 				     /**
 				      * STL-like iterator with the
@@ -832,7 +842,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * nonzero entry of the matrix
 				      * per line.
 				      */
-//    void print (std::ostream &out) const;
+    void print (std::ostream &out) const;
 
 				     /**
 				      * Print the matrix in the usual
@@ -1574,33 +1584,61 @@ SparseMatrixEZ<number>::add_scaled (const number factor,
 
 template<typename number>
 template <class MATRIXA, class MATRIXB>
-void
+inline void
 SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
-				       const MATRIXB& B)
+				       const MATRIXB& B,
+				       bool transpose)
 {
 // Compute the result
 // r_ij = \sum_kl b_ik b_jl a_kl
+
+//    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
+//    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+//    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
+//    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
   
   typename MATRIXB::const_iterator b1 = B.begin();
-  typename MATRIXB::const_iterator b2 = B.begin();
   const typename MATRIXB::const_iterator b_final = B.end();
-  while (b1 != b_final)
-    {
-      const unsigned int i = b1->row();
-      const unsigned int k = b1->column();
-      while (b2 != b_final)
-	{
-	  const unsigned int j = b2->row();
-	  const unsigned int l = b2->column();
-	  
-	  const typename MATRIXA::value_type a = A.el(k,l);
-	  
-	  if (a != 0.)
-	    add (i, j, a * b1->value() * b2->value());
-	  ++b2;
-	}
-      ++b1;
-    }
+  if (transpose)
+    while (b1 != b_final)
+      {
+	const unsigned int i = b1->column();
+	const unsigned int k = b1->row();
+	typename MATRIXB::const_iterator b2 = B.begin();
+	while (b2 != b_final)
+	  {
+	    const unsigned int j = b2->column();
+	    const unsigned int l = b2->row();
+	    
+	    const typename MATRIXA::value_type a = A.el(k,l);
+	    
+	    if (a != 0.)
+	      add (i, j, a * b1->value() * b2->value());
+	    ++b2;
+	  }
+	++b1;
+      }
+  else
+    while (b1 != b_final)
+      {
+	const unsigned int i = b1->row();
+	const unsigned int k = b1->column();
+	typename MATRIXB::const_iterator b2 = B.begin();
+	while (b2 != b_final)
+	  {
+	    const unsigned int j = b2->row();
+	    const unsigned int l = b2->column();
+	    
+	    const typename MATRIXA::value_type a = A.el(k,l);
+	    
+	    if (a != 0.)
+	      {
+		add (i, j, a * b1->value() * b2->value());
+	      }
+	    ++b2;
+	  }
+	++b1;
+      }
 }
 
 
