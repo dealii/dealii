@@ -4715,6 +4715,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
 	struct X {
+            X ();
 	  private:
 	    static int f();
 
