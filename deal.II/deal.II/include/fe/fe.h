@@ -41,10 +41,70 @@ template <int dim> class Quadrature;
   $dx dy$ from the real to the unit cell, we have to take the determinant of
   the inverse matrix, which is the reciprocal value of the determinant of the
   matrix defined above.
+
+  The #FEValues# object keeps track of those fields which really need to
+  be computed, since the computation of the gradients of the ansatz functions
+  on each real cell can be quite an expensive thing if it is not needed. The
+  object knows about which fields are needed by the #UpdateStruct# object
+  passed through the constructor. In debug mode, the accessor functions, which
+  return values from the different fields, check whether the required field
+  was initialized, thus avoiding use of unitialized data.
   */
 template <int dim>
 class FEValues {
   public:
+				     /**
+				      * Provide a structure which tells the
+				      * #reinit# function, which fields are
+				      * to be updated for each cell. E.g. if
+				      * you do not need the gradients since
+				      * you want to assemble the mass matrix,
+				      * you can switch that off. By default,
+				      * all flags are off, i.e. no
+				      * reinitialization will be done.
+				      *
+				      * A structure of this type has to be
+				      * passed to the constructor of the
+				      * #FEValues# object. 
+				      */
+    struct UpdateStruct {
+					 /**
+					  * Constructor. Sets all fields to
+					  * false.
+					  */
+	UpdateStruct ();
+					 /**
+					  * Compute quadrature points in real
+					  * space (not on unit cell).
+					  */
+	bool update_q_points;
+					 /**
+					  * Transform gradients on unit cell to
+					  * gradients on real cell.
+					  */
+	bool update_gradients;
+					 /**
+					  * Compute jacobian matrices of the
+					  * transform between unit and real cell
+					  * in the evaluation points.
+					  */
+	bool update_jacobians;
+					 /**
+					  * Compute the JxW values (Jacobian
+					  * determinant at the quadrature point
+					  * times the weight of this point).
+					  */
+	bool update_JxW_values;
+					 /**
+					  * Compute the points on the real cell
+					  * on which the ansatz functions are
+					  * located.
+					  */
+	bool update_ansatz_points;
+    };
+
+    
+    
 				     /**
 				      * Number of quadrature points.
 				      */
@@ -63,7 +123,8 @@ class FEValues {
 				      * quadrature rule.
 				      */
     FEValues (const FiniteElement<dim> &,
-	      const Quadrature<dim> &);
+	      const Quadrature<dim> &,
+	      const UpdateStruct &);
 
 				     /**
 				      * Return the value of the #i#th shape
@@ -147,6 +208,14 @@ class FEValues {
 		    int, int,
 		    << "The index " << arg1
 		    << " is out of range, it should be less than " << arg2);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcAccessToUninitializedField);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcCannotInitializeField);
     
   private:
 				     /**
@@ -226,6 +295,12 @@ class FEValues {
 				      * is set each time #reinit# is called.
 				      */
     vector<dFMatrix>     jacobi_matrices;
+
+				     /**
+				      * Store which fields are to be updated by
+				      * the reinit function.
+				      */
+    UpdateStruct         update_flags;
 };
 
 
@@ -344,6 +419,14 @@ class FiniteElementBase {
 				      * elements need different transformations
 				      * of the unit cell to a real cell.
 				      *
+				      * The computation of the two fields may
+				      * share some common code, which is why we
+				      * put it in one function. However, it may
+				      * not always be necessary to really
+				      * compute both fields, so there are two
+				      * bool flags which tell the function which
+				      * of the fields to actually compute.
+				      *
 				      * Refer to the documentation of the
 				      * \Ref{FEValues} class for a definition
 				      * of the Jacobi matrix.
@@ -357,7 +440,9 @@ class FiniteElementBase {
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
-				 vector<Point<dim> > &points) const;
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &points,
+				 const bool           compute_points) const;
     
 				     /**
 				      * Comparison operator. We also check for
@@ -547,7 +632,9 @@ class FiniteElement<1> : public FiniteElementBase<1> {
     virtual void fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				 const vector<Point<1> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
-				 vector<Point<1> > &points) const;
+				 const bool         compute_jacobians,
+				 vector<Point<1> > &points,
+				 const bool         compute_points) const;
 };
 
 
@@ -667,7 +754,9 @@ class FiniteElement<2> : public FiniteElementBase<2> {
     virtual void fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				 const vector<Point<2> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
-				 vector<Point<2> > &points) const;
+				 const bool         compute_jacobians,
+				 vector<Point<2> > &points,
+				 const bool         compute_points) const;
 };
 
 
@@ -691,6 +780,7 @@ template <int dim>
 inline
 const vector<vector<Point<dim> > > &
 FEValues<dim>::get_shape_grads () const {
+  Assert (update_flags.update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
 
@@ -700,6 +790,7 @@ template <int dim>
 inline
 const vector<Point<dim> > &
 FEValues<dim>::get_quadrature_points () const {
+  Assert (update_flags.update_q_points, ExcAccessToUninitializedField());
   return quadrature_points;
 };
 
@@ -709,6 +800,7 @@ template <int dim>
 inline
 const vector<double> &
 FEValues<dim>::get_JxW_values () const {
+  Assert (update_flags.update_JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
 };
 

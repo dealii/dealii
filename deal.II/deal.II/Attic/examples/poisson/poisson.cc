@@ -131,14 +131,14 @@ int main () {
 //  tria.create_hyper_ball(Point<2>(2,3),4);
 //  tria.set_boundary (&boundary);
   
-/*  tria.refine_global (1);
-  (--tria.last_active())->set_refine_flag();
-  tria.execute_refinement ();
-  tria.begin_active(2)->set_refine_flag();
-  tria.execute_refinement ();
+  tria.refine_global (1);
+//  (--tria.last_active())->set_refine_flag();
+//  tria.execute_refinement ();
+//  tria.begin_active(2)->set_refine_flag();
+//  tria.execute_refinement ();
   tria.refine_global (2);
-*/
 
+/*
   const unsigned int dim=2;
   tria.refine_global (1);
 	
@@ -163,7 +163,7 @@ int main () {
       tria.execute_refinement ();
     };
   tria.refine_global (1);
-  
+*/
 
   cout << "Distributing dofs... "; 
   dof.distribute_dofs (fe);

@@ -45,10 +45,11 @@ ProblemBase<dim>::~ProblemBase () {};
 
 
 template <int dim>
-void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
-				 const Quadrature<dim>    &quadrature,
-				 const FiniteElement<dim> &fe,
-				 const DirichletBC        &dirichlet_bc) {
+void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
+				 const Quadrature<dim>             &quadrature,
+				 const FiniteElement<dim>          &fe,
+				 const FEValues<dim>::UpdateStruct &update_flags,
+				 const DirichletBC                 &dirichlet_bc) {
   system_sparsity.reinit (dof_handler->n_dofs(),
 			  dof_handler->n_dofs(),
 			  dof_handler->max_couplings_between_dofs());
@@ -66,18 +67,18 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // reinit solution vector, preset
 				   // with zeroes.
   solution.reinit (dof_handler->n_dofs());
-
+  
 				   // create assembler
   AssemblerData<dim> data (*dof_handler,
 			   true, true, //assemble matrix and rhs
 			   *this,
 			   quadrature,
-			   fe);
+			   fe,
+			   update_flags);
   TriaActiveIterator<dim, Assembler<dim> > assembler (tria,
 						      tria->begin_active()->level(),
 						      tria->begin_active()->index(),
 						      &data);
-
 				   // loop over all cells, fill matrix and rhs
   do 
     {
@@ -128,7 +129,10 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
   difference.erase (difference.begin(), difference.end());
   difference.reserve (tria->n_cells());
 
-  FEValues<dim> fe_values(fe, q);
+  FEValues<dim>::UpdateStruct update_flags;
+  update_flags.update_q_points   = true;
+  update_flags.update_JxW_values = true;
+  FEValues<dim> fe_values(fe, q, update_flags);
   
 				   // loop over all cells
 				   // (we need an iterator on the triangulation for
@@ -187,9 +191,10 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 				       psi);
 					     // then subtract finite element
 					     // solution
-	    for (unsigned int j=0; j<n_dofs; ++j)
+	    const vector<double> &JxW_values = fe_values.get_JxW_values();
+	    for (unsigned int j=0; j<n_dofs; ++j) 
 	      for (unsigned int i=0; i<n_dofs; ++i)
-		psi[j] -= dof_values[i]*shape_values(i,j);
+		psi[j] -= dof_values[i]*shape_values(i,j)*JxW_values[j];
 
 					     // for L1_norm and Linfty_norm:
 					     // take absolute

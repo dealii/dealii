@@ -105,7 +105,8 @@ struct AssemblerData {
 		   const bool                assemble_rhs,
 		   ProblemBase<dim>         &problem,
 		   const Quadrature<dim>    &quadrature,
-		   const FiniteElement<dim> &fe);
+		   const FiniteElement<dim> &fe,
+		   const FEValues<dim>::UpdateStruct &update_flags);
     
 				     /**
 				      * Pointer to the dof handler object
@@ -135,6 +136,12 @@ struct AssemblerData {
 				      * object.
 				      */
     const FiniteElement<dim> &fe;
+				     /**
+				      * Store which of the fields of the
+				      * FEValues object need to be reinitialized
+				      * on each cell.
+				      */
+    const FEValues<dim>::UpdateStruct update_flags;
 };
 
 

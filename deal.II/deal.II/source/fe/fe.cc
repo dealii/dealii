@@ -7,12 +7,25 @@
 
 
 
+template <int dim>
+FEValues<dim>::UpdateStruct::UpdateStruct () :
+		update_q_points(false),
+		update_gradients(false),
+		update_jacobians(false),
+		update_JxW_values(false),
+		update_ansatz_points(false) {};
+		
+
+
+
+
 /*------------------------------- FEValues -------------------------------*/
 
 
 template <int dim>
 FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
-			 const Quadrature<dim>    &quadrature) :
+			 const Quadrature<dim>    &quadrature,
+			 const UpdateStruct       &update_flags) :
 		n_quadrature_points(quadrature.n_quadrature_points),
 		total_dofs(fe.total_dofs),
 		shape_values(fe.total_dofs, quadrature.n_quadrature_points),
@@ -25,7 +38,8 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
 		unit_quadrature_points(quadrature.n_quadrature_points, Point<dim>()),
 		jacobi_matrices (quadrature.n_quadrature_points,
-				 dFMatrix(dim,dim))
+				 dFMatrix(dim,dim)),
+		update_flags (update_flags)
 {
   for (unsigned int i=0; i<fe.total_dofs; ++i)
     for (unsigned int j=0; j<n_quadrature_points; ++j) 
@@ -61,6 +75,7 @@ FEValues<dim>::shape_grad (const unsigned int i,
 			   const unsigned int j) const {
   Assert (i<(unsigned int)shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
   Assert (j<(unsigned int)shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
+  Assert (update_flags.update_gradients, ExcAccessToUninitializedField());
 
   return shape_gradients[i][j];
 };
@@ -70,6 +85,7 @@ FEValues<dim>::shape_grad (const unsigned int i,
 template <int dim>
 const Point<dim> & FEValues<dim>::quadrature_point (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
+  Assert (update_flags.update_q_points, ExcAccessToUninitializedField());
   
   return quadrature_points[i];
 };
@@ -79,6 +95,7 @@ const Point<dim> & FEValues<dim>::quadrature_point (const unsigned int i) const 
 template <int dim>
 double FEValues<dim>::JxW (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcInvalidIndex(i, n_quadrature_points));
+  Assert (update_flags.update_JxW_values, ExcAccessToUninitializedField());
   
   return JxW_values[i];
 };
@@ -89,35 +106,50 @@ template <int dim>
 void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
 			    const FiniteElement<dim>                         &fe) {
 				   // fill jacobi matrices and real
-				   //quadrature points
-  fe.fill_fe_values (cell,
-		     unit_quadrature_points,
-		     jacobi_matrices,
-		     quadrature_points);
+				   // quadrature points
+  if (update_flags.update_jacobians || update_flags.update_q_points)
+    fe.fill_fe_values (cell,
+		       unit_quadrature_points,
+		       jacobi_matrices,
+		       update_flags.update_jacobians,
+		       quadrature_points,
+		       update_flags.update_q_points);
 
-				   // compute gradients on real element
-  for (unsigned int i=0; i<fe.total_dofs; ++i)
-    for (unsigned int j=0; j<n_quadrature_points; ++j)
-      for (unsigned int s=0; s<dim; ++s)
-	{
-	  shape_gradients[i][j](s) = 0;
-
-					   // (grad psi)_s =
-					   // (grad_{\xi\eta})_b J_{bs}
-					   // with J_{bs}=(d\xi_b)/(dx_s)
-	  for (unsigned int b=0; b<dim; ++b)
-	    shape_gradients[i][j](s)
-	      +=
-	      unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
-	};
+				   // compute gradients on real element if
+				   // requested
+  if (update_flags.update_gradients) 
+    {
+      Assert (update_flags.update_jacobians, ExcCannotInitializeField());
+      
+      for (unsigned int i=0; i<fe.total_dofs; ++i)
+	for (unsigned int j=0; j<n_quadrature_points; ++j)
+	  for (unsigned int s=0; s<dim; ++s)
+	    {
+	      shape_gradients[i][j](s) = 0;
+	      
+					       // (grad psi)_s =
+					       // (grad_{\xi\eta})_b J_{bs}
+					       // with J_{bs}=(d\xi_b)/(dx_s)
+	      for (unsigned int b=0; b<dim; ++b)
+		shape_gradients[i][j](s)
+		  +=
+		  unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
+	    };
+    };
+  
   
 				   // compute Jacobi determinants in
 				   // quadrature points.
 				   // refer to the general doc for
 				   // why we take the inverse of the
 				   // determinant
-  for (unsigned int i=0; i<n_quadrature_points; ++i)
-    JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
+  if (update_flags.update_JxW_values) 
+    {
+      Assert (update_flags.update_jacobians,
+	      ExcCannotInitializeField());
+      for (unsigned int i=0; i<n_quadrature_points; ++i)
+	JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
+    };
 };
 
 
@@ -199,7 +231,9 @@ template <int dim>
 void FiniteElementBase<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator &,
 					     const vector<Point<dim> > &,
 					     vector<dFMatrix> &,
-					     vector<Point<dim> > &) const {
+					     const bool,
+					     vector<Point<dim> > &,
+					     const bool) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
@@ -219,14 +253,18 @@ bool FiniteElement<1>::operator == (const FiniteElement<1> &f) const {
 void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				       const vector<Point<1> > &unit_points,
 				       vector<dFMatrix>  &jacobians,
-				       vector<Point<1> > &points) const {
+				       const bool         compute_jacobians,
+				       vector<Point<1> > &points,
+				       const bool         compute_points) const {
 				   // local mesh width
   const double h=(cell->vertex(1)(0) - cell->vertex(0)(0));
 
   for (unsigned int i=0; i<points.size(); ++i) 
     {
-      jacobians[i](0,0) = 1./h;
-      points[i] = cell->vertex(0) + h*unit_points[i];
+      if (compute_jacobians)
+	jacobians[i](0,0) = 1./h;
+      if (compute_points)
+	points[i] = cell->vertex(0) + h*unit_points[i];
     };
 };
 
@@ -244,7 +282,9 @@ bool FiniteElement<2>::operator == (const FiniteElement<2> &f) const {
 void FiniteElement<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				       const vector<Point<2> > &,
 				       vector<dFMatrix> &,
-				       vector<Point<2> > &) const {
+				       const bool,
+				       vector<Point<2> > &,
+				       const bool) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
@@ -253,6 +293,9 @@ void FiniteElement<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 
 
 /*------------------------------- Explicit Instantiations -------------*/
+
+template struct FEValues<1>::UpdateStruct;
+template struct FEValues<2>::UpdateStruct;
 
 template class FEValues<1>;
 template class FEValues<2>;

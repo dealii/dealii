@@ -50,13 +50,15 @@ AssemblerData<dim>::AssemblerData (const DoFHandler<dim>   &dof,
 				   const bool               assemble_rhs,
 				   ProblemBase<dim>         &problem,
 				   const Quadrature<dim>    &quadrature,
-				   const FiniteElement<dim> &fe) :
+				   const FiniteElement<dim> &fe,
+				   const FEValues<dim>::UpdateStruct &update_flags) :
 		dof(dof),
 		assemble_matrix(assemble_matrix),
 		assemble_rhs(assemble_rhs),
 		problem(problem),
 		quadrature(quadrature),
-		fe(fe) {};
+		fe(fe),
+		update_flags(update_flags) {};
 
 
 
@@ -75,7 +77,8 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 		problem (((AssemblerData<dim>*)local_data)->problem),
 		fe(((AssemblerData<dim>*)local_data)->fe),
 		fe_values (((AssemblerData<dim>*)local_data)->fe,
-			   ((AssemblerData<dim>*)local_data)->quadrature)
+			   ((AssemblerData<dim>*)local_data)->quadrature,
+			   ((AssemblerData<dim>*)local_data)->update_flags)
 {
   Assert ((unsigned int)problem.system_matrix.m() == dof_handler->n_dofs(),
 	  ExcInvalidData());

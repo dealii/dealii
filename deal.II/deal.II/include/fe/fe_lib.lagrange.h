@@ -70,7 +70,9 @@ class FELinear : public FiniteElement<dim> {
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
-				 vector<Point<dim> > &points) const;
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &points,
+				 const bool           compute_points) const;
 };
 
 
@@ -129,7 +131,9 @@ class FEQuadratic : public FiniteElement<dim> {
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
-				 vector<Point<dim> > &points) const;
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &points,
+				 const bool           compute_points) const;
 };
 
 
@@ -188,7 +192,9 @@ class FECubic : public FiniteElement<dim> {
     virtual void fill_fe_values (const Triangulation<dim>::cell_iterator &cell,
 				 const vector<Point<dim> >               &unit_points,
 				 vector<dFMatrix>    &jacobians,
-				 vector<Point<dim> > &points) const;
+				 const bool           compute_jacobians,
+				 vector<Point<dim> > &points,
+				 const bool           compute_points) const;
 };
 
 

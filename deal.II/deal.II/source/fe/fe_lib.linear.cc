@@ -79,9 +79,13 @@ FELinear<1>::shape_grad(const unsigned int i,
 void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				  const vector<Point<1> >               &unit_points,
 				  vector<dFMatrix>  &jacobians,
-				  vector<Point<1> > &points) const {
+				  const bool         compute_jacobians,
+				  vector<Point<1> > &points,
+				  const bool         compute_points) const {
 				   // simply pass down
-  FiniteElement<1>::fill_fe_values (cell, unit_points, jacobians, points);
+  FiniteElement<1>::fill_fe_values (cell, unit_points,
+				    jacobians, compute_jacobians,
+				    points, compute_points);
 };
 
 
@@ -227,32 +231,37 @@ FELinear<2>::shape_grad (const unsigned int i,
 void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				  const vector<Point<2> >               &unit_points,
 				  vector<dFMatrix>  &jacobians,
-				  vector<Point<2> > &points) const {
+				  const bool         compute_jacobians,
+				  vector<Point<2> > &points,
+				  const bool         compute_points) const {
   const unsigned int dim=2;
   const unsigned int n_vertices=4;
   unsigned int n_points=unit_points.size();
 
-				   // recomputation of values
   Point<dim> vertices[n_vertices];
   for (unsigned int l=0; l<n_vertices; ++l)
     vertices[l] = cell->vertex(l);
   
+
+  if (compute_points) 
+    {
+				       // initialize points to zero
+      for (unsigned int i=0; i<n_points; ++i)
+	points[i] = Point<dim> ();
+      
+				       // note: let x_l be the vector of the
+				       // lth quadrature point in real space and
+				       // xi_l that on the unit cell, let further
+				       // p_j be the vector of the jth vertex
+				       // of the cell in real space and
+				       // N_j(xi_l) be the value of the associated
+				       // basis function at xi_l, then
+				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
+      for (unsigned int j=0; j<n_vertices; ++j) 
+	for (unsigned int l=0; l<n_points; ++l) 
+	  points[l] += vertices[j] * shape_value(j, unit_points[l]);
+    };
   
-				   // initialize points to zero
-  for (unsigned int i=0; i<n_points; ++i)
-    points[i] = Point<dim> ();
-  
-				   // note: let x_l be the vector of the
-				   // lth quadrature point in real space and
-				   // xi_l that on the unit cell, let further
-				   // p_j be the vector of the jth vertex
-				   // of the cell in real space and
-				   // N_j(xi_l) be the value of the associated
-				   // basis function at xi_l, then
-				   // x_l(xi_l) = sum_j p_j N_j(xi_l)
-  for (unsigned int j=0; j<n_vertices; ++j) 
-    for (unsigned int l=0; l<n_points; ++l) 
-      points[l] += vertices[j] * shape_value(j, unit_points[l]);
 
 /* jacobi matrices: compute d(x)/d(xi) and invert this
    Let M(l) be the inverse of J at the quadrature point l, then
@@ -272,24 +281,27 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
   However, we rewrite the loops to only compute the gradient once for
   each integration point and basis function.
 */
-  dFMatrix M(dim,dim);
-  for (unsigned int l=0; l<n_points; ++l) 
+  if (compute_jacobians) 
     {
-      M.clear ();
-      for (unsigned int s=0; s<n_vertices; ++s)
+      dFMatrix M(dim,dim);
+      for (unsigned int l=0; l<n_points; ++l) 
 	{
-					   // we want a linear transform and
-					   // if we prepend the class name in
-					   // front of the #shape_grad#, we
-					   // need not use virtual function
-					   // calls.
-	  const Point<dim> gradient
-	    = FELinear<dim>::shape_grad (s, unit_points[l]);
-	  for (unsigned int i=0; i<dim; ++i)
-	    for (unsigned int j=0; j<dim; ++j)
-	      M(i,j) += vertices[s](i) * gradient(j);
+	  M.clear ();
+	  for (unsigned int s=0; s<n_vertices; ++s)
+	    {
+					       // we want a linear transform and
+					       // if we prepend the class name in
+					       // front of the #shape_grad#, we
+					       // need not use virtual function
+					       // calls.
+	      const Point<dim> gradient
+		= FELinear<dim>::shape_grad (s, unit_points[l]);
+	      for (unsigned int i=0; i<dim; ++i)
+		for (unsigned int j=0; j<dim; ++j)
+		  M(i,j) += vertices[s](i) * gradient(j);
+	    };
+	  jacobians[l].invert(M);
 	};
-      jacobians[l].invert(M);
     };
 };
 
@@ -306,9 +318,13 @@ FEQuadratic<1>::FEQuadratic () :
 void FEQuadratic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				     const vector<Point<1> >               &unit_points,
 				     vector<dFMatrix>  &jacobians,
-				     vector<Point<1> > &points) const {
+				     const bool         compute_jacobians,
+				     vector<Point<1> > &points,
+				     const bool         compute_points) const {
 				   // simply pass down
-  FiniteElement<1>::fill_fe_values (cell, unit_points, jacobians, points);
+  FiniteElement<1>::fill_fe_values (cell, unit_points,
+				    jacobians, compute_jacobians,
+				    points, compute_points);
 };
 
 
@@ -355,7 +371,9 @@ FEQuadratic<dim>::shape_grad (const unsigned int i,
 void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				     const vector<Point<2> >               &,
 				     vector<dFMatrix>  &,
-				     vector<Point<2> > &) const {
+				     const bool,
+				     vector<Point<2> > &,
+				     const bool) const {
   Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
 
@@ -372,9 +390,13 @@ FECubic<1>::FECubic () :
 void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				 const vector<Point<1> >               &unit_points,
 				 vector<dFMatrix>  &jacobians,
-				 vector<Point<1> > &points) const {
+				 const bool         compute_jacobians,
+				 vector<Point<1> > &points,
+				 const bool          compute_points) const {
 				   // simply pass down
-  FiniteElement<1>::fill_fe_values (cell, unit_points, jacobians, points);
+  FiniteElement<1>::fill_fe_values (cell, unit_points,
+				    jacobians, compute_jacobians,
+				    points, compute_points);
 };
 
 
@@ -413,7 +435,9 @@ FECubic<dim>::shape_grad (const unsigned int i,
 void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				 const vector<Point<2> >               &,
 				 vector<dFMatrix>  &,
-				 vector<Point<2> > &) const {
+				 const bool,
+				 vector<Point<2> > &,
+				 const bool) const {
   Assert (false, typename FiniteElementBase<2>::ExcNotImplemented());
 };
 
