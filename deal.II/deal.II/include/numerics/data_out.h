@@ -634,6 +634,15 @@ class DataOut : public DataOut_DoFData<dim,dim>
     
   private:
 				     /**
+				      * Define a map from cell
+				      * iterators to patch iterators
+				      * for finding neighbors.
+				      */
+    typedef map<typename DoFHandler<dim>::cell_iterator,
+      typename std::vector<typename DataOutBase::Patch<dim> >::iterator>
+      PatchMap;
+    
+				     /**
 				      * All data needed in one thread
 				      * is gathered in the struct
 				      * Data.
@@ -650,6 +659,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 	unsigned int n_subdivisions;
 	std::vector<double>          patch_values;
 	std::vector<Vector<double> > patch_values_system;
+	PatchMap* patch_map;
 	Data ()
 	  {}
     };

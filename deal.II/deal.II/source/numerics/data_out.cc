@@ -361,6 +361,10 @@ void DataOut<dim>::build_some_patches (Data data)
   for (;cell != dofs->end();)
     {
       Assert (patch != patches.end(), ExcInternalError());
+
+				       // Insert cell-patch pair into
+				       // map for neighbors
+      data.patch_map->insert(typename PatchMap::value_type(cell, patch));
       
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 	patch->vertices[vertex] = cell->vertex(vertex);
@@ -467,7 +471,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      std::vector<DataOutBase::Patch<dim> > dummy;
+      typename std::vector<DataOutBase::Patch<dim> > dummy;
       patches.swap (dummy);
     };
   
@@ -480,6 +484,9 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
        cell = next_cell(cell))
     ++n_patches;
 
+  
+  PatchMap patch_map;
+    
   std::vector<Data> thread_data(n_threads);
 
 				   // init data for the threads
@@ -490,6 +497,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
       thread_data[i].n_components   = n_components;
       thread_data[i].n_datasets     = n_datasets;
       thread_data[i].n_subdivisions = n_subdivisions;
+      thread_data[i].patch_map      = &patch_map;
       thread_data[i].patch_values.resize (n_q_points);
       thread_data[i].patch_values_system.resize (n_q_points);
       
@@ -522,6 +530,67 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 #else
   build_some_patches(thread_data[0]);
 #endif
+//TODO: New code for neighbors: Parallelize?
+
+				   // First, number patches
+				   // consecutively.
+  unsigned int patch_no = 0;
+  typename std::vector<typename DataOutBase::Patch<dim> >::iterator patch;
+  for (patch = patches.begin(); patch != patches.end(); ++patch)
+    patch->me = patch_no++;
+
+				   // Traverse the map of cells
+				   // created in build_some_patches
+				   // and enter numbers of neighboring
+				   // patches on the same level.
+  typename PatchMap::iterator map_entry;
+  for (map_entry = patch_map.begin(); map_entry != patch_map.end(); ++map_entry)
+    {
+      typename DoFHandler<dim>::cell_iterator cell = map_entry->first;
+      patch = map_entry->second;
+
+      for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	{
+	  if (cell->at_boundary(i))
+	    continue;
+	  typename DoFHandler<dim>::cell_iterator
+	    neighbor = cell->neighbor(i);
+	  if (cell->level() != neighbor->level())
+	    continue;
+	  typename PatchMap::iterator
+	    neighbor_entry = patch_map.find(neighbor);
+	  if (neighbor_entry == patch_map.end())
+	    continue;
+	  typename std::vector<typename DataOutBase::Patch<dim> >::iterator
+	    neighbor_patch = neighbor_entry->second;
+	  
+	  switch (dim)
+	    {
+	      case 2:
+		switch (i)
+		  {
+		    case 0: patch->neighbors[2] = neighbor_patch->me; break;
+		    case 1: patch->neighbors[1] = neighbor_patch->me; break;
+		    case 2: patch->neighbors[3] = neighbor_patch->me; break;
+		    case 3: patch->neighbors[0] = neighbor_patch->me; break;
+		  }
+		break;
+	      case 3:
+		switch (i)
+		  {
+		    case 0: patch->neighbors[2] = neighbor_patch->me; break;
+		    case 1: patch->neighbors[3] = neighbor_patch->me; break;
+		    case 2: patch->neighbors[4] = neighbor_patch->me; break;
+		    case 3: patch->neighbors[1] = neighbor_patch->me; break;
+		    case 4: patch->neighbors[5] = neighbor_patch->me; break;
+		    case 5: patch->neighbors[0] = neighbor_patch->me; break;
+		  }
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
+	}
+    }
 };
 
 

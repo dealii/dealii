@@ -32,10 +32,15 @@ using namespace std;
 
 template <int dim, int spacedim>
 DataOutBase::Patch<dim,spacedim>::Patch () :
+		me(no_neighbor),
 		n_subdivisions (1)
+
 				   // all the other data has a
 				   // constructor of its own
 {
+  for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+    neighbors[i] = no_neighbor;
+  
   Assert (dim<=spacedim, ExcInvalidCombinationOfDimensions(dim,spacedim));
   Assert (spacedim<=3, ExcNotImplemented());
 };
@@ -469,7 +474,7 @@ void DataOutBase::write_ucd (const typename std::vector<Patch<dim,spacedim> > &p
 template <int dim, int spacedim>
 void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &patches,
 			    const std::vector<std::string>          &data_names,
-			    const DXFlags                           &/*flags*/,
+			    const DXFlags                           &flags,
 			    std::ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
@@ -508,8 +513,10 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 	      Assert (false, ExcNotImplemented());
       };
 
-				   // start with vertices
-  out << "object 1 class array type float rank 1 shape " << spacedim << " items " << n_nodes << " data follows"
+				   // start with vertices order is
+				   // lexicographical, x varying
+				   // fastest
+  out << "object \"vertices\" class array type float rank 1 shape " << spacedim << " items " << n_nodes << " data follows"
       << std::endl;
 
 				   ///////////////////////////////
@@ -613,7 +620,7 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 
 				   /////////////////////////////////////////
 				   // write cells
-  out << "object 2 class array type int rank 1 shape " << GeometryInfo<dim>::vertices_per_cell
+  out << "object \"cells\" class array type int rank 1 shape " << GeometryInfo<dim>::vertices_per_cell
       << " items " << n_cells << " data follows"
       << std::endl;
   
@@ -644,8 +651,8 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 		  for (unsigned int j=0; j<n_subdivisions; ++j)
 		    {
 		      out << first_vertex_of_patch+i*(n_subdivisions+1)+j << '\t'
-			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << '\t'
 			  << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << '\t'
+			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << '\t'
 			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1
 			  << std::endl;
 		    };
@@ -706,12 +713,134 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
   if (dim==3) out << "cubes";
   out << "\"" << std::endl
       << "attribute \"ref\" string \"positions\"" << std::endl;
-  
+
+//TODO:[GK] Patches must be of same size!
+				   /////////////////////////////
+				   // write neighbor information
+  if (flags.write_neighbors)
+    {
+      out << "object \"neighbors\" class array type int rank 1 shape "
+	  << GeometryInfo<dim>::faces_per_cell
+	  << " items " << n_cells
+	  << " data follows";
+
+      for (typename std::vector<Patch<dim,spacedim> >::const_iterator
+	     patch=patches.begin();
+	   patch!=patches.end(); ++patch)
+	{
+	  const unsigned int n = patch->n_subdivisions;
+	  const unsigned int cells_per_patch
+	    = n
+	    * ((dim>1) ? n : 1)
+	    * ((dim>2) ? n : 1);
+	  const unsigned int patch_start = patch->me * cells_per_patch;
+
+	  for (unsigned int ix=0;ix<n;++ix)
+	    for (unsigned int iy=0;iy<((dim>1) ? n : 1);++iy)
+	      for (unsigned int iz=0;iz<((dim>2) ? n : 1);++iz)
+		{
+		  const unsigned int nx = ix*n;
+		  const unsigned int ny = iy;
+		  const unsigned int nz = iz*n*n;
+
+		  out << std::endl;
+						   // Direction -x
+						   // Last cell in row
+						   // of other patch
+		  if (ix==0)
+		    {
+		      const unsigned int nn = patch->neighbors[0];
+		      out << '\t';
+		      if (nn != patch->no_neighbor)
+			out << (nn*cells_per_patch+ny+nz+n*(n-1));
+		      else
+			out << "-1";
+		    } else {      
+		      out << '\t'
+			  << patch_start+nx-n+ny+nz;
+		    }
+						       // Direction +x
+						       // First cell in row
+						       // of other patch
+		  if (ix == n-1)
+		    {
+		      const unsigned int nn = patch->neighbors[1];
+		      out << '\t';
+		      if (nn != patch->no_neighbor)
+			out << (nn*cells_per_patch+ny+nz);
+		      else
+			out << "-1";
+		    } else {
+		      out << '\t'
+			  << patch_start+nx+n+ny+nz;
+		    }
+		  if (dim<2)
+		    continue;
+						   // Direction -y
+		  if (iy==0)
+		    {
+		      const unsigned int nn = patch->neighbors[2];
+		      out << '\t';
+		      if (nn != patch->no_neighbor)
+			out << (nn*cells_per_patch+nx+nz+1*(n-1));
+		      else
+			out << "-1";
+		    } else {      
+		      out << '\t'
+			  << patch_start+nx+ny-1+nz;
+		    }
+						   // Direction +y
+		  if (iy == n-1)
+		    {
+		      const unsigned int nn = patch->neighbors[3];
+		      out << '\t';
+		      if (nn != patch->no_neighbor)
+			out << (nn*cells_per_patch+nx+nz);
+		      else
+			out << "-1";
+		    } else {
+		      out << '\t'
+			  << patch_start+nx+ny+1+nz;
+		    }
+		  if (dim<3)
+		    continue;
+		  
+						   // Direction -z
+		  if (iz==0)
+		    {
+		      const unsigned int nn = patch->neighbors[4];
+		      out << '\t';
+		      if (nn != patch->no_neighbor)
+			out << (nn*cells_per_patch+nx+ny+n*n*(n-1));
+		      else
+			out << "-1";
+		    } else {      
+		      out << '\t'
+			  << patch_start+nx+ny+nz-n*n;
+		    }
+						   // Direction +z
+		  if (iz == n-1)
+		    {
+		      const unsigned int nn = patch->neighbors[4];
+		      out << '\t';
+		      if (nn != patch->no_neighbor)
+			out << (nn*cells_per_patch+nx+ny);
+		      else
+			out << "-1";
+		    } else {
+		      out << '\t'
+			  << patch_start+nx+ny+nz+n*n;
+		    }
+		}
+	  out << std::endl;	  
+	}
+    }
 				   /////////////////////////////
 				   // now write data
   if (n_data_sets != 0)
     {      
-      out << "object 3 class array type float rank 1 shape " << n_data_sets
+      out << "object \"data\" class array type float rank 1 shape "
+	  << n_data_sets
 	  << " items " << n_nodes << " data follows" << std::endl;
 
 				       // loop over all patches
@@ -780,16 +909,19 @@ void DataOutBase::write_dx (const typename std::vector<Patch<dim,spacedim> > &pa
 	};
       out << "attribute \"dep\" string \"positions\"" << std::endl;
     } else {
-      out << "object 3 class constantarray type float rank 0 items " << n_nodes << " data follows"
+      out << "object \"data\" class constantarray type float rank 0 items " << n_nodes << " data follows"
 	  << std::endl << '0' << std::endl;
     }
   
 				   // no model data
   
   out << "object \"deal data\" class field" << std::endl
-      << "component \"positions\" value 1" << std::endl
-      << "component \"connections\" value 2" << std::endl
-      << "component \"data\" value 3" << std::endl;
+      << "component \"positions\" value \"vertices\"" << std::endl
+      << "component \"connections\" value \"cells\"" << std::endl
+      << "component \"data\" value \"data\"" << std::endl;
+
+  if (flags.write_neighbors)
+    out << "component \"neighbors\" value \"neighbors\"" << std::endl;
 
   if (true)
     {

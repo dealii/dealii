@@ -32,14 +32,26 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 {};
 
 
+DataOutBase::DXFlags::DXFlags (const bool write_multigrid,
+			       const bool write_neighbors) :
+		write_multigrid(write_multigrid),
+		write_neighbors(write_neighbors)
+{}
 
-void DataOutBase::DXFlags::declare_parameters (ParameterHandler &/*prm*/)
-{};
+
+void DataOutBase::DXFlags::declare_parameters (ParameterHandler &prm)
+{
+  prm.declare_entry ("Write multigrid", "true", Patterns::Bool());
+  prm.declare_entry ("Write neighbors", "true", Patterns::Bool());
+};
 
 
 
-void DataOutBase::DXFlags::parse_parameters (ParameterHandler &/*prm*/)
-{};
+void DataOutBase::DXFlags::parse_parameters (ParameterHandler &prm)
+{
+  write_multigrid = prm.get_bool ("Write multigrid");
+  write_neighbors = prm.get_bool ("Write neighbors");
+};
 
 
 

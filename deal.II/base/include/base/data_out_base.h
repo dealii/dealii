@@ -480,6 +480,11 @@ class DataOutBase
 	unsigned int memory_consumption () const;
 	
 					 /**
+					  * Value for no neighbor.
+					  */
+	static const unsigned int no_neighbor = static_cast<unsigned int>(-1);
+	
+					 /**
 					  * Exception
 					  */
 	DeclException2 (ExcInvalidCombinationOfDimensions,
@@ -497,18 +502,23 @@ class DataOutBase
 				      */
     struct DXFlags 
     {
-      private:
 					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * @p{private} as well).
+					  * Write in multigrid format.
+					  * This will be necessary to
+					  * get streamlines right on
+					  * locally refined grids.
 					  */
-	int dummy;
-
-      public:
+	bool write_multigrid;
+					 /**
+					  * Write neighbor information.
+					  */
+	bool write_neighbors;
+					 /**
+					  * Constructor.
+					  */
+	DXFlags (const bool write_multigrid = false,
+		 const bool write_neighbors = false);
+public:
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
@@ -1373,6 +1383,7 @@ class DataOutBase
     static void
     write_gmv_reorder_data_vectors (const typename std::vector<Patch<dim,spacedim> > &patches,
 				    std::vector<std::vector<double> >       &data_vectors);
+
 };
 
 
