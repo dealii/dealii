@@ -800,6 +800,16 @@ class DoFTools
 				      * asymptotically vanishing as we refine
 				      * the mesh as long as the number of
 				      * partitions is kept constant.
+				      *
+				      * This function returns the association
+				      * of each DoF with one subdomain. If you
+				      * are looking for the association of
+				      * each @em cell with a subdomain, either
+				      * query the
+				      * <tt>cell->subdomain_id()</tt>
+				      * function, or use the
+				      * <tt>GridTools::get_subdomain_association</tt>
+				      * function.
                                       */
     template <int dim>
     static void
@@ -821,6 +831,13 @@ class DoFTools
                                       * This function will generate an
                                       * exception if there are no cells with
                                       * the given @p subdomain index.
+				      *
+				      * This function returns the number of
+				      * DoFs associated with one subdomain. If
+				      * you are looking for the association of
+				      * @em cells with this subdomain, use the
+				      * <tt>GridTools::count_cells_with_subdomain_association</tt>
+				      * function.
                                       */
     template <int dim>
     static unsigned int
