@@ -22,8 +22,8 @@
 
 
 // forward declaration
-template <unsigned int N, typename T> class TableBase;
-template <unsigned int N, typename T> class Table;
+template <int N, typename T> class TableBase;
+template <int N, typename T> class Table;
 template <typename T> class Table<1,T>;
 template <typename T> class Table<2,T>;
 template <typename T> class Table<3,T>;
@@ -42,7 +42,7 @@ template <typename T> class Table<6,T>;
  *
  * @author Wolfgang Bangerth, 2002
  */
-template <unsigned int N>
+template <int N>
 class TableIndicesBase
 {
   public:
@@ -298,7 +298,7 @@ namespace TableBaseAccessors
  * indicating constness of the table for which accessor objects are to
  * be generated in this namespace.
  */
-  template <unsigned int N, typename T, bool Constness>
+  template <int N, typename T, bool Constness>
   class Types
   {};
 
@@ -307,7 +307,7 @@ namespace TableBaseAccessors
  * template parameters. Specialization for accessors to constant
  * objects.
  */
-  template <unsigned int N, typename T> struct Types<N,T,true> 
+  template <int N, typename T> struct Types<N,T,true> 
   {
       typedef const T value_type;
       typedef const TableBase<N,T> TableType;
@@ -318,7 +318,7 @@ namespace TableBaseAccessors
  * template parameters. Specialization for accessors to non-constant
  * objects.
  */
-  template <unsigned int N, typename T> struct Types<N,T,false> 
+  template <int N, typename T> struct Types<N,T,false> 
   {
       typedef T value_type;
       typedef TableBase<N,T> TableType;
@@ -363,7 +363,7 @@ namespace TableBaseAccessors
  * 
  * @author Wolfgang Bangerth, 2002
  */
-  template <unsigned int N, typename T, bool C, unsigned int P>
+  template <int N, typename T, bool C, unsigned int P>
   class Accessor
   {
     public:
@@ -450,7 +450,7 @@ namespace TableBaseAccessors
                                        // compilers
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG      
       template <int N1, typename T1> friend class Table;
-      template <unsigned int N1, typename T1, bool C1, unsigned int P1>
+      template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
 #else
       friend class Accessor<N,T,C,P+1>;
@@ -469,7 +469,7 @@ namespace TableBaseAccessors
  *
  * @author Wolfgang Bangerth, 2002
  */
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   class Accessor<N,T,C,1>
   {
     public:
@@ -599,8 +599,8 @@ namespace TableBaseAccessors
                                        // work around bugs in some
                                        // compilers
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
-      template <unsigned int N1, typename T1> friend class Table;
-      template <unsigned int N1, typename T1, bool C1, unsigned int P1>
+      template <int N1, typename T1> friend class Table;
+      template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
 #else
       friend class Accessor<N,T,C,2>;
@@ -686,7 +686,7 @@ namespace TableBaseAccessors
  * 
  * @author Wolfgang Bangerth, 2002.
  */
-template <unsigned int N, typename T>
+template <int N, typename T>
 class TableBase : public Subscriptor
 {
   public:
@@ -931,7 +931,7 @@ class TableBase : public Subscriptor
  * 
  * @author Wolfgang Bangerth, 2002
  */
-template <unsigned int N,typename T>
+template <int N,typename T>
 class Table : public TableBase<N,T>
 {};
 
@@ -1535,7 +1535,7 @@ class Table<6,T> : public TableBase<6,T>
 /* --------------------- Template and inline functions ---------------- */
 
 
-template <unsigned int N>
+template <int N>
 inline
 unsigned int
 TableIndicesBase<N>::operator [] (const unsigned int i) const 
@@ -1671,7 +1671,7 @@ TableIndices<6>::TableIndices (const unsigned int index1,
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 TableBase<N,T>::TableBase ()
                 :
                 val (0),
@@ -1680,7 +1680,7 @@ TableBase<N,T>::TableBase ()
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
                 :
                 val (0),
@@ -1691,7 +1691,7 @@ TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 TableBase<N,T>::TableBase (const TableBase<N,T> &src)
                 :
                 Subscriptor (),
@@ -1704,7 +1704,7 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 template <typename T2>
 TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
                 :
@@ -1719,7 +1719,7 @@ TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
 
 namespace TableBaseAccessors 
 {
-  template <unsigned int N, typename T, bool C, unsigned int P>
+  template <int N, typename T, bool C, unsigned int P>
   inline
   Accessor<N,T,C,P>::Accessor (const TableType &table,
                                const pointer    data)
@@ -1730,7 +1730,7 @@ namespace TableBaseAccessors
 
 
 
-  template <unsigned int N, typename T, bool C, unsigned int P>
+  template <int N, typename T, bool C, unsigned int P>
   inline
   Accessor<N,T,C,P>::Accessor (const Accessor &)
                   :
@@ -1745,7 +1745,7 @@ namespace TableBaseAccessors
   
 
   
-  template <unsigned int N, typename T, bool C, unsigned int P>
+  template <int N, typename T, bool C, unsigned int P>
   inline
   Accessor<N,T,C,P>::Accessor ()
                   :
@@ -1760,7 +1760,7 @@ namespace TableBaseAccessors
   
 
   
-  template <unsigned int N, typename T, bool C, unsigned int P>
+  template <int N, typename T, bool C, unsigned int P>
   inline
   Accessor<N,T,C,P-1>
   Accessor<N,T,C,P>::operator [] (const unsigned int i) const 
@@ -1788,7 +1788,7 @@ namespace TableBaseAccessors
 
 
 
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   Accessor<N,T,C,1>::Accessor (const TableType &table,
                                const pointer    data)
@@ -1799,7 +1799,7 @@ namespace TableBaseAccessors
 
 
 
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   Accessor<N,T,C,1>::Accessor ()
                   :
@@ -1814,7 +1814,7 @@ namespace TableBaseAccessors
   
 
 
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   Accessor<N,T,C,1>::Accessor (const Accessor &)
                   :
@@ -1829,7 +1829,7 @@ namespace TableBaseAccessors
 
 
   
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   typename Accessor<N,T,C,1>::reference
   Accessor<N,T,C,1>::operator [] (const unsigned int i) const 
@@ -1841,7 +1841,7 @@ namespace TableBaseAccessors
 
 
   
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   unsigned int
   Accessor<N,T,C,1>::size () const
@@ -1851,7 +1851,7 @@ namespace TableBaseAccessors
 
 
 
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   typename Accessor<N,T,C,1>::iterator
   Accessor<N,T,C,1>::begin () const
@@ -1861,7 +1861,7 @@ namespace TableBaseAccessors
 
 
 
-  template <unsigned int N, typename T, bool C>
+  template <int N, typename T, bool C>
   inline
   typename Accessor<N,T,C,1>::iterator
   Accessor<N,T,C,1>::end () const
@@ -1872,7 +1872,7 @@ namespace TableBaseAccessors
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline
 TableBase<N,T>::~TableBase ()
 {
@@ -1882,7 +1882,7 @@ TableBase<N,T>::~TableBase ()
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 TableBase<N,T>&
 TableBase<N,T>::operator = (const TableBase<N,T>& m) 
 {
@@ -1895,7 +1895,7 @@ TableBase<N,T>::operator = (const TableBase<N,T>& m)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 template <typename T2>
 TableBase<N,T>&
 TableBase<N,T>::operator = (const TableBase<N,T2>& m) 
@@ -1909,7 +1909,7 @@ TableBase<N,T>::operator = (const TableBase<N,T2>& m)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline
 void
 TableBase<N,T>::clear ()
@@ -1920,7 +1920,7 @@ TableBase<N,T>::clear ()
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 void
 TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
 {
@@ -1966,7 +1966,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 const TableIndices<N> &
 TableBase<N,T>::size () const
 {
@@ -1975,7 +1975,7 @@ TableBase<N,T>::size () const
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 unsigned int
 TableBase<N,T>::n_elements () const
 {
@@ -1987,7 +1987,7 @@ TableBase<N,T>::n_elements () const
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 bool
 TableBase<N,T>::empty () const
 {
@@ -1996,7 +1996,7 @@ TableBase<N,T>::empty () const
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 template <typename T2>
 inline
 void
@@ -2008,7 +2008,7 @@ TableBase<N,T>::fill (const T2* entries)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 unsigned int
 TableBase<N,T>::memory_consumption () const
 {
@@ -2016,7 +2016,7 @@ TableBase<N,T>::memory_consumption () const
 }
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline
 unsigned int
 TableBase<N,T>::position (const TableIndices<N> &indices) const 
@@ -2048,7 +2048,7 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline const T &
 TableBase<N,T>::operator() (const TableIndices<N> &indices) const
 {
@@ -2060,7 +2060,7 @@ TableBase<N,T>::operator() (const TableIndices<N> &indices) const
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline T &
 TableBase<N,T>::operator() (const TableIndices<N> &indices)
 {
@@ -2072,7 +2072,7 @@ TableBase<N,T>::operator() (const TableIndices<N> &indices)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline const T &
 TableBase<N,T>::el (const TableIndices<N> &indices) const
 {  
@@ -2081,7 +2081,7 @@ TableBase<N,T>::el (const TableIndices<N> &indices) const
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline T &
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
@@ -2090,7 +2090,7 @@ TableBase<N,T>::el (const TableIndices<N> &indices)
 
 
 
-template <unsigned int N, typename T>
+template <int N, typename T>
 inline
 const T *
 TableBase<N,T>::data () const
