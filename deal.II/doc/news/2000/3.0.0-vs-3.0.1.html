@@ -15,6 +15,14 @@
 
 <ol>
   <li> <p>
+       Fix: the triangulation class over-estimated the necessary
+       amount of memory needed upon refinement and allocated too
+       much.
+       <br>
+       (WB 2000/04/19)
+       </p>
+
+  <li> <p>
        Fix: getting the support points from system finite elements
        (class <code class="class">FESystem</code>) resulted in an
        exception. 
@@ -23,19 +31,18 @@
        </p>
 
   <li> <p>
-       Fix: the triangulation class over-estimated the necessary
-       amount of memory needed upon refinement and allocated too
-       much.
-       <br>
-       (WB 2000/04/19)
-       </p>
-
-
-  <li> <p>
        Fix: <code class="member">FullMatrix::Tmmult</code> and
        <code class="member">FullMatrix::Tvmult</code> were broken.
        <br>
        (WB 2000/05/08 and 2000/05/26)
+       </p>
+
+  <li> <p>
+       Fix: slight bug in 
+       <code class="member">DataOut::build_patches</code>
+       in multithreaded mode fixed.
+       <br>
+       (Ralf Hartmann, 2000/05/29)
        </p>
 </ol>
 
