@@ -307,6 +307,42 @@ class ThreadManager : public ACE_Thread_Manager
 {
   public:
 				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific void member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
+    template <typename Class>
+    struct Mem_Fun_Data0
+    {
+	typedef void * (Class::*MemFun) ();
+
+	typedef void (Class::*VoidMemFun) ();
+
+	Class     *object;
+	MemFun     mem_fun;
+	VoidMemFun void_mem_fun;
+
+	Mem_Fun_Data0 (Class *object,
+		       MemFun mem_fun) :
+			object (object),
+			mem_fun (mem_fun),
+			void_mem_fun (0) {};
+
+	Mem_Fun_Data0 (Class     *object,
+		       VoidMemFun void_mem_fun) :
+			object (object),
+			mem_fun (0),
+			void_mem_fun (void_mem_fun) {};
+    };
+
+    
+				     /**
 				      * This class is used to package all
 				      * data needed to call a specific unary
 				      * member function of an object. It is
@@ -1299,6 +1335,24 @@ class ThreadManager : public ACE_Thread_Manager
 				      * rather than for global functions only.
 				      *
 				      * This version is for member functions
+				      * taking no arguments.
+				      */
+    template <typename ObjectClass>
+    int spawn (Mem_Fun_Data0<ObjectClass> *mem_fun_data,
+	       long flags = THR_NEW_LWP | THR_JOINABLE,
+	       ACE_thread_t * = 0,
+	       ACE_hthread_t *t_handle = 0,
+	       long priority = ACE_DEFAULT_THREAD_PRIORITY,
+	       int grp_id = -1,
+	       void *stack = 0,
+	       size_t stack_size = 0);
+
+				     /**
+				      * Wrapper function to allow spawning
+				      * threads for member functions as well,
+				      * rather than for global functions only.
+				      *
+				      * This version is for member functions
 				      * taking a single argument.
 				      */
     template <typename ObjectClass, typename Arg>
@@ -1685,6 +1739,26 @@ class ThreadManager : public ACE_Thread_Manager
 	       int grp_id = -1,
 	       void *stack = 0,
 	       size_t stack_size = 0);
+
+				     /**
+				      * Wrapper function to allow spawning
+				      * multiple threads for member functions
+				      * as well, rather than for global
+				      * functions only.
+				      *
+				      * This version is for member functions
+				      * taking a single argument.
+				      */
+    template <typename ObjectClass>
+    int spawn_n (size_t n,
+		 Mem_Fun_Data0<ObjectClass> *mem_fun_data,
+		 long flags = THR_NEW_LWP | THR_JOINABLE,
+		 long priority = ACE_DEFAULT_THREAD_PRIORITY,
+		 int grp_id = -1,
+		 ACE_Task_Base *task = 0,
+		 ACE_hthread_t thread_handles[] = 0,
+		 void *stack[] = 0,
+		 size_t stack_size[] = 0);
 
 				     /**
 				      * Wrapper function to allow spawning
@@ -2143,6 +2217,16 @@ class ThreadManager : public ACE_Thread_Manager
 				      * requirements for thread entry points.
 				      * It takes as argument all the
 				      * information necessary to call a
+				      * void member function.
+				      */
+    template <typename Class>
+    static void * thread_entry_point0 (void *_arg);
+
+				     /**
+				      * This is a function satisfying the
+				      * requirements for thread entry points.
+				      * It takes as argument all the
+				      * information necessary to call a
 				      * unary member function.
 				      */
     template <typename Class, typename Arg>
@@ -2382,6 +2466,29 @@ class ThreadManager : public ACE_Thread_Manager
 
 
 /* ------------------------------ Template functions -------------------------------- */
+
+
+template <typename ObjectClass>
+int ThreadManager::spawn (Mem_Fun_Data0<ObjectClass> *mem_fun_data,
+			  long flags,
+			  ACE_thread_t *t,
+			  ACE_hthread_t *t_handle,
+			  long priority,
+			  int grp_id,
+			  void *stack,
+			  size_t stack_size)
+{
+  return ACE_Thread_Manager::spawn (&ThreadManager::template thread_entry_point0<ObjectClass>,
+				    (void*)mem_fun_data,
+				    flags,
+				    t,
+				    t_handle,
+				    priority,
+				    grp_id,
+				    stack,
+				    stack_size);
+};
+
 
 
 template <typename ObjectClass, typename Arg>
@@ -2894,6 +3001,31 @@ int ThreadManager::spawn (Fun_Data10<Arg1,Arg2,Arg3,Arg4,Arg5,
 				    stack,
 				    stack_size);
 };
+
+
+template <typename ObjectClass>
+int ThreadManager::spawn_n (size_t n,
+			    Mem_Fun_Data0<ObjectClass> *mem_fun_data,
+			    long flags,
+			    long priority,
+			    int grp_id,
+			    ACE_Task_Base *task,
+			    ACE_hthread_t thread_handles[],
+			    void *stack[],
+			    size_t stack_size[]) 
+{
+  return ACE_Thread_Manager::spawn_n (n,
+				      &ThreadManager::template thread_entry_point0<ObjectClass>,
+				      (void*)mem_fun_data,
+				      flags,
+				      priority,
+				      grp_id,
+				      task,
+				      thread_handles,
+				      stack,
+				      stack_size);
+};
+
 
 
 template <typename ObjectClass, typename Arg>
@@ -3432,6 +3564,29 @@ int ThreadManager::spawn_n (size_t n,
 				      stack,
 				      stack_size);
 };
+
+
+template <typename Class>
+void * ThreadManager::thread_entry_point0 (void *_arg)
+{
+				   // reinterpret the given pointer as
+				   // a pointer to the structure
+				   // containing all the necessary
+				   // information
+  Mem_Fun_Data0<Class> *arg = reinterpret_cast<Mem_Fun_Data0<Class> *>(_arg);
+
+				   // extract function pointer, object
+				   // and argument and dispatch the
+				   // call
+  if (arg->mem_fun != 0)
+    return (arg->object->*(arg->mem_fun))();
+  else
+    {
+      (arg->object->*(arg->void_mem_fun))();
+      return 0;
+    };
+};
+
 
 
 template <typename Class, typename Arg>
