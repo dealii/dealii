@@ -215,7 +215,7 @@ documentation, etc</a>.
 
 
   <li> <p>
-       Change: Sort the quadrature points of each <code
+       Changed: Sort the quadrature points of each <code
        class="class">Quadrature&lt;1&gt;</code> in ascending order. This
        actually changed the order of the points of only <code
        class="class">QGauss4</code> and <code
@@ -238,13 +238,28 @@ documentation, etc</a>.
 <h3>lac</h3>
 
 <ol>
+  <li> <p> 
+       New: The functions <code class="class">FullMatrix</code>::<code
+       class="member">mmult</code> and <code
+       class="member">Tmmult</code> now have an additional
+       <code>adding</code> argument. If this flag is
+       <code>true</code>, the matrix-matrix product is added to the
+       resulting matrix; if <code>false</code>, the resulting matrix
+       is set to (overwritten by) the matrix-matrix product. The
+       latter is the behaviour these functions had before. Hence the
+       default value is set to be <code>false</code> to ensure
+       backward compatibility.
+       <br>
+       (RH 2001/03/29)
+       </p>
+
   <li> <p>
        New: class <code class="class">SchurMatrix</code> implements
        a Schur complement for block matrices. It provides matrix-vector
        multiplication suitable for iterative methods as well as pre- and
        post-processing of right hand side and slution, respectively. 
        <br>
-       (GK 2001/02/13)
+       (GK 2001/03/22)
        </p>
 
   <li> <p>
@@ -377,13 +392,14 @@ documentation, etc</a>.
   <li> <p>
        Changed: The syntax of the <code
        class="class">FiniteElement&lt;dim&gt;</code>::<code
-       class="member">get_unit_support_points</code>
-       function is changed; it returns a reference to the vector of
-       points. These points are now computed by the constructor of the
-       <code class="class">FiniteElement</code> and not on each <code
+       class="member">get_unit_support_points</code> function is
+       changed; it returns a reference to the vector of points in lieu
+       of taking this vector as argument. The unit support points are
+       now computed by the constructor of the <code
+       class="class">FiniteElement</code> and not on each <code
        class="class">FiniteElement&lt;dim&gt;</code>::<code
-       class="member">get_unit_support_points</code>
-       function call as before.
+       class="member">get_unit_support_points</code> function call as
+       before.
        <br>
        (WB 2001/03/14)
        </p>

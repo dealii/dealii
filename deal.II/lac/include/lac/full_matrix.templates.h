@@ -575,21 +575,32 @@ void FullMatrix<number>::diagadd (const number src)
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
-				const FullMatrix<number2> &src) const
+				const FullMatrix<number2> &src,
+				const bool                 adding) const
 {
   Assert (val != 0, ExcEmptyMatrix());
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   Assert (dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert (dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
-  
-  for (unsigned int i=0; i<m(); i++)
-    for (unsigned int j=0; j<src.n(); j++)
-      {
-	number2 s = 0.;
-	for (unsigned k=0; k<n(); k++)
-	  s+= el(i,k) * src.el(k,j);
-	dst.el(i,j) = s;
-      }
+
+  if (!adding)
+    for (unsigned int i=0; i<m(); i++)
+      for (unsigned int j=0; j<src.n(); j++)
+	{
+	  number2 s = 0.;
+	  for (unsigned k=0; k<n(); k++)
+	    s+= el(i,k) * src.el(k,j);
+	  dst.el(i,j) = s;
+	}
+  else
+    for (unsigned int i=0; i<m(); i++)
+      for (unsigned int j=0; j<src.n(); j++)
+	{
+	  number2 s = 0.;
+	  for (unsigned k=0; k<n(); k++)
+	    s+= el(i,k) * src.el(k,j);
+	  dst.el(i,j) += s;
+	}
 }
 
 
@@ -597,21 +608,32 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
-				 const FullMatrix<number2> &src) const
+				 const FullMatrix<number2> &src,
+				 const bool                 adding) const
 {
   Assert (val != 0, ExcEmptyMatrix());  
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
   Assert (n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
   Assert (src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
 
-  for (unsigned int i=0; i<n(); i++)
-    for (unsigned int j=0; j<src.n(); j++)
-      {
-	number2 s = 0;
-	for (unsigned int k=0; k<m(); k++)
-	  s += el(k,i) * src.el(k,j);
-	dst.el(i,j) = s;
-      }
+  if (!adding)
+    for (unsigned int i=0; i<n(); i++)
+      for (unsigned int j=0; j<src.n(); j++)
+	{
+	  number2 s = 0;
+	  for (unsigned int k=0; k<m(); k++)
+	    s += el(k,i) * src.el(k,j);
+	  dst.el(i,j) = s;
+	}
+  else
+    for (unsigned int i=0; i<n(); i++)
+      for (unsigned int j=0; j<src.n(); j++)
+	{
+	  number2 s = 0;
+	  for (unsigned int k=0; k<m(); k++)
+	    s += el(k,i) * src.el(k,j);
+	  dst.el(i,j) += s;
+	}
 }
 
 

@@ -284,28 +284,50 @@ class FullMatrix : public Subscriptor
     
 				     /**
 				      * Matrix-matrix-multiplication.
-				      * $C=A*B$.
+				      *
+				      * The optional parameter
+				      * @p{adding} determines, whether the
+				      * result is stored in @p{C} or added
+				      * to @p{C}.
+				      *
+				      * if (adding)
+				      *  $C += A*B$
+				      *
+				      * if (!adding)
+				      *  $C = A*B$
 				      *
 				      * Assumes that @p{A} and @p{B} have
-				      * compatible sizes and thet @p{C}
+				      * compatible sizes and that @p{C}
 				      * already has the right size.
 				      */
     template<typename number2>
     void mmult (FullMatrix<number2>       &C,
-		const FullMatrix<number2> &B) const;
+		const FullMatrix<number2> &B,
+		const bool                 adding=false) const;
     
 				     /**
 				      * Matrix-matrix-multiplication using
 				      * transpose of @p{this}.
-				      * $C=A^T*B$.
+				      *
+				      * The optional parameter
+				      * @p{adding} determines, whether the
+				      * result is stored in @p{C} or added
+				      * to @p{C}.
+				      *
+				      * if (adding)
+				      *  $C += A^T*B$
+				      *
+				      * if (!adding)
+				      *  $C = A^T*B$
 				      *
 				      * Assumes that @p{A} and @p{B} have
-				      * compatible sizes and thet @p{C}
+				      * compatible sizes and that @p{C}
 				      * already has the right size.
 				      */
     template<typename number2>
     void Tmmult (FullMatrix<number2>       &C,
-		 const FullMatrix<number2> &B) const;
+		 const FullMatrix<number2> &B,
+		 const bool                 adding=false) const;
     
 				     /**
 				      * Matrix-vector-multiplication.
