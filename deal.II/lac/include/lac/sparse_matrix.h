@@ -835,6 +835,22 @@ class SparseMatrix : public Subscriptor
     void Tvmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
   
 				     /**
+				      * Adding Matrix-vector multiplication. Add
+				      * $M*src$ on $dst$ with $M$ being this matrix.
+				      */
+    template <typename somenumber>
+    void vmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+    
+				     /**
+				      * Adding Matrix-vector multiplication. Add
+				      * $M^T*src$  to $dst$ with $M$ being this
+				      * matrix. This function does the same as
+				      * #vmult_add# but takes the transposed matrix.
+				      */
+    template <typename somenumber>
+    void Tvmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+  
+				     /**
 				      * Return the norm of the vector $v$ with
 				      * respect to the norm induced by this
 				      * matrix, i.e. $\left(v,Mv\right)$. This
@@ -902,34 +918,72 @@ class SparseMatrix : public Subscriptor
     void precondition_Jacobi (Vector<somenumber>       &dst,
 			      const Vector<somenumber> &src,
 			      const number              om = 1.) const;
-				     //
+				     /**
+				      * Apply SOR preconditioning to #src#.
+				      */
     template <typename somenumber>
     void precondition_SSOR (Vector<somenumber>       &dst,
 			    const Vector<somenumber> &src,
 			    const number              om = 1.) const;
-				     //
+
+				     /**
+				      * Apply SOR preconditioning matrix to #src#.
+				      * The result of this method is
+				      * $dst = (om D - L)^{-1} src$.
+				      */
     template <typename somenumber>
     void precondition_SOR (Vector<somenumber>       &dst,
 			   const Vector<somenumber> &src,
 			   const number              om = 1.) const;
     
 				     /**
-				      * Perform an SSOR step in-place, i.e.
-				      * without copying to a second vector.
-				      * #omega# is the damping parameter.
+				      * Perform SSOR preconditioning in-place.
+				      * Apply the preconditioner matrix without
+				      * copying to a second vector.
+				      * #omega# is the relaxation parameter.
 				      */
     template <typename somenumber>
-    void SSOR (Vector<somenumber> &dst,
+    void SSOR (Vector<somenumber> &v,
 	       const number        omega = 1.) const;
 
 				     /**
-				      * Perform an SOR step in-place, i.e.
-				      * without copying to a second vector.
+				      * Perform an SOR preconditioning in-place.
+				      * The result is $v = (\omega D - L)^{-1} v$.
 				      * #omega# is the damping parameter.
 				      */
     template <typename somenumber>
-    void SOR (Vector<somenumber> &dst,
+    void SOR (Vector<somenumber> &v,
 	      const number        om = 1.) const;
+
+				     /**
+				      * Do one SOR step on #v#.
+				      * Performs a direct SOR step with right hand
+				      * side #b#.
+				      */
+    template <typename somenumber>
+    void SOR_step (Vector<somenumber> &v,
+		   const Vector<somenumber> &b,
+		   const number        om = 1.) const;
+
+				     /**
+				      * Do one adjoint SOR step on #v#.
+				      * Performs a direct TSOR step with right hand
+				      * side #b#.
+				      */
+    template <typename somenumber>
+    void TSOR_step (Vector<somenumber> &v,
+		    const Vector<somenumber> &b,
+		    const number        om = 1.) const;
+
+				     /**
+				      * Do one adjoint SSOR step on #v#.
+				      * Performs a direct SSOR step with right hand
+				      * side #b# by performing TSOR after SOR.
+				      */
+    template <typename somenumber>
+    void SSOR_step (Vector<somenumber> &v,
+		    const Vector<somenumber> &b,
+		    const number        om = 1.) const;
 
 				     /**
 				      * Return a (constant) reference to the
