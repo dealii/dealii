@@ -485,6 +485,10 @@ dnl that this comparison is always true. This is, at the best, annoying
 dnl since it crops up at several places where std::advance is called from
 dnl inside the library. Check whether the present version of the compiler
 dnl has this problem
+dnl
+dnl This test is only called if gcc is used.
+dnl
+dnl Usage: DEAL_II_CHECK_ADVANCE_WARNING
 AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
   AC_LANG_CPLUSPLUS
   CXXFLAGS="$CXXFLAGSG -Werror"
