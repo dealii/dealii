@@ -23,15 +23,15 @@
 #include <numerics/data_out.h>
 
 				 // This is the first new file. It
-				 // declares the MappingQ1 class that
-				 // gives the standard bilinear
+				 // declares the ``MappingQ1'' class
+				 // that gives the standard bilinear
 				 // mapping. For bilinear mappings use
 				 // an object of this class rather
-				 // than an object of the MappingQ(1)
-				 // class, as the MappingQ1 class is
-				 // optimized due to the
-				 // pre-knowledge of the actual
-				 // polynomial degree 1.
+				 // than an object of the
+				 // ``MappingQ(1)'' class, as the
+				 // ``MappingQ1'' class is optimized
+				 // due to the pre-knowledge of the
+				 // actual polynomial degree 1.
 #include <fe/mapping_q1.h>
 				 // Here the discontinuous finite
 				 // elements are defined. They are
