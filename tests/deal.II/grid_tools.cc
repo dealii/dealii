@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001 by the deal.II authors
+//    Copyright (C) 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_tools.h>
+#include <grid/grid_out.h>
 
 #include <fstream>
 
@@ -24,8 +25,9 @@ std::ofstream logfile("grid_tools.output");
 
 
 
+// check GridTools::diameter
 template <int dim>
-void test ()
+void test1 ()
 {
 				   // test 1: hypercube
   if (true)
@@ -65,15 +67,38 @@ void test ()
 };
 
 
+// GridTools::transform
+void test2 ()
+{
+  Triangulation<2> tria;
+  GridGenerator::hyper_cube(tria);
+
+  logfile << "Unchanged grid:" << std::endl;
+  GridOut().write_gnuplot (tria, logfile);
+  
+  logfile << "Shifted grid:" << std::endl;
+  const Point<2> shift(1,2);
+  GridTools::shift (shift, tria);
+  GridOut().write_gnuplot (tria, logfile);
+
+  logfile << "Rotated grid:" << std::endl;
+  GridTools::rotate (3.14159265258/4, tria);
+  GridOut().write_gnuplot (tria, logfile);
+};
+
+
 int main ()
 {
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test1<1> ();
+  test1<2> ();
+  test1<3> ();
+
+  test2 ();
   
   return 0;
 };
+

@@ -17,7 +17,9 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+
 #include <cmath>
+#include <functional>
 
 #if deal_II_dimension != 1
 
@@ -93,8 +95,61 @@ GridTools::diameter (const Triangulation<1> &tria)
 
 
 
+// define some transformations in an anonymous namespace
+namespace 
+{
+  template <int dim>
+  inline
+  Point<dim> shift_point (const Point<dim> p,
+			  const Point<dim> shift)
+  {
+    return p+shift;
+  };
+
+
+
+  inline
+  Point<2> rotate2d (const Point<2> p,
+		     const double     angle)
+  {
+    return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
+		     std::sin(angle)*p(0) + std::cos(angle) * p(1));
+  };
+};
+
+
+template <int dim>
+void
+GridTools::shift (const Point<dim>   &shift_vector,
+		  Triangulation<dim> &triangulation)
+{
+  transform (std::bind2nd(ptr_fun(&shift_point<dim>),
+			  shift_vector),
+	     triangulation);
+};
+
+
+#if deal_II_dimension == 2
+
+void
+GridTools::rotate (const double      angle,
+		   Triangulation<2> &triangulation)
+{
+  transform (std::bind2nd(ptr_fun(&rotate2d),
+			  angle),
+	     triangulation);
+};
+
+#endif
+
+
+
 #if deal_II_dimension != 1
 template
 double
 GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &);
 #endif
+
+template
+void GridTools::shift<deal_II_dimension> (const Point<deal_II_dimension> &,
+					  Triangulation<deal_II_dimension> &);
