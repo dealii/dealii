@@ -254,21 +254,22 @@ SolverQMRS<VECTOR>::solve (const MATRIX &A,
     }
   while (state);
     
-  // Deallocate Memory
- 
+				   // Deallocate Memory
   memory.free(Vv);
   memory.free(Vp);
   memory.free(Vq);
   memory.free(Vt);
   memory.free(Vd);
  
-  // Output
-
+				   // Output
   deallog.pop();
 
-  AssertThrow(control().last_check() == SolverControl::success,
-	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
-							control().last_value()));
+				   // in case of failure: throw
+				   // exception
+  if (control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (control().last_step(),
+					control().last_value());
+				   // otherwise exit as normal
 };
 
 

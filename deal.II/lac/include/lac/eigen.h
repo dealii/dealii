@@ -361,10 +361,13 @@ EigenPower<VECTOR>::solve (double       &value,
   memory.free(Vr);
 
   deallog.pop();
-				   // Output
-  AssertThrow(control().last_check() == SolverControl::success,
-	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
-							control().last_value()));
+
+				   // in case of failure: throw
+				   // exception
+  if (control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (control().last_step(),
+					control().last_value());
+				   // otherwise exit as normal
 }
 
 //----------------------------------------------------------------------//
@@ -470,10 +473,12 @@ EigenInverse<VECTOR>::solve (double       &value,
   
   deallog.pop();
 
-				   // Output
-  AssertThrow(control().last_check() == SolverControl::success,
-	      typename Solver<VECTOR>::ExcNoConvergence(control().last_step(),
-							control().last_value()));
+				   // in case of failure: throw
+				   // exception
+  if (control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (control().last_step(),
+					control().last_value());
+				   // otherwise exit as normal
 }
 
 #endif

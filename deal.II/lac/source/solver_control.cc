@@ -21,6 +21,15 @@
 /*----------------------- SolverControl ---------------------------------*/
 
 
+SolverControl::NoConvergence::NoConvergence (const unsigned int last_step,
+					     const double       last_residual)
+		:
+		last_step (last_step),
+		last_residual (last_residual)
+{};
+
+
+
 SolverControl::SolverControl (const unsigned int maxiter,
 			      const double tolerance,
 			      const bool _log_history,

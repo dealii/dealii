@@ -63,6 +63,46 @@ class SolverControl : public Subscriptor
     enum State {
       iterate = 0, success, failure
     };
+
+				     /**
+				      * Class to be thrown upon
+				      * failing convergence of an
+				      * iterative solver, when either
+				      * the number of iterations
+				      * exceeds the limit or the
+				      * residual fails to reach the
+				      * desired limit, e.g. in the
+				      * case of a break-down.
+				      *
+				      * The residual in the last
+				      * iteration, as well as the
+				      * iteration number of the last
+				      * step are stored in this object
+				      * and can be recovered upon
+				      * catching an exception of this
+				      * class.
+				      */
+    class NoConvergence : public std::exception 
+    {
+      public:
+					 /**
+					  * Constructor.
+					  */
+	NoConvergence (const unsigned int last_step,
+		       const double       last_residual);
+
+					 /**
+					  * Iteration number of the
+					  * last step.
+					  */
+	const unsigned int last_step;
+
+					 /**
+					  * Residual in the last step.
+					  */
+	const double       last_residual;
+    };
+    
     
 				     /**
 				      * Constructor. The parameters
