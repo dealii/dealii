@@ -182,7 +182,7 @@
  * @sect2{Random renumbering}
  *
  * The @p{random} function renumbers degrees of freedom randomly. This
- * function is probably seldom of use, but to check the dependence of
+ * function is probably seldom of use, except to check the dependence of
  * solvers (iterative or direct ones) on the numbering of the degrees
  * of freedom. It uses the @p{random_shuffle} function from the C++
  * standard library to do its work.
