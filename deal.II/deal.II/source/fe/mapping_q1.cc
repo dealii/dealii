@@ -470,12 +470,12 @@ MappingQ1<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterator &cel
 				   // if necessary, recompute the
 				   // support points of the
 				   // transformation of this cell
-  if ((data.mapping_support_points.size() == 0)
+  if ((cell != data.cell_of_current_support_points)
       ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation())
       ||
-      (cell != data.cell_of_current_support_points))
+      (data.mapping_support_points.size() == 0))
     {
       compute_mapping_support_points(cell, data.mapping_support_points);
       data.cell_of_current_support_points = cell;
