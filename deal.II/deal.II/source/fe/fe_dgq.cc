@@ -266,7 +266,7 @@ FE_DGQ<dim>::update_each (const UpdateFlags flags) const
     out |= update_gradients | update_covariant_transformation;
 
   if (flags & update_second_derivatives)
-    out |= update_second_derivatives;
+    out |= update_second_derivatives | update_covariant_transformation;
 
   return out;
 }

@@ -264,8 +264,8 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 				   // respective flag since the base
 				   // elements don't have them
   if (flags & update_second_derivatives)
-    out |= update_second_derivatives;
-  
+    out |= update_second_derivatives | update_covariant_transformation;
+    
   return out;
 }
 
