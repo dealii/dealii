@@ -15,7 +15,7 @@
 #include <base/polynomial.h>
 
 
-Polynomial::Polynomial (const vector<double> &a):
+Polynomial::Polynomial (const std::vector<double> &a):
 		coefficients(a)
 {}
 
@@ -43,8 +43,8 @@ double Polynomial::value (const double x) const
 
 
 
-void Polynomial::value (const double    x,
-			vector<double> &values) const
+void Polynomial::value (const double         x,
+			std::vector<double> &values) const
 {
   Assert (coefficients.size() > 0, ExcVoidPolynomial());
   Assert (values.size() > 0, ExcEmptyArray());
@@ -68,7 +68,7 @@ void Polynomial::value (const double    x,
 				   // then do it properly by the
 				   // full Horner scheme
   const unsigned int m=coefficients.size();
-  vector<double> a(coefficients);
+  std::vector<double> a(coefficients);
   unsigned int j_faculty=1;
   for (unsigned int j=0; j<values_size; ++j)
     {      
@@ -97,11 +97,11 @@ LagrangeEquidistant::LagrangeEquidistant ()
 
 
 
-vector<double> 
+std::vector<double> 
 LagrangeEquidistant::compute_coefficients (const unsigned int n,
 					   const unsigned int support_point)
 {
-  vector<double> a (n+1);
+  std::vector<double> a (n+1);
   Assert(support_point<n+1, ExcIndexRange(support_point, 0, n+1));
 
   switch (n)

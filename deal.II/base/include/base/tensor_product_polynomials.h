@@ -43,7 +43,7 @@ class TensorProductPolynomials
 				      * and will be copied into the
 				      * member variable @p{polynomials}.
 				      */
-    TensorProductPolynomials(const vector<SmartPointer<Polynomial> > &pols);
+    TensorProductPolynomials(const std::vector<SmartPointer<Polynomial> > &pols);
 
 				     /**
 				      * Calculates the polynomials
@@ -56,10 +56,10 @@ class TensorProductPolynomials
 				      * case, the function will not
 				      * compute these values.
 				      */
-    void compute (const Point<dim> &unit_point,
-		  vector<double> &values,
-		  vector<Tensor<1,dim> > &grads,
-		  vector<Tensor<2,dim> > &grad_grads) const;
+    void compute (const Point<dim>                     &unit_point,
+		  std::vector<double>                  &values,
+		  typename std::vector<Tensor<1,dim> > &grads,
+		  typename std::vector<Tensor<2,dim> > &grad_grads) const;
 
 				     /**
 				      * Returns the number of tensor
@@ -81,7 +81,7 @@ class TensorProductPolynomials
 				      * Pointer to the @p{polynomials}
 				      * given to the constructor.
 				      */
-    vector<SmartPointer<Polynomial> > polynomials;
+    std::vector<SmartPointer<Polynomial> > polynomials;
 
 				     /**
 				      * Number of tensor product

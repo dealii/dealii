@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@ number power(number x, unsigned int y)
 
 template <int dim>
 TensorProductPolynomials<dim>::TensorProductPolynomials(
-  const vector<SmartPointer<Polynomial> > &pols):
+  const std::vector<SmartPointer<Polynomial> > &pols):
 		polynomials(pols),
 		n_tensor_pols(power(polynomials.size(), dim))
 {}
@@ -38,13 +38,13 @@ TensorProductPolynomials<dim>::TensorProductPolynomials(
 
 template <int dim>
 void TensorProductPolynomials<dim>::compute(
-  const Point<dim> &p,
-  vector<double> &values,
-  vector<Tensor<1,dim> > &grads,
-  vector<Tensor<2,dim> > &grad_grads) const
+  const Point<dim>                     &p,
+  std::vector<double>                  &values,
+  typename std::vector<Tensor<1,dim> > &grads,
+  typename std::vector<Tensor<2,dim> > &grad_grads) const
 {
   unsigned int n_pols=polynomials.size();
-  vector<unsigned int> n_pols_to(dim+1);
+  std::vector<unsigned int> n_pols_to(dim+1);
   n_pols_to[0]=1;
   for (unsigned int i=0; i<dim; ++i)
     n_pols_to[i+1]=n_pols_to[i]*n_pols;
@@ -75,12 +75,12 @@ void TensorProductPolynomials<dim>::compute(
       v_size=3;
     }
 
-  vector<vector<vector<double> > > v(
-    dim, vector<vector<double> > (n_pols, vector<double> (v_size)));
+  std::vector<std::vector<std::vector<double> > > v(
+    dim, std::vector<std::vector<double> > (n_pols, std::vector<double> (v_size)));
 
   for (unsigned int d=0; d<dim; ++d)
     {
-      vector<vector<double> > &v_d=v[d];
+      std::vector<std::vector<double> > &v_d=v[d];
       Assert(v_d.size()==n_pols, ExcInternalError());
       for (unsigned int i=0; i<n_pols; ++i)
 	polynomials[i]->value(p(d), v_d[i]);

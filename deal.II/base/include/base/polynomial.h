@@ -48,7 +48,7 @@ class Polynomial : public Subscriptor
 				      * the @p{coefficient} array
 				      * minus one.
 				      */
-    Polynomial (const vector<double> &coefficients);
+    Polynomial (const std::vector<double> &coefficients);
 
                                      /**
 				      * Default-Constructor.
@@ -81,8 +81,8 @@ class Polynomial : public Subscriptor
 				      * scheme for numerical stability
 				      * of the evaluation.
 				      */
-    void value (const double    x,
-		vector<double> &values) const;
+    void value (const double         x,
+		std::vector<double> &values) const;
 
 				     /**
 				      * Exception
@@ -104,7 +104,7 @@ class Polynomial : public Subscriptor
 				      * passed down by derived
 				      * classes.
 				      */
-    vector<double> coefficients;
+    std::vector<double> coefficients;
 };
 
 
@@ -162,7 +162,7 @@ class LagrangeEquidistant: public Polynomial
 				      * constructor.
 				      */
     static 
-    vector<double> 
+    std::vector<double> 
     compute_coefficients (const unsigned int n,
 			  const unsigned int support_point);
 };
