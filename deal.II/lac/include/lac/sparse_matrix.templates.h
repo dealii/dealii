@@ -764,7 +764,7 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
     {
       somenumber s = dst(row);
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
-	if ((unsigned int)cols->colnums[j] < row)
+	if (static_cast<unsigned int>(cols->colnums[j]) < row)
 	  s -= val[j] * dst(cols->colnums[j]);
 
       dst(row) = s * om / val[cols->rowstart[row]];
@@ -870,7 +870,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst, const number om) const
 	  p = cols->colnums[j];
 	  if (p>=0)
 	    {
-	      if ((unsigned int)i<j) s += val[j] * dst(p);
+	      if (static_cast<unsigned int>(i)<j) s += val[j] * dst(p);
 	    }
 	}
       dst(i) -= s * om / val[cols->rowstart[i]];
