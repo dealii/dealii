@@ -99,7 +99,7 @@ sub parse_class_declarations {
 		$declaration =~ s/\s+$//g;
 
 		# strip default template parameters
-		while ( $declaration =~ s/<(.*)=\s[-\w,_\s]+(<[^.]*>)?(.*)>/<$1 $3 > / ) {
+		while ( $declaration =~ s/<(.*)=\s*[-\w,_\s]+(<[^.]*>)?(.*)>/<$1 $3 > / ) {
 		}
 
 		# impose a negativ-list of names we do not want to
