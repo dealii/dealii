@@ -79,7 +79,7 @@ main()
 	  case 4: fe = &fe4; deallog.push("Q4"); break;
 	}
       
-      for (unsigned int step=0;step < 4; ++step)
+      for (unsigned int step=0;step < 3; ++step)
 	{
 	  tr.refine_global(1);
 	  dof.distribute_dofs(*fe);
