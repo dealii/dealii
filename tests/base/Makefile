@@ -13,6 +13,7 @@ CXXFLAGS  = -DDEBUG -g -Wall -W -pedantic -Wconversion \
             -Winline -Woverloaded-virtual -fno-rtti  \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 
+
 %.go : %.cc
 	@echo ============================ Compiling with debugging information:   $<
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -34,19 +35,19 @@ test: run-reference run-logtest run-tensor
 
 
 reference: reference.go
-	$(CXX) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
 
 run-reference: reference
 	./reference
 
 logtest: logtest.go
-	$(CXX) -o $@ $^ $D/base/lib/libbase.g.a
+	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
 
 run-logtest: logtest
 	./logtest
 
 tensor: tensor.go
-	$(CXX) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $D/base/lib/libbase.g.a
 
 run-tensor: tensor
 	./tensor
