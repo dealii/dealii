@@ -37,7 +37,6 @@ namespace PETScWrappers
  * and are implemented in this particular class.
  *
  * @ingroup PETSc
- * @brief Sequential vector
  * @author Wolfgang Bangerth, 2004
  */
   class Vector : public VectorBase

@@ -43,7 +43,6 @@ namespace PETScWrappers
  * elements.
  *
  * @ingroup PETSc
- * @brief Matrix iterator
  * @author Guido Kanschat, Roy Stogner, Wolfgang Bangerth, 2004
  */
     class const_iterator

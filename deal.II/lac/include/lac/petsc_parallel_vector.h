@@ -136,7 +136,6 @@ namespace PETScWrappers
  * necessary.
  *
  * @ingroup PETSc
- * @brief Parallel vector using MPI
  * @author Wolfgang Bangerth, 2004
  */
     class Vector : public VectorBase
