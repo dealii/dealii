@@ -2558,7 +2558,11 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * @p true, and reversed otherwise.
                                       *
                                       * Fortunately, this is only very rarely
-                                      * of concern.
+                                      * of concern, since one is usually only
+                                      * concerned either in the exact number
+                                      * of a subface, or in the cell that is
+                                      * behind it, not in both at the same
+                                      * time.
                                       */
     TriaIterator<dim,CellAccessor<dim> >
     neighbor_child_on_subface (const unsigned int face_no,
