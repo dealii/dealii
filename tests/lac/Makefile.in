@@ -23,12 +23,12 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs.g   = $(lib-lac.g)      \
-           $(lib-base.g)     \
-	   $(lib-deal2-2d.g)
-libs     = $(lib-lac.o)      \
-           $(lib-base.o)     \
-	   $(lib-deal2-2d.o)
+libs.g   = $(lib-deal2-2d.g) \
+           $(lib-lac.g)      \
+           $(lib-base.g)
+libs     = $(lib-deal2-2d.o) \
+           $(lib-lac.o)      \
+           $(lib-base.o)
 
 
 ############################################################
