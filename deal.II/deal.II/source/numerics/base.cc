@@ -48,8 +48,8 @@ void ProblemBase<dim>::set_tria_and_dof (Triangulation<dim> *t,
 
 template <int dim>
 void ProblemBase<dim>::clear () {
-  tria        = 0;
-  dof_handler = 0;
+  if (tria)        { delete tria;         tria        = 0; };
+  if (dof_handler) { delete dof_handler;  dof_handler = 0; };
   system_sparsity.reinit (0,0,1);
   system_matrix.clear ();
   right_hand_side.reinit (1);
