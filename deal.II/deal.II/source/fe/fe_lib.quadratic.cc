@@ -101,23 +101,23 @@ FEQuadraticSub<1>::shape_grad(const unsigned int i,
 
 
 template <>
-void FEQuadraticSub<1>::get_unit_ansatz_points (vector<Point<1> > &unit_points) const {
-  FiniteElement<1>::get_unit_ansatz_points (unit_points);
+void FEQuadraticSub<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
+  FiniteElement<1>::get_unit_support_points (unit_points);
 };
 
 
 
 template <>
-void FEQuadraticSub<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+void FEQuadraticSub<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
 					   const Boundary<1>  &boundary,
-					   vector<Point<1> >  &ansatz_points) const {
-  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
+					   vector<Point<1> >  &support_points) const {
+  FiniteElement<1>::get_support_points (cell, boundary, support_points);
 };
 
 
 
 template <>
-void FEQuadraticSub<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+void FEQuadraticSub<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					     const Boundary<1>  &,
 					     vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
@@ -866,7 +866,7 @@ void FEQuadraticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterato
 
 
 template <>
-void FEQuadraticSub<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+void FEQuadraticSub<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
   
@@ -884,44 +884,44 @@ void FEQuadraticSub<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) 
   
 
 template <>
-void FEQuadraticSub<2>::get_ansatz_points (const typename DoFHandler<2>::cell_iterator &cell,
+void FEQuadraticSub<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
 					   const Boundary<2>&,
-					   vector<Point<2> >  &ansatz_points) const {
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension (ansatz_points.size(), total_dofs));
+					   vector<Point<2> >  &support_points) const {
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension (support_points.size(), total_dofs));
   
   for (unsigned int vertex=0; vertex<4; ++vertex)
-    ansatz_points[vertex] = cell->vertex(vertex);
+    support_points[vertex] = cell->vertex(vertex);
 
 				   // for the bilinear mapping, the centers
 				   // of the face on the unit cell are mapped
 				   // to the mean coordinates of the vertices
   for (unsigned int line=0; line<4; ++line)
-    ansatz_points[4+line] = (cell->line(line)->vertex(0) +
+    support_points[4+line] = (cell->line(line)->vertex(0) +
 			     cell->line(line)->vertex(1)) / 2;
 				   // same for the center of the square:
 				   // since all four linear basis functions
 				   // take on the value 1/4 at the center,
 				   // the center is mapped to the mean
 				   // coordinates of the four vertices
-  ansatz_points[8] = (ansatz_points[0] +
-		      ansatz_points[1] +
-		      ansatz_points[2] +
-		      ansatz_points[3]) / 4;
+  support_points[8] = (support_points[0] +
+		      support_points[1] +
+		      support_points[2] +
+		      support_points[3]) / 4;
 };
 
 
 
 template <>
-void FEQuadraticSub<2>::get_face_ansatz_points (const typename DoFHandler<2>::face_iterator &face,
+void FEQuadraticSub<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
 						const Boundary<2>  &,
-						vector<Point<2> >  &ansatz_points) const {
-  Assert (ansatz_points.size() == dofs_per_face,
-	  ExcWrongFieldDimension (ansatz_points.size(), dofs_per_face));
+						vector<Point<2> >  &support_points) const {
+  Assert (support_points.size() == dofs_per_face,
+	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 
   for (unsigned int vertex=0; vertex<2; ++vertex)
-    ansatz_points[vertex] = face->vertex(vertex);
-  ansatz_points[2] = (ansatz_points[0] + ansatz_points[1]) / 2;
+    support_points[vertex] = face->vertex(vertex);
+  support_points[2] = (support_points[0] + support_points[1]) / 2;
 };
 
 

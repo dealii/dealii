@@ -51,23 +51,23 @@ class FELinear : public FELinearMapping<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+    virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
+				    vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const;
+					 vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -114,23 +114,23 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+    virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
+				    vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const;
+					 vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -196,23 +196,23 @@ class FECubicSub : public FELinearMapping<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+    virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
+				    vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const;
+					 vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -279,23 +279,23 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+    virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
+				    vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const;
+					 vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed

@@ -367,7 +367,7 @@ enum RenumberingMethod {
  * The question what a degree of freedom on the boundary is, is not so easy.
  * It should really be a degree of freedom of which the respective basis
  * function has nonzero values on the boundary. At least for Lagrange elements
- * this definition is equal to the statement that the off-point of the ansatz
+ * this definition is equal to the statement that the off-point of the trial
  * function, i.e. the point where the function assumes its nominal value (for
  * Lagrange elements this is the point where it has the function value #1#), is
  * located on the boundary. We do not check this directly, the criterion is
@@ -740,10 +740,10 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * not on the boundary, the value of
 				      * #mapping[dof]# is #-1#. This function is
 				      * mainly used when setting up matrices and
-				      * vectors on the boundary from the ansatz
+				      * vectors on the boundary from the trial
 				      * functions, which have global numbers,
 				      * while the matrices and vectors use
-				      * numbers of the ansatz functions local
+				      * numbers of the trial functions local
 				      * to the boundary.
 				      *
 				      * Prior content of #mapping# is deleted.

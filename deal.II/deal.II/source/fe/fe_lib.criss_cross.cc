@@ -16,13 +16,13 @@
 
   n_functions      := 5:
 
-  # note: ansatz_points[i] is a vector which is indexed from
+  # note: support_points[i] is a vector which is indexed from
   # one and not from zero!
-  ansatz_points[0] := [0,0]:
-  ansatz_points[1] := [1,0]:
-  ansatz_points[2] := [1,1]:
-  ansatz_points[3] := [0,1]:
-  ansatz_points[4] := [1/2,1/2]:
+  support_points[0] := [0,0]:
+  support_points[1] := [1,0]:
+  support_points[2] := [1,1]:
+  support_points[3] := [0,1]:
+  support_points[4] := [1/2,1/2]:
   
   phi[0] := proc(x,y) if(y<1-x) then 1-x-y; else 0; fi; end:
   phi[1] := proc(x,y) if(y<x)   then x-y;   else 0; fi; end:
@@ -32,23 +32,23 @@
                         - phi[2](x,y) - phi[3](x,y) ; end:
 
   #points on children: let them be indexed one-based, as are
-  #the ansatz_points
+  #the support_points
   points[0] := array(0..n_functions-1, 1..2):
   points[1] := array(0..n_functions-1, 1..2):
   points[2] := array(0..n_functions-1, 1..2):
   points[3] := array(0..n_functions-1, 1..2):
   for i from 0 to n_functions-1 do
-    points[0][i,1] := ansatz_points[i][1]/2:
-    points[0][i,2] := ansatz_points[i][2]/2:
+    points[0][i,1] := support_points[i][1]/2:
+    points[0][i,2] := support_points[i][2]/2:
     
-    points[1][i,1] := ansatz_points[i][1]/2+1/2:
-    points[1][i,2] := ansatz_points[i][2]/2:
+    points[1][i,1] := support_points[i][1]/2+1/2:
+    points[1][i,2] := support_points[i][2]/2:
 
-    points[2][i,1] := ansatz_points[i][1]/2+1/2:
-    points[2][i,2] := ansatz_points[i][2]/2+1/2:
+    points[2][i,1] := support_points[i][1]/2+1/2:
+    points[2][i,2] := support_points[i][2]/2+1/2:
 
-    points[3][i,1] := ansatz_points[i][1]/2:
-    points[3][i,2] := ansatz_points[i][2]/2+1/2:
+    points[3][i,1] := support_points[i][1]/2:
+    points[3][i,2] := support_points[i][2]/2+1/2:
   od:  
 
   prolongation := array(0..3,0..n_functions-1, 0..n_functions-1):
@@ -79,7 +79,7 @@
   phi_eta[4] := proc(x,y) 1 - phi_eta[0](x,y) - phi_eta[1](x,y)
                             - phi_eta[2](x,y) - phi_eta[3](x,y) ; end:
 
-  # define an array of the ansatz points in real space; the first
+  # define an array of the support points in real space; the first
   # four are the vertices, the last one is the crossing point of
   # the two diagonals
   print ("Computing cross point"):
@@ -286,14 +286,14 @@ Point<1> FECrissCross<1>::shape_grad (const unsigned int, const Point<1> &) cons
 
 
 template <>
-void FECrissCross<1>::get_unit_ansatz_points (vector<Point<1> >&) const {
+void FECrissCross<1>::get_unit_support_points (vector<Point<1> >&) const {
   Assert (false, ExcNotUseful());
 };
 
 
 
 template <>
-void FECrissCross<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &,
+void FECrissCross<1>::get_support_points (const DoFHandler<1>::cell_iterator &,
 					 const Boundary<1> &,
 					 vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
@@ -302,7 +302,7 @@ void FECrissCross<1>::get_ansatz_points (const DoFHandler<1>::cell_iterator &,
 
 
 template <>
-void FECrissCross<1>::get_face_ansatz_points (const DoFHandler<1>::face_iterator &,
+void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 					      const Boundary<1> &,
 					      vector<Point<1> > &) const {
   Assert (false, ExcNotUseful());
@@ -502,7 +502,7 @@ Point<2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) c
 
 
 template <>
-void FECrissCross<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+void FECrissCross<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert(unit_points.size()==total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
 
@@ -516,20 +516,20 @@ void FECrissCross<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) co
 
 
 template <>
-void FECrissCross<2>::get_ansatz_points (const DoFHandler<2>::cell_iterator &cell,
+void FECrissCross<2>::get_support_points (const DoFHandler<2>::cell_iterator &cell,
 					 const Boundary<2> &,
-					 vector<Point<2> > &ansatz_points) const {
+					 vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension (ansatz_points.size(), total_dofs));
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension (support_points.size(), total_dofs));
 
 				   // copy vertices
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-    ansatz_points[vertex] = cell->vertex(vertex);
+    support_points[vertex] = cell->vertex(vertex);
 
 /*
-  last ansatz point is the common point of the two diagonals; the formula for
+  last support point is the common point of the two diagonals; the formula for
   the computation is a bit lengthy but straightforward. You can get it with
   the small Maple script printed at the beginning of this file.
 */
@@ -547,25 +547,25 @@ void FECrissCross<2>::get_ansatz_points (const DoFHandler<2>::cell_iterator &cel
   const double t5 = x3*y0;
   const double t14 = (t1-t2+x1*y3-t4+t5-x3*y1)/(t1-t2-x2*y1+x2*y3-t4+x1*y2+t5-x3*y2);
   const double t15 = 1.0-t14;
-  ansatz_points[4](0) = t15*x0+t14*x2;
-  ansatz_points[4](1) = t15*y0+t14*y2;
+  support_points[4](0) = t15*x0+t14*x2;
+  support_points[4](1) = t15*y0+t14*y2;
 };
 
 
 
 template <>
-void FECrissCross<2>::get_face_ansatz_points (const DoFHandler<2>::face_iterator &face,
+void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterator &face,
 					      const Boundary<2> &,
-					      vector<Point<2> > &ansatz_points) const {
+					      vector<Point<2> > &support_points) const {
   const unsigned int dim = 2;
   
-  Assert ((ansatz_points.size() == dofs_per_face) &&
-	  (ansatz_points.size() == GeometryInfo<dim>::vertices_per_face),
-	  ExcWrongFieldDimension (ansatz_points.size(),
+  Assert ((support_points.size() == dofs_per_face) &&
+	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
+	  ExcWrongFieldDimension (support_points.size(),
 				  GeometryInfo<dim>::vertices_per_face));
 
   for (unsigned int vertex=0; vertex<dofs_per_face; ++vertex)
-    ansatz_points[vertex] = face->vertex(vertex);
+    support_points[vertex] = face->vertex(vertex);
 };
 
 
@@ -852,7 +852,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 					const vector<Point<dim> >            &unit_points,
 					vector<dFMatrix>    &jacobians,
 					const bool           compute_jacobians,
-					vector<Point<dim> > &ansatz_points,
+					vector<Point<dim> > &support_points,
 					const bool,
 					vector<Point<dim> > &q_points,
 					const bool           compute_q_points,
@@ -863,15 +863,15 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
 	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension(ansatz_points.size(), total_dofs));
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension(support_points.size(), total_dofs));
 
   
   unsigned int n_points=unit_points.size();
 
-				   // we need the ansatz points in any
+				   // we need the support points in any
 				   // way, wanted or not by the user
-  get_ansatz_points (cell, boundary, ansatz_points);
+  get_support_points (cell, boundary, support_points);
 
   if (compute_q_points) 
     {
@@ -889,7 +889,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 				       // x_l(xi_l) = sum_j p_j N_j(xi_l)
       for (unsigned int j=0; j<n_transform_functions; ++j) 
 	for (unsigned int l=0; l<n_points; ++l) 
-	  q_points[l] += ansatz_points[j] * shape_values_transform(j, l);
+	  q_points[l] += support_points[j] * shape_values_transform(j, l);
     };
   
 
@@ -905,7 +905,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
      i=0..dim-1
        j=0..dim-1
          M_{ij}(l) = 0
-	 s=0..n_ansatz_points
+	 s=0..n_support_points
 	   M_{ij}(l) += p_i(s) d(N_s(l))/d(xi_j)
 
   However, we rewrite the loops to only compute the gradient once for
@@ -924,7 +924,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 	      const Point<dim> gradient = shape_grad_transform[s][l];
 	      for (unsigned int i=0; i<dim; ++i)
 		for (unsigned int j=0; j<dim; ++j)
-		  M(i,j) += ansatz_points[s](i) * gradient(j);
+		  M(i,j) += support_points[s](i) * gradient(j);
 	    };
 	  jacobians[l].invert(M);
 	};

@@ -27,7 +27,7 @@
  * linear on each triangles and vanishes at the faces of the quadrilateral.
  *
  * Now, on the unit element, these basis functions are the same as for
- * a triangular ansatz space, namely the class of ${\cal P}_1$ Lagrange
+ * a triangular trial space, namely the class of ${\cal P}_1$ Lagrange
  * elements. Due to the arrangement of the four triangles on the
  * quadrilateral, it is clear that considering the whole triangulation
  * of the domain, always four triangles meet at the points which
@@ -81,8 +81,8 @@
  * between unit and real cell, the mapping of each of the four triangles
  * is linear (note that this does not hold for the whole element; the
  * mapping of the quadrilaterals is only piecewise linear and globally
- * continuous). It also proves that the ansatz space using this element
- * is equivalent to the ansatz space using triangles and linear elements.
+ * continuous). It also proves that the trial space using this element
+ * is equivalent to the trial space using triangles and linear elements.
  *
  * Since in one space dimension, this element equals two linear elements,
  * i.e. a linear ansatz on a mesh once more refined than the present one,
@@ -188,23 +188,23 @@ class FECrissCross : public FiniteElement<dim> {
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_unit_ansatz_points (vector<Point<dim> > &ansatz_points) const;
+    virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_ansatz_points (const DoFHandler<dim>::cell_iterator &cell,
+    virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
 				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &ansatz_points) const;
+				    vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
-    virtual void get_face_ansatz_points (const DoFHandler<dim>::face_iterator &face,
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
 					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &ansatz_points) const;
+					 vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -319,8 +319,8 @@ class FECrissCross : public FiniteElement<dim> {
 				 const vector<Point<dim> >            &unit_points,
 				 vector<dFMatrix>    &jacobians,
 				 const bool           compute_jacobians,
-				 vector<Point<dim> > &ansatz_points,
-				 const bool           compute_ansatz_points,
+				 vector<Point<dim> > &support_points,
+				 const bool           compute_support_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
 				 const dFMatrix      &shape_values_transform,

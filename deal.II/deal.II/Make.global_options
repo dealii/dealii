@@ -2,13 +2,22 @@
 # Copyright W. Bangerth, University of Heidelberg, 1998
 
 # Global options for all compilations (compilations in /source now
-# use other options!)
+# use other options! THEY REALLY SHOULD NOT (gk))
+
+# This file uses the variable $D, which is the deal home directory,
+# that is, the parent directory of this directory.
+#
+# Please set $D to the right path before including this file!
 
 deal_II_dimension=2
 
+vpath %.a: $D/base/lib
+vpath %.a: $D/lac/lib
+vpath %.a: $D/deal.II/lib
+
 CXX       = c++
-INCLUDE   = -I../../include -I../../../lac/include \
-            -I../../../base/include -I../../../mia/include
+INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
+            -I$D/base/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
             -Winline -Woverloaded-virtual -fno-rtti  \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
@@ -21,17 +30,12 @@ ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc/bin/c++
 endif
 
-ifeq ($(shell uname),SunOS)
-CXX       = /usr/local/gcc/egcs-19980803/bin/c++
-endif
-
-
 %.go : %.cc Makefile
-	@echo ============================ Compiling with debugging information:   $<
+	@echo ======================== Compiling (DEBUG): $<
 #	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o : %.cc Makefile
-	@echo ============================ Compiling with optimization:   $<
+	@echo ======================== Compiling (OPT):   $<
 #	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 

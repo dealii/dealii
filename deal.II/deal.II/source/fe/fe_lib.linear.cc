@@ -83,23 +83,23 @@ FELinear<1>::shape_grad(const unsigned int i,
 
 
 template <>
-void FELinear<1>::get_unit_ansatz_points (vector<Point<1> >  &ansatz_points) const {
-  FiniteElement<1>::get_unit_ansatz_points (ansatz_points);
+void FELinear<1>::get_unit_support_points (vector<Point<1> >  &support_points) const {
+  FiniteElement<1>::get_unit_support_points (support_points);
 };
 
 
 
 template <>
-void FELinear<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+void FELinear<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
 				     const Boundary<1>  &boundary,
-				     vector<Point<1> >  &ansatz_points) const {
-  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
+				     vector<Point<1> >  &support_points) const {
+  FiniteElement<1>::get_support_points (cell, boundary, support_points);
 };
 
 
 
 template <>
-void FELinear<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+void FELinear<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					  const Boundary<1>  &,
 					  vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
@@ -366,7 +366,7 @@ void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cel
 
 
 template <>
-void FELinear<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+void FELinear<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
 
@@ -382,29 +382,29 @@ void FELinear<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const 
 
 
 template <int dim>
-void FELinear<dim>::get_ansatz_points (const typename DoFHandler<dim>::cell_iterator &cell,
+void FELinear<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				       const Boundary<dim>  &,
-				       vector<Point<dim> >  &ansatz_points) const {
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension (ansatz_points.size(), total_dofs));
+				       vector<Point<dim> >  &support_points) const {
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension (support_points.size(), total_dofs));
   
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-    ansatz_points[vertex] = cell->vertex(vertex);
+    support_points[vertex] = cell->vertex(vertex);
 };
 
 
 
 template <int dim>
-void FELinear<dim>::get_face_ansatz_points (const typename DoFHandler<dim>::face_iterator &face,
+void FELinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &face,
 					    const Boundary<dim>  &,
-					    vector<Point<dim> >  &ansatz_points) const {
-  Assert ((ansatz_points.size() == dofs_per_face) &&
-	  (ansatz_points.size() == GeometryInfo<dim>::vertices_per_face),
-	  ExcWrongFieldDimension (ansatz_points.size(),
+					    vector<Point<dim> >  &support_points) const {
+  Assert ((support_points.size() == dofs_per_face) &&
+	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
+	  ExcWrongFieldDimension (support_points.size(),
 				  GeometryInfo<dim>::vertices_per_face));
 
   for (unsigned int vertex=0; vertex<dofs_per_face; ++vertex)
-    ansatz_points[vertex] = face->vertex(vertex);
+    support_points[vertex] = face->vertex(vertex);
 };
 
 

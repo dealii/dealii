@@ -32,8 +32,8 @@ class dVector;
  *  It can be understood as a gradient recovery estimator; see the survey
  *  of Ainsworth for a complete discussion.
  *
- *  It seem as if this error estimator should only be valid for linear ansatz
- *  spaces, and there are indications that for higher order ansatz spaces the
+ *  It seem as if this error estimator should only be valid for linear trial
+ *  spaces, and there are indications that for higher order trial spaces the
  *  integrals computed here show superconvergence properties, i.e. they tend
  *  to zero faster than the error itself, thus ruling out the values as error
  *  indicators.
@@ -70,7 +70,7 @@ class dVector;
  *  square of the jumps) of each cell and take the square root.
  *
  *  The integration is done using a quadrature formula on the face.
- *  For linear ansatz functions (#FELinear#), the #Gauss2# or even the
+ *  For linear trial functions (#FELinear#), the #Gauss2# or even the
  *  #Midpoint# rule will suffice. For higher order elements, it is
  *  necessary to utilize higher order quadrature formulae as well.
  *

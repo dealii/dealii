@@ -20,12 +20,12 @@
   --------------------------------------------------------------------------
   n_functions := 5;
   
-  ansatz_points := array(0..n_functions-1);
-  ansatz_points[0] := 0;
-  ansatz_points[1] := 1;
-  ansatz_points[2] := 1/4;
-  ansatz_points[3] := 2/4;
-  ansatz_points[4] := 3/4;
+  support_points := array(0..n_functions-1);
+  support_points[0] := 0;
+  support_points[1] := 1;
+  support_points[2] := 1/4;
+  support_points[3] := 2/4;
+  support_points[4] := 3/4;
 
   phi_polynom := array(0..n_functions-1);
   grad_phi_polynom := array(0..n_functions-1);
@@ -40,12 +40,12 @@
     od;  
     values[i+1] := 1;
 
-    shifted_ansatz_points := array (1..n_functions);
+    shifted_support_points := array (1..n_functions);
     for j from 1 to n_functions do
-      shifted_ansatz_points[j] := ansatz_points[j-1];
+      shifted_support_points[j] := support_points[j-1];
     od;
     
-    phi_polynom[i] := interp (shifted_ansatz_points, values, xi);
+    phi_polynom[i] := interp (shifted_support_points, values, xi);
     grad_phi_polynom[i] := diff(phi_polynom[i], xi);
   od;
 
@@ -55,8 +55,8 @@
   points[0] := array(0..n_functions-1);
   points[1] := array(0..n_functions-1);
   for i from 0 to n_functions-1 do
-    points[0][i] := ansatz_points[i]/2;  
-    points[1][i] := ansatz_points[i]/2+1/2;
+    points[0][i] := support_points[i]/2;  
+    points[1][i] := support_points[i]/2+1/2;
   od;  
 
   prolongation := array(0..1,0..n_functions-1, 0..n_functions-1);
@@ -111,55 +111,55 @@
   n_functions      := 25:
   n_face_functions := 5:
 
-  ansatz_function := (a1 + a2*xi + a3*xi*xi + a4*xi**3 + a5*xi**4) +
+  trial_function := (a1 + a2*xi + a3*xi*xi + a4*xi**3 + a5*xi**4) +
                      (b1 + b2*xi + b3*xi*xi + b4*xi**3 + b5*xi**4)*eta +
 		     (c1 + c2*xi + c3*xi*xi + c4*xi**3 + c5*xi**4)*eta*eta +
 		     (d1 + d2*xi + d3*xi*xi + d4*xi**3 + d5*xi**4)*eta**3 +
 		     (e1 + e2*xi + e3*xi*xi + e4*xi**3 + e5*xi**4)*eta**4:
-  face_ansatz_function := a + b*xi + c*xi*xi + d*xi**3 + e*xi**4:
-  # note: ansatz_points[i] is a vector which is indexed from
+  face_trial_function := a + b*xi + c*xi*xi + d*xi**3 + e*xi**4:
+  # note: support_points[i] is a vector which is indexed from
   # one and not from zero!
-  ansatz_points := array(0..n_functions-1):
-  ansatz_points[0] := [0,0]:
-  ansatz_points[1] := [1,0]:
-  ansatz_points[2] := [1,1]:
-  ansatz_points[3] := [0,1]:
-  ansatz_points[4] := [1/4,0]:
-  ansatz_points[5] := [2/4,0]:
-  ansatz_points[6] := [3/4,0]:
-  ansatz_points[7] := [1,1/4]:
-  ansatz_points[8] := [1,2/4]:
-  ansatz_points[9] := [1,3/4]:
-  ansatz_points[10] := [1/4,1]:
-  ansatz_points[11] := [2/4,1]:
-  ansatz_points[12] := [3/4,1]:
-  ansatz_points[13] := [0,1/4]:
-  ansatz_points[14] := [0,2/4]:
-  ansatz_points[15] := [0,3/4]:
-  ansatz_points[16] := [1/4,1/4]:
-  ansatz_points[17] := [3/4,1/4]:
-  ansatz_points[18] := [3/4,3/4]:
-  ansatz_points[19] := [1/4,3/4]:
-  ansatz_points[20] := [1/2,1/4]:
-  ansatz_points[21] := [3/4,1/2]:
-  ansatz_points[22] := [1/2,3/4]:
-  ansatz_points[23] := [1/4,1/2]:
-  ansatz_points[24] := [1/2,1/2]:
+  support_points := array(0..n_functions-1):
+  support_points[0] := [0,0]:
+  support_points[1] := [1,0]:
+  support_points[2] := [1,1]:
+  support_points[3] := [0,1]:
+  support_points[4] := [1/4,0]:
+  support_points[5] := [2/4,0]:
+  support_points[6] := [3/4,0]:
+  support_points[7] := [1,1/4]:
+  support_points[8] := [1,2/4]:
+  support_points[9] := [1,3/4]:
+  support_points[10] := [1/4,1]:
+  support_points[11] := [2/4,1]:
+  support_points[12] := [3/4,1]:
+  support_points[13] := [0,1/4]:
+  support_points[14] := [0,2/4]:
+  support_points[15] := [0,3/4]:
+  support_points[16] := [1/4,1/4]:
+  support_points[17] := [3/4,1/4]:
+  support_points[18] := [3/4,3/4]:
+  support_points[19] := [1/4,3/4]:
+  support_points[20] := [1/2,1/4]:
+  support_points[21] := [3/4,1/2]:
+  support_points[22] := [1/2,3/4]:
+  support_points[23] := [1/4,1/2]:
+  support_points[24] := [1/2,1/2]:
 
-  face_ansatz_points := array(0..n_face_functions-1):
-  face_ansatz_points[0] := 0:
-  face_ansatz_points[1] := 1:
-  face_ansatz_points[2] := 1/4:
-  face_ansatz_points[3] := 2/4:
-  face_ansatz_points[4] := 3/4:
-  constrained_face_ansatz_points := array(0..2*(n_face_functions-2)+1-1):
-  constrained_face_ansatz_points[0] := 1/2:
-  constrained_face_ansatz_points[1] := 1/8:
-  constrained_face_ansatz_points[2] := 2/8:
-  constrained_face_ansatz_points[3] := 3/8:
-  constrained_face_ansatz_points[4] := 5/8:
-  constrained_face_ansatz_points[5] := 6/8:
-  constrained_face_ansatz_points[6] := 7/8:
+  face_support_points := array(0..n_face_functions-1):
+  face_support_points[0] := 0:
+  face_support_points[1] := 1:
+  face_support_points[2] := 1/4:
+  face_support_points[3] := 2/4:
+  face_support_points[4] := 3/4:
+  constrained_face_support_points := array(0..2*(n_face_functions-2)+1-1):
+  constrained_face_support_points[0] := 1/2:
+  constrained_face_support_points[1] := 1/8:
+  constrained_face_support_points[2] := 2/8:
+  constrained_face_support_points[3] := 3/8:
+  constrained_face_support_points[4] := 5/8:
+  constrained_face_support_points[5] := 6/8:
+  constrained_face_support_points[6] := 7/8:
   
   phi_polynom := array(0..n_functions-1):
   grad_phi_polynom := array(0..n_functions-1,0..1):
@@ -180,9 +180,9 @@
 
     equation_system := {}:
     for j from 0 to n_functions-1 do
-      poly := subs(xi=ansatz_points[j][1],
-                   eta=ansatz_points[j][2],
-		   ansatz_function):
+      poly := subs(xi=support_points[j][1],
+                   eta=support_points[j][2],
+		   trial_function):
       if (i=j) then
         equation_system := equation_system union {poly = 1}:
       else	
@@ -190,7 +190,7 @@
       fi:	
     od:
     
-    phi_polynom[i] := subs(solve(equation_system), ansatz_function):
+    phi_polynom[i] := subs(solve(equation_system), trial_function):
     grad_phi_polynom[i,0] := diff(phi_polynom[i], xi):
     grad_phi_polynom[i,1] := diff(phi_polynom[i], eta):
   od:
@@ -199,23 +199,23 @@
 
 
   #points on children: let them be indexed one-based, as are
-  #the ansatz_points
+  #the support_points
   points[0] := array(0..n_functions-1, 1..2):
   points[1] := array(0..n_functions-1, 1..2):
   points[2] := array(0..n_functions-1, 1..2):
   points[3] := array(0..n_functions-1, 1..2):
   for i from 0 to n_functions-1 do
-    points[0][i,1] := ansatz_points[i][1]/2:
-    points[0][i,2] := ansatz_points[i][2]/2:
+    points[0][i,1] := support_points[i][1]/2:
+    points[0][i,2] := support_points[i][2]/2:
     
-    points[1][i,1] := ansatz_points[i][1]/2+1/2:
-    points[1][i,2] := ansatz_points[i][2]/2:
+    points[1][i,1] := support_points[i][1]/2+1/2:
+    points[1][i,2] := support_points[i][2]/2:
 
-    points[2][i,1] := ansatz_points[i][1]/2+1/2:
-    points[2][i,2] := ansatz_points[i][2]/2+1/2:
+    points[2][i,1] := support_points[i][1]/2+1/2:
+    points[2][i,2] := support_points[i][2]/2+1/2:
 
-    points[3][i,1] := ansatz_points[i][1]/2:
-    points[3][i,2] := ansatz_points[i][2]/2+1/2:
+    points[3][i,1] := support_points[i][1]/2:
+    points[3][i,2] := support_points[i][2]/2+1/2:
   od:  
 
   print ("Computing prolongation matrices"):
@@ -251,12 +251,12 @@
     od:
   od:
 
-  print ("computing ansatz points in real space"):
+  print ("computing support points in real space"):
   for i from 0 to n_functions-1 do
-    real_points[i,0] := subs(xi=ansatz_points[i][1],
-                             eta=ansatz_points[i][2], x_real);
-    real_points[i,1] := subs(xi=ansatz_points[i][1],
-                             eta=ansatz_points[i][2], y_real);
+    real_points[i,0] := subs(xi=support_points[i][1],
+                             eta=support_points[i][2], x_real);
+    real_points[i,1] := subs(xi=support_points[i][1],
+                             eta=support_points[i][2], y_real);
   od:
 
   print ("computing interface constraint matrices"):
@@ -273,17 +273,17 @@
     od:  
     values[i+1] := 1:
 
-    shifted_face_ansatz_points := array (1..n_face_functions):
+    shifted_face_support_points := array (1..n_face_functions):
     for j from 1 to n_face_functions do
-      shifted_face_ansatz_points[j] := face_ansatz_points[j-1]:
+      shifted_face_support_points[j] := face_support_points[j-1]:
     od:
     
-    face_phi_polynom[i] := interp (shifted_face_ansatz_points, values, xi):
+    face_phi_polynom[i] := interp (shifted_face_support_points, values, xi):
   od:
 
   for i from 0 to 2*(n_face_functions-2)+1-1 do
     for j from 0 to n_face_functions-1 do
-      interface_constraints[i,j] := subs(xi=constrained_face_ansatz_points[i],
+      interface_constraints[i,j] := subs(xi=constrained_face_support_points[i],
                                      face_phi_polynom[j]); 
     od:
   od:
@@ -394,23 +394,23 @@ FEQuarticSub<1>::shape_grad(const unsigned int i,
 
 
 template <>
-void FEQuarticSub<1>::get_unit_ansatz_points (vector<Point<1> > &unit_points) const {
-  FiniteElement<1>::get_unit_ansatz_points (unit_points);
+void FEQuarticSub<1>::get_unit_support_points (vector<Point<1> > &unit_points) const {
+  FiniteElement<1>::get_unit_support_points (unit_points);
 };
 
 
 
 template <>
-void FEQuarticSub<1>::get_ansatz_points (const typename DoFHandler<1>::cell_iterator &cell,
+void FEQuarticSub<1>::get_support_points (const typename DoFHandler<1>::cell_iterator &cell,
 					 const Boundary<1>  &boundary,
-					 vector<Point<1> >  &ansatz_points) const {
-  FiniteElement<1>::get_ansatz_points (cell, boundary, ansatz_points);
+					 vector<Point<1> >  &support_points) const {
+  FiniteElement<1>::get_support_points (cell, boundary, support_points);
 };
 
 
 
 template <>
-void FEQuarticSub<1>::get_face_ansatz_points (const typename DoFHandler<1>::face_iterator &,
+void FEQuarticSub<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					      const Boundary<1>  &,
 					      vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
@@ -2662,7 +2662,7 @@ void FEQuarticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator 
 
 
 template <>
-void FEQuarticSub<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) const {
+void FEQuarticSub<2>::get_unit_support_points (vector<Point<2> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
 
@@ -2696,11 +2696,11 @@ void FEQuarticSub<2>::get_unit_ansatz_points (vector<Point<2> > &unit_points) co
 
 
 template <>
-void FEQuarticSub<2>::get_ansatz_points (const typename DoFHandler<2>::cell_iterator &cell,
+void FEQuarticSub<2>::get_support_points (const typename DoFHandler<2>::cell_iterator &cell,
 					 const Boundary<2>&,
-					 vector<Point<2> >  &ansatz_points) const {
-  Assert (ansatz_points.size() == total_dofs,
-	  ExcWrongFieldDimension (ansatz_points.size(), total_dofs));
+					 vector<Point<2> >  &support_points) const {
+  Assert (support_points.size() == total_dofs,
+	  ExcWrongFieldDimension (support_points.size(), total_dofs));
 
   const double x[4] = { cell->vertex(0)(0),
 			cell->vertex(1)(0),
@@ -2751,72 +2751,72 @@ void FEQuarticSub<2>::get_ansatz_points (const typename DoFHandler<2>::cell_iter
   const double t90 = 3.0/8.0*x[3];
   const double t92 = y[1]/8.0;
   const double t93 = 3.0/8.0*y[3];
-  ansatz_points[0](0) = x[0];
-  ansatz_points[0](1) = y[0];
-  ansatz_points[1](0) = x[1];
-  ansatz_points[1](1) = y[1];
-  ansatz_points[2](0) = x[2];
-  ansatz_points[2](1) = y[2];
-  ansatz_points[3](0) = x[3];
-  ansatz_points[3](1) = y[3];
-  ansatz_points[4](0) = t1+t2;
-  ansatz_points[4](1) = t4+t5;
-  ansatz_points[5](0) = x[0]/2.0+x[1]/2.0;
-  ansatz_points[5](1) = y[0]/2.0+y[1]/2.0;
-  ansatz_points[6](0) = t9+t10;
-  ansatz_points[6](1) = t12+t13;
-  ansatz_points[7](0) = t10+t15;
-  ansatz_points[7](1) = t13+t17;
-  ansatz_points[8](0) = x[1]/2.0+x[2]/2.0;
-  ansatz_points[8](1) = y[1]/2.0+y[2]/2.0;
-  ansatz_points[9](0) = t2+t21;
-  ansatz_points[9](1) = t5+t23;
-  ansatz_points[10](0) = t15+t25;
-  ansatz_points[10](1) = t17+t27;
-  ansatz_points[11](0) = x[2]/2.0+x[3]/2.0;
-  ansatz_points[11](1) = y[2]/2.0+y[3]/2.0;
-  ansatz_points[12](0) = t21+t31;
-  ansatz_points[12](1) = t23+t33;
-  ansatz_points[13](0) = t1+t31;
-  ansatz_points[13](1) = t4+t33;
-  ansatz_points[14](0) = x[0]/2.0+x[3]/2.0;
-  ansatz_points[14](1) = y[0]/2.0+y[3]/2.0;
-  ansatz_points[15](0) = t9+t25;
-  ansatz_points[15](1) = t12+t27;
-  ansatz_points[16](0) = 9.0/16.0*x[0]+t42+x[2]/16.0+t44;
-  ansatz_points[16](1) = 9.0/16.0*y[0]+t47+y[2]/16.0+t49;
-  ansatz_points[17](0) = t51+9.0/16.0*x[1]+t53+x[3]/16.0;
-  ansatz_points[17](1) = t56+9.0/16.0*y[1]+t58+y[3]/16.0;
-  ansatz_points[18](0) = x[0]/16.0+t42+9.0/16.0*x[2]+t44;
-  ansatz_points[18](1) = y[0]/16.0+t47+9.0/16.0*y[2]+t49;
-  ansatz_points[19](0) = t51+x[1]/16.0+t53+9.0/16.0*x[3];
-  ansatz_points[19](1) = t56+y[1]/16.0+t58+9.0/16.0*y[3];
-  ansatz_points[20](0) = t73+t74+t75+t76;
-  ansatz_points[20](1) = t78+t79+t80+t81;
-  ansatz_points[21](0) = t83+t74+t84+t76;
-  ansatz_points[21](1) = t86+t79+t87+t81;
-  ansatz_points[22](0) = t83+t89+t84+t90;
-  ansatz_points[22](1) = t86+t92+t87+t93;
-  ansatz_points[23](0) = t73+t89+t75+t90;
-  ansatz_points[23](1) = t78+t92+t80+t93;
-  ansatz_points[24](0) = x[0]/4.0+x[1]/4.0+x[2]/4.0+x[3]/4.0;
-  ansatz_points[24](1) = y[0]/4.0+y[1]/4.0+y[2]/4.0+y[3]/4.0;
+  support_points[0](0) = x[0];
+  support_points[0](1) = y[0];
+  support_points[1](0) = x[1];
+  support_points[1](1) = y[1];
+  support_points[2](0) = x[2];
+  support_points[2](1) = y[2];
+  support_points[3](0) = x[3];
+  support_points[3](1) = y[3];
+  support_points[4](0) = t1+t2;
+  support_points[4](1) = t4+t5;
+  support_points[5](0) = x[0]/2.0+x[1]/2.0;
+  support_points[5](1) = y[0]/2.0+y[1]/2.0;
+  support_points[6](0) = t9+t10;
+  support_points[6](1) = t12+t13;
+  support_points[7](0) = t10+t15;
+  support_points[7](1) = t13+t17;
+  support_points[8](0) = x[1]/2.0+x[2]/2.0;
+  support_points[8](1) = y[1]/2.0+y[2]/2.0;
+  support_points[9](0) = t2+t21;
+  support_points[9](1) = t5+t23;
+  support_points[10](0) = t15+t25;
+  support_points[10](1) = t17+t27;
+  support_points[11](0) = x[2]/2.0+x[3]/2.0;
+  support_points[11](1) = y[2]/2.0+y[3]/2.0;
+  support_points[12](0) = t21+t31;
+  support_points[12](1) = t23+t33;
+  support_points[13](0) = t1+t31;
+  support_points[13](1) = t4+t33;
+  support_points[14](0) = x[0]/2.0+x[3]/2.0;
+  support_points[14](1) = y[0]/2.0+y[3]/2.0;
+  support_points[15](0) = t9+t25;
+  support_points[15](1) = t12+t27;
+  support_points[16](0) = 9.0/16.0*x[0]+t42+x[2]/16.0+t44;
+  support_points[16](1) = 9.0/16.0*y[0]+t47+y[2]/16.0+t49;
+  support_points[17](0) = t51+9.0/16.0*x[1]+t53+x[3]/16.0;
+  support_points[17](1) = t56+9.0/16.0*y[1]+t58+y[3]/16.0;
+  support_points[18](0) = x[0]/16.0+t42+9.0/16.0*x[2]+t44;
+  support_points[18](1) = y[0]/16.0+t47+9.0/16.0*y[2]+t49;
+  support_points[19](0) = t51+x[1]/16.0+t53+9.0/16.0*x[3];
+  support_points[19](1) = t56+y[1]/16.0+t58+9.0/16.0*y[3];
+  support_points[20](0) = t73+t74+t75+t76;
+  support_points[20](1) = t78+t79+t80+t81;
+  support_points[21](0) = t83+t74+t84+t76;
+  support_points[21](1) = t86+t79+t87+t81;
+  support_points[22](0) = t83+t89+t84+t90;
+  support_points[22](1) = t86+t92+t87+t93;
+  support_points[23](0) = t73+t89+t75+t90;
+  support_points[23](1) = t78+t92+t80+t93;
+  support_points[24](0) = x[0]/4.0+x[1]/4.0+x[2]/4.0+x[3]/4.0;
+  support_points[24](1) = y[0]/4.0+y[1]/4.0+y[2]/4.0+y[3]/4.0;
 };
 
 
 
 template <>
-void FEQuarticSub<2>::get_face_ansatz_points (const typename DoFHandler<2>::face_iterator &face,
+void FEQuarticSub<2>::get_face_support_points (const typename DoFHandler<2>::face_iterator &face,
 					      const Boundary<2>  &,
-					      vector<Point<2> >  &ansatz_points) const {
-  Assert (ansatz_points.size() == dofs_per_face,
-	  ExcWrongFieldDimension (ansatz_points.size(), dofs_per_face));
+					      vector<Point<2> >  &support_points) const {
+  Assert (support_points.size() == dofs_per_face,
+	  ExcWrongFieldDimension (support_points.size(), dofs_per_face));
 
   for (unsigned int vertex=0; vertex<2; ++vertex)
-    ansatz_points[vertex] = face->vertex(vertex);
-  ansatz_points[2] = (3*ansatz_points[0] + ansatz_points[1]) / 4;
-  ansatz_points[3] = (ansatz_points[0] + ansatz_points[1]) / 2;
-  ansatz_points[4] = (ansatz_points[0] + 3*ansatz_points[1]) / 4;
+    support_points[vertex] = face->vertex(vertex);
+  support_points[2] = (3*support_points[0] + support_points[1]) / 4;
+  support_points[3] = (support_points[0] + support_points[1]) / 2;
+  support_points[4] = (support_points[0] + 3*support_points[1]) / 4;
 };
 
 

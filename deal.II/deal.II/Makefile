@@ -28,7 +28,8 @@ examples-clean:
 
 source-clean:
 	cd source ; make clean
-
+TAGS:
+	etags include/*/* source/*/*
 
 
 .PHONY: all deal.II doc examples
