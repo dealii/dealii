@@ -82,16 +82,20 @@ class SmartPointer
     ~SmartPointer();
     
 				     /**
-				      * Assignment operator for
-				      * normal pointers. Change of
-				      * subscription is necessary.
+				      * Assignment operator for normal
+				      * pointers. The pointer
+				      * subscribes to the new object
+				      * automatically and unsubscribes
+				      * to an old one if it exists.
 				      */
     SmartPointer<T> & operator= (T *tt);
 
 				     /**
 				      *Assignment operator for
-				      * #SmartPointer#. Change of
-				      * subscription is necessary.
+				      * #SmartPointer#.  The pointer
+				      * subscribes to the new object
+				      * automatically and unsubscribes
+				      * to an old one if it exists.
 				      */
     SmartPointer<T> & operator= (const SmartPointer<T>& tt);
 
