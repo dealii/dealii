@@ -97,7 +97,8 @@ Quadrature<1>::Quadrature (const Quadrature<0> &,
 
 template <int dim>
 Quadrature<dim>::Quadrature (const SubQuadrature &q1,
-			     const Quadrature<1> &q2) :
+			     const Quadrature<1>                     &q2)
+		:
 		n_quadrature_points (q1.n_quadrature_points *
 				     q2.n_quadrature_points),
 		quadrature_points (n_quadrature_points),
