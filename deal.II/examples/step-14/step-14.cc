@@ -163,11 +163,7 @@ namespace Evaluation
     results_table.add_value ("u(x_0)", point_value);
 
     std::cout << "   Point value=" << point_value
-	      << ", exact value=1.59492, error="
-	      << 1.594915543-point_value << std::endl;
-//      std::cout << "   Point value=" << point_value   //TODO
-//  	      << ", exact value=1, error="
-//  	      << 1.-point_value << std::endl;
+	      << std::endl;
   };
 
 
@@ -372,7 +368,8 @@ namespace Evaluation
     results_table.add_value ("DoFs", dof_handler.n_dofs());
     results_table.add_value ("d_x u(x_0)", point_derivative);
 
-    std::cout << "   Point x-derivative=" << point_derivative  //TODO
+				     // At the end report the status:
+    std::cout << "   Point x-derivative=" << point_derivative
 	      << std::endl;
   };
 
