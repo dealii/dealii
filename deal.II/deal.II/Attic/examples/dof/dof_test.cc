@@ -180,8 +180,8 @@ void TestCases<dim>::run (ParameterHandler &prm) {
       {
 					 // set the boundary function
 	Boundary<dim> *boundary = (test_case==2 ?
-				   new Ball<dim>() :
-				   new CurvedLine<dim>());
+				   static_cast<Boundary<dim>*>(new Ball<dim>()) :
+				   static_cast<Boundary<dim>*>(new CurvedLine<dim>()));
 	tria->set_boundary (boundary);
 	
 					 // refine once
