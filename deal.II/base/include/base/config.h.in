@@ -36,6 +36,12 @@
    */
 #undef DEAL_II_COMPAT_MAPPING
 
+/* Define if we have to work around another bug in Intel's icc compiler in
+   which the compiler refuses to store the const attribute at a member
+   function pointer with a constant class. See the aclocal.m4 file in the
+   top-level directory for a description of this bug. */
+#undef DEAL_II_CONST_MEM_FUN_PTR_BUG
+
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
 #undef DEAL_II_HAVE_TECPLOT

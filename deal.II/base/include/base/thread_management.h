@@ -412,17 +412,21 @@ namespace Threads
       typedef RetType (Class::*type) ();
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class RetType>
   struct MemFunPtr0<const Class, RetType>
   {
       typedef RetType (Class::*type) () const;
   };
-
+#endif  
 				   /**
 				    * Given a class, argument types,
 				    * and the return type, generate a
@@ -435,17 +439,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class RetType>
   struct MemFunPtr1<const Class, Arg1, RetType>
   {
       typedef RetType (Class::*type) (Arg1) const;
   };
-
+#endif  
 				   /**
 				    * Given a class, argument types,
 				    * and the return type, generate a
@@ -458,17 +466,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class RetType>
   struct MemFunPtr2<const Class, Arg1, Arg2, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2) const;
   };
-
+#endif  
 
   				   /**
 				    * Given a class, argument types,
@@ -482,17 +494,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class RetType>
   struct MemFunPtr3<const Class, Arg1, Arg2, Arg3, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3) const;
   };
-
+#endif  
 
   				   /**
 				    * Given a class, argument types,
@@ -506,17 +522,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class RetType>
   struct MemFunPtr4<const Class, Arg1, Arg2, Arg3, Arg4, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4) const;
   };
-
+#endif  
 
   				   /**
 				    * Given a class, argument types,
@@ -530,17 +550,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class RetType>
   struct MemFunPtr5<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5) const;
   };
-
+#endif  
 
   				   /**
 				    * Given a class, argument types,
@@ -554,17 +578,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class RetType>
   struct MemFunPtr6<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const;
   };
-
+#endif  
 
   				   /**
 				    * Given a class, argument types,
@@ -578,17 +606,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class RetType>
   struct MemFunPtr7<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const;
   };
-
+#endif  
 
 
   				   /**
@@ -603,17 +635,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class RetType>
   struct MemFunPtr8<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const;
   };
-
+#endif  
 
 
 
@@ -629,17 +665,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class RetType>
   struct MemFunPtr9<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const;
   };
-
+#endif  
 
   
 
@@ -656,17 +696,21 @@ namespace Threads
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10);
   };
 
+#ifdef DEAL_II_CONST_MEM_FUN_PTR_BUG
 				   /**
 				    * Same as above, but for the case
 				    * of a member function marked
-				    * @p{const}.
+				    * @p{const}. This should not
+				    * really be necessary, but Intel's
+				    * compiler has a bug here so we
+				    * have to work around.
 				    */
   template <class Class, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Arg10, class RetType>
   struct MemFunPtr10<const Class, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10, RetType>
   {
       typedef RetType (Class::*type) (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, Arg10) const;
   };
-
+#endif  
 
   
   
