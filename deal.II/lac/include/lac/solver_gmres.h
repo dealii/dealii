@@ -88,12 +88,16 @@ class SolverGMRES : public Solver<VECTOR>
     {
 					 /**
 					  * Constructor. By default,
-					  * set the number of temporary
-					  * vectors to 30.
+					  * set the number of
+					  * temporary vectors to 30
+					  * and preconditioning from
+					  * left..
 					  */
-	AdditionalData(const unsigned int max_n_tmp_vectors = 30)
+	AdditionalData(const unsigned int max_n_tmp_vectors = 30,
+		       bool right_preconditioning = false)
 			:
-			max_n_tmp_vectors(max_n_tmp_vectors)
+			max_n_tmp_vectors(max_n_tmp_vectors),
+			right_preconditioning(right_preconditioning)
 	  {};
 	
 					 /**
@@ -101,6 +105,10 @@ class SolverGMRES : public Solver<VECTOR>
 					  * tmp vectors.
 					  */
 	unsigned int    max_n_tmp_vectors;
+					   /**
+					    * Flag for right preconditioning.
+					    */
+	  bool right_preconditioning;
     };
     
 				     /**
@@ -270,7 +278,7 @@ unsigned int dim = 0;
 				   // left or a right preconditioner. at
 				   // present, left is default, but both
 				   // ways are implemented
-  const bool left_precondition = true;
+  const bool left_precondition = ! additional_data.right_preconditioning;
 
 				   // define two aliases
   VECTOR &v = *tmp_vectors[0];
