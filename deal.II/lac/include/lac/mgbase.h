@@ -19,9 +19,7 @@
  * The interface of a function call operator is defined to execute coarse
  * grid solution in a derived class.
  */
-class MGCoarseGridSolver
-  :
-  public Subscriptor
+class MGCoarseGridSolver : public Subscriptor
 {
   public:
 				     /**
@@ -36,7 +34,7 @@ class MGCoarseGridSolver
 				      * class like
 				      * #MGCoarseGridLACIteration#.
 				      *
-				      * Remark that the information
+				      * Note that the information
 				      * about the matrix is removed to
 				      * that class.
 				      */
@@ -46,16 +44,15 @@ class MGCoarseGridSolver
 
 
 
+
 /**
  * Abstract base class for multigrid smoothers.
  * In fact, this class only provides the interface of the smoothing function.
- * Using deal.II grid handling, #MGSmoother# is a good point to start.
+ * Using #deal.II# grid handling, #MGSmoother# is a good point to start.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGSmootherBase
-  :
-  public Subscriptor 
+class MGSmootherBase :  public Subscriptor 
 {  
   public:
 				     /**
@@ -64,7 +61,7 @@ class MGSmootherBase
     virtual ~MGSmootherBase();
     
 				     /**
-				      * Smoothen the residual of #u# on the given
+				      * Smooth the residual of #u# on the given
 				      * level. This function should keep the interior
 				      * level boundary values, so you may want
 				      * to call #set_zero_interior_boundary#
@@ -79,13 +76,19 @@ class MGSmootherBase
 
 };
 
+
+
+
+
 /**
- * Smoother doing nothing.
+ * Smoother doing nothing. This class is not useful for many applications other
+ * than for testing some multigrid procedures. Also some applications might
+ * get convergence without smoothing and then this class brings you the
+ * cheapest possible multigrid.
+ *
  * @author Guido Kanschat, 1999
  */
-class MGSmootherIdentity
-  :
-  public MGSmootherBase
+class MGSmootherIdentity : public MGSmootherBase
 {
   public:
 				     /**
@@ -97,6 +100,8 @@ class MGSmootherIdentity
 			 const Vector<double> &rhs) const;
 };
 
+
+
 /**
  * Base class used to declare the operations needed by a concrete class
  * implementing prolongation and restriction of vectors in the multigrid
@@ -105,9 +110,7 @@ class MGSmootherIdentity
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
-class MGTransferBase
-  :
-  public Subscriptor
+class MGTransferBase : public Subscriptor
 {
   public:
 				     /**
@@ -150,6 +153,8 @@ class MGTransferBase
 			   const Vector<double> &src) const = 0;
 };
 
+
+
 /**
  * An array with a vector for each level.
  * The purpose of this class is mostly to provide range checking that is missing in
@@ -157,10 +162,8 @@ class MGTransferBase
  * @author Guido Kanschat, 1999
  */
 template<class VECTOR>
-class MGVector
-  :
-  public Subscriptor,
-  public vector<VECTOR>
+class MGVector : public Subscriptor,
+		 public vector<VECTOR>
 {
   public:
 				     /**
@@ -188,6 +191,7 @@ class MGVector
 
 
 
+
 /**
  * An array of matrices for each level.
  * This class provides the functionality of #vector<MATRIX># combined
@@ -195,20 +199,20 @@ class MGVector
  * @author Guido Kanschat, 1999
  */
 template<class MATRIX>
-class MGMatrix
-  :
-  public Subscriptor,
-  public vector<MATRIX>
+class MGMatrix : public Subscriptor,
+		 public vector<MATRIX>
 {
   public:
 				     /**
 				      * Constructor allowing to initialize the number of levels.
 				      */
     MGMatrix(unsigned int minlevel, unsigned int maxlevel);
+    
 				     /**
 				      * Safe access operator.
 				      */
     MATRIX& operator[](unsigned int);
+    
 				     /**
 				      * Safe access operator.
 				      */
@@ -222,16 +226,17 @@ class MGMatrix
 };
 
 
+
+
 /**
  * Coarse grid solver using LAC iterative methods.
  * This is a little wrapper, transforming a triplet of iterative
  * solver, matrix and preconditioner into a coarse grid solver.
+ *
  * @author Guido Kanschat, 1999
  */
 template<class SOLVER, class MATRIX, class PRECOND>
-class MGCoarseGridLACIteration
-  :
-  public MGCoarseGridSolver
+class MGCoarseGridLACIteration :  public MGCoarseGridSolver
 {
   public:
 				     /**
@@ -240,7 +245,7 @@ class MGCoarseGridLACIteration
 				      * preconditioning method for later
 				      * use.
 				      */
-    MGCoarseGridLACIteration( SOLVER&, const MATRIX&, const PRECOND&);
+    MGCoarseGridLACIteration(SOLVER&, const MATRIX&, const PRECOND&);
     
 				     /**
 				      * Implementation of the abstract
@@ -249,13 +254,15 @@ class MGCoarseGridLACIteration
 				      * matrix, vectors and
 				      * preconditioner.
 				      */
-    virtual void operator() (unsigned int level, Vector<double>& dst,
-			     const Vector<double>& src) const;
+    virtual void operator() (const unsigned int   level,
+			     Vector<double>       &dst,
+			     const Vector<double> &src) const;
   private:
 				     /**
 				      * Reference to the solver.
 				      */
     SOLVER& solver;
+    
 				     /**
 				      * Reference to the matrix.
 				      */
@@ -266,6 +273,8 @@ class MGCoarseGridLACIteration
 				      */
     const PRECOND& precondition;
 };
+
+
 
 /**
  * Basic class for multigrid preconditioning.
@@ -286,9 +295,7 @@ class MGCoarseGridLACIteration
  *
  * @author Guido Kanschat, 1999
  * */
-class MGBase
-  :
-  public Subscriptor
+class MGBase : public Subscriptor
 {
   private:
     MGBase(const MGBase&);
