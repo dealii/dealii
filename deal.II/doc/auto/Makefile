@@ -20,17 +20,19 @@ kdoc.dealII = $(kdoc.grid) $(kdoc.dof) $(kdoc.numerics)
 
 # user projects. the projects should be independent of each other, so
 # we need not take care of cross-dependencies each time 
-kdoc.transport     = $(shell echo ../../../projects/transport/trans_dg/*.h)
+kdoc.transport     = $(shell echo ../../../projects/transport/hyperbolic/include/*.h)
 kdoc.wave-equation = $(shell echo ../../../projects/wave-equation/include/*.h)
 
 
+kdoc.dealII-files = kdoc/base.kdoc         \
+                    kdoc/lac.kdoc          \
+                    kdoc/basic.kdoc        \
+                    kdoc/grid.kdoc         \
+                    kdoc/dof.kdoc          \
+                    kdoc/numerics.kdoc     \
+
 # specify the names of the resulting doc libraries
-kdoc.library-files = kdoc/base.kdoc         \
-                     kdoc/lac.kdoc          \
-                     kdoc/basic.kdoc        \
-                     kdoc/grid.kdoc         \
-                     kdoc/dof.kdoc          \
-                     kdoc/numerics.kdoc     \
+kdoc.library-files = $(kdoc.dealII-files)  \
                      kdoc/transport.kdoc    \
                      kdoc/wave-equation.kdoc
 ##########################################################################
@@ -105,8 +107,8 @@ $(kdoc.library-files.rerun):
 		$($(subst /,.,$(subst .kdoc.rerun,,$@)):../..%=../../..%)
 
 
-kdoc/names.html: $(kdoc.libray-files)
-	@cd kdoc ; perl ../scripts/index.pl *.kdoc > names.html
+kdoc/names.html: $(kdoc.dealII-files)
+	@perl scripts/index.pl $(kdoc.dealII-files) > kdoc/names.html
 
 
 
