@@ -51,6 +51,19 @@ else
   LIBHSL=
 endif
 
+# in general, when linking shared libraries, we will want to link with
+# the underlying libs as well. AIX even requires this. on the other
+# hand, on DEC OSF with CXX this will fail with duplicate symbols, so
+# make sure that it doesn't happen on that system and that compiler
+ifneq ($(GXX-VERSION),compaq_cxx)
+  deplibs.g = $(lib-base.g) $(LIBHSL)
+  deplibs.o = $(lib-base.o) $(LIBHSL)
+else
+  deplibs.g =
+  deplibs.o =
+endif
+
+
 $(LIBDIR)/liblac.a: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@ar ru $@ $(o-files)
@@ -64,11 +77,11 @@ $(LIBDIR)/liblac.g.a: $(go-files)
 
 $(LIBDIR)/liblac.so: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(lib-base.o) $(LIBHSL)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(deplibs.o)
 
 $(LIBDIR)/liblac.g.so: $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(lib-base.g) $(LIBHSL)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(deplibs.g)
 
 
 

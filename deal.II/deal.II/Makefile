@@ -87,6 +87,19 @@ $(LIBDIR)/3d/%.$(OBJEXT) :
 
 
 
+# in general, when linking shared libraries, we will want to link with
+# the underlying libs as well. AIX even requires this. on the other
+# hand, on DEC OSF with CXX this will fail with duplicate symbols, so
+# make sure that it doesn't happen on that system and that compiler
+ifneq ($(GXX-VERSION),compaq_cxx)
+  deplibs.g = $(lib-lac.g) $(lib-base.g)
+  deplibs.o = $(lib-lac.o) $(lib-base.o)
+else
+  deplibs.g =
+  deplibs.o =
+endif
+
+
 
 # rules how to make the libraries themselves
 $(LIBDIR)/libdeal_II_1d.g.a: $(go-files-1d)
@@ -121,29 +134,29 @@ $(LIBDIR)/libdeal_II_3d.a: $(o-files-3d)
 
 $(LIBDIR)/libdeal_II_1d.g.so: $(go-files-1d)
 	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-1d) $(lib-lac.g) $(lib-base.g)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-1d) $(deplibs.g)
 
 $(LIBDIR)/libdeal_II_1d.so: $(o-files-1d)
 	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-1d) $(lib-lac.o) $(lib-base.o)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-1d) $(deplibs.o)
 
 
 $(LIBDIR)/libdeal_II_2d.g.so: $(go-files-2d)
 	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-2d) $(lib-lac.g) $(lib-base.g)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-2d) $(deplibs.g)
 
 $(LIBDIR)/libdeal_II_2d.so: $(o-files-2d)
 	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-2d) $(lib-lac.o) $(lib-base.o)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-2d) $(deplibs.o)
 
 
 $(LIBDIR)/libdeal_II_3d.g.so: $(go-files-3d)
 	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-3d) $(lib-lac.g) $(lib-base.g)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files-3d) $(deplibs.g)
 
 $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-3d) $(lib-lac.o) $(lib-base.o)
+	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files-3d) $(deplibs.o)
 
 
 
