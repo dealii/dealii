@@ -96,6 +96,11 @@ class Quadrature : public Subscriptor
 				      */
     Quadrature (const typename std::vector<Point<dim> > &points,
 		const std::vector<double>      &weights);
+
+				     /**
+				      * Constructor for a one-point quadrature.
+				      */
+    Quadrature (const Point<dim> &point);
     
 				     /**
 				      * Virtual destructor.
