@@ -788,7 +788,7 @@ MappingQ1<dim>::transform_covariant (Tensor<1,dim>       *begin,
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
 
 //TODO: [GK] Can we do a similar assertion?  
 //  Assert (dst.size() == data.contravariant.size(),
@@ -817,7 +817,7 @@ MappingQ1<dim>::transform_covariant (Tensor<2,dim>       *begin,
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_covariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
 
 //TODO: [GK] Can we do a similar assertion?  
 //  Assert (dst.size() == data.contravariant.size(),
@@ -846,7 +846,7 @@ MappingQ1<dim>::transform_contravariant (Tensor<1,dim>       *begin,
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
 
   typename std::vector<Tensor<2,dim> >::const_iterator
     tensor = data.contravariant.begin();
@@ -870,7 +870,7 @@ MappingQ1<dim>::transform_contravariant (Tensor<2,dim>       *begin,
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  ExcAccessToUninitializedField());
 
   typename std::vector<Tensor<2,dim> >::const_iterator
     tensor = data.contravariant.begin();
