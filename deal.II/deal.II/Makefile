@@ -6,6 +6,11 @@
 D=..
 
 
+# get options which hold for all files of the project
+include $D/common/Make.global_options
+
+
+
 # top level targets
 default: 2dg 2d
 
@@ -51,9 +56,6 @@ go-files-3d = $(addprefix lib/3d/go/, $(tmp1:.cc=_3d.go))
 
 o-files  = $(o-files-1d)  $(o-files-2d)  $(o-files-3d)
 go-files = $(go-files-1d) $(go-files-2d) $(go-files-3d)
-
-# get options which hold for all files of the project
-include $D/common/Make.global_options
 
 
 # rules how to generate object files from source files. note that
