@@ -403,7 +403,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
-       Changed: The <code
+       New: The <code
+       class="member">FiniteElement::system_to_base_index</code> function now
+       exports the values of the <code
+       class="member">FiniteElement::system_to_base_table</code> member
+       variable. Likewise for the indices on faces.
+       <br>
+       (WB 2002/10/17)
+       </p>
+
+  <li> <p> 
+       New: The <code
        class="member">FiniteElement::element_multiplicity</code> function was
        previously only available in the <code class="class">FESystem</code>
        class, where it actually returned a non-trivial value. However, in some

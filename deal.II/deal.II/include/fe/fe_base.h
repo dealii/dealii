@@ -757,8 +757,10 @@ class FiniteElementBase : public Subscriptor,
 				      * that has more than one
 				      * vector-component). For this
 				      * information, refer to the
-				      * @p{system_to_base_table}
-				      * field.
+				      * @p{system_to_base_table} field
+				      * and the
+				      * @p{system_to_base_index}
+				      * function.
 				      */
     std::pair<unsigned int,unsigned int>
     system_to_component_index (const unsigned int index) const;    
@@ -770,6 +772,55 @@ class FiniteElementBase : public Subscriptor,
 				      */
     std::pair<unsigned int,unsigned int>
     face_system_to_component_index (const unsigned int index) const;
+
+                                     /**
+                                      * Return for shape function
+                                      * @p{index} the base element it
+                                      * belongs to, the number of the
+                                      * copy of this base element
+                                      * (which is between zero and the
+                                      * multiplicity of this element),
+                                      * and the index of this shape
+                                      * function within this base
+                                      * element.
+                                      *
+                                      * If the element is not composed of
+				      * others, then base and instance
+				      * are always zero, and the index
+				      * is equal to the number of the
+				      * shape function. If the element
+				      * is composed of single
+				      * instances of other elements
+				      * (i.e. all with multiplicity
+				      * one) all of which are scalar,
+				      * then base values and dof
+				      * indices within this element
+				      * are equal to the
+				      * @p{system_to_component_table}. It
+				      * differs only in case the
+				      * element is composed of other
+				      * elements and at least one of
+				      * them is vector-valued itself.
+				      *
+				      * This function returns valid
+				      * values also in the case of
+				      * vector-valued
+				      * (i.e. non-primitive) shape
+				      * functions, in contrast to the
+				      * @p{system_to_component_index}
+				      * function.
+                                      */
+    std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+    system_to_base_index (const unsigned int index) const;
+
+                                     /**
+                                      * Same as
+                                      * @p{system_to_base_index}, but
+                                      * for degrees of freedom located
+                                      * on a face.
+                                      */
+    std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+    face_system_to_base_index (const unsigned int index) const;
     
  				     /**
 				      * Given a vector component,
@@ -1589,7 +1640,33 @@ FiniteElementBase<dim>::face_system_to_component_index (const unsigned int index
           typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(index));
 
   return face_system_to_component_table[index];
+};
+
+
+
+template <int dim>  
+inline
+std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
+FiniteElementBase<dim>::system_to_base_index (const unsigned int index) const
+{
+  Assert (index < system_to_base_table.size(),
+	 ExcIndexRange(index, 0, system_to_base_table.size()));
+  return system_to_base_table[index];
 }
+
+
+
+
+template <int dim>  
+inline
+std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
+FiniteElementBase<dim>::face_system_to_base_index (const unsigned int index) const
+{
+  Assert(index < face_system_to_base_table.size(),
+	 ExcIndexRange(index, 0, face_system_to_base_table.size()));
+  return face_system_to_base_table[index];
+};
+
 
 
 template <int dim>  
