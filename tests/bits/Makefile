@@ -52,7 +52,7 @@ tests_x = anna_? \
           sparsity_pattern_* \
           sparse_matrix_* \
 	  full_matrix_vector_* \
-	  solver_selector \
+	  solver_* \
 	  deal_solver_* \
 	  vector_* \
 	  subdomain_ids_* \
