@@ -153,7 +153,7 @@ class PreconditionSelector : public Subscriptor
 
 template <class Matrix, class Vector>
 PreconditionSelector<Matrix,Vector>
-::PreconditionSelector(std::string                       &preconditioning,
+::PreconditionSelector(const std::string                 &preconditioning,
 		       const typename Vector::value_type &omega) :
 		preconditioning(preconditioning),
 		omega(omega)  {}
