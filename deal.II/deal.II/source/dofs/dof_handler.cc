@@ -1825,15 +1825,15 @@ template <>
 void DoFHandler<1>::reserve_space () {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
+
                                    // delete all levels and set them up
                                    // newly, since vectors are
                                    // troublesome if you want to change
                                    // their size
   clear_space ();
   
-  vertex_dofs = std::vector<unsigned int>(tria->vertices.size()*
-					  selected_fe->dofs_per_vertex,
-					  invalid_dof_index);
+  vertex_dofs.resize(tria->vertices.size()*selected_fe->dofs_per_vertex,
+		     invalid_dof_index);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
@@ -1862,9 +1862,9 @@ void DoFHandler<2>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = std::vector<unsigned int>(tria->vertices.size()*
-					  selected_fe->dofs_per_vertex,
-					  invalid_dof_index);
+  vertex_dofs.resize(tria->vertices.size()*selected_fe->dofs_per_vertex,
+		     invalid_dof_index);
+
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<2>);
@@ -1894,9 +1894,9 @@ void DoFHandler<3>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs = std::vector<unsigned int>(tria->vertices.size()*
-					  selected_fe->dofs_per_vertex,
-					  invalid_dof_index);
+  vertex_dofs.resize(tria->vertices.size()*selected_fe->dofs_per_vertex,
+		     invalid_dof_index);
+
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<3>);
@@ -1921,6 +1921,9 @@ void DoFHandler<dim>::clear_space () {
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.resize (0);
+
+  std::vector<unsigned int> tmp;
+  std::swap (vertex_dofs, tmp);
 };
 
 
