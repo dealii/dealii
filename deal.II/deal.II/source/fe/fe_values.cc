@@ -287,6 +287,48 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe
 
 
 template <int dim>
+template <class InputVector>
+void
+FEValuesBase<dim>::
+get_function_2nd_derivatives (const InputVector               &fe_function,
+			      vector<vector<Tensor<2,dim> > > &second_derivs) const
+{
+  Assert (n_quadrature_points == second_derivs.size(),
+	  ExcWrongNoOfComponents());
+  Assert (selected_dataset<shape_values.size(),
+	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
+  for (unsigned i=0;i<second_derivs.size();++i)
+    Assert (second_derivs[i].size() == fe->n_components(),
+	    ExcWrongVectorSize(second_derivs[i].size(), fe->n_components()));
+  Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+
+				   // get function values of dofs
+				   // on this cell
+  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  if (present_cell->active())
+    present_cell->get_dof_values (fe_function, dof_values);
+  else
+    present_cell->get_interpolated_dof_values(fe_function, dof_values);
+
+				   // initialize with zero
+  for (unsigned i=0;i<second_derivs.size();++i)
+    fill_n (second_derivs[i].begin(), second_derivs[i].size(), Tensor<2,dim>());
+
+				   // add up contributions of trial
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+      {
+	Tensor<2,dim> tmp(shape_2nd_derivatives[shape_func][point]);
+	tmp *= dof_values(shape_func);
+	second_derivs[point][fe->system_to_component_index(shape_func).first]
+	  += tmp;
+      };
+};
+
+
+
+template <int dim>
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 {
@@ -929,3 +971,14 @@ void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<double> &,
 					     vector<Tensor<2,deal_II_dimension> > &) const;
+//-----------------------------------------------------------------------------
+
+template
+void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<double> &,
+					    vector<vector<Tensor<2,deal_II_dimension> > > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const Vector<float> &,
+					     vector<vector<Tensor<2,deal_II_dimension> > > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives (const BlockVector<double> &,
+					     vector<vector<Tensor<2,deal_II_dimension> > > &) const;

@@ -468,6 +468,33 @@ class FEValuesBase
     void get_function_2nd_derivatives (const InputVector      &fe_function,
 				       vector<Tensor<2,dim> > &second_derivatives) const;
 
+    
+				     /**
+				      * Return the tensor of second
+				      * derivatives of the finite
+				      * element function characterized
+				      * by @p{fe_function} restricted to
+				      * @p{cell} at the quadrature points.
+				      *
+				      * The function assumes that the
+				      * @p{second_derivatives} object already has
+				      * the right size.
+				      *
+				      * This function does the same as
+				      * the other one with the same
+				      * name, but applies to
+				      * vector-valued finite elements.
+				      *
+				      * The actual data type of the
+				      * input vector may be either a
+				      * @p{Vector<double>},
+				      * @p{Vector<float>}, or
+				      * @p{BlockVector<double,...>}.
+				      */
+    template <class InputVector>
+    void get_function_2nd_derivatives (const InputVector      &fe_function,
+				       vector<vector<Tensor<2,dim> > > &second_derivatives) const;
+    
 				     /**
 				      * Return the position of the @p{i}th
 				      * quadrature point in real space.
