@@ -158,8 +158,8 @@ class LogStream
     void log_time_differences (bool flag);
     
 				     /**
-				      * Output a constant something through
-				      * this stream.
+				      * Output a constant something
+				      * through this stream.
 				      */
     template <typename T>
     LogStream & operator << (const T &t);
@@ -281,6 +281,16 @@ class LogStream
 				      * the contents of the prefix stack.
 				      */
     void print_line_head();
+
+				     /**
+				      * Actually do the work of
+				      * writing output. This function
+				      * unifies the work that is
+				      * common to the two
+				      * @p{operator<<} functions.
+				      */
+    template <typename T>
+    void print (const T &t);
 };
 
 
@@ -292,9 +302,42 @@ inline
 LogStream &
 LogStream::operator<< (const T& t)
 {
+				   // do the work that is common to
+				   // the two operator<< functions
+  print (t);
+  return *this;
+};
+
+
+
+inline
+LogStream &
+LogStream::operator<< (std::ostream& (*p) (std::ostream&))
+{
+				   // do the work that is common to
+				   // the two operator<< functions
+  print (p);
+
+				   // next check whether this is the
+				   // @p{endl} manipulator, and if so
+				   // set a flag
+  std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
+  if (p == p_endl)
+    was_endl = true;
+
+  return *this;
+};
+
+
+
+template <class T>
+inline
+void
+LogStream::print (const T &t)
+{
 				   // if the previous command was an
-				   // @p{std::endl}, print the topmost prefix
-				   // and a colon
+				   // @p{std::endl}, print the topmost
+				   // prefix and a colon
   if (was_endl)
     {
       print_line_head();
@@ -307,29 +350,7 @@ LogStream::operator<< (const T& t)
 
   if (file && (prefixes.size() <= file_depth))
     *file << t;
-
-  return *this;
 }
-
-
-
-inline
-LogStream &
-LogStream::operator<< (std::ostream& (*p) (std::ostream&))
-{
-				   // first pass on to the other
-				   // (templatized function)
-  this->template operator<< <std::ostream & (*)(std::ostream&)> (p);
-
-				   // next check whether this is the
-				   // @p{endl} manipulator, and if so
-				   // set a flag
-  std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
-  if (p == p_endl)
-    was_endl = true;
-
-  return *this;
-};
 
 
 
