@@ -565,7 +565,35 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 			    << ' ' << cell->level()
 			    << ' ' << static_cast<unsigned int>(cell->material_id())
 			    << std::endl;
-			
+
+                                                         // compute
+                                                         // offset of
+                                                         // quadrature
+                                                         // points
+                                                         // within set
+                                                         // of
+                                                         // projected
+                                                         // points. note
+                                                         // that we
+                                                         // need not
+                                                         // care about
+                                                         // reverted
+                                                         // faces in
+                                                         // 3d since
+                                                         // boundary
+                                                         // faces
+                                                         // always
+                                                         // have to be
+                                                         // in
+                                                         // standard
+                                                         // orientation
+                                                         // and the
+                                                         // standard
+                                                         // orientation
+                                                         // quadrature
+                                                         // points are
+                                                         // first in
+                                                         // the list
 			const unsigned int offset=face_no*n_points;
 			for (unsigned int i=0; i<n_points; ++i)
 			  out << (mapping->transform_unit_to_real_cell

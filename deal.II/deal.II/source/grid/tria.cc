@@ -6555,7 +6555,7 @@ Triangulation<3>::execute_refinement ()
 					     // not refined, the
 					     // neighbor iterators
 					     // point to the common
-					     // moter cell. the same
+					     // mother cell. the same
 					     // applies if there is no
 					     // neighbor: the
 					     // iterators are past the
@@ -6598,7 +6598,7 @@ Triangulation<3>::execute_refinement ()
 						     // two
 						     // possibilities:
 						     // either the
-						     // nieghbor has
+						     // neighbor has
 						     // no children or
 						     // it has
 						     // children. these
@@ -6642,12 +6642,34 @@ Triangulation<3>::execute_refinement ()
 							 // by a
 							 // function
 							 // of
-							 // GeometryInfo
+							 // GeometryInfo. however,
+							 // if the
+							 // neighbors
+							 // face has
+							 // the wrong
+							 // orientation,
+							 // then we
+							 // run into
+							 // trouble
+							 // and have
+							 // to swap
+							 // subfaces
+							 // to account
+							 // for that
+                        const bool orient = neighbor->get_face_orientation(face);
+                        static const unsigned int
+                          child_switch_table[GeometryInfo<dim>::subfaces_per_face]
+                          = { 0, 3, 2, 1 };
+                        
 			for (unsigned int c=0;
 			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
 			  {
 			    neighbor_cells[face][c]
-			      = neighbor->child(GeometryInfo<dim>::child_cell_on_face(nb_nb, c));
+			      = neighbor->child(GeometryInfo<dim>::
+                                                child_cell_on_face(nb_nb,
+                                                                   orient ?
+                                                                   c :
+                                                                   child_switch_table[c]));
 			    
 			    Assert (neighbor_cells[face][c].state() ==
 				    IteratorState::valid,
@@ -6720,7 +6742,7 @@ Triangulation<3>::execute_refinement ()
 
 
 					     // now we need to set the
-					     // neighbors neighborship
+					     // neighbors' neighborship
 					     // information; this is
 					     // only necessary if the
 					     // neighboring cell is
@@ -6744,7 +6766,7 @@ Triangulation<3>::execute_refinement ()
 						     // new children
 						     // as its
 						     // neighbor
-		    cell_iterator neighbor = neighbor_cells[nb][subface];
+		    const cell_iterator neighbor = neighbor_cells[nb][subface];
 
 						     // find which
 						     // neighbor
@@ -6761,12 +6783,35 @@ Triangulation<3>::execute_refinement ()
 		    Assert (face<GeometryInfo<dim>::faces_per_cell,
 			    ExcInternalError());
 
-						     // now
-						     // neighbor->neighbor(face)
-						     // needs to be
-						     // reset
-		    neighbor->set_neighbor(face,
-					   new_hexes[GeometryInfo<dim>::child_cell_on_face(nb, subface)]);
+                                                     // then figure
+                                                     // out which of
+                                                     // the new cells
+                                                     // points to this
+                                                     // neighbor. this
+                                                     // could
+                                                     // presumably be
+                                                     // made faster
+                                                     // with only one
+                                                     // loop, but is
+                                                     // notoriously
+                                                     // tricky to get
+                                                     // right in view
+                                                     // of
+                                                     // mis-oriented
+                                                     // faces :-(
+                    for (unsigned int c=0;
+                         c<GeometryInfo<dim>::children_per_cell; ++c)
+                      for (unsigned int f=0;
+                           f<GeometryInfo<dim>::faces_per_cell; ++f)
+                        if (new_hexes[c]->neighbor(f) == neighbor)
+                          {
+                            neighbor->set_neighbor(face, new_hexes[c]);
+                            goto found;
+                          }
+                    Assert (false, ExcInternalError());
+
+                    found:
+                    ;
 		  };
 
 
