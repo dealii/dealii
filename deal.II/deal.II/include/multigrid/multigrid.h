@@ -4,7 +4,10 @@
 #define __multigrid_H
 /*----------------------------   multigrid.h     ---------------------------*/
 
-class dVector;
+
+#include <lac/forward-declarations.h>
+
+
 
 /**
  * Vector with data for each level.
@@ -21,25 +24,24 @@ class dVector;
  */
 class MGVector
 {
-  MGVector(const MGVector&);
-public:
-				   /**
-				    * Constructor using the number of
-				    * levels.
-				    */
-  MGVector(unsigned l);
-				   /**
-				    * Access to data on a specific
-				    level.
-				   */
-  dVector& operator[](unsigned l);
-
-				   /**
-				    * Access to data on a specific
-				    level.
-				   */
-  const dVector& operator[](unsigned l) const;
-  
+    MGVector(const MGVector&);
+  public:
+				     /**
+				      * Constructor using the number of
+				      * levels.
+				      */
+    MGVector(unsigned l);
+				     /**
+				      * Access to data on a specific
+				      * level.
+				      */
+    Vector<double>& operator[](unsigned l);
+    
+				     /**
+				      * Access to data on a specific
+				      level.
+				     */
+    const Vector<double>& operator[](unsigned l) const;
 };
 
 
@@ -95,19 +97,19 @@ class MultiGrid
 				    * corresponding levels of an
 				    * MGVector.
 				    */
-  void copy_to_mg(MGVector& dst, const dVector& src) const;
+  void copy_to_mg(MGVector& dst, const Vector<double>& src) const;
 
 				   /**
 				    * Transfer from MGVector to
-				    * dVector.
+				    * Vector<double>.
 				    *
 				    * Copies data from active portions
 				    * of an MGVector into the
 				    * respective positions of a
-				    * dVector. All other entries of
+				    * Vector<double>. All other entries of
 				    * #src# are zero.
 				    */
-  void copy_from_mg(dVector& dst, const MGVector& src) const;
+  void copy_from_mg(Vector<double>& dst, const MGVector& src) const;
 
 				   /**
 				    * The actual v-cycle multigrid method.
@@ -144,8 +146,8 @@ protected:
 				    *
 				    */
   virtual void smooth(unsigned level,
-		      dVector& x,
-		      const dVector& b,
+		      Vector<double>& x,
+		      const Vector<double>& b,
 		      unsigned steps) const;
 
 				   /**
@@ -153,8 +155,8 @@ protected:
 				    * Defaults to #smooth#.
 				    */
   virtual void post_smooth(unsigned level,
-			   dVector& dst,
-			   const dVector& src,
+			   Vector<double>& dst,
+			   const Vector<double>& src,
 			   unsigned steps) const;
 
 				   /**
@@ -163,8 +165,8 @@ protected:
 				    *
 				    */
   virtual void level_vmult(unsigned level,
-			   dVector& dst,
-			   const dVector& src) const;
+			   Vector<double>& dst,
+			   const Vector<double>& src) const;
 				   /**
 				    * Apply operator on non-refined
 				    * cells.
@@ -175,8 +177,8 @@ protected:
 				    * normal fine-grid matrix.
 				    */
   virtual void level_active_vmult(unsigned level,
-				  dVector& dst,
-				  const dVector& src) const;
+				  Vector<double>& dst,
+				  const Vector<double>& src) const;
 
 				   /**
 				    * Restriction from #level#.
@@ -187,8 +189,8 @@ protected:
 				    * and #dst# is on #level#-1.
 				    */
   virtual void restriction(unsigned level,
-			   dVector& dst,
-			   const dVector& src) const;
+			   Vector<double>& dst,
+			   const Vector<double>& src) const;
 			   
 
 				   /**
@@ -199,15 +201,15 @@ protected:
 				    * #level# and #src# on #level#-1.
 				    */
   virtual void prolongation(unsigned level,
-			    dVector& dst,
-			    const dVector& src) const;
+			    Vector<double>& dst,
+			    const Vector<double>& src) const;
 
 				   /**
 				    * Solve exactly on coarsest grid.
 				    */
   virtual void coarse_grid_solution(unsigned l,
-				    dVector& dst,
-				    const dVector& src) const;
+				    Vector<double>& dst,
+				    const Vector<double>& src) const;
   
 
   
@@ -227,14 +229,14 @@ public:
 				    * the outer iteration.
 				    *
 				    */
-  void vmult(dVector& dst, const dVector& src) const;
+  void vmult(Vector<double>& dst, const Vector<double>& src) const;
 				   /** Multigrid preconditioning.
 				    *
 				    * This is the function, where the
 				    * multigrid method is implemented.
 				    *
 				    */
-  void precondition(dVector& dst, const dVector& src) const;
+  void precondition(Vector<double>& dst, const Vector<double>& src) const;
 };
 
 

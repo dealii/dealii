@@ -9,7 +9,6 @@
 #include <base/exceptions.h>
 
 
-template <int dim> class Triangulation;
 
 
 /**

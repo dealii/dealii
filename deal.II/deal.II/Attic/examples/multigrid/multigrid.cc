@@ -19,8 +19,8 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 
-#include <lac/dvector.h>
-#include <lac/dsmatrix.h>
+#include <lac/vector.h>
+#include <lac/sparsematrix.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 
@@ -41,14 +41,14 @@ class PoissonEquation :  public Equation<dim> {
 		    Equation<dim>(1),
 		    right_hand_side (rhs)  {};
 
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
-    virtual void assemble (dFMatrix            &cell_matrix,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
-    virtual void assemble (dVector             &rhs,
+    virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
   protected:
@@ -125,22 +125,22 @@ class PoissonProblem {
 				     /**
 				      * Sparsity pattern of the system matrix.
 				      */
-    dSMatrixStruct      system_sparsity;
+    SparseMatrixStruct  system_sparsity;
 
 				     /**
 				      * System matrix.
 				      */
-    dSMatrix            system_matrix;
+    SparseMatrix<double> system_matrix;
 
 				     /**
 				      * Vector storing the right hand side.
 				      */
-    dVector             right_hand_side;
+    Vector<double>      right_hand_side;
 
 				     /**
 				      * Solution vector.
 				      */
-    dVector             solution;
+    Vector<double>      solution;
 
 				     /**
 				      * List of constraints introduced by
@@ -228,8 +228,8 @@ Tensor<1,2> Solution<2>::gradient (const Point<2> &p) const {
 
 
 template <>
-void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
+void PoissonEquation<2>::assemble (FullMatrix<double>  &cell_matrix,
+				   Vector<double>      &rhs,
 				   const FEValues<2>   &fe_values,
 				   const DoFHandler<2>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -248,7 +248,7 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dFMatrix            &,
+void PoissonEquation<dim>::assemble (FullMatrix<double>  &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -257,7 +257,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &,
 
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dVector             &,
+void PoissonEquation<dim>::assemble (Vector<double>      &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -393,8 +393,8 @@ void PoissonProblem<dim>::solve () {
   Assert ((tria!=0) && (dof!=0), ExcNoTriaSelected());
   
   SolverControl                    control(4000, 1e-16);
-  PrimitiveVectorMemory<dVector>   memory;
-  SolverCG<dSMatrix,dVector>       cg(control,memory);
+  PrimitiveVectorMemory<Vector<double> >   memory;
+  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
 				   // solve
   cg.solve (system_matrix, solution, right_hand_side);
@@ -486,8 +486,8 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   solve ();
 
   Solution<dim> sol;
-  dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
-  dVector       h1_seminorm_error_per_cell, h1_error_per_cell;
+  Vector<float>       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
+  Vector<float>       h1_seminorm_error_per_cell, h1_error_per_cell;
   
   cout << "    Calculating L1 error... ";
   VectorTools<dim>::integrate_difference (*dof,
@@ -531,8 +531,8 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 
   if (dof->DoFHandler<dim>::n_dofs()<=5000) 
     {
-      dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
-      dVector h1_seminorm_error_per_dof, h1_error_per_dof;
+      Vector<double> l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
+      Vector<double> h1_seminorm_error_per_dof, h1_error_per_dof;
       dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
@@ -541,7 +541,7 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 					  h1_seminorm_error_per_dof);
       dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
 
-//       dVector projected_solution;
+//       Vector<double> projected_solution;
 //       ConstraintMatrix constraints;
 //       constraints.close ();
 //       VectorTools<dim>::project (*dof, constraints, *fe,

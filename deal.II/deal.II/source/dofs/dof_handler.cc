@@ -12,8 +12,9 @@
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
-#include <lac/dsmatrix.h>
-#include <lac/dvector.h>
+#include <lac/sparsematrix.h>
+#include <lac/vector.h>
+#include <lac/vector.h>
 
 #include <map>
 #include <set>
@@ -1569,7 +1570,7 @@ void DoFHandler<dim>::renumber_dofs (const RenumberingMethod method,
 				     const bool use_constraints,
 				     const vector<int> &starting_points) {
 				   // make the connection graph
-  dSMatrixStruct sparsity (n_dofs(), max_couplings_between_dofs());
+  SparseMatrixStruct sparsity (n_dofs(), max_couplings_between_dofs());
   make_sparsity_pattern (sparsity);
 
   if (use_constraints) 
@@ -2160,7 +2161,7 @@ void DoFHandler<3>::make_constraint_matrix (ConstraintMatrix &constraints) const
 
 
 template <int dim>
-void DoFHandler<dim>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
+void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (sparsity.n_rows() == n_dofs(),
 	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs()));
@@ -2186,8 +2187,8 @@ void DoFHandler<dim>::make_sparsity_pattern (dSMatrixStruct &sparsity) const {
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::make_boundary_sparsity_pattern (const vector<int> &,
-						    dSMatrixStruct &) const {
+void DoFHandler<1>::make_boundary_sparsity_pattern (const vector<int>  &,
+						    SparseMatrixStruct &) const {
     Assert (selected_fe != 0, ExcNoFESelected());
     Assert (false, ExcInternalError());
 };
@@ -2195,9 +2196,9 @@ void DoFHandler<1>::make_boundary_sparsity_pattern (const vector<int> &,
 
 
 template <>
-void DoFHandler<1>::make_boundary_sparsity_pattern (const FunctionMap &,
-						    const vector<int> &,
-						    dSMatrixStruct &) const {
+void DoFHandler<1>::make_boundary_sparsity_pattern (const FunctionMap  &,
+						    const vector<int>  &,
+						    SparseMatrixStruct &) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (false, ExcInternalError());
 };
@@ -2207,8 +2208,8 @@ void DoFHandler<1>::make_boundary_sparsity_pattern (const FunctionMap &,
 
 
 template <int dim>
-void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int> &dof_to_boundary_mapping,
-						      dSMatrixStruct &sparsity) const {
+void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int>  &dof_to_boundary_mapping,
+						      SparseMatrixStruct &sparsity) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (dof_to_boundary_mapping.size() == n_dofs(), ExcInternalError());
   Assert (sparsity.n_rows() == n_boundary_dofs(),
@@ -2245,9 +2246,9 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const vector<int> &dof_to_
 
 
 template <int dim>
-void DoFHandler<dim>::make_boundary_sparsity_pattern (const FunctionMap &boundary_indicators,
-						      const vector<int> &dof_to_boundary_mapping,
-						      dSMatrixStruct &sparsity) const {
+void DoFHandler<dim>::make_boundary_sparsity_pattern (const FunctionMap  &boundary_indicators,
+						      const vector<int>  &dof_to_boundary_mapping,
+						      SparseMatrixStruct &sparsity) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (dof_to_boundary_mapping.size() == n_dofs(), ExcInternalError());
   Assert (boundary_indicators.find(255) == boundary_indicators.end(),
@@ -2289,7 +2290,7 @@ void DoFHandler<dim>::make_boundary_sparsity_pattern (const FunctionMap &boundar
 
 template <int dim>
 void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from,
-					    dSMatrixStruct        &transfer_pattern) const {
+					    SparseMatrixStruct    &transfer_pattern) const {
   Assert (tria->n_cells(0) == transfer_from.tria->n_cells(0),
 	  ExcGridsDoNotMatch());
   Assert (*selected_fe == *transfer_from.selected_fe,
@@ -2325,7 +2326,7 @@ void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from
 
 template <int dim>
 void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from,
-					    dSMatrix              &transfer_matrix) const {
+					    SparseMatrix<double>  &transfer_matrix) const {
   cell_iterator old_cell = transfer_from.begin(0),
 		new_cell = begin(0);
   unsigned int  n_coarse_cells = tria->n_cells(0);
@@ -2340,7 +2341,7 @@ void DoFHandler<dim>::make_transfer_matrix (const DoFHandler<dim> &transfer_from
 template <int dim>
 void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterator &old_cell,
 				     const typename DoFHandler<dim>::cell_iterator &new_cell,
-				     dSMatrixStruct      &transfer_pattern) const {
+				     SparseMatrixStruct      &transfer_pattern) const {
   if (!new_cell->active() && !old_cell->active())
 				     // both cells have children; go deeper
     for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -2421,7 +2422,7 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 template <int dim>
 void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterator &old_cell,
 				     const typename DoFHandler<dim>::cell_iterator &new_cell,
-				     dSMatrix            &transfer_matrix) const {
+				     SparseMatrix<double>            &transfer_matrix) const {
   if (!new_cell->active() && !old_cell->active())
 				     // both cells have children; go deeper
     for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -2438,9 +2439,9 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 
 					 // copy dofs one-by-one
 	for (unsigned int j=0; j<old_dofs.size(); ++j)
-					   // use the dSMatrix:: as a workaround
+					   // use the SparseMatrix<double>:: as a workaround
 					   // for a bug in egcs
-	  transfer_matrix.dSMatrix::set (new_dofs[j], old_dofs[j], 1.0);
+	  transfer_matrix.SparseMatrix<double>::set (new_dofs[j], old_dofs[j], 1.0);
       }
     else
       if (!new_cell->active() && old_cell->active())
@@ -2467,12 +2468,12 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
 		  if (selected_fe->prolongate(c)(k,j) != 0.) 
-						     // use the dSMatrix::
+						     // use the SparseMatrix<double>::
 						     // as a workaround
 						     // for a bug in egcs
-		    transfer_matrix.dSMatrix::set (child_dof_indices[k],
-						   old_dof_indices[j],
-						   selected_fe->prolongate(c)(k,j));
+		    transfer_matrix.SparseMatrix<double>::set (child_dof_indices[k],
+							       old_dof_indices[j],
+							       selected_fe->prolongate(c)(k,j));
 	    };
 	} else {
 					   // old cell has children, new one has not
@@ -2497,13 +2498,13 @@ void DoFHandler<dim>::transfer_cell (const typename DoFHandler<dim>::cell_iterat
 	      for (unsigned int k=0; k<selected_fe->total_dofs; ++k)
 		for (unsigned int j=0; j<selected_fe->total_dofs; ++j)
 		  if (selected_fe->restrict(c)(k,j) != 0.)
-						     // use the dSMatrix:: as
+						     // use the SparseMatrix<double>:: as
 						     // a workaround
 						     // for a bug in egcs
 
-		    transfer_matrix.dSMatrix::set (new_dof_indices[k],
-						   child_dof_indices[j],
-						   selected_fe->restrict(c)(k,j));
+		    transfer_matrix.SparseMatrix<double>::set (new_dof_indices[k],
+							       child_dof_indices[j],
+							       selected_fe->restrict(c)(k,j));
 	    };
 	};
 };
@@ -2687,9 +2688,11 @@ unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const {
 
 
 
+
 template <int dim>
-void DoFHandler<dim>::distribute_cell_to_dof_vector (const dVector &cell_data,
-						     dVector       &dof_data) const {
+template <typename Number>
+void DoFHandler<dim>::distribute_cell_to_dof_vector (const Vector<Number> &cell_data,
+						     Vector<double>       &dof_data) const {
   Assert (cell_data.size()==tria->n_active_cells(),
 	  ExcWrongSize (cell_data.size(), tria->n_active_cells()));
 
@@ -2925,6 +2928,16 @@ void DoFHandler<dim>::clear_space () {
 
 /*-------------- Explicit Instantiations -------------------------------*/
 template class DoFHandler<deal_II_dimension>;
+
+template
+void
+DoFHandler<deal_II_dimension>::distribute_cell_to_dof_vector (const Vector<float>  &cell_data,
+							      Vector<double>       &dof_data) const;
+
+template
+void
+DoFHandler<deal_II_dimension>::distribute_cell_to_dof_vector (const Vector<double> &cell_data,
+							      Vector<double>       &dof_data) const;
 
 
 

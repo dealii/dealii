@@ -9,10 +9,6 @@
 #include <grid/dof_accessor.h>
 
 
-// forward declaration
-template <int dim> class MGDoFHandler;
-
-
 
 
 /**
@@ -668,8 +664,8 @@ class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
 				      * entries as there are degrees of
 				      * freedom on this level.
 				      */
-    void get_mg_dof_values (const dVector &values,
-			    dVector       &dof_values) const;
+    void get_mg_dof_values (const Vector<double> &values,
+			    Vector<double>       &dof_values) const;
 
 
     				     /**

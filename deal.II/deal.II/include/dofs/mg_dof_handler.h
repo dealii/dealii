@@ -10,14 +10,6 @@
 
 
 
-// forward declarations
-template <int dim, typename BaseClass> class MGDoFLineAccessor;
-template <int dim, typename BaseClass> class MGDoFQuadAccessor;
-template <int dim> class MGDoFCellAccessor;
-
-
-
-
 /**
  * Define some types which differ between the dimensions. This class
  * is analogous to the \Ref{TriaDimensionInfo} class hierarchy.
@@ -212,10 +204,10 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      * added. However, if you don't want to call
 				      * #ConstraintMatrix::condense(1)#, you
 				      * have to compress the matrix yourself,
-				      * using #dSMatrixStruct::compress()#.
+				      * using #SparseMatrixStruct::compress()#.
 				      */
-    void make_sparsity_pattern (const unsigned int level,
-				dSMatrixStruct    &sparsity) const; 
+    void make_sparsity_pattern (const unsigned int  level,
+				SparseMatrixStruct &sparsity) const; 
 
 				     /*--------------------------------------*/
     

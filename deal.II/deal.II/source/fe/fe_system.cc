@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Copyright W. Bangerth, G. Kanschat University of Heidelberg, 1990 */
+/* Copyright W. Bangerth, G. Kanschat University of Heidelberg, 1999 */
 
 
 #include <fe/fe_system.h>
@@ -344,7 +344,7 @@ void FESystem<dim>::get_face_support_points (const DoFHandler<dim>::face_iterato
 template <int dim>
 void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &/*cell*/,
 					   const Boundary<dim> &/*boundary*/,
-					   dFMatrix            &/*local_mass_matrix*/) const
+					   FullMatrix<double>  &/*local_mass_matrix*/) const
 {
   Assert(false, ExcNotImplemented());
 /*
@@ -355,7 +355,7 @@ void FESystem<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator 
 
 				   // first get the local mass matrix for
 				   // the base object
-  dFMatrix base_mass_matrix (base_element->total_dofs,
+  FullMatrix<double> base_mass_matrix (base_element->total_dofs,
 			     base_element->total_dofs);
   base_element->get_local_mass_matrix (cell, boundary, base_mass_matrix);
 
@@ -452,7 +452,7 @@ FESystem<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
 			       const bool           compute_support_points,
 			       vector<Point<dim> > &q_points,
 			       const bool           compute_q_points,
-			       const dFMatrix      &shape_values_transform,
+			       const FullMatrix<double>  &shape_values_transform,
 			       const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 			       const Boundary<dim> &boundary) const
 {

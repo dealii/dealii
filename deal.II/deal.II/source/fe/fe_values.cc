@@ -9,7 +9,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_accessor.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 
 /*------------------------------- FEValuesBase ---------------------------*/
@@ -26,7 +26,7 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		n_quadrature_points (n_q_points),
 		total_dofs (total_dofs),
 		n_transform_functions (n_transform_functions),
-		shape_values (n_values_arrays, dFMatrix(total_dofs, n_q_points)),
+		shape_values (n_values_arrays, FullMatrix<double>(total_dofs, n_q_points)),
 		shape_gradients (total_dofs, vector<Tensor<1,dim> >(n_q_points)),
 		shape_2nd_derivatives (total_dofs, vector<Tensor<2,dim> >(n_q_points)),
 		weights (n_q_points, 0),
@@ -36,8 +36,8 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 		jacobi_matrices (n_q_points, Tensor<2,dim>()),
 		jacobi_matrices_grad (n_q_points, Tensor<3,dim>()),
 		shape_values_transform (n_values_arrays,
-					dFMatrix(n_transform_functions,
-						 n_quadrature_points)),
+					FullMatrix<double>(n_transform_functions,
+							   n_quadrature_points)),
 		selected_dataset (0),
 		update_flags (update_flags),
 		fe(&fe)        {};
@@ -61,8 +61,8 @@ double FEValuesBase<dim>::shape_value (const unsigned int i,
 
 
 template <int dim>
-void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
-					     vector<double> &values) const
+void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
+					     vector<double>       &values) const
 {
   Assert (fe->n_components == 1,
 	  ExcWrongNoOfComponents());
@@ -73,7 +73,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  dVector dof_values (total_dofs);
+  Vector<double> dof_values (total_dofs);
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero
@@ -89,7 +89,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 
 
 template <int dim>
-void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
+void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_function,
 					     vector< vector<double> > &values) const
 {
   Assert (fe->n_components == values.size(),
@@ -102,7 +102,7 @@ void FEValuesBase<dim>::get_function_values (const dVector  &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  dVector dof_values (total_dofs);
+  Vector<double> dof_values (total_dofs);
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero
@@ -136,14 +136,14 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 
 
 template <int dim>
-void FEValuesBase<dim>::get_function_grads (const dVector          &fe_function,
+void FEValuesBase<dim>::get_function_grads (const Vector<double>   &fe_function,
 					    vector<Tensor<1,dim> > &gradients) const {
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
 
 				   // get function values of dofs
 				   // on this cell
-  dVector dof_values (total_dofs);
+  Vector<double> dof_values (total_dofs);
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero
@@ -178,14 +178,14 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 
 
 template <int dim>
-void FEValuesBase<dim>::get_function_2nd_derivatives (const dVector &fe_function,
+void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe_function,
 						      vector<Tensor<2,dim> > &second_derivatives) const {
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
 
 				   // get function values of dofs
 				   // on this cell
-  dVector dof_values (total_dofs);
+  Vector<double> dof_values (total_dofs);
   present_cell->get_dof_values (fe_function, dof_values);
 
 				   // initialize with zero

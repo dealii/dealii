@@ -8,7 +8,8 @@
 
 #include <fe/fe.h>
 #include <base/quadrature.h>
-#include <math.h>
+#include <cmath>
+
 
 /**
  * This class implements a rather unusual macro element, the so-called
@@ -45,7 +46,7 @@
  * triangular element, which uses a linear mapping. The missing linearity
  * makes assemblage of matrices a bit more complicated, since the gradient
  * is not constant and we need more than one quadrature point, as well
- * as some other dubtle difficulties. This problem can, however, be cured
+ * as some other subtle difficulties. This problem can, however, be cured
  * using a trick: the usual transformation from unit coordinates $\vec\xi$
  * to real coordinates $\vec x(\vec\xi)$ looks like
  * $$
@@ -227,7 +228,7 @@ class FECrissCross : public FiniteElement<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
 
     				     /**
 				      * Return the value of the #i#th shape
@@ -340,7 +341,7 @@ class FECrissCross : public FiniteElement<dim> {
 				 const bool              compute_support_points,
 				 vector<Point<dim> >    &q_points,
 				 const bool              compute_q_points,
-				 const dFMatrix         &shape_values_transform,
+				 const FullMatrix<double>         &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
 

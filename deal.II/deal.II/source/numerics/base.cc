@@ -12,7 +12,7 @@
 #include <base/function.h>
 #include <fe/fe.h>
 #include <base/quadrature.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 
@@ -141,8 +141,8 @@ void ProblemBase<dim>::solve () {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   SolverControl                    control(4000, 1e-16);
-  PrimitiveVectorMemory<dVector>   memory;
-  SolverCG<dSMatrix,dVector>       cg(control,memory);
+  PrimitiveVectorMemory<Vector<double> >   memory;
+  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
 				   // solve
   cg.solve (system_matrix, solution, right_hand_side);

@@ -3,15 +3,15 @@
 
 
 #include "poisson.h"
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 
 
 #if deal_II_dimension == 1
 
 template <>
-void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
+void PoissonEquation<1>::assemble (FullMatrix<double>  &cell_matrix,
+				   Vector<double>      &rhs,
 				   const FEValues<1>   &fe_values,
 				   const DoFHandler<1>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -34,12 +34,12 @@ void PoissonEquation<1>::assemble (dFMatrix            &cell_matrix,
 //#if deal_II_dimension >= 2
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dFMatrix            &cell_matrix,
-				     dVector             &rhs,
+void PoissonEquation<dim>::assemble (FullMatrix<double>  &cell_matrix,
+				     Vector<double>      &rhs,
 				     const FEValues<dim> &fe_values,
 				     const DoFHandler<dim>::cell_iterator &) const {
   const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const dFMatrix       &values    = fe_values.get_shape_values ();
+  const FullMatrix<double>            &values    = fe_values.get_shape_values ();
   vector<double>        rhs_values (fe_values.n_quadrature_points);
   const vector<double> &weights   = fe_values.get_JxW_values ();
 
@@ -63,7 +63,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dFMatrix            &,
+void PoissonEquation<dim>::assemble (FullMatrix<double>  &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -72,7 +72,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &,
 
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dVector             &,
+void PoissonEquation<dim>::assemble (Vector<double>      &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());

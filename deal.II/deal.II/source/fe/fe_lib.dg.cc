@@ -27,7 +27,7 @@ FEDGQuarticSub<dim>::FEDGQuarticSub():
 
 
 template <int dim>
-const dFMatrix & 
+const FullMatrix<double> & 
 FEDGLinear<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
@@ -35,7 +35,7 @@ FEDGLinear<dim>::restrict (const unsigned int child) const {
 
 
 template <int dim>
-const dFMatrix & 
+const FullMatrix<double> & 
 FEDGQuadraticSub<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
@@ -44,7 +44,7 @@ FEDGQuadraticSub<dim>::restrict (const unsigned int child) const {
 
 
 template <int dim>
-const dFMatrix & 
+const FullMatrix<double> & 
 FEDGCubicSub<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
@@ -53,7 +53,7 @@ FEDGCubicSub<dim>::restrict (const unsigned int child) const {
 
 
 template <int dim>
-const dFMatrix & 
+const FullMatrix<double> & 
 FEDGQuarticSub<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];

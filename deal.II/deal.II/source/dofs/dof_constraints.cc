@@ -4,8 +4,8 @@
 
 
 #include <grid/dof_constraints.h>
-#include <lac/dsmatrix.h>
-#include <lac/dvector.h>
+#include <lac/sparsematrix.h>
+#include <lac/vector.h>
 #include <iostream>
 #include <algorithm>
 #include <numeric>
@@ -119,8 +119,8 @@ void ConstraintMatrix::clear () {
 
 
 
-void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
-				 dSMatrixStruct       &condensed) const {
+void ConstraintMatrix::condense (const SparseMatrixStruct &uncondensed,
+				 SparseMatrixStruct       &condensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed.n_rows() == uncondensed.n_cols(),
@@ -228,7 +228,7 @@ void ConstraintMatrix::condense (const dSMatrixStruct &uncondensed,
 
 
 
-void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
+void ConstraintMatrix::condense (SparseMatrixStruct &sparsity) const {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
@@ -311,9 +311,9 @@ void ConstraintMatrix::condense (dSMatrixStruct &sparsity) const {
 
 
 
-void ConstraintMatrix::condense (const dSMatrix &uncondensed,
-				 dSMatrix       &condensed) const {
-  const dSMatrixStruct &uncondensed_struct = uncondensed.get_sparsity_pattern ();
+void ConstraintMatrix::condense (const SparseMatrix<double> &uncondensed,
+				 SparseMatrix<double>       &condensed) const {
+  const SparseMatrixStruct &uncondensed_struct = uncondensed.get_sparsity_pattern ();
   
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed_struct.is_compressed() == true, ExcMatrixNotClosed());
@@ -434,8 +434,8 @@ void ConstraintMatrix::condense (const dSMatrix &uncondensed,
 
 
 
-void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
-  const dSMatrixStruct &sparsity = uncondensed.get_sparsity_pattern ();
+void ConstraintMatrix::condense (SparseMatrix<double> &uncondensed) const {
+  const SparseMatrixStruct &sparsity = uncondensed.get_sparsity_pattern ();
 
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
@@ -555,8 +555,8 @@ void ConstraintMatrix::condense (dSMatrix &uncondensed) const {
 
 
 
-void ConstraintMatrix::condense (const dVector &uncondensed,
-				 dVector       &condensed) const {
+void ConstraintMatrix::condense (const Vector<double> &uncondensed,
+				 Vector<double>       &condensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
 	  ExcWrongDimension());
@@ -626,7 +626,7 @@ void ConstraintMatrix::condense (const dVector &uncondensed,
 
 
 
-void ConstraintMatrix::condense (dVector &vec) const {
+void ConstraintMatrix::condense (Vector<double> &vec) const {
   Assert (sorted == true, ExcMatrixNotClosed());
 
   if (lines.size() == 0)
@@ -655,8 +655,8 @@ void ConstraintMatrix::condense (dVector &vec) const {
 
 
 
-void ConstraintMatrix::distribute (const dVector &condensed,
-				   dVector       &uncondensed) const {
+void ConstraintMatrix::distribute (const Vector<double> &condensed,
+				   Vector<double>       &uncondensed) const {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
 	  ExcWrongDimension());
@@ -725,7 +725,7 @@ void ConstraintMatrix::distribute (const dVector &condensed,
 
 
 
-void ConstraintMatrix::distribute (dVector &vec) const {
+void ConstraintMatrix::distribute (Vector<double> &vec) const {
   Assert (sorted == true, ExcMatrixNotClosed());
 
   vector<ConstraintLine>::const_iterator next_constraint = lines.begin();

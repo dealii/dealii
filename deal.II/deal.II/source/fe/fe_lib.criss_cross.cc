@@ -369,7 +369,7 @@ void FECrissCross<1>::get_face_support_points (const DoFHandler<1>::face_iterato
 template <>
 void FECrissCross<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &,
 					     const Boundary<1> &,
-					     dFMatrix &) const {
+					     FullMatrix<double> &) const {
   Assert (false, ExcNotUseful());
 };
 
@@ -446,7 +446,7 @@ void FECrissCross<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &,
 				       const bool            ,
 				       vector<Point<1> >    &,
 				       const bool            ,
-				       const dFMatrix       &,
+				       const FullMatrix<double>       &,
 				       const vector<vector<Tensor<1,1> > > &,
 				       const Boundary<1> &) const {
   Assert (false, ExcNotUseful());
@@ -657,7 +657,7 @@ void FECrissCross<2>::get_face_support_points (const DoFHandler<2>::face_iterato
 template <>
 void FECrissCross<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					     const Boundary<2> &,
-					     dFMatrix &mass_matrix) const {
+					     FullMatrix<double> &mass_matrix) const {
   Assert (mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(mass_matrix.n(),total_dofs));
   Assert (mass_matrix.m() == total_dofs,
@@ -942,7 +942,7 @@ void FECrissCross<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &ce
 					const bool compute_support_points,
 					vector<Point<dim> >    &q_points,
 					const bool              compute_q_points,
-					const dFMatrix         &shape_values_transform,
+					const FullMatrix<double>         &shape_values_transform,
 					const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
 					const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),

@@ -17,14 +17,6 @@
 
 
 
-// forward declaration needed
-template <int dim> class Triangulation;
-
-
-
-
-
-
 
 
 /**

@@ -10,8 +10,8 @@
 #include <fe/fe_values.h>
 #include <numerics/matrices.h>
 #include <numerics/assembler.h>
-#include <lac/dvector.h>
-#include <lac/dsmatrix.h>
+#include <lac/vector.h>
+#include <lac/sparsematrix.h>
 
 #include <algorithm>
 #include <set>
@@ -23,11 +23,11 @@ template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     const Boundary<dim>      &boundary,
-					     dSMatrix                 &matrix,
+					     SparseMatrix<double>     &matrix,
 					     const Function<dim> * const a) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
-  dVector dummy;    // no entries, should give an error if accessed
+  Vector<double> dummy;    // no entries, should give an error if accessed
   UpdateFlags update_flags = update_JxW_values;
   if (a != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
@@ -55,9 +55,9 @@ template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     const Boundary<dim>      &boundary,
-					     dSMatrix                 &matrix,
+					     SparseMatrix<double>     &matrix,
 					     const Function<dim>      &rhs,
-					     dVector                  &rhs_vector,
+					     Vector<double>           &rhs_vector,
 					     const Function<dim> * const a) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -85,13 +85,13 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Boundary<dim>      &boundary,
-					     dSMatrix                 &matrix) {
+					     SparseMatrix<double>     &matrix) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
   const unsigned int total_dofs = fe.total_dofs;
   
-  dFMatrix    local_mass_matrix (total_dofs, total_dofs);
-  vector<int> dofs_on_this_cell (total_dofs);
+  FullMatrix<double>  local_mass_matrix (total_dofs, total_dofs);
+  vector<int>         dofs_on_this_cell (total_dofs);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -115,9 +115,9 @@ template <>
 void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    const Quadrature<0>    &,
 						    const Boundary<1>      &,
-						    dSMatrix               &,
+						    SparseMatrix<double>   &,
 						    const FunctionMap      &,
-						    dVector                &,
+						    Vector<double>         &,
 						    vector<int>            &,
 						    const Function<1>      *) {
   Assert (false, ExcNotImplemented());
@@ -131,9 +131,9 @@ template <int dim>
 void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 						      const Quadrature<dim-1>  &q,
 						      const Boundary<dim>      &boundary,
-						      dSMatrix                 &matrix,
+						      SparseMatrix<double>     &matrix,
 						      const FunctionMap        &rhs,
-						      dVector                  &rhs_vector,
+						      Vector<double>           &rhs_vector,
 						      vector<int>              &dof_to_boundary_mapping,
 						      const Function<dim>      *a) {
   const FiniteElement<dim> &fe = dof.get_fe();
@@ -150,8 +150,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   
   const unsigned int dofs_per_cell = fe.total_dofs,
 		     dofs_per_face = fe.dofs_per_face;
-  dFMatrix cell_matrix(dofs_per_cell, dofs_per_cell);
-  dVector  cell_vector(dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_vector(dofs_per_cell);
   
   
   UpdateFlags update_flags = UpdateFlags (update_JxW_values | update_q_points);
@@ -170,9 +170,9 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 	  
 	  fe_values.reinit (cell, face, boundary);
 
-	  const dFMatrix       &values    = fe_values.get_shape_values ();
-	  const vector<double> &weights   = fe_values.get_JxW_values ();
-	  vector<double>        rhs_values (fe_values.n_quadrature_points);
+	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+	  const vector<double>     &weights   = fe_values.get_JxW_values ();
+	  vector<double>           rhs_values (fe_values.n_quadrature_points);
 	  rhs.find(cell->face(face)->boundary_indicator())
 	    ->second->value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
@@ -326,11 +326,11 @@ template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						const Boundary<dim>      &boundary,
-						dSMatrix                 &matrix,
+						SparseMatrix<double>     &matrix,
 						const Function<dim> * const a) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
-  dVector dummy;   // no entries, should give an error if accessed
+  Vector<double> dummy;   // no entries, should give an error if accessed
   UpdateFlags update_flags = UpdateFlags(update_gradients |
 					 update_JxW_values);
   if (a != 0)
@@ -358,9 +358,9 @@ template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						const Boundary<dim>      &boundary,
-						dSMatrix                 &matrix,
+						SparseMatrix<double>     &matrix,
 						const Function<dim>      &rhs,
-						dVector                  &rhs_vector,
+						Vector<double>           &rhs_vector,
 						const Function<dim> * const a) {
   const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -393,9 +393,9 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_values,
-					      dSMatrix  &matrix,
-					      dVector   &solution,
-					      dVector   &right_hand_side) {
+					      SparseMatrix<double>  &matrix,
+					      Vector<double>   &solution,
+					      Vector<double>   &right_hand_side) {
   Assert (matrix.n() == matrix.m(),
 	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
@@ -411,7 +411,7 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
   map<int,double>::const_iterator dof  = boundary_values.begin(),
 				  endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
-  const dSMatrixStruct &sparsity        = matrix.get_sparsity_pattern();
+  const SparseMatrixStruct &sparsity    = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
   const int          *sparsity_colnums  = sparsity.get_column_numbers();
 
@@ -460,10 +460,10 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 		break;
 	      };
 
-					   // use the dSMatrix:: as a workaround
+					   // use the SparseMatrix<double>:: as a workaround
 					   // for a bug in egcs
-	  matrix.dSMatrix::set(dof_number, dof_number,
-			       first_diagonal_entry);
+	  matrix.SparseMatrix<double>::set(dof_number, dof_number,
+					   first_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_diagonal_entry;
 	};
@@ -546,8 +546,8 @@ MassMatrix<dim>::MassMatrix (const Function<dim> * const rhs,
 
 
 template <int dim>
-void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
-				const FEValues<dim> &fe_values,
+void MassMatrix<dim>::assemble (FullMatrix<double>      &cell_matrix,
+				const FEValues<dim>     &fe_values,
 				const typename DoFHandler<dim>::cell_iterator &) const {
   const unsigned int total_dofs = fe_values.total_dofs,
 		     n_q_points = fe_values.n_quadrature_points;
@@ -558,8 +558,8 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 	  ExcWrongSize(cell_matrix.m(), total_dofs));
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   
-  const dFMatrix       &values    = fe_values.get_shape_values ();
-  const vector<double> &weights   = fe_values.get_JxW_values ();
+  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+  const vector<double>     &weights   = fe_values.get_JxW_values ();
 
   
   if (coefficient != 0)
@@ -587,8 +587,8 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
-				dVector             &rhs,
+void MassMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
+				Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
 				const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
@@ -605,9 +605,9 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   Assert (cell_matrix.all_zero(), ExcObjectNotEmpty());
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
-  const dFMatrix       &values    = fe_values.get_shape_values ();
-  const vector<double> &weights   = fe_values.get_JxW_values ();
-  vector<double>        rhs_values (fe_values.n_quadrature_points);
+  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+  const vector<double>     &weights   = fe_values.get_JxW_values ();
+  vector<double>            rhs_values (fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   if (coefficient != 0)
@@ -645,7 +645,7 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void MassMatrix<dim>::assemble (dVector             &rhs,
+void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 				const FEValues<dim> &fe_values,
 				const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
@@ -656,9 +656,9 @@ void MassMatrix<dim>::assemble (dVector             &rhs,
   Assert (rhs.size() == total_dofs, ExcWrongSize(rhs.size(), total_dofs));
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
-  const dFMatrix       &values    = fe_values.get_shape_values ();
-  const vector<double> &weights   = fe_values.get_JxW_values ();
-  vector<double>        rhs_values(fe_values.n_quadrature_points);
+  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+  const vector<double>     &weights   = fe_values.get_JxW_values ();
+  vector<double>            rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
   for (unsigned int point=0; point<n_q_points; ++point)
@@ -681,9 +681,9 @@ LaplaceMatrix<dim>::LaplaceMatrix (const Function<dim> * const rhs,
 
 
 template <int dim>
-void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
-				   const FEValues<dim> &fe_values,
+void LaplaceMatrix<dim>::assemble (FullMatrix<double>         &cell_matrix,
+				   Vector<double>             &rhs,
+				   const FEValues<dim>        &fe_values,
 				   const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
   
@@ -700,7 +700,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
   const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const dFMatrix       &values    = fe_values.get_shape_values ();
+  const FullMatrix<double>             &values    = fe_values.get_shape_values ();
   vector<double>        rhs_values(fe_values.n_quadrature_points);
   const vector<double> &weights   = fe_values.get_JxW_values ();
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
@@ -741,7 +741,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
+void LaplaceMatrix<dim>::assemble (FullMatrix<double>  &cell_matrix,
 				   const FEValues<dim> &fe_values,
 				   const DoFHandler<dim>::cell_iterator &) const {
   const unsigned int total_dofs = fe_values.total_dofs,
@@ -781,7 +781,7 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void LaplaceMatrix<dim>::assemble (dVector             &rhs,
+void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 				   const FEValues<dim> &fe_values,
 				   const DoFHandler<dim>::cell_iterator &) const {
   Assert (right_hand_side != 0, ExcNoRHSSelected());
@@ -792,8 +792,8 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
   Assert (rhs.size() == total_dofs, ExcWrongSize(rhs.size(), total_dofs));
   Assert (rhs.all_zero(), ExcObjectNotEmpty());
 
-  const dFMatrix       &values    = fe_values.get_shape_values ();
-  const vector<double> &weights   = fe_values.get_JxW_values ();
+  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+  const vector<double>     &weights   = fe_values.get_JxW_values ();
   vector<double>        rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
    
@@ -807,7 +807,7 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
 template<int dim> void
 MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 						const FiniteElement<dim> &low,
-						dFMatrix& result)
+						FullMatrix<double>& result)
 {
   result.reinit (low.total_dofs, high.total_dofs);
 

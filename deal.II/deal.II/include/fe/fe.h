@@ -11,12 +11,8 @@
 #include <base/tensor.h>
 #include <grid/dof.h>
 #include <grid/geometry_info.h>
-#include <lac/dfmatrix.h>
+#include <lac/fullmatrix.h>
 
-
-
-template <int dim> class Boundary;
-template <int dim> class FiniteElementData;
 
 
 
@@ -203,7 +199,7 @@ class FiniteElementBase :
 				      * mother cell. See the #restriction# array
 				      * for more information.
 				      */
-    const dFMatrix & restrict (const unsigned int child) const;
+    const FullMatrix<double> & restrict (const unsigned int child) const;
 
 				     /**
 				      * Return a readonly reference to the
@@ -211,7 +207,7 @@ class FiniteElementBase :
 				      * mother cell to the child with the given
 				      * number.
 				      */
-    const dFMatrix & prolongate (const unsigned int child) const;
+    const FullMatrix<double> & prolongate (const unsigned int child) const;
 
 				     /**
 				      * Return a readonly reference to the
@@ -223,7 +219,7 @@ class FiniteElementBase :
 				      * one space dimension, since there are no
 				      * constraints then.
 				      */
-    const dFMatrix & constraints () const;
+    const FullMatrix<double> & constraints () const;
 
 				     /**
 				      * Comparison operator. We also check for
@@ -378,7 +374,7 @@ class FiniteElementBase :
 				      * matrix are discarded and will not fill
 				      * up the transfer matrix.
 				      */
-    dFMatrix restriction[GeometryInfo<dim>::children_per_cell];
+    FullMatrix<double> restriction[GeometryInfo<dim>::children_per_cell];
 
     				     /**
 				      * Have #N=2^dim# matrices keeping the
@@ -416,7 +412,7 @@ class FiniteElementBase :
 				      * matrix are discarded and will not fill
 				      * up the transfer matrix.
 				      */
-    dFMatrix prolongation[GeometryInfo<dim>::children_per_cell];
+    FullMatrix<double> prolongation[GeometryInfo<dim>::children_per_cell];
 
     				     /**
 				      * Specify the constraints which the
@@ -430,7 +426,7 @@ class FiniteElementBase :
 				      * This field is obviously useless in one
 				      * space dimension.
 				      */
-    dFMatrix interface_constraints;
+    FullMatrix<double> interface_constraints;
 
 				     /**
 				      * Map between linear dofs and component dofs.
@@ -875,7 +871,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				 const bool                 compute_support_points,
 				 vector<Point<dim> >       &q_points,
 				 const bool                 compute_q_points,
-				 const dFMatrix            &shape_values_transform,
+				 const FullMatrix<double>            &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 				 const Boundary<dim> &boundary) const;
 
@@ -999,7 +995,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      const bool           compute_face_jacobians,
 				      vector<Point<dim> > &normal_vectors,
 				      const bool           compute_normal_vectors,
-				      const dFMatrix      &shape_values_transform,
+				      const FullMatrix<double>      &shape_values_transform,
 				      const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 				      const Boundary<dim> &boundary) const;
 
@@ -1046,7 +1042,7 @@ class FiniteElement : public FiniteElementBase<dim> {
 					 const bool           compute_face_jacobians,
 					 vector<Point<dim> > &normal_vectors,
 					 const bool           compute_normal_vectors,
-					 const dFMatrix      &shape_values_transform,
+					 const FullMatrix<double>      &shape_values_transform,
 					 const vector<vector<Tensor<1,dim> > > &shape_grads_transform,
 					 const Boundary<dim> &boundary) const;
 
@@ -1317,8 +1313,8 @@ class FiniteElement : public FiniteElementBase<dim> {
 				      * documentation.
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
-					const Boundary<dim> &boundary, 
-					dFMatrix            &local_mass_matrix) const =0;
+					const Boundary<dim>           &boundary, 
+					FullMatrix<double>            &local_mass_matrix) const =0;
 
 				     /**
 				      * Exception

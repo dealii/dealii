@@ -6,20 +6,10 @@
 /*----------------------------   vectors.h     ---------------------------*/
 
 
-
+#include <base/forward-declarations.h>
 #include <base/exceptions.h>
 #include <map>
 
-template <int dim> class DoFHandler;
-template <int dim> class Function;
-template <int dim> class Quadrature;
-template <int dim> class QGauss2;
-template <int dim> class FiniteElement;
-template <int dim> class Boundary;
-template <int dim> class StraightBoundary;
-class ConstraintMatrix;
-class dVector;
-class VectorFunction;
 
 
 /**
@@ -231,16 +221,16 @@ enum NormType {
  *   full $H_1$ norm is the sum of the seminorm and the $L_2$ norm.
  * 
  *   To get the {\it global} L_1 error, you have to sum up the entries in
- *   #difference#, e.g. using #dVector::l1_norm# function.
+ *   #difference#, e.g. using #Vector<double>::l1_norm# function.
  *   For the global L_2 difference, you have to sum up the squares of the
- *   entries and take the root of the sum, e.g. using #dVector::l2_norm#.
+ *   entries and take the root of the sum, e.g. using #Vector<double>::l2_norm#.
  *   These two operations represent the
  *   l_1 and l_2 norms of the vectors, but you need not take the absolute
  *   value of each entry, since the cellwise norms are already positive.
  *  
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the L_\infty norm, take the maximum of the vector elements, e.g.
- *   using the #dVector::linfty_norm# function.
+ *   using the #Vector<double>::linfty_norm# function.
  *
  *   For the global $H_1$ norm and seminorm, the same rule applies as for the
  *   $L_2$ norm: compute the $l_2$ norm of the cell error vector.
@@ -279,7 +269,7 @@ class VectorTools {
     static void interpolate (const DoFHandler<dim>    &dof,
 			     const Boundary<dim>      &boundary,
 			     const Function<dim>      &function,
-			     dVector                  &vec);
+			     Vector<double>           &vec);
 
 				     /**
 				      * Interpolate different finite
@@ -295,9 +285,9 @@ class VectorTools {
 				      */
     static void interpolate(const DoFHandler<dim>    &high_dof,
 			    const DoFHandler<dim>    &low_dof,
-			    const dFMatrix           &transfer,
-			    const dVector            &high,
-			    dVector                  &low);
+			    const FullMatrix<double> &transfer,
+			    const Vector<double>     &high,
+			    Vector<double>           &low);
 			  
 				     /**
 				      * Compute the projection of
@@ -320,7 +310,7 @@ class VectorTools {
 			 const Boundary<dim>      &boundary,
 			 const Quadrature<dim>    &q,
 			 const Function<dim>      &function,
-			 dVector                  &vec,
+			 Vector<double>           &vec,
 			 const bool                enforce_zero_boundary = false,
 			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim-1>(),
 			 const bool                project_to_boundary_first = false);
@@ -335,7 +325,7 @@ class VectorTools {
 					const Quadrature<dim>    &q,
 					const Boundary<dim>      &boundary,
 					const Function<dim>      &rhs,
-					dVector                  &rhs_vector);
+					Vector<double>           &rhs_vector);
     
 				     /**
 				      * Make up the list of node subject
@@ -384,29 +374,38 @@ class VectorTools {
 				      * is given as a continuous function
 				      * object.
 				      *
+				      * Note that this function returns
+				      * its results in a vector of #float#s,
+				      * rather than in a vector of #double#s,
+				      * since accuracy is not that important
+				      * here and to save memory. During
+				      * computation of the results, the full
+				      * accuracy of the #double# data type is
+				      * used.
+				      *
 				      * See the general documentation of this
 				      * class for more information.
 				      */
     static void integrate_difference (const DoFHandler<dim>    &dof,
-				      const dVector            &fe_function,
+				      const Vector<double>     &fe_function,
 				      const Function<dim>      &exact_solution,
-				      dVector                  &difference,
+				      Vector<float>            &difference,
 				      const Quadrature<dim>    &q,
 				      const NormType           &norm,
-				      const Boundary<dim> &boundary=StraightBoundary<dim>());
+				      const Boundary<dim>      &boundary=StraightBoundary<dim>());
 
 				     /**
 				      * Compute the error for the solution of a system.
 				      * See the other #integrate_difference#.
 				      */
-    static void integrate_difference (const DoFHandler<dim>    &dof,
-				      const dVector            &fe_function,
-				      const VectorFunction     &exact_solution,
-				      dVector                  &difference,
-				      const Quadrature<dim>    &q,
-				      const FiniteElement<dim> &fe,
-				      const NormType           &norm,
-				      const Boundary<dim>      &boundary);
+//     static void integrate_difference (const DoFHandler<dim>    &dof,
+// 				      const Vector<double>     &fe_function,
+// 				      const TensorFunction<1,dim>&exact_solution,
+// 				      Vector<float>            &difference,
+// 				      const Quadrature<dim>    &q,
+// 				      const FiniteElement<dim> &fe,
+// 				      const NormType           &norm,
+// 				      const Boundary<dim>      &boundary);
     
 
 				     /**

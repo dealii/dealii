@@ -9,6 +9,8 @@
 #include <vector>
 #include <pair.h>
 
+
+
 /**
  * This class provides an interface to group several equal elements together
  * into one. To the outside world, the resulting object looks just like
@@ -219,7 +221,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
 
 				     /**
 				      * Return the value of the #i#th shape
@@ -329,7 +331,7 @@ class FESystem : public FiniteElement<dim>
 				 const bool           compute_support_points,
 				 vector<Point<dim> > &q_points,
 				 const bool           compute_q_points,
-				 const dFMatrix      &shape_values_transform,
+				 const FullMatrix<double>  &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
     

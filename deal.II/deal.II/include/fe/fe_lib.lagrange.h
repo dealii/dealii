@@ -110,7 +110,7 @@ class FELinear : public FELinearMapping<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
 
   private:
 
@@ -291,7 +291,7 @@ class FEQuadraticSub : public FELinearMapping<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
 
   private:
 
@@ -416,7 +416,7 @@ class FECubicSub : public FELinearMapping<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
 
   private:
 
@@ -542,7 +542,7 @@ class FEQuarticSub : public FELinearMapping<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
 
   private:
 

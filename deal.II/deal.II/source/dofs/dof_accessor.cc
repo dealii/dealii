@@ -10,9 +10,9 @@
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
 
-#include <lac/dvector.h>
-#include <lac/dfmatrix.h>
-#include <lac/dsmatrix.h>
+#include <lac/vector.h>
+#include <lac/fullmatrix.h>
+#include <lac/sparsematrix.h>
 
 #include <vector>
 
@@ -134,8 +134,8 @@ DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 void DoFLineAccessor<dim,BaseClass>::
-distribute_local_to_global (const dVector &local_source,
-			    dVector       &global_destination) const {
+distribute_local_to_global (const Vector<double> &local_source,
+			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.size() == (2*dof_handler->get_fe().dofs_per_vertex +
@@ -159,8 +159,8 @@ distribute_local_to_global (const dVector &local_source,
 
 template <int dim, typename BaseClass>
 void DoFLineAccessor<dim,BaseClass>::
-distribute_local_to_global (const dFMatrix &local_source,
-			    dSMatrix       &global_destination) const {
+distribute_local_to_global (const FullMatrix<double> &local_source,
+			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.m() == (2*dof_handler->get_fe().dofs_per_vertex +
@@ -327,8 +327,8 @@ DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 void DoFQuadAccessor<dim,BaseClass>::
-distribute_local_to_global (const dVector &local_source,
-			    dVector       &global_destination) const {
+distribute_local_to_global (const Vector<double> &local_source,
+			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.size() == (4*dof_handler->get_fe().dofs_per_vertex +
@@ -353,8 +353,8 @@ distribute_local_to_global (const dVector &local_source,
 
 template <int dim, typename BaseClass>
 void DoFQuadAccessor<dim,BaseClass>::
-distribute_local_to_global (const dFMatrix &local_source,
-			    dSMatrix       &global_destination) const {
+distribute_local_to_global (const FullMatrix<double> &local_source,
+			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.m() == (4*dof_handler->get_fe().dofs_per_vertex +
@@ -542,8 +542,8 @@ DoFHexAccessor<dim,BaseClass>::child (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 void DoFHexAccessor<dim,BaseClass>::
-distribute_local_to_global (const dVector &local_source,
-			    dVector       &global_destination) const {
+distribute_local_to_global (const Vector<double> &local_source,
+			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.size() == (8*dof_handler->get_fe().dofs_per_vertex +
@@ -569,8 +569,8 @@ distribute_local_to_global (const dVector &local_source,
 
 template <int dim, typename BaseClass>
 void DoFHexAccessor<dim,BaseClass>::
-distribute_local_to_global (const dFMatrix &local_source,
-			    dSMatrix       &global_destination) const {
+distribute_local_to_global (const FullMatrix<double> &local_source,
+			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (local_source.m() == (8*dof_handler->get_fe().dofs_per_vertex +
@@ -660,8 +660,8 @@ DoFCellAccessor<1>::face (const unsigned int) const {
 
 template <>
 void
-DoFCellAccessor<1>::get_dof_values (const dVector &values,
-				    dVector       &local_values) const {
+DoFCellAccessor<1>::get_dof_values (const Vector<double> &values,
+				    Vector<double>       &local_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -684,8 +684,8 @@ DoFCellAccessor<1>::get_dof_values (const dVector &values,
 
 template <>
 void
-DoFCellAccessor<1>::set_dof_values (const dVector &local_values,
-				    dVector       &values) const {
+DoFCellAccessor<1>::set_dof_values (const Vector<double> &local_values,
+				    Vector<double>       &values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -722,8 +722,8 @@ DoFCellAccessor<2>::face (const unsigned int i) const {
 
 template <>
 void
-DoFCellAccessor<2>::get_dof_values (const dVector &values,
-				    dVector       &local_values) const {
+DoFCellAccessor<2>::get_dof_values (const Vector<double> &values,
+				    Vector<double>       &local_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -750,8 +750,8 @@ DoFCellAccessor<2>::get_dof_values (const dVector &values,
 
 template <>
 void
-DoFCellAccessor<2>::set_dof_values (const dVector &local_values,
-				    dVector       &values) const {
+DoFCellAccessor<2>::set_dof_values (const Vector<double> &local_values,
+				    Vector<double>       &values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -792,8 +792,8 @@ DoFCellAccessor<3>::face (const unsigned int i) const {
 
 template <>
 void
-DoFCellAccessor<3>::get_dof_values (const dVector &values,
-				    dVector       &local_values) const {
+DoFCellAccessor<3>::get_dof_values (const Vector<double> &values,
+				    Vector<double>       &local_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -824,8 +824,8 @@ DoFCellAccessor<3>::get_dof_values (const dVector &values,
 
 template <>
 void
-DoFCellAccessor<3>::set_dof_values (const dVector &local_values,
-				    dVector       &values) const {
+DoFCellAccessor<3>::set_dof_values (const Vector<double> &local_values,
+				    Vector<double>       &values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
@@ -861,8 +861,8 @@ DoFCellAccessor<3>::set_dof_values (const dVector &local_values,
 
 template <int dim>
 void
-DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
-						   dVector       &interpolated_values) const {
+DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<double> &values,
+						   Vector<double>       &interpolated_values) const {
   const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
   
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -879,8 +879,8 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
   else
 				     // otherwise clobber them from the children
     {
-      dVector tmp1(total_dofs);
-      dVector tmp2(total_dofs);
+      Vector<double> tmp1(total_dofs);
+      Vector<double> tmp2(total_dofs);
       
       interpolated_values.clear ();
 
@@ -914,8 +914,8 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const dVector &values,
 
 template <int dim>
 void
-DoFCellAccessor<dim>::set_dof_values_by_interpolation (const dVector &local_values,
-						       dVector       &values) const {
+DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<double> &local_values,
+						       Vector<double>       &values) const {
   const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
   
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -932,7 +932,7 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const dVector &local_valu
   else
 				     // otherwise distribute them to the children
     {
-      dVector tmp(total_dofs);
+      Vector<double> tmp(total_dofs);
       
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
 	   ++child)

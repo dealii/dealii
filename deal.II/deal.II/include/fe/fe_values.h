@@ -8,16 +8,11 @@
 
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <lac/dfmatrix.h>
+#include <lac/fullmatrix.h>
 #include <base/point.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
 
-
-// forward declarations
-template <int dim> class Boundary;
-template <int dim> class FiniteElement;
-template <int dim> class Quadrature;
 
 
 
@@ -275,7 +270,7 @@ class FEValuesBase {
 				      * For the format of this matrix, see the
 				      * documentation for the matrix itself.
 				      */
-    const dFMatrix & get_shape_values () const;
+    const FullMatrix<double> & get_shape_values () const;
 
 				     /**
 				      * Return the values of the finite
@@ -297,8 +292,8 @@ class FEValuesBase {
 				      * #values# object already has the
 				      * right size. 
 				      */
-    void get_function_values (const dVector      &fe_function,
-			      vector<double>     &values) const;
+    void get_function_values (const Vector<double> &fe_function,
+			      vector<double>       &values) const;
 
 				   /**
 				    * Access to vector valued finite element functions.
@@ -308,8 +303,8 @@ class FEValuesBase {
 				    * but applied to multi-component
 				    * elements.
 				    */
-    void get_function_values (const dVector      &fe_function,
-			      vector<vector<double> >     &values) const;
+    void get_function_values (const Vector<double>    &fe_function,
+			      vector<vector<double> > &values) const;
 
     				     /**
 				      * Return the gradient of the #i#th shape
@@ -346,7 +341,7 @@ class FEValuesBase {
 				      * #gradients# object already has the
 				      * right size.
 				      */
-    void get_function_grads (const dVector          &fe_function,
+    void get_function_grads (const Vector<double>   &fe_function,
 			     vector<Tensor<1,dim> > &gradients) const;
 
     				     /**
@@ -393,7 +388,7 @@ class FEValuesBase {
 				      * #second_derivatives# object already has
 				      * the right size.
 				      */
-    void get_function_2nd_derivatives (const dVector          &fe_function,
+    void get_function_2nd_derivatives (const Vector<double>   &fe_function,
 				       vector<Tensor<2,dim> > &second_derivatives) const;
 
 				     /**
@@ -529,7 +524,7 @@ class FEValuesBase {
 				      * is determined by the #selected_dataset#
 				      * variable.
 				      */
-    vector<dFMatrix>     shape_values;
+    vector<FullMatrix<double> >     shape_values;
 
     				     /**
 				      * Store the gradients of the shape
@@ -647,7 +642,7 @@ class FEValuesBase {
 				      * of the #i#th transfer basis function
 				      * at the #j#th quadrature point.
 				      */
-    vector<dFMatrix>     shape_values_transform;
+    vector<FullMatrix<double> >     shape_values_transform;
 
 				     /**
 				      * Store which of the data sets in the
@@ -1207,7 +1202,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim> {
 
 template <int dim>
 inline
-const dFMatrix & FEValuesBase<dim>::get_shape_values () const {
+const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const {
   Assert (selected_dataset<shape_values.size(),
 	  ExcInvalidIndex (selected_dataset, shape_values.size()));
   return shape_values[selected_dataset];

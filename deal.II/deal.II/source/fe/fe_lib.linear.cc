@@ -146,7 +146,7 @@ void FELinear<1>::get_face_support_points (const typename DoFHandler<1>::face_it
 template <>
 void FELinear<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					 const Boundary<1> &,
-					 dFMatrix &local_mass_matrix) const {
+					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -314,7 +314,7 @@ FELinear<2>::shape_grad_grad (const unsigned int i,
 template <>
 void FELinear<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					 const Boundary<2> &,
-					 dFMatrix &local_mass_matrix) const {
+					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -850,7 +850,7 @@ FELinear<3>::shape_grad_grad (const unsigned int i,
 template <>
 void FELinear<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					 const Boundary<3> &,
-					 dFMatrix &local_mass_matrix) const {
+					 FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,

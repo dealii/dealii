@@ -6,14 +6,10 @@
 /*----------------------------   data_io.h     ---------------------------*/
 
 #include <base/exceptions.h>
+#include <basic/forward-declarations.h>
+#include <lac/forward-declarations.h>
 #include <vector>
 #include <string>
-
-template <int dim> class Triangulation;
-template <int dim> class DoFHandler;
-
-class dVector;
-
 
 
 
@@ -359,9 +355,9 @@ class DataOut {
 				      * see which characters are valid and which
 				      * are not.
 				      */
-    void add_data_vector (const dVector &data,
-			  const string  &name,
-			  const string  &units="<dimensionless>");
+    void add_data_vector (const Vector<double> &data,
+			  const string         &name,
+			  const string         &units="<dimensionless>");
 
 				     /**
 				      * Release the pointers to the data
@@ -531,16 +527,18 @@ class DataOut {
 					 /**
 					  * Constructor
 					  */
-	DataEntry (const dVector *data, const string name, const string units);
+	DataEntry (const Vector<double> *data, const string name, const string units);
 	
 					 /**
 					  * Pointer to the data vector.
 					  */
-	const dVector *data;
+	const Vector<double> *data;
+	
 					 /**
 					  * Name of this component.
 					  */
 	string   name;
+	
 					 /**
 					  * Physical unit name of this
 					  * component.

@@ -16,7 +16,14 @@
  * other types than those explicitely instantiated.
  */
 template <int N>
-class DoFLevel;
+class DoFLevel {
+  private:
+				     /**
+				      * Make the constructor private to avoid
+				      * that someone uses this class.
+				      */
+    DoFLevel ();
+};
 
 
 

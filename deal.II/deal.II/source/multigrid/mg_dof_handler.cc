@@ -12,7 +12,7 @@
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
-#include <lac/dsmatrix.h>
+#include <lac/sparsematrix.h>
 
 #include <algorithm>
 
@@ -1002,7 +1002,7 @@ unsigned int MGDoFHandler<dim>::n_dofs (const unsigned int level) const {
 
 template <int dim>
 void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
-					       dSMatrixStruct     &sparsity) const {
+					       SparseMatrixStruct &sparsity) const {
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (sparsity.n_rows() == n_dofs(level),
 	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs(level)));
@@ -1032,7 +1032,7 @@ void MGDoFHandler<dim>::renumber_dofs (const unsigned int      level,
 				       const RenumberingMethod method,
 				       const vector<int>      &starting_points) {
 				   // make the connection graph
-  dSMatrixStruct sparsity (n_dofs(level), max_couplings_between_dofs());
+  SparseMatrixStruct sparsity (n_dofs(level), max_couplings_between_dofs());
   make_sparsity_pattern (level, sparsity);
     
   int n_dofs = sparsity.n_rows();

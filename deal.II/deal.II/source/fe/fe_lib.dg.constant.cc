@@ -127,7 +127,7 @@ FEDGConstant<dim>::shape_grad_grad (const unsigned int i,
 template <int dim>
 void FEDGConstant<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					       const Boundary<dim> &,
-					       dFMatrix &local_mass_matrix) const {
+					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -176,7 +176,7 @@ FEDGConstant<dim>::get_face_support_points (const typename DoFHandler<dim>::face
 
 
 template <int dim>
-const dFMatrix & 
+const FullMatrix<double> & 
 FEDGConstant<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];

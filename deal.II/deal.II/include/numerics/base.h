@@ -6,24 +6,12 @@
 /*----------------------------   problem_base.h     ---------------------------*/
 
 
-#include <lac/dsmatrix.h>
+#include <lac/sparsematrix.h>
 #include <base/exceptions.h>
 #include <grid/dof_constraints.h>
 #include <fe/fe_update_flags.h>
 #include <map>
 
-
-// forward declaration
-template <int dim> class Triangulation;
-template <int dim> class DoFHandler;
-template <int dim> class FiniteElement;
-template <int dim> class Quadrature;
-template <int dim> class DataOut;
-template <int dim> class Equation;
-template <int dim> class Assembler;
-template <int dim> class Boundary;
-template <int dim> class StraightBoundary;
-template <int dim> class Function;
 
 
 
@@ -227,22 +215,22 @@ class ProblemBase {
 				     /**
 				      * Sparsity pattern of the system matrix.
 				      */
-    dSMatrixStruct      system_sparsity;
+    SparseMatrixStruct      system_sparsity;
 
 				     /**
 				      * System matrix.
 				      */
-    dSMatrix            system_matrix;
+    SparseMatrix<double>    system_matrix;
 
 				     /**
 				      * Vector storing the right hand side.
 				      */
-    dVector             right_hand_side;
+    Vector<double>             right_hand_side;
 
 				     /**
 				      * Solution vector.
 				      */
-    dVector             solution;
+    Vector<double>             solution;
 
 				     /**
 				      * List of constraints introduced by

@@ -4,7 +4,7 @@
 
 
 #include "poisson.h"
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 
 

@@ -10,7 +10,8 @@
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
 #include <grid/geometry_info.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
+#include <lac/vector.h>
 
 #include <numeric>
 #include <algorithm>
@@ -32,8 +33,8 @@ void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 					     const FiniteElement<1> &,
 					     const Boundary<1> &,
 					     const FunctionMap &,
-					     const dVector &,
-					     dVector &,
+					     const Vector<double> &,
+					     Vector<float> &,
 					     const Function<1> *) {
   Assert(false, ExcNotImplemented());
 };
@@ -47,8 +48,8 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					       const FiniteElement<dim> &fe,
 					       const Boundary<dim>      &boundary,
 					       const FunctionMap        &neumann_bc,
-					       const dVector            &solution,
-					       dVector                  &error,
+					       const Vector<double>     &solution,
+					       Vector<float>            &error,
 					       const Function<dim> *coefficient) {
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
@@ -195,7 +196,7 @@ void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iter
 							  FEFaceValues<1>        &,
 							  FEFaceValues<1>        &,
 							  FaceIntegrals          &,
-							  const dVector          &,
+							  const Vector<double>   &,
 							  const Function<1>      *) {
   Assert (false, ExcInternalError());
 };
@@ -212,7 +213,7 @@ integrate_over_irregular_face (const active_cell_iterator &,
 			       FEFaceValues<1>            &,
 			       FESubfaceValues<1>         &,
 			       FaceIntegrals              &,
-			       const dVector              &,
+			       const Vector<double>       &,
 			       const Function<1>          *) {
   Assert (false, ExcInternalError());
 };
@@ -232,7 +233,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 			     FEFaceValues<dim>          &fe_face_values_cell,
 			     FEFaceValues<dim>          &fe_face_values_neighbor,
 			     FaceIntegrals              &face_integrals,
-			     const dVector              &solution,
+			     const Vector<double>       &solution,
 			     const Function<dim>        *coefficient) {
   const DoFHandler<dim>::face_iterator face = cell->face(face_no);
   
@@ -386,7 +387,7 @@ integrate_over_irregular_face (const active_cell_iterator &cell,
 			       FEFaceValues<dim>          &fe_face_values,
 			       FESubfaceValues<dim>       &fe_subface_values,
 			       FaceIntegrals              &face_integrals,
-			       const dVector              &solution,
+			       const Vector<double>       &solution,
 			       const Function<dim>        *coefficient) {
   const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
   Assert (neighbor.state() == valid, ExcInternalError());

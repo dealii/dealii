@@ -6,34 +6,13 @@
 /*----------------------------   tria.h     ---------------------------*/
 
 #include <vector>
+#include <basic/forward-declarations.h>
+#include <lac/forward-declarations.h>
+#include <base/forward-declarations.h>
 #include <base/point.h>
 #include <grid/geometry_info.h>
 #include <base/subscriptor.h>
 
-
-//forward declaration needed
-template <int dim> class Boundary;
-
-template <int dim> class TriaAccessor;
-template <int dim> class LineAccessor;
-template <int dim> class QuadAccessor;
-template <int dim> class HexAccessor;
-template <int dim> class CellAccessor;
-
-template <int dim> class TriangulationLevel;
-
-template <int dim, class Accessor> class TriaRawIterator;
-template <int dim, class Accessor> class TriaIterator;
-template <int dim, class Accessor> class TriaActiveIterator;
-
-template <int dim> class DoFHandler;
-template <int dim> class MGDoFHandler;
-
-class dVector;
-
-
-class istream;
-class ostream;
 
 
 
@@ -670,12 +649,12 @@ class TriaDimensionInfo<3> {
  *   elements.
  *
  *   The central function to this is
- *   #refine (const dVector &criterion, const double threshold)#: it takes a
+ *   #refine (const Vector<float> &criterion, const double threshold)#: it takes a
  *   vector of values, one per active cell, which denote the criterion according
  *   to which the triangulation is to be refined. It marks all cells for which
  *   the criterion is greater than the threshold being given as the second
  *   argument. Analogously,
- *   #coarsen (const dVector &criterion, const double threshold)# flags those
+ *   #coarsen (const Vector<float> &criterion, const double threshold)# flags those
  *   cells for coarsening for which the criterion is less than the treshold.
  *
  *   There are two variations of these functions, which rely on #refine# and
@@ -1690,9 +1669,15 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * for mesh refinement; refer to the
 				      * following functions and to the general
 				      * doc for this class for more information.
+				      *
+				      * Note that this function takes a vector
+				      * of #float#s, rather than the usual
+				      * #double#s, since accuracy is not so
+				      * much needed here and saving memory may
+				      * be a good goal when using many cells.
 				      */
-    void refine (const dVector &criteria,
-		 const double   threshold);
+    void refine (const Vector<float> &criteria,
+		 const double         threshold);
 
 				     /**
 				      * Analogue to the #refine# function:
@@ -1700,9 +1685,15 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      * which the absolute value of the
 				      * criterion is less than the
 				      * given threshold.
+				      *
+				      * Note that this function takes a vector
+				      * of #float#s, rather than the usual
+				      * #double#s, since accuracy is not so
+				      * much needed here and saving memory may
+				      * be a good goal when using many cells.
 				      */
-    void coarsen (const dVector &criteria,
-		  const double   threshold);
+    void coarsen (const Vector<float> &criteria,
+		  const double         threshold);
     
 				     /**
 				      * Refine the triangulation by refining
@@ -1718,10 +1709,16 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *
 				      * Refer to the general doc of this class
 				      * for more information.
+				      *
+				      * Note that this function takes a vector
+				      * of #float#s, rather than the usual
+				      * #double#s, since accuracy is not so
+				      * much needed here and saving memory may
+				      * be a good goal when using many cells.
 				      */
-    void refine_and_coarsen_fixed_number (const dVector &criteria,
-					  const double   top_fraction_of_cells,
-					  const double   bottom_fraction_of_cells);
+    void refine_and_coarsen_fixed_number (const Vector<float> &criteria,
+					  const double         top_fraction_of_cells,
+					  const double         bottom_fraction_of_cells);
 
 				     /**
 				      * Refine the triangulation by flagging
@@ -1737,10 +1734,16 @@ class Triangulation : public TriaDimensionInfo<dim>, public Subscriptor {
 				      *
 				      * Refer to the general doc of this class
 				      * for more information.
+				      *
+				      * Note that this function takes a vector
+				      * of #float#s, rather than the usual
+				      * #double#s, since accuracy is not so
+				      * much needed here and saving memory may
+				      * be a good goal when using many cells.
 				      */
-    void refine_and_coarsen_fixed_fraction (const dVector &criteria,
-					    const double   top_fraction,
-					    const double   bottom_fraction);
+    void refine_and_coarsen_fixed_fraction (const Vector<float> &criteria,
+					    const double         top_fraction,
+					    const double         bottom_fraction);
     
 				     /**
 				      *  Refine all cells on all levels which

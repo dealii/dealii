@@ -7,30 +7,8 @@
 
 
 #include <base/exceptions.h>
-
-
-// forward declaration needed
-class Line;
-class Quad;
-class Hexahedron;
-
-template <int dim> class Point;
-
-
-template <int dim> class TriaAccessor;
-template <int dim> class LineAccessor;
-template <int dim> class QuadAccessor;
-template <int dim> class CellAccessor;
-
-template <int dim> class DoFCellAccessor;
-template <int dim, class BaseClass> class DoFLineAccessor;
-
-template <int dim, class Accessor> class TriaRawIterator;
-template <int dim, class Accessor> class TriaIterator;
-template <int dim, class Accessor> class TriaActiveIterator;
-
-template <int dim> class Triangulation;
-
+#include <base/forward-declarations.h>
+#include <basic/forward-declarations.h>
 
 
 

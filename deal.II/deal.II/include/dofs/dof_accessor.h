@@ -6,14 +6,8 @@
 /*----------------------------   dof_iterator.h     ---------------------------*/
 
 
-template <int dim> class Triangulation;
-template <int dim> class DoFHandler;
-class dVector;
-class dFMatrix;
-class dSMatrix;
-
-
 #include <grid/tria_accessor.h>
+#include <lac/forward-declarations.h>
 #include <vector>
 
 
@@ -257,8 +251,8 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * rather than just set, since this is
 				      * usually what one wants.
 				      */
-    void distribute_local_to_global (const dVector &local_source,
-				     dVector       &global_destination) const;
+    void distribute_local_to_global (const Vector<double> &local_source,
+				     Vector<double>       &global_destination) const;
 
 				     /**
 				      * This function does much the same as the
@@ -268,8 +262,8 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const dFMatrix &local_source,
-				     dSMatrix       &global_destination) const;
+    void distribute_local_to_global (const FullMatrix<double> &local_source,
+				     SparseMatrix<double>     &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -383,8 +377,8 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * rather than just set, since this is
 				      * usually what one wants.
 				      */
-    void distribute_local_to_global (const dVector &local_source,
-				     dVector       &global_destination) const;
+    void distribute_local_to_global (const Vector<double> &local_source,
+				     Vector<double>       &global_destination) const;
 
 				     /**
 				      * This function does much the same as the
@@ -394,8 +388,8 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const dFMatrix &local_source,
-				     dSMatrix       &global_destination) const;
+    void distribute_local_to_global (const FullMatrix<double> &local_source,
+				     SparseMatrix<double>     &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -515,8 +509,8 @@ class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * rather than just set, since this is
 				      * usually what one wants.
 				      */
-    void distribute_local_to_global (const dVector &local_source,
-				     dVector       &global_destination) const;
+    void distribute_local_to_global (const Vector<double> &local_source,
+				     Vector<double>       &global_destination) const;
 
 				     /**
 				      * This function does much the same as the
@@ -526,8 +520,8 @@ class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const dFMatrix &local_source,
-				     dSMatrix       &global_destination) const;
+    void distribute_local_to_global (const FullMatrix<double> &local_source,
+				     SparseMatrix<double>     &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -765,8 +759,8 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * function is only callable for active
 				      * cells.
 				      */
-    void get_dof_values (const dVector &values,
-			 dVector       &local_values) const;
+    void get_dof_values (const Vector<double> &values,
+			 Vector<double>       &local_values) const;
 
 				     /**
 				      * Return the interpolation of the given
@@ -807,8 +801,8 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * what the this function does in these
 				      * cases.
 				      */
-    void get_interpolated_dof_values (const dVector &values,
-				      dVector       &interpolated_values) const;
+    void get_interpolated_dof_values (const Vector<double> &values,
+				      Vector<double>       &interpolated_values) const;
 
 				     /**
 				      * This function is the counterpart to
@@ -832,8 +826,8 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
 				      */				       
-    void set_dof_values (const dVector &local_values,
-			 dVector       &values) const;
+    void set_dof_values (const Vector<double> &local_values,
+			 Vector<double>       &values) const;
 
 				     /**
 				      * This, again, is the counterpart to
@@ -888,8 +882,8 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * the prolongation matrices represent in
 				      * this case.
 				      */
-    void set_dof_values_by_interpolation (const dVector &local_values,
-					  dVector       &values) const;
+    void set_dof_values_by_interpolation (const Vector<double> &local_values,
+					  Vector<double>       &values) const;
     
     				     /**
 				      *  Exception

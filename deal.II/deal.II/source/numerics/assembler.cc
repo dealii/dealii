@@ -6,9 +6,9 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
-#include <lac/dfmatrix.h>
-#include <lac/dvector.h>
-#include <lac/dsmatrix.h>
+#include <lac/fullmatrix.h>
+#include <lac/vector.h>
+#include <lac/sparsematrix.h>
 
 
 template <int dim>
@@ -18,8 +18,8 @@ Equation<dim>::Equation (const unsigned int n_equations) :
 
 
 template <int dim>
-void Equation<dim>::assemble (dFMatrix          &,
-			      dVector           &,
+void Equation<dim>::assemble (FullMatrix<double>          &,
+			      Vector<double>           &,
 			      const FEValues<dim> &,
 			      const typename DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -28,7 +28,7 @@ void Equation<dim>::assemble (dFMatrix          &,
 
 
 template <int dim>
-void Equation<dim>::assemble (dFMatrix          &,
+void Equation<dim>::assemble (FullMatrix<double>          &,
 			      const FEValues<dim> &,
 			      const typename DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -37,7 +37,7 @@ void Equation<dim>::assemble (dFMatrix          &,
 
 
 template <int dim>
-void Equation<dim>::assemble (dVector           &,
+void Equation<dim>::assemble (Vector<double>           &,
 			      const FEValues<dim> &,
 			      const typename DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -50,8 +50,8 @@ template <int dim>
 AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
 				   const bool                assemble_matrix,
 				   const bool                assemble_rhs,
-				   dSMatrix                 &matrix,
-				   dVector                  &rhs_vector,
+				   SparseMatrix<double>     &matrix,
+				   Vector<double>           &rhs_vector,
 				   const Quadrature<dim>    &quadrature,
 				   const FiniteElement<dim> &fe,
 				   const UpdateFlags        &update_flags,
@@ -76,7 +76,7 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 			   const AssemblerData<dim> *local_data) :
 		DoFCellAccessor<dim> (tria,level,index, &local_data->dof),
 		cell_matrix (dof_handler->get_fe().total_dofs),
-		cell_vector (dVector(dof_handler->get_fe().total_dofs)),
+		cell_vector (Vector<double>(dof_handler->get_fe().total_dofs)),
 		assemble_matrix (local_data->assemble_matrix),
 		assemble_rhs (local_data->assemble_rhs),
 		matrix(local_data->matrix),

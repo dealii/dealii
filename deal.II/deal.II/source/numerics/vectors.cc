@@ -14,8 +14,8 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
-#include <lac/dvector.h>
-#include <lac/dsmatrix.h>
+#include <lac/vector.h>
+#include <lac/sparsematrix.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 
@@ -45,7 +45,7 @@ template <int dim>
 void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 				    const Boundary<dim>      &boundary,
 				    const Function<dim>      &function,
-				    dVector                  &vec)
+				    Vector<double>           &vec)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   
@@ -75,12 +75,12 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 template <int dim> void
 VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
 			      const DoFHandler<dim>    &low_dof,
-			      const dFMatrix           &transfer,
-			      const dVector            &high,
-			      dVector                  &low)
+			      const FullMatrix<double>        &transfer,
+			      const Vector<double>            &high,
+			      Vector<double>                  &low)
 {
-  dVector cell_high(high_dof.get_fe().total_dofs);
-  dVector cell_low(low_dof.get_fe().total_dofs);
+  Vector<double> cell_high(high_dof.get_fe().total_dofs);
+  Vector<double> cell_low(low_dof.get_fe().total_dofs);
   
   DoFHandler<dim>::active_cell_iterator h = high_dof.begin_active();
   DoFHandler<dim>::active_cell_iterator l = low_dof.begin_active();
@@ -102,7 +102,7 @@ void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const Boundary<1>      &,
 			      const Quadrature<1>    &,
 			      const Function<1>      &,
-			      dVector                &,
+			      Vector<double>         &,
 			      const bool              ,
 			      const Quadrature<0>    &,
 			      const bool              ) {
@@ -126,7 +126,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const Boundary<dim>      &boundary,
 				const Quadrature<dim>    &q,
 				const Function<dim>      &function,
-				dVector                  &vec,
+				Vector<double>           &vec,
 				const bool                enforce_zero_boundary,
 				const Quadrature<dim-1>  &q_boundary,
 				const bool                project_to_boundary_first) {
@@ -173,14 +173,14 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
       
 				   // set up mass matrix and right hand side
   vec.reinit (dof.n_dofs());
-  dSMatrixStruct sparsity(dof.n_dofs(),
-			  dof.n_dofs(),
-			  dof.max_couplings_between_dofs());
+  SparseMatrixStruct sparsity(dof.n_dofs(),
+			      dof.n_dofs(),
+			      dof.max_couplings_between_dofs());
   dof.make_sparsity_pattern (sparsity);
   constraints.condense (sparsity);
   
-  dSMatrix mass_matrix (sparsity);
-  dVector tmp (mass_matrix.n());
+  SparseMatrix<double> mass_matrix (sparsity);
+  Vector<double> tmp (mass_matrix.n());
   MatrixCreator<dim>::create_mass_matrix (dof, boundary, mass_matrix);
   VectorTools<dim>::create_right_hand_side (dof, q, boundary,
 					    function, tmp);
@@ -191,8 +191,8 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 					   mass_matrix, vec, tmp);
 
   SolverControl                    control(1000,1e-16);
-  PrimitiveVectorMemory<dVector>   memory;
-  SolverCG<dSMatrix,dVector>       cg(control,memory);
+  PrimitiveVectorMemory<Vector<double> >   memory;
+  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
 				   // solve
   cg.solve (mass_matrix, vec, tmp);
@@ -208,12 +208,12 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 					       const Quadrature<dim>    &q,
 					       const Boundary<dim>      &boundary,
 					       const Function<dim>      &rhs,
-					       dVector                  &rhs_vector) {
+					       Vector<double>           &rhs_vector) {
   const FiniteElement<dim> &fe = dof.get_fe();
   
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
-  dSMatrix dummy;
+  SparseMatrix<double> dummy;
   const AssemblerData<dim> data (dof,
 				 false, true,
 				 dummy, rhs_vector,
@@ -304,8 +304,8 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
   
 				   // set up sparsity structure
-  dSMatrixStruct sparsity(dof.n_boundary_dofs(boundary_functions),
-			  dof.max_couplings_between_boundary_dofs());
+  SparseMatrixStruct sparsity(dof.n_boundary_dofs(boundary_functions),
+			      dof.max_couplings_between_boundary_dofs());
   dof.make_boundary_sparsity_pattern (boundary_functions, dof_to_boundary_mapping,
 				      sparsity);
 
@@ -330,8 +330,8 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   
 
 				   // make mass matrix and right hand side
-  dSMatrix       mass_matrix(sparsity);
-  dVector        rhs(sparsity.n_rows());
+  SparseMatrix<double> mass_matrix(sparsity);
+  Vector<double>       rhs(sparsity.n_rows());
   
 
   MatrixTools<dim>::create_boundary_mass_matrix (dof, q, boundary,
@@ -343,11 +343,11 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
   Assert (dim<3, ExcNotImplemented());
 
   
-  dVector boundary_projection (rhs.size());
+  Vector<double> boundary_projection (rhs.size());
 
   SolverControl                    control(1000, 1e-16);
-  PrimitiveVectorMemory<dVector>   memory;
-  SolverCG<dSMatrix,dVector>       cg(control,memory);
+  PrimitiveVectorMemory<Vector<double> >   memory;
+  SolverCG<SparseMatrix<double>,Vector<double> >       cg(control,memory);
 
 				   // solve
   cg.solve (mass_matrix, boundary_projection, rhs);
@@ -370,9 +370,9 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
-					     const dVector            &fe_function,
+					     const Vector<double>     &fe_function,
 					     const Function<dim>      &exact_solution,
-					     dVector                  &difference,
+					     Vector<float>            &difference,
 					     const Quadrature<dim>    &q,
 					     const NormType           &norm,
 					     const Boundary<dim>      &boundary) {
@@ -555,193 +555,195 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
     };
 };
 
-template <int dim>
-void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
-					     const dVector            &fe_function,
-					     const TensorFunction<1,dim>      &exact_solution,
-					     dVector                  &difference,
-					     const Quadrature<dim>    &q,
-					     const FiniteElement<dim> &fe,
-					     const NormType           &norm,
-					     const Boundary<dim>      &boundary) {
-  Assert (fe == dof.get_fe(), ExcInvalidFE());
+
+
+// template <int dim>
+// void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
+// 					     const Vector<double>     &fe_function,
+// 					     const TensorFunction<1,dim>&exact_solution,
+// 					     Vector<float>            &difference,
+// 					     const Quadrature<dim>    &q,
+// 					     const FiniteElement<dim> &fe,
+// 					     const NormType           &norm,
+// 					     const Boundary<dim>      &boundary) {
+//   Assert (fe == dof.get_fe(), ExcInvalidFE());
   
-  difference.reinit (dof.get_tria().n_active_cells());
+//   difference.reinit (dof.get_tria().n_active_cells());
   
-  UpdateFlags update_flags = UpdateFlags (update_q_points  |
-					  update_JxW_values);
-  if ((norm==H1_seminorm) || (norm==H1_norm))
-    update_flags = UpdateFlags (update_flags | update_gradients);
-  FEValues<dim> fe_values(fe, q, update_flags);
+//   UpdateFlags update_flags = UpdateFlags (update_q_points  |
+// 					  update_JxW_values);
+//   if ((norm==H1_seminorm) || (norm==H1_norm))
+//     update_flags = UpdateFlags (update_flags | update_gradients);
+//   FEValues<dim> fe_values(fe, q, update_flags);
   
-				   // loop over all cells
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
-  for (unsigned int index=0; cell != endc; ++cell, ++index)
-    {
-      double diff=0;
-				       // initialize for this cell
-      fe_values.reinit (cell, boundary);
+// 				   // loop over all cells
+//   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+// 					endc = dof.end();
+//   for (unsigned int index=0; cell != endc; ++cell, ++index)
+//     {
+//       double diff=0;
+// 				       // initialize for this cell
+//       fe_values.reinit (cell, boundary);
 
-      switch (norm) 
-	{
-	  case mean:
-	  case L1_norm:
-	  case L2_norm:
-	  case Linfty_norm:
-	  case H1_norm:
-	  {
-					     // we need the finite element
-					     // function \psi at the different
-					     // integration points. Compute
-					     // it like this:
-					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
-					     // with v_i the nodal values of the
-					     // fe_function and \phi_i(x_j) the
-					     // matrix of the trial function
-					     // values at the integration point
-					     // x_j. Then the vector
-					     // of the \psi(x_j) is v*Phi with
-					     // v being the vector of nodal
-					     // values on this cell and Phi
-					     // the matrix.
-					     //
-					     // we then need the difference:
-					     // reference_function(x_j)-\psi_j
-					     // and assign that to the vector
-					     // \psi.
-	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<double>   psi (n_q_points);
+//       switch (norm) 
+// 	{
+// 	  case mean:
+// 	  case L1_norm:
+// 	  case L2_norm:
+// 	  case Linfty_norm:
+// 	  case H1_norm:
+// 	  {
+// 					     // we need the finite element
+// 					     // function \psi at the different
+// 					     // integration points. Compute
+// 					     // it like this:
+// 					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
+// 					     // with v_i the nodal values of the
+// 					     // fe_function and \phi_i(x_j) the
+// 					     // matrix of the trial function
+// 					     // values at the integration point
+// 					     // x_j. Then the vector
+// 					     // of the \psi(x_j) is v*Phi with
+// 					     // v being the vector of nodal
+// 					     // values on this cell and Phi
+// 					     // the matrix.
+// 					     //
+// 					     // we then need the difference:
+// 					     // reference_function(x_j)-\psi_j
+// 					     // and assign that to the vector
+// 					     // \psi.
+// 	    const unsigned int n_q_points = q.n_quadrature_points;
+// 	    vector<double>   psi (n_q_points);
 
-					     // in praxi: first compute
-					     // exact fe_function vector
-	    exact_solution.value_list (fe_values.get_quadrature_points(),
-				       psi);
-					     // then subtract finite element
-					     // fe_function
-	    if (true) 
-	      {
-		vector< vector<double> > function_values (fe.n_components, vector<double>(n_q_points, 0));
-		fe_values.get_function_values (fe_function, function_values);
+// 					     // in praxi: first compute
+// 					     // exact fe_function vector
+// 	    exact_solution.value_list (fe_values.get_quadrature_points(),
+// 				       psi);
+// 					     // then subtract finite element
+// 					     // fe_function
+// 	    if (true) 
+// 	      {
+// 		vector< vector<double> > function_values (fe.n_components, vector<double>(n_q_points, 0));
+// 		fe_values.get_function_values (fe_function, function_values);
 
-		transform (psi.begin(), psi.end(),
-			   function_values.begin(),
-			   psi.begin(),
-			   minus<double>());
-	      };	    
+// 		transform (psi.begin(), psi.end(),
+// 			   function_values.begin(),
+// 			   psi.begin(),
+// 			   minus<double>());
+// 	      };	    
 
-					     // for L1_norm and Linfty_norm:
-					     // take absolute
-					     // value, for the L2_norm take
-					     // square of psi
-	    switch (norm) 
-	      {
-		case mean:
-		      break;
-		case L1_norm:
-		case Linfty_norm:
-		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(fabs));
-		      break;
-		case L2_norm:
-		case H1_norm:
-		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(sqr));
-		      break;
-		default:
-		      Assert (false, ExcNotImplemented());
-	      };
+// 					     // for L1_norm and Linfty_norm:
+// 					     // take absolute
+// 					     // value, for the L2_norm take
+// 					     // square of psi
+// 	    switch (norm) 
+// 	      {
+// 		case mean:
+// 		      break;
+// 		case L1_norm:
+// 		case Linfty_norm:
+// 		      transform (psi.begin(), psi.end(),
+// 				 psi.begin(), ptr_fun(fabs));
+// 		      break;
+// 		case L2_norm:
+// 		case H1_norm:
+// 		      transform (psi.begin(), psi.end(),
+// 				 psi.begin(), ptr_fun(sqr));
+// 		      break;
+// 		default:
+// 		      Assert (false, ExcNotImplemented());
+// 	      };
 
-					     // ok, now we have the integrand,
-					     // let's compute the integral,
-					     // which is
-					     // sum_j psi_j JxW_j
-					     // (or |psi_j| or |psi_j|^2
-	    switch (norm) 
-	      {
-		case mean:
-		case L1_norm:
-		      diff = inner_product (psi.begin(), psi.end(),
-					    fe_values.get_JxW_values().begin(),
-					    0.0);
-		      break;
-		case L2_norm:
-		case H1_norm:
-		      diff = sqrt(inner_product (psi.begin(), psi.end(),
-						 fe_values.get_JxW_values().begin(),
-						 0.0));
-		      break;
-		case Linfty_norm:
-		      diff = *max_element (psi.begin(), psi.end());
-		      break;
-		default:
-		      Assert (false, ExcNotImplemented());
-	      };
+// 					     // ok, now we have the integrand,
+// 					     // let's compute the integral,
+// 					     // which is
+// 					     // sum_j psi_j JxW_j
+// 					     // (or |psi_j| or |psi_j|^2
+// 	    switch (norm) 
+// 	      {
+// 		case mean:
+// 		case L1_norm:
+// 		      diff = inner_product (psi.begin(), psi.end(),
+// 					    fe_values.get_JxW_values().begin(),
+// 					    0.0);
+// 		      break;
+// 		case L2_norm:
+// 		case H1_norm:
+// 		      diff = sqrt(inner_product (psi.begin(), psi.end(),
+// 						 fe_values.get_JxW_values().begin(),
+// 						 0.0));
+// 		      break;
+// 		case Linfty_norm:
+// 		      diff = *max_element (psi.begin(), psi.end());
+// 		      break;
+// 		default:
+// 		      Assert (false, ExcNotImplemented());
+// 	      };
 
-					     // note: the H1_norm uses the result
-					     // of the L2_norm and control goes
-					     // over to the next case statement!
-	    if (norm != H1_norm)
-	      break;
-	  };
+// 					     // note: the H1_norm uses the result
+// 					     // of the L2_norm and control goes
+// 					     // over to the next case statement!
+// 	    if (norm != H1_norm)
+// 	      break;
+// 	  };
 
-	  case H1_seminorm:
-	  {
-					     // note: the computation of the
-					     // H1_norm starts at the previous
-					     // case statement, but continues
-					     // here!
+// 	  case H1_seminorm:
+// 	  {
+// 					     // note: the computation of the
+// 					     // H1_norm starts at the previous
+// 					     // case statement, but continues
+// 					     // here!
 
-					     // for H1_norm: re-square L2_norm.
-	    diff = sqr(diff);
+// 					     // for H1_norm: re-square L2_norm.
+// 	    diff = sqr(diff);
 
-					     // same procedure as above, but now
-					     // psi is a vector of gradients
-	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<Tensor<1,dim> >   psi (n_q_points);
+// 					     // same procedure as above, but now
+// 					     // psi is a vector of gradients
+// 	    const unsigned int n_q_points = q.n_quadrature_points;
+// 	    vector<Tensor<1,dim> >   psi (n_q_points);
 
-					     // in praxi: first compute
-					     // exact fe_function vector
-	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
-					  psi);
+// 					     // in praxi: first compute
+// 					     // exact fe_function vector
+// 	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
+// 					  psi);
 	    
-					     // then subtract finite element
-					     // fe_function
-	    if (true) 
-	      {
-		vector<Tensor<1,dim> > function_grads (n_q_points, Tensor<1,dim>());
-		fe_values.get_function_grads (fe_function, function_grads);
+// 					     // then subtract finite element
+// 					     // fe_function
+// 	    if (true) 
+// 	      {
+// 		vector<Tensor<1,dim> > function_grads (n_q_points, Tensor<1,dim>());
+// 		fe_values.get_function_grads (fe_function, function_grads);
 
-		transform (psi.begin(), psi.end(),
-			   function_grads.begin(),
-			   psi.begin(),
-			   minus<Tensor<1,dim> >());
-	      };
-					     // take square of integrand
-	    vector<double> psi_square (psi.size(), 0.0);
-	    for (unsigned int i=0; i<n_q_points; ++i)
-	      psi_square[i] = sqr_point(psi[i]);
+// 		transform (psi.begin(), psi.end(),
+// 			   function_grads.begin(),
+// 			   psi.begin(),
+// 			   minus<Tensor<1,dim> >());
+// 	      };
+// 					     // take square of integrand
+// 	    vector<double> psi_square (psi.size(), 0.0);
+// 	    for (unsigned int i=0; i<n_q_points; ++i)
+// 	      psi_square[i] = sqr_point(psi[i]);
 
-					     // add seminorm to L_2 norm or
-					     // to zero
-	    diff += inner_product (psi_square.begin(), psi_square.end(),
-				   fe_values.get_JxW_values().begin(),
-				   0.0);
-	    diff = sqrt(diff);
+// 					     // add seminorm to L_2 norm or
+// 					     // to zero
+// 	    diff += inner_product (psi_square.begin(), psi_square.end(),
+// 				   fe_values.get_JxW_values().begin(),
+// 				   0.0);
+// 	    diff = sqrt(diff);
 
-	    break;
-	  };
+// 	    break;
+// 	  };
 					     
-	  default:
-		Assert (false, ExcNotImplemented());
-	};
+// 	  default:
+// 		Assert (false, ExcNotImplemented());
+// 	};
 
       
-				       // append result of this cell
-				       // to the end of the vector
-      difference(index) = diff;
-    };
-};
+// 				       // append result of this cell
+// 				       // to the end of the vector
+//       difference(index) = diff;
+//     };
+// };
 
 
 template VectorTools<deal_II_dimension>;

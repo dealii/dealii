@@ -165,7 +165,7 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 
 
 template <int dim>
-const dFMatrix &
+const FullMatrix<double> &
 FiniteElementBase<dim>::restrict (const unsigned int child) const {
   Assert (child<GeometryInfo<dim>::children_per_cell, ExcInvalidIndex(child));
   return restriction[child];
@@ -174,7 +174,7 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const {
 
 
 template <int dim>
-const dFMatrix &
+const FullMatrix<double> &
 FiniteElementBase<dim>::prolongate (const unsigned int child) const {
   Assert (child<GeometryInfo<dim>::children_per_cell, ExcInvalidIndex(child));
   return prolongation[child];
@@ -183,7 +183,7 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const {
 
 
 template <int dim>
-const dFMatrix &
+const FullMatrix<double> &
 FiniteElementBase<dim>::constraints () const {
   if (dim==1)
     Assert ((interface_constraints.m()==1) && (interface_constraints.n()==1),
@@ -237,7 +237,7 @@ void FiniteElement<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 				       const bool            compute_support_points,
 				       vector<Point<1> >    &q_points,
 				       const bool            compute_q_points,
-				       const dFMatrix       &,
+				       const FullMatrix<double>       &,
 				       const vector<vector<Tensor<1,1> > > &,
 				       const Boundary<1> &boundary) const {
   Assert ((!compute_jacobians) || (jacobians.size() == unit_points.size()),
@@ -296,7 +296,7 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    const bool              ,
 					    vector<Point<1> >       &,
 					    const bool,
-					    const dFMatrix          &,
+					    const FullMatrix<double>          &,
 					    const vector<vector<Tensor<1,1> > > &,
 					    const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
@@ -319,7 +319,7 @@ void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterato
 					       const bool               ,
 					       vector<Point<1> >       &,
 					       const bool,
-					       const dFMatrix          &,
+					       const FullMatrix<double>          &,
 					       const vector<vector<Tensor<1,1> > > &,
 					       const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
@@ -388,7 +388,7 @@ void FiniteElement<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator &,
 					 const bool,
 					 vector<Point<dim> > &,
 					 const bool,
-					 const dFMatrix      &,
+					 const FullMatrix<double>      &,
 					 const vector<vector<Tensor<1,dim> > > &,
 					 const Boundary<dim> &) const {
   Assert (false, ExcPureFunctionCalled());
@@ -413,7 +413,7 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 					      const bool           compute_face_jacobians,
 					      vector<Point<dim> > &normal_vectors,
 					      const bool           compute_normal_vectors,
-					      const dFMatrix      &shape_values_transform,
+					      const FullMatrix<double>      &shape_values_transform,
 					      const vector<vector<Tensor<1,dim> > > &shape_gradients_transform,
 					      const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),
@@ -465,7 +465,7 @@ void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_ite
 						 const bool           compute_face_jacobians,
 						 vector<Point<dim> > &normal_vectors,
 						 const bool           compute_normal_vectors,
-						 const dFMatrix      &shape_values_transform,
+						 const FullMatrix<double>      &shape_values_transform,
 						 const vector<vector<Tensor<1,dim> > > &shape_gradients_transform,
 						 const Boundary<dim> &boundary) const {
   Assert (jacobians.size() == unit_points.size(),

@@ -2,10 +2,10 @@
 // Copyright Guido Kanschat, Universitaet Heidelberg, 1999
 
 #include <numerics/multigrid.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 void
-MultiGrid::vmult(dVector& dst, const dVector& src) const
+MultiGrid::vmult(Vector<double>& dst, const Vector<double>& src) const
 {
   dst = 0.;
   
@@ -20,7 +20,7 @@ MultiGrid::vmult(dVector& dst, const dVector& src) const
 
 
 void
-MultiGrid::precondition(dVector& dst, const dVector& src) const
+MultiGrid::precondition(Vector<double>& dst, const Vector<double>& src) const
 {
   copy_to_mg(s,src);
   copy_to_mg(d,dst);
@@ -44,7 +44,7 @@ MultiGrid::level_mgstep(unsigned level) const
 
 
 void MultiGrid::post_smooth(unsigned level,
-			    dVector& dst, const dVector& src,
+			    Vector<double>& dst, const Vector<double>& src,
 			    unsigned steps) const
 {
   smooth(level, dst, src, steps);

@@ -20,15 +20,14 @@
 #include <base/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
-#include <lac/dsmatrix.h>
+#include <lac/sparsematrix.h>
 
 
 #include <map.h>
 #include <fstream.h>
 #include <cmath>
-extern "C" {
-#  include <stdlib.h>
-}
+#include <cstdlib>
+
 
 
 
@@ -42,14 +41,14 @@ class PoissonEquation :  public Equation<dim> {
 		    Equation<dim>(1),
 		    right_hand_side (rhs)  {};
 
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
-    virtual void assemble (dFMatrix            &cell_matrix,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
-    virtual void assemble (dVector             &rhs,
+    virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
   protected:

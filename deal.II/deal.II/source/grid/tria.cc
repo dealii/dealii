@@ -8,7 +8,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
 #include <basic/magic_numbers.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 #include <iostream>
 #include <algorithm>
 #include <numeric>
@@ -3759,8 +3759,8 @@ void Triangulation<3>::print_gnuplot (ostream &out,
 
 
 template <int dim>
-void Triangulation<dim>::refine (const dVector &criteria,
-				 const double   threshold) {
+void Triangulation<dim>::refine (const Vector<float> &criteria,
+				 const double         threshold) {
   Assert (criteria.size() == n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
 
@@ -3783,8 +3783,8 @@ void Triangulation<dim>::refine (const dVector &criteria,
 
 
 template <int dim>
-void Triangulation<dim>::coarsen (const dVector &criteria,
-				  const double   threshold) {
+void Triangulation<dim>::coarsen (const Vector<float> &criteria,
+				  const double         threshold) {
   Assert (criteria.size() == n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
 
@@ -3799,9 +3799,9 @@ void Triangulation<dim>::coarsen (const dVector &criteria,
 
 
 template <int dim>
-void Triangulation<dim>::refine_and_coarsen_fixed_number (const dVector &criteria,
-							  const double   top_fraction,
-							  const double   bottom_fraction) {
+void Triangulation<dim>::refine_and_coarsen_fixed_number (const Vector<float> &criteria,
+							  const double         top_fraction,
+							  const double         bottom_fraction) {
 				   // correct number of cells is
 				   // checked in #refine#
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
@@ -3814,7 +3814,7 @@ void Triangulation<dim>::refine_and_coarsen_fixed_number (const dVector &criteri
   const int coarsen_cells = max(static_cast<int>(bottom_fraction*criteria.size()),
 				1);
   
-  dVector tmp(criteria);  
+  Vector<float> tmp(criteria);  
   nth_element (tmp.begin(), tmp.begin()+refine_cells,
 	       tmp.end(),
 	       greater<double>());
@@ -3838,9 +3838,9 @@ double sqr(double a) {
 
 template <int dim>
 void
-Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
-						       const double   top_fraction,
-						       const double   bottom_fraction) {
+Triangulation<dim>::refine_and_coarsen_fixed_fraction (const Vector<float> &criteria,
+						       const double         top_fraction,
+						       const double         bottom_fraction) {
 				   // correct number of cells is
 				   // checked in #refine#
   Assert ((top_fraction>=0) && (top_fraction<=1), ExcInvalidParameterValue());
@@ -3851,15 +3851,15 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
 				   // error, which is what we have to sum
 				   // up and compare with
 				   // #fraction_of_error*total_error#.
-  dVector tmp(criteria);
+  Vector<float> tmp(criteria);
   const double total_error = tmp.l1_norm();
-  
-  dVector partial_sums(criteria.size());
+
+  Vector<float> partial_sums(criteria.size());
   sort (tmp.begin(), tmp.end(), greater<double>());
   partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
 
 				   // compute thresholds
-  dVector::const_iterator p;
+  Vector<float>::const_iterator p;
   double top_threshold, bottom_threshold;
   p = lower_bound (partial_sums.begin(), partial_sums.end(),
 		   top_fraction*total_error);

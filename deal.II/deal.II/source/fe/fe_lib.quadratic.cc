@@ -212,7 +212,7 @@ void FEQuadraticSub<1>::get_face_support_points (const typename DoFHandler<1>::f
 template <>
 void FEQuadraticSub<1>::get_local_mass_matrix (const DoFHandler<1>::cell_iterator &cell,
 					       const Boundary<1> &,
-					       dFMatrix &local_mass_matrix) const {
+					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -787,7 +787,7 @@ FEQuadraticSub<2>::shape_grad_grad (const unsigned int i,
 template <>
 void FEQuadraticSub<2>::get_local_mass_matrix (const DoFHandler<2>::cell_iterator &cell,
 					       const Boundary<2> &,
-					       dFMatrix &local_mass_matrix) const {
+					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,
@@ -2777,7 +2777,7 @@ return_value[2][2] = 2.0*(-64.0*xi+64.0*xi*xi)*eta+2.0*(64.0*xi-64.0*xi*xi)*eta*
 template <>
 void FEQuadraticSub<3>::get_local_mass_matrix (const DoFHandler<3>::cell_iterator &,
 					       const Boundary<3> &,
-					       dFMatrix &local_mass_matrix) const {
+					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
   Assert (local_mass_matrix.m() == total_dofs,

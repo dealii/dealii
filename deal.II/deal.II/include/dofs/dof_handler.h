@@ -8,37 +8,10 @@
 #include <vector>
 #include <map>
 #include <base/exceptions.h>
+#include <base/forward-declarations.h>
 #include <base/smartpointer.h>
-
-template <int dim> class TriaAccessor;
-template <int dim> class LineAccessor;
-template <int dim> class QuadAccessor;
-template <int dim> class HexAccessor;
-template <int dim> class CellAccessor;
-
-template <int dim, class BaseClass> class DoFLineAccessor;
-template <int dim, class BaseClass> class DoFQuadAccessor;
-template <int dim, class BaseClass> class DoFHexAccessor;
-template <int dim> class DoFCellAccessor;
-
-template <int dim> class DoFLevel;
-
-
-template <int dim, class Accessor> class TriaRawIterator;
-template <int dim, class Accessor> class TriaIterator;
-template <int dim, class Accessor> class TriaActiveIterator;
-
-template <int dim> class Triangulation;
-template <int dim> class FiniteElement;
-template <int dim> class Function;
-
-class dVector;
-class dSMatrix;
-class dSMatrixStruct;
-class ConstraintMatrix;
-
-
-
+#include <basic/forward-declarations.h>
+#include <lac/forward-declarations.h>
 
 
 
@@ -273,7 +246,7 @@ enum RenumberingMethod {
  *
  * The renumbering algorithms need quite a lot of memory, since they have
  * to store for each dof with which other dofs it couples. This is done
- * using a #dSMatrixStruct# object used to store the sparsity pattern of
+ * using a #SparseMatrixStruct# object used to store the sparsity pattern of
  * matrices. It
  * is not useful for the user to do anything between distributing the dofs
  * and renumbering, i.e. the calls to #DoFHandler::distribute_dofs# and
@@ -471,12 +444,12 @@ enum RenumberingMethod {
  *
  * To build the matrix, you first have to call
  * #make_transfer_matrix (old_dof_object, sparsity_pattern);#, then create a
- * sparse matrix out of this pattern, e.g. by #dSMatrix m(sparsity_pattern);#
+ * sparse matrix out of this pattern, e.g. by #SparseMatrix<double> m(sparsity_pattern);#
  * and finally give this to the second run:
  * #make_transfer_matrix (old_dof_object, m);#. The spasity pattern created
  * by the first run is automatically compressed.
  *
- * When creating the #dSMatrixStruct# sparsity pattern, you have to give the
+ * When creating the #SparseMatrixStruct# sparsity pattern, you have to give the
  * dimension and the maximum number of entries per row. Obviously the image
  * dimension is the number of dofs on the new grid (you can get this using the
  * #n_dofs()# function), while the range dimension is the number of dofs on the
@@ -659,9 +632,9 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * added. However, if you don't want to call
 				      * #ConstraintMatrix::condense(1)#, you
 				      * have to compress the matrix yourself,
-				      * using #dSMatrixStruct::compress()#.
+				      * using #SparseMatrixStruct::compress()#.
 				      */
-    void make_sparsity_pattern (dSMatrixStruct &) const; 
+    void make_sparsity_pattern (SparseMatrixStruct &) const; 
 
     				     /**
 				      * Write the sparsity structure of the
@@ -678,14 +651,14 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * added. However, if you don't want to call
 				      * #ConstraintMatrix::condense(1)#, you
 				      * have to compress the matrix yourself,
-				      * using #dSMatrixStruct::compress()#.
+				      * using #SparseMatrixStruct::compress()#.
 				      *
 				      * Since this function is obviously useless
 				      * in one spatial dimension, it is not
 				      * implemented.
 				      */
     void make_boundary_sparsity_pattern (const vector<int> &dof_to_boundary_mapping,
-					 dSMatrixStruct &) const; 
+					 SparseMatrixStruct &) const; 
 
 				     /**
 				      * Write the sparsity structure of the
@@ -712,9 +685,9 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * in one spatial dimension, it is not
 				      * implemented.
 				      */
-    void make_boundary_sparsity_pattern (const FunctionMap &boundary_indicators,
-					 const vector<int> &dof_to_boundary_mapping,
-					 dSMatrixStruct    &sparsity) const; 
+    void make_boundary_sparsity_pattern (const FunctionMap  &boundary_indicators,
+					 const vector<int>  &dof_to_boundary_mapping,
+					 SparseMatrixStruct &sparsity) const; 
 
     
 				     /**
@@ -740,7 +713,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * documentation for this class.
 				      */
     void make_transfer_matrix (const DoFHandler<dim> &transfer_from,
-			       dSMatrixStruct        &transfer_pattern) const;
+			       SparseMatrixStruct    &transfer_pattern) const;
 
 				     /**
 				      * Make up the transfer matrix which
@@ -760,7 +733,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * documentation for this class.
 				      */
     void make_transfer_matrix (const DoFHandler<dim> &transfer_from,
-			       dSMatrix              &transfer_matrix) const;
+			       SparseMatrix<double>  &transfer_matrix) const;
 
 				     /**
 				      * Return the maximum number of
@@ -770,7 +743,7 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * This is the maximum number of entries
 				      * per line in the system matrix; this
 				      * information can therefore be used upon
-				      * construction of the #dSMatrixStruct#
+				      * construction of the #SparseMatrixStruct#
 				      * object.
 				      *
 				      * The returned number is not really the
@@ -825,9 +798,17 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      * number of active cells. The size of
 				      * #dof_data# is adjusted to the right
 				      * size.
+				      *
+				      * Note that the input vector may be
+				      * a vector of any data type as long
+				      * as it is convertible to #double#.
+				      * The output vector, being a data
+				      * vector on the grid, always consists
+				      * of elements of type #double#.
 				      */
-    void distribute_cell_to_dof_vector (const dVector &cell_data,
-					dVector       &dof_data) const;
+    template <typename Number>
+    void distribute_cell_to_dof_vector (const Vector<Number> &cell_data,
+					Vector<double>       &dof_data) const;
 
 				     /**
 				      * Create a mapping from degree of freedom
@@ -1585,15 +1566,15 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     void transfer_cell (const cell_iterator &old_cell,
 			const cell_iterator &new_cell,
-			dSMatrixStruct      &transfer_pattern) const;
+			SparseMatrixStruct  &transfer_pattern) const;
 
     				     /**
 				      * Make up part of the transfer matrix by
 				      * looking at the two cells given.
 				      */
-    void transfer_cell (const cell_iterator &old_cell,
-			const cell_iterator &new_cell,
-			dSMatrix            &transfer_matrix) const;
+    void transfer_cell (const cell_iterator  &old_cell,
+			const cell_iterator  &new_cell,
+			SparseMatrix<double> &transfer_matrix) const;
 
 				     /**
 				      * Space to store the DoF numbers for the

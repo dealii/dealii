@@ -122,7 +122,7 @@ void FELinearMapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cel
 					 const bool            compute_support_points,
 					 vector<Point<1> >    &q_points,
 					 const bool            compute_q_points,
-					 const dFMatrix       &shape_values_transform,
+					 const FullMatrix<double>       &shape_values_transform,
 					 const vector<vector<Tensor<1,1> > > &shape_gradients_transform,
 					 const Boundary<1> &boundary) const {
 				   // simply pass down
@@ -565,7 +565,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
 					   const bool           compute_support_points,
 					   vector<Point<dim> > &q_points,
 					   const bool           compute_q_points,
-					   const dFMatrix      &shape_values_transform,
+					   const FullMatrix<double>      &shape_values_transform,
 					   const vector<vector<Tensor<1,dim> > > &/*shape_grad_transform*/,
 					   const Boundary<dim> &boundary) const
 {
@@ -636,7 +636,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
   
   if (compute_jacobians) 
     {
-      dFMatrix M(dim,dim);
+      FullMatrix<double> M(dim,dim);
       for (unsigned int l=0; l<n_points; ++l) 
 	{
 	  M.clear ();
@@ -674,7 +674,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
   #include <base/quadrature_lib.h>
   #include <grid/tria_iterator.h>
   #include <grid/dof_accessor.h>
-  #include <lac/dvector.h>
+  #include <lac/vector.h>
 
   int main () {
     Triangulation<2> tria;
@@ -691,7 +691,7 @@ void FELinearMapping<dim>::fill_fe_values (const DoFHandler<dim>::cell_iterator 
     fevalues.reinit (dof.begin_active(),b);
   
   
-    dVector val(4);
+    Vector<double> val(4);
     val(2) = 1;
 
     vector<Point<2> > grads(4);

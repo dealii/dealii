@@ -76,7 +76,7 @@ class FEDGConstant : public FELinearMapping<dim> {
 				      */
     virtual void get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					const Boundary<dim> &boundary,
-					dFMatrix &local_mass_matrix) const;
+					FullMatrix<double> &local_mass_matrix) const;
   
 				     /**
 				      * Return a readonly reference to the
@@ -90,7 +90,7 @@ class FEDGConstant : public FELinearMapping<dim> {
 				      * matrices is not yet finally decided
 				      * about.
 				      */
-    const dFMatrix & restrict (const unsigned int) const;
+    const FullMatrix<double> & restrict (const unsigned int) const;
   
 				     /**
 				      * Exception
@@ -136,7 +136,7 @@ class FEDGLinear : public FELinear<dim>{
 				      * matrices is not yet finally decided
 				      * about.
 				      */
-    const dFMatrix & restrict (const unsigned int) const;
+    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -176,7 +176,7 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
 				      * matrices is not yet finally decided
 				      * about.
 				      */
-    const dFMatrix & restrict (const unsigned int) const;
+    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -217,7 +217,7 @@ class FEDGCubicSub : public FECubicSub<dim>{
 				      * matrices is not yet finally decided
 				      * about.
 				      */
-    const dFMatrix & restrict (const unsigned int) const;
+    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 
@@ -257,7 +257,7 @@ class FEDGQuarticSub : public FEQuarticSub<dim>{
 				      * matrices is not yet finally decided
 				      * about.
 				      */
-    const dFMatrix & restrict (const unsigned int) const;
+    const FullMatrix<double> & restrict (const unsigned int) const;
 };
 
 

@@ -10,9 +10,9 @@
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
 
-#include <lac/dvector.h>
-#include <lac/dfmatrix.h>
-#include <lac/dsmatrix.h>
+#include <lac/vector.h>
+#include <lac/fullmatrix.h>
+#include <lac/sparsematrix.h>
 
 
 
@@ -349,8 +349,8 @@ MGDoFCellAccessor<1>::face (const unsigned int) const {
 
 template <>
 void
-MGDoFCellAccessor<1>::get_mg_dof_values (const dVector &values,
-					 dVector       &dof_values) const {
+MGDoFCellAccessor<1>::get_mg_dof_values (const Vector<double> &values,
+					 Vector<double>       &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
@@ -385,8 +385,8 @@ MGDoFCellAccessor<2>::face (const unsigned int i) const {
 
 template <>
 void
-MGDoFCellAccessor<2>::get_mg_dof_values (const dVector &values,
-					 dVector       &dof_values) const {
+MGDoFCellAccessor<2>::get_mg_dof_values (const Vector<double> &values,
+					 Vector<double>       &dof_values) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (mg_dof_handler != 0, ExcInvalidObject());
   Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());

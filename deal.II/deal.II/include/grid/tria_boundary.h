@@ -8,9 +8,7 @@
 #include <base/point.h>
 #include <base/subscriptor.h>
 #include <grid/geometry_info.h>
-
-
-template <int dim> class Triangulation;
+#include <basic/forward-declarations.h>
 
 
 

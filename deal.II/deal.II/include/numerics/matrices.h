@@ -10,18 +10,6 @@
 #include <base/exceptions.h>
 #include <map>
 
-template <int dim> class Triangulation;
-template <int dim> class DoFHandler;
-template <int dim> class FiniteElement;
-template <int dim> class FEValues;
-template <int dim> class Quadrature;
-template <int dim> class Function;
-template <int dim> class Boundary;
-template <int dim> class Equation;
-
-class dVector;
-class dFMatrix;
-class dSMatrix;
 
 
 
@@ -36,7 +24,7 @@ class dSMatrix;
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
- * sparsity pattern (#dSMatrixStruct#) corresponding to the given degree
+ * sparsity pattern (#SparseMatrixStruct#) corresponding to the given degree
  * of freedom handler, i.e. the sparsity structure is already as needed.
  * You can do this by calling the #DoFHandler<dim>::make_sparsity_pattern#
  * function.
@@ -196,7 +184,7 @@ class MatrixCreator {
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    const Boundary<dim>      &boundary,
-				    dSMatrix                 &matrix,
+				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      *a = 0);
 
     				     /**
@@ -219,9 +207,9 @@ class MatrixCreator {
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    const Boundary<dim>      &boundary,
-				    dSMatrix                 &matrix,
+				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      &rhs,
-				    dVector                  &rhs_vector,
+				    Vector<double>           &rhs_vector,
 				    const Function<dim>      *a = 0);
 
 				     /**
@@ -245,7 +233,7 @@ class MatrixCreator {
 				      */
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Boundary<dim>      &boundary,
-				    dSMatrix                 &matrix);
+				    SparseMatrix<double>     &matrix);
     
 				     /**
 				      * Assemble the mass matrix and a right
@@ -265,9 +253,9 @@ class MatrixCreator {
     static void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 					     const Quadrature<dim-1>  &q,
 					     const Boundary<dim>      &boundary,
-					     dSMatrix                 &matrix,
+					     SparseMatrix<double>     &matrix,
 					     const FunctionMap        &rhs,
-					     dVector                  &rhs_vector,
+					     Vector<double>           &rhs_vector,
 					     vector<int>              &vec_to_dof_mapping,
 					     const Function<dim>      *a = 0);
 
@@ -282,7 +270,7 @@ class MatrixCreator {
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
 				       const Boundary<dim>      &boundary,
-				       dSMatrix &matrix,
+				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      *a = 0);
 
 				     /**
@@ -297,9 +285,9 @@ class MatrixCreator {
     static void create_laplace_matrix (const DoFHandler<dim>    &dof,
 				       const Quadrature<dim>    &q,
 				       const Boundary<dim>      &boundary,
-				       dSMatrix &matrix,
+				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      &rhs,
-				       dVector                  &rhs_vector,
+				       Vector<double>           &rhs_vector,
 				       const Function<dim>      *a = 0);
 
 				     /**
@@ -309,7 +297,7 @@ class MatrixCreator {
 				      */
     static void create_interpolation_matrix(const FiniteElement<dim> &high,
 					    const FiniteElement<dim> &low,
-					    dFMatrix& result);
+					    FullMatrix<double>& result);
 
 
 				     /**
@@ -404,9 +392,9 @@ class MatrixTools : public MatrixCreator<dim> {
 				      * documentation.
 				      */
     static void apply_boundary_values (const map<int,double> &boundary_values,
-				       dSMatrix              &matrix,
-				       dVector               &solution,
-				       dVector               &right_hand_side);
+				       SparseMatrix<double>  &matrix,
+				       Vector<double>        &solution,
+				       Vector<double>        &right_hand_side);
 
 				     /**
 				      * Exception
@@ -522,8 +510,8 @@ class MassMatrix :  public Equation<dim> {
 				      * and right hand side to have the right
 				      * size and to be empty.
 				      */
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const typename DoFHandler<dim>::cell_iterator &) const;
 
@@ -532,7 +520,7 @@ class MassMatrix :  public Equation<dim> {
 				      * If a coefficient was given to the
 				      * constructor, it is used.
 				      */
-    virtual void assemble (dFMatrix            &cell_matrix,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
 			   const typename DoFHandler<dim>::cell_iterator &) const;
 
@@ -543,7 +531,7 @@ class MassMatrix :  public Equation<dim> {
 				      * constructor in order to call this
 				      * function.
 				      */
-    virtual void assemble (dVector             &rhs,
+    virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const typename DoFHandler<dim>::cell_iterator &) const;
     
@@ -625,8 +613,8 @@ class LaplaceMatrix :  public Equation<dim> {
 				      * a coefficient was given to the
 				      * constructor, it is used.
 				      */
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const typename DoFHandler<dim>::cell_iterator &) const;
 
@@ -635,7 +623,7 @@ class LaplaceMatrix :  public Equation<dim> {
 				      * If a coefficient was given to the
 				      * constructor, it is used.
 				      */
-    virtual void assemble (dFMatrix            &cell_matrix,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
 			   const typename DoFHandler<dim>::cell_iterator &) const;
 
@@ -646,7 +634,7 @@ class LaplaceMatrix :  public Equation<dim> {
 				      * constructor in order to call this
 				      * function.
 				      */
-    virtual void assemble (dVector             &rhs,
+    virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const typename DoFHandler<dim>::cell_iterator &) const;
 

@@ -9,13 +9,8 @@
 #include <vector>
 #include <utility>
 #include <base/exceptions.h>
+#include <lac/forward-declarations.h>
 
-
-
-class ostream;
-class dSMatrix;
-class dSMatrixStruct;
-class dVector;
 
 
 /**
@@ -168,8 +163,8 @@ class ConstraintMatrix {
 				      * The constraint matrix object must be
 				      * closed to call this function.
 				      */
-    void condense (const dSMatrixStruct &uncondensed,
-		   dSMatrixStruct       &condensed) const;
+    void condense (const SparseMatrixStruct &uncondensed,
+		   SparseMatrixStruct       &condensed) const;
 
 
 				     /**
@@ -188,7 +183,7 @@ class ConstraintMatrix {
 				      * The matrix struct is compressed at the
 				      * end of the function.
 				      */
-    void condense (dSMatrixStruct &sparsity) const;
+    void condense (SparseMatrixStruct &sparsity) const;
 
 				     /**
 				      * Condense a given matrix. The associated
@@ -201,8 +196,8 @@ class ConstraintMatrix {
 				      * The constraint matrix object must be
 				      * closed to call this function.
 				      */
-    void condense (const dSMatrix &uncondensed,
-		   dSMatrix       &condensed) const;
+    void condense (const SparseMatrix<double> &uncondensed,
+		   SparseMatrix<double>       &condensed) const;
 
 				     /**
 				      * This function does much the same as
@@ -211,7 +206,7 @@ class ConstraintMatrix {
 				      * documentation of this class for more
 				      * detailed information.
 				      */
-    void condense (dSMatrix &matrix) const;
+    void condense (SparseMatrix<double> &matrix) const;
 
 				     /**
 				      * Condense the given vector #uncondensed#
@@ -219,13 +214,13 @@ class ConstraintMatrix {
 				      * responsibility to guarantee that all
 				      * entries of #condensed# be zero!
 				      */
-    void condense (const dVector &uncondensed,
-		   dVector       &condensed) const;
+    void condense (const Vector<double> &uncondensed,
+		   Vector<double>       &condensed) const;
 
 				     /**
 				      * Condense the given vector in-place.
 				      */
-    void condense (dVector &vec) const;
+    void condense (Vector<double> &vec) const;
 
 				     /**
 				      * Re-distribute the elements of the vector
@@ -237,14 +232,14 @@ class ConstraintMatrix {
 				      * #condense# somehow, but it should be noted
 				      * that it is not the inverse of #condense#-
 				      */
-    void distribute (const dVector &condensed,
-		     dVector       &uncondensed) const;
+    void distribute (const Vector<double> &condensed,
+		     Vector<double>       &uncondensed) const;
 
 				     /**
 				      * Re-distribute the elements of the vector
 				      * in-place.
 				      */
-    void distribute (dVector &vec) const;
+    void distribute (Vector<double> &vec) const;
     
     
 				     /**

@@ -18,7 +18,7 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/error_estimator.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 #include <map.h>
 #include <fstream.h>
@@ -45,14 +45,14 @@ class PoissonEquation :  public Equation<dim> {
 		    right_hand_side (rhs),
 		    coefficient (coefficient) {};
 
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
-    virtual void assemble (dFMatrix            &cell_matrix,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
-    virtual void assemble (dVector             &rhs,
+    virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
   protected:
@@ -256,8 +256,8 @@ double RHS<2>::Kink::operator () (const Point<2> &) const {
 
 
 template <>
-void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
-				   dVector             &rhs,
+void PoissonEquation<2>::assemble (FullMatrix<double>  &cell_matrix,
+				   Vector<double>      &rhs,
 				   const FEValues<2>   &fe_values,
 				   const DoFHandler<2>::cell_iterator &) const {
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point) 
@@ -282,7 +282,7 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dFMatrix            &,
+void PoissonEquation<dim>::assemble (FullMatrix<double>  &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -291,7 +291,7 @@ void PoissonEquation<dim>::assemble (dFMatrix            &,
 
 
 template <int dim>
-void PoissonEquation<dim>::assemble (dVector             &,
+void PoissonEquation<dim>::assemble (Vector<double>      &,
 				     const FEValues<dim> &,
 				     const DoFHandler<dim>::cell_iterator &) const {
   Assert (false, ExcPureVirtualFunctionCalled());
@@ -465,8 +465,8 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       cout << "    Solving..." << endl;
       solve ();
 
-      dVector       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
-      dVector       estimated_error_per_cell;
+      Vector<float>       l2_error_per_cell, linfty_error_per_cell, h1_error_per_cell;
+      Vector<float>       estimated_error_per_cell;
       QGauss3<dim>  q;
   
       cout << "    Calculating L2 error... ";
@@ -505,9 +505,9 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
       cout << estimated_error_per_cell.l2_norm() << endl;
       estimated_error.push_back (estimated_error_per_cell.l2_norm());
 
-      dVector l2_error_per_dof, linfty_error_per_dof;
-      dVector h1_error_per_dof, estimated_error_per_dof;
-      dVector error_ratio;
+      Vector<double> l2_error_per_dof, linfty_error_per_dof;
+      Vector<double> h1_error_per_dof, estimated_error_per_dof;
+      Vector<double> error_ratio;
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
 					  linfty_error_per_dof);

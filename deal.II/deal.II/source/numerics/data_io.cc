@@ -12,7 +12,7 @@
 #include <base/quadrature_lib.h>
 #include <fe/fe_values.h>
 #include <fe/fe.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 #include <map>
 #include <iostream>
@@ -181,7 +181,7 @@ DataOut<dim>::DataEntry::DataEntry () :
 
 
 template <int dim>
-DataOut<dim>::DataEntry::DataEntry (const dVector *data,
+DataOut<dim>::DataEntry::DataEntry (const Vector<double> *data,
 				    const string name,
 				    const string units) :
 			data(data), name(name), units(units) {};
@@ -203,7 +203,7 @@ void DataOut<dim>::attach_dof_handler (DoFHandler<dim> &d) {
 
 
 template <int dim>
-void DataOut<dim>::add_data_vector (const dVector &vec,
+void DataOut<dim>::add_data_vector (const Vector<double> &vec,
 				    const string  &name,
 				    const string  &units) {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());

@@ -12,13 +12,6 @@
 #include <vector>
 
 
-// forward declarations
-template <int dim> class FiniteElement;
-template <int dim> class Quadrature;
-
-class dFMatrix;
-class dVector;
-
 
 
 
@@ -56,8 +49,8 @@ class Equation {
 				      * #ExcWrongSize# and #ExcObjectNotEmpty#
 				      * are declared.
 				      */
-    virtual void assemble (dFMatrix            &cell_matrix,
-			   dVector             &rhs,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
 
@@ -74,7 +67,7 @@ class Equation {
 				      * #ExcWrongSize# and #ExcObjectNotEmpty#
 				      * are declared.
 				      */
-    virtual void assemble (dFMatrix            &cell_matrix,
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
 
@@ -91,7 +84,7 @@ class Equation {
 				      * #ExcWrongSize# and #ExcObjectNotEmpty#
 				      * are declared.
 				      */
-    virtual void assemble (dVector             &rhs,
+    virtual void assemble (Vector<double>      &rhs,
 			   const FEValues<dim> &fe_values,
 			   const DoFHandler<dim>::cell_iterator &cell) const;
 
@@ -146,11 +139,11 @@ struct AssemblerData {
     AssemblerData (const DoFHandler<dim>    &dof,
 		   const bool                assemble_matrix,
 		   const bool                assemble_rhs,
-		   dSMatrix                 &matrix,
-		   dVector                  &rhs_vector,
+		   SparseMatrix<double>     &matrix,
+		   Vector<double>           &rhs_vector,
 		   const Quadrature<dim>    &quadrature,
 		   const FiniteElement<dim> &fe,
-		   const UpdateFlags       &update_flags,
+		   const UpdateFlags        &update_flags,
 		   const Boundary<dim>      &boundary);
     
 				     /**
@@ -172,7 +165,7 @@ struct AssemblerData {
 				      * to clear this object (set all entries
 				      * to zero) before use.
 				      */
-    dSMatrix               &matrix;
+    SparseMatrix<double>   &matrix;
 
 				     /**
 				      * Pointer to the vector to be assembled
@@ -181,7 +174,7 @@ struct AssemblerData {
 				      * to clear this object (set all entries
 				      * to zero) before use.
 				      */
-    dVector                &rhs_vector;
+    Vector<double>         &rhs_vector;
     
 				     /**
 				      * Pointer to a quadrature object to be
@@ -280,12 +273,12 @@ class Assembler : public DoFCellAccessor<dim> {
 				     /**
 				      * Store a local cell matrix.
 				      */
-    dFMatrix          cell_matrix;
+    FullMatrix<double>  cell_matrix;
 
 				     /**
 				      * Right hand side local to cell.
 				      */
-    dVector           cell_vector;
+    Vector<double>    cell_vector;
 
 				     /**
 				      * Store whether to assemble the
@@ -303,13 +296,13 @@ class Assembler : public DoFCellAccessor<dim> {
 				      * Pointer to the matrix to be assembled
 				      * by this object.
 				      */
-    dSMatrix         &matrix;
+    SparseMatrix<double>    &matrix;
 
 				     /**
 				      * Pointer to the vector to be assembled
 				      * by this object.
 				      */
-    dVector          &rhs_vector;
+    Vector<double>          &rhs_vector;
 
 				     /**
 				      * Pointer to the finite element used for

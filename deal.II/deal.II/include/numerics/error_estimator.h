@@ -11,17 +11,6 @@
 #include <map>
 
 
-// forward declarations
-template <int dim> class DoFHandler;
-template <int dim> class Quadrature;
-template <int dim> class FiniteElement;
-template <int dim> class FEFaceValues;
-template <int dim> class FESubfaceValues;
-template <int dim> class Boundary;
-template <int dim> class Function;
-class dVector;
-
-
 
 
 /**
@@ -44,7 +33,10 @@ class dVector;
  *  the conormal derivative $a\frac{du}{dn} = g$.
  *
  *  The error estimator returns a vector of estimated errors per cell which
- *  can be used to feed the #Triangulation<dim>::refine_*# functions.
+ *  can be used to feed the #Triangulation<dim>::refine_*# functions. This
+ *  vector contains elements of data type #float#, rather than #double#,
+ *  since accuracy is not so important here, and since this can save rather
+ *  a lot of memory, when using many cells.
  *
  *  
  *  \subsection{Implementation}
@@ -175,8 +167,8 @@ class KellyErrorEstimator {
 				const FiniteElement<dim> &fe,
 				const Boundary<dim>      &boundary,
 				const FunctionMap        &neumann_bc,
-				const dVector            &solution,
-				dVector                  &error,
+				const Vector<double>     &solution,
+				Vector<float>            &error,
 				const Function<dim>      *coefficient = 0);
 
 				     /**
@@ -234,7 +226,7 @@ class KellyErrorEstimator {
 					     FEFaceValues<dim>   &fe_face_values_cell,
 					     FEFaceValues<dim>   &fe_face_values_neighbor,
 					     FaceIntegrals       &face_integrals,
-					     const dVector       &solution,
+					     const Vector<double>&solution,
 					     const Function<dim> *coefficient);
 
 				     /**
@@ -253,7 +245,7 @@ class KellyErrorEstimator {
 					       FEFaceValues<dim>    &fe_face_values,
 					       FESubfaceValues<dim> &fe_subface_values,
 					       FaceIntegrals        &face_integrals,
-					       const dVector        &solution,
+					       const Vector<double> &solution,
 					       const Function<dim> *coefficient);
 };
 

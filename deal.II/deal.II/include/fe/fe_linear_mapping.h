@@ -6,7 +6,7 @@
 /*----------------------------   fe_linear_mapping.h     ---------------------------*/
 
 
-#include <math.h>
+#include <cmath>
 #include <fe/fe.h>
 
 
@@ -146,7 +146,7 @@ class FELinearMapping : public FiniteElement<dim> {
 				 const bool              compute_support_points,
 				 vector<Point<dim> >    &q_points,
 				 const bool              compute_q_points,
-				 const dFMatrix         &shape_values_transform,
+				 const FullMatrix<double>         &shape_values_transform,
 				 const vector<vector<Tensor<1,dim> > > &shape_grad_transform,
 				 const Boundary<dim> &boundary) const;
 
