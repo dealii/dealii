@@ -29,18 +29,22 @@ template <int rank, int dim> class TensorFunction;
  * @author Guido Kanschat, 1999
  */
 template <int dim>
-class VectorFunction //<dim>
-  :
-  public FunctionTime,
-  public Subscriptor
+class VectorFunction : public FunctionTime,
+		       public Subscriptor
 {
   public:
+				     /**
+				      * Number of vector components.
+				      */
+    const unsigned int n_components;
+
 				     /**
 				      * Constructor. May take an initial vakue
 				      * for the time variable, which defaults
 				      * to zero.
 				      */
-    VectorFunction (unsigned n_components, const double initial_time = 0.0);
+    VectorFunction (const unsigned int n_components,
+		    const double       initial_time = 0.0);
     
 				     /**
 				      * Virtual destructor; absolutely
@@ -48,12 +52,6 @@ class VectorFunction //<dim>
 				      */
     virtual ~VectorFunction ();
     
-// 				     /**
-// 				      * Return the value of the function
-// 				      * at the given point.
-// 				      */
-//     virtual double operator () (const Point<dim> &p, unsigned component) const;
-
 				     /**
 				      * Set #values# to the point values
 				      * of the function at points #p#.
@@ -69,7 +67,8 @@ class VectorFunction //<dim>
 				      * directly in #value_list# of the derived
 				      * class.
 				      */
-    virtual void value (const Point<dim>  &p, Vector<double> &values) const;
+    virtual void value (const Point<dim> &p,
+			Vector<double>   &values) const;
 
 				     /**
 				      * Set #values# to the point values
@@ -84,7 +83,7 @@ class VectorFunction //<dim>
 				      * If possible, overload this function.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
-			     vector<Vector<double> > &values) const;
+			     vector<Vector<double> >   &values) const;
 
 				     /**
 				      * Set #gradients# to the gradients of
@@ -93,22 +92,16 @@ class VectorFunction //<dim>
 				      * already has the right size, i.e.
 				      * the same size as the #points# array.
 				      */
-    virtual void gradient_list (const vector<Point<dim> > &points,
+    virtual void gradient_list (const vector<Point<dim> >       &points,
 				vector<vector<Tensor<1,dim> > > &gradients) const;
     
-				     /**
-				      * Number of vector components.
-				      */
-    const unsigned int n_components;
-
 				     /**
 				      * Access #VectorFunction# as a #Function#.
 				      * This class allows to store a reference to a
 				      * #VectorFunction# and an #index#. Later on, it
 				      * can be used as a normal single valued #Function#.
 				      */
-    class Extractor
-      : public Function<dim>
+    class Extractor : public Function<dim>
     {
       public:
 					 /**
@@ -168,6 +161,8 @@ class VectorFunction //<dim>
     
 };
   
+
+
 /**
  *  This class is a model for a tensor valued function.
  *  It returns the value
@@ -189,9 +184,7 @@ class VectorFunction //<dim>
  *  @author Guido Kanschat, 1999
  */
 template <int rank, int dim>
-class TensorFunction //<rank , dim>
-  :
-  public VectorFunction<dim>
+class TensorFunction : public VectorFunction<dim>
 {
   public:
 				     /**
@@ -223,12 +216,6 @@ class TensorFunction //<rank , dim>
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<Tensor<rank,dim> > &values) const;
-
-//				   /**
-//				    * Return one component of the value.
-//				    */
-//  virtual double operator() (TensorIndex<rank> i, const Point<dim>& p) const;
-  
 
 				     /**
 				      * Return the gradient of the function
