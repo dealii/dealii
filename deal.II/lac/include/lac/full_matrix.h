@@ -68,13 +68,9 @@ template<typename number>
 class FullMatrix : public Table<2,number>
 {
   public:
+    class const_iterator;
+    
 				     /**
-				      * STL conforming iterator.
-				      */
-    class const_iterator
-    {
-      private:
-                                         /**
                                           * Accessor class for iterators
                                           */
         class Accessor
@@ -131,6 +127,12 @@ class FullMatrix : public Table<2,number>
                                               */
             friend class const_iterator;
         };
+				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator
+    {
+      private:
         
       public:
                                          /**
@@ -893,7 +895,7 @@ class FullMatrix : public Table<2,number>
 		    << "This function is not implemented for the given"
 		    << " matrix dimension " << arg1);
     
-    friend class const_iterator::Accessor;
+    friend class Accessor;
 };
 
 /*@}*/
@@ -944,7 +946,7 @@ FullMatrix<number>::copy_from (const MATRIX& M)
 
 template <typename number>
 inline
-FullMatrix<number>::const_iterator::Accessor::
+FullMatrix<number>::Accessor::
 Accessor (const FullMatrix<number>* matrix,
           const unsigned int r,
           const unsigned int c)
@@ -958,7 +960,7 @@ Accessor (const FullMatrix<number>* matrix,
 template <typename number>
 inline
 unsigned int
-FullMatrix<number>::const_iterator::Accessor::row() const
+FullMatrix<number>::Accessor::row() const
 {
   return a_row;
 }
@@ -967,7 +969,7 @@ FullMatrix<number>::const_iterator::Accessor::row() const
 template <typename number>
 inline
 unsigned int
-FullMatrix<number>::const_iterator::Accessor::column() const
+FullMatrix<number>::Accessor::column() const
 {
   return a_col;
 }
@@ -976,7 +978,7 @@ FullMatrix<number>::const_iterator::Accessor::column() const
 template <typename number>
 inline
 number
-FullMatrix<number>::const_iterator::Accessor::value() const
+FullMatrix<number>::Accessor::value() const
 {
   return matrix->el(a_row, a_col);
 }
@@ -1012,7 +1014,7 @@ FullMatrix<number>::const_iterator::operator++ ()
 
 template <typename number>
 inline
-const typename FullMatrix<number>::const_iterator::Accessor &
+const typename FullMatrix<number>::Accessor &
 FullMatrix<number>::const_iterator::operator* () const
 {
   return accessor;
@@ -1021,7 +1023,7 @@ FullMatrix<number>::const_iterator::operator* () const
 
 template <typename number>
 inline
-const typename FullMatrix<number>::const_iterator::Accessor *
+const typename FullMatrix<number>::Accessor *
 FullMatrix<number>::const_iterator::operator-> () const
 {
   return &accessor;
