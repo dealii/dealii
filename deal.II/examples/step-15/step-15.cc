@@ -206,9 +206,9 @@ class MinimizationProblem
     void setup_system_on_mesh ();
     void assemble_step ();
     double line_search (const Vector<double> & update) const;
+    void do_step ();
     void output_results () const;
     void refine_grid ();
-    void do_step ();
 
     static double energy (const DoFHandler<dim> &dof_handler,
                           const Vector<double>  &function);
