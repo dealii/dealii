@@ -84,7 +84,7 @@ class SolverGMRES : public Solver<Matrix, Vector>
 					  * Maximum number of
 					  * tmp vectors.
 					  */
-	const unsigned int    max_n_tmp_vectors;
+	unsigned int    max_n_tmp_vectors;
     };
     
 				     /**
