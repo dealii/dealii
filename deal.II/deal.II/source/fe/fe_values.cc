@@ -752,30 +752,6 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
   mapping_data = mapping.get_subface_data(flags, quadrature);
   fe_data      = fe.get_subface_data(flags, mapping, quadrature);
 
-  
-				   // The get_face_data functions
-				   // might have added an update flag.
-				   // Therefore collect all flags
-				   // again.
-				   //
-				   // E.g. if update_JxW_values is set
-				   // the update_boundary_forms flag
-				   // is added within the
-				   // Mapping::get_face_data function.
-				   // If also update_normal_vectors is
-				   // set this update_boundary_forms
-				   // flag was already set by the
-				   // update_once or update_each
-				   // function resulting in no change
-				   // in flags below, but if
-				   // update_normal_vectors is not set
-				   // this actually makes a
-				   // difference.
-  flags |= mapping_data->update_once
-	   | mapping_data->update_each
-	   | fe_data->update_once
-	   | fe_data->update_each;
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
@@ -816,29 +792,6 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
   mapping_data = mapping->get_subface_data(flags, quadrature);
   fe_data      = fe.get_subface_data(flags, *mapping, quadrature);
   
-				   // The get_face_data functions
-				   // might have added an update flag.
-				   // Therefore collect all flags
-				   // again.
-				   //
-				   // E.g. if update_JxW_values is set
-				   // the update_boundary_forms flag
-				   // is added within the
-				   // Mapping::get_face_data function.
-				   // If also update_normal_vectors is
-				   // set this update_boundary_forms
-				   // flag was already set by the
-				   // update_once or update_each
-				   // function resulting in no change
-				   // in flags below, but if
-				   // update_normal_vectors is not set
-				   // this actually makes a
-				   // difference.
-  flags |= mapping_data->update_once
-	   | mapping_data->update_each
-	   | fe_data->update_once
-	   | fe_data->update_each;
-
 				   // set up objects within this class
   FEValuesData<dim>::initialize(n_quadrature_points,
 				dofs_per_cell,
