@@ -398,32 +398,41 @@ namespace internal
 
                                      /**
                                       * During building the
-                                      * conectivity information we
+                                      * connectivity information we
                                       * don't need all the heavy duty
                                       * information about edges that
                                       * we will need later. So we can
                                       * save memory and time by using
-                                      * a light-weight class for edges.
+                                      * a light-weight class for
+                                      * edges. It stores the two
+                                      * vertices, but no direction, so
+                                      * we make the optimization to
+                                      * store the vertex number in
+                                      * sorted order to allow for
+                                      * easier comparison of edge
+                                      * objects.
                                       */
     struct CheapEdge
     {
                                          /**
                                           * The first node
                                           */
-        unsigned int node0;
+        const unsigned int node0;
 
 					 /**
                                           * The second node
                                           */
-        unsigned int node1;
+        const unsigned int node1;
 
                                          /**
-                                          * A simple constructor
+                                          * Constructor. Take the
+                                          * vertex numbers and store
+                                          * them sorted.
                                           */
         CheapEdge (const unsigned int n0,
 		   const unsigned int n1);
 
-					 /**
+                                         /**
                                           * Need a partial ordering
                                           * for the STL
                                           */
@@ -433,7 +442,7 @@ namespace internal
   
 
                                      /**
-                                      * A conectivity and orientation
+                                      * A connectivity and orientation
                                       * aware edge class.
                                       */
     struct Edge
@@ -442,8 +451,7 @@ namespace internal
                                           * Simple constructor
                                           */
         Edge (const unsigned int n0,
-	      const unsigned int n1,
-	      const int          orient = 0);      
+	      const unsigned int n1);      
       
                                          /**
                                           * The IDs for the end nodes
@@ -451,21 +459,30 @@ namespace internal
         unsigned int nodes[2];
 
                                          /** 
-                                          * Whether the edge has been
-                                          * oriented (0), points from
-                                          * node 0 to node 1 (1), or
-                                          * the reverse (-1).
+                                          * Whether the edge has not
+                                          * already been oriented (0),
+                                          * points from node 0 to node
+                                          * 1 (1), or the reverse
+                                          * (-1). The initial state of
+                                          * this flag is zero.
                                           */
-        int orientation_flag;
+        signed short int orientation_flag;
 
                                          /** 
                                           * Used to determine which
-                                          * "sheet" of parallel edges
+                                          * "sheet" or equivalence
+                                          * class of parallel edges
                                           * the edge falls in when
-                                          * oriented. 0 means not yet
-                                          * decided.
+                                          * oriented.
+                                          * deal_II_numbers::invalid_unsigned_int
+                                          * means not yet
+                                          * decided. This is also the
+                                          * default value after
+                                          * construction. Each edge
+                                          * will later be assigned an
+                                          * index greater than zero.
                                           */
-        int group;
+        unsigned int group;
 
 					 /**
 					  * Indices of neighboring cubes.
@@ -491,7 +508,7 @@ namespace internal
                                       * are the second four, and the
                                       * third four.
                                       *
-                                      * TODO: Need to move conectivity information out 
+                                      * TODO: Need to move connectivity information out 
                                       *       of cell and into edge.
                                       */
     struct Cell
@@ -500,11 +517,6 @@ namespace internal
                                           * Default Constructor
                                           */
         Cell ();
-
-                                         /**
-                                          * Copy Constructor
-                                          */
-        Cell (const Cell &c);
 
                                          /**
                                           * The IDs for each of the edges.
@@ -524,7 +536,7 @@ namespace internal
                                           * (1) or node 1 is the base
                                           * (-1).
                                           */
-        int local_orientation_flags[GeometryInfo<3>::lines_per_cell];
+        signed int local_orientation_flags[GeometryInfo<3>::lines_per_cell];
         
                                          /**
                                           * An internal flag used to
@@ -552,8 +564,19 @@ namespace internal
                                          /**
                                           * Default Constructor
                                           */
-        Mesh ();
+        Mesh (const std::vector<CellData<3> > &incubes);
 
+                                         /**
+                                          * Export the data of this
+                                          * object to the deal.II
+                                          * format that the
+                                          * @ref{Triangulation} class
+                                          * wants as input.
+                                          */
+        void
+        export_to_deal_format (std::vector<CellData<3> > &outcubes) const;
+
+      private:
                                          /**
                                           * The list of edges 
                                           */
@@ -570,7 +593,15 @@ namespace internal
                                           */
         void sanity_check() const;
 
-      private:
+                                         /**
+                                          * Given the cell list, build
+                                          * the edge list and all the
+                                          * connectivity information
+                                          * and other stuff that we
+                                          * will need later.
+                                          */
+        void build_connectivity ();
+
                                          /**
                                           * Unimplemented private copy
                                           * constructor to disable it.
@@ -579,7 +610,7 @@ namespace internal
 	
                                          /**
                                           * Unimplemented private
-                                          * assignemnet operator to
+                                          * assignment operator to
                                           * disable it.
                                           */
         Mesh& operator=(const Mesh&);
@@ -590,21 +621,55 @@ namespace internal
                                           * correctly set up.
                                           */
         void sanity_check_node (const Cell        &cell,
-				const unsigned int local_node_num) const;	
+				const unsigned int local_node_num) const;
+
+                                         /**
+                                          * Let the orienter access
+                                          * out private fields.
+                                          */
+        friend class Orienter;
     };
 
 
-    
+                                     /**
+                                      * The class that orients the
+                                      * edges of a triangulation in
+                                      * 3d. The member variables
+                                      * basically only store the
+                                      * present state of the
+                                      * algorithm.
+                                      */
     class Orienter
     {
       public:
                                          /**
-                                          * Constructor.
+                                          * Orient the given
+                                          * mesh. Creates an object of
+                                          * the present type and lets
+                                          * that toil away at the
+                                          * task.
+                                          *
+                                          * This function is the
+                                          * single entry point to the
+                                          * functionality of this
+                                          * class.
                                           */
-        Orienter();
+        static
+        void
+        orient_mesh (std::vector<CellData<3> > &incubes);
 
+      private:
                                          /**
-                                          * The cube we're looking at now.
+                                          * Internal representation of
+                                          * the given list of cells,
+                                          * including connectivity
+                                          * information and the like.
+                                          */
+        Mesh mesh;
+        
+                                         /**
+                                          * The cube we're looking at
+                                          * presently.
                                           */
         unsigned int cur_posn;
         
@@ -614,41 +679,85 @@ namespace internal
                                           */
         unsigned int marker_cube;
 
+                                         /**
+                                          * The index of the sheet or
+                                          * equivalence class we are
+                                          * presently processing.
+                                          */
+        unsigned int cur_edge_group;
+
+                                         /**
+                                          * Indices of the cells to be
+                                          * processed withing the
+                                          * present sheet. If a cell
+                                          * is being processed
+                                          * presently, it is taken
+                                          * from this list.
+                                          */
         std::vector<int> sheet_to_process;
 
-        int cur_edge_group;
-
         bool edge_orient_array[12];
+
+                                         /**
+                                          * Constructor. Take a list
+                                          * of cells and set up the
+                                          * internal data structures
+                                          * of the mesh member
+                                          * variable.
+                                          *
+                                          * Since it is
+                                          * private, the only entry
+                                          * point of this class is the
+                                          * static function
+                                          * @ref{orient_mesh}.
+                                          */
+        Orienter (const std::vector<CellData<3> > &incubes);
+
+                                         /**
+                                          * Orient all the edges of a
+                                          * mesh.
+                                          */
+        void orient_edges ();
+
+                                         /**
+                                          * Given oriented edges,
+                                          * rotate the cubes so that
+                                          * the edges are in standard
+                                          * direction.
+                                          */
+        void orient_cubes ();
       
-        bool orient_edges (Mesh &m);
-        void orient_cubes (Mesh &m);
-      
-        bool get_next_unoriented_cube (Mesh &m);
-        bool is_oriented (const Mesh &m,
-                          int cell_num);
+        bool get_next_unoriented_cube ();
 
-        bool orient_edges_in_current_cube (Mesh &m);
-        bool orient_edge_set_in_current_cube (Mesh &m,
-					      const unsigned int edge_set);
-        bool orient_next_unoriented_edge (Mesh &m);
-        bool consistent (Mesh &m,
-                         int cell_num);
+                                         /**
+                                          * Return whether the cell
+                                          * with cell number
+                                          * @p{cell_num} is fully
+                                          * oriented.
+                                          */
+        bool is_oriented (const unsigned int cell_num) const;
+
+        bool orient_edges_in_current_cube ();
+        bool orient_edge_set_in_current_cube (const unsigned int edge_set);
+        bool orient_next_unoriented_edge ();
+
+                                         /**
+                                          * Return whether the cell is
+                                          * consistenty oriented at
+                                          * present (i.e. only
+                                          * considering those edges
+                                          * that are already
+                                          * oriented. This is a sanity
+                                          * check that should be
+                                          * called from inside an
+                                          * assert macro.
+                                          */
+        bool cell_is_consistent (const unsigned int cell_num) const;
 
 
-        void get_adjacent_cubes (Mesh &m);
-        bool get_next_active_cube (Mesh &m);
-    };
-
-
-                                     /**
-                                      * Creates the connectivity
-                                      * information for the mesh m.
-                                      */
-    void build_mesh (Mesh &m);
-
-
-    
-    
+        void get_adjacent_cubes ();
+        bool get_next_active_cube ();
+    };    
   }  // namespace GridReordering3d
 }  // namespace internal
 

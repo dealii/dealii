@@ -59,7 +59,7 @@ namespace internal
                                       * used in the is_consistent
                                       * function.
                                       */
-    struct Edge 
+    struct Edge
     {
         Edge (const unsigned int v0,
               const unsigned int v1)
@@ -85,10 +85,14 @@ namespace internal
         {
                                            // construct the four edges
 	                                   // in reverse order
-          const Edge reverse_edges[4] = { Edge (c->vertices[1], c->vertices[0]),
-                                          Edge (c->vertices[2], c->vertices[1]),
-                                          Edge (c->vertices[2], c->vertices[3]),
-                                          Edge (c->vertices[3], c->vertices[0]) };
+          const Edge reverse_edges[4] = { Edge (c->vertices[1],
+                                                c->vertices[0]),
+                                          Edge (c->vertices[2],
+                                                c->vertices[1]),
+                                          Edge (c->vertices[2],
+                                                c->vertices[3]),
+                                          Edge (c->vertices[3],
+                                                c->vertices[0]) };
                                            // for each of them, check
                                            // whether they are already
                                            // in the set
@@ -583,15 +587,6 @@ namespace internal
 		    <<  "Grid Orientation Error: " << arg1);
 
 
-				     // sort two integers
-    static inline void sort2 (unsigned int &v1,
-			      unsigned int &v2)
-    {
-      if (v1>v2)
-	std::swap (v1, v2);
-    }
-
-
     namespace ElementInfo
     {
 				       /**
@@ -678,12 +673,13 @@ namespace internal
     CheapEdge::CheapEdge (const unsigned int n0,
 			  const unsigned int n1)
 		    :
-		    node0(n0), node1(n1)
-    {
-				       // sort the entries so that
-				       // node0<node1;
-      sort2 (node0,node1);
-    }
+                                                     // sort the
+                                                     // entries so
+                                                     // that
+                                                     // node0<node1
+		    node0(std::min (n0, n1)),
+                    node1(std::max (n0, n1))
+    {}
 
 
     
@@ -696,15 +692,111 @@ namespace internal
     }
 
   
-				     // This is the guts of the matter...
-    void build_mesh(Mesh &m)
+    Edge::Edge (const unsigned int n0,
+		const unsigned int n1)
+		    :
+		    orientation_flag (0),
+		    group (deal_II_numbers::invalid_unsigned_int)
     {
-      std::vector<Cell> & cell_list = m.cell_list;
-      std::vector<Edge> & edge_list = m.edge_list;
+      nodes[0] = n0;
+      nodes[1] = n1;
+    }
 
-      const unsigned int cell_list_length = cell_list.size();
 
 
+    Cell::Cell () 
+    {
+      for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
+	{
+	  edges[i] = static_cast<unsigned int>(-1);
+	  local_orientation_flags[i] = 1;
+	}
+      
+      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+	nodes[i] = static_cast<unsigned int>(-1);
+      
+      waiting_to_be_processed = false;
+    }
+
+
+
+    Mesh::Mesh (const std::vector<CellData<3> > &incubes)
+    {
+                                       // copy the cells into our own
+                                       // internal data format.
+      const unsigned int numelems = incubes.size();
+      for (unsigned int i=0; i<numelems; ++i)
+        {
+          Cell the_cell;
+          std::copy (&incubes[i].vertices[0],
+                     &incubes[i].vertices[GeometryInfo<3>::vertices_per_cell],
+                     &the_cell.nodes[0]);
+	
+          cell_list.push_back(the_cell);
+        }
+
+                                       // then build edges and
+                                       // connectivity
+      build_connectivity ();
+    }
+    
+
+    
+    void
+    Mesh::sanity_check () const
+    {
+      for (unsigned int i=0; i<cell_list.size(); ++i)
+	for (unsigned int j=0; j<8; ++j)
+	  sanity_check_node (cell_list[i], j);
+    }
+
+
+
+    void
+    Mesh::sanity_check_node (const Cell         &c,
+                             const unsigned int local_node_num) const
+    {
+                                       // check that every edge
+                                       // coming into a node has the
+                                       // same node value
+
+                                       // Get the Local Node Numbers
+				       // of the incoming edges
+      const unsigned int e0 = ElementInfo::edge_to_node[local_node_num][0];
+      const unsigned int e1 = ElementInfo::edge_to_node[local_node_num][1]; 
+      const unsigned int e2 = ElementInfo::edge_to_node[local_node_num][2];
+
+				       // Global Edge Numbers
+      const unsigned int ge0 = c.edges[e0];
+      const unsigned int ge1 = c.edges[e1];
+      const unsigned int ge2 = c.edges[e2];
+
+      const int or0 = ElementInfo::edge_to_node_orient[local_node_num][0] *
+		      c.local_orientation_flags[e0];
+      const int or1 = ElementInfo::edge_to_node_orient[local_node_num][1] *
+		      c.local_orientation_flags[e1];
+      const int or2 = ElementInfo::edge_to_node_orient[local_node_num][2] *
+		      c.local_orientation_flags[e2];
+
+				       // Make sure that edges agree
+				       // what the current node should
+				       // be.
+      Assert ((edge_list[ge0].nodes[or0 == 1 ? 0 : 1] ==
+	       edge_list[ge1].nodes[or1 == 1 ? 0 : 1])
+	      &&
+	      (edge_list[ge1].nodes[or1 == 1 ? 0 : 1] ==
+	       edge_list[ge2].nodes[or2 == 1 ? 0 : 1]),
+	      ExcMessage ("This message does not satisfy the internal "
+			  "consistency check"));
+    }    
+
+
+
+				     // This is the guts of the matter...
+    void Mesh::build_connectivity ()
+    {
+      const unsigned int n_cells = cell_list.size();
+      
       unsigned int n_edges = 0;
 				       // Correctly build the edge
 				       // list
@@ -715,25 +807,26 @@ namespace internal
 	std::map<CheapEdge,unsigned int> edge_map;
 	unsigned int ctr = 0;
 	for (unsigned int cur_cell_id = 0; 
-	     cur_cell_id<cell_list_length; 
+	     cur_cell_id<n_cells; 
 	     ++cur_cell_id)
 	  {
 					     // Get the local node
 					     // numbers on edge
 					     // edge_num
-	    Cell & cur_cell = cell_list[cur_cell_id];
+	    const Cell & cur_cell = cell_list[cur_cell_id];
 
 	    for (unsigned short int edge_num = 0; 
 		 edge_num<12; 
 		 ++edge_num)
 	      {
 		unsigned int gl_edge_num = 0;
-		int l_edge_orient = 1;
-						 // Construct the CheapEdge
+		signed int l_edge_orient = 1;
+						 // Construct the
+						 // CheapEdge
 		const unsigned int
 		  node0 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][0]],
 		  node1 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][1]];
-		const CheapEdge cur_edge(node0,node1);
+		const CheapEdge cur_edge (node0, node1);
 		
 		if (edge_map.count(cur_edge) == 0)
 						   // Edge not in map
@@ -776,279 +869,204 @@ namespace internal
 
 					 // Count every time an edge
 					 // occurs in a cube.
-	for (unsigned int cur_cell_id = 0; 
-	     cur_cell_id<cell_list_length; 
-	     ++cur_cell_id)
-	  {
-	    Cell & cur_cell = cell_list[cur_cell_id];
-	    for (unsigned short int edge_num = 0; 
-		 edge_num<12; 
-		 ++edge_num)
-	      {
-		edge_count[cur_cell.edges[edge_num]]++;
-	      }	
-	  }
+	for (unsigned int cur_cell_id=0; cur_cell_id<n_cells; ++cur_cell_id)
+          for (unsigned short int edge_num = 0; edge_num<12; ++edge_num)
+            ++edge_count[cell_list[cur_cell_id].edges[edge_num]];
 
-					 // So we now know howmany
+					 // So we now know how many
 					 // cubes contain a given
-					 // edge.  Just need to store
+					 // edge. Just need to store
 					 // the list of cubes in the
 					 // edge
 
 					 // Allocate the space for the
 					 // neighbor list
 	for (unsigned int cur_edge_id=0; cur_edge_id<n_edges; ++cur_edge_id)
-	    edge_list[cur_edge_id].neighboring_cubes
-	      .resize (edge_count[cur_edge_id]);
+          edge_list[cur_edge_id].neighboring_cubes
+            .resize (edge_count[cur_edge_id]);
       
-					 // Stores the position of the
+					 // Store the position of the
 					 // current neighbor in the
 					 // edge's neighbor list
 	std::vector<int> cur_cell_edge_list_posn(n_edges,0);
-	for (unsigned int cur_cell_id = 0;
-	     cur_cell_id<cell_list_length;
-	     ++cur_cell_id)
-	  {
-	    Cell & cur_cell = cell_list[cur_cell_id];
-	    for (unsigned short int edge_num = 0; 
-		 edge_num<12; 
-		 ++edge_num)
-	      {
-		unsigned int gl_edge_id = cur_cell.edges[edge_num];
-		Edge & cur_edge = edge_list[gl_edge_id];
-		cur_edge.neighboring_cubes[cur_cell_edge_list_posn[gl_edge_id]] = cur_cell_id;
-		cur_cell_edge_list_posn[gl_edge_id]++;
-	      }
-	  }
-      
+	for (unsigned int cur_cell_id=0; cur_cell_id<n_cells; ++cur_cell_id)
+          for (unsigned short int edge_num=0; edge_num<12; ++edge_num)
+            {
+              const unsigned int
+                gl_edge_id = cell_list[cur_cell_id].edges[edge_num];
+              Edge & cur_edge = edge_list[gl_edge_id];
+              cur_edge.neighboring_cubes[cur_cell_edge_list_posn[gl_edge_id]]
+                = cur_cell_id;
+              cur_cell_edge_list_posn[gl_edge_id]++;
+            }
       }
     }
 
 
-    
-    Edge::Edge (const unsigned int n0,
-		const unsigned int n1,
-		const int orient)
-		    :
-		    orientation_flag(orient),
-		    group(0)
-    {
-      nodes[0] = n0;
-      nodes[1] = n1;
-    }
 
-
-
-    Cell::Cell (const Cell &c)
-    {
-      for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
-	{
-	  edges[i] = c.edges[i];
-	  local_orientation_flags[i] = c.local_orientation_flags[i];
-	}
-      
-      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
-	nodes[i] = c.nodes[i];
-      
-      waiting_to_be_processed = c.waiting_to_be_processed;
-    }
-
-
-    
-    Cell::Cell () 
-    {
-      for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
-	{
-	  edges[i] = static_cast<unsigned int>(-1);
-	  local_orientation_flags[i] = 1;
-	}
-      
-      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
-	nodes[i] = static_cast<unsigned int>(-1);
-      
-      waiting_to_be_processed = false;
-    }
-
-
-
-    Mesh::Mesh ()
-    {}
-    
-
-    
     void
-    Mesh::sanity_check() const
+    Mesh::export_to_deal_format (std::vector<CellData<3> > &outcubes) const 
     {
+      Assert (outcubes.size() == cell_list.size(),
+              ExcInternalError());
+
+                                       // simply overwrite the output
+                                       // array with the new
+                                       // information
       for (unsigned int i=0; i<cell_list.size(); ++i)
-					 // check that every edge
-					 // coming into a node has the
-					 // same node value
-	for (unsigned int j=0; j<8; ++j)
-	  sanity_check_node (cell_list[i], j);
+        std::copy (&cell_list[i].nodes[0],
+                   &cell_list[i].nodes[GeometryInfo<3>::vertices_per_cell],
+                   &outcubes[i].vertices[0]);
     }
+    
 
-
-
-    void
-    Mesh::sanity_check_node(const Cell         &c,
-			    const unsigned int local_node_num) const
-    {
-				       // Get the Local Node Numbers
-				       // of the incoming edges
-      const unsigned int e0 = ElementInfo::edge_to_node[local_node_num][0];
-      const unsigned int e1 = ElementInfo::edge_to_node[local_node_num][1]; 
-      const unsigned int e2 = ElementInfo::edge_to_node[local_node_num][2];
-
-				       // Global Edge Numbers
-      const unsigned int ge0 = c.edges[e0];
-      const unsigned int ge1 = c.edges[e1];
-      const unsigned int ge2 = c.edges[e2];
-
-      const int or0 = ElementInfo::edge_to_node_orient[local_node_num][0] *
-		      c.local_orientation_flags[e0];
-      const int or1 = ElementInfo::edge_to_node_orient[local_node_num][1] *
-		      c.local_orientation_flags[e1];
-      const int or2 = ElementInfo::edge_to_node_orient[local_node_num][2] *
-		      c.local_orientation_flags[e2];
-
-				       // Make sure that edges agree
-				       // what the current node should
-				       // be.
-      Assert ((edge_list[ge0].nodes[or0 == 1 ? 0 : 1] ==
-	       edge_list[ge1].nodes[or1 == 1 ? 0 : 1])
-	      &&
-	      (edge_list[ge1].nodes[or1 == 1 ? 0 : 1] ==
-	       edge_list[ge2].nodes[or2 == 1 ? 0 : 1]),
-	      ExcMessage ("This message does not satisfy the internal "
-			  "consistency check"));
-    }    
-
-
-
-    Orienter::Orienter () 
-    {
+    
+    Orienter::Orienter (const std::vector<CellData<3> > &incubes)
+                    :
+                    mesh (incubes),
+                    cur_posn (0),
+                    marker_cube (0),
+                    cur_edge_group  (0)
+    {  
       for (unsigned int i = 0; i<12; ++i)
 	edge_orient_array[i] = false;
     }
 
+
+    
+    void Orienter::orient_mesh (std::vector<CellData<3> > &incubes)
+    {
+      Orienter orienter (incubes);
+      
+				       // First check that the mesh is
+				       // sensible
+      orienter.mesh.sanity_check ();
+
+                                       // Orient the mesh
+      orienter.orient_edges ();
+
+                                       // Now we have a bunch of oriented
+                                       // edges int the structure we only
+                                       // have to turn the cubes so they
+                                       // match the edge orientation.
+      orienter.orient_cubes ();
+        
+                                       // Copy the elements from our
+                                       // internal structure back into
+                                       // their original location.
+      orienter.mesh.export_to_deal_format (incubes);
+    }
+
 				     /**
-				      * This assignes an orientation
+				      * This assigns an orientation
 				      * to each edge so that every
 				      * cube is a rotated Deal.II
 				      * cube.
 				      */
-    bool Orienter::orient_edges (Mesh &m)
+    void Orienter::orient_edges ()
     {
-  
-				       // First check that the mesh is
-				       // sensible
-      m.sanity_check ();
-
-				       // We start by looking only at
-				       // the first cube.
-      cur_posn = 0; 
-      marker_cube = 0;
-
-				       // We mark each edge with a
-				       // group number (mostly for
-				       // mesh debugging purposes)
-      cur_edge_group = 1;
 				       // While there are still cubes
 				       // to orient
-      while (get_next_unoriented_cube(m))
-	{
-					   // And there are edges in
-					   // the cube to orient
-	  while (orient_next_unoriented_edge(m))
-	    {
-					       // Make all the sides
-					       // in the current set
-					       // match
-	      orient_edges_in_current_cube(m);
-					       // Add the adjacent
-					       // cubes to the list
-					       // for processing
-	      get_adjacent_cubes(m);
-					       // Start working on
-					       // this list of cubes
-	      while (get_next_active_cube(m))
-		{
-						   // Make sure the
-						   // Cube doesn't
-						   // have a
-						   // contradiction
-		  AssertThrow(consistent(m,cur_posn),
-			      ExcGridOrientError("Mesh is Unorientable"));
-						   // If we needed to
-						   // orient any edges
-						   // in the current
-						   // cube then we may
-						   // have to process
-						   // the neighbor.
-		  if (orient_edges_in_current_cube(m))
-		    get_adjacent_cubes(m);
-		}
-	      cur_edge_group++;
-	    }
-	}
-      return true;
+      while (get_next_unoriented_cube())
+                                         // And there are edges in
+                                         // the cube to orient
+        while (orient_next_unoriented_edge())
+          {
+                                             // Make all the sides
+                                             // in the current set
+                                             // match
+            orient_edges_in_current_cube();
+
+                                             // Add the adjacent
+                                             // cubes to the list
+                                             // for processing
+            get_adjacent_cubes();
+                                             // Start working on
+                                             // this list of cubes
+            while (get_next_active_cube())
+              {
+                                                 // Make sure the
+                                                 // Cube doesn't
+                                                 // have a
+                                                 // contradiction
+                AssertThrow(cell_is_consistent(cur_posn),
+                            ExcGridOrientError("Mesh is Unorientable"));
+
+                                                 // If we needed to
+                                                 // orient any edges
+                                                 // in the current
+                                                 // cube then we may
+                                                 // have to process
+                                                 // the neighbor.
+                if (orient_edges_in_current_cube())
+                  get_adjacent_cubes();
+              }
+
+                                             // start the next sheet
+                                             // (equivalence class
+                                             // of edges)
+            ++cur_edge_group;
+          }	
     }
 
 
     
-    bool Orienter::get_next_unoriented_cube(Mesh &m)
+    bool Orienter::get_next_unoriented_cube ()
     {
 				       // The last cube in the list
-      unsigned int end_cube_num = m.cell_list.size();
+      const unsigned int n_cubes = mesh.cell_list.size();
 				       // Keep shifting along the list
 				       // until we find a cube which
 				       // is not fully oriented or the
 				       // end.
-      while( (marker_cube<end_cube_num)&&(is_oriented(m,marker_cube)) )
-	marker_cube++;
+      while( (marker_cube<n_cubes) &&
+             (is_oriented(marker_cube)) )
+	++marker_cube;
       cur_posn = marker_cube;
 				       // Return true if we now point
 				       // at a valid cube.
-      return cur_posn<end_cube_num;
+      return (cur_posn < n_cubes);
     }
 
 
     
-    bool Orienter::is_oriented(const Mesh &m, int cell_num)
+    bool Orienter::is_oriented (const unsigned int cell_num) const
     {
-      const Cell& c = m.cell_list[cell_num];
-      for (int i = 0; i<12; ++i)
-	if (m.edge_list[c.edges[i]].orientation_flag == 0)
+      for (unsigned int i=0; i<12; ++i)
+	if (mesh.edge_list[mesh.cell_list[cell_num].edges[i]].orientation_flag
+            == 0)
 	  return false;
       return true;
     }
 
 
     
-    bool Orienter::consistent(Mesh &m, int cell_num)
+    bool
+    Orienter::cell_is_consistent(const unsigned int cell_num) const
     {
 
-      const Cell& c = m.cell_list[cell_num];
+      const Cell& c = mesh.cell_list[cell_num];
   
 				       // Checks that all oriented
 				       // edges in the group are
 				       // oriented consistently.
-      for (int group = 0; group<3; ++group)
+      for (unsigned int group=0; group<3; ++group)
 	{
 					   // When a nonzero
 					   // orientation is first
 					   // encountered in the group
 					   // it is stored in this
-	  int value = 0;
+	  signed int value = 0;
 					   // Loop over all parallel
 					   // edges
-	  for (int i = 4*group;i<4*(group+1);++i)
+	  for (unsigned int i=4*group; i<4*(group+1); ++i)
 	    {
 					       // The local edge
 					       // orientation within
 					       // the cell
-	      int LOR = c.local_orientation_flags[i] *
-			m.edge_list[c.edges[i]].orientation_flag;
+	      const signed int LOR
+                = (c.local_orientation_flags[i] *
+                   mesh.edge_list[c.edges[i]].orientation_flag);
 	      
 					       // If the edge has
 					       // orientation
@@ -1063,7 +1081,7 @@ namespace internal
 		    value = LOR;
 		  else
 						     // If we have
-						     // seen a
+						     // seen an
 						     // oriented edge
 						     // in this group
 						     // we'd better
@@ -1079,54 +1097,54 @@ namespace internal
 
 
     
-    bool Orienter::orient_next_unoriented_edge(Mesh &m)
+    bool Orienter::orient_next_unoriented_edge ()
     {
       cur_posn = marker_cube;
-      const Cell& c = m.cell_list[cur_posn];
-      int i = 0;
+      const Cell& c = mesh.cell_list[cur_posn];
+      unsigned int edge = 0;
  
 				       // search for the unoriented
 				       // side
-      while ((i<12) &&
-	     (m.edge_list[c.edges[i]].orientation_flag != 0))
-	++i;
+      while ((edge<12) &&
+	     (mesh.edge_list[c.edges[edge]].orientation_flag != 0))
+	++edge;
   
 				       // if we found none then return
 				       // false
-      if (i == 12)
+      if (edge == 12)
 	return false;
   
 				       // Which edge group we're in.
-      int egrp = i/4;
+      const unsigned int edge_group = edge/4;
 
 				       // A sanity check that none of
 				       // the other edges in the group
 				       // have been oriented yet Each
 				       // of the edges in the group
 				       // should be un-oriented
-      for (int j = egrp*4; j<egrp*4+4; ++j)
-	Assert (m.edge_list[c.edges[j]].orientation_flag == 0,
+      for (unsigned int j = edge_group*4; j<edge_group*4+4; ++j)
+	Assert (mesh.edge_list[c.edges[j]].orientation_flag == 0,
 		ExcGridOrientError("Tried to orient edge when other edges "
-				"in group already oriented!"));
+                                   "in group are already oriented!"));
 
 				       // Make the edge alignment
 				       // match that of the local
 				       // cube.
-      m.edge_list[c.edges[i]].orientation_flag
-	= c.local_orientation_flags[i];
-      m.edge_list[c.edges[i]].group = cur_edge_group;
+      mesh.edge_list[c.edges[edge]].orientation_flag
+	= c.local_orientation_flags[edge];
+      mesh.edge_list[c.edges[edge]].group = cur_edge_group;
 
-      edge_orient_array[i] = true;
+      edge_orient_array[edge] = true;
 
       return true;
     }
 
 
     
-    bool Orienter::orient_edges_in_current_cube (Mesh &m)
+    bool Orienter::orient_edges_in_current_cube ()
     {
-      for (unsigned int i = 0; i<3; ++i)
-	if (orient_edge_set_in_current_cube(m,i) == true)
+      for (unsigned int edge_group=0; edge_group<3; ++edge_group)
+	if (orient_edge_set_in_current_cube(edge_group) == true)
 	  return true;
       
       return false;
@@ -1135,24 +1153,24 @@ namespace internal
 
     
     bool
-    Orienter::orient_edge_set_in_current_cube (Mesh &m,
-					       const unsigned int n)
+    Orienter::orient_edge_set_in_current_cube (const unsigned int n)
     {
-      const Cell& c = m.cell_list[cur_posn];
+      const Cell& c = mesh.cell_list[cur_posn];
   
 				       // Check if any edge is
 				       // oriented
-      unsigned int num_oriented = 0;
-      int glorient = 0;
+      unsigned int n_oriented = 0;
+      signed int   glorient   = 0;
       unsigned int edge_flags = 0;
-      unsigned int cur_flag = 1;
+      unsigned int cur_flag   = 1;
       for (unsigned int i = 4*n; i<4*(n+1); ++i, cur_flag<<=1)
 	{
-	  const int orient = m.edge_list[c.edges[i]].orientation_flag *
-			     c.local_orientation_flags[i];
+	  const signed int orient
+            = (mesh.edge_list[c.edges[i]].orientation_flag *
+               c.local_orientation_flags[i]);
 	  if (orient != 0)
 	    {
-	      num_oriented++;
+	      ++n_oriented;
 	      if (glorient == 0)
 		glorient = orient;
 	      else
@@ -1166,7 +1184,7 @@ namespace internal
 				       // were any of the sides
 				       // oriented?  were they all
 				       // already oriented?
-      if ((glorient == 0) || (num_oriented == 4))
+      if ((glorient == 0) || (n_oriented == 4))
 	return false;
 
 				       // If so orient all edges
@@ -1175,9 +1193,9 @@ namespace internal
       for (unsigned int i=4*n; i<4*(n+1); ++i, cur_flag<<=1)
 	if ((edge_flags & cur_flag) != 0)
 	  {
-	    m.edge_list[c.edges[i]].orientation_flag 
+	    mesh.edge_list[c.edges[i]].orientation_flag 
 	      = c.local_orientation_flags[i]*glorient;
-	    m.edge_list[c.edges[i]].group = cur_edge_group;
+	    mesh.edge_list[c.edges[i]].group = cur_edge_group;
 	    edge_orient_array[i] = true;
 	  }
 	
@@ -1186,22 +1204,22 @@ namespace internal
 
 
     
-    void Orienter::get_adjacent_cubes (Mesh &m)
+    void Orienter::get_adjacent_cubes ()
     {
-      const Cell &c = m.cell_list[cur_posn];
+      const Cell &c = mesh.cell_list[cur_posn];
       for (unsigned int e=0; e<12; ++e)
 	if (edge_orient_array[e] == true)
 	  {
 	    edge_orient_array[e] = false;
 	    
-	    Edge & the_edge = m.edge_list[c.edges[e]];
+	    const Edge & the_edge = mesh.edge_list[c.edges[e]];
 	    for (unsigned int local_cube_num = 0; 
 		 local_cube_num < the_edge.neighboring_cubes.size();
 		 ++local_cube_num)
 	      {
 		const unsigned int
 		  global_cell_num = the_edge.neighboring_cubes[local_cube_num];
-		Cell &ncell = m.cell_list[global_cell_num];
+		Cell &ncell = mesh.cell_list[global_cell_num];
 		
 		if (!ncell.waiting_to_be_processed)
 		  {
@@ -1214,10 +1232,11 @@ namespace internal
 
 
     
-    bool Orienter::get_next_active_cube (Mesh &m)
+    bool Orienter::get_next_active_cube ()
     {
-				       // Mark the curent Cube as finnished with.
-      Cell &c = m.cell_list[cur_posn];
+				       // Mark the curent Cube as
+				       // finished with.
+      Cell &c = mesh.cell_list[cur_posn];
       c.waiting_to_be_processed = false;
       if (sheet_to_process.size() != 0)
 	{
@@ -1229,11 +1248,10 @@ namespace internal
     }
 
     
-    void Orienter::orient_cubes(Mesh & the_mesh)
+    void Orienter::orient_cubes ()
     {
 				       // We assume that the mesh has
 				       // all edges oriented already.
-      const unsigned int numelems = the_mesh.cell_list.size();
   
 				       // This is a list of
 				       // permutations that take node
@@ -1261,9 +1279,9 @@ namespace internal
 				       // that should be the local
 				       // zero node has three edges
 				       // coming into it.
-      for (unsigned int i = 0;i<numelems;++i)
+      for (unsigned int i=0; i<mesh.cell_list.size(); ++i)
 	{
-	  Cell& the_cell = the_mesh.cell_list[i];
+	  Cell& the_cell = mesh.cell_list[i];
     
 					   // This stores whether the
 					   // global oriented edge
@@ -1273,10 +1291,10 @@ namespace internal
 					   // cube. (for each edge on
 					   // the curent cube)
 	  int local_edge_orientation[12];
-	  for (unsigned int j = 0;j<12;++j)
+	  for (unsigned int j = 0; j<12; ++j)
 	    {
 					       // get the global edge
-	      const Edge& the_edge = the_mesh.edge_list[the_cell.edges[j]];
+	      const Edge& the_edge = mesh.edge_list[the_cell.edges[j]];
 					       // All edges should be
 					       // oriented at this
 					       // stage..
@@ -1292,7 +1310,7 @@ namespace internal
 					   // Here the number of
 					   // incoming edges is
 					   // tallied for each node.
-	  int perm_num = -1;
+	  unsigned int perm_num = static_cast<unsigned int>(-1);
 	  for (unsigned int node_num=0; node_num<8; ++node_num)
 	    {
 					       // The local edge
@@ -1320,7 +1338,7 @@ namespace internal
       
 	      if (total == 3) 
 		{
-		  Assert (perm_num == -1,
+		  Assert (perm_num == static_cast<unsigned int>(-1),
 			  ExcGridOrientError("More than one node with 3 incoming "
 					     "edges found in curent hex.")); 
 		  perm_num = node_num;
@@ -1328,7 +1346,7 @@ namespace internal
 	    }
 					   // We should now have a
 					   // valid permutation number
-	  Assert (perm_num != -1,
+	  Assert (perm_num != static_cast<unsigned int>(-1),
 		  ExcGridOrientError("No node having 3 incoming edges found in curent hex.")); 
 
 					   // So use the apropriate
@@ -1346,54 +1364,15 @@ namespace internal
 
 
 
-void GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
+void
+GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
 {
 
   Assert (incubes.size() != 0,
 	  ExcMessage("List of elements to orient was of zero length"));
   
 				   // This does the real work
-  internal::GridReordering3d::Orienter orienter;
-
-				   // This is the internal store for
-				   // all global connectivity
-				   // information it starts prety much
-				   // empty.
-  internal::GridReordering3d::Mesh the_mesh;
-  
-				   // Copy the cells into our own
-				   // internal data format.
-  const unsigned int numelems = incubes.size();
-  for (unsigned int i=0; i<numelems; ++i)
-    {
-      internal::GridReordering3d::Cell the_cell;
-      for (unsigned int j=0; j<8; j++)
-	the_cell.nodes[j] = incubes[i].vertices[j];
-	
-      the_mesh.cell_list.push_back(the_cell);
-    }
-  
-				   // Build the connectivity
-				   // information This fills in the
-				   // connectivity information in the
-				   // internal structure
-  build_mesh(the_mesh);
-
-				   // Orient the mesh
-  orienter.orient_edges(the_mesh);
-
-				   // Now we have a bunch of oriented
-				   // edges int the structure we only
-				   // have to turn the cubes so thy
-				   // match the edge orientation.
-  orienter.orient_cubes(the_mesh);
-
-				   // Copy the elements from our
-				   // internal structure back into
-				   // their original location.
-  for (unsigned int i=0; i<numelems; ++i)
-    for (unsigned int j=0; j<8; j++)
-      incubes[i].vertices[j] = the_mesh.cell_list[i].nodes[j];
+  internal::GridReordering3d::Orienter::orient_mesh (incubes);
 }
 
 
