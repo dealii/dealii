@@ -49,6 +49,19 @@ double sqr (const double x)
 
 #if deal_II_dimension == 1
 
+// provide zero pointers to be used in the initialization of 
+// invalid references
+namespace 
+{
+  const Mapping<1> * const           invalid_mapping         = 0;
+  const DoFHandler<1> * const        invalid_dof_handler     = 0;
+  const Quadrature<0> * const        invalid_face_quadrature = 0;
+  const FunctionMap<1>::type * const invalid_function_map    = 0;
+  const std::vector<const Vector<double> *> * const invalid_solutions = 0;
+  KellyErrorEstimator<1>::FaceIntegrals * const invalid_face_integrals = 0;
+}
+
+
 template <>
 KellyErrorEstimator<1>::Data::Data(const Mapping<1>                    &,
 				   const DoFHandler<1>                 &,
@@ -59,14 +72,14 @@ KellyErrorEstimator<1>::Data::Data(const Mapping<1>                    &,
 				   const Function<1>                   *,
 				   const unsigned int                   ,
 				   FaceIntegrals                       &):
-		mapping(* static_cast <const Mapping<1> *> (0)),
-		dof_handler(* static_cast <const DoFHandler<1> *> (0)),
-		quadrature(* static_cast <const Quadrature<0> *> (0)),
-		neumann_bc(* static_cast <const FunctionMap<1>::type *> (0)),
-		solutions(* static_cast <const std::vector<const Vector<double>*> *> (0)),
+		mapping(*invalid_mapping),
+		dof_handler(*invalid_dof_handler),
+		quadrature(*invalid_face_quadrature),
+		neumann_bc(*invalid_function_map),
+		solutions(*invalid_solutions),
 		n_threads (0),
 		n_solution_vectors (0),
-		face_integrals (* static_cast<FaceIntegrals*> (0))
+		face_integrals (*invalid_face_integrals)
 {
   Assert (false, ExcInternalError());
 }

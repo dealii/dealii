@@ -114,7 +114,8 @@ namespace Threads
 				     // present. return dummy value
 				     // instead
     Assert (false, ExcNotImplemented());
-    return *static_cast<const FunEncapsulation *>(0);
+    const FunEncapsulation * const p = 0;
+    return *p;
   };
 
 

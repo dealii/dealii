@@ -16,6 +16,12 @@
 #include <numerics/vectors.h>
 
 
+
+// allocate storage and initialize static variables
+const Quadrature<0> * const VectorTools::invalid_face_quadrature = 0;
+
+
+
 void
 VectorTools::subtract_mean_value(Vector<double>     &v,
 				 const std::vector<bool> &p_select)

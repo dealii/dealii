@@ -407,6 +407,10 @@ class VectorTools
 				      * of the previous function for
 				      * 1d. At present, it is not
 				      * implemented.
+				      *
+				      * The default value of the
+				      * quadrature formula is an
+				      * invalid object.
 				      */
     static void project (const Mapping<1>         &mapping,
 			 const DoFHandler<1>      &dof,
@@ -415,7 +419,7 @@ class VectorTools
 			 const Function<1>        &function,
 			 Vector<double>           &vec,
 			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<0>      &q_boundary = *static_cast<const Quadrature<0>*>(0),
+			 const Quadrature<0>      &q_boundary = *invalid_face_quadrature,
 			 const bool                project_to_boundary_first = false);
     
 				     /**
@@ -797,7 +801,15 @@ class VectorTools
 				     /**
 				      * Exception
 				      */
-  DeclException0 (ExcNonInterpolatingFE);
+    DeclException0 (ExcNonInterpolatingFE);
+
+  private:
+				     /**
+				      * Null pointer used to 
+				      * denote invalid face 
+				      * quadrature formulas in 1d.
+ 				      */
+    static const Quadrature<0> * const invalid_face_quadrature;
 };
 
 
