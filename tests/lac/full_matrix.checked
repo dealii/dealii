@@ -16,53 +16,53 @@ DEAL::Inverse(dim=9):
                       1.000e+00                        
                                  1.000e+00             
                                             1.000e+00  
-DEAL::l1-norm: 1.38
+DEAL::l1-norm: 1.382
 5.403e-01  8.415e-01                                   
 -8.415e-01 5.403e-01                                   
                       1.000e+00                        
                                  1.000e+00             
                                             1.000e+00  
-DEAL::linfty-norm: 1.38
-DEAL::Frobenius-norm: 2.24
+DEAL::linfty-norm: 1.382
+DEAL::Frobenius-norm: 2.236
 1.000e+00                                              
            -4.161e-01 -9.093e-01                       
            9.093e-01  -4.161e-01                       
                                  1.000e+00             
                                             1.000e+00  
-DEAL::l1-norm: 1.33
+DEAL::l1-norm: 1.325
 1.000e+00                                              
            -4.161e-01 9.093e-01                        
            -9.093e-01 -4.161e-01                       
                                  1.000e+00             
                                             1.000e+00  
-DEAL::linfty-norm: 1.33
-DEAL::Frobenius-norm: 2.24
+DEAL::linfty-norm: 1.325
+DEAL::Frobenius-norm: 2.236
 1.000e+00                                              
            1.000e+00                                   
                       -9.900e-01 -1.411e-01            
                       1.411e-01  -9.900e-01            
                                             1.000e+00  
-DEAL::l1-norm: 1.13
+DEAL::l1-norm: 1.131
 1.000e+00                                              
            1.000e+00                                   
                       -9.900e-01 1.411e-01             
                       -1.411e-01 -9.900e-01            
                                             1.000e+00  
-DEAL::linfty-norm: 1.13
-DEAL::Frobenius-norm: 2.24
+DEAL::linfty-norm: 1.131
+DEAL::Frobenius-norm: 2.236
 1.000e+00                                              
            1.000e+00                                   
                       1.000e+00                        
                                  -6.536e-01 7.568e-01  
                                  -7.568e-01 -6.536e-01 
-DEAL::l1-norm: 1.41
+DEAL::l1-norm: 1.410
 1.000e+00                                              
            1.000e+00                                   
                       1.000e+00                        
                                  -6.536e-01 -7.568e-01 
                                  7.568e-01  -6.536e-01 
-DEAL::linfty-norm: 1.41
-DEAL::Frobenius-norm: 2.24
+DEAL::linfty-norm: 1.410
+DEAL::Frobenius-norm: 2.236
 1.708e+00  -1.892e-01 4.093e-01  -3.813e-02 4.415e-02  
 -1.892e-01 2.704e+00  6.399e-01  -5.962e-02 6.903e-02  
 4.093e-01  6.399e-01  1.636e+00  2.203e-01  -2.551e-01 
