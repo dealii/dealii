@@ -243,7 +243,7 @@ namespace Threads
       {
 	error = pthread_create (&tid_list.back(), 0, fun_ptr, fun_data);
       }
-    while ( ! ((error == 0) || (error != EAGAIN)));
+    while (error == EAGAIN);
 
     Assert (error == 0, ExcInternalError());
   };
