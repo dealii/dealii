@@ -126,9 +126,16 @@ else
       GXX_VERSION=MIPSpro
     else
 
-      dnl  Aw, nothing suitable found...
-      AC_MSG_ERROR(Unrecognized compiler, sorry)
-      exit 1
+      is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
+      if test "x$is_intel_icc" != "x" ; then
+        AC_MSG_RESULT(compiler is Intel ICC)
+        GXX_VERSION=intel_icc
+      else
+
+        dnl  Aw, nothing suitable found...
+        AC_MSG_ERROR(Unrecognized compiler, sorry)
+        exit 1
+      fi
     fi
   fi
 fi
@@ -247,19 +254,26 @@ else
         CXXFLAGSO="$CXXFLAGS -LANG:alias_const=ON -LANG:std -w"
 
     else
+      
+      if test "x$GXX_VERSION" = "xintel_icc" ; then
+        CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -DDEBUG -inline_debug_info"
+        CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -tpp6 -axiMK -ip -unroll -w"
 
-      dnl Other compiler
+      else
 
-      dnl For DECs cxx we should use the following options:
-      dnl   CXXFLAGSO: -ansi_alias -O3
-      dnl   CXXFLAGSG: -std strict_ansi_errors -w0
-      dnl if necessary: -shared, -pthread 
-      dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
-      dnl                -pch? -noimplicit_include?
+        dnl Other compiler
 
-      AC_MSG_ERROR(No compiler options for this C++ compiler
-                   specified at present)
-      exit 1
+        dnl For DECs cxx we should use the following options:
+        dnl   CXXFLAGSO: -ansi_alias -O3
+        dnl   CXXFLAGSG: -std strict_ansi_errors -w0
+        dnl if necessary: -shared, -pthread 
+        dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
+        dnl                -pch? -noimplicit_include?
+
+        AC_MSG_ERROR(No compiler options for this C++ compiler
+                     specified at present)
+        exit 1
+      fi
     fi
   fi
 fi
@@ -345,6 +359,12 @@ if test $enableshared = yes ; then
                 LDFLAGS="$LDFLAGS -fPIC"
                 ;;
         *MIPSpro*)
+                CFLAGS="$CFLAGS -KPIC"
+                CXXFLAGSG="$CXXFLAGSG -KPIC"
+                CXXFLAGSO="$CXXFLAGSO -KPIC"
+                LDFLAGS="$LDFLAGS -KPIC"
+                ;;
+	intel_icc)
                 CFLAGS="$CFLAGS -KPIC"
                 CXXFLAGSG="$CXXFLAGSG -KPIC"
                 CXXFLAGSO="$CXXFLAGSO -KPIC"
