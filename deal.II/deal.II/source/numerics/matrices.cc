@@ -410,7 +410,7 @@ void MatrixCreator::create_boundary_mass_matrix (const Mapping<1>          &,
 #endif
 
 
-// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
+
 template <int dim>
 void
 MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
@@ -420,7 +420,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 					    const typename FunctionMap<dim>::type         &boundary_functions,
 					    Vector<double>            &rhs_vector,
 					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<dim> * const a)
+					    const Function<dim> * const coefficient)
 {
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadManager thread_manager;
@@ -443,7 +443,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 					 create_boundary_mass_matrix_1<dim>)
 		    .collect_args (mapping, dof, q, matrix,
 				   boundary_functions, rhs_vector,
-				   dof_to_boundary_mapping, a,
+				   dof_to_boundary_mapping, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
 };
@@ -460,14 +460,14 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			       const typename FunctionMap<dim>::type &boundary_functions,
 			       Vector<double>            &rhs_vector,
 			       std::vector<unsigned int> &dof_to_boundary_mapping,
-			       const Function<dim> * const a,
+			       const Function<dim> * const coefficient,
 			       const IteratorRange<dim>   range,
 			       Threads::ThreadMutex      &mutex)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
-  const bool         fe_is_system  = (n_components != 1);
-  
+  const bool         fe_is_system  = (n_components != 1);  
+
   Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions), ExcInternalError());
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
@@ -477,6 +477,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	  ExcInternalError());
   Assert (n_components == boundary_functions.begin()->second->n_components,
 	  ExcComponentMismatch());
+  Assert (coefficient->n_components==1 ||
+	  coefficient->n_components==n_components, ExcComponentMismatch());
 #ifdef DEBUG
   if (true)
     {
@@ -505,8 +507,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
 				   // the name
-  std::vector<double>          coefficient_values_scalar (fe_values.n_quadrature_points);
-  std::vector<Vector<double> > coefficient_values_system (fe_values.n_quadrature_points,
+  std::vector<double>          coefficient_values (fe_values.n_quadrature_points);
+  std::vector<Vector<double> > coefficient_vector_values (fe_values.n_quadrature_points,
 							  Vector<double>(n_components));
 
   std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
@@ -543,32 +545,59 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		->second->vector_value_list (fe_values.get_quadrature_points(),
 					     rhs_values_system);
 
-	      if (a != 0)
+	      if (coefficient != 0)
 		{
-		  a->vector_value_list (fe_values.get_quadrature_points(),
-					coefficient_values_system);
-		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
-		      {
-			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			  if (fe.system_to_component_index(i).first ==
-			      fe.system_to_component_index(j).first)
-			    {
-			      cell_matrix(i,j)
-				+= (values(i,point) *
-				    values(j,point) *
-				    weights[point] *
-				    coefficient_values_system[point](
-				      fe.system_to_component_index(i).first));
-			    };
+		  if (coefficient->n_components==1)
+		    {
+		      coefficient->value_list (fe_values.get_quadrature_points(),
+					       coefficient_values);
+		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
+			  {
+			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+			      if (fe.system_to_component_index(i).first ==
+				  fe.system_to_component_index(j).first)
+				{
+				  cell_matrix(i,j)
+				    += (values(i,point) *
+					values(j,point) *
+					weights[point] *
+					coefficient_values[point]);
+				};
 			
-			cell_vector(i) += values(i,point) *
-					  rhs_values_system[point](
-					    fe.system_to_component_index(i).first) *
-					  weights[point];
-		      };
+			    cell_vector(i) += values(i,point) *
+					      rhs_values_system[point](
+						fe.system_to_component_index(i).first) *
+					      weights[point];
+			  };
+		    }
+		  else
+		    {
+		      coefficient->vector_value_list (fe_values.get_quadrature_points(),
+						      coefficient_vector_values);
+		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
+			  {
+			    const unsigned int component_i=
+			      fe.system_to_component_index(i).first;
+			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+			      if (fe.system_to_component_index(j).first ==
+				  component_i)
+				{
+				  cell_matrix(i,j)
+				    += (values(i,point) *
+					values(j,point) *
+					weights[point] *
+					coefficient_vector_values[point](component_i));
+				};
+			
+			    cell_vector(i) += values(i,point) *
+					      rhs_values_system[point](component_i) *
+					      weights[point];
+			  };
+		    }
 		}
-	      else
+	      else	//      if (coefficient == 0)
 		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		    {
@@ -593,10 +622,10 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
-	      if (a != 0)
+	      if (coefficient != 0)
 		{
-		  a->value_list (fe_values.get_quadrature_points(),
-				 coefficient_values_scalar);
+		  coefficient->value_list (fe_values.get_quadrature_points(),
+					   coefficient_values);
 		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		      {
@@ -604,7 +633,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			  cell_matrix(i,j) += (values(i,point) *
 					       values(j,point) *
 					       weights[point] *
-					       coefficient_values_scalar[point]);
+					       coefficient_values[point]);
 			cell_vector(i) += values(i,point) *
 					  rhs_values_scalar[point] *
 					  weights[point];
