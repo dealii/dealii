@@ -45,7 +45,7 @@ foreach $name (sort keys %testcase) {
 # then generate output for the three frames and the panels for 
 # the different months
 
-# first get last active months for the default panel
+# first get last active month for the default panel
 foreach $date (sort {$b cmp $a} keys %results)
 {
     $date =~ /(\d+)-(\d+)-\d+/;
@@ -134,7 +134,7 @@ foreach $date (sort {$b cmp $a} keys %results)
 	    print TABLE_FILE "</body>\n</html>\n";
 	    close TABLE_FILE;
 	}
-	$file = "tests_report_${this_year}_$this_month.html";
+	$file = "tests_report_${this_year}_${this_month}.html";
 	use Cwd;
 	$dir = cwd();
 	open TABLE_FILE, ">$file" or die "Can't open output file $file in $dir\n";
@@ -172,7 +172,7 @@ EOT
 	}
 	# now write link to month file
 	print HEAD_FILE "<a href=\"$file\" target=\"report_results\">";
-	print HEAD_FILE "$this_year/$this_month</a>&nbsp;&nbsp;\n";
+	print HEAD_FILE "${this_year}/${this_month}</a>&nbsp;&nbsp;\n";
     }
 
     print TABLE_FILE "<tr><td>$date  ";
@@ -216,10 +216,15 @@ foreach $name (sort keys %testcase) {
     if ($col == 0) {
 	print NAMES_FILE "<tr>\n";
     }
-    print NAMES_FILE "   <td><small>$testcase{$name}</small> <td><small>$name</small>\n";
+    print NAMES_FILE "   <td><small>$testcase{$name}</small></td>",
+                     "   <td><small>$name</small></td>\n";
 
     # next column. if at end, wrap around
     $col = ($col+1)%4;
+
+    if ($col == 0) {
+	print NAMES_FILE "</tr>\n";
+    }
 }
 
 print NAMES_FILE <<'EOT'
