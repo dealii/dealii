@@ -16,6 +16,7 @@
 
 #include <map>
 #include <vector>
+#include <stack>
 #include <grid/tria.h>
 
 
