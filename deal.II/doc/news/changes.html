@@ -42,14 +42,17 @@ inconvenience this causes.
 
 
 <ol>
-  <li> <p>Changed: <code class="class">BlockMatrixArray</code>
-  received a second template argument <tt>number</tt>, equal to the
-  same argument of the used <code
+
+  <li> <p>Changed: The template argument of <code
+  class="class">BlockMatrixArray</code> was changed to
+  <tt>number</tt>, equal to the same argument of the used <code
   class="class">BlockVector</code>. Furthermore, its constructor
   requires an additional argument of type <code
   class="class">VectorMemory&lt;Vector&lt;number&gt; &gt;</code>
-  providing space for auxiliary vectors.
-  <br> (GK 2005/03/14)
+  providing space for auxiliary vectors. Since the entries are now of
+  type <code class="class">PointerMatrixBase</code>, even matrices
+  with blocks of different types can be constructed.
+  <br> (GK 2005/03/21)
   </p>
 
   <li> <p>Changed: The <code class="class">GeometryInfo</code>::<code

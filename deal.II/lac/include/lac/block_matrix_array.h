@@ -15,14 +15,15 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-#include <base/smartpointer.h>
 #include <base/table.h>
 
+#include <lac/pointer_matrix.h>
 #include <lac/vector_memory.h>
 
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -40,15 +41,16 @@ template <typename> class Vector;
 
 
 /**
- * Block matrix composed of different single matrices.
+ * Block matrix composed of different single matrices; these matrices
+ * may even be of different types.
  *
  * Given a set of arbitrary matrices <i>A<sub>i</sub></i>, this class
  * implements a block matrix with block entries of the form
  * <i>M<sub>jk</sub> = s<sub>jk</sub>A<sub>i</sub></i>.  Each
  * <i>A<sub>i</sub></i> may be used several times with different
  * prefix. The matrices are not copied into the BlockMatrixArray
- * object, but rather references to them will be stored along with
- * factors and transposition flags.
+ * object, but rather a PointerMatrix referencing each of them will be
+ * stored along with factors and transposition flags.
  *
  * Non-zero entries are registered by the function enter(), zero
  * entries are not stored at all. Using enter() with the same location
@@ -69,7 +71,9 @@ template <typename> class Vector;
  * matrix-vector multiplication functions vmult(), Tvmult(),
  * vmult_add() and Tvmult_add() used in this class, but with arguments
  * of type Vector&lt;number&gt; instead of
- * BlockVector&lt;number&gt;. SparseMatrix is a possible entry type.
+ * BlockVector&lt;number&gt;. Every matrix which can be used by
+ * PointerMatrix is allowed, in particular SparseMatrix is a possible
+ * entry type.
  *
  * <h3>Example program</h3>
  * We document the relevant parts of <tt>examples/doxygen/block_matrix_array.cc</tt>.
@@ -118,7 +122,7 @@ template <typename> class Vector;
  *
  * @author Guido Kanschat, 2000 - 2005
  */
-template <class MATRIX, typename number = double>
+template <typename number = double>
 class BlockMatrixArray : public Subscriptor
 {
   public:
@@ -156,6 +160,7 @@ class BlockMatrixArray : public Subscriptor
 				      * ExcDimensionMismatch in one of
 				      * the multiplication functions.
 				      */
+    template <class MATRIX>
     void enter (const MATRIX      &matrix,
 		const unsigned int row,
 		const unsigned int col,
@@ -263,10 +268,33 @@ class BlockMatrixArray : public Subscriptor
 					  * Constructor initializing all
 					  * data fields.
 					  */
+	template<class MATRIX> 
 	Entry (const MATRIX& matrix,
 	       unsigned row, unsigned int col,
 	       double prefix, bool transpose);
-    
+					 /**
+					  * Copy constructor
+					  * invalidating the old
+					  * object. Since it is only
+					  * used for entering
+					  * temporary objects into a
+					  * vector, this is ok.
+					  *
+					  * For a deep copy, we would
+					  * need a reproduction
+					  * operator in
+					  * PointerMatixBase.
+					  */
+	Entry(const Entry&);
+	
+					 /**
+					  * Destructor, where we
+					  * delete the PointerMatrix
+					  * created by the
+					  * constructor.
+					  */
+	~Entry();
+	
 					 /**
 					  * Row number in the block
 					  * matrix.
@@ -295,7 +323,7 @@ class BlockMatrixArray : public Subscriptor
 					 /**
 					  * The matrix block itself.
 					  */
-	SmartPointer<const MATRIX> matrix;
+	PointerMatrixBase<Vector<number> >* matrix;
     };
   
 				     /**
@@ -382,9 +410,9 @@ class BlockMatrixArray : public Subscriptor
  *
  * @author Guido Kanschat, 2001, 2005
  */
-template <class MATRIX, typename number = double>
+template <typename number = double>
 class BlockTrianglePrecondition
-  : private BlockMatrixArray<MATRIX, number>
+  : private BlockMatrixArray<number>
 {
   public:
 				     /**
@@ -403,6 +431,15 @@ class BlockTrianglePrecondition
 				      */
     void reinit(const unsigned int n_block_rows);
     
+				     /**
+				      * Add a new block. Calls BlockMatrixArray::enter().
+				      */
+    template <class MATRIX>
+    void enter (const MATRIX      &matrix,
+		const unsigned int row,
+		const unsigned int col,
+		const double       prefix = 1.,
+		const bool         transpose = false);
 				     /**
 				      * Preconditioning.
 				      */
@@ -432,25 +469,25 @@ class BlockTrianglePrecondition
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<MATRIX, number>::enter;
+    BlockMatrixArray<number>::enter;
 
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<MATRIX, number>::print_latex;
+    BlockMatrixArray<number>::print_latex;
 
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<MATRIX, number>::n_block_rows;
+    BlockMatrixArray<number>::n_block_rows;
 
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<MATRIX, number>::n_block_cols;
-    BlockMatrixArray<MATRIX, number>::clear;
-    BlockMatrixArray<MATRIX, number>::Subscriptor::subscribe;
-    BlockMatrixArray<MATRIX, number>::Subscriptor::unsubscribe;
+    BlockMatrixArray<number>::n_block_cols;
+    BlockMatrixArray<number>::clear;
+    BlockMatrixArray<number>::Subscriptor::subscribe;
+    BlockMatrixArray<number>::Subscriptor::unsubscribe;
 
       				     /** @addtogroup Exceptions
 				      * @{ */
@@ -484,9 +521,10 @@ class BlockTrianglePrecondition
 ///@if NoDoc
 //----------------------------------------------------------------------//
 
-template <class MATRIX, typename number>
+template <typename number>
+template <class MATRIX>
 inline
-BlockMatrixArray<MATRIX,number>::Entry::Entry (const MATRIX& matrix,
+BlockMatrixArray<number>::Entry::Entry (const MATRIX& matrix,
 					unsigned row, unsigned int col,
 					double prefix, bool transpose)
 		:
@@ -494,40 +532,16 @@ BlockMatrixArray<MATRIX,number>::Entry::Entry (const MATRIX& matrix,
 		col (col),
 		prefix (prefix),
 		transpose (transpose),
-		matrix (&matrix, typeid(*this).name())
+		matrix (new PointerMatrix<MATRIX, Vector<number> >(&matrix))
 {}
 
 
 
-template <class MATRIX, typename number>
-inline
-BlockMatrixArray<MATRIX,number>::BlockMatrixArray (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols,
-  VectorMemory<Vector<number> >& mem)
-		: block_rows (n_block_rows),
-		  block_cols (n_block_cols),
-		  mem(&mem, typeid(*this).name())
-{}
-
-
-
-template <class MATRIX, typename number>
+template <typename number>
+template <class MATRIX>
 inline
 void
-BlockMatrixArray<MATRIX,number>::reinit (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols)
-{
-  clear();
-  block_rows = n_block_rows;
-  block_cols = n_block_cols;
-}
-
-template <class MATRIX, typename number>
-inline
-void
-BlockMatrixArray<MATRIX,number>::enter (const MATRIX& matrix,
+BlockMatrixArray<number>::enter (const MATRIX& matrix,
 				 unsigned row, unsigned int col,
 				 double prefix, bool transpose)
 {
@@ -537,189 +551,31 @@ BlockMatrixArray<MATRIX,number>::enter (const MATRIX& matrix,
 }
 
 
-
-template <class MATRIX, typename number>
-inline
-void
-BlockMatrixArray<MATRIX,number>::clear ()
+template<typename number>
+struct BlockMatrixArrayPointerMatrixLess
 {
-  entries.clear();
-}
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockMatrixArray<MATRIX,number>::vmult_add (BlockVector<number>& dst,
-				     const BlockVector<number>& src) const
-{
-  Assert (dst.n_blocks() == block_rows,
-	  ExcDimensionMismatch(dst.n_blocks(), block_rows));
-  Assert (src.n_blocks() == block_cols,
-	  ExcDimensionMismatch(src.n_blocks(), block_cols));
-
-  Vector<number>* p_aux = mem->alloc();
-  Vector<number>& aux = *p_aux;
+    bool operator () (const PointerMatrixBase<Vector<number> >*a,
+		      const PointerMatrixBase<Vector<number> >* b) const
+      {
+	return *a < *b;
+      }
+};
   
-  typename std::vector<Entry>::const_iterator m = entries.begin();
-  typename std::vector<Entry>::const_iterator end = entries.end();
-  
-  for (; m != end ; ++m)
-    {
-      aux.reinit(dst.block(m->row));
-      if (m->transpose)
-	m->matrix->Tvmult(aux, src.block(m->col));
-      else
-	m->matrix->vmult(aux, src.block(m->col));
-      dst.block(m->row).add (m->prefix, aux);
-    }
-  mem->free(p_aux);
-}
 
-
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockMatrixArray<MATRIX,number>::vmult (BlockVector<number>& dst,
-				 const BlockVector<number>& src) const
-{
-  dst = 0.;
-  vmult_add (dst, src);
-}
-
-
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockMatrixArray<MATRIX,number>::Tvmult_add (BlockVector<number>& dst,
-				      const BlockVector<number>& src) const
-{
-  Assert (dst.n_blocks() == block_cols,
-	  ExcDimensionMismatch(dst.n_blocks(), block_cols));
-  Assert (src.n_blocks() == block_rows,
-	  ExcDimensionMismatch(src.n_blocks(), block_rows));
-
-  typename std::vector<Entry>::const_iterator m = entries.begin();
-  typename std::vector<Entry>::const_iterator end = entries.end();
-  
-  Vector<number>* p_aux = mem->alloc();
-  Vector<number>& aux = *p_aux;
-  
-  for (; m != end ; ++m)
-    {
-      aux.reinit(dst.block(m->col));
-      if (m->transpose)
-	m->matrix->vmult(aux, src.block(m->row));
-      else
-	m->matrix->Tvmult(aux, src.block(m->row));
-      dst.block(m->col).add (m->prefix, aux);
-    }
-  mem->free(p_aux);
-}
-
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockMatrixArray<MATRIX,number>::Tvmult (BlockVector<number>& dst,
-				  const BlockVector<number>& src) const
-{
-  dst = 0.;
-  Tvmult_add (dst, src);
-}
-
-
-
-
-template <class MATRIX, typename number>
-inline
-number
-BlockMatrixArray<MATRIX,number>::matrix_scalar_product (
-  const BlockVector<number>& u,
-  const BlockVector<number>& v) const
-{
-  Assert (u.n_blocks() == block_rows,
-	  ExcDimensionMismatch(u.n_blocks(), block_rows));
-  Assert (v.n_blocks() == block_cols,
-	  ExcDimensionMismatch(v.n_blocks(), block_cols));
-
-  Vector<number>* p_aux = mem->alloc();
-  Vector<number>& aux = *p_aux;
-  
-  typename std::vector<Entry>::const_iterator m;
-  typename std::vector<Entry>::const_iterator end = entries.end();
-
-  number result = 0.;
-  
-  for (unsigned int i=0;i<block_rows;++i)
-    {
-      aux.reinit(u.block(i));
-      for (m = entries.begin(); m != end ; ++m)
-	{
-	  if (m->row != i)
-	    continue;
-	  if (m->transpose)
-	    m->matrix->Tvmult_add(aux, v.block(m->col));
-	  else
-	    m->matrix->vmult(aux, v.block(m->col));
-	}
-      result += u.block(i)*aux;
-    }
-  mem->free(p_aux);
-
-  return result;
-}
-
-
-
-template <class MATRIX, typename number>
-inline
-number
-BlockMatrixArray<MATRIX,number>::matrix_norm_square (
-  const BlockVector<number>& u) const
-{
-  return matrix_scalar_product(u,u);
-}
-
-
-
-template <class MATRIX, typename number>
-inline
-unsigned int
-BlockMatrixArray<MATRIX,number>::n_block_rows () const
-{
-  return block_rows;
-}
-
-
-
-template <class MATRIX, typename number>
-inline
-unsigned int
-BlockMatrixArray<MATRIX,number>::n_block_cols () const
-{
-  return block_cols;
-}
-
-
-
-template <class MATRIX, typename number>
+template <typename number>
 template <class STREAM>
 inline
 void
-BlockMatrixArray<MATRIX,number>::print_latex (STREAM& out) const
+BlockMatrixArray<number>::print_latex (STREAM& out) const
 {
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')
       << "}" << std::endl;
 
   Table<2,std::string> array(n_block_rows(), n_block_cols());
-  typedef std::map<const MATRIX*, std::string> NameMap;
+  
+  typedef std::map<const PointerMatrixBase<Vector<number> >*,
+    std::string, BlockMatrixArrayPointerMatrixLess<number> > NameMap;
   NameMap matrix_names;
   
   typename std::vector<Entry>::const_iterator m = entries.begin();
@@ -732,7 +588,7 @@ BlockMatrixArray<MATRIX,number>::print_latex (STREAM& out) const
 	{
 	  std::pair<typename NameMap::iterator, bool> x =
 	    matrix_names.insert(
-	      std::pair<const MATRIX*, std::string> (m->matrix,
+	      std::pair<const PointerMatrixBase<Vector<number> >*, std::string> (m->matrix,
                                                      std::string("M")));
 #ifdef HAVE_STD_STRINGSTREAM
           std::ostringstream stream;
@@ -779,143 +635,21 @@ BlockMatrixArray<MATRIX,number>::print_latex (STREAM& out) const
   out << "\\end{array}" << std::endl;
 }
 
-//----------------------------------------------------------------------//
 
-template <class MATRIX, typename number>
-BlockTrianglePrecondition<MATRIX,number>::BlockTrianglePrecondition(
-  unsigned int block_rows,
-  VectorMemory<Vector<number> >& mem,
-  bool backward)
-		:
-		BlockMatrixArray<MATRIX,number> (block_rows, block_rows, mem),
-		backward(backward)
-{}
-
-
-template <class MATRIX, typename number>
+template <typename number>
+template <class MATRIX>
 inline
 void
-BlockTrianglePrecondition<MATRIX,number>::reinit (
-  const unsigned int n)
+BlockTrianglePrecondition<number>::enter (
+  const MATRIX      &matrix,
+  const unsigned int row,
+  const unsigned int col,
+  const double       prefix,
+  const bool         transpose)
 {
-  BlockMatrixArray<MATRIX,number>::reinit(n,n);
+  BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
 }
 
-template <class MATRIX, typename number>
-inline
-void
-BlockTrianglePrecondition<MATRIX,number>::do_row (
-  BlockVector<number>& dst,
-  unsigned int row_num) const
-{
-  typename std::vector<typename BlockMatrixArray<MATRIX,number>::Entry>::const_iterator
-    m = this->entries.begin();
-  typename std::vector<typename BlockMatrixArray<MATRIX,number>::Entry>::const_iterator
-    end = this->entries.end();
-  typename std::vector<typename BlockMatrixArray<MATRIX,number>::Entry>::const_iterator
-    diagonal = end;  
-  
-  Vector<number>* p_aux = this->mem->alloc();
-  Vector<number>& aux = *p_aux;
-  
-  aux.reinit(dst.block(row_num), true);
-
-  for (; m != end ; ++m)
-    {
-      const unsigned int i=m->row;
-      if (i != row_num)
-	continue;
-      const unsigned int j=m->col;
-      if (((j > i) && !backward) || ((j < i) && backward))
-	continue;
-      if (j == i)
-	{
-	  Assert (diagonal == end, ExcMultipleDiagonal(j));
-	  diagonal = m;
-	} else {
-	  if (m->transpose)
-	    m->matrix->Tvmult(aux, dst.block(j));
-	  else
-	    m->matrix->vmult(aux, dst.block(j));
-	  dst.block(i).add (-1 * m->prefix, aux);
-	}
-    }
-  if (diagonal->transpose)
-    diagonal->matrix->Tvmult(aux, dst.block(row_num));
-  else
-    diagonal->matrix->vmult(aux, dst.block(row_num));
-  dst.block(row_num).equ (diagonal->prefix, aux);
-  
-  this->mem->free(p_aux);
-}
-
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockTrianglePrecondition<MATRIX,number>::vmult_add (
-  BlockVector<number>& dst,
-  const BlockVector<number>& src) const
-{
-  Assert (dst.n_blocks() == n_block_rows(),
-	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert (src.n_blocks() == n_block_cols(),
-	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
-
-  BlockVector<number> aux;
-  aux.reinit(dst);
-  vmult(aux, src);
-  dst.add(aux);
-}
-
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockTrianglePrecondition<MATRIX,number>::vmult (
-  BlockVector<number>& dst,
-  const BlockVector<number>& src) const
-{
-  Assert (dst.n_blocks() == n_block_rows(),
-	  ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert (src.n_blocks() == n_block_cols(),
-	  ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
-
-  dst.equ(1., src);
-
-  if (backward)
-    {
-      for (unsigned int i=n_block_rows(); i>0;)
-	do_row(dst, --i);
-    } else {
-      for (unsigned int i=0; i<n_block_rows(); ++i)
-	do_row(dst, i);
-    }
-  
-}
-
-template <class MATRIX, typename number>
-inline
-void
-BlockTrianglePrecondition<MATRIX,number>::Tvmult (
-  BlockVector<number>&,
-  const BlockVector<number>&) const
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
-template <class MATRIX, typename number>
-inline
-void
-BlockTrianglePrecondition<MATRIX,number>::Tvmult_add (
-  BlockVector<number>&,
-  const BlockVector<number>&) const
-{
-  Assert (false, ExcNotImplemented());
-}
 
 ///@endif
 
