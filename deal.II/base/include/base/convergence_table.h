@@ -55,7 +55,7 @@ class ConvergenceTable: public TableHandler
 				      * 
 				      * #reduction_rate#: $value(row-1)/value(row)$.
 				      *
-				      * #reduction_rate_log2#: the order $O(h^r) of 
+				      * #reduction_rate_log2#: the order $O(h^r)$ of 
 				      * the reduction rate with the assumption
 				      * row-1: h, row: h/2. Hence the order 
 				      * is evaluated by
