@@ -873,7 +873,7 @@ class DoFTools
 				     /**
 				      * This function can be used when
 				      * different variables shall be
-				      * discritized on different
+				      * discretized on different
 				      * grids, where one grid is
 				      * coarser than the other. This
 				      * idea might seem nonsensical at
