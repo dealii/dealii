@@ -844,7 +844,7 @@ number SparseMatrix<number>::diag_element (const unsigned int i) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (i<max_len, ExcInvalidIndex1(i));
+  Assert (i<m(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
 				   // row of a square matrix is the main
@@ -859,7 +859,7 @@ number & SparseMatrix<number>::diag_element (const unsigned int i)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
-  Assert (i<max_len, ExcInvalidIndex1(i));
+  Assert (i<m()(), ExcInvalidIndex1(i));
   
 				   // Use that the first element in each
 				   // row of a square matrix is the main
