@@ -303,7 +303,7 @@ SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
 					 const AdditionalData &data) :
 		Solver<VECTOR> (cn,mem),
 		additional_data(data)
-{};
+{}
 
 
 template <class VECTOR>
@@ -530,7 +530,7 @@ unsigned int dim = 0;
     throw SolverControl::NoConvergence (this->control().last_step(),
 					this->control().last_value());
 				   // otherwise exit as normal
-};
+}
 
 
 template<class VECTOR>
@@ -542,7 +542,7 @@ SolverGMRES<VECTOR>::criterion ()
 				   // of gmres
   Assert (false, ExcInternalError());
   return 0;
-};
+}
 
 
 /*----------------------------   solver_pgmres.h     ---------------------------*/
