@@ -418,11 +418,13 @@ void __IssueError_Throw (const char *file,
  *  @see ExceptionBase
  *  @author Wolfgang Bangerth, November 1997, extensions 1998
  */
-#define Assert(cond, exc)                              \
-  if (!(cond))                                         \
-    __IssueError_Assert (__FILE__,                    \
-			 __LINE__,                    \
-			 __PRETTY_FUNCTION__, #cond, #exc, exc)
+#define Assert(cond, exc)                                         \
+  {                                                               \
+    if (!(cond))                                                  \
+      __IssueError_Assert (__FILE__,                              \
+			   __LINE__,                              \
+			   __PRETTY_FUNCTION__, #cond, #exc, exc);\
+  }
 
 
 #else        ////////////////////////////////////////
@@ -443,11 +445,13 @@ void __IssueError_Throw (const char *file,
  *  @see ExceptionBase
  *  @author Wolfgang Bangerth, November 1997, extensions 1998
  */
-#define AssertThrow(cond, exc)                       \
-  if (!(cond))                                       \
-    __IssueError_Throw (__FILE__,                    \
-			__LINE__,                    \
-			__PRETTY_FUNCTION__, #cond, #exc, exc)
+#define AssertThrow(cond, exc)                                   \
+  {                                                              \
+    if (!(cond))                                                 \
+      __IssueError_Throw (__FILE__,                              \
+			  __LINE__,                              \
+			  __PRETTY_FUNCTION__, #cond, #exc, exc);\
+  }
 
   
 
@@ -471,7 +475,7 @@ class Exception0 :  public ExceptionBase {};
 class Exception1 : public ExceptionBase {                             \
   public:                                                             \
       Exception1 (const type1 a1) : arg1 (a1) {};                     \
-      virtual void PrintInfo (ostream &out) const {                           \
+      virtual void PrintInfo (ostream &out) const {                   \
         out outsequence << endl;                                      \
       };                                                              \
   private:                                                            \
