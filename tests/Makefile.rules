@@ -71,6 +71,7 @@ flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
 
 %.check : %.output
 	@echo '=====Checking======' $<
+	@perl -pi $(normalize)  $<
 	@if test "x$(verbose)" = "xon" ; then \
 		cmd="diff $< $(patsubst %.output,%.checked, $<)" ; \
 	 else \
