@@ -301,7 +301,7 @@ dnl have it).
 
 dnl Next try to find out something about the name and version of the compiler
 if test "x$F77" != "x" ; then
-  F77_VERSION_STRING=`($F77 -v 2>&1)`
+  F77_VERSION_STRING="`($F77 -v 2>&1)`"
   if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
     dnl Yes, this is a GNU g77 version. find out the right version
     G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
