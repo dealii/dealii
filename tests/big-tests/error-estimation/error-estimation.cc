@@ -542,14 +542,16 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 		tria->refine_global (1);
 		break;
 	  case true_error:
-		tria->refine_fixed_number (h1_error_per_cell,
-					   prm.get_double("Refinement fraction"));
-		tria->execute_refinement ();
+		tria->refine_and_coarsen_fixed_number (h1_error_per_cell,
+						       prm.get_double("Refinement fraction"),
+						       0);
+		tria->execute_coarsening_and_refinement ();
 		break;
 	  case error_estimator:
-		tria->refine_fixed_number (estimated_error_per_cell,
-					   prm.get_double("Refinement fraction"));
-		tria->execute_refinement ();
+		tria->refine_and_coarsen_fixed_number (estimated_error_per_cell,
+						       prm.get_double("Refinement fraction"),
+						       0);
+		tria->execute_coarsening_and_refinement ();
 		break;
 	};
       cout << endl << endl;
@@ -573,7 +575,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << endl;
   
   filename += "finest_mesh.gnuplot";
-  cout << "    Wrinting finest grid to <" << filename << ">... " << endl;
+  cout << "    Writing finest grid to <" << filename << ">... " << endl;
   ofstream finest_mesh (filename.c_str());
   tria->print_gnuplot (finest_mesh);
   finest_mesh.close();
