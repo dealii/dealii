@@ -90,6 +90,20 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 
 
 
+#if deal_II_dimension == 1
+
+template <>
+Point<1>
+HalfHyperBallBoundary<1>::
+get_new_point_on_quad (const typename Triangulation<1>::quad_iterator &) const 
+{
+  Assert (false, ExcInternalError());
+  return Point<1>();
+};
+
+#endif
+
+
 template <int dim>
 Point<dim>
 HalfHyperBallBoundary<dim>::
