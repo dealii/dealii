@@ -163,7 +163,7 @@ template <template <int> class GridClass, int dim>
 typename InterGridMap<GridClass,dim>::cell_iterator
 InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) const
 {
-  Assert (source_cell.state() == valid,
+  Assert (source_cell.state() == IteratorState::valid,
 	  ExcInvalidKey (source_cell));
   Assert (source_cell->level() <= static_cast<int>(mapping.size()),
 	  ExcInvalidKey (source_cell));

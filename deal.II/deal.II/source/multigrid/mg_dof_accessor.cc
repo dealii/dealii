@@ -172,7 +172,7 @@ MGDoFObjectAccessor<1, dim>::child (const unsigned int i) const
 						    mg_dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
@@ -354,7 +354,7 @@ MGDoFObjectAccessor<2, dim>::child (const unsigned int i) const
 						    mg_dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
@@ -558,7 +558,7 @@ MGDoFObjectAccessor<3, dim>::child (const unsigned int i) const {
 						    mg_dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
@@ -584,7 +584,7 @@ MGDoFCellAccessor<dim>::neighbor (const unsigned int i) const {
 					       mg_dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
 #endif
   return q;
@@ -600,7 +600,7 @@ MGDoFCellAccessor<dim>::child (const unsigned int i) const {
 					       mg_dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;

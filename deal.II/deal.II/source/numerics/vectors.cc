@@ -723,7 +723,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 				   // grid to its end and then going
 				   // to the children
   DoFHandler<1>::cell_iterator outermost_cell = dof.begin(0);
-  while (outermost_cell->neighbor(direction).state() == valid)
+  while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
     outermost_cell = outermost_cell->neighbor(direction);
   
   while (outermost_cell->has_children())

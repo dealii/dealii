@@ -83,7 +83,7 @@ MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  if ((cell->neighbor(face).state() == valid) &&
+	  if ((cell->neighbor(face).state() == IteratorState::valid) &&
 	      (static_cast<unsigned int>(cell->neighbor(face)->level())
 	       == level-1))
 	    {

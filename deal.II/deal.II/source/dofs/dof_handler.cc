@@ -1351,7 +1351,7 @@ unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
     {
       cell_iterator neighbor = cell->neighbor(v);
 
-      if (neighbor.state() == valid)
+      if (neighbor.state() == IteratorState::valid)
 	{
 					   // find true neighbor; may be its
 					   // a child of @p{neighbor}

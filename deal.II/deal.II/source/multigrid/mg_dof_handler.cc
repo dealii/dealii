@@ -1221,7 +1221,7 @@ MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
       {
 	cell_iterator neighbor = cell->neighbor(v);
 	
-	if (neighbor.state() == valid)
+	if (neighbor.state() == IteratorState::valid)
 	  {
 					     // has neighbor already been processed?
 	    if (neighbor->user_flag_set() &&

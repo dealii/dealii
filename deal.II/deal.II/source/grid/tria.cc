@@ -3209,10 +3209,10 @@ Triangulation<dim>::begin_line (const unsigned int level) const
 {
   				   // level is checked in begin_raw
   raw_line_iterator ri = begin_raw_line (level);
-  if (ri.state() != valid)
+  if (ri.state() != IteratorState::valid)
     return ri;
   while (ri->used() == false)
-    if ((++ri).state() != valid)
+    if ((++ri).state() != IteratorState::valid)
       return ri;
   return ri;
 };
@@ -3225,10 +3225,10 @@ Triangulation<dim>::begin_quad (const unsigned int level) const
 {
   				   // level is checked in begin_raw
   raw_quad_iterator ri = begin_raw_quad (level);
-  if (ri.state() != valid)
+  if (ri.state() != IteratorState::valid)
     return ri;
   while (ri->used() == false)
-    if ((++ri).state() != valid)
+    if ((++ri).state() != IteratorState::valid)
       return ri;
   return ri;
 };
@@ -3241,10 +3241,10 @@ Triangulation<dim>::begin_hex (const unsigned int level) const
 {
   				   // level is checked in begin_raw
   raw_hex_iterator ri = begin_raw_hex (level);
-  if (ri.state() != valid)
+  if (ri.state() != IteratorState::valid)
     return ri;
   while (ri->used() == false)
-    if ((++ri).state() != valid)
+    if ((++ri).state() != IteratorState::valid)
       return ri;
   return ri;
 };
@@ -3257,10 +3257,10 @@ Triangulation<dim>::begin_active_line (const unsigned int level) const
 {
   				   // level is checked in begin_raw
   line_iterator i = begin_line (level);
-  if (i.state() != valid)
+  if (i.state() != IteratorState::valid)
     return i;
   while (i->has_children())
-    if ((++i).state() != valid)
+    if ((++i).state() != IteratorState::valid)
       return i;
   return i;
 };
@@ -3273,10 +3273,10 @@ Triangulation<dim>::begin_active_quad (const unsigned int level) const
 {
   				   // level is checked in begin_raw
   quad_iterator i = begin_quad (level);
-  if (i.state() != valid)
+  if (i.state() != IteratorState::valid)
     return i;
   while (i->has_children())
-    if ((++i).state() != valid)
+    if ((++i).state() != IteratorState::valid)
       return i;
   return i;
 };
@@ -3289,10 +3289,10 @@ Triangulation<dim>::begin_active_hex (const unsigned int level) const
 {
   				   // level is checked in begin_raw
   hex_iterator i = begin_hex (level);
-  if (i.state() != valid)
+  if (i.state() != IteratorState::valid)
     return i;
   while (i->has_children())
-    if ((++i).state() != valid)
+    if ((++i).state() != IteratorState::valid)
       return i;
   return i;
 };
@@ -3402,7 +3402,7 @@ Triangulation<dim>::last_line (const unsigned int level) const {
   raw_line_iterator ri = last_raw_line(level);
   if (ri->used()==true)
     return ri;
-  while ((--ri).state() == valid)
+  while ((--ri).state() == IteratorState::valid)
     if (ri->used()==true)
       return ri;
   return ri;
@@ -3416,7 +3416,7 @@ Triangulation<dim>::last_quad (const unsigned int level) const {
   raw_quad_iterator ri = last_raw_quad(level);
   if (ri->used()==true)
     return ri;
-  while ((--ri).state() == valid)
+  while ((--ri).state() == IteratorState::valid)
     if (ri->used()==true)
       return ri;
   return ri;
@@ -3430,7 +3430,7 @@ Triangulation<dim>::last_hex (const unsigned int level) const {
   raw_hex_iterator ri = last_raw_hex(level);
   if (ri->used()==true)
     return ri;
-  while ((--ri).state() == valid)
+  while ((--ri).state() == IteratorState::valid)
     if (ri->used()==true)
       return ri;
   return ri;
@@ -3465,7 +3465,7 @@ Triangulation<dim>::last_active_line (const unsigned int level) const {
   line_iterator i = last_line(level);
   if (i->has_children()==false)
     return i;
-  while ((--i).state() == valid)
+  while ((--i).state() == IteratorState::valid)
     if (i->has_children()==false)
       return i;
   return i;
@@ -3479,7 +3479,7 @@ Triangulation<dim>::last_active_quad (const unsigned int level) const {
   quad_iterator i = last_quad(level);
   if (i->has_children()==false)
     return i;
-  while ((--i).state() == valid)
+  while ((--i).state() == IteratorState::valid)
     if (i->has_children()==false)
       return i;
   return i;
@@ -3493,7 +3493,7 @@ Triangulation<dim>::last_active_hex (const unsigned int level) const {
   hex_iterator i = last_hex(level);
   if (i->has_children()==false)
     return i;
-  while ((--i).state() == valid)
+  while ((--i).state() == IteratorState::valid)
     if (i->has_children()==false)
       return i;
   return i;
@@ -4155,7 +4155,7 @@ void Triangulation<1>::execute_refinement () {
 					     // (refer to \Ref{TriangulationLevel<0>}
 					     // for details)
 	    first_child->set_neighbor (1, second_child);
-	    if (cell->neighbor(0).state() != valid)
+	    if (cell->neighbor(0).state() != IteratorState::valid)
 	      first_child->set_neighbor (0, cell->neighbor(0));
 	    else
 	      if (cell->neighbor(0)->active())
@@ -4194,7 +4194,7 @@ void Triangulation<1>::execute_refinement () {
 	    second_child->set_neighbor (0, first_child);
 	    second_child->set_material_id (cell->material_id());
 	    second_child->set_subdomain_id (cell->subdomain_id());	    
-	    if (cell->neighbor(1).state() != valid)
+	    if (cell->neighbor(1).state() != IteratorState::valid)
 	      second_child->set_neighbor (1, cell->neighbor(1));
 	    else
 	      if (cell->neighbor(1)->active())
@@ -4304,7 +4304,7 @@ void Triangulation<2>::execute_refinement () {
 	      {
 		const cell_iterator neighbor = acell->neighbor(nb);
 						 // if cell is at boundary
-		if (neighbor.state() != valid) 
+		if (neighbor.state() != IteratorState::valid) 
 		  {
 						     // new midpoint vertex
 						     // necessary
@@ -4435,7 +4435,7 @@ void Triangulation<2>::execute_refinement () {
 #ifdef DEBUG
 	    for (unsigned int neighbor=0;
 		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-	      if (cell->neighbor(neighbor).state() == valid)
+	      if (cell->neighbor(neighbor).state() == IteratorState::valid)
 		Assert (((cell->neighbor(neighbor)->level() == cell->level()) &&
 			 (cell->neighbor(neighbor)->coarsen_flag_set() == false))  ||
 			((cell->neighbor(neighbor)->level() == cell->level()-1) &&
@@ -4539,7 +4539,7 @@ void Triangulation<2>::execute_refinement () {
 	    for (unsigned int nb=0; nb<4; ++nb)
 	      {
 		bool neighbor_refined=false;
-		if (cell->neighbor(nb).state() == valid)
+		if (cell->neighbor(nb).state() == IteratorState::valid)
 		  if (cell->neighbor(nb)->active() == false)
 						     // (ask in two if-statements,
 						     // since otherwise both
@@ -4807,7 +4807,7 @@ void Triangulation<2>::execute_refinement () {
 	    const int neighbor_mapping[8] = {0,1, 1,2, 2,3, 3,0};
 	    
 	    for (unsigned int nb=0; nb<8; ++nb)
-	      if (neighbors[nb].state() == valid)
+	      if (neighbors[nb].state() == IteratorState::valid)
 		if (neighbors[nb]->level() == level+1)
 						   // neighbor is refined cell
 		  neighbors[nb]->set_neighbor(neighbors_neighbor[nb],
@@ -5391,7 +5391,7 @@ void Triangulation<3>::execute_refinement ()
 #ifdef DEBUG
 	    for (unsigned int neighbor=0;
 		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-	      if (hex->neighbor(neighbor).state() == valid)
+	      if (hex->neighbor(neighbor).state() == IteratorState::valid)
 		Assert (((hex->neighbor(neighbor)->level() == hex->level()) &&
 			 (hex->neighbor(neighbor)->coarsen_flag_set() == false))  ||
 			((hex->neighbor(neighbor)->level() == hex->level()-1) &&
@@ -5935,7 +5935,7 @@ void Triangulation<3>::execute_refinement ()
 		const cell_iterator neighbor = hex->neighbor(face);
 
 						 // if no neighbor
-		if (neighbor.state() != valid)
+		if (neighbor.state() != IteratorState::valid)
 		  for (unsigned int child_face=0;
 		       child_face<GeometryInfo<dim>::subfaces_per_face;
 		       ++child_face)
@@ -5993,7 +5993,8 @@ void Triangulation<3>::execute_refinement ()
 			    neighbor_cells[face][c]
 			      = neighbor->child(GeometryInfo<dim>::child_cell_on_face(nb_nb, c));
 			    
-			    Assert (neighbor_cells[face][c].state() == valid,
+			    Assert (neighbor_cells[face][c].state() ==
+				    IteratorState::valid,
 				    ExcInternalError());
 			    Assert (!neighbor_cells[face][c]->has_children(),
 				    ExcInternalError());
@@ -6071,7 +6072,8 @@ void Triangulation<3>::execute_refinement ()
 	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb)
 	      for (unsigned int subface=0;
 		   subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-		if ((neighbor_cells[nb][subface].state() == valid) &&
+		if ((neighbor_cells[nb][subface].state() ==
+		     IteratorState::valid) &&
 		    (neighbor_cells[nb][subface]->level() ==
 		     hex->level()+1))
 		  {
@@ -6439,7 +6441,7 @@ void Triangulation<dim>::fix_coarsen_flags () {
 	  for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
 	    {
 	      const cell_iterator child_neighbor = cell->child(c)->neighbor(n);
-	      if (child_neighbor.state() == valid)
+	      if (child_neighbor.state() == IteratorState::valid)
 		if (child_neighbor->has_children() ||
 						     // neighbor has children,
 						     // then only allow coarsening
@@ -6672,7 +6674,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 			   n<GeometryInfo<dim>::faces_per_cell; ++n)
 			{
 			  const cell_iterator neighbor = cell->neighbor(n);
-			  if (neighbor.state() == valid)
+			  if (neighbor.state() == IteratorState::valid)
 			    {
 			      ++n_neighbors;
 
@@ -6766,10 +6768,10 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n) 
 		      {
 			const cell_iterator neighbor = cell->neighbor(n);
-			if (neighbor.state() == valid)
+			if (neighbor.state() == IteratorState::valid)
 			  ++total_neighbors;
 
-			if (neighbor.state() == valid)
+			if (neighbor.state() == IteratorState::valid)
 			  if ((neighbor->active() &&
 			       !neighbor->refine_flag_set()) ||
 			      (neighbor->level() == cell->level()-1))
@@ -7117,7 +7119,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 	  {
 					     // loop over neighbors of cell
 	    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-	      if (cell->neighbor(i).state() == valid)
+	      if (cell->neighbor(i).state() == IteratorState::valid)
 		{
 						   // regularisation?
 		  if ((cell->neighbor_level(i) == cell->level()-1)
@@ -7212,7 +7214,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
   
 				   // first do it for the cells to the
 				   // left
-  if (cell->neighbor(0).state() == valid)
+  if (cell->neighbor(0).state() == IteratorState::valid)
     if (cell->neighbor(0)->has_children())
       {
 	cell_iterator neighbor = cell->neighbor(0);
@@ -7238,7 +7240,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
 
   				   // now do it for the cells to the
 				   // left
-  if (cell->neighbor(1).state() == valid)
+  if (cell->neighbor(1).state() == IteratorState::valid)
     if (cell->neighbor(1)->has_children())
       {
 	cell_iterator neighbor = cell->neighbor(1);
@@ -7315,7 +7317,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
       {
 	const cell_iterator neighbor = cell->child(child)->neighbor(n);
 					 // do nothing if at boundary
-	if (neighbor.state() != valid)
+	if (neighbor.state() != IteratorState::valid)
 	  continue;
 	
 	Assert ((neighbor->level()==cell->level()) ||
@@ -7382,7 +7384,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 				   // one less or the same as that of
 				   // cell
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
-    if ((cell->neighbor(face).state() != valid) ||
+    if ((cell->neighbor(face).state() != IteratorState::valid) ||
 	(cell->neighbor(face)->level() == cell->level()-1) ||
 	((cell->neighbor(face)->level() == cell->level()) &&
 	 !cell->neighbor(face)->has_children()))
@@ -7444,7 +7446,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
       {
 	const cell_iterator neighbor = cell->child(child)->neighbor(n);
 					 // do nothing if at boundary
-	if (neighbor.state() != valid)
+	if (neighbor.state() != IteratorState::valid)
 	  continue;
 	
 	Assert ((neighbor->level()==cell->level()) ||
@@ -7544,7 +7546,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // one less or the same as that of
 				   // cell
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
-    if ((cell->neighbor(face).state() != valid) ||
+    if ((cell->neighbor(face).state() != IteratorState::valid) ||
 	(cell->neighbor(face)->level() == cell->level()-1) ||
 	((cell->neighbor(face)->level() == cell->level()) &&
 	 !cell->neighbor(face)->has_children()))
@@ -7653,7 +7655,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
     {
       const cell_iterator neighbor = cell->neighbor(nb);
 				       // do nothing if at boundary
-      if (neighbor.state() != valid)
+      if (neighbor.state() != IteratorState::valid)
 	continue;
 
       Assert (neighbor->level() == cell->level(),
@@ -7688,7 +7690,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	{
 	  const cell_iterator neighbor_neighbor = neighbor->neighbor(nb_nb);
 					   // do nothing if at boundary
-	  if (neighbor_neighbor.state() != valid)
+	  if (neighbor_neighbor.state() != IteratorState::valid)
 	    continue;
 
 	  Assert ((neighbor_neighbor->level() == cell->level()) ||

@@ -304,7 +304,7 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 	{
 					   // find right active neighbor
 	  DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
-	  if (neighbor.state() == valid)
+	  if (neighbor.state() == IteratorState::valid)
 	    while (neighbor->has_children())
 	      neighbor = neighbor->child(n==0 ? 1 : 0);
       
@@ -315,7 +315,7 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 	  for (unsigned int s=0; s<n_solution_vectors; ++s)
 	    fe_values.get_function_grads (*solutions[s], gradients_here[s]);
 
-	  if (neighbor.state() == valid)
+	  if (neighbor.state() == IteratorState::valid)
 	    {
 	      fe_values.reinit (neighbor);
 
@@ -780,7 +780,7 @@ integrate_over_regular_face (Data                       &data,
 				     // internal face; integrate jump
 				     // of gradient across this face
     {
-      Assert (cell->neighbor(face_no).state() == valid,
+      Assert (cell->neighbor(face_no).state() == IteratorState::valid,
 	      ExcInternalError());      
       
       const active_cell_iterator neighbor = cell->neighbor(face_no);
@@ -947,7 +947,7 @@ integrate_over_irregular_face (Data                       &data,
 		     n_components       = data.dof_handler.get_fe().n_components(),
 		     n_solution_vectors = data.n_solution_vectors;
 
-  Assert (neighbor.state() == valid, ExcInternalError());
+  Assert (neighbor.state() == IteratorState::valid, ExcInternalError());
   Assert (neighbor->has_children(), ExcInternalError());
 				   // set up a vector of the gradients
 				   // of the finite element function

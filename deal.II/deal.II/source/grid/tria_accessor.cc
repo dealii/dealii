@@ -54,7 +54,7 @@ TriaObjectAccessor<1, dim>::vertex (const unsigned int i) const
 template <int dim>
 void TriaObjectAccessor<1, dim>::set_used_flag () const
 {
-  Assert (state() == valid,
+  Assert (state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   tria->levels[present_level]->lines.used[present_index] = true;
 };
@@ -64,7 +64,7 @@ void TriaObjectAccessor<1, dim>::set_used_flag () const
 template <int dim>
 void TriaObjectAccessor<1, dim>::clear_used_flag () const
 {
-  Assert (state() == valid,
+  Assert (state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   tria->levels[present_level]->lines.used[present_index] = false;
 };
@@ -256,7 +256,8 @@ template <int dim>
 void
 TriaObjectAccessor<2, dim>::set_used_flag () const
 {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   tria->levels[present_level]->quads.used[present_index] = true;
 };
 
@@ -265,7 +266,8 @@ TriaObjectAccessor<2, dim>::set_used_flag () const
 template <int dim>
 void TriaObjectAccessor<2, dim>::clear_used_flag () const
 {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   tria->levels[present_level]->quads.used[present_index] = false;
 };
 
@@ -649,7 +651,8 @@ TriaObjectAccessor<3, dim>::vertex (const unsigned int i) const
 template <int dim>
 void TriaObjectAccessor<3, dim>::set_used_flag () const
 {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   tria->levels[present_level]->hexes.used[present_index] = true;
 };
 
@@ -658,7 +661,8 @@ void TriaObjectAccessor<3, dim>::set_used_flag () const
 template <int dim>
 void TriaObjectAccessor<3, dim>::clear_used_flag () const
 {
-  Assert (state() == valid, typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   tria->levels[present_level]->hexes.used[present_index] = false;
 };
 
@@ -1743,7 +1747,7 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
   Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaAccessor<dim>::ExcInvalidNeighbor(i));
 
-  if (pointer.state() == valid)
+  if (pointer.state() == IteratorState::valid)
     {
       tria->levels[present_level]->
 	neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first

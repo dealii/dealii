@@ -161,13 +161,14 @@ class TriaAccessor
 				      *  present level.
 				      */
     int index () const;
+    
 				     /**
 				      *  Return the state of the iterator.
 				      *  For the different states an accessor 
 				      *  can be in, refer to the
 				      *  @ref{TriaRawIterator} documentation.
 				      */
-    IteratorState state () const;
+    IteratorState::IteratorState state () const;
 
 				     /**
 				      * Return a pointer to the triangulation

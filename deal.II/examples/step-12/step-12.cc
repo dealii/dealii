@@ -1279,7 +1279,8 @@ void DGMethod<dim>::assemble_system2 ()
 	    }
 	  else
 	    {
-	      Assert (cell->neighbor(face_no).state() == valid, ExcInternalError());
+	      Assert (cell->neighbor(face_no).state() == IteratorState::valid,
+		      ExcInternalError());
 	      typename DoFHandler<dim>::cell_iterator neighbor=
 		cell->neighbor(face_no);
 					       // Case 2:

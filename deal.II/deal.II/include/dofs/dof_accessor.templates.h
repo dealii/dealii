@@ -176,7 +176,7 @@ DoFObjectAccessor<1,dim>::child (const unsigned int i) const
 						 dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
@@ -297,7 +297,7 @@ DoFObjectAccessor<2,dim>::child (const unsigned int i) const
 						 dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
@@ -435,7 +435,7 @@ DoFObjectAccessor<3,dim>::child (const unsigned int i) const
 						 dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
@@ -464,7 +464,7 @@ DoFCellAccessor<dim>::neighbor (const unsigned int i) const
 					     dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
 #endif
   return q;
@@ -482,7 +482,7 @@ DoFCellAccessor<dim>::child (const unsigned int i) const
 					     dof_handler);
   
 #ifdef DEBUG
-  if (q.state() != past_the_end)
+  if (q.state() != IteratorState::past_the_end)
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;

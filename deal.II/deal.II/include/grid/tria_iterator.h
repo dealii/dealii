@@ -454,7 +454,7 @@ class TriaRawIterator :
 				     /**
 				      *  Return the state of the iterator.
 				      */
-    IteratorState state () const;
+    IteratorState::IteratorState state () const;
 
 				     /**
 				      * Print the iterator to @p{out}. The
@@ -851,7 +851,7 @@ inline
 const Accessor &
 TriaRawIterator<dim,Accessor>::operator * () const
 {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
   return accessor;
 };
 
@@ -862,7 +862,7 @@ inline
 Accessor &
 TriaRawIterator<dim,Accessor>::operator * ()
 {
-  Assert (state() == valid, ExcDereferenceInvalidObject());
+  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
   return accessor;
 };
 
@@ -890,7 +890,7 @@ TriaRawIterator<dim,Accessor>::operator -> ()
 
 template <int dim, typename Accessor>
 inline
-IteratorState
+IteratorState::IteratorState
 TriaRawIterator<dim,Accessor>::state () const
 {
   return accessor.state ();
@@ -903,17 +903,18 @@ inline
 bool
 TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
 {
-  Assert (state() != invalid, ExcDereferenceInvalidObject());
-  Assert (i.state() != invalid, ExcDereferenceInvalidObject());
+  Assert (state() != IteratorState::invalid, ExcDereferenceInvalidObject());
+  Assert (i.state() != IteratorState::invalid, ExcDereferenceInvalidObject());
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
 	  ExcInvalidComparison());
   
   return ((((accessor.level() < i.accessor.level()) ||
 	    ((accessor.level() == i.accessor.level()) &&
 	     (accessor.index() < i.accessor.index()))        ) &&
-	   (state()==valid)                                  &&
-	   (i.state()==valid)                                  ) ||
-	  ((state()==valid) && (i.state()==past_the_end)));
+	   (state()==IteratorState::valid)                     &&
+	   (i.state()==IteratorState::valid)                 ) ||
+	  ((state()==IteratorState::valid) &&
+	   (i.state()==IteratorState::past_the_end)));
 };
 
 
@@ -922,7 +923,7 @@ inline
 TriaRawIterator<dim,Accessor> &
 TriaRawIterator<dim,Accessor>::operator ++ ()
 {
-  Assert (state() == valid, ExcAdvanceInvalidObject());
+  Assert (state() == IteratorState::valid, ExcAdvanceInvalidObject());
 
   ++accessor;
   return *this;
@@ -935,7 +936,7 @@ inline
 TriaRawIterator<dim,Accessor> &
 TriaRawIterator<dim,Accessor>::operator -- ()
 {
-  Assert (state() == valid, ExcAdvanceInvalidObject());
+  Assert (state() == IteratorState::valid, ExcAdvanceInvalidObject());
 
   --accessor;
   return *this;
@@ -981,11 +982,11 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccesso
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || used)"
 				   // used() is called anyway, even if
-				   // state==past_the_end, and will then
+				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != past_the_end)
+  if (state() != IteratorState::past_the_end)
     Assert (accessor.used(),
 	    ExcAssignmentOfUnusedObject());
 #endif
@@ -1011,11 +1012,11 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || used)"
 				   // has_children() is called anyway, even if
-				   // state==past_the_end, and will then
+				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
-  if (state() != past_the_end) 
+  if (state() != IteratorState::past_the_end) 
     Assert (accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif

@@ -221,6 +221,17 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Changed: The <code class="class">IteratorState</code> enum used
+       to indicate the state in which an iterator can be is now
+       enclosed in a namespace of the same name, to take its members
+       out of the global namespace. When using one of these members,
+       you now have to prefix it by <code
+       class="class">IteratorState::</code>.
+       <br>
+       (RH, WB 2001/11/30)
+       </p>
+
+  <li> <p>
        Changed: The <code class="class">NormType</code> enum used to
        indicate the norm the <code
        class="member">VectorTools::integrate_difference</code>
