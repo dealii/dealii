@@ -1390,14 +1390,14 @@ void VectorTools::integrate_difference (const DoFHandler<deal_II_dimension> &,
 template
 void VectorTools::project_boundary_values (const Mapping<deal_II_dimension>     &,
 					   const DoFHandler<deal_II_dimension>  &,
-					   const FunctionMap<deal_II_dimension>::FunctionMap &,
+					   const FunctionMap<deal_II_dimension>::type &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
 #endif
 
 template
 void VectorTools::project_boundary_values (const DoFHandler<deal_II_dimension>  &,
-					   const FunctionMap<deal_II_dimension>::FunctionMap &,
+					   const FunctionMap<deal_II_dimension>::type &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
 template
