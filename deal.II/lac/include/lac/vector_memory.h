@@ -95,7 +95,7 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
 				     /**
 				      * Return a vector to the global heap.
 				      */
-    virtual void free (const Vector* v)
+    virtual void free (const Vector * const v)
       {
 	delete v;
       }
@@ -144,7 +144,7 @@ class GrowingVectorMemory : public VectorMemory<Vector>
 				      * Return a vector into the pool
 				      * for later use.
 				      */
-    virtual void free (const Vector*);
+    virtual void free (const Vector * const);
 
   private:
 				     /**

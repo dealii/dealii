@@ -342,7 +342,7 @@ MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        &mapp
 						 const typename FunctionMap<dim>::type         &boundary_functions,
 						 Vector<double>            &rhs_vector,
 						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<dim>       *a)
+						 const Function<dim> * const a)
 {
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadManager thread_manager;
@@ -695,7 +695,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 						      const typename FunctionMap<dim>::type &rhs,
 						      Vector<double>            &rhs_vector,
 						      std::vector<unsigned int> &dof_to_boundary_mapping,
-						      const Function<dim>       *a)
+						      const Function<dim> * const a)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
