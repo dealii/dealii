@@ -24,12 +24,12 @@
 #   files against each other in a preconditional clause and
 #   copy over the file if necessary.
 # - delete the two temporary files
-$(forward-declarations): $(filter-out $(forward-declarations),$(h-files))
+$(forward-declarations): $(filter-out %forward-declarations%,$(h-files))
 ifeq (0,${MAKELEVEL})
 	@echo ============================ Checking $@
 	@touch $@.old
 	-@cp $@ $@.old
-	@perl $D/deal.II/Make_forward_declarations $(filter-out $(forward-declarations),$(h-files)) > $@.new
+	@perl $D/deal.II/Make_forward_declarations $(filter-out %forward-declarations.h,$(h-files)) > $@.new
 	@make --silent $@
 	@rm $@.old $@.new
 else

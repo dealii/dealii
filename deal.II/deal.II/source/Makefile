@@ -15,7 +15,7 @@ D=../..
 cc-files = $(wildcard */*.cc)
 h-files  = $(wildcard ../include/*/*.h)
 
-forward-declarations = ../include/basic/forward-declarations.h
+forward-declarations = $D/deal.II/include/basic/forward-declarations.h
 
 include $D/deal.II/Make.global_options
 
@@ -49,47 +49,6 @@ all: 1d 2d 3d
 
 3d: ../lib/libdeal_II_3d.g.a ../lib/libdeal_II_3d.a
 
-
-# rule how to make the file containing all the forward declarations
-# this rule is rather complicated, it works as follows:
-#
-# - if this is the outermost 'make', then create a file $@.old.
-#   if the forward declaration file $@ already exists, then copy
-#   it over, otherwise leave it empty. this way, we always have
-#   a file to run diff on
-# - write the forward declarations for the presently available
-#   header files to $@.new
-# - we would like to compare the output of the script generating
-#   the forward declarations with the old file, or the empty
-#   string if there is no such file; this is why we created $@.old
-# - if the files differ, we would like to copy over the old file.
-# - this can either be done using shell programming using 'if [...]'
-#   or using conditionals inside 'make'. the first way is not 
-#   portable over different shells, however, and I also do not know
-#   how to write it. the second way has a problem also: conditionals
-#   are evaluated at the time the Makefile is read first, so we
-#   can't compare against $@.old, since this file does not exist at
-#   that time.
-# - we therefore invoke a second 'make', which can compare the two
-#   files against each other in a preconditional clause and
-#   copy over the file if necessary.
-# - delete the two temporary files
-$(forward-declarations): $(filter-out $(forward-declarations),$(h-files))
-ifeq (0,${MAKELEVEL})
-	@echo ============================ Checking $@
-	@touch $@.old
-	-@cp $@ $@.old
-	@perl ../Make_forward_declarations $(filter-out $(forward-declarations),$(h-files)) > $@.new
-	@make --silent $@
-	@rm $@.old $@.new
-else
-  ifneq (,$(shell diff $(forward-declarations).old $(forward-declarations).new))
-	@echo ============================ Generating $@
-	@cp $@.new $@
-  else
-	@echo "============================          $@ needs no change"
-  endif
-endif
 
 
 
