@@ -462,13 +462,13 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
 [
   if test "$GXX" = yes ; then
-    AC_MSG_CHECKING(whether -ggdb works for long symbols)
     case "$target" in
        dnl On Alpha, use the special treatment
        alpha*-osf*)
-            CXXFLAGS="-ggdb $CXXFLAGSG"
-            AC_TRY_COMPILE(
-              [
+           AC_MSG_CHECKING(whether -ggdb works for long symbols)
+           CXXFLAGS="-ggdb $CXXFLAGSG"
+           AC_TRY_COMPILE(
+             [
 #               include <string>
 #               include <map>
                 using namespace std;
@@ -483,27 +483,40 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
                         ::const_iterator i1=t2->begin();
                   return (i1==i2);
                 }
-              ],
-            [
+             ],
+             [
                   ;
-            ],
-            [
-                CXXFLAGSG="-ggdb $CXXFLAGSG"
-              AC_MSG_RESULT(yes)
-            ],
-            [
-                CXXFLAGSG="-gstabs $CXXFLAGSG"
-              AC_MSG_RESULT(no -- using -gstabs)
-            ])
-          ;;
+             ],
+             [
+               CXXFLAGSG="-ggdb $CXXFLAGSG"
+               AC_MSG_RESULT(yes)
+             ],
+             [
+               CXXFLAGSG="-gstabs $CXXFLAGSG"
+               AC_MSG_RESULT(no -- using -gstabs instead)
+             ])
+           ;;
   
-       dnl For all other systems assume that -ggdb works (we can't make the
-       dnl test  above the default, as stabs are not the default debugging
-       dnl format on many systems, and we only want to use it where necessary
+       dnl For all other systems test whether -ggdb works at all, and if
+       dnl not fall back on -g instead. This test is mainly used to
+       dnl accomodate for a failure on Mac OS X, where -ggdb leads to
+       dnl information the assembler does not understand (see mailing
+       dnl list thread on this from mid-October 2002)
        *)
-          AC_MSG_RESULT(yes)
-            CXXFLAGSG="-ggdb $CXXFLAGSG"
-          ;;
+           AC_MSG_CHECKING(whether -ggdb works)
+           CXXFLAGS="-ggdb $CXXFLAGSG"
+	   AC_TRY_COMPILE(
+             [],
+             [ ; ],
+             [
+               CXXFLAGSG="-ggdb $CXXFLAGSG"
+               AC_MSG_RESULT(yes)
+             ],
+             [
+               CXXFLAGSG="-g $CXXFLAGSG"
+               AC_MSG_RESULT(no -- using -g instead)
+             ])
+           ;;
     esac
   
   else
