@@ -255,7 +255,7 @@ class SwappableVector : public Vector<number>
 				      * is used to spawn threads in
 				      * #alert# detached.
 				      */
-    static ACE_Thread_Manager thread_manager;
+    static Threads::ThreadManager thread_manager;
 #endif
 
 				     /**

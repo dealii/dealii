@@ -111,7 +111,7 @@ SparseVanka<number>::compute_inverses ()
   FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
   
 				   // Now spawn the threads
-  ACE_Thread_Manager thread_manager;
+  Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
 		    Threads::encapsulate (fun_ptr)
@@ -559,7 +559,7 @@ void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
 				     // otherwise: blocking requested
     {
 #ifdef DEAL_II_USE_MT
-      ACE_Thread_Manager thread_manager;
+      Threads::ThreadManager thread_manager;
       for (unsigned int block=0; block<n_blocks; ++block)
 	Threads::spawn (thread_manager,
 			Threads::encapsulate (&SparseVanka<number>::

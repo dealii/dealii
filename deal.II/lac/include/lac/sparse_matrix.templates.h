@@ -207,7 +207,7 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
-      ACE_Thread_Manager thread_manager;
+      Threads::ThreadManager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
 			Threads::encapsulate (&SparseMatrix<number>::
@@ -356,7 +356,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 				       // space for the norms of
 				       // the different parts
       vector<somenumber> partial_sums (n_threads, 0);
-      ACE_Thread_Manager thread_manager;
+      Threads::ThreadManager thread_manager;
 				       // spawn some jobs...
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
@@ -449,7 +449,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 				       // space for the norms of
 				       // the different parts
       vector<somenumber> partial_sums (n_threads, 0);
-      ACE_Thread_Manager thread_manager;
+      Threads::ThreadManager thread_manager;
 				       // spawn some jobs...
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
@@ -586,7 +586,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 				       // space for the square norms of
 				       // the different parts
       vector<somenumber> partial_norms (n_threads, 0);
-      ACE_Thread_Manager thread_manager;
+      Threads::ThreadManager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
 			Threads::encapsulate (&SparseMatrix<number>::

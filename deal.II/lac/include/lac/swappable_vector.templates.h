@@ -23,7 +23,7 @@
 #ifdef DEAL_II_USE_MT
 				 // allocate static variable
 template <typename number>
-ACE_Thread_Manager SwappableVector<number>::thread_manager;
+Threads::ThreadManager SwappableVector<number>::thread_manager;
 #endif
 
 
