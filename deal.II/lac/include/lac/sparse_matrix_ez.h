@@ -1118,6 +1118,7 @@ inline
 typename SparseMatrixEZ<number>::const_iterator&
 SparseMatrixEZ<number>::const_iterator::operator++ ()
 {
+//TODO[GK]: exclude entries with column index -1, i.e. simply jump over them  
   Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
   
   ++(accessor.a_index);
@@ -1320,6 +1321,8 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 {
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
+
+//TODO[GK]: Do as the documentation promises: ignore zero values. The complication is that we should ignore the zero entry if no entry is there already, but set an existing entry to zero
   Entry* entry = allocate(i,j);
   entry->value = value;
 }
