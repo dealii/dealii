@@ -23,7 +23,6 @@
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <fe/fe.h>
-#include <fe/fe_system.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
