@@ -148,7 +148,8 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 		system_to_component_table(total_dofs),
 		face_system_to_component_table(dofs_per_face),
 		component_to_system_table(n_components, vector<unsigned>(total_dofs)),
-		face_component_to_system_table(n_components, vector<unsigned>(dofs_per_face))
+		face_component_to_system_table(n_components, vector<unsigned>(dofs_per_face)),
+		component_to_base_table(n_components)
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i) 
     {

@@ -405,20 +405,6 @@ class FESystem : public FiniteElement<dim>
 				      */
     vector< ElementPair > base_elements;
 
-				     /**
-				      * The base element establishing a
-				      * component.
-				      *
-				      * This table converts a
-				      * component number to the
-				      * #base_element# number. While
-				      * component information contains
-				      * multiplicity of base elements,
-				      * the result allows access to
-				      * shape functions of the base
-				      * element.
-				      */
-    vector<unsigned int> component_to_base_table;
     
 				     /**
 				      * Helper function used in the constructor:
@@ -534,8 +520,7 @@ template <int dim>
 template <class FE>
 FESystem<dim>::FESystem (const FE &fe, const unsigned int n_elements) :
 		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements)),
-		base_elements(1),
-		component_to_base_table(n_components)
+		base_elements(1)
 {
   base_elements[0] = ElementPair(new FE, n_elements);
   base_elements[0].first -> subscribe ();
@@ -550,8 +535,7 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 			 const FE2 &fe2, const unsigned int n2)
 		:
 		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2)),
-		base_elements(2),
-		component_to_base_table(n_components)
+		base_elements(2)
 {
   Assert(fe1.n_transform_functions == fe2.n_transform_functions,
 	 ExcElementTransformNotEqual());
@@ -574,8 +558,7 @@ FESystem<dim>::FESystem (const FE1 &fe1, const unsigned int n1,
 		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
 							 fe2, n2,
 							 fe3, n3)),
-		base_elements(3),
-		component_to_base_table(n_components)
+		base_elements(3)
 {
   Assert(fe1.n_transform_functions == fe2.n_transform_functions,
 	 ExcElementTransformNotEqual());

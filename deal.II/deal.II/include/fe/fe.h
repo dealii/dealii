@@ -274,6 +274,20 @@ class FiniteElementBase : public Subscriptor,
 				      * component.
 				      */
     pair<unsigned int,unsigned int> face_system_to_component_index (unsigned int index) const; 
+ 				     /**
+				      * The base element establishing a
+				      * component.
+				      *
+				      * This table converts a
+				      * component number to the
+				      * #base_element# number. While
+				      * component information contains
+				      * multiplicity of base elements,
+				      * the result allows access to
+				      * shape functions of the base
+				      * element.
+				      */
+    unsigned int component_to_base(unsigned int index) const;
     
 
 				     /**
@@ -470,6 +484,20 @@ class FiniteElementBase : public Subscriptor,
 				      * Map between component and linear dofs on a face.
 				      */
     vector< vector<unsigned int> > face_component_to_system_table;
+				     /**
+				      * The base element establishing a
+				      * component.
+				      *
+				      * This table converts a
+				      * component number to the
+				      * #base_element# number. While
+				      * component information contains
+				      * multiplicity of base elements,
+				      * the result allows access to
+				      * shape functions of the base
+				      * element.
+				      */
+    vector<unsigned int> component_to_base_table;
 };
 
 
@@ -1473,6 +1501,17 @@ FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) cons
 {
   Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
   return face_system_to_component_table[index];
+}
+
+template <int dim>  
+inline
+unsigned int
+FiniteElementBase<dim>::component_to_base (unsigned int index) const
+{
+  if (n_components == 1)
+    return 0;
+  Assert(index < component_to_base_table.size(), ExcInvalidIndex(index));
+  return component_to_base_table[index];
 }
 
 /*----------------------------   fe.h     ---------------------------*/
