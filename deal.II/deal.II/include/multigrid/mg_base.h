@@ -110,7 +110,12 @@ class MGSmootherIdentity : public MGSmootherBase
 				     /**
 				      * Implementation of the
 				      * interface in #MGSmootherBase#.
-				      * This function does nothing.
+				      * This function does nothing,
+				      * which by comparison with the
+				      * definition of this function
+				      * means that the the smoothing
+				      * operator equals the null
+				      * operator.
 				      */
     virtual void smooth (const unsigned int   level,
 			 Vector<double>       &u,
