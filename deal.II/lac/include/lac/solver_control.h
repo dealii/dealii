@@ -130,10 +130,10 @@ class SolverControl : public Subscriptor
 				      * logged to @p{deallog}. Default
 				      * is yes.
 				      */
-    SolverControl (const unsigned int n = 100,
-		   const double tol = 1.e-10,
-		   const bool log_history = false,
-		   const bool log_result = true);
+    SolverControl (const unsigned int n           = 100,
+		   const double       tol         = 1.e-10,
+		   const bool         log_history = false,
+		   const bool         log_result  = true);
     
 				     /**
 				      * Virtual destructor is needed
@@ -197,7 +197,7 @@ class SolverControl : public Subscriptor
 				      * other computations.
 				      */
     virtual State check (const unsigned int step,
-			 const double check_value);
+			 const double   check_value);
 
 				     /**
 				      * Return the result of the last check operation.
@@ -290,24 +290,24 @@ class SolverControl : public Subscriptor
 				     /**
 				      * Result of last check operation.
 				      */
-    State lcheck;
+    State        lcheck;
     
 				     /**
 				      * Last value of the convergence criterion.
 				      */
-    double             lvalue;
+    double       lvalue;
     
 				     /**
 				      * Last step.
 				      */
-    unsigned int       lstep;
+    unsigned int lstep;
 
 				     /**
 				      * Is set to @p{true} by
 				      * @p{set_failure_criterion} and
 				      * enables failure checking.
 				      */
-    bool check_failure;
+    bool         check_failure;
 
 				     /*
 				      * Stores the
@@ -332,13 +332,11 @@ class SolverControl : public Subscriptor
 				      * Log convergence history to
 				      * @p{deallog}.
 				      */
-//TODO:[GK] leading underscores are prohibited by the C++ standard in user code. what is the reason here anyway?
-    bool         _log_history;
+    bool         m_log_history;
 				     /**
 				      * Log only every nth step.
 				      */
-//TODO:[GK] leading underscores are prohibited by the C++ standard in user code. what is the reason here anyway?
-    unsigned int _log_frequency;
+    unsigned int m_log_frequency;
     
 				     /**
 				      * Log iteration result to
@@ -348,8 +346,7 @@ class SolverControl : public Subscriptor
 				      * success together with @p{lstep}
 				      * and @p{lvalue} are logged.
 				      */
-//TODO:[GK] leading underscores are prohibited by the C++ standard in user code. what is the reason here anyway?
-    bool         _log_result;
+    bool         m_log_result;
 };
 
 
@@ -375,10 +372,10 @@ class ReductionControl : public SolverControl
 				      * constructor.
 				      */
     ReductionControl (const unsigned int maxiter = 100,
-		      const double tolerance = 1.e-10,
-		      const double reduce = 1.e-2,
-		      const bool log_history = false,
-		      const bool log_result = true);
+		      const double   tolerance   = 1.e-10,
+		      const double   reduce      = 1.e-2,
+		      const bool     log_history = false,
+		      const bool     log_result  = true);
 
 				     /**
 				      * Virtual destructor is needed
@@ -406,7 +403,7 @@ class ReductionControl : public SolverControl
 				      * upon the first iteration.
 				      */
     virtual State check (const unsigned int step,
-			 const double check_value);
+			 const double   check_value);
 
 				     /**
 				      * Return the initial convergence
@@ -424,7 +421,7 @@ class ReductionControl : public SolverControl
 				      */
     double set_reduction (const double);
 
-protected:
+  protected:
 				     /**
 				      * Desired reduction factor.
 				      */
@@ -454,6 +451,7 @@ SolverControl::max_steps () const
 }
 
 
+
 inline unsigned int
 SolverControl::set_max_steps (const unsigned int newval)
 {
@@ -463,12 +461,14 @@ SolverControl::set_max_steps (const unsigned int newval)
 }
 
 
+
 inline void
 SolverControl::set_failure_criterion (const double rel_failure_residual)
 {
   relative_failure_residual=rel_failure_residual;
   check_failure=true;
 }
+
 
 
 inline void
@@ -480,11 +480,13 @@ SolverControl::clear_failure_criterion ()
 }
 
 
+
 inline double
 SolverControl::tolerance () const
 {
   return tol;
 }
+
 
 
 inline double
@@ -499,14 +501,15 @@ SolverControl::set_tolerance (const double t)
 inline void
 SolverControl::log_history (const bool newval)
 {
-  _log_history = newval;
+  m_log_history = newval;
 }
+
 
 
 inline bool
 SolverControl::log_history () const
 {
-  return _log_history;
+  return m_log_history;
 }
 
 
@@ -514,8 +517,9 @@ SolverControl::log_history () const
 inline void
 SolverControl::log_result (const bool newval)
 {
-  _log_result = newval;
+  m_log_result = newval;
 }
+
 
 
 inline double
@@ -523,6 +527,7 @@ ReductionControl::reduction () const
 {
   return reduce;
 }
+
 
 
 inline double

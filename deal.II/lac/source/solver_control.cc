@@ -60,8 +60,8 @@ SolverControl::NoConvergence::what () const throw ()
 
 SolverControl::SolverControl (const unsigned int maxiter,
 			      const double tolerance,
-			      const bool _log_history,
-			      const bool _log_result)
+			      const bool m_log_history,
+			      const bool m_log_result)
 		:
 		maxsteps(maxiter),
 		tol(tolerance),
@@ -70,9 +70,9 @@ SolverControl::SolverControl (const unsigned int maxiter,
 		check_failure(false),
 		relative_failure_residual(0),
 		failure_residual(0),
-		_log_history(_log_history),
-		_log_frequency(1),
-		_log_result(_log_result)
+		m_log_history(m_log_history),
+		m_log_frequency(1),
+		m_log_result(m_log_result)
 {};
 
 
@@ -86,7 +86,7 @@ SolverControl::State
 SolverControl::check (const unsigned int step,
 		      const double check_value)
 {
-  if (_log_history && ((step % _log_frequency) == 0))
+  if (m_log_history && ((step % m_log_frequency) == 0))
     deallog << "Check " << step << "\t" << check_value << std::endl;
   
   lstep  = step;
@@ -97,7 +97,7 @@ SolverControl::check (const unsigned int step,
       if (check_failure)
 	failure_residual=relative_failure_residual*check_value;
       
-      if (_log_result)
+      if (m_log_result)
 	deallog << "Starting value " << check_value << std::endl;
     }
 
@@ -115,7 +115,7 @@ SolverControl::check (const unsigned int step,
       (check_failure && (check_value > failure_residual))
   )
     {
-      if (_log_result)
+      if (m_log_result)
 	deallog << "Failure step " << step
 		<< " value " << check_value << std::endl;
       lcheck = failure;
@@ -124,7 +124,7 @@ SolverControl::check (const unsigned int step,
 
   if (check_value <= tol)
     {
-      if (_log_result)
+      if (m_log_result)
 	deallog << "Convergence step " << step
 		<< " value " << check_value << std::endl;
       lcheck = success;
@@ -162,8 +162,8 @@ SolverControl::log_frequency (unsigned int f)
 {
   if (f==0)
     f = 1;
-  unsigned int old = _log_frequency;
-  _log_frequency = f;
+  unsigned int old = m_log_frequency;
+  m_log_frequency = f;
   return old;
 }
 
@@ -194,10 +194,10 @@ void SolverControl::parse_parameters (ParameterHandler& param)
 ReductionControl::ReductionControl(const unsigned int n,
 				   const double tol,
 				   const double red,
-				   const bool _log_history,
-				   const bool _log_result)
+				   const bool m_log_history,
+				   const bool m_log_result)
 		:
-		SolverControl (n, tol, _log_history, _log_result),
+		SolverControl (n, tol, m_log_history, m_log_result),
 		reduce(red)
 {};
 
@@ -231,7 +231,7 @@ ReductionControl::check (const unsigned int step,
 				   // residual already was zero
   if (check_value <= reduced_tol)
     {
-      if (_log_result)
+      if (m_log_result)
 	deallog << "Convergence step " << step
 		<< " value " << check_value << std::endl;
       lcheck = success;
