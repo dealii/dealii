@@ -1,0 +1,11 @@
+# $Id$
+
+# this used to be a whole perl script, but it has been superceded by a
+# program written in C++ since it was too slow. if someone is still
+# using the perl script, simply forward all actions to the C++
+# executable
+#
+# since the perl script is not usually called from the directory which
+# it is in, we need to have the path to the C++ executable. Autoconf
+# does this for us upon configuration time.
+print `@DEAL2_DIR@/common/scripts/make_dependencies @ARGV`
