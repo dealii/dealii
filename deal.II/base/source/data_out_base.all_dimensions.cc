@@ -283,7 +283,7 @@ void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
   prm.declare_entry ("Color shading of interior of cells", "true",
 		     Patterns::Bool());
   prm.declare_entry ("Color function", "default",
-		     Patterns::Selection ("default|grey scale"));
+		     Patterns::Selection ("default|grey scale|reverse grey scale"));
 };
 
 
@@ -306,8 +306,16 @@ void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
   shade_cells   = prm.get_bool ("Color shading of interior of cells");
   if (prm.get("Color function") == "default")
     color_function = &default_color_function;
-  else
+  else if (prm.get("Color function") == "grey scale")
     color_function = &grey_scale_color_function;
+  else if (prm.get("Color function") == "reverse grey scale")
+    color_function = &reverse_grey_scale_color_function;
+  else
+				     // we shouldn't get here, since
+				     // the parameter object should
+				     // already have checked that the
+				     // given value is valid
+    Assert (false, ExcInternalError());
 };
 
 
