@@ -88,6 +88,11 @@
 /* Defined if the compiler refuses to specialize an outer class template while
    keeping a member as a template. For the exact failure mode, look at
    aclocal.m4 in the top-level directory. */
+#undef DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG
+
+/* Defined if the compiler refuses to allow the explicit specialization of
+   static member variables. For the exact failure mode, look at aclocal.m4 in
+   the top-level directory. */
 #undef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 
 /* Minor version number of deal.II */

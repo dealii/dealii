@@ -2517,7 +2517,7 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_TEMPLATE_SPECIALIZATION_BUG, dnl
     ],
     [
       AC_MSG_RESULT(yes. using workaround)
-      AC_DEFINE(DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG, 1, 
+      AC_DEFINE(DEAL_II_MEMBER_TEMPLATE_SPECIALIZATION_BUG, 1, 
                      [Defined if the compiler refuses to specialize
                       an outer class template while keeping a member
                       as a template. For the exact failure mode, look at
