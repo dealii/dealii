@@ -4585,7 +4585,8 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
     AC_CHECK_FILE($1/UMFPACK/Include/umfpack.h,
 	UMFPACK_INCLUDE_DIR=-I$1/UMFPACK/Include,
         AC_MSG_ERROR(UMFPack installation faulty))
-    grep "UMFPACK v" $1
+    echo -n "UMFPack Versions "
+    grep "UMFPACK v" $1/README
   else
     AC_MSG_CHECKING(UmfPack library)
     UMFPACK_LIB='$(LIBDIR)/liblac_umfpack$(lib-suffix)'
