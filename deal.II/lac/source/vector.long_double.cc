@@ -1,4 +1,4 @@
-//----------------------------  std::vector.long_double.cc  ---------------------------
+//----------------------------  vector.long_double.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  std::vector.long_double.cc  ---------------------------
+//----------------------------  vector.long_double.cc  ---------------------------
 
 
 #include <lac/vector.templates.h>
@@ -26,6 +26,7 @@ template float Vector<float>::operator * (const Vector<long double> &) const;
 template double Vector<double>::operator * (const Vector<long double> &) const;
 template long double Vector<long double>::operator * (const Vector<float> &) const;
 template long double Vector<long double>::operator * (const Vector<double> &) const;
+template long double Vector<long double>::operator * (const Vector<long double> &) const;
 // see the .h file for why these functions are disabled.
 // template Vector<float>::Vector (const Vector<double>& v);
 // template Vector<double>::Vector (const Vector<float>& v);
