@@ -40,6 +40,7 @@ class MGDoFDimensionInfo
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
+template <>
 class MGDoFDimensionInfo<1>
 {
   public:
@@ -71,6 +72,7 @@ class MGDoFDimensionInfo<1>
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
+template <>
 class MGDoFDimensionInfo<2>
 {
   public:
@@ -102,6 +104,7 @@ class MGDoFDimensionInfo<2>
  *
  * The types have the same meaning as those declared in @ref{TriaDimensionInfo<2>}.
  */
+template <>
 class MGDoFDimensionInfo<3>
 {
   public:

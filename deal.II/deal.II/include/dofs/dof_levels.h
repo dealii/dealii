@@ -81,6 +81,7 @@ class DoFLevel
  *
  * @author Wolfgang Bangerth, 1998
  */
+template <>
 class DoFLevel<1>
 {
   public:
@@ -100,6 +101,7 @@ class DoFLevel<1>
  *
  * @author Wolfgang Bangerth, 1998
  */
+template <>
 class DoFLevel<2> : public DoFLevel<1>
 {
   public:
@@ -119,6 +121,7 @@ class DoFLevel<2> : public DoFLevel<1>
  *
  * @author Wolfgang Bangerth, 1998
  */
+template <>
 class DoFLevel<3> : public DoFLevel<2>
 {
   public:

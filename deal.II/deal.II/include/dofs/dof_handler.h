@@ -53,6 +53,7 @@ class DoFDimensionInfo
  *
  * @author Wolfgang Bangerth, 1998
  */
+template <>
 class DoFDimensionInfo<1>
 {
   public:
@@ -86,6 +87,7 @@ class DoFDimensionInfo<1>
  *
  * @author Wolfgang Bangerth, 1998
  */
+template <>
 class DoFDimensionInfo<2>
 {
   public:
@@ -119,6 +121,7 @@ class DoFDimensionInfo<2>
  *
  * @author Wolfgang Bangerth, 1998
  */
+template <>
 class DoFDimensionInfo<3>
 {
   public:
