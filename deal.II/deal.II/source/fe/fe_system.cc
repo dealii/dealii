@@ -187,6 +187,8 @@ FESystem<dim>::build_face_table()
 	  comp_start += element_multiplicity(base);
 	}
     }
+  Assert (total_index <= face_system_to_component_table.size(),
+	  ExcInternalError());
   
 				   // 2. Lines
   for (unsigned line_number= 0 ; ((line_number != GeometryInfo<dim>::lines_per_face) &&
@@ -213,6 +215,8 @@ FESystem<dim>::build_face_table()
 	  comp_start += element_multiplicity(base);
 	}
     }
+  Assert (total_index <= face_system_to_component_table.size(),
+	  ExcInternalError());
   
 				   // 3. Quads
   for (unsigned quad_number= 0 ; ((quad_number != GeometryInfo<dim>::quads_per_face) &&
@@ -239,6 +243,8 @@ FESystem<dim>::build_face_table()
 	  comp_start += element_multiplicity(base);
 	}
     }
+  Assert (total_index <= face_system_to_component_table.size(),
+	  ExcInternalError());
   
 				   // Inintialize mapping from component
 				   // to base element
@@ -345,10 +351,92 @@ void FESystem<dim>::build_interface_constraints ()
 	    };
 
 	    case 3:
-						   // it should be straightforward
-						   // to implement this for 3d from
-						   // the code above, but I haven't
-						   // done it yet.
+	    {
+					       // the indices
+					       // m=0..5*d_v-1 are
+					       // from the center and
+					       // the four subline
+					       // vertices.  their
+					       // order is the same as
+					       // for the first vertex
+					       // of the whole cell,
+					       // so we can use the
+					       // simple arithmetic
+	      if (m < 5*dofs_per_vertex)
+		{
+		  m_index.first  = system_to_component_index(m % dofs_per_vertex).first;
+		  m_index.second = m / dofs_per_vertex;
+		}
+	      else
+						 // then come the 12 sets of
+						 // line indices
+		if (m < 5*dofs_per_vertex + 12*dofs_per_line)
+		  {   
+		    const unsigned int index_in_line
+		      = (m-5*dofs_per_vertex) % dofs_per_line;
+		    const unsigned int sub_line
+		      = (m-5*dofs_per_vertex) / dofs_per_line;
+		    Assert (sub_line < 12, ExcInternalError());
+		  
+						     // get the component by
+						     // asking s_t_c_index and
+						     // tweaking the index a bit
+		    m_index.first = system_to_component_index
+				    (GeometryInfo<3>::vertices_per_cell * dofs_per_vertex
+				     + index_in_line).first;
+		    
+						     // first find out the how-many'th
+						     // line index of that component
+						     // this was
+		    m_index.second = (system_to_component_index
+				      (GeometryInfo<3>::vertices_per_cell * dofs_per_vertex
+				       + index_in_line).second
+				      - base_element (component_to_base_table[m_index.first]).first_line_index)
+								      // then add the number of dofs
+								      // for the five vertices to get
+								      // the index on the first line
+				     + 5*base_element(component_to_base_table[m_index.first]).dofs_per_vertex
+								      // and correct for the
+								      // how-many'th line
+				     + base_element(component_to_base_table[m_index.first]).dofs_per_line * sub_line;
+		  }
+		else
+						   // on one of the four sub-quads
+		  {   
+		    const unsigned int index_in_quad
+		      = (m-5*dofs_per_vertex-12*dofs_per_line) % dofs_per_line;
+		    const unsigned int sub_quad
+		      = (m-5*dofs_per_vertex-12*dofs_per_line) / dofs_per_line;
+		    Assert (sub_quad < 4, ExcInternalError());
+		  
+						     // get the component by
+						     // asking s_t_c_index and
+						     // tweaking the index a bit
+		    m_index.first = system_to_component_index
+				    (GeometryInfo<3>::vertices_per_cell * dofs_per_vertex
+				     + GeometryInfo<3>::lines_per_cell * dofs_per_line
+				     + index_in_quad).first;
+		    
+						     // first find out the how-many'th
+						     // quad index of that component
+						     // this was
+		    m_index.second = (system_to_component_index
+				      (GeometryInfo<3>::vertices_per_cell * dofs_per_vertex
+				       + GeometryInfo<3>::lines_per_cell * dofs_per_line
+				       + index_in_quad).second
+				      - base_element (component_to_base_table[m_index.first]).first_quad_index)
+								      // then add the number of dofs
+								      // for the five vertices and 12 lines
+								      // to get the index on the first quad
+				     + 5*base_element(component_to_base_table[m_index.first]).dofs_per_vertex
+				     + 12*base_element(component_to_base_table[m_index.first]).dofs_per_line
+								      // and correct for the
+								      // how-many'th line
+				     + base_element(component_to_base_table[m_index.first]).dofs_per_quad * sub_quad;
+		  };
+	      
+	      break;
+	    };
 		  
 	    default:
 		  Assert (false, ExcNotImplemented());
