@@ -17,6 +17,85 @@ template<int rank_, int dim>
 class Tensor;
 
 /**
+ * Base class for multi-valued functions.
+ *
+ * 
+ */
+template <int dim>
+class VectorFunction :
+  public FunctionTime
+{
+  public:
+				     /**
+				      * Constructor. May take an initial vakue
+				      * for the time variable, which defaults
+				      * to zero.
+				      */
+    VectorFunction (unsigned n_components, const double initial_time = 0.0);
+    
+				     /**
+				      * Virtual destructor; absolutely
+				      * necessary in this case.
+				      */
+    virtual ~VectorFunction ();
+    
+// 				     /**
+// 				      * Return the value of the function
+// 				      * at the given point.
+// 				      */
+//     virtual double operator () (const Point<dim> &p, unsigned component) const;
+
+				     /**
+				      * Set #values# to the point values
+				      * of the function at points #p#.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #n_components#
+				      * array.
+				      */
+    virtual void value (const Point<dim>  &p, vector<double> &values) const;
+
+				     /**
+				      * Set #values# to the point values
+				      * of the function at the #points#.
+				      * It is assumed that #values#
+				      * already has the right size, i.e.
+				      * the same size as the #points#
+				      * array.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<vector<double> > &values) const;
+
+				     /**
+				      * Set #gradients# to the gradients of
+				      * the function at the #points#.
+				      * It is assumed that #values# 
+				      * already has the right size, i.e.
+				      * the same size as the #points# array.
+				      */
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<vector<Tensor<1,dim> > > &gradients) const;
+    
+				     /**
+				      * Number of vector components.
+				      */
+    const unsigned n_components;
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcPureFunctionCalled);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcVectorHasWrongSize,
+		    int, int,
+		    << "The vector has size " << arg1 << " but should have "
+		    << arg2 << " elements.");
+    
+};
+  
+/**
  *  This class is a model for a tensor valued function.
  *  It returns the value
  *  at a given point through the #operator ()# member functions,
@@ -38,7 +117,7 @@ class Tensor;
  */
 template <int rank_, int dim>
 class TensorFunction :
-  public FunctionTime
+  public VectorFunction<dim>
 {
   public:
 				     /**
@@ -92,7 +171,19 @@ class TensorFunction :
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Tensor<rank_+1,dim> > &gradients) const;
-    
+
+				     /**
+				      * See #VectorFunction#.
+				      */  
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<vector<double> > &values) const;
+
+				     /**
+				      * See #VectorFunction#.
+				      */  
+    virtual void gradient_list (const vector<Point<dim> > &points,
+				vector<vector<Tensor<1,dim> > > &gradients) const;
+
 				     /**
 				      * Exception
 				      */

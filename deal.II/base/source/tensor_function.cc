@@ -4,11 +4,61 @@
 #include <base/tensorfunction.h>
 #include <vector>
 #include <base/tensor.h>
+#include <cmath>
 
+template <int dim>
+VectorFunction<dim>::VectorFunction(unsigned n_components, const double initial_time)
+		:
+		FunctionTime(initial_time),
+		n_components(n_components)
+{}
+
+
+template <int dim>
+VectorFunction<dim>::~VectorFunction()
+{}
+
+/*
+template <int dim> double
+VectorFunction<dim>::operator () (const Point<dim> &, unsigned) const
+
+{
+  Assert (false, ExcPureFunctionCalled());
+  return 0.;
+}
+*/
+
+template <int dim> void
+VectorFunction<dim>::value (const Point<dim>  &, vector<double> &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+}
+
+
+template <int dim> void
+VectorFunction<dim>::value_list (const vector<Point<dim> > &,
+				 vector<vector<double> > &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+}
+
+
+template <int dim> void
+VectorFunction<dim>::gradient_list (const vector<Point<dim> > &,
+				    vector<vector<Tensor<1,dim> > > &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// TensorFunction
+//////////////////////////////////////////////////////////////////////
 
 template <int rank_, int dim>
-TensorFunction<rank_, dim>::TensorFunction (const double initial_time) :
-		FunctionTime(initial_time)
+TensorFunction<rank_, dim>::TensorFunction (const double initial_time)
+		:
+		VectorFunction<dim>(pow(dim,rank_), initial_time)
 {};
 
 
@@ -77,6 +127,37 @@ TensorFunction<rank_, dim>::gradient_list (const vector<Point<dim> > &points,
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i]);
 };
+
+/*
+template <int rank_, int dim> void
+TensorFunction<rank_, dim>::value (const Point<dim>  &p, vector<double> &erg) const
+{
+  Tensor<rank_,dim> h = operator()(p);
+  h.unroll(erg);
+}
+*/
+
+template <int rank_, int dim> void
+TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > & points,
+				 vector<vector<double> > & values) const
+{
+  Assert (values.size() == points.size(),
+	  ExcVectorHasWrongSize(values.size(), points.size()));
+
+  for (unsigned int i=0; i<points.size(); ++i)
+    operator() (points[i]).unroll(values[i]);
+  
+}
+
+
+template <int rank_, int dim> void
+TensorFunction<rank_, dim>::gradient_list (const vector<Point<dim> > &,
+				    vector<vector<Tensor<1,dim> > > &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+}
+
+
 
 template class TensorFunction<1,1>;
 template class TensorFunction<2,1>;

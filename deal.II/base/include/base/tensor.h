@@ -8,7 +8,6 @@
 #include <base/tensor_base.h>
 
 
-
 /**
  * Provide a general tensor class with an arbitrary rank, i.e. with
  * an arbitrary number of indices. The Tensor class provides an
@@ -131,10 +130,27 @@ class Tensor {
     Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
 
 				     /**
+				      * Fill a vector with all tensor elements.
+				      *
+				      * Thsi function unrolls all
+				      * tensor entries into a single,
+				      * linearly numbered vector. As
+				      * usual in C++, the rightmost
+				      * index marches fastest.
+				      */
+    void unroll(vector<double> & result) const;
+    
+
+				     /**
 				      * Reset all values to zero.
 				      */
     void clear ();
 
+				     /**
+				      * Exception
+				      */
+    DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
+		   << " entries, but vector has size " << arg2);
     
 				     /**
 				      *  Exception
@@ -148,6 +164,14 @@ class Tensor {
 				      * subelements.
 				      */
     Tensor<rank_-1,dim> subtensor[dim];
+
+				     /**
+				      * Help function for unroll.
+				      */
+    void unroll_recursion(vector<double> & result, unsigned& start_index) const;
+
+    template<>
+    friend void Tensor<rank_+1,dim>::unroll_recursion(vector<double> &, unsigned&) const;
 };
 
 

@@ -12,6 +12,7 @@
 
 #include <base/exceptions.h>
 #include <iostream>
+#include <vector>
 
 
 
@@ -160,12 +161,31 @@ class Tensor<1,dim> {
 				      * Reset all values to zero.
 				      */
     void clear ();
-    
+
+				     /**
+				      * Fill a vector with all tensor elements.
+				      *
+				      * Thsi function unrolls all
+				      * tensor entries into a single,
+				      * linearly numbered vector. As
+				      * usual in C++, the rightmost
+				      * index marches fastest.
+				      */
+    void unroll(vector<double> & result) const;
+     
   protected:
 				     /**
 				      *  Stores the values in a simple array.
 				      */
     double values[dim];
+
+				     /**
+				      * Help function for unroll.
+				      */
+    void unroll_recursion(vector<double> & result, unsigned& start_index) const;
+
+    template<>
+    friend void Tensor<2,dim>::unroll_recursion(vector<double> &, unsigned&) const;
 };
 
 
