@@ -62,7 +62,8 @@ tests_x = anna_? \
 	  cylinder_shell_* \
 	  grid_in_* \
 	  compressed_sparsity_pattern_* \
-	  point_difference_*
+	  point_difference_* \
+	  umfpack_*
 
 # tests for the hp branch:
 #	  fe_collection_*

@@ -1,0 +1,131 @@
+//----------------------------  umfpack_03.cc  ---------------------------
+//    $Id$
+//    Version: $Name$ 
+//
+//    Copyright (C) 2002, 2003, 2004 by the deal.II authors and Brian Carnes
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  umfpack_03.cc  ---------------------------
+
+// test the umfpack sparse direct solver on a mass matrix that is slightly modified to make it nonsymmetric
+
+#include "../tests.h"
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+
+#include <base/quadrature_lib.h>
+#include <base/function.h>
+
+#include <fe/fe_q.h>
+#include <fe/fe_values.h>
+
+#include <dofs/dof_tools.h>
+
+#include <lac/sparse_matrix.h>
+#include <lac/sparsity_pattern.h>
+#include <lac/vector.h>
+#include <lac/sparse_direct.h>
+
+#include <grid/tria.h>
+#include <grid/grid_generator.h>
+
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
+
+
+
+template <int dim>
+void test ()
+{
+  deallog << dim << 'd' << std::endl;
+  
+  Triangulation<dim> tria;  
+  GridGenerator::hyper_cube (tria,0,1);
+  tria.refine_global (1);
+
+                                   // destroy the uniformity of the matrix by
+                                   // refining one cell
+  tria.begin_active()->set_refine_flag ();
+  tria.execute_coarsening_and_refinement ();
+  tria.refine_global(8-2*dim);
+
+  FE_Q<dim> fe (1);
+  DoFHandler<dim> dof_handler (tria);
+  dof_handler.distribute_dofs (fe);
+    
+  deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
+  
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.reinit (dof_handler.n_dofs(),
+                           dof_handler.n_dofs(),
+                           dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+  sparsity_pattern.compress ();
+  
+  SparseMatrix<double> B;
+  B.reinit (sparsity_pattern);  
+  
+  QGauss<dim> qr (2);
+  MatrixTools::create_mass_matrix (dof_handler, qr, B);
+
+                                   // scale lower left part of the matrix by
+                                   // 1/2 and upper right part by 2 to make
+                                   // matrix nonsymmetric
+  for (SparseMatrix<double>::iterator p=B.begin();
+       p!=B.end(); ++p)
+    if (p->column() < p->row())
+      p->value() = p->value()/2;
+    else if (p->column() > p->row())
+      p->value() = p->value() * 2;
+
+                                   // check that we've done it right
+  for (SparseMatrix<double>::iterator p=B.begin();
+       p!=B.end(); ++p)
+    if (p->column() != p->row())
+      Assert (B(p->row(),p->column()) != B(p->column(),p->row()),
+              ExcInternalError());
+  
+                                   // for a number of different solution
+                                   // vectors, make up a matching rhs vector
+                                   // and check what the UMFPACK solver finds
+  for (unsigned int i=0; i<3; ++i)
+    {
+      Vector<double> solution (dof_handler.n_dofs());
+      Vector<double> x (dof_handler.n_dofs());
+      Vector<double> b (dof_handler.n_dofs());
+
+      for (unsigned int j=0; j<dof_handler.n_dofs(); ++j)
+        solution(j) = j+j*(i+1)*(i+1);
+
+      B.vmult (b, solution);
+      x = b;
+      SparseDirectUMFPACK().solve (B, x);
+
+      x -= solution;
+      deallog << "relative norm distance = "
+              << x.l2_norm() / solution.l2_norm()
+              << std::endl;
+      deallog << "absolute norms = "
+              << x.l2_norm() << ' ' << solution.l2_norm()
+              << std::endl;
+      Assert (x.l2_norm() / solution.l2_norm() < 1e-8,
+              ExcInternalError());
+    }
+}
+
+
+int main ()
+{
+  std::ofstream logfile("umfpack_03.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
+  test<1> ();
+  test<2> ();
+  test<3> ();
+}
