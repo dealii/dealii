@@ -17,12 +17,12 @@
  *       domain which is the tensor product of an interval $[a,b]$ in
  *       the given number of spatial dimensions. If you want to create such
  *       a domain, which is a common test case for model problems, call
- *       #GridGenerator::create_hypercube (tria, a,b)#, which produces a
+ *       #GridGenerator::hyper_cube (tria, a,b)#, which produces a
  *       hypercube domain triangulated with exactly one element. You can
  *       get tensor product meshes by successive refinement of this cell.
  *
  *    \item Generalized L-shape domain:
- *      using the #GridGenerator::create_L_region (tria, a,b)# function produces
+ *      using the #GridGenerator::hyper_L (tria, a,b)# function produces
  *      the hypercube with the interval $[a,b]$ without the hypercube
  *      made out of the interval $[(a+b)/2,b]$. Let, for example, be $a=-1$
  *      and $b=1$, then the hpyer-L in two dimensions is the region
@@ -32,15 +32,15 @@
  *    \item Hyper balls:
  *      You get the circle or ball (or generalized: hyperball) around origin
  *      #p# and with radius #r# by calling
- *      #Triangulation<dim>::create_hyper_ball (p, r)#. The circle is triangulated
+ *      #Triangulation<dim>::hyper_ball (p, r)#. The circle is triangulated
  *      by five cells, the ball by seven cells. The diameter of the center cell is
  *      chosen so that the aspect ratio of the boundary cells after one refinement
  *      is minimized in some way. To create a hyperball in one dimension results in
  *      an error.
  *
- *      Do not forget to attach a suitable
- *      boundary approximation object if you want the triangulation to be refined
- *      at the outer boundaries.
+ *      Do not forget to attach a suitable boundary approximation object
+ *      to the triangulation object you passed to this function if you later want
+ *      the triangulation to be refined at the outer boundaries.
  * \end{itemize}
  *
  * @author Wolfgang Bangerth, 1998, 1999
