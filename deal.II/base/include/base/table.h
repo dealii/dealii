@@ -242,7 +242,7 @@ class TableIndices<5> : public TableIndicesBase<5>
  * Array of indices of fixed size used for the @ref{TableBase}
  * class.
  *
- * This is the specialization for a four-dimensional table. This class
+ * This is the specialization for a six-dimensional table. This class
  * only differs in the non-default constructors from the other
  * specializations. Actual storage of and access to data is done by
  * the @ref{TableIndicesBase} base class of a specializations.
