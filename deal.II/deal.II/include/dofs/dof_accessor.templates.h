@@ -567,7 +567,7 @@ void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 
 template <int dim>
 inline
-DoFCellAccessor<1,dim>::
+DoFCellAccessor<dim>::
 DoFCellAccessor (const Triangulation<dim> *tria,
                  const int                 level,
                  const int                 index,
