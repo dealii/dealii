@@ -303,18 +303,18 @@ template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
     prm.declare_entry ("Test run", "zoom in",
-		       Patterns::Sequence("tensor|zoom in|ball|curved line|"
+		       Patterns::Selection("tensor|zoom in|ball|curved line|"
 					  "random|jump|L-region"));
   else
     prm.declare_entry ("Test run", "zoom in",
-		       Patterns::Sequence("tensor|zoom in|random"));
+		       Patterns::Selection("tensor|zoom in|random"));
 
   prm.declare_entry ("Global refinement", "0",
 		     Patterns::Integer());
   prm.declare_entry ("Right hand side", "zero",
-		     Patterns::Sequence("zero|constant|trigpoly|poly"));
+		     Patterns::Selection("zero|constant|trigpoly|poly"));
   prm.declare_entry ("Boundary values", "zero",
-		     Patterns::Sequence("zero|sine|jump"));
+		     Patterns::Selection("zero|sine|jump"));
   prm.declare_entry ("Output file", "gnuplot.1");
 };
 

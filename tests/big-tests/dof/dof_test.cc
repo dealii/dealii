@@ -212,10 +212,10 @@ template <int dim>
 void TestCases<dim>::declare_parameters (ParameterHandler &prm) {
   if (dim>=2)
     prm.declare_entry ("Test run", "zoom in",
-		       Patterns::Sequence("zoom in|ball|curved line|random"));
+		       Patterns::Selection("zoom in|ball|curved line|random"));
   else
     prm.declare_entry ("Test run", "zoom in",
-		       Patterns::Sequence("zoom in|random"));
+		       Patterns::Selection("zoom in|random"));
   prm.declare_entry ("Grid file", "grid.1");
   prm.declare_entry ("Sparsity file", "sparsity.1");
   prm.declare_entry ("Condensed sparsity file", "sparsity.c.1");

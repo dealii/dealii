@@ -358,11 +358,11 @@ void PoissonProblem<dim>::create_new (const unsigned int) {
 template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
   prm.declare_entry ("Test case", "Gauss shape",
-		     Patterns::Sequence("Gauss shape|Singular|Kink"));
+		     Patterns::Selection("Gauss shape|Singular|Kink"));
   prm.declare_entry ("Initial refinement", "2",
 		     Patterns::Integer());
   prm.declare_entry ("Refinement criterion", "estimated error",
-		     Patterns::Sequence("global|true error|estimated error"));
+		     Patterns::Selection("global|true error|estimated error"));
   prm.declare_entry ("Refinement fraction", "0.3",
 		     Patterns::Double());
   prm.declare_entry ("Coarsening fraction", "0.1",
@@ -371,7 +371,7 @@ void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
 		     Patterns::Integer());
   prm.declare_entry ("Output base filename", "");
   prm.declare_entry ("Output format", "ucd",
-		     Patterns::Sequence("ucd|gnuplot"));
+		     Patterns::Selection("ucd|gnuplot"));
 };
 
 
