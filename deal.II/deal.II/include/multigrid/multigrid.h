@@ -238,7 +238,7 @@ class Multigrid : public Subscriptor
 				      * needed for @p{MG_DEBUG}
 				      * defined.
 				      */
-//TODO[GK]: This won't fly either: deal_II_dimension can't be used in header files
+//TODO[GK]: This won't fly: deal_II_dimension can't be used in header files
 #ifdef MG_DEBUG
     SmartPointer<const MGDoFHandler<deal_II_dimension> > mg_dof_handler;
 #endif
