@@ -14,6 +14,6 @@ make_dependencies : make_dependencies.cc
 	@$(CXX) $(CXXFLAGS.o) $< -o $@
 
 clean:
-	rm -f make_dependencies
+	-rm -f make_dependencies
 
 .PHONY: clean
