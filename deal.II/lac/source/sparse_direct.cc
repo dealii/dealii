@@ -235,7 +235,7 @@ struct SparseDirectMA27::DetachedModeData
         int ret = write (server_client_pipe[1],
                          reinterpret_cast<const char *> (t),
                          sizeof(T) * N);
-                                         // if read call was
+                                         // if write call was
                                          // interrupted, just
                                          // retry
         if ((ret<0) && (errno==EINTR))
