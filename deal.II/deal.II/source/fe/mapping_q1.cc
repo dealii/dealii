@@ -288,10 +288,11 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 
   //  cerr << "Mapping-each " << hex << in << ' ' << out;
   
-  if (in & update_normal_vectors)
+  if (out & (update_JxW_values
+	    |update_normal_vectors))
     out |= update_boundary_forms;
   
-  if (in & (update_covariant_transformation
+  if (out & (update_covariant_transformation
 	    | update_JxW_values
 	    | update_boundary_forms
 	    | update_normal_vectors))
