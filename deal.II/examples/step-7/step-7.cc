@@ -1877,4 +1877,4 @@ int main ()
                                  // systems, and since it is necessary
                                  // to get things running on AIX, why
                                  // not do it:
-template double SolutionBase<2>::width;
+template const double SolutionBase<2>::width;
