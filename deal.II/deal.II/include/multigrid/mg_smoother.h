@@ -18,6 +18,7 @@
 #include <base/smartpointer.h>
 #include <lac/pointer_matrix.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_level_object.h>
 #include <vector>
 
 template <int dim> class MGDoFHandler;

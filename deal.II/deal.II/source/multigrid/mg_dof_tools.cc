@@ -25,6 +25,7 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_dof_tools.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_level_object.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
 
@@ -356,7 +357,7 @@ MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
 template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
-			   MGLevelObject<Vector<number> >& v)
+			MGLevelObject<Vector<number> >& v)
 {
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)

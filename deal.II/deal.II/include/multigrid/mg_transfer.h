@@ -18,6 +18,7 @@
 #include <lac/block_vector.h>
 #include <lac/block_sparsity_pattern.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_level_object.h>
 
 template <int dim> class MGDoFHandler;
 
