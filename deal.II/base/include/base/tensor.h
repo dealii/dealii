@@ -922,6 +922,23 @@ double determinant (const Tensor<2,3> &t)
 
 
 /**
+ * Compute and return the trace of a tensor of rank 2, i.e. the sum of
+ * its diagonal entries.
+ *
+ * @author Wolfgang Bangerth, 2001
+ */
+template <int dim>
+double trace (const Tensor<2,dim> &d)
+{
+  double t=0;
+  for (unsigned int i=0; i<dim; ++i)
+    t += d[i][i];
+  return t;
+};
+
+
+
+/**
  * Compute and return the inverse of the given tensor. Since the
  * compiler can perform the return value optimization, and since the
  * size of the return object is known, it is acceptable to return the
