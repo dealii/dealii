@@ -372,6 +372,18 @@ class SparseMatrix : public virtual Subscriptor
 	      const number value);
     
 				     /**
+				      * Multiply the entire matrix by a
+				      * fixed factor.
+				      */
+    SparseMatrix & operator *= (const number factor);
+    
+				     /**
+				      * Divide the entire matrix by a
+				      * fixed factor.
+				      */
+    SparseMatrix & operator /= (const number factor);
+    
+				     /**
 				      * Add @p{value} to the element
 				      * @p{(i,j)}.  Throws an error if
 				      * the entry does not
@@ -1248,6 +1260,44 @@ void SparseMatrix<number>::add (const unsigned int i,
 
   if (value != 0.)
     val[index] += value;
+}
+
+
+
+template <typename number>
+inline
+SparseMatrix<number> &
+SparseMatrix<number>::operator *= (const number factor)
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+
+  number             *val_ptr    = &val[0];
+  const number *const end_ptr    = &val[cols->n_nonzero_elements()];
+
+  while (val_ptr != end_ptr)
+    *val_ptr++ *= factor;
+
+  return *this;
+}
+
+
+
+template <typename number>
+inline
+SparseMatrix<number> &
+SparseMatrix<number>::operator /= (const number factor)
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+
+  number             *val_ptr    = &val[0];
+  const number *const end_ptr    = &val[cols->n_nonzero_elements()];
+
+  while (val_ptr != end_ptr)
+    *val_ptr++ /= factor;
+
+  return *this;
 }
 
 
