@@ -201,6 +201,15 @@ int main(int,char)
   check_faces(q2,false);
   check_faces(q2,true);
   deallog.pop();
+
+				   // delete objects again to avoid
+				   // messages about memory leaks
+  for (unsigned int i=0; i<q1.size(); ++i)
+    delete q1[i];
+  for (unsigned int i=0; i<q2.size(); ++i)
+    delete q2[i];
+  for (unsigned int i=0; i<q3.size(); ++i)
+    delete q3[i];  
 }
 
 
