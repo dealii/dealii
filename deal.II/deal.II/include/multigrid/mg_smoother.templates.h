@@ -24,7 +24,7 @@ MGSmootherRelaxation<MATRIX, VECTOR>
 			const unsigned int           steps,
 			const double                 omega)
 		:
-		MGSmootherContinuous(mg_dof, steps),
+		MGSmootherContinuous<VECTOR>(mg_dof, steps),
 		matrix(&matrix),
 		relaxation(relaxation),
 		omega(omega)

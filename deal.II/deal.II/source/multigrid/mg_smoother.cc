@@ -18,7 +18,6 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
-//#include <multigrid/multigrid.h>
 #include <multigrid/mg_smoother.h>
 #include <multigrid/mg_smoother.templates.h>
 #include <lac/vector.h>
@@ -29,14 +28,21 @@
 #include <algorithm>
 
 
+template <class VECTOR>
+MGSmoother<VECTOR>::~MGSmoother()
+{}
+
+
 //////////////////////////////////////////////////////////////////////
 
 
 
 #if deal_II_dimension == 1
 
-MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<1> &/*mg_dof*/,
-					    const unsigned int steps)
+template <class VECTOR>
+MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
+  const MGDoFHandler<1> &/*mg_dof*/,
+  const unsigned int steps)
 		:
 		steps(steps)
 {
@@ -48,9 +54,11 @@ MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<1> &/*mg_dof*/,
 
 #if deal_II_dimension > 1
 
+template <class VECTOR>
 template <int dim>
-MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
-					    const unsigned int steps)
+MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
+  const MGDoFHandler<dim> &mg_dof,
+  const unsigned int steps)
 		:
 		steps(steps)
 {
@@ -115,7 +123,7 @@ MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
 
 template <class VECTOR>
 void
-MGSmootherContinuous::set_zero_interior_boundary (const unsigned int level,
+MGSmootherContinuous<VECTOR>::set_zero_interior_boundary (const unsigned int level,
 						  VECTOR&            u) const
 {
   if (level==0)
@@ -130,28 +138,45 @@ MGSmootherContinuous::set_zero_interior_boundary (const unsigned int level,
 
 
 // explicit instantiations
+
+template MGSmoother<Vector<float> >::~MGSmoother();
+template MGSmoother<Vector<double> >::~MGSmoother();
+template MGSmoother<BlockVector<float> >::~MGSmoother();
+template MGSmoother<BlockVector<double> >::~MGSmoother();
+
 // don't do the following instantiation in 1d, since there is a specialized
 // function there
 #if deal_II_dimension > 1
-template MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<deal_II_dimension>&,
-						     const unsigned int);
+template MGSmootherContinuous<Vector<float> >::MGSmootherContinuous (
+  const MGDoFHandler<deal_II_dimension>&,
+  const unsigned int);
+template MGSmootherContinuous<Vector<double> >::MGSmootherContinuous (
+  const MGDoFHandler<deal_II_dimension>&,
+  const unsigned int);
+template MGSmootherContinuous<BlockVector<float> >::MGSmootherContinuous (
+  const MGDoFHandler<deal_II_dimension>&,
+  const unsigned int);
+template MGSmootherContinuous<BlockVector<double> >::MGSmootherContinuous (
+  const MGDoFHandler<deal_II_dimension>&,
+  const unsigned int);
 #endif
 
 template
-void MGSmootherContinuous::set_zero_interior_boundary<Vector<double> > (const unsigned int,
-							 Vector<double>&) const;
-
+void MGSmootherContinuous<Vector<double> >::set_zero_interior_boundary (
+  const unsigned int,
+  Vector<double>&) const;
 template
-void MGSmootherContinuous::set_zero_interior_boundary<Vector<float> > (const unsigned int,
-							 Vector<float>&) const;
-
+void MGSmootherContinuous<Vector<float> >::set_zero_interior_boundary (
+  const unsigned int,
+  Vector<float>&) const;
 template
-void MGSmootherContinuous::set_zero_interior_boundary<BlockVector<double> > (const unsigned int,
-							 BlockVector<double>&) const;
-
+void MGSmootherContinuous<BlockVector<double> >::set_zero_interior_boundary (
+  const unsigned int,
+  BlockVector<double>&) const;
 template
-void MGSmootherContinuous::set_zero_interior_boundary<BlockVector<float> > (const unsigned int,
-							 BlockVector<float>&) const;
+void MGSmootherContinuous<BlockVector<float> >::set_zero_interior_boundary (
+  const unsigned int,
+  BlockVector<float>&) const;
 
 
   

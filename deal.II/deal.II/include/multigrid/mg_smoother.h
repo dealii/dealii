@@ -21,15 +21,43 @@
 
 template <int dim> class MGDoFHandler;
 
+
+/**
+ * Base class for multigrid smoothers. Does nothing but defining the
+ * interface used by multigrid methods.
+ *
+ * @author Guido KAnschat, 2002
+ */
+template <class VECTOR>
+class MGSmoother : public Subscriptor
+{
+  public:
+				   /**
+				    * Virtual destructor.
+				    */
+  virtual ~MGSmoother();
+
+				   /**
+				    * Smoothing function. This is the
+				    * function used in multigrid
+				    * methods.
+				    */
+  virtual void smooth (const unsigned int level,
+		       VECTOR&            u,
+		       const VECTOR&      rhs) const = 0;  
+};
+
+
 /**
  * Smoother doing nothing. This class is not useful for many applications other
  * than for testing some multigrid procedures. Also some applications might
  * get convergence without smoothing and then this class brings you the
  * cheapest possible multigrid.
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, 1999, 2002
  */
-class MGSmootherIdentity : public Subscriptor
+template <class VECTOR>
+class MGSmootherIdentity : public MGSmoother<VECTOR>
 {
   public:
 				     /**
@@ -42,10 +70,9 @@ class MGSmootherIdentity : public Subscriptor
 				      * operator equals the null
 				      * operator.
 				      */
-  template <class VECTOR>
-  void smooth (const unsigned int level,
-	       VECTOR&            u,
-	       const VECTOR&      rhs) const;
+  virtual void smooth (const unsigned int level,
+		       VECTOR&            u,
+		       const VECTOR&      rhs) const;
 };
 
 
@@ -56,9 +83,10 @@ class MGSmootherIdentity : public Subscriptor
  * triangulation) to zero, by building a list of these degrees of
  * freedom's indices at construction time.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002
  */
-class MGSmootherContinuous : public Subscriptor
+template <class VECTOR>
+class MGSmootherContinuous : public MGSmoother<VECTOR>
 {
   private:
 				     /**
@@ -122,7 +150,6 @@ class MGSmootherContinuous : public Subscriptor
 				      * has no interior boundaries, this
 				      * function does nothing in this case.
 				      */
-    template <class VECTOR>
     void set_zero_interior_boundary (const unsigned int level,
 				     VECTOR&            u) const;
     
@@ -173,7 +200,7 @@ class MGSmootherContinuous : public Subscriptor
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template<class MATRIX, class VECTOR>
-class MGSmootherRelaxation : public MGSmootherContinuous
+class MGSmootherRelaxation : public MGSmootherContinuous<VECTOR>
 {
   public:
 				     /**
@@ -214,9 +241,9 @@ class MGSmootherRelaxation : public MGSmootherContinuous
 				      * work and find a way to keep
 				      * the boundary values.
 				      */
-    void smooth (const unsigned int level,
-		 VECTOR&            u,
-		 const VECTOR&      rhs) const;
+    virtual void smooth (const unsigned int level,
+			 VECTOR&            u,
+			 const VECTOR&      rhs) const;
   private:
 				     /**
 				      * Pointer to the matrices.
@@ -236,12 +263,12 @@ class MGSmootherRelaxation : public MGSmootherContinuous
 				     /**
 				      * Auxiliary vector.
 				      */
-    mutable Vector<double> h1;
+    mutable VECTOR h1;
     
 				     /**
 				      * Auxiliary vector.
 				      */
-    mutable Vector<double> h2;
+    mutable VECTOR h2;
 };
 
 
@@ -249,21 +276,25 @@ class MGSmootherRelaxation : public MGSmootherContinuous
 
 template <class VECTOR>
 inline void
-MGSmootherIdentity::smooth (const unsigned int, VECTOR&, const VECTOR&) const
+MGSmootherIdentity<VECTOR>::smooth (
+  const unsigned int, VECTOR&,
+  const VECTOR&) const
 {};
 
 /*----------------------------------------------------------------------*/
 
+template <class VECTOR>
 inline
 void
-MGSmootherContinuous::set_steps(unsigned int i)
+MGSmootherContinuous<VECTOR>::set_steps(unsigned int i)
 {
   steps = i;
 }
 
+template <class VECTOR>
 inline
 unsigned int
-MGSmootherContinuous::get_steps() const
+MGSmootherContinuous<VECTOR>::get_steps() const
 {
   return steps;
 }
