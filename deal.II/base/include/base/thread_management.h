@@ -1130,6 +1130,20 @@ namespace Threads
 					    * from that.
 					    */
 	  FunEncapsulation collect_args (Class *object);
+
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object);
     
 	private:
 					   /**
@@ -1239,8 +1253,23 @@ namespace Threads
 					    * from that.
 					    */
 	  FunEncapsulation collect_args (Class *object,
-					 Arg1 arg1);
-    
+					 Arg1   arg1);
+
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1);
+
 	private:
 					   /**
 					    * Space to temporarily store
@@ -1353,6 +1382,22 @@ namespace Threads
 	  FunEncapsulation collect_args (Class *object,
 					 Arg1 arg1,
 					 Arg2 arg2);
+	  
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2);
     
 	private:
 					   /**
@@ -1469,6 +1514,23 @@ namespace Threads
 					 Arg2 arg2,
 					 Arg3 arg3);
     
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2,
+					 Arg3   arg3);
+
 	private:
 					   /**
 					    * Space to temporarily store
@@ -1588,6 +1650,23 @@ namespace Threads
 					 Arg3 arg3,
 					 Arg4 arg4);
     
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2,
+					 Arg3   arg3,
+					 Arg4   arg4);
 	private:
 					   /**
 					    * Space to temporarily store
@@ -1710,6 +1789,24 @@ namespace Threads
 					 Arg4 arg4,
 					 Arg5 arg5);
     
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2,
+					 Arg3   arg3,
+					 Arg4   arg4,
+					 Arg5   arg5);
 	private:
 					   /**
 					    * Space to temporarily store
@@ -1835,6 +1932,25 @@ namespace Threads
 					 Arg5 arg5,
 					 Arg6 arg6);
     
+					   /**
+					    * Same as above, but take
+					    * a reference instead of a
+					    * pointer. This allows us
+					    * to be a little
+					    * convenient, as we can
+					    * use @p{object} or
+					    * @p{this}, without taking
+					    * care that one is a
+					    * reference and the other
+					    * a pointer.
+					    */
+	  FunEncapsulation collect_args (Class &object,
+					 Arg1   arg1,
+					 Arg2   arg2,
+					 Arg3   arg3,
+					 Arg4   arg4,
+					 Arg5   arg5,
+					 Arg6   arg6);
 	private:
 					   /**
 					    * Space to temporarily store
@@ -2904,6 +3020,16 @@ namespace Threads
  
 
 
+  template <class Class, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData0<Class,RetType>::ArgCollector::collect_args (Class &object)
+  {
+    return collect_args (&object);
+  };
+ 
+
+
 /* ---------------------- MemFunData1 implementation ------------------------ */
 
   template <class Class, typename Arg1, typename RetType>
@@ -2986,7 +3112,16 @@ namespace Threads
  
   
 
+  template <class Class, typename Arg1, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData1<Class,Arg1,RetType>::ArgCollector::collect_args (Class &object,
+							       Arg1   arg1)
+  {
+    return collect_args (&object, arg1);
+  };
 
+  
 /* ---------------------- MemFunData2 implementation ------------------------ */
 
   template <class Class, typename Arg1, typename Arg2, typename RetType>
@@ -3071,6 +3206,17 @@ namespace Threads
 								    Arg2   arg2)
   {
     return new MemFunData2<Class,Arg1,Arg2,void>(fun_ptr, object, arg1, arg2);
+  };
+ 
+  
+  template <class Class, typename Arg1, typename Arg2, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData2<Class,Arg1,Arg2,RetType>::ArgCollector::collect_args (Class &object,
+								    Arg1   arg1,
+								    Arg2   arg2)
+  {
+    return collect_args (&object, arg1, arg2);
   };
  
   
@@ -3168,6 +3314,18 @@ namespace Threads
 						      arg1, arg2, arg3);
   };
  
+  
+  
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData3<Class,Arg1,Arg2,Arg3,RetType>::ArgCollector::collect_args (Class &object,
+									 Arg1   arg1,
+									 Arg2   arg2,
+									 Arg3   arg3)
+  {
+    return collect_args (&object, arg1, arg2, arg3);
+  };
   
 
 
@@ -3270,6 +3428,18 @@ namespace Threads
  
   
 
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,RetType>::ArgCollector::collect_args (Class &object,
+									      Arg1   arg1,
+									      Arg2   arg2,
+									      Arg3   arg3,
+									      Arg4   arg4)
+  {
+    return collect_args (&object, arg1, arg2, arg3, arg4);
+  };
+  
 
 /* ---------------------- MemFunData5 implementation ------------------------ */
 
@@ -3373,6 +3543,20 @@ namespace Threads
 								arg1, arg2, arg3, arg4, arg5);
   };
  
+
+  
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,RetType>::ArgCollector::collect_args (Class &object,
+										   Arg1   arg1,
+										   Arg2   arg2,
+										   Arg3   arg3,
+										   Arg4   arg4,
+										   Arg5   arg5)
+  {
+    return collect_args (&object, arg1, arg2, arg3, arg4, arg5);
+  };
   
 
   
@@ -3478,13 +3662,27 @@ namespace Threads
 											Arg4   arg4,
 											Arg5   arg5,
 											Arg6   arg6)
-    {
-      return new MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>(fun_ptr, object,
-								       arg1, arg2, arg3, arg4, arg5, arg6);
+  {
+    return new MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>(fun_ptr, object,
+								     arg1, arg2, arg3, arg4, arg5, arg6);
   };
- 
   
 
+
+  template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename RetType>
+  inline
+  FunEncapsulation
+  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,RetType>::ArgCollector::collect_args (Class &object,
+											Arg1   arg1,
+											Arg2   arg2,
+											Arg3   arg3,
+											Arg4   arg4,
+											Arg5   arg5,
+											Arg6   arg6)
+    {
+      return collect_args (&object, arg1, arg2, arg3, arg4, arg5, arg6);
+    };
+  
 
 /* ---------------------------------------------------------------- */
 
