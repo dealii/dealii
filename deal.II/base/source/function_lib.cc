@@ -411,7 +411,7 @@ LSingularityFunction::gradient (const Point<2>   &p,
   if ((x>=0) && (y>=0))
     {
 //TODO: should return infinity, but how to do that?
-      static double infty[2] = {0., 0.};
+      static const double infty[2] = {0., 0.};
       return Tensor<1,2>(infty);
     }
   
