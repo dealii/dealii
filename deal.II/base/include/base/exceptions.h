@@ -563,8 +563,14 @@ class Exception5 : public ExceptionBase {                             \
 }
 
 
-DeclException0 (ExcNotImplemented);
-DeclException0 (ExcInternalError);
+namespace StandardExceptions 
+{
+  DeclException0 (ExcNotImplemented);
+  DeclException0 (ExcInternalError);
+};
+
+
+using namespace StandardExceptions;
 
 
 
