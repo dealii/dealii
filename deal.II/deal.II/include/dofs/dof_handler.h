@@ -372,6 +372,32 @@ class DoFHandler  :  public Subscriptor,
 				      * picture drawing. An example can be
 				      * found in the implementation of this
 				      * function.
+				      *
+				      * Note that this function is
+				      * most often used to determine
+				      * the maximal row length for
+				      * sparsity
+				      * patterns. Unfortunately, the
+				      * while the estimates returned
+				      * by this function are rather
+				      * accurate in 1d and 2d, they
+				      * are often significantly too
+				      * high in 3d, leading the
+				      * SparsityPattern class to
+				      * allocate much too much memory
+				      * in some cases. Unless someone
+				      * comes around to improving the
+				      * present function for 3d, there
+				      * is not very much one can do
+				      * about these cases. The typical
+				      * way to work around this
+				      * problem is to use an
+				      * intermediate compressed
+				      * sparsity pattern that only
+				      * allocated memory on
+				      * demand. Refer to the step-11
+				      * example program on how to do
+				      * this.
 				      */
     unsigned int max_couplings_between_dofs () const;
 
