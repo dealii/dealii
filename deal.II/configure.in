@@ -589,6 +589,7 @@ if test "x$doxygen_not_found" = "xyes" ; then
   echo "     WARNING: documentation generation program could be found."
   echo "     WARNING: You can still use the library, but you won't be"
   echo "     WARNING: able to generate API documentation locally on"
-  echo "     WARNING: your machine."
+  echo "     WARNING: your machine. It is available for download,"
+  echo "     WARNING: however."
   echo
 fi
