@@ -1,4 +1,4 @@
-//----------------------------  sparse_matrix_05.cc  ---------------------------
+//----------------------------  sparse_matrix_05a.cc  ---------------------------
 //    sparse_matrix_05.cc,v 1.4 2003/07/03 10:31:46 guido Exp
 //    Version: 
 //
@@ -9,11 +9,11 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparse_matrix_05.cc  ---------------------------
+//----------------------------  sparse_matrix_05a.cc  ---------------------------
 
 
 // check querying the number of nonzero elements in
-// SparseMatrix
+// SparseMatrix when we don't store the diagonal elements explicitly
 
 #include "../tests.h"
 #include <lac/sparse_matrix.h>    
@@ -22,7 +22,7 @@
 
 void test ()
 {
-  SparsityPattern sp (5,5,3);
+  SparsityPattern sp (5,5,3,false);
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<5; ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -34,21 +34,17 @@ void test ()
                                    // first set a few entries. count how many
                                    // entries we have. note that for square
                                    // matrices we also always store the
-                                   // diagonal element, so add one per row,
-                                   // but don't count it when traversing the
-                                   // row
+                                   // diagonal element, except when as above
+                                   // we set the special flag for the matrix
+                                   // sparsity pattern
   unsigned int counter = 0;
   for (unsigned int i=0; i<m.m(); ++i)
-    {
-      for (unsigned int j=0; j<m.m(); ++j)
-        if ((i+2*j+1) % 3 == 0)
-          {
-            m.set (i,j, i*j*.5+.5);
-            if (i!=j)
-              ++counter;
-          }
-      ++counter;
-    }
+    for (unsigned int j=0; j<m.m(); ++j)
+      if ((i+2*j+1) % 3 == 0)
+        {
+          m.set (i,j, i*j*.5+.5);
+          ++counter;
+        }
 
   deallog << m.n_nonzero_elements() << std::endl;
   Assert (m.n_nonzero_elements() == counter,
@@ -61,7 +57,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("sparse_matrix_05.output");
+  std::ofstream logfile("sparse_matrix_05a.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

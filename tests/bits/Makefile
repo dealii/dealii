@@ -142,6 +142,7 @@ sparse_matrix_02.exe    : sparse_matrix_02.g.$(OBJEXT)     $(libraries)
 sparse_matrix_03.exe    : sparse_matrix_03.g.$(OBJEXT)     $(libraries)
 sparse_matrix_04.exe    : sparse_matrix_04.g.$(OBJEXT)     $(libraries)
 sparse_matrix_05.exe    : sparse_matrix_05.g.$(OBJEXT)     $(libraries)
+sparse_matrix_05a.exe   : sparse_matrix_05a.g.$(OBJEXT)    $(libraries)
 sparse_matrix_06.exe    : sparse_matrix_06.g.$(OBJEXT)     $(libraries)
 sparse_matrix_07.exe    : sparse_matrix_07.g.$(OBJEXT)     $(libraries)
 sparse_matrix_08.exe    : sparse_matrix_08.g.$(OBJEXT)     $(libraries)
@@ -201,7 +202,8 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	mapping_q4_3d \
 	q_points find_cell_1 find_cell_2 find_cell_3 \
         sparse_matrix_01 sparse_matrix_02 sparse_matrix_03 \
-        sparse_matrix_04 sparse_matrix_05 sparse_matrix_06 \
+        sparse_matrix_04 sparse_matrix_05 sparse_matrix_05a \
+	sparse_matrix_06 \
         sparse_matrix_07 sparse_matrix_08 sparse_matrix_09 \
         sparse_matrix_10 sparse_matrix_11 sparse_matrix_12
 
