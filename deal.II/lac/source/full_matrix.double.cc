@@ -56,3 +56,8 @@ template void FullMatrix<TYPEMAT>::householder(Vector<TYPEVEC>&);
 template double FullMatrix<TYPEMAT>::least_squares(Vector<TYPEVEC>&, Vector<TYPEVEC>&);
 template void FullMatrix<TYPEMAT>::gsmult(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const iVector&) const;
 
+#undef TYPERES
+#define TYPERES float
+
+template double FullMatrix<TYPEMAT>::residual(Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
+

@@ -35,6 +35,19 @@ class iVector;
  * data types, the implementation of non-inline functions is in
  * "fullmatrix.templates.h". Driver files are in the source tree.
  *
+ * <TABLE BORDER=1>
+ * <TR><TH ALIGN=CENTER><B>this</B><TH ALIGN=CENTER><B>other
+ * matrix</B><TH ALIGN=CENTER><B>vector</B><TH ALIGN=CENTER><B>rhs in
+ * residual</B></TR>
+ * <TR><TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>double</TR>
+ * <TR><TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>float<TD ALIGN=CENTER>double</TR>
+ * <TR><TD ALIGN=CENTER>double<TD ALIGN=CENTER>double<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float</TR>
+ * <TR><TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>double<TD ALIGN=CENTER>double</TR>
+ * <TR><TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>double</TR>
+ * <TR><TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float<TD ALIGN=CENTER>float</TR>
+ * <CAPTION>Instantiations provided in the library</CAPTION>
+ * </TABLE>
+ *
  *  CONVENTIONS for used 'equations' : <p>
  *  - THIS matrix is always named 'A' <p>
  *  - matrices are always uppercase , vectors and scalars are lowercase <p>

@@ -696,112 +696,112 @@ FullMatrix<number>::add (const number s,const FullMatrix<number2>& src)
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
   if ((n()==3) && (m()==3))
   {
-    val[0] += s * src.el(0);
-    val[1] += s * src.el(1);
-    val[2] += s * src.el(2);
-    val[3] += s * src.el(3);
-    val[4] += s * src.el(4);
-    val[5] += s * src.el(5);
-    val[6] += s * src.el(6);
-    val[7] += s * src.el(7);
-    val[8] += s * src.el(8);
+    val[0] += s * src.val[0];
+    val[1] += s * src.val[1];
+    val[2] += s * src.val[2];
+    val[3] += s * src.val[3];
+    val[4] += s * src.val[4];
+    val[5] += s * src.val[5];
+    val[6] += s * src.val[6];
+    val[7] += s * src.val[7];
+    val[8] += s * src.val[8];
   }
   else if ((n()==4) && (m()==4))
   {
-    val[0] += s * src.el(0);
-    val[1] += s * src.el(1);
-    val[2] += s * src.el(2);
-    val[3] += s * src.el(3);
-    val[4] += s * src.el(4);
-    val[5] += s * src.el(5);
-    val[6] += s * src.el(6);
-    val[7] += s * src.el(7);
-    val[8] += s * src.el(8);
-    val[9] += s * src.el(9);
-    val[10] += s * src.el(10);
-    val[11] += s * src.el(11);
-    val[12] += s * src.el(12);
-    val[13] += s * src.el(13);
-    val[14] += s * src.el(14);
-    val[15] += s * src.el(15);
+    val[0] += s * src.val[0];
+    val[1] += s * src.val[1];
+    val[2] += s * src.val[2];
+    val[3] += s * src.val[3];
+    val[4] += s * src.val[4];
+    val[5] += s * src.val[5];
+    val[6] += s * src.val[6];
+    val[7] += s * src.val[7];
+    val[8] += s * src.val[8];
+    val[9] += s * src.val[9];
+    val[10] += s * src.val[10];
+    val[11] += s * src.val[11];
+    val[12] += s * src.val[12];
+    val[13] += s * src.val[13];
+    val[14] += s * src.val[14];
+    val[15] += s * src.val[15];
   }
   else if ((n()==8) && (m()==8))
   {
-    val[0] += s * src.el(0);
-    val[1] += s * src.el(1);
-    val[2] += s * src.el(2);
-    val[3] += s * src.el(3);
-    val[4] += s * src.el(4);
-    val[5] += s * src.el(5);
-    val[6] += s * src.el(6);
-    val[7] += s * src.el(7);
-    val[8] += s * src.el(8);
-    val[9] += s * src.el(9);
-    val[10] += s * src.el(10);
-    val[11] += s * src.el(11);
-    val[12] += s * src.el(12);
-    val[13] += s * src.el(13);
-    val[14] += s * src.el(14);
-    val[15] += s * src.el(15);
-    val[16] += s * src.el(16);
-    val[17] += s * src.el(17);
-    val[18] += s * src.el(18);
-    val[19] += s * src.el(19);
+    val[0] += s * src.val[0];
+    val[1] += s * src.val[1];
+    val[2] += s * src.val[2];
+    val[3] += s * src.val[3];
+    val[4] += s * src.val[4];
+    val[5] += s * src.val[5];
+    val[6] += s * src.val[6];
+    val[7] += s * src.val[7];
+    val[8] += s * src.val[8];
+    val[9] += s * src.val[9];
+    val[10] += s * src.val[10];
+    val[11] += s * src.val[11];
+    val[12] += s * src.val[12];
+    val[13] += s * src.val[13];
+    val[14] += s * src.val[14];
+    val[15] += s * src.val[15];
+    val[16] += s * src.val[16];
+    val[17] += s * src.val[17];
+    val[18] += s * src.val[18];
+    val[19] += s * src.val[19];
 
-    val[20] += s * src.el(20);
-    val[21] += s * src.el(21);
-    val[22] += s * src.el(22);
-    val[23] += s * src.el(23);
-    val[24] += s * src.el(24);
-    val[25] += s * src.el(25);
-    val[26] += s * src.el(26);
-    val[27] += s * src.el(27);
-    val[28] += s * src.el(28);
-    val[29] += s * src.el(29);
+    val[20] += s * src.val[20];
+    val[21] += s * src.val[21];
+    val[22] += s * src.val[22];
+    val[23] += s * src.val[23];
+    val[24] += s * src.val[24];
+    val[25] += s * src.val[25];
+    val[26] += s * src.val[26];
+    val[27] += s * src.val[27];
+    val[28] += s * src.val[28];
+    val[29] += s * src.val[29];
 
-    val[30] += s * src.el(30);
-    val[31] += s * src.el(31);
-    val[32] += s * src.el(32);
-    val[33] += s * src.el(33);
-    val[34] += s * src.el(34);
-    val[35] += s * src.el(35);
-    val[36] += s * src.el(36);
-    val[37] += s * src.el(37);
-    val[38] += s * src.el(38);
-    val[39] += s * src.el(39);
+    val[30] += s * src.val[30];
+    val[31] += s * src.val[31];
+    val[32] += s * src.val[32];
+    val[33] += s * src.val[33];
+    val[34] += s * src.val[34];
+    val[35] += s * src.val[35];
+    val[36] += s * src.val[36];
+    val[37] += s * src.val[37];
+    val[38] += s * src.val[38];
+    val[39] += s * src.val[39];
 
-    val[40] += s * src.el(40);
-    val[41] += s * src.el(41);
-    val[42] += s * src.el(42);
-    val[43] += s * src.el(43);
-    val[44] += s * src.el(44);
-    val[45] += s * src.el(45);
-    val[46] += s * src.el(46);
-    val[47] += s * src.el(47);
-    val[48] += s * src.el(48);
-    val[49] += s * src.el(49);
+    val[40] += s * src.val[40];
+    val[41] += s * src.val[41];
+    val[42] += s * src.val[42];
+    val[43] += s * src.val[43];
+    val[44] += s * src.val[44];
+    val[45] += s * src.val[45];
+    val[46] += s * src.val[46];
+    val[47] += s * src.val[47];
+    val[48] += s * src.val[48];
+    val[49] += s * src.val[49];
 
-    val[50] += s * src.el(50);
-    val[51] += s * src.el(51);
-    val[52] += s * src.el(52);
-    val[53] += s * src.el(53);
-    val[54] += s * src.el(54);
-    val[55] += s * src.el(55);
-    val[56] += s * src.el(56);
-    val[57] += s * src.el(57);
-    val[58] += s * src.el(58);
-    val[59] += s * src.el(59);
+    val[50] += s * src.val[50];
+    val[51] += s * src.val[51];
+    val[52] += s * src.val[52];
+    val[53] += s * src.val[53];
+    val[54] += s * src.val[54];
+    val[55] += s * src.val[55];
+    val[56] += s * src.val[56];
+    val[57] += s * src.val[57];
+    val[58] += s * src.val[58];
+    val[59] += s * src.val[59];
 
-    val[60] += s * src.el(60);
-    val[61] += s * src.el(61);
-    val[62] += s * src.el(62);
-    val[63] += s * src.el(63);
+    val[60] += s * src.val[60];
+    val[61] += s * src.val[61];
+    val[62] += s * src.val[62];
+    val[63] += s * src.val[63];
   }
   else
   {
     const unsigned int size = n()*m();
     for (unsigned int i=0; i<size; i++)
-      val[i] += s * src.el(i);
+      val[i] += s * src.val[i];
   }
 }
 
@@ -817,112 +817,112 @@ FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
 
   if ((n()==3) && (m()==3))
   {
-    val[0] += s * src.el(0);
-    val[0] += s * src.el(1);
-    val[0] += s * src.el(2);
-    val[3] += s * src.el(3);
-    val[3] += s * src.el(4);
-    val[3] += s * src.el(5);
-    val[6] += s * src.el(6);
-    val[6] += s * src.el(7);
-    val[6] += s * src.el(8);
+    val[0] += s * src.val[0];
+    val[0] += s * src.val[1];
+    val[0] += s * src.val[2];
+    val[3] += s * src.val[3];
+    val[3] += s * src.val[4];
+    val[3] += s * src.val[5];
+    val[6] += s * src.val[6];
+    val[6] += s * src.val[7];
+    val[6] += s * src.val[8];
   }
   else if ((n()==4) && (m()==4))
   {
-    val[0] += s * src.el(0);
-    val[0] += s * src.el(1);
-    val[0] += s * src.el(2);
-    val[0] += s * src.el(3);
-    val[4] += s * src.el(4);
-    val[4] += s * src.el(5);
-    val[4] += s * src.el(6);
-    val[4] += s * src.el(7);
-    val[8] += s * src.el(8);
-    val[8] += s * src.el(9);
-    val[8] += s * src.el(10);
-    val[8] += s * src.el(11);
-    val[12] += s * src.el(12);
-    val[12] += s * src.el(13);
-    val[12] += s * src.el(14);
-    val[12] += s * src.el(15);
+    val[0] += s * src.val[0];
+    val[0] += s * src.val[1];
+    val[0] += s * src.val[2];
+    val[0] += s * src.val[3];
+    val[4] += s * src.val[4];
+    val[4] += s * src.val[5];
+    val[4] += s * src.val[6];
+    val[4] += s * src.val[7];
+    val[8] += s * src.val[8];
+    val[8] += s * src.val[9];
+    val[8] += s * src.val[10];
+    val[8] += s * src.val[11];
+    val[12] += s * src.val[12];
+    val[12] += s * src.val[13];
+    val[12] += s * src.val[14];
+    val[12] += s * src.val[15];
   }
   else if ((n()==8) && (m()==8))
   {
-    val[0] += s * src.el(0);
-    val[0] += s * src.el(1);
-    val[0] += s * src.el(2);
-    val[0] += s * src.el(3);
-    val[0] += s * src.el(4);
-    val[0] += s * src.el(5);
-    val[0] += s * src.el(6);
-    val[0] += s * src.el(7);
-    val[8] += s * src.el(8);
-    val[8] += s * src.el(9);
-    val[8] += s * src.el(10);
-    val[8] += s * src.el(11);
-    val[8] += s * src.el(12);
-    val[8] += s * src.el(13);
-    val[8] += s * src.el(14);
-    val[8] += s * src.el(15);
-    val[16] += s * src.el(16);
-    val[16] += s * src.el(17);
-    val[16] += s * src.el(18);
-    val[16] += s * src.el(19);
+    val[0] += s * src.val[0];
+    val[0] += s * src.val[1];
+    val[0] += s * src.val[2];
+    val[0] += s * src.val[3];
+    val[0] += s * src.val[4];
+    val[0] += s * src.val[5];
+    val[0] += s * src.val[6];
+    val[0] += s * src.val[7];
+    val[8] += s * src.val[8];
+    val[8] += s * src.val[9];
+    val[8] += s * src.val[10];
+    val[8] += s * src.val[11];
+    val[8] += s * src.val[12];
+    val[8] += s * src.val[13];
+    val[8] += s * src.val[14];
+    val[8] += s * src.val[15];
+    val[16] += s * src.val[16];
+    val[16] += s * src.val[17];
+    val[16] += s * src.val[18];
+    val[16] += s * src.val[19];
 
-    val[16] += s * src.el(20);
-    val[16] += s * src.el(21);
-    val[16] += s * src.el(22);
-    val[16] += s * src.el(23);
-    val[24] += s * src.el(24);
-    val[24] += s * src.el(25);
-    val[24] += s * src.el(26);
-    val[24] += s * src.el(27);
-    val[24] += s * src.el(28);
-    val[24] += s * src.el(29);
+    val[16] += s * src.val[20];
+    val[16] += s * src.val[21];
+    val[16] += s * src.val[22];
+    val[16] += s * src.val[23];
+    val[24] += s * src.val[24];
+    val[24] += s * src.val[25];
+    val[24] += s * src.val[26];
+    val[24] += s * src.val[27];
+    val[24] += s * src.val[28];
+    val[24] += s * src.val[29];
 
-    val[24] += s * src.el(30);
-    val[24] += s * src.el(31);
-    val[32] += s * src.el(32);
-    val[32] += s * src.el(33);
-    val[32] += s * src.el(34);
-    val[32] += s * src.el(35);
-    val[32] += s * src.el(36);
-    val[32] += s * src.el(37);
-    val[32] += s * src.el(38);
-    val[32] += s * src.el(39);
+    val[24] += s * src.val[30];
+    val[24] += s * src.val[31];
+    val[32] += s * src.val[32];
+    val[32] += s * src.val[33];
+    val[32] += s * src.val[34];
+    val[32] += s * src.val[35];
+    val[32] += s * src.val[36];
+    val[32] += s * src.val[37];
+    val[32] += s * src.val[38];
+    val[32] += s * src.val[39];
 
-    val[40] += s * src.el(40);
-    val[40] += s * src.el(41);
-    val[40] += s * src.el(42);
-    val[40] += s * src.el(43);
-    val[40] += s * src.el(44);
-    val[40] += s * src.el(45);
-    val[40] += s * src.el(46);
-    val[40] += s * src.el(47);
-    val[48] += s * src.el(48);
-    val[48] += s * src.el(49);
+    val[40] += s * src.val[40];
+    val[40] += s * src.val[41];
+    val[40] += s * src.val[42];
+    val[40] += s * src.val[43];
+    val[40] += s * src.val[44];
+    val[40] += s * src.val[45];
+    val[40] += s * src.val[46];
+    val[40] += s * src.val[47];
+    val[48] += s * src.val[48];
+    val[48] += s * src.val[49];
 
-    val[48] += s * src.el(50);
-    val[48] += s * src.el(51);
-    val[48] += s * src.el(52);
-    val[48] += s * src.el(53);
-    val[48] += s * src.el(54);
-    val[48] += s * src.el(55);
-    val[56] += s * src.el(56);
-    val[56] += s * src.el(57);
-    val[56] += s * src.el(58);
-    val[56] += s * src.el(59);
+    val[48] += s * src.val[50];
+    val[48] += s * src.val[51];
+    val[48] += s * src.val[52];
+    val[48] += s * src.val[53];
+    val[48] += s * src.val[54];
+    val[48] += s * src.val[55];
+    val[56] += s * src.val[56];
+    val[56] += s * src.val[57];
+    val[56] += s * src.val[58];
+    val[56] += s * src.val[59];
 
-    val[56] += s * src.el(60);
-    val[56] += s * src.el(61);
-    val[56] += s * src.el(62);
-    val[56] += s * src.el(63);
+    val[56] += s * src.val[60];
+    val[56] += s * src.val[61];
+    val[56] += s * src.val[62];
+    val[56] += s * src.val[63];
   }
   else
   {
     const unsigned int size = n()*m();
     for (unsigned int i=0; i<size; i++)
-      val[i] += s * src.el(i);
+      val[i] += s * src.val[i];
   }
 }
 
@@ -937,113 +937,113 @@ FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
 
   if ((n()==3) && (m()==3))
   {
-    val[0] += s * src.el(0);
-    val[1] += s * src.el(3);
-    val[2] += s * src.el(6);
+    val[0] += s * src.val[0];
+    val[1] += s * src.val[3];
+    val[2] += s * src.val[6];
 
-    val[3] += s * src.el(1);
-    val[4] += s * src.el(4);
-    val[5] += s * src.el(7);
+    val[3] += s * src.val[1];
+    val[4] += s * src.val[4];
+    val[5] += s * src.val[7];
 
-    val[6] += s * src.el(2);
-    val[7] += s * src.el(5);
-    val[8] += s * src.el(8);
+    val[6] += s * src.val[2];
+    val[7] += s * src.val[5];
+    val[8] += s * src.val[8];
   }
   else if ((n()==4) && (m()==4))
   {
-    val[0] += s * src.el(0);
-    val[1] += s * src.el(4);
-    val[2] += s * src.el(8);
-    val[3] += s * src.el(12);
+    val[0] += s * src.val[0];
+    val[1] += s * src.val[4];
+    val[2] += s * src.val[8];
+    val[3] += s * src.val[12];
 
-    val[4] += s * src.el(1);
-    val[5] += s * src.el(5);
-    val[6] += s * src.el(9);
-    val[7] += s * src.el(13);
+    val[4] += s * src.val[1];
+    val[5] += s * src.val[5];
+    val[6] += s * src.val[9];
+    val[7] += s * src.val[13];
 
-    val[8] += s * src.el(2);
-    val[9] += s * src.el(6);
-    val[10] += s * src.el(10);
-    val[11] += s * src.el(14);
+    val[8] += s * src.val[2];
+    val[9] += s * src.val[6];
+    val[10] += s * src.val[10];
+    val[11] += s * src.val[14];
 
-    val[12] += s * src.el(3);
-    val[13] += s * src.el(7);
-    val[14] += s * src.el(11);
-    val[15] += s * src.el(15);
+    val[12] += s * src.val[3];
+    val[13] += s * src.val[7];
+    val[14] += s * src.val[11];
+    val[15] += s * src.val[15];
   }
   else if ((n()==8) && (m()==8))
   {
-    val[0] += s * src.el(0);
-    val[1] += s * src.el(8);
-    val[2] += s * src.el(16);
-    val[3] += s * src.el(24);
-    val[4] += s * src.el(32);
-    val[5] += s * src.el(40);
-    val[6] += s * src.el(48);
-    val[7] += s * src.el(56);
+    val[0] += s * src.val[0];
+    val[1] += s * src.val[8];
+    val[2] += s * src.val[16];
+    val[3] += s * src.val[24];
+    val[4] += s * src.val[32];
+    val[5] += s * src.val[40];
+    val[6] += s * src.val[48];
+    val[7] += s * src.val[56];
 
-    val[8] += s * src.el(1);
-    val[9] += s * src.el(9);
-    val[10] += s * src.el(17);
-    val[11] += s * src.el(25);
-    val[12] += s * src.el(33);
-    val[13] += s * src.el(41);
-    val[14] += s * src.el(49);
-    val[15] += s * src.el(57);
+    val[8] += s * src.val[1];
+    val[9] += s * src.val[9];
+    val[10] += s * src.val[17];
+    val[11] += s * src.val[25];
+    val[12] += s * src.val[33];
+    val[13] += s * src.val[41];
+    val[14] += s * src.val[49];
+    val[15] += s * src.val[57];
 
-    val[16] += s * src.el(2);
-    val[17] += s * src.el(10);
-    val[18] += s * src.el(18);
-    val[19] += s * src.el(26);
-    val[20] += s * src.el(34);
-    val[21] += s * src.el(42);
-    val[22] += s * src.el(50);
-    val[23] += s * src.el(58);
+    val[16] += s * src.val[2];
+    val[17] += s * src.val[10];
+    val[18] += s * src.val[18];
+    val[19] += s * src.val[26];
+    val[20] += s * src.val[34];
+    val[21] += s * src.val[42];
+    val[22] += s * src.val[50];
+    val[23] += s * src.val[58];
 
-    val[24] += s * src.el(3);
-    val[25] += s * src.el(11);
-    val[26] += s * src.el(19);
-    val[27] += s * src.el(27);
-    val[28] += s * src.el(35);
-    val[29] += s * src.el(43);
-    val[30] += s * src.el(51);
-    val[31] += s * src.el(59);
+    val[24] += s * src.val[3];
+    val[25] += s * src.val[11];
+    val[26] += s * src.val[19];
+    val[27] += s * src.val[27];
+    val[28] += s * src.val[35];
+    val[29] += s * src.val[43];
+    val[30] += s * src.val[51];
+    val[31] += s * src.val[59];
 
-    val[32] += s * src.el(4);
-    val[33] += s * src.el(12);
-    val[34] += s * src.el(20);
-    val[35] += s * src.el(28);
-    val[36] += s * src.el(36);
-    val[37] += s * src.el(44);
-    val[38] += s * src.el(52);
-    val[39] += s * src.el(60);
+    val[32] += s * src.val[4];
+    val[33] += s * src.val[12];
+    val[34] += s * src.val[20];
+    val[35] += s * src.val[28];
+    val[36] += s * src.val[36];
+    val[37] += s * src.val[44];
+    val[38] += s * src.val[52];
+    val[39] += s * src.val[60];
 
-    val[40] += s * src.el(5);
-    val[41] += s * src.el(13);
-    val[42] += s * src.el(21);
-    val[43] += s * src.el(29);
-    val[44] += s * src.el(37);
-    val[45] += s * src.el(45);
-    val[46] += s * src.el(53);
-    val[47] += s * src.el(61);
+    val[40] += s * src.val[5];
+    val[41] += s * src.val[13];
+    val[42] += s * src.val[21];
+    val[43] += s * src.val[29];
+    val[44] += s * src.val[37];
+    val[45] += s * src.val[45];
+    val[46] += s * src.val[53];
+    val[47] += s * src.val[61];
 
-    val[48] += s * src.el(6);
-    val[49] += s * src.el(14);
-    val[50] += s * src.el(22);
-    val[51] += s * src.el(30);
-    val[52] += s * src.el(38);
-    val[53] += s * src.el(46);
-    val[54] += s * src.el(54);
-    val[55] += s * src.el(62);
+    val[48] += s * src.val[6];
+    val[49] += s * src.val[14];
+    val[50] += s * src.val[22];
+    val[51] += s * src.val[30];
+    val[52] += s * src.val[38];
+    val[53] += s * src.val[46];
+    val[54] += s * src.val[54];
+    val[55] += s * src.val[62];
 
-    val[56] += s * src.el(7);
-    val[57] += s * src.el(15);
-    val[58] += s * src.el(23);
-    val[59] += s * src.el(31);
-    val[60] += s * src.el(39);
-    val[61] += s * src.el(47);
-    val[62] += s * src.el(55);
-    val[63] += s * src.el(63);
+    val[56] += s * src.val[7];
+    val[57] += s * src.val[15];
+    val[58] += s * src.val[23];
+    val[59] += s * src.val[31];
+    val[60] += s * src.val[39];
+    val[61] += s * src.val[47];
+    val[62] += s * src.val[55];
+    val[63] += s * src.val[63];
   }
   else
     Assert (false, ExcNotImplemented(n()));
