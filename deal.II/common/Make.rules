@@ -17,10 +17,10 @@ else
   MT = ==
 endif
 
-%.g.o : %.cc
+%.g.$(OBJEXT) : %.cc
 	@echo =====debug======$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(CXXFLAGS) -c $< -o $@
-%.o : %.cc
+%.$(OBJEXT) : %.cc
 	@echo =====optimized==$(MT)== $<
 	@$(CXX) $(CXXFLAGS.o) $(CXXFLAGS) -c $< -o $@
 
@@ -33,6 +33,6 @@ all-cc-files = $(shell echo *.cc)
 Makefile.depend: $(all-cc-files)
 	@echo =====Dependencies== Makefile.depend
 	@$(CXX) $(flags) $^ -M > $@
-	@$(PERL) -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.g.o:/;' $@
+	@$(PERL) -pi~ -e 's/(^[^.]+)\.$(OBJEXT):/\1.$(OBJEXT) \1.g.$(OBJEXT):/;' $@
 
 include Makefile.depend
