@@ -380,8 +380,8 @@ FE_DGP<dim>::base_element (const unsigned int index) const
 
 template <int dim>
 bool
-FE_DGP<dim>::has_support_on_face (const unsigned int shape_index,
-				  const unsigned int face_index) const
+FE_DGP<dim>::has_support_on_face (const unsigned int,
+				  const unsigned int) const
 {
   return true;
 }
