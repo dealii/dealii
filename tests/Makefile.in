@@ -20,7 +20,7 @@ big-tests:
 
 report:
 	@for i in base lac fe deal.II ; do \
-		echo =======Report: $i ======= ; \
+		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	done
 
