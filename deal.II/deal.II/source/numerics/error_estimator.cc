@@ -475,6 +475,26 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 				       // loop over all faces of this cell
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
+					   // make sure we do work
+					   // only once: this face
+					   // may either be regular
+					   // or irregular. if it is
+					   // regular and has a
+					   // neighbor, then we
+					   // visit the face twice,
+					   // once from every
+					   // side. let the one with
+					   // the lower index do the
+					   // work. if it is at the
+					   // boundary, or if the
+					   // face is irregular,
+					   // then do the work below
+	  if ((cell->face(face_no)->has_children() == false) &&
+	      !cell->at_boundary(face_no) &&
+	      (cell->neighbor(face_no)->level() == cell->level()) &&
+	      (cell->neighbor(face_no)->index() < cell->index()))
+	    continue;
+	  
 					   // if we already visited
 					   // this face: do
 					   // nothing. only check
