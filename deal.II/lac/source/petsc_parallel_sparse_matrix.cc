@@ -72,8 +72,8 @@ namespace PETScWrappers
     SparseMatrix::
     SparseMatrix (const MPI_Comm                  &communicator,
                   const CompressedSparsityPattern &sparsity_pattern,
-                  const std::vector<unsigned int>  local_rows_per_process,
-                  const std::vector<unsigned int>  local_columns_per_process,
+                  const std::vector<unsigned int> &local_rows_per_process,
+                  const std::vector<unsigned int> &local_columns_per_process,
                   const unsigned int               this_process,
                   const bool                       preset_nonzero_locations)
                     :
@@ -142,8 +142,8 @@ namespace PETScWrappers
     SparseMatrix::
     reinit (const MPI_Comm                  &communicator,
             const CompressedSparsityPattern &sparsity_pattern,
-            const std::vector<unsigned int>  local_rows_per_process,
-            const std::vector<unsigned int>  local_columns_per_process,
+            const std::vector<unsigned int> &local_rows_per_process,
+            const std::vector<unsigned int> &local_columns_per_process,
             const unsigned int               this_process,
             const bool                       preset_nonzero_locations)
     {
@@ -250,8 +250,8 @@ namespace PETScWrappers
     void
     SparseMatrix::
     do_reinit (const CompressedSparsityPattern &sparsity_pattern,
-               const std::vector<unsigned int>  local_rows_per_process,
-               const std::vector<unsigned int>  local_columns_per_process,
+               const std::vector<unsigned int> &local_rows_per_process,
+               const std::vector<unsigned int> &local_columns_per_process,
                const unsigned int               this_process,
                const bool                       preset_nonzero_locations)
     {

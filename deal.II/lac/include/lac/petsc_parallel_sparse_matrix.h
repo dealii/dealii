@@ -280,8 +280,8 @@ namespace PETScWrappers
                                           */
         SparseMatrix (const MPI_Comm                  &communicator,
                       const CompressedSparsityPattern &sparsity_pattern,
-                      const std::vector<unsigned int>  local_rows_per_process,
-                      const std::vector<unsigned int>  local_columns_per_process,
+                      const std::vector<unsigned int> &local_rows_per_process,
+                      const std::vector<unsigned int> &local_columns_per_process,
                       const unsigned int               this_process,
                       const bool                       preset_nonzero_locations = false);
 
@@ -387,8 +387,8 @@ namespace PETScWrappers
                                           */
         void reinit (const MPI_Comm                  &communicator,
                      const CompressedSparsityPattern &sparsity_pattern,
-                     const std::vector<unsigned int>  local_rows_per_process,
-                     const std::vector<unsigned int>  local_columns_per_process,
+                     const std::vector<unsigned int> &local_rows_per_process,
+                     const std::vector<unsigned int> &local_columns_per_process,
                      const unsigned int               this_process,
                      const bool                       preset_nonzero_locations = false);
         
@@ -451,8 +451,8 @@ namespace PETScWrappers
                                           * Same as previous functions.
                                           */
         void do_reinit (const CompressedSparsityPattern &sparsity_pattern,
-                        const std::vector<unsigned int>  local_rows_per_process,
-                        const std::vector<unsigned int>  local_columns_per_process,
+                        const std::vector<unsigned int> &local_rows_per_process,
+                        const std::vector<unsigned int> &local_columns_per_process,
                         const unsigned int               this_process,
                         const bool                       preset_nonzero_locations);
     };
