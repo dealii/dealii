@@ -6362,7 +6362,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 					   // and maybe already flag additional
 					   // cells in this loop
 	  for (cell=last_active(); cell != endc; --cell)
-	    if (!cell->refine_flag_set() == true) 
+	    if (cell->refine_flag_set() == false) 
 	      for (unsigned int vertex=0;
 		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 		if (vertex_level[cell->vertex_index(vertex)] >
@@ -6385,7 +6385,26 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 			 ++v)
 		      vertex_level[cell->vertex_index(v)]
 			= max (vertex_level[cell->vertex_index(v)],
-				 cell->level()+1);
+			       cell->level()+1);
+
+						     // now that we fixed this cell,
+						     // we can safely leave this
+						     // inner loop. however, we check
+						     // the remaining vertices before
+						     // leaving. note that since
+						     // we flagged this cell, 
+						     // vertex_level might be up to
+						     // three levels higher than this
+						     // cell
+		    for (unsigned int v=vertex+1; v<GeometryInfo<dim>::vertices_per_cell;
+			 ++v)
+		      Assert (vertex_level[cell->vertex_index(v)]
+			      <=
+			      cell->level()+3,
+			      ExcInternalError());
+		    
+						     // next cell
+		    break;
 		  };	  
 	};
 
