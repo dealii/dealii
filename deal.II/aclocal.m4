@@ -501,8 +501,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       templates and conditional compilation
  	  dnl #175: "out-of-bounds array indices": the same reason as
 	  dnl       for Compaq cxx
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
-          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175"
+ 	  dnl #284: "NULL references not allowed"
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
+          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
           ;;
 
