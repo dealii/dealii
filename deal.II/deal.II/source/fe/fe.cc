@@ -200,7 +200,7 @@ void FiniteElement<1>::fill_fe_face_values (const DoFHandler<1>::cell_iterator &
 					    const bool,
 					    const Boundary<1>       &) const {
   Assert (false, ExcNotImplemented());
-}
+};
 
 
 
@@ -248,6 +248,65 @@ void FiniteElement<dim>::fill_fe_face_values (const DoFHandler<dim>::cell_iterat
 			unit_points, normal_vectors);
 };
 
+
+
+
+void FiniteElement<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
+					       const unsigned int       ,
+					       const unsigned int       ,
+					       const vector<Point<0> > &,
+					       const vector<Point<1> > &,
+					       vector<dFMatrix>        &,
+					       const bool               ,
+					       vector<Point<1> >       &,
+					       const bool               ,
+					       vector<double>          &,
+					       const bool               ,
+					       vector<Point<1> >       &,
+					       const bool,
+					       const Boundary<1>       &) const {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void FiniteElement<dim>::fill_fe_subface_values (const DoFHandler<dim>::cell_iterator &cell,
+						 const unsigned int           face_no,
+						 const unsigned int           subface_no,
+						 const vector<Point<dim-1> > &unit_points,
+						 const vector<Point<dim> > &global_unit_points,
+						 vector<dFMatrix>    &jacobians,
+						 const bool           compute_jacobians,
+						 vector<Point<dim> > &q_points,
+						 const bool           compute_q_points,
+						 vector<double>      &face_jacobi_determinants,
+						 const bool           compute_face_jacobians,
+						 vector<Point<dim> > &normal_vectors,
+						 const bool           compute_normal_vectors,
+						 const Boundary<dim> &boundary) const {
+  Assert (jacobians.size() == unit_points.size(),
+	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
+  Assert (q_points.size() == unit_points.size(),
+	  ExcWrongFieldDimension(q_points.size(), unit_points.size()));
+  Assert (global_unit_points.size() == unit_points.size(),
+	  ExcWrongFieldDimension(global_unit_points.size(), unit_points.size()));
+
+  static vector<Point<dim> > dummy(total_dofs);
+  fill_fe_values (cell, global_unit_points,
+		  jacobians, compute_jacobians,
+		  dummy, false,
+		  q_points, compute_q_points,
+		  boundary);
+  
+  if (compute_face_jacobians)
+    get_subface_jacobians (cell->face(face_no), subface_no,
+			   unit_points, face_jacobi_determinants);
+
+  if (compute_normal_vectors)
+    get_normal_vectors (cell, face_no, subface_no,
+			unit_points, normal_vectors);
+};
 
 
 /*------------------------------- Explicit Instantiations -------------*/

@@ -160,7 +160,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 				     vector<Point<dim> >(quadrature.n_quadrature_points)),
 		unit_quadrature_points(quadrature.get_quad_points())
 {
-  Assert ((update_flags | update_normal_vectors) == false,
+  Assert ((update_flags & update_normal_vectors) == false,
 	  ExcInvalidUpdateFlag());
 
   for (unsigned int i=0; i<fe.total_dofs; ++i)
@@ -254,20 +254,15 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 				   n_dofs,
 				   n_faces_or_subfaces,
 				   update_flags),
+		unit_shape_gradients (n_faces_or_subfaces,
+				      vector<vector<Point<dim> > >(n_dofs,
+								   vector<Point<dim> >(n_q_points))),
 		unit_face_quadrature_points (n_q_points, Point<dim-1>()),
 		unit_quadrature_points (n_faces_or_subfaces,
 					vector<Point<dim> >(n_q_points, Point<dim>())),
 		face_jacobi_determinants (n_q_points, 0),
 		normal_vectors (n_q_points)
-{
-  for (unsigned int i=0; i<n_faces_or_subfaces; ++i) 
-    {
-      unit_shape_gradients[i].resize (n_dofs,
-				      vector<Point<dim> >(n_q_points));
-      unit_quadrature_points[i].resize (n_q_points,
-					Point<dim>());
-    };
-};
+{};
 
 
 
@@ -358,10 +353,11 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
       Assert (update_flags & update_jacobians, ExcCannotInitializeField());
       
       for (unsigned int i=0; i<fe.total_dofs; ++i)
-	for (unsigned int j=0; j<n_quadrature_points; ++j) 
-	  {
-	    shape_gradients[i][j] = Point<dim>();
-	    
+	{
+	  fill_n (shape_gradients[i].begin(),
+		  n_quadrature_points,
+		  Point<dim>());
+	  for (unsigned int j=0; j<n_quadrature_points; ++j) 
 	    for (unsigned int s=0; s<dim; ++s)
 					       // (grad psi)_s =
 					       // (grad_{\xi\eta})_b J_{bs}
@@ -370,7 +366,7 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 		shape_gradients[i][j](s)
 		  += (unit_shape_gradients[face_no][i][j](b) *
 		      jacobi_matrices[j](b,s));
-	  };
+	};
     };
   
   
@@ -443,6 +439,9 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   const unsigned int         subface_no,
 				   const FiniteElement<dim>  &fe,
 				   const Boundary<dim>       &boundary) {
+  Assert (cell->face(face_no)->at_boundary() == false,
+	  ExcReinitCalledWithBoundaryFace());
+  
   present_cell  = cell;
   selected_dataset = face_no*(1<<(dim-1)) + subface_no;
 				   // fill jacobi matrices and real
@@ -471,11 +470,12 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
     {
       Assert (update_flags & update_jacobians, ExcCannotInitializeField());
       
-      for (unsigned int i=0; i<fe.total_dofs; ++i)
-	for (unsigned int j=0; j<n_quadrature_points; ++j) 
-	  {
-	    shape_gradients[i][j] = Point<dim>();
-	    
+      for (unsigned int i=0; i<fe.total_dofs; ++i) 
+	{
+	  fill_n (shape_gradients[i].begin(),
+		  n_quadrature_points,
+		  Point<dim>());
+	  for (unsigned int j=0; j<n_quadrature_points; ++j) 
 	    for (unsigned int s=0; s<dim; ++s)
 					       // (grad psi)_s =
 					       // (grad_{\xi\eta})_b J_{bs}
@@ -484,7 +484,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 		shape_gradients[i][j](s)
 		  += (unit_shape_gradients[selected_dataset][i][j](b) *
 		      jacobi_matrices[j](b,s));
-	  };
+	};
     };
   
   
