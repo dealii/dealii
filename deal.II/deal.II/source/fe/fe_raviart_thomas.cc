@@ -889,10 +889,10 @@ FE_RaviartThomas<2>::initialize_restriction ()
 	this->restriction[1](8,6) = -1.;
 	this->restriction[1](8,2) = 1.;
 	
-	this->restriction[3](8,7) = 1.;
-	this->restriction[3](8,3) = -1.;
-	this->restriction[2](8,7) = -1.;
-	this->restriction[2](8,3) = 1.;
+	this->restriction[3](9,7) = 1.;
+	this->restriction[3](9,3) = -1.;
+	this->restriction[2](9,7) = -1.;
+	this->restriction[2](9,3) = 1.;
 	
 	break;
       };
