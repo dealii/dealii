@@ -97,6 +97,10 @@
    friends of the enclosing class. */
 #undef DEAL_II_NESTED_CLASS_FRIEND_BUG
 
+/* Defined if the compiler does not understand friend declarations for nested
+   member classes when giving a full class specification. */
+#undef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
+
 /* Path to the deal.II directory */
 #undef DEAL_II_PATH
 

@@ -2172,8 +2172,8 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
 
 
 dnl -------------------------------------------------------------
-dnl gcc 2.95 does not correctly implement the resolution of 
-dnl defect report #45 to the C++ standard (see
+dnl gcc 2.95 as well as some other compilers do not correctly implement
+dnl the resolution of defect report #45 to the C++ standard (see
 dnl http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/cwg_active.html#45).
 dnl try to detect this, and set a flag correspondingly. in short,
 dnl the DR says that this is allowed, since member classes are
@@ -2221,6 +2221,64 @@ AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_FRIEND_BUG, dnl
                       the resolution of defect report #45 to the C++
                       standard, which makes nested types implicit friends
                       of the enclosing class.])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl gcc up to 3.3 won't accept the following code:
+dnl -----------------------------
+dnl template <typename> class X {
+dnl     template <typename> class Y {};
+dnl 
+dnl     template <typename T>
+dnl     template <typename>
+dnl     friend class X<T>::Y;
+dnl };
+dnl 
+dnl X<int> x;
+dnl -----------------------------
+dnl
+dnl They don't accept the X<T>::Y here, probably because the class is
+dnl not complete at this point. gcc3.4 gets it right, though. One
+dnl can work around by simply saying 
+dnl   template <typename> friend class Y;
+dnl but then icc doesn't understand this :-( So everyone's got a bug
+dnl here. Also, note that the standard says that Y is an implicit friend
+dnl of X, but again, many compiler don't implement this correctly, which
+dnl is why we have to do something like the above in the first place...
+dnl
+dnl Usage: DEAL_II_CHECK_NESTED_CLASS_TEMPL_FRIEND_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_NESTED_CLASS_TEMPL_FRIEND_BUG, dnl
+[
+  AC_MSG_CHECKING(for nested template class friends bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      template <typename> class X {
+          template <typename> class Y {};
+
+          template <typename T>
+          template <typename>
+          friend class X<T>::Y;
+      };
+
+      X<int> x;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG, 1, 
+                     [Defined if the compiler does not understand friend
+	              declarations for nested member classes when giving
+                      a full class specification.])
     ])
 ])
 
