@@ -262,7 +262,7 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>                 &dof_
       for (unsigned int n=0; n<2; ++n)
 	{
 					   // find right active neighbor
-	  typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
+	  DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
 	  if (neighbor.state() == valid)
 	    while (neighbor->has_children())
 	      neighbor = neighbor->child(n==0 ? 1 : 0);
