@@ -59,7 +59,7 @@
  * returning the solution to the system @p{Ax=b} on the coarsest level
  * in @p{x}.
  * 
- * @author Guido Kanschat, 1999, 2001, 2002, Ralf Hartmann 2002
+ * @author Guido Kanschat, 1999, 2001, 2002, Ralf Hartmann 2002, 2003.
  */
 template <class VECTOR>
 class Multigrid : public Subscriptor
@@ -137,6 +137,13 @@ class Multigrid : public Subscriptor
 				      */
     void set_edge_matrices (const MGMatrixBase<VECTOR>& edge_down,
 			    const MGMatrixBase<VECTOR>& edge_up);
+
+#ifdef MG_DEBUG
+    void print_vector (const unsigned int level,
+		       const VECTOR &v,
+		       const char *name) const;
+#endif
+    
   private:
     
 				     /**
@@ -154,6 +161,7 @@ class Multigrid : public Subscriptor
 				      * this level.
 				      */
     void level_mgstep (const unsigned int level);
+
 				     /**
 				      * Level for coarse grid solution.
 				      */
@@ -220,6 +228,15 @@ class Multigrid : public Subscriptor
 				      */
     SmartPointer<const MGMatrixBase<VECTOR> > edge_up;
 
+				     /**
+				      * Pointer to the MGDoFHandler
+				      * given to the constructor. Only
+				      * needed for @p{MG_DEBUG}
+				      * defined.
+				      */
+#ifdef MG_DEBUG
+    SmartPointer<const MGDoFHandler<deal_II_dimension> > mg_dof_handler;
+#endif
 				     /**
 				      * Exception.
 				      */
@@ -345,6 +362,9 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 		post_smooth(&post_smooth),
 		edge_down(0),
 		edge_up(0)
+#ifdef MG_DEBUG  
+                , mg_dof_handler(&mg_dof_handler)
+#endif
 {}
 
 
