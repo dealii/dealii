@@ -230,10 +230,10 @@ LAPACKFullMatrix<number>::fill (
   const unsigned int src_offset_i,
   const unsigned int src_offset_j)
 {
-  const unsigned int endrow = src_offset_i + m();
-  const unsigned int endcol = src_offset_j + n();
+  const unsigned int endrow = src_offset_i + this->m();
+  const unsigned int endcol = src_offset_j + this->n();
 
-  for (unsigned int i=0;i<m();++i)
+  for (unsigned int i=0;i<this->m();++i)
     {
       const typename MATRIX::const_iterator end = M.end(src_offset_i+i);
       for (typename MATRIX::const_iterator entry = M.begin(src_offset_i+i);
