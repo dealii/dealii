@@ -271,6 +271,11 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * exception declared in this
 				      * class to see which characters
 				      * are valid and which are not.
+				      *
+				      * The actual type for the
+				      * template argument may only be
+				      * either @p{Vector<double>} or
+				      * @p{BlockVector<double>}.
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR                   &data,
@@ -300,6 +305,11 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * components by appending an
 				      * underscore and the number of
 				      * each component to @p{name}
+				      *
+				      * The actual type for the
+				      * template argument may only be
+				      * either @p{Vector<double>} or
+				      * @p{BlockVector<double>}.
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR         &data,
