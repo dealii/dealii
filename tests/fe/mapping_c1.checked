@@ -1,61 +1,61 @@
-JobId Tue Mar 27 15:27:48 2001
-DEAL::Normalized radius=-0.707107 -0.707107
-DEAL::C1 normal vector 0: -0.707107 -0.707107
-DEAL::Q3 normal vector 0: -0.710090 -0.704111
-DEAL::Normalized radius=0.000000 -1.000000
-DEAL::C1 normal vector 1: 0.000000 -1.000000
-DEAL::Q3 normal vector 1: 0.004228 -0.999991
-DEAL::Normalized radius=-0.707107 -0.707107
-DEAL::C1 normal vector 0: -0.707107 -0.707107
-DEAL::Q3 normal vector 0: -0.704111 -0.710090
-DEAL::Normalized radius=-1.000000 0.000000
-DEAL::C1 normal vector 1: -1.000000 0.000000
-DEAL::Q3 normal vector 1: -0.999991 0.004228
-DEAL::Normalized radius=1.000000 0.000000
-DEAL::C1 normal vector 0: 1.000000 0.000000
-DEAL::Q3 normal vector 0: 0.999991 -0.004228
-DEAL::Normalized radius=0.707107 0.707107
-DEAL::C1 normal vector 1: 0.707107 0.707107
-DEAL::Q3 normal vector 1: 0.704111 0.710090
-DEAL::Normalized radius=0.000000 1.000000
-DEAL::C1 normal vector 0: 0.000000 1.000000
-DEAL::Q3 normal vector 0: -0.004228 0.999991
-DEAL::Normalized radius=0.707107 0.707107
-DEAL::C1 normal vector 1: 0.707107 0.707107
-DEAL::Q3 normal vector 1: 0.710090 0.704111
-DEAL::Normalized radius=-0.707107 0.707107
-DEAL::C1 normal vector 0: -0.707107 0.707107
-DEAL::Q3 normal vector 0: -0.710090 0.704111
-DEAL::Normalized radius=0.000000 1.000000
-DEAL::C1 normal vector 1: 0.000000 1.000000
-DEAL::Q3 normal vector 1: 0.004228 0.999991
-DEAL::Normalized radius=-1.000000 0.000000
-DEAL::C1 normal vector 0: -1.000000 0.000000
-DEAL::Q3 normal vector 0: -0.999991 -0.004228
-DEAL::Normalized radius=-0.707107 0.707107
-DEAL::C1 normal vector 1: -0.707107 0.707107
-DEAL::Q3 normal vector 1: -0.704111 0.710090
-DEAL::Normalized radius=0.000000 -1.000000
-DEAL::C1 normal vector 0: -0.000000 -1.000000
-DEAL::Q3 normal vector 0: -0.000553 -1.000000
-DEAL::Normalized radius=0.382683 -0.923880
-DEAL::C1 normal vector 1: 0.382683 -0.923880
-DEAL::Q3 normal vector 1: 0.383194 -0.923668
-DEAL::Normalized radius=0.382683 -0.923880
-DEAL::C1 normal vector 0: 0.382683 -0.923880
-DEAL::Q3 normal vector 0: 0.382173 -0.924091
-DEAL::Normalized radius=0.707107 -0.707107
-DEAL::C1 normal vector 1: 0.707107 -0.707107
-DEAL::Q3 normal vector 1: 0.707497 -0.706716
-DEAL::Normalized radius=0.707107 -0.707107
-DEAL::C1 normal vector 0: 0.707107 -0.707107
-DEAL::Q3 normal vector 0: 0.706716 -0.707497
-DEAL::Normalized radius=0.923880 -0.382683
-DEAL::C1 normal vector 1: 0.923880 -0.382683
-DEAL::Q3 normal vector 1: 0.924091 -0.382173
-DEAL::Normalized radius=0.923880 -0.382683
-DEAL::C1 normal vector 0: 0.923880 -0.382683
-DEAL::Q3 normal vector 0: 0.923668 -0.383194
-DEAL::Normalized radius=1.000000 0.000000
-DEAL::C1 normal vector 1: 1.000000 0.000000
-DEAL::Q3 normal vector 1: 1.000000 0.000553
+
+DEAL::Normalized radius=-0.70 -0.70
+DEAL::C1 normal vector 0: -0.70 -0.70
+DEAL::Q3 normal vector 0: -0.71 -0.70
+DEAL::Normalized radius=0.00 -1.00
+DEAL::C1 normal vector 1: 0.00 -1.00
+DEAL::Q3 normal vector 1: 0.00 -0.99
+DEAL::Normalized radius=-0.70 -0.70
+DEAL::C1 normal vector 0: -0.70 -0.70
+DEAL::Q3 normal vector 0: -0.70 -0.71
+DEAL::Normalized radius=-1.00 0.00
+DEAL::C1 normal vector 1: -1.00 0.00
+DEAL::Q3 normal vector 1: -0.99 0.00
+DEAL::Normalized radius=1.00 0.00
+DEAL::C1 normal vector 0: 1.00 0.00
+DEAL::Q3 normal vector 0: 0.99 0.00
+DEAL::Normalized radius=0.70 0.70
+DEAL::C1 normal vector 1: 0.70 0.70
+DEAL::Q3 normal vector 1: 0.70 0.71
+DEAL::Normalized radius=0.00 1.00
+DEAL::C1 normal vector 0: 0.00 1.00
+DEAL::Q3 normal vector 0: 0.00 0.99
+DEAL::Normalized radius=0.70 0.70
+DEAL::C1 normal vector 1: 0.70 0.70
+DEAL::Q3 normal vector 1: 0.71 0.70
+DEAL::Normalized radius=-0.70 0.70
+DEAL::C1 normal vector 0: -0.70 0.70
+DEAL::Q3 normal vector 0: -0.71 0.70
+DEAL::Normalized radius=0.00 1.00
+DEAL::C1 normal vector 1: 0.00 1.00
+DEAL::Q3 normal vector 1: 0.00 0.99
+DEAL::Normalized radius=-1.00 0.00
+DEAL::C1 normal vector 0: -1.00 0.00
+DEAL::Q3 normal vector 0: -0.99 0.00
+DEAL::Normalized radius=-0.70 0.70
+DEAL::C1 normal vector 1: -0.70 0.70
+DEAL::Q3 normal vector 1: -0.70 0.71
+DEAL::Normalized radius=0.00 -1.00
+DEAL::C1 normal vector 0: 0.00 -1.00
+DEAL::Q3 normal vector 0: 0.00 -1.00
+DEAL::Normalized radius=0.38 -0.92
+DEAL::C1 normal vector 1: 0.38 -0.92
+DEAL::Q3 normal vector 1: 0.38 -0.92
+DEAL::Normalized radius=0.38 -0.92
+DEAL::C1 normal vector 0: 0.38 -0.92
+DEAL::Q3 normal vector 0: 0.38 -0.92
+DEAL::Normalized radius=0.70 -0.70
+DEAL::C1 normal vector 1: 0.70 -0.70
+DEAL::Q3 normal vector 1: 0.70 -0.70
+DEAL::Normalized radius=0.70 -0.70
+DEAL::C1 normal vector 0: 0.70 -0.70
+DEAL::Q3 normal vector 0: 0.70 -0.70
+DEAL::Normalized radius=0.92 -0.38
+DEAL::C1 normal vector 1: 0.92 -0.38
+DEAL::Q3 normal vector 1: 0.92 -0.38
+DEAL::Normalized radius=0.92 -0.38
+DEAL::C1 normal vector 0: 0.92 -0.38
+DEAL::Q3 normal vector 0: 0.92 -0.38
+DEAL::Normalized radius=1.00 0.00
+DEAL::C1 normal vector 1: 1.00 0.00
+DEAL::Q3 normal vector 1: 1.00 0.00
