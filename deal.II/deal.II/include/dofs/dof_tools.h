@@ -14,10 +14,12 @@
 #define __deal2__dof_tools_h
 
 
-// Copyright Wolfgang Bangerth, Guido Kanschat, and others 1999
+// Copyright Wolfgang Bangerth, Guido Kanschat, and others 1999, 2000
 
 
+#include <base/exceptions.h>
 #include <lac/forward_declarations.h>
+#include <grid/forward_declarations.h>
 #include <vector>
 
 
