@@ -54,8 +54,8 @@ namespace GridOutFlags
 				     /**
 				      * Constructor.
 				      */
-    DX (bool write_faces = false,
-	bool write_all_faces = false);  
+    DX (const bool write_faces = false,
+	const bool write_all_faces = false);  
   };			   
     
 				   /**

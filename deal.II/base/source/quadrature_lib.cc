@@ -358,7 +358,7 @@ QWeddle<1>::QWeddle () :
 // tensor product of lower dimensions
 
 template <int dim>
-QGauss<dim>::QGauss (unsigned int n)
+QGauss<dim>::QGauss (const unsigned int n)
   :  Quadrature<dim> (QGauss<dim-1>(n), QGauss<1>(n))
 {};
 

@@ -585,7 +585,7 @@ FE_DGQ<dim>::base_element (const unsigned int index) const
 
 template <int dim>
 bool
-FE_DGQ<dim>::has_support_on_face (unsigned int shape_index,
+FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
 				  const unsigned int face_index) const
 {
 

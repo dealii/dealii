@@ -809,7 +809,7 @@ namespace Functions
 					* only.
 					*/
       CutOffFunctionLinfty (const double radius = 1.,
-			    Point<dim> = Point<dim>(),
+			    const Point<dim> = Point<dim>(),
 			    const unsigned int n_components = 1,
 			    const unsigned int select = no_component);
     
@@ -880,7 +880,7 @@ namespace Functions
 					* component only.
 					*/
       CutOffFunctionW1 (const double radius = 1.,
-			Point<dim> = Point<dim>(),
+			const Point<dim> = Point<dim>(),
 			const unsigned int n_components = 1,
 			const unsigned int select = no_component);
     
@@ -953,7 +953,7 @@ namespace Functions
 					* component only.
 					*/
       CutOffFunctionCinfty (const double radius = 1.,
-			    Point<dim> = Point<dim>(),
+			    const Point<dim> = Point<dim>(),
 			    const unsigned int n_components = 1,
 			    const unsigned int select = no_component);
     

@@ -44,7 +44,7 @@ namespace Functions
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
 						   const Point<dim> p,
 						   const unsigned int n_components,
-						   unsigned int select)
+						   const unsigned int select)
 		  :
 		  Function<dim> (n_components),
     center(p),
@@ -111,7 +111,7 @@ namespace Functions
   CutOffFunctionW1<dim>::CutOffFunctionW1 (const double     r,
 					   const Point<dim> p,
 					   const unsigned int n_components,
-					   unsigned int select)
+					   const unsigned int select)
 		  :
 		  Function<dim> (n_components),
                   center(p),
@@ -183,7 +183,7 @@ namespace Functions
   CutOffFunctionCinfty<dim>::CutOffFunctionCinfty (const double     r,
 						   const Point<dim> p,
 						   const unsigned int n_components,
-						   unsigned int select)
+						   const unsigned int select)
 		  :
 		  Function<dim> (n_components),
                   center(p),

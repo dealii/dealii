@@ -203,7 +203,7 @@ class QWeddle : public Quadrature<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> QGauss<1>::QGauss (unsigned int n);
+template <> QGauss<1>::QGauss (const unsigned int n);
 template <> QGauss2<1>::QGauss2 ();
 template <> QGauss3<1>::QGauss3 ();
 template <> QGauss4<1>::QGauss4 ();

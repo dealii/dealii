@@ -30,6 +30,10 @@
 #  include <strstream>
 #endif
 
+#ifdef HAVE_STD_NUMERIC_LIMITS
+# include <limits>
+#endif
+
 
 namespace Patterns
 {  
