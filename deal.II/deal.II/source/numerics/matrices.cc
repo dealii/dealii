@@ -146,7 +146,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   
   
   UpdateFlags update_flags = UpdateFlags (update_JxW_values | update_q_points);
-  FEFaceValues<dim> fe_values (fe, q, update_flags, dof.get_tria().get_boundary());
+  FEFaceValues<dim> fe_values (fe, q, update_flags);
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
 					endc = dof.end ();

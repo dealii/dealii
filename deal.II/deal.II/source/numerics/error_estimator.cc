@@ -88,12 +88,9 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>    &dof,
 						     ((!neumann_bc.empty() ||
 						       (coefficient != 0))  ?
 						      update_q_points : 0) |
-						     update_normal_vectors),
-					 dof.get_tria().get_boundary()); 
-  FEFaceValues<dim> fe_face_values_neighbor (dof.get_fe(), quadrature, update_gradients,
-					     dof.get_tria().get_boundary());
-  FESubfaceValues<dim> fe_subface_values (dof.get_fe(), quadrature, update_gradients,
-					  dof.get_tria().get_boundary());
+						     update_normal_vectors)); 
+  FEFaceValues<dim> fe_face_values_neighbor (dof.get_fe(), quadrature, update_gradients);
+  FESubfaceValues<dim> fe_subface_values (dof.get_fe(), quadrature, update_gradients);
   
 				   // loop over all cells
   const active_cell_iterator endc = dof.end();

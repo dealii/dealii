@@ -453,7 +453,7 @@ void VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
 					  update_JxW_values);
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
-  FEValues<dim> fe_values(fe, q, update_flags, dof.get_tria().get_boundary());
+  FEValues<dim> fe_values(fe, q, update_flags);
   
 				   // loop over all cells
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
@@ -643,7 +643,7 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
  					  update_JxW_values);
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
-  FEValues<dim> fe_values(fe, q, update_flags, dof.get_tria().get_boundary());
+  FEValues<dim> fe_values(fe, q, update_flags);
   
  				   // loop over all cells
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),

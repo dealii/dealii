@@ -22,8 +22,8 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 				 const unsigned int n_transform_functions,
 				 const unsigned int n_values_arrays,
 				 const UpdateFlags update_flags,
-				 const FiniteElement<dim> &fe,
-				 const Boundary<dim>      &boundary) :
+				 const FiniteElement<dim> &fe)
+		:
 		n_quadrature_points (n_q_points),
 		total_dofs (total_dofs),
 		n_transform_functions (n_transform_functions),
@@ -41,8 +41,7 @@ FEValuesBase<dim>::FEValuesBase (const unsigned int n_q_points,
 							   n_quadrature_points)),
 		selected_dataset (0),
 		update_flags (update_flags),
-		fe(&fe),
-		boundary(&boundary)
+		fe(&fe)
 {};
 
 
@@ -283,16 +282,15 @@ double FEValuesBase<dim>::JxW (const unsigned int i) const {
 template <int dim>
 FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &quadrature,
-			 const UpdateFlags         update_flags,
-			 const Boundary<dim>      &boundary) :
+			 const UpdateFlags         update_flags)
+		:
 		FEValuesBase<dim> (quadrature.n_quadrature_points,
 				   fe.total_dofs,
 				   fe.total_dofs,
 				   fe.n_transform_functions,
 				   1,
 				   update_flags,
-				   fe,
-				   boundary),
+				   fe),
 		unit_shape_gradients(fe.total_dofs,
 				     vector<Tensor<1,dim> >(quadrature.n_quadrature_points)),
 		unit_shape_2nd_derivatives(fe.total_dofs,
@@ -426,16 +424,15 @@ FEFaceValuesBase<dim>::FEFaceValuesBase (const unsigned int n_q_points,
 					 const unsigned int n_transform_functions,
 					 const unsigned int n_faces_or_subfaces,
 					 const UpdateFlags         update_flags,
-					 const FiniteElement<dim> &fe,
-					 const Boundary<dim>      &boundary) :
+					 const FiniteElement<dim> &fe)
+		:
 		FEValuesBase<dim> (n_q_points,
 				   n_support_points,
 				   total_dofs,
 				   n_transform_functions,
 				   n_faces_or_subfaces,
 				   update_flags,
-				   fe,
-				   boundary),
+				   fe),
 		unit_shape_gradients (n_faces_or_subfaces,
 				      vector<vector<Tensor<1,dim> > >(total_dofs,
 								   vector<Tensor<1,dim> >(n_q_points))),
@@ -475,16 +472,15 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const {
 template <int dim>
 FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				 const Quadrature<dim-1>  &quadrature,
-				 const UpdateFlags         update_flags,
-				 const Boundary<dim>      &boundary) :
+				 const UpdateFlags         update_flags)
+		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_face,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell,
 				       update_flags,
-				       fe,
-				       boundary)
+				       fe)
 {
   unit_face_quadrature_points = quadrature.get_quad_points();
   weights = quadrature.get_weights ();  
@@ -627,16 +623,15 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 template <int dim>
 FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       const Quadrature<dim-1>  &quadrature,
-				       const UpdateFlags         update_flags,
-				       const Boundary<dim>      &boundary) :
+				       const UpdateFlags         update_flags)
+		:
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       0,
 				       fe.total_dofs,
 				       fe.n_transform_functions,
 				       GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::subfaces_per_face,
 				       update_flags,
-				       fe,
-				       boundary)
+				       fe)
 {
   Assert ((update_flags & update_support_points) == false,
 	  ExcInvalidUpdateFlag());
@@ -698,7 +693,8 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 template <int dim>
 void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int         face_no,
-				   const unsigned int         subface_no) {
+				   const unsigned int         subface_no)
+{
   Assert (cell->face(face_no)->at_boundary() == false,
 	  ExcReinitCalledWithBoundaryFace());
   

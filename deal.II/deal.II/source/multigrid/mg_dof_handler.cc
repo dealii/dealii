@@ -1548,7 +1548,7 @@ void MGDoFHandler<dim>::make_sparsity_pattern (const unsigned int  level,
 
   const unsigned int total_dofs = selected_fe->total_dofs;
   vector<int> dofs_on_this_cell(total_dofs);
-  cell_iterator cell = begin_active(level),
+  cell_iterator cell = begin(level),
 		endc = end(level);
   for (; cell!=endc; ++cell) 
     {

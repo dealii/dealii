@@ -10,7 +10,6 @@
 #include <base/subscriptor.h>
 #include <lac/fullmatrix.h>
 #include <grid/dof.h>
-#include <grid/tria_boundary.h>
 #include <base/point.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
@@ -203,7 +202,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEValuesBase {
+class FEValuesBase
+{
   public:
         
 				     /**
@@ -249,8 +249,7 @@ class FEValuesBase {
 		  const unsigned int n_transform_functions,
 		  const unsigned int n_values_array,
 		  const UpdateFlags         update_flags,
-		  const FiniteElement<dim> &fe,
-		  const Boundary<dim>      &boundary);
+		  const FiniteElement<dim> &fe);
     
 
 				     /**
@@ -694,11 +693,6 @@ class FEValuesBase {
 				      * Store the finite element for later use.
 				      */
     const SmartPointer<const FiniteElement<dim> > fe;
-
-				     /**
-				      * Store the boundary for later use.
-				      */
-    const SmartPointer<const Boundary<dim> > boundary;
 };
 
 
@@ -724,7 +718,10 @@ class FEValuesBase {
  * @author Wolfgang Bangerth, 1998  
  */
 template <int dim>
-class FEValues : public FEValuesBase<dim> {
+class FEValues
+  :
+  public FEValuesBase<dim>
+{
   public:
 
     
@@ -743,6 +740,8 @@ class FEValues : public FEValuesBase<dim> {
 				      * need to be initialized using the
 				      * #reinit# function.
 				      *
+				      * UPDATE!
+				      *
 				      * This function needs a boundary object
 				      * passed, since this class needs to know
 				      * how to handle faces which are located
@@ -758,8 +757,7 @@ class FEValues : public FEValuesBase<dim> {
 				      */
     FEValues (const FiniteElement<dim> &fe,
 	      const Quadrature<dim>    &quadrature,
-	      const UpdateFlags         update_flags,
-	      const Boundary<dim>      &boundary);
+	      const UpdateFlags         update_flags);
     
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -878,7 +876,10 @@ class FEValues : public FEValuesBase<dim> {
  *  @author Wolfgang Bangerth, 1998
 */
 template <int dim>
-class FEFaceValuesBase : public FEValuesBase<dim> {
+class FEFaceValuesBase
+  :
+  public FEValuesBase<dim>
+{
   public:
 				     /**
 				      * Constructor. Call the constructor of
@@ -904,8 +905,7 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
 		      const unsigned int n_transform_functions,
 		      const unsigned int n_faces_or_subfaces,
 		      const UpdateFlags         update_flags,
-		      const FiniteElement<dim> &fe,
-		      const Boundary<dim>      &boundary);
+		      const FiniteElement<dim> &fe);
 
     				     /**
 				      * Return the outward normal vector to
@@ -1016,7 +1016,10 @@ class FEFaceValuesBase : public FEValuesBase<dim> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FEFaceValues : public FEFaceValuesBase<dim> {
+class FEFaceValues
+  :
+  public FEFaceValuesBase<dim>
+{
   public:
 				     /**
 				      * Constructor. Fill all arrays with the
@@ -1034,6 +1037,8 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
 				      * need to be initialized using the
 				      * #reinit# function.
 				      *
+				      * UPDATE!
+				      *
 				      * This function needs a boundary object
 				      * passed, since this class needs to know
 				      * how to handle faces which are located
@@ -1049,8 +1054,7 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
 				      */
     FEFaceValues (const FiniteElement<dim> &,
 		  const Quadrature<dim-1> &,
-		  const UpdateFlags,
-		  const Boundary<dim> &);
+		  const UpdateFlags);
 
 				     /**
 				      * Reinitialize the gradients, Jacobi
@@ -1166,7 +1170,10 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class FESubfaceValues : public FEFaceValuesBase<dim> {
+class FESubfaceValues
+  :
+  public FEFaceValuesBase<dim>
+{
   public:
 				     /**
 				      * Constructor. Fill all arrays with the
@@ -1186,8 +1193,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim> {
 				      */
     FESubfaceValues (const FiniteElement<dim> &fe,
 		     const Quadrature<dim-1>  &face_quadrature,
-		     const UpdateFlags         update_flags,
-		     const Boundary<dim>      &boundary);
+		     const UpdateFlags         update_flags);
 
 				     /**
 				      * Reinitialize the gradients, Jacobi

@@ -594,8 +594,7 @@ void DataOut<dim>::write_gnuplot (ostream &out, unsigned int accuracy) const
 
   QIteratedTrapez<dim> points(accuracy);
   
-  FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points),
-		   dofs->get_tria().get_boundary());
+  FEValues<dim> fe(dofs->get_fe(), points, UpdateFlags(update_q_points));
   vector< vector <Vector<double> > >
     values (dof_data.size(),
 	    vector< Vector<double> >(points.n_quadrature_points,

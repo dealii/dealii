@@ -45,8 +45,7 @@ Assembler<dim>::Assembler (Triangulation<dim>  *tria,
 		rhs_vector(local_data->rhs_vector),
 		fe_values (dof_handler->get_fe(),
 			   local_data->quadrature,
-			   local_data->update_flags,
-			   tria->get_boundary())
+			   local_data->update_flags)
 {
   Assert (!assemble_matrix || (matrix.m() == dof_handler->n_dofs()),
 	  ExcInvalidData());
