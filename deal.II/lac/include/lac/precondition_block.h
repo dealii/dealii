@@ -704,13 +704,12 @@ template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSOR : public virtual Subscriptor,
 			     protected PreconditionBlock<MATRIX, inverse_type>
 {
-  private:
+  public:
 				     /**
 				      * Define number type of matrix.
 				      */
     typedef typename MATRIX::value_type number;
     
-  public:
 				     /**
 				      * Make initialization function
 				      * publicly available.
@@ -860,13 +859,12 @@ template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockSSOR : public virtual Subscriptor,
 			      private PreconditionBlockSOR<MATRIX, inverse_type>
 {
-  private:
+  public:
 				     /**
 				      * Define number type of matrix.
 				      */
     typedef typename MATRIX::value_type number;
-    
-  public:
+
 				     /**
 				      * Constructor.
 				      */
