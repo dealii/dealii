@@ -33,7 +33,7 @@
  * $[0,d], then the tensor product polynomials are orthogonal on
  * $[-1,1]^d$ or $[0,1]^d$, respectively.
  *
- * Indexing is as following: the order of dim-dimensional polynomials
+ * Indexing is as follows: the order of dim-dimensional polynomials
  * is x-coordinates running fastest, then y-coordinate, etc. The first
  * few polynomials are thus @p{P1(x)P1(y)}, @p{P2(x)P1(y)},
  * @p{P3(x)P1(y)}, ..., @p{P1(x)P2(y)}, @p{P2(x)P2(y)},
@@ -234,7 +234,7 @@ class TensorProductPolynomials
  * product polynomials are orthogonal on $[-1,1]^d$ or $[0,1]^d$,
  * respectively.
  *
- * Indexing is as following: the order of dim-dimensional polynomials
+ * Indexing is as follows: the order of dim-dimensional polynomials
  * is x-coordinates running fastest, then y-coordinate, etc. The first
  * few polynomials are thus @p{Px1(x)Py1(y)}, @p{Px2(x)Py1(y)},
  * @p{Px3(x)Py1(y)}, ..., @p{Px1(x)Py2(y)}, @p{Px2(x)Py2(y)},
