@@ -109,11 +109,11 @@ class PreconditionRichardson : public Subscriptor
     };
 
 				     /**
-				      * Constructor with optional
-				      * setting of the relaxation
-				      * parameter
+				      * Constructor, sets the
+				      * relaxation parameter to its
+				      * default.
 				      */
-    PreconditionRichardson(const AdditionalData = AdditionalData());
+    PreconditionRichardson();
 
 				     /**
 				      * Change the relaxaton parameter.
@@ -751,11 +751,13 @@ PreconditionRichardson::AdditionalData::AdditionalData (
 
 
 inline
-PreconditionRichardson::PreconditionRichardson (
-  const PreconditionRichardson::AdditionalData parameters)
+PreconditionRichardson::PreconditionRichardson ()
 		:
-		relaxation(parameters.relaxation)
-{}
+		relaxation(0)
+{
+  AdditionalData add_data;
+  relaxation=add_data.relaxation;
+}
 
 
 
