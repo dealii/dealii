@@ -90,7 +90,8 @@
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class ProblemBase {
+class ProblemBase
+{
   public:
 				     /**
 				      *	Declare a data type which denotes a
@@ -188,7 +189,7 @@ class ProblemBase {
     virtual void fill_data (DataOut<dim> &) const;
 
 
-/**
+				     /**
 				      * Return the name of the solution as a
 				      * #string#. The default implementation
 				      * returns #"solution"#.
