@@ -97,6 +97,10 @@ main ()
             
             logfile << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
           };
+
+      for (unsigned int i=0; i<4; ++i)
+        Assert (Td[i].end() - Td[i].begin() == 3,
+                ExcInternalError());
     };
 
 
@@ -157,6 +161,12 @@ main ()
             logfile << i << " " << j << " " << k << " "
                     << Td[i][j][k] << " ok" << std::endl;
           };
+
+      for (unsigned int i=0; i<I; ++i)
+        for (unsigned int j=0; j<J; ++j)
+          Assert (Td[i][j].end() - Td[i][j].begin() ==
+                  static_cast<signed int>(K),
+                  ExcInternalError());
     };
 };
 
