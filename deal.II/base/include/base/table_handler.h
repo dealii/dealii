@@ -227,6 +227,14 @@ class TableHandler
 			const unsigned int precision);
 
 				     /**
+				      * Sets the #scientific_flag#. True means
+				      * scientific, false means fixed point
+				      * notation.
+				      */
+    void set_scientific (const string &key,
+			 bool scientific);
+
+				     /**
 				      * Sets the caption of the column #key#
 				      * for tex output. You may want to chose
 				      * this different from #key#, if it 
@@ -365,6 +373,12 @@ class TableHandler
 					  * The default is 4.
 					  */
 	unsigned int precision;
+
+					 /**
+					  * #scientific#=false means fixed
+					  * point notation.
+					  */
+	bool scientific;
 
 					 /**
 					  * Flag that may be used by derived 

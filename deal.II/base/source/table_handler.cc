@@ -5,6 +5,7 @@
 
 #include <base/table_handler.h>
 
+#include <iostream>
 #include <iomanip>
 
 
@@ -53,6 +54,7 @@ TableHandler::Column::Column(const string &tex_caption):
 		tex_caption(tex_caption),
 		tex_format("c"),
 		precision(4),
+		scientific(0),
 		flag(0)  
 {}
 
@@ -61,6 +63,7 @@ TableHandler::Column::Column():
 		tex_caption(),
 		tex_format("c"),
 		precision(4),
+		scientific(0),
 		flag(0)  
 {}
 
@@ -192,6 +195,15 @@ void TableHandler::set_precision (const string &key,
 
 
 
+void TableHandler::set_scientific (const string &key,
+				   bool scientific)
+{
+  Assert(columns.count(key), ExcColumnNotExistent(key));
+  columns[key].scientific=scientific;
+}
+
+
+
 void TableHandler::write_text(ostream &out) const
 {
   vector<string> sel_columns;
@@ -235,6 +247,11 @@ void TableHandler::write_text(ostream &out) const
 	  const Column &column=col_iter->second;
 	  
 	  out << setprecision(column.precision);
+
+	  if (col_iter->second.scientific)
+	    out.setf(ios::scientific, ios::floatfield);
+	  else
+	    out.setf(ios::fixed, ios::floatfield);
 	  column.entries[i]->write_tex(out);
 	  
 	  if (j<n_cols-1)
@@ -337,6 +354,12 @@ void TableHandler::write_tex(ofstream &out) const
 	  const Column &column=col_iter->second;
 	  
 	  out << setprecision(column.precision);
+
+	  if (col_iter->second.scientific)
+	    out.setf(ios::scientific, ios::floatfield);
+	  else
+	    out.setf(ios::fixed, ios::floatfield);
+	  
 	  column.entries[i]->write_tex(out);
 	  
 	  if (j<n_cols-1)
