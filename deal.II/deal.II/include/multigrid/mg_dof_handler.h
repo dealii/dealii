@@ -152,9 +152,10 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      * See the general documentation of the
 				      * #DoFHandler# class for more details.
 				      */
-    virtual void renumber_dofs (const RenumberingMethod method,
-				const bool use_constraints         = false,
-				const vector<int> &starting_points = vector<int>());
+    void renumber_dofs (const unsigned int       level,
+			const RenumberingMethod  method,
+			const bool               use_constraints         = false,
+			const vector<int>       &starting_points = vector<int>());
 
 				     /**
 				      * Write the sparsity structure of the
@@ -440,22 +441,19 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
 				      */
-    raw_line_iterator
-    begin_raw_line   (const unsigned int level = 0) const;
+    raw_line_iterator begin_raw_line (const unsigned int level = 0) const;
 
 				     /**
 				      *  Return iterator to the first used line
 				      *  on level #level#.
 				      */
-    line_iterator
-    begin_line       (const unsigned int level = 0) const;
+    line_iterator     begin_line (const unsigned int level = 0) const;
 
 				     /**
 				      *  Return iterator to the first active
 				      *  line on level #level#.
 				      */
-    active_line_iterator
-    begin_active_line(const unsigned int level = 0) const;
+    active_line_iterator begin_active_line(const unsigned int level = 0) const;
 
 				     /**
 				      *  Return iterator past the end; this
@@ -463,8 +461,7 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      */
-    raw_line_iterator
-    end_line () const;
+    raw_line_iterator end_line () const;
 
 				     /**
 				      * Return an iterator which is the first
@@ -495,44 +492,38 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      *  Return an iterator pointing to the
 				      *  last line, used or not.
 				      */
-    raw_line_iterator
-    last_raw_line () const;
+    raw_line_iterator    last_raw_line () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  line of the level #level#, used or not.
 
 				      */
-    raw_line_iterator
-    last_raw_line (const unsigned int level) const;
+    raw_line_iterator    last_raw_line (const unsigned int level) const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  used line.
 				      */
-    line_iterator
-    last_line () const;
+    line_iterator        last_line () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  used line on level #level#.
 				      */
-    line_iterator
-    last_line (const unsigned int level) const;
+    line_iterator        last_line (const unsigned int level) const;
 
     				     /**
 				      *  Return an iterator pointing to the last
 				      *  active line.
 				      */
-    active_line_iterator
-    last_active_line () const;
+    active_line_iterator last_active_line () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  active line on level #level#.
 				      */
-    active_line_iterator
-    last_active_line (const unsigned int level) const;
+    active_line_iterator last_active_line (const unsigned int level) const;
 				     /*@}*/	  
 
 				     /*---------------------------------------*/
@@ -547,22 +538,19 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
 				      */
-    raw_quad_iterator
-    begin_raw_quad   (const unsigned int level = 0) const;
+    raw_quad_iterator    begin_raw_quad   (const unsigned int level = 0) const;
 
 				     /**
 				      *  Return iterator to the first used quad
 				      *  on level #level#.
 				      */
-    quad_iterator
-    begin_quad       (const unsigned int level = 0) const;
+    quad_iterator        begin_quad       (const unsigned int level = 0) const;
 
 				     /**
 				      *  Return iterator to the first active
 				      *  quad on level #level#.
 				      */
-    active_quad_iterator
-    begin_active_quad(const unsigned int level = 0) const;
+    active_quad_iterator begin_active_quad(const unsigned int level = 0) const;
 
 				     /**
 				      *  Return iterator past the end; this
@@ -570,8 +558,7 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      */
-    raw_quad_iterator
-    end_quad () const;
+    raw_quad_iterator    end_quad () const;
 
 				     /**
 				      * Return an iterator which is the first
@@ -602,44 +589,38 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      *  Return an iterator pointing to the
 				      *  last quad, used or not.
 				      */
-    raw_quad_iterator
-    last_raw_quad () const;
+    raw_quad_iterator    last_raw_quad () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  quad of the level #level#, used or not.
 
 				      */
-    raw_quad_iterator
-    last_raw_quad (const unsigned int level) const;
+    raw_quad_iterator    last_raw_quad (const unsigned int level) const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  used quad.
 				      */
-    quad_iterator
-    last_quad () const;
+    quad_iterator        last_quad () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  used quad on level #level#.
 				      */
-    quad_iterator
-    last_quad (const unsigned int level) const;
+    quad_iterator        last_quad (const unsigned int level) const;
 
     				     /**
 				      *  Return an iterator pointing to the last
 				      *  active quad.
 				      */
-    active_quad_iterator
-    last_active_quad () const;
+    active_quad_iterator last_active_quad () const;
 
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  active quad on level #level#.
 				      */
-    active_quad_iterator
-    last_active_quad (const unsigned int level) const;
+    active_quad_iterator last_active_quad (const unsigned int level) const;
 				     /*@}*/
 
 				     /*---------------------------------------*/
