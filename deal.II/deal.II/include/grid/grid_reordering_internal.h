@@ -410,16 +410,20 @@ namespace internal
                                          /**
                                           * The first node
                                           */
-        int node0;
-                                         /**
+        unsigned int node0;
+
+					 /**
                                           * The second node
                                           */
-        int node1;
+        unsigned int node1;
+
                                          /**
                                           * A simple constructor
                                           */
-        CheapEdge(int n0, int n1);
-                                         /**
+        CheapEdge (const unsigned int n0,
+		   const unsigned int n1);
+
+					 /**
                                           * Need a partial ordering
                                           * for the STL
                                           */
@@ -437,19 +441,15 @@ namespace internal
                                          /**
                                           * Simple constructor
                                           */
-        Edge (int n0,
-	      int n1,
-	      int orient=0);
-      
-                                         /**
-                                          * Simple Destructor
-                                          */
-        ~Edge();
+        Edge (const unsigned int n0,
+	      const unsigned int n1,
+	      const int          orient = 0);      
       
                                          /**
                                           * The IDs for the end nodes
                                           */
-        int nodes[2];
+        unsigned int nodes[2];
+
                                          /** 
                                           * Whether the edge has been
                                           * oriented (0), points from
@@ -467,8 +467,10 @@ namespace internal
                                           */
         int group;
 
-        unsigned int num_neighbouring_cubes;
-        unsigned int * neighbouring_cubes;
+					 /**
+					  * Indices of neighboring cubes.
+					  */
+        std::vector<unsigned int> neighboring_cubes;
     };
 
                                      /**
@@ -548,6 +550,11 @@ namespace internal
     {
       public:
                                          /**
+                                          * Default Constructor
+                                          */
+        Mesh ();
+
+                                         /**
                                           * The list of nodes
                                           */
         std::vector<Point<3> > node_list;
@@ -562,33 +569,9 @@ namespace internal
 
                                          /**
                                           * Checks whether every cell
-                                          * in the mesh is sensible. By
-                                          * calling
-                                          * sanity_check(cell_num) on
-                                          * every cell.
+                                          * in the mesh is sensible.
                                           */
-        bool sanity_check() const;
-        
-                                         /**
-                                          * Checks that every node
-                                          * matches with its edges. By
-                                          * calling
-                                          * sanity_check(cell_num,node_num)
-                                          * for each node.
-                                          */
-        bool sanity_check(int cell_num) const;
-        
-                                         /**
-                                          * Checks that each edge
-                                          * going into a node is
-                                          * correctly setup.
-                                          */
-        bool sanity_check_node(int cell_num, int i) const;
-
-                                         /**
-                                          * Default Constructor
-                                          */
-        Mesh ();
+        void sanity_check() const;
 
       private:
                                          /**
@@ -596,12 +579,21 @@ namespace internal
                                           * constructor to disable it.
                                           */
         Mesh(const Mesh&);
+	
                                          /**
                                           * Unimplemented private
                                           * assignemnet operator to
                                           * disable it.
                                           */
         Mesh& operator=(const Mesh&);
+        
+                                         /**
+                                          * Checks that each edge
+                                          * going into a node is
+                                          * correctly set up.
+                                          */
+        void sanity_check_node (const Cell        &cell,
+				const unsigned int local_node_num) const;	
     };
 
 
@@ -640,7 +632,7 @@ namespace internal
 
         bool orient_edges_in_current_cube (Mesh &m);
         bool orient_edge_set_in_current_cube (Mesh &m,
-					      int edge_set);
+					      const unsigned int edge_set);
         bool orient_next_unoriented_edge (Mesh &m);
         bool consistent (Mesh &m,
                          int cell_num);

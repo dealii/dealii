@@ -584,7 +584,8 @@ namespace internal
 
 
 				     // sort two integers
-    static inline void sort2 (int &v1, int &v2)
+    static inline void sort2 (unsigned int &v1,
+			      unsigned int &v2)
     {
       if (v1>v2)
 	std::swap (v1, v2);
@@ -600,7 +601,7 @@ namespace internal
 					* edge_to_node[i][k] where
 					* k=0,1,2.
 					*/    
-      static const int edge_to_node[8][3] = 
+      static const unsigned int edge_to_node[8][3] = 
       { 
 	    {0,4,8},
 	    {0,5,9},
@@ -641,7 +642,7 @@ namespace internal
 					* nodesonedge[i][1] is the
 					* end node for edge i.
 					*/
-      static const int nodes_on_edge[12][2] = 
+      static const unsigned int nodes_on_edge[12][2] = 
       {
 	    {0,1},
 	    {4,5},
@@ -662,7 +663,7 @@ namespace internal
 				       // (for edges) and chosing
 				       // clockwise order
 // TODO: HERE
-      static const int nodes_on_face[6][4] = 
+      static const unsigned int nodes_on_face[6][4] = 
       {
 	    {0,1,2,3},
 	    {0,4,5,1},
@@ -674,15 +675,19 @@ namespace internal
     }
     
     
-    CheapEdge::CheapEdge(int n0, int n1) : node0(n0), node1(n1)
+    CheapEdge::CheapEdge (const unsigned int n0,
+			  const unsigned int n1)
+		    :
+		    node0(n0), node1(n1)
     {
 				       // sort the entries so that
 				       // node0<node1;
-      sort2(node0,node1);
+      sort2 (node0,node1);
     }
 
+
     
-    bool CheapEdge::operator<(const CheapEdge & e2) const
+    bool CheapEdge::operator< (const CheapEdge & e2) const
     {
       if (node0 < e2.node0) return true;
       if (node0 > e2.node0) return false;
@@ -700,14 +705,14 @@ namespace internal
       const unsigned int cell_list_length = cell_list.size();
 
 
-      unsigned int NumEdges = 0;
+      unsigned int n_edges = 0;
 				       // Correctly build the edge
 				       // list
       {
 					 // edge_map stores the
 					 // edge_number associated
 					 // with a given CheapEdge
-	std::map<CheapEdge,int> edge_map;
+	std::map<CheapEdge,unsigned int> edge_map;
 	unsigned int ctr = 0;
 	for (unsigned int cur_cell_id = 0; 
 	     cur_cell_id<cell_list_length; 
@@ -725,10 +730,13 @@ namespace internal
 		unsigned int gl_edge_num = 0;
 		int l_edge_orient = 1;
 						 // Construct the CheapEdge
-		int node0 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][0]];
-		int node1 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][1]];
-		CheapEdge cur_edge(node0,node1);
-		if (edge_map.count(cur_edge) == 0) // Edge not in map
+		const unsigned int
+		  node0 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][0]],
+		  node1 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][1]];
+		const CheapEdge cur_edge(node0,node1);
+		
+		if (edge_map.count(cur_edge) == 0)
+						   // Edge not in map
 		  {
 						     // put edge in
 						     // hash map with
@@ -758,12 +766,12 @@ namespace internal
 		  = l_edge_orient;
 	      }
 	  }
-	NumEdges = ctr;
+	n_edges = ctr;
       }
 
 				       // Count each of the edges.
       {
-	std::vector<int> edge_count(NumEdges,0);
+	std::vector<int> edge_count(n_edges,0);
       
 
 					 // Count every time an edge
@@ -788,21 +796,15 @@ namespace internal
 					 // edge
 
 					 // Allocate the space for the
-					 // neighbour list
-	for (unsigned int cur_edge_id = 0;
-	     cur_edge_id<NumEdges;
-	     ++cur_edge_id)
-	  {
-	    Edge & cur_edge = edge_list[cur_edge_id];
-	    unsigned int NN = edge_count[cur_edge_id];
-	    cur_edge.num_neighbouring_cubes = NN;
-	    cur_edge.neighbouring_cubes = new unsigned int [NN];
-	  }
+					 // neighbor list
+	for (unsigned int cur_edge_id=0; cur_edge_id<n_edges; ++cur_edge_id)
+	    edge_list[cur_edge_id].neighboring_cubes
+	      .resize (edge_count[cur_edge_id]);
       
 					 // Stores the position of the
-					 // current neighbour in the
-					 // edge's neighbour list
-	std::vector<int> cur_cell_edge_list_posn(NumEdges,0);
+					 // current neighbor in the
+					 // edge's neighbor list
+	std::vector<int> cur_cell_edge_list_posn(n_edges,0);
 	for (unsigned int cur_cell_id = 0;
 	     cur_cell_id<cell_list_length;
 	     ++cur_cell_id)
@@ -814,7 +816,7 @@ namespace internal
 	      {
 		unsigned int gl_edge_id = cur_cell.edges[edge_num];
 		Edge & cur_edge = edge_list[gl_edge_id];
-		cur_edge.neighbouring_cubes[cur_cell_edge_list_posn[gl_edge_id]] = cur_cell_id;
+		cur_edge.neighboring_cubes[cur_cell_edge_list_posn[gl_edge_id]] = cur_cell_id;
 		cur_cell_edge_list_posn[gl_edge_id]++;
 	      }
 	  }
@@ -824,14 +826,12 @@ namespace internal
 
 
     
-    Edge::Edge (int n0,
-		int n1,
-		int orient)
+    Edge::Edge (const unsigned int n0,
+		const unsigned int n1,
+		const int orient)
 		    :
 		    orientation_flag(orient),
-		    group(0),
-		    num_neighbouring_cubes(0),
-		    neighbouring_cubes(NULL)
+		    group(0)
     {
       nodes[0] = n0;
       nodes[1] = n1;
@@ -839,22 +839,15 @@ namespace internal
 
 
 
-    Edge::~Edge()
-    {
-      delete [] neighbouring_cubes;
-    }
-
-
-
     Cell::Cell (const Cell &c)
     {
-      for (unsigned int i = 0; i<GeometryInfo<3>::lines_per_cell; ++i)
+      for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
 	{
 	  edges[i] = c.edges[i];
 	  local_orientation_flags[i] = c.local_orientation_flags[i];
 	}
       
-      for (unsigned int i = 0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
 	nodes[i] = c.nodes[i];
       
       waiting_to_be_processed = c.waiting_to_be_processed;
@@ -883,62 +876,51 @@ namespace internal
     
 
     
-    bool Mesh::sanity_check() const
+    void
+    Mesh::sanity_check() const
     {
-      bool retval = true;
-      for (unsigned int i = 0; i<cell_list.size(); ++i)
-	retval &= sanity_check(i);
-      return retval;
+      for (unsigned int i=0; i<cell_list.size(); ++i)
+					 // check that every edge
+					 // coming into a node has the
+					 // same node value
+	for (unsigned int j=0; j<8; ++j)
+	  sanity_check_node (cell_list[i], j);
     }
 
 
-    
-    bool Mesh::sanity_check(int cellnum) const
-    {
-				       // Should check that every edge
-				       // coming into a node has the
-				       // same node value
-      bool retval = true;
-      for (int i = 0;i<8;++i)
-	{
-	  retval &= sanity_check_node(cellnum,i);
-	}
-      return retval;
-    }
 
-    bool Mesh::sanity_check_node(int cell_num, int local_node_num) const
+    void
+    Mesh::sanity_check_node(const Cell         &c,
+			    const unsigned int local_node_num) const
     {
 				       // Get the Local Node Numbers
 				       // of the incoming edges
-      int e0 = ElementInfo::edge_to_node[local_node_num][0];
-      int e1 = ElementInfo::edge_to_node[local_node_num][1]; 
-      int e2 = ElementInfo::edge_to_node[local_node_num][2];
+      const unsigned int e0 = ElementInfo::edge_to_node[local_node_num][0];
+      const unsigned int e1 = ElementInfo::edge_to_node[local_node_num][1]; 
+      const unsigned int e2 = ElementInfo::edge_to_node[local_node_num][2];
 
 				       // Global Edge Numbers
-      const Cell& c = cell_list[cell_num];
-  
-      int ge0 = c.edges[e0];
-      int ge1 = c.edges[e1];
-      int ge2 = c.edges[e2];
+      const unsigned int ge0 = c.edges[e0];
+      const unsigned int ge1 = c.edges[e1];
+      const unsigned int ge2 = c.edges[e2];
 
+      int or0 = ElementInfo::edge_to_node_orient[local_node_num][0] *
+		c.local_orientation_flags[e0];
+      int or1 = ElementInfo::edge_to_node_orient[local_node_num][1] *
+		c.local_orientation_flags[e1];
+      int or2 = ElementInfo::edge_to_node_orient[local_node_num][2] *
+		c.local_orientation_flags[e2];
 
-      int or0 = ElementInfo::edge_to_node_orient[local_node_num][0]*c.local_orientation_flags[e0];
-      int or1 = ElementInfo::edge_to_node_orient[local_node_num][1]*c.local_orientation_flags[e1];
-      int or2 = ElementInfo::edge_to_node_orient[local_node_num][2]*c.local_orientation_flags[e2];
-
-				       // What each edge thinks the
-				       // current node should be.
-
-      int curglobalnodenum0 = edge_list[ge0].nodes[or0 == 1 ? 0 : 1];
-      int curglobalnodenum1 = edge_list[ge1].nodes[or1 == 1 ? 0 : 1];
-      int curglobalnodenum2 = edge_list[ge2].nodes[or2 == 1 ? 0 : 1];
-
-      const bool retval = ((curglobalnodenum0 == curglobalnodenum1)&&
-			   (curglobalnodenum1 == curglobalnodenum2) );
-
-      Assert (retval == true, ExcInternalError());
-  
-      return retval;
+				       // Make sure that edges agree
+				       // what the current node should
+				       // be.
+      Assert ((edge_list[ge0].nodes[or0 == 1 ? 0 : 1] ==
+	       edge_list[ge1].nodes[or1 == 1 ? 0 : 1])
+	      &&
+	      (edge_list[ge1].nodes[or1 == 1 ? 0 : 1] ==
+	       edge_list[ge2].nodes[or2 == 1 ? 0 : 1]),
+	      ExcMessage ("This message does not satisfy the internal "
+			  "consistency check"));
     }    
 
 
@@ -955,12 +937,12 @@ namespace internal
 				      * cube is a rotated Deal.II
 				      * cube.
 				      */
-    bool Orienter::orient_edges(Mesh &m)
+    bool Orienter::orient_edges (Mesh &m)
     {
   
 				       // First check that the mesh is
 				       // sensible
-      AssertThrow(m.sanity_check(),GridOrientError("Invalid Mesh Detected"));
+      m.sanity_check ();
 
 				       // We start by looking only at
 				       // the first cube.
@@ -973,11 +955,11 @@ namespace internal
       cur_edge_group = 1;
 				       // While there are still cubes
 				       // to orient
-      while(get_next_unoriented_cube(m))
+      while (get_next_unoriented_cube(m))
 	{
 					   // And there are edges in
 					   // the cube to orient
-	  while(orient_next_unoriented_edge(m))
+	  while (orient_next_unoriented_edge(m))
 	    {
 					       // Make all the sides
 					       // in the current set
@@ -989,7 +971,7 @@ namespace internal
 	      get_adjacent_cubes(m);
 					       // Start working on
 					       // this list of cubes
-	      while(get_next_active_cube(m))
+	      while (get_next_active_cube(m))
 		{
 						   // Make sure the
 						   // Cube doesn't
@@ -1002,7 +984,7 @@ namespace internal
 						   // in the current
 						   // cube then we may
 						   // have to process
-						   // the neighbour.
+						   // the neighbor.
 		  if (orient_edges_in_current_cube(m))
 		    get_adjacent_cubes(m);
 		}
@@ -1012,6 +994,8 @@ namespace internal
       return true;
     }
 
+
+    
     bool Orienter::get_next_unoriented_cube(Mesh &m)
     {
 				       // The last cube in the list
@@ -1028,14 +1012,14 @@ namespace internal
       return cur_posn<end_cube_num;
     }
 
+
+    
     bool Orienter::is_oriented(const Mesh &m, int cell_num)
     {
       const Cell& c = m.cell_list[cell_num];
       for (int i = 0; i<12; ++i)
-	{
-	  int edgenum = c.edges[i];
-	  if (m.edge_list[edgenum].orientation_flag == 0) return false;
-	}
+	if (m.edge_list[c.edges[i]].orientation_flag == 0)
+	  return false;
       return true;
     }
 
@@ -1064,7 +1048,8 @@ namespace internal
 					       // orientation within
 					       // the cell
 	      int LOR = c.local_orientation_flags[i] *
-			m.edge_list[c.edges[i]].orientation_flag; 
+			m.edge_list[c.edges[i]].orientation_flag;
+	      
 					       // If the edge has
 					       // orientation
 	      if (LOR != 0)
@@ -1102,7 +1087,8 @@ namespace internal
  
 				       // search for the unoriented
 				       // side
-      while((i<12)&&(m.edge_list[c.edges[i]].orientation_flag != 0))
+      while ((i<12) &&
+	     (m.edge_list[c.edges[i]].orientation_flag != 0))
 	++i;
   
 				       // if we found none then return
@@ -1137,17 +1123,19 @@ namespace internal
 
 
     
-    bool Orienter::orient_edges_in_current_cube(Mesh &m)
+    bool Orienter::orient_edges_in_current_cube (Mesh &m)
     {
-      bool retval = false;
-      for (int i = 0; i<3; ++i)
-	retval = retval || orient_edge_set_in_current_cube(m,i);
-      return retval;
+      for (unsigned int i = 0; i<3; ++i)
+	if (orient_edge_set_in_current_cube(m,i) == true)
+	  return true;
+      
+      return false;
     }
 
 
     
-    bool Orienter::orient_edge_set_in_current_cube(Mesh &m,int n)
+    bool Orienter::orient_edge_set_in_current_cube(Mesh &m,
+						   const unsigned int n)
     {
       const Cell& c = m.cell_list[cur_posn];
   
@@ -1157,7 +1145,7 @@ namespace internal
       int glorient = 0;
       unsigned int edge_flags = 0;
       unsigned int cur_flag = 1;
-      for (int i = 4*n; i<4*(n+1); ++i)
+      for (unsigned int i = 4*n; i<4*(n+1); ++i)
 	{
 	  int orient = m.edge_list[c.edges[i]].orientation_flag *
 		       c.local_orientation_flags[i];
@@ -1184,7 +1172,7 @@ namespace internal
 				       // If so orient all edges
 				       // consistently.
       cur_flag = 1;
-      for (int i = 4*n; i<4*(n+1); ++i)
+      for (unsigned int i=4*n; i<4*(n+1); ++i)
 	{
 	  if ((edge_flags&cur_flag) != 0)
 	    {
@@ -1200,36 +1188,35 @@ namespace internal
 
 
     
-    void Orienter::get_adjacent_cubes(Mesh &m)
+    void Orienter::get_adjacent_cubes (Mesh &m)
     {
-      const Cell& c = m.cell_list[cur_posn];
-      for (unsigned int e = 0;e<12;++e)
-	{
-	  if (edge_orient_array[e])
-	    {
-	      edge_orient_array[e] = false;
-	      const unsigned int cur_local_edge_num = e;
+      const Cell &c = m.cell_list[cur_posn];
+      for (unsigned int e=0; e<12; ++e)
+	if (edge_orient_array[e] == true)
+	  {
+	    edge_orient_array[e] = false;
+	    
+	    Edge & the_edge = m.edge_list[c.edges[e]];
+	    for (unsigned int local_cube_num = 0; 
+		 local_cube_num < the_edge.neighboring_cubes.size();
+		 ++local_cube_num)
+	      {
+		const unsigned int
+		  global_cell_num = the_edge.neighboring_cubes[local_cube_num];
+		Cell &ncell = m.cell_list[global_cell_num];
+		
+		if (!ncell.waiting_to_be_processed)
+		  {
+		    sheet_to_process.push_back(global_cell_num);
+		    ncell.waiting_to_be_processed = true;
+		  }
+	      }
+	  }
+    }
 
-	      Edge & the_edge = m.edge_list[c.edges[cur_local_edge_num]];
-	      for (unsigned int local_cube_num = 0; 
-		   local_cube_num < the_edge.num_neighbouring_cubes; 
-		   ++local_cube_num)
-		{
-		  unsigned int global_cell_num = the_edge.neighbouring_cubes[local_cube_num];
-		  Cell& ncell = m.cell_list[global_cell_num];
-		  if (!ncell.waiting_to_be_processed)
-		    {
-		      sheet_to_process.push_back(global_cell_num);
-		      ncell.waiting_to_be_processed = true;
-		    }
 
-		}
-	    }
-
-	}
-    }	
-
-    bool Orienter::get_next_active_cube(Mesh &m)
+    
+    bool Orienter::get_next_active_cube (Mesh &m)
     {
 				       // Mark the curent Cube as finnished with.
       Cell &c = m.cell_list[cur_posn];
