@@ -96,7 +96,7 @@
   </p>
 
   <p>
-  Also note that on some installations of CygWin, one of the system
+  Also note that on some installations of Cygwin, one of the system
   header files used the proprocessor to define <code>quad</code> to
   <code>quad_t</code>. Since <acronym>deal.II</acronym> uses the name
   <code>quad</code> as a function name, the name is sometimes
@@ -118,12 +118,16 @@
 
   <h4>Other Windows compilers</h4>
   <p>
-  Authomatic configuration requires a lot of Unix tools. We have not
-  heard of anybody trying to generate the necessary files to compile
-  with any of the genuine Windows compilers. And, we do not encourage
-  to change a lot of files to make this possible. Still, if you see a
-  simple and clean way to make <acronym>deal.II</acronym> work with
-  any other Windows compiler, get in contact!
+  As long as a compiler is sufficiently standards conforming, and has
+  a command line interface, it may be used to compile the library. In
+  order to do so, the automatic configuration needs to recognize the
+  compiler, and be able to specify some flags, for example for
+  optimization. Presently, except for gcc and Intel C++, we do not
+  support any of the genuine Windows compilers, such as Visual C++, or
+  Borland C++. However, if you want to add support for them, just look
+  at how this is done in <code>aclocal.m4</code> for the existing
+  compilers, and add support for the one you prefer. You may also want
+  to get into contact with us on the matter.
   </p>
 
 
