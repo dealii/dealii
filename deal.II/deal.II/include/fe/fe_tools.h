@@ -181,11 +181,11 @@ class FETools
 				  Vector<number>           &u1_interpolated);
 
 				     /**
-				      * Gives $(Id-I_h)z2$ for a given
-				      * @p{fe2}-function @p{z2}, where $I_h$
-				      * is the interpolation from @p{fe2}
-				      * to @p{fe1}. $(Id-I_h)z2$ is
-				      * denoted by @p{z2_difference}.
+				      * Gives $(Id-I_h)z1$ for a given
+				      * @p{dof1}-function @p{z1}, where $I_h$
+				      * is the interpolation from @p{fe1}
+				      * to @p{fe2}. $(Id-I_h)z1$ is
+				      * denoted by @p{z1_difference}.
 				      */
     template <int dim, typename number>
     static void interpolation_difference(const DoFHandler<dim> &dof1,
