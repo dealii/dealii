@@ -1,0 +1,58 @@
+############################################################
+# $Id$
+# Copyright (C) 2000, 2001 by the deal.II authors
+############################################################
+
+############################################################
+# Include general settings for including DEAL libraries
+############################################################
+
+D = @DEAL2_DIR@
+include $D/common/Make.global_options
+debug-mode = on
+
+libraries = $(lib-deal2-1d.g) \
+            $(lib-deal2-2d.g) \
+            $(lib-deal2-3d.g) \
+            $(lib-lac.g)  \
+            $(lib-base.g)
+
+############################################################
+# First how to create executables, including all necessary
+# flags:
+############################################################
+
+flags     = $(CXXFLAGS.g)
+
+ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
+flags += -Wno-missing-noreturn
+endif
+
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+%.g.o : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+%.exe :
+	@echo =====linking======= $@
+	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+
+default: embedding.exe interpolation.exe
+
+############################################################
+
+embedding.exe    : embedding.o  $(libraries)
+interpolation.exe: interpolation.o $(libraries)
+
+############################################################
+# Automatic generation of dependencies
+############################################################
+
+Makefile.depend: $(shell echo *.cc)
+	@echo =====Dependencies== $@
+	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
+	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.g.o:/;' $@
+
+include Makefile.depend
