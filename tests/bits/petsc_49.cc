@@ -12,7 +12,7 @@
 //----------------------------  petsc_49.cc  ---------------------------
 
 
-// check PETScWrappers::copy_from<PetscScalar>
+// check PETScWrappers::operator = (Vector<PetscVector>)
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>
@@ -29,7 +29,7 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int i=0; i<w.size(); ++i)
     w(i) = i;
   
-  v.copy_from (w);
+  v = w;
 
   
                                    // make sure we get the expected result

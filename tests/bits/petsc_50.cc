@@ -12,7 +12,7 @@
 //----------------------------  petsc_50.cc  ---------------------------
 
 
-// check PETScWrappers::copy_from<T> with T!=PetscScalar
+// check PETScWrappers::operator = (Vector<T>) with T!=PetscScalar
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>
@@ -39,7 +39,7 @@ void test (PETScWrappers::Vector &v)
                                    // two cases, the template argument to
                                    // Vector<T> must be different from
                                    // PetscScalar
-  v.copy_from (w);
+  v = w;
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (w(i) == i, ExcInternalError());
@@ -47,7 +47,7 @@ void test (PETScWrappers::Vector &v)
       Assert (x(i) == i+1, ExcInternalError());
     }
 
-  v.copy_from (x);
+  v = x;
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (w(i) == i, ExcInternalError());
