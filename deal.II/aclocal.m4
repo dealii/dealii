@@ -1965,7 +1965,7 @@ AC_DEFUN(DEAL_II_CHECK_RAND_R, dnl
 #include <cstdlib>
 	],
 	[
-int seed = 0;
+unsigned int seed = 0;
 int i=rand_r(&i);
 	],
 	[
