@@ -27,8 +27,10 @@
     points of the line have to be given consecutively twice, as
     elements 0 and 1, and 2 and 3, respectively.
     
-    There is a specialisation, #StraightBoundary<dim>#, which places
-    the new point right into the middle of the given points.
+    There are specialisations, #StraightBoundary<dim>#, which places
+    the new point right into the middle of the given points, and
+    #HyperBallBoundary<dim># creating a hyperball with given radius
+    around a given center point.
     */
 template <int dim>
 class Boundary {
@@ -72,6 +74,59 @@ class StraightBoundary : public Boundary<dim> {
 };
 
 
+
+
+/**
+    Specialisation of \Ref{Boundary}<dim>, which places the new point on
+    the boundary of a ball in arbitrary dimension. It works by projecting
+    the point in the middle of the old points onto the ball. The middle is
+    defined as the arithmetic mean of the points. 
+
+    The center of the ball and its radius have to be given upon construction of
+    an object of this type.
+
+    This class is derived from #StraightBoundary# rather than from
+    #Boundary#, which would seem natural, since this way we can use the
+    #StraightBoundary<dim>::in_between(neighbors)# function.
+    */
+template <int dim>
+class HyperBallBoundary : public StraightBoundary<dim> {
+  public:
+				     /**
+				      * Constructor
+				      */
+    HyperBallBoundary (const Point<dim> p, const double radius) :
+		    center(p), radius(radius) {};
+
+				     /**
+				      *  This function calculates the position
+				      *  of the new vertex.
+				      */
+    virtual Point<dim> in_between (const PointArray &neighbors) const {
+      Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
+
+      middle -= center;
+				       // project to boundary
+      middle *= radius / sqrt(middle.square());
+
+      middle += center;
+      return middle;
+    };
+
+
+  private:
+				     /**
+				      * Center point of the hyperball.
+				      */
+    const Point<dim> center;
+
+				     /**
+				      * Radius of the hyperball.
+				      */
+    const double radius;
+};
+
+    
 
 
 /*----------------------------   boundary-function.h     ---------------------------*/
