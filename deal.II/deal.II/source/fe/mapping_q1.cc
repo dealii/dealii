@@ -930,9 +930,13 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
 				   // point p_unit.
   const Quadrature<dim> point_quadrature(p_unit);
   InternalData *mdata=dynamic_cast<InternalData *> (
-    get_data(update_transformation_values | update_transformation_gradients,
-	     point_quadrature));
+    MappingQ1<dim>::get_data(update_transformation_values
+			     | update_transformation_gradients,
+			     point_quadrature));
   Assert(mdata!=0, ExcInternalError());
+
+  MappingQ1<dim>::compute_mapping_support_points(cell, mdata->mapping_support_points);
+  Assert(mdata->mapping_support_points.size()==4, ExcInternalError());
 
 				   // perform the newton iteration.
   transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
@@ -955,7 +959,6 @@ void MappingQ1<dim>::transform_real_to_unit_cell_internal (
   Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
   
   std::vector<Point<dim> > &points=mdata.mapping_support_points;
-  compute_mapping_support_points(cell, points);
   Assert(points.size()==n_shapes, ExcInternalError());
   
 				   // Newton iteration to solve

@@ -1232,38 +1232,29 @@ Point<dim> MappingQ<dim>::transform_real_to_unit_cell (
   const typename Triangulation<dim>::cell_iterator cell,
   const Point<dim> &p) const
 {
-				   // Let the start value of the
-				   // newton iteration be the center
-				   // of the unit cell
-  Point<dim> p_unit;
-  for (unsigned int i=0; i<dim; ++i)
-    p_unit(i)=0.5;
-
-				   // Use the get_data function to
-				   // create an InternalData with data
-				   // vectors of the right size and
-				   // transformation shape values and
-				   // derivatives already computed at
-				   // point p_unit.
-  const Quadrature<dim> point_quadrature(p_unit);
-  InternalData *mdata=dynamic_cast<InternalData *> (
-    get_data(update_transformation_values | update_transformation_gradients,
-	     point_quadrature));
-  Assert(mdata!=0, ExcInternalError());
-
-  mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
-					     || cell->has_boundary_lines());
-
-  typename MappingQ1<dim>::InternalData *p_data=0;
-  if (mdata->use_mapping_q1_on_current_cell)
-    p_data=&mdata->mapping_q1_data;
-  else
-    p_data=mdata;
+				   // first a Newton iteration based
+				   // on a Q1 mapping
+  Point<dim> p_unit=MappingQ1<dim>::transform_real_to_unit_cell(cell, p);
   
-				   // perform the newton iteration.
-  transform_real_to_unit_cell_internal(cell, p, *p_data, p_unit);
+  if (cell->has_boundary_lines() || use_mapping_q_on_all_cells)
+    {
+				       // then a Newton iteration
+				       // based on the full MappingQ
+      const Quadrature<dim> point_quadrature(p_unit);
+      InternalData *mdata=dynamic_cast<InternalData *> (
+	get_data(update_transformation_values | update_transformation_gradients,
+		 point_quadrature));
+      Assert(mdata!=0, ExcInternalError());
+      mdata->use_mapping_q1_on_current_cell=false;
+
+      std::vector<Point<dim> > &points=mdata->mapping_support_points;
+      compute_mapping_support_points(cell, points);
+
+      transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
   
-  delete mdata;
+      delete mdata;
+    }
+  
   return p_unit;
 }
 
