@@ -181,6 +181,7 @@ template <int dim> class FEValues;
  *
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
+//TODO: [WB] remove template arg and make functions static once FunctionMap is globalized
 template <int dim>
 class MatrixCreator
 {
@@ -197,6 +198,7 @@ class MatrixCreator
 				      *	See the general documentation of this
 				      *	class for more detail.
 				      */
+// TODO: [WB] use one global declaration of FunctionMap, rather than one in every place
     typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
 
 				     /**
