@@ -100,6 +100,12 @@ class BlockIndices
     unsigned int total_size () const;
 
 				     /**
+				      * Return the size of the @p{i}th
+				      * block.
+				      */
+    unsigned int block_size (const unsigned int i) const
+      
+				     /**
 				      * Copy operator.
 				      */
     BlockIndices & operator = (const BlockIndices &b);
@@ -148,8 +154,9 @@ class BlockIndices
 
 inline
 BlockIndices::BlockIndices (unsigned int n_blocks)
-  : n_blocks(n_blocks),
-    start_indices(n_blocks+1)
+		:
+		n_blocks(n_blocks),
+		start_indices(n_blocks+1)
 {
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = 0;
@@ -159,8 +166,9 @@ BlockIndices::BlockIndices (unsigned int n_blocks)
 
 inline
 BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
-  : n_blocks(n.size()),
-    start_indices(n.size()+1)
+		:
+		n_blocks(n.size()),
+		start_indices(n.size()+1)
 {
   reinit (n);
 };
@@ -235,6 +243,16 @@ unsigned int
 BlockIndices::total_size () const
 {
   return start_indices[n_blocks];
+};
+
+
+
+inline
+unsigned int
+BlockIndices::block_size (const unsigned int block) const
+{
+  Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  return start_indices[block+1]-start_indices[block];
 };
 
 
