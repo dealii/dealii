@@ -6745,7 +6745,7 @@ else
 fi;
 
 case "$target" in
-   *-aix4* | alpha*-linux* | alpha*-osf45* | *cygwin | powerpc-apple-darwin* )
+   *-aix4* | alpha*-linux* | alpha*-osf45* | *cygwin | powerpc-apple-darwin* | hppa64-unknown-linux-gnu )
 	   { echo "$as_me:$LINENO: WARNING: Shared libraries not supported on $target. Using static libs instead" >&5
 echo "$as_me: WARNING: Shared libraries not supported on $target. Using static libs instead" >&2;}
 	   enableshared=no
