@@ -1124,6 +1124,13 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 				   // indicators or whether we can
 				   // accept all
   const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+
+                                   // also see whether we have to
+                                   // check whether a certain vector
+                                   // component is selected, or all
+  const bool check_vector_component
+    = (component_select != std::vector<bool>(component_select.size(),
+                                             true));
   
 				   // clear and reset array by default
 				   // values
@@ -1154,9 +1161,13 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim>         &dof_handler,
 	     != boundary_indicators.end()))
 	  {
 	    cell->face(face)->get_dof_indices (face_dof_indices);
+
 	    for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_face; ++i)
-	      if (component_select[dof_handler.get_fe().
-				  face_system_to_component_index(i).first] == true)
+	      if (!check_vector_component
+                  ||
+                  (component_select[dof_handler.get_fe().
+                                    face_system_to_component_index(i).first]
+                   == true))
 		selected_dofs[face_dof_indices[i]] = true;
 	  };
 };
