@@ -366,12 +366,6 @@ AC_SUBST(LIBS)
 AC_SUBST(LDFLAGS)
 
 
-dnl ======================================================================
-dnl Check for operating system properties like header files and
-dnl special functions.
-dnl ======================================================================
-AC_CHECK_FUNCS(gethostname)
-
 
 
 dnl We still need to set the flag for debug output. We will usually
@@ -622,19 +616,25 @@ DEAL_II_CHECK_IBM_XLC_ERROR
 dnl See whether we can use the std::iterator class
 DEAL_II_HAVE_STD_ITERATOR
 
+
+
+dnl ======================================================================
+dnl With all the right flags in place now, check for operating system
+dnl properties like header files and accessibility of special functions
+dnl with these flags.
+
 dnl See whether we have to declare lrand48 ourselves with -ansi
 DEAL_II_HAVE_LRAND48_DECLARED
 
-dnl See whether getrusage() is declared properly
+dnl See whether getrusage() is declared properly, and for the present
+dnl flags. likewise for other functions as well
 DEAL_II_CHECK_GETRUSAGE
-
-dnl Likewise for isnan()
 DEAL_II_CHECK_ISNAN
+DEAL_II_CHECK_RAND_R
+AC_CHECK_FUNCS(gethostname)
 
 
-
-
-
+dnl ======================================================================
 dnl Find path to a Fortran 77 compiler. By default try to find a
 dnl vendor compiler which is usually names `f77', and only if that could
 dnl not be found, use `g77' instead. The reasoning is that usually vendor

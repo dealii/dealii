@@ -271,6 +271,31 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 )      
 
 
+dnl rand_r is defined for some compiler flag combinations, but not for
+dnl others. check that. note that since these are C++ flags, we can't
+dnl just use AC_CHECK_FUNCS
+AC_DEFUN(DEAL_II_CHECK_RAND_R, dnl
+  AC_LANG_CPLUSPLUS
+  CXXFLAGS=$CXXFLAGSG
+  AC_MSG_CHECKING(for rand_r)
+  AC_TRY_COMPILE(
+	[
+#include <cstdlib>
+	],
+	[
+int seed = 0;
+int i=rand_r(&i);
+	],
+	[
+	  AC_MSG_RESULT(found)
+	  AC_DEFINE(HAVE_RAND_R)
+	],
+	[
+	  AC_MSG_RESULT(no)
+	]
+  )
+)
+
 
 dnl On some systems (well, DEC Alphas are the only ones we know of),
 dnl gcc2.95 throws the hands in the air if it sees one of the AssertThrow
