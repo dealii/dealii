@@ -679,8 +679,6 @@ CompressedSparsityPattern::Line::flush_cache () const
       
       Assert (new_entries.size() == n_new_entries,
               ExcInternalError());
-      Assert (new_entries.capacity() == n_new_entries,
-              ExcInternalError());
 
                                        // finally swap old and new array, and
                                        // set cache size to zero
