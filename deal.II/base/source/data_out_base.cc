@@ -1162,13 +1162,8 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 	  else
 					     // d>dim. write zeros instead
 	    {
-	      const unsigned int n_points = (dim==1 ?
-					     n_subdivisions+1 :
-					     (dim==2 ?
-					      (n_subdivisions+1) * (n_subdivisions+1) :
-					      (dim == 3 ?
-					       (n_subdivisions+1) * (n_subdivisions+1) * (n_subdivisions+1) :
-					       0)));
+	      const unsigned int n_points
+		= static_cast<unsigned int>(pow (n_subdivisions+1, dim));
 	      for (unsigned int i=0; i<n_points; ++i)
 		out << "0 ";
 	    };
