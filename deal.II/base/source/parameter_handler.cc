@@ -315,7 +315,8 @@ namespace Patterns
   bool List::match (const std::string &test_string_list) const
   {
     std::string tmp = test_string_list;
-    std::list<std::string> split_list;
+    std::vector<std::string> split_list;
+    split_list.reserve (std::count (tmp.begin(), tmp.end(), ',')+1);
 
 				     // first split the input list
     while (tmp.length() != 0)
@@ -345,7 +346,8 @@ namespace Patterns
       return false;
 
 				     // check the different possibilities
-    for (std::list<std::string>::const_iterator test_string = split_list.begin();
+    for (std::vector<std::string>::const_iterator
+           test_string = split_list.begin();
 	 test_string != split_list.end(); ++test_string) 
       if (pattern->match (*test_string) == false)
         return false;
