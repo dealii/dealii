@@ -697,9 +697,14 @@ struct LineEntry
     Point<2> first;
     Point<2> second;
     bool colorize;
-    LineEntry(const Point<2>& f, const Point<2>& s, const bool c)
+    unsigned int level;
+    LineEntry (const Point<2>    &f,
+	       const Point<2>    &s,
+	       const bool         c,
+	       const unsigned int l)
 		    :
-		    first(f), second(s), colorize(c)
+		    first(f), second(s),
+		    colorize(c), level(l)
       {}
 };
 
@@ -792,7 +797,8 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 						    line->vertex(0)(1)),
 					   Point<2>(line->vertex(1)(0),
 						    line->vertex(1)(1)),
-					   line->user_flag_set()));
+					   line->user_flag_set(),
+					   line->level()));
 	
 					 // next if we are to treat
 					 // curved boundaries
@@ -845,7 +851,8 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 			  const Point<2>   p1     (p1_dim(0), p1_dim(1));
 			  
 			  line_list.push_back (LineEntry(p0, p1,
-							 face->user_flag_set()));
+							 face->user_flag_set(),
+							 face->level() ));
 			  p0=p1;
 			}
 
@@ -853,7 +860,8 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 		      const Point<dim> p1_dim (face->vertex(1));
 		      const Point<2>   p1     (p1_dim(0), p1_dim(1));
 		      line_list.push_back (LineEntry(p0, p1,
-						     face->user_flag_set()));
+						     face->user_flag_set(),
+						     face->level()));
 		    };
 		};
 	  };
@@ -919,7 +927,8 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 						  line->vertex(0) * unit_vector1),
 					 Point<2>(line->vertex(1) * unit_vector2,
 						  line->vertex(1) * unit_vector1),
-					 line->user_flag_set()));
+					 line->user_flag_set(),
+					 line->level()));
 
 	break;
       };
@@ -937,6 +946,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   double x_max = x_min;
   double y_min = tria.begin_active_line()->vertex(0)(1);
   double y_max = y_min;
+  unsigned int  max_level = line_list.begin()->level;
 
   for (LineList::const_iterator line=line_list.begin();
        line!=line_list.end(); ++line)
@@ -952,6 +962,8 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 
       y_max = std::max (y_max, line->first(1));
       y_max = std::max (y_max, line->second(1));
+      
+      max_level = std::max (max_level,  line->level);      
     };
 
 				   // scale in x-direction such that
@@ -1003,6 +1015,18 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  << "/b {0 0 0 setrgbcolor} def" << std::endl
 	  << "/r {1 0 0 setrgbcolor} def" << std::endl;
 
+				       // calculate colors for level
+				       // coloring; level 0 is black,
+				       // other levels are blue
+				       // ... red
+      double levelscale  = 0.66666/std::max(1U,(max_level-1));
+      
+      out  << "/l  { neg "
+	   << (max_level)
+	   << " add "
+	   << levelscale
+	   << " mul 1 0.8 sethsbcolor} def" << std::endl;
+
 				       // in 2d, we can also plot cell
 				       // and vertex numbers, but this
 				       // requires a somewhat more
@@ -1042,10 +1066,20 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   
   for (LineList::const_iterator line=line_list.begin();
        line!=line_list.end(); ++line)
-    out << ((line->colorize && eps_flags_base.color_lines_on_user_flag) ? "r " : "b ")
-	<< (line->first  - offset) * scale << " m "
-	<< (line->second - offset) * scale << " x" << std::endl;
-
+    if (eps_flags_base.color_lines_level && line-> level > 0)
+				       // lines colored according to
+				       // refinement level,
+				       // contributed by Jörg
+				       // R. Weimar
+      out << line->level
+	  << " l "
+	  << (line->first  - offset) * scale << " m "
+	  << (line->second - offset) * scale << " x" << std::endl;
+    else
+      out << ((line->colorize && eps_flags_base.color_lines_on_user_flag) ? "r " : "b ")
+	  << (line->first  - offset) * scale << " m "
+	  << (line->second - offset) * scale << " x" << std::endl;
+    
 				   // finally write the cell numbers
 				   // in 2d, if that is desired
   if ((dim == 2) && (eps_flags_2.write_cell_numbers == true))

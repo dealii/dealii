@@ -207,9 +207,11 @@ namespace GridOutFlags
 					* units. Default is 0.5.
 					*/
       double line_width;
+      
 				       /**
-					* Should lines with a set @p{user_flag}
-					* be drawn in a different color?
+					* Should lines with a set
+					* @p{user_flag} be drawn in a
+					* different color (red)?
 					*/
       bool color_lines_on_user_flag;
       
@@ -228,13 +230,27 @@ namespace GridOutFlags
       unsigned int n_boundary_face_points;
       
 				       /**
+					* Should lines be colored
+					* according to their
+					* refinement level?  This
+					* overrides
+					* color_lines_on_user_flag for
+					* all levels except level 0.
+					* Colors are: level 0: black,
+					* other levels: rainbow scale
+					* from blue to red.
+					*/
+      bool color_lines_level;
+      
+				       /**
 					* Constructor.
 					*/
       EpsFlagsBase (const SizeType     size_type  = width,
 		    const unsigned int size       = 300,
 		    const double       line_width = 0.5,
 		    const bool color_lines_on_user_flag = false,
-		    const unsigned int n_boundary_face_points = 2);
+		    const unsigned int n_boundary_face_points = 2,
+		    const bool color_lines_level = false);
   };
   
   
@@ -331,7 +347,8 @@ namespace GridOutFlags
 	   const unsigned int n_boundary_face_points = 2,
 	   const bool         write_cell_numbers = false,
 	   const bool         write_cell_number_level = true,
-	   const bool         write_vertex_numbers = false);
+	   const bool         write_vertex_numbers = false,
+	   const bool         color_lines_level = false);
   };
   
 				   /**
