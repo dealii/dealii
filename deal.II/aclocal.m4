@@ -314,7 +314,75 @@ AC_DEFUN(DEAL_II_CHECK_ASSERT_THROW, dnl
   CXXFLAGS=$2
   AC_TRY_COMPILE(
     [
-#include "base/include/base/exceptions.h"
+#include <exception>
+#include <iostream>
+#include <cstdlib>
+
+#ifndef __GNUC__
+#  define __PRETTY_FUNCTION__ "(unknown)"
+#endif
+class ExceptionBase : public std::exception {
+  public:
+    ExceptionBase ();
+    ExceptionBase (const char* f, const int l, const char *func,
+		   const char* c, const char *e);
+    virtual ~ExceptionBase () throw();
+    void SetFields (const char *f, const int   l, const char *func,
+		    const char *c, const char *e);
+    void PrintExcData (std::ostream &out) const;
+    virtual void PrintInfo (std::ostream &out) const;
+    virtual const char * what () const throw ();
+  protected:
+    const char  *file;
+    unsigned int line;
+    const char  *function, *cond, *exc;
+};
+
+template <class exc>
+void __IssueError_Assert (const char *file,
+			  int         line,
+			  const char *function,
+			  const char *cond,
+			  const char *exc_name,
+			  exc         e){
+  e.SetFields (file, line, function, cond, exc_name);
+  std::cerr << "--------------------------------------------------------"
+	    << std::endl;
+  e.PrintExcData (std::cerr);
+  e.PrintInfo (std::cerr);
+  std::cerr << "--------------------------------------------------------"
+	    << std::endl;  
+  std::abort ();
+};
+
+template <class exc>
+void __IssueError_Throw (const char *file,
+			 int         line,
+			 const char *function,
+			 const char *cond,
+			 const char *exc_name,
+			 exc         e) {
+				   // Fill the fields of the exception object
+  e.SetFields (file, line, function, cond, exc_name);
+  throw e;
+};
+
+#define AssertThrow(cond, exc)                                    \
+  {                                                               \
+    if (!(cond))                                                  \
+      __IssueError_Throw (__FILE__,                               \
+			  __LINE__,                               \
+			  __PRETTY_FUNCTION__, #cond, #exc, exc); \
+  }
+
+#define DeclException0(Exception0)  \
+class Exception0 :  public ExceptionBase {}
+
+namespace StandardExceptions 
+{
+  DeclException0 (ExcInternalError);
+};
+using namespace StandardExceptions;
     ],
     [
 	AssertThrow (false, ExcInternalError());
