@@ -268,25 +268,25 @@ namespace CommunicationsLog
       unsigned int          completed_bytes;
       std::string           description;
 
-    /**
-     * Constructor
-     */
-    Record (const pid_t           child_pid,
-	    const Direction       direction,
-	    const std::type_info *type,
-	    const unsigned int    count,
-	    const  unsigned int   scheduled_bytes,
-	    const unsigned int    completed_bytes,
-	    const std::string    &description)
-      :
-      child_pid (child_pid),
-      direction (direction),
-      type (type),
-      count (count),
-      scheduled_bytes (scheduled_bytes),
-      completed_bytes (completed_bytes),
-      description (description)
-    {}
+                                       /**
+                                        * Constructor
+                                        */
+      Record (const pid_t           child_pid,
+              const Direction       direction,
+              const std::type_info *type,
+              const unsigned int    count,
+              const  unsigned int   scheduled_bytes,
+              const unsigned int    completed_bytes,
+              const std::string    &description)
+                      :
+                      child_pid (child_pid),
+                      direction (direction),
+                      type (type),
+                      count (count),
+                      scheduled_bytes (scheduled_bytes),
+                      completed_bytes (completed_bytes),
+                      description (description)
+        {}
   };
 
                                    /**
