@@ -545,9 +545,10 @@ MappingCartesian<dim>::transform_contravariant (Tensor<2,dim>       *begin,
 
 
 template <int dim>
-Point<dim> MappingCartesian<dim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p) const
+Point<dim>
+MappingCartesian<dim>::transform_unit_to_real_cell (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p) const
 {
   Tensor<1,dim> length;
   const Point<dim> start = cell->vertex(0);
@@ -579,9 +580,10 @@ Point<dim> MappingCartesian<dim>::transform_unit_to_real_cell (
 
 
 template <int dim>
-Point<dim> MappingCartesian<dim>::transform_real_to_unit_cell (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p) const
+Point<dim>
+MappingCartesian<dim>::transform_real_to_unit_cell (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p) const
 {
   const Point<dim> &start = cell->vertex(0);
   Point<dim> real = p;

@@ -22,8 +22,8 @@
 
 
 template <int dim>
-MappingQ1Eulerian<dim>::MappingQ1Eulerian ( const Vector<double>  &euler_transform_vectors,
-					    const DoFHandler<dim> &shiftmap_dof_handler)
+MappingQ1Eulerian<dim>::MappingQ1Eulerian (const Vector<double>  &euler_transform_vectors,
+                                           const DoFHandler<dim> &shiftmap_dof_handler)
                      :
 		     euler_transform_vectors(euler_transform_vectors),
 		     shiftmap_dof_handler(&shiftmap_dof_handler)

@@ -1063,9 +1063,10 @@ MappingQ<dim>::transform_contravariant (Tensor<2,dim>       *begin,
 
 
 template <int dim>
-Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p) const
+Point<dim>
+MappingQ<dim>::transform_unit_to_real_cell (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p) const
 {
 				   // Use the get_data function to
 				   // create an InternalData with data
@@ -1096,9 +1097,10 @@ Point<dim> MappingQ<dim>::transform_unit_to_real_cell (
 
 
 template <int dim>
-Point<dim> MappingQ<dim>::transform_real_to_unit_cell (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p) const
+Point<dim>
+MappingQ<dim>::transform_real_to_unit_cell (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p) const
 {
 				   // first a Newton iteration based
 				   // on a Q1 mapping

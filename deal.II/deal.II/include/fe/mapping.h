@@ -67,9 +67,10 @@ class Mapping : public Subscriptor
 				      * @p{p_real} on the real cell
 				      * @p{cell} and returns @p{p_real}.
 				      */
-    virtual Point<dim> transform_unit_to_real_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p) const=0;
+    virtual Point<dim>
+    transform_unit_to_real_cell (
+      const typename Triangulation<dim>::cell_iterator &cell,
+      const Point<dim>                                 &p) const = 0;
     
 				     /**
 				      * Transforms the point @p{p} on
@@ -77,9 +78,10 @@ class Mapping : public Subscriptor
 				      * @p{p_unit} on the unit cell
 				      * @p{cell} and returns @p{p_unit}.
 				      */
-    virtual Point<dim> transform_real_to_unit_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p) const=0;
+    virtual Point<dim>
+    transform_real_to_unit_cell (
+      const typename Triangulation<dim>::cell_iterator &cell,
+      const Point<dim>                                 &p) const = 0;
     
 				     /**
 				      * Base class for internal data

@@ -52,9 +52,10 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{p_real} on the real cell
 				      * @p{cell} and returns @p{p_real}.
 				      */
-    virtual Point<dim> transform_unit_to_real_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p) const;
+    virtual Point<dim>
+    transform_unit_to_real_cell (
+      const typename Triangulation<dim>::cell_iterator &cell,
+      const Point<dim>                                 &p) const;
     
 				     /**
 				      * Transforms the point @p{p} on
@@ -66,9 +67,10 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{transform_unit_to_real_cell}
 				      * function.
 				      */
-    virtual Point<dim> transform_real_to_unit_cell (
-      const typename Triangulation<dim>::cell_iterator cell,
-      const Point<dim> &p) const;
+    virtual Point<dim>
+    transform_real_to_unit_cell (
+      const typename Triangulation<dim>::cell_iterator &cell,
+      const Point<dim>                                 &p) const;
     
 				     /**
 				      * Implementation of the interface in
@@ -527,7 +529,7 @@ class MappingQ1 : public Mapping<dim>
 				      * @p{mdata} will be changed by
 				      * this function.
 				      */
-    void transform_real_to_unit_cell_internal (const typename Triangulation<dim>::cell_iterator cell,
+    void transform_real_to_unit_cell_internal (const typename Triangulation<dim>::cell_iterator &cell,
 					       const Point<dim> &p,
 					       InternalData &mdata,
 					       Point<dim> &p_unit) const;

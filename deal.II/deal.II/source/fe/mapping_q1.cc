@@ -884,9 +884,10 @@ MappingQ1<dim>::transform_contravariant (Tensor<2,dim>       *begin,
 
 
 template <int dim>
-Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p) const
+Point<dim>
+MappingQ1<dim>::transform_unit_to_real_cell (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p) const
 {
 				   // Use the get_data function to
 				   // create an InternalData with data
@@ -910,7 +911,8 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell (
 
 
 template <int dim>
-Point<dim> MappingQ1<dim>::transform_unit_to_real_cell_internal (
+Point<dim>
+MappingQ1<dim>::transform_unit_to_real_cell_internal (
   const InternalData &data) const
 {
   const unsigned int n_mapping_points=data.mapping_support_points.size();
@@ -927,9 +929,10 @@ Point<dim> MappingQ1<dim>::transform_unit_to_real_cell_internal (
 
 
 template <int dim>
-Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p) const
+Point<dim>
+MappingQ1<dim>::transform_real_to_unit_cell (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p) const
 {
 				   // Let the start value of the
 				   // newton iteration be the center
@@ -965,11 +968,12 @@ Point<dim> MappingQ1<dim>::transform_real_to_unit_cell (
 
 
 template <int dim>
-void MappingQ1<dim>::transform_real_to_unit_cell_internal (
-  const typename Triangulation<dim>::cell_iterator cell,
-  const Point<dim> &p,
-  InternalData &mdata,
-  Point<dim> &p_unit) const
+void
+MappingQ1<dim>::transform_real_to_unit_cell_internal (
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Point<dim>                                 &p,
+  InternalData                                     &mdata,
+  Point<dim>                                       &p_unit) const
 {
   const unsigned int n_shapes=mdata.shape_values.size();
   Assert(n_shapes!=0, ExcInternalError());
