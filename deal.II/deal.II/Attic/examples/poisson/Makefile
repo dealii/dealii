@@ -23,7 +23,7 @@ run-parameters  = $(target).prm
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = gnuplot make_ps
+additional-run-action = cd results ; gnuplot make_ps
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
@@ -51,8 +51,8 @@ h-files     = $(wildcard *.h)
 lib-h-files = $(wildcard ../../include/*/*.h)
 
 # list of libraries needed to link with
-libs     = ./Obj.a   -ldeal_II_3d   -llac -lbase
-libs.g   = ./Obj.g.a -ldeal_II_3d.g -llac.g -lbase.g
+libs     = ./Obj.a   -ldeal_II_2d   -llac -lbase
+libs.g   = ./Obj.g.a -ldeal_II_2d.g -llac.g -lbase.g
 
 
 # check whether we use debug mode or not

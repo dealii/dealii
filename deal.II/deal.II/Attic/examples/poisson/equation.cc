@@ -83,4 +83,4 @@ void PoissonEquation<dim>::assemble (Vector<double>      &,
 
 
 
-template class PoissonEquation<3>;
+template class PoissonEquation<2>;

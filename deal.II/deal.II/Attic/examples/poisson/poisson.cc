@@ -5,7 +5,7 @@
 
 #include "poisson.h"
 #include <lac/vector.h>
-
+#include <base/logstream.h>
 
 
 int main (int argc, char **argv) {
@@ -15,7 +15,10 @@ int main (int argc, char **argv) {
       return 1;
     };
 
-  PoissonProblem<3> poisson;
+				   // no additional output to console
+  deallog.depth_console (0);
+
+  PoissonProblem<2> poisson;
   MultipleParameterLoop input_data;
 
   poisson.declare_parameters(input_data);
