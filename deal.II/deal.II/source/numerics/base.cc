@@ -159,6 +159,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 
   FEValues<dim>::UpdateStruct update_flags;
   update_flags.q_points   = true;
+  update_flags.jacobians  = true;
   update_flags.JxW_values = true;
   FEValues<dim> fe_values(fe, q, update_flags);
   
@@ -172,7 +173,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 				   // incrementing is faster than conversion...)
   DoFHandler<dim>::active_cell_iterator cell = dof_handler->begin_active(),
 					endc = dof_handler->end();
-  Triangulation<dim>::active_cell_iterator tria_cell = dof_handler->get_tria().begin();
+  Triangulation<dim>::active_cell_iterator tria_cell = dof_handler->get_tria().begin_active();
   
   for (; cell != endc; ++cell, ++tria_cell) 
     {
@@ -210,7 +211,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 	    const dFMatrix & shape_values = fe_values.get_shape_values();
 	    vector<double>   dof_values;
 	    cell->get_dof_values (solution, dof_values);
-
+	    
 	    vector<double>   psi;
 
 					     // in praxi: first compute
@@ -219,10 +220,15 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 				       psi);
 					     // then subtract finite element
 					     // solution
-	    const vector<double> &JxW_values = fe_values.get_JxW_values();
 	    for (unsigned int j=0; j<n_dofs; ++j) 
 	      for (unsigned int i=0; i<n_dofs; ++i)
-		psi[j] -= dof_values[i]*shape_values(i,j)*JxW_values[j];
+		psi[j] -= dof_values[i]*shape_values(i,j);
+	    cout << "  Cell = " << cell << ", ";
+	    cout << "    Delta = ";
+	    for (unsigned int i=0; i<psi.size(); ++i)
+	      cout << psi[i] << " ";
+	    cout << ", av = " << (psi[0]+psi[1]+psi[2]+psi[3])/4;
+	    cout << endl;
 
 					     // for L1_norm and Linfty_norm:
 					     // take absolute
@@ -243,7 +249,6 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 		      break;
 	      };
 
-
 					     // ok, now we have the integrand,
 					     // let's compute the integral,
 					     // which is
@@ -254,15 +259,15 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 		case mean:
 		case L1_norm:
 		case L2_norm:
-		      diff = inner_product (psi.begin(), psi.end(),
-					    fe_values.get_JxW_values().begin(),
-					    0.0);
+		      diff = sqrt(inner_product (psi.begin(), psi.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0));
 		      break;
 		case Linfty_norm:
 		      diff = *max_element (psi.begin(), psi.end());
 		      break;
 	      };
-
+	    
 	    if (norm==L2_norm)
 	      diff = sqrt(diff);
 	    
@@ -326,8 +331,8 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
   map<int,double>::const_iterator dof, endd;
   const unsigned int n_dofs   = (unsigned int)matrix.m();
   const dSMatrixStruct &sparsity = matrix.get_sparsity_pattern();
-  const int *sparsity_rowstart = sparsity.get_rowstart_indices(),
-	    *sparsity_colnums  = sparsity.get_column_numbers();
+  const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
+  const int          *sparsity_colnums  = sparsity.get_column_numbers();
 
   for (dof=boundary_values.begin(), endd=boundary_values.end(); dof != endd; ++dof)
     {
@@ -335,7 +340,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 
 				       // set entries of this line
 				       // to zero
-      for (int j=sparsity_rowstart[(*dof).first];
+      for (unsigned int j=sparsity_rowstart[(*dof).first];
 	   j<sparsity_rowstart[(*dof).first+1]; ++j)
 	if (sparsity_colnums[j] != (*dof).first)
 					   // if not main diagonal entry
@@ -381,7 +386,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 
 				       // do the Gauss step
       for (unsigned int row=0; row<n_dofs; ++row) 
-	for (int j=sparsity_rowstart[row];
+	for (unsigned int j=sparsity_rowstart[row];
 	     j<sparsity_rowstart[row+1]; ++j)
 	  if ((sparsity_colnums[j] == (signed int)(*dof).first) &&
 	      ((signed int)row != (*dof).first))
