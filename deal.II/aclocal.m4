@@ -452,7 +452,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl #734: `X::X(const X&), required for copy that was eliminated, is
 	  dnl       inaccessible'
 	  dnl       (valid, but annoying and sometimes hard to work around)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -DDEBUG -inline_debug_info"
+	  dnl #858: `type qualifier on return type is meaningless'
+	  dnl       (on conversion operators to types that are already const)
+          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -DDEBUG -inline_debug_info"
           CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll -w0 -wd424 -wd11"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
