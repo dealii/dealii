@@ -31,8 +31,8 @@ namespace PETScWrappers
               ExcIndexRange (index, 0, vector.size()));
               
                                        // this is clumsy: there is no simple
-                                       // way in PETSc read an element from a
-                                       // vector, i.e. there is no function
+                                       // way in PETSc to read an element from
+                                       // a vector, i.e. there is no function
                                        // VecGetValue or so. The only way is
                                        // to obtain a pointer to a contiguous
                                        // representation of the vector and
