@@ -159,8 +159,7 @@ class DoFDimensionInfo<3> {
  * is the same as that for the alike triangulation iterators.
  *
  * This class also provides functions to create the sparsity patterns of
- * global matrices as well as matrices living on (parts of) the boundary
- * and handles some simple forms of transfer of data from one grid to another.
+ * global matrices as well as matrices living on (parts of) the boundary.
  * 
  * 
  * \subsection{Distribution of indices for degrees of freedom}
@@ -289,63 +288,8 @@ class DoFDimensionInfo<3> {
  * relevant in this context.
  *
  *
- * \subsection{Data transfer between grids}
- *
- * {\bf Note: The functionality described in this section has never been tested
- * and is expected to be broken or at least incomplete. Contact the author if
- * you need these functions for more information.}
- *
- * The #DoFHandler# class offers two functions #make_transfer_matrix# which create
- * a matrix to transform the data of one grid to another. The functions assumes the
- * coarsest mesh of the two grids to be the same. However there are few ways to
- * check this (only the number of cells on the coarsest grid is compared). Also,
- * the selected finite element type of the two degree of freedom handler objects
- * must be the same.
- *
- * The algorithm goes recursively from the coarse mesh cells to their children
- * until the grids differ at this level. It then tries to prolong or restrict the
- * old cell(s) to the new cell(s) and makes up a matrix of these prolongations and
- * restrictions. This matrix multiplied with a vector on the old grid yields an
- * approximation of the projection of the function on the old grid to the new one.
- *
- * Building and using the transfer matrix is usually quite an expensive operation,
- * since we have to perform two runs over all cells (one for building the sparsity
- * structure, one to build the entries) and because of the memory consumption.
- * It may, however, pay if you have many
- * equations, since then the entries in the matrix can be considered as block
- * entries which are then applied to all function values at a given degree of
- * freedom.
- *
- * To build the matrix, you first have to call
- * #make_transfer_matrix (old_dof_object, sparsity_pattern);#, then create a
- * sparse matrix out of this pattern, e.g. by #SparseMatrix<double> m(sparsity_pattern);#
- * and finally give this to the second run:
- * #make_transfer_matrix (old_dof_object, m);#. The spasity pattern created
- * by the first run is automatically compressed.
- *
- * When creating the #SparseMatrixStruct# sparsity pattern, you have to give the
- * dimension and the maximum number of entries per row. Obviously the image
- * dimension is the number of dofs on the new grid (you can get this using the
- * #n_dofs()# function), while the range dimension is the number of dofs on the
- * old grid. The maximum number of entries per row is determined by the maximum
- * number of levels $d$ which we have to cross upon transferring from one cell to
- * another (presently, transfer of one cell is only possible for #d=0,1#, i.e.
- * the two cells match or one is refined once more than the other, the
- * number of degrees of freedom per vertex $d_v$, those on lines $d_l$, those
- * on quads $d_q$ and the number of subcells a cell is
- * refined to, which is $2^{dim}$. The maximum number of entries per row in one
- * dimension is then given by $(2*d_l+d_v)*2+1$ if $d=1$. For example, a one
- * dimensional linear element would need two entries per row.
- * In two dimensions, the maxmimum number is $(4*d_q+12*d_l+5*d_v)*4+1$ if $d=1$.
- * You can get these numbers by drawing little pictures and counting, there is
- * no mystique behind this. You can also get the right number by calling the
- * #max_transfer_entries (max_level_difference)# function. The actual number
- * depends on the finite element selected and may be much less, especially in
- * higher dimensions.
- *
- *
- *
- * @author Wolfgang Bangerth, 1998 */
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 class DoFHandler  :  public Subscriptor,
 		     public DoFDimensionInfo<dim>
@@ -600,51 +544,6 @@ class DoFHandler  :  public Subscriptor,
 
     
 				     /**
-				      * Make up the transfer matrix which
-				      * transforms the data vectors from one
-				      * triangulation to the present one.
-				      * You have to pass references to the old
-				      * dof handler object and to a matrix
-				      * sparsity object. This function therefore
-				      * only makes up the sparsity pattern.
-				      *
-				      * The given sparsity pattern is
-				      * compressed at the end.
-				      *
-				      * In the matrix, row indices belong to
-				      * new dof numbers, column indices to the
-				      * ones on the old grid. Therefore,
-				      * multiplying this matrix by a vector
-				      * of the old grid yields the vector on
-				      * the new one.
-				      *
-				      * For more details see the general
-				      * documentation for this class.
-				      */
-    void make_transfer_matrix (const DoFHandler<dim> &transfer_from,
-			       SparseMatrixStruct    &transfer_pattern) const;
-
-				     /**
-				      * Make up the transfer matrix which
-				      * transforms the data vectors from one
-				      * triangulation to the present one.
-				      * You have to pass references to the old
-				      * dof handler object and to a matrix
-				      * object. This function therefore
-				      * builds the matrix itself
-				      *
-				      * The matrix object should be
-				      * associated with the sparsity pattern
-				      * constructed by the other
-				      * #make_transfer_matrix# object.
-				      *
-				      * For more details see the general
-				      * documentation for this class.
-				      */
-    void make_transfer_matrix (const DoFHandler<dim> &transfer_from,
-			       SparseMatrix<double>  &transfer_matrix) const;
-
-				     /**
 				      * Return the maximum number of
 				      * degrees of freedom a degree of freedom
 				      * in the given triangulation with the
@@ -681,19 +580,6 @@ class DoFHandler  :  public Subscriptor,
 				      */
     unsigned int max_couplings_between_boundary_dofs () const;
     
-				     /**
-				      * Return the maximum number of entries
-				      * a row in a transfer matrix may contain
-				      * if any two cells of which the dofs are
-				      * to be transferred differ in refinement
-				      * level at most by #max_level_diff#.
-				      * It is assumed that the finite element
-				      * selected by the last call to
-				      * #distribute_dofs# is used also for
-				      * the transfer process.
-				      */
-    unsigned int max_transfer_entries (const unsigned int max_level_diff) const;
-
 				     /**
 				      * Take a vector of values which live on
 				      * cells (e.g. an error per cell) and
@@ -1397,10 +1283,6 @@ class DoFHandler  :  public Subscriptor,
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcOnlyOnelevelTransferImplemented);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
 				     /**
 				      * Exception
@@ -1525,23 +1407,6 @@ class DoFHandler  :  public Subscriptor,
 				      */
     unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
 					  unsigned int next_free_dof);
-
-				     /**
-				      * Make up part of the sparsity pattern of
-				      * the transfer matrix by looking at the
-				      * two cells given.
-				      */
-    void transfer_cell (const cell_iterator &old_cell,
-			const cell_iterator &new_cell,
-			SparseMatrixStruct  &transfer_pattern) const;
-
-    				     /**
-				      * Make up part of the transfer matrix by
-				      * looking at the two cells given.
-				      */
-    void transfer_cell (const cell_iterator  &old_cell,
-			const cell_iterator  &new_cell,
-			SparseMatrix<double> &transfer_matrix) const;
 
 				     /**
 				      * Space to store the DoF numbers for the
