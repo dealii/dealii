@@ -14,13 +14,15 @@
 #ifndef __deal2__mg_tools_templates_h
 #define __deal2__mg_tools_templates_h
 
+#include <lac/sparse_matrix.h>
 #include <dofs/dof_constraints.h>
 #include <numerics/data_out.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_transfer.h>
+
 #include <algorithm>
 #include <fstream>
 
-#include <lac/sparse_matrix.h>
 
 
 //TODO:[?] This function needs to be specially implemented, since in 2d mode we use faces

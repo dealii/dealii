@@ -16,9 +16,10 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/point.h>
 #include <map>
 
-template <int dim> class Point;
+
 template <int dim> class Triangulation;
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;

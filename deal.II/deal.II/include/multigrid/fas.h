@@ -20,6 +20,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_dof_handler.h>
 
 #include <vector>
 
@@ -86,10 +87,9 @@ class FAS : public Subscriptor
 				      * this type as late as possible.
 				      */
   template <int dim>
-    FAS(const MGDoFHandler<dim>& mg_dof_handler,
-	      const unsigned int            minlevel = 0,
-	      const unsigned int            maxlevel = 1000000);
-    
+  FAS (const MGDoFHandler<dim>& mg_dof_handler,
+       const unsigned int            minlevel = 0,
+       const unsigned int            maxlevel = 1000000);
 
 				     /**
 				      * Execute one step of the
@@ -312,8 +312,8 @@ class PreconditionFAS : public Subscriptor
 template <class VECTOR>
 template <int dim>
 FAS<VECTOR>::FAS (const MGDoFHandler<dim>& mg_dof_handler,
-			      const unsigned int min_level,
-			      const unsigned int max_level)
+                  const unsigned int min_level,
+                  const unsigned int max_level)
 		:
 		minlevel(min_level),
 				     maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,

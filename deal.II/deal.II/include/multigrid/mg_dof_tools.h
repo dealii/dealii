@@ -13,13 +13,16 @@
 #ifndef __deal2__mg_dof_tools_h
 #define __deal2__mg_dof_tools_h
 
+#include <base/config.h>
+#include <multigrid/mg_dof_handler.h>
+
+#include <vector>
+
 template <class Object> class MGLevelObject;
 template <int dim> class MGDoFHandler;
 template <typename number> class Vector;
 template <typename number> class BlockVector;
 template <class number> class FullMatrix;
-
-#include <base/config.h>
 
 
 /**
@@ -166,7 +169,7 @@ class MGTools
     template <int dim, typename number>
       static void
       reinit_vector (const MGDoFHandler<dim>& mg_dof,
-		     MGLevelObject<BlockVector<number> >& vector,
+		     MGLevelObject<BlockVector<number> >& v,
 		     const std::vector<bool>& selected);
 };
 

@@ -16,7 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
-
+#include <grid/tria_iterator_base.h>
 
 /**
  * In this namespace a number of classes is declared that may be used

@@ -14,6 +14,8 @@
 #define __deal2__mg_dof_handler_templates_h
 
 
+#include <multigrid/mg_smoother.h>
+
 
 template<class MATRIX, class VECTOR>
 template<int dim>

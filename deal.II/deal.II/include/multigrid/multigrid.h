@@ -20,6 +20,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <multigrid/mg_base.h>
+#include <multigrid/mg_dof_handler.h>
 
 #include <vector>
 
