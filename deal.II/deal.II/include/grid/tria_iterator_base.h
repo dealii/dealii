@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,8 +30,11 @@ namespace IteratorState
  */
   enum IteratorStates
   {
+					 /// Iterator points to a valid object
 	valid,
+					 /// Iterator reached end of container
 	past_the_end,
+					 /// Iterator is invalid, probably due to an error
 	invalid
   };
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,193 +42,140 @@ template <int dim> class Triangulation;
 
 
 /**
- *   This class implements an iterator, analogous to those of the standard
- *   template library (STL). It fulfills the requirements of a bidirectional iterator.
- *   See the C++ documentation for further details of iterator specification and
- *   usage. In addition to the STL
- *   iterators an iterator of this class provides a @p{->} operator, i.e. you can
- *   write statements like @p{i->set_refine_flag ();}.
+ * This class implements an iterator, analogous to those of the
+ * standard template library (STL). It fulfills the requirements of a
+ * bidirectional iterator.  See the C++ documentation for further
+ * details of iterator specification and usage.
+ *
+ *
+ * In addition to the STL
+ * iterators an iterator of this class provides a <tt>-@></tt>
+ * operator, i.e. you can write statements like
+ * @code
+ * i->set_refine_flag ();
+ * @endcode
  *   
- *   @em{Note:} Please read the documentation about the prefix and the
- *   postfix @p{++} operators in this and the derived classes!
+ * Iterators are used whenever a loop over all lines, quads, cells
+ * etc.  is to be performed. These loops can then be coded like this:
+ * @code
+ *   cell_iterator i   = tria.begin();
+ *   cell_iterator end = tria.end();
+ *   for (; i!=end; ++i)
+ *     if (cell->at_boundary())
+ *       cell->set_refine_flag();
+ * @endcode
+ *
+ * Note the usage of <tt>++i</tt> instead of <tt>i++</tt> since this
+ * does not involve temporaries and copying. It is recommended to use
+ * a fixed value <tt>end</tt> inside the loop instead of
+ * <tt>tria.end()</tt>, since the creation and copying of these
+ * iterators is rather expensive compared to normal pointers.
  *   
- *   @sect3{Purpose}
+ * The objects pointed to are accessors, derived from
+ * TriaAccessor. Which kind of accessor is determined by the template
+ * argument <em>Accessor</em>. These accessors are not so much data
+ * structures as they are a collection of functions providing access
+ * to the data stored in Tringulation or DoFHandler objects. Using
+ * these accessors, the structure of these classes is hidden from the
+ * application program.
  *
- *   @p{iterators} are used whenever a loop over all lines, quads, cells etc.
- *   is to be performed. These loops can then be coded like this:
- *   @begin{verbatim}
- *     cell_iterator i   = tria.begin();
- *     cell_iterator end = tria.end();
- *     for (; i!=end; ++i)
- *       if (cell->at_boundary())
- *         cell->set_refine_flag();
- *   @end{verbatim}
- *   Note the usage of @p{++i} instead of @p{i++} since this does not involve
- *   temporaries and copying. You should also really use a fixed value
- *   @p{end} rather than coding @p{for (; i!=tria.end(); ++i)}, since
- *   the creation and copying of these iterators is rather expensive
- *   compared to normal pointers.
+ * @section TIDiff Which iterator to use when
+ *
+ * @attention Application programs will rarely use TriaRawIterator,
+ * but rather one of the derived classes TriaIterator or
+ * TriaActiveIterator.
+ *
+ * <ul> <li> TriaRawIterator objects point to lines, cells, etc in the
+ * lists whether they are used or not (in the vectors, also
+ * <i>dead</i> objects are stored, since deletion in vectors is
+ * expensive and we also do not want to destroy the ordering induced
+ * by the numbering in the vectors). Therefore not all raw iterators
+ * point to valid objects.
+ *
+ * <li> The derived class TriaIterator selects the valid cells, that
+ * is, cells used somewhere in the triangulation hierarchy.
+ *
+ * <li> TriaActiveIterator objects which only loop over active cells.
  *   
- *   The objects pointed to by iterators are @ref{TriangulationLevel<1>}@p{::LinesData},
- *   @ref{TriangulationLevel<2>}@p{::LinesData}
- *   and @ref{TriangulationLevel<2>}@p{::QuadsData}. To chose which of those, the
- *   template parameter @p{Pointee} is used.
+ * @section TIPurpose Purpose
  *
- *   Since the names as is are quite unhandy, the @ref{Triangulation} class which
- *   uses these iterators declares typedef'd versions. See there for more
- *   information.
+ * Iterators are not much slower than operating directly on the data
+ * structures, since they perform the loops that you had to handcode
+ * yourself anyway. Most iterator and accessor functions are inlined.
  *
- *   The objects pointed to are, as mentioned, @ref{LinesData} etc. To be
- *   more exact, when dereferencing an iterator, you do not get a @ref{LineData}
- *   object (or the like, but we will assume that you have a @p{line_iterator}
- *   in the following), but a @em{virtual} object (called @em{accessor}) which
- *   behaves as if it stored the data of a line. It does not contain any data
- *   itself, but provides functions to manipulate the data of the line it
- *   stands for.
+ * The main functionality of iterators, resides in the <tt>++</tt> and
+ * <tt>--</tt> operators. These move the iterator forward or backward
+ * just as if it were a pointer into an array. Here, this operation is
+ * not so easy, since it may include skipping some elements and the
+ * transition between the triangulation levels. This is completely
+ * hidden from the user, though you can still create an iterator
+ * pointing to an arbitrary element.  Actually, the operation of
+ * moving iterators back and forth is not done in the iterator
+ * classes, but rather in the accessor classes. Since these are passed
+ * as template arguments, you can write your own versions here to add
+ * more functionality.
  *
- *   Since the data of one line is splitted to
- *   several arrays (@p{lines}, @p{children} and @p{used}) for performance reasons
- *   rather than keeping all information in a @ref{Line} struct, access through
- *   an accessor is usually much simpler than handling the exact data structure
- *   and also less error prone since the data structure itself can be changed
- *   in an arbitrary way while the only pieces of code which access these
- *   data structures are the accessors.
- *
- *   On the other hand, iterators are not much slower than operating directly
- *   on the data structures, since they perform the loops that you had
- *   to handcode yourself anyway. Most iterator and accessor functions are
- *   inlined. 
- *
- *   The main functionality of iterators, however, resides in the @p{++} and
- *   @p{--} operators. These move the iterator forward or backward just as if
- *   it were a pointer into an array. Here, this operation is not so easy,
- *   since it may include skipping some elements and the transition between
- *   the triangulation levels. This is completely hidden from the user, though
- *   you can still create an iterator pointing to an arbitrary element.
- *   Actually, the operation of moving iterators back and forth is not done in
- *   the iterator classes, but rather in the accessor classes. Since these are
- *   passed as template arguments, you can write your own versions here to add
- *   more functionality.
- *
- *   Furthermore, the iterators decribed here satisfy the requirement of
- *   input and bidirectional iterators as stated by the C++ standard and
- *   the STL documentation. It is therefore possible to use the functions
- *   from the @em{algorithm section} of the C++ standard, e.g. @p{count_if}
- *   (see the documentation for @ref{Triangulation} for an example) and
- *   several others.
+ * Furthermore, the iterators decribed here satisfy the requirement of
+ * input and bidirectional iterators as stated by the C++ standard and
+ * the STL documentation. It is therefore possible to use the
+ * functions from the algorithm section of the C++ standard,
+ * e.g. <em>count_if</em> (see the documentation for Triangulation for
+ * an example) and several others.
  *   
+ * @section TIImplementation Implementation
  *
- *   @sect3{Differences between the classes in this inheritance tree}
+ * The iterator class itself does not have much functionality. It only
+ * becomes useful when assigned an Accessor (the second template
+ * parameter), which really does the access to data. An Accessor
+ * has to fulfil some requirements:
  *
- *   @p{TriaRawIterator} objects point to lines, cells, etc in
- *   the lists whether they are used or not (in the vectors, also @em{dead}
- *   objects are stored, since deletion in vectors is expensive and we
- *   also do not want to destroy the ordering induced by the numbering
- *   in the vectors). Therefore not all raw iterators point to valid objects.
- *   
- *   There are two derived versions of this class: @ref{TriaIterator}
- *   objects, which only loop over used (valid) cells and
- *   @p{TriaActiveIterator} objects
- *   which only loop over active cells (not refined).
+ * <ul> <li> It must have two members named <tt>present_level</tt> and
+ * <tt>present_index</tt> storing the address of the element in the
+ * triangulation presently pointed to. These data have to be
+ * accessible by all triangulation iterators listed above.
  *
- *   
- *   @sect3{Implementation}
+ * <li> It must have a constructor which takes a Triangulation* and
+ * two unsigned integers, denoting the initial level and index, as
+ * well as a data object depending on its type.
  *
- *   In principle, the Iterator class does not have much functionality. It
- *   only becomes useful when assigned an @p{Accessor} (the second template
- *   parameter), which really does the access to data. An @p{Accessor} has to
- *   fulfil some requirements:
- *   @begin{itemize}
- *     @item It must have two members named @p{present_level} and @p{present_index}
- *       storing the address of the element in the triangulation presently
- *       pointed to. Furthermore, the three @p{Tria{Raw| |Active}Iterator} classes
- *       have to be friends to the accessor or these data members must be public.
- *     @item It must have a constructor which takes 1. a @p{Triangulation<dim>*},
- *       2. and 3. and integer, denoting the initial level and index.
- *     @item For the @p{TriaIterator} and the @p{TriaActiveIterator} class, it must
- *       have a member function @p{bool used()}, for the latter a member function
- *       @p{bool active()}.
- *     @item It must have void operators @p{++} and @p{--}.
- *     @item It must declare a local @p{typedef} @p{AccessorData} which states
- *       the data type the accessor expects to get passed as fourth constructor
- *       argument. By declaring a local data type, the respective iterator
- *       class may type-safely enforce that data type to be one of its own
- *       constructor argument types. If an accessor class does not need
- *       additional data, this type shall be @p{void}.
- *   @end{itemize}
- *   Then the iterator is able to do what it is supposed to. All of the necessary
- *   functions are implemented in the @p{Accessor} base class, but you may write
- *   your own version (non-virtual, since we use templates) to add functionality.
+ * <li> For the TriaIterator and the TriaActiveIterator class, it must
+ * have a member function <tt>bool used()</tt>, for the latter a
+ * member function <tt>bool active()</tt>.
  *
- *   There is a standard implementation, using classes which are derived from
- *   @ref{TriaAccessor}. These classes point to @ref{Line}s, @ref{Quad}s and the like.
- *   For advanced use of the iterator classes, derive classes from
- *   @p{{Line|Quad|Cell}Accessor} which also dereference data structures in other
- *   objects, e.g. in a finite element context. An iterator with such an accessor
- *   then simultaneously points to (for example) a cell in the triangulation and
- *   the data stored on it in the finite element class.
+ * <li> It must have void operators <tt>++</tt> and <tt>--</tt>.
  *
- *   Derived accessor classes may need additional data (e.g. the @ref{DoFAccessor}
- *   needs a pointer to the @ref{DoFHandler} to work on). This data can be
- *   set upon construction through the last argument of the constructors.
- *   The data type of this additional data is given by the local data type
- *   @ref{AccessorData} explained above. The iterator classes take a pointer to
- *   an object of that data type; by default, this parameter equals the
- *   @p{NULL} pointer.
- *   
- *   
- *   @sect3{Warning}
+ * <li> It must declare a local <tt>typedef AccessorData</tt> which
+ * states the data type the accessor expects to get passed as fourth
+ * constructor argument. By declaring a local data type, the
+ * respective iterator class may type-safely enforce that data type to
+ * be one of its own constructor argument types. If an accessor class
+ * does not need additional data, this type shall be <tt>void</tt>.
+ * </ul>
  *
- *   It seems impossible to preserve @p{const}ness of a triangulation through
- *   iterator usage. Thus, if you declare pointers to a @p{const} triangulation
- *   object, you should be well aware that you might involuntarily alter the
- *   data stored in the triangulation.
+ * Then the iterator is able to do what it is supposed to. All of the
+ * necessary functions are implemented in the <tt>Accessor</tt> base
+ * class, but you may write your own version (non-virtual, since we
+ * use templates) to add functionality.
  *
+ * The accessors provided by the library are distributed in three
+ * groups, determined by whether they access the data of
+ * Triangulation, DoFHandler or MGDoFHandler. They are derived from
+ * TriaObjectAccessor, DoFObjectAccessor and MGDoFObjectAccessor,
+ * respectively. In each group, there is an accessor to cells, which
+ * have more functionality.
+ * 
+ * @attention It seems impossible to preserve constness of a
+ * triangulation through iterator usage. Thus, if you declare pointers
+ * to a <tt>const</tt> triangulation object, you should be well aware
+ * that you might involuntarily alter the data stored in the
+ * triangulation.
  *
- *   @sect3{Internals}
- *   
- *   There is a representation of past-the-end-pointers, denoted by special
- *   values of the member variables @p{present_level} and @p{present_index}:
- *   If @p{present_level>=0} and @p{present_index>=0}, then the object is valid
- *   (there is no check whether the triangulation really has that
- *   many levels or that many cells on the present level when we investigate
- *   the state of an iterator; however, in many places where an iterator is
- *   dereferenced we make this check);
- *   if @p{present_level==-1} and @p{present_index==-1}, then the iterator points
- *   past the end; in all other cases, the iterator is considered invalid.
- *   You can check this by calling the @p{state()} function.
+ * @note More information on valid and invalid iterators can be found
+ * in the documentation of TriaAccessor, where the iterator states are
+ * checked and implemented.
  *
- *   An iterator is also invalid, if the pointer pointing to the @ref{Triangulation}
- *   object is invalid or zero.
- *
- *   Finally, an iterator is invalid, if the element pointed to by
- *   @p{present_level} and @p{present_index} is not used, i.e. if the @p{used}
- *   flag is set to false.
- *
- *   The last two checks are not made in @p{state()} since both cases should only
- *   occur upon unitialized construction through @p{memcpy} and the like (the
- *   parent triangulation can only be set upon construction). If
- *   an iterator is constructed empty through the empty constructor,
- *   @p{present_level==-2} and @p{present_index==-2}. Thus, the iterator is
- *   invalid anyway, regardless of the state of the triangulation pointer
- *   and the state of the element pointed to.
- *
- *   Past-the-end iterators may also be used to compare an iterator with the
- *   @em{before-the-start} value, when running backwards. There is no
- *   distiction between the iterators pointing past the two ends of a vector.
- *   
- *   By defining only one value to be past-the-end and making all other values
- *   invalid porvides a second track of security: if we should have forgotten
- *   a check in the library when an iterator is incremented or decremented,
- *   we automatically convert the iterator from the allowed state "past-the-end"
- *   to the disallowed state "invalid" which increases the chance that somehwen
- *   earlier than for past-the-end iterators an exception is raised.
- *
- *   @ref Triangulation
- *   @ref TriaDimensionInfo<1>
- *   @ref TriaDimensionInfo<2>
- *   @ref TriaDimensionInfo<3>
- *   @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998
+ * @author documentation update Guido Kanschat, 2004
  */
 template <int dim, typename Accessor>
 class TriaRawIterator :

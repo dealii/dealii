@@ -42,8 +42,6 @@ namespace std
   struct pair;
 }
 
-
-
 // note: the file tria_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates. originally, this was
 // only done in debug mode, but led to cyclic reduction problems and
@@ -51,15 +49,57 @@ namespace std
 
 
 /**
- *   Implements the accessor class descibed in the documentation of
- *   the iterator classes (see @ref{TriaRawIterator}.
+ * Implements the accessor class used by TriaRawIterator and derived
+ * classes.
  *
- *   This class offers only the basic functionality (stores the necessary
- *   data members, offers comparison operators and the like), but has no
- *   functionality to actually dereference data. This is done in the derived
- *   classes.
+ * This class offers only the basic functionality erquired by the
+ * iterators (stores the necessary data members, offers comparison
+ * operators and the like), but has no functionality to actually
+ * dereference data. This is done in the derived classes.
  *
- *   @author Wolfgang Bangerth, 1998
+ * @section TAInternals Internals
+ *   
+ * There is a representation of past-the-end-pointers, denoted by
+ * special values of the member variables #present_level and
+ * #present_index: If #present_level>=0 and #present_index>=0, then
+ * the object is valid (there is no check whether the triangulation
+ * really has that many levels or that many cells on the present level
+ * when we investigate the state of an iterator; however, in many
+ * places where an iterator is dereferenced we make this check); if
+ * #present_level==-1 and #present_index==-1, then the iterator points
+ * past the end; in all other cases, the iterator is considered
+ * invalid.  You can check this by calling the state() function.
+ *
+ * An iterator is also invalid, if the pointer pointing to the
+ * Triangulation object is invalid or zero.
+ *
+ * Finally, an iterator is invalid, if the element pointed to by
+ * #present_level and #present_index is not used, i.e. if the
+ * <tt>used</tt> flag is set to false.
+ *
+ * The last two checks are not made in state() since both cases should
+ * only occur upon unitialized construction through <tt>memcpy</tt>
+ * and the like (the parent triangulation can only be set upon
+ * construction). If an iterator is constructed empty through the
+ * empty constructor, it sets #present_level==-2 and
+ * #present_index==-2. Thus, the iterator is invalid anyway,
+ * regardless of the state of the triangulation pointer and the state
+ * of the element pointed to.
+ *
+ * Past-the-end iterators may also be used to compare an iterator with
+ * the before-the-start value, when running backwards. There is no
+ * distiction between the iterators pointing past the two ends of a
+ * vector.
+ *   
+ * Defining only one value to be past-the-end and making all other
+ * values invalid provides a second track of security: if we should
+ * have forgotten a check in the library when an iterator is
+ * incremented or decremented, we automatically convert the iterator
+ * from the allowed state "past-the-end" to the disallowed state
+ * "invalid" which increases the chance that somehwen earlier than for
+ * past-the-end iterators an exception is raised.
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class TriaAccessor
@@ -1266,21 +1306,22 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     void set (const Quad &q) const;
     
 				     /**
-				      *  Return index of vertex @p{i=0
-				      *  through 3} of a quad. The
-				      *  @p{i}th vertex is the common
-				      *  one of line @p{i} and
-				      *  @p{(i+3)%4}. See also the
-				      *  introduced convention
-				      *  (@ref{Triangulation}).
+				      * Return index of a vertex of a
+				      * quad in the internal data
+				      * structure of a Triangulation.
 				      *
-				      *  Note that the returned value is only
-				      *  the index of the geometrical
-				      *  vertex. It has nothing to do with
-				      *  possible degrees of freedom
-				      *  associated with it. For this, see the
-				      *  @p{DoFAccessor::vertex_dof_index}
-				      *  functions.
+				      * For local numbering of the
+				      * vertices, see the page on
+				      * Geometry.
+				      *
+				      * @attention The value returned
+				      * is only the index of the
+				      * geometrical vertex. It has
+				      * nothing to do with possible
+				      * degrees of freedom associated
+				      * with it. For this, see the
+				      * DoFAccessor::vertex_dof_index
+				      * functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -1762,13 +1803,12 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     void set (const Hexahedron &h) const;
     
 				     /**
-				      *  Return index of vertex @p{i=0
-				      *  through 7} of a hex. The
-				      *  convention regarding the
-				      *  numbering of vertices is laid
-				      *  down in the documentation of
-				      *  the @ref{Triangulation}
-				      *  class.
+				      *  Return index of a vertex of a hex in the internal structures of Triangulation.
+				      *
+				      * For local numbering of the
+				      * vertices, see the page on
+				      * Geometry.
+				      *
 				      *
 				      *  Note that the returned value is only
 				      *  the index of the geometrical
