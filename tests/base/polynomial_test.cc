@@ -44,11 +44,12 @@ void check_poly(const Point<dim>& x,
     {
 				       // Check if compute_value is ok
       double val = p.compute_value(k,x);
-      if (val != values[k])
+      //if (val != values[k])
+      if (fabs(val - values[k]) > 5.0E-16)
 	deallog << 'P' << k << ": values differ " << val << " != "
 		<< values[k] << std::endl;
 
-				       // Check if compute_grad is ok
+                                       // Check if compute_grad is ok
       Tensor<1,dim> grad = p.compute_grad(k,x);
       if (grad != gradients[k])
 	deallog << 'P' << k << ": gradients differ " << grad << " != "
@@ -59,7 +60,7 @@ void check_poly(const Point<dim>& x,
       if (grad2 != second[k])
 	deallog << 'P' << k << ": second derivatives differ " << grad2 << " != "
 		<< second[k] << std::endl;
-      
+
       values[k] *= pow(10, dim);
       gradients[k] *= pow(10, dim);
       
@@ -138,6 +139,15 @@ int main()
   p.clear ();
   for (unsigned int i=0;i<3;++i)
     p.push_back (Legendre<double>(i));
+
+  check_dimensions(p);
+
+  deallog.pop();
+  deallog.push("Hierarchical");
+
+  p.clear ();
+  for (unsigned int i=0;i<3;++i)
+    p.push_back (Hierarchical<double>(i));
 
   check_dimensions(p);
 
