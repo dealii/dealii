@@ -116,7 +116,9 @@ LogStream::print_line_head()
     {
       if (print_utime)
 	{
+	  int p = std_out->width(5);
 	  *std_out << utime << ':';
+	  std_out->width(p);
 	}
     *std_out << prefixes.top() << ':';
     }
@@ -125,7 +127,9 @@ LogStream::print_line_head()
     {
       if (print_utime)
 	{
+	  int p = file->width(6);
 	  *file << utime << ':';
+	  file->width(p);
 	}  
     *file << prefixes.top() << ':';
     }
