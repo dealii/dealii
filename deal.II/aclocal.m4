@@ -119,15 +119,31 @@ dnl simply declared in <math.h> (or <cmath>, for what it's worth), but
 dnl on Linux for example, it is only declared if we specifically require
 dnl support for ISO C 99. This macro checks whether `isnan' is declared
 dnl or whether we have to pass special compiler flags, namely 
-dnl -D_ISOC99_SOURCE. Note that when checking we have to use the two
-dnl sets of compiler flags.
+dnl -D_ISOC99_SOURCE (Linux) or -D__EXTENSIONS__ (Sun). Note that when
+dnl checking we have to use the two sets of compiler flags.
 dnl
 dnl Usage: DEAL_II_CHECK_ISNAN
 dnl
 AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
-  AC_MSG_CHECKING(whether isnan is declared with debug flags)
+  DEAL_II_CHECK_ISNAN_FLAG(debug, $CXXFLAGSG,
+			   CXXFLAGSG="$CXXFLAGSG $deal_II_isnan_flag")
+  DEAL_II_CHECK_ISNAN_FLAG(optimized, $CXXFLAGSO,
+		 	   CXXFLAGSO="$CXXFLAGSO $deal_II_isnan_flag")
+)
+
+
+dnl The following function actually performs the check for the right flag
+dnl for `isnan'. If a flag is found, the third argument is executed, and 
+dnl the right flag is available in $deal_II_isnan_flag.
+dnl
+dnl Usage: DEAL_II_CHECK_ISNAN_FLAG("description of options set",
+dnl                                 "compiler options set",
+dnl                                 action when flag is found)
+dnl
+AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
+  AC_MSG_CHECKING(whether isnan is declared with $1 flags)
   AC_REQUIRE([AC_LANG_CPLUSPLUS])
-  CXXFLAGS="$CXXFLAGSG"
+  CXXFLAGS=$2
   AC_TRY_COMPILE(
     [
 #include <cmath>
@@ -140,25 +156,37 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN, dnl
 	AC_MSG_RESULT("yes")
     ],
     [
-	AC_MSG_RESULT("no")
-	CXXFLAGSG="$CXXFLAGSG -D_ISOC99_SOURCE"
-    ])
-  AC_MSG_CHECKING(whether isnan is declared with optimized flags)
-  AC_REQUIRE([AC_LANG_CPLUSPLUS])
-  CXXFLAGS="$CXXFLAGSO"
-  AC_TRY_COMPILE(
-    [
+	dnl We need to define something. Unfortunately, this is system 
+	dnl dependent (argh!)
+	deal_II_isnan_flag=""
+	for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
+	  CXXFLAGS="$2 $testflag"
+          AC_TRY_COMPILE(
+     	    [
 #include <cmath>
-    ],
-    [
-	double d=0;
-	isnan (d);
-    ],
-    [
-	AC_MSG_RESULT("yes")
-    ],
-    [
-	AC_MSG_RESULT("no")
-	CXXFLAGSO="$CXXFLAGSO -D_ISOC99_SOURCE"
+	    ],
+	    [
+		double d=0;
+		isnan (d);
+	    ],
+	    [
+		deal_II_isnan_flag=$testflag
+		break;
+	    ],
+	    [
+	])
+	done
+
+	dnl if no such flag was found, then abort ./configure since
+	dnl the library will not be compilable on this platform
+	dnl without knowledge of the right flag
+	if test "$deal_II_isnan_flag" = "" ; then
+	  AC_MSG_RESULT(no. no such flag found. aborting)
+	  exit 1
+	fi
+
+	dnl we found something, lets us it
+	AC_MSG_RESULT(no. using $testflag)
+	$3
     ])
 )      
