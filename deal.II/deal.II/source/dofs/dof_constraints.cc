@@ -1100,6 +1100,9 @@ unsigned int ConstraintMatrix::n_constraints () const
 
 bool ConstraintMatrix::is_constrained (const unsigned int index) const 
 {
+  if (lines.size() == 0)
+    return false;
+  
   if (sorted == true)
     {
       ConstraintLine index_comparison;
@@ -1124,6 +1127,9 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
 
 bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const 
 {
+  if (lines.size() == 0)
+    return false;
+  
   if (sorted == true)
     {
       ConstraintLine index_comparison;
