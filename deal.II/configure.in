@@ -290,8 +290,11 @@ else
 	  dnl #1136:`conversion to integral type of smaller size could lose data'
 	  dnl       (occurs rather often in addition of int and x.size(), because the latter
 	  dnl       is size_t=long unsigned int on Alpha)
+	  dnl #1182:`statement either is unreachable or causes unreachable code'
+	  dnl       (happens in switch(dim) clauses for other dimensions than
+	  dnl       the present one)
 
-	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w0 -msg_disable 236 -msg_disable 381 -msg_disable 487 -msg_disable 1136 -DDEBUG"
+	  CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w0 -msg_disable 236 -msg_disable 381 -msg_disable 487 -msg_disable 1136 -msg_disable 1182 -DDEBUG"
 	  CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -accept restrict_keyword -fast"
           dnl if necessary: -shared, -pthread 
           dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
