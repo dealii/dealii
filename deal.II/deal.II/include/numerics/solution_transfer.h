@@ -76,7 +76,9 @@
  * The template argument #number# denotes the data type of the vectors you want
  * to transfer.
  *
+ *
  * \subsection{Implementation}
+ *
  * \begin{itemize}
  * \item Solution transfer while pure refinement. Assume that we have got a
  * solution vector on the current (original) grid.
@@ -136,7 +138,7 @@
  * the values of the discrete
  * functions in #all_out# are set to the stored local interpolated values 
  * that are accessible due to the 'vector<Vector<number> > *' pointer in 
- * #Pointerstruct# that is pointed to by the user_pointer of that cell.
+ * #Pointerstruct# that is pointed to by the #user_pointer# of that cell.
  * It is clear that #interpolate(all_in, all_out)# only can be called with
  * the #vector<Vector<number> > all_in# that previously was the parameter
  * of the #prepare_for_coarsening_and_refinement(all_in)# function. Hence 
