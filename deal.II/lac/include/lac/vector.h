@@ -364,11 +364,22 @@ class Vector
 	       const Number c, const Vector<Number>& X);
     
 				     /**
-				      * Scale each element of the vector by the
-				      * given factor.
+				      * Scale each element of the
+				      * vector by the given factor.
 				      */
 //TODO:[?] Why not have an operator *= instead of/in addition to `scale'?    
     void scale (const Number factor);
+
+				     /**
+				      * Scale each element of this
+				      * vector by the corresponding
+				      * element in the argument. This
+				      * function is mostly meant to
+				      * simulate multiplication (and
+				      * immediate re-assignment) by a
+				      * diagonal scaling matrix.
+				      */
+    void scale (const Vector<Number> &scaling_factors);
     
 				     /**
 				      *  U=a*V. Replacing.

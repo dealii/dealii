@@ -234,8 +234,17 @@ documentation, etc</a>.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       New: There is now a function <code
+       class="member">Vector::scale(Vector)</code>
+       that scales each element of the vector by the corresponding
+       element of the argument.
+       <br>
+       (WB 2001/04/23)
+       </p>
+
   <li> <p> Changed: Solver functions <code class="member">solve</code>
-       are void now. If the solver has not converged within the
+       return void now. If the solver has not converged within the
        maximum number of iterations or encounters a breakdown, it
        throws an exception of type <code
        class="class">SolverControl::NoConvergence</code> instead of

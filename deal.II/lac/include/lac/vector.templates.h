@@ -452,15 +452,33 @@ void Vector<Number>::sadd (const Number x, const Number a,
 }
 
 
+
 template <typename Number>
 void Vector<Number>::scale (const Number factor)
 {
   Assert (dim!=0, ExcEmptyVector());
 
-  iterator ptr=begin(), eptr=end();
+  iterator             ptr  = begin();
+  const const_iterator eptr = end();
   while (ptr!=eptr)
     *ptr++ *= factor;
 }
+
+
+
+template <typename Number>
+void Vector<Number>::scale (const Vector<Number> &s)
+{
+  Assert (dim!=0, ExcEmptyVector());
+  Assert (dim == s.dim, ExcDimensionMismatch(dim, s.dim));
+  
+  iterator             ptr  = begin();
+  const_iterator       sptr = s.begin();
+  const const_iterator eptr = end();
+  while (ptr!=eptr)
+    *ptr++ *= *sptr++;
+}
+
 
 
 template <typename Number>
