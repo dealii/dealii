@@ -208,10 +208,23 @@ namespace HSL
 
 
 
+/**
+ * Namespace implementing a number of functions that are used to
+ * record the communication between master and detached
+ * processes. This is mainly for debugging purposes.
+ */
 namespace CommunicationsLog
 {
+                                   /**
+                                    * Type denoting the direction of a
+                                    * recorder communication.
+                                    */
   enum Direction { put, get };
-  
+
+                                   /**
+                                    * One record of a recorded
+                                    * communication.
+                                    */
   struct Record 
   {
       pid_t                 child_pid;
@@ -223,10 +236,22 @@ namespace CommunicationsLog
       std::string           description;
   };
 
+                                   /**
+                                    * The object in which we store the
+                                    * recorded communication, and the
+                                    * lock that is used to access it,
+                                    * since accesses may happen from
+                                    * more than one thread at the same
+                                    * time.
+                                    */
   std::list<Record> communication_log;
   Threads::ThreadMutex list_access_lock;
 
-  
+
+                                   /**
+                                    * Record a sent or received
+                                    * message
+                                    */
   template <typename T>
   void record_communication (const pid_t        child_pid,
 			     const Direction    direction,
@@ -242,7 +267,12 @@ namespace CommunicationsLog
   };
 
 
-  void list_communication (const pid_t child_pid) 
+                                   /**
+                                    * List all the communication that
+                                    * has happened with presently
+                                    * active detached programs.
+                                    */
+  void list_communication (const pid_t /*child_pid*/)
   {
     list_access_lock.acquire ();
     
@@ -251,130 +281,75 @@ namespace CommunicationsLog
     
     for (std::list<Record>::const_iterator i=communication_log.begin();
          i!=communication_log.end(); ++i)
-      //      if (i->child_pid == child_pid)
-	std::cerr << "++ " << i->child_pid << ' '
-		  << (i->direction == put ? "put" : "get")
-		  << " "
-		  << i->count << " objects of type "
-		  << i->type->name()
-		  << ", " << i->completed_bytes
-		  << " of " << i->scheduled_bytes
-		  << " bytes completed, description="
-		  << i->description
-		  << std::endl;
+      std::cerr << "++ " << i->child_pid << ' '
+                << (i->direction == put ? "put" : "get")
+                << " "
+                << i->count << " objects of type "
+                << i->type->name()
+                << ", " << i->completed_bytes
+                << " of " << i->scheduled_bytes
+                << " bytes completed, description="
+                << i->description
+                << std::endl;
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
 
+    list_access_lock.release ();
+  };
+
+
+                                   /**
+                                    * If all transactions with a
+                                    * detached slave have been
+                                    * finished successfully, remove
+                                    * these communications from the
+                                    * logs, using this function, to
+                                    * make log transcripts simpler
+                                    * readable.
+                                    */
+  void remove_history (const pid_t &child_pid) 
+  {
+    list_access_lock.acquire ();
+    for (std::list<Record>::iterator i=communication_log.begin();
+         i!=communication_log.end(); ++i)
+      communication_log.erase (i);
     list_access_lock.release ();
   };
 };
 
 
 
+namespace 
+{
 /**
  * Output an error message and terminate the program.
  */
-void die (const std::string &text, const pid_t child)
-{
-  std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
-            << std::endl;
-  CommunicationsLog::list_communication (child);
-  std::abort ();
-};
+  void die (const std::string &text,
+            const pid_t child)
+  {
+    std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
+              << std::endl;
+    CommunicationsLog::list_communication (child);
+    std::abort ();
+  };
 
 
 /**
  * Output an error message and terminate the program. Write two error
  * codes.
  */
-template <typename T1, typename T2>
-void die (const std::string &text, const T1 t1, const T2 t2, const pid_t child)
-{
-  std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
-            << " code1=" << t1 << ", code2=" << t2
-            << std::endl;
-  CommunicationsLog::list_communication (child);
-  std::abort ();
-};
-
-
-
-/**
- * loop and check every once in a while whether the mother process is
- * still existing or has died without giving us due notice. if the
- * latter is the case, then also exit this process
- *
- * check by calling "kill(PID,0)", where PID is the pid of the
- * child. if the return value is non-null, then kill couldn't find
- * out about the process, so it is apparently gone
- *
- * note that if the child dies, then it first becomes a zombie, until we 
- * bury it by calling wait, waitpid, wait3, or wait4. before we do it, the
- * process is dead but still exists, so kill will not report an error. so
- * we have to make sure we call wait* before the kill, but then we also 
- * do not want to use a blocking wait, so use it with WNOHANG
- *
- * the reason we check at all is that if the child dies and we do not
- * eventually kill the master as well, we may end up in a situation
- * where the master is waiting indefinitely for incoming data. so
- * rather than creating a situation where the master hangs, we'd like
- * to abort it
- */
-namespace MonitorChildLiveness 
-{
-  Threads::ThreadMutex process_list_lock;
-  std::list<pid_t> process_list;
-  
-  void monitor (const pid_t child_pid) 
+  template <typename T1, typename T2>
+  void die (const std::string &text,
+            const T1 t1,
+            const T2 t2,
+            const pid_t child)
   {
-    while (true)
-      {
-                                         // check whether the process
-                                         // we are looking for is
-                                         // still in the list of
-                                         // pending processes
-        process_list_lock.acquire ();
-        bool process_found = false;
-        for (std::list<pid_t>::const_iterator i=process_list.begin();
-             i!=process_list.end(); ++i)
-          if (*i == child_pid)
-            {
-              process_found = true;
-              break;
-            };
-        process_list_lock.release ();
-        
-                                         // if not, then the
-                                         // respective process has
-                                         // exited gracefully upon our
-                                         // request, and has been
-                                         // deleted from the
-                                         // list. then we can exit
-                                         // this monitor thread
-        if (process_found == false)
-          return;
-
-                                         // otherwise, we expect the
-                                         // process to still be
-                                         // living. check this:
-        waitpid (child_pid, 0, WNOHANG);
-        int ret = kill (child_pid, 0);
-        if (ret != 0)
-          if ((ret == -1) && (errno == ESRCH))
-            die ("Child process seems to have died!", child_pid);
-          else
-            die ("Unspecified error while checking for other process!", ret, errno, child_pid);
-        
-                                         // ok, master still running,
-                                         // take a little rest and then
-                                         // ask again
-        sleep (10);
-      };
+    std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
+              << " code1=" << t1 << ", code2=" << t2
+              << std::endl;
+    CommunicationsLog::list_communication (child);
+    std::abort ();
   };
 };
-
-
-
-Threads::ThreadManager child_liveness_watchers;
 
 
 
@@ -407,8 +382,17 @@ struct SparseDirectMA27::DetachedModeData
 				      */
     pid_t child_pid;
 
+                                     /**
+                                      * Put a message from the server
+                                      * to the client program. Obey
+                                      * all the rules the operating
+                                      * system sets, and create a log
+                                      * entry for this communication
+                                      */
     template <typename T>
-    void put (const T *t, const size_t N, const char *debug_info) const
+    void put (const T *t,
+              const size_t N,
+              const char *debug_info) const
       {
         unsigned int count = 0;
         while (count < sizeof(T)*N)
@@ -430,10 +414,19 @@ struct SparseDirectMA27::DetachedModeData
         
         std::fflush (NULL);
         CommunicationsLog::
-          record_communication<T> (child_pid, CommunicationsLog::put, N, count, debug_info);
+          record_communication<T> (child_pid,
+                                   CommunicationsLog::put,
+                                   N, count, debug_info);
       };
 
     
+                                     /**
+                                      * Get a message from the client
+                                      * program. Obey all the rules
+                                      * the operating system sets, and
+                                      * create a log entry for this
+                                      * communication
+                                      */
     template <typename T>
     void get (T *t, const size_t N, const char *debug_info) const
       {
@@ -454,8 +447,10 @@ struct SparseDirectMA27::DetachedModeData
           };
         
         CommunicationsLog::
-          record_communication<T> (child_pid, CommunicationsLog::get, N, count, debug_info);
-      };    
+          record_communication<T> (child_pid,
+                                   CommunicationsLog::get,
+                                   N, count, debug_info);
+      };
 };
 
 
@@ -489,22 +484,13 @@ SparseDirectMA27::~SparseDirectMA27()
   if (detached_mode)
     if (detached_mode_data != 0)
       {
-                                         // first remove this process
-                                         // from the watch list. this
-                                         // will also terminate the
-                                         // watcher thread on its next
-                                         // awakening
-      MonitorChildLiveness::process_list_lock.acquire();
-      for (std::list<pid_t>::iterator
-             i=MonitorChildLiveness::process_list.begin();
-           i!=MonitorChildLiveness::process_list.end(); ++i)
-        if (*i == detached_mode_data->child_pid)
-          {
-            MonitorChildLiveness::process_list.erase (i);
-            break;
-          };
-      MonitorChildLiveness::process_list_lock.release();
-        
+                                         // since everything went fine
+                                         // with this client, remove
+                                         // the communication it
+                                         // performed from the list of
+                                         // communications we have
+                                         // stored
+        CommunicationsLog::remove_history (detached_mode_data->child_pid);
 
                                          // next close down client
         detached_mode_data->mutex.acquire ();
@@ -606,16 +592,6 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // him this information
       const pid_t parent_pid = getpid();
       detached_mode_data->put (&parent_pid, 1, "parent_pid");
-
-                                       // then set up a watcher thread
-      MonitorChildLiveness::process_list_lock.acquire();
-      MonitorChildLiveness::
-        process_list.push_back (detached_mode_data->child_pid);
-      MonitorChildLiveness::process_list_lock.release();
-      
-//       Threads::spawn (child_liveness_watchers,
-//                       Threads::encapsulate(&MonitorChildLiveness::monitor)
-//                       .collect_args (detached_mode_data->child_pid));
     };
   
   
