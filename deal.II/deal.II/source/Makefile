@@ -6,8 +6,6 @@
 #it gives you quicker compile time and annoys those FEATFLOW
 #people ;-)
 
-include ../Make.global_options
-
 
 cc-files = $(wildcard */*.cc)
 h-files  = $(wildcard ../include/*/*.h)
