@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.59 
+# From configure.in Revision: 1.61 
 
 
 
@@ -1224,7 +1224,7 @@ fi
 
 
 case "$target" in
-   *-aix* | alpha*-linux* | alpha*-osf4* | *cygwin )
+   *-aix* | alpha*-linux* | alpha*-osf45* | *cygwin )
 	   echo "configure: warning: Shared libraries not supported on $target. Using static libs instead" 1>&2
 	   enableshared=no 
 	   ;;
