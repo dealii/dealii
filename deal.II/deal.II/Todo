@@ -48,10 +48,6 @@ Change <iostream> to <ostream> in grid/point.h and
   grid/tria_iterator.h when this becomes possible.
 
 
-Fill in docs for the timer class. Hopefully finally find a way to
-  let it measure times larger than half an hour.
-
-
 Use a correct strategy to output the reduction rate for adaptively
   refined grids in examples/error-estimation
 
