@@ -30,7 +30,9 @@ SparseMatrixEZ<number>::SparseMatrixEZ()
 
 
 template <typename number>
-SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number>&)
+SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
+                :
+                Subscriptor (m)
 {
   Assert(false, ExcNotImplemented());
 }
