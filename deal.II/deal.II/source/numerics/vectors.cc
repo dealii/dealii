@@ -604,7 +604,9 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	    const pair<unsigned int, unsigned int>
 	      index = fe.face_system_to_component_index(i);
 	    const double s = dof_values[i](index.first);
-	    if (s != HUGE_VAL)
+// properly fix this place to work without retreat to HUGE_VAL
+// to fix: GK	    
+//	    if (s != HUGE_VAL)
 	      boundary_values[face_dofs[i]] = s;
 	  }
       }
