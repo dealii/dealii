@@ -131,14 +131,27 @@ namespace Threads
   PosixThreadMutex::PosixThreadMutex ()
   {
     pthread_mutex_init (&mutex, 0);
-  };
+  }
 
 
 
   PosixThreadMutex::~PosixThreadMutex ()
   {
     pthread_mutex_destroy (&mutex);
-  };
+  }
+
+
+  PosixThreadCondition::PosixThreadCondition ()
+  {
+    pthread_cond_init (&cond, 0);
+  }
+
+
+
+  PosixThreadCondition::~PosixThreadCondition ()
+  {
+    pthread_cond_destroy (&cond);
+  }
   
 
 #ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
@@ -147,7 +160,7 @@ namespace Threads
 					  void               *)
   {
     pthread_barrier_init (&barrier, 0, count);
-  };
+  }
 
 #else
 
@@ -167,7 +180,7 @@ namespace Threads
 			     "POSIX barriers. You will not be able to use\n"
 			     "this class, but the rest of the threading\n"
 			     "functionality is available."));
-  };
+  }
 #endif
 
 
@@ -183,7 +196,7 @@ namespace Threads
     if (count != 1)
       std::abort ();
 #endif
-  };
+  }
 
 
 
@@ -205,14 +218,14 @@ namespace Threads
         return 1;
       };
 #endif
-  };
+  }
   
 
 
   PosixThreadManager::PosixThreadManager ()
 		  :
 		  thread_id_list (new std::list<pthread_t>())
-  {};
+  {}
 
 
   PosixThreadManager::~PosixThreadManager ()
@@ -221,7 +234,7 @@ namespace Threads
 				     // release memory
     wait ();
     delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
-  };
+  }
 
 
 
@@ -246,7 +259,7 @@ namespace Threads
     while (error == EAGAIN);
 
     Assert (error == 0, ExcInternalError());
-  };
+  }
   
 
 
@@ -259,7 +272,7 @@ namespace Threads
     for (std::list<pthread_t>::iterator i=tid_list.begin();
 	 i != tid_list.end(); ++i)
       pthread_join (*i, 0);
-  };
+  }
   
 #  endif
 #endif  
@@ -320,12 +333,14 @@ namespace Threads
 
   FunEncapsulation::~FunEncapsulation ()
   {
-				     // wait until the data in
-				     // fun_data_base has been copied
-				     // and is no more needed
-    fun_data_base->lock.acquire();
-				     // now that we have got the lock,
-				     // we can delete the data
+                                     // note that the spawn() function
+                                     // makes sure that we only get
+                                     // here if the data has already
+                                     // been copied by the spawned
+                                     // thread, so destruction is safe
+                                     // here.
+                                     //
+                                     // so do so.
     delete fun_data_base;
     fun_data_base = 0;
 
@@ -394,16 +409,13 @@ namespace Threads
     fun_data.fun_data_base->lock.acquire ();
 				     // now start the new thread
 #if DEAL_II_USE_MT == 1
-#  if defined(DEAL_II_USE_MT_ACE)
+#  if defined(DEAL_II_USE_MT_POSIX)
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,
-			  THR_SCOPE_SYSTEM | THR_DETACHED);
-#  elif defined(DEAL_II_USE_MT_POSIX)
-    thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
-			  (void*)&fun_data,
-			  0);    
+			  0);
+#  else
+#    error Not implemented
 #  endif
-    
 #else
                                      // if not in MT mode, then simply
                                      // call the respective
@@ -414,6 +426,22 @@ namespace Threads
 			  (void*)&fun_data,
 			  0);
 #endif
+
+                                     // unlock the mutex and wait for
+                                     // the condition that the data
+                                     // has been copied to be
+                                     // signalled. unlocking the mutex
+                                     // will allow the other thread to
+                                     // proceed to the signal() call,
+                                     // which we want to catch here
+                                     //
+                                     // the mutex will subsequently be
+                                     // locked again, but since we
+                                     // don't need it any more, we can
+                                     // go on unlocking it immediately
+                                     // again
+    fun_data.fun_data_base->condition.wait(fun_data.fun_data_base->lock);
+    fun_data.fun_data_base->lock.release ();
   }
 
 

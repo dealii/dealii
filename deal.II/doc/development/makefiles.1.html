@@ -208,8 +208,7 @@
       <dt> <code>LIBS</code> </dt>
       <dd> <p>
            Additional libraries to be linked in, such as Fortran
-           support, the ACE library when multithreading is enabled, or
-           Tecplot libraries when binary output is available.
+           support, or Tecplot libraries when binary output is available.
            </p>
       </dd>
 
@@ -371,32 +370,11 @@
 
     <li><h4>Variables in multithreading mode</h4>
  
-    <p>
-    If --with-multithreading was given to ./configure, $(INCLUDE) and
-    $(LIBPATH) are augmented by the ACE include and library paths, and
-    the following symbols are meaningful:
-
     <dl>
-      <dt> <code>ACE_ROOT</code> </dt>
-      <dd> <p>
-           Path to the ACE library as given to ./configure
-           </p>
-      </dd>
-
-
-      <dt> <code>lib-ACE</code> </dt>
-      <dd> <p>
-           Path and name of the ACE library
-           </p>
-      </dd>
-
-
       <dt> <code>with-multithreading</code> </dt>
       <dd> <p>
            This symbol is 'no' if the flag was not given
-           to ./configure and not 'no' (it actually equals
-           $(ACE_ROOT)) if -with-multithreading=... was
-           given
+           to ./configure and 'posix' otherwise
            </p>
       </dd>
     </dl>

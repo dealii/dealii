@@ -921,8 +921,11 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
 
 dnl -------------------------------------------------------------
 dnl Test which library the MT code shall use to support threads.
-dnl We support either POSIX or ACE. If requested, then set
-dnl $withmultithreading to either POSIX or to the path to ACE.
+dnl We used to support either POSIX or ACE, but support for ACE
+dnl has now been deleted and we only use POSIX these days. However,
+dnl the code to pass another name than "posix" remains here in 
+dnl case someone wants to hook in support for other thread
+dnl implementations
 dnl
 dnl Usage:
 dnl   DEAL_II_CHECK_USE_MT
@@ -932,8 +935,7 @@ AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
 [
   AC_ARG_WITH(multithreading,
   [  --with-multithreading=name If name==posix, or no name given, then use
-                                POSIX threads, otherwise assume use of ACE 
-                                and use given argument as path to ACE],
+                                POSIX threads],
       withmultithreading=$withval,
       withmultithreading=no)
 
@@ -949,17 +951,7 @@ dnl Default (i.e. no arg) means POSIX
                 [Defined if multi-threading is to be achieved by using
                  the POSIX functions])
     else
-      AC_MSG_CHECKING(for ACE)
-      if test -d "$withmultithreading" ; then
-        AC_MSG_RESULT(found)
-      else
-        AC_MSG_RESULT(not found)
-        AC_MSG_ERROR(Invalid ACE path)
-      fi
-      AC_DEFINE(DEAL_II_USE_MT_ACE, 1,
-                [Defined if multi-threading is to be achieved by using
-                 the ACE library])
-      DEAL_II_SET_ACE_FLAGS
+      AC_MSG_ERROR(Invalid flag for --with-multithreading)
     fi
   
     DEAL_II_USE_MT_VAL=1
@@ -1073,32 +1065,6 @@ AC_DEFUN(DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS, dnl
                 is available.])
   fi
 ])
-
-
-
-dnl -------------------------------------------------------------
-dnl If the MT code shall be used through ACE, we might have to 
-dnl adjust the compiler flags: Possibly remove -pedantic from
-dnl compiler flags again, since ACE yields a lot of error messages
-dnl with this flag.
-dnl
-dnl Usage:
-dnl   DEAL_II_SET_ACE_FLAGS
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_SET_ACE_FLAGS, dnl
-[
-  if test "$enablemultithreading" = yes ; then
-    if test "$GXX" = yes ; then
-      DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
-      if test "x$deal_II_ace_remove_pedantic" = "xyes" ; then
-        CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-pedantic//g;'`"
-        CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-pedantic//g;'`"
-      fi
-    fi
-  fi
-])
-
 
 
 
@@ -2468,42 +2434,6 @@ static preload_terminate_dummy dummy;
     [
       AC_MSG_RESULT(no)
     ])
-])
-
-
-
-dnl -------------------------------------------------------------
-dnl When compiling with ACE thread support, there are many constructs
-dnl that are not allowed in C++, or that yield warnings when compiling with
-dnl -pedantic. Check this, and if that is the case, set the variables
-dnl $deal_II_ace_remove_ansi and $deal_II_ace_remove_pedantic to "yes".
-dnl
-dnl Usage: DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_ACE_FORBIDDEN_FLAGS, dnl
-[
-  AC_MSG_CHECKING(whether compilation with ACE disallows flags)
-  AC_LANG(C++)
-  CXXFLAGS="-pedantic -Werror -I$withmultithreading"
-  AC_TRY_COMPILE(
-    [
-#  include <ace/Thread_Manager.h>
-#  include <ace/Synch.h>
-    ],
-    [],
-    [
-      deal_II_ace_remove_pedantic="no"
-    ],
-    [
-      deal_II_ace_remove_pedantic="yes"
-    ])
-
-  if test $deal_II_ace_remove_pedantic = "no" ; then 
-    AC_MSG_RESULT(no)
-  else
-    AC_MSG_RESULT(-pedantic)
-  fi
 ])
 
 

@@ -22,10 +22,7 @@
 #include <iterator>
 
 #if DEAL_II_USE_MT == 1
-#  if defined(DEAL_II_USE_MT_ACE)
-#    include <ace/Thread_Manager.h>
-#    include <ace/Synch.h>
-#  elif defined(DEAL_II_USE_MT_POSIX)
+#  if defined(DEAL_II_USE_MT_POSIX)
 #    include <pthread.h>
 #  endif
 #endif
@@ -74,6 +71,67 @@ namespace Threads
   };
 
 
+
+/**
+ * This class is used in single threaded mode instead of a class
+ * implementing real condition variable semantics. It allows to write
+ * programs such that they start new threads and/or lock objects in
+ * multithreading mode, and use dummy thread management and
+ * synchronisation classes instead when running in single-thread
+ * mode. Specifically, the @p{spawn} functions only call the function
+ * but wait for it to return instead of running in on another thread,
+ * and the mutices do nothing really. The only reason to provide such
+ * a function is that the program can be compiled both in MT and
+ * non-MT mode without difference.
+ *
+ * In this particular case, just as with mutexes, the functions do
+ * nothing, and by this provide the same semantics of condition
+ * variables as in multi-threaded mode.
+ *
+ * @author Wolfgang Bangerth, 2003
+ */
+  class DummyThreadCondition
+  {
+    public:
+				       /**
+					* Signal to a single listener
+					* that a condition has been
+					* met, i.e. that some data
+					* will now be available. Since
+					* in single threaded mode,
+					* this function of course does
+					* nothing.
+					*/
+      inline void signal () {};
+
+				       /**
+					* Signal to multiple listener
+					* that a condition has been
+					* met, i.e. that some data
+					* will now be available. Since
+					* in single threaded mode,
+					* this function of course does
+					* nothing.
+					*/
+      inline void broadcast () {};
+
+				       /**
+					* Wait for the condition to be
+					* signalled. Signal variables
+					* need to be guarded by a
+					* mutex which needs to be
+					* given to this function as an
+					* argument, see the man page
+					* of @p{posix_cond_wait} for a
+					* description of the
+					* mechanisms. Since in single
+					* threaded mode, this function
+					* of course does nothing, but
+					* returns immediately.
+					*/
+      inline void wait (DummyThreadMutex &) {};
+  };
+  
 /**
  * This class is used instead of a true thread manager class when not
  * using multithreading. It allows to write programs such that they
@@ -183,20 +241,7 @@ namespace Threads
   
   
 #if DEAL_II_USE_MT == 1
-#  if defined(DEAL_II_USE_MT_ACE)
-				   /**
-				    * In multithread mode with ACE
-				    * enabled, we alias the mutex and
-				    * thread management classes to the
-				    * respective classes of the ACE
-				    * library. Likewise for the
-				    * barrier class.
-				    */
-  typedef ACE_Thread_Mutex   ThreadMutex;
-  typedef ACE_Thread_Manager ThreadManager;
-  typedef ACE_Barrier        Barrier;
-  
-#  elif defined(DEAL_II_USE_MT_POSIX)
+#  if defined(DEAL_II_USE_MT_POSIX)
 
 				   /**
 				    * Class implementing a Mutex with
@@ -237,6 +282,82 @@ namespace Threads
 					* call the POSIX functions.
 					*/
       pthread_mutex_t mutex;
+
+                                       /**
+                                        * Make the class implementing
+                                        * condition variables a
+                                        * friend, since it needs
+                                        * access to the
+                                        * @p{pthread_mutex_t}
+                                        * structure.
+                                        */
+      friend class PosixThreadCondition;
+  };
+
+
+				   /**
+				    * Class implementing a condition
+				    * variable with the help of POSIX
+				    * functions. The semantics of this
+				    * class and its member functions
+				    * are the same as those of the
+				    * POSIX functions.
+				    *
+				    * @author Wolfgang Bangerth, 2003
+				    */
+  class PosixThreadCondition
+  {
+    public:
+				       /**
+					* Constructor. Initialize the
+					* underlying POSIX condition
+					* variable data structure.
+					*/
+      PosixThreadCondition ();
+
+				       /**
+					* Destructor. Release all
+					* resources.
+					*/
+      ~PosixThreadCondition ();
+      
+				       /**
+					* Signal to a single listener
+					* that a condition has been
+					* met, i.e. that some data
+					* will now be available.
+					*/
+      inline void signal () { pthread_cond_signal(&cond); };
+
+				       /**
+					* Signal to multiple listener
+					* that a condition has been
+					* met, i.e. that some data
+					* will now be available.
+					*/
+      inline void broadcast () { pthread_cond_broadcast(&cond); };
+
+				       /**
+					* Wait for the condition to be
+					* signalled. Signal variables
+					* need to be guarded by a
+					* mutex which needs to be
+					* given to this function as an
+					* argument, see the man page
+					* of @p{posix_cond_wait} for a
+					* description of the
+					* mechanisms.
+					*/
+      inline void wait (PosixThreadMutex &mutex)
+        { pthread_cond_wait(&cond, &mutex.mutex); };
+
+    private:
+				       /**
+					* Data object storing the
+					* POSIX data which we need to
+					* call the POSIX functions.
+					*/
+      pthread_cond_t cond;
   };
 
 
@@ -377,10 +498,13 @@ namespace Threads
   
   
   
-  typedef PosixThreadMutex   ThreadMutex;
-  typedef PosixThreadManager ThreadManager;
-  typedef PosixThreadBarrier Barrier;
-  
+  typedef PosixThreadMutex     ThreadMutex;
+  typedef PosixThreadCondition ThreadCondition;  
+  typedef PosixThreadManager   ThreadManager;
+  typedef PosixThreadBarrier   Barrier;
+
+#  else
+#    error Not Implemented
 #  endif
 #else
 				   /**
@@ -393,9 +517,10 @@ namespace Threads
 				    * threads. Likewise for the
 				    * barrier class.
 				    */
-  typedef DummyThreadMutex   ThreadMutex;
-  typedef DummyThreadManager ThreadManager;
-  typedef DummyBarrier       Barrier;
+  typedef DummyThreadMutex     ThreadMutex;
+  typedef DummyThreadCondition ThreadCondition;  
+  typedef DummyThreadManager   ThreadManager;
+  typedef DummyBarrier         Barrier;
 #endif
 
 
@@ -832,6 +957,12 @@ namespace Threads
 					* still in use.
 					*/
       mutable ThreadMutex lock;
+
+                                       /**
+                                        * A condition variable that is
+                                        * used for the same purpose.
+                                        */
+      mutable ThreadCondition condition;
     
     private:
 				       /**
@@ -4832,7 +4963,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -4933,7 +5076,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5038,7 +5193,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5149,7 +5316,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5265,7 +5444,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5386,7 +5577,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5513,7 +5716,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5646,7 +5861,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5786,7 +6013,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -5930,7 +6169,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6082,7 +6333,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6198,7 +6461,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6313,7 +6588,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6432,7 +6719,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6559,7 +6858,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6693,7 +7004,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6832,7 +7155,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -6978,7 +7313,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -7132,7 +7479,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -7289,7 +7648,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -7452,7 +7823,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the
@@ -7622,7 +8005,19 @@ namespace Threads
 
 				     // copying of parameters is done,
 				     // now we can release the lock on
-				     // @p{fun_data}
+				     // @p{fun_data}, by first making
+				     // sure that the main thread is
+				     // hanging in the condition
+				     // variable's wait() function,
+				     // and then signalling that the
+				     // condition has been met,
+				     // i.e. that the data has been
+				     // copied. (note that there can
+				     // be only one listener, so
+				     // signal() is fine and we don't
+				     // need broadcast())
+    fun_data->lock.acquire ();
+    fun_data->condition.signal ();
     fun_data->lock.release ();
 
                                      // register new thread, call the

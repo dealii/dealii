@@ -124,19 +124,3 @@ ifeq ($(enable-shared),yes)
 
   LDFLAGS    += @LDFLAGSPIC@
 endif
-
-
-# if multithread support in the library is requested, then set the
-# respective flags
-ifneq ($(with-multithreading),no)
-  ifneq ($(with-multithreading),posix)
-    ACE_ROOT    = $(with-multithreading)
-    INCLUDE    += -I$(ACE_ROOT)
-    LIBPATH    += -L$(ACE_ROOT)/ace
-
-    lib-ACE     = $(ACE_ROOT)/ace/libACE.so
-    LIBS       += $(lib-ACE)
-
-    vpath %.a $(ACE_ROOT)
-  endif
-endif

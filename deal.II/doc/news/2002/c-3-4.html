@@ -34,6 +34,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Removed: Thread support now relies solely on the use of POSIX
+       functions. The use of the
+       <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
+       (Adaptive Communications Environment)</a> library for this is now no
+       longer supported. However, application programs can of course still use
+       ACE, but they will need to generate paths to this library in their
+       makefiles themselves.
+       <br>
+       (WB 2003/01/11)
+       </p>
+
+  <li> <p> 
        New: Some changes have been made to support Mac OS X 10.2. Shared
        libraries are not supported on this architecture, but everything else
        should work.
@@ -222,6 +234,39 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> 
+       Fixed: The <code class="class">Subscriptor</code> uses a counter to
+       count how many <code class="class">SmartPointer</code> objects subscribe
+       to the pointed-to object. This counter needs to be a volatile variable
+       in multithreaded mode, to avoid false compiler optimizations based on
+       the assumption that the variable cannot change between two subsequent
+       reads.
+       <br>
+       (Michael Anderson, WB 2003/01/11)
+       </p>
+
+  <li> <p> 
+       Fixed: In multithreaded mode, when a new thread is started, the
+       arguments to the function being called need to be copied from the stack
+       of the starting thread to that of the new thread. In order to
+       synchronise this, mutexes were used that were acquired from one thread
+       and released from another thread. On Linux this does not lead to
+       problems, but POSIX functions do not guarantee that this actually works,
+       and it also leads to problems when running programs under valgrind. This
+       is now fixed with the help of condition variables.
+       <br>
+       (Michael Anderson, WB 2003/01/11)
+       </p>
+
+  <li> <p> 
+       New: There are now classes <code class="class">ThreadCondition</code>
+       that implement thread condition variable operations through POSIX
+       functions (in multithreaded mode) or doing nothing (in singlethreaded
+       mode).
+       <br>
+       (WB 2003/01/11)
+       </p>
+
   <li> <p> 
        New: Newer versions of gcc have a very nice feature: you can set
        a verbose terminate handler, that not only aborts a program
