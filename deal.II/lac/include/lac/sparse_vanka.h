@@ -185,13 +185,6 @@ class SparseVanka
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidRange,
-		    unsigned int, unsigned int,
-		    << "The bounds [" << arg1 << ',' << arg2
-		    << ") do not form a valid range.");
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcInvalidVectorSize,
 		    unsigned int, unsigned int,
 		    << "The dimensions of vectors and matrices, "
@@ -199,45 +192,50 @@ class SparseVanka
 
   protected:
 				     /**
-				      * Apply the inverses in the
-				      * range #[begin,end)# to the
+				      * Apply the inverses
+				      * corresponding to those degrees
+				      * of freedom that have a #true#
+				      * value in #dof_mask#, to the
 				      * #src# vector and move the
 				      * result into #dst#. Actually,
-				      * only values of #src# from
-				      * within the range are taken
-				      * (all others are set to zero),
-				      * and only values inside the
-				      * range are written to #dst#, so
-				      * the application of this
+				      * only values for allowed
+				      * indices are written to #dst#,
+				      * so the application of this
 				      * function only does what is
 				      * announced in the general
 				      * documentation if the given
-				      * range is the whole interval.
+				      * mask sets all values to zero
 				      *
 				      * The reason for providing the
-				      * interval anyway is that in
-				      * derived classes we may want to
-				      * apply the preconditioner to
-				      * blocks of the matrix only, in
-				      * order to parallelize the
+				      * mask anyway is that in derived
+				      * classes we may want to apply
+				      * the preconditioner to parts of
+				      * the matrix only, in order to
+				      * parallelize the
 				      * application. Then, it is
 				      * important to only write to
-				      * some slices of #dst# and only
-				      * takes values from similar
-				      * slices of #src#, in order to
-				      * eliminate the dependencies of
-				      * threads of each other.
+				      * some slices of #dst#, in order
+				      * to eliminate the dependencies
+				      * of threads of each other.
+				      *
+				      * If a null pointer is passed
+				      * instead of a pointer to the
+				      * #dof_mask# (as is the default
+				      * value), then it is assumed
+				      * that we shall work on all
+				      * degrees of freedom. This is
+				      * then equivalent to calling the
+				      * function with a
+				      * #vector<bool>(n_dofs,true)#.
 				      *
 				      * The #operator()# of this class
 				      * of course calls this function
-				      * with the whole interval
-				      * #[begin,end)=[0,matrix.m())#.
+				      * with a null pointer
 				      */
     template<typename number2>
     void apply_preconditioner (Vector<number2>       &dst,
 			       const Vector<number2> &src,
-			       const unsigned int     begin,
-			       const unsigned int     end) const;    
+			       const vector<bool>    *dof_mask = 0) const;    
     
   private:
 				     /**
@@ -318,17 +316,9 @@ class SparseVanka
  * divides the matrix into blocks and works on the diagonal blocks
  * only, which of course reduces the efficiency as preconditioner, but
  * is perfectly parallelizable. The constructor takes a parameter into
- * how many diagonal blocks the matrix shall be subdivided and then
- * lets the underlying class do the work.
- *
- * Division of the matrix is done in a way such that the blocks are
- * not necessarily of equal size, but such that the number of selected
- * degrees of freedom for which a local system is to be solved is
- * equal between blocks. The reason for this strategy to subdivision
- * is load-balancing for multithreading, but it is necessary to note
- * that this almost renders the capability as precondition useless if
- * the degrees of freedom are numbered by component, i.e. all Lagrange
- * multipliers en bloc.
+ * how many blocks the matrix shall be subdivided and then lets the
+ * underlying class do the work. Division of the matrix is done in
+ * several ways which are described in detail below.
  *
  * This class is probably useless if you don't have a multiprocessor
  * system, since then the amount of work per preconditioning step is
@@ -356,6 +346,81 @@ class SparseVanka
  * mentioned, this reduces the preconditioning properties.
  *
  *
+ * \subsection{Splitting the matrix into blocks}
+ *
+ * Splitting the matrix into blocks is always done in a way such that
+ * the blocks are not necessarily of equal size, but such that the
+ * number of selected degrees of freedom for which a local system is
+ * to be solved is equal between blocks. The reason for this strategy
+ * to subdivision is load-balancing for multithreading. There are
+ * several possibilities to actually split the matrix into blocks,
+ * which are selected by the flag #blocking_strategy# that is passed
+ * to the constructor. By a block, we will in the sequel denote a list
+ * of indices of degrees of freedom; the algorithm will work on each
+ * block separately, i.e. the solutions of the local systems
+ * corresponding to a degree of freedom of one block will only be used
+ * to update the degrees of freedom belonging to the same block, but
+ * never to update degrees of freedoms of other blocks. A block can be
+ * a consecutive list of indices, as in the first alternative below,
+ * or a nonconsecutive list of indices. Of course, we assume that the
+ * intersection of each two blocks is empty and that the union of all
+ * blocks equals the interval #[0,N)#, where #N# is the number of
+ * degrees of freedom of the system of equations.
+ *
+ * \begin{itemize}
+ * \item #index_intervals#:
+ *    Here, we chose the blocks to be intervals #[a_i,a_{i+1})#,
+ *    i.e. consecutive degrees of freedom are usually also within the
+ *    same block. This is a reasonable strategy, if the degrees of
+ *    freedom have, for example, be re-numbered using the
+ *    Cuthill-McKee algorithm, in which spatially neighboring degrees
+ *    of freedom have neighboring indices. In that case, coupling in
+ *    the matrix is usually restricted to the vicinity of the diagonal
+ *    as well, and we can simply cut the matrix into blocks.
+ *
+ *    The bounds of the intervals, i.e. the #a_i# above, are chosen
+ *    such that the number of degrees of freedom on which we shall
+ *    work (i.e. usually the degrees of freedom corresponding to
+ *    Lagrange multipliers) is about the same in each block; this does
+ *    not mean, however, that the sizes of the blocks are equal, since
+ *    the blocks also comprise the other degrees of freedom for which
+ *    no local system is solved. In the extreme case, consider that
+ *    all Lagrange multipliers are sorted to the end of the range of
+ *    DoF indices, then the first block would be very large, since it
+ *    comprises all other DoFs and some Lagrange multipliers, while
+ *    all other blocks are rather small and comprise only Langrange
+ *    multipliers. This strategy therefore does not only depend on the
+ *    order in which the Lagrange DoFs are sorted, but also on the
+ *    order in which the other DoFs are sorted. It is therefore
+ *    necessary to note that this almost renders the capability as
+ *    preconditioner useless if the degrees of freedom are numbered by
+ *    component, i.e. all Lagrange multipliers en bloc.
+ *
+ * \item #adaptive#: This strategy is a bit more clever in cases where
+ *    the Langrange DoFs are clustered, as in the example above. It
+ *    works as follows: it first groups the Lagrange DoFs into blocks,
+ *    using the same strategy as above. However, instead of grouping
+ *    the other DoFs into the blocks of Lagrange DoFs with nearest DoF
+ *    index, it decides for each non-Lagrange DoF to put it into the
+ *    block of Lagrange DoFs which write to this non-Lagrange DoF most
+ *    often. This makes it possible to even sort the Lagrange DoFs to
+ *    the end and still associate spatially neighboring non-Lagrange
+ *    DoFs to the same blocks where the respective Lagrange DoFs are,
+ *    since they couple to each other while spatially distant DoFs
+ *    don't couple.
+ *
+ *    The additional computational effort to sorting the non-Lagrange
+ *    DoFs is not very large compared with the inversion of the local
+ *    systems and applying the preconditioner, so this strategy might
+ *    be reasonable if you want to sort your degrees of freedom by
+ *    component. If the degrees of freedom are not sorted by
+ *    component, the results of the both strategies outlined above
+ *    does not differ much. However, unlike the first strategy, the
+ *    performance of the second strategy does not deteriorate if the
+ *    DoFs are renumbered by component.
+ * \end{itemize}
+ *
+ *
  * \subsection{Typical results}
  *
  * As a prototypical test case, we use a nonlinear problem from
@@ -365,18 +430,31 @@ class SparseVanka
  * freedom. With the non-blocked version #SparseVanka# (or
  * #SparseBlockVanka# with #n_blocks==1#), the following numbers of
  * iterations is needed to solver the linear system in each nonlinear
- * step: \begin{verbatim} 101 68 64 53 35 21 \end{verbatim} With four
- * blocks, we need the following numbers of iterations
- * \begin{verbatim} 124 88 83 66 44 28 \end{verbatim} As can be seen,
- * more iterations are needed. However, in terms of computing time,
- * the first version needs 72 seconds wall time (and 79 seconds CPU
- * time, which is more than wall time since some other parts of the
- * program were parallelized as well), while the second version needed
- * 53 second wall time (and 110 seconds CPU time) on a four processor
- * machine. The total time is in both cases dominated by the linear
- * solvers. In this case, it is therefore worth while using the
- * blocked version of the preconditioner if wall time is more
- * important than CPU time.
+ * step:
+ * \begin{verbatim}
+ *   101 68 64 53 35 21
+ * \end{verbatim}
+ *
+ * With four blocks, we need the following numbers of iterations
+ * \begin{verbatim}
+ *   124 88 83 66 44 28
+ * \end{verbatim}
+ * As can be seen, more iterations are needed. However, in terms of
+ * computing time, the first version needs 72 seconds wall time (and
+ * 79 seconds CPU time, which is more than wall time since some other
+ * parts of the program were parallelized as well), while the second
+ * version needed 53 second wall time (and 110 seconds CPU time) on a
+ * four processor machine. The total time is in both cases dominated
+ * by the linear solvers. In this case, it is therefore worth while
+ * using the blocked version of the preconditioner if wall time is
+ * more important than CPU time.
+ *
+ * The results with the block version above were obtained with the
+ * first blocking strategy and the degrees of freedom were not
+ * numbered by component. Using the second strategy does not much
+ * change the numbers of iterations (at most by one in each step) and
+ * they also do not much change when the degrees of freedom are sorted
+ * by component.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -385,15 +463,26 @@ class SparseBlockVanka : public SparseVanka<number>
 {
   public:
 				     /**
+				      * Enumeration of the different
+				      * methods by which the DoFs are
+				      * distributed to the blocks on
+				      * which we are to work.
+				      */
+    enum BlockingStrategy {
+	  index_intervals, adaptive
+    };
+    
+				     /**
 				      * Constructor. Pass all
 				      * arguments except for
 				      * #n_blocks# to the base class.
 				      */
     SparseBlockVanka (const SparseMatrix<number> &M,
 		      const vector<bool>         &selected,
+		      const unsigned int          n_blocks,
+		      const BlockingStrategy      blocking_strategy,
 		      const bool                  conserve_memory = false,
-		      const unsigned int          n_threads       = 1,
-		      const unsigned int          n_blocks        = 1);
+		      const unsigned int          n_threads       = 1);
 
 				     /**
 				      * Apply the preconditioner.
@@ -417,8 +506,9 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * avoid recomputing each time
 				      * the preconditioner is called.
 				      */
-    vector<pair<unsigned int, unsigned int> > intervals;
+    vector<vector<bool> > dof_masks;
 };
+
 
 
 

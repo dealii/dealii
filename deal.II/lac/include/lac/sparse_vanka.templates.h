@@ -29,7 +29,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 {
   Assert (M.m() == M.n(), ExcMatrixNotSquare ());
   Assert (M.m() == selected.size(), ExcInvalidVectorSize(M.m(), selected.size()));
-  
+
   if (conserve_mem == false)
     compute_inverses ();
 }
@@ -217,7 +217,7 @@ SparseVanka<number>::operator ()(Vector<number2>       &dst,
   dst.clear ();
 				   // then pass on to the function
 				   // that actually does the work
-  apply_preconditioner (dst, src, 0, matrix->m());
+  apply_preconditioner (dst, src);
 };
 
 
@@ -228,10 +228,8 @@ template<typename number2>
 void
 SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 					   const Vector<number2> &src,
-					   const unsigned int     begin,
-					   const unsigned int     end) const
+					   const vector<bool>    *const dof_mask) const
 {
-  Assert (begin < end, ExcInvalidRange(begin, end));
   Assert (dst.size() == src.size(),
 	  ExcInvalidVectorSize(dst.size(), src.size()));
   Assert (dst.size() == matrix->m(),
@@ -249,7 +247,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 				   // blocks. this variable is used to
 				   // optimize access to vectors a
 				   // little bit.
-  const bool range_is_restricted = ((begin != 0) || (end != matrix->m()));
+  const bool range_is_restricted = (dof_mask != 0);
   
 				   // space to be used for local
 				   // systems. allocate as much memory
@@ -266,8 +264,10 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 
 				   // traverse all rows of the matrix
 				   // which are selected
-  for (unsigned int row=begin; row<end; ++row)
-    if (selected[row] == true)
+  const unsigned int n = matrix->m();
+  for (unsigned int row=0; row<n; ++row)
+    if ((selected[row] == true) &&
+	((range_is_restricted == false) || ((*dof_mask)[row] == true)))
       {
 	const unsigned int row_length = structure.row_length(row);
 	
@@ -342,7 +342,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 		if (js == local_index.end())
 		  {
 		    if (!range_is_restricted ||
-			((begin <= col) && (col < end)))
+			((*dof_mask)[col] == true))
 		      b(i) -= matrix->raw_entry(irow,j) * dst(col);
 		  }
 		else
@@ -368,7 +368,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 	    const unsigned int i = is->second;
 
 	    if (!range_is_restricted ||
-		((begin <= irow) && (irow < end)))
+		((*dof_mask)[irow] == true))
 	      dst(irow) = x(i);
 					       // do nothing if not in
 					       // the range
@@ -388,18 +388,18 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>       &dst,
 template <typename number>
 SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 					    const vector<bool>         &selected,
+					    const unsigned int          n_blocks,
+					    const BlockingStrategy      blocking_strategy,
 					    const bool                  conserve_memory,
-					    const unsigned int          n_threads,
-					    const unsigned int          n_blocks)
+					    const unsigned int          n_threads)
 		:
 		SparseVanka<number> (M, selected, conserve_memory, n_threads),
-                n_blocks (n_blocks)
+                n_blocks (n_blocks),
+                dof_masks (n_blocks,
+		           vector<bool>(M.m(), false))
 {
   Assert (n_blocks > 0, ExcInternalError());
 
-				   // precompute the splitting points
-  intervals.resize (n_blocks);
-  
   const unsigned int n_inverses = count (selected.begin(),
 					 selected.end(),
 					 true);
@@ -407,6 +407,9 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
   const unsigned int n_inverses_per_block = max(n_inverses / n_blocks,
 						1U);
   
+				   // precompute the splitting points
+  vector<pair<unsigned int, unsigned int> > intervals (n_blocks);
+    
 				   // set up start and end index for
 				   // each of the blocks. note that
 				   // we have to work somewhat to get
@@ -421,24 +424,140 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
 				   // consecutive, with other
 				   // consecutive regions where we do
 				   // not have to do something
-  unsigned int c       = 0;
-  unsigned int block   = 0;
-  intervals[0].first   = 0;
-  
-  for (unsigned int i=0; (i<M.m()) && (block+1<n_blocks); ++i)
+  if (true)
     {
-      if (selected[i] == true)
-	++c;
-      if (c == n_inverses_per_block)
+      unsigned int c       = 0;
+      unsigned int block   = 0;
+      intervals[0].first   = 0;
+      
+      for (unsigned int i=0; (i<M.m()) && (block+1<n_blocks); ++i)
 	{
-	  intervals[block].second  = i;
-	  intervals[block+1].first = i;
-	  ++block;
-	  
-	  c = 0;
+	  if (selected[i] == true)
+	    ++c;
+	  if (c == n_inverses_per_block)
+	    {
+	      intervals[block].second  = i;
+	      intervals[block+1].first = i;
+	      ++block;
+	      
+	      c = 0;
+	    };
 	};
+      intervals[n_blocks-1].second = M.m();
     };
-  intervals[n_blocks-1].second = M.m();
+
+				   // now transfer the knowledge on
+				   // the splitting points into the
+				   // vector<bool>s that the base
+				   // class wants to see. the way how
+				   // we do this depends on the
+				   // requested blocking strategy
+  switch (blocking_strategy)
+    {
+      case index_intervals:
+      {
+	for (unsigned int block=0; block<n_blocks; ++block)
+	  fill_n (dof_masks[block].begin()+intervals[block].first,
+		  intervals[block].second - intervals[block].first,
+		  true);
+	break;
+      };
+
+      case adaptive:
+      {
+					 // the splitting points for
+					 // the DoF have been computed
+					 // above already, but we will
+					 // only use them to split the
+					 // Lagrange dofs into
+					 // blocks. splitting the
+					 // remaining dofs will be
+					 // done now.
+	
+					 // first count how often the
+					 // Lagrange dofs of each
+					 // block access the different
+					 // dofs
+	vector<vector<unsigned int> > access_count (n_blocks,
+						    vector<unsigned int>(M.m(), 0));
+	
+					 // set-up the map that will
+					 // be used to store the
+					 // indices each Lagrange dof
+					 // accesses
+	map<unsigned int, unsigned int> local_index;
+	const SparsityPattern &structure = M.get_sparsity_pattern();
+
+	for (unsigned int row=0; row<M.m(); ++row)
+	  if (selected[row] == true)
+	    {
+					       // first find out to
+					       // which block the
+					       // present row belongs
+	      unsigned int block_number = 0;
+	      while (row>=intervals[block_number].second)
+		++block_number;
+	      Assert (block_number < n_blocks, ExcInternalError());
+	      
+					       // now traverse the
+					       // matrix structure to
+					       // find out to which
+					       // dofs number the
+					       // present index wants
+					       // to write
+	      const unsigned int row_length = structure.row_length(row);
+	      for (unsigned int i=0; i<row_length; ++i)
+		++access_count[block_number][structure.column_number(row, i)];
+	    };
+
+					 // now we know that block #i#
+					 // wants to write to DoF #j#
+					 // as often as
+					 // #access_count[i][j]#
+					 // times. Let #j# be allotted
+					 // to the block which
+					 // accesses it most often.
+					 //
+					 // if it is a Lagrange dof,
+					 // the of course we leave it
+					 // to the block we put it
+					 // into in the first place
+	for (unsigned int row=0; row<M.m(); ++row)
+	  if (selected[row] == true)
+	    {
+	      unsigned int block_number = 0;
+	      while (row>=intervals[block_number].second)
+		++block_number;
+
+	      dof_masks[block_number][row] = true;
+	    }
+	  else
+	    {
+					       // find out which block
+					       // accesses this dof
+					       // the most often
+	      unsigned int max_accesses     = 0;
+	      unsigned int max_access_block = 0;
+	      for (unsigned int block=0; block<n_blocks; ++block)
+		if (access_count[block][row] > max_accesses)
+		  {
+		    max_accesses = access_count[block][row];
+		    max_access_block = block;
+		  };
+					       // each dof should be
+					       // accessed by at least
+					       // one block!
+	      Assert (max_accesses > 0, ExcInternalError());
+	      
+	      dof_masks[max_access_block][row] = true;
+	    };
+
+	break;
+      };
+       
+      default:
+	    Assert (false, ExcInternalError());
+    };
 };
 
 
@@ -454,25 +573,24 @@ void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
 				   // if no blocking is required, pass
 				   // down to the underlying class
   if (n_blocks == 1)
-    apply_preconditioner (dst, src, 0, dst.size());
+    apply_preconditioner (dst, src);
   else
 				     // otherwise: blocking requested
     {
 #ifdef DEAL_II_USE_MT
-      typedef ThreadManager::Mem_Fun_Data4
+      typedef ThreadManager::Mem_Fun_Data3
 	<const SparseVanka<number>, Vector<number2>&,
-	const Vector<number2> &, unsigned int, unsigned int> MemFunData;
+	const Vector<number2> &, const vector<bool> *> MemFunData;
       vector<MemFunData> mem_fun_data
 	(n_blocks,
 	 MemFunData (this,
-		     dst, src, 0, 0,
+		     dst, src, 0,
 		     &SparseVanka<number>::template apply_preconditioner<number2>));
-
+      
       ThreadManager thread_manager;
       for (unsigned int block=0; block<n_blocks; ++block)
 	{
-	  mem_fun_data[block].arg3 = intervals[block].first;
-	  mem_fun_data[block].arg4 = intervals[block].second;
+	  mem_fun_data[block].arg3 = &dof_masks[block];
 
 	  thread_manager.spawn (&mem_fun_data[block],
 				THR_SCOPE_SYSTEM | THR_DETACHED);
@@ -482,8 +600,7 @@ void SparseBlockVanka<number>::operator() (Vector<number2>       &dst,
 #else
       for (unsigned int block=0; block<n_blocks; ++block)
 	apply_preconditioner (dst, src,
-			      intervals[block].first,
-			      intervals[block].second);
+			      &dof_masks[block]);
 #endif
     };
 };
