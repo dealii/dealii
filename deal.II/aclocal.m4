@@ -2106,7 +2106,13 @@ AC_DEFUN(DEAL_II_CHECK_MEMBER_VAR_SPECIALIZATION_BUG, dnl
 dnl -------------------------------------------------------------
 dnl gcc3.1 (and maybe later compilers) has a bug with long double
 dnl and optimization (see code below), when compiling on Sparc
-dnl machines
+dnl machines. Since it affects only one platform and one compiler,
+dnl we take the liberty to disable the function in which the problem
+dnl occurs (Polynomial::shift in base/source/polynomial.cc), since 
+dnl this is a function that is rarely used anyway.
+dnl
+dnl For more information: the bug just described is reported to
+dnl the gcc project under number 7335.
 dnl
 dnl Usage: DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG
 dnl
