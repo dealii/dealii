@@ -1414,20 +1414,6 @@ void Triangulation<1>::clear_user_flags () {
     cell->clear_user_flag ();
 };
 
-
-
-template <>
-void Triangulation<1>::save_user_flags (ostream &out) const {
-  save_user_flags_line (out);
-};
-
-
-
-template <>
-void Triangulation<1>::save_user_flags (vector<bool> &v) const {
-  save_user_flags_line (v);
-};
-
 #endif
 
 
@@ -1459,22 +1445,6 @@ void Triangulation<2>::clear_user_flags () {
 		endc = end();
   for (; cell!=endc; ++cell)
     cell->clear_user_flag ();
-};
-
-
-
-template <>
-void Triangulation<2>::save_user_flags (ostream &out) const {
-  save_user_flags_line (out);
-  save_user_flags_quad (out);
-};
-
-
-
-template <>
-void Triangulation<2>::save_user_flags (vector<bool> &v) const {
-  save_user_flags_line (v);
-  save_user_flags_quad (v);
 };
 
 
@@ -1524,25 +1494,47 @@ void Triangulation<3>::clear_user_flags () {
 };
 
 
-
-template <>
-void Triangulation<3>::save_user_flags (ostream &out) const {
-  save_user_flags_line (out);
-  save_user_flags_quad (out);
-  save_user_flags_hex (out);
-};
-
-
-
-template <>
-void Triangulation<3>::save_user_flags (vector<bool> &v) const {
-  save_user_flags_line (v);
-  save_user_flags_quad (v);
-  save_user_flags_hex (v);
-};
-
-
 #endif
+
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_flags (ostream &out) const {
+  save_user_flags_line (out);
+  
+  if (dim>=2)
+    save_user_flags_quad (out);
+  
+  if (dim>=3)
+    save_user_flags_hex (out);
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_flags (vector<bool> &v) const {
+				   // clear vector and append
+				   // all the stuff later on
+  v.clear ();
+
+  vector<bool> tmp;
+
+  save_user_flags_line (tmp);
+  v.insert (v.end(), tmp.begin(), tmp.end());
+
+  if (dim >= 2)
+    {
+      save_user_flags_quad (tmp);
+      v.insert (v.end(), tmp.begin(), tmp.end());
+    };
+  
+  if (dim >= 3)
+    {
+      save_user_flags_hex (tmp);
+      v.insert (v.end(), tmp.begin(), tmp.end());
+    };      
+};
 
 
 

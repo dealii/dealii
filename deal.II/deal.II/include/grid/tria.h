@@ -2066,6 +2066,8 @@ class Triangulation
 				     /**
 				      * Same as above, but store the flags to
 				      * a bitvector rather than to a file.
+				      * The output vector is resized if
+				      * necessary.
 				      */
     void save_user_flags (vector<bool> &v) const;
 
@@ -2089,6 +2091,8 @@ class Triangulation
 				     /**
 				      * Same as above, but store the flags to
 				      * a bitvector rather than to a file.
+				      * The output vector is resized if
+				      * necessary.
 				      */
     void save_user_flags_line (vector<bool> &v) const;
 
@@ -2110,6 +2114,8 @@ class Triangulation
 				     /**
 				      * Same as above, but store the flags to
 				      * a bitvector rather than to a file.
+				      * The output vector is resized if
+				      * necessary.
 				      */
     void save_user_flags_quad (vector<bool> &v) const;
 
@@ -2131,6 +2137,8 @@ class Triangulation
 				     /**
 				      * Same as above, but store the flags to
 				      * a bitvector rather than to a file.
+				      * The output vector is resized if
+				      * necessary.
 				      */
     void save_user_flags_hex (vector<bool> &v) const;
 
