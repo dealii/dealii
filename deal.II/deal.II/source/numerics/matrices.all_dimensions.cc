@@ -21,7 +21,7 @@
 #include <algorithm>
 
 
-
+//TODO:[WB] I don't think that the optimized storage of diagonals is needed (GK)
 template <typename number>
 void
 MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
@@ -30,8 +30,8 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    Vector<number>   &right_hand_side,
 				    const bool        preserve_symmetry)
 {
-  Assert (matrix.n() == matrix.m(),
-	  ExcDimensionMismatch(matrix.n(), matrix.m()));
+  Assert (matrix.get_sparsity_pattern().optimize_diagonal(),
+	  typename SparsityPattern::ExcDiagonalNotOptimized());
   Assert (matrix.n() == right_hand_side.size(),
 	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
@@ -195,8 +195,6 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 {
   const unsigned int blocks = matrix.n_block_rows();
   
-  Assert (matrix.n() == matrix.m(),
-	  ExcDimensionMismatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
 	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
@@ -212,7 +210,11 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
   Assert (matrix.get_sparsity_pattern().get_row_indices() ==
 	  right_hand_side.get_block_indices (),
 	  ExcBlocksDontMatch ());
-  
+
+  for (unsigned int i=0;i<blocks;++i)
+    Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
+	    typename SparsityPattern::ExcDiagonalNotOptimized());
+
   
 				   // if no boundary values are to be applied
 				   // simply return
