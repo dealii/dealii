@@ -31,6 +31,8 @@
     <ul>
       <li>Linux ELF with egcs 1.1.x and gcc 2.95.x;
       <li>Sun Solaris 2.5, 2.6, and 7, with egcs 1.1.x and gcc 2.95.x;
+      <li>SGI IRIX64 with gcc 2.95.x (with some restrictions on
+          the use of shared libraries);
       <li>IBM AIX 4.2, with gcc 2.95.x (with some restrictions on
           the use of shared libraries).
     </ul>
@@ -267,7 +269,7 @@
 
       <p>
       You will want to link your programs against these libraries when
-      your application runs stably and are used in production mode.
+      they run stable and are used in production mode.
       </p>
     </ul>
 
@@ -285,11 +287,11 @@
       start-up time, so this is the default. However, some systems
       might not support shared libraries, in which case you should
       call ./configure with the parameter
-      <code>--disable-shared</code>. (Since on AIX we could not get
-      shared libraries right immediately, they are disabled by default
-      on this system. Probably, there is a simple work-around, but
-      since we do not regularly test on AIX, we did not try very
-      hard.)
+      <code>--disable-shared</code>. (Since on AIX and IRIX64 we could
+      not get shared libraries right immediately, they are disabled by
+      default on these systems. Probably, there is a simple
+      work-around, but since we do not regularly test on these
+      systems, we did not try very hard.)
       </p>
 
       <p>
