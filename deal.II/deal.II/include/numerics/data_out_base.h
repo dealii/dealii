@@ -122,8 +122,8 @@
  * Given the lines as described above, a cut through this data in Gnuplot
  * can then be achieved like this:
  * \begin{verbatim}
- * set data style lines
- * splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
+ *   set data style lines
+ *   splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
  * \end{verbatim}
  * This command plots data in x- and y-direction unbounded, but in z-direction
  * only those data points which are above the x-y-plane (we assume here a
@@ -149,7 +149,7 @@
  *
  * To be filled in.
  * precision=5; viewpoint=gnuplot default; no border
- * shade or not; grid or not; grid shaded; data vector
+ * shade or not; grid or not; grid shaded; data vector; memory; color=one per cell
  *
  * \subsection{GMV format}
  *
@@ -183,7 +183,7 @@
  * details of the viewpoint, light source, etc.
  *
  *
- * @author Wolfgang Bangerth 1999
+ * @author Wolfgang Bangerth 1999; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class
  */
 class DataOutBase 
 {
@@ -332,6 +332,7 @@ class DataOutBase
 	int dummy;
     };
 
+    
     				     /**
 				      * Flags describing the details of
 				      * output in encapsulated postscript
@@ -345,12 +346,20 @@ class DataOutBase
 					  * for generating the height
 					  * information. By default, the
 					  * first data vector is taken,
-					  * i.e. #height_value==0#, if
+					  * i.e. #height_vector==0#, if
 					  * there is any data vector. If there
 					  * is no data vector, no height
 					  * information is generated.
 					  */
 	unsigned int height_vector;
+
+					 /**
+					  * Number of the vector which is
+					  * to be taken to colorize cells.
+					  * The same applies as for
+					  * #height_vector#.
+					  */
+	unsigned int color_vector;
 	
 					 /**
 					  * Enum denoting the possibilities
@@ -440,16 +449,104 @@ class DataOutBase
 	bool   draw_mesh;
 
 					 /**
+					  * Flag whether to fill the regions
+					  * between the lines bounding the cells
+					  * or not. If not, no hidden line removal
+					  * is performed, which in this crude
+					  * implementation is done through
+					  * writing the cells in a back-to-front
+					  * order, thereby hiding the cells in
+					  * the background by cells in the
+					  * foreground.
+					  *
+					  * If this flag is #false# and #draw_mesh#
+					  * is #false# as well, nothing will be
+					  * printed.
+					  *
+					  * If this flag is #true#, then the cells
+					  * will be drawn either colored by one
+					  * of the data sets (if #shade_cells# is
+					  * #true#), or pure white (if
+					  * #shade_cells# is false or if there are
+					  * no data sets).
+					  *
+					  * Default is #true#.
+					  */
+	bool   draw_cells;
+
+					 /**
+					  * Flag to determine whether the cells
+					  * shall be colorized by one the data
+					  * set denoted by #color_vector#, or
+					  * simply be painted in white. This
+					  * flag only makes sense if
+					  * #draw_cells==true#. Colorization is
+					  * done through the #color_function#.
+					  *
+					  * Default is #true#.
+					  */
+	bool   shade_cells;
+
+					 /**
+					  * Structure keeping the three color
+					  * values in the RGB system.
+					  */
+	struct RgbValues { float red, green, blue; };
+
+					 /**
+					  * Definition of a function pointer
+					  * type taking a value and returning
+					  * a triple of color values in RGB
+					  * values.
+					  *
+					  * Besides the actual value by which
+					  * the color is to be computed, min
+					  * and max values of the data to
+					  * be colorized are given as well.
+					  */
+	typedef RgbValues (*ColorFunction) (const double value,
+					    const double min_value,
+					    const double max_value);
+
+					 /**
+					  * This is a pointer to the function
+					  * which is used to colorize the cells.
+					  * By default, it points to the
+					  * static function #default_color_function#
+					  * which is a member of this class.
+					  */
+	ColorFunction color_function;
+
+
+					 /**
+					  * Default colorization function. This
+					  * one does what one usually wants:
+					  * it shifts colors from black (lowest
+					  * value) through blue, green and red
+					  * to white (highest value).
+					  *
+					  * This function was originally written
+					  * by Stefan Nauber.
+					  */
+	static RgbValues default_color_function (const double value,
+						 const double min_value,
+						 const double max_value);
+	
+					 /**
 					  * Constructor.
 					  */
-	EpsFlags (const unsigned int height_vector = 0,
-		  const SizeType     size_type    = width,
-		  const unsigned int size         = 300,
-		  const double       line_width   = 0.5,
-		  const double       azimut_angle = 60,
-		  const double       turn_angle   = 30,
-		  const double       z_scaling    = 1.0,
-		  const bool         draw_mesh    = true);
+	EpsFlags (const unsigned int  height_vector = 0,
+		  const unsigned int  color_vector  = 0,
+		  const SizeType      size_type     = width,
+		  const unsigned int  size          = 300,
+		  const double        line_width    = 0.5,
+		  const double        azimut_angle  = 60,
+		  const double        turn_angle    = 30,
+		  const double        z_scaling     = 1.0,
+		  const bool          draw_mesh     = true,
+		  const bool          draw_cells    = true,
+		  const bool          shade_cells   = true,
+		  const ColorFunction color_function= &default_color_function);
     };
 
     				     /**
@@ -555,10 +652,10 @@ class DataOutBase
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidHeightVectorNumber,
+    DeclException2 (ExcInvalidVectorNumber,
 		    int, int,
 		    << "The number " << arg1 << " of the vector to be used for "
-		    << "height information is invalid, since there are only "
+		    << "this information is invalid, since there are only "
 		    << arg2 << " data sets.");
 				     /**
 				      * Exception
@@ -584,12 +681,13 @@ class DataOutBase
 	Point<2> vertices[4];
 	
 					 /**
-					  * Color values.
+					  * Data value from which the actual
+					  * colors will be computed by
+					  * the colorization function stated
+					  * in the #EpsFlags# class.
 					  */
-	float red;
-	float green;
-	float blue;
-
+	float color_value;
+	
 					 /**
 					  * Depth into the picture, which
 					  * is defined as the distance from
