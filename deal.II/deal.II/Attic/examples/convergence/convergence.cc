@@ -3,15 +3,15 @@
 
 
 #include <grid/tria.h>
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <grid/grid_generator.h>
 #include <base/function.h>
-#include <basic/data_out.h>
+#include <numerics/data_out.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
 #include <base/quadrature_lib.h>

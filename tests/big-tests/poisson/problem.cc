@@ -7,7 +7,7 @@
 #include <lac/vector.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_boundary_lib.h>
-#include <basic/data_out.h>
+#include <numerics/data_out.h>
 
 
 template <int dim>

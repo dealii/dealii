@@ -17,7 +17,7 @@
 #include <grid/tria_boundary_lib.h>
                                  // Output of grids in various
                                  // graphics formats:
-#include <basic/grid_out.h>
+#include <grid/grid_out.h>
 
                                  // This is needed for C++ output:
 #include <fstream>

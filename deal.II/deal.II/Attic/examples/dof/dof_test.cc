@@ -3,18 +3,18 @@
 
 
 
-#include <basic/grid_out.h>
-#include <basic/dof_tools.h>
-#include <grid/dof.h>
+#include <grid/grid_out.h>
+#include <dofs/dof_tools.h>
+#include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <fe/fe_lib.lagrange.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <base/parameter_handler.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
 #include <numerics/dof_renumbering.h>
 
 #include <fstream>

@@ -7,7 +7,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
-#include <basic/grid_out.h>
+#include <grid/grid_out.h>
 #include <fstream>
 #include <string>
 #include <cmath>

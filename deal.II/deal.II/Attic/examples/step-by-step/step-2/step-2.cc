@@ -13,7 +13,7 @@
 				 // association of degrees of freedom
 				 // ("DoF"s) to vertices, lines, and
 				 // cells.
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 				 // The following include contains the
 				 // description of the bilinear finite
 				 // element, including the facts that
@@ -33,14 +33,14 @@
 				 // In the following file, several
 				 // tools for manipulating degrees of
 				 // freedom can be found:
-#include <basic/dof_tools.h>
+#include <dofs/dof_tools.h>
 				 // We will use a sparse matrix to
 				 // visualize the pattern of nonzero
 				 // entries resulting from the
 				 // distribution of degrees of freedom
 				 // on the grid. That class can be
 				 // found here:
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 				 // We will want to use a special
 				 // algorithm to renumber degrees of
 				 // freedom. It is declared here:

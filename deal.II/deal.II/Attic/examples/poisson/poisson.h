@@ -7,20 +7,20 @@
 
 
 #include <grid/tria.h>
-#include <grid/dof.h>
+#include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
-#include <grid/dof_accessor.h>
+#include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
-#include <grid/dof_constraints.h>
-#include <basic/data_io.h>
+#include <dofs/dof_constraints.h>
+#include <numerics/data_io.h>
 #include <base/function.h>
 #include <base/parameter_handler.h>
 #include <fe/fe_lib.lagrange.h>
 #include <base/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 
 
 #include <map>

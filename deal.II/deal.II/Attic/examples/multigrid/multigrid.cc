@@ -3,15 +3,16 @@
 
 
 #include <grid/tria.h>
-#include <grid/mg_dof.h>
+#include <dofs/mg_dof_handler.h>
 #include <grid/tria_accessor.h>
-#include <grid/mg_dof_accessor.h>
+#include <dofs/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
-#include <grid/dof_constraints.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_tools.h>
 #include <grid/grid_generator.h>
 #include <base/function.h>
-#include <basic/data_out.h>
+#include <numerics/data_out.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
 #include <fe/fe_update_flags.h>
@@ -23,7 +24,7 @@
 #include <numerics/mg_smoother.h>
 
 #include <lac/vector.h>
-#include <lac/sparsematrix.h>
+#include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
@@ -354,7 +355,7 @@ void PoissonProblem<dim>::assemble (const Equation<dim>      &equation,
   constraints.clear ();
   dof->DoFHandler<dim>::make_hanging_node_constraints (constraints);
   constraints.close ();
-  dof->DoFHandler<dim>::make_sparsity_pattern (system_sparsity);
+  DoFTools::make_sparsity_pattern (*dof, system_sparsity);
   constraints.condense (system_sparsity);
 
   MGTransferPrebuilt p;
