@@ -76,7 +76,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   deallog.pop();
 }
 
-main()
+int main()
 {
 
   deallog.push("GeometryInfo");

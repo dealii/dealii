@@ -49,7 +49,7 @@ class MGSmootherLAC : public MGSmootherBase
     
 };
 
-main()
+int main()
 {
   Helmholtz equation;
   RHSFunction<2> rhs;

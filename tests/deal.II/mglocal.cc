@@ -56,7 +56,7 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 			   unsigned int level,
 			   ostream &out);
 
-main()
+int main()
 {
   Helmholtz equation;
   RHSFunction<2> rhs;
