@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -59,6 +59,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       *3.3*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.3)
   	GXX_VERSION=gcc3.3
+  	;;
+      *3.4*)
+  	AC_MSG_RESULT(C++ compiler is gcc-3.4)
+  	GXX_VERSION=gcc3.4
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	dnl These compilers are too old to support a useful subset
@@ -614,6 +618,10 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
   	  AC_MSG_RESULT(F77 compiler is gcc-3.3)
   	  F77_VERSION=gcc3.3
   	  ;;
+        *3.4*)
+  	  AC_MSG_RESULT(F77 compiler is gcc-3.4)
+  	  F77_VERSION=gcc3.4
+  	  ;;
         *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	  dnl These compilers are too old to support a useful subset
   	  dnl of modern C++, so we don't support them. gcc2.7.2 is 
@@ -691,7 +699,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 [
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.[[0123]])
+    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.[[01234]])
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
   
