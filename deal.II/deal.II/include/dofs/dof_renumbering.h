@@ -470,8 +470,9 @@ class DoFRenumbering
 				      * Cell-wise clockwise numbering.
 				      *
 				      * This function produces a
-				      * clockwise ordering of the
-				      * mesh cells and calls
+				      * (counter)clockwise ordering of
+				      * the mesh cells with respect to
+				      * the hub @p{center} and calls
 				      * @ref{cell_wise_dg}.
 				      * Therefore, it only works with
 				      * Discontinuous Galerkin Finite
@@ -482,7 +483,8 @@ class DoFRenumbering
     template <int dim>
     static void
     clockwise_dg (DoFHandler<dim>  &dof_handler,
-		   const Point<dim> &center);
+		  const Point<dim> &center,
+		  const bool counter = false);
 
 				     /**
 				      * Cell-wise clockwise numbering
@@ -492,8 +494,9 @@ class DoFRenumbering
     template <int dim>
     static void
     clockwise_dg (MGDoFHandler<dim>  &dof_handler,
-		   const unsigned int level,
-		   const Point<dim> &center);
+		  const unsigned int level,
+		  const Point<dim> &center,
+		  const bool counter = false);
 
     				     /**
 				      * Computes the renumbering
@@ -508,8 +511,9 @@ class DoFRenumbering
     template <int dim>
     static void
     compute_clockwise_dg (std::vector<unsigned int>&,
-			   const DoFHandler<dim>  &dof_handler,
-			   const Point<dim> &center);
+			  const DoFHandler<dim>  &dof_handler,
+			  const Point<dim> &center,
+			  const bool counter);
 
 				     /**
 				      * Sort those degrees of freedom

@@ -1005,13 +1005,19 @@ struct ClockCells
 				      */
     const Point<dim>& center;
 				     /**
+				      * Revert sorting order.
+				      */
+    bool counter;
+    
+				     /**
 				      * Constructor.
 				      */
-    ClockCells (const Point<dim>& center) :
-		    center(center) 
+    ClockCells (const Point<dim>& center, bool counter) :
+		    center(center),
+		    counter(counter)
       {}
 				     /**
-				      * Return true if c1 < c2.
+				      * Comparison operator
 				      */    
     bool operator () (const typename DoFHandler<dim>::cell_iterator& c1,
 		      const typename DoFHandler<dim>::cell_iterator&c2) const
@@ -1021,7 +1027,7 @@ struct ClockCells
 	const Point<dim> v2 = c2->center() - center;
 	const double s1 = atan2(v1(0), v1(1));
 	const double s2 = atan2(v2(0), v2(1));
-	return (s1>s2);
+	return ( counter ? (s1>s2) : (s2>s1));
       }
 };
 
@@ -1029,10 +1035,11 @@ struct ClockCells
 template <int dim>
 void
 DoFRenumbering::clockwise_dg (DoFHandler<dim>& dof,
-			       const Point<dim>& center)
+			      const Point<dim>& center,
+			      const bool counter)
 {
   std::vector<unsigned int> renumbering(dof.n_dofs());
-  compute_clockwise_dg(renumbering, dof, center);
+  compute_clockwise_dg(renumbering, dof, center, counter);
 
   dof.renumber_dofs(renumbering);
 }
@@ -1044,11 +1051,12 @@ void
 DoFRenumbering::compute_clockwise_dg (
   std::vector<unsigned int>& new_indices,
   const DoFHandler<dim>& dof,
-  const Point<dim>& center)
+  const Point<dim>& center,
+  const bool counter)
 {
   std::vector<typename DoFHandler<dim>::cell_iterator>
     ordered_cells(dof.get_tria().n_active_cells());
-  ClockCells<dim> comparator(center);
+  ClockCells<dim> comparator(center, counter);
   
   typename DoFHandler<dim>::active_cell_iterator begin = dof.begin_active();
   typename DoFHandler<dim>::active_cell_iterator end = dof.end();
@@ -1062,12 +1070,13 @@ DoFRenumbering::compute_clockwise_dg (
 
 template <int dim>
 void DoFRenumbering::clockwise_dg (MGDoFHandler<dim>& dof,
-				    const unsigned int level,
-				    const Point<dim>& center)
+				   const unsigned int level,
+				   const Point<dim>& center,
+				   const bool counter)
 {
   std::vector<typename MGDoFHandler<dim>::cell_iterator>
     ordered_cells(dof.get_tria().n_cells(level));
-  ClockCells<dim> comparator(center);
+  ClockCells<dim> comparator(center, counter);
   
   typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
   typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
@@ -1183,20 +1192,20 @@ template
 void
 DoFRenumbering::clockwise_dg<deal_II_dimension>
 (DoFHandler<deal_II_dimension>&,
- const Point<deal_II_dimension>&);
+ const Point<deal_II_dimension>&, bool);
 
 template
 void
 DoFRenumbering::compute_clockwise_dg<deal_II_dimension>
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension>&,
- const Point<deal_II_dimension>&);
+ const Point<deal_II_dimension>&, bool);
 
 template
 void DoFRenumbering::clockwise_dg<deal_II_dimension>
 (MGDoFHandler<deal_II_dimension>&,
  const unsigned int,
- const Point<deal_II_dimension>&);
+ const Point<deal_II_dimension>&, bool);
 
 template
 void DoFRenumbering::sort_selected_dofs_back<deal_II_dimension>
