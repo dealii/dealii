@@ -50,6 +50,11 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 				    Vector<double>           &vec)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
+
+				   // use #interpolate# function with
+				   // #VectorFunction# param for system
+				   // elements
+  Assert (fe.n_components == 1, ExcNotUseful());
   
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
@@ -82,6 +87,11 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   
+				   // use #interpolate# function with
+				   // #Function# param for non-system
+				   // elements
+  Assert (fe.n_components == vectorfunction.n_components, ExcNotUseful());
+
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 					endc = dof.end();
 
@@ -100,7 +110,8 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
   fe.get_unit_support_points(unit_support_points);
 
 				   // The following works well
-				   // if #dofs_per_cell<=1# as then
+				   // if #dofs_per_x<=1 (x=vertex,line,cell)#
+				   // as then
 				   // the multiple support_points
 				   // are placed one after another.
 
@@ -273,8 +284,8 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 
 
 template <int dim> void
-VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
-			      const DoFHandler<dim>    &low_dof,
+VectorTools<dim>::interpolate(const DoFHandler<dim>           &high_dof,
+			      const DoFHandler<dim>           &low_dof,
 			      const FullMatrix<double>        &transfer,
 			      const Vector<double>            &high,
 			      Vector<double>                  &low)
@@ -284,8 +295,9 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
   
   DoFHandler<dim>::active_cell_iterator h = high_dof.begin_active();
   DoFHandler<dim>::active_cell_iterator l = low_dof.begin_active();
+  const DoFHandler<dim>::cell_iterator endh = high_dof.end();
   
-  for(; h != high_dof.end(); ++h, ++l)
+  for(; h != endh; ++h, ++l)
   {
     h->get_dof_values(high, cell_high);
     transfer.vmult(cell_low, cell_high);
@@ -328,7 +340,10 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				Vector<double>           &vec,
 				const bool                enforce_zero_boundary,
 				const Quadrature<dim-1>  &q_boundary,
-				const bool                project_to_boundary_first) {
+				const bool                project_to_boundary_first)
+{
+  Assert (dof.get_fe().n_components == 1, ExcNotUseful());
+  
   const FiniteElement<dim> &fe = dof.get_fe();
 
 				   // make up boundary values
@@ -421,7 +436,10 @@ template <int dim>
 void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 					       const Quadrature<dim>    &quadrature,
 					       const Function<dim>      &rhs,
-					       Vector<double>           &rhs_vector) {
+					       Vector<double>           &rhs_vector)
+{
+  Assert (dof.get_fe().n_components == 1, ExcNotUseful());
+  
   UpdateFlags update_flags = UpdateFlags(update_q_points |
 					 update_JxW_values);
   SparseMatrix<double> dummy;
@@ -444,6 +462,7 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 
 
 
+
 #if deal_II_dimension == 1
 
 template <>
@@ -457,7 +476,8 @@ VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
 
   const FiniteElement<1> &fe = dof.get_fe();
   Assert (fe.dofs_per_vertex == 1, ExcInvalidFE());
-
+  Assert (fe.n_components == 1, ExcInvalidFE());
+  
 				   // check whether boundary values at the
 				   // left boundary of the line are requested
   if (dirichlet_bc.find(0) != dirichlet_bc.end())
@@ -525,13 +545,9 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<dim> &fe = dof.get_fe();
+  Assert (fe.dofs_per_vertex == 1, ExcInvalidFE());
+  Assert (fe.n_components == 1, ExcInvalidFE());
 
-				   // use two face iterators, since we need
-				   // a DoF-iterator for the dof indices, but
-				   // a Tria-iterator for the fe object
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();
-  
   typename FunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
@@ -539,6 +555,8 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
   vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
   vector<double>      dof_values (fe.dofs_per_face);
 	
+  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+					endf = dof.end_face();  
   for (; face!=endf; ++face)
     if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
 	dirichlet_bc.end()) 
@@ -570,20 +588,19 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  ExcInvalidBoundaryIndicator());
 
   const FiniteElement<dim> &fe = dof.get_fe();
+  Assert (fe.n_components == dirichlet_bc.begin()->second->n_components,
+	  ExcInvalidFE());
 
-				   // use two face iterators, since we need
-				   // a DoF-iterator for the dof indices, but
-				   // a Tria-iterator for the fe object
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();
-  
   typename VectorFunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
-  vector<int>         face_dofs (fe.dofs_per_face);
+  vector<int>         face_dofs (fe.dofs_per_face, -1);
   vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
-  vector< Vector<double> > dof_values (fe.dofs_per_face, Vector<double>(fe.n_components));
+  vector< Vector<double> > dof_values (fe.dofs_per_face,
+				       Vector<double>(fe.n_components));
 	
+  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+					endf = dof.end_face();
   for (; face!=endf; ++face)
     if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
 	dirichlet_bc.end()) 
@@ -600,13 +617,9 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 					 // enter into list
 
 	for (unsigned int i=0; i<face_dofs.size(); ++i)
-	  {
-	    const pair<unsigned int, unsigned int>
-	      index = fe.face_system_to_component_index(i);
-	    const double s = dof_values[i](index.first);
-	      boundary_values[face_dofs[i]] = s;
-	  }
-      }
+	  boundary_values[face_dofs[i]]
+	    = dof_values[i](fe.face_system_to_component_index(i).first);
+      };
 }
 
 
@@ -617,6 +630,8 @@ VectorTools<dim>::project_boundary_values (const DoFHandler<dim>    &dof,
 					   const FunctionMap        &boundary_functions,
 					   const Quadrature<dim-1>  &q,
 					   map<int,double>          &boundary_values) {
+  Assert (dof.get_fe().n_components == 1, ExcInvalidFE());
+  
   vector<int>    dof_to_boundary_mapping;
   dof.map_dof_to_boundary_indices (boundary_functions, dof_to_boundary_mapping);
   
@@ -1104,23 +1119,34 @@ VectorTools<dim>::integrate_difference (const DoFHandler<dim>    &dof,
     };
 };
 
+
+
 template<int dim>
 void
-VectorTools<dim>::subtract_mean_value(Vector<double>& v, const
-				      bit_vector& p_select)
+VectorTools<dim>::subtract_mean_value(Vector<double>     &v,
+				      const vector<bool> &p_select)
 {
   unsigned int n = v.size();
   Assert(n == p_select.size(), ExcDimensionMismatch(n, p_select.size()));
 
-  double s = 0;
-  for (unsigned int i=0;i<n;++i)
-    if (p_select[i]) s += v(i);
-
-  s /= n;
+  double       s       = 0;
+  unsigned int counter = 0;
   
-  for (unsigned int i=0;i<n;++i)
-    if (p_select[i]) v(i) -= s;  
+  for (unsigned int i=0; i<n; ++i)
+    if (p_select[i])
+      {
+	s += v(i);
+	++counter;
+      };
+
+  s /= counter;
+  
+  for (unsigned int i=0; i<n; ++i)
+    if (p_select[i])
+      v(i) -= s;  
 }
+
+
 
 // explicit instantiations
 template VectorTools<deal_II_dimension>;
