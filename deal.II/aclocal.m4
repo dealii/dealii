@@ -422,6 +422,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #236 and
           dnl #237: `controlling expression is constant' (in while(true), or
           dnl       switch(dim))
+	  dnl #368: `class "..." defines no constructor' (for classes that have
+	  dnl       const members; they need not have a constructor if we
+	  dnl       initialize them via ={1,2,3})
           dnl #381: `extra ";" ignored' (at function or namespace closing
           dnl       brace)
           dnl #487: `Inline function ... cannot be explicitly instantiated'
@@ -456,7 +459,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSG="$CXXFLAGS -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local -DDEBUG"
           CXXFLAGSO="$CXXFLAGS -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -fast"
   
-          for i in 11 175 236 237 381 487 1136 1156 111 1182 265 450 ; do
+          for i in 11 175 236 237 368 381 487 1136 1156 111 1182 265 450 ; do
             CXXFLAGSG="$CXXFLAGSG -msg_disable $i"
             CXXFLAGSO="$CXXFLAGSO -msg_disable $i"
           done
