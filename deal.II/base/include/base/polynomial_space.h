@@ -153,6 +153,20 @@ class PolynomialSpace
     const unsigned int n_pols;
 
 				     /**
+				      * Compute numbers in x, y and z
+				      * direction. Given an index
+				      * @p{n} in the d-dimensional
+				      * polynomial space, compute the
+				      * indices i,j,k such that
+				      * @p{p_n(x,y,z) =
+				      * p_i(x)p_j(y)p_k(z)}.
+				      */
+    void compute_index(unsigned int n,
+		       unsigned int& nx,
+		       unsigned int& ny,
+		       unsigned int& nz) const;
+    
+				     /**
 				      * Static function used in the
 				      * constructor to compute the
 				      * number of polynomials.

@@ -30,34 +30,103 @@ PolynomialSpace<dim>::compute_n_pols (const unsigned int n)
 };
 
 
+template <int dim>
+void
+PolynomialSpace<dim>::compute_index(unsigned int n,
+				    unsigned int& nx,
+				    unsigned int& ny,
+				    unsigned int& nz) const
+{
+  const unsigned int n_1d=polynomials.size();
+  unsigned int k=0;
+  for (unsigned int iz=0;iz<((dim>2) ? n_1d : 1);++iz)
+    for (unsigned int iy=0;iy<((dim>1) ? n_1d-iz : 1);++iy)
+      for (unsigned int ix=0; ix<n_1d-iy-iz; ++ix)
+	if (k++ == n)
+	  {
+	    nz = iz;
+	    ny = iy;
+	    nx = ix;
+	    return;
+	  }
+}
+
 
 template <int dim>
 double
-PolynomialSpace<dim>::compute_value(const unsigned int /*i*/,
-				    const Point<dim> & /*p*/) const
+PolynomialSpace<dim>::compute_value(const unsigned int i,
+				    const Point<dim> & p) const
 {
-  Assert(false, ExcNotImplemented());
-  return 0.;
+  unsigned int ix = 0;
+  unsigned int iy = 0;
+  unsigned int iz = 0;
+  compute_index(i,ix,iy,iz);
+  
+  double result = polynomials[ix].value(p(0));
+  if (dim>1)
+    result *= polynomials[iy].value(p(1));
+  if (dim>2)
+    result *= polynomials[iz].value(p(2));
+  return result;
 }
 
   
 template <int dim>
 Tensor<1,dim>
-PolynomialSpace<dim>::compute_grad(const unsigned int /*i*/,
-				   const Point<dim> &/*p*/) const
+PolynomialSpace<dim>::compute_grad(const unsigned int i,
+				   const Point<dim> &p) const
 {
-  Assert(false, ExcNotImplemented());
-  return Tensor<1,dim>();
+  unsigned int ix[3];
+  compute_index(i,ix[0],ix[1],ix[2]);
+  
+  Tensor<1,dim> result;
+  for (unsigned int d=0;d<dim;++d)
+    result[d] = 1.;
+  
+  std::vector<double> v(2);
+  for (unsigned int d=0;d<dim;++d)
+    {
+      polynomials[ix[d]].value(p(d), v);
+      result[d] *= v[1];
+      for (unsigned int d1=0;d1<dim;++d1)
+	if (d1 != d)
+	  result[d1] *= v[0];
+    }
+  return result;
 }
 
 
 template <int dim>
 Tensor<2,dim>
-PolynomialSpace<dim>::compute_grad_grad(const unsigned int /*i*/,
-					const Point<dim> &/*p*/) const
+PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
+					const Point<dim> &p) const
 {
-  Assert(false, ExcNotImplemented());
-  return Tensor<2,dim>();
+  unsigned int ix[3];
+  compute_index(i,ix[0],ix[1],ix[2]);
+  
+  Tensor<2,dim> result;
+  for (unsigned int d=0;d<dim;++d)
+    for (unsigned int d1=0;d1<dim;++d1)
+      result[d][d1] = 1.;
+  
+  std::vector<double> v(3);
+  for (unsigned int d=0;d<dim;++d)
+    {
+      polynomials[ix[d]].value(p(d), v);
+      result[d][d] *= v[2];
+      for (unsigned int d1=0;d1<dim;++d1)
+	{
+	  if (d1 != d)
+	    {
+	      result[d][d1] *= v[1];
+	      result[d1][d] *= v[1];
+	      for (unsigned int d2=0;d2<dim;++d2)
+		if (d2 != d)
+		  result[d1][d2] *= v[0];
+	    }
+	}
+    }
+  return result;
 }
 
 
