@@ -11,38 +11,42 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+                                 // As usual, most of the headers here have
+                                 // already been used and discussed in
+                                 // previous examples:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
-                                 //
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
-#include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
+#include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
+#include <fe/fe_q.h>
 #include <fe/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+
+                                 // This is probably the only new one - it
+                                 // declares the class that we use to transfer
+                                 // a solution on one grid to the one we
+                                 // obtain after refining/coarsening it:
 #include <numerics/solution_transfer.h>
-#include <fe/fe_q.h>
-#include <grid/grid_out.h>
 
-#include <grid/grid_refinement.h>
-
-#include <dofs/dof_constraints.h>
-
-#include <numerics/error_estimator.h>
-
+                                 // And here comes the usual assortment of C++
+                                 // header files:
 #include <fstream>
 #include <iostream>
 
@@ -53,27 +57,164 @@
 #endif
 
 
+                                 // The first thing we have here is a helper
+                                 // function that computes an even power |v|^n
+                                 // of a vector ``v'', by evaluating
+                                 // (v*v)^(n/2). We need this in the
+                                 // computations below where we do not want to
+                                 // dwell on the fact that the gradient of the
+                                 // solution is actually a scalar in the 1d
+                                 // situation we consider in this program (in
+                                 // 1d, the gradient is a vector with a single
+                                 // element, which is easily extracted). Small
+                                 // tricks like this make it significantly
+                                 // simpler to later extend a program so that
+                                 // it also runs in higher space dimensions.
+                                 //
+                                 // While the implementation of the function
+                                 // is obvious, note the assertion at the
+                                 // beginning of the function body, which
+                                 // makes sure that the exponent is indeed an
+                                 // even number (here, we use that ``n/2'' is
+                                 // computed in integer arithmetic, i.e. any
+                                 // remainder of the division is
+                                 // lost). ``ExcMessage'' is a pre-defined
+                                 // exception class that takes a string
+                                 // argument explaining what goes wrong. It is
+                                 // a simpler way to declare exceptions than
+                                 // the ones shown in step-9 and step-13/14
+                                 // where we explicitly declared exception
+                                 // classes. However, by using a generic
+                                 // exception class, we lose the ability to
+                                 // attach additional information at run-time
+                                 // to the exception message, such as the
+                                 // value of the variable ``n''. By following
+                                 // the way explained in above example
+                                 // programs, adding this feature is simple,
+                                 // though.
+template <int dim>
+inline
+double gradient_power (const Tensor<1,dim> &v,
+                       const unsigned int n)
+{
+  Assert ((n/2)*2 == n, ExcMessage ("Value of 'n' must be even"));
+  double p = 1;
+  for (unsigned int k=0; k<n; k+=2)
+    p += (v*v);
+  return p;
+}
 
+
+
+                                 // Secondly, we declare a class that defines
+                                 // our initial values for the nonlinear
+                                 // iteration. It is a function object,
+                                 // i.e. it has a member operator that returns
+                                 // for a given point the value of the
+                                 // function. The value we return is a random
+                                 // perturbation of the ``x^1/3'' function
+                                 // which we know is the optimal solution in a
+                                 // larger function space. To make things a
+                                 // little simpler on the optimizer, we return
+                                 // zero if the proposed random value is
+                                 // negative.
+                                 //
+                                 // Note that this class works strictly only
+                                 // for 1d. If the program is to be extended
+                                 // to higher space dimensions, so has to be
+                                 // this class.
+class InitializationValues : public Function<1> 
+{
+  public:
+    InitializationValues () : Function<1>() {};
+    
+    virtual double value (const Point<1>     &p,
+			  const unsigned int  component = 0) const;
+};
+
+
+
+                                 // So here comes the function that implements
+                                 // the function object. The ``base'' value is
+                                 // ``x^1/3'', while ``random'' is a random
+                                 // number between -1 and 1 (note that
+                                 // ``rand()'' returns a random integer value
+                                 // between zero and ``RAND_MAX''; to convert
+                                 // it to a floating point value between 0 and
+                                 // 2, we have to divide by ``RAND_MAX'' and
+                                 // multiply by two -- note that the first
+                                 // multiplication has to happen in floating
+                                 // point arithmetic, so that the division is
+                                 // done in non-truncating floating point mode
+                                 // as well; the final step is then to shift
+                                 // the interval [0,2] to [-1,1]).
+                                 //
+                                 // In a second step, we add the base value
+                                 // and a random value in [-0.1,0.1] together
+                                 // and return it, unless it is less than
+                                 // zero, in which case we take zero.
+double InitializationValues::value (const Point<1> &p,
+                                    const unsigned int) const 
+{
+  const double base = std::pow(p(0), 1./3.);
+  const double random = 2.*rand()/RAND_MAX-1;
+  return std::max (base+.1*random, 0.);
+}
+
+
+
+                                 // Next is the declaration of the main
+                                 // class. As in most of the previous example
+                                 // programs, the public interface of the
+                                 // class consists only of a constructor and a
+                                 // ``run'' function that does the actual
+                                 // work. The constructor takes an additional
+                                 // argument that indicates the number of the
+                                 // run we are presently performing. This
+                                 // value is only used at the very end when we
+                                 // generate graphical output with a filename
+                                 // that matches this number.
+                                 //
+                                 // The private section of the class has the
+                                 // usual assortment of functions setting up
+                                 // the computations, doing one nonlinear
+                                 // step, refineming the mesh, doing a line
+                                 // search for step length computations,
+                                 // etc. The ``energy'' function computes the
+                                 // value of the optimization functional on an
+                                 // arbitrary finite element function with
+                                 // nodal values given on the ``DoFHandler''
+                                 // given as an argument. Since it does not
+                                 // depend on the state of this object, we
+                                 // declare this function as ``static''.
+                                 //
+                                 // The member variables of this class are
+                                 // what we have seen before, and the
+                                 // variables that characterize the linear
+                                 // system to be solved in the next nonlinear
+                                 // step, as well as the present approximation
+                                 // of the solution.
 template <int dim>
 class MinimizationProblem 
 {
   public:
-    MinimizationProblem  ();
-    ~MinimizationProblem  ();
+    MinimizationProblem  (const unsigned int run_number);
     void run ();
-    void output_results (const unsigned int cycle) const;
     
   private:
-    void setup_system ();
+    void initialize ();
+    void setup_system_on_mesh ();
     void assemble_step ();
     double line_search (const Vector<double> & update) const;
-    void do_step ();
-    void initialize ();
+    void output_results () const;
     void refine_grid ();
+    void do_step ();
 
     static double energy (const DoFHandler<dim> &dof_handler,
                           const Vector<double>  &function);
  
+
+    const unsigned int run_number;
     
     Triangulation<dim>   triangulation;
 
@@ -91,48 +232,38 @@ class MinimizationProblem
 
 
 
-class InitializationValues : public Function<1> 
-{
-  public:
-    InitializationValues () : Function<1>() {};
-    
-    virtual double value (const Point<1>     &p,
-			  const unsigned int  component = 0) const;
-};
-
-
-
-double InitializationValues::value (const Point<1> &p,
-                                    const unsigned int) const 
-{
-  const double base = std::pow(p(0), 1./3.);
-  const double random = 2.*rand()/RAND_MAX-1;
-  if (base+.1*random < 0 )
-    return 0;
-  else
-    return base+.1*random;
-}
-
-
-
+                                 // The constructor of this class is actually
+                                 // somewhat boring:
 template <int dim>
-MinimizationProblem<dim>::MinimizationProblem ()
+MinimizationProblem<dim>::MinimizationProblem (const unsigned int run_number)
                 :
+                run_number (run_number),
                 fe (1),
 		dof_handler (triangulation)
 {}
 
 
+                                 // And so is the function that prepares the
+                                 // member variables of this class for
+                                 // assembling the linear system in each
+                                 // nonlinear step. This has all been shown
+                                 // before in previous example programs. Note,
+                                 // however, that all this works in 1d just as
+                                 // in any other space dimension, and would
+                                 // not require any changes if we were to use
+                                 // the program in another space dimension.
+                                 //
+                                 // Note that this function is only called
+                                 // when the mesh has been changed (or before
+                                 // the first nonlinear step). It only
+                                 // initializes the variables to their right
+                                 // sizes, but since these sizes don't change
+                                 // as long as we don't change the mesh, we
+                                 // can use them for more than just one
+                                 // nonlinear iteration without reinitializing
+                                 // them.
 template <int dim>
-MinimizationProblem<dim>::~MinimizationProblem () 
-{
-  dof_handler.clear ();
-}
-
-
-
-template <int dim>
-void MinimizationProblem<dim>::setup_system ()
+void MinimizationProblem<dim>::setup_system_on_mesh ()
 {
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -150,26 +281,45 @@ void MinimizationProblem<dim>::setup_system ()
 }
 
 
-template <int dim>
-double gradient_power (const Tensor<1,dim> &v,
-                       const unsigned int n)
-{
-  Assert ((n/2)*2 == n, ExcMessage ("Value of 'n' must be even"));
-  double p = 1;
-  for (unsigned int k=0; k<n; k+=2)
-    p += (v*v);
-  return p;
-}
 
-
+                                 // Next is the function that assembles the
+                                 // linear system. The first part,
+                                 // initializing various local variables is
+                                 // what we have been doing previously
+                                 // already.
 template <int dim>
 void MinimizationProblem<dim>::assemble_step ()
 {
+                                   // The first two lines of the function
+                                   // clear the matrix and right hand side
+                                   // values of their prior content, which
+                                   // could possibly still be there from the
+                                   // previous nonlinear step.
   matrix.reinit (sparsity_pattern);
   residual.reinit (dof_handler.n_dofs());
-  
-  QGauss3<dim>  quadrature_formula;
 
+                                   // Then we initialize a ``FEValues'' object
+                                   // with a 3-point Gauss quadrature
+                                   // formula. This object will be used to
+                                   // compute the values and gradients of the
+                                   // shape functions at the quadrature
+                                   // points, which we need to assemble the
+                                   // matrix and right hand side of the
+                                   // nonlinear step as outlined in the
+                                   // introduction to this example program. In
+                                   // order to compute values and gradients,
+                                   // we need to pass the ``update_values''
+                                   // and ``update_gradients'' flags to the
+                                   // constructor, and the
+                                   // ``update_JxW_values'' flag for the
+                                   // Jacobian times the weight at a
+                                   // quadrature point. In addition, we need
+                                   // to have the coordinate values of each
+                                   // quadrature point in real space for the
+                                   // ``x-u^3'' terms; to get these from the
+                                   // ``FEValues'' object, we need to pass it
+                                   // the ``update_q_points'' flag.
+  QGauss3<dim>  quadrature_formula;
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
@@ -349,6 +499,7 @@ void MinimizationProblem<dim>::do_step ()
   const double step_length = line_search (update);
   present_solution.add (step_length, update);
 }
+
 
 
 template <>
@@ -545,7 +696,8 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 
 
 template <int dim>
-void MinimizationProblem<dim>::output_results (const unsigned int cycle) const
+void
+MinimizationProblem<dim>::output_results () const
 {
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -558,7 +710,7 @@ void MinimizationProblem<dim>::output_results (const unsigned int cycle) const
   std::ostrstream filename;
 #endif
   filename << "solution-"
-           << cycle
+           << run_number
            << ".gnuplot"
            << std::ends;
 #ifdef HAVE_STD_STRINGSTREAM
@@ -583,7 +735,7 @@ void MinimizationProblem<dim>::run ()
   
   while (true)
     {
-      setup_system ();
+      setup_system_on_mesh ();
 
       unsigned int iteration=0;
       for (; iteration<5; ++iteration)
@@ -599,6 +751,9 @@ void MinimizationProblem<dim>::run ()
 
       refine_grid ();
     }
+  
+  output_results ();
+  
   std::cout << std::endl;
 }
 
@@ -614,9 +769,8 @@ int main ()
         {
           std::cout << "Realization " << realization << ":" << std::endl;
   
-          MinimizationProblem<1> minimization_problem_1d;
+          MinimizationProblem<1> minimization_problem_1d (realization);
           minimization_problem_1d.run ();
-          minimization_problem_1d.output_results (realization);
         }
     }
   catch (std::exception &exc)
