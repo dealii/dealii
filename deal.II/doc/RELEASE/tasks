@@ -17,8 +17,6 @@ when a new release shall be issued:
   announcement. Do these things on both HEAD and branch. Be sure to
   have the changes file on both HEAD and branch.
 
-- adjust download.html on both HEAD and branch
-
 - cvs tag all files with Version-x-y-z
 
 - tell your friends to tag their programs
