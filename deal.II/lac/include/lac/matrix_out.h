@@ -85,8 +85,7 @@
  *
  * @author Wolfgang Bangerth, 2001
  */
-class MatrixOut : public DataOutInterface<2,2>,
-                  private DataOutBase
+class MatrixOut : public DataOutInterface<2,2>
 {
   public:
 				     /**
