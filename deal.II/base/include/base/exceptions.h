@@ -415,7 +415,7 @@ void __IssueError_Throw (const char *file,
 
 /**
  * This is the main routine in the exception mechanism for debug mode
- * error checking. It assert that a certain condition is fulfilled,
+ * error checking. It asserts that a certain condition is fulfilled,
  * otherwise issues an error and aborts the program.
  *
  * See the @p{ExceptionBase} class for more information.
@@ -463,7 +463,7 @@ void __IssueError_Throw (const char *file,
   }
 #else
 #define AssertThrow(cond, exc)                                   \
-   { abort(); }
+   { if (!(cond)) abort(); }
 #endif
 
 /**
