@@ -17,8 +17,6 @@
 
 #include <cmath>
 
-//TODO: Derivatives in 3d wrong (GK!)
-
 template<int dim>
 double
 PillowFunction<dim>::value (const Point<dim>   &p,
@@ -75,11 +73,11 @@ PillowFunction<dim>::laplacian (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    return 2.;
+	    return -2.;
       case 2:
-	    return 2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
+	    return -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
       case 3:
-	    return 2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
+	    return -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
 		       +(1.-p(1)*p(1))*(1.-p(2)*p(2))
 		       +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
       default:
@@ -103,13 +101,15 @@ PillowFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
       switch(dim)
 	{
 	  case 1:
-		values[i] = 2.;
+		values[i] = -2.;
 		break;
 	  case 2:
-		values[i] = 2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
+		values[i] = -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
 		break;
 	  case 3:
-		values[i] = 2.*((1.-p(0)*p(0))+(1.-p(1)*p(1))+(1.-p(2)*p(2)));
+		values[i] = -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
+				 +(1.-p(1)*p(1))*(1.-p(2)*p(2))
+				 +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -126,16 +126,16 @@ PillowFunction<dim>::gradient (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    result[0] = 2.*p(0);
+	    result[0] = -2.*p(0);
 	    break;
       case 2:
-	    result[0] = 2.*p(0)*(1.-p(1)*p(1));
-	    result[1] = 2.*p(1)*(1.-p(0)*p(0));
+	    result[0] = -2.*p(0)*(1.-p(1)*p(1));
+	    result[1] = -2.*p(1)*(1.-p(0)*p(0));
 	    break;
       case 3:
-	    result[0] = 2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
-	    result[1] = 2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
-	    result[2] = 2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
+	    result[0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
+	    result[1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
+	    result[2] = -2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
 	    break;
       default:
 	    Assert(false, ExcNotImplemented());
@@ -158,16 +158,16 @@ PillowFunction<dim>::gradient_list (const vector<Point<dim> > &points,
       switch(dim)
 	{
 	  case 1:
-		gradients[i][0] = 2.*p(0);
+		gradients[i][0] = -2.*p(0);
 		break;
 	  case 2:
-		gradients[i][0] = 2.*p(0)*(1.-p(1)*p(1));
-		gradients[i][1] = 2.*p(1)*(1.-p(0)*p(0));
+		gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1));
+		gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0));
 		return;
 	  case 3:
-		gradients[i][0] = 2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
-		gradients[i][1] = 2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
-		gradients[i][2] = 2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
+		gradients[i][0] = -2.*p(0)*(1.-p(1)*p(1))*(1.-p(2)*p(2));
+		gradients[i][1] = -2.*p(1)*(1.-p(0)*p(0))*(1.-p(2)*p(2));
+		gradients[i][2] = -2.*p(2)*(1.-p(0)*p(0))*(1.-p(1)*p(1));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -405,6 +405,18 @@ LSingularityFunction::gradient (const Point<2>   &/*p*/,
 			       const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
+  double x = p(0);
+  double y = p(1);
+
+  if ((x>=0) && (y>=0))
+    {
+      static double infty[2] = {1./0., 1./0.};
+      return Tensor<1,2>(infty);
+    }
+  
+  double phi = atan2(y,-x)+M_PI;
+  double r2 = x*x+y*y;
+
   return Tensor<1,2>();
 }
 
