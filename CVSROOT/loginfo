@@ -16,11 +16,19 @@
 # name and listing the modified file names.
 #
 # For example:
+#
 DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/default.html > /tmp/Tdefault; mv /tmp/Tdefault $CVSROOT/LOG/default.html
+#
+# The various DEAL libraries
+#
 ^base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base.html
+#
 ^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports.html
+#
 ^tests.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/tests.html > /tmp/Ttests; mv /tmp/Ttests $CVSROOT/LOG/tests.html
+#
 ^lac.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/lac.html > /tmp/Tlac; mv /tmp/Tlac $CVSROOT/LOG/lac.html
+#
 ^deal.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/deal.html > /tmp/Tdeal; mv /tmp/Tdeal $CVSROOT/LOG/deal.html
 
 
