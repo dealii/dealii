@@ -204,8 +204,8 @@ sub makeReferencedText
 	$t =~ s/$pat/$repl/;
     }
 
-    $t =~ s/</&lt;/g;
-    $t =~ s/>/&gt;/g;
+#    $t =~ s/</&lt;/g;
+#    $t =~ s/>/&gt;/g;
     $t =~ s/&lt;\/p&gt;&lt;p&gt;/<\/p><p>/g;
     $t =~ s/\#([^\#]*)\#/<CODE>$1<\/CODE>/g;
     $t =~ s/\\begin\{verbatim\}/<pre>/g;
@@ -218,6 +218,15 @@ sub makeReferencedText
     $t =~ s/\\subsection\{([^}]*)\}/<H4>$1<\/H4>/g;
     $t =~ s/\\subsubsection\{([^}]*)\}/<H5>$1<\/H5>/g;
 
+#while($t =~ m/(\#([^\#]*)\#)/)
+#{
+#    $full = $1;
+#    $text = $2;
+#    $text =~ s/</&lt;/g;
+#    $text =~ s/>/&gt;/g;
+#    $text =~ s/\&/&amp;/g;
+#    $t =~ s/$full/<CODE>$text<\/CODE>/;
+#}
     return $t;
 }
 
