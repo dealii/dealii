@@ -18,7 +18,7 @@
 
 # Your deal CVS access. Replace 'deal' by your name if necessary.
 
-export CVSROOT=:pserver:deal@eris:/home/people/cvs/deal
+export CVSROOT=:pserver:deal@eris.iwr.uni-heidelberg.de:/home/people/cvs/deal
 
 # System name is detected automatically. Only change in case of trouble
 
