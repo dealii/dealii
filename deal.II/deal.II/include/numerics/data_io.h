@@ -321,6 +321,12 @@ template <int dim>
 class DataOut {
   public:
 				     /**
+				      * Provide a data type specifying the
+				      * presently supported output formats.
+				      */
+    enum OutputFormat { ucd, gnuplot };
+    
+				     /**
 				      * Constructor
 				      */
     DataOut ();
@@ -381,6 +387,31 @@ class DataOut {
 				      * Write data and grid in GNUPLOT format.
 				      */
     void write_gnuplot (ostream &out) const;
+
+				     /**
+				      * Write data and grid to #out# according
+				      * to the given data format. This function
+				      * simply calles the appropriate
+				      * #write_*# function.
+				      */
+    void write (ostream &out, const OutputFormat output_format) const;
+    
+				     /**
+				      * Provide a function which tells us which
+				      * suffix with a given output format
+				      * usually has. At present the following
+				      * formats are defined:
+				      * \begin{itemize}
+				      * \item UCD: #.inp#
+				      * \item GNUPLOT: #.gnuplot#
+				      * \end{itemize}
+				      *
+				      * Since this function does not need data
+				      * from this object, it is static and can
+				      * thus be called without creating an
+				      * object of this class.
+				      */
+    static string default_suffix (const OutputFormat output_format);
     
 				     /**
 				      * Exception
@@ -489,6 +520,8 @@ class DataOut {
 
 
 
+
+		
 
 
 /*----------------------------   io.h     ---------------------------*/

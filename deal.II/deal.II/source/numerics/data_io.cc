@@ -553,6 +553,35 @@ void DataOut<dim>::write_gnuplot (ostream &out) const {
 
       
 
+template <int dim>
+void DataOut<dim>::write (ostream &out,
+			  const OutputFormat output_format) const {
+  switch (output_format) 
+    {
+      case ucd:
+	    write_ucd (out);
+	    break;
+      case gnuplot:
+	    write_gnuplot (out);
+	    break;
+    };
+};
+
+
+
+template <int dim>
+string DataOut<dim>::default_suffix (const OutputFormat output_format) {
+  switch (output_format) 
+    {
+      case ucd:
+	    return ".inp";
+      case gnuplot:
+	    return ".gnuplot";
+    };
+};
+  
+
+
 
 //explicite instantiations
 template class DataIn<1>;
