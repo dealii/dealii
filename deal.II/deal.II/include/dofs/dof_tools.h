@@ -27,14 +27,15 @@
  * $a_{ij} = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an
  * integral. When using sparse matrices, we therefore only need to reserve space
  * for those $a_{ij}$ only, which are nonzero, which is the same as to say that
- * that the basis functions $\phi_i$ and $\phi_j$ have a nonempty intersection of
+ * the basis functions $\phi_i$ and $\phi_j$ have a nonempty intersection of
  * their support. Since the support of basis functions is bound only on cells
- * on which they are located or to which they are adjacent, to determine the
- * sparsity pattern it is sufficient to loop over all cells and connect all
- * basis functions on each cell with all other basis functions on that cell.
- * There may be finite elements for which not all basis functions on a cell
- * connect with each other, but no use of this case is made since no examples
- * where this occurs are known to the author.
+ * on which they are located or to which they are adjacent, to
+ * determine the sparsity pattern it is sufficient to loop over all
+ * cells and connect all basis functions on each cell with all other
+ * basis functions on that cell.  There may be finite elements for
+ * which not all basis functions on a cell connect with each other,
+ * but no use of this case is made since no examples where this occurs
+ * are known to the author.
  *
  * When setting up sparsity patterns for matrices on the boundary, the same
  * procedure is done, except for the fact that the loop only goes over faces
@@ -92,40 +93,50 @@ class DoFTools
 
 				     /**
 				      * Locate non-zero entries for
-				      * mixed methods.
-				      * This function does mostly the same as
-				      * the other
-				      * #make_sparsity_pattern#, but
-				      * it is specialized for
-				      * mixed finite elements and allows to
-				      * specify which variables couple in which
-				      * equation. For example, if wanted to solve
-				      * the Stokes equations,
+				      * mixed methods.  This function
+				      * does mostly the same as the
+				      * other #make_sparsity_pattern#,
+				      * but it is specialized for
+				      * mixed finite elements and
+				      * allows to specify which
+				      * variables couple in which
+				      * equation. For example, if
+				      * wanted to solve the Stokes
+				      * equations,
+				      *
+				      *
 				      * \begin{verbatim}
-				      *    -\Delta \vec u + \nabla p = 0,
-				      *    \div u                    = 0
+				      * -\Delta \vec u + \nabla p = 0,
+				      * \div u                    = 0
 				      * \end{verbatim}
-				      * in, two space dimensions, using
-				      * stable Q2/Q1 mixed elements
-				      * (using the #FESystem# class), then
-				      * you don't want all degrees of freedom
-				      * to couple in each equation. You rather
-				      * may want to give the following pattern
-				      * of couplings:
+				      *
+				      * in two space dimensions,
+				      * using stable Q2/Q1 mixed
+				      * elements (using the #FESystem#
+				      * class), then you don't want
+				      * all degrees of freedom to
+				      * couple in each equation. You
+				      * rather may want to give the
+				      * following pattern of
+				      * couplings:
+				      *
 				      * \begin{verbatim}
-				      *    1  0  1
-				      *    0  1  1
-				      *    1  1  0
+				      *   1 0 1
+				      *   0 1 1
+				      *   1 1 0
 				      * \end{verbatim}
-				      * where "1" indicates that two variables
-				      * (i.e. components of the #FESystem#)
-				      * couple in the respective equation, and
-				      * a "0" means no coupling, in which case
-				      * it is not necessary to allocate space
-				      * in the matrix structure. Obviously, the
-				      * mask refers to components of the
-				      * composed #FESystem#, rather than to the
-				      * degrees of freedom contained in there.
+				      * where "1" indicates that two
+				      * variables (i.e. components of
+				      * the #FESystem#) couple in the
+				      * respective equation, and a "0"
+				      * means no coupling, in which
+				      * case it is not necessary to
+				      * allocate space in the matrix
+				      * structure. Obviously, the mask
+				      * refers to components of the
+				      * composed #FESystem#, rather
+				      * than to the degrees of freedom
+				      * contained in there.
 				      *
 				      * This function is designed to accept
 				      * a mask, like the one shown above,
@@ -141,24 +152,29 @@ class DoFTools
 				       SparseMatrixStruct          &sparsity_pattern);
 
     				     /**
-				      * Write the sparsity structure of the
-				      * matrix composed of the basis functions
-				      * on the boundary into the
-				      * matrix structure. The sparsity pattern
-				      * does not include entries introduced by
-				      * the elimination of constrained nodes.
-				      * The sparsity
-				      * pattern is not compressed, since if
+				      * Write the sparsity structure
+				      * of the matrix composed of the
+				      * basis functions on the
+				      * boundary into the matrix
+				      * structure. The sparsity
+				      * pattern does not include
+				      * entries introduced by the
+				      * elimination of constrained
+				      * nodes.  The sparsity pattern
+				      * is not compressed, since if
 				      * you want to call
 				      * #ConstraintMatrix::condense(1)#
-				      * afterwards, new entries have to be
-				      * added. However, if you don't want to call
-				      * #ConstraintMatrix::condense(1)#, you
-				      * have to compress the matrix yourself,
-				      * using #SparseMatrixStruct::compress()#.
+				      * afterwards, new entries have
+				      * to be added. However, if you
+				      * don't want to call
+				      * #ConstraintMatrix::condense(1)#,
+				      * you have to compress the
+				      * matrix yourself, using
+				      * #SparseMatrixStruct::compress()#.
 				      *
-				      * Since this function is obviously useless
-				      * in one spatial dimension, it is not
+				      * Since this function is
+				      * obviously useless in one
+				      * spatial dimension, it is not
 				      * implemented.
 				      */
     template<int dim>
@@ -177,19 +193,25 @@ class DoFTools
 				      * the boundary indicator is listed in the
 				      * set of numbers passed to this function.
 				      *
-				      * In fact, rather than a #set# of boundary
-				      * indicators, a #map# needs to be passed,
-				      * since most of the functions handling with
-				      * boundary indicators take a mapping of
-				      * boundary indicators and the respective
-				      * boundary functions. The boundary function,
-				      * however, is ignored in this function.
-				      * If you have no functions at hand, but only
-				      * the boundary indicators, set the function
-				      * pointers to null pointers.
+				      * In fact, rather than a #set#
+				      * of boundary indicators, a
+				      * #map# needs to be passed,
+				      * since most of the functions
+				      * handling with boundary
+				      * indicators take a mapping of
+				      * boundary indicators and the
+				      * respective boundary
+				      * functions. The boundary
+				      * function, however, is ignored
+				      * in this function.  If you have
+				      * no functions at hand, but only
+				      * the boundary indicators, set
+				      * the function pointers to null
+				      * pointers.
 				      *
-				      * Since this function is obviously useless
-				      * in one spatial dimension, it is not
+				      * Since this function is
+				      * obviously useless in one
+				      * spatial dimension, it is not
 				      * implemented.
 				      */
     template<int dim>
