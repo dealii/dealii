@@ -113,7 +113,7 @@ class DoFAccessor {
 /* -------------------------------------------------------------------------- */
 
 /**
- * This is a switch class which only declares a #typdef#. It is meant to
+ * This is a switch class which only declares a #typedef#. It is meant to
  * determine which class a #DoFObjectAccessor# class is to be derived
  * from. By default, #DoFObjectAccessor<celldim,dim># derives from
  * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
@@ -139,7 +139,7 @@ class DoFObjectAccessor_Inheritance
 
 
 /**
- * This is a switch class which only declares a #typdef#. It is meant to
+ * This is a switch class which only declares a #typedef#. It is meant to
  * determine which class a #DoFObjectAccessor# class is to be derived
  * from. By default, #DoFObjectAccessor<celldim,dim># derives from
  * the #typedef# in the general #DoFObjectAccessor_Inheritance<celldim,dim>#
