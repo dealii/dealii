@@ -75,6 +75,8 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
 };
 
 
+#if deal_II_dimension == 2
+
 template <>
 void
 HyperBallBoundary<2>::get_intermediate_points_on_line (
@@ -110,6 +112,7 @@ HyperBallBoundary<2>::get_intermediate_points_on_line (
     }
 }
 
+#endif
 
 
 template <int dim>
@@ -119,6 +122,38 @@ HyperBallBoundary<dim>::get_intermediate_points_on_line (
   vector<Point<dim> > &) const
 {
   Assert(false, ExcNotImplemented());
+}
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+HyperBallBoundary<3>::get_intermediate_points_on_quad (
+  const Triangulation<3>::quad_iterator &quad,
+  vector<Point<3> > &points) const
+{
+  Assert(points.size()==1, ExcNotImplemented());
+  StraightBoundary<3>::get_intermediate_points_on_quad (quad, points);
+  Point<3> &middle=points[0];
+  
+  middle -= center;
+				   // project to boundary
+  middle *= radius / sqrt(middle.square());
+  
+  middle += center;
+}
+
+#endif
+
+
+template <int dim>
+void
+HyperBallBoundary<dim>::get_intermediate_points_on_quad (
+  const Triangulation<dim>::quad_iterator &,
+  vector<Point<dim> > &) const
+{
+  Assert(false,ExcNotImplemented());
 }
 
 

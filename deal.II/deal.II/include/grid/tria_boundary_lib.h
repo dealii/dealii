@@ -70,6 +70,18 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				     vector<Point<dim> > &points) const;
 
 				     /**
+				      * Refer to the general documentation of
+				      * this class and the documentation of the
+				      * base class.
+				      *
+				      * Only implemented for @p{dim=3}
+				      * and for @p{points.size()==1}.
+				      */
+    virtual void
+    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				     vector<Point<dim> > &points) const;
+
+				     /**
 				      * Return the center of the ball.
 				      */
     Point<dim> get_center () const;
