@@ -996,7 +996,6 @@ class SparseDirectMA47 : public Subscriptor
 
 
 
-#ifdef HAVE_UMFPACK
 
 /**
  * This class provides an interface to the sparse direct solver UMFPACK (see
@@ -1016,6 +1015,8 @@ class SparseDirectMA47 : public Subscriptor
  */
 class SparseDirectUMFPACK : public Subscriptor
 {
+#ifdef HAVE_UMFPACK
+    
   public:
 				     /**
 				      * Constructor. See the
@@ -1144,9 +1145,9 @@ class SparseDirectUMFPACK : public Subscriptor
                                       * routines.
                                       */
     std::vector<double> control;
-};
 
 #endif
+};
 
 /*@}*/
 
