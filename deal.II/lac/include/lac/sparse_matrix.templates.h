@@ -1027,7 +1027,9 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
 
-  out.precision (precision);
+  std::ios::fmtflags old_flags = out.flags();
+  unsigned int old_precision = out.precision (precision);
+
   if (scientific)
     {
       out.setf (std::ios::scientific, std::ios::floatfield);
@@ -1051,9 +1053,9 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
     };
   AssertThrow (out, ExcIO());
 
-// see above
-
-//  out.setf (0, std::ios::floatfield);                 // reset output format
+				   // reset output format
+  out.precision(old_precision);
+  out.flags (old_flags);
 };
 
 

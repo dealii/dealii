@@ -1335,7 +1335,7 @@ void
 FullMatrix<number>::print_formatted (std::ostream       &out,
 				     const unsigned int  precision,
 				     const bool          scientific,
-				     const unsigned int  width,
+				     unsigned int  width,
 				     const char         *zero_string,
 				     const double        denominator) const
 {
@@ -1344,32 +1344,33 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 				   // set output format, but store old
 				   // state
   std::ios::fmtflags old_flags = out.flags();
+  unsigned int old_precision = out.precision (precision);
 
-  unsigned int actual_width = width;
   if (scientific)
     {
       out.setf (std::ios::scientific, std::ios::floatfield);
       if (!width)
-	actual_width = precision+7;
+	width = precision+7;
     } else {
       out.setf (std::ios::fixed, std::ios::floatfield);
       if (!width)
-	actual_width = precision+2;
+	width = precision+2;
     }
   
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
 	if (el(i,j) != 0)
-	  out << std::setw(actual_width)
+	  out << std::setw(width)
 	      << el(i,j) * denominator << ' ';
 	else
-	  out << std::setw(actual_width) << zero_string << ' ';
+	  out << std::setw(width) << zero_string << ' ';
       out << std::endl;
     };
 
   AssertThrow (out, ExcIO());
 				   // reset output format
+  out.precision(old_precision);
   out.flags (old_flags);
 };
 
