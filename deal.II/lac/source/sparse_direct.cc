@@ -243,6 +243,11 @@ namespace CommunicationsLog
 
   void list_communication () 
   {
+                                     // make sure only one thread is
+                                     // writing out at a time
+    static Threads::ThreadMutex write_lock;
+    write_lock.acquire ();
+    
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl
               << "Communiction log history:" << std::endl;
     
@@ -259,6 +264,8 @@ namespace CommunicationsLog
                 << i->description
                 << std::endl;
     std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
+
+    write_lock.release ();
   };  
 };
 
