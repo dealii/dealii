@@ -180,7 +180,7 @@ namespace deal_II_exceptions
 			     const char *function,
 			     const char *cond,
 			     const char *exc_name,
-			     ExceptionBase &         e)
+			     ExceptionBase &e)
     {
 				       // fill the fields of the
 				       // exception object
