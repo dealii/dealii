@@ -26,6 +26,8 @@
 #include <base/thread_manager.h>
 #endif
 
+#include <strstream>
+
 template <int dim>
 DataOut_DoFData<dim>::DataEntry::DataEntry (const Vector<double> *data,
 					    const vector<string> &names) :
@@ -95,20 +97,24 @@ template <int dim>
 void DataOut_DoFData<dim>::add_data_vector (const Vector<double> &vec,
 					    const string         &name)
 {
-//TODO: Guido fixes the following when string operators work properly
-// There was a problem with stringstreams (Linux, egcs1.2)
-//  unsigned int n = dofs->get_fe().n_components ();
-//    if (n > 1)
-//      {
-//        vector<string> names (dofs->get_fe().n_components ());
-//        for (unsigned int i=0;i<n;++i)
-//  	{
-//  	  names[i] = name + string("_");
-//  	}
-//    }
-  add_data_vector (vec, vector<string>(1,name));
-}
+  unsigned int n = dofs->get_fe().n_components ();
 
+  vector<string> names (1);
+  if (n > 1)
+    {
+      names.resize(dofs->get_fe().n_components ());
+      for (unsigned int i=0;i<n;++i)
+	{
+	  ostrstream namebuf;
+	  namebuf << name << '_' << i << ends;
+  	  names[i] = namebuf.str();
+  	}
+    } else {
+      names[0] = name;
+    }
+  
+  add_data_vector (vec, names);
+}
 
 
 
@@ -127,7 +133,7 @@ void DataOut_DoFData<dim>::clear ()
 				   // delete patches
   vector<DataOutBase::Patch<dim> > dummy;
   patches.swap (dummy);
-};
+}
 
 
 template <int dim>
