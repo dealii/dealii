@@ -1,4 +1,4 @@
-//----------------------------  petsc_vector.h  ---------------------------
+//----------------------------  petsc_parallel_vector.h  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  petsc_vector.h  ---------------------------
-#ifndef __deal2__petsc_vector_h
-#define __deal2__petsc_vector_h
+//----------------------------  petsc_parallel_vector.h  ---------------------------
+#ifndef __deal2__petsc_parallel_vector_h
+#define __deal2__petsc_parallel_vector_h
 
 #include <base/config.h>
 #include <base/exceptions.h>
@@ -182,7 +182,7 @@ namespace PETScWrappers
 
 #endif // DEAL_II_USE_PETSC
 
-/*----------------------------   petsc_vector.h     ---------------------------*/
+/*----------------------------   petsc_parallel_vector.h     ---------------------------*/
 
 #endif
-/*----------------------------   petsc_vector.h     ---------------------------*/
+/*----------------------------   petsc_parallel_vector.h     ---------------------------*/
