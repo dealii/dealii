@@ -128,7 +128,7 @@ class RightHandSide : public Function<dim>
 {
   public:
     virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const;
+			  const unsigned int  component = 0) const;
 };
 
 
@@ -138,7 +138,7 @@ class BoundaryValues : public Function<dim>
 {
   public:
     virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const;
+			  const unsigned int  component = 0) const;
 };
 
 
@@ -510,9 +510,9 @@ void LaplaceProblem<dim>::output_results ()
 				   // other values than 2 or 3, but we
 				   // neglect this here for the sake
 				   // of brevity).
-  ofstream output ((dim == 2 ?
-		    "solution-2d.gmv" :
-		    "solution-3d.gmv");
+  ofstream output (dim == 2 ?
+		   "solution-2d.gmv" :
+		   "solution-3d.gmv");
   data_out.write_gmv (output);
 };
 
@@ -580,10 +580,11 @@ int main ()
 				   // on just as before: define one of
 				   // these top-level objects and
 				   // transfer control to it:
-//  LaplaceProblem<2> laplace_problem_2d;
-//  laplace_problem_2d.run ();
+  LaplaceProblem<2> laplace_problem_2d;
+  laplace_problem_2d.run ();
 
-    LaplaceProblem<3> laplace_problem_3d;
-    laplace_problem_3d.run ();
+  LaplaceProblem<3> laplace_problem_3d;
+  laplace_problem_3d.run ();
+  
   return 0;
 };
