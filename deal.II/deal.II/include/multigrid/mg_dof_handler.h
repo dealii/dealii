@@ -1190,39 +1190,6 @@ template <>
 MGDoFDimensionInfo<2>::active_face_iterator
 MGDoFHandler<2>::last_active_face (const unsigned int) const;
 template <>
-MGDoFHandler<2>::raw_quad_iterator
-MGDoFHandler<2>::begin_raw_quad (const unsigned int) const;
-template <>
-MGDoFHandler<2>::quad_iterator
-MGDoFHandler<2>::begin_quad (const unsigned int) const;
-template <>
-MGDoFHandler<2>::active_quad_iterator
-MGDoFHandler<2>::begin_active_quad (const unsigned int) const;
-template <>
-MGDoFHandler<2>::raw_quad_iterator
-MGDoFHandler<2>::end_quad () const;
-template <>
-MGDoFHandler<2>::raw_quad_iterator
-MGDoFHandler<2>::last_raw_quad (const unsigned int) const;
-template <>
-MGDoFHandler<2>::quad_iterator
-MGDoFHandler<2>::last_quad (const unsigned int) const;
-template <>
-MGDoFHandler<2>::active_quad_iterator
-MGDoFHandler<2>::last_active_quad (const unsigned int) const;
-template <>
-MGDoFHandler<2>::raw_quad_iterator
-MGDoFHandler<2>::last_raw_quad () const;
-template <>
-MGDoFHandler<2>::raw_quad_iterator
-MGDoFHandler<2>::last_raw_quad () const;
-template <>
-MGDoFHandler<2>::quad_iterator
-MGDoFHandler<2>::last_quad () const;
-template <>
-MGDoFHandler<2>::active_quad_iterator
-MGDoFHandler<2>::last_active_quad () const;
-template <>
 MGDoFHandler<2>::raw_hex_iterator
 MGDoFHandler<2>::begin_raw_hex (const unsigned int) const;
 template <>
@@ -1313,69 +1280,6 @@ MGDoFHandler<3>::last_active_face () const;
 template <>
 MGDoFDimensionInfo<3>::active_face_iterator
 MGDoFHandler<3>::last_active_face (const unsigned int) const;
-template <>
-MGDoFHandler<3>::raw_quad_iterator
-MGDoFHandler<3>::begin_raw_quad (const unsigned int) const;
-template <>
-MGDoFHandler<3>::quad_iterator
-MGDoFHandler<3>::begin_quad (const unsigned int) const;
-template <>
-MGDoFHandler<3>::active_quad_iterator
-MGDoFHandler<3>::begin_active_quad (const unsigned int) const;
-template <>
-MGDoFHandler<3>::raw_quad_iterator
-MGDoFHandler<3>::end_quad () const;
-template <>
-MGDoFHandler<3>::raw_quad_iterator
-MGDoFHandler<3>::last_raw_quad (const unsigned int) const;
-template <>
-MGDoFHandler<3>::quad_iterator
-MGDoFHandler<3>::last_quad (const unsigned int) const;
-template <>
-MGDoFHandler<3>::active_quad_iterator
-MGDoFHandler<3>::last_active_quad (const unsigned int) const;
-template <>
-MGDoFHandler<3>::raw_quad_iterator
-MGDoFHandler<3>::last_raw_quad () const;
-template <>
-MGDoFHandler<3>::raw_quad_iterator
-MGDoFHandler<3>::last_raw_quad () const;
-template <>
-MGDoFHandler<3>::quad_iterator
-MGDoFHandler<3>::last_quad () const;
-template <>
-MGDoFHandler<3>::active_quad_iterator
-MGDoFHandler<3>::last_active_quad () const;
-template <>
-MGDoFHandler<3>::raw_hex_iterator
-MGDoFHandler<3>::begin_raw_hex (const unsigned int) const;
-template <>
-MGDoFHandler<3>::hex_iterator
-MGDoFHandler<3>::begin_hex (const unsigned int) const;
-template <>
-MGDoFHandler<3>::active_hex_iterator
-MGDoFHandler<3>::begin_active_hex (const unsigned int) const;
-template <>
-MGDoFHandler<3>::raw_hex_iterator
-MGDoFHandler<3>::end_hex () const;
-template <>
-MGDoFHandler<3>::raw_hex_iterator
-MGDoFHandler<3>::last_raw_hex (const unsigned int) const;
-template <>
-MGDoFHandler<3>::hex_iterator
-MGDoFHandler<3>::last_hex (const unsigned int) const;
-template <>
-MGDoFHandler<3>::active_hex_iterator
-MGDoFHandler<3>::last_active_hex (const unsigned int) const;
-template <>
-MGDoFHandler<3>::raw_hex_iterator
-MGDoFHandler<3>::last_raw_hex () const;
-template <>
-MGDoFHandler<3>::hex_iterator
-MGDoFHandler<3>::last_hex () const;
-template <>
-MGDoFHandler<3>::active_hex_iterator
-MGDoFHandler<3>::last_active_hex () const;
 
 /*----------------------------   mg_dof.h     ---------------------------*/
 
