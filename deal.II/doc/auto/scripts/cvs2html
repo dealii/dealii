@@ -1,0 +1,1535 @@
+#!/usr/bin/perl
+#
+# Perl program to transform the 'cvs log' output to something decend.
+# cvs2html can be used for any type of cvs archive.
+#
+# ** Note that the first line might be wrong depending **
+# ** on the location of your perl program.             **
+# ** The program requires:                             **
+# **             perl version 5.003                    **
+#
+# cvs2html should run on any Unix compatible machine
+# with the above programs. 
+# Test machine: Linux RedHat 5.0 with Perl 5.004
+#
+# Usage :
+#
+#  type cvs2html with no arguments to display basic help
+#  or type cvs2html -h to get more help
+
+# 1.39 1998-04-20  Tim Bradshaw          Problem with odd CVSROOT 
+#                                        construction
+#                  Peter Toft and        Limit number of crono log
+#                  Henrik Carlquist      lines by using new -N Option
+#                                        + color in crono log now gray.
+#
+# 1.40 1998-05-31  Curtis L. Olson       Remove subdirs that are not 
+#                                        under CVS control
+#
+# 1.41 1998-06-14  Peter Toft and        Remove subdirs that are not
+#                  Curtis L. Olson       under CVS control - one more place
+#                  Aubrey Jaffer         If special characters like '<' '>'
+#                                        are in the log message then they
+#                                        was not shown. Bugfix!
+#
+# 1.42 1998-06-22  Tim Bradshaw          Make the find command an option. 
+#
+# 1.43 1998-98-25  Peter Toft            Minor cleanup and changes in the
+#                                        handling of our mailing list.
+#
+# 1.44 1998-10-11  Michael Krause        Michael removed the calls to find
+#                                        and other GNU utils. Now it 
+#                                        is a pure Perl program!
+#                  Peter Toft            Bugfix, that the crono-log file
+#                                        is not shown in left column if 
+#                                        single dir.
+#
+# 1.45 1998-10-11  Peter Toft            Bug in the way the cronological
+#                                        log file was sorting the entries.
+#
+# 1.46 1998-10-25  Peter Toft            Help added regarding -s option.
+#                                        Added -C option to do reverse 
+#                                        sort of the cronological log file.
+#                                        Bug in comment corrected.
+#                                        Added time stamp to the log files
+#                                        to show when this HTML pages were
+#                                        made.
+#
+# 1.47 1998-11-01  Peter Toft            Bug fix: Error in the way the 
+#                                        crono log worked. Wrong indices.
+#
+# 1.48 1998-11-01  Peter Toft            Added a -r option so you can select
+#                                        crono log output between two 
+#                                        revisions.
+# ---- ----------  --------------------  -------------------------------
+#
+# This program is protected by the GPL, and all modifications of
+# general interest must be emailed to the cvs2html@sslug.dk
+# or to Peter Toft.
+#
+# Other people that have contributed directly or indirectly to cvs2html
+#  Henner Zeller <zeller@think.de>
+#  Henning Niss <hniss@diku.dk>
+#  Henrik Carlquist <Henrik.Carlqvist@dynamics.saab.se>
+#  Tim Bradshaw <tfb@aiai.ed.ac.uk>
+#  David Miller
+#  Finn Aarup Nielsen <fn@imm.dtu.dk>
+#  Michael Krause <mkrause@teuto.net>
+#  Edward S. Marshall <emarshal@logic.net>
+#  Curtis L. Olson <curt@me.umn.edu>
+#  Aubrey Jaffer <jaffer@colorage.com>
+#
+# Copyright under GPL 1997,1998 by
+# Peter Toft (pto@sslug.dk) + the persons above
+#
+# Join the cvs2html mailing list by sending an email to
+# sslug-cvs2html-subscribe@sslug.dk, the contents of this mails
+# is of no matter. You will receive an email than you need to 
+# reply to.
+#
+# If you want to unsubscribe from the list - write a mail to
+# sslug-cvs2html-unsubscribe@sslug.dk, and reply to the mail you get.
+# 
+# The URL of cvs2html is:
+
+$URL = "http://www.sslug.dk/cvs2html";
+
+# $Id$
+
+require 'getopts.pl';
+require 'ctime.pl';
+
+use File::Basename;
+use File::Find;
+
+$v = '$Revision$';
+
+($dummy,$version) = $v =~ /^\$(\w+): (.*) \$$/;
+
+###############################################################
+# Default variables that you can change
+###############################################################
+
+# Default width of the left frame in pixels. Also changed by -w option
+$leftframewidth = 150;
+
+# Default splitratio of the left frame in percent. Also changed by -s option
+$leftsplitratio = "80%";
+
+# Border of Frames
+$frameborder = "4";
+# Default cell color
+$cellcolor = "#c7c7c7";
+
+# Default filename cell color
+$filenamecellcolor = "#7777FF";
+
+# Default background color gray
+$backcolor = "#AAAAAA";
+
+# Default background for the difference cells
+$differencebackground = "#AABBAA";
+
+# Get the options. The ones with a colon means the an extra argument follows.
+&Getopts('r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:');
+
+# Colors and font to show the diff type of code changes when using -a
+$diffcolorHeading='#909090';  # color of 'Line'-heading of each diffed file
+$diffcolorEmpty  ='#909090';  # color of 'empty' lines
+$diffcolorRemove ='#FF5555';  # Removed line(s) (left)  (empty)
+$diffcolorChange ='#55FF55';  # Added line(s)   (empty) (right)
+$diffcolorDarkChange ='#55AA55';  # lines, which are empty on the left/right
+$diffcolorAdd    ='#5555FF';  # Changed line(s) (     both    )
+$difffontface    ="Arial,Helvetica";
+$difffontsize    ="-1";
+
+# Set $kkon ="-kk" if you permanently want to hide keyword substitutions
+# when making diff-files.
+$kkon = "";
+
+# Set $whitespace = "-w" if you want to ignore white space changes
+# in diff
+$whitespace="-w";
+
+###############################################################
+# Subfunctions
+###############################################################
+
+#function to help sort
+sub sorter{
+  $cronotimesince0[$a] <=> $cronotimesince0[$b];
+}
+
+#Function to close the main file
+sub closemainfile {
+  # Print date info in the last part of the HTML document
+  print OUTFILE "<hr width=100%>\n";
+  print OUTFILE "<font size=2>\n";
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  print OUTFILE "<p>File made using version $version of ";
+  print OUTFILE "<a href=\"$URL\" target=\"_top\">cvs2html</a> by ";
+
+  printf OUTFILE "%s at %2d-%02d-%02d %2d:%02d  $revisionlimitertext",getlogin,  $year, $mon+1, $mday,$hour,$min;
+  if ($cutdate>"00000000")
+  {
+    printf OUTFILE " leaving out any log message prior to $cutyearformat2";
+  }
+  if (($opt_n>0) && ($opt_a))
+  {
+    printf OUTFILE " and only showing the $opt_n latest version differences";
+  }
+
+  # Lets wrap up OUTFILE
+  print OUTFILE "\.</font></p>\n";
+  print OUTFILE "</body>\n";
+  print OUTFILE "</html>\n";
+
+  close(OUTFILE);
+}
+
+# Function to show how the function is used. Called if no options are given.
+sub shorthelp {
+  print "*** CVS2HTML ***\nA Perl program to transform the 'cvs log' output to HTML.\n";
+
+  print "Usage of cvs2html\n\n";
+  print "cvs2html [-a [-b][-k]] [-n NUMDIF] [-l FTPHOME] [-L FTPHOME -E EXTENSION]\n";
+  print "         [-e] [-f] [-d \"MMM DD [YYYY]\"] [-D DD]  [-h]\n";
+  print "         [-v] [-w FRAMEWIDTH] [-s PERCENTAGE] [-N MAXCRONO]\n";
+  print "         [-rREV1:REV2] [-c/-C CFILENAME] -O/o HTMLNAME\n";
+}
+
+sub showhelp {
+  print "\n";
+
+  print " cvs2html -O foo\n";
+  print " outputs html files foo.html and alike for each subdirectory\n";
+  print " Note that if foo is a directory the files are stored there\n";
+  print " using the name of the repository as the base filename.\n";
+  print "\n";
+
+  print " cvs2html -O foo -v\n";
+  print " which outputs a html file to the file foo.html including\n";
+  print " information about the CVSROOT setting.\n";
+  print " Using -o instead of -O, frames will be made for easy control.\n";
+  print "\n";
+
+  print " If -e is specified the log messages are printed\n";
+  print " in courier (non-proportional) font.\n";
+  print "\n";
+
+  print " If -c CFILENAME is specified a cronological sorted list of all log\n";
+  print " entries will be saved in CFILENAME (CFILENAME is a full html filename)\n";
+  print " Use -C CFILENAME instead of -c to do reverse sort of the log file.\n\n";
+
+  print " If -a is specified additional fields and files are generated\n";
+  print " containing differences betweeen versions\n";
+  print " in a xdiff-like side by side manner.\n";
+  print " The -n NUMDIF will only output the lastest NUMDIF diff files\.n";
+  print " The -N MAXCRONO will only show thw last MAXCRONO file changes\n";
+  print " in the cronological list of changes.\n";
+  print "\n";
+
+  print " if -b is specified in addition to diff-mode\n";
+  print " spcaces are used as breakpoint to wrap the text\n";
+  print " so the two columns don't exceed the total width\n";
+  print " If -k is specified in addition to diff-mode\n";
+  print " changes in lines caused by CVS-keyword substition\n";
+  print " are ignored.\n";
+
+  print " If an option -l ftphome is given links to the files relative\n";
+  print " to the URL ftphome is made. Add -F ftphtmlhome to do the same but\n";
+  print " substitutes file extension with .html (-l and -L works together)\n";
+  print " and -L requires that the -E option is used.\n";
+
+  print " If an option -d \"month day year\" is given (year optional) any\n";
+  print " log message prior to that date is omitted. The three first \n";
+  print " letters of the name of the month is used, e.g., Jun 5.\n";
+  print " A -D DD option will drop any log DD days ago or earlier\n";
+  print "\n";
+
+  print " If an option -rREVISIONTAG1:REVISIONTAG2 is given, then\n";
+  print " the log messages are only shown between those revision\n";
+  print " REVISIONTAG1 and REVISIONTAG2. If a file was not tagged\n";
+  print " then the whole revision story of the file will be shown.\n";
+  print "\n";
+
+  print " If -o and -w FRAMEWIDTH is used the left frame will have\n";
+  print " FRAMEWIDTH pixels. Add -f when using the -o option to \n";
+  print " generate individual log files for each file.\n";
+  print " Use -s Number/Percentage to change the fraction of the left\n";
+  print " bar in eigher pixels or percentage.\n\n";
+
+  print " The html file also contains anchors, if a file foo.html\n";
+  print " containing a file e.g., foofoo.m is generated then it is\n";
+  print " possible to search http://CORRECT_URL/foo.html#foofoo.m\n";
+  print "\n";
+
+  print " Example :\n";
+  print " cvs2html -l ftp://eivind.imm.dtu.dk/pub/utils -D 5 -c crono.html \\";
+  print " -v -o ~/utils.html\n";
+  print " makes ~/utils.html with log data for the 5 most recent days.\n";
+  print " with links relative to ftp://eivind.imm.dtu.dk/pub/utils\n";
+  print " and makes the cronological log file.\n\n";
+
+  print " cvs2html with no arguments displays this help\n";
+  print " Peter Toft et al, Technical University of Denmark, 1997\n";
+  exit(0);
+}
+
+# This function will set the date after which the log info is shown.
+# Any log info before the date is NOT shown.
+sub date_control
+{
+  %months= (
+            'Jan','01',
+            'Feb','02',
+            'Mar','03',
+            'Apr','04',
+            'May','05',
+            'Jun','06',
+            'Jul','07',
+            'Aug','08',
+            'Sep','09',
+            'Oct','10',
+            'Nov','11',
+            'Dec','12',
+            );
+
+
+  &ctime(time) =~/^(\w+) (\w+) (\d+) (\d+):(\d+):(\d+) (\d+)$/;
+
+  $currentyear=$7;
+
+  if (($opt_d)||($opt_D)) {
+    if ($opt_d) {
+      ($cutmonthtxt,$cutdatetxt,$cutyeartxt)= $opt_d =~ /^(\w+) (\d+) (\d+)$/;
+    }
+    if ($opt_D)
+    {
+      $cd = localtime(time-3600*24*$opt_D);
+      $cd =~ /^(\w+) (\w+)[ ]*(\d+)[ ]*(\d+):(\d+):(\d+) (\d+)$/;
+      $cutyeartxt = $7;
+      $cutmonthtxt = $2;
+      $cutdatetxt = $3;
+    }
+
+    if (length($cutyeartxt)==0)
+    {
+      ($cutmonthtxt,$cutdatetxt)= $opt_d =~ /^(\w+) (\d+)$/;
+      $cutyeartxt=$currentyear;
+    }
+    $cutyearformat2="$cutmonthtxt $cutdatetxt $cutyeartxt";
+
+    if (length($cutdatetxt)==1)
+    {
+      $cutdatetxt="0".$cutdatetxt;
+    }
+    $m=$months{$cutmonthtxt};
+    if (length($m)==0)
+    {
+      print "The option -d \"month day [year]\" was used with a wrong month ($cutmonthtxt).\n";
+      print "First three letters is used\n";
+      exit(0);
+    }
+    $cutdate = $cutyeartxt.$m.$cutdatetxt;
+  }
+  else
+  {
+    $cutdate = "00000000";
+  }
+  # Anything before year 0000 - I dont think so...........
+}
+
+# Function to read the next line from cvslogarray
+sub getnextline
+{
+  $lineno++;
+  $cvslogarray[$lineno];
+}
+
+sub flush_diff_rows ($$$$)
+{
+    local $j;
+    my ($leftColRef,$rightColRef,$leftRow,$rightRow) = @_;
+    if ($state eq "PreChangeRemove") {          # we just got remove-lines before
+      for ($j = 0 ; $j < $leftRow; $j++) {
+          print DIFFFILE "<tr><td bgcolor=\"$diffcolorRemove\">@$leftColRef[$j]</td>";
+          print DIFFFILE "<td bgcolor=\"$diffcolorEmpty\">&nbsp;</td></tr>\n";
+      }
+    }
+    elsif ($state eq "PreChange") {             # state eq "PreChange"
+      # we got removes with subsequent adds
+      for ($j = 0; $j < $leftRow || $j < $rightRow ; $j++) {  # dump out both cols
+          print DIFFFILE "<tr>";
+          if ($j < $leftRow) { print DIFFFILE "<td bgcolor=\"$diffcolorChange\">@$leftColRef[$j]</td>"; }
+          else { print DIFFFILE "<td bgcolor=\"$diffcolorDarkChange\">&nbsp;</td>"; }
+          if ($j < $rightRow) { print DIFFFILE "<td bgcolor=\"$diffcolorChange\">@$rightColRef[$j]</td>"; }
+          else { print DIFFFILE "<td bgcolor=\"$diffcolorDarkChange\">&nbsp;</td>"; }
+          print DIFFFILE "</tr>\n";
+      }
+    }
+}
+# Function to generate diff-files
+sub generate_diff_file
+{
+  local ( $ii,$difftxt,@diffar );
+  $diffname = "$outdirname".'/'."$filename$convdir\_diff\_$oldrevnumber\_$revnumber.html";
+  @listhtmlnames = (@listhtmlnames,$diffname);
+  open(DIFFFILE,">$diffname") or die "Error: Could not open ; $diffname";
+  print DIFFFILE "<html>\n<head>\n<title>CVS diff $filename $convdir</title>\n</head>\n";
+  print DIFFFILE "<BODY BGCOLOR=\"$backcolor\">\n";
+  if ($opt_k) {
+      $kkon = "-kk";
+  }
+  @diffar = `cvs diff $kkon $whitespace -u -r $revnumber -r $oldrevnumber $currentdir/$filename\n`;
+  print DIFFFILE "<h2>Difference for $currentdir/$filename from version $revnumber to $oldrevnumber</h2>\n";
+
+  print DIFFFILE "<table border=0 cellspacing=0 cellpadding=0 width=100%>\n";
+  print DIFFFILE "<tr bgcolor=#ffffff><th width=\"50%\">version $revnumber</th><th witdh=\"50%\">version $oldrevnumber</th></tr>";
+
+  $fs="<font face=\"$difffontface\" size=\"$difffontsize\">";
+  $fe="</font>";
+
+  $leftRow = 0;
+  $rightRow = 0;
+
+# the first 8 lines are garbage for us
+  for ($ii=8;$ii<=$#diffar;$ii++) {
+      chop($difftxt = $diffar[$ii]);
+      if ($difftxt =~ /^@@/) {
+        ($oldline,$newline) = $difftxt =~ /@@ \-([0-9]+).*\+([0-9]+).*@@/;
+        print DIFFFILE "<tr bgcolor=\"$diffcolorHeading\"><td width=\"50%\">";
+        print DIFFFILE "<table width=100% border=1 cellpadding=5><tr><td><b>Line $oldline</b></td></tr></table>";
+        print DIFFFILE "</td><td width=\"50%\">";
+        print DIFFFILE "<table width=100% border=1 cellpadding=5><tr><td><b>Line $newline</b></td></tr></table>";
+        print DIFFFILE "</td><tr>\n";
+        $state = "dump";
+        $leftRow = 0;
+        $rightRow = 0;
+      }
+      else {
+        ($diffcode,$rest) = $difftxt =~ /^([-+ ])(.*)/;
+        $_= $rest;
+########
+# quote special characters
+# according to RFC 1866,Hypertext Markup Language 2.0,
+# 9.7.1. Numeric and Special Graphic Entity Set
+# (Hen)
+#######
+          s/&/&amp;/g;
+          s/\"/&quot;/g;
+          s/</&lt;/g;
+          s/>/&gt;/g;
+
+          # replace <tab> and <space>
+          if ($opt_b) {
+              # make every other space 'breakable'
+              s/        /&nbsp; &nbsp; &nbsp; &nbsp; /g;    # <tab>
+              s/   /&nbsp; &nbsp;/g;                        # 3 * <space>
+              s/  /&nbsp; /g;                               # 2 * <space>
+              # leave single space as it is
+          }
+          else {
+              s/        /&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/g;
+              s/ /&nbsp;/g;
+          }
+
+          # Add fontface, size
+          $_ = "$fs&nbsp;$_$fe";
+
+          #########
+          # little state machine to parse unified-diff output (Hen, zeller@think.de)
+          # in order to get some nice 'ediff'-mode output
+          # states:
+          #  "dump"             - just dump the value
+          #  "PreChangeRemove"  - we began with '-' .. so this could be the start of a 'change' area or just remove
+          #  "PreChange"        - okey, we got several '-' lines and moved to '+' lines -> this is a change block
+          ##########
+
+          if ($diffcode eq '+') {
+              if ($state eq "dump") {  # 'change' never begins with '+': just dump out value
+                  print DIFFFILE "<tr><td bgcolor=\"$diffcolorEmpty\">&nbsp;</td><td bgcolor=\"$diffcolorAdd\">$_</td></tr>\n";
+              }
+              else {                   # we got minus before
+                  $state = "PreChange";
+                  $rightCol[$rightRow++] = $_;
+              }
+          }
+          elsif ($diffcode eq '-') {
+              $state = "PreChangeRemove";
+              $leftCol[$leftRow++] = $_;
+        }
+        else {  # empty diffcode
+            flush_diff_rows \@leftCol, \@rightCol, $leftRow, $rightRow;
+              print DIFFFILE "<tr><td>$_</td><td>$_</td></tr>\n";
+              $state = "dump";
+              $leftRow = 0;
+              $rightRow = 0;
+          }
+      }
+  }
+  flush_diff_rows \@leftCol, \@rightCol, $leftRow, $rightRow;
+  print DIFFFILE "</table>";
+
+  # print legend
+  print DIFFFILE "<br><hr width=100%><table border=1><tr><td>";
+  print DIFFFILE "Legend:<br><table border=0 cellspacing=0 cellpadding=1>\n";
+  print DIFFFILE "<tr><td align=center bgcolor=\"$diffcolorRemove\">Removed in v.$revnumber</td><td bgcolor=\"$diffcolorEmpty\">&nbsp;</td></tr>";
+  print DIFFFILE "<tr bgcolor=\"$diffcolorChange\"><td align=center colspan=2>changed lines</td></tr>";
+  print DIFFFILE "<tr><td bgcolor=\"$diffcolorEmpty\">&nbsp;</td><td align=center bgcolor=\"$diffcolorAdd\">Added in v.$oldrevnumber</td></tr>";
+  print DIFFFILE "</table></td></tr></table>\n";
+
+  print DIFFFILE "<br><hr width=100\%><br>Made by ",getlogin;
+  print DIFFFILE " using version $version of ";
+  print DIFFFILE "<a href=\"$URL\" target=\"_top\">cvs2html</a>\n";
+
+  print DIFFFILE "</body>\n</html>\n";
+  close(DIFFFILE);
+}
+
+sub find_alldirs {
+  my @dirs = ();
+  find(
+       sub {
+         if (-d && ! /CVS$/) {
+           if ($File::Find::dir eq "." && $_ eq ".") {
+             push @dirs, "./";
+           } 
+           else {
+             push @dirs, "$File::Find::dir/$_";
+           }
+         }
+       }, '.'
+    );
+
+  @dirs = map { $_ . "\n" } @dirs;
+
+  return @dirs;
+}   
+
+sub find_subdirs {
+  my $currentdir = shift;
+  
+  my @dirs = ();
+  finddepth(
+            sub {
+              if (-d && ! /CVS$/ && $File::Find::dir eq $currentdir) {
+                if ( ! ($File::Find::dir eq $currentdir && $_ eq ".") ) {
+                  push @dirs, "$File::Find::dir/$_";
+                }
+              }
+            }, $currentdir
+  );
+
+  @dirs = map { $_ . "\n" } @dirs;
+
+  return @dirs;
+}
+
+#############################################################
+# Lets set up the basics
+#############################################################
+
+# Always enforce restrictions on dates. If no date is given
+# a very early one is used.
+date_control;
+
+# Set the width of the left frame.
+# Default value has been set above.
+if ($opt_w)
+{
+  $leftframewidth = $opt_w;
+}
+
+# Set the splitratio of the left frame.
+# Default value has been set above.
+if ($opt_s)
+{
+  $leftsplitratio = $opt_s;
+}
+
+# I want help!
+if ($opt_h)
+{
+  shorthelp;
+  showhelp;
+  exit(0);
+}
+
+# The user must give a filename for the HTML-file(s)
+if ((!(($opt_O) || ($opt_o))) || (($opt_O) && ($opt_o)))
+{
+  shorthelp;
+  print "\nMade by Peter Toft (pto\@sslug.dk).\ncvs2html is Protected by the GPL.\n";
+  exit(0);
+}
+
+$docrono="";
+if($opt_c)
+{
+  $docrono=$opt_c;
+}
+if($opt_C)
+{
+  $docrono=$opt_C;
+}
+
+
+# Is -c followed by a "valid" filename ?
+if (length($docrono)>5)
+{
+  $cronooutname = $docrono;
+}
+else
+{
+  $cronooutname = "cvs2html_crono_log.html";
+}
+
+# Want to write to a file with frames?
+if ($opt_o)
+{
+  $frames = 1;
+  $outname = $opt_o;
+}
+
+# Do you want to limit to certain revisions
+$revisionlimiter="";
+$revisionlimitertext="";
+if ($opt_r)
+{
+  $revisionlimiter = "-r".$opt_r;
+  $revisionlimitertext=" and only showing data between revisions $opt_r";
+}
+
+# Want to write to a file without frames?
+if ($opt_O)
+{
+  $frames = 0;
+  $outname = $opt_O;
+}
+
+$linkrel = "";
+# Want to link to external file
+if ($opt_l)
+{
+  $linkrel=$opt_l;
+}
+
+# Want to link to external file
+if (($opt_L) && ($opt_E))
+{
+  $htmllinkrel=$opt_L;
+}
+
+# Get the environment variable CVSROOT for this CVS repository
+open(INFILE,"<./CVS/Root") or die "Eror: The file ./CVS/Root is missing.";
+($fullcvsroot) = <INFILE> =~/^(.*)$/;
+close INFILE;
+
+# Split CVSROOT in machine and dir if possible.
+@spl = split(':',$fullcvsroot);
+if ($#spl == 3) {
+# @spl[0] is empty because client/server root starts with ':' -> :pserver
+    $protocol =$spl[1]; # client/server
+    $machine = $spl[2];
+    $cvsroot = $spl[3];
+}
+elsif ($#spl == 1) {
+    $protocol = "rsh/ssh";
+    $machine = $spl[0];
+    $cvsroot = $spl[1];
+}
+else {
+    $protocol = "local";
+    $machine =  "localhost";
+    $cvsroot = $spl[0];
+}
+
+# Get the name of the repository
+open(INFILE,"<./CVS/Repository")  or die "Eror: The file ./CVS/Repository is missing."; ;
+
+($rootdir) = <INFILE> =~/^\Q$fullcvsroot\E(.*)$/;
+close INFILE;
+
+
+# Strip a .html from the outname if any (pasted on later)
+($outnamem) = $outname =~ /^(.*).html$/;
+if (length($outnamem)>0)
+{
+  $outname = $outnamem;
+}
+
+
+# If an outputname is a directory a file named after the repository
+# is generated (and others if using frames).
+if (-d $outname)
+{
+  $outname = $outname.$rootdir;
+}
+
+# Split the outname from a possible directory full path
+$outfilename = basename ($outname);
+$outdirname = dirname ($outname);
+
+# Get all dirs to search
+@entirealldirs = find_alldirs();
+
+# Only pass along subdirectories that are under version control
+@alldirs = ();
+foreach $dir (@entirealldirs) {
+    chop($dir);
+    # print "$dir\n";
+    if ( -d "$dir/CVS" ) {
+        print "$dir\n";
+        push(@alldirs, "$dir\n");
+    }
+}
+
+if ($frames == 1)
+{
+  # Write the start of the left lower frame if more than one dir
+  if (($#alldirs > 0) || ($docrono))
+  {
+    $llname = $outdirname.'/'.$outfilename."__lfl.html";
+    open(OUTFILE3,">$llname") or die "Error: The file $llname could not be opened.";
+    @listhtmlnames = (@listhtmlnames,$llname);
+    print OUTFILE3 "<html>\n";
+    print OUTFILE3 "<title>CVS</title>\n";
+    print OUTFILE3 "<BODY BGCOLOR=\"$backcolor\">\n";
+
+    if ($docrono)
+    {
+      print OUTFILE3 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+      print OUTFILE3 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+      $coutref = $outdirname."/".$cronooutname;
+      print OUTFILE3 '<tr><td><a href="'.$cronooutname.'" target="rf"><FONT SIZE="-1">Cronological Log'."</font></a></td></tr>\n";
+      print OUTFILE3 "</TABLE><br>\n";
+    }
+
+    print OUTFILE3 "<h3 align=center>Dirs</h3>\n";
+    print OUTFILE3 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+    print OUTFILE3 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+
+    for ($ii=0;$ii<=$#alldirs;$ii++)
+    {
+      $alldirs[$ii] =~ /^\.(.*)$/;
+      $dir = $1;
+      $showdir = "[$rootdir]$dir";
+      $refname = $dir;
+
+      $refname =~ tr/\//_/;
+
+      if (length($refname) == 1)
+      {
+        $refname = $outfilename;
+      }
+      else
+      {
+        $refname = $outfilename.$refname;
+      }
+      print OUTFILE3 '<tr><td><a href="'.$refname.'.html" target="_top"><FONT SIZE="-1">'.$showdir."</font></a></td></tr>\n";
+    }
+    print OUTFILE3 "</TABLE><br>\n";
+
+    print OUTFILE3 "</font>\n";
+    print OUTFILE3 "</body>\n";
+    print OUTFILE3 "</html>\n";
+
+    close(OUTFILE3);
+  }
+}
+
+if ($docrono)
+{
+  $cronocounter = -1;
+  @cronoindex=();
+  @cronoauthor=();
+  @crononame=();
+  @cronotimesince0=();
+  @cronoversion=();
+  @cronoshowtime=();
+  @cronolinknames=();
+}
+
+#############################################################
+# Lets go for each of the directories
+#############################################################
+for ($dd=0;$dd<=$#alldirs;$dd++)
+{
+  # Initialization
+  @otherdnames = ();
+  $lineno = -1;
+  $foundbadone = 0;
+  $fnumber = 1;
+
+  # Where are we ?
+  # $convdir is the current dir where all / are converted to _
+  ($currentdir) = $alldirs[$dd] =~ /^\.\/(.*)$/;
+  $convdir = $currentdir;
+  $convdir =~ tr/\//_/;
+  if (length($currentdir)==0)
+  {
+    $currentdirformat2 ="";
+    $currentdir='.';
+    $convdir = "";
+  }
+  else
+  {
+    $currentdirformat2 = $currentdir."/";
+    $convdir = '_'.$convdir;
+  }
+  print "Processing $currentdir\n";
+
+  @entiresubdirs = find_subdirs($currentdir);
+ 
+  @subdirs = ();
+  foreach $dir (@entiresubdirs) {
+    chop($dir);
+    # print "$dir\n";
+    if ( -d "$dir/CVS" ) {
+        push(@subdirs, "$dir\n");
+      }
+  }
+
+  if ($frames == 1)
+  {
+      $llname = $outdirname.'/'.$outfilename.$convdir."__lfl.html";
+      open(OUTFILE3,">$llname") or die "Error: The file $llname could not be opened.";
+      @listhtmlnames = (@listhtmlnames,$llname);
+      print OUTFILE3 "<html>\n";
+      print OUTFILE3 "<title>CVS</title>\n";
+      print OUTFILE3 "<BODY BGCOLOR=\"$backcolor\">\n";
+
+      if ($docrono)
+      {
+          print OUTFILE3 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+          print OUTFILE3 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+          $coutref = $outdirname."/".$cronooutname;
+          print OUTFILE3 '<tr><td><a href="'.$cronooutname.'" target="rf"><FONT SIZE="-1">Cronological Log'."</font></a></td></tr>\n";
+          print OUTFILE3 "</TABLE><br>\n";
+      }
+
+      if ($#subdirs>=0) {
+        print OUTFILE3 "<h3 align=center>Sub Dirs</h3>\n";
+        print OUTFILE3 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+        print OUTFILE3 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+        
+        if($currentdir eq '.')
+        {
+          # No parent directory to top
+        }
+        else
+        {
+          $showdir = ".. Parent Dir";
+          $up = dirname ($currentdir) . "\n";
+          if ($up eq ".\n")
+          {
+            $refname = "/";
+          }
+          else
+          {
+            $refname = "/$up";
+          }
+          
+          $refname =~ tr/\//_/;
+          
+          if (length($refname) == 1)
+          {
+            $refname = $outfilename;
+          }
+          else
+          {
+            $refname = $outfilename.$refname;
+          }
+          print OUTFILE3 '<tr><td><a href="'.$refname.'.html" target="_top"><FONT SIZE="-1">'.$showdir."</font></a></td></tr>\n";
+        }
+        for ($ii=0;$ii<=$#subdirs;$ii++)
+        {
+          $subdirs[$ii] =~ /^\.(.*)$/;
+          $dir = $1;
+          $up = dirname ($subdirs[$ii]) . "\n";
+          $up = basename ($up) . "\n";
+          $down = basename ($subdirs[$ii]) . "\n";
+          $dir = "/$down";
+          if ($up eq ".\n")
+          {
+            $showdir = "[$rootdir]$dir";
+          }
+          else
+          {
+            $showdir = "[$up]$dir";
+          }
+          
+          if($currentdir eq '.')
+          {
+            $refname = $dir;
+          }
+          else
+          {
+            $refname = "/$currentdir$dir";
+          }
+          
+          $refname =~ tr/\//_/;
+          
+          if (length($refname) == 1)
+          {
+            $refname = $outfilename;
+          }
+          else
+          {
+            $refname = $outfilename.$refname;
+          }
+          chop($refname);
+          print OUTFILE3 '<tr><td><a href="'.$refname.'.html"  target="_top"><FONT SIZE="-1">'.$showdir."</font></a></td></tr>\n";
+        }
+        print OUTFILE3 "</TABLE><br>\n";
+        
+      }
+      print OUTFILE3 "</body>\n";
+      print OUTFILE3 "</html>\n";
+
+
+      close(OUTFILE3);
+  }
+
+  # Should the output have frames then make left lower frame.
+  if ($frames == 1)
+  {
+    # Write the start of the left upper frame
+    $luname = $outdirname.'/'.$outfilename.$convdir."__lfu.html";
+    open(OUTFILE2,">$luname") or die "Error: The file $luname could not be opened.";
+    @listhtmlnames = (@listhtmlnames,$luname);
+    print OUTFILE2 "<html>\n";
+    print OUTFILE2 "<title>CVS</title>\n";
+    print OUTFILE2 "<BODY BGCOLOR=\"$backcolor\">\n";
+    print OUTFILE2 "<h3 align=center>Log history</h3>\n";
+    print OUTFILE2 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+    print OUTFILE2 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+
+  }
+
+  # Should the output have frames ?
+  if ($frames == 1)
+  {
+    # Write the start of the main html file
+    $mainname = $outdirname.'/'.$outfilename.$convdir.".html";
+    open(OUTFILE4,">$mainname") or die "Error: The file $mainname could not be opened.";
+    @listhtmlnames = (@listhtmlnames,$mainname);
+    print OUTFILE4 "<html>\n";
+    print OUTFILE4 "<head><title>CVS2HTML</title></head>\n";
+    print OUTFILE4 "<frameset cols=\"$leftframewidth,*\" border=\"$frameborder\">\n";
+    # only do the left lower frame if subdirs found
+
+    if (($#alldirs > 0)  || ($docrono))
+    {
+      print OUTFILE4 "<frameset rows=\"".$leftsplitratio.",*\" border=\"$frameborder\">\n";
+      print OUTFILE4 "<frame scrolling=auto src=\"".$outfilename.$convdir."__lfu.html\" name=\"lfu\">\n";
+      print OUTFILE4 "<frame scrolling=auto src=\"".$outfilename.$convdir."__lfl.html\" name=\"lfl\">\n";
+#      print OUTFILE4 "<frame scrolling=auto src=\"$outfilename"."__lfl.html\" name=\"lfl\">\n";
+      print OUTFILE4 "</frameset>\n";
+    }
+    else
+    {
+      print OUTFILE4 "<frame scrolling=auto src=\"$outfilename".$convdir."__lfu.html\" name=\"lfu\">\n";
+    }
+    # Do right frame link
+    print OUTFILE4 "<frame scrolling=auto src=\"$outfilename".$convdir."__rf.html\" name=\"rf\">\n";
+    print OUTFILE4 "</frameset>\n";
+    print OUTFILE4 "<noframes>\n";
+    print OUTFILE4 "<h2 align=center>CVS Directories</h2><hr width=100%><br>\n";
+  }
+
+  $cvsnames = "";
+  $Entryfilename = $currentdir."/CVS/Entries";
+
+  open(NAMEFILE,"<$Entryfilename");
+  $contin = 1;
+  $nooffiles = 0;
+  while ($contin ==1)
+  {
+    $namlin = <NAMEFILE>;
+    ($readnameline) = $namlin =~ /^\/([a-zA-Z0-9-+_\.(...)]*)\/.*$/;
+    if (length($namlin)>0)
+    {
+      if (length($readnameline)>0)
+      {
+        $nooffiles++;
+        $cvsnames = $cvsnames." ".$currentdir.'/'.$readnameline;
+      }
+    }
+    else
+    {
+      $contin=0;
+    }
+  }
+  close(NAMEFILE);
+
+  # Check for an empty Log (if, e.g., the directory does not contain files
+  # registered with CVS).
+  if (length ($cvsnames) <= 0)
+  {
+      print "  Doing $currentdir: Log is empty.\n";
+      # We really should make a file here I think
+      # Lets open the main file and process
+      if ($frames == 1)
+      {
+          $rfoutname = $outdirname.'/'.$outfilename.$convdir.$fname."__rf.html";
+          open(OUTFILE,">$rfoutname") or die "Error: Could not open $rfoutname\n.";
+          @listhtmlnames = (@listhtmlnames,$rfoutname);
+      }
+      else
+      {
+          $mainoutname = $outdirname.'/'.$outfilename.$convdir.$fname.".html";
+          open(OUTFILE,">$mainoutname") or die "Error: Could not open $mainoutname\n.";
+          @listhtmlnames = (@listhtmlnames,$mainoutname);
+      }
+      $fnumber=2;
+      print OUTFILE "<html>\n";
+      print OUTFILE "<title>CVS</title>\n";
+      print OUTFILE "<BODY BGCOLOR=\"$backcolor\">\n";
+      if (length($currentdir)==1)
+      {
+          print OUTFILE "<hr><center><h1>--- $rootdir ---</h1></center><hr>\n";
+      }
+      else
+      {
+          print OUTFILE "<hr><center><h1>--- $rootdir/$currentdir ---</h1></center><hr>\n";
+      }
+      print OUTFILE "<center>This directory is empty</center>\n";
+      closemainfile;
+  }
+  next if (length ($cvsnames) <= 0); # Log is empty so proceed to next directory
+
+  $cvsnames = join (' ', sort (split ' ', $cvsnames));
+  @cvslogarray=`cvs log $revisionlimiter $cvsnames `;
+
+  $line = getnextline;
+
+  while ($line =~ /^\? (.*)$/)
+  {
+    $foundbadone = 1 ;
+    $line = getnextline;
+  }
+
+  while ($line)
+  {
+    if ($opt_n>0) {
+      $nodiff = $opt_n;
+    }
+    else
+    {
+      $nodiff = -1;
+    }
+    $oldrevnumber=0;
+    if ($line =~ /^\? (.*)/) {
+      print "The file \"$1\" is not part of cvs\n";
+      $line = getnextline;
+    }
+    $line = getnextline;
+
+    while ($line =~ /^\? (.*)$/)
+    {
+      $foundbadone = 1 ;
+      $line = getnextline;
+    }
+
+    if ($line =~ /^.*: (.*),v$/) {
+      $line = getnextline;
+      ($lfilename) = $line =~ /^.*: (.*)$/;
+
+      ($filename) = $lfilename =~ (/^.*\/([a-zA-Z0-9-+_\.(...)]*)$/);
+      if (length($filename) == 0)
+      {
+        $filename = $lfilename;
+      }
+
+      if (length($filename) == 0)
+      {
+        print "Error 2 in processing the output of cvs log in $currentdir\n";
+        print $line;
+      }
+      $printfilename = 0;
+      $onlist = 0;
+    }
+    else
+    {
+      print "Error 1 in processing the output of cvs log in $currentdir\n";
+      print $line;
+    }
+
+    while (!($line =~ /^--------*$/)) {
+      $line = getnextline;
+    }
+    $leftfill = 0;
+    $line = getnextline;
+    $newfile=0;
+
+    while ($newfile==0)
+    {
+      if ($line =~ /revision (\S*)/)
+      {
+        $revnumber=$1;
+      }
+      else
+      {
+        $revnumber = "<Error in revnumber>";
+      }
+
+      $line = getnextline;
+
+      if ($line =~ /date: (...................)/)
+      {
+        $revdate = $1;
+      }
+      else
+      {
+        $revdate = "<Error in revdate>";
+      }
+
+      if ($line =~ /author: ([a-zA-Z]*);/)
+      {
+        $author = $1;
+      }
+      else
+      {
+        $author = "<Error in author>";
+      }
+
+      if ($line =~ /lines: ([+\-0-9 ]*)$/)
+      {
+        $changelines = $1;
+      }
+      else
+      {
+        $changelines = "None";
+      }
+
+      $line = getnextline;
+
+      if ($line =~ /branches: (.*)/)
+      {
+        $line = getnextline;
+      }
+
+      ($rd1,$rd2,$rd3,$rdrest) = $revdate =~ /^(\d+)\/(\d+)\/(\d+) (.*)$/;
+      $revdateformat2 = $rd1.$rd2.$rd3;
+      ($rt1,$rt2,$rt3) = $rdrest =~/(\d+)\:(\d+)\:(\d+)/;
+
+      $revdateformat3 = 3600*$rt1+60*$rt2+$rt3+86400*$revdateformat2;
+      $printfilename = $printfilename + 1;
+
+      $fname="";
+      if ($opt_f)
+      {
+        $fname = '~'.$filename;
+      }
+      if ((($fnumber == 1) || ($opt_f)) && ($printfilename==1))
+      {
+        if (($opt_f) && ($fnumber==1))
+        {
+          $rfoutname = $outdirname.'/'.$outfilename.$convdir."__rf.html";
+          open(OUTFILE,">$rfoutname") or die "Error: Could not open $rfoutname\n.";
+          @listhtmlnames = (@listhtmlnames,$rfoutname);
+          print OUTFILE "<html>\n";
+          print OUTFILE "<title>CVS</title>\n";
+          print OUTFILE "<BODY BGCOLOR=\"$backcolor\">\n";
+          if (length($currentdir)==1)
+          {
+              print OUTFILE "<hr><center><h1>--- $rootdir ---</h1></center><hr>\n";
+          }
+          else
+          {
+              print OUTFILE "<hr><center><h1>--- $rootdir/$currentdir ---</h1></center><hr>\n";
+          }
+
+          print OUTFILE "<H2>Press the left panel to get to the cvs log information for the files</h2>\n";
+          print OUTFILE "<hr>Made by ",getlogin;
+          print OUTFILE " using version $version of ";
+          print OUTFILE "<a href=\"$URL\" target=\"_top\">cvs2html</a> $revisionlimitertext\n";
+
+          print OUTFILE "</html>\n";
+          close(OUTFILE);
+        }
+
+        # Lets open the main file and process
+        if ($frames == 1)
+        {
+          $rfoutname = $outdirname.'/'.$outfilename.$convdir.$fname."__rf.html";
+          open(OUTFILE,">$rfoutname") or die "Error: Could not open $rfoutname\n.";
+          @listhtmlnames = (@listhtmlnames,$rfoutname);
+        }
+        else
+        {
+          $mainoutname = $outdirname.'/'.$outfilename.$convdir.$fname.".html";
+          open(OUTFILE,">$mainoutname") or die "Error: Could not open $mainoutname\n.";
+          @listhtmlnames = (@listhtmlnames,$mainoutname);
+        }
+        $fnumber=2;
+        print OUTFILE "<html>\n";
+        print OUTFILE "<title>CVS</title>\n";
+        print OUTFILE "<BODY BGCOLOR=\"$backcolor\">\n";
+        if (length($currentdir)==1)
+        {
+          print OUTFILE "<hr><center><h1>--- $rootdir ---</h1></center><hr>\n";
+        }
+        else
+        {
+          print OUTFILE "<hr><center><h1>--- $rootdir/$currentdir ---</h1></center><hr>\n";
+        }
+
+        if ($opt_v)
+        {
+          print OUTFILE "<TABLE BORDER=2 ALIGN=\"MIDDLE\" BGCOLOR=\"$cellcolor\" width=\"100%\">\n";
+        print OUTFILE "<tr><td><table>\n";
+        print OUTFILE "<tr><td align=right><font size=+1>Protocol:</font></td> <td><font size=+1>$protocol</font></td></tr>\n";
+        print OUTFILE "<tr><td align=right><font size=+1>Machine:</font></td> <td><font size=+1>$machine</font></td></tr>\n";
+        print OUTFILE "<tr><td align=right><font size=+1>CVSROOT:</font></td> <td><font size=+1>$cvsroot</font></td></tr>\n";
+        print OUTFILE "</table></td></tr>\n";
+          print OUTFILE "</table><hr>\n";
+        }
+      }
+
+      if ($printfilename == 1)
+      {
+        print OUTFILE "<A NAME=\"$filename\">\n</a>\n";
+        print OUTFILE "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">\n";
+        print OUTFILE "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+        print OUTFILE "<TD COLSPAN=4 BGCOLOR=\"$filenamecellcolor\"><b><FONT SIZE=\"+2\">\n";
+
+        $cdir = "";
+        if (length($currentdir)>1)
+        {
+          $cdir = '/'.$currentdir;
+        }
+
+        $Ls = "";
+        $Le = "";
+        if (($opt_L) && ($opt_E))
+        {
+          ($flname,$ext) = $filename =~ /^([a-zA-Z0-9+-_]*)\.([a-zA-Z0-9]*)$/;
+          if (length($ext)==0)
+          {
+            $flname = $filename;
+          }
+          if ($ext eq $opt_E)
+          {
+            $Ls = "<a href=\"$opt_L$cdir/$flname".".html\" target=\"_top\">";
+            $Le = "</a>\n";
+          }
+        }
+        print OUTFILE $Ls."Filename".$Le.": ";
+
+        $Ls = "";
+        $Le = "";
+        if ($opt_l)
+        {
+          $Ls = "<a href=\"$opt_l$cdir/$filename\">";
+          $Le = "</a>\n";
+        }
+        print OUTFILE $Ls.$filename.$Le;
+        print OUTFILE "</font></B><br></td><tr>\n";
+      }
+      if ($revdateformat2 >= $cutdate)
+      {
+        $onlist = 1;
+        if (($opt_o) && ($leftfill == 0))
+        {
+          if ($opt_f)
+          {
+            $cronolinker = $outfilename.$convdir.'~'.$filename.'__rf.html';
+          }
+          else
+          {
+            $cronolinker = $outfilename.$convdir.'__rf.html#'.$filename;
+          }
+          print OUTFILE2 '<tr><td><a href="'.$cronolinker.'" target="rf"><FONT SIZE="-1">'.$filename."</font></a></td></tr>\n";
+          $leftfill=2;
+        }
+        if (($opt_a) && ($oldrevnumber!=0) && ($nodiff!=0))
+        {
+          print OUTFILE "<tr><td colspan=4 BGCOLOR=\"$differencebackground\"><i>Show difference between <a href=\"$filename$convdir\_diff\_$oldrevnumber\_$revnumber.html\">Revision $revnumber and $oldrevnumber </a></i>\n";
+          generate_diff_file;
+          $nodiff--;
+        }
+        $oldrevnumber=$revnumber;
+        print OUTFILE "<tr><td><b>Revision $revnumber</b><td>$author\n";
+        print OUTFILE "<td>$revdate";
+        if (length($changelines)<2)
+        {
+          print OUTFILE "<td>None\n";
+        }
+        else
+        {
+          print OUTFILE "<td>$changelines\n";
+        }
+        print OUTFILE "<TR><TD COLSPAN=4>\n";
+        if ($docrono)
+        {
+          $cronocounter++;
+          $nams = $currentdirformat2.$filename;
+          @cronoindex = (@cronoindex,$cronocounter);
+          @crononame = (@crononame,$nams);
+          @cronoauthor = (@cronoauthor,$author);
+          @cronoversion = (@cronoversion,$revnumber);
+          @cronoshowtime = (@cronoshowtime,$revdate);
+          @cronotimesince0 = (@cronotimesince0,$revdateformat3);
+          @cronolinknames = (@cronolinknames,$cronolinker);
+        }
+      }
+
+      # While more log read and process
+      $morelog=1;
+      while ($morelog==1)
+      {
+        if ($line =~ /^----------*$/)
+        {
+          $morelog=0;
+        }
+        else
+        {
+          if ($line =~ /^========*$/)
+          {
+            $newfile=1;
+            $morelog=0;
+          }
+          else
+          {
+            $_=$line;
+            s/&/&amp;/g;
+            s/\"/&quot;/g;
+            s/</&lt;/g;
+            s/>/&gt;/g;
+            $line=$_;
+            if ($line =~ /^(.*)$/)
+            {
+              if ($revdateformat2 >= $cutdate)
+              {
+                if ($opt_e) {
+                  print OUTFILE "<code>$1</code><br>\n";
+                }
+                else {
+                  print OUTFILE "$1<br>\n";
+                }
+              }
+            }
+          }
+        }
+        $line = getnextline;
+      }
+      print OUTFILE "\n";
+    }
+
+    if ($onlist==0)
+    {
+        print OUTFILE "<tr><TD COLSPAN=4>No revisions after $cutyearformat2\n";
+    }
+    print OUTFILE "</TABLE><br>\n";
+    if ($onlist==0)
+    {
+      @otherdnames = (@otherdnames,$filename);
+    }
+    if ($opt_f)
+    {
+      closemainfile;
+    }
+  }
+
+  if (!$opt_f)
+  {
+    closemainfile;
+  }
+
+  if ($opt_o)
+  {
+    print OUTFILE2 "</TABLE><br>\n";
+  }
+  if (($opt_o) && ($nooffiles == $#otherdnames+1))
+  {
+    print OUTFILE2 "No file revisions.<br>\n";
+  }
+  if (($#otherdnames>=0) && ($opt_o))
+  {
+    print OUTFILE2 "<br><hr><h3 align=center>Unchanged</h3>\n";
+    if ($#otherdnames>=0)
+    {
+      print OUTFILE2 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+      print OUTFILE2 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+      if ($opt_f)
+      {
+        for ($ii=0;$ii<=$#otherdnames;$ii++)
+        {
+          print OUTFILE2 "<tr><td><a href=\"$outfilename$convdir".'~'.$otherdnames[$ii].'__rf.html'."\" target=\"rf\"><FONT SIZE=\"-1\">$otherdnames[$ii]</font></a></font></td></tr>\n";
+        }
+      }
+      else
+      {
+        for ($ii=0;$ii<=$#otherdnames;$ii++)
+        {
+          print OUTFILE2 "<tr><td><a href=\"$outfilename$convdir".'__rf.html#'.$otherdnames[$ii]."\" target=\"rf\"><FONT SIZE=\"-1\">$otherdnames[$ii]</font></a></font></td></tr>\n";
+        }
+      }
+
+      print OUTFILE2 "</TABLE><br>\n";
+
+    }
+    else
+    {
+      print OUTFILE2 "All files have revisions.<br>\n";
+    }
+
+  }
+
+
+  # Lets wrap up OUTFILE2
+  if ($opt_o)
+  {
+    print OUTFILE2 "</font>\n";
+    print OUTFILE2 "</body>\n";
+    print OUTFILE2 "</html>\n";
+    close(OUTFILE2);
+  }
+
+  # Found a bad one....... This should NOT happen
+  if ($foundbadone == 1)
+  {
+    print "\ncvs2html found some files that was no part of CVS\n\n";
+  }
+
+  if ($frames == 1)
+  {
+    print OUTFILE4 "<TABLE BORDER=3 CELLSPACING=1 CELLPADDING=3 BGCOLOR=\"$cellcolor\" width=\"100%\">";
+    print OUTFILE4 "<TR ALIGN=\"left\" VALIGN=\"top\">\n";
+
+    for ($ddd=0;$ddd<=$#alldirs;$ddd++)
+    {
+      ($currentdir) = $alldirs[$ddd] =~ /^\.\/(.*)$/;
+      $convdir = $currentdir;
+      $convdir =~ tr/\//_/;
+      if (length($currentdir)==0)
+      {
+        $currentdir='.';
+        $convdir = "";
+      }
+      else
+      {
+        $convdir = '_'.$convdir;
+      }
+
+      chop($ldir = $alldirs[$ddd]);
+      if (length($ldir) == 2)
+      {
+        $ldir ="";
+      }
+      print OUTFILE4 "<TR><td><a href=\"".$outfilename.$convdir."__lfu.html\">[$rootdir]$ldir</a></td></tr>\n";
+    }
+    print OUTFILE4 "</TABLE><br>\n";
+  }
+
+  print OUTFILE4 "<hr>Made by ",getlogin;
+  print OUTFILE4 " using version $version of ";
+  print OUTFILE4 "<a href=\"$URL\" target=\"_top\">cvs2html</a>  $revisionlimitertext\n";
+
+  print OUTFILE4 "</noframes>\n";
+  print OUTFILE4 "</html>\n";
+  close(OUTFILE4);
+
+}
+
+if ($docrono)
+{
+  $coutref = $outdirname."/".$cronooutname;
+  open(CRONOFILE,">$coutref");
+
+  print CRONOFILE "<html>\n<head>\n<title>CVS time sorted logs</title>\n</head>\n";
+  print CRONOFILE "<BODY BGCOLOR=\"$backcolor\">\n";
+  print CRONOFILE "<h2 align=\"center\">CVS time sorted logs</h2>\n";
+
+
+  print "Sorting the logfiles\r";
+  @cindex = sort sorter @cronoindex;
+  print "Done sorting the logfiles\n";
+  if ($frames == 1)
+  {
+    print CRONOFILE "<table border width=100% BGCOLOR=\"$cellcolor\">";
+    printf(CRONOFILE "<td><b>%s</b></td> <td><b>%s</b></td> <td><b>%s</b></td>  <td><b>%s</b></td></tr>\n","Time       ","Revision","Author","Filename");
+  }
+  else
+  {
+    printf(CRONOFILE "<br><tr ALIGN=\"left\"><br>\n%20s %8s %10s %s<br><hr>\n","Time       ","Revision","Author","Filename");
+  }
+
+  $cclim = $cronocounter;
+  $cindexlow=0;
+  if ($opt_N>0)
+  {
+    if ($opt_N-1<$cronocounter)
+    {
+      $cclim = $opt_N-1;
+      $cindexlow = $cronocounter+1-$opt_N;
+      $cctxt = " and only the last $opt_N changes are shown.";
+    }
+  }
+
+  if ($cindexlow<0)
+  {
+    $cindexlow=0;
+  }
+  for ($ii=$cindexlow;$ii<=$cronocounter;$ii++)
+  {
+    if ($opt_c) 
+    {
+      $cind = $ii;
+    }
+    else
+    {
+      $cind = $cronocounter-$ii+$cindexlow;
+    }
+    $index = $cindex[$cind];
+    $ccc = '<A HREF="'.$cronolinknames[$index].'">'.$crononame[$index]."</a>";
+    if ($frames==0)
+    {
+      printf(CRONOFILE "%20s %8s %10s %s<br>\n",$cronoshowtime[$index],$cronoversion[$index],$cronoauthor[$index],$ccc);
+    }
+    else
+    {
+      printf(CRONOFILE "<tr ALIGN=\"left\"><td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td></tr>\n",$cronoshowtime[$index],$cronoversion[$index],$cronoauthor[$index],$ccc);
+    }
+  }
+
+  if ($frames == 1)
+  {
+    print CRONOFILE "</table>\n";
+  }
+  else
+  {
+    print CRONOFILE "<hr>\n";
+  }
+
+  #Wrap up the file
+  print CRONOFILE "\n</body>\n</html>\n";
+
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  print CRONOFILE "<p><br>File made using version $version of ";
+  print CRONOFILE "<a href=\"$URL\" target=\"_top\">cvs2html</a> by ";
+
+  printf CRONOFILE "%s at %2d-%02d-%02d %2d:%02d",getlogin,  $year, $mon+1, $mday,$hour,$min;
+  if ($cutdate>"00000000")
+  {
+    printf CRONOFILE " leaving out any log message prior to $cutyearformat2 $revisionlimitertext";
+  }
+  print CRONOFILE " $cctxt</p>\n";
+
+  close(CRONOFILE);
+# We must report that a new file has been made
+  @listhtmlnames = (@listhtmlnames,$coutref);
+}
+
+# Print status
+print "\ncvs2html have generated the following files :\n\n";
+@ll=sort(@listhtmlnames);
+for ($ff=0;$ff<=$#listhtmlnames;$ff++)
+{
+  print "   $ll[$ff]\n";
+}
+print "\n";
+
