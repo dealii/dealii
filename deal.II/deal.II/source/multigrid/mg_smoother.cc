@@ -28,11 +28,6 @@
 #include <algorithm>
 
 
-template <class VECTOR>
-MGSmoother<VECTOR>::~MGSmoother()
-{}
-
-
 //////////////////////////////////////////////////////////////////////
 
 
@@ -138,11 +133,6 @@ MGSmootherContinuous<VECTOR>::set_zero_interior_boundary (const unsigned int lev
 
 
 // explicit instantiations
-
-template MGSmoother<Vector<float> >::~MGSmoother();
-template MGSmoother<Vector<double> >::~MGSmoother();
-template MGSmoother<BlockVector<float> >::~MGSmoother();
-template MGSmoother<BlockVector<double> >::~MGSmoother();
 
 // don't do the following instantiation in 1d, since there is a specialized
 // function there

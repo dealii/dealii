@@ -93,10 +93,10 @@ class Multigrid : public Subscriptor
   template <int dim>
     Multigrid(const MGDoFHandler<dim>& mg_dof_handler,
 	      const MGMatrixBase<VECTOR>& matrix,
-	      const MGCoarseGrid<VECTOR>& coarse,
-	      const MGTransfer<VECTOR>& transfer,
-	      const MGSmoother<VECTOR>& pre_smooth,
-	      const MGSmoother<VECTOR>& post_smooth,
+	      const MGCoarseGridBase<VECTOR>& coarse,
+	      const MGTransferBase<VECTOR>& transfer,
+	      const MGSmootherBase<VECTOR>& pre_smooth,
+	      const MGSmootherBase<VECTOR>& post_smooth,
 	      const unsigned int            minlevel = 0,
 	      const unsigned int            maxlevel = 1000000);
 
@@ -201,22 +201,22 @@ class Multigrid : public Subscriptor
 				     /**
 				      * The matrix for each level.
 				      */
-    SmartPointer<const MGCoarseGrid<VECTOR> > coarse;
+    SmartPointer<const MGCoarseGridBase<VECTOR> > coarse;
     
 				     /**
 				      * Object for grid tranfer.
 				      */
-    SmartPointer<const MGTransfer<VECTOR> > transfer;
+    SmartPointer<const MGTransferBase<VECTOR> > transfer;
 
 				     /**
 				      * The pre-smoothing object.
 				      */
-    SmartPointer<const MGSmoother<VECTOR> > pre_smooth;
+    SmartPointer<const MGSmootherBase<VECTOR> > pre_smooth;
 
 				     /**
 				      * The post-smoothing object.
 				      */
-    SmartPointer<const MGSmoother<VECTOR> > post_smooth;
+    SmartPointer<const MGSmootherBase<VECTOR> > post_smooth;
     
 				     /**
 				      * Edge matrix from fine to coarse.
@@ -342,10 +342,10 @@ template <class VECTOR>
 template <int dim>
 Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 			      const MGMatrixBase<VECTOR>& matrix,
-			      const MGCoarseGrid<VECTOR>& coarse,
-			      const MGTransfer<VECTOR>& transfer,
-			      const MGSmoother<VECTOR>& pre_smooth,
-			      const MGSmoother<VECTOR>& post_smooth,
+			      const MGCoarseGridBase<VECTOR>& coarse,
+			      const MGTransferBase<VECTOR>& transfer,
+			      const MGSmootherBase<VECTOR>& pre_smooth,
+			      const MGSmootherBase<VECTOR>& post_smooth,
 			      const unsigned int min_level,
 			      const unsigned int max_level)
 		:

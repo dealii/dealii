@@ -23,6 +23,10 @@
 template <int dim> class MGDoFHandler;
 
 
+/*
+ * MGSmootherBase is defined in mg_base.h
+ */
+
 /**
  * Smoother doing nothing. This class is not useful for many applications other
  * than for testing some multigrid procedures. Also some applications might
@@ -32,7 +36,7 @@ template <int dim> class MGDoFHandler;
  * @author Guido Kanschat, 1999, 2002
  */
 template <class VECTOR>
-class MGSmootherIdentity : public MGSmoother<VECTOR>
+class MGSmootherIdentity : public MGSmootherBase<VECTOR>
 {
   public:
 				     /**
@@ -61,7 +65,7 @@ class MGSmootherIdentity : public MGSmoother<VECTOR>
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002
  */
 template <class VECTOR>
-class MGSmootherContinuous : public MGSmoother<VECTOR>
+class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 {
   private:
 				     /**
@@ -196,7 +200,7 @@ class MGSmootherContinuous : public MGSmoother<VECTOR>
  * @author Guido Kanschat, 2003
  */
 template<class MATRIX, class RELAX, class VECTOR>
-class MGSmootherRelaxation : public MGSmoother<VECTOR>
+class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 {
   public:
 				     /**

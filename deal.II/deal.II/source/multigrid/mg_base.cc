@@ -18,7 +18,7 @@
 
 
 template <class VECTOR>
-MGTransfer<VECTOR>::~MGTransfer()
+MGTransferBase<VECTOR>::~MGTransferBase()
 {}
 
 
@@ -28,23 +28,33 @@ MGMatrixBase<VECTOR>::~MGMatrixBase()
 
 
 template <class VECTOR>
-MGCoarseGrid<VECTOR>::~MGCoarseGrid()
+MGSmootherBase<VECTOR>::~MGSmootherBase()
+{}
+
+
+template <class VECTOR>
+MGCoarseGridBase<VECTOR>::~MGCoarseGridBase()
 {}
 
 
 // Explicit instantiations
 
-template class MGTransfer<Vector<double> >;
-template class MGTransfer<Vector<float> >;
-template class MGTransfer<BlockVector<double> >;
-template class MGTransfer<BlockVector<float> >;
+template class MGTransferBase<Vector<double> >;
+template class MGTransferBase<Vector<float> >;
+template class MGTransferBase<BlockVector<double> >;
+template class MGTransferBase<BlockVector<float> >;
 
 template class MGMatrixBase<Vector<double> >;
 template class MGMatrixBase<Vector<float> >;
 template class MGMatrixBase<BlockVector<double> >;
 template class MGMatrixBase<BlockVector<float> >;
 
-template class MGCoarseGrid<Vector<double> >;
-template class MGCoarseGrid<Vector<float> >;
-template class MGCoarseGrid<BlockVector<double> >;
-template class MGCoarseGrid<BlockVector<float> >;
+template MGSmootherBase<Vector<float> >;
+template MGSmootherBase<Vector<double> >;
+template MGSmootherBase<BlockVector<float> >;
+template MGSmootherBase<BlockVector<double> >;
+
+template class MGCoarseGridBase<Vector<double> >;
+template class MGCoarseGridBase<Vector<float> >;
+template class MGCoarseGridBase<BlockVector<double> >;
+template class MGCoarseGridBase<BlockVector<float> >;

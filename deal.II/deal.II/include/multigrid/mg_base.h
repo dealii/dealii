@@ -13,6 +13,10 @@
 #ifndef __deal2__mg_base_h
 #define __deal2__mg_base_h
 
+/*
+ * This file contains MGLevelObject and some abstract base classes
+ * used by Multigrid.
+ */
 
 #include <base/config.h>
 #include <base/subscriptor.h>
@@ -161,13 +165,13 @@ class MGMatrixBase : public Subscriptor
  * @author Guido Kanschat, 2002
  */
 template <class VECTOR>
-class MGCoarseGrid : public Subscriptor
+class MGCoarseGridBase : public Subscriptor
 {
   public:
 				     /**
 				      * Virtual destructor.
 				      */
-    virtual ~MGCoarseGrid ();
+    virtual ~MGCoarseGridBase ();
 
 				     /**
 				      * Solver method implemented by
@@ -188,14 +192,14 @@ class MGCoarseGrid : public Subscriptor
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002
  */
  template <class VECTOR>
- class MGTransfer : public Subscriptor
+ class MGTransferBase : public Subscriptor
  {
    public:
  				     /**
  				      * Destructor. Does nothing here, but
  				      * needs to be declared virtual anyway.
  				      */
-     virtual ~MGTransfer();
+     virtual ~MGTransferBase();
 
  				     /**
  				      * Prolongate a vector from level
@@ -253,13 +257,13 @@ class MGCoarseGrid : public Subscriptor
  * @author Guido Kanschat, 2002
  */
 template <class VECTOR>
-class MGSmoother : public Subscriptor
+class MGSmootherBase : public Subscriptor
 {
   public:
 				   /**
 				    * Virtual destructor.
 				    */
-  virtual ~MGSmoother();
+  virtual ~MGSmootherBase();
 
 				   /**
 				    * Smoothing function. This is the

@@ -21,6 +21,9 @@
 
 template <int dim> class MGDoFHandler;
 
+/*
+ * MGTransferBase is defined in mg_base.h
+ */
 
 /**
  * Implementation of the @p{MGTransferBase} interface for which the transfer
@@ -32,7 +35,7 @@ template <int dim> class MGDoFHandler;
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002
  */
 template<typename number>
-class MGTransferPrebuilt : public MGTransfer<Vector<number> > 
+class MGTransferPrebuilt : public MGTransferBase<Vector<number> > 
 {
   public:
 				     /**
@@ -257,7 +260,7 @@ class MGTransferBlockBase
  * @author Guido Kanschat, 2001, 2002
  */
 template <typename number>
-class MGTransferBlock : public MGTransfer<BlockVector<number> >,
+class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 			private MGTransferBlockBase
 {
   public:
@@ -386,7 +389,7 @@ class MGTransferBlock : public MGTransfer<BlockVector<number> >,
  * @author Guido Kanschat, 2001, 2002
  */
 template <typename number>
-class MGTransferSelect : public MGTransfer<Vector<number> >,
+class MGTransferSelect : public MGTransferBase<Vector<number> >,
 			 private MGTransferBlockBase
 {
   public:

@@ -29,7 +29,7 @@
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR = Vector<double> >
-class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
+class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
 {
   public:
 				     /**
