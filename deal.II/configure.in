@@ -224,7 +224,14 @@ case "$target" in
 	   ;;
 esac
 
+if test "x$enableshared" = "xyes" ; then
+  lib_suffix=".so"
+else
+  lib_suffix=".a"
+fi
+
 AC_SUBST(enableshared)
+AC_SUBST(lib_suffix)
 
 
 
