@@ -69,22 +69,27 @@ class BlockIndices;
  * applied to matrix and right hand side of the linear system, while the
  * distribute() function is applied to the solution vector.
  *
- * Condensation is done in four steps: first the large matrix sparsity pattern
- * is created (e.g. using @ref{DoFHandler}@p{::create_sparsity_pattern}), then the
- * sparsity pattern of the condensed matrix is made out of the large sparsity
- * pattern and the constraints. After that the global matrix is assembled and
- * finally condensed. To do these steps, you have (at least) two possibilities:
+ *
+ * @sect3{Condensing matrices and sparsity patterns}
+ * 
+ * Condensation of a matrix is done in four steps: first one builds the
+ * sparsity pattern (e.g. using
+ * @ref{DoFHandler}@p{::create_sparsity_pattern}); then the sparsity pattern
+ * of the condensed matrix is made out of the original sparsity pattern and
+ * the constraints; third, the global matrix is assembled; and fourth, the
+ * matrix is finally condensed. To do these steps, you have (at least) two
+ * possibilities:
+ * 
  * @begin{itemize}
  * @item Use two different sparsity patterns and two different matrices: you
  *   may eliminate the lines and rows connected with a constraint and create
  *   a totally new sparsity pattern and a new system matrix. This has the
- *   advantage that the resulting system of equations is free from artifacts
- *   of the condensation process and is therefore faster in the solution process
- *   since no unnecessary multiplications occur (see below). However, there are
+ *   advantage that the resulting system of equations is smaller and free from
+ *   artifacts of the condensation process and is therefore faster in the solution
+ *   process since no unnecessary multiplications occur (see below). However, there are
  *   two major drawbacks: keeping two matrices at the same time can be quite
- *   unacceptable in many cases, since these matrices may be several 10 or even
- *   100 MB large. Secondly, the condensation process is quite expensive, since
- *   <em>all</em> entries of the matrix have to be copied, not only
+ *   unacceptable if you're short of memory. Secondly, the condensation process is 
+ *   expensive, since <em>all</em> entries of the matrix have to be copied, not only
  *   those which are subject to constraints.
  *
  * @item Use only one sparsity pattern and one matrix: doing it this way, the
