@@ -40,8 +40,14 @@ void ProblemBase<dim>::set_tria_and_dof (Triangulation<dim> *t,
   tria        = t;
   dof_handler = d;
 
-  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
-  Assert (tria == &dof_handler->get_tria(), ExcDofAndTriaDontMatch());
+				   // allow a user to reset both tria and
+				   // dof to null pointers, but don't allow
+				   // something other
+  if ((tria != 0) || (dof_handler != 0))
+    {
+      Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
+      Assert (tria == &dof_handler->get_tria(), ExcDofAndTriaDontMatch());
+    };
 };
 
 
