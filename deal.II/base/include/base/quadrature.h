@@ -74,6 +74,15 @@ class Quadrature : public Subscriptor
 {
   public:
 				     /**
+				      * Define a typedef for a
+				      * quadrature that acts on an
+				      * object of one dimension
+				      * less. For cells, this would
+				      * then be a face quadrature.
+				      */
+    typedef Quadrature<dim-1> SubQuadrature;
+    
+				     /**
 				      * Number of quadrature points.
 				      */
     const unsigned int n_quadrature_points;
@@ -90,8 +99,8 @@ class Quadrature : public Subscriptor
 				      * less than the present and a
 				      * formula in one dimension.
 				      */
-    Quadrature (const Quadrature<dim-1> &,
-		const Quadrature<1>     &);
+    Quadrature (const SubQuadrature &,
+		const Quadrature<1> &);
     
 				     /**
 				      * Construct a quadrature formula
@@ -281,6 +290,15 @@ class QProjector
 {
   public:
 				     /**
+				      * Define a typedef for a
+				      * quadrature that acts on an
+				      * object of one dimension
+				      * less. For cells, this would
+				      * then be a face quadrature.
+				      */
+    typedef Quadrature<dim-1> SubQuadrature;    
+    
+				     /**
 				      * Compute the quadrature points
 				      * on the cell if the given
 				      * quadrature formula is used on
@@ -288,8 +306,8 @@ class QProjector
 				      * details, see the general doc
 				      * for this class.
 				      */
-    static void project_to_face (const Quadrature<dim-1>  &quadrature,
-				 const unsigned int        face_no,
+    static void project_to_face (const SubQuadrature    &quadrature,
+				 const unsigned int      face_no,
 				 typename std::vector<Point<dim> > &q_points);
 
     				     /**
@@ -301,9 +319,9 @@ class QProjector
 				      * further details, see the
 				      * general doc for this class.
 				      */
-    static void project_to_subface (const Quadrature<dim-1>  &quadrature,
-				    const unsigned int        face_no,
-				    const unsigned int        subface_no,
+    static void project_to_subface (const SubQuadrature &quadrature,
+				    const unsigned int   face_no,
+				    const unsigned int   subface_no,
 				    typename std::vector<Point<dim> > &q_points);
 
 				     /**
@@ -335,7 +353,7 @@ class QProjector
 				      * later.
 				      */
     static Quadrature<dim>
-    project_to_all_faces (const Quadrature<dim-1> &quadrature);
+    project_to_all_faces (const SubQuadrature &quadrature);
 
 				     /**
 				      * This function is alike the
@@ -346,7 +364,7 @@ class QProjector
 				      * faces of the unit cell.
 				      */
     static Quadrature<dim>
-    project_to_all_subfaces (const Quadrature<dim-1> &quadrature);
+    project_to_all_subfaces (const SubQuadrature &quadrature);
 
 				     /**
 				      * Project a give quadrature

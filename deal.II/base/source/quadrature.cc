@@ -96,8 +96,8 @@ Quadrature<1>::Quadrature (const Quadrature<0> &,
 
 
 template <int dim>
-Quadrature<dim>::Quadrature (const Quadrature<dim-1> &q1,
-			     const Quadrature<1>     &q2) :
+Quadrature<dim>::Quadrature (const SubQuadrature &q1,
+			     const Quadrature<1> &q2) :
 		n_quadrature_points (q1.n_quadrature_points *
 				     q2.n_quadrature_points),
 		quadrature_points (n_quadrature_points),
@@ -575,7 +575,7 @@ QProjector<1>::project_to_all_faces (const Quadrature<0> &)
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_all_faces (const Quadrature<dim-1> &quadrature)
+QProjector<dim>::project_to_all_faces (const SubQuadrature &quadrature)
 {
   const unsigned int n_points = quadrature.n_quadrature_points,
 		     n_faces  = GeometryInfo<dim>::faces_per_cell;
@@ -616,7 +616,7 @@ QProjector<1>::project_to_all_subfaces (const Quadrature<0> &)
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_all_subfaces (const Quadrature<dim-1> &quadrature)
+QProjector<dim>::project_to_all_subfaces (const SubQuadrature &quadrature)
 {
   const unsigned int n_points          = quadrature.n_quadrature_points,
 		     n_faces           = GeometryInfo<dim>::faces_per_cell,

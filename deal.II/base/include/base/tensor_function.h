@@ -56,6 +56,14 @@ class TensorFunction : public FunctionTime,
 {
   public:
 				     /**
+				      * Define typedefs for the return
+				      * types of the @p{value} and the
+				      * @p{gradient} functions.
+				      */
+    typedef Tensor<rank,dim> value_type;
+    typedef Tensor<rank+1,dim> gradient_type;
+    
+				     /**
 				      * Constructor. May take an
 				      * initial value for the time
 				      * variable, which defaults to
@@ -77,7 +85,7 @@ class TensorFunction : public FunctionTime,
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual Tensor<rank, dim> value (const Point<dim> &p) const;
+    virtual value_type value (const Point<dim> &p) const;
 
 				     /**
 				      * Set @p{values} to the point
@@ -88,13 +96,13 @@ class TensorFunction : public FunctionTime,
 				      * size as the @p{points} array.  
 				      */
     virtual void value_list (const typename std::vector<Point<dim> > &points,
-			     typename std::vector<Tensor<rank,dim> > &values) const;
+			     typename std::vector<value_type> &values) const;
 
 				     /**
 				      * Return the gradient of the
 				      * function at the given point.
 				      */
-    virtual Tensor<rank+1,dim> gradient (const Point<dim> &p) const;
+    virtual gradient_type gradient (const Point<dim> &p) const;
 
 				     /**
 				      * Set @p{gradients} to the
@@ -105,7 +113,7 @@ class TensorFunction : public FunctionTime,
 				      * size as the @p{points} array.  
 				      */
     virtual void gradient_list (const typename std::vector<Point<dim> >   &points,
-				typename std::vector<Tensor<rank+1,dim> > &gradients) const;
+				typename std::vector<gradient_type> &gradients) const;
 
 				     /**
 				      * Exception

@@ -79,6 +79,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: The class <code class="class">TensorFunction</code>
+       now uses local types <code class="class">value_type</code> and
+       <code class="class">gradient_type</code> as return values of
+       its member functions. This works around a bug in Sun's Forte
+       C++ compilers.
+       <br>
+       (WB 2002/03/20)
+       </p>
+
+  <li> <p> 
        Improved: The <code class="member">AssertThrow</code> macro now
        uses <code class="member">__builtin_expect</code> if the
        compiler supports this. This indicates to the compiler that we
