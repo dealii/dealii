@@ -786,6 +786,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The restriction matrices for the Q1 element in 1d had a
+       trivial bug in that one element was not set. Due to the fact
+       that contributions from all child cells are taken into account,
+       this did no harm, though, since all computations were done
+       correctly anyway.
+       <br>
+       (WB 2003/05/06)
+       </p>
+
+  <li> <p>
        New: The <code class="class">GeometryInfo</code> classes now
        have new static member functions <code
        class="member">child_cell_from_point</code> that, given a point
