@@ -92,6 +92,13 @@ void GridIn<dim>::read_ucd (std::istream &in)
 
   for (unsigned int cell=0; cell<n_cells; ++cell) 
     {
+				       // note that since in the input
+				       // file we found the number of
+				       // cells at the top, there
+				       // should still be input here,
+				       // so check this:
+      AssertThrow (in, ExcIO());
+      
       std::string cell_type;
       int material_id;
       
