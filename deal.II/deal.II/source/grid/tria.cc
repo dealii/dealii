@@ -605,7 +605,7 @@ void Triangulation<2>::create_hyper_L (const double a, const double b) {
 template <>
 void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius) {
   const unsigned int dim=2;
-  const double a = 0.453;         // equilibrate cell sizes
+  const double a = 1./(1+sqrt(2)/2);         // equilibrate cell sizes
   const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*(radius/sqrt(2)),
 				   p+Point<dim>(+1,-1)*(radius/sqrt(2)),
 				   p+Point<dim>(-1,-1)*(radius/sqrt(2)*a),
@@ -1815,7 +1815,26 @@ unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
 
 template <int dim>
 unsigned int Triangulation<dim>::n_levels () const {
-  return levels.size();
+  if (levels.size() == 0)
+    return 0;
+				   // check whether there are
+				   // cells on the highest levels
+				   // (there need not be, since they
+				   // might all have been coarsened
+				   // away)
+  raw_cell_iterator cell = last_raw (levels.size()-1),
+		    endc = end();
+  for (; cell!=endc; --cell)
+    if (cell->used())
+				       // return level of most refined
+				       // existing cell (+1 because of
+				       // counting conventions)
+      return cell->level()+1;
+
+				   // no cells at all?
+  Assert (false, ExcInternalError());
+				   // just to make the compiler happy:
+  return 0;
 };
 
 
@@ -1922,6 +1941,14 @@ void Triangulation<dim>::refine (const dVector &criteria,
   Assert (criteria.size() == n_active_cells(),
 	  ExcInvalidVectorSize(criteria.size(), n_active_cells()));
 
+				   // nothing to do; especially we
+				   // do not want to flag with zero
+				   // error since then we may get
+				   // into conflict with coarsening
+				   // in some cases
+  if (threshold==0)
+    return;
+  
   active_cell_iterator cell = begin_active();
   const unsigned int n_cells = criteria.size();
   
@@ -2026,8 +2053,6 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
   else
     bottom_threshold = sqrt(*p - *(p-1));
 
-  Assert (bottom_threshold<=top_threshold, ExcInternalError());
-
 				   // in some rare cases it may happen that
 				   // both thresholds are the same (e.g. if
 				   // there are many cells with the same
@@ -2038,10 +2063,16 @@ Triangulation<dim>::refine_and_coarsen_fixed_fraction (const dVector &criteria,
 				   // which the indicator equals the
 				   // thresholds. This is forbidden, however.
 				   //
-				   // In that case we arbitrarily reduce the
-				   // bottom threshold by one permille.
-  if (bottom_threshold==top_threshold)
-    bottom_threshold *= 0.999;
+				   // In some rare cases with very few cells
+				   // we also could get integer round off
+				   // errors and get problems with
+				   // the top and bottom fractions.
+				   //
+				   // In these case we arbitrarily reduce the
+				   // bottom threshold by one permille below
+				   // the top threshold
+  if (bottom_threshold>=top_threshold)
+    bottom_threshold = 0.999*top_threshold;
   
 				   // actually flag cells
   refine (criteria, top_threshold);
@@ -2111,11 +2142,10 @@ void Triangulation<1>::execute_refinement () {
 
 				       // count number of used cells on
 				       // the next higher level
-      unsigned int used_cells = 0;
-      count_if (levels[level+1]->lines.used.begin(),
-		levels[level+1]->lines.used.end(),
-		bind2nd (equal_to<bool>(), true),
-		used_cells);
+      const unsigned int used_cells
+	=  count_if (levels[level+1]->lines.used.begin(),
+		     levels[level+1]->lines.used.end(),
+		     bind2nd (equal_to<bool>(), true));
 
 				       // reserve space for the used_cells
 				       // cells already existing on the next
@@ -2137,12 +2167,18 @@ void Triangulation<1>::execute_refinement () {
 
 				   // add to needed vertices how
 				   // many vertices are already in use
-  count_if (vertices_used.begin(), vertices_used.end(),
-	    bind2nd (equal_to<bool>(), true),
-	    needed_vertices);
-
-  vertices.resize (needed_vertices, Point<1>());
-  vertices_used.resize (needed_vertices, false);
+  needed_vertices += count_if (vertices_used.begin(), vertices_used.end(),
+			       bind2nd (equal_to<bool>(), true));
+				   // if we need more vertices: create them,
+				   // if not: leave the array as is, since
+				   // shrinking is not really possible because
+				   // some of the vertices at the end may be
+				   // in use
+  if (needed_vertices > vertices.size())
+    {
+      vertices.resize (needed_vertices, Point<1>());
+      vertices_used.resize (needed_vertices, false);
+    };
 
 
 				   // Do REFINEMENT
@@ -2401,21 +2437,12 @@ void Triangulation<2>::execute_refinement () {
 	      };
 	  };
       
-				       // count number of used lines on
-				       // the next higher level
-      unsigned int used_lines = 0;
-      count_if (levels[level+1]->lines.used.begin(),
-		levels[level+1]->lines.used.end(),
-		bind2nd (equal_to<bool>(), true),
-		used_lines);
-
       				       // count number of used cells on
 				       // the next higher level
-      unsigned int used_cells = 0;
-      count_if (levels[level+1]->quads.used.begin(),
+      const unsigned int used_cells
+	= count_if (levels[level+1]->quads.used.begin(),
 		levels[level+1]->quads.used.end(),
-		bind2nd (equal_to<bool>(), true),
-		used_cells);
+		bind2nd (equal_to<bool>(), true));
       
       
 				       // reserve space for the used_cells
@@ -2438,14 +2465,18 @@ void Triangulation<2>::execute_refinement () {
 
 				   // add to needed vertices how
 				   // many vertices are already in use
-  count_if (vertices_used.begin(), vertices_used.end(),
-	    bind2nd (equal_to<bool>(), true),
-	    needed_vertices);
-
-				   // reserve enough space for all vertices
-  vertices.resize (needed_vertices, Point<2>());
-  vertices_used.resize (needed_vertices, false);
-
+  needed_vertices += count_if (vertices_used.begin(), vertices_used.end(),
+			       bind2nd (equal_to<bool>(), true));
+				   // if we need more vertices: create them,
+				   // if not: leave the array as is, since
+				   // shrinking is not really possible because
+				   // some of the vertices at the end may be
+				   // in use
+  if (needed_vertices > vertices.size())
+    {
+      vertices.resize (needed_vertices, Point<dim>());
+      vertices_used.resize (needed_vertices, false);
+    };
 
 
 				   // Do REFINEMENT
@@ -3537,14 +3568,10 @@ void TriangulationLevel<0>::monitor_memory (const unsigned int true_dimension) c
 
 
 void TriangulationLevel<1>::reserve_space (const unsigned int new_lines) {
-  vector<bool>::iterator u = lines.used.begin(),
-			 e = lines.used.end();
-
-  unsigned int used_lines = 0;
-  for (; u!=e; ++u)
-    ++used_lines;
-
-  const unsigned int new_size = used_lines + new_lines;
+  const unsigned int new_size = new_lines +
+				count_if (lines.used.begin(),
+					  lines.used.end(),
+					  bind2nd (equal_to<bool>(), true));
 
 				   // same as in #reserve_space<0>#: only
 				   // allocate space if necessary
@@ -3616,14 +3643,10 @@ void TriangulationLevel<1>::monitor_memory (const unsigned int true_dimension) c
 #if deal_II_dimension >= 2
 
 void TriangulationLevel<2>::reserve_space (const unsigned int new_quads) {
-  vector<bool>::iterator u = quads.used.begin(),
-			 e = quads.used.end();
-
-  unsigned int used_quads = 0;
-  for (; u!=e; ++u)
-    ++used_quads;
-
-  const unsigned int new_size = used_quads + new_quads;
+  const unsigned int new_size = new_quads +
+				count_if (quads.used.begin(),
+					  quads.used.end(),
+					  bind2nd (equal_to<bool>(), true));
 
 				   // see above...
   if (new_size>quads.quads.size())

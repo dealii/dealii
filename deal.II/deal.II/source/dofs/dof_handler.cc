@@ -779,6 +779,7 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElementBase<dim> &fe) {
   unsigned int next_free_dof = 0;   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
+
   for (; cell != endc; ++cell) 
     next_free_dof = distribute_dofs_on_cell (cell, next_free_dof);
   
@@ -857,23 +858,19 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 	  cell->set_vertex_dof_index (vertex, d, next_free_dof++);
     
   				   // for the four sides
-  for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
-    {
-      line_iterator line = cell->line(side);
-
-				       // distribute dofs if necessary
-      if ((selected_fe->dofs_per_line > 0) &&
+  if (selected_fe->dofs_per_line > 0)
+    for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
+      {
+	line_iterator line = cell->line(side);
+	
+					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	  (line->dof_index(0) == -1))
-					 // if not: distribute dofs
-	for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
-	  line->set_dof_index (d, next_free_dof++);	    
-
-				       // note if line is subject to constraints
-      if (line->child_index(0) != -1) 
-	line->set_user_flag ();
-    };
+	if (line->dof_index(0) == -1)
+					   // if not: distribute dofs
+	  for (unsigned int d=0; d<selected_fe->dofs_per_line; ++d)
+	    line->set_dof_index (d, next_free_dof++);	    
+      };
   
 
       				       // dofs of quad
@@ -1156,6 +1153,7 @@ void DoFHandler<2>::make_constraint_matrix (ConstraintMatrix &constraints) const
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->face(face)->has_children()) 
 	cell->face(face)->set_user_flag();
+	  
   
 
   
@@ -1834,16 +1832,17 @@ void DoFHandler<1>::reserve_space () {
     delete levels[i];
   levels.resize (0);
 
-  vertex_dofs.erase (vertex_dofs.begin(), vertex_dofs.end());
-  vertex_dofs.resize (tria->vertices.size(), -1);
+  vertex_dofs = vector<int>(tria->vertices.size()*
+			    selected_fe->dofs_per_vertex,
+			    -1);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<1>);
 
-      levels.back()->line_dofs.resize (tria->levels[i]->lines.lines.size() *
-				       selected_fe->dofs_per_line,
-				       -1);
+      levels.back()->line_dofs = vector<int>(tria->levels[i]->lines.lines.size() *
+					     selected_fe->dofs_per_line,
+					     -1);
     };
 };
 
@@ -1865,20 +1864,19 @@ void DoFHandler<2>::reserve_space () {
     delete levels[i];
   levels.resize (0);
 
-  vertex_dofs.erase (vertex_dofs.begin(), vertex_dofs.end());
-  vertex_dofs.resize (tria->vertices.size(),
-		      -1);
-    
+  vertex_dofs = vector<int>(tria->vertices.size()*
+			    selected_fe->dofs_per_vertex,
+			    -1);
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new DoFLevel<2>);
 
-      levels.back()->line_dofs.resize (tria->levels[i]->lines.lines.size() *
-				       selected_fe->dofs_per_line,
-				       -1);
-      levels.back()->quad_dofs.resize (tria->levels[i]->quads.quads.size() *
-				       selected_fe->dofs_per_quad,
-				       -1);
+      levels.back()->line_dofs = vector<int> (tria->levels[i]->lines.lines.size() *
+					      selected_fe->dofs_per_line,
+					      -1);
+      levels.back()->quad_dofs = vector<int> (tria->levels[i]->quads.quads.size() *
+					      selected_fe->dofs_per_quad,
+					      -1);
     };
 };
 
