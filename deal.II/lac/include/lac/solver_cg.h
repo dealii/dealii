@@ -14,6 +14,7 @@
 
 /**
  * Preconditioned cg method.
+ * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
 class SolverPCG : public Solver<Matrix,Vector> {

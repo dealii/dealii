@@ -32,7 +32,6 @@ dVector::dVector (const unsigned int n) :
 
 
 dVector::dVector (const dVector& v) :
-		VectorBase(v),
 		dim(v.size()),
 		maxdim(v.size()),
 		val(0)
@@ -486,12 +485,10 @@ dVector& dVector::operator = (const dVector& v)
 
 
 
-void dVector::cadd (const unsigned int i, const VectorBase& V,
+void dVector::cadd (const unsigned int i, const dVector& v,
 		    const double s, const unsigned int j)
 {
   Assert (dim!=0, ExcEmptyVector());
-  const dVector& v = (const dVector&) V;
-
   Assert (i<dim, ExcInvalidIndex(i,dim));
   Assert (j<v.dim, ExcInvalidIndex(j,v.dim));
 
@@ -500,13 +497,11 @@ void dVector::cadd (const unsigned int i, const VectorBase& V,
 
 
 
-void dVector::cadd(unsigned int i, const VectorBase& V,
+void dVector::cadd(unsigned int i, const dVector &v,
 		   double s, unsigned int j,
 		   double t, unsigned int k)
 {
   Assert (dim!=0, ExcEmptyVector());
-  const dVector& v = (const dVector&) V;
-
   Assert (i<dim, ExcInvalidIndex(i,dim));
   Assert (j<v.dim, ExcInvalidIndex(j,v.dim));
   Assert (k<v.dim, ExcInvalidIndex(k,v.dim));
@@ -516,15 +511,13 @@ void dVector::cadd(unsigned int i, const VectorBase& V,
 
 
 
-void dVector::cadd (const unsigned int i, const VectorBase& V,
+void dVector::cadd (const unsigned int i, const dVector &v,
 		    const double s, const unsigned int j,
 		    const double t, const unsigned int k,
 		    const double q, const unsigned int l,
 		    const double r, const unsigned int m)
 {
   Assert (dim!=0, ExcEmptyVector());
-  const dVector& v = (const dVector&) V;
-
   Assert (i<dim, ExcInvalidIndex(i,dim));
   Assert (j<v.dim, ExcInvalidIndex(j,v.dim));
   Assert (k<v.dim, ExcInvalidIndex(k,v.dim));
@@ -545,12 +538,10 @@ void dVector::czero (const unsigned int i)
 
 
 
-void dVector::cequ (const unsigned int i, const VectorBase& V,
+void dVector::cequ (const unsigned int i, const dVector &v,
 		    const double s, const unsigned int j)
 {
   Assert (dim!=0, ExcEmptyVector());
-  const dVector& v = (const dVector&) V;
-
   Assert (i<dim, ExcInvalidIndex(i,dim));
   Assert (j<v.dim, ExcInvalidIndex(j,v.dim));
 
@@ -559,13 +550,11 @@ void dVector::cequ (const unsigned int i, const VectorBase& V,
 
 
 
-void dVector::cequ (const unsigned int i, const VectorBase& V,
+void dVector::cequ (const unsigned int i, const dVector &v,
 		    const double s, const unsigned int j,
 		    const double t, const unsigned int k)
 {
   Assert (dim!=0, ExcEmptyVector());
-  const dVector& v = (const dVector&) V;
-
   Assert (i<dim, ExcInvalidIndex(i,dim));
   Assert (j<v.dim, ExcInvalidIndex(j,v.dim));
   Assert (k<v.dim, ExcInvalidIndex(k,v.dim));
@@ -575,15 +564,13 @@ void dVector::cequ (const unsigned int i, const VectorBase& V,
 
 
 
-void dVector::cequ (const unsigned int i, const VectorBase& V,
+void dVector::cequ (const unsigned int i, const dVector &v,
 		    const double s, const unsigned int j,
 		    const double t, const unsigned int k,
 		    const double q, const unsigned int l,
 		    const double r, const unsigned int m)
 {
   Assert (dim!=0, ExcEmptyVector());
-  const dVector& v = (const dVector&) V;
-
   Assert (i<dim, ExcInvalidIndex(i,dim));
   Assert (j<v.dim, ExcInvalidIndex(j,v.dim));
   Assert (k<v.dim, ExcInvalidIndex(k,v.dim));
@@ -593,12 +580,6 @@ void dVector::cequ (const unsigned int i, const VectorBase& V,
   val[i] = s*v.val[j] + t*v.val[k] + q*v.val[l] + r*v.val[m];
 }
 
-
-
-const char* dVector::name () const
-{
-  return "dVector";
-}
 
 
 

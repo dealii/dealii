@@ -10,7 +10,6 @@
 
 #include <cstdio>
 #include <base/types.h>
-#include <lac/vectorbase.h>
 #include <base/exceptions.h>
 
 
@@ -27,8 +26,7 @@
  *
  * @author Roland Becker, Guido Kanschat, Franz-Theo Suttmeier, revised and extended by Wolfgang Bangerth, documented by Klaus Mampel and Wolfgang Bangerth
  */
-class dVector : public VectorBase
-{
+class dVector {
   friend class dFMatrix;
 
   protected:
@@ -376,13 +374,13 @@ class dVector : public VectorBase
 				     /**
 				      *  U(i)=a*V(j)        . Replacing
 				      */
-    void cequ(unsigned int i, const VectorBase& V,
+    void cequ(unsigned int i, const dVector& V,
 	      double a, unsigned int j);
     
 				     /**
 				      *  U(i)=a*V(j)+b*V(k) . Replacing by sum
 				      */
-    void cequ (const unsigned int i, const VectorBase& V,
+    void cequ (const unsigned int i, const dVector& V,
 	       const double a, const unsigned int j,
 	       const double b, const unsigned int k);
     
@@ -390,7 +388,7 @@ class dVector : public VectorBase
 				      * U(i)=a*V(j)+b*V(k)+c*V(l)+d*V(m).
 				      * Replacing by sum
 				      */
-    void cequ (const unsigned int i, const VectorBase& V,
+    void cequ (const unsigned int i, const dVector& V,
 	       const double a, const unsigned int j,
 	       const double b, const unsigned int k,
 	       const double c, const unsigned int l,
@@ -399,13 +397,13 @@ class dVector : public VectorBase
 				     /**
 				      *  U(i)+=a*V(j)       . Simple addition
 				      */
-    void cadd (const unsigned int i, const VectorBase& V,
+    void cadd (const unsigned int i, const dVector& V,
 	       const double a, const unsigned int j);
     
 				     /**
 				      *  U(i)+=a*V(j)+b*V(k). Multiple addition
 				      */ 
-    void cadd (const unsigned int i, const VectorBase& V,
+    void cadd (const unsigned int i, const dVector& V,
 	       const double a, const unsigned int j,
 	       const double b, const unsigned int k);
     
@@ -413,7 +411,7 @@ class dVector : public VectorBase
 				      * U(i)+=a*V(j)+b*V(k)+c*V(l)+d*V(m).
 				      * Multiple addition
 				      */
-    void cadd (const unsigned int i, const VectorBase& V,
+    void cadd (const unsigned int i, const dVector& V,
 	       const double a, const unsigned int j,
 	       const double b, const unsigned int k,
 	       const double c, const unsigned int l,
@@ -425,9 +423,6 @@ class dVector : public VectorBase
 				      * @name 5: Mixed stuff
 				      */
 				     //@{
-				     ///
-    virtual const char* name () const;
-    
 				     /**
 				      *  Output of vector in user-defined format.
 				      */
