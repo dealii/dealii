@@ -73,6 +73,11 @@ class SubCellData;
  * output since we don't know their meaning, but the data that is read
  * is enough to build up the mesh as intended by the mesh generator.
  * This format can be read by the @p{read_dbmesh} function.
+ *
+ * @item @p{XDA} format: this is a rather simple format used by the MGF
+ * code. We don't have an exact specification of the format, but the reader
+ * can read in several example files. If the reader does not grok your files,
+ * it should be fairly simple to extend it.
  * @end{itemize}
  *
  *
@@ -158,6 +163,13 @@ class GridIn
 				      * format.
 				      */
     void read_dbmesh (std::istream &);
+    
+				     /**
+				      * Read grid data from a file
+				      * containing data in the XDA
+				      * format.
+				      */
+    void read_xda (std::istream &);
     
 				     /**
 				      * Exception

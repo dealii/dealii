@@ -363,6 +363,75 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 
 
 template <int dim>
+void GridIn<dim>::read_xda (std::istream &in)
+{
+  Assert (tria != 0, ExcNoTriangulationSelected());
+  AssertThrow (in, ExcIO());
+
+  std::string line;
+				   // skip comments at start of file
+  getline (in, line);
+
+
+  unsigned int n_vertices;
+  unsigned int n_cells;
+
+				   // read cells, throw away rest of line
+  in >> n_cells;
+  getline (in, line);
+
+  in >> n_vertices;
+  getline (in, line);
+
+				   // ignore following 8 lines
+  for (unsigned int i=0; i<8; ++i)
+    getline (in, line);
+
+				   // set up array of cells
+  std::vector<CellData<dim> > cells (n_cells);
+  SubCellData subcelldata;
+
+  for (unsigned int cell=0; cell<n_cells; ++cell) 
+    {
+				       // note that since in the input
+				       // file we found the number of
+				       // cells at the top, there
+				       // should still be input here,
+				       // so check this:
+      AssertThrow (in, ExcIO());
+      
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+	in >> cells[cell].vertices[i];
+    };
+
+
+  
+				   // set up array of vertices
+  std::vector<Point<dim> > vertices (n_vertices);
+  for (unsigned int vertex=0; vertex<n_vertices; ++vertex) 
+    {
+      double x[3];
+
+				       // read vertex
+      in >> x[0] >> x[1] >> x[2];
+
+				       // store vertex
+      for (unsigned int d=0; d<dim; ++d)
+	vertices[vertex](d) = x[d];
+    };
+  AssertThrow (in, ExcIO());
+
+				   // do some clean-up on vertices...
+  delete_unused_vertices (vertices, cells, subcelldata);
+				   // ... and cells
+  GridReordering<dim>::reorder_cells (cells);
+  tria->create_triangulation (vertices, cells, subcelldata);
+}
+
+
+
+
+template <int dim>
 void GridIn<dim>::skip_empty_lines (std::istream &in)
 {    
   std::string line;
