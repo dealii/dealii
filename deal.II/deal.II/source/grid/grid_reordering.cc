@@ -1,6 +1,6 @@
 //----------------------------  grid_reordering.cc  ---------------------------
-//    $Id$
-//    Version: $Name$
+//    grid_reordering.cc,v 1.27 2002/05/28 07:43:22 wolf Exp
+//    Version: 
 //
 //    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
@@ -1106,7 +1106,6 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
 
   unsigned int next_free_new_number = 0;
   
-  
                                    // loop over each connected part of
                                    // the domain. since the domain may
                                    // consist of different unconnected
@@ -1143,6 +1142,7 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
 					      // better is not possible
 	     break;
 	 };
+
 				      // have an array of the next
 				      // cells to be numbered (old numbers)
      std::vector<unsigned int> next_round_cells (1, cell_with_min_neighbors);
@@ -1197,7 +1197,6 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
        };
    };   // end of loop over subdomains
   
-
     
   Assert (std::find (new_cell_numbers.begin(), new_cell_numbers.end(), invalid_cell_number)
 	  ==
@@ -1210,7 +1209,7 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
   for (unsigned int i=0; i<cells.size(); ++i)
     new_cells[new_cell_numbers[i]] = cells[i];
 				   // then switch old and new array
-  swap (cells, new_cells);
+  std::swap (cells, new_cells);
   
 				   // now we still have to convert all
 				   // old cell numbers to new cells
@@ -1221,7 +1220,12 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
       Assert (cells[c].cell_no == c, ExcInternalError());
 
       for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
+	{
+	  Assert (cells[c].neighbors[n] < new_cell_numbers.size(),
+		  ExcIndexRange(cells[c].neighbors[n], 0, 
+				new_cell_numbers.size()));
+	  cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
+	};
     };
 
   for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
