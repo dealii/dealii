@@ -102,7 +102,7 @@ class GridGenerator
                                      /**
 				      * Initialize the given
 				      * Triangulation with a hypercube
-				      * with a slit. The slot goes
+				      * with a slit. The slit goes
 				      * from the middle of the top
 				      * boundary to the middle of the
 				      * area.
