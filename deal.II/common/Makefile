@@ -131,7 +131,8 @@ clean:
 TAGS: $(filter-out %/forward-declarations.h,                                \
                   $(shell echo ../base/source/*.cc ../base/include/*/*.h    \
                                ../lac/source/*.cc ../lac/include/*/*.h      \
-                               ../deal.II/source/*/*.cc ../deal.II/include/*/*.h))
+                               ../deal.II/source/*/*.cc ../deal.II/include/*/*.h \
+                               ../tests/*/*.cc ../tests/*/*.h ))
 	@etags $^
 
 
