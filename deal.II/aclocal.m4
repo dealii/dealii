@@ -3979,6 +3979,7 @@ AC_DEFUN(DEAL_II_CHECK_GETHOSTNAME, dnl
     [
 #include <unistd.h>
 #include <limits>
+#include <iostream>
 
 int main()
 {
@@ -3988,11 +3989,14 @@ int main()
    volatile long double x=1.0;
    x += std::numeric_limits<long double>::epsilon();
 
-   return (x != 1.0);
+   if (x == 1.0)
+     return 1;  // this shouldn't happen...
+   else
+     return 0;
 }
     ],
     [
-      AC_MSG_RESULT(ok)
+      AC_MSG_RESULT(no)
     ],
     [
       AC_MSG_RESULT([yes. disabling gethostname()])
