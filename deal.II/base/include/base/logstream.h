@@ -311,7 +311,7 @@ class LogStream
 				      * time, or when the destructor
 				      * of this class is run.
 				      */
-    std::ostream::__streambuf_type* old_cerr;
+    std::streambuf *old_cerr;
       
                                      /**
 				      * Print head of line. This prints
