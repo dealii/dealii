@@ -126,6 +126,17 @@ run-tests: $(tests:%=%.OK)
 
 output: $(tests:%=%.output)
 
+############################################################
+# Link and copy files in ./results/* to generate checked
+# checked files for new hardware/compiler platform.
+#
+# It is expected that the tests are run with ./compare being
+# sym-linked to a suitable existing result directory.
+#
+# The current subdirectory must exist there.
+############################################################
+new-platform: output run-tests
+	csh ../newplatform.csh $(WORKDIR) $(TARGET)+$(GXX-VERSION)
 
 ############################################################
 # Cleanup targets

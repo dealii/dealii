@@ -26,6 +26,12 @@ carefully.
 Running the tests on a new platform
 -----------------------------------
 
+Run
+
+make new-platform
+
+if you understand what's going on there. Else, do it by hand:
+
 1) Link the subdirectory in results, matching your platform most closely
    to a directory ./compare.
 2) Run the tests and check the results.
