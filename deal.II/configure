@@ -5918,7 +5918,7 @@ echo "${ECHO_T}F77 compiler is unkown. no flags set!" >&6
 
 
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.0123)
+    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.[0123])
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
 
