@@ -49,10 +49,10 @@ template class MGMatrixBase<Vector<float> >;
 template class MGMatrixBase<BlockVector<double> >;
 template class MGMatrixBase<BlockVector<float> >;
 
-template MGSmootherBase<Vector<float> >;
-template MGSmootherBase<Vector<double> >;
-template MGSmootherBase<BlockVector<float> >;
-template MGSmootherBase<BlockVector<double> >;
+template class MGSmootherBase<Vector<float> >;
+template class MGSmootherBase<Vector<double> >;
+template class MGSmootherBase<BlockVector<float> >;
+template class MGSmootherBase<BlockVector<double> >;
 
 template class MGCoarseGridBase<Vector<double> >;
 template class MGCoarseGridBase<Vector<float> >;
