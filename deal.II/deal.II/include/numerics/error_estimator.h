@@ -35,25 +35,35 @@ class dVector;
    to zero faster than the error itself, thus ruling out the values as error
    indicators.
    
+   The error estimator returns a vector of estimated errors per cell which
+   can be used to feed the #Triangulation<dim>::refine_*# functions.
+
    
    {\bf Implementation}
 
    In principle, the implementation of the error estimation is simple: let
    $$ \eta_K^2 =
-   h \int_{\partial K} \left[\frac{\partial u_h}{\partial n}\right]^2 do
+   \frac h{24} \int_{\partial K} \left[\frac{\partial u_h}{\partial n}\right]^2 do
    $$
    be the error estimator for cell $K$. $[\cdot]$ denotes the jump of the
    argument at the face. In the paper of Ainsworth, $h$ is divided by $24$,
    but this factor is a bit esoteric, stemming from interpolation estimates
    and stability constants which may hold for the Poisson problem, but may
    not hold for more general situations. In the implementation, this factor
-   is dropped for these reasons.
+   is considered, but may lead to wrong results. You may scale the vector
+   appropriately afterwards.
 
-   To perform the integration, use is made of the #FEFaceValues# class and the
-   integration is performed for each cell, i.e. no use is made of the fact, that
-   the integration along a face need in principle be done only once for both
-   adjacent cells. Clearly there is room for optimization here.
+   To perform the integration, use is made of the #FEFaceValues# and
+   #FESubfaceValues# classes. The integration is performed by looping
+   over all cells and integrating over faces that are not yet treated.
+   This way we avoid integration on faces twice, once for each time we
+   visit one of the adjacent cells. In a second loop over all cells, we
+   sum up the contributions of the faces (which are the integrated
+   square of the jumps) of each cell and take the square root.
 
+
+   {\bf Boundary values}
+   
    If the face is at the boundary, i.e. there is no neighboring cell to which
    the jump in the gradiend could be computed, there are two possibilities:
    \begin{itemize}
@@ -70,6 +80,10 @@ class dVector;
      one is neglected for practical reasons, in the hope that the error made
      here will tend to zero faster than the energy error we wish to estimate.
 
+     Though no integration is necessary, in the list of face contributions we
+     store a zero for this face, which makes summing up the contributions of
+     the different faces to the cells easier.
+
    \item The face belongs to a Neumann boundary.  In this case, the
      contribution of the face $F\in\partial K$ looks like
      $$ \int_F \left|g-\frac{\partial u_h}{\partial n}\right| ds $$
@@ -78,16 +92,35 @@ class dVector;
    \item No other boundary conditions are considered.
    \end{itemize}
 
+   Thanks go to Franz-Theo Suttmeier for clarifications about boundary
+   conditions.
+
+   
+   {\bf Handling of hanging nodes}
+   
    The integration along faces with hanging nodes is quite tricky, since one
    of the elements has to be shifted one level up or down. See the
-   documentation for the #FEFaceValues# class for more information about
+   documentation for the #FESubfaceValues# class for more information about
    technical issues regarding this topic.
 
-   The error estimator returns a vector of estimated errors per cell which
-   can be used to feed rge #Triangulation<dim>::refine_*# functions.
+   In praxi, since we integrate over each face only once, we do this when we
+   are on the coarser one of the two cells adjacent to a subface (a subface
+   is defined to be the child of a face; seen from the coarse cell, it is a
+   subface, while seen from the refined cell it is one of its faces). The
+   reason is that finding neighborship information is a bit easier then, but
+   that's all practical reasoning, nothing fundamental.
+
+   Since we integrate from the coarse side of the face, we have the mother
+   face readily at hand and store the result of the integration over that
+   mother face (being the sum of the integrals along the subfaces) in the
+   abovementionned map of integrals as well. This consumes some memory more
+   than needed, but makes the summing up of the face contributions to the
+   cells easier, since then we have the information from all faces of all
+   cells at hand and need not think about explicitely determining whether
+   a face was refined or not. The same applies for boundary faces, see
+   above.
    
-   @author Wolfgang Bangerth, 1998; thanks to Franz-Theo Suttmeier for
-     clarifications about boundary conditions.
+   @author Wolfgang Bangerth, 1998
 */
 template <int dim>
 class KellyErrorEstimator {
