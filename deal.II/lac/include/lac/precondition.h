@@ -356,6 +356,87 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 
 
 /**
+ * Permuted SOR preconditioner using matrix built-in function.  The MATRIX
+ * class used is required to have functions
+ * @p{PSOR(VECTOR&, const VECTOR&, double)} and
+ * @p{TPSOR(VECTOR&, const VECTOR&, double)}.
+ *
+ *
+ * @sect2{Usage example}
+ * @begin{itemize}
+ *     // Declare related objects
+ *
+ * SparseMatrix<double> A;
+ * Vector<double> x;
+ * Vector<double> b;
+ * SolverCG<> solver(...);
+ *
+ * //...initialize and build A
+ *
+ * std::vector<unsigned int> permutation(x.size());
+ *
+ * //...fill permutation with reasonable values
+ *
+ *     // Define and initialize preconditioner
+ *
+ * PreconditionPSOR<SparseMatrix<double> > precondition;
+ * precondition.initialize (A, permutation, .6);
+ *
+ * solver.solve (A, x, b, precondition);
+ * @end{itemize}
+ *
+ * @author Guido Kanschat, 2003
+ */
+template <class MATRIX = SparseMatrix<double> >
+class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
+{
+  public:
+				     /**
+				      * Initialize matrix and
+				      * relaxation parameter. The
+				      * matrix is just stored in the
+				      * preconditioner object.
+				      *
+				      * The permutation vector is
+				      * stored as a
+				      * pointer. Therefore, it has to
+				      * be assured that the lifetime
+				      * of the vector exceeds the
+				      * lifetime of the
+				      * preconditioner.
+				      *
+				      * The relaxation parameter
+				      * should be larger than zero and
+				      * smaller than 2 for numerical
+				      * reasons. It defaults to 1.
+				      */
+    void initialize (const MATRIX& A,
+		     const std::vector<unsigned int>& permutation,
+		     typename PreconditionRelaxation<MATRIX>::AdditionalData
+		     parameters = AdditionalData());
+    
+				     /**
+				      * Apply preconditioner.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Apply transpose
+				      * preconditioner.
+				      */
+    template<class VECTOR>
+    void Tvmult (VECTOR&, const VECTOR&) const;
+  private:
+				     /**
+				      * Storage for the permutation vector.
+				      */
+    const std::vector<unsigned int>* permutation;
+};
+
+
+
+/**
  * Preconditioner using an iterative solver.  This preconditioner uses
  * a fully initialized LAC iterative solver for the approximate
  * inverse of the matrix. Naturally, this solver needs another
@@ -621,6 +702,43 @@ PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SSOR (dst, src, this->relaxation);
+}
+
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+inline void
+PreconditionPSOR<MATRIX>::initialize (
+  const MATRIX &rA,
+  const std::vector<unsigned int>& p,
+  typename PreconditionRelaxation<MATRIX>::AdditionalData parameters)
+{
+  permutation = &p;
+  PreconditionRelaxation<MATRIX>::initalize(rA, parameters);
+}
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionPSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (this->A!=0, ExcNotInitialized());
+  dst = src;
+  this->A->PSOR (dst, *permutation, this->relaxation);
+}
+
+
+
+template <class MATRIX>
+template<class VECTOR>
+inline void
+PreconditionPSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+{
+  Assert (this->A!=0, ExcNotInitialized());
+  dst = src;
+  this->A->TPSOR (dst, *permutation, this->relaxation);
 }
 
 

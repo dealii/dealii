@@ -996,6 +996,69 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst, const number om) const
 template <typename number>
 template <typename somenumber>
 void
+SparseMatrix<number>::PSOR (
+  Vector<somenumber>& dst,
+  const std::vector<unsigned int> permutation,
+  const number om) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
+  Assert (m() == permutation.size(),
+	  ExcDimensionMismatch(m(), permutation.size()));
+
+  for (unsigned int urow=0; urow<m(); ++urow)
+    {
+      const unsigned int row = permutation[urow];
+      somenumber s = dst(row);
+      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
+	{
+	  const unsigned int col = permutation[cols->colnums[j]];
+	  if (col < row)
+	    s -= val[j] * dst(col);
+	}
+
+      dst(row) = s * om / val[cols->rowstart[row]];
+    }
+}
+
+
+template <typename number>
+template <typename somenumber>
+void
+SparseMatrix<number>::TPSOR (
+  Vector<somenumber>& dst,
+  const std::vector<unsigned int> permutation,
+  const number om) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
+  Assert (m() == permutation.size(),
+	  ExcDimensionMismatch(m(), permutation.size()));
+
+  for (unsigned int urow=m(); urow != 0;)
+    {
+      --urow;
+      const unsigned int row = permutation[urow];
+      somenumber s = dst(row);
+      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
+	{
+	  const unsigned int col = permutation[cols->colnums[j]];
+	  if (col > row)
+	    s -= val[j] * dst(col);
+	}
+
+      dst(row) = s * om / val[cols->rowstart[row]];
+    }
+}
+
+
+template <typename number>
+template <typename somenumber>
+void
 SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
 	       const Vector<somenumber> &b,
 	       const number        om) const

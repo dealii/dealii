@@ -38,7 +38,7 @@ template<typename number> class FullMatrix;
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Original version by Roland Becker, Guido Kanschat, Franz-Theo Suttmeier; lots of enhancements, reorganisation and documentation by Wolfgang Bangerth 1998
+ * @author several, 1994-2003
  */
 template <typename number>
 class SparseMatrix : public Subscriptor
@@ -802,6 +802,46 @@ class SparseMatrix : public Subscriptor
 				      */
     template <typename somenumber>
     void TSOR (Vector<somenumber> &v,
+	      const number        om = 1.) const;
+
+				     /**
+				      * Perform a permuted SOR
+				      * preconditioning in-place.
+				      *
+				      * The standard SOR method is
+				      * applied in the order
+				      * prescribed by @p{permutation},
+				      * that is, first the row
+				      * @p{permutation[0]}, then
+				      * @p{permutation[1]} and so
+				      * on.
+				      *
+				      * @p{omega} is the relaxation
+				      * parameter.
+				      */
+    template <typename somenumber>
+    void PSOR (Vector<somenumber> &v,
+	      const std::vector<unsigned int> permutation,
+	      const number        om = 1.) const;
+
+				     /**
+				      * Perform a transposed permuted SOR
+				      * preconditioning in-place.
+				      *
+				      * The transposed SOR method is
+				      * applied in the order
+				      * prescribed by @p{permutation},
+				      * that is, first the row
+				      * @p{permutation[m()-1]}, then
+				      * @p{permutation[m()-2]} and so
+				      * on.
+				      *
+				      * @p{omega} is the relaxation
+				      * parameter.
+				      */
+    template <typename somenumber>
+    void TPSOR (Vector<somenumber> &v,
+	      const std::vector<unsigned int> permutation,
 	      const number        om = 1.) const;
 
 				     /**
