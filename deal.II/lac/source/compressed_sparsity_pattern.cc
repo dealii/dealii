@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,11 @@
 #include <cmath>
 #include <numeric>
 #include <functional>
+
+
+const unsigned int CompressedSparsityPattern::Line::cache_size;
+
+
 
 CompressedSparsityPattern::CompressedSparsityPattern ()
                 :
@@ -84,8 +89,8 @@ CompressedSparsityPattern::reinit (const unsigned int m,
   rows = m;
   cols = n;
 
-  std::vector<std::set<unsigned int> > new_column_indices (rows);
-  column_indices.swap (new_column_indices);
+  std::vector<Line> new_lines (rows);
+  lines.swap (new_lines);
 }
 
 
@@ -108,26 +113,15 @@ unsigned int
 CompressedSparsityPattern::max_entries_per_row () const
 {
   unsigned int m = 0;
-  for (unsigned int i=1; i<rows; ++i)
-    m = std::max (m, static_cast<unsigned int>(column_indices[i].size()));
-
+  for (unsigned int i=0; i<rows; ++i)
+    {
+      lines[i].flush_cache ();
+      m = std::max (m, static_cast<unsigned int>(lines[i].entries.size()));
+    }
+  
   return m;
 }
 
-
-
-void
-CompressedSparsityPattern::add (const unsigned int i,
-				const unsigned int j)
-{
-  Assert (i<rows, ExcInvalidIndex(i,rows));
-  Assert (j<cols, ExcInvalidIndex(j,cols));
-
-				   // the std::set automatically
-				   // assures uniqueness and
-				   // sortedness of the column indices
-  column_indices[i].insert (j);
-}
 
 
 bool 
@@ -136,7 +130,11 @@ CompressedSparsityPattern::exists (const unsigned int i,
 {
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
-  return (column_indices[i].find(j) != column_indices[i].end());
+
+  lines[i].flush_cache();
+  return std::binary_search (lines[i].entries.begin(),
+                             lines[i].entries.end(),
+                             j);
 }
 
 
@@ -158,53 +156,40 @@ CompressedSparsityPattern::symmetrize ()
 				   // be called on elements that
 				   // already exist without any harm
   for (unsigned int row=0; row<rows; ++row)
-    for (std::set<unsigned int>::const_iterator i=column_indices[row].begin();
-	 i!=column_indices[row].end(); ++i)
+    {
+      lines[row].flush_cache ();
+      for (std::vector<unsigned int>::const_iterator
+             j=lines[row].entries.begin();
+           j != lines[row].entries.end();
+           ++j)
 				       // add the transpose entry if
 				       // this is not the diagonal
-      if (row != *i)
-	add (*i, row);
+        if (row != *j)
+          add (*j, row);
+    }
 }
 
 
 
 void
 CompressedSparsityPattern::print_gnuplot (std::ostream &out) const
-{
+{ 
   for (unsigned int row=0; row<rows; ++row)
-    for (std::set<unsigned int>::const_iterator i=column_indices[row].begin();
-	 i!=column_indices[row].end(); ++i)
-				       // while matrix entries are
-				       // usually written (i,j),
-				       // with i vertical and j
-				       // horizontal, gnuplot output
-				       // is x-y, that is we have to
-				       // exchange the order of
-				       // output
-      out << *i << " " << -static_cast<signed int>(row) << std::endl;
+    {
+      lines[row].flush_cache ();
+      for (std::vector<unsigned int>::const_iterator
+             j=lines[row].entries.begin();
+           j != lines[row].entries.end(); ++j)
+                                         // while matrix entries are usually
+                                         // written (i,j), with i vertical and
+                                         // j horizontal, gnuplot output is
+                                         // x-y, that is we have to exchange
+                                         // the order of output
+        out << *j << " " << -static_cast<signed int>(row) << std::endl;
+    }
+      
 
   AssertThrow (out, ExcIO());
-}
-
-
-
-unsigned int
-CompressedSparsityPattern::row_length (const unsigned int row) const
-{
-  return column_indices[row].size();
-}
-
-
-
-unsigned int
-CompressedSparsityPattern::column_number (const unsigned int row,
-					  const unsigned int index) const
-{
-  Assert (index < column_indices[row].size(),
-	  ExcIndexRange (index, 0, column_indices[row].size()));
-  std::set<unsigned int>::const_iterator p = column_indices[row].begin();
-  std::advance (p, index);
-  return *p;
 }
 
 
@@ -214,11 +199,16 @@ CompressedSparsityPattern::bandwidth () const
 {
   unsigned int b=0;
   for (unsigned int row=0; row<rows; ++row)
-    for (std::set<unsigned int>::const_iterator i=column_indices[row].begin();
-	 i!=column_indices[row].end(); ++i)
-      if (static_cast<unsigned int>(std::abs(static_cast<int>(row-*i))) > b)
-	b = std::abs(static_cast<signed int>(row-*i));
+    {
+      lines[row].flush_cache ();
 
+      for (std::vector<unsigned int>::const_iterator
+             j=lines[row].entries.begin();
+           j != lines[row].entries.end(); ++j)
+        if (static_cast<unsigned int>(std::abs(static_cast<int>(row-*j))) > b)
+          b = std::abs(static_cast<signed int>(row-*j));
+    }
+  
   return b;
 }
 
@@ -229,6 +219,10 @@ CompressedSparsityPattern::n_nonzero_elements () const
 {
   unsigned int n=0;
   for (unsigned int i=0; i<rows; ++i)
-    n += column_indices[i].size();
+    {
+      lines[i].flush_cache ();
+      n += lines[i].entries.size();
+    }
+  
   return n;
 }
