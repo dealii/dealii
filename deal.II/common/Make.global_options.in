@@ -112,6 +112,17 @@ ifneq ($(OS),Linux)
 endif
 
 
+
+# after egcs1.1, the optimization flag -fstrict-aliasing was
+# introduced, which enables better optimizations for well-written C++
+# code. we believe that deal.II falls into that category and thusly
+# enable the flag
+ifneq ($(GXX-Version),egcs1.1)
+  CXXFLAGS.o += -fstrict-aliasing
+endif
+
+
+
 # if --enable-multithreading was given, then set the compiler flags
 # accordingly. note that this only sets the flags to generate programs
 # which use thread-safe allocation functions, include the right files,
