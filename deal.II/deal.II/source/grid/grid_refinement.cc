@@ -11,8 +11,6 @@
 //
 //----------------------------  grid_refinement.cc  ---------------------------
 
-
-#include <lac/vector.h>
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -21,6 +19,55 @@
 #include <numeric>
 #include <algorithm>
 #include <cmath>
+
+#include <math.h>
+#include <fstream>
+
+template<typename number>
+void GridRefinement::qsort_index(const Vector<number>  &a,
+				 vector<unsigned int> &ind,
+				 int                  l,
+				 int                  r)
+{
+  int i,j,t;
+  number v;
+  
+  if (r<=l)
+    return;
+
+  v = a(ind[r]);
+  i = l-1;
+  j = r;
+  do
+    {
+      do 
+	{
+	  ++i;
+	}
+      while ((a(ind[i])>v)&&(i<r));
+      do
+	{
+	  --j;
+	}
+      while ((a(ind[j])<v)&&(j>0));
+      
+      if (i<j)
+	{
+	  t=ind[i];
+	  ind[i] = ind[j];
+	  ind[j] = t;
+	}
+      else
+	{
+	  t = ind[i];
+	  ind[i] = ind[r];
+	  ind[r] = t;
+	}
+    }
+  while (i<j);
+  qsort_index(a,ind,l,i-1);
+  qsort_index(a,ind,i+1,r);  
+}
 
 
 
@@ -196,6 +243,56 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
 
 
 
+template <int dim, typename number>
+void
+GridRefinement::refine_and_coarsen_optimize (Triangulation<dim>   &tria,
+					     const Vector<number> &criteria)
+{
+  Assert (criteria.size() == tria.n_active_cells(),
+	  ExcInvalidVectorSize(criteria.size(), tria.n_active_cells()));
+  
+				   // get an increasing order on
+				   // the error indicator
+  vector<unsigned int> tmp(criteria.size());
+  for (unsigned int i=0;i<criteria.size();++i)
+    tmp[i] = i;
+  
+  qsort_index(criteria,tmp,0,criteria.size()-1);
+  
+  double s0 = 0.75 * criteria(tmp[0]);
+  double E  = criteria.l1_norm();
+  
+  unsigned int N = criteria.size();
+  unsigned int M = 0;
+  
+				   // The first M cells are refined
+				   // to minimize the expected error
+				   // multiplied with the expected
+				   // number of cells.
+				   // We assume that the error is
+				   // decreased by 3/4 a_K if the cell
+				   // K with error indicator a_K is
+				   // refined.
+				   // The expected number of cells is
+				   // N+3*M (N is the current number
+				   // of cells)
+  double min = (3.*(1.+M)+N) * (E-s0);
+  
+  unsigned int minArg = N-1;
+  
+  for (M=1;M<criteria.size();++M)
+    {
+      s0+= 0.75 * criteria(tmp[M]);
+      
+      if ( (3.*(1+M)+N)*(E-s0) <= min)
+	{
+	  min = (3.*(1+M)+N)*(E-s0);
+	  minArg = M;
+	}
+    }
+  refine(tria,criteria,criteria(tmp[minArg]));
+};
+
 // explicit instantiations
 template void GridRefinement
 ::refine (Triangulation<deal_II_dimension> &, const Vector<float> &, const double);
@@ -233,4 +330,13 @@ template void GridRefinement
 				     const Vector<float> &criteria,
 				     const double         top_fraction,
 				     const double         bottom_fraction);
+
+template void GridRefinement
+::refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
+			       const Vector<float> &criteria);
+
+template void GridRefinement
+::refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
+			       const Vector<double> &criteria);
+
 

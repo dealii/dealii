@@ -14,6 +14,9 @@
 #define __deal2__grid_refinement_h
 
 
+#include<lac/vector.h>
+#include<vector>
+
 // forward declarations
 template <int dim> class Triangulation;
 template <class T> class Vector;
@@ -214,7 +217,7 @@ class GridRefinement
 						 const Vector<number> &criteria,
 						 const double         top_fraction_of_cells,
 						 const double         bottom_fraction_of_cells);
-
+    
 				     /**
 				      * Refine the triangulation by
 				      * flagging those cells which
@@ -248,6 +251,41 @@ class GridRefinement
 						   const double         top_fraction,
 						   const double         bottom_fraction);
 
+
+
+				     /**
+				      * Refine the triangulation by
+				      * flagging certain cells to reach
+				      * an optimal grid:
+				      * We try to minimize the error
+				      * multiplied with the number of
+				      * cells in the new grid. All cells
+				      * with large error indicator are
+				      * refined to generate an optimal
+				      * grid in the above sense.
+				      * We assume that the error in one
+				      * cell is reduced to a quarter
+				      * after refinement.
+				      * The new triangulation has three
+				      * new cells for every flagged cell.
+				      *
+				      * Refer to the general doc of
+				      * this class for more
+				      * information.
+				      *
+				      * Note that this function takes
+				      * a vector of @p{float}s, rather
+				      * than the usual @p{double}s,
+				      * since accuracy is not so much
+				      * needed here and saving memory
+				      * may be a good goal when using
+				      * many cells.
+				      */
+    
+    template<int dim, typename number>
+    static void refine_and_coarsen_optimize (Triangulation<dim>   &tria,
+					     const Vector<number> &criteria);
+
 				     /**
 				      * Exception
 				      */
@@ -259,8 +297,28 @@ class GridRefinement
 				      * Exception
 				      */
     DeclException0 (ExcInvalidParameterValue);
+
+
+  private:
+    
+				     /**
+				      * Sorts the vector ind as
+				      * an index vector of a in
+				      * increasing order.
+				      * This implementation of
+				      * quicksort seems to be faster
+				      * than the STL version and is
+				      * needed in
+				      * @p{refine_and_coarsen_optimize}
+				      */
+    template<typename number>
+    static void qsort_index(const Vector<number>  &a,
+			    vector<unsigned int>  &ind,
+			    int                   l,
+			    int                   r);
 };
 
 
 
 #endif //__deal2__grid_refinement_h
+
