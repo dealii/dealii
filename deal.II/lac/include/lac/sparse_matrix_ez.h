@@ -1631,7 +1631,7 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 				       // Determine minimal and
 				       // maximal row for a column in
 				       // advance.
-      if(false){
+/*
       std::vector<unsigned int>::minrow(B.n(), B.m());
       std::vector<unsigned int>::maxrow(B.n(), 0);
       while (b1 != b_final)
@@ -1642,7 +1642,7 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 	  if (r > maxrow[b1->column()])
 	    maxrow[b1->column()] = r;
 	}
-      }
+*/
       
       b1 = B.begin();
       while (b1 != b_final)
