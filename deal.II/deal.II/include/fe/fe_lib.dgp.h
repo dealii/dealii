@@ -14,7 +14,7 @@
 #define __deal2__fe_lib_dgp_h
 
 
-/*----------------------------   fe_lib.h     ---------------------------*/
+/*----------------------------   fe_lib.dgp.h     ---------------------------*/
 
 
 #include <fe/q1_mapping.h>
@@ -38,6 +38,7 @@ class FEDG_P1 : public FEQ1Mapping<dim>
 				      * Constructor
 				      */
     FEDG_P1 ();
+
 				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
@@ -113,10 +114,12 @@ class FEDG_P1 : public FEQ1Mapping<dim>
 };
 
 
+
+
 /**
  * Discontinuous P2-element on hypercubes.
  *
- * This is the implementation of a linear (sic) polynomial space on a
+ * This is the implementation of a quadratic (sic) polynomial space on a
  * d-dimensional hypercube. The shape functions are those of
  * @p{1,x,y,z, x*x, x*y, x*z, y*y, y*z, z*z} applying to the space
  * dimension. Later on, these should be exchanged for mutually
@@ -205,10 +208,12 @@ class FEDG_P2 : public FEQ1Mapping<dim>
 };
 
 
+
+
 /**
  * Discontinuous P3-element on hypercubes.
  *
- * This is the implementation of a linear (sic) polynomial space on a
+ * This is the implementation of a cubic (sic) polynomial space on a
  * d-dimensional hypercube. The shape functions are the basis
  * polynomials spanning the space of cubic polynomials. Later on,
  * they should be exchanged for mutually orthogonal, preferably by
@@ -225,7 +230,6 @@ class FEDG_P3 : public FEQ1Mapping<dim>
 				      */
     FEDG_P3 ();
 
-  public:
 				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
@@ -298,10 +302,12 @@ class FEDG_P3 : public FEQ1Mapping<dim>
 };
 
 
+
+
 /**
  * Discontinuous P3-element on hypercubes.
  *
- * This is the implementation of a linear (sic) polynomial space on a
+ * This is the implementation of a quartic (sic) polynomial space on a
  * d-dimensional hypercube. The shape functions are the basis
  * polynomials spanning the space of cubic polynomials. Later on,
  * they should be exchanged for mutually orthogonal, preferably by
@@ -318,7 +324,6 @@ class FEDG_P4 : public FEQ1Mapping<dim>
 				      */
     FEDG_P4 ();
 
-  public:
 				     /**
 				      * Return the value of the #i#th shape
 				      * function at point #p# on the unit cell.
@@ -391,9 +396,9 @@ class FEDG_P4 : public FEQ1Mapping<dim>
 };
 
 
-/*----------------------------   fe_lib.h     ---------------------------*/
+/*----------------------------   fe_lib.dgp.h     ---------------------------*/
 
 #endif
-/*----------------------------   fe_lib.h     ---------------------------*/
+/*----------------------------   fe_lib.dgp.h     ---------------------------*/
 
 
