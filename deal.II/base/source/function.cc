@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,16 @@ Function<dim>::Function (const unsigned int n_components,
                 :
 		FunctionTime(initial_time),
 		n_components(n_components)
-{}
+{
+                                   // avoid the construction of function
+                                   // objects that don't return any
+                                   // values. This doesn't make much sense in
+                                   // the first place, but will lead to odd
+                                   // errors later on (happened to me in fact
+                                   // :-)
+  Assert (n_components > 0,
+          ExcInvalidNumberOfComponents(n_components));
+}
 
 
 template <int dim>

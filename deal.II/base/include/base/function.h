@@ -343,6 +343,13 @@ class Function : public FunctionTime,
                     << "number of components. However, here the left operand "
                     << "has " << arg1 << " components, and the right operand "
                     << arg2 << " components.");
+                                     /**
+                                      * Exception
+                                      */
+    DeclException1 (ExcInvalidNumberOfComponents,
+                    int,
+                    << "The number of components of a function object must "
+                    << "at least be one, but you gave " << arg1);
 };
 
 
