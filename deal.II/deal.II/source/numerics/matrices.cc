@@ -156,6 +156,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim> * const coefficient)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   create_mass_matrix(mapping, dof, q, matrix, coefficient);
 }
@@ -303,6 +304,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 					     Vector<double>           &rhs_vector,
 					     const Function<dim> * const coefficient)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   create_mass_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
 }
@@ -699,6 +701,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 						      std::vector<unsigned int> &dof_to_boundary_mapping,
 						      const Function<dim>       *a)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   create_boundary_mass_matrix(mapping, dof, q, matrix, rhs, rhs_vector,
 			      dof_to_boundary_mapping, a);
@@ -824,6 +827,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						SparseMatrix<double>     &matrix,
 						const Function<dim> * const coefficient)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   create_laplace_matrix(mapping, dof, q, matrix, coefficient);
 }
@@ -1012,6 +1016,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 						Vector<double>           &rhs_vector,
 						const Function<dim> * const coefficient)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;  
   create_laplace_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
 }

@@ -228,6 +228,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 			       const Function<dim>   &function,
 			       Vector<double>        &vec)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   interpolate(mapping, dof, function, vec);
 }
@@ -437,6 +438,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 			   const Quadrature<dim-1>  &q_boundary,
 			   const bool                project_to_boundary_first)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   project(mapping, dof, constraints, quadrature, function, vec,
 	  enforce_zero_boundary, q_boundary, project_to_boundary_first);
@@ -539,6 +541,7 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 					  const Function<dim>      &rhs_function,
 					  Vector<double>           &rhs_vector)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   create_right_hand_side(mapping, dof_handler, quadrature,
 			 rhs_function, rhs_vector);
@@ -739,6 +742,7 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   interpolate_boundary_values(mapping, dof, boundary_component,
 			      boundary_function, boundary_values, component_mask);
@@ -846,6 +850,7 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   project_boundary_values(mapping, dof, boundary_functions, q, boundary_values);
 }
@@ -1193,6 +1198,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 				   const NormType           &norm,
 				   const Function<dim>      *weight)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   integrate_difference(mapping, dof, fe_function, exact_solution,
 		       difference, q, norm, weight);
@@ -1245,6 +1251,7 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 				 Vector<double>        &v,
 				 const unsigned int     component)
 {
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   return compute_mean_value(mapping, dof, quadrature, v, component);
 }
