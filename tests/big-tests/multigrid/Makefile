@@ -39,7 +39,7 @@ delete-files = *gnuplot *.eps *ucd *history
 #deal include base path
 D = ../../..
 
-include ../../Make.global_options
+include $D/common/Make.global_options
 
 
 # get lists of files we need
@@ -112,7 +112,7 @@ clean:
 #rather for libnumerics.a(tria.o)
 Makefile.dep: $(cc-files) $(h-files) $(lib-h-files)
 	@echo ============================ Remaking Makefile
-	@perl ../../Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
+	@perl $D/common/scripts/Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
 		> Makefile.dep
 
 
