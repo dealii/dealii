@@ -19,12 +19,18 @@
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
+#include <base/quadrature.h>
+#include <fe/mapping_q1.h>
+
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
 #endif
 
+
+
+static MappingQ1<deal_II_dimension> mapping;
 
 template <int dim>
 Assembler<dim>::AssemblerData::AssemblerData (const DoFHandler<dim>    &dof,
@@ -56,7 +62,7 @@ Assembler<dim>::Assembler (Triangulation<dim>  *tria,
 		assemble_rhs (local_data->assemble_rhs),
 		matrix(local_data->matrix),
 		rhs_vector(local_data->rhs_vector),
-		fe_values (dof_handler->get_fe(),
+		fe_values (mapping, dof_handler->get_fe(),
 			   local_data->quadrature,
 			   local_data->update_flags)
 {

@@ -21,6 +21,8 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_q1.h>
+
 
 
 // if necessary try to work around a bug in the IBM xlC compiler
@@ -28,6 +30,9 @@
 using namespace std;
 #endif
 
+
+//TODO: Comment?? Use proper mapping!
+static MappingQ1<deal_II_dimension> mapping;
 
 
 template <int dim>
@@ -77,8 +82,8 @@ void DataOutStack<dim>::attach_dof_handler (const DoFHandler<dim> &dof)
 
 
 template <int dim>
-void DataOutStack<dim>::declare_data_vector (const std::string     &name,
-					     const VectorType  vector_type)
+void DataOutStack<dim>::declare_data_vector (const std::string &name,
+					     const VectorType   vector_type)
 {
   std::vector<std::string> names;
   names.push_back (name);
@@ -88,7 +93,7 @@ void DataOutStack<dim>::declare_data_vector (const std::string     &name,
 
 template <int dim>
 void DataOutStack<dim>::declare_data_vector (const std::vector<std::string> &names,
-					     const VectorType      vector_type)
+					     const VectorType    vector_type)
 {
 				   // make sure this function is
 				   // not called after some parameter
@@ -129,7 +134,7 @@ void DataOutStack<dim>::declare_data_vector (const std::vector<std::string> &nam
 template <int dim>
 template <typename number>
 void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
-					 const std::string         &name)
+					 const std::string    &name)
 {
   std::vector<std::string> names;
   names.push_back (name);
@@ -165,7 +170,7 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 	  {
 	    data_vector->data.reinit (vec.size());
 	    std::copy (vec.begin(), vec.end(),
-		  data_vector->data.begin());
+		       data_vector->data.begin());
 	    break;
 	  };
       Assert (data_vector != dof_data.end(),
@@ -218,13 +223,13 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				   // cell to these points
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
-  FEValues<dim>  fe_patch_values (dof_handler->get_fe(),
+  FEValues<dim>  fe_patch_values (mapping, dof_handler->get_fe(),
 				  patch_points,
 				  update_values);
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   std::vector<double>          patch_values (n_q_points);
   std::vector<Vector<double> > patch_values_system (n_q_points,
-					       Vector<double>(n_components));
+						    Vector<double>(n_components));
 
 				   // add the required number of patches
   DataOutBase::Patch<dim+1>  default_patch;
@@ -368,7 +373,7 @@ std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
 // explicit instantiations
 template class DataOutStack<deal_II_dimension>;
 template void DataOutStack<deal_II_dimension>::add_data_vector (const Vector<double> &vec,
-								const std::string         &name);
+								const std::string    &name);
 template void DataOutStack<deal_II_dimension>::add_data_vector (const Vector<float>  &vec,
-								const std::string         &name);
+								const std::string    &name);
 

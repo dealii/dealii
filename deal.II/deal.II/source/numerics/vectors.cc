@@ -29,6 +29,7 @@
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
+#include <fe/mapping_q1.h>
 
 #include <numeric>
 #include <algorithm>
@@ -40,6 +41,12 @@
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
 #endif
+
+
+
+//TODO: Comment?? Use proper mapping!
+static MappingQ1<deal_II_dimension> mapping;
+
 
 
 static inline double sqr (const double x)
@@ -54,6 +61,7 @@ inline double sqr_point (const Tensor<1,dim> &p)
 {
   return p * p;
 };
+
 
 
 
@@ -83,89 +91,10 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 				   // avoided to evaluate
 				   // the vectorfunction multiply at
 				   // the same point on a cell.
-  std::vector<Point<dim> > unit_support_points (fe.dofs_per_cell);
+  std::vector<Point<dim> > unit_support_points;
   fe.get_unit_support_points(unit_support_points);
-
-				   // The following works well
-				   // if @p{dofs_per_x<=1 (x=vertex,line,cell)}
-				   // as then
-				   // the multiple support_points
-				   // are placed one after another.
-
-				   // find the support points 
-				   // on a cell that
-				   // are multiply mentioned in 
-				   // @p{unit_support_points}.
-				   // Mark the first representative
-				   // of each multiply mentioned
-				   // support point by setting
-				   // @p{true} in the boolean vector 
-				   // @p{is_representative_point}.
-//   vector<bool>  is_representative_point(fe.dofs_per_cell, false);
-//   is_representative_point[0]=true;
-//   unsigned int n_rep_points=1;
-//   for (unsigned int last_rep_point=0, i=1; i<fe.dofs_per_cell; ++i)
-//     {
-//       if (unit_support_points[i] != unit_support_points[last_rep_point])
-// 	{
-// 	  is_representative_point[i] = true;
-// 	  last_rep_point=i;
-// 	  ++n_rep_points;
-// 	}
-//    };
-
-//   vector<unsigned int> dofs_on_cell (fe.dofs_per_cell);
-//   vector<Point<dim> >  support_points (fe.dofs_per_cell);
-
-//   vector<Point<dim> > rep_points (n_rep_points);
-//   vector<Vector<double> > function_values_at_rep_points (
-//     n_rep_points, Vector<double>(fe.n_components()));
-
-//   for (; cell!=endc; ++cell)
-//     {
-// 				       // for each cell:
-// 				       // get location of finite element
-// 				       // off-points (support_points)
-//       fe.get_support_points (cell, support_points);
-
-// 				       // pick out the representative
-// 				       // support points
-//       unsigned int j=0;
-//       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-// 	if (is_representative_point[i])
-// 	  rep_points[j++]=support_points[i];
-//       Assert(j == n_rep_points, ExcInternalError());
-
-// 				       // get function values at these points
-//       vectorfunction.value_list (rep_points, function_values_at_rep_points);
-  
-// 					     // get indices of the dofs on this cell
-//       cell->get_dof_indices (dofs_on_cell);
-
-// 				       // distribute function values to the
-// 				       // whole vector
-//       int last_rep_point = -1;
-// 				       // it holds `is_representative_point[0]=true'
-// 				       // therefore the first @p{last_rep_point} is 0
-// 				       // and we need to start with
-// 				       // `last_rep_point = -1'
-//       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-// 	{
-// 	  if (is_representative_point[i])
-// 	    ++last_rep_point;
-
-// 	  const unsigned int component
-// 	    = fe.system_to_component_index(i).first;
-// 	  vec(dofs_on_cell[i])
-// 	    = function_values_at_rep_points[last_rep_point](component);
-// 	} 
-//     }
-
-				   // The following is more general.
-				   // It also works if @p{dofs_per_x>1},
-				   // i.e. it is usable also for systems
-				   // including
-				   // FEQ3, FEQ4, FEDG_Qx.
+  Assert (unit_support_points.size() != 0,
+	  ExcNonInterpolatingFE());
 
 				   // Find the support points 
 				   // on a cell that
@@ -222,7 +151,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
   Assert(dof_to_rep_index_table.size()==fe.dofs_per_cell, ExcInternalError());
 
   std::vector<unsigned int> dofs_on_cell (fe.dofs_per_cell);
-  std::vector<Point<dim> >  support_points (fe.dofs_per_cell);
+  std::vector<double>       dummy_weights (fe.dofs_per_cell);
 
   std::vector<Point<dim> >  rep_points (n_rep_points);
 
@@ -236,12 +165,23 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
   std::vector<Vector<double> > function_values_system (n_rep_points,
 						  Vector<double>(fe.n_components()));
 
+				   // Make a quadrature rule from support points
+				   // to feed it into FEValues
+  Quadrature<dim> support_quadrature(unit_support_points, dummy_weights);
+
+//TODO: Higher order mapping?  
+				   // Transformed support points are computed by
+				   // FEValues
+  FEValues<dim> fe_values (mapping, fe, support_quadrature, update_q_points);
+  
   for (; cell!=endc; ++cell)
     {
 				       // for each cell:
 				       // get location of finite element
-				       // off-points (support_points)
-      fe.get_support_points (cell, support_points);
+				       // support_points
+      fe_values.reinit(cell);
+      const std::vector<Point<dim> >& support_points =
+	fe_values.get_quadrature_points();
       
 				       // pick out the representative
 				       // support points
@@ -286,6 +226,7 @@ void VectorTools::interpolate (const DoFHandler<dim> &dof,
 	};
     }
 }
+
 
 
 
@@ -452,17 +393,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
 
-				   // try to assemble the mass matrix by exact
-				   // integration. if this is not supported,
-				   // then use quadrature
-  try 
-    {
-      MatrixCreator<dim>::create_mass_matrix (dof, mass_matrix);
-    }
-  catch (FiniteElement<dim>::ExcComputationNotUseful)
-    {
-      MatrixCreator<dim>::create_mass_matrix (dof, quadrature, mass_matrix);
-    };
+  MatrixCreator<dim>::create_mass_matrix (dof, quadrature, mass_matrix);
   
   VectorTools::create_right_hand_side (dof, quadrature, function, tmp);
 
@@ -504,7 +435,7 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_q_points |
 					 update_JxW_values);
-  FEValues<dim> fe_values (fe, quadrature, update_flags);
+  FEValues<dim> fe_values (mapping, fe, quadrature, update_flags);
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points,
@@ -513,8 +444,8 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
   std::vector<unsigned int> dofs (dofs_per_cell);
   Vector<double> cell_vector (dofs_per_cell);
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+						 endc = dof_handler.end();
 
   if (n_components==1)
     {
@@ -524,8 +455,8 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 	{
 	  fe_values.reinit(cell);
 	  
-	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-	  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
+	  const FullMatrix<double>  &values    = fe_values.get_shape_values ();
+	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	  rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
 	  cell_vector.clear();
@@ -550,8 +481,8 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 	{
 	  fe_values.reinit(cell);
 	  
-	  const FullMatrix<double> &values    = fe_values.get_shape_values ();
-	  const std::vector<double>     &weights   = fe_values.get_JxW_values ();
+	  const FullMatrix<double>  &values    = fe_values.get_shape_values ();
+	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	  rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
 	  
 	  cell_vector.clear();
@@ -597,8 +528,8 @@ VectorTools::interpolate_boundary_values (const DoFHandler<1>      &dof,
 				   // the original value or a vector
 				   // of @p{true}s
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-				     std::vector<bool> (fe.n_components(), true) :
-				     component_mask_);
+					  std::vector<bool> (fe.n_components(), true) :
+					  component_mask_);
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
   
@@ -675,14 +606,15 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 				   // the original value or a vector
 				   // of @p{true}s
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-				     std::vector<bool> (fe.n_components(), true) :
-				     component_mask_);
+					  std::vector<bool> (fe.n_components(), true) :
+					  component_mask_);
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
 
-				   // field to store the indices of dofs
+				   // field to store the indices
   std::vector<unsigned int> face_dofs (fe.dofs_per_face, -1);
   std::vector<Point<dim> >  dof_locations (face_dofs.size(), Point<dim>());
+  
 				   // array to store the values of
 				   // the boundary function at the
 				   // boundary points. have to arrays
@@ -691,55 +623,78 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>    &dof,
 				   // respectively
   std::vector<double>          dof_values_scalar (fe.dofs_per_face);
   std::vector<Vector<double> > dof_values_system (fe.dofs_per_face,
-					     Vector<double>(fe.n_components()));
-	
-  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-					endf = dof.end_face();
-  for (; face!=endf; ++face)
-    if (boundary_component == face->boundary_indicator()) 
-				       // face is of the right component
-      {
-					 // get indices, physical location and
-					 // boundary values of dofs on this
-					 // face
-	face->get_dof_indices (face_dofs);
-	fe.get_face_support_points (face, dof_locations);
+						  Vector<double>(fe.n_components()));
 
-	if (fe_is_system)
+				   // next generate a quadrature rule
+				   // on the face from the unit
+				   // support points. this wil be used
+				   // to obtain the quadrature points
+				   // on the real cell's face
+  typename std::vector<Point<dim-1> > unit_support_points;
+  fe.get_unit_face_support_points(unit_support_points);
+				   // check whether there are support
+				   // points on the face, if not, then
+				   // this FE does not allow to be
+				   // used in this function
+  Assert (unit_support_points.size() != 0, ExcNonInterpolatingFE());
+
+  std::vector<double> dummy_weights (unit_support_points.size());
+  Quadrature<dim-1> aux_quad (unit_support_points, dummy_weights);
+  FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
+
+  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+					endc = dof.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+	 ++face_no)
+      {
+	DoFHandler<dim>::face_iterator face = cell->face(face_no);
+	if (boundary_component == face->boundary_indicator()) 
+					   // face is of the right component
 	  {
-	    boundary_function.vector_value_list (dof_locations, dof_values_system);
+					     // get indices, physical location and
+					     // boundary values of dofs on this
+					     // face
+	    face->get_dof_indices (face_dofs);
+	    fe_values.reinit(cell, face_no);
+	    const std::vector<Point<dim> > &dof_locations = fe_values.get_quadrature_points ();
 	    
-					     // enter into list
-	    
-	    for (unsigned int i=0; i<face_dofs.size(); ++i)
-	      if (component_mask[fe.face_system_to_component_index(i).first])
-		boundary_values[face_dofs[i]]
-		  = dof_values_system[i](fe.face_system_to_component_index(i).first);
+	    if (fe_is_system)
+	      {
+		boundary_function.vector_value_list (dof_locations, dof_values_system);
+		
+						 // enter into list
+		
+		for (unsigned int i=0; i<face_dofs.size(); ++i)
+		  if (component_mask[fe.face_system_to_component_index(i).first])
+		    boundary_values[face_dofs[i]]
+		      = dof_values_system[i](fe.face_system_to_component_index(i).first);
+	      }
+	    else
+					       // fe has only one component,
+					       // so save some computations
+	      {
+						 // get only the one component that
+						 // this function has
+		boundary_function.value_list (dof_locations,
+					      dof_values_scalar,
+					      0);
+		
+						 // enter into list
+		
+		for (unsigned int i=0; i<face_dofs.size(); ++i)
+		  boundary_values[face_dofs[i]] = dof_values_scalar[i];
+	      }
 	  }
-	else
-					   // fe has only one component,
-					   // so save some computations
-	  {
-					     // get only the one component that
-					     // this function has
-	    boundary_function.value_list (dof_locations,
-					  dof_values_scalar,
-					  0);
-	    
-					     // enter into list
-	    
-	    for (unsigned int i=0; i<face_dofs.size(); ++i)
-	      boundary_values[face_dofs[i]] = dof_values_scalar[i];
-	  };
-      };
+      }
 }
 
-
-
+  
+  
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
-				      const typename std::map<unsigned char,const Function<dim>*> &boundary_functions,
+				      const std::map<unsigned char,const Function<dim>*> &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
@@ -858,19 +813,19 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
   if ((norm==H1_seminorm) || (norm==H1_norm))
     update_flags = UpdateFlags (update_flags | update_gradients);
   
-  FEValues<dim> fe_values(fe, q, update_flags);
+  FEValues<dim> fe_values(mapping, fe, q, update_flags);
 
   std::vector< Vector<double> >        function_values (n_q_points,
-						   Vector<double>(n_components));
+							Vector<double>(n_components));
   std::vector<std::vector<Tensor<1,dim> > > function_grads (n_q_points,
-						  std::vector<Tensor<1,dim> >(n_components));
+							    std::vector<Tensor<1,dim> >(n_components));
   std::vector<double> weight_values (n_q_points);
   std::vector<Vector<double> > weight_vectors (n_q_points, n_components);
   
   std::vector<Vector<double> >         psi_values (n_q_points,
-					      Vector<double>(n_components));
+						   Vector<double>(n_components));
   std::vector<std::vector<Tensor<1,dim> > > psi_grads (n_q_points,
-					     std::vector<Tensor<1,dim> >(n_components));
+						       std::vector<Tensor<1,dim> >(n_components));
   std::vector<double> psi_scalar (n_q_points);
 				   // tmp vector when we use the
 				   // Function<dim> functions for
@@ -913,15 +868,15 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 					     // the function really has only
 					     // one component
 	    if (fe_is_system)
-		exact_solution.vector_value_list (fe_values.get_quadrature_points(),
-						  psi_values);
+	      exact_solution.vector_value_list (fe_values.get_quadrature_points(),
+						psi_values);
 	    else
 	      {
 		exact_solution.value_list (fe_values.get_quadrature_points(),
 					   tmp_values);
 		for (unsigned int i=0; i<n_q_points; ++i)
 		  psi_values[i](0) = tmp_values[i];
-	      }
+	      };
 	    
  					     // then subtract finite element
  					     // fe_function
@@ -1109,7 +1064,7 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 		psi_grads[q][k] -= function_grads[q][k];
 
 					     // take square of integrand
-	    fill_n (psi_scalar.begin(), n_q_points, 0.0);
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
 
 	    for (unsigned int k=0; k<n_components; ++k)
 	      if (weight != 0)
@@ -1134,9 +1089,9 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 
  					     // add seminorm to L_2 norm or
  					     // to zero
- 	    diff += inner_product (psi_scalar.begin(), psi_scalar.end(),
-				   fe_values.get_JxW_values().begin(),
-				   0.0);
+ 	    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+					fe_values.get_JxW_values().begin(),
+					0.0);
  	    diff = sqrt(diff);
 
  	    break;
@@ -1165,20 +1120,18 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
   Assert (component < dof.get_fe().n_components(),
 	  ExcIndexRange(component, 0, dof.get_fe().n_components()));
   
-  FEValues<dim> fe(dof.get_fe(), quadrature,
+  FEValues<dim> fe(mapping, dof.get_fe(), quadrature,
 		   UpdateFlags(update_JxW_values
 			       | update_values));
 
-  DoFHandler<dim>::active_cell_iterator c;
+  typename DoFHandler<dim>::active_cell_iterator c;
   std::vector<Vector<double> > values(quadrature.n_quadrature_points,
-				 Vector<double> (dof.get_fe().n_components()));
+				      Vector<double> (dof.get_fe().n_components()));
   
   double mean = 0.;
   double area = 0.;
 				   // Compute mean value
-  for (c = dof.begin_active();
-       c != dof.end();
-       ++c)
+  for (c = dof.begin_active(); c != dof.end(); ++c)
     {
       fe.reinit (c);
       fe.get_function_values(v, values);
@@ -1186,10 +1139,13 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 	{
 	  mean += fe.JxW(k) * values[k](component);
 	  area += fe.JxW(k);
-	}
-    }
+	};
+    };
+  
   return (mean/area);
-}
+};
+
+
 
 
 
@@ -1229,8 +1185,6 @@ double VectorTools::compute_mean_value (const DoFHandler<deal_II_dimension> &dof
 					const Quadrature<deal_II_dimension> &quadrature,
 					Vector<double>        &v,
 					const unsigned int component);
-
-
 
 
 // the following two functions are not derived from a template in 1d

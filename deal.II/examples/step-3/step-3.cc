@@ -23,7 +23,7 @@
 
 				 // In this file are the finite
 				 // element descriptions.
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
 
 				 // And this file is needed for the
 				 // creation of sparsity patterns of
@@ -118,11 +118,13 @@ class LaplaceProblem
 				     // variables. There are variables
 				     // describing the triangulation
 				     // and the numbering of the
-				     // degrees of freedom...
-				     // (FEQ1<2> is the space with
-				     // shape functions {1,x,y,xy})
+				     // degrees of freedom (we will
+				     // specify the exact polynomial
+				     // degree of the finite element
+				     // in the constructor of this
+				     // class)...
     Triangulation<2>     triangulation;
-    FEQ1<2>              fe;
+    FE_Q<2>              fe;
     DoFHandler<2>        dof_handler;
 
 				     // ...variables for the sparsity
@@ -142,14 +144,20 @@ class LaplaceProblem
 
 
 				 // Here comes the constructor. It
-				 // does not much more than associate
-				 // the dof_handler variable to the
+				 // does not much more than first to
+				 // specify that we want bi-linear
+				 // elements (denoted by the parameter
+				 // to the finite element object,
+				 // which specifies the polynomial
+				 // degree), and to associate the
+				 // dof_handler variable to the
 				 // triangulation we use. All the
 				 // other member variables of the
 				 // LaplaceProblem class have a
 				 // default constructor which does all
 				 // we want.
 LaplaceProblem::LaplaceProblem () :
+                fe (1),
 		dof_handler (triangulation)
 {};
 

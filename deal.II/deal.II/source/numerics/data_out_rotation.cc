@@ -19,8 +19,12 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+
+//TODO: Do this more clever
+static MappingQ1<deal_II_dimension> mapping;
 
 #ifdef DEAL_II_USE_MT
 #include <base/thread_management.h>
@@ -35,15 +39,14 @@ using namespace std;
 #endif
 
 
-
-
 template <int dim>
 void DataOutRotation<dim>::build_some_patches (Data data)
 {
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
   
-  FEValues<dim> fe_patch_values(dofs->get_fe(),
+  FEValues<dim> fe_patch_values(mapping,
+				dofs->get_fe(),
 				patch_points,
 				update_values);
 

@@ -197,15 +197,7 @@ class MatrixCreator
 				     /**
 				      * Assemble the mass matrix. If no 
 				      * coefficient is given, it is assumed
-				      * to be constant one.
-				      * 
-				      * If the coefficient is constant, it
-				      * may be more adequate to use the
-				      * functions assembling the mass matrix
-				      * without quadrature. However, the
-				      * two functions have different effects
-				      * for finite elements composed of
-				      * several subobjects.
+				      * to be unity.
 				      * 
 				      * See the general doc of this class
 				      * for more information.
@@ -219,16 +211,8 @@ class MatrixCreator
 				      * Assemble the mass matrix and a right
 				      * hand side vector. If no 
 				      * coefficient is given, it is assumed
-				      * to be constant one.
+				      * to be unity.
 				      *
-				      * If the coefficient is constant, it
-				      * may be more adequate to use the
-				      * functions assembling the mass matrix
-				      * without quadrature. However, the
-				      * two functions have different effects
-				      * for finite elements composed of
-				      * several subobjects.
-				      * 
 				      * See the general doc of this class
 				      * for more information.
 				      */
@@ -239,28 +223,6 @@ class MatrixCreator
 				    Vector<double>           &rhs_vector,
 				    const Function<dim>      *a = 0);
 
-				     /**
-				      * Create the mass matrix by exact
-				      * evaluation without using a quadrature
-				      * formula.
-				      *
-				      * No right hand side may be created using
-				      * this function. See the general doc of
-				      * this class for more information.
-				      *
-				      * It is assumed that the matrix already
-				      * has the right size. The mass matrix
-				      * elements are summed up to the values
-				      * previously in the matrix, so if you want
-				      * the pure mass matrix, you have to clear
-				      * the matrix beforehand.
-				      * 
-				      * See the general doc of this class
-				      * for more information.
-				      */
-    static void create_mass_matrix (const DoFHandler<dim>    &dof,
-				    SparseMatrix<double>     &matrix);
-    
 				     /**
 				      * Assemble the mass matrix and a right
 				      * hand side vector along the boundary.

@@ -22,6 +22,11 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 
+#include <fe/mapping_q1.h>
+
+//TODO: Do this more clever
+static MappingQ1<deal_II_dimension> mapping;
+
 #ifdef DEAL_II_USE_MT
 #include <base/thread_management.h>
 #endif
@@ -36,7 +41,8 @@ void DataOutFaces<dim>::build_some_patches (Data data)
   QTrapez<1>        q_trapez;
   QIterated<dim-1>  patch_points (q_trapez, data.n_subdivisions);
   
-  FEFaceValues<dim> fe_patch_values(dofs->get_fe(),
+  FEFaceValues<dim> fe_patch_values(mapping,
+				    dofs->get_fe(),
 				    patch_points,
 				    update_values);
 

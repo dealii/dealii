@@ -13,10 +13,12 @@
 
 
 #include <base/point.h>
+#include <base/quadrature.h>
 #include <grid/grid_out.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <fe/mapping.h>
 
 #include <iomanip>
 #include <algorithm>
@@ -222,16 +224,68 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
       };	  
 };
 
+#if deal_II_dimension==1
+
+template <>
+void GridOut::write_gnuplot (const Triangulation<1> &tria,
+			     std::ostream           &out,
+			     const Mapping<1>       *) 
+{
+  AssertThrow (out, ExcIO());
+
+  Triangulation<1>::active_cell_iterator        cell=tria.begin_active();
+  const Triangulation<1>::active_cell_iterator  endc=tria.end();
+  for (; cell!=endc; ++cell)
+    {
+      if (gnuplot_flags.write_cell_numbers)
+	out << "# cell " << cell << std::endl;
+//TODO: plot level and material according to switches      
+
+      out << cell->vertex(0)
+	  << ' ' << cell->level()
+	  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	  << cell->vertex(1)
+		    << ' ' << cell->level()
+	  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	  << std::endl;
+      break;
+    }
+  AssertThrow (out, ExcIO());
+}
+
+
+#else
 
 
 template <int dim>
 void GridOut::write_gnuplot (const Triangulation<dim> &tria,
-			     std::ostream             &out) 
+			     std::ostream             &out,
+			     const Mapping<dim>       *mapping) 
 {
   AssertThrow (out, ExcIO());
 
+  const unsigned int n_points=
+    gnuplot_flags.n_boundary_face_points;
+
   typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
   const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
+
+				   // if we are to treat curved
+				   // boundaries, then generate a
+				   // quadrature formula which will be
+				   // used to probe boundary points at
+				   // curved faces
+  QProjector<dim> *q_projector=0;
+  if (mapping!=0)
+    {
+      typename std::vector<Point<dim-1> > boundary_points(n_points);
+      for (unsigned int i=0; i<n_points; ++i)
+	boundary_points[i](0)= 1.*(i+1)/(n_points+1);
+
+      Quadrature<dim-1> quadrature(boundary_points, std::vector<double> (n_points, 1));
+      q_projector = new QProjector<dim> (quadrature, false);
+    }
+  
   for (; cell!=endc; ++cell)
     {
       if (gnuplot_flags.write_cell_numbers)
@@ -240,16 +294,24 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
       switch (dim)
 	{
 	  case 1:
-		out << cell->vertex(0)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(1)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-		break;
-
+	  {
+	    Assert(false, ExcInternalError());
+	    break;
+	  };
+	   
 	  case 2:
+	  {
+	    if (mapping==0 || !cell->at_boundary())
+	      {
+						 // write out the four
+						 // sides of this cell
+						 // by putting the
+						 // four points (+ the
+						 // initial point
+						 // again) in a row
+						 // and lifting the
+						 // drawing pencil at
+						 // the end
 		out << cell->vertex(0)
 		    << ' ' << cell->level()
 		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
@@ -267,81 +329,153 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 		    << std::endl  // double new line for gnuplot 3d plots
 		    << std::endl;
-		break;
-
+	      }
+	    else
+					       // cell is at boundary
+					       // and we are to treat
+					       // curved
+					       // boundaries. so loop
+					       // over all faces and
+					       // draw them as small
+					       // pieces of lines
+	      {
+		for (unsigned int face_no=0;
+		     face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+		  {
+		    const typename Triangulation<dim>::face_iterator
+		      face = cell->face(face_no);
+		    if (face->at_boundary())
+		      {
+			out << face->vertex(0)
+			    << ' ' << cell->level()
+			    << ' ' << static_cast<unsigned int>(cell->material_id())
+			    << std::endl;
+			
+			const unsigned int offset=face_no*n_points;
+			for (unsigned int i=0; i<n_points; ++i)
+			  out << (mapping->transform_unit_to_real_cell
+				  (cell, q_projector->point(offset+i)))
+			      << ' ' << cell->level()
+			      << ' ' << static_cast<unsigned int>(cell->material_id())
+			      << std::endl;
+			
+			out << face->vertex(1)
+			    << ' ' << cell->level()
+			    << ' ' << static_cast<unsigned int>(cell->material_id())
+			    << std::endl
+			    << std::endl
+			    << std::endl;
+		      }
+		    else
+		      {
+							 // if,
+							 // however,
+							 // the face
+							 // is not at
+							 // the
+							 // boundary,
+							 // then draw
+							 // it as
+							 // usual
+			out << face->vertex(0)
+			    << ' ' << cell->level()
+			    << ' ' << static_cast<unsigned int>(cell->material_id())
+			    << std::endl
+			    << face->vertex(1)
+			    << ' ' << cell->level()
+			    << ' ' << static_cast<unsigned int>(cell->material_id())
+			    << std::endl
+			    << std::endl
+			    << std::endl;
+		      };
+		  };
+	      };
+	    
+	    break;
+	  };
+	   
 	  case 3:
-						 // front face
-		out << cell->vertex(0)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(1)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(2)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(3)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(0)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-						 // back face
-		out << cell->vertex(4)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(5)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(6)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(7)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(4)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-
-						 // now for the four connecting lines
-		out << cell->vertex(0)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(4)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-		out << cell->vertex(1)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(5)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-		out << cell->vertex(2)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(6)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-		out << cell->vertex(3)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << cell->vertex(7)
-		    << ' ' << cell->level()
-		    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-		    << std::endl;
-		break;
+	  {
+//TODO: curved boundaries in 3d gnuplot not supported	    
+	    Assert (mapping == 0, ExcNotImplemented());
+	    
+					     // front face
+	    out << cell->vertex(0)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(1)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(2)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(3)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(0)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< std::endl;
+					     // back face
+	    out << cell->vertex(4)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(5)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(6)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(7)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(4)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< std::endl;
+	    
+					     // now for the four connecting lines
+	    out << cell->vertex(0)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(4)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< std::endl;
+	    out << cell->vertex(1)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(5)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< std::endl;
+	    out << cell->vertex(2)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(6)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< std::endl;
+	    out << cell->vertex(3)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< cell->vertex(7)
+		<< ' ' << cell->level()
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+		<< std::endl;
+	    break;
+	  };
 	};
     };
+
+  if (q_projector != 0)
+    delete q_projector;
+  
   
   AssertThrow (out, ExcIO());
 };
 
-
+#endif
 
 struct LineEntry
 {
@@ -355,10 +489,23 @@ struct LineEntry
 };
 
 
+#if deal_II_dimension==1
+
+template <>
+void GridOut::write_eps (const Triangulation<1> &,
+			 std::ostream &,
+			 const Mapping<1> *) 
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+#else
 
 template <int dim>
 void GridOut::write_eps (const Triangulation<dim> &tria,
-			 std::ostream             &out) 
+			 std::ostream             &out,
+			 const Mapping<dim>       *mapping) 
 {
   
   typedef std::list<LineEntry> LineList;
@@ -368,15 +515,14 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				   // in order to avoid the recurring
 				   // distinctions between
 				   // eps_flags_1, eps_flags_2, ...
-  const EpsFlagsBase &eps_flags_base = (dim==1 ?
-					(EpsFlagsBase&)eps_flags_1 :
-					(dim==2 ?
-					 (EpsFlagsBase&)eps_flags_2 :
-					 (dim==3 ?
-					  (EpsFlagsBase&)eps_flags_3 :
-					  *(EpsFlagsBase*)0)));
+  const EpsFlagsBase &eps_flags_base = (dim==2 ?
+					static_cast<EpsFlagsBase&>(eps_flags_2) :
+					(dim==3 ?
+					 static_cast<EpsFlagsBase&>(eps_flags_3) :
+					 *static_cast<EpsFlagsBase*>(0)));
   
   AssertThrow (out, ExcIO());
+  const unsigned int n_points = eps_flags_base.n_boundary_face_points;
 
 				   // make up a list of lines by which
 				   // we will construct the triangulation
@@ -393,36 +539,120 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 
   switch (dim)
     {
+      case 1:
+      {
+	Assert(false, ExcInternalError());
+	break;
+      };
+       
       case 2:
       {
 	Triangulation<dim>::active_line_iterator line   =tria.begin_active_line ();
 	Triangulation<dim>::active_line_iterator endline=tria.end_line ();
-	
+
+					 // first treat all interior
+					 // lines and make up a list
+					 // of them. if curved lines
+					 // shall not be supported
+					 // (i.e. no mapping is
+					 // provided), then also treat
+					 // all other lines
 	for (; line!=endline; ++line)
-					   // one would expect
-					   // make_pair(line->vertex(0),
-					   //           line->vertex(1))
-					   // here, but that is not
-					   // dimension independent, since
-					   // vertex(i) is Point<dim>,
-					   // but we want a Point<2>.
-					   // in fact, whenever we're here,
-					   // the vertex is a Point<dim>,
-					   // but the compiler does not
-					   // know this. hopefully, the
-					   // compiler will optimize away
-					   // this little kludge
-	  line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
-						  line->vertex(0)(1)),
-					 Point<2>(line->vertex(1)(0),
-						  line->vertex(1)(1)),
-					 line->user_flag_set()));
+	  if (mapping==0 || !line->at_boundary())
+					     // one would expect
+					     // make_pair(line->vertex(0),
+					     //           line->vertex(1))
+					     // here, but that is not
+					     // dimension independent, since
+					     // vertex(i) is Point<dim>,
+					     // but we want a Point<2>.
+					     // in fact, whenever we're here,
+					     // the vertex is a Point<dim>,
+					     // but the compiler does not
+					     // know this. hopefully, the
+					     // compiler will optimize away
+					     // this little kludge
+	    line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
+						    line->vertex(0)(1)),
+					   Point<2>(line->vertex(1)(0),
+						    line->vertex(1)(1)),
+					   line->user_flag_set()));
+	
+					 // next if we are to treat
+					 // curved boundaries
+					 // specially, then add lines
+					 // to the list consisting of
+					 // pieces of the boundary
+					 // lines
+	if (mapping!=0)
+	  {
+					     // to do so, first
+					     // generate a sequence of
+					     // points on a face and
+					     // project them onto the
+					     // faces of a unit cell
+	    typename std::vector<Point<dim-1> > boundary_points (n_points);
+	    
+	    for (unsigned int i=0; i<n_points; ++i)
+	      boundary_points[i](0) = 1.*(i+1)/(n_points+1);
+	    
+	    Quadrature<dim-1> quadrature (boundary_points,
+					  std::vector<double> (n_points, 1));
+	    QProjector<dim> q_projector (quadrature, false);
+
+					     // next loop over all
+					     // boundary faces and
+					     // generate the info from
+					     // them
+	    typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active ();
+	    const typename Triangulation<dim>::active_cell_iterator end=tria.end ();
+	    for (; cell!=end; ++cell)
+	      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+		{
+		  const typename Triangulation<dim>::face_iterator
+		    face = cell->face(face_no);
+		  
+		  if (face->at_boundary())
+		    {
+		      Point<dim> p0_dim(face->vertex(0));
+		      Point<2>   p0    (p0_dim(0), p0_dim(1));
+
+						       // loop over
+						       // all pieces
+						       // of the line
+						       // and generate
+						       // line-lets
+		      const unsigned int offset=face_no*n_points;
+		      for (unsigned int i=0; i<n_points; ++i)
+			{
+			  const Point<dim> p1_dim (mapping->transform_unit_to_real_cell
+						   (cell, q_projector.point(offset+i)));
+			  const Point<2>   p1     (p1_dim(0), p1_dim(1));
+			  
+			  line_list.push_back (LineEntry(p0, p1,
+							 face->user_flag_set()));
+			  p0=p1;
+			}
+
+						       // generate last piece
+		      const Point<dim> p1_dim (face->vertex(1));
+		      const Point<2>   p1     (p1_dim(0), p1_dim(1));
+		      line_list.push_back (LineEntry(p0, p1,
+						     face->user_flag_set()));
+		    };
+		};
+	  };
 	
 	break;
       };
        
       case 3:
       {
+					 // curved boundary output
+					 // presently not supported
+//TODO: curved boundaries in eps for 3d	
+	Assert (mapping == 0, ExcNotImplemented());
+	
 	Triangulation<dim>::active_line_iterator line   =tria.begin_active_line ();
 	Triangulation<dim>::active_line_iterator endline=tria.end_line ();
 	
@@ -442,14 +672,8 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // is in direction of the viewer, but
 					 // I am too tired at present to fix
 					 // this
-//#if !((__GNUC__==2) && (__GNUC_MINOR__==95))
 	const double z_angle    = eps_flags_3.azimut_angle;
 	const double turn_angle = eps_flags_3.turn_angle;
-//#else
-//#   warning Not implemented for gcc2.95
-//	const double z_angle    = 60;
-//	const double turn_angle = 30;
-//#endif
 	const double pi = 3.1415926536;
 	const Point<dim> view_direction(-sin(z_angle * 2.*pi / 360.) * sin(turn_angle * 2.*pi / 360.),
 					+sin(z_angle * 2.*pi / 360.) * cos(turn_angle * 2.*pi / 360.),
@@ -486,6 +710,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
       default:
 	    Assert (false, ExcNotImplemented());
     };
+
 
 
 				   // find out minimum and maximum x and
@@ -545,9 +770,9 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 					 // lower left corner
 	  << "0 0 "
 					 // upper right corner
-	  << static_cast<unsigned int>( (x_max-x_min) * scale )
+	  << static_cast<unsigned int>( (x_max-x_min) * scale )+1
 	  << ' '
-	  << static_cast<unsigned int>( (y_max-y_min) * scale )
+	  << static_cast<unsigned int>( (y_max-y_min) * scale )+1
 	  << std::endl;
 
 				       // define some abbreviations to keep
@@ -582,12 +807,14 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   AssertThrow (out, ExcIO());
 };
 
+#endif
 
 
 template <int dim>
 void GridOut::write (const Triangulation<dim> &tria,
 		     std::ostream             &out,
-		     OutputFormat              output_format)
+		     OutputFormat              output_format,
+		     const Mapping<dim>       *mapping)
 {
   switch (output_format)
     {
@@ -596,11 +823,11 @@ void GridOut::write (const Triangulation<dim> &tria,
 	    return;
 
       case gnuplot:
-	    write_gnuplot (tria, out);
+	    write_gnuplot (tria, out, mapping);
 	    return;
 
       case eps:
-	    write_eps (tria, out);
+	    write_eps (tria, out, mapping);
 	    return;
     };
 
@@ -612,10 +839,14 @@ void GridOut::write (const Triangulation<dim> &tria,
 // explicit instantiations
 template void GridOut::write_ucd (const Triangulation<deal_II_dimension> &,
  				  std::ostream &);
+#if deal_II_dimension != 1
 template void GridOut::write_gnuplot (const Triangulation<deal_II_dimension> &,
- 				      std::ostream &);
+ 				      std::ostream &,
+				      const Mapping<deal_II_dimension> *);
 template void GridOut::write_eps (const Triangulation<deal_II_dimension> &,
- 				  std::ostream &);
+ 				  std::ostream &,
+				  const Mapping<deal_II_dimension> *);
+#endif
 template void GridOut::write (const Triangulation<deal_II_dimension> &,
 			      std::ostream &,
 			      OutputFormat);

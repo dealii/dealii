@@ -22,31 +22,62 @@ GridOut::UcdFlags::UcdFlags (const bool write_preamble,
 {}
 
 
-GridOut::GnuplotFlags::GnuplotFlags (const bool write_cell_numbers) :
-		write_cell_numbers (write_cell_numbers)
+GridOut::GnuplotFlags::GnuplotFlags (const bool write_cell_numbers,
+				     const unsigned int n_boundary_face_points) :
+		write_cell_numbers (write_cell_numbers),
+		n_boundary_face_points(n_boundary_face_points)
 {}
 
 
 GridOut::EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
 				     const unsigned int size,
 				     const double       line_width,
-				     bool color_lines_on_user_flag) :
+				     const bool color_lines_on_user_flag,
+				     const unsigned int n_boundary_face_points) :
 		size_type (size_type),
 		size (size),
 		line_width (line_width),
-		color_lines_on_user_flag(color_lines_on_user_flag)
+		color_lines_on_user_flag(color_lines_on_user_flag),
+		n_boundary_face_points(n_boundary_face_points)
 {}
 
 
-// egcs 1.1.2 does not understand this, so I made it inlined in the
-// class declaration
-//
-// template <>
-// GridOut::EpsFlags<3>::EpsFlags (const double        azimut_angle,
-// 				const double        turn_angle) :
-// 		azimut_angle (azimut_angle),
-// 		turn_angle (turn_angle)
-// {};
+
+GridOut::EpsFlags<1>::EpsFlags (const SizeType     size_type,
+				const unsigned int size,
+				const double       line_width,
+				const bool color_lines_on_user_flag,
+				const unsigned int n_boundary_face_points):
+			EpsFlagsBase(size_type, size, line_width,
+				     color_lines_on_user_flag,
+				     n_boundary_face_points)
+{}
+
+
+GridOut::EpsFlags<2>::EpsFlags (const SizeType     size_type,
+				const unsigned int size,
+				const double       line_width,
+				const bool color_lines_on_user_flag,
+				const unsigned int n_boundary_face_points):
+			EpsFlagsBase(size_type, size, line_width,
+				     color_lines_on_user_flag,
+				     n_boundary_face_points)
+{}
+
+
+GridOut::EpsFlags<3>::EpsFlags (const SizeType     size_type,
+				const unsigned int size,
+				const double       line_width,
+				const bool color_lines_on_user_flag,
+				const unsigned int n_boundary_face_points,
+				const double        azimut_angle,
+				const double        turn_angle):
+			EpsFlagsBase(size_type, size, line_width,
+				     color_lines_on_user_flag,
+				     n_boundary_face_points),
+			azimut_angle (azimut_angle),
+			turn_angle (turn_angle)
+{}
 
 
 void GridOut::set_flags (const UcdFlags &flags) 

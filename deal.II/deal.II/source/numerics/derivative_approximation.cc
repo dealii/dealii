@@ -1,4 +1,4 @@
-//----------------------------  derivative_approximation.cc  ---------------------------
+//----------------------------  gradient_estimator.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -21,10 +21,14 @@
 #include <dofs/dof_handler.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_q1.h>
 #include <numerics/derivative_approximation.h>
 
 #include <cmath>
 
+
+//TODO: Comment? Use proper mapping!
+static MappingQ1<deal_II_dimension> mapping;
 
 
 template <typename T>
@@ -257,7 +261,7 @@ DerivativeApproximation::approximate (const DoFHandler<dim> &dof_handler,
 				      Vector<float>         &derivative_norm)
 {
   QMidpoint<dim> midpoint_rule;
-  FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
+  FEValues<dim>  fe_midpoint_value (mapping, dof_handler.get_fe(),
 				    midpoint_rule,
 				    UpdateFlags(DerivativeDescription::update_flags |
 						update_q_points));

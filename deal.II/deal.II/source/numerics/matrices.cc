@@ -26,16 +26,27 @@
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
+#include <fe/mapping_q1.h>
 
 #include <algorithm>
 #include <set>
 #include <cmath>
+
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
 #endif
 
+
+
+
+//TODO: Comment?? Use proper mapping!
+static MappingQ1<deal_II_dimension> mapping;
+
+
+
+//TODO: re-create the create_mass_matrix function with 2 args
 
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
@@ -96,42 +107,16 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 
 
-template <int dim>
-void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
-					     SparseMatrix<double>     &matrix)
-{
-  const FiniteElement<dim> &fe = dof.get_fe();
-
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  
-  FullMatrix<double>   local_mass_matrix (dofs_per_cell, dofs_per_cell);
-  std::vector<unsigned int> dofs_on_this_cell (dofs_per_cell);
-  
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-					endc = dof.end();
-  for (; cell!=endc; ++cell) 
-    {
-      cell->get_dof_indices (dofs_on_this_cell);
-      fe.get_local_mass_matrix (cell, local_mass_matrix);
-      
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  matrix.add (dofs_on_this_cell[i], dofs_on_this_cell[j],
-		      local_mass_matrix(i,j));
-    };
-};
-
-
 #if deal_II_dimension == 1
 
 template <>
-void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
-						    const Quadrature<0>    &,
-						    SparseMatrix<double>   &,
-						    const FunctionMap      &,
-						    Vector<double>         &,
-						    std::vector<unsigned int>   &,
-						    const Function<1>      *)
+void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>       &,
+						    const Quadrature<0>       &,
+						    SparseMatrix<double>      &,
+						    const FunctionMap         &,
+						    Vector<double>            &,
+						    std::vector<unsigned int> &,
+						    const Function<1>         *)
 {
   Assert (false, ExcNotImplemented());
 };
@@ -140,13 +125,13 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 
 
 template <int dim>
-void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
-						      const Quadrature<dim-1>  &q,
-						      SparseMatrix<double>     &matrix,
-						      const FunctionMap        &rhs,
-						      Vector<double>           &rhs_vector,
-						      std::vector<unsigned int>     &dof_to_boundary_mapping,
-						      const Function<dim>      *a)
+void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
+						      const Quadrature<dim-1>   &q,
+						      SparseMatrix<double>      &matrix,
+						      const FunctionMap         &rhs,
+						      Vector<double>            &rhs_vector,
+						      std::vector<unsigned int> &dof_to_boundary_mapping,
+						      const Function<dim>       *a)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
@@ -184,7 +169,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
 					  update_q_points);
-  FEFaceValues<dim> fe_values (fe, q, update_flags);
+  FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
 
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
@@ -452,6 +437,8 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 
+
+//TODO: recreate this function
 /*
 
 template <int dim>
@@ -485,6 +472,8 @@ void MatrixCreator<dim>::create_level_laplace_matrix (unsigned int level,
 };
 
 */
+
+
 
 
 
@@ -525,10 +514,10 @@ template <int dim>
 template <typename number>
 void
 MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-					 SparseMatrix<number> &matrix,
-					 Vector<number>       &solution,
-					 Vector<number>       &right_hand_side,
-					 const bool            preserve_symmetry)
+					 SparseMatrix<number>  &matrix,
+					 Vector<number>   &solution,
+					 Vector<number>   &right_hand_side,
+					 const bool        preserve_symmetry)
 {
   Assert (matrix.n() == matrix.m(),
 	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
@@ -542,8 +531,8 @@ MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &bo
     return;
 
 
-  std::map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
-					    endd = boundary_values.end();
+  std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
+						endd = boundary_values.end();
   const unsigned int n_dofs             = matrix.m();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
@@ -695,7 +684,7 @@ MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &bo
 					 BlockSparseMatrix<double>  &matrix,
 					 BlockVector<double>   &solution,
 					 BlockVector<double>   &right_hand_side,
-					 const bool                    preserve_symmetry)
+					 const bool             preserve_symmetry)
 {
   const unsigned int blocks = matrix.n_block_rows();
   
@@ -724,8 +713,8 @@ MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &bo
     return;
 
 
-  std::map<unsigned int,double>::const_iterator  dof  = boundary_values.begin(),
-					    endd = boundary_values.end();
+  std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
+						endd = boundary_values.end();
   const unsigned int n_dofs = matrix.m();
   const BlockSparsityPattern &
     sparsity_pattern = matrix.get_sparsity_pattern();
@@ -949,17 +938,17 @@ MatrixTools<dim>::apply_boundary_values (const std::map<unsigned int,double> &bo
 			    [this_sparsity.get_rowstart_indices()[row]];
 		      else
 			p = std::lower_bound(&this_sparsity.get_column_numbers()
-					[this_sparsity.get_rowstart_indices()[row]+1],
-					&this_sparsity.get_column_numbers()
-					[this_sparsity.get_rowstart_indices()[row+1]],
-					block_index.second);
+					     [this_sparsity.get_rowstart_indices()[row]+1],
+					     &this_sparsity.get_column_numbers()
+					     [this_sparsity.get_rowstart_indices()[row+1]],
+					     block_index.second);
 		    }
 		  else
 		    p = std::lower_bound(&this_sparsity.get_column_numbers()
-				    [this_sparsity.get_rowstart_indices()[row]],
-				    &this_sparsity.get_column_numbers()
-				    [this_sparsity.get_rowstart_indices()[row+1]],
-				    block_index.second);
+					 [this_sparsity.get_rowstart_indices()[row]],
+					 &this_sparsity.get_column_numbers()
+					 [this_sparsity.get_rowstart_indices()[row+1]],
+					 block_index.second);
 
 						   // check whether this line has
 						   // an entry in the regarding column
@@ -1202,6 +1191,8 @@ void MassMatrix<dim>::assemble (Vector<double>      &rhs,
 		rhs_values[point] *
 		weights[point];
 };
+
+
 
 
 

@@ -18,6 +18,7 @@
 #include <string>
 
 template <int dim> class Triangulation;
+template <int dim> class Mapping;
 
 /**
  * This class provides a means to output a triangulation to a file in different
@@ -172,10 +173,21 @@ class GridOut
 					  * Default: @p{false}.
 					  */
 	bool write_cell_numbers;
+
+					 /**
+					  * This is the number of
+					  * points on a boundary face,
+					  * that are ploted
+					  * additionally to the
+					  * vertices of the face.
+					  */
+	unsigned int n_boundary_face_points;
+	
 					 /**
 					  * Constructor.
 					  */
-	GnuplotFlags (const bool write_cell_number = false);
+	GnuplotFlags (const bool         write_cell_number = false,
+		      const unsigned int n_boundary_face_points = 2);
     };
 
 				     /**
@@ -232,6 +244,20 @@ class GridOut
 					  * be drawn in a different color?
 					  */
 	bool color_lines_on_user_flag;
+
+					 /**
+					  * This is the number of
+					  * points on a boundary face,
+					  * that are ploted
+					  * additionally to the
+					  * vertices of the face.
+					  *
+					  * This is used if the
+					  * mapping used is not the
+					  * standard @p{MappingQ1}
+					  * mapping.
+					  */
+	unsigned int n_boundary_face_points;
 	
 					 /**
 					  * Constructor.
@@ -239,7 +265,8 @@ class GridOut
 	EpsFlagsBase (const SizeType     size_type  = width,
 		      const unsigned int size       = 300,
 		      const double       line_width = 0.5,
-		      bool color_lines_on_user_flag = false);
+		      const bool color_lines_on_user_flag = false,
+		      const unsigned int n_boundary_face_points = 2);
     };
 
 
@@ -252,13 +279,49 @@ class GridOut
 				      * listed in the base class
 				      */
     template <int dim>
-    struct EpsFlags : public EpsFlagsBase 
+    struct EpsFlags;
+//        : public EpsFlagsBase
+//      {
+	
+//  					 /**
+//  					  * Constructor.
+//  					  */
+//  	EpsFlags (const SizeType     size_type  = width,
+//  		  const unsigned int size       = 300,
+//  		  const double       line_width = 0.5,
+//  		  bool color_lines_on_user_flag = false,
+//  		  const unsigned int n_boundary_face_points = 2);
+//      };
+
+//  //#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+//  //    template <>
+    
+    struct EpsFlags<1> : public EpsFlagsBase 
     {
+	
+					 /**
+					  * Constructor.
+					  */
+	EpsFlags (const SizeType     size_type  = width,
+		  const unsigned int size       = 300,
+		  const double       line_width = 0.5,
+		  bool color_lines_on_user_flag = false,
+		  const unsigned int n_boundary_face_points = 2);
     };
 
-//#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
-//    template <>
-
+    
+    struct EpsFlags<2> : public EpsFlagsBase 
+    {
+	
+					 /**
+					  * Constructor.
+					  */
+	EpsFlags (const SizeType     size_type  = width,
+		  const unsigned int size       = 300,
+		  const double       line_width = 0.5,
+		  bool color_lines_on_user_flag = false,
+		  const unsigned int n_boundary_face_points = 2);
+    };
 				     /**
 				      * Flags specific to the output of
 				      * grids in three space dimensions.
@@ -292,11 +355,16 @@ class GridOut
 					 /**
 					  * Constructor.
 					  */
-	EpsFlags (const double        azimut_angle    = 60,
-		  const double        turn_angle      = 30) :
-			azimut_angle (azimut_angle),
-			turn_angle (turn_angle)      {};
+	EpsFlags (const SizeType     size_type  = width,
+		  const unsigned int size       = 300,
+		  const double       line_width = 0.5,
+		  const bool color_lines_on_user_flag = false,
+		  const unsigned int n_boundary_face_points = 2,
+		  const double        azimut_angle    = 60,
+		  const double        turn_angle      = 30);
     };
+
+
 //#else
 //#   warning Not implemented for gcc2.95
 //#endif
@@ -355,6 +423,12 @@ class GridOut
 				      * plots of the different levels
 				      * of grid.
 				      *
+				      * @p{mapping} is a pointer to a
+				      * mapping used for the
+				      * transformation of cells at the
+				      * boundary. If zero, then use
+				      * standard Q1 mapping.
+				      *
 				      * Names and values of additional
 				      * flags controlling the output
 				      * can be found in the
@@ -363,7 +437,8 @@ class GridOut
 				      */
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
-			std::ostream             &out);
+			std::ostream             &out,
+			const Mapping<dim> *mapping=0);
 
 				     /**
 				      * Write the triangulation in the
@@ -444,6 +519,12 @@ class GridOut
 				      * file and can be changed there
 				      * according to need.
 				      *
+				      * @p{mapping} is a pointer to a
+				      * mapping used for the
+				      * transformation of cells at the
+				      * boundary. If zero, then use
+				      * standard Q1 mapping.
+				      *
 				      * Names and values of additional
 				      * flags controlling the output
 				      * can be found in the
@@ -456,7 +537,8 @@ class GridOut
 				      */
     template <int dim>
     void write_eps (const Triangulation<dim> &tria,
-		    std::ostream             &out);
+		    std::ostream             &out,
+		    const Mapping<dim>       *mapping=0);
     
 				     /**
 				      * Write data and grid to @p{out} according
@@ -467,7 +549,8 @@ class GridOut
     template <int dim>
     void write (const Triangulation<dim> &tria,
 		std::ostream             &out,
-		const OutputFormat        output_format);
+		const OutputFormat        output_format,
+		const Mapping<dim>       *mapping=0);
 
 				     /**
 				      * Set the flags to be used for output

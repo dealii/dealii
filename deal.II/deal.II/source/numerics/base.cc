@@ -33,11 +33,6 @@
 #include <algorithm>
 #include <cmath>
 
-// if necessary try to work around a bug in the IBM xlC compiler
-#ifdef XLC_WORK_AROUND_STD_BUG
-using namespace std;
-#endif
-
 
 template <int dim>
 ProblemBase<dim>::ProblemBase () :
@@ -170,7 +165,8 @@ void ProblemBase<dim>::solve ()
 
 
 template <int dim>
-void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
+void ProblemBase<dim>::fill_data (DataOut<dim> &out) const
+{
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   out.clear ();
@@ -181,7 +177,8 @@ void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
 
 
 template <int dim>
-std::string ProblemBase<dim>::get_solution_name () const {
+std::string ProblemBase<dim>::get_solution_name () const
+{
   return "solution";
 };
 

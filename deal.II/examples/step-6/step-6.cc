@@ -27,14 +27,11 @@
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
 				 // From the following include file we
-				 // will import the declaration of the
-				 // quadratic finite element class,
-				 // which in analogy to ``FEQ1'' for
-				 // the linear element is called
-				 // ``FEQ2''. The Lagrange elements of
-				 // polynomial degrees one through four
-				 // are all declared in this file.
-#include <fe/fe_lib.lagrange.h>
+				 // will import the declaration of
+				 // H1-conforming finite element shape
+				 // functions. This family of 
+				 // finite elements is called ``FE_Q''.
+#include <fe/fe_q.h>
 				 // We will not read the grid from a
 				 // file as in the previous example,
 				 // but generate it using a function
@@ -114,13 +111,14 @@ class LaplaceProblem
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
-    DoFHandler<dim>      dof_handler;
 
-				     // In order to use the quadratic
-				     // element, we only have to
-				     // replace the declaration of the
-				     // ``fe'' variable like this:
-    FEQ2<dim>            fe;
+				     // We need a finite element
+				     // again. This time, we will want
+				     // to use quadratic polynomials
+				     // (but this is only specified in
+				     // the constructor):
+    FE_Q<dim>            fe;
+    DoFHandler<dim>      dof_handler;
 
 				     // This is the new variable in
 				     // the main class. We need an
@@ -187,8 +185,17 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 };
 
 
+				 // This is mostly the same as before,
+				 // but this time we want to use the
+				 // quadratic element. To do so, we
+				 // only have to replace the
+				 // constructor argument (which was
+				 // ``1'' in all previous examples) by
+				 // the desired polynomial degree
+				 // (here ``2''):
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
+                fe (2),
 		dof_handler (triangulation)
 {};
 

@@ -12,30 +12,36 @@
 //----------------------------  error_estimator.cc  ---------------------------
 
 
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <fe/fe_update_flags.h>
+#include <base/timer.h>
 #include <base/thread_management.h>
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
-#include <numerics/error_estimator.h>
-#include <dofs/dof_handler.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <grid/geometry_info.h>
 #include <lac/vector.h>
+#include <grid/tria_iterator.h>
+#include <grid/geometry_info.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <fe/fe.h>
+#include <fe/fe_values.h>
+#include <fe/fe_update_flags.h>
+#include <fe/mapping_q1.h>
+#include <numerics/error_estimator.h>
 
 #include <numeric>
 #include <algorithm>
 #include <cmath>
 #include <vector>
-#include <base/timer.h>
-
 
 // if necessary try to work around a bug in the IBM xlC compiler
 #ifdef XLC_WORK_AROUND_STD_BUG
 using namespace std;
 #endif
+
+
+
+//TODO: Comment?? Proper Mapping
+static MappingQ1<deal_II_dimension> mapping;
+
 
 
 static
@@ -44,8 +50,6 @@ double sqr (const double x)
 {
   return x*x;
 };
-
-
 
 
 #if deal_II_dimension == 1
@@ -104,8 +108,7 @@ KellyErrorEstimator<dim>::Data::Data(const DoFHandler<dim>               &dof_ha
 	  ExcInvalidBoundaryIndicator());
   
   for (typename FunctionMap::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
-    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
-  
+    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());  
   
 				   // Init the size of a lot of vectors
 				   // needed in the calculations once
@@ -151,7 +154,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 					 const FunctionMap       &neumann_bc,
 					 const Vector<double>    &solution,
 					 Vector<float>           &error,
-					 const std::vector<bool>      &component_mask,
+					 const std::vector<bool> &component_mask,
 					 const Function<dim>     *coefficients,
 					 unsigned int             n_threads)
 {
@@ -201,8 +204,8 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>                 &dof_
   
 				   // if no mask given: treat all components
   std::vector<bool> component_mask ((component_mask_.size() == 0)    ?
-			       std::vector<bool>(n_components, true) :
-			       component_mask_);
+				    std::vector<bool>(n_components, true) :
+				    component_mask_);
   Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
   Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcInvalidComponentMask());
@@ -254,7 +257,7 @@ void KellyErrorEstimator<1>::estimate (const DoFHandler<1>                 &dof_
 				   // two contributions from the two
 				   // vertices of each cell.
   QTrapez<1> quadrature;
-  FEValues<1> fe_values (dof_handler.get_fe(), quadrature, update_gradients);
+  FEValues<1> fe_values (mapping, dof_handler.get_fe(), quadrature, update_gradients);
   active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int cell_index=0; cell != dof_handler.end(); ++cell, ++cell_index)
     {
@@ -373,7 +376,8 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 				   // need not compute all values on the
 				   // neighbor cells, so using two objects
 				   // gives us a performance gain).
-  FEFaceValues<dim> fe_face_values_cell (data.dof_handler.get_fe(),
+  FEFaceValues<dim> fe_face_values_cell (mapping,
+					 data.dof_handler.get_fe(),
 					 data.quadrature,
 					 UpdateFlags(update_gradients      |
 						     update_JxW_values     |
@@ -381,10 +385,12 @@ void KellyErrorEstimator<dim>::estimate_some (Data               &data,
 						       (data.coefficients != 0))  ?
 						      update_q_points : 0) |
 						     update_normal_vectors)); 
-  FEFaceValues<dim> fe_face_values_neighbor (data.dof_handler.get_fe(),
+  FEFaceValues<dim> fe_face_values_neighbor (mapping,
+					     data.dof_handler.get_fe(),
 					     data.quadrature,
 					     update_gradients);
-  FESubfaceValues<dim> fe_subface_values (data.dof_handler.get_fe(),
+  FESubfaceValues<dim> fe_subface_values (mapping,
+					  data.dof_handler.get_fe(),
 					  data.quadrature,
 					  update_gradients);
 
@@ -564,7 +570,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 				   solutions,
 				   ((component_mask.size() == 0)    ?
 				    std::vector<bool>(dof_handler.get_fe().n_components(),
-						 true) :
+						      true) :
 				    component_mask),
 				   coefficients,
 				   n_threads,
@@ -989,8 +995,8 @@ integrate_over_irregular_face (Data                       &data,
 	      data.face_integrals.end(),
 	      ExcInternalError());
       Assert (data.face_integrals[face->child(subface_no)][0] >= 0,
-	      ExcInternalError());
-
+ 	      ExcInternalError());
+      
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	sum[n] += data.face_integrals[face->child(subface_no)][n];
     };

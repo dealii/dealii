@@ -15,6 +15,7 @@
 				 // ("DoF"s) to vertices, lines, and
 				 // cells.
 #include <dofs/dof_handler.h>
+
 				 // The following include contains the
 				 // description of the bilinear finite
 				 // element, including the facts that
@@ -30,7 +31,7 @@
 				 // elements, but not only for two
 				 // space dimensions, but also for one
 				 // and three dimensions.
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
 				 // In the following file, several
 				 // tools for manipulating degrees of
 				 // freedom can be found:
@@ -144,21 +145,33 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // object which describes how many
 				   // degrees of freedom are to be
 				   // associated to each of these
-				   // objects. For (bi-, tri-)linear
-				   // finite elements, this is done
-				   // using the FEQ1 class, which
+				   // objects. This is done using the
+				   // ``FE_Q'' class. Giving a
+                                   // constructor argument one
 				   // states that one degree of
 				   // freedom is to be assigned to
 				   // each vertex, while there are
 				   // none on lines and inside the
-				   // quadrilateral. We first need to
-				   // create an object of this class
-				   // and use it to distribute the
-				   // degrees of freedom. Note that
-				   // the DoFHandler object will store
-				   // a reference to this object, so
-				   // we need to make it static as
-				   // well, in order to prevent its
+				   // quadrilateral. In fact, the
+				   // argument denotes the polynomial
+				   // degree, in this case, we get
+				   // bilinear finite elements in two
+				   // space dimensions; a value of,
+				   // say, three would give us
+				   // bi-cubic ones. In general, ``FE_Q''
+				   // denotes the family of continuous
+				   // elements with complete polynomials
+				   // (i.e. tensor-product polynomials)
+				   // up to the specified order 
+				   //
+				   // We first need to create an
+				   // object of this class and use it
+				   // to distribute the degrees of
+				   // freedom. Note that the
+				   // DoFHandler object will store a
+				   // reference to this object, so we
+				   // need to make it static as well,
+				   // in order to prevent its
 				   // preemptive
 				   // destruction. (However, the
 				   // library would warn us about this
@@ -166,7 +179,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // occured. You can check this, if
 				   // you want, by removing the
 				   // 'static' declaration.)
-  static const FEQ1<2> finite_element;
+  static const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs (finite_element);
 
 				   // Now we have associated a number
