@@ -182,3 +182,8 @@ Remove that pseudo-template clutter in the lower parts of
 
 
 Remove the flag -fno-vtable-thunks if egcs's bug is removed someday.
+
+Improve the initialization of the sparsity structures in the
+  MGTransferPrebuilt::build_matrices function, since there no hanging
+  nodes can occur and the maximum number of couplings per line
+  is thus lower than for the global numbering scheme
