@@ -16,11 +16,13 @@ template<typename number> class BlockVector;
 
 
 /**
- * Poor man's matrix product. Stores two matrices $m_1$ and $m_2$ and
- * implements matrix-vector multiplications for the product $m_1 m_2$
- * by performing multiplication with both factors consecutively.
+ * Poor man's matrix product of two quadratic matrices. Stores two
+ * quadratic matrices #m1 and #m2 of arbitrary types and implements
+ * matrix-vector multiplications for the product
+ * <i>M<sub>1</sub>M<sub>2</sub></i> by performing multiplication with
+ * both factors consecutively.
  *
- * @author Guido Kanschat, 2000, 2001, 2002
+ * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
 template<class VECTOR>
 class ProductMatrix : public PointerMatrixBase<VECTOR>
@@ -43,30 +45,35 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
     ~ProductMatrix();
     
 				     /**
-				      * Matrix-vector product.
+				      * Matrix-vector product <i>w =
+				      * m1 * m2 * v</i>.
 				      */
-    virtual void vmult (VECTOR& dst,
-			const VECTOR& src) const;
+    virtual void vmult (VECTOR&       w,
+			const VECTOR& v) const;
     
 				     /**
-				      * Tranposed matrix-vector product.
+				      * Tranposed matrix-vector
+				      * product <i>w = m2<sup>T</sup>
+				      * * m1<sup>T</sup> * v</i>.
 				      */
-    virtual void Tvmult (VECTOR& dst,
-			 const VECTOR& src) const;
+    virtual void Tvmult (VECTOR&       w,
+			 const VECTOR& v) const;
     
 				     /**
-				      * Matrix-vector product, adding to
-				      * @p dst.
+				      * Adding matrix-vector product
+				      * <i>w += m1 * m2 * v</i>
 				      */
-    virtual void vmult_add (VECTOR& dst,
-			    const VECTOR& src) const;
+    virtual void vmult_add (VECTOR&       w,
+			    const VECTOR& v) const;
     
 				     /**
-				      * Tranposed matrix-vector product,
-				      * adding to @p dst.
+				      * Adding, tranposed
+				      * matrix-vector product <i>w +=
+				      * m2<sup>T</sup> *
+				      * m1<sup>T</sup> * v</i>.
 				      */
-    virtual void Tvmult_add (VECTOR& dst,
-			     const VECTOR& src) const;
+    virtual void Tvmult_add (VECTOR&       w,
+			     const VECTOR& v) const;
     
   private:
 				     /**
