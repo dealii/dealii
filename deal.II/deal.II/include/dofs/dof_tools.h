@@ -805,8 +805,29 @@ class DoFTools
     static void
     get_subdomain_association (const DoFHandler<dim>     &dof_handler,
                                std::vector<unsigned int> &subdomain);
-    
-				     /**
+
+                                     /**
+                                      * Count how many degrees of freedom are
+                                      * uniquely associated with the given
+                                      * @arg subdomain index.
+                                      *
+                                      * Note that there may be rare cases
+                                      * where cells with the given @arg
+                                      * subdomain index exist, but none of its
+                                      * degrees of freedom are actually
+                                      * associated with it. In that case, the
+                                      * returned value will be zero.
+                                      *
+                                      * This function will generate an
+                                      * exception if there are no cells with
+                                      * the given @arg subdomain index.
+                                      */
+    template <int dim>
+    static unsigned int
+    count_dofs_with_subdomain_association (const DoFHandler<dim> &dof_handler,
+                                           const unsigned int     subdomain);
+
+                                     /**
 				      * Count how many degrees of
 				      * freedom out of the total
 				      * number belong to each
