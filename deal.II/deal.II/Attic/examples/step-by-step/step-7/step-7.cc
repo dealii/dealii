@@ -1,6 +1,10 @@
 /* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 
+				 // These first include files have all
+				 // been treated in previous examples,
+				 // so we won't explain what is in
+				 // them again.
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
@@ -11,26 +15,304 @@
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
-#include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
 #include <fe/fe_lib.lagrange.h>
-#include <dofs/dof_constraints.h>
+#include <numerics/matrices.h>
 #include <numerics/error_estimator.h>
+#include <numerics/data_out.h>
 
+				 // In this example, we will not use
+				 // the numeration scheme which is
+				 // used per default by the
+				 // ``DoFHandler'' class, but will
+				 // renumber them using the
+				 // Cuthill-McKee algorithm. The
+				 // necessary functions are declared
+				 // in the following file:
 #include <numerics/dof_renumbering.h>
+				 // Then we will show a little trick
+				 // how we can make sure that objects
+				 // are not deleted while they are
+				 // still in use. For this purpose,
+				 // there is the ``SmartPointer''
+				 // helper class, which is declared in
+				 // this file:
 #include <base/smartpointer.h>
+				 // Then we will want to use the
+				 // ``integrate_difference'' function
+				 // mentioned in the introduction. It
+				 // comes from this file:
+#include <numerics/vectors.h>
+				 // And finally, we need to use the
+				 // ``FEFaceValues'' class, which is
+				 // declare in the same file as the
+				 // ``FEValues'' class:
+#include <fe/fe_values.h>
 
 #include <fstream>
 
 
+
+				 // Since we want to compare the
+				 // exactly known continuous solution
+				 // to the computed one, we need a
+				 // function object which represents
+				 // the continuous solution. On the
+				 // other hand, we need the right hand
+				 // side function, and that one of
+				 // course shares some characteristics
+				 // with the solution. In order to
+				 // reduce dependencies which arise if
+				 // we have to change something in
+				 // both classes at the same time, we
+				 // exclude the common characteristics
+				 // of both functions into a base
+				 // class.
+				 //
+				 // The common characteristics for the
+				 // given solution, which as explained
+				 // in the introduction is a sum of
+				 // three exponentials, are here: the
+				 // number of exponentials, their
+				 // centers, and their half width. We
+				 // declare them in the following
+				 // class. Since the number of
+				 // exponentials is a constant scalar
+				 // integral quantity, C++ allows its
+				 // definition (i.e. assigning a
+				 // value) right at the place of
+				 // declaration (i.e. where we declare
+				 // that such a variable exists).
+template <int dim>
+class SolutionBase 
+{
+  protected:
+    static const unsigned int n_source_centers = 3;    
+    static const Point<dim>   source_centers[n_source_centers];
+    static const double       width;
+};
+
+
+				 // The variables which denote the
+				 // centers and the width of the
+				 // exponentials have just been
+				 // declared, now we still need to
+				 // assign values to them. Here, we
+				 // can show another small piece of
+				 // template sourcery, namely how we
+				 // can assign different values to
+				 // these variables depending on the
+				 // dimension. We will only use the 2d
+				 // case in the program, but we show
+				 // the 1d case for exposition of a
+				 // useful technique.
+				 //
+				 // First we assign values to the
+				 // centers for the 1d case, where we
+				 // place the centers equidistanly at
+				 // -1/3, 0, and 1/3:
+template <>
+const Point<1>
+SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
+= { Point<1>(-1.0 / 3.0), 
+    Point<1>(0.0), 
+    Point<1>(+1.0 / 3.0)   };
+
+				 // Then we place the centers for the
+				 // 2d case as follows:
+template <>
+const Point<2>
+SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
+= { Point<2>(-0.5, +0.5), 
+    Point<2>(-0.5, -0.5), 
+    Point<2>(+0.5, -0.5)   };
+
+				 // There remains to assign a value to
+				 // the half-width of the
+				 // exponentials. We would like to use
+				 // the same value for all dimensions,
+				 // so here is how that works:
+template <int dim>
+const double SolutionBase<dim>::width = 1./3.;
+
+
+
+				 // After declaring and defining the
+				 // characteristics of solution and
+				 // right hand side, we can declare
+				 // the classes representing these
+				 // two. They both represent
+				 // continuous functions, so they are
+				 // derived from the ``Function<dim>''
+				 // base class, and they also inherit
+				 // the characteristics defined in the
+				 // ``SolutionBase'' class.
+				 //
+				 // The actual classes are declared in
+				 // the following. Note that in order
+				 // to compute the error of the
+				 // numerical solution against the
+				 // continuous one in the L2 and H1
+				 // norms, we have to export value and
+				 // gradient of the exact solution,
+				 // which is done by overloading the
+				 // respective virtual member
+				 // functions in the ``Function'' base
+				 // class.
+template <int dim>
+class Solution : public Function<dim>,
+		 protected SolutionBase<dim>
+{
+  public:
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				    const unsigned int  component = 0) const;
+};
+
+
+				 // The actual definition of the
+				 // values and gradients of the exact
+				 // solution class is according to
+				 // their mathematical definition and
+				 // probably needs not much
+				 // explanation.
+template <int dim>
+double Solution<dim>::value (const Point<dim>   &p,
+			     const unsigned int) const
+{
+  double return_value = 0;
+  for (unsigned int i=0; i<n_source_centers; ++i)
+    {
+				       // One of the few things worth
+				       // mentioning is the following
+				       // variables, which represents
+				       // the vector (x-x_i). It is
+				       // computed in the way that one
+				       // would intuitively expect:
+      const Point<dim> shifted_point = p-source_centers[i];
+      
+				       // The ``Point<dim>'' class
+				       // offers a member function
+				       // ``square'' that does what
+				       // it's name suggests.
+      return_value += exp(-shifted_point.square() / (width*width));
+    };
+  
+  return return_value;
+};
+
+
+
+template <int dim>
+Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
+				       const unsigned int) const
+{
+				   // In order to accumulate the
+				   // gradient from the contributions
+				   // of the exponentials, we allocate
+				   // an object which denotes the
+				   // mathematical quantity of a
+				   // tensor of rank ``1'' and
+				   // dimension ``dim''. Its default
+				   // constructor sets it to the
+				   // vector containing only zeroes,
+				   // so we need not explicitely care
+				   // for its initialization.
+  Tensor<1,dim> return_value;
+				   // Note that we could as well have
+				   // taken the type of the object to
+				   // be ``Point<dim>''. Tensors of
+				   // rank 1 and points are almost
+				   // exchangeable, and have only very
+				   // slightly different mathematical
+				   // meanings. In fact, the
+				   // ``Point<dim>'' class is derived
+				   // from the ``Tensor<1,dim>''
+				   // class, which makes up for their
+				   // mutual exchangeability.
+
+  for (unsigned int i=0; i<n_source_centers; ++i)
+    {
+      const Point<dim> shifted_point = p-source_centers[i];
+      
+				       // For the gradient, note that
+				       // it's direction is along
+				       // (x-x_i), so we add up
+				       // multiples of this distance
+				       // vector, where the factor is
+				       // given by the exponentials.
+      return_value += (-2 / (width*width) *
+		       exp(-shifted_point.square() / (width*width)) *
+		       shifted_point);
+    };
+  
+  return return_value;
+};
+
+
+
+				 // Besides the function that
+				 // represents the exact solution, we
+				 // also need a function which we can
+				 // use as right hand side when
+				 // assembling the linear system of
+				 // discretized equations. This is
+				 // accomplished using the following
+				 // class and the following definition
+				 // of its function. Note that here we
+				 // only need the value of the
+				 // function, not its gradients or
+				 // higher derivatives.
+template <int dim>
+class RightHandSide : public Function<dim>,
+		      protected SolutionBase<dim>
+{
+  public:
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+};
+
+
+				 // The value of the right hand side
+				 // is given by the negative Laplacian
+				 // of the solution plus the solution
+				 // itself, since we wanted to solve
+				 // Helmholtz's equation:
+template <int dim>
+double RightHandSide<dim>::value (const Point<dim>   &p,
+				  const unsigned int) const
+{
+  double return_value = 0;
+  for (unsigned int i=0; i<n_source_centers; ++i)
+    {
+      const Point<dim> shifted_point = p-source_centers[i];
+      
+				       // The first contribution is
+				       // the Laplacian:
+      return_value += ((2*dim - 4*shifted_point.square()/(width*width)) / 
+		       (width*width) *
+		       exp(-shifted_point.square() / (width*width)));
+				       // And the second is the
+				       // solution itself:
+      return_value += exp(-shifted_point.square() / (width*width));
+    };
+  
+  return return_value;
+};
+
+
+
+				 // Then we need the class that does
+				 // all the work.
+//.......................
 template <int dim>
 class LaplaceProblem 
 {
@@ -68,112 +350,6 @@ class LaplaceProblem
 
 
 
-template <int dim>
-class SolutionBase 
-{
-  protected:
-    static const unsigned int n_source_centers = 3;    
-    static const Point<dim>   source_centers[n_source_centers];
-    static const double       width;
-};
-
-
-template <int dim>
-class Solution : public Function<dim>,
-		 protected SolutionBase<dim>
-{
-  public:
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-				    const unsigned int  component = 0) const;
-};
-
-
-
-template <int dim>
-class RightHandSide : public Function<dim>,
-		      protected SolutionBase<dim>
-{
-  public:
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
-};
-
-
-
-template <>
-const Point<1>
-SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
-= { Point<1>(-1.0 / 3.0), 
-    Point<1>(0.0), 
-    Point<1>(+1.0 / 3.0)   };
-
-template <>
-const Point<2>
-SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
-= { Point<2>(-0.5, +0.5), 
-    Point<2>(-0.5, -0.5), 
-    Point<2>(+0.5, -0.5)   };
-
-template <int dim>
-const double SolutionBase<dim>::width = 0.15;
-
-
-
-template <int dim>
-double Solution<dim>::value (const Point<dim>   &p,
-			     const unsigned int) const
-{
-  double return_value = 0;
-  for (unsigned int i=0; i<n_source_centers; ++i)
-    {
-      const Point<dim> shifted_point = p-source_centers[i];
-      
-      return_value += exp(-shifted_point.square() / (width*width));
-    };
-  
-  return return_value;
-};
-
-
-
-template <int dim>
-Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
-				       const unsigned int) const
-{
-  Tensor<1,dim> return_value;
-  for (unsigned int i=0; i<n_source_centers; ++i)
-    {
-      const Point<dim> shifted_point = p-source_centers[i];
-      
-      return_value += (-2 / (width*width) *
-		       exp(-shifted_point.square() / (width*width)) *
-		       shifted_point);
-    };
-  
-  return return_value;
-};
-
-
-
-template <int dim>
-double RightHandSide<dim>::value (const Point<dim>   &p,
-				  const unsigned int) const
-{
-  double return_value = 0;
-  for (unsigned int i=0; i<n_source_centers; ++i)
-    {
-      const Point<dim> shifted_point = p-source_centers[i];
-      
-      return_value += ((2*dim - 4*shifted_point.square()/(width*width)) / (width*width) *
-		       exp(-shifted_point.square() / (width*width)));
-    };
-  
-  return return_value;
-};
-
-
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const FiniteElement<dim> &fe,
@@ -192,13 +368,42 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 };
 
 
-
+				 // The following function sets up the
+				 // degrees of freedom, sizes of
+				 // matrices and vectors, etc. Most of
+				 // its functionality has been showed
+				 // in previous examples, the only
+				 // difference being the renumbering
+				 // step.
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (*fe);
-				   // Renumber the degrees of freedom...
+				   // Renumbering the degrees of
+				   // freedom is not overly difficult,
+				   // as long as you use one of the
+				   // algorithms included in the
+				   // library. It requires just one
+				   // line of code, namely the
+				   // following:
   DoFRenumbering::Cuthill_McKee (dof_handler);
+				   // Note, however, that when you
+				   // renumber the degrees of freedom,
+				   // you must do so immediately after
+				   // distributing them, since such
+				   // things as hanging nodes, the
+				   // sparsity pattern etc. depend on
+				   // the absolute numbers which are
+				   // altered by renumbering.
+				   //
+				   // Renumbering does not serve any
+				   // specific purpose in this
+				   // example, it is done only for
+				   // exposition of the technique. To
+				   // see the effect of renumbering on
+				   // the sparsity pattern of the
+				   // matrix, refer to the second
+				   // example program.
 
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -220,19 +425,101 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 
+				 // Assembling the system of equations
+				 // for the problem at hand is mostly
+				 // as for the example programs
+				 // before. However, some things have
+				 // changed anyway, so we comment on
+				 // this function fairly extensively.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  QGauss3<dim>  quadrature_formula;
-  FEValues<dim> fe_values (*fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+				   // First we need to define objects
+				   // which will be used as quadrature
+				   // formula for domain and face
+				   // integrals.
+				   //
+				   // Note the way in which we define
+				   // a quadrature rule for the faces:
+				   // it is simply a quadrature rule
+				   // for one dimension less!
+  QGauss3<dim>   quadrature_formula;
+  QGauss3<dim-1> face_quadrature_formula;
+				   // For simpler use later on, we
+				   // alias the number of quadrature
+				   // points to local variables:
+  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int n_face_q_points = face_quadrature_formula.n_quadrature_points;
+  
+				   // Then we need objects which can
+				   // evaluate the values, gradients,
+				   // etc of the shape functions at
+				   // the quadrature points. While it
+				   // seems that it should be feasible
+				   // to do it with one object for
+				   // both domain and face integrals,
+				   // there is a subtle difference
+				   // since the weights in the domain
+				   // integrals include the measure of
+				   // the cell in the domain, while
+				   // the face integral quadrature
+				   // requires the measure of the face
+				   // in a lower-dimensional
+				   // mannifold. Internally these two
+				   // classes are rooted on a common
+				   // base class which does most of
+				   // the work; that, however, is
+				   // something that you need not
+				   // worry about.
+				   //
+				   // For the domain integrals in the
+				   // bilinear form for Helmholtz's
+				   // equation, we need to compute the
+				   // values and gradients, as well as
+				   // the weights at the quadrature
+				   // points. Furthermore, we need the
+				   // quadrature points on the real
+				   // cell (rather than on the unit
+				   // cell) to evaluate the right hand
+				   // side function.
+  FEValues<dim>  fe_values (*fe, quadrature_formula, 
+			    UpdateFlags(update_values    |
+					update_gradients |
+					update_q_points  |
+					update_JxW_values));
 
+				   // For the face integrals, we only
+				   // need the values of the shape
+				   // functions, as well as the
+				   // weights. We also need the normal
+				   // vectors and quadrature points on
+				   // the real cell since we want to
+				   // determine the Neumann values
+				   // from the exact solution object
+				   // (see below).
+  FEFaceValues<dim> fe_face_values (*fe, face_quadrature_formula, 
+				    UpdateFlags(update_values         |
+						update_q_points       |
+						update_normal_vectors |
+						update_JxW_values));
+
+				   // In order to make programming
+				   // more readable below, we alias
+				   // the number of degrees of freedom
+				   // per cell to a local variable, as
+				   // already done for the number of
+				   // quadrature points above:
   const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
+				   // Then we need some objects
+				   // already known from previous
+				   // examples: An object denoting the
+				   // right hand side function, its
+				   // values at the quadrature points
+				   // on a cell, the cell matrix and
+				   // right hand side, and the indices
+				   // of the degrees of freedom on a
+				   // cell.
   RightHandSide<dim>   right_hand_side;
   vector<double>       rhs_values (n_q_points);
 
@@ -241,6 +528,28 @@ void LaplaceProblem<dim>::assemble_system ()
 
   vector<unsigned int> local_dof_indices (dofs_per_cell);
 
+				   // Then we define an object
+				   // denoting the exact solution
+				   // function. We will use it to
+				   // compute the Neumann values at
+				   // the boundary from it. Usually,
+				   // one would of course do so using
+				   // a separate object, in particular
+				   // since the exact solution is not
+				   // known while the Neumann values
+				   // are prescribed. We will,
+				   // however, be a little bit lazy
+				   // and use what we already have in
+				   // information. Real-life programs
+				   // would to go other ways here, of
+				   // course.
+  Solution<dim> exact_solution;
+
+				   // Now for the main loop over all
+				   // cells. This is mostly unchanged
+				   // from previous examples, so we
+				   // only comment on the things that
+				   // have changed.
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 					endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -264,16 +573,134 @@ void LaplaceProblem<dim>::assemble_system ()
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (shape_grads[i][q_point] *
-				   shape_grads[j][q_point] *
-				   JxW_values[q_point]);
+					       // The first thing that
+					       // has changed is the
+					       // bilinear form. It
+					       // now contains the
+					       // additional term from
+					       // the Helmholtz
+					       // equation, namely the
+					       // scalar products of
+					       // the two function
+					       // values, rather than
+					       // their gradients,
+					       // which is the second
+					       // term below:
+	      cell_matrix(i,j) += ((shape_grads[i][q_point] *
+				    shape_grads[j][q_point] *
+				    JxW_values[q_point])
+				   +
+				   (shape_values(i,q_point) *
+				    shape_values(j,q_point) *
+				    JxW_values[q_point]));
 
 	    cell_rhs(i) += (shape_values (i,q_point) *
 			    rhs_values [q_point] *
 			    fe_values.JxW (q_point));
 	  };
 
+				       // Then there is that second
+				       // term on the right hand side,
+				       // the contour integral. First
+				       // we have to find out whether
+				       // the intersection of the face
+				       // of this cell with the
+				       // boundary part Gamma2 is
+				       // nonzero. To this end, we
+				       // loop over all faces and
+				       // check whether its boundary
+				       // indicator equals ``1'',
+				       // which is the value that we
+				       // have assigned to that
+				       // portions of the boundary
+				       // composing Gamma2 in a
+				       // function further below. The
+				       // default value of boundary
+				       // indicators is ``0'' for
+				       // external faces, and ``255''
+				       // for internal faces (the
+				       // latter value should never be
+				       // changed, and there is also
+				       // no need to do so), so faces
+				       // can only have an indicator
+				       // equal to ``1'' if we have
+				       // explicitely set it.
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	if (cell->face(face)->boundary_indicator() == 1)
+	  {
+					     // If we came into here,
+					     // then we have found an
+					     // external face
+					     // belonging to
+					     // Gamma2. Next, we have
+					     // to compute the values
+					     // of the shape functions
+					     // and the other
+					     // quantities which we
+					     // will need for the
+					     // computation of the
+					     // contour integral. This
+					     // is done using the
+					     // ``reinit'' function
+					     // which we already know
+					     // from the ``FEValue''
+					     // class:
+	    fe_face_values.reinit (cell, face);
 
+					     // Then, for simpler
+					     // access, we alias the
+					     // various quantities to
+					     // local variables:
+	    const FullMatrix<double> 
+	      & face_shape_values   = fe_face_values.get_shape_values();
+	    const vector<double>
+	      & face_JxW_values     = fe_face_values.get_JxW_values();
+	    const vector<Point<dim> >
+	      & face_q_points       = fe_face_values.get_quadrature_points();
+	    const vector<Point<dim> >
+	      & face_normal_vectors = fe_face_values.get_normal_vectors ();
+
+					     // And we can then
+					     // perform the
+					     // integration by using a
+					     // loop over all
+					     // quadrature points.
+	    for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+	      {
+						 // On each quadrature
+						 // point, we first
+						 // compute the value
+						 // of the normal
+						 // derivative. We do
+						 // so using the
+						 // gradient of the
+						 // exact solution and
+						 // the normal vector
+						 // to the face at the
+						 // present quadrature
+						 // point:
+		const double neumann_value
+		  = (exact_solution.gradient (face_q_points[q_point]) *
+		     face_normal_vectors[q_point]);
+
+						 // Using this, we can
+						 // compute the
+						 // contribution of
+						 // this face for each
+						 // shape function:
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  cell_rhs(i) += (neumann_value *
+				  face_shape_values(i,q_point) *
+				  face_JxW_values[q_point]);
+	      };
+	  };
+
+				       // Now that we have the
+				       // contributions of the present
+				       // cell, we can transfer it to
+				       // the global matrix and right
+				       // hand side vector, as in the
+				       // examples before.
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -286,9 +713,29 @@ void LaplaceProblem<dim>::assemble_system ()
 	};
     };
 
+				   // The rest of the function has
+				   // also been shown previously:
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);
 
+				   // Only with the interpolation of
+				   // boundary values, there is one
+				   // notable thing, namely that now
+				   // the boundary indicator for which
+				   // we interpolate boundary values
+				   // (denoted by the second parameter
+				   // to
+				   // ``interpolate_boundary_values'')
+				   // does not represent the whole
+				   // boundary an more. Rather, it is
+				   // that portion of the boundary
+				   // which we have not assigned
+				   // another indicator (see
+				   // below). The degrees of freedom
+				   // at the boundary that do not
+				   // belong to Gamma1 are therefore
+				   // excluded from the interpolation
+				   // of boundary values.
   map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -301,7 +748,8 @@ void LaplaceProblem<dim>::assemble_system ()
 };
 
 
-
+				 // Solving the system of equations is
+				 // done in the same way as before.
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
@@ -355,8 +803,6 @@ void LaplaceProblem<dim>::refine_grid ()
 };
 
 
-#include <numerics/data_out.h>
-
 template <int dim>
 void LaplaceProblem<dim>::process_solution (const unsigned int cycle) const
 {
@@ -402,15 +848,105 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle) const
 
 
 
+				 // The following function is the main
+				 // one which controls the flow of
+				 // execution. The basic layout is as
+				 // in previous examples: an outer
+				 // loop over successively refined
+				 // grids, and in this loop first
+				 // problem setup, assemblage of the
+				 // linear system, solution, and
+				 // postprocessing.
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<12; ++cycle)
+  for (unsigned int cycle=0; cycle<9; ++cycle)
     {
+				       // The first action in each
+				       // iteration of the outer loop
+				       // is setting up the grid on
+				       // which we will solve in this
+				       // iteration. In the first
+				       // iteration, the coarsest grid
+				       // is generated, in later
+				       // iterations it is refined,
+				       // for which we call the
+				       // ``refine_grid'' function.
       if (cycle == 0)
 	{
+					   // Setting up the coarse
+					   // grid is done as in
+					   // previous examples: we
+					   // first create an initial
+					   // grid, which is the unit
+					   // square [-1,1]x[-1,1] in
+					   // the present case. Then
+					   // we refine it globally a
+					   // specific number of
+					   // times.
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
 	  triangulation.refine_global (1);
+
+					   // However, here we have to
+					   // do something else in
+					   // addition: mark those
+					   // faces that belong to the
+					   // different components of
+					   // the boundary, Gamma1 and
+					   // Gamma2. We will use the
+					   // following convention:
+					   // Faces belonging to
+					   // Gamma1 will have the
+					   // boundary indicator ``0''
+					   // (which is the default,
+					   // so we don't have to set
+					   // it explicitely), and
+					   // faces belonging to
+					   // Gamma2 will use ``1'' as
+					   // boundary indicator.
+					   //
+					   // To set these values, we
+					   // loop over all cells,
+					   // then over all faces of a
+					   // given cell, check
+					   // whether it belongs to
+					   // the boundary Gamma2, and
+					   // if so set its boundary
+					   // indicator to ``1''.
+					   //
+					   // It is worth noting that
+					   // we have to loop over all
+					   // cells here, not only the
+					   // active ones. The reason
+					   // is that upon refinement,
+					   // newly created faces
+					   // inherit the boundary
+					   // indicator of their
+					   // parent face. If we now
+					   // only set the boundary
+					   // indicator for active
+					   // faces, coarsen some
+					   // cells and refine them
+					   // later on, they will
+					   // again have the boundary
+					   // indicator of the parent
+					   // cell which we have not
+					   // modified, instead of the
+					   // one we
+					   // intended. Therefore, we
+					   // have to change the
+					   // boundary indicators of
+					   // all faces on Gamma2,
+					   // irrespective whether
+					   // they are active or not.
+	  Triangulation<dim>::cell_iterator cell = triangulation.begin (),
+					    endc = triangulation.end();
+	  for (; cell!=endc; ++cell)
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	      if ((cell->face(face)->center()(0) == -1)
+		  ||
+		  (cell->face(face)->center()(1) == -1))
+		cell->face(face)->set_boundary_indicator (1);
 	}
       else
 	refine_grid ();      
