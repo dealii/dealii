@@ -1585,7 +1585,7 @@ rm -f conftest*
 	  exit 1
 	fi
 
-		echo "$ac_t""no. using $testflag" 1>&6
+		echo "$ac_t""using $testflag" 1>&6
 	CXXFLAGSG="$CXXFLAGSG $deal_II_isnan_flag"
     
 fi
@@ -1655,7 +1655,7 @@ rm -f conftest*
 	  exit 1
 	fi
 
-		echo "$ac_t""no. using $testflag" 1>&6
+		echo "$ac_t""using $testflag" 1>&6
 	CXXFLAGSO="$CXXFLAGSO $deal_II_isnan_flag"
     
 fi

@@ -186,7 +186,7 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 	fi
 
 	dnl we found something, lets us it
-	AC_MSG_RESULT(no. using $testflag)
+	AC_MSG_RESULT(using $testflag)
 	$3
     ])
 )      
