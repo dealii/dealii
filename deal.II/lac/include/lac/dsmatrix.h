@@ -390,6 +390,18 @@ double dSMatrix::diag_element (const int i) const {
 
 
 
+inline
+double dSMatrix::global_entry (const int j) const {
+  return val[j];
+};
+
+
+
+inline
+double & dSMatrix::global_entry (const int j) {
+  return val[j];
+};
+
 
 
 /*----------------------------   dsmatrix.h     ---------------------------*/
