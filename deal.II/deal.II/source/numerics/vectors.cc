@@ -284,6 +284,9 @@ VectorTools::interpolate (const DoFHandler<dim>           &high_dof,
 {
   Vector<double> cell_high(high_dof.get_fe().dofs_per_cell);
   Vector<double> cell_low(low_dof.get_fe().dofs_per_cell);
+
+  vector <short unsigned int> touch_count (low_dof.n_dofs(), 0);
+  vector <int> local_dof_indices (low_dof.get_fe().dofs_per_cell);
   
   DoFHandler<dim>::active_cell_iterator h = high_dof.begin_active();
   DoFHandler<dim>::active_cell_iterator l = low_dof.begin_active();
@@ -293,8 +296,32 @@ VectorTools::interpolate (const DoFHandler<dim>           &high_dof,
   {
     h->get_dof_values(high, cell_high);
     transfer.vmult(cell_low, cell_high);
-    l->distribute_local_to_global(cell_low, low);
-  }
+
+    l->get_dof_indices (local_dof_indices);
+  
+				   // distribute cell vector
+    for (unsigned int j=0; j<low_dof.get_fe().dofs_per_cell; ++j) 
+      {
+	low(local_dof_indices[j]) += cell_low(j);
+
+					 // count, how often we have
+					 // added to this dof
+	Assert (touch_count[local_dof_indices[j]] < 255,
+		ExcInternalError());	
+	++touch_count[local_dof_indices[j]];
+      };
+  };
+
+				   // compute the mean value of the
+				   // sum which we have placed in each
+				   // entry of the output vector
+  for (unsigned int i=0; i<low_dof.n_dofs(); ++i)
+    {
+      Assert (touch_count[i] != 0,
+	      ExcInternalError());
+      
+      low(i) /= touch_count[i];
+    };
 }
 
 
