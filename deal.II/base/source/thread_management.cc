@@ -13,11 +13,14 @@
 
 
 #include <base/thread_management.h>
-
+#ifdef DEAL_II_USE_MT_POSIX
+#  include <list>
+#endif
 
 
 namespace Threads 
 {
+#ifndef DEAL_II_USE_MT
   void DummyThreadManager::spawn (const FunPtr fun_ptr,
 				  void *       fun_data,
 				  int          /*flags*/) const
@@ -34,7 +37,110 @@ namespace Threads
     Assert (count == 1, ExcBarrierSizeNotUseful(count));
   };
 
+
+#else
+#  ifdef DEAL_II_USE_MT_POSIX
+
+  PosixThreadMutex::PosixThreadMutex ()
+  {
+    pthread_mutex_init (&mutex, 0);
+  };
+
+
+
+  PosixThreadMutex::~PosixThreadMutex ()
+  {
+    pthread_mutex_destroy (&mutex);
+  };
   
+
+  PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
+					  const char         *,
+					  void               *)
+  {
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
+    pthread_barrier_init (&barrier, 0, count);
+#else
+    AssertThrow (false,
+		 ExcMessage ("Your local POSIX installation does not support\n"
+			     "POSIX barriers. You will not be able to use\n"
+			     "this class, but the rest of the threading\n"
+			     "functionality is available."));
+#endif
+  };
+
+
+
+  PosixThreadBarrier::~PosixThreadBarrier ()
+  {
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+    pthread_barrier_destroy (&barrier);
+#else
+    abort ();
+#endif
+  };
+
+
+
+  int
+  PosixThreadBarrier::wait ()
+  {
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
+    return pthread_barrier_wait (&barrier);
+#else
+    abort ();
+#endif
+  };
+  
+
+
+  PosixThreadManager::PosixThreadManager ()
+		  :
+		  thread_id_list (new std::list<pthread_t>())
+  {};
+
+
+  PosixThreadManager::~PosixThreadManager ()
+  {
+				     // wait for all threads, and
+				     // release memory
+    wait ();
+    delete reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
+  };
+
+
+
+  void
+  PosixThreadManager::spawn (const FunPtr fun_ptr,
+			     void *       fun_data,
+			     int)
+  {
+    std::list<pthread_t> &tid_list
+      = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
+
+    tid_list.push_back (pthread_t());
+
+    const int error
+      = pthread_create (&tid_list.back(), 0, fun_ptr, fun_data);
+
+    Assert (error == 0, ExcInternalError());
+  };
+  
+
+
+  void
+  PosixThreadManager::wait () const
+  {
+    std::list<pthread_t> &tid_list
+      = *reinterpret_cast<std::list<pthread_t>*>(thread_id_list);
+
+    for (std::list<pthread_t>::iterator i=tid_list.begin();
+	 i != tid_list.end(); ++i)
+      pthread_join (tid_list.back(), 0);
+  };
+  
+#  endif
+#endif  
   
   FunDataCounter::FunDataCounter () :
 		  n_fun_encapsulation_objects (0),
@@ -166,9 +272,15 @@ namespace Threads
     fun_data.fun_data_base->lock.acquire ();
 				     // now start the new thread
 #ifdef DEAL_II_USE_MT
+#  if defined(DEAL_II_USE_MT_ACE)
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,
 			  THR_SCOPE_SYSTEM | THR_DETACHED);
+#  elif defined(DEAL_II_USE_MT_POSIX)
+    thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
+			  (void*)&fun_data,
+			  0);    
+#  endif    
 #else
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,

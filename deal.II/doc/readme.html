@@ -454,48 +454,62 @@
       <p>
       <code>--enable-multithreading</code>: This sets compiler
       variables such that the resulting program supports
-      multi-threading. Basically, for this different system include
+      multi-threading. Basically, for this, different system include
       files have to be selected (gcc option -threads) and memory
       allocation has to be made thread-safe; the latter can be done
       for the C++ standard containers by defining
-      <code>-D__USE_MALLOC</code>. Note that not all parts of the
-      deal.II library are fully thread-safe (though most are and
-      multi-threaded programs are working well and routinely) and that
-      gcc's runtime library is not thread-safe unless you configure gcc
-      with <code>--enable-threads</code> and recompile it. Using a gcc
+      <code>-D__USE_MALLOC</code>. Note that 
+      gcc's runtime library was not thread-safe prior to gcc 3.x
+      unless you configured gcc 
+      with <code>--enable-threads</code> and recompiled it. Using a gcc
       that was not configured with this option may lead to errors in
-      your threaded programs that are extremely hard to find.
+      your threaded programs that are extremely hard to find. Newer
+      versions of gcc are thread-safe by default.
       </p>
 
     <li>
       <p>
-      <code>--with-multithreading=ACE-path</code>: enabling
+      <code>--with-multithreading=name</code>: enabling
       multi-threading as shown above does not enable multi-threading
-      inside the library itself. However, there are several places
-      where multi-threading can be used (in some parts of the graphical
-      output routines, the KellyErrorEstimator class and some other
-      places), and you can switch to multi-threading using this
-      configure option.
+      inside the library itself. However, there are many places in the
+      library and example programs
+      where multi-threading can be used, and you can switch to
+      multi-threading using this configure option.
       </p>
 
       <p>
-      To support multi-threading in a cross-platform way, we use the 
-      <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
-      (Adaptive Communications Environment)</a> library. This needs
-      to be installed separately, and the path to its installation
-      directory needs to be given to this option. 
+      To support multi-threading in a cross-platform way, two methods
+      are implemented that are selected by the argument given to
+      <code>--with-multithreading=name</code>:
+      <ul>
+        <li> <code>name=posix</code>: in this case, POSIX functions
+        are used to start threads and to implement mutex and barrier
+        data structures. Most systems today support POSIX, so this
+        should be fairly portable. If no argument is given to
+        <code>--with-multithreading</code>, then POSIX is assumed.
+
+	<li> <code>name=path-to-ACE</code>: 
+	In previous versions of
+	<acronym>deal.II</acronym>, we exclusively used the <a
+	href="http://www.cs.wustl.edu/~schmidt/ACE.html"
+	target="_top">ACE (Adaptive Communications Environment)</a>
+	library for cross-platform portability. This mode is still
+	supported for backward compatibility, although we prefer to
+	use POSIX. The ACE library needs to be installed separately,
+	and the path to its installation directory needs to be given
+	as argument to this option.
+      </ul>
+      As a rule, if the name of the argument is <code>posix</code>,
+      then POSIX threads are used. Otherwise, the configuration script
+      assumes that it is the path to the ACE library.
       </p>
 
       <p>
-      In our experience, if you want to use ACE on Sun, you should
-      compile it for pthreads rather than Solaris threads.
-      </p>
-
-      <p>
-      Note that the multi-thread support in the library is still
-      experimental. While <acronym>deal.II</acronym> runs on a variety
-      of Unix systems, we presently support detection of the number of
-      CPUs in your system only for Linux and Solaris.
+      Note that the library tries to detect the number of processors
+      in your system in multit-thread mode, to determine a default
+      number of threads to start in some situations. We presently
+      support this detection only on Linux, Solaris, OSF, and SGI
+      systems.
       </p>
 
     <li>
@@ -617,10 +631,12 @@
 
     <ul>
       <li>
-      <p>
+      <p> The
       <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
-      (Adaptive Communications Environment)</a>: This library is used
-      to support multithreading in a cross-platform way. It also
+      (Adaptive Communications Environment)</a> library: This library
+      can be used
+      to support multithreading in a cross-platform way if you say so
+      to the <code>./configure</code> script. It also
       enables programs to use interprocess communication and many
       other related services using a platform independent
       interface. On how to enable using this library, see the section on

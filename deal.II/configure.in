@@ -127,9 +127,9 @@ DEAL_II_CHECK_MULTITHREADING
 DEAL_II_SET_MULTITHREADING_FLAGS
 AC_SUBST(enablemultithreading)
 
-dnl Next also check whether the MT code shall be used through ACE
-DEAL_II_CHECK_USE_ACE
-DEAL_II_SET_ACE_FLAGS
+dnl Next also check whether the MT code shall be used through 
+dnl POSIX or ACE
+DEAL_II_CHECK_USE_MT
 AC_SUBST(withmultithreading)
 
 

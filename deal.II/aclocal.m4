@@ -697,6 +697,7 @@ dnl compiler flags to use:
 dnl - Use the right -threads/-pthread/-mthread option
 dnl - Set preprocessor directives if necessary
 dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
+dnl   (don't use this for gcc3.1 or later)
 dnl - _REENTRANT is a flag that is used in the standard UNIX
 dnl   headers to make reentrant functions (with suffix _r) declared
 dnl
@@ -718,8 +719,12 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
       DEAL_II_GET_THREAD_FLAGS
       DEAL_II_THREAD_CPPFLAGS
   
-      CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC -D_REENTRANT"
-      CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC -D_REENTRANT"
+      CXXFLAGSG="$CXXFLAGSG -D_REENTRANT"
+      CXXFLAGSO="$CXXFLAGSO -D_REENTRANT"
+      if test "$GXX_VERSION" = "gcc2.95" -o "$GXX_VERSION" = "gcc3.0" ; then
+        CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
+        CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
+      fi
     else
       if test "x$GXX_VERSION" = "xibm_xlc" ; then
         CXXFLAGSG = "$CXXFLAGSG -threaded"  
@@ -737,31 +742,129 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Test whether MT code shall be used through ACE. If so, set
-dnl $withmultithreading to the path to ACE
+dnl Test which library the MT code shall use to support threads.
+dnl We support either POSIX or ACE. If requested, then set
+dnl $withmultithreading to either POSIX or to the path to ACE.
 dnl
 dnl Usage:
-dnl   DEAL_II_CHECK_USE_ACE
+dnl   DEAL_II_CHECK_USE_MT
 dnl
 dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_USE_ACE, dnl
+AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
 [
   AC_ARG_WITH(multithreading,
-  [  --with-multithreading=DIR use DIR as path to the ACE library],
+  [  --with-multithreading=name If name==posix, then use POSIX threads,
+                                otherwise assume use of ACE and use given
+                                argument as path to ACE],
       withmultithreading=$withval,
       withmultithreading=no)
-  if test "$withmultithreading" != no ; then
-    AC_MSG_CHECKING(for ACE)
-    if test -d "$withmultithreading" ; then
-      AC_MSG_RESULT(found)
+
+dnl Default (i.e. no arg) means POSIX
+  if test "x$withmultithreading" = "xyes" ; then
+    withmultithreading=posix
+  fi
+
+  if test "x$withmultithreading" != "xno" ; then
+    if test "x$withmultithreading" = "xposix" ; then
+      DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS
+      AC_DEFINE(DEAL_II_USE_MT_POSIX, 1,
+                [Defined if multi-threading is to be achieved by using
+                 the POSIX functions])
     else
-      AC_MSG_RESULT(not found)
-      AC_MSG_ERROR(Invalid ACE path)
+      AC_MSG_CHECKING(for ACE)
+      if test -d "$withmultithreading" ; then
+        AC_MSG_RESULT(found)
+      else
+        AC_MSG_RESULT(not found)
+        AC_MSG_ERROR(Invalid ACE path)
+      fi
+      AC_DEFINE(DEAL_II_USE_MT_ACE, 1,
+                [Defined if multi-threading is to be achieved by using
+                 the ACE library])
+      DEAL_II_SET_ACE_FLAGS
     fi
   
     AC_DEFINE(DEAL_II_USE_MT, 1, 
-              [Flag indicating whether the library shall be compiler for
+              [Flag indicating whether the library shall be compiled for
                multithreaded applications])
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check whether the POSIX functions needed for multi-threading
+dnl are available on this system
+dnl 
+dnl Usage: DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_POSIX_THREAD_FUNCTIONS, dnl
+[
+  AC_MSG_CHECKING(for posix thread functions)
+  AC_LANG(C++)
+  AC_TRY_COMPILE(
+   [
+#	include <pthread.h>
+   ],
+   [
+	pthread_t         p;
+	pthread_create (&p, 0, 0, 0);
+	pthread_join (&p, 0);
+   ],
+   [
+	AC_MSG_RESULT(ok)
+   ],
+   [
+	AC_MSG_ERROR(not found)
+   ])
+
+  AC_MSG_CHECKING(for posix thread mutex functions)
+  AC_LANG(C++)
+  AC_TRY_COMPILE(
+   [
+#	include <pthread.h>
+   ],
+   [
+	pthread_mutex_t   pm;
+	pthread_mutex_init (&pm, 0);
+	pthread_mutex_lock (&pm);
+	pthread_mutex_unlock (&pm);
+	pthread_mutex_destroy (&pm);
+   ],
+   [
+	AC_MSG_RESULT(ok)
+   ],
+   [
+	AC_MSG_ERROR(not found)
+   ])
+
+  AC_MSG_CHECKING(for posix thread barrier functions)
+  AC_LANG(C++)
+  AC_TRY_COMPILE(
+   [
+#	include <pthread.h>
+   ],
+   [
+	pthread_barrier_t pb;
+	pthread_barrier_init (&pb, 0, 1);
+	pthread_barrier_wait (&pb);
+	pthread_barrier_destroy (&pb);
+   ],
+   [
+	AC_MSG_RESULT(ok)
+	x=0
+   ],
+   [
+	AC_MSG_RESULT(not found. barriers will not be supported)
+	x=1
+   ])
+   if test "x$x" = "x1" ; then
+     AC_DEFINE(DEAL_II_USE_MT_POSIX_NO_BARRIERS, 1,
+	       [Defined if POSIX is supported but not the newer POSIX
+                barrier functions. Barriers will then not work in
+                the library, but the other threading functionality
+                is available.])
   fi
 ])
 

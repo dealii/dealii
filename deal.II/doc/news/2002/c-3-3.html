@@ -34,7 +34,22 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: In all previous versions, <acronym>deal.II</acronym> used
+       the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
+       target="_top">ACE (Adaptive Communications Environment)</a>
+       library to support cross-platform threading
+       facilities. While this is still supported, the default way
+       is now to use the POSIX threading functions that are
+       available on many systems. The relieves you from the need of
+       installing a huge library of which the most part is not used
+       anyway. However, if you use ACE for other reasons, then it is
+       still supported. For installation instructions, see the 
+       <a href="../../readme.html" target="body">ReadMe</a> file.
+       <br>
+       (WB 2002/04/30)
+       </p>
 
+  <li> <p> 
        Changed: The Makefiles for the library are now truly
        parallel. To this end, the automatic generation of the files
        <tt>forward_declarations.h</tt> in the various directories had
@@ -44,7 +59,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        single library. In this case, <tt>make forward</tt> can be used
        to build them manually.
        <br>
-       I introduced separate targets for the generation of the optimized versions only.
+       I introduced separate targets for the generation of the
+       optimized versions only.
        <br>
        (GK 2002/04/17)
        </p>

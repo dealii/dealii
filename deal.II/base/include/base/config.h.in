@@ -76,9 +76,21 @@
    description of this bug. */
 #undef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
 
-/* Flag indicating whether the library shall be compiler for multithreaded
+/* Flag indicating whether the library shall be compiled for multithreaded
    applications */
 #undef DEAL_II_USE_MT
+
+/* Defined if multi-threading is to be achieved by using the ACE library */
+#undef DEAL_II_USE_MT_ACE
+
+/* Defined if multi-threading is to be achieved by using the POSIX functions
+   */
+#undef DEAL_II_USE_MT_POSIX
+
+/* Defined if POSIX is supported but not the newer POSIX barrier functions.
+   Barriers will then not work in the library, but the other threading
+   functionality is available. */
+#undef DEAL_II_USE_MT_POSIX_NO_BARRIERS
 
 /* Enable the multigrid components of the library */
 #undef ENABLE_MULTIGRID

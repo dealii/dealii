@@ -820,7 +820,9 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-multithreading=DIR use DIR as path to the ACE library
+  --with-multithreading=name If name==posix, then use POSIX threads,
+                                otherwise assume use of ACE and use given
+                                argument as path to ACE
   --with-kdoc=DIR use kdoc installed in DIR
   --with-docxx=PATH use the doc++ executable pointed to by PATH
 
@@ -3097,8 +3099,15 @@ fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 
 
-      CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC -D_REENTRANT"
-      CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC -D_REENTRANT"
+      CXXFLAGSG="$CXXFLAGSG -D_REENTRANT"
+      CXXFLAGSO="$CXXFLAGSO -D_REENTRANT"
+	echo xxxxxxxxxxxxxxxxxxxxxxxxx $GXX_VERSION
+      if test "$GXX_VERSION" = "gcc2.95" -o "$GXX_VERSION" = "gcc3.0" ; then
+	echo xxxxxxxxxxxxxxxxxxxxxxxxx
+        CXXFLAGSG="$CXXFLAGSG -D__USE_MALLOC"
+        CXXFLAGSO="$CXXFLAGSO -D__USE_MALLOC"
+      fi
+	echo xxxxxxxxxxxxxxxxxxxxxxxxx
     else
       if test "x$GXX_VERSION" = "xibm_xlc" ; then
         CXXFLAGSG = "$CXXFLAGSG -threaded"
@@ -3125,26 +3134,224 @@ if test "${with_multithreading+set}" = set; then
 else
   withmultithreading=no
 fi;
-  if test "$withmultithreading" != no ; then
-    echo "$as_me:$LINENO: checking for ACE" >&5
-echo $ECHO_N "checking for ACE... $ECHO_C" >&6
-    if test -d "$withmultithreading" ; then
-      echo "$as_me:$LINENO: result: found" >&5
-echo "${ECHO_T}found" >&6
-    else
-      echo "$as_me:$LINENO: result: not found" >&5
-echo "${ECHO_T}not found" >&6
-      { { echo "$as_me:$LINENO: error: Invalid ACE path" >&5
-echo "$as_me: error: Invalid ACE path" >&2;}
-   { (exit 1); exit 1; }; }
-    fi
 
+  if test "x$withmultithreading" = "xyes" ; then
+    withmultithreading=posix
+  fi
+
+  if test "x$withmultithreading" != "xno" ; then
+    if test "x$withmultithreading" = "xposix" ; then
+
+  echo "$as_me:$LINENO: checking for posix thread functions" >&5
+echo $ECHO_N "checking for posix thread functions... $ECHO_C" >&6
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+#	include <pthread.h>
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+
+	pthread_t         p;
+	pthread_create (&p, 0, 0, 0);
+	pthread_join (&p, 0);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+	echo "$as_me:$LINENO: result: ok" >&5
+echo "${ECHO_T}ok" >&6
+
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+
+	{ { echo "$as_me:$LINENO: error: not found" >&5
+echo "$as_me: error: not found" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+
+  echo "$as_me:$LINENO: checking for posix thread mutex functions" >&5
+echo $ECHO_N "checking for posix thread mutex functions... $ECHO_C" >&6
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+#	include <pthread.h>
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+
+	pthread_mutex_t   pm;
+	pthread_mutex_init (&pm, 0);
+	pthread_mutex_lock (&pm);
+	pthread_mutex_unlock (&pm);
+	pthread_mutex_destroy (&pm);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+	echo "$as_me:$LINENO: result: ok" >&5
+echo "${ECHO_T}ok" >&6
+
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+
+	{ { echo "$as_me:$LINENO: error: not found" >&5
+echo "$as_me: error: not found" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+
+  echo "$as_me:$LINENO: checking for posix thread barrier functions" >&5
+echo $ECHO_N "checking for posix thread barrier functions... $ECHO_C" >&6
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+#	include <pthread.h>
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+
+	pthread_barrier_t pb;
+	pthread_barrier_init (&pb, 0, 1);
+	pthread_barrier_wait (&pb);
+	pthread_barrier_destroy (&pb);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+	echo "$as_me:$LINENO: result: ok" >&5
+echo "${ECHO_T}ok" >&6
+	x=0
+
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+
+	echo "$as_me:$LINENO: result: not found. barriers will not be supported" >&5
+echo "${ECHO_T}not found. barriers will not be supported" >&6
+	x=1
+
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+   if test "x$x" = "x1" ; then
 
 cat >>confdefs.h <<\_ACEOF
-#define DEAL_II_USE_MT 1
+#define DEAL_II_USE_MT_POSIX_NO_BARRIERS 1
 _ACEOF
 
   fi
+
+
+cat >>confdefs.h <<\_ACEOF
+#define DEAL_II_USE_MT_POSIX 1
+_ACEOF
+
+    else
+      echo "$as_me:$LINENO: checking for ACE" >&5
+echo $ECHO_N "checking for ACE... $ECHO_C" >&6
+      if test -d "$withmultithreading" ; then
+        echo "$as_me:$LINENO: result: found" >&5
+echo "${ECHO_T}found" >&6
+      else
+        echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+        { { echo "$as_me:$LINENO: error: Invalid ACE path" >&5
+echo "$as_me: error: Invalid ACE path" >&2;}
+   { (exit 1); exit 1; }; }
+      fi
+
+cat >>confdefs.h <<\_ACEOF
+#define DEAL_II_USE_MT_ACE 1
+_ACEOF
 
 
   if test "$enablemultithreading" = yes ; then
@@ -3217,6 +3424,15 @@ echo "${ECHO_T}-pedantic" >&6
         CXXFLAGSO="`echo $CXXFLAGSO | perl -pi -e 's/-pedantic//g;'`"
       fi
     fi
+  fi
+
+    fi
+
+
+cat >>confdefs.h <<\_ACEOF
+#define DEAL_II_USE_MT 1
+_ACEOF
+
   fi
 
 

@@ -22,8 +22,12 @@
 #include <iterator>
 
 #ifdef DEAL_II_USE_MT
-#  include <ace/Thread_Manager.h>
-#  include <ace/Synch.h>
+#  if defined(DEAL_II_USE_MT_ACE)
+#    include <ace/Thread_Manager.h>
+#    include <ace/Synch.h>
+#  elif defined(DEAL_II_USE_MT_POSIX)
+#    include <pthread.h>
+#  endif
 #endif
 
 
@@ -179,17 +183,193 @@ namespace Threads
   
   
 #ifdef DEAL_II_USE_MT
+#  if defined(DEAL_II_USE_MT_ACE)
 				   /**
-				    * In multithread mode, we alias
-				    * the mutex and thread management
-				    * classes to the respective
-				    * classes of the ACE
+				    * In multithread mode with ACE
+				    * enabled, we alias the mutex and
+				    * thread management classes to the
+				    * respective classes of the ACE
 				    * library. Likewise for the
 				    * barrier class.
 				    */
   typedef ACE_Thread_Mutex   ThreadMutex;
   typedef ACE_Thread_Manager ThreadManager;
   typedef ACE_Barrier        Barrier;
+  
+#  elif defined(DEAL_II_USE_MT_POSIX)
+
+				   /**
+				    * Class implementing a Mutex with
+				    * the help of POSIX functions.
+				    *
+				    * @author Wolfgang Bangerth, 2002
+				    */
+  class PosixThreadMutex 
+  {
+    public:
+				       /**
+					* Constructor. Initialize the
+					* underlying POSIX mutex data
+					* structure.
+					*/
+      PosixThreadMutex ();
+
+				       /**
+					* Destructor. Release all
+					* resources.
+					*/
+      ~PosixThreadMutex ();
+      
+				       /**
+					* Acquire a mutex.
+					*/
+      inline void acquire () { pthread_mutex_lock(&mutex); };
+
+				       /**
+					* Release the mutex again.
+					*/
+      inline void release () { pthread_mutex_unlock(&mutex); };
+
+    private:
+				       /**
+					* Data object storing the
+					* POSIX data which we need to
+					* call the POSIX functions.
+					*/
+      pthread_mutex_t mutex;
+  };
+
+
+				   /**
+				    * Implementation of a thread
+				    * barrier class, based on the
+				    * POSIX thread functions. POSIX
+				    * barriers are a relatively new
+				    * feature and are not supported on
+				    * all systems. If the
+				    * configuration detected the
+				    * absence of these functions, then
+				    * barriers will not be available,
+				    * and using this class will result
+				    * in an exception been thrown. The
+				    * rest of the threading
+				    * functionality will be available,
+				    * though.
+				    *
+				    * @author Wolfgang Bangerth, 2002
+				    */
+  class PosixThreadBarrier 
+  {
+    public:
+				       /**
+					* Constructor. Initialize the
+					* underlying POSIX barrier data
+					* structure.
+					*/
+      PosixThreadBarrier (const unsigned int  count,
+			  const char         *name = 0,
+			  void               *arg  = 0);
+
+				       /**
+					* Destructor. Release all
+					* resources.
+					*/
+      ~PosixThreadBarrier ();      
+
+				       /**
+					* Wait for all threads to
+					* reach this point. The return
+					* value is zero for all
+					* participating threads except
+					* for one, for which the
+					* return value is some
+					* non-zero value. The
+					* operating system picks the
+					* special thread by some not
+					* further known method.
+					*/
+      int wait ();
+
+    private:
+				       /**
+					* Data object storing the
+					* POSIX data which we need to
+					* call the POSIX functions.
+					*/
+#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+      pthread_barrier_t barrier;
+#endif
+  };
+
+
+  class PosixThreadManager 
+  {
+    public:
+				       /**
+					* Typedef for a global
+					* function that might be
+					* called on a new thread.
+					*/
+      typedef void * (*FunPtr) (void *);
+
+				       /**
+					* Constructor. Initialize data
+					* structures.
+					*/
+      PosixThreadManager ();
+
+				       /**
+					* Destructor. Wait for all
+					* spawned threads if they have
+					* not yet finished, and
+					* release the resources of
+					* this object.
+					*/
+      ~PosixThreadManager ();
+      
+				       /**
+					* Spawn a new thread and
+					* calling the passed function
+					* thereon. Store the
+					* identifier of the thread for
+					* later operations as waiting
+					* for that thread.
+					*
+					* The @p{flags} argument is
+					* currently ignored.
+					*/
+      void spawn (const FunPtr fun_ptr,
+		  void *       fun_data,
+		  int          flags);
+
+				       /**
+					* Wait for all spawned threads
+					* to return.
+					*/
+      void wait () const;
+
+    private:
+				       /**
+					* List of thread ids. This
+					* variable actually points to
+					* an object of type
+					* @p{std::list<pthread_t>},
+					* but to avoid including
+					* @p{<list>} into this central
+					* header file and all other
+					* files including it, we use a
+					* void pointer instead.
+					*/
+      void * const thread_id_list;
+  };
+  
+  
+  
+  typedef PosixThreadMutex   ThreadMutex;
+  typedef PosixThreadManager ThreadManager;
+  typedef PosixThreadBarrier Barrier;
+  
+#  endif
 #else
 				   /**
 				    * In non-multithread mode, the

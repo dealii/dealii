@@ -49,6 +49,20 @@
     <dir>
     <dl>
       <dt>
+          <strong>2004/04/30: Multi-threading support using POSIX</strong>
+      </dt>
+      <dd>
+          In all previous versions, <acronym>deal.II</acronym> used
+          the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
+	  target="_top">ACE (Adaptive Communications Environment)</a>
+	  library to support cross-platform threading
+          facilities. While this is still supported, the default way
+          is now to use the POSIX threading functions that are
+          available on many systems.
+	  </p>
+      </dd>
+
+      <dt>
           <strong>2004/04/16: New example program showing
           software design practices for finite element programs</strong>
       </dt>
