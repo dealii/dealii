@@ -67,10 +67,10 @@ class VectorSlice
  */
 template <class VECTOR>
 inline
-const VectorSlice<VECTOR>
+const VectorSlice<const VECTOR>
 make_slice (VECTOR& v)
 {
-  const VectorSlice<VECTOR> r(v);
+  const VectorSlice<const VECTOR> r(v);
   return r;
 }
 
@@ -85,10 +85,10 @@ make_slice (VECTOR& v)
  */
 template <class VECTOR>
 inline
-const VectorSlice<VECTOR>
+const VectorSlice<const VECTOR>
 make_slice (VECTOR& v, unsigned int start, unsigned int length)
 {
-  const VectorSlice<VECTOR> r(v, start, length);
+  const VectorSlice<const VECTOR> r(v, start, length);
   return r;
 }
 
