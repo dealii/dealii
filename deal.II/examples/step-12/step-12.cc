@@ -223,7 +223,7 @@ template <int dim>
 class DGTransportEquation
 {
   public:
-    DGTransportEquation() {};
+    DGTransportEquation();
 
     void assemble_cell_term(const FEValues<dim>& fe_v,
 			    FullMatrix<double> &u_v_matrix,
@@ -249,6 +249,15 @@ class DGTransportEquation
     const RHS<dim> rhs_function;
     const BoundaryValues<dim> boundary_function;
 };
+
+
+template <int dim>
+DGTransportEquation<dim>::DGTransportEquation ()
+		:
+		beta_function (),
+		rhs_function (),
+		boundary_function ()
+{};
 
 
 				 // @sect4{Function: assemble_cell_term}
@@ -613,12 +622,17 @@ class DGMethod
 
 
 template <int dim>
-DGMethod<dim>::DGMethod () :
+DGMethod<dim>::DGMethod ()
+		:
+		mapping (),
 						 // Change here for DG
 						 // methods of
 						 // different degrees.
                 fe (1),
-		dof_handler (triangulation)
+		dof_handler (triangulation),
+		quadrature (),
+		face_quadrature (),
+		dg ()
 {}
 
 
