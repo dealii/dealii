@@ -38,8 +38,8 @@ void
 check(const FiniteElement<dim> &fe1,
       const FiniteElement<dim> &fe2)
 {
-  deallog << fe1.get_name () << " to " << fe2.get_name ()
-	  << std::endl;
+//    deallog << fe1.get_name () << " to " << fe2.get_name ()
+//  	  << std::endl;
 
   FullMatrix<float> m (fe2.dofs_per_cell,
                        fe1.dofs_per_cell);
