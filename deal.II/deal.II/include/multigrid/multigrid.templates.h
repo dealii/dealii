@@ -64,6 +64,7 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
       
       solution[level].reinit(system_size);
       defect[level].reinit(system_size);
+      t[level].reinit(system_size);
     };
 
 				   // traverse the grid top-down
@@ -121,14 +122,15 @@ Multigrid<dim>::copy_to_mg (const Vector<number>& osrc)
 		};
 	    };
 	};
-
 				       // for that part of the level
 				       // which is further refined:
 				       // get the defect by
 				       // restriction of the defect on
 				       // one level higher
       if (static_cast<unsigned int>(level) < maxlevel)
-	transfer->restrict_and_add (level+1, defect[level], defect[level+1]);
+	{
+	  transfer->restrict_and_add (level+1, defect[level], defect[level+1]);
+	}
     };
 };
 

@@ -134,7 +134,6 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
       prolongation_matrices.push_back (SparseMatrix<double>());
       prolongation_matrices[level].reinit (prolongation_sparsities[level]);
 
-
 // now actually build the matrices
       for (MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)

@@ -30,6 +30,7 @@ MGBase::MGBase(const MGTransferBase &transfer,
 		minlevel(minlevel),
 		defect(minlevel,maxlevel),
 		solution(minlevel,maxlevel),
+		t(minlevel,maxlevel),
 		transfer(&transfer)
 {
   Assert(minlevel <= maxlevel,
@@ -73,24 +74,31 @@ MGBase::level_mgstep(const unsigned int        level,
 
 			   // smoothing of the residual by modifying s
   pre_smooth.smooth(level, solution[level], defect[level]);
-				   // t = d-As
 
 #ifdef MG_DEBUG
   sprintf(name, "MG%d-pre",level);
   print_vector(level, solution[level], name);
 #endif
   
-  t.reinit(solution[level].size());
-  level_vmult(level, t, solution[level], defect[level]);
+  t[level] = 0.;
+
+				   // t = -A*solution[level]
+  level_vmult(level, t[level], solution[level], defect[level]);
   
 				   // make t rhs of lower level
 				   // The non-refined parts of the
 				   // coarse-level defect already contain
-				   // the global defect.
-  transfer->restrict_and_add (level, defect[level-1], t);
+				   // the global defect, the refined parts
+				   // its restriction.
+  for (unsigned int l = level;l>minlevel;--l)
+    {
+      t[l-1] = 0.;
+      transfer->restrict_and_add (l, t[l-1], t[l]);
+      defect[l-1] += t[l-1];
+    }
 
 				   // add additional DG contribution
-  edge_vmult(level, defect[level-1], defect[level]);
+//  edge_vmult(level, defect[level-1], defect[level]);
   
 				   // do recursion
   level_mgstep(level-1, pre_smooth, post_smooth, coarse_grid_solver);
@@ -99,21 +107,20 @@ MGBase::level_mgstep(const unsigned int        level,
 				   // vector, since it has been
 				   // resized in the recursive call to
 				   // level_mgstep directly above
-  t.reinit(solution[level].size());
+  t[level] = 0.;
 
 				   // do coarse grid correction
 
-  transfer->prolongate(level, t, solution[level-1]);
+  transfer->prolongate(level, t[level], solution[level-1]);
 
 #ifdef MG_DEBUG
   sprintf(name, "MG%d-cgc",level);
   print_vector(level, t, name);
 #endif
 
-  solution[level] += t;
+  solution[level] += t[level];
   
 				   // post-smoothing
-
   post_smooth.smooth(level, solution[level], defect[level]);
 
 #ifdef MG_DEBUG

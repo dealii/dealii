@@ -357,6 +357,11 @@ class MGBase : public Subscriptor
     MGLevelObject<Vector<double> > solution;
     
 				     /**
+				      * Auxiliary vector.
+				      */
+    MGLevelObject<Vector<double> > t;    
+
+				     /**
 				      * Prolongation and restriction object.
 				      */
     SmartPointer<const MGTransferBase> transfer;
@@ -431,11 +436,6 @@ class MGBase : public Subscriptor
 			       const Vector<double>& v,
 			       const char* name) const = 0;
     
-  private:
-				     /**
-				      * Auxiliary vector.
-				      */
-    Vector<double> t;    
 };
 
 
