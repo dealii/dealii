@@ -580,7 +580,7 @@ class DoFTools
 				      * if the finite element in use
 				      * has shape functions that are
 				      * non-zero in more than one
-				      * shape function (in deal.II
+				      * vector component (in deal.II
 				      * speak: they are
 				      * non-primitive).
 				      */
