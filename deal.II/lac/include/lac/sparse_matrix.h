@@ -14,7 +14,7 @@
 #define __deal2__sparse_matrix_h
 
 
-/*----------------------------   sparsematrix.h     ---------------------------*/
+/*----------------------------   sparse_matrix.h     ---------------------------*/
 
 
 #include <base/exceptions.h>
@@ -206,7 +206,6 @@ class SparseMatrix : public Subscriptor
 				      * matrix is of dimension
 				      * $m \times n$.
 				      */
-
     unsigned int n () const;
 
 				     /**
@@ -443,7 +442,8 @@ class SparseMatrix : public Subscriptor
 				      * being this matrix.
 				      */
     template <typename somenumber>
-    void vmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+    void vmult (Vector<somenumber>       &dst,
+		const Vector<somenumber> &src) const;
     
 				     /**
 				      * Matrix-vector multiplication:
@@ -454,7 +454,8 @@ class SparseMatrix : public Subscriptor
 				      * transposed matrix.
 				      */
     template <typename somenumber>
-    void Tvmult (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+    void Tvmult (Vector<somenumber>       &dst,
+		 const Vector<somenumber> &src) const;
   
 				     /**
 				      * Adding Matrix-vector
@@ -463,7 +464,8 @@ class SparseMatrix : public Subscriptor
 				      * matrix.
 				      */
     template <typename somenumber>
-    void vmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+    void vmult_add (Vector<somenumber>       &dst,
+		    const Vector<somenumber> &src) const;
     
 				     /**
 				      * Adding Matrix-vector
@@ -474,7 +476,8 @@ class SparseMatrix : public Subscriptor
 				      * the transposed matrix.
 				      */
     template <typename somenumber>
-    void Tvmult_add (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+    void Tvmult_add (Vector<somenumber>       &dst,
+		     const Vector<somenumber> &src) const;
   
 				     /**
 				      * Return the square of the norm
@@ -534,13 +537,15 @@ class SparseMatrix : public Subscriptor
 
 				     /**
 				      * Compute the residual of an
-				      * equation @p{Ax=b}, where the
+				      * equation @p{Mx=b}, where the
 				      * residual is defined to be
-				      * @p{r=b-Ax} with @p{x} typically
+				      * @p{r=b-Mx} with @p{x} typically
 				      * being an approximate of the
 				      * true solution of the
 				      * equation. Write the residual
-				      * into @p{dst}.
+				      * into @p{dst}. The l2 norm of
+				      * the residual vector is
+				      * returned.
 				      */
     template <typename somenumber>
     somenumber residual (Vector<somenumber>       &dst,
@@ -563,7 +568,7 @@ class SparseMatrix : public Subscriptor
 			      const number              omega = 1.) const;
 
 				     /**
-				      * Apply SOR preconditioning to
+				      * Apply SSOR preconditioning to
 				      * @p{src}.
 				      */
     template <typename somenumber>
@@ -1042,9 +1047,9 @@ number & SparseMatrix<number>::global_entry (const unsigned int j)
 };
 
 
-/*----------------------------   sparsematrix.h     ---------------------------*/
+/*----------------------------   sparse_matrix.h     ---------------------------*/
 
 #endif
-/*----------------------------   sparsematrix.h     ---------------------------*/
+/*----------------------------   sparse_matrix.h     ---------------------------*/
 
 
