@@ -1275,7 +1275,7 @@ namespace BlockVectorIterators
 				     // got is true and we are trying
 				     // to cast away the
 				     // constness. disallow this
-    Assert (constness==false, ExcCastingAwayConstness());
+    Assert (constness==true, ExcCastingAwayConstness());
   };
   
 
