@@ -1,4 +1,4 @@
-//----------------------------  dof_constraints_07.cc  ---------------------------
+//----------------------------  dof_constraints_09.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,16 +9,17 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_constraints_07.cc  ---------------------------
+//----------------------------  dof_constraints_09.cc  ---------------------------
 
 
-// simply check what happens when calling DoFConstraints::set_zero on
-// block vectors. This test was written when I changed a few things in the algorithm
+// simply check what happens when condensing block matrices. This test was
+// written when I changed a few things in the algorithm. By simply looping
+// over all entries of the sparse matrix, we also check that things went right
+// during compression of the sparsity pattern.
 
 #include "../tests.h"
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
+#include <lac/block_sparsity_pattern.h>
+#include <lac/block_sparse_matrix.h>
 #include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
@@ -61,36 +62,57 @@ void test ()
   constraints.close ();
   deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
+                                   // then set up a sparsity pattern and a
+                                   // matrix on top of it
   std::vector<unsigned int> block_sizes(2);
   block_sizes[0] = dof_handler.n_dofs()/3;
   block_sizes[1] = dof_handler.n_dofs() - block_sizes[0];
-  BlockVector<double> b(block_sizes);
-  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-    b(i) = (1.+1.*i*i)/3;
 
-                                   // now condense away constraints
-  constraints.set_zero (b);
+  BlockSparsityPattern sparsity(2,2);
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<2; ++j)
+      sparsity.block(i,j).reinit (block_sizes[i], block_sizes[j],
+                                  dof_handler.max_couplings_between_dofs());
+  sparsity.collect_sizes();
+  
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity);
+  constraints.condense (sparsity);
+  BlockSparseMatrix<double> A(sparsity);
+
+                                   // then fill the matrix by setting up
+                                   // bogus matrix entries
+  std::vector<unsigned int> local_dofs (fe.dofs_per_cell);
+  FullMatrix<double> local_matrix (fe.dofs_per_cell, fe.dofs_per_cell);
+  for (typename DoFHandler<dim>::active_cell_iterator
+         cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    {
+      cell->get_dof_indices (local_dofs);
+      local_matrix.clear ();
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+          local_matrix(i,j) = (i+1.)*(j+1.)*(local_dofs[i]+1.)*(local_dofs[j]+1.);
+
+                                       // copy local to global
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+          A.add (local_dofs[i], local_dofs[j], local_matrix(i,j));
+    }
+
+                                   // now condense away constraints from A
+  constraints.condense (A);
 
                                    // and output what we have
-  for (BlockVector<double>::const_iterator i=b.begin(); i!=b.end(); ++i)
-    deallog << *i << std::endl;
-
-                                   // now also make sure that the elements in
-                                   // constrained rows are zero, and that all
-                                   // the other elements are unchanged
-  for (unsigned int i=0; i<b.size(); ++i)
-    if (constraints.is_constrained(i))
-      Assert (b(i) == 0, ExcInternalError())
-    else
-      Assert (std::fabs(b(i) - (1.+1.*i*i)/3) < 1e-14*std::fabs(b(i)),
-              ExcInternalError());
+  for (BlockSparseMatrix<double>::const_iterator i=A.begin(); i!=A.end(); ++i)
+    deallog << i->row() << ' ' << i->column() << ' ' << i->value()
+            << std::endl;
 }
 
 
 
 int main ()
 {
-  std::ofstream logfile("dof_constraints_07.output");
+  std::ofstream logfile("dof_constraints_09.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

@@ -1,4 +1,4 @@
-//----------------------------  dof_constraints_07.cc  ---------------------------
+//----------------------------  dof_constraints_08.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,11 +9,11 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_constraints_07.cc  ---------------------------
+//----------------------------  dof_constraints_08.cc  ---------------------------
 
 
-// simply check what happens when calling DoFConstraints::set_zero on
-// block vectors. This test was written when I changed a few things in the algorithm
+// simply check what happens when condensing block vectors. This test was
+// written when I changed a few things in the algorithm
 
 #include "../tests.h"
 #include <lac/sparsity_pattern.h>
@@ -69,28 +69,24 @@ void test ()
     b(i) = (1.+1.*i*i)/3;
 
                                    // now condense away constraints
-  constraints.set_zero (b);
+  constraints.condense (b);
 
                                    // and output what we have
   for (BlockVector<double>::const_iterator i=b.begin(); i!=b.end(); ++i)
     deallog << *i << std::endl;
 
                                    // now also make sure that the elements in
-                                   // constrained rows are zero, and that all
-                                   // the other elements are unchanged
+                                   // constrained rows are zero
   for (unsigned int i=0; i<b.size(); ++i)
     if (constraints.is_constrained(i))
-      Assert (b(i) == 0, ExcInternalError())
-    else
-      Assert (std::fabs(b(i) - (1.+1.*i*i)/3) < 1e-14*std::fabs(b(i)),
-              ExcInternalError());
+      Assert (b(i) == 0, ExcInternalError());
 }
 
 
 
 int main ()
 {
-  std::ofstream logfile("dof_constraints_07.output");
+  std::ofstream logfile("dof_constraints_08.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
