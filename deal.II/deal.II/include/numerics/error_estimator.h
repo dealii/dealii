@@ -264,7 +264,7 @@ class KellyErrorEstimator
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  unsigned int             n_threads = multithread_info.n_default_threads);
+			  const unsigned int       n_threads = multithread_info.n_default_threads);
 
 				     /**
 				      * Calls the @p{estimate}

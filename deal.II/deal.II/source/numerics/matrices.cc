@@ -320,7 +320,7 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const Mapping<1>          &,
 						    const FunctionMap<1>::type&,
 						    Vector<double>            &,
 						    std::vector<unsigned int> &,
-						    const Function<1>         *)
+						    const Function<1>         * const)
 {
 				   // what would that be in 1d? the
 				   // identity matrix on tehe boundary

@@ -544,7 +544,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &ma
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
-					 unsigned int                         n_threads)
+					 const unsigned int                   n_threads_)
 {
 				   // sanity checks
   Assert (solutions.size() > 0,
@@ -557,6 +557,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &ma
   
 	  
 				   // if NOT multithreaded, set n_threads to one
+  unsigned int n_threads = n_threads_;
 #ifndef DEAL_II_USE_MT
   n_threads = 1;
 #endif
