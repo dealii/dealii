@@ -9,7 +9,10 @@
 ##
 ##
 ##   This file exports several variables. They are documented in 
-##   the file  doc/development/makefiles.html.
+##   the file  doc/development/makefiles.html. If you add a new
+##   variable, make sure it is documented in 
+##   doc/development/makefiles.1.html and listed in 
+##   doc/development/Makefile.
 ###############################################################################
 
 

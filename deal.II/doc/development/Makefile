@@ -22,6 +22,7 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>PERL=$(PERL)</code>' >> $@
 	@echo '<li><code>DEAL_II_MAJOR=$(DEAL_II_MAJOR)</code>' >> $@
 	@echo '<li><code>DEAL_II_MINOR=$(DEAL_II_MINOR)</code>' >> $@
+	@echo '<li><code>TARGET=$(TARGET)</code>' >> $@
 	@echo '<li><code>USE_CONTRIB_HSL=$(USE_CONTRIB_HSL)</code>' >> $@
 	@echo '<li><code>lib-path-base=$(lib-path-base)</code>' >> $@
 	@echo '<li><code>lib-path-lac=$(lib-path-lac)</code>' >> $@
