@@ -77,12 +77,6 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 				      * constructor by a new matrix.
 				      */
     void set_matrix (const MATRIX &);
-
-				     /**
-				      * Exception.
-				      */
-    DeclException0 (ExcNoMatrixGiven);
-
     
   private:
 				     /**
@@ -158,7 +152,9 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 	      VECTOR       &dst,
 	      const VECTOR &src) const
 {
-  Assert(matrix!=0, ExcNoMatrixGiven());
+  Assert(solver!=0, ExcNotInitialized());
+  Assert(matrix!=0, ExcNotInitialized());
+  Assert(precondition!=0, ExcNotInitialized());
   solver->solve(*matrix, dst, src, *precondition);
 }
 
