@@ -9,7 +9,7 @@ debug-mode = on
 
 D = ../..
 
-include ../../deal.II/Make.global_options
+include ../../common/Make.global_options
 
 
 
@@ -39,6 +39,13 @@ libraries = $(libs)
 flags     = $(CXXFLAGS) -L$D/deal.II/lib
 lib-tag   = "deal_II_libraries="
 endif
+
+%.go : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
 
 
 

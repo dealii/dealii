@@ -41,6 +41,15 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
+
+%.go : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
+
+
 all: solver.check mgbase.check mg.check
 exe: $(all:.check=.testcase) benchmark
 run: $(all:.check=.output)

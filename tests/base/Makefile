@@ -41,6 +41,14 @@ libraries = $(libs)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
+%.go : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
+
+
 all: logtest.check reference.check tensor.check
 exe: $(all:.check=.testcase)
 output: $(all:.check=.output)
