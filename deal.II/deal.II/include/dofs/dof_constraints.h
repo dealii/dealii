@@ -22,9 +22,11 @@
 class SparsityPattern;
 class CompressedSparsityPattern;
 class BlockSparsityPattern;
+class CompressedBlockSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
+
 
 /**
  * This class represents the matrix denoting the distribution of the degrees
@@ -290,6 +292,13 @@ class ConstraintMatrix : public Subscriptor
 				      * sparsity patterns.
 				      */
     void condense (CompressedSparsityPattern &sparsity) const;
+
+				     /**
+				      * Same function as above, but
+				      * condenses square compressed
+				      * sparsity patterns.
+				      */
+    void condense (CompressedBlockSparsityPattern &sparsity) const;
     
 				     /**
 				      * Condense a given matrix. The associated

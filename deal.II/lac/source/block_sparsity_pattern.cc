@@ -16,7 +16,8 @@
 
 
 
-BlockSparsityPattern::BlockSparsityPattern ()
+template <class SparsityPatternBase>
+BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase ()
 		:
 		rows (0),
 		columns (0)
@@ -24,8 +25,10 @@ BlockSparsityPattern::BlockSparsityPattern ()
 
 
 
-BlockSparsityPattern::BlockSparsityPattern (const unsigned int r,
-					    const unsigned int c)
+template <class SparsityPatternBase>
+BlockSparsityPatternBase<SparsityPatternBase>::
+BlockSparsityPatternBase (const unsigned int r,
+		      const unsigned int c)
 		:
 		rows (0),
 		columns (0)
@@ -35,7 +38,8 @@ BlockSparsityPattern::BlockSparsityPattern (const unsigned int r,
 
 
 
-BlockSparsityPattern::~BlockSparsityPattern ()
+template <class SparsityPatternBase>
+BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase ()
 {
 				   // clear all memory
   reinit (0,0);
@@ -43,15 +47,16 @@ BlockSparsityPattern::~BlockSparsityPattern ()
 
 
 
+template <class SparsityPatternBase>
 void
-BlockSparsityPattern::reinit (const unsigned int r,
-			      const unsigned int c)
+BlockSparsityPatternBase<SparsityPatternBase>::reinit (const unsigned int r,
+						       const unsigned int c)
 {
 				   // delete previous content
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
       {
-	SparsityPattern * sp = sub_objects[i][j];
+	SparsityPatternBase * sp = sub_objects[i][j];
 	sub_objects[i][j] = 0;
 	delete sp;
       };
@@ -60,18 +65,20 @@ BlockSparsityPattern::reinit (const unsigned int r,
 				   // set new sizes
   rows = r;
   columns = c;
-  sub_objects.resize (rows, std::vector<SmartPointer<SparsityPattern> > (columns));
+  sub_objects.resize (rows, std::vector<SmartPointer<SparsityPatternBase> > (columns));
 
 				   // allocate new objects
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
-      sub_objects[i][j] = new SparsityPattern;
+      sub_objects[i][j] = new SparsityPatternBase;
 };
 
 
 
-BlockSparsityPattern &
-BlockSparsityPattern::operator = (const BlockSparsityPattern &bsp)
+template <class SparsityPatternBase>
+BlockSparsityPatternBase<SparsityPatternBase> &
+BlockSparsityPatternBase<SparsityPatternBase>::
+operator = (const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
 {
   Assert (rows == bsp.rows, ExcIncompatibleSizes(rows, bsp.rows));
   Assert (columns == bsp.columns, ExcIncompatibleSizes(columns, bsp.columns));
@@ -84,12 +91,12 @@ BlockSparsityPattern::operator = (const BlockSparsityPattern &bsp)
 
   return *this;
 };
-
   
 
 
+template <class SparsityPatternBase>
 void
-BlockSparsityPattern::collect_sizes ()
+BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes ()
 {
   std::vector<unsigned int> row_sizes (rows);
   std::vector<unsigned int> col_sizes (columns);
@@ -126,8 +133,9 @@ BlockSparsityPattern::collect_sizes ()
 
 
 
+template <class SparsityPatternBase>
 void
-BlockSparsityPattern::compress ()
+BlockSparsityPatternBase<SparsityPatternBase>::compress ()
 {
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
@@ -136,8 +144,9 @@ BlockSparsityPattern::compress ()
 
 
 
+template <class SparsityPatternBase>
 bool
-BlockSparsityPattern::empty () const
+BlockSparsityPatternBase<SparsityPatternBase>::empty () const
 {
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)
@@ -148,8 +157,9 @@ BlockSparsityPattern::empty () const
 
 
 
+template <class SparsityPatternBase>
 unsigned int
-BlockSparsityPattern::max_entries_per_row () const
+BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row () const
 {
   unsigned int max_entries = 0;
   for (unsigned int block_row=0; block_row<rows; ++block_row)
@@ -165,8 +175,10 @@ BlockSparsityPattern::max_entries_per_row () const
 };
 
 
+
+template <class SparsityPatternBase>
 unsigned int
-BlockSparsityPattern::n_rows () const
+BlockSparsityPatternBase<SparsityPatternBase>::n_rows () const
 {
 				   // only count in first column, since
 				   // all rows should be equivalent
@@ -178,8 +190,9 @@ BlockSparsityPattern::n_rows () const
 
 
 
+template <class SparsityPatternBase>
 unsigned int
-BlockSparsityPattern::n_cols () const
+BlockSparsityPatternBase<SparsityPatternBase>::n_cols () const
 {
 				   // only count in first row, since
 				   // all rows should be equivalent
@@ -191,10 +204,9 @@ BlockSparsityPattern::n_cols () const
 
 
 
-
-
+template <class SparsityPatternBase>
 unsigned int
-BlockSparsityPattern::n_nonzero_elements () const
+BlockSparsityPatternBase<SparsityPatternBase>::n_nonzero_elements () const
 {
   unsigned int count = 0;
   for (unsigned int i=0; i<rows; ++i)
@@ -202,6 +214,20 @@ BlockSparsityPattern::n_nonzero_elements () const
       count += sub_objects[i][j]->n_nonzero_elements ();
   return count;
 };
+
+
+
+BlockSparsityPattern::BlockSparsityPattern ()
+{};
+
+
+
+BlockSparsityPattern::BlockSparsityPattern (const unsigned int n_rows,
+					    const unsigned int n_columns)
+		:
+		BlockSparsityPatternBase<SparsityPattern>(n_rows,
+							  n_columns)
+{};
 
 
 
@@ -214,6 +240,7 @@ BlockSparsityPattern::is_compressed () const
 	return false;
   return true;
 };
+
 
 
 unsigned int
@@ -231,3 +258,43 @@ BlockSparsityPattern::memory_consumption () const
   
   return mem;
 };
+
+
+
+void
+BlockSparsityPattern::copy_from  (const CompressedBlockSparsityPattern &csp)
+{
+				   // delete old content, set block
+				   // sizes anew
+  reinit (csp.n_block_rows(), csp.n_block_cols());
+
+				   // copy over blocks
+  for (unsigned int i=0; i<rows; ++i)
+    for (unsigned int j=0; j<rows; ++j)
+      block(i,j).copy_from (csp.block(i,j));
+
+				   // and finally enquire their new
+				   // sizes
+  collect_sizes();
+};
+
+
+
+CompressedBlockSparsityPattern::CompressedBlockSparsityPattern ()
+{};
+
+
+
+CompressedBlockSparsityPattern::
+CompressedBlockSparsityPattern (const unsigned int n_rows,
+				const unsigned int n_columns)
+		:
+		BlockSparsityPatternBase<CompressedSparsityPattern>(n_rows,
+								    n_columns)
+{};
+
+
+
+// explicit instantiations
+template class BlockSparsityPatternBase<SparsityPattern>;
+template class BlockSparsityPatternBase<CompressedSparsityPattern>;

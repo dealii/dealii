@@ -18,22 +18,31 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/block_indices.h>
 
 
+template <typename number> class BlockSparseMatrix;
+class BlockSparsityPattern;
+class CompressedBlockSparsityPattern;
+
+
 /**
- * This is a block version of the sparsity pattern class. It has not
- * much functionality, but only administrated an array of sparsity
- * pattern objects and delegates work to them. It has mostly the same
- * interface as has the @p{SparsityPattern} class, and simply transforms
+ * This is the base class for block versions of the sparsity pattern
+ * and compressed sparsity pattern classes. It has not much
+ * functionality, but only administrates an array of sparsity pattern
+ * objects and delegates work to them. It has mostly the same
+ * interface as has the @ref{SparsityPattern} and
+ * @ref{CompressedSparsityPattern} classes, and simply transforms
  * calls to its member functions to calls to the respective member
  * functions of the member sparsity patterns.
  *
- * The largest difference between the @p{SparsityPattern} class and
- * this class is that mostly, the matrices have different properties
- * and you will want to work on the blocks making up the matrix rather
- * than the whole matrix. You can access the different blocks using
- * the @p{block(row,col)} function.
+ * The largest difference between the @ref{SparsityPattern} and
+ * @ref{CompressedSparsityPattern} classes and this class is that
+ * mostly, the matrices have different properties and you will want to
+ * work on the blocks making up the matrix rather than the whole
+ * matrix. You can access the different blocks using the
+ * @p{block(row,col)} function.
  *
  * Attention: this object is not automatically notified if the size of
  * one of its subobjects' size is changed. After you initialize the
@@ -43,9 +52,13 @@
  * that all sub-matrices in a column have to have the same number of
  * columns.
  *
- * @author Wolfgang Bangerth, 2000
+ * You will in general not want to use this class, but one of the
+ * derived classes.
+ *
+ * @author Wolfgang Bangerth, 2000, 2001
  */
-class BlockSparsityPattern : public Subscriptor
+template <class SparsityPatternBase>
+class BlockSparsityPatternBase : public Subscriptor
 {
   public:
 				     /**
@@ -72,7 +85,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * structure usable by calling
 				      * the @p{reinit} function.
 				      */
-    BlockSparsityPattern ();
+    BlockSparsityPatternBase ();
 
 				     /**
 				      * Initialize the matrix with the
@@ -82,8 +95,8 @@ class BlockSparsityPattern : public Subscriptor
 				      * to call @p{collect_args} after
 				      * you assign them sizes.
 				      */
-    BlockSparsityPattern (const unsigned int n_rows,
-			  const unsigned int n_columns);
+    BlockSparsityPatternBase (const unsigned int n_rows,
+			      const unsigned int n_columns);
 
 				     /**
 				      * Copy constructor. This
@@ -96,12 +109,12 @@ class BlockSparsityPattern : public Subscriptor
 				      * @p{SparsityPattern}, see there
 				      * for the details.
 				      */
-    BlockSparsityPattern (const BlockSparsityPattern &bsp);
+    BlockSparsityPatternBase (const BlockSparsityPatternBase &bsp);
 
 				     /**
 				      * Destructor.
 				      */
-    ~BlockSparsityPattern ();
+    ~BlockSparsityPatternBase ();
     
 				     /**
 				      * Resize the matrix. This
@@ -140,7 +153,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * but the latter only for empty
 				      * objects.
 				      */
-    BlockSparsityPattern & operator = (const BlockSparsityPattern &);
+    BlockSparsityPatternBase & operator = (const BlockSparsityPatternBase &);
 
 				     /**
 				      * This function collects the
@@ -160,7 +173,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * Access the block with the
 				      * given coordinates.
 				      */
-    SparsityPattern &
+    SparsityPatternBase &
     block (const unsigned int row,
 	   const unsigned int column);
     
@@ -170,7 +183,7 @@ class BlockSparsityPattern : public Subscriptor
 				      * given coordinates. Version for
 				      * constant objects.
 				      */
-    const SparsityPattern &
+    const SparsityPatternBase &
     block (const unsigned int row,
 	   const unsigned int column) const;    
 
@@ -291,21 +304,6 @@ class BlockSparsityPattern : public Subscriptor
     unsigned int n_nonzero_elements () const;
 
 				     /**
-				      * Return whether the structure
-				      * is compressed or not,
-				      * i.e. whether all sub-matrices
-				      * are compressed.
-				      */
-    bool is_compressed () const;
-
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-
-				     /**
 				      * Exception
 				      */
     DeclException1 (ExcInvalidSize,
@@ -334,7 +332,7 @@ class BlockSparsityPattern : public Subscriptor
 		    << "The number of blocks " << arg1 << " and " << arg2
 		    << " are different.");
     
-  private:
+  protected:
 
 				     /**
 				      * Number of block rows.
@@ -349,7 +347,7 @@ class BlockSparsityPattern : public Subscriptor
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    std::vector<std::vector<SmartPointer<SparsityPattern> > > sub_objects;
+    std::vector<std::vector<SmartPointer<SparsityPatternBase> > > sub_objects;
 
 				     /**
 				      * Object storing and managing
@@ -379,23 +377,132 @@ class BlockSparsityPattern : public Subscriptor
 
 
 
+/**
+ * This class extends the base class to implement an array of sparsity
+ * patterns that can be used by block sparse matrix objects. It only
+ * adds a few additional member functions, but the main interface
+ * stems from the base class, see there for more information.
+ *
+ * @author Wolfgang Bangerth, 2000, 2001
+ */
+class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
+{
+  public:
+    
+				     /**
+				      * Initialize the matrix empty,
+				      * that is with no memory
+				      * allocated. This is useful if
+				      * you want such objects as
+				      * member variables in other
+				      * classes. You can make the
+				      * structure usable by calling
+				      * the @p{reinit} function.
+				      */
+    BlockSparsityPattern ();
+
+				     /**
+				      * Initialize the matrix with the
+				      * given number of block rows and
+				      * columns. The blocks themselves
+				      * are still empty, and you have
+				      * to call @p{collect_args} after
+				      * you assign them sizes.
+				      */
+    BlockSparsityPattern (const unsigned int n_rows,
+			  const unsigned int n_columns);
+
+				     /**
+				      * Return whether the structure
+				      * is compressed or not,
+				      * i.e. whether all sub-matrices
+				      * are compressed.
+				      */
+    bool is_compressed () const;    
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
+				      * Copy data from an object of
+				      * type
+				      * @ref{CompressedBlockSparsityPattern},
+				      * i.e. resize this object to the
+				      * size of the given argument,
+				      * and copy over the contents of
+				      * each of the
+				      * subobjects. Previous content
+				      * of this object is lost.
+				      */
+    void copy_from (const CompressedBlockSparsityPattern &csp);
+};
+
+
+
+/**
+ * This class extends the base class to implement an array of
+ * compressed sparsity patterns that can be used to initialize objects
+ * of type @ref{BlockSparsityPattern}. It does not add additional
+ * member functions, but rather acts as a @p{typedef} to introduce the
+ * name of this class, without requiring the user to specify the
+ * templated name of the base class. For information on the interface
+ * of this class refer to the base class.
+ *
+ * @author Wolfgang Bangerth, 2000, 2001
+ */
+class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
+{
+  public:
+    
+				     /**
+				      * Initialize the matrix empty,
+				      * that is with no memory
+				      * allocated. This is useful if
+				      * you want such objects as
+				      * member variables in other
+				      * classes. You can make the
+				      * structure usable by calling
+				      * the @p{reinit} function.
+				      */
+    CompressedBlockSparsityPattern ();
+
+				     /**
+				      * Initialize the matrix with the
+				      * given number of block rows and
+				      * columns. The blocks themselves
+				      * are still empty, and you have
+				      * to call @p{collect_args} after
+				      * you assign them sizes.
+				      */
+    CompressedBlockSparsityPattern (const unsigned int n_rows,
+				    const unsigned int n_columns);
+};
+
+
+
 /*---------------------- Template functions -----------------------------------*/
 
 
 
+template <class SparsityPatternBase>
 inline
-SparsityPattern &
-BlockSparsityPattern::block (const unsigned int row,
-			     const unsigned int column)
+SparsityPatternBase &
+BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
+						  const unsigned int column)
 {
   return *sub_objects[row][column];
 };
 
 
 
+template <class SparsityPatternBase>
 inline
-const SparsityPattern &
-BlockSparsityPattern::block (const unsigned int row,
+const SparsityPatternBase &
+BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
 			     const unsigned int column) const
 {
   return *sub_objects[row][column];
@@ -403,28 +510,31 @@ BlockSparsityPattern::block (const unsigned int row,
 
 
 
+template <class SparsityPatternBase>
 inline
 const BlockIndices &
-BlockSparsityPattern::get_row_indices () const
+BlockSparsityPatternBase<SparsityPatternBase>::get_row_indices () const
 {
   return row_indices;
 };
 
 
 
+template <class SparsityPatternBase>
 inline
 const BlockIndices &
-BlockSparsityPattern::get_column_indices () const
+BlockSparsityPatternBase<SparsityPatternBase>::get_column_indices () const
 {
   return column_indices;
 };
 
 
 
+template <class SparsityPatternBase>
 inline
 void
-BlockSparsityPattern::add (const unsigned int i,
-			   const unsigned int j)
+BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
+						const unsigned int j)
 {
 				   // if you get an error here, are
 				   // you sure you called
@@ -438,18 +548,20 @@ BlockSparsityPattern::add (const unsigned int i,
 
 
 
+template <class SparsityPatternBase>
 inline
 unsigned int
-BlockSparsityPattern::n_block_cols () const
+BlockSparsityPatternBase<SparsityPatternBase>::n_block_cols () const
 {
   return columns;
 }
 
 
 
+template <class SparsityPatternBase>
 inline
 unsigned int
-BlockSparsityPattern::n_block_rows () const
+BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 {
   return rows;
 }

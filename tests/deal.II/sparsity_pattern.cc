@@ -20,6 +20,7 @@
 
 #include <base/logstream.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/block_sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -56,6 +57,25 @@ bool operator == (const SparsityPattern &sp1,
 
 
 
+bool operator == (const BlockSparsityPattern &sp1,
+		  const BlockSparsityPattern &sp2)
+{
+  if (sp1.n_block_rows() != sp2.n_block_rows())
+    return false;
+  
+  if (sp1.n_block_cols() != sp2.n_block_cols())
+    return false;
+  
+  for (unsigned int i=0; i<sp1.n_block_rows(); ++i)
+    for (unsigned int j=0; j<sp1.n_block_cols(); ++j)
+      if (!(sp1.block(i,j) == sp2.block(i,j)))
+	return false;
+  
+  return true;
+};
+
+
+
 template <int dim>
 void
 check_boundary (const DoFHandler<dim> &dof)
@@ -84,7 +104,7 @@ check_boundary (const DoFHandler<dim> &dof)
 				   // patterns is checked in other
 				   // tests, so only make sure that
 				   // sparsity_[12] are equal
-  deallog << __PRETTY_FUNCTION__
+  deallog << "Check boundary"
 	  << " -- "
 	  << (sparsity_1 == sparsity_2 ? "ok" : "failed")
 	  << std::endl;
@@ -127,29 +147,76 @@ check ()
   std::vector<std::vector<bool> > mask (2, std::vector<bool>(2, false));
   mask[0][0] = mask[1][1] = true;
 
+  
+//--------------- Regular sparsity pattern checks -----------------
+  
 				   // first way: directly
   SparsityPattern sparsity_1 (dof.n_dofs(), dof.n_dofs());
   DoFTools::make_sparsity_pattern (dof, mask, sparsity_1);
   constraints.condense (sparsity_1);
   sparsity_1.compress ();
 
-				   // second way: via CompressedSparsityPattern
+				   // second way: via
+				   // CompressedSparsityPattern
   SparsityPattern sparsity_2;
-  CompressedSparsityPattern csp (dof.n_dofs());
-  DoFTools::make_sparsity_pattern (dof, mask, csp);
-  constraints.condense (csp);
-  sparsity_2.copy_from (csp);
+  CompressedSparsityPattern csp_2 (dof.n_dofs());
+  DoFTools::make_sparsity_pattern (dof, mask, csp_2);
+  constraints.condense (csp_2);
+  sparsity_2.copy_from (csp_2);
 
 
 				   // the exact content of sparsity
 				   // patterns is checked in other
 				   // tests, so only make sure that
 				   // sparsity_[12] are equal
-  deallog << __PRETTY_FUNCTION__
+  deallog << "Check 1:"
 	  << " -- "
 	  << (sparsity_1 == sparsity_2 ? "ok" : "failed")
 	  << std::endl;
+
+
   
+//--------------- Block sparsity pattern checks -----------------
+
+  const unsigned int n  = dof.n_dofs();
+  const unsigned int n1 = n/3;
+  const unsigned int n2 = n - n1;
+
+  BlockSparsityPattern sparsity_3(2,2);
+  sparsity_3.block(0,0).reinit (n1,n1,n);
+  sparsity_3.block(1,0).reinit (n2,n1,n);
+  sparsity_3.block(0,1).reinit (n1,n2,n);
+  sparsity_3.block(1,1).reinit (n2,n2,n);
+  sparsity_3.collect_sizes ();
+
+  DoFTools::make_sparsity_pattern (dof, sparsity_3);
+  constraints.condense (sparsity_3);
+  sparsity_3.compress ();
+
+  BlockSparsityPattern sparsity_4;
+  CompressedBlockSparsityPattern csp_4(2,2);
+  csp_4.block(0,0).reinit (n1,n1);
+  csp_4.block(1,0).reinit (n2,n1);
+  csp_4.block(0,1).reinit (n1,n2);
+  csp_4.block(1,1).reinit (n2,n2);
+  csp_4.collect_sizes ();
+
+  DoFTools::make_sparsity_pattern (dof, csp_4);
+  constraints.condense (csp_4);
+  csp_4.compress ();
+
+  sparsity_4.copy_from (csp_4);
+
+  deallog << "Check 2:"
+	  << " -- "
+	  << (sparsity_3 == sparsity_4 ? "ok" : "failed")
+	  << std::endl;
+
+  
+//--------------- Sparsity pattern checks for
+//                boundary sparsity generators -----------------
+
+				   // check boundary matrices
   check_boundary (dof);
 };
 
