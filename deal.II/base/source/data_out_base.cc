@@ -3493,21 +3493,23 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
      int ierr      = 0,
          num_nodes = static_cast<int>(n_nodes),
          num_cells = static_cast<int>(n_cells);
-   
+
+     char dot[2] = {'.', 0};
      ierr = TECINI (NULL,
 		    tecVarNames,
 		    file_name,
-		    static_cast<char*>("."),
+		    dot,
 		    &tec_debug,
 		    &is_double);
      
      Assert (ierr == 0, ExcErrorOpeningTecplotFile(file_name));
-     
+
+     char FEBLOCK[] = {'F','E','B','L','O','C','K',0};
      ierr = TECZNE (NULL,
 		    &num_nodes,
 		    &num_cells,
 		    &cell_type,
-		    static_cast<char*>("FEBLOCK"),
+		    FEBLOCK,
 		    NULL);
      
      Assert (ierr == 0, ExcTecplotAPIError());
