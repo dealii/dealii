@@ -57,14 +57,14 @@ void make_tria (Triangulation<3> &tria, int step)
 					Point<3>(1,2,1),
 					Point<3>(0,2,1)    };
 	const int cell_vertices[2][8] = { { 0,1,2,3,4,5,6,7 }, { 4,5,6,7,8,9,10,11 } };
-	vector<CellData<3> > cells (2, CellData<3>());
+	std::vector<CellData<3> > cells (2, CellData<3>());
 	for (unsigned int cell=0; cell<2; ++cell)
 	  for (unsigned int j=0; j<8; ++j)
 	    cells[cell].vertices[j] = cell_vertices[cell][j];
 	cells[0].material_id = 0;
 	cells[1].material_id = 0;
   
-	tria.create_triangulation (vector<Point<3> >(&vertices[0], &vertices[12]),
+	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[12]),
 				   cells,
 				   SubCellData());       // no boundary information
 
@@ -98,14 +98,14 @@ void make_tria (Triangulation<3> &tria, int step)
 					Point<3>(2,1,0),
 					Point<3>(2,1,1)    };
 	const int cell_vertices[2][8] = { { 0,1,2,3,4,5,6,7 }, { 1,8,9,2,5,10,11,6 } };
-	vector<CellData<3> > cells (2, CellData<3>());
+	std::vector<CellData<3> > cells (2, CellData<3>());
 	for (unsigned int cell=0; cell<2; ++cell)
 	  for (unsigned int j=0; j<8; ++j)
 	    cells[cell].vertices[j] = cell_vertices[cell][j];
 	cells[0].material_id = 0;
 	cells[1].material_id = 0;
   
-	tria.create_triangulation (vector<Point<3> >(&vertices[0], &vertices[12]),
+	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[12]),
 				   cells,
 				   SubCellData());       // no boundary information
 
@@ -139,14 +139,14 @@ void make_tria (Triangulation<3> &tria, int step)
 					Point<3>(1,1,2),
 					Point<3>(0,1,2)    };
 	const int cell_vertices[2][8] = { { 0,1,2,3,4,5,6,7 }, { 3, 2, 8, 9 , 7, 6, 10, 11} };
-	vector<CellData<3> > cells (2, CellData<3>());
+	std::vector<CellData<3> > cells (2, CellData<3>());
 	for (unsigned int cell=0; cell<2; ++cell)
 	  for (unsigned int j=0; j<8; ++j)
 	    cells[cell].vertices[j] = cell_vertices[cell][j];
 	cells[0].material_id = 0;
 	cells[1].material_id = 0;
 	
-	tria.create_triangulation (vector<Point<3> >(&vertices[0], &vertices[12]),
+	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[12]),
 				   cells,
 				   SubCellData());       // no boundary information
 	
@@ -193,7 +193,7 @@ void make_tria (Triangulation<3> &tria, int step)
 					  { 1,8,9,2,5,10,11,6 },
 					  { 4,5,6,7,12,13,14,15},
 					  { 5,10,11,6,13,16,17,14} };
-	vector<CellData<3> > cells (4, CellData<3>());
+	std::vector<CellData<3> > cells (4, CellData<3>());
 	for (unsigned int cell=0; cell<4; ++cell)
 	  for (unsigned int j=0; j<8; ++j)
 	    cells[cell].vertices[j] = cell_vertices[cell][j];
@@ -202,7 +202,7 @@ void make_tria (Triangulation<3> &tria, int step)
 	cells[2].material_id = 0;
 	cells[3].material_id = 0;
   
-	tria.create_triangulation (vector<Point<3> >(&vertices[0], &vertices[18]),
+	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[18]),
 				   cells,
 				   SubCellData());       // no boundary information
 
@@ -232,7 +232,7 @@ void make_tria (Triangulation<3> &tria, int step)
 
 int main ()
 {
-  ofstream logfile("constraints.output");
+  std::ofstream logfile("constraints.output");
   logfile.precision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);

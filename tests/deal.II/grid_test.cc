@@ -25,7 +25,7 @@
 #include <fstream>
 #include <cstdio>
 
-ofstream logfile("grid_test.output");
+std::ofstream logfile("grid_test.output");
 
 // 1: continuous refinement of the unit square always in the middle
 // 2: refinement of the circle at the boundary

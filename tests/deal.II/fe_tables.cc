@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@
 
 #include <base/logstream.h>
 
-ofstream logfile("fe_tables.output");
+std::ofstream logfile("fe_tables.output");
 
 #define TEST_ELEMENT(e) { deallog.push(#e); e el;\
   print_fe_statistics(el); deallog.pop(); deallog << std::endl; }
@@ -55,13 +55,9 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face();
 
-  vector<Point<dim> > unit_points(fe.dofs_per_cell);
-  vector<Point<dim> > support_points(fe.dofs_per_cell);
-  vector<Point<dim> > face_support_points(fe.dofs_per_face);
-
-  fe.get_unit_support_points(unit_points);
-  fe.get_support_points(cell, support_points);
-  fe.get_face_support_points(face, face_support_points);
+  const std::vector<Point<dim> > unit_points = fe.get_unit_support_points();
+  const std::vector<Point<dim> > support_points = fe.get_support_points();
+  const std::vector<Point<dim> > face_support_points = fe.get_face_support_points();
   
   deallog << "dofs_per_cell" << " " << fe.dofs_per_cell;
   deallog << ": vertex" << " " << fe.dofs_per_vertex;
@@ -72,7 +68,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
   deallog.push("components");
   for (unsigned i=0;i<fe.dofs_per_cell;++i)
     {
-      pair<unsigned,unsigned> p = fe.system_to_component_index(i);
+      std::pair<unsigned,unsigned> p = fe.system_to_component_index(i);
       deallog << "Index " << i << " ("
 	      << p.first << "," << p.second << ") -> "
 	      << fe.component_to_system_index(p.first, p.second)
@@ -81,7 +77,7 @@ print_fe_statistics(const FiniteElement<dim>& fe)
     }
   for (unsigned i=0;i<fe.dofs_per_face;++i)
     {
-      pair<unsigned,unsigned> p = fe.face_system_to_component_index(i);
+      std::pair<unsigned,unsigned> p = fe.face_system_to_component_index(i);
       deallog << "FaceIndex " << i << " ("
 	      << p.first << "," << p.second << ") -> " 
 	      << fe.face_component_to_system_index(p.first, p.second)
@@ -109,7 +105,7 @@ int main()
   deallog.depth_console(0);
 
   logfile.precision(4);
-  logfile.setf(ios::fixed);
+  logfile.setf(std::ios::fixed);
   
   deallog.push("GeometryInfo");
 

@@ -30,7 +30,7 @@
 
 int main ()
 {
-  ofstream logfile("second_derivatives.output");
+  std::ofstream logfile("second_derivatives.output");
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -78,7 +78,7 @@ Vector<double> val(4);
 	  val.clear ();
 	  val(vertex) = 1;
 	  
-	  vector<Tensor<2,2> > derivs(4);
+	  std::vector<Tensor<2,2> > derivs(4);
 	  fevalues.get_function_2nd_derivatives (val, derivs);
 	  
 	  deallog << "Vertex " << vertex << ": " << std::endl;

@@ -2,10 +2,10 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by Wolfgang Bangerth
+//    std::copyright (C) 1998, 1999, 2000, 2001 by Wolfgang Bangerth
 //
 //    This file is subject to QPL and may not be  distributed
-//    without copyright and license information. Please refer
+//    without std::copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
@@ -17,6 +17,7 @@
 #include <numerics/time_dependent.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_constraints.h>
 #include <lac/sparse_matrix.h>
 #include <lac/full_matrix.h>
 #include <base/parameter_handler.h>
@@ -26,6 +27,7 @@
 #include <base/forward_declarations.h>
 #include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
+#include <lac/vector.h>
 
 #include <fstream>
 #include <string>
@@ -33,7 +35,9 @@
 #include <iostream>
 #include <list>
 
-ofstream logfile("wave-test-3.output");
+using namespace std;
+
+std::ofstream logfile("wave-test-3.output");
 
 class UserMatrix;
 class SweepInfo;
@@ -57,7 +61,7 @@ class TimeStepBase_Wave :  public TimeStepBase_Tria<dim>{
     const TimeStep_Primal<dim> & get_timestep_primal () const;
     const TimeStep_Dual<dim> &   get_timestep_dual () const;
     const TimeStep_Postprocess<dim> &   get_timestep_postprocess () const;
-    string tmp_filename_base (const string &branch_signature) const;
+    std::string tmp_filename_base (const std::string &branch_signature) const;
     void attach_sweep_info (SweepInfo &sweep_info);
     void attach_sweep_data (SweepData<dim> &sweep_data);
 
@@ -72,7 +76,7 @@ template <int dim>
 class TimeStep_Wave :  public virtual TimeStepBase_Wave<dim>
 {
   public:
-    TimeStep_Wave (const string fe_name);
+    TimeStep_Wave (const std::string fe_name);
     ~TimeStep_Wave();
     virtual void wake_up (const unsigned int wakeup_level);
     virtual void sleep (const unsigned int sleep_level);
@@ -80,7 +84,7 @@ class TimeStep_Wave :  public virtual TimeStepBase_Wave<dim>
     unsigned int solve (const UserMatrix       &matrix,
 			Vector<double>         &solution,
 			const Vector<double>   &rhs) const;
-    virtual string branch_signature () const = 0;
+    virtual std::string branch_signature () const = 0;
     DeclException0 (ExcIO);
     DeclException0 (ExcCoarsestGridsDiffer);
 
@@ -93,14 +97,14 @@ protected:
 		       const unsigned int        n_dofs,
 		       const unsigned int        n_solver_steps_helmholtz,
 		       const unsigned int        n_solver_steps_projection,
-		       const pair<double,double> energy);
-	static void write_descriptions (ostream &out);
-	void write (ostream &out) const;
+		       const std::pair<double,double> energy);
+	static void write_descriptions (std::ostream &out);
+	void write (std::ostream &out) const;
 	unsigned int n_active_cells;
 	unsigned int n_dofs;
 	unsigned int n_solver_steps_helmholtz;
 	unsigned int n_solver_steps_projection;
-	pair<double,double> energy;
+	std::pair<double,double> energy;
     };	
 
     DoFHandler<dim>           *dof_handler;
@@ -121,7 +125,7 @@ protected:
 				 const Vector<double>  &old_grid_v,
 				 Vector<double>        &old_u,
 				 Vector<double>        &old_v) const;
-    pair<double,double> compute_energy ();
+    std::pair<double,double> compute_energy ();
     template <int anydim> friend class DualFunctional;
     template <int anydim> friend class EvaluationBase;
     template <int anydim> friend class TimeStep_ErrorEstimation;
@@ -133,11 +137,11 @@ template <int dim>
 class TimeStep_Primal :  public TimeStep_Wave<dim> 
 {
   public:
-    TimeStep_Primal (const string &primal_fe);
+    TimeStep_Primal (const std::string &primal_fe);
     void do_initial_step ();
     void do_timestep ();
     virtual void solve_primal_problem ();    
-    virtual string branch_signature () const;
+    virtual std::string branch_signature () const;
     virtual void wake_up (const unsigned int wakeup_level);
     virtual void end_sweep ()
       {
@@ -178,11 +182,11 @@ template <int dim>
 class TimeStep_Dual :  public TimeStep_Wave<dim>
 {
   public:
-    TimeStep_Dual (const string &dual_fe);
+    TimeStep_Dual (const std::string &dual_fe);
     void do_initial_step ();
     void do_timestep ();
     virtual void solve_dual_problem ();    
-    virtual string branch_signature () const;
+    virtual std::string branch_signature () const;
     virtual void wake_up (const unsigned int wakeup_level);
 
     virtual void end_sweep ()
@@ -232,15 +236,15 @@ class TimeStep_ErrorEstimation :  public virtual TimeStepBase_Wave<dim>
     virtual void sleep (const unsigned int sleep_level);
     virtual void get_tria_refinement_criteria (Vector<float> &indicators) const;
     void get_error_indicators (Vector<float> &indicators) const;
-    virtual string branch_signature () const = 0;
+    virtual std::string branch_signature () const = 0;
     
   protected:
     struct StatisticData 
     {
 	StatisticData ();
 	StatisticData (const double estimated_error);
-	static void write_descriptions (ostream &out);
-	void write (ostream &out) const;
+	static void write_descriptions (std::ostream &out);
+	void write (std::ostream &out) const;
 	double estimated_error;
     };
 
@@ -255,8 +259,8 @@ class TimeStep_ErrorEstimation :  public virtual TimeStepBase_Wave<dim>
 struct CellwiseError
     {
 	CellwiseError (const unsigned int n_errors);
-	vector<ErrorOnCell>                    errors;
-	typename vector<ErrorOnCell>::iterator next_free_slot;
+	std::vector<ErrorOnCell>                    errors;
+	typename ErrorOnCell* next_free_slot;
     };
 
     Vector<float> estimated_error_per_cell;
@@ -329,15 +333,15 @@ class TimeStep_Postprocess : public TimeStep_ErrorEstimation<dim>
     virtual void wake_up (const unsigned int wakeup_level);
     virtual void sleep (const unsigned int sleep_level);
     virtual void end_sweep ();
-    string branch_signature () const;
+    std::string branch_signature () const;
 
   protected:
     struct StatisticData 
     {
-	static void write_descriptions (ostream &out,
+	static void write_descriptions (std::ostream &out,
 					const WaveParameters<dim> &parameters);
-	void write (ostream &out) const;
-	vector<double> evaluation_results;
+	void write (std::ostream &out) const;
+	std::vector<double> evaluation_results;
     };
 
     StatisticData statistic_data;
@@ -361,9 +365,9 @@ class TimeStep :  public TimeStep_Primal<dim>, public TimeStep_Dual<dim>, public
     virtual void wake_up (const unsigned int wakeup_level);
     virtual void sleep (const unsigned int sleep_level);
     virtual void end_sweep ();
-    static void write_statistics_descriptions (ostream                   &out,
+    static void write_statistics_descriptions (std::ostream                   &out,
 					       const WaveParameters<dim> &parameters);
-    void write_statistics (ostream &out) const;
+    void write_statistics (std::ostream &out) const;
 };
 
 template <int dim> class TimeStep_Primal;
@@ -545,7 +549,7 @@ class EvaluationBase {
 				      *
 				      * Default is: do nothing.
 				      */
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
 
 				     /**
 				      * Return the final result as a number
@@ -556,11 +560,11 @@ class EvaluationBase {
     virtual double get_final_result ();
 
 				     /**
-				      * Return a brief string of description
+				      * Return a brief std::string of description
 				      * which will go into the first line
 				      * of the "results" file.
 				      */
-    virtual string description () const = 0;
+    virtual std::string description () const = 0;
 
 				     /**
 				      * Exception.
@@ -636,7 +640,7 @@ class EvaluationBase {
 				      * Base of the filenames under which
 				      * we shall store our results.
 				      */
-    string                    base_file_name;
+    std::string                    base_file_name;
 };
 
 
@@ -706,9 +710,9 @@ class EvaluateIntegratedValueAtOrigin : public EvaluationBase<dim> {
 		    integrated_value (0) {};
     
     virtual double evaluate ();
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
     virtual double get_final_result ();
-    virtual string description () const;
+    virtual std::string description () const;
 
 				     /**
 				      * Reset the average value to zero.
@@ -742,9 +746,9 @@ class EvaluateSeismicSignal : public EvaluationBase<dim> {
 
 
 virtual double evaluate ();
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
     virtual double get_final_result ();
-    virtual string description () const;
+    virtual std::string description () const;
 
 				     /**
 				      * Reset the value to zero.
@@ -767,9 +771,9 @@ class EvaluateSplitSignal : public EvaluationBase<dim> {
 
 
 virtual double evaluate ();
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
     virtual double get_final_result ();
-    virtual string description () const;
+    virtual std::string description () const;
 
 				     /**
 				      * Reset the value to zero.
@@ -789,9 +793,9 @@ class EvaluateOneBranch1d : public EvaluationBase<dim> {
 
 
 virtual double evaluate ();
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
     virtual double get_final_result ();
-    virtual string description () const;
+    virtual std::string description () const;
 
 				     /**
 				      * Reset the value to zero.
@@ -811,9 +815,9 @@ class EvaluateSecondCrossing1d : public EvaluationBase<dim> {
 
 
 virtual double evaluate ();
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
     virtual double get_final_result ();
-    virtual string description () const;
+    virtual std::string description () const;
 
 				     /**
 				      * Reset the value to zero.
@@ -834,9 +838,9 @@ class EvaluateHuyghensWave : public EvaluationBase<dim> {
 
 
 virtual double evaluate ();
-    virtual void print_final_result (ostream &out);
+    virtual void print_final_result (std::ostream &out);
     virtual double get_final_result ();
-    virtual string description () const;
+    virtual std::string description () const;
 
 				     /**
 				      * Reset the value to zero.
@@ -909,8 +913,8 @@ Data & get_data ();
 
 
 template <int dim>
-    void write_summary (const list<EvaluationBase<dim>*> & eval_list,
-			ostream &out) const;
+    void write_summary (const std::list<EvaluationBase<dim>*> & eval_list,
+			std::ostream &out) const;
     
   private:
     Data data;
@@ -976,7 +980,7 @@ class UserMatrix :  public SparseMatrix<double> {
 
 
 
-string int_to_string (const unsigned int i, const unsigned int digits);
+std::string int_to_string (const unsigned int i, const unsigned int digits);
 
 
 template <typename number>
@@ -1019,21 +1023,21 @@ struct FEHelper {
 				      * element specified by the name
 				      * #name#.
 				      */
-    static const FiniteElement<dim> & get_fe (const string &name);
+    static const FiniteElement<dim> & get_fe (const std::string &name);
 
 				     /**
 				      * Return the correct domain quadrature
 				      * formula for the finite element denoted
 				      * by the name #name#.
 				      */
-    static const Quadrature<dim>    & get_quadrature (const string &name);
+    static const Quadrature<dim>    & get_quadrature (const std::string &name);
 
 				     /**
 				      * Return the correct boundary quadrature
 				      * formula for the finite element denoted
 				      * by the name #name#.
 				      */
-    static const Quadrature<dim-1>  & get_quadrature_face (const string &name);
+    static const Quadrature<dim-1>  & get_quadrature_face (const std::string &name);
 };
 
 
@@ -1051,7 +1055,7 @@ template <int dim> class EvaluationBase;
  *
  * \section{Description of the input parameters}
  *
- * Note that this list may not be up-tp-date at present.
+ * Note that this std::list may not be up-tp-date at present.
  *
  * \subsection{Subsection #Grid#}
  * \begin{itemize}
@@ -1081,7 +1085,7 @@ template <int dim> class EvaluationBase;
  *    @begin{itemize}
  * @item #Initial refinement#: States how often the grid named by the above
  *    parameter shall be globally refined to form the coarse mesh.
- * @item #Maximum refinement#: maximum refinement level a cell may attain.
+ * @item #Maximum refinement#: std::maximum refinement level a cell may attain.
  *    Cells with such a refinement level are flagged as others are, but they
  *    are not refined any more; it is therefore not necessary to lower the
  *    fraction of cells to be refined in order to avoid the refinement of a
@@ -1211,7 +1215,7 @@ class WaveParameters
     void delete_parameters ();
 
 				     /**
-				      * Enum holding a list of possible coarse
+				      * Enum holding a std::list of possible coarse
 				      * mesh choices.
 				      */
     enum InitialMesh {
@@ -1228,7 +1232,7 @@ class WaveParameters
     };
 
 				     /**
-				      * Enum holding a list of possible
+				      * Enum holding a std::list of possible
 				      * boundary condition choices.
 				      */
     enum BoundaryConditions {
@@ -1321,13 +1325,13 @@ class WaveParameters
     
 				     /**
 				      * Level of initial refinement, i.e. the
-				      * minimum level cells on all grids at
+				      * std::minimum level cells on all grids at
 				      * all times need to have.
 				      */
     unsigned int        initial_refinement;
 
 				     /**
-				      * Maximum refinement level a cell may
+				      * std::maximum refinement level a cell may
 				      * have. This one defaults to zero,
 				      * meaning no limit.
 				      */
@@ -1348,7 +1352,7 @@ class WaveParameters
 				      * are to be refined (first) and
 				      * coarsened (second).
 				      */
-    pair<double,double>      refinement_fraction;
+    std::pair<double,double>      refinement_fraction;
 
 				     /**
 				      * Fraction by which the number of cells
@@ -1357,7 +1361,7 @@ class WaveParameters
 				      * (first: top deviation, second: bottom
 				      * deviation).
 				      */
-    pair<double,double>      cell_number_corridor;
+    std::pair<double,double>      cell_number_corridor;
 
 				     /**
 				      * Number of iterations to be performed
@@ -1414,19 +1418,19 @@ class WaveParameters
 				      * Directory to which we want the output
 				      * written.
 				      */
-    string              output_directory;
+    std::string              output_directory;
 
 				     /**
 				      * Directory to which we want the temporary
 				      * file to be written.
 				      */
-    string              tmp_directory;
+    std::string              tmp_directory;
     
 				     /**
 				      * Format in which the results on the
 				      * meshes is to be written to files.
 				      */
-    string              output_format;
+    std::string              output_format;
 
 				     /**
 				      * Denotes in which sweeps the solution is
@@ -1478,13 +1482,13 @@ class WaveParameters
 				      * How to break the intervals: linear
 				      * or logarithmic.
 				      */
-    string              error_statistics_scaling;
+    std::string              error_statistics_scaling;
     
 				     /**
 				      * Names of the finite element classes to
 				      * be used for the primal and dual problems.
 				      */
-    string              primal_fe, dual_fe;
+    std::string              primal_fe, dual_fe;
     
 				     /**
 				      * Strategy for mesh refinement.
@@ -1523,11 +1527,11 @@ class WaveParameters
     unsigned int        number_of_sweeps;
 
 				     /**
-				      * List of operations which shall be
+				      * std::list of operations which shall be
 				      * done on each time step after finishing
 				      * a sweep.
 				      */
-    list<EvaluationBase<dim>*> eval_list;
+    std::list<EvaluationBase<dim>*> eval_list;
 
 				     /**
 				      * Symbolic name of the boundary conditions
@@ -1542,89 +1546,89 @@ class WaveParameters
 				      * Exception.
 				      */
     DeclException1 (ExcParameterNotInList,
-		    string,
+		    std::string,
 		    << "The given parameter <" << arg1 << "> is not "
 		    << "recognized to be a valid one.");
     
   private:
 
 				     /**
-				      * Undefined copy constructor.
+				      * Undefined std::copy constructor.
 				      */
     WaveParameters (const WaveParameters &);
 
 				     /**
-				      * Undefined copy operator.
+				      * Undefined std::copy operator.
 				      */
     WaveParameters & operator = (const WaveParameters &);
 
 
 /**
-				      * List of names for the initial values.
+				      * std::list of names for the initial values.
 				      * Make this a member of the templated
 				      * class since the supported initial
 				      * values could be different from
 				      * dimension to dimension.
 				      */
-    static const string initial_value_names;
+    static const std::string initial_value_names;
 
 				     /**
 				      * Names of coefficient functions. The
 				      * same applies as for
 				      * #initial_value_names#.
 				      */
-    static const string coefficient_names;
+    static const std::string coefficient_names;
 
     				     /**
 				      * Names of boundary value functions. The
 				      * same applies as for
 				      * #initial_value_names#.
 				      */
-    static const string boundary_function_names;
+    static const std::string boundary_function_names;
 
     				     /**
 				      * Names of error functionals. The
 				      * same applies as for
 				      * #initial_value_names#.
 				      */
-    static const string dual_functional_names;
+    static const std::string dual_functional_names;
 
 
 /**
 				      * Set the initial function pointers
 				      * depending on the given names.
 				      */
-    void set_initial_functions (const string &u_name,
-				const string &v_name);
+    void set_initial_functions (const std::string &u_name,
+				const std::string &v_name);
 
 				     /**
 				      * Set the coefficient functions.
 				      */
-    void set_coefficient_functions (const string &name);
+    void set_coefficient_functions (const std::string &name);
 
 				     /**
 				      * Set the boundary values.
 				      */
-    void set_boundary_functions (const string &name);
+    void set_boundary_functions (const std::string &name);
 
 				     /**
-				      * Make a list of evaluations to be
+				      * Make a std::list of evaluations to be
 				      * performed after each sweep.
 				      */
-    void make_eval_list (const string &names);
+    void make_eval_list (const std::string &names);
 
 				     /**
 				      * Set the dual functional after
 				      * which the dual solution will be
 				      * computed.
 				      */
-    void set_dual_functional (const string &name);
+    void set_dual_functional (const std::string &name);
 
 				     /**
 				      * Create the coarse grid for
 				      * this run.
 				      */
-    void make_coarse_grid (const string &name);
+    void make_coarse_grid (const std::string &name);
 };
 
 
@@ -1723,7 +1727,7 @@ class WaveProblem :  public MultipleParameterLoop::UserClass {
     virtual void create_new (const unsigned int run_no);
 
 				     /**
-				      * Make the list of parameters known
+				      * Make the std::list of parameters known
 				      * to the parameter handler. This
 				      * function only delegates its work
 				      * to the #parameters# sub-object.
@@ -1731,7 +1735,7 @@ class WaveProblem :  public MultipleParameterLoop::UserClass {
     virtual void declare_parameters (ParameterHandler &prm);
 
     				     /**
-				      * Parse the list of parameters given
+				      * Parse the std::list of parameters given
 				      * by the parameter handler. This
 				      * function only delegates its work
 				      * to the #parameters# sub-object.
@@ -1892,13 +1896,13 @@ void EndEnergy<dim>::compute_vectors (const PartOfDomain pod,
   
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
 
-  vector<Tensor<1,dim> > local_u_grad (n_q_points);
-  vector<double>         local_v (n_q_points);
+  std::vector<Tensor<1,dim> > local_u_grad (n_q_points);
+  std::vector<double>         local_v (n_q_points);
   
-  vector<double> density_values(quadrature->n_quadrature_points);
-  vector<double> stiffness_values(quadrature->n_quadrature_points);
+  std::vector<double> density_values(quadrature->n_quadrature_points);
+  std::vector<double> stiffness_values(quadrature->n_quadrature_points);
 
-  vector<unsigned int> cell_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell, ++primal_cell)
     {
@@ -1925,12 +1929,12 @@ fe_values.reinit (cell);
       stiffness->value_list (fe_values.get_quadrature_points(),
 			     stiffness_values);
       
-      const vector<vector<Tensor<1,dim> > > &shape_grads = fe_values.get_shape_grads ();
+      const std::vector<std::vector<Tensor<1,dim> > > &shape_grads = fe_values.get_shape_grads ();
       const FullMatrix<double>            &shape_values = fe_values.get_shape_values ();
-      const vector<double>      &JxW_values (fe_values.get_JxW_values());
+      const std::vector<double>      &JxW_values (fe_values.get_JxW_values());
       
-      vector<double> local_functional1 (dofs_per_cell, 0);
-      vector<double> local_functional2 (dofs_per_cell, 0);
+      std::vector<double> local_functional1 (dofs_per_cell, 0);
+      std::vector<double> local_functional2 (dofs_per_cell, 0);
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	for (unsigned int point=0; point<n_q_points; ++point) 
 	  {
@@ -2009,7 +2013,7 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<unsigned int> cell_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
   FEFaceValues<dim> fe_face_values (*fe, *quadrature_face,
 				    UpdateFlags(update_values         |
@@ -2026,11 +2030,11 @@ void SeismicSignal<dim>::compute_functionals (Vector<double> &j1,
 	  fe_face_values.reinit (cell, face_no);
 	  const FullMatrix<double>            &shape_values = fe_face_values.
 						    get_shape_values ();
-	  const vector<double>      &JxW_values (fe_face_values.
+	  const std::vector<double>      &JxW_values (fe_face_values.
 						 get_JxW_values());
-	  const vector<Point<dim> > &q_points (fe_face_values.get_quadrature_points());
+	  const std::vector<Point<dim> > &q_points (fe_face_values.get_quadrature_points());
 
-	  vector<double> local_integral (dofs_per_cell, 0);
+	  std::vector<double> local_integral (dofs_per_cell, 0);
 	  for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	    for (unsigned int point=0; point<n_q_points; ++point)
 	      local_integral[shape_func] += shape_values(shape_func,point) *
@@ -2069,7 +2073,7 @@ void EarthSurface<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<unsigned int> face_dof_indices (face_dofs);
+  std::vector<unsigned int> face_dof_indices (face_dofs);
 
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
@@ -2121,7 +2125,7 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<unsigned int> dof_indices (fe->dofs_per_cell);
+  std::vector<unsigned int> dof_indices (fe->dofs_per_cell);
   FEFaceValues<dim> fe_face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
@@ -2143,7 +2147,7 @@ void SplitSignal<dim>::compute_functionals (Vector<double> &j1,
 
 	  fe_face_values.reinit (cell, face_no);
 	  const FullMatrix<double> &shape_values = fe_face_values.get_shape_values ();
-	  const vector<double>     &JxW_values   = fe_face_values.get_JxW_values();
+	  const std::vector<double>     &JxW_values   = fe_face_values.get_JxW_values();
 	  cell->get_dof_indices (dof_indices);
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -2184,7 +2188,7 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
 					endc = dof->end ();
 
   FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
-  vector<unsigned int> cell_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> cell_dof_indices (dofs_per_cell);
 
   for (; cell!=endc; ++cell)
     {
@@ -2195,9 +2199,9 @@ void SplitLine<1>::compute_endtime_vectors (Vector<double> &final_u_bar,
       fe_values.reinit (cell);
 
       const FullMatrix<double>  &shape_values = fe_values.get_shape_values ();
-      const vector<double>      &JxW_values (fe_values.get_JxW_values());
+      const std::vector<double>      &JxW_values (fe_values.get_JxW_values());
 
-      vector<double> local_functional (dofs_per_cell, 0);
+      std::vector<double> local_functional (dofs_per_cell, 0);
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	for (unsigned int point=0; point<n_q_points; ++point) 
 	  local_functional[shape_func] += shape_values(shape_func,point) *
@@ -2231,7 +2235,7 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<unsigned int> dof_indices (fe->dofs_per_cell);
+  std::vector<unsigned int> dof_indices (fe->dofs_per_cell);
   FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
@@ -2240,7 +2244,7 @@ void OneBranch1d<dim>::compute_functionals (Vector<double> &j1,
       {
 	fe_values.reinit (cell);
 	const FullMatrix<double>  &shape_values = fe_values.get_shape_values ();
-	const vector<double>      &JxW_values   = fe_values.get_JxW_values();
+	const std::vector<double>      &JxW_values   = fe_values.get_JxW_values();
 	cell->get_dof_indices (dof_indices);
 	
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -2275,7 +2279,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
   cell = dof->begin_active();
   endc = dof->end();
 
-  vector<unsigned int> dof_indices (fe->dofs_per_cell);
+  std::vector<unsigned int> dof_indices (fe->dofs_per_cell);
   FEValues<dim> fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
   
   for (; cell!=endc; ++cell)
@@ -2284,7 +2288,7 @@ void SecondCrossing<dim>::compute_functionals (Vector<double> &j1,
       {
 	fe_values.reinit (cell);
 	const FullMatrix<double>  &shape_values = fe_values.get_shape_values ();
-	const vector<double>      &JxW_values   = fe_values.get_JxW_values();
+	const std::vector<double>      &JxW_values   = fe_values.get_JxW_values();
 	cell->get_dof_indices (dof_indices);
 	
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -2416,7 +2420,7 @@ void EvaluationBase<dim>::reset () {};
 
 
 template <int dim>
-void EvaluationBase<dim>::print_final_result (ostream &) {};
+void EvaluationBase<dim>::print_final_result (std::ostream &) {};
 
 
 template <int dim>
@@ -2457,8 +2461,8 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
   Vector<double>   local_u (fe->dofs_per_cell);
   Vector<double>   local_v (fe->dofs_per_cell);
   
-  vector<double> density_values(quadrature->n_quadrature_points);
-  vector<double> stiffness_values(quadrature->n_quadrature_points);
+  std::vector<double> density_values(quadrature->n_quadrature_points);
+  std::vector<double> stiffness_values(quadrature->n_quadrature_points);
 
   double total_energy = 0;
   
@@ -2479,8 +2483,8 @@ double EvaluateEnergyContent<dim>::compute_energy (const PartOfDomain pod) const
 
 fe_values.reinit (cell);
       const FullMatrix<double>             &values    = fe_values.get_shape_values();
-      const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-      const vector<double>                 &weights   = fe_values.get_JxW_values ();
+      const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+      const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
       cell->get_dof_values (*u, local_u);
       cell->get_dof_values (*v, local_v);
@@ -2519,9 +2523,9 @@ fe_values.reinit (cell);
 
 
 template <int dim>
-void EvaluateIntegratedValueAtOrigin<dim>::print_final_result (ostream &out) {
+void EvaluateIntegratedValueAtOrigin<dim>::print_final_result (std::ostream &out) {
   out << "    Integrated value of u at origin: "
-      << integrated_value << endl;
+      << integrated_value << std::endl;
 };
 
 
@@ -2532,7 +2536,7 @@ double EvaluateIntegratedValueAtOrigin<dim>::get_final_result () {
 
 
 template <int dim>
-string EvaluateIntegratedValueAtOrigin<dim>::description () const {
+std::string EvaluateIntegratedValueAtOrigin<dim>::description () const {
   return "integrated value at origin";
 };
 
@@ -2575,8 +2579,8 @@ double EvaluateIntegratedValueAtOrigin<dim>::evaluate () {
 
 
 template <int dim>
-void EvaluateSeismicSignal<dim>::print_final_result (ostream &out) {
-  out << "    Integrated seismic signal: " << result << endl;
+void EvaluateSeismicSignal<dim>::print_final_result (std::ostream &out) {
+  out << "    Integrated seismic signal: " << result << std::endl;
 };
 
 
@@ -2587,7 +2591,7 @@ double EvaluateSeismicSignal<dim>::get_final_result () {
 
 
 template <int dim>
-string EvaluateSeismicSignal<dim>::description () const {
+std::string EvaluateSeismicSignal<dim>::description () const {
   return "Integrated seismic signal at top";
 };
 
@@ -2610,7 +2614,7 @@ template <int dim>
 double EvaluateSeismicSignal<dim>::evaluate () {
   const unsigned int n_q_points = quadrature_face->n_quadrature_points;
 
-  ofstream out((base_file_name + ".seismic").c_str());
+  std::ofstream out((base_file_name + ".seismic").c_str());
   AssertThrow (out, typename EvaluationBase<dim>::ExcIO());
   
   DoFHandler<dim>::active_cell_iterator cell = dof->begin_active(),
@@ -2620,7 +2624,7 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 				 UpdateFlags(update_values         |
 					     update_JxW_values     |
 					     update_q_points));
-  vector<double>    face_u (fe->dofs_per_face);
+  std::vector<double>    face_u (fe->dofs_per_face);
   
   for (; cell!=endc; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -2628,8 +2632,8 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	{
 	  face_values.reinit (cell, face);
 	  face_values.get_function_values (*u, face_u);
-	  const vector<double>      &JxW_values (face_values.get_JxW_values());
-	  const vector<Point<dim> > &q_points   (face_values.get_quadrature_points());
+	  const std::vector<double>      &JxW_values (face_values.get_JxW_values());
+	  const std::vector<Point<dim> > &q_points   (face_values.get_quadrature_points());
 	  
 	  double local_integral = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
@@ -2643,14 +2647,14 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 	      << cell->face(face)->vertex(0)(0)
 	      << "  "
 	      << (*u)(cell->face(face)->vertex_dof_index(0,0))
-	      << endl
+	      << std::endl
 	      << time
 	      << ' '
 	      << cell->face(face)->vertex(1)(0)
 	      << "  "
 	      << (*u)(cell->face(face)->vertex_dof_index(1,0))
-	      << endl
-	      << endl;
+	      << std::endl
+	      << std::endl;
 	};
   AssertThrow (out, typename EvaluationBase<dim>::ExcIO());
   out.close ();
@@ -2666,8 +2670,8 @@ double EvaluateSeismicSignal<dim>::evaluate () {
 
 
 template <int dim>
-void EvaluateSplitSignal<dim>::print_final_result (ostream &out) {
-  out << "    Integrated split signal: " << result << endl;
+void EvaluateSplitSignal<dim>::print_final_result (std::ostream &out) {
+  out << "    Integrated split signal: " << result << std::endl;
 };
 
 
@@ -2678,7 +2682,7 @@ double EvaluateSplitSignal<dim>::get_final_result () {
 
 
 template <int dim>
-string EvaluateSplitSignal<dim>::description () const {
+std::string EvaluateSplitSignal<dim>::description () const {
   return "Integrated split signal (exact: (2+pi)/(16-pi)=0.010229)";
 };
 
@@ -2707,7 +2711,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
 					endc = dof->end();
   double u_integrated=0;
   FEFaceValues<dim> face_values (*fe, *quadrature_face, UpdateFlags(update_values | update_JxW_values));
-  vector<double>    face_u (fe->dofs_per_face);
+  std::vector<double>    face_u (fe->dofs_per_face);
   
   for (; cell!=endc; ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
@@ -2727,7 +2731,7 @@ double EvaluateSplitSignal<dim>::evaluate () {
 
 	  face_values.reinit (cell, face_no);
 	  face_values.get_function_values (*u, face_u);
-	  const vector<double>      &JxW_values (face_values.get_JxW_values());
+	  const std::vector<double>      &JxW_values (face_values.get_JxW_values());
 	  
 	  double local_integral = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
@@ -2747,8 +2751,8 @@ double EvaluateSplitSignal<dim>::evaluate () {
 
 
 template <int dim>
-void EvaluateOneBranch1d<dim>::print_final_result (ostream &out) {
-  out << "    One branch integrated: " << result << endl;
+void EvaluateOneBranch1d<dim>::print_final_result (std::ostream &out) {
+  out << "    One branch integrated: " << result << std::endl;
 };
 
 
@@ -2759,7 +2763,7 @@ double EvaluateOneBranch1d<dim>::get_final_result () {
 
 
 template <int dim>
-string EvaluateOneBranch1d<dim>::description () const {
+std::string EvaluateOneBranch1d<dim>::description () const {
   return "One branch integrated (exact: 0.055735)";
 };
 
@@ -2790,7 +2794,7 @@ double EvaluateOneBranch1d<1>::evaluate () {
 				      endc = dof->end();
   double u_integrated=0;
   FEValues<1>  fe_values (*fe, *quadrature, UpdateFlags(update_values | update_JxW_values));
-  vector<double> cell_u (fe->dofs_per_cell);
+  std::vector<double> cell_u (fe->dofs_per_cell);
   
   for (; cell!=endc; ++cell)
     if ((cell->center()(0) > -0.6) &&
@@ -2798,7 +2802,7 @@ double EvaluateOneBranch1d<1>::evaluate () {
       {
 	fe_values.reinit (cell);
 	fe_values.get_function_values (*u, cell_u);
-	const vector<double>    &JxW_values (fe_values.get_JxW_values());
+	const std::vector<double>    &JxW_values (fe_values.get_JxW_values());
 
 	double local_integral = 0;
 	for (unsigned int point=0; point<n_q_points; ++point)
@@ -2818,8 +2822,8 @@ double EvaluateOneBranch1d<1>::evaluate () {
 
 
 template <int dim>
-void EvaluateSecondCrossing1d<dim>::print_final_result (ostream &out) {
-  out << "    Second crossing: " << result << endl;
+void EvaluateSecondCrossing1d<dim>::print_final_result (std::ostream &out) {
+  out << "    Second crossing: " << result << std::endl;
 };
 
 
@@ -2830,7 +2834,7 @@ double EvaluateSecondCrossing1d<dim>::get_final_result () {
 
 
 template <int dim>
-string EvaluateSecondCrossing1d<dim>::description () const {
+std::string EvaluateSecondCrossing1d<dim>::description () const {
   return "Second crossing (exact: 0.011147)";
 };
 
@@ -2862,7 +2866,7 @@ double EvaluateSecondCrossing1d<1>::evaluate () {
   double u_integrated=0;
   FEValues<1>  fe_values (*fe, *quadrature,
 			  UpdateFlags(update_values | update_JxW_values | update_q_points));
-  vector<double> cell_u (fe->dofs_per_cell);
+  std::vector<double> cell_u (fe->dofs_per_cell);
   
   for (; cell!=endc; ++cell)
     if ((cell->center()(0) > -0.03) &&
@@ -2870,8 +2874,8 @@ double EvaluateSecondCrossing1d<1>::evaluate () {
       {
 	fe_values.reinit (cell);
 	fe_values.get_function_values (*u, cell_u);
-	const vector<double>    &JxW_values (fe_values.get_JxW_values());
-	const vector<Point<1> > &quadrature_points (fe_values.get_quadrature_points());
+	const std::vector<double>    &JxW_values (fe_values.get_JxW_values());
+	const std::vector<Point<1> > &quadrature_points (fe_values.get_quadrature_points());
 	
 	double local_integral = 0;
 	for (unsigned int point=0; point<n_q_points; ++point)
@@ -2891,9 +2895,9 @@ double EvaluateSecondCrossing1d<1>::evaluate () {
 
 
 template <int dim>
-void EvaluateHuyghensWave<dim>::print_final_result (ostream &out) {
-  out << "    Hughens wave -- weighted time: " << weighted_value / integrated_value << endl;
-  out << "                    average      : " << integrated_value << endl;
+void EvaluateHuyghensWave<dim>::print_final_result (std::ostream &out) {
+  out << "    Hughens wave -- weighted time: " << weighted_value / integrated_value << std::endl;
+  out << "                    average      : " << integrated_value << std::endl;
 };
 
 
@@ -2904,7 +2908,7 @@ double EvaluateHuyghensWave<dim>::get_final_result () {
 
 
 template <int dim>
-string EvaluateHuyghensWave<dim>::description () const {
+std::string EvaluateHuyghensWave<dim>::description () const {
   return "Huyghens wave";
 };
 
@@ -3010,16 +3014,16 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
     };
 
 
-deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
-       << "---------" << endl;
+  deallog << "Sweep " << std::setw(2) << sweep_no << ':' << std::endl
+       << "---------" << std::endl;
 
-  for (typename list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
+  for (typename std::list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
        i != parameters.eval_list.end(); ++i)
     (*i)->reset ();
   
   start_sweep (sweep_no);
 
-  for (vector<TimeStepBase*>::iterator timestep=timesteps.begin();
+  for (std::vector<TimeStepBase*>::iterator timestep=timesteps.begin();
        timestep!=timesteps.end(); ++timestep)
     {
       dynamic_cast<TimeStepBase_Wave<dim>*>(*timestep)->attach_sweep_info (sweep_info);
@@ -3027,14 +3031,14 @@ deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
     };
   
   solve_primal_problem ();
-  deallog << endl;
+  deallog << std::endl;
 
   if ((parameters.refinement_strategy == WaveParameters<dim>::dual_estimator)
       &&
       (sweep_no >= parameters.initial_energy_estimator_sweeps))
     {
       solve_dual_problem ();
-      deallog << endl;
+      deallog << std::endl;
     };
   
   postprocess ();
@@ -3042,7 +3046,7 @@ deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
   if (parameters.write_stacked_data)
     write_stacked_data (*sweep_data.data_out_stack);
 
-  deallog << endl;
+  deallog << std::endl;
   
   if (sweep_no != parameters.number_of_sweeps-1)
     refine_grids ();
@@ -3051,19 +3055,19 @@ deallog << "Sweep " << setw(2) << sweep_no << ':' << endl
 
   end_sweep ();
   
-  deallog << endl << endl;
+  deallog << std::endl << std::endl;
 };
 
 
 template <int dim>
 void TimestepManager<dim>::refine_grids () 
 {
-  deallog << "  Collecting refinement data: " << endl;
+  deallog << "  Collecting refinement data: " << std::endl;
 
 
 const unsigned int n_timesteps = timesteps.size();
       
-  vector<Vector<float> > indicators (n_timesteps);
+  std::vector<Vector<float> > indicators (n_timesteps);
       
   for (unsigned int i=0; i<n_timesteps; ++i)
     static_cast<TimeStepBase_Wave<dim>*>(timesteps[i])
@@ -3079,7 +3083,7 @@ if (parameters.produce_error_statistics)
     {
       deallog << "    Generating error statistics ";
 
-      vector<double> time_values (timesteps.size());
+      std::vector<double> time_values (timesteps.size());
       for (unsigned int i=0; i<timesteps.size(); ++i)
 	time_values[i] = timesteps[i]->get_time();
       
@@ -3090,7 +3094,7 @@ if (parameters.produce_error_statistics)
 				 Histogram::parse_interval_spacing(parameters.error_statistics_scaling));
       error_statistics.write_gnuplot (logfile);
 
-      deallog << endl;
+      deallog << std::endl;
     };
 
 
@@ -3101,7 +3105,7 @@ if (parameters.compare_indicators_globally)
       unsigned int next_index=0;
       for (unsigned int i=0; i<timesteps.size(); ++i)
 	{
-	  copy (indicators[0].begin(),
+	  std::copy (indicators[0].begin(),
 		indicators[0].end(),
 		&all_indicators(next_index));
 	  next_index += (indicators[0].end() - indicators[0].begin());
@@ -3115,14 +3119,14 @@ if (parameters.compare_indicators_globally)
       const double total_error = all_indicators.l1_norm();
 
       Vector<float> partial_sums(all_indicators.size());
-      sort (all_indicators.begin(), all_indicators.end(), greater<double>());
-      partial_sum (all_indicators.begin(), all_indicators.end(),
+      std::sort (all_indicators.begin(), all_indicators.end(), std::greater<double>());
+      std::partial_sum (all_indicators.begin(), all_indicators.end(),
 		   partial_sums.begin());
 
       const Vector<float>::const_iterator
-	p = upper_bound (partial_sums.begin(), partial_sums.end(),
+	p = std::upper_bound (partial_sums.begin(), partial_sums.end(),
 			 total_error*(1-parameters.refinement_fraction.second)),
-	q = lower_bound (partial_sums.begin(), partial_sums.end(),
+	q = std::lower_bound (partial_sums.begin(), partial_sums.end(),
 			 parameters.refinement_fraction.first*total_error);
 
       double bottom_threshold = all_indicators(p != partial_sums.end() ?
@@ -3135,20 +3139,20 @@ if (parameters.compare_indicators_globally)
 
       deallog << "    " << all_indicators.size()
 	   << " cells in total."
-	   << endl;
+	   << std::endl;
       deallog << "    Thresholds are [" << bottom_threshold << "," << top_threshold << "]"
 	   << " out of ["
 	   << *min_element(all_indicators.begin(),all_indicators.end())
 	   << ','
 	   << *max_element(all_indicators.begin(),all_indicators.end())
 	   << "]. "
-	   << endl;
+	   << std::endl;
       deallog << "    Expecting "
 	   << (all_indicators.size() +
 	       (q-partial_sums.begin())*(GeometryInfo<dim>::children_per_cell-1) -
 	       (partial_sums.end() - p)/(GeometryInfo<dim>::children_per_cell-1))
 	   << " cells in next sweep."
-	   << endl;
+	   << std::endl;
       deallog << "    Now refining...";
       do_loop (mem_fun (&TimeStepBase_Tria<dim>::init_for_refinement),
 	       bind2nd (mem_fun1 (&TimeStepBase_Wave<dim>::refine_grid),
@@ -3156,12 +3160,12 @@ if (parameters.compare_indicators_globally)
 								bottom_threshold)),
 	       TimeDependent::TimeSteppingData (0,1),
 	       TimeDependent::forward);
-      deallog << endl;
+      deallog << std::endl;
     }
 
   else
     {
-      deallog << "    Refining each time step separately." << endl;
+      deallog << "    Refining each time step separately." << std::endl;
       
       for (unsigned int timestep=0; timestep<timesteps.size(); ++timestep)
 	static_cast<TimeStepBase_Tria<dim>*>(timesteps[timestep])->init_for_refinement();
@@ -3183,14 +3187,14 @@ if (parameters.compare_indicators_globally)
 	  
 	  Vector<float> partial_sums(criteria.size());
 
-	  sort (criteria.begin(), criteria.end(), greater<double>());
-	  partial_sum (criteria.begin(), criteria.end(),
+	  std::sort (criteria.begin(), criteria.end(), std::greater<double>());
+	  std::partial_sum (criteria.begin(), criteria.end(),
 		       partial_sums.begin());
 
 	  const Vector<float>::const_iterator
-	    p = upper_bound (partial_sums.begin(), partial_sums.end(),
+	    p = std::upper_bound (partial_sums.begin(), partial_sums.end(),
 			     total_error*(1-parameters.refinement_fraction.second)),
-	    q = lower_bound (partial_sums.begin(), partial_sums.end(),
+	    q = std::lower_bound (partial_sums.begin(), partial_sums.end(),
 			     parameters.refinement_fraction.first*total_error);
 
 	  double bottom_threshold = criteria(p != partial_sums.end() ?
@@ -3220,7 +3224,7 @@ if (parameters.compare_indicators_globally)
 
 
 deallog << "    Got " << total_number_of_cells << " presently, expecting "
-	   << total_expected_cells << " for next sweep." << endl;
+	   << total_expected_cells << " for next sweep." << std::endl;
     };
 };
 
@@ -3232,13 +3236,13 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
     {
       deallog << "    Writing statistics for whole sweep.";
       
-      deallog << "#  Description of fields" << endl
-	   << "#  =====================" << endl
-	   << "#  General:"              << endl
-	   << "#    time"                << endl;
+      deallog << "#  Description of fields" << std::endl
+	   << "#  =====================" << std::endl
+	   << "#  General:"              << std::endl
+	   << "#    time"                << std::endl;
       
       TimeStep<dim>::write_statistics_descriptions (logfile, parameters);
-      deallog << endl << endl;
+      deallog << std::endl << std::endl;
       
       for (unsigned int timestep=0; timestep<timesteps.size(); ++timestep)
 	{
@@ -3247,12 +3251,12 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 	  dynamic_cast<TimeStep<dim>*>
 	    (static_cast<TimeStepBase_Wave<dim>*>
 	     (timesteps[timestep]))->write_statistics (logfile);
-	  deallog << endl;
+	  deallog << std::endl;
 	};
 
       AssertThrow (logfile, ExcIO());
       
-      deallog << endl;
+      deallog << std::endl;
     };
 
 
@@ -3264,7 +3268,7 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 				logfile);
       AssertThrow (logfile, ExcIO());
 
-      deallog << endl;
+      deallog << std::endl;
     };
 };
 
@@ -3284,7 +3288,7 @@ void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack
   eps_flags.turn_angle = 0;
   data_out_stack.set_flags (eps_flags);
   data_out_stack.write (logfile, output_format);
-  deallog << '.' << endl;
+  deallog << '.' << std::endl;
 };
 
 
@@ -3308,7 +3312,7 @@ template class TimestepManager<2>;
 
 
 template <int dim>
-const string WaveParameters<dim>::initial_value_names ("zero"
+const std::string WaveParameters<dim>::initial_value_names ("zero"
 						       "|eigenmode"
 						       "|bump"
 						       "|small bump"
@@ -3317,19 +3321,19 @@ const string WaveParameters<dim>::initial_value_names ("zero"
 						       "|plateau"
 						       "|earthquake");
 template <int dim>
-const string WaveParameters<dim>::coefficient_names ("unit"
+const std::string WaveParameters<dim>::coefficient_names ("unit"
 						     "|kink"
 						     "|gradient"
 						     "|preliminary earth model"
 						     "|distorted");
 template <int dim>
-const string WaveParameters<dim>::boundary_function_names ("wave from left"
+const std::string WaveParameters<dim>::boundary_function_names ("wave from left"
 							   "|fast wave from left"
 							   "|wave from left center"
 							   "|wave from left bottom"
 							   "|zero");
 template <int dim>
-const string WaveParameters<dim>::dual_functional_names ("none"
+const std::string WaveParameters<dim>::dual_functional_names ("none"
 							 "|integrated value at origin"
 							 "|seismic signature"
 							 "|split signal"
@@ -3341,8 +3345,8 @@ const string WaveParameters<dim>::dual_functional_names ("none"
 
 
 DeclException1 (ExcUnknownName,
-		string,
-		<< "Unknown description string " << arg1);
+		std::string,
+		<< "Unknown description std::string " << arg1);
 
 
 template <int dim>
@@ -3442,8 +3446,8 @@ class Coefficients {
 	  return 1+8*(p(dim-1)>1./5. ? 1. : 0.);
 	};
 	
-	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values,
+	virtual void value_list (const std::vector<Point<dim> > &points,
+				 std::vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcDimensionMismatch(values.size(), points.size()));
@@ -3459,8 +3463,8 @@ class Coefficients {
 	  return tmp;
 	};
 	
-	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients,
+	virtual void gradient_list (const std::vector<Point<dim> > &points,
+				    std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    gradients[i] = Kink::gradient (points[i], 0);
@@ -3475,8 +3479,8 @@ class Gradient : public Function<dim> {
 	  return 1+8*p(1)*p(1);
 	};
 	
-	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values,
+	virtual void value_list (const std::vector<Point<dim> > &points,
+				 std::vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcDimensionMismatch(values.size(), points.size()));
@@ -3491,8 +3495,8 @@ class Gradient : public Function<dim> {
 	  return tmp;
 	};
 	
-	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients,
+	virtual void gradient_list (const std::vector<Point<dim> > &points,
+				    std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    gradients[i] = Gradient::gradient (points[i], 0);
@@ -3508,8 +3512,8 @@ class PreliminaryEarthModel : public Function<dim> {
 	  return 10+2.5*(2-r/6371)*(2-r/6371)+20*(r<2000 ? 1 : 0);
 	};
 	
-	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values,
+	virtual void value_list (const std::vector<Point<dim> > &points,
+				 std::vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcDimensionMismatch(values.size(), points.size()));
@@ -3525,8 +3529,8 @@ class PreliminaryEarthModel : public Function<dim> {
 	  return tmp;
 	};
 	
-	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients,
+	virtual void gradient_list (const std::vector<Point<dim> > &points,
+				    std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    gradients[i] = PreliminaryEarthModel::gradient (points[i], 0);
@@ -3546,8 +3550,8 @@ class Distorted : public Function<dim> {
 			 (sin(3*pi*(2*x+y)/sqrt(3)))>0 ? 1 : 0));
 	};
 	
-	virtual void value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values,
+	virtual void value_list (const std::vector<Point<dim> > &points,
+				 std::vector<double>            &values,
 				 const unsigned int) const {
 	  Assert (values.size() == points.size(),
 		  ExcDimensionMismatch(values.size(), points.size()));
@@ -3560,8 +3564,8 @@ class Distorted : public Function<dim> {
 	  return Tensor<1,dim>();
 	};
 	
-	virtual void gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients,
+	virtual void gradient_list (const std::vector<Point<dim> > &points,
+				    std::vector<Tensor<1,dim> >    &gradients,
 				    const unsigned int) const {
 	  for (unsigned int i=0; i<points.size(); ++i)
 	    gradients[i] = Distorted::gradient (points[i], 0);
@@ -3772,7 +3776,7 @@ void WaveParameters<dim>::delete_parameters ()
     delete coarse_grid;
   coarse_grid = 0;
 
-  for (typename list<EvaluationBase<dim>*>::iterator i=eval_list.begin();
+  for (typename std::list<EvaluationBase<dim>*>::iterator i=eval_list.begin();
        i!=eval_list.end(); ++i)
     delete *i;
   eval_list.erase (eval_list.begin(), eval_list.end());
@@ -3780,12 +3784,12 @@ void WaveParameters<dim>::delete_parameters ()
 
 
 template <int dim>
-void WaveParameters<dim>::set_initial_functions (const string &u_name,
-						 const string &v_name) {
+void WaveParameters<dim>::set_initial_functions (const std::string &u_name,
+						 const std::string &v_name) {
   Assert (initial_u==0, ExcInternalError());
   Assert (initial_v==0, ExcInternalError());
   
-  const string names[2] = {u_name, v_name};
+  const std::string names[2] = {u_name, v_name};
   Function<dim> *functions[2];
   
   for (unsigned int i=0; i<2; ++i)
@@ -3823,7 +3827,7 @@ void WaveParameters<dim>::set_initial_functions (const string &u_name,
 
 
 template <int dim>
-void WaveParameters<dim>::set_coefficient_functions (const string &name) {  
+void WaveParameters<dim>::set_coefficient_functions (const std::string &name) {  
   Assert (density==0, ExcInternalError());
   Assert (stiffness==0, ExcInternalError());
 
@@ -3865,7 +3869,7 @@ void WaveParameters<dim>::set_coefficient_functions (const string &name) {
 
 
 template <int dim>
-void WaveParameters<dim>::set_boundary_functions (const string &name) {
+void WaveParameters<dim>::set_boundary_functions (const std::string &name) {
   Assert (boundary_values_u==0, ExcInternalError());
   Assert (boundary_values_v==0, ExcInternalError());
   
@@ -3904,18 +3908,18 @@ void WaveParameters<dim>::set_boundary_functions (const string &name) {
 
 
 template <int dim>
-void WaveParameters<dim>::make_eval_list (const string &names) {
+void WaveParameters<dim>::make_eval_list (const std::string &names) {
   Assert (eval_list.size()==0, ExcInternalError());
-  string split_list = names;
+  std::string split_list = names;
 
   while (split_list.length())
     {
-      string name;
+      std::string name;
       name = split_list;
       
-      if (name.find(",") != string::npos)
+      if (name.find(",") != std::string::npos)
 	{
-	  name.erase (name.find(","), string::npos);
+	  name.erase (name.find(","), std::string::npos);
 	  split_list.erase (0, split_list.find(",")+1);
 	}
       else
@@ -3950,7 +3954,7 @@ void WaveParameters<dim>::make_eval_list (const string &names) {
 
 
 template <int dim>
-void WaveParameters<dim>::set_dual_functional (const string &name) {
+void WaveParameters<dim>::set_dual_functional (const std::string &name) {
   Assert (dual_functional==0, ExcInternalError());
   if (name == "none")
     dual_functional = new DualFunctional<dim>();
@@ -3986,7 +3990,7 @@ void WaveParameters<dim>::set_dual_functional (const string &name) {
 #if 2 == 1
 
 template <>
-void WaveParameters<1>::make_coarse_grid (const string &name) {
+void WaveParameters<1>::make_coarse_grid (const std::string &name) {
   const unsigned int dim = 1;
   
   coarse_grid = new Triangulation<dim>(MeshSmoothing(smoothing_on_refinement |
@@ -4001,7 +4005,7 @@ void WaveParameters<1>::make_coarse_grid (const string &name) {
 				       Point<1>(-1./3.),
 				       Point<1>(1./3.),
 				       Point<1>(1.) };
-	vector<CellData<1> > cells (3, CellData<1>());
+	std::vector<CellData<1> > cells (3, CellData<1>());
 	cells[0].vertices[0] = 0;
 	cells[0].vertices[1] = 1;
 	cells[0].material_id = 0;
@@ -4014,7 +4018,7 @@ void WaveParameters<1>::make_coarse_grid (const string &name) {
 	cells[2].vertices[1] = 3;
 	cells[2].material_id = 0;
 
-	coarse_grid->create_triangulation (vector<Point<1> >(&vertices[0],
+	coarse_grid->create_triangulation (std::vector<Point<1> >(&vertices[0],
 							     &vertices[4]),
 					   cells,
 					   SubCellData());
@@ -4044,10 +4048,10 @@ void WaveParameters<1>::make_coarse_grid (const string &name) {
 #if 2 == 2
 
 template <>
-void WaveParameters<2>::make_coarse_grid (const string &name) {
+void WaveParameters<2>::make_coarse_grid (const std::string &name) {
   const unsigned int dim=2;
 
-  map<string,InitialMesh> initial_mesh_list;
+  std::map<std::string,InitialMesh> initial_mesh_list;
   initial_mesh_list["split channel bottom"] = split_channel_bottom;
   initial_mesh_list["split channel left"]   = split_channel_left;
   initial_mesh_list["split channel right"]  = split_channel_right;
@@ -4084,7 +4088,7 @@ void WaveParameters<2>::make_coarse_grid (const string &name) {
 					 {1, 4, 5, 2},
 					 {4, 6, 7, 5}};
 	
-	vector<CellData<dim> > cells (3, CellData<dim>());
+	std::vector<CellData<dim> > cells (3, CellData<dim>());
 	
 	for (unsigned int i=0; i<3; ++i) 
 	  {
@@ -4125,7 +4129,7 @@ void WaveParameters<2>::make_coarse_grid (const string &name) {
 	    boundary_info.boundary_lines[0].vertices[1] = 3;
 	  };
 	
-	coarse_grid->create_triangulation (vector<Point<dim> >(&vertices[0],
+	coarse_grid->create_triangulation (std::vector<Point<dim> >(&vertices[0],
 							       &vertices[8]),
 					   cells, boundary_info);
 	
@@ -4247,7 +4251,7 @@ case square:
 					 {1, 7, 5, 3},
 					 {6, 4, 5, 7}};
 	
-	vector<CellData<2> > cells (4, CellData<2>());
+	std::vector<CellData<2> > cells (4, CellData<2>());
 	
 	for (unsigned int i=0; i<4; ++i) 
 	  {
@@ -4256,7 +4260,7 @@ case square:
 	    cells[i].material_id = 0;
 	  };
   
-	coarse_grid->create_triangulation (vector<Point<2> >(&vertices[0],
+	coarse_grid->create_triangulation (std::vector<Point<2> >(&vertices[0],
 							     &vertices[8]),
 					   cells,
 					   SubCellData());
@@ -4281,10 +4285,10 @@ case square:
 #if 2 == 3
 
 template <>
-void WaveParameters<3>::make_coarse_grid (const string &name) {
+void WaveParameters<3>::make_coarse_grid (const std::string &name) {
   const unsigned int dim=3;
 
-  map<string,InitialMesh> initial_mesh_list;
+  std::map<std::string,InitialMesh> initial_mesh_list;
   initial_mesh_list["square"]          = square;
   initial_mesh_list["earth"]           = earth;
   initial_mesh_list["seismic square"]  = seismic_square;
@@ -4451,20 +4455,20 @@ prm.declare_entry ("Refinement criterion", "energy estimator",
 
 template <int dim>
 void WaveParameters<dim>::parse_parameters (ParameterHandler &prm) {
-  map<string,BoundaryConditions> boundary_conditions_list;
+  std::map<std::string,BoundaryConditions> boundary_conditions_list;
   boundary_conditions_list["wave from left"]        = wave_from_left;
   boundary_conditions_list["fast wave from left"]   = fast_wave_from_left;
   boundary_conditions_list["wave from left center"] = wave_from_left_center;
   boundary_conditions_list["wave from left bottom"] = wave_from_left_bottom;
   boundary_conditions_list["zero"] = zero;
   
-  map<string,Preconditioning> preconditioning_list;
+  std::map<std::string,Preconditioning> preconditioning_list;
   preconditioning_list["jacobi"] = jacobi;
   preconditioning_list["sor"]    = sor;
   preconditioning_list["ssor"]   = ssor;
   preconditioning_list["none"]   = no_preconditioning;
   
-  map<string,WriteStrategy> write_strategy_list;
+  std::map<std::string,WriteStrategy> write_strategy_list;
   write_strategy_list["never"] = never;
   write_strategy_list["all sweeps"] = all_sweeps;
   write_strategy_list["last sweep only"] = last_sweep_only;
@@ -4616,25 +4620,25 @@ SweepInfo::get_timers ()
 
 template <int dim>
 void
-SweepInfo::write_summary (const list<EvaluationBase<dim>*> &eval_list,
-			  ostream &out) const
+SweepInfo::write_summary (const std::list<EvaluationBase<dim>*> &eval_list,
+			  std::ostream &out) const
 {
-  out << "Summary of this sweep:" << endl
-      << "======================" << endl
-      << endl;
+  out << "Summary of this sweep:" << std::endl
+      << "======================" << std::endl
+      << std::endl;
 
-  out << "  Accumulated number of cells: " << data.cells       << endl
-      << "  Acc. number of primal dofs : " << data.primal_dofs << endl
-      << "  Acc. number of dual dofs   : " << data.dual_dofs   << endl
-      << "  Accumulated error          : " << data.accumulated_error       << endl;
+  out << "  Accumulated number of cells: " << data.cells       << std::endl
+      << "  Acc. number of primal dofs : " << data.primal_dofs << std::endl
+      << "  Acc. number of dual dofs   : " << data.dual_dofs   << std::endl
+      << "  Accumulated error          : " << data.accumulated_error       << std::endl;
   
   if (eval_list.size() != 0)
     {
-      out << endl;
-      out << "  Evaluations:" << endl
-	  << "  ------------" << endl;
+      out << std::endl;
+      out << "  Evaluations:" << std::endl
+	  << "  ------------" << std::endl;
       
-      for (typename list<EvaluationBase<dim>*>::const_iterator i = eval_list.begin();
+      for (typename std::list<EvaluationBase<dim>*>::const_iterator i = eval_list.begin();
 	   i != eval_list.end(); ++i)
 
       (*i)->print_final_result (out);
@@ -4648,7 +4652,7 @@ SweepInfo::write_summary (const list<EvaluationBase<dim>*> &eval_list,
       << time->tm_mday << ' '
       << int_to_string (time->tm_hour, 2) << ":"
       << int_to_string (time->tm_min, 2) << ":"
-      << int_to_string (time->tm_sec, 2) << endl;
+      << int_to_string (time->tm_sec, 2) << std::endl;
 };
 
 
@@ -4661,8 +4665,8 @@ SweepInfo::Data::Data () :
 
 
 template 
-void SweepInfo::write_summary (const list<EvaluationBase<2>*> &eval_list,
-			       ostream &out) const;
+void SweepInfo::write_summary (const std::list<EvaluationBase<2>*> &eval_list,
+			       std::ostream &out) const;
 
 
 
@@ -4691,13 +4695,13 @@ void SweepInfo::write_summary (const list<EvaluationBase<2>*> &eval_list,
 #include <iomanip>
 
 
-static const pair<unsigned int, double> relaxations[3]
-= { make_pair(100,5), make_pair(300,3), make_pair(500,2) };
+static const std::pair<unsigned int, double> relaxations[3]
+= { std::make_pair(100,5), std::make_pair(300,3), std::make_pair(500,2) };
 
 
 static const TimeStepBase_Tria<2>::RefinementFlags::CorrectionRelaxations
 wave_correction_relaxations (1,
-			     vector<pair<unsigned int,double> > (&relaxations[0],
+			     std::vector<std::pair<unsigned int,double> > (&relaxations[0],
 								 &relaxations[3]));
 
 
@@ -4756,7 +4760,7 @@ TimeStepBase_Wave<dim>::get_timestep_postprocess () const
 
 
 template <int dim>
-string TimeStepBase_Wave<dim>::tmp_filename_base (const string &branch_signature) const
+std::string TimeStepBase_Wave<dim>::tmp_filename_base (const std::string &branch_signature) const
 {
   return (parameters.tmp_directory +
 	  branch_signature + 's' +
@@ -4783,7 +4787,7 @@ void TimeStepBase_Wave<dim>::attach_sweep_data (SweepData<dim> &sd)
 
 
 template <int dim>
-TimeStep_Wave<dim>::TimeStep_Wave (const string fe_name) :
+TimeStep_Wave<dim>::TimeStep_Wave (const std::string fe_name) :
 		dof_handler (0),
 		fe (FEHelper<dim>::get_fe(fe_name)),
 		quadrature (FEHelper<dim>::get_quadrature(fe_name)),
@@ -4854,7 +4858,7 @@ constraints.clear ();
 	  case postprocess:
 	  {
 	    sweep_info->get_timers().postprocessing.start();
-	    ifstream tmp_in(tmp_filename_base(branch_signature()).c_str());
+	    std::ifstream tmp_in(tmp_filename_base(branch_signature()).c_str());
 	    u.block_read (tmp_in);
 	    v.block_read (tmp_in);
 	    tmp_in.close ();
@@ -4886,7 +4890,7 @@ void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level)
 	Assert (u.size() != 0, ExcInternalError());
 	Assert (v.size() != 0, ExcInternalError());
 
-	ofstream tmp_out(tmp_filename_base(branch_signature()).c_str());
+	std::ofstream tmp_out(tmp_filename_base(branch_signature()).c_str());
 	u.block_write (tmp_out);
 	v.block_write (tmp_out);
 	tmp_out.close ();
@@ -4921,7 +4925,7 @@ void TimeStep_Wave<dim>::sleep (const unsigned int sleep_level)
 template <int dim>
 void TimeStep_Wave<dim>::end_sweep ()
 {
-  string tmp_filename = tmp_filename_base(branch_signature());
+  std::string tmp_filename = tmp_filename_base(branch_signature());
   remove (tmp_filename.c_str());
 };
 
@@ -4962,8 +4966,8 @@ void TimeStep_Wave<dim>::create_matrices ()
   const bool   density_constant = parameters.density_constant,
 	     stiffness_constant = parameters.stiffness_constant;
 
-  vector<double> density_values   (n_q_points, 1.);
-  vector<double> stiffness_values (n_q_points, 1.);
+  std::vector<double> density_values   (n_q_points, 1.);
+  std::vector<double> stiffness_values (n_q_points, 1.);
 
   if (density_constant)
     fill_n (density_values.begin(), n_q_points,
@@ -4981,7 +4985,7 @@ FEValues<dim>  fe_values (fe, quadrature,
 					 update_q_points :
 					 0)));
 
-  vector<unsigned int>    dof_indices_on_cell (dofs_per_cell);
+  std::vector<unsigned int>    dof_indices_on_cell (dofs_per_cell);
   FullMatrix<double> cell_mass_matrix (dofs_per_cell, dofs_per_cell);
   FullMatrix<double> cell_laplace_matrix (dofs_per_cell, dofs_per_cell);
 
@@ -4995,12 +4999,12 @@ for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_acti
       cell->get_dof_indices (dof_indices_on_cell);
 
       const FullMatrix<double>              &shape_values = fe_values.get_shape_values ();
-      const vector<vector<Tensor<1,dim> > > &shape_grads  = fe_values.get_shape_grads ();
-      const vector<double>                  &JxW_values   = fe_values.get_JxW_values ();
+      const std::vector<std::vector<Tensor<1,dim> > > &shape_grads  = fe_values.get_shape_grads ();
+      const std::vector<double>                  &JxW_values   = fe_values.get_JxW_values ();
 
       if (!density_constant || !stiffness_constant)
 	{
-	  const vector<Point<dim> > &quadrature_points = fe_values.get_quadrature_points ();
+	  const std::vector<Point<dim> > &quadrature_points = fe_values.get_quadrature_points ();
 	  if (!density_constant)
 	    parameters.density->value_list (quadrature_points,
 					    density_values);
@@ -5118,9 +5122,9 @@ TimeStep_Wave<dim>::transfer_old_solutions (const typename DoFHandler<dim>::cell
 
 
 template <int dim>
-pair<double,double>
+std::pair<double,double>
 TimeStep_Wave<dim>::compute_energy () {
-  pair<double,double> energy;
+  std::pair<double,double> energy;
   
   switch (next_action)
     {
@@ -5149,7 +5153,7 @@ StatisticData () :
 		n_dofs (0),
 		n_solver_steps_helmholtz (0),
 		n_solver_steps_projection (0),
-		energy (make_pair(0.0, 0.0))
+		energy (std::make_pair(0.0, 0.0))
 {};
 
 
@@ -5159,7 +5163,7 @@ StatisticData (const unsigned int        n_active_cells,
 	       const unsigned int        n_dofs,
 	       const unsigned int        n_solver_steps_helmholtz,
 	       const unsigned int        n_solver_steps_projection,
-	       const pair<double,double> energy) :
+	       const std::pair<double,double> energy) :
 		n_active_cells (n_active_cells),
 		n_dofs (n_dofs),
 		n_solver_steps_helmholtz (n_solver_steps_helmholtz),
@@ -5170,20 +5174,20 @@ StatisticData (const unsigned int        n_active_cells,
 
 template <int dim>
 void
-TimeStep_Wave<dim>::StatisticData::write_descriptions (ostream &out) 
+TimeStep_Wave<dim>::StatisticData::write_descriptions (std::ostream &out) 
 {
-  out << "#    number of active cells"                 << endl
-      << "#    number of degrees of freedom"           << endl
-      << "#    iterations for the helmholtz equation"  << endl
-      << "#    iterations for the projection equation" << endl
-      << "#    elastic energy"                         << endl
-      << "#    kinetic energy"                         << endl
-      << "#    total energy"                           << endl;
+  out << "#    number of active cells"                 << std::endl
+      << "#    number of degrees of freedom"           << std::endl
+      << "#    iterations for the helmholtz equation"  << std::endl
+      << "#    iterations for the projection equation" << std::endl
+      << "#    elastic energy"                         << std::endl
+      << "#    kinetic energy"                         << std::endl
+      << "#    total energy"                           << std::endl;
 };
 
 
 template <int dim>
-void TimeStep_Wave<dim>::StatisticData::write (ostream &out) const
+void TimeStep_Wave<dim>::StatisticData::write (std::ostream &out) const
 {
   out << n_active_cells             << ' '
       << n_dofs                     << ' '
@@ -5217,7 +5221,7 @@ template class TimeStep_Wave<2>;
 
 
 template <int dim>
-TimeStep_Dual<dim>::TimeStep_Dual (const string &dual_fe)
+TimeStep_Dual<dim>::TimeStep_Dual (const std::string &dual_fe)
 		:
 		TimeStep_Wave<dim> (dual_fe)
 {};
@@ -5261,8 +5265,8 @@ void TimeStep_Dual<dim>::do_initial_step () {
     statistic_data = typename TimeStep_Wave<dim>::StatisticData (tria->n_active_cells(),
 								 dof_handler->n_dofs(),
 								 0, 0,
-								 make_pair (0.0, 0.0));
-  deallog << "." << endl;
+								 std::make_pair (0.0, 0.0));
+  deallog << "." << std::endl;
 };
 
 
@@ -5310,7 +5314,7 @@ void TimeStep_Dual<dim>::do_timestep ()
     };
 
 
-  map<unsigned int,double> boundary_value_list;
+  std::map<unsigned int,double> boundary_value_list;
   if (dim != 1)
     {
       static const ZeroFunction<dim> boundary_values;
@@ -5354,7 +5358,7 @@ void TimeStep_Dual<dim>::do_timestep ()
 							       solver_steps2,
 							       compute_energy ());
   
-  deallog << "." << endl;
+  deallog << "." << std::endl;
 };
 
 
@@ -5371,7 +5375,7 @@ void TimeStep_Dual<dim>::solve_dual_problem ()
 
 
 template <int dim>
-string TimeStep_Dual<dim>::branch_signature () const 
+std::string TimeStep_Dual<dim>::branch_signature () const 
 {
   return "d";
 };
@@ -5475,12 +5479,12 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
     {
       fe_values.reinit (old_cell);
       const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-      const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-      const vector<double>                 &weights   = fe_values.get_JxW_values ();
+      const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+      const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
       FullMatrix<double>    cell_matrix (dofs_per_cell, dofs_per_cell);
 
-      vector<double> density_values(fe_values.n_quadrature_points);
+      std::vector<double> density_values(fe_values.n_quadrature_points);
       parameters.density->value_list (fe_values.get_quadrature_points(),
 				      density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -5507,7 +5511,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       cell_matrix.vmult (local_M_u, tmp);
 
       cell_matrix.clear ();
-      vector<double> stiffness_values(fe_values.n_quadrature_points);
+      std::vector<double> stiffness_values(fe_values.n_quadrature_points);
       parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					stiffness_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -5530,7 +5534,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 		time_step,
 		local_A_v);
 
-      vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
+      std::vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -5548,7 +5552,7 @@ TimeStep_Dual<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 
       collect_from_children (old_cell, fe_values, rhs1, rhs2);
       
-      vector<unsigned int> new_dof_indices (dofs_per_cell);
+      std::vector<unsigned int> new_dof_indices (dofs_per_cell);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	{
@@ -5614,20 +5618,20 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 	{
 	  const unsigned int l = collect_from_children (old_child, fe_values,
 							child_rhs1, child_rhs2);
-	  level_difference = max (l+1, level_difference);
+	  level_difference = std::max (l+1, level_difference);
 	}
       else
 	{
 	  fe_values.reinit (old_child);
 	  const FullMatrix<double>             &values    = fe_values.get_shape_values();
-	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
+	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
 
 	  cell_matrix.clear ();
-	  vector<double> density_values(fe_values.n_quadrature_points);
+	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -5642,7 +5646,7 @@ TimeStep_Dual<dim>::collect_from_children (const DoFHandler<dim>::cell_iterator 
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
 	  cell_matrix.clear ();
-	  vector<double> stiffness_values(fe_values.n_quadrature_points);
+	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 						stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -5699,7 +5703,7 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 
   Vector<double> rhs2 (dofs_per_cell);
 	    
-  vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
+  std::vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
@@ -5718,17 +5722,17 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 							 local_old_dof_values_v,
  							 right_hand_side1,
  							 right_hand_side2);
-	  level_difference = max (l+1, level_difference);
+	  level_difference = std::max (l+1, level_difference);
 	}
       else
 	{
 	  fe_values.reinit (new_child);
 	  const FullMatrix<double>             &values    = fe_values.get_shape_values();
-	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
+	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
 	  cell_matrix.clear ();
-	  vector<double> density_values(fe_values.n_quadrature_points);
+	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -5743,7 +5747,7 @@ TimeStep_Dual<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterator
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
 	  cell_matrix.clear ();
-	  vector<double> stiffness_values(fe_values.n_quadrature_points);
+	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -5823,9 +5827,9 @@ void TimeStep_ErrorEstimation<dim>::estimate_error ()
 	estimate_error_dual ();
     };
 
-  const double accumulated_error = accumulate (estimated_error_per_cell.begin(),
-					       estimated_error_per_cell.end(),
-					       0.0);
+  const double accumulated_error = std::accumulate (estimated_error_per_cell.begin(),
+						    estimated_error_per_cell.end(),
+						    0.0);
   statistic_data = StatisticData (accumulated_error);
   sweep_info->get_data().accumulated_error += accumulated_error;
 
@@ -5858,7 +5862,7 @@ void TimeStep_ErrorEstimation<dim>::sleep (const unsigned int sleep_level)
       Assert (estimated_error_per_cell.size()!=0,
 	      ExcInternalError());
 
-      ofstream tmp_out(tmp_filename_base(branch_signature()).c_str());
+      std::ofstream tmp_out(tmp_filename_base(branch_signature()).c_str());
       estimated_error_per_cell.block_write (tmp_out);
       tmp_out.close ();
 
@@ -5881,7 +5885,7 @@ template <int dim>
 void
 TimeStep_ErrorEstimation<dim>::get_error_indicators (Vector<float> &indicators) const 
 {
-  ifstream in (tmp_filename_base(branch_signature()).c_str());
+  std::ifstream in (tmp_filename_base(branch_signature()).c_str());
   indicators.block_read (in);
 };
 
@@ -5905,7 +5909,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 				       target.u :
 				       target.v),
 				      estimated_error_per_cell,
-				      vector<bool>(),
+				      std::vector<bool>(),
 				      parameters.stiffness);
 
   if (((previous_timestep == 0) && (which_variables==0)) ||
@@ -5919,7 +5923,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int wh
 					   target.v :
 					   target.u),
 					  v_estimator,
-					  vector<bool>(),
+					  std::vector<bool>(),
 					  parameters.density);
       estimated_error_per_cell += v_estimator;
     };
@@ -5975,7 +5979,7 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 			     cellwise_error,
 			     fe_values);
 
-      Assert (cellwise_error.next_free_slot == cellwise_error.errors.end(),
+      Assert (cellwise_error.next_free_slot == &*cellwise_error.errors.end(),
 	      ::ExcInternalError());
     };
 
@@ -5989,8 +5993,8 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
     endc = primal_problem.dof_handler->end();
   for (; cell!=endc; ++cell, ++i)
     {
-      const typename vector<ErrorOnCell>::iterator
-	error_on_this_cell = static_cast<typename vector<ErrorOnCell>::iterator>(cell->user_pointer());
+      const ErrorOnCell *
+	error_on_this_cell = static_cast<ErrorOnCell*>(cell->user_pointer());
       Assert (error_on_this_cell != 0, ::ExcInternalError());
 
       cell->clear_user_pointer ();
@@ -6378,10 +6382,10 @@ TimeStep_ErrorEstimation<dim>::error_formula (const DoFHandler<dim>::active_cell
   Vector<double> tmp2(dofs_per_cell);
 
 
-vector<double> stiffness(fe_values.n_quadrature_points);
+std::vector<double> stiffness(fe_values.n_quadrature_points);
   parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 				    stiffness);
-  vector<Tensor<1,dim> > grad_stiffness(fe_values.n_quadrature_points);
+  std::vector<Tensor<1,dim> > grad_stiffness(fe_values.n_quadrature_points);
   parameters.stiffness->gradient_list (fe_values.get_quadrature_points(),
 				       grad_stiffness);
 
@@ -6390,12 +6394,12 @@ vector<double> stiffness(fe_values.n_quadrature_points);
   
   fe_values.reinit (cell);
   const FullMatrix<double>             &values    = fe_values.get_shape_values();
-  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-  const vector<vector<Tensor<2,dim> > >&second_derivatives
+  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+  const std::vector<std::vector<Tensor<2,dim> > >&second_derivatives
     = fe_values.get_shape_2nd_derivatives ();
-  const vector<double>                 &weights   = fe_values.get_JxW_values ();
+  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-  vector<double> density_values(fe_values.n_quadrature_points);
+  std::vector<double> density_values(fe_values.n_quadrature_points);
   parameters.density->value_list (fe_values.get_quadrature_points(),
 				  density_values);
   for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -6552,14 +6556,14 @@ TimeStep_ErrorEstimation<dim>::StatisticData::StatisticData (const double estima
 
 
 template <int dim>
-void TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (ostream &out)
+void TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (std::ostream &out)
 {
-  out << "#    total estimated error in this timestep" << endl;
+  out << "#    total estimated error in this timestep" << std::endl;
 };
 
 
 template <int dim>
-void TimeStep_ErrorEstimation<dim>::StatisticData::write (ostream &out) const
+void TimeStep_ErrorEstimation<dim>::StatisticData::write (std::ostream &out) const
 {
   out << estimated_error*100000;
 };
@@ -6593,7 +6597,7 @@ double TimeStep_ErrorEstimation<dim>::ErrorOnCell::sum () const {
 template <int dim>
 TimeStep_ErrorEstimation<dim>::CellwiseError::CellwiseError (const unsigned int n_errors) :
 		errors (n_errors),
-		next_free_slot (errors.begin())
+		next_free_slot (&*errors.begin())
 {};
 
 
@@ -6704,30 +6708,30 @@ void TimeStep<dim>::end_sweep ()
 
 
 template <int dim>
-void TimeStep<dim>::write_statistics_descriptions (ostream                   &out,
+void TimeStep<dim>::write_statistics_descriptions (std::ostream                   &out,
 						   const WaveParameters<dim> &parameters)
 {
-  out << "#  Primal problem:" << endl;
+  out << "#  Primal problem:" << std::endl;
   typename TimeStep_Primal<dim>::StatisticData xp;
   xp.write_descriptions (out);
 
-  out << "#  Dual problem:" << endl;
+  out << "#  Dual problem:" << std::endl;
   typename TimeStep_Dual<dim>::StatisticData xd;
   xd.write_descriptions (out);
 
-  out << "#  Error estimation:" << endl;
+  out << "#  Error estimation:" << std::endl;
   TimeStep_ErrorEstimation<dim>::StatisticData::write_descriptions (out);
 
   if (parameters.eval_list.size() != 0)
     {
-      out << "#  Postprocessing:" << endl;
+      out << "#  Postprocessing:" << std::endl;
       TimeStep_Postprocess<dim>::StatisticData::write_descriptions (out, parameters);
     };
 };
 
 
 template <int dim>
-void TimeStep<dim>::write_statistics (ostream &out) const 
+void TimeStep<dim>::write_statistics (std::ostream &out) const 
 {
   TimeStep_Primal<dim>::statistic_data.write (out);
   out << "    ";
@@ -6772,7 +6776,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
   sweep_info->get_timers().postprocessing.start();
 
   statistic_data.evaluation_results.clear();
-  for (typename list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
+  for (typename std::list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
        i != parameters.eval_list.end(); ++i)
     {
       (*i)->reset_timelevel (get_timestep_primal());
@@ -6792,7 +6796,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       typename DataOut<dim>::OutputFormat output_format
 	= DataOut<dim>::parse_output_format (parameters.output_format);
       
-      string data_filename	= (parameters.output_directory +
+      std::string data_filename	= (parameters.output_directory +
 				   "sweep" + int_to_string(sweep_no,2) +
 				   "/" + int_to_string(timestep_no,4) +
 				   out.default_suffix (output_format));
@@ -6828,9 +6832,9 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
 	  if (parameters.write_error_as_cell_data) 
 	    {
 	      estimated_error.reinit (estimated_error_per_cell.size());
-	      copy_n (estimated_error_per_cell.begin(),
-		      estimated_error_per_cell.size(),
-		      estimated_error.begin());
+	      std::copy (estimated_error_per_cell.begin(),
+		    estimated_error_per_cell.end(),
+		    estimated_error.begin());
 	    }
 	  else
 	    {
@@ -6894,7 +6898,7 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
     };
 
 
-deallog << endl;
+deallog << std::endl;
   sweep_info->get_timers().postprocessing.stop();
 };
 
@@ -6914,7 +6918,7 @@ void TimeStep_Postprocess<dim>::sleep (const unsigned int sleep_level)
 
 
 template <int dim>
-string TimeStep_Postprocess<dim>::branch_signature () const 
+std::string TimeStep_Postprocess<dim>::branch_signature () const 
 {
   return "o";
 };
@@ -6923,7 +6927,7 @@ string TimeStep_Postprocess<dim>::branch_signature () const
 template <int dim>
 void TimeStep_Postprocess<dim>::end_sweep ()
 {
-  string tmp_filename = tmp_filename_base(branch_signature());
+  std::string tmp_filename = tmp_filename_base(branch_signature());
   remove (tmp_filename.c_str());
 };
 
@@ -6956,17 +6960,17 @@ void TimeStep_Postprocess<dim>::interpolate_dual_solution (Vector<double> &inter
 
 template <int dim>
 void TimeStep_Postprocess<dim>::StatisticData::
-write_descriptions (ostream &out,
+write_descriptions (std::ostream &out,
 		    const WaveParameters<dim> &parameters) 
 {
-  for (typename list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
+  for (typename std::list<EvaluationBase<dim>*>::const_iterator i = parameters.eval_list.begin();
        i != parameters.eval_list.end(); ++i)
-    out << "#    " << (*i)->description() << endl;
+    out << "#    " << (*i)->description() << std::endl;
 };
 
 
 template <int dim>
-void TimeStep_Postprocess<dim>::StatisticData::write (ostream &out) const
+void TimeStep_Postprocess<dim>::StatisticData::write (std::ostream &out) const
 {
   for (unsigned int i=0; i<evaluation_results.size(); ++i)
     out << evaluation_results[i]*100000 << ' ';
@@ -6994,7 +6998,7 @@ template class TimeStep_Postprocess<2>;
 
 
 template <int dim>
-TimeStep_Primal<dim>::TimeStep_Primal (const string &primal_fe)
+TimeStep_Primal<dim>::TimeStep_Primal (const std::string &primal_fe)
 		:
 		TimeStep_Wave<dim> (primal_fe)
 {};
@@ -7030,9 +7034,9 @@ void TimeStep_Primal<dim>::do_initial_step ()
 							       dof_handler->n_dofs(),
 							       0,
 							       0,
-							       make_pair (0.0, 0.0));
+							       std::make_pair (0.0, 0.0));
 
-  deallog << "." << endl;
+  deallog << "." << std::endl;
 };
 
 
@@ -7087,7 +7091,7 @@ assemble_vectors (right_hand_side1, right_hand_side2);
       parameters.boundary_values_u->set_time (time);
       parameters.boundary_values_v->set_time (time);
       
-      map<unsigned int,double> boundary_value_list;
+      std::map<unsigned int,double> boundary_value_list;
       VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_u),
 						     boundary_value_list);
@@ -7111,7 +7115,7 @@ assemble_vectors (right_hand_side1, right_hand_side2);
 
   if (dim != 1)
     {
-      map<unsigned int,double> boundary_value_list;
+      std::map<unsigned int,double> boundary_value_list;
       VectorTools::interpolate_boundary_values (*dof_handler, 0,
 						     *(parameters.boundary_values_v),
 						     boundary_value_list);
@@ -7137,7 +7141,7 @@ if (parameters.extrapolate_old_solutions)
 							       solver_steps2,
 							       compute_energy ());
   
-  deallog << "." << endl;
+  deallog << "." << std::endl;
 };
 
 
@@ -7154,7 +7158,7 @@ void TimeStep_Primal<dim>::solve_primal_problem ()
 
 
 template <int dim>
-string TimeStep_Primal<dim>::branch_signature () const 
+std::string TimeStep_Primal<dim>::branch_signature () const 
 {
   return "p";
 };
@@ -7249,10 +7253,10 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
 
       FullMatrix<double>                    cell_matrix (dofs_per_cell, dofs_per_cell);
       const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-      const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-      const vector<double>                 &weights   = fe_values.get_JxW_values ();
+      const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+      const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
-      vector<double> density_values(fe_values.n_quadrature_points);
+      std::vector<double> density_values(fe_values.n_quadrature_points);
       parameters.density->value_list (fe_values.get_quadrature_points(),
 				      density_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -7279,7 +7283,7 @@ TimeStep_Primal<dim>::build_rhs (const DoFHandler<dim>::cell_iterator &old_cell,
       cell_matrix.vmult (local_M_v, tmp);
 
       cell_matrix.clear ();
-      vector<double> stiffness_values(fe_values.n_quadrature_points);
+      std::vector<double> stiffness_values(fe_values.n_quadrature_points);
       parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -7303,7 +7307,7 @@ rhs1 = local_M_u;
 		time_step,
 		local_A_u);
 
-      vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
+      std::vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -7322,7 +7326,7 @@ rhs1 = local_M_u;
 
       collect_from_children (old_cell, fe_values, rhs1, rhs2);
 
-      vector<unsigned int> new_dof_indices (dofs_per_cell);
+      std::vector<unsigned int> new_dof_indices (dofs_per_cell);
       new_cell->get_dof_indices (new_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	{
@@ -7389,20 +7393,20 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 	{
 	  const unsigned int l = collect_from_children (old_child, fe_values,
 							child_rhs1, child_rhs2);
-	  level_difference = max (l+1, level_difference);
+	  level_difference = std::max (l+1, level_difference);
 	}
       else
 	{
 	  fe_values.reinit (old_child);
 	  const FullMatrix<double>             &values    = fe_values.get_shape_values ();
-	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
+	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
 	  old_child->get_dof_values (previous_time_level.u, local_old_dof_values_u);
 	  old_child->get_dof_values (previous_time_level.v, local_old_dof_values_v);
       
 	  cell_matrix.clear ();
-	  vector<double> density_values(fe_values.n_quadrature_points);
+	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
 					  density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -7418,7 +7422,7 @@ FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
       
 	  cell_matrix.clear ();
 
-	  vector<double> stiffness_values(fe_values.n_quadrature_points);
+	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 					    stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -7475,7 +7479,7 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 
   Vector<double> rhs2 (dofs_per_cell);
 	    
-  vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
+  std::vector<unsigned int> new_dof_indices (dofs_per_cell, DoFHandler<dim>::invalid_dof_index);
 
 
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
@@ -7494,17 +7498,17 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 							 local_old_dof_values_v,
 							 right_hand_side1,
 							 right_hand_side2);
-	  level_difference = max (l+1, level_difference);
+	  level_difference = std::max (l+1, level_difference);
 	}
       else
 	{
 	  fe_values.reinit (new_child);
 	  const FullMatrix<double>             &values = fe_values.get_shape_values ();
-	  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
-	  const vector<double>                 &weights   = fe_values.get_JxW_values ();
+	  const std::vector<std::vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+	  const std::vector<double>                 &weights   = fe_values.get_JxW_values ();
 
 	  cell_matrix.clear ();
-	  vector<double> density_values(fe_values.n_quadrature_points);
+	  std::vector<double> density_values(fe_values.n_quadrature_points);
 	  parameters.density->value_list (fe_values.get_quadrature_points(),
 					      density_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -7519,7 +7523,7 @@ TimeStep_Primal<dim>::distribute_to_children (const DoFHandler<dim>::cell_iterat
 	  cell_matrix.vmult (local_M_v, local_old_dof_values_v);
 
 	  cell_matrix.clear ();
-	  vector<double> stiffness_values(fe_values.n_quadrature_points);
+	  std::vector<double> stiffness_values(fe_values.n_quadrature_points);
 	  parameters.stiffness->value_list (fe_values.get_quadrature_points(),
 						stiffness_values);
 	  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -7613,7 +7617,7 @@ const QGauss7<2-1> FEHelper<2>::q_gauss_7_face;
 
 
 template <int dim>
-const FiniteElement<dim> & FEHelper<dim>::get_fe (const string &name) {
+const FiniteElement<dim> & FEHelper<dim>::get_fe (const std::string &name) {
   if (name=="linear")
     return fe_linear;
   else
@@ -7635,7 +7639,7 @@ const FiniteElement<dim> & FEHelper<dim>::get_fe (const string &name) {
 
 
 template <int dim>
-const Quadrature<dim> &FEHelper<dim>::get_quadrature (const string &name) {
+const Quadrature<dim> &FEHelper<dim>::get_quadrature (const std::string &name) {
   if (name=="linear")
     return q_gauss_2;
   else
@@ -7657,14 +7661,14 @@ const Quadrature<dim> &FEHelper<dim>::get_quadrature (const string &name) {
 
 
 template <>
-const Quadrature<0> &FEHelper<1>::get_quadrature_face (const string &) {
+const Quadrature<0> &FEHelper<1>::get_quadrature_face (const std::string &) {
   static const Quadrature<0> dummy_quadrature(1);
   return dummy_quadrature;
 };
 
 
 template <int dim>
-const Quadrature<dim-1> &FEHelper<dim>::get_quadrature_face (const string &name) {
+const Quadrature<dim-1> &FEHelper<dim>::get_quadrature_face (const std::string &name) {
   if (name=="linear")
     return q_gauss_2_face;
   else
@@ -7685,8 +7689,8 @@ const Quadrature<dim-1> &FEHelper<dim>::get_quadrature_face (const string &name)
 };
 
 
-string int_to_string (const unsigned int i, const unsigned int digits) {
-  string s;
+std::string int_to_string (const unsigned int i, const unsigned int digits) {
+  std::string s;
   switch (digits) 
     {
       case 4:
@@ -7788,7 +7792,7 @@ void WaveProblem<dim>::run (ParameterHandler &prm)
 int main ()
 {
   deallog.attach(logfile);
-  logfile.setf(ios::fixed);
+  logfile.setf(std::ios::fixed);
   logfile.precision (2);
   deallog.depth_console(0);
 
@@ -7801,15 +7805,15 @@ int main ()
     {
       input_data.read_input ("wave-test-3.prm");
     }
-  catch (exception &e)
+  catch (std::exception &e)
     {
-      cerr << endl << endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on input: " << e.what() << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      std::cerr << "Exception on input: " << e.what() << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
       return 1;
     };
 
@@ -7817,26 +7821,26 @@ int main ()
     {
       input_data.loop (waves);
     }
-  catch (exception &e)
+  catch (std::exception &e)
     {
-      cerr << endl << endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Exception on processing: " << e.what() << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      std::cerr << "Exception on processing: " << e.what() << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
       return 2;
     }
   catch (...) 
     {
-      cerr << endl << endl
+      std::cerr << std::endl << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
-      cerr << "Unknown exception!" << endl
-	   << "Aborting!" << endl
+	   << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+	   << "Aborting!" << std::endl
 	   << "----------------------------------------------------"
-	   << endl;
+	   << std::endl;
       return 3;
     };
 

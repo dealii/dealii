@@ -201,9 +201,9 @@ check ()
 
 int main ()
 {
-  ofstream logfile ("matrices.output");
+  std::ofstream logfile ("matrices.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console (0);
 

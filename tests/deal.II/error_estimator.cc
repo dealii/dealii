@@ -112,9 +112,9 @@ check ()
 
 int main ()
 {
-  ofstream logfile ("error_estimator.output");
+  std::ofstream logfile ("error_estimator.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console (0);
 

@@ -75,9 +75,9 @@ check ()
 
 int main ()
 {
-  ofstream logfile ("derivative_approximation.output");
+  std::ofstream logfile ("derivative_approximation.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console (0);
 

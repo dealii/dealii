@@ -69,8 +69,8 @@ extern void write_gnuplot (const MGDoFHandler<2>& dofs,
 
 int main()
 {
-  ofstream logfile("mglocal.output");
-  //  logfile.setf(ios::fixed);
+  std::ofstream logfile("mglocal.output");
+  //  logfile.setf(std::ios::fixed);
   //  logfile.precision (3);
   deallog.attach(logfile);
 //  deallog.log_execution_time(true);
@@ -126,7 +126,7 @@ int main()
 
 	  if (false)
 	    {
-	      ofstream out_file("MGf");
+	      std::ofstream out_file("MGf");
 	      DataOut<2> out;
 	      out.attach_dof_handler(dof);
 	      out.add_data_vector(f, "v");
@@ -186,7 +186,7 @@ Multigrid<2> multigrid(mgdof, hanging_nodes, mgstruct, mgA, transfer, tr.n_level
 
 	      sprintf(name, "MG-Q%d-%d", degree, step);
 	  
-	      ofstream ofile(name);
+	      std::ofstream ofile(name);
 	      out.attach_dof_handler(dof);
 	      out.add_data_vector(u,"u");
 	      out.add_data_vector(f,"f");

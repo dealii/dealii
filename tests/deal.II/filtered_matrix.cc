@@ -64,7 +64,7 @@ solve_filtered (std::map<unsigned int,double> &bv,
   
   solver.solve (A1, u, f1, prec);
 
-  for (typename std::map<unsigned int,double>::const_iterator i=bv.begin();
+  for (std::map<unsigned int,double>::const_iterator i=bv.begin();
        i!=bv.end(); ++i)
     Assert (std::fabs(u(i->first) - i->second) < 1e-8,
 	    ExcInternalError());
@@ -118,8 +118,8 @@ check ()
 		    update_values | update_gradients
 		    | update_q_points | update_JxW_values);
 
-  vector <unsigned int> global_dofs (element.dofs_per_cell);
-  vector <double> function (quadrature.n_quadrature_points);
+  std::vector <unsigned int> global_dofs (element.dofs_per_cell);
+  std::vector <double> function (quadrature.n_quadrature_points);
 
   Vector<double> f (dof.n_dofs ());
 
@@ -196,9 +196,9 @@ check ()
 
 int main ()
 {
-  ofstream logfile ("filtered_matrix.output");
+  std::ofstream logfile ("filtered_matrix.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
 

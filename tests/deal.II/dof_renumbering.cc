@@ -91,9 +91,9 @@ check ()
 
 int main ()
 {
-  ofstream logfile ("dof_renumbering.output");
+  std::ofstream logfile ("dof_renumbering.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console (0);
 

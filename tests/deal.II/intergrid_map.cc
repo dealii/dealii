@@ -101,7 +101,7 @@ void check ()
 
 int main ()
 {
-  ofstream logfile("intergrid_map.output");
+  std::ofstream logfile("intergrid_map.output");
   logfile.precision(2);
   
   deallog.attach(logfile);

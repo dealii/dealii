@@ -40,7 +40,7 @@ int main ()
   GridOut grid_out;
   if (false)
     {
-      ofstream eps_stream1("grid_untransformed.output");
+      std::ofstream eps_stream1("grid_untransformed.output");
       grid_out.write_eps(tria, eps_stream1, &mapping);
     }
   
@@ -73,7 +73,7 @@ int main ()
 						       // leave the
 						       // point, where
 						       // they are.
-		      new_points.insert(pair<unsigned int, Point<dim> > (
+		      new_points.insert(std::pair<unsigned int, Point<dim> > (
 			face->vertex_index(vertex_no), v));
 		    }
 		  else if (fabs(sqrt(v.square())-inner_radius)<1e-15)
@@ -87,7 +87,7 @@ int main ()
 						       // the radius
 						       // of the
 						       // circle.
-		      new_points.insert(pair<unsigned int, Point<dim> > (
+		      new_points.insert(std::pair<unsigned int, Point<dim> > (
 			face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
 		      face->set_boundary_indicator(1);
 		    }
@@ -100,16 +100,16 @@ int main ()
 				   // test output
   if (false)
     {
-      cout << "New points:" << endl;
+      std::cout << "New points:" << std::endl;
       std::map<unsigned int,Point<dim> >::const_iterator map_iter;
       for (map_iter=new_points.begin(); map_iter!=new_points.end(); ++map_iter)
-	cout << "vertex " << map_iter->first << ": " << map_iter->second << endl;
+	std::cout << "vertex " << map_iter->first << ": " << map_iter->second << std::endl;
     }
 
   GridGenerator::laplace_transformation (tria, new_points);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);
-  ofstream eps_stream2("grid_transform.output");
+  std::ofstream eps_stream2("grid_transform.output");
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
   tria.clear();

@@ -223,7 +223,7 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
       {
 	const unsigned int n_dofs = dof_handler.n_dofs();
 	const unsigned int block_size_[2] = { n_dofs/3, n_dofs - n_dofs/3 };
-	const vector<unsigned int> block_size (&block_size_[0],
+	const std::vector<unsigned int> block_size (&block_size_[0],
 					       &block_size_[2]);
 	
 	solution.reinit (block_size);
@@ -236,7 +236,7 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
       {
 	const unsigned int n_dofs = dof_handler.n_dofs();
 	const unsigned int block_size_[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
-	const vector<unsigned int> block_size (&block_size_[0],
+	const std::vector<unsigned int> block_size (&block_size_[0],
 					       &block_size_[3]);
 	
 	solution.reinit (block_size);
@@ -267,7 +267,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   ::Vector<double>     cell_rhs (dofs_per_cell);
 
-  vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
 				      endc = dof_handler.end();
@@ -304,7 +304,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
     };
 
 
-  map<unsigned int,double> boundary_values;
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<2>(),
@@ -351,7 +351,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
 
 int main () 
 {
-  ofstream logfile("block_matrices.output");
+  std::ofstream logfile("block_matrices.output");
   logfile.precision(2);
   
   deallog.attach(logfile);
@@ -359,7 +359,7 @@ int main ()
   
 
 				   // vector of solution vectors
-  vector<vector<double> > solutions;
+  std::vector<std::vector<double> > solutions;
 
   if (true)
     {
@@ -367,7 +367,7 @@ int main ()
 	laplace_problem (2);
       laplace_problem.run ();
       
-      solutions.push_back (vector<double>());
+      solutions.push_back (std::vector<double>());
       solutions.back().resize (laplace_problem.solution.size());
       for (unsigned int i=0; i<laplace_problem.solution.size(); ++i)
 	solutions.back()[i] = laplace_problem.solution(i);
@@ -379,7 +379,7 @@ int main ()
 	laplace_problem (3);
       laplace_problem.run ();
       
-      solutions.push_back (vector<double>());
+      solutions.push_back (std::vector<double>());
       solutions.back().resize (laplace_problem.solution.size());
       for (unsigned int i=0; i<laplace_problem.solution.size(); ++i)
 	solutions.back()[i] = laplace_problem.solution(i);
@@ -391,7 +391,7 @@ int main ()
 	laplace_problem (2);
       laplace_problem.run ();
       
-      solutions.push_back (vector<double>());
+      solutions.push_back (std::vector<double>());
       solutions.back().resize (laplace_problem.solution.size());
       for (unsigned int i=0; i<laplace_problem.solution.size(); ++i)
 	solutions.back()[i] = laplace_problem.solution(i);
@@ -403,7 +403,7 @@ int main ()
 	laplace_problem (3);  
       laplace_problem.run ();
       
-      solutions.push_back (vector<double>());
+      solutions.push_back (std::vector<double>());
       solutions.back().resize (laplace_problem.solution.size());
       for (unsigned int i=0; i<laplace_problem.solution.size(); ++i)
 	solutions.back()[i] = laplace_problem.solution(i);
@@ -433,7 +433,7 @@ int main ()
 		    << ", sol[i][j]=" << solutions[i][j]
 		    << ", sol[0][j]=" << solutions[0][j]
 		    << std::endl;
-	    deallog << flush;
+	    deallog << std::flush;
 	    Assert (false, ExcInternalError());
 	  };
     };

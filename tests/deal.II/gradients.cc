@@ -30,7 +30,7 @@
 
 int main ()
 {
-  ofstream logfile("gradients.output");
+  std::ofstream logfile("gradients.output");
 				   // limit output a bit
   logfile.precision (3);
   deallog.attach(logfile);
@@ -62,7 +62,7 @@ Vector<double> val(4);
       val.clear ();
       val(vertex) = 1;
 
-      vector<Tensor<1,2> > grads(4);
+      std::vector<Tensor<1,2> > grads(4);
       fevalues.get_function_grads (val, grads);
 
 

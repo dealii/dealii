@@ -72,8 +72,8 @@ check (const unsigned int level,
 		    update_values
 		    | update_q_points | update_JxW_values);
 
-  vector <unsigned int> global_dofs (element.dofs_per_cell);
-  vector <double> function (quadrature.n_quadrature_points);
+  std::vector <unsigned int> global_dofs (element.dofs_per_cell);
+  std::vector <double> function (quadrature.n_quadrature_points);
 
   Vector<double> u (dof.n_dofs ());
   Vector<double> f (dof.n_dofs ());
@@ -130,11 +130,11 @@ check (const unsigned int level,
   double h1 = 0.;
   double h2 = 0.;
 
-  vector<double> u_local (quadrature.n_quadrature_points);
-  vector<Tensor<1,dim> > Du (quadrature.n_quadrature_points);
-  vector<Tensor<1,dim> > Df (quadrature.n_quadrature_points);
-  vector<Tensor<2,dim> > DDu (quadrature.n_quadrature_points);
-  vector<Tensor<2,dim> > DDf (quadrature.n_quadrature_points);
+  std::vector<double> u_local (quadrature.n_quadrature_points);
+  std::vector<Tensor<1,dim> > Du (quadrature.n_quadrature_points);
+  std::vector<Tensor<1,dim> > Df (quadrature.n_quadrature_points);
+  std::vector<Tensor<2,dim> > DDu (quadrature.n_quadrature_points);
+  std::vector<Tensor<2,dim> > DDf (quadrature.n_quadrature_points);
   
   for (cell = dof.begin_active(); cell != end;++cell)
     {
@@ -177,12 +177,12 @@ void loop ()
 {
   QGauss<dim> gauss((dim<3) ? 5 : 3);
 
-  vector<Mapping<dim>*> maps;
+  std::vector<Mapping<dim>*> maps;
 //  maps.push_back (new MappingCartesian<dim>);
   maps.push_back (new MappingQ1<dim>);
   maps.push_back (new MappingQ<dim>(2));
 
-  vector<FiniteElement<dim>*> elements;
+  std::vector<FiniteElement<dim>*> elements;
   elements.push_back (new FE_Q<dim> (1));
   elements.push_back (new FE_Q<dim> (2));
   if (dim<3)
@@ -210,9 +210,9 @@ void loop ()
 
 int main ()
 {
-  ofstream logfile ("derivatives.output");
+  std::ofstream logfile ("derivatives.output");
   logfile.precision (2);
-  logfile.setf(ios::fixed);  
+  logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   if (!errors) deallog.depth_console(0);
 

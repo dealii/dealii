@@ -71,7 +71,7 @@ int main()
 {
   try 
     {
-  ofstream logfile("mg.output");
+  std::ofstream logfile("mg.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
