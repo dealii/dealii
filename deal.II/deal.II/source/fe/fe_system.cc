@@ -573,6 +573,8 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 			     typename Mapping<dim>::InternalDataBase       &fedata,
 			     FEValuesData<dim>                    &data) const
 {       
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  
 				   // convert data object to internal
 				   // data for this class. fails with
 				   // an exception if that is not
@@ -621,9 +623,7 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 					       // for the base elements.
 	      FEValuesData<dim> &base_data=fe_data.get_fe_values_data(base_no);
 	      const FiniteElement<dim> &base_fe=base_element(base_no);
-	      base_data.initialize(quadrature.n_quadrature_points,
-				   base_fe,
-				   base_update_flags);
+	      base_data.initialize (n_q_points, base_fe, base_update_flags);
 	    }
 	}
       
@@ -670,6 +670,33 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	    base_fe_data = fe_data.get_fe_data(base_no);
 	  FEValuesData<dim> &
             base_data    = fe_data.get_fe_values_data(base_no);
+
+                                           // Make sure that in the
+                                           // case of fill_fe_values
+                                           // the data is only copied
+                                           // from base_data to data
+                                           // if base_data is
+                                           // changed. therefore use
+                                           // fe_fe_data.current_update_flags()
+                                           //
+                                           // for the case of
+                                           // fill_fe_(sub)face_values
+                                           // the data needs to be
+                                           // copied from base_data to
+                                           // data on each face,
+                                           // therefore use
+                                           // base_fe_data.update_flags.
+                                           //
+                                           // Store these flags into
+                                           // base_flags before
+                                           // calling
+                                           // base_fe.fill_fe_([sub]face_)values
+                                           // as the latter changes
+                                           // the return value of
+                                           // base_fe_data.current_update_flags()
+          const UpdateFlags base_flags(dim_1==dim ?
+                                       base_fe_data.current_update_flags() :
+                                       base_fe_data.update_flags);	  
           
 	  if (face_no==invalid_face_number)
 	    base_fe.fill_fe_values(mapping, cell,
@@ -680,134 +707,92 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
 	  else
 	    base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
 					   *face_quadrature, mapping_data, base_fe_data, base_data);
+
+                                           // now data has been
+                                           // generated, so copy
+                                           // it. we used to work by
+                                           // looping over all base
+                                           // elements (i.e. this
+                                           // outer loop), then over
+                                           // multiplicity, then over
+                                           // the shape functions from
+                                           // that base element, but
+                                           // that requires that we
+                                           // can infer the global
+                                           // number of a shape
+                                           // function from its number
+                                           // in the base element. for
+                                           // that we had the
+                                           // component_to_system_table.
+                                           //
+                                           // however, this does of
+                                           // course no longer work
+                                           // since we have
+                                           // non-primitive
+                                           // elements. so we go the
+                                           // other way round: loop
+                                           // over all shape functions
+                                           // of the composed element,
+                                           // and here only treat
+                                           // those shape functions
+                                           // that belong to a given
+                                           // base element
+          for (unsigned int system_index=0; system_index<this->dofs_per_cell;
+               ++system_index)
+            if (this->system_to_base_table[system_index].first.first == base_no)
+              {
+                const unsigned int
+                  base_index = system_to_base_table[system_index].second;
+                Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
+
+                                                 // now copy. if the
+                                                 // shape function is
+                                                 // primitive, then
+                                                 // there is only one
+                                                 // value to be copied,
+                                                 // but for
+                                                 // non-primitive
+                                                 // elements, there
+                                                 // might be more values
+                                                 // to be copied
+                                                 //
+                                                 // so, find out from
+                                                 // which index to take
+                                                 // this one value, and
+                                                 // to which index to
+                                                 // put
+                unsigned int out_index = 0;
+                for (unsigned int i=0; i<system_index; ++i)
+                  out_index += this->n_nonzero_components(i);
+                unsigned int in_index = 0;
+                for (unsigned int i=0; i<base_index; ++i)
+                  in_index += base_fe.n_nonzero_components(i);
+                
+                                                 // then loop over the
+                                                 // number of components
+                                                 // to be copied
+                Assert (this->n_nonzero_components(system_index) ==
+                        base_fe.n_nonzero_components(base_index),
+                        ExcInternalError());
+                for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+                  {
+                    if (base_flags & update_values)
+                      for (unsigned int q=0; q<n_q_points; ++q)
+                        data.shape_values[out_index+s][q] =
+                          base_data.shape_values(in_index+s,q);
+                    
+                    if (base_flags & update_gradients)
+                      for (unsigned int q=0; q<n_q_points; ++q)
+                        data.shape_gradients[out_index+s][q]=
+                          base_data.shape_gradients[in_index+s][q];
+                    
+                    if (base_flags & update_second_derivatives)
+                      for (unsigned int q=0; q<n_q_points; ++q)
+                        data.shape_2nd_derivatives[out_index+s][q]=
+                          base_data.shape_2nd_derivatives[in_index+s][q];
+                  };
+              };
         };
-
-                                       // now data has been generated,
-                                       // so copy it. we used to work
-                                       // by looping over all base
-                                       // elements, then over
-                                       // multiplicity, then over the
-                                       // shape functions from that
-                                       // base element, but that
-                                       // requires that we can infer
-                                       // the global number of a shape
-                                       // function from its number in
-                                       // the base element. for that
-                                       // we had the
-                                       // component_to_system_table.
-                                       //
-                                       // however, this does of course
-                                       // no longer work since we have
-                                       // non-primitive elements. so
-                                       // we go the other way round:
-                                       // loop over all shape
-                                       // functions of the composed
-                                       // element, and find from where
-                                       // to copy the data. to be able
-                                       // to cache some data, make
-                                       // things a little bit more
-                                       // complicated: loop over all
-                                       // base elements, then over all
-                                       // shape functions of the
-                                       // composed element, and only
-                                       // treat those shape functions
-                                       // that belong to a given base
-                                       // element
-      for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
-        for (unsigned int system_index=0; system_index<this->dofs_per_cell;
-             ++system_index)
-          if (this->system_to_base_table[system_index].first.first == base_no)
-            {
-              const FiniteElement<dim> &
-                base_fe      = base_element(base_no);
-              typename FiniteElementBase<dim>::InternalDataBase &
-                base_fe_data = fe_data.get_fe_data(base_no);
-              FEValuesData<dim> &
-                base_data    = fe_data.get_fe_values_data(base_no);
-
-              const unsigned int n_q_points = quadrature.n_quadrature_points;
-              
-                                               // Make sure that in
-                                               // the case of
-                                               // fill_fe_values the
-                                               // data is only copied
-                                               // from base_data to
-                                               // data if base_data is
-                                               // changed. therefore
-                                               // use
-                                               // fe_fe_data.current_update_flags()
-                                               //
-                                               // for the case of
-                                               // fill_fe_(sub)face_values
-                                               // the data needs to be
-                                               // copied from
-                                               // base_data to data on
-                                               // each face, therefore
-                                               // use
-                                               // base_fe_data.update_flags.
-                                               //
-                                               // Store these flags into
-                                               // base_flags before
-                                               // calling
-                                               // base_fe.fill_fe_([sub]face_)values
-                                               // as the latter changes
-                                               // the return value of
-                                               // base_fe_data.current_update_flags()
-              const UpdateFlags base_flags(dim_1==dim ?
-                                           base_fe_data.current_update_flags() :
-                                           base_fe_data.update_flags);	  
-
-              const unsigned int k = system_to_base_table[system_index].second;
-              Assert (k<base_fe.dofs_per_cell, ExcInternalError());
-
-                                               // now copy. if the
-                                               // shape function is
-                                               // primitive, then
-                                               // there is only one
-                                               // value to be copied,
-                                               // but for
-                                               // non-primitive
-                                               // elements, there
-                                               // might be more values
-                                               // to be copied
-                                               //
-                                               // so, find out from
-                                               // which index to take
-                                               // this one value, and
-                                               // to which index to
-                                               // put
-              unsigned int out_index = 0;
-              for (unsigned int i=0; i<system_index; ++i)
-                out_index += this->n_nonzero_components(i);
-              unsigned int in_index = 0;
-              for (unsigned int i=0; i<k; ++i)
-                in_index += base_fe.n_nonzero_components(i);
-
-                                               // then loop over the
-                                               // number of components
-                                               // to be copied
-              Assert (this->n_nonzero_components(system_index) ==
-                      base_fe.n_nonzero_components(k),
-                      ExcInternalError());
-              for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                {
-                  if (base_flags & update_values)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      data.shape_values[out_index+s][q] =
-                        base_data.shape_values(in_index+s,q);
-              
-                  if (base_flags & update_gradients)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      data.shape_gradients[out_index+s][q]=
-                        base_data.shape_gradients[in_index+s][q];
-              
-                  if (base_flags & update_second_derivatives)
-                    for (unsigned int q=0; q<n_q_points; ++q)
-                      data.shape_2nd_derivatives[out_index+s][q]=
-                        base_data.shape_2nd_derivatives[in_index+s][q];
-                };
-            };
-  
 
       if (fe_data.first_cell)
 	{
@@ -842,9 +827,9 @@ FESystem<dim>::compute_fill (const Mapping<dim>                   &mapping,
       unsigned int offset = 0;
       if (face_no != invalid_face_number)
 	offset = (sub_no == invalid_face_number)
-		 ? face_no * quadrature.n_quadrature_points
+		 ? face_no * n_q_points
 		 :(face_no * GeometryInfo<dim>::subfaces_per_face
-		   + sub_no) * quadrature.n_quadrature_points;  
+		   + sub_no) * n_q_points;
       compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
     }
 }
