@@ -41,10 +41,10 @@ configuration.</p>
 
 <h3>Enable/disable configured options</h3>
 
-<p>Some of the features of the library are turned on and of by
+<p>Some of the features of the library are turned on and off by
 <TT>--enable-xxx</TT> and <TT>--with-xxx=yyy</TT> options to
 configure. These user-supplied parameters can be changed by modifying
-related variables: for example, to turn of shared libraries on aix,
+related variables: for example, to turn off shared libraries on aix,
 enter the following in the operating system case-block
 <pre>
    *-aix*) enableshared=no ;;
@@ -53,15 +53,15 @@ enter the following in the operating system case-block
 
 <h3>Preprocessor variables</h3>
 
-<p>Some features of the library can be turned on or of by preprocessor
+<p>Some features of the library can be turned on or off by preprocessor
 symbols. The following commands can be used:
 <dl>
 
 <dt><TT>throw_opt=-DNO_THROW</TT></dt>
-<dd>Turn of throwing exceptions in optimized mode.</dd>
+<dd>Turn off throwing exceptions in optimized mode.</dd>
 
 <dt><TT>AC_DEFINE(QUIET_SUBSCRIPTOR)</dt>
-<dd>Turn of type information in <CODE class="class">Subscriptor</CODE>.
+<dd>Turn off type information in <CODE class="class">Subscriptor</CODE>.
 Helps to save memory (not much though) and is necessary if your
 compiler does not implement RTTI.
 </dl>
