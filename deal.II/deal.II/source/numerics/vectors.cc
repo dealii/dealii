@@ -121,13 +121,14 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 					    endf = dof.end_face();
       vector<int> face_dof_indices (fe.dofs_per_face);
       for (; face!=endf; ++face)
-	{
-	  face->get_dof_indices (face_dof_indices);
-	  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-					     // enter zero boundary values
-					     // for all boundary nodes
-	    boundary_values[face_dof_indices[i]] = 0.;
-	};
+	if (face->at_boundary())
+	  {
+	    face->get_dof_indices (face_dof_indices);
+	    for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+					       // enter zero boundary values
+					       // for all boundary nodes
+	      boundary_values[face_dof_indices[i]] = 0.;
+	  };
     }
   else
 				     // no homogeneous boundary values
