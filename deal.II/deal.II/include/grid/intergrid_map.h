@@ -114,9 +114,10 @@ class InterGridMap
 {
   public:
 
-#if (__GNUC__==2) && (__GNUC_MINOR__==95)
+#ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF
 				     // helper class
-    struct GridClass_dim : public GridClass<dim> {
+    struct GridClass_dim : public GridClass<dim>
+    {
 					 // constructor. will
 					 // not be implemented,
 					 // but suppresses compiler

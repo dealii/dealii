@@ -1771,6 +1771,62 @@ AC_DEFUN(DEAL_II_CHECK_IMPLEMENTED_PURE_FUNCTION_BUG, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl gcc 2.95 dies on this construct:
+dnl -----------------------------
+dnl template <int dim> struct TT { typedef int type; };
+dnl
+dnl template <template <int> class T> struct X {
+dnl     typedef typename T<1>::type type;
+dnl     void foo (type t);
+dnl };
+dnl
+dnl template <template <int> class T>
+dnl void X<T>::foo (type t) {};
+dnl
+dnl template struct X<TT>;
+dnl -----------------------------
+dnl
+dnl We work around this problem, if we encounter it.
+dnl
+dnl Usage: DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TEMPLATE_TEMPLATE_TYPEDEF_BUG, dnl
+[
+  AC_MSG_CHECKING(for template template typedef bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	template <int dim> struct TT { typedef int type; };
+
+	template <template <int> class T> struct X {
+	    typedef typename T<1>::type type;
+	    void foo (type t);
+	};
+
+	template <template <int> class T>
+	void X<T>::foo (type t) {};
+
+	template struct X<TT>;
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. using workaround)
+      AC_DEFINE(DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG, 1, 
+                     [Defined if the compiler refuses to allow a typedef
+                      to a template template class template parameter. For
+                      the exact failure mode, look at aclocal.m4 in the
+                      top-level directory.])
+    ])
+])
+
+
+
 
 dnl -------------------------------------------------------------
 dnl gcc2.95 doesn't have the std::iterator class, but the standard
