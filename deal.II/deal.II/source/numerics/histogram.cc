@@ -70,82 +70,67 @@ void Histogram::evaluate (const typename std::vector<Vector<number> > &values,
   switch (interval_spacing)
     {
       case linear:
-	    min_value = *std::min_element(values[0].begin(),
-				     values[0].end());
-	    max_value = *std::max_element(values[0].begin(),
-				     values[0].end());
-
-	    for (unsigned int i=1; i<values.size(); ++i)
-	      {
-		min_value = std::min (min_value,
-				 *std::min_element(values[i].begin(),
-					      values[i].end()));
-		max_value = std::max (max_value,
-				 *std::max_element(values[i].begin(),
-					      values[i].end()));
-	      };
-	    
-	    break;
-	    
+      {
+	min_value = *std::min_element(values[0].begin(),
+				      values[0].end());
+	max_value = *std::max_element(values[0].begin(),
+				      values[0].end());
+	
+	for (unsigned int i=1; i<values.size(); ++i)
+	  {
+	    min_value = std::min (min_value,
+				  *std::min_element(values[i].begin(),
+						    values[i].end()));
+	    max_value = std::max (max_value,
+				  *std::max_element(values[i].begin(),
+						    values[i].end()));
+	  };
+	
+	break;
+      };
+       
       case logarithmic:
-	    min_value = *std::min_element(values[0].begin(),
-					  values[0].end(),
-#if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
-				     &logarithmic_less<number>
+      {
+	typedef bool (*comparator) (const number, const number);
+	const comparator logarithmic_less_function
+	  =
+#ifdef __GNU_CC
+#if (__GNUC__==2) && (__GNUC_MINOR__ < 95)
+	  &logarithmic_less<number>
 #else
-				     &Histogram::template logarithmic_less<number>
+	  &Histogram::template logarithmic_less<number>
 #endif
-	    );
+#else
+	  &Histogram::template logarithmic_less<number>	  
+#endif
+	  ;
+	
+	min_value = *std::min_element(values[0].begin(),
+				      values[0].end(),
+				      logarithmic_less_function);
+	
+	max_value = *std::max_element(values[0].begin(),
+				      values[0].end(),
+				      logarithmic_less_function);
+	
+	for (unsigned int i=1; i<values.size(); ++i)
+	  {
+	    min_value = std::min (min_value,
+				  *std::min_element(values[i].begin(),
+						    values[i].end(),
+						    logarithmic_less_function),
+				  logarithmic_less_function);
 	    
-	    max_value = *std::max_element(values[0].begin(),
-				     values[0].end(),
-#if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
-				     &logarithmic_less<number>
-#else
-				     &Histogram::template logarithmic_less<number>
-#endif
-	    );
-
-
-	    for (unsigned int i=1; i<values.size(); ++i)
-	      {
-		min_value = std::min (min_value,
-				 *std::min_element(values[i].begin(),
-					      values[i].end(),
-#if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
-					      &logarithmic_less<number>
-#else
-					      &Histogram::template logarithmic_less<number>
-#endif
-				 ),
-
-#if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
-				 &logarithmic_less<number>
-#else
-				 &Histogram::template logarithmic_less<number>
-#endif
-		);
-
-		max_value = std::max (max_value,
-				 *std::max_element(values[i].begin(),
-					      values[i].end(),
-#if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
-					      &logarithmic_less<number>
-#else
-					      &Histogram::template logarithmic_less<number>
-#endif
-				 ),
-
-#if (__GNUC__-0==2) && (__GNUC_MINOR__-0 < 95)
-				 &logarithmic_less<number>
-#else
-				 &Histogram::template logarithmic_less<number>
-#endif
-		);
-	      };
-	    
-	    break;
-
+	    max_value = std::max (max_value,
+				  *std::max_element(values[i].begin(),
+						    values[i].end(),
+						    logarithmic_less_function),
+				  logarithmic_less_function);
+	  };
+	
+	break;
+      };
+       
       default:
 	    Assert (false, ExcInternalError());
     };
