@@ -16,7 +16,7 @@
 
 #include <dofs/dof_constraints.h>
 #include <numerics/data_out.h>
-#include <multigrid/multigrid.h>
+#include <multigrid/mg_base.h>
 #include <algorithm>
 #include <fstream>
 

@@ -195,7 +195,15 @@ class Multigrid : public Subscriptor
 				      */
     SmartPointer<const MGSmoother<VECTOR> > post_smooth;
     
-    
+				     /**
+				      * Edge matrix from fine to coarse.
+				      */
+    SmartPointer<const MGMatrixBase<VECTOR> > edge_down;
+
+				     /**
+				      * Transpose edge matrix from coarse to fine.
+				      */
+    SmartPointer<const MGMatrixBase<VECTOR> > edge_up;
 
 				     /**
 				      * Exception.
@@ -290,140 +298,7 @@ class PreconditionMG : public Subscriptor
 };
 
 
-
-
 /* --------------------------- inline functions --------------------- */
-
-
-template <class VECTOR>
-template <int dim>
-Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
-			      const MGMatrixBase<VECTOR>& matrix,
-			      const MGCoarseGrid<VECTOR>& coarse,
-			      const MGTransfer<VECTOR>& transfer,
-			      const MGSmoother<VECTOR>& pre_smooth,
-			      const MGSmoother<VECTOR>& post_smooth,
-			      const unsigned int min_level,
-			      const unsigned int max_level)
-		:
-		minlevel(min_level),
-		maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,
-				  max_level)),
-		defect(minlevel,maxlevel),
-		solution(minlevel,maxlevel),
-		t(minlevel,maxlevel),
-		matrix(&matrix),
-		coarse(&coarse),
-		transfer(&transfer),
-		pre_smooth(&pre_smooth),
-		post_smooth(&post_smooth)
-{
-};
-
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::level_mgstep(const unsigned int level)
-{
-#ifdef MG_DEBUG
-  char *name = new char[100];
-  sprintf(name, "MG%d-defect",level);
-  print_vector(level, defect[level], name);
-#endif
-
-  solution[level] = 0.;
-  
-  if (level == minlevel)
-    {
-      (*coarse)(level, solution[level], defect[level]);
-#ifdef MG_DEBUG
-      sprintf(name, "MG%d-solution",level);
-      print_vector(level, solution[level], name);
-#endif
-      return;
-    }
-
-			   // smoothing of the residual by modifying s
-  pre_smooth->smooth(level, solution[level], defect[level]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-pre",level);
-  print_vector(level, solution[level], name);
-#endif
-  
-				   // t = -A*solution[level]
-  matrix->vmult(level, t[level], solution[level]);
-  t[level].scale(-1);
-  
-				   // make t rhs of lower level
-				   // The non-refined parts of the
-				   // coarse-level defect already contain
-				   // the global defect, the refined parts
-				   // its restriction.
-  for (unsigned int l = level;l>minlevel;--l)
-    {
-      t[l-1] = 0.;
-      transfer->restrict_and_add (l, t[l-1], t[l]);
-      defect[l-1] += t[l-1];
-    }
-
-				   // add additional DG contribution
-//  edge_vmult(level, defect[level-1], defect[level]);
-  
-				   // do recursion
-  level_mgstep(level-1);
-
-				   // reset size of the auxiliary
-				   // vector, since it has been
-				   // resized in the recursive call to
-				   // level_mgstep directly above
-  t[level] = 0.;
-
-				   // do coarse grid correction
-
-  transfer->prolongate(level, t[level], solution[level-1]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-cgc",level);
-  print_vector(level, t, name);
-#endif
-
-  solution[level] += t[level];
-  
-				   // post-smoothing
-  post_smooth->smooth(level, solution[level], defect[level]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-post",level);
-  print_vector(level, solution[level], name);
-
-  delete[] name;
-#endif
-}
-
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::vcycle()
-{
-				   // The defect vector has been
-				   // initialized by copy_to_mg. Now
-				   // adjust the other vectors.
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
-  
-  for (unsigned int level=minlevel; level<=maxlevel;++level)
-    {
-      solution[level].reinit(defect[level]);
-      t[level].reinit(defect[level]);
-    }
-
-  level_mgstep (maxlevel);
-//  abort ();
-}
-
-
-/* ------------------------------------------------------------------- */
 
 
 template<int dim, class VECTOR, class TRANSFER>

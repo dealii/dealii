@@ -130,6 +130,29 @@ class MGMatrixBase : public Subscriptor
 				    */
   virtual void vmult(unsigned int level, VECTOR& dst,
 		     const VECTOR& src) const = 0;
+
+				   /**
+				    * Adding matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void vmult_add(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const = 0;
+
+				   /**
+				    * Transpose
+				    * matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void Tvmult(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const = 0;
+
+				   /**
+				    * Adding transpose
+				    * matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void Tvmult_add(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const = 0;
 };
 
 
@@ -159,6 +182,28 @@ class MGMatrix : public MGMatrixBase<VECTOR>,
     virtual void vmult(unsigned int level, VECTOR& dst,
 		       const VECTOR& src) const;
     
+				   /**
+				    * Adding matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void vmult_add(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const;
+
+				   /**
+				    * Transpose
+				    * matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void Tvmult(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const;
+
+				   /**
+				    * Adding transpose
+				    * matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void Tvmult_add(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const;    
 };
 
 
@@ -370,6 +415,39 @@ MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
 {
   const MGLevelObject<MATRIX>& m = **this;
   m[level].vmult(dst, src);
+}
+
+
+template <class MATRIX, class VECTOR>
+void
+MGMatrix<MATRIX, VECTOR>::vmult_add (unsigned int level,
+				 VECTOR& dst,
+				 const VECTOR& src) const
+{
+  const MGLevelObject<MATRIX>& m = **this;
+  m[level].vmult_add(dst, src);
+}
+
+
+template <class MATRIX, class VECTOR>
+void
+MGMatrix<MATRIX, VECTOR>::Tvmult (unsigned int level,
+				 VECTOR& dst,
+				 const VECTOR& src) const
+{
+  const MGLevelObject<MATRIX>& m = **this;
+  m[level].Tvmult(dst, src);
+}
+
+
+template <class MATRIX, class VECTOR>
+void
+MGMatrix<MATRIX, VECTOR>::Tvmult_add (unsigned int level,
+				 VECTOR& dst,
+				 const VECTOR& src) const
+{
+  const MGLevelObject<MATRIX>& m = **this;
+  m[level].Tvmult_add(dst, src);
 }
 
 

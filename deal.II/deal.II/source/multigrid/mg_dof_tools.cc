@@ -121,8 +121,8 @@ MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 template<int dim, class SparsityPattern>
 void
 MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
-					     SparsityPattern       &sparsity,
-					     const unsigned int level)
+					  SparsityPattern       &sparsity,
+					  const unsigned int level)
 {
   Assert ((level>=1) && (level<dof.get_tria().n_levels()),
 	  ExcIndexRange(level, 1, dof.get_tria().n_levels()));

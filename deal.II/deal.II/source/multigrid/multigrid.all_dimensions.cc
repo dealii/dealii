@@ -17,6 +17,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <multigrid/mg_transfer.h>
+#include <multigrid/multigrid.templates.h>
 
 
 template <typename number>
@@ -134,6 +135,11 @@ void MGTransferSelect<number>::restrict_and_add (
 
 
 // Explicit instantiations
+
+template class Multigrid<Vector<float> >;
+template class Multigrid<Vector<double> >;
+template class Multigrid<BlockVector<float> >;
+template class Multigrid<BlockVector<double> >;
 
 template class MGTransferPrebuilt<float>;
 template class MGTransferPrebuilt<double>;
