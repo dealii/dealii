@@ -311,6 +311,9 @@ class ExpFunction : public Function<dim>
 
 /**
  * Singularity on the L-shaped domain in 2D.
+ *
+ * Caveat: derivatives of this function are not implemented!
+ *
  * @author Guido Kanschat, 1999
  */
 class LSingularityFunction : public Function<2>
@@ -360,6 +363,9 @@ class LSingularityFunction : public Function<2>
 
 /**
  * Singularity on the slit domain in 2D.
+ *
+ * Caveat: derivatives of this function are not implemented!
+ *
  * @author Guido Kanschat, 1999
  */
 class SlitSingularityFunction : public Function<2>

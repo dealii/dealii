@@ -35,9 +35,20 @@ class JobIdentifier
     JobIdentifier();
 
 				     /**
-				      * ???
+				      * This function returns an
+				      * identifier for the running
+				      * program. Currently, the
+				      * library provides a function
+				      * returning "JobID".
+				      *
+				      * The user may define a
+				      * replacement of this function
+				      * in his source code and avoid
+				      * linking the library
+				      * version. Unfortunately, this
+				      * mechanism does not work with
+				      * shared libraries.
 				      */
-//TODO:[GK] document this variable    
     static const char* program_id();
 
 				     /**
