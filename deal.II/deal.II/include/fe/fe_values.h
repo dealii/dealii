@@ -134,9 +134,22 @@ template <int dim> class Quadrature;
  * passed through the constructor. In debug mode, the accessor functions, which
  * return values from the different fields, check whether the required field
  * was initialized, thus avoiding use of unitialized data.
- * 
-  @author Wolfgang Bangerth, 1998
-*/
+ *
+ * Functions should not assume that one flag is needed for another object as
+ * well. For example, the computation of the Jacobi determinant usually
+ * requires the computation of the Jacobi matrix. However, functions shall
+ * not assume that someone who wants to get the #JxW_values# must set the
+ * #update_jacobians# flag besides the #update_JxW_values# flag.
+ *
+ *
+ * It is also forbidden that the constructor of a class set the
+ * #update_jacobians# flag if the user specifies #update_JxW_values#. This is
+ * since derived classes may be able to compute the #JxW_values# field without
+ * the Jacobian matrices, but need to do the latter since they can't know who
+ * set the #update_jacobians# flag.
+ *
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 class FEValuesBase {
   public:

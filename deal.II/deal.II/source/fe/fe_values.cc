@@ -188,12 +188,16 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians) ||
+      (update_flags & update_JxW_values)||
       (update_flags & update_q_points)  ||
+      (update_flags & update_gradients) ||
       (update_flags & update_ansatz_points))
     fe.fill_fe_values (cell,
 		       unit_quadrature_points,
 		       jacobi_matrices,
-		       update_flags & update_jacobians,
+		       update_flags & (update_jacobians  |
+				       update_JxW_values |
+				       update_gradients),
 		       ansatz_points,
 		       update_flags & update_ansatz_points,
 		       quadrature_points,
@@ -203,24 +207,20 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    {
-      Assert (update_flags & update_jacobians, ExcCannotInitializeField());
-      
-      for (unsigned int i=0; i<fe.total_dofs; ++i)
-	for (unsigned int j=0; j<n_quadrature_points; ++j)
-	  for (unsigned int s=0; s<dim; ++s)
-	    {
-	      shape_gradients[i][j](s) = 0;
-	      
-					       // (grad psi)_s =
-					       // (grad_{\xi\eta})_b J_{bs}
-					       // with J_{bs}=(d\xi_b)/(dx_s)
-	      for (unsigned int b=0; b<dim; ++b)
-		shape_gradients[i][j](s)
-		  +=
-		  unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
-	    };
-    };
+    for (unsigned int i=0; i<fe.total_dofs; ++i)
+      for (unsigned int j=0; j<n_quadrature_points; ++j)
+	for (unsigned int s=0; s<dim; ++s)
+	  {
+	    shape_gradients[i][j](s) = 0;
+	    
+					     // (grad psi)_s =
+					     // (grad_{\xi\eta})_b J_{bs}
+					     // with J_{bs}=(d\xi_b)/(dx_s)
+	    for (unsigned int b=0; b<dim; ++b)
+	      shape_gradients[i][j](s)
+		+=
+		unit_shape_gradients[i][j](b) * jacobi_matrices[j](b,s);
+	  };
   
   
 				   // compute Jacobi determinants in
@@ -229,11 +229,8 @@ void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell,
 				   // why we take the inverse of the
 				   // determinant
   if (update_flags & update_JxW_values) 
-    {
-      Assert (update_flags & update_jacobians, ExcCannotInitializeField());
-      for (unsigned int i=0; i<n_quadrature_points; ++i)
-	JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
-    };
+    for (unsigned int i=0; i<n_quadrature_points; ++i)
+      JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
 };
 
 
@@ -327,7 +324,9 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians) ||
+      (update_flags & update_JxW_values)||
       (update_flags & update_q_points)  ||
+      (update_flags & update_gradients) ||
       (update_flags & update_ansatz_points) ||
       (update_flags & update_JxW_values))
     fe.fill_fe_face_values (cell,
@@ -335,7 +334,9 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 			    unit_face_quadrature_points,
 			    unit_quadrature_points[face_no],
 			    jacobi_matrices,
-			    update_flags & update_jacobians,
+			    update_flags & (update_jacobians |
+					    update_gradients |
+					    update_JxW_values),
 			    ansatz_points,
 			    update_flags & update_ansatz_points,
 			    quadrature_points,
@@ -349,25 +350,21 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    {
-      Assert (update_flags & update_jacobians, ExcCannotInitializeField());
-      
-      for (unsigned int i=0; i<fe.total_dofs; ++i)
-	{
-	  fill_n (shape_gradients[i].begin(),
-		  n_quadrature_points,
-		  Point<dim>());
-	  for (unsigned int j=0; j<n_quadrature_points; ++j) 
-	    for (unsigned int s=0; s<dim; ++s)
-					       // (grad psi)_s =
-					       // (grad_{\xi\eta})_b J_{bs}
-					       // with J_{bs}=(d\xi_b)/(dx_s)
-	      for (unsigned int b=0; b<dim; ++b)
-		shape_gradients[i][j](s)
-		  += (unit_shape_gradients[face_no][i][j](b) *
-		      jacobi_matrices[j](b,s));
-	};
-    };
+    for (unsigned int i=0; i<fe.total_dofs; ++i)
+      {
+	fill_n (shape_gradients[i].begin(),
+		n_quadrature_points,
+		Point<dim>());
+	for (unsigned int j=0; j<n_quadrature_points; ++j) 
+	  for (unsigned int s=0; s<dim; ++s)
+					     // (grad psi)_s =
+					     // (grad_{\xi\eta})_b J_{bs}
+					     // with J_{bs}=(d\xi_b)/(dx_s)
+	    for (unsigned int b=0; b<dim; ++b)
+	      shape_gradients[i][j](s)
+		+= (unit_shape_gradients[face_no][i][j](b) *
+		    jacobi_matrices[j](b,s));
+      };
   
   
 				   // compute Jacobi determinants in
@@ -376,12 +373,8 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 				   // why we take the inverse of the
 				   // determinant
   if (update_flags & update_JxW_values) 
-    {
-      Assert (update_flags & update_jacobians,
-	      ExcCannotInitializeField());
-      for (unsigned int i=0; i<n_quadrature_points; ++i)
-	JxW_values[i] = weights[i] * face_jacobi_determinants[i];
-    };
+    for (unsigned int i=0; i<n_quadrature_points; ++i)
+      JxW_values[i] = weights[i] * face_jacobi_determinants[i];
 };
 
 
@@ -447,7 +440,9 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians) ||
+      (update_flags & update_JxW_values)||
       (update_flags & update_q_points)  ||
+      (update_flags & update_gradients) ||
       (update_flags & update_JxW_values))
     fe.fill_fe_subface_values (cell,
 			       face_no,
@@ -455,7 +450,9 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 			       unit_face_quadrature_points,
 			       unit_quadrature_points[selected_dataset],
 			       jacobi_matrices,
-			       update_flags & update_jacobians,
+			       update_flags & (update_jacobians |
+					       update_gradients |
+					       update_JxW_values),
 			       quadrature_points,
 			       update_flags & update_q_points,
 			       face_jacobi_determinants,
@@ -467,25 +464,21 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // compute gradients on real element if
 				   // requested
   if (update_flags & update_gradients) 
-    {
-      Assert (update_flags & update_jacobians, ExcCannotInitializeField());
-      
-      for (unsigned int i=0; i<fe.total_dofs; ++i) 
-	{
-	  fill_n (shape_gradients[i].begin(),
-		  n_quadrature_points,
-		  Point<dim>());
-	  for (unsigned int j=0; j<n_quadrature_points; ++j) 
-	    for (unsigned int s=0; s<dim; ++s)
-					       // (grad psi)_s =
-					       // (grad_{\xi\eta})_b J_{bs}
-					       // with J_{bs}=(d\xi_b)/(dx_s)
-	      for (unsigned int b=0; b<dim; ++b)
-		shape_gradients[i][j](s)
-		  += (unit_shape_gradients[selected_dataset][i][j](b) *
-		      jacobi_matrices[j](b,s));
-	};
-    };
+    for (unsigned int i=0; i<fe.total_dofs; ++i) 
+      {
+	fill_n (shape_gradients[i].begin(),
+		n_quadrature_points,
+		Point<dim>());
+	for (unsigned int j=0; j<n_quadrature_points; ++j) 
+	  for (unsigned int s=0; s<dim; ++s)
+					     // (grad psi)_s =
+					     // (grad_{\xi\eta})_b J_{bs}
+					     // with J_{bs}=(d\xi_b)/(dx_s)
+	    for (unsigned int b=0; b<dim; ++b)
+	      shape_gradients[i][j](s)
+		+= (unit_shape_gradients[selected_dataset][i][j](b) *
+		    jacobi_matrices[j](b,s));
+      };
   
   
 				   // compute Jacobi determinants in
@@ -494,12 +487,8 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // why we take the inverse of the
 				   // determinant
   if (update_flags & update_JxW_values) 
-    {
-      Assert (update_flags & update_jacobians,
-	      ExcCannotInitializeField());
-      for (unsigned int i=0; i<n_quadrature_points; ++i)
-	JxW_values[i] = weights[i] * face_jacobi_determinants[i];
-    };
+    for (unsigned int i=0; i<n_quadrature_points; ++i)
+      JxW_values[i] = weights[i] * face_jacobi_determinants[i];
 };
 
 
