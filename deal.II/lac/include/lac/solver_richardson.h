@@ -274,8 +274,8 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
     }
 
 				   // Deallocate Memory
-  memory.free(Vr);
-  memory.free(Vd);
+  this->memory.free(Vr);
+  this->memory.free(Vd);
 
   deallog.pop();
 				   // in case of failure: throw

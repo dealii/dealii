@@ -311,7 +311,7 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				       // multiples of this distance
 				       // vector, where the factor is
 				       // given by the exponentials.
-      return_value += (-2 / (width*width) *
+      return_value += (-2 / (this->width * this->width) *
 		       std::exp(-shifted_point.square() /
 				(this->width * this->width)) *
 		       shifted_point);
