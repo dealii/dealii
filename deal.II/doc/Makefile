@@ -2,7 +2,7 @@
 
 
 # generic targets
-default: autogen-doc tutorial development
+default: autogen-doc tutorial development validate-xrefs
 
 all: default autogen-doc-all
 
@@ -22,9 +22,15 @@ tutorial:
 development:
 	cd development ; $(MAKE)
 
+
+validate-xrefs:
+	@echo "Validating cross-references in HTML files."
+	cd tutorial ; $(MAKE) validate-xrefs
+	cd development ; $(MAKE) validate-xrefs
+
 clean:
 	cd auto ; $(MAKE) clean
 	cd tutorial ; $(MAKE) clean
 	cd development ; $(MAKE) clean
 
-.PHONY: default all autogen-doc autogen-doc-all tutorial clean development
+.PHONY: default all autogen-doc autogen-doc-all tutorial clean development validate-xrefs

@@ -1,3 +1,6 @@
+# $Id$
+
+
 D = ../..
 include $D/common/Make.global_options
 
@@ -43,7 +46,14 @@ makefile.large.html: Makefile.large
 	@$(PERL) makefile2html < $< > $@
 
 
+validate-xrefs:
+	$(PERL) $D/doc/auto/scripts/validate-xrefs.pl \
+		$(filter-out makefiles.1.html makefiles.2.html, \
+		  $(shell echo *.html))
+
+
+
 clean:
 	-rm -f makefiles.html makefile.small.html makefile.large.html
 
-.PHONY: default clean
+.PHONY: default validate-xrefs clean
