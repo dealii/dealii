@@ -265,7 +265,7 @@ target1: $(target1-o-files) $(libraries)
 # Postprocessing
 ############################################################
 
-wavetest.output:%.testcase
+wave-test-3.output: wave-test-3.testcase
 	@echo =====Running======= $<
 	@./$<
 	@perl -pi~ -e 's/JobId.*//;s/value.*//;s/(\.\d\d)\d*/\1/g;' $@

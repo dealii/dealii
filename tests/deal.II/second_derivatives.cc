@@ -22,6 +22,7 @@
 int main ()
 {
   ofstream logfile("second_derivatives.output");
+  logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
 
