@@ -1,0 +1,24 @@
+DEAL.II TESTSUITE README
+========================
+
+Subdirectories in this tree contain test programs for various features
+of base lac and deal.II libraries.
+
+All features of deal that should be available in future releases
+should be tested here.
+
+Run make in this directory to do all tests. This is required before
+any commit to the CVS repository.
+
+How to interpret the output?
+----------------------------
+
+Apart from several messages containing compiling and linking
+information, the output of make will contain lines like
+
+=====Running======== heavy.testcase
+=====OK=============
+
+If the second line is replaced by some diff-output, please check for
+consistency. A check-in of the modified results should be considered
+carefully.

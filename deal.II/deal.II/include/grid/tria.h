@@ -223,9 +223,9 @@ class TriaDimensionInfo<1> {
 template <>
 class TriaDimensionInfo<2> {
   public:
-    typedef TriaRawIterator<2,LineAccessor<2> >    raw_line_iterator;
-    typedef TriaIterator<2,LineAccessor<2> >       line_iterator;
-    typedef TriaActiveIterator<2,LineAccessor<2> > active_line_iterator;
+    typedef TriaRawIterator<2,TriaObjectAccessor<1, 2> >    raw_line_iterator;
+    typedef TriaIterator<2,TriaObjectAccessor<1, 2> >       line_iterator;
+    typedef TriaActiveIterator<2,TriaObjectAccessor<1, 2> > active_line_iterator;
     
     typedef TriaRawIterator<2,CellAccessor<2> >    raw_quad_iterator;
     typedef TriaIterator<2,CellAccessor<2> >       quad_iterator;
@@ -267,13 +267,13 @@ class TriaDimensionInfo<2> {
 template <>
 class TriaDimensionInfo<3> {
   public:
-    typedef TriaRawIterator<3,LineAccessor<3> >    raw_line_iterator;
-    typedef TriaIterator<3,LineAccessor<3> >       line_iterator;
-    typedef TriaActiveIterator<3,LineAccessor<3> > active_line_iterator;
+    typedef TriaRawIterator<3,TriaObjectAccessor<1, 3> >    raw_line_iterator;
+    typedef TriaIterator<3,TriaObjectAccessor<1, 3> >       line_iterator;
+    typedef TriaActiveIterator<3,TriaObjectAccessor<1, 3> > active_line_iterator;
     
-    typedef TriaRawIterator<3,QuadAccessor<3> >    raw_quad_iterator;
-    typedef TriaIterator<3,QuadAccessor<3> >       quad_iterator;
-    typedef TriaActiveIterator<3,QuadAccessor<3> > active_quad_iterator;
+    typedef TriaRawIterator<3,TriaObjectAccessor<2, 3> >    raw_quad_iterator;
+    typedef TriaIterator<3,TriaObjectAccessor<2, 3> >       quad_iterator;
+    typedef TriaActiveIterator<3,TriaObjectAccessor<2, 3> > active_quad_iterator;
 
     typedef TriaRawIterator<3,CellAccessor<3> >    raw_hex_iterator;
     typedef TriaIterator<3,CellAccessor<3> >       hex_iterator;
@@ -1971,7 +1971,7 @@ class Triangulation
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first cell, used
+				      *  Iterator to the first cell, used
 				      *  or not, on level #level#. If a level
 				      *  has no cells, a past-the-end iterator
 				      *  is returned.
@@ -1982,7 +1982,7 @@ class Triangulation
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used cell
+				      *  Iterator to the first used cell
 				      *  on level #level#.
 				      *
 				      *  This function calls #begin_line#
@@ -1991,7 +1991,7 @@ class Triangulation
     cell_iterator        begin       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  cell on level #level#.
 				      *
 				      *  This function calls #begin_active_line#
@@ -2000,7 +2000,7 @@ class Triangulation
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -2098,7 +2098,7 @@ class Triangulation
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first face, used
+				      *  Iterator to the first face, used
 				      *  or not, on level #level#. If a level
 				      *  has no faces, a past-the-end iterator
 				      *  is returned.
@@ -2109,7 +2109,7 @@ class Triangulation
     raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used face
+				      *  Iterator to the first used face
 				      *  on level #level#.
 				      *
 				      *  This function calls #begin_line#
@@ -2118,7 +2118,7 @@ class Triangulation
     face_iterator        begin_face       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  face on level #level#.
 				      *
 				      *  This function calls #begin_active_line#
@@ -2127,7 +2127,7 @@ class Triangulation
     active_face_iterator begin_active_face(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -2224,7 +2224,7 @@ class Triangulation
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first line, used
+				      *  Iterator to the first line, used
 				      *  or not, on level #level#. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
@@ -2233,21 +2233,21 @@ class Triangulation
     begin_raw_line   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used line
+				      *  Iterator to the first used line
 				      *  on level #level#.
 				      */
     line_iterator
     begin_line       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  line on level #level#.
 				      */
     active_line_iterator
     begin_active_line(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -2330,7 +2330,7 @@ class Triangulation
     				     /*@{
 				      */
     				     /**
-				      *  Return iterator to the first quad, used
+				      *  Iterator to the first quad, used
 				      *  or not, on level #level#. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
@@ -2339,21 +2339,21 @@ class Triangulation
     begin_raw_quad   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used quad
+				      *  Iterator to the first used quad
 				      *  on level #level#.
 				      */
     quad_iterator
     begin_quad       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  quad on level #level#.
 				      */
     active_quad_iterator
     begin_active_quad(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -2436,7 +2436,7 @@ class Triangulation
     				     /*@{
 				      */
     				     /**
-				      *  Return iterator to the first hex, used
+				      *  Iterator to the first hex, used
 				      *  or not, on level #level#. If a level
 				      *  has no hexs, a past-the-end iterator
 				      *  is returned.
@@ -2445,21 +2445,21 @@ class Triangulation
     begin_raw_hex   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used hex
+				      *  Iterator to the first used hex
 				      *  on level #level#.
 				      */
     hex_iterator
     begin_hex       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  hex on level #level#.
 				      */
     active_hex_iterator
     begin_active_hex(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -3003,21 +3003,21 @@ class Triangulation
 
 				     // Friendship includes local classes.
     friend class TriaAccessor<dim>;
-    friend class LineAccessor<dim>;
-    friend class QuadAccessor<dim>;
+    friend class TriaObjectAccessor<1, dim>;
+    friend class TriaObjectAccessor<2, dim>;
     friend class HexAccessor<dim>;
 
     friend class CellAccessor<dim>;
     
-    friend class TriaRawIterator<1,LineAccessor<1> >;
+    friend class TriaRawIterator<1,TriaObjectAccessor<1, 1> >;
     friend class TriaRawIterator<1,CellAccessor<1> >;
 
-    friend class TriaRawIterator<2,LineAccessor<2> >;
-    friend class TriaRawIterator<2,QuadAccessor<2> >;
+    friend class TriaRawIterator<2,TriaObjectAccessor<1, 2> >;
+    friend class TriaRawIterator<2,TriaObjectAccessor<2, 2> >;
     friend class TriaRawIterator<2,CellAccessor<2> >;
 
-    friend class TriaRawIterator<3,LineAccessor<3> >;
-    friend class TriaRawIterator<3,QuadAccessor<3> >;
+    friend class TriaRawIterator<3,TriaObjectAccessor<1, 3> >;
+    friend class TriaRawIterator<3,TriaObjectAccessor<2, 3> >;
     friend class TriaRawIterator<3,HexAccessor<3> >;
     friend class TriaRawIterator<3,CellAccessor<3> >;
 

@@ -512,8 +512,9 @@ FECrissCross<2>::FECrissCross () :
 template <>
 inline
 double FECrissCross<2>::shape_value (const unsigned int i,
-				     const Point<2>    &p) const {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+				     const Point<2>    &p) const
+{
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   const double x = p(0),
 	       y = p(1);
@@ -539,8 +540,9 @@ double FECrissCross<2>::shape_value (const unsigned int i,
 
 template <>
 inline
-Tensor<1,2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) const {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+Tensor<1,2> FECrissCross<2>::shape_grad (const unsigned int i, const Point<2> &p) const
+{
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   const double x = p(0),
 	       y = p(1);  
@@ -569,7 +571,7 @@ Tensor<2,2>
 FECrissCross<2>::shape_grad_grad (const unsigned int i,
 				  const Point<2> &) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 				   // second derivatives on the unit cell
 				   // are always zero, at least almost
 				   // everywhere. see the doc for more

@@ -31,7 +31,8 @@
 
 template <int dim>
 class Ball :
-  public StraightBoundary<dim> {
+  public StraightBoundary<dim>
+{
   public:
     virtual Point<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const {
@@ -64,7 +65,8 @@ class Ball :
 
 template <int dim>
 class CurvedLine :
-  public StraightBoundary<dim> {
+  public StraightBoundary<dim>
+{
   public:
     virtual Point<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
@@ -161,7 +163,8 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 
 
 template <int dim>
-void test (const int test_case) {
+void test (const int test_case)
+{
   cout << "Running testcase " << test_case
        << " in " << dim << " dimensions." << endl;
   Triangulation<dim> tria;
@@ -241,7 +244,7 @@ void test (const int test_case) {
  	    tria.execute_coarsening_and_refinement();
  	  };
 
-	tria.set_boundary (0);
+	tria.set_boundary (1);
 	break;
       }
     };

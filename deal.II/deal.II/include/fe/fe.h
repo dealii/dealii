@@ -293,12 +293,6 @@ class FiniteElementBase : public Subscriptor,
 				     /**
 				      * Exception
 				      */
-    DeclException1 (ExcInvalidIndex,
-		    int,
-		    << "Invalid index " << arg1);
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcWrongFieldDimension,
 		    int, int,
 		    << "The field has not the assumed dimension " << arg2
@@ -1461,9 +1455,11 @@ unsigned int
 FiniteElementBase<dim>::component_to_system_index (unsigned int component,
 						   unsigned int component_index) const
 {
-  Assert(component<n_components, ExcInvalidIndex(component));
+  Assert(component<n_components,
+	 ExcIndexRange(component, 0, n_components));
   Assert(component_index<component_to_system_table[component].size(),
-	 ExcInvalidIndex(component_index));
+	 ExcIndexRange(component_index, 0,
+		       component_to_system_table[component].size()));
   return component_to_system_table[component][component_index];
 }
 
@@ -1474,7 +1470,8 @@ inline
 pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::system_to_component_index (unsigned int index) const
 {
-  Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
+  Assert(index < system_to_component_table.size(),
+	 ExcIndexRange(index, 0, system_to_component_table.size()));
   return system_to_component_table[index];
 }
 
@@ -1486,9 +1483,11 @@ unsigned int
 FiniteElementBase<dim>::face_component_to_system_index (unsigned int component,
 							unsigned int component_index) const
 {
-  Assert(component<n_components, ExcInvalidIndex(component));
+  Assert(component<n_components,
+	 ExcIndexRange(component, 0, n_components));
   Assert(component_index<face_component_to_system_table[component].size(),
-	 ExcInvalidIndex(component_index));
+	 ExcIndexRange(component_index, 0,
+		       face_component_to_system_table[component].size()));
   return face_component_to_system_table[component][component_index];
 }
 
@@ -1499,7 +1498,8 @@ inline
 pair<unsigned int,unsigned int>
 FiniteElementBase<dim>::face_system_to_component_index (unsigned int index) const
 {
-  Assert(index < system_to_component_table.size(), ExcInvalidIndex(index));
+  Assert(index < face_system_to_component_table.size(),
+	 ExcIndexRange(index, 0, face_system_to_component_table.size()));
   return face_system_to_component_table[index];
 }
 
@@ -1510,7 +1510,8 @@ FiniteElementBase<dim>::component_to_base (unsigned int index) const
 {
   if (n_components == 1)
     return 0;
-  Assert(index < component_to_base_table.size(), ExcInvalidIndex(index));
+  Assert(index < component_to_base_table.size(),
+	 ExcIndexRange(index, 0, component_to_base_table.size()));
   return component_to_base_table[index];
 }
 

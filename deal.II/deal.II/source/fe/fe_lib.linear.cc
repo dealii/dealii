@@ -71,7 +71,7 @@ double
 FEQ1<1>::shape_value(const unsigned int i,
 			 const Point<1>     &p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   switch (i)
     {
     case 0: return 1.-p(0);
@@ -88,7 +88,7 @@ Tensor<1,1>
 FEQ1<1>::shape_grad(const unsigned int i,
 			const Point<1>&) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
 				   // still construct it as that. it should
@@ -110,7 +110,7 @@ Tensor<2,1>
 FEQ1<1>::shape_grad_grad (const unsigned int i,
 			      const Point<1> &) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 				   // second derivatives on the unit cell
 				   // are always zero
   return Tensor<2,1>();
@@ -241,7 +241,7 @@ double
 FEQ1<2>::shape_value (const unsigned int i,
 			  const Point<2>& p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   switch (i)
     {
       case 0: return (1.-p(0)) * (1.-p(1));
@@ -260,7 +260,7 @@ Tensor<1,2>
 FEQ1<2>::shape_grad (const unsigned int i,
 			 const Point<2>& p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
 				   // still construct it as that. it should
@@ -284,7 +284,7 @@ Tensor<2,2>
 FEQ1<2>::shape_grad_grad (const unsigned int i,
 			      const Point<2> &) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   switch (i)
     {
@@ -700,7 +700,7 @@ double
 FEQ1<3>::shape_value (const unsigned int i,
 			  const Point<3>& p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   switch (i)
     {
       case 0: return 1.0-p(0)+(-1.0+p(0))*p(1)+(-1.0+p(0)+(1.0-p(0))*p(1))*p(2);
@@ -723,7 +723,7 @@ Tensor<1,3>
 FEQ1<3>::shape_grad (const unsigned int i,
 			 const Point<3>& p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
 				   // still construct it as that. it should
@@ -767,7 +767,7 @@ Tensor<2,3>
 FEQ1<3>::shape_grad_grad (const unsigned int i,
 			      const Point<3> &p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   Tensor<2,3> return_value;
   

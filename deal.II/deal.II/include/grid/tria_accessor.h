@@ -35,7 +35,8 @@
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class TriaAccessor {
+class TriaAccessor
+{
   protected:
 				     /**
 				      * Declare the data type that this accessor
@@ -50,6 +51,7 @@ class TriaAccessor {
 				      *  Constructor. Protected, thus
 				      *  only callable from friend
 				      *  classes.
+				      * //TODO: Could be private: check!
 				      */
     TriaAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
@@ -192,16 +194,6 @@ class TriaAccessor {
 				     /**
 				      *  Exception
 				      */
-    DeclException3 (ExcInvalidIndex,
-		    int,
-		    int,
-		    int,
-		    << "Invalid index " << arg1
-		    << ", index must be between " << arg2
-		    << " and " << arg3 << ".");
-				     /**
-				      *  Exception
-				      */
     DeclException0 (ExcUncaughtCase);
 				     /**
 				      *  Exception
@@ -244,6 +236,13 @@ class TriaAccessor {
 
 
 
+/**
+ * Common template for line, quad, hex.
+ * @author Guido Kanschat, 1999
+ */
+template<int celldim, int dim>
+class TriaObjectAccessor;
+
 
 
 
@@ -257,12 +256,13 @@ class TriaAccessor {
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class LineAccessor :  public TriaAccessor<dim> {
+class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
+{
   public:
 				     /**
 				      *  Constructor.
 				      */
-    LineAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
 		  const void         *local_data = 0) :
@@ -359,7 +359,7 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      *  Return a pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,LineAccessor<dim> > child (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> > child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th child.
@@ -524,7 +524,7 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      *  and will give a linker error if
 				      *  used anyway.
 				      */
-    void operator = (const LineAccessor &);
+    void operator = (const TriaObjectAccessor<1, dim> &);
 
     
 
@@ -563,8 +563,6 @@ class LineAccessor :  public TriaAccessor<dim> {
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
-
-
 /**
  *   Accessor to dereference the data of quads. This accessor is used to
  *   point to quads in #dim# space dimensions (only #dim>=2# seems reasonable
@@ -575,12 +573,13 @@ class LineAccessor :  public TriaAccessor<dim> {
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class QuadAccessor :  public TriaAccessor<dim> {
+class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
+{
   public:
 				     /**
 				      *  Constructor.
 				      */
-    QuadAccessor (Triangulation<dim> *parent     = 0,
+    TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
 		  const void         *local_data = 0) :
@@ -610,7 +609,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Quad#.
 				      */
-    TriaIterator<dim,LineAccessor<dim> > line (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
 
 				     /**
 				      * Return the line index of the #i#th
@@ -699,7 +698,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      *  Return a pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,QuadAccessor<dim> > child (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<2, dim> > child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the #i#th child.
@@ -883,7 +882,7 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      *  and will give a linker error if
 				      *  used anyway.
 				      */
-    void operator = (const QuadAccessor &);
+    void operator = (const TriaObjectAccessor<2, dim> &);
 
   protected:
 				     /**@name Advancement of iterators*/
@@ -966,7 +965,7 @@ class HexAccessor :  public TriaAccessor<dim> {
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Hex#.
 				      */
-    TriaIterator<dim,LineAccessor<dim> > line (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<1, dim> > line (const unsigned int i) const;
 
 				     /**
 				      * Return the line index of the #i#th
@@ -979,7 +978,7 @@ class HexAccessor :  public TriaAccessor<dim> {
 				      *  Return a pointer to the #i#th quad
 				      *  bounding this #Hex#.
 				      */
-    TriaIterator<dim,QuadAccessor<dim> > quad (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<2, dim> > quad (const unsigned int i) const;
 
 				     /**
 				      * Return the quad index of the #i#th
@@ -1300,8 +1299,8 @@ class TriaSubstructAccessor;
  * with template parameters. This class and #TriaSubstructAccessor<2>#
  * wrap the following names:
  * \begin{verbatim}
- *   TriaSubstructAccessor<1> := LineAccessor<1>;
- *   TriaSubstructAccessor<2> := QuadAccessor<2>;
+ *   TriaSubstructAccessor<1> := TriaObjectAccessor<1, 1>;
+ *   TriaSubstructAccessor<2> := TriaObjectAccessor<2, 2>;
  *   TriaSubstructAccessor<3> := HexAccessor<3>;
  * \end{verbatim}
  * We do this rather complex (and needless, provided C++ the needed constructs!)
@@ -1309,18 +1308,18 @@ class TriaSubstructAccessor;
  * the \Ref{CellAccessor} dimension independent as an inheritance from
  * #TriaSubstructAccessor<dim>#. If we had not declared these
  * types, we would have to write two class declarations, one for
- * #CellAccessor<1>#, derived from #LineAccessor<1>#
+ * #CellAccessor<1>#, derived from #TriaObjectAccessor<1, 1>#
  * and one for #CellAccessor<2>#, derived from
- * #QuadAccessor<2>#.
+ * #TriaObjectAccessor<2, 2>#.
  */
 template <>
-class TriaSubstructAccessor<1> :  public LineAccessor<1> {
+class TriaSubstructAccessor<1> :  public TriaObjectAccessor<1, 1> {
   public:
 				     /**
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef LineAccessor<1>::AccessorData AccessorData;
+    typedef TriaObjectAccessor<1, 1>::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
@@ -1328,7 +1327,7 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
 			   const int         level,
 			   const int         index,
 			   const void       *local_data) :
-		    LineAccessor<1> (tria,level,index,local_data) {};
+		    TriaObjectAccessor<1, 1> (tria,level,index,local_data) {};
 
     				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
@@ -1347,13 +1346,13 @@ class TriaSubstructAccessor<1> :  public LineAccessor<1> {
  * @see TriaSubstructAccessor<1>
  */
 template <>
-class TriaSubstructAccessor<2> : public QuadAccessor<2> {
+class TriaSubstructAccessor<2> : public TriaObjectAccessor<2, 2> {
   public:
 				     /**
 				      * Propagate the AccessorData type
 				      * into the present class.
 				      */
-    typedef QuadAccessor<2>::AccessorData AccessorData;
+    typedef TriaObjectAccessor<2, 2>::AccessorData AccessorData;
     				     /**
 				      * Constructor
 				      */
@@ -1361,7 +1360,7 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 			   const int         level,
 			   const int         index,
 			   const void       *local_data) :
-		    QuadAccessor<2> (tria,level,index,local_data) {};
+		    TriaObjectAccessor<2, 2> (tria,level,index,local_data) {};
 
     				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
@@ -1369,7 +1368,7 @@ class TriaSubstructAccessor<2> : public QuadAccessor<2> {
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<2,LineAccessor<2> > substruct_iterator;
+    typedef TriaIterator<2,TriaObjectAccessor<1, 2> > substruct_iterator;
 };
 
 
@@ -1404,7 +1403,7 @@ class TriaSubstructAccessor<3> : public HexAccessor<3> {
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<3,QuadAccessor<3> > substruct_iterator;
+    typedef TriaIterator<3,TriaObjectAccessor<2, 3> > substruct_iterator;
 };
 
 

@@ -170,13 +170,6 @@ struct GeometryInfo
     static unsigned int child_cell_on_face (unsigned int face,
 					    unsigned int subface);
 
-				     /**
-				      * Exception */
-    DeclException2 (ExcInvalidIndex,
-		    int,
-		    int,
-		    << "Invalid index " << arg1
-		    << ", index must be between 0 and " << arg2 << ".");
 };
 
 
@@ -188,8 +181,8 @@ inline unsigned int
 GeometryInfo<2>::child_cell_on_face (const unsigned int face,
                                      const unsigned int subface)
 {
-  Assert (face<faces_per_cell, ExcInvalidIndex(face,faces_per_cell));
-  Assert (subface<subfaces_per_face, ExcInvalidIndex(subface,subfaces_per_face));
+  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
+  Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
   
   static const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0,1},
 								       {1,2},
@@ -202,9 +195,10 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
 template<>
 inline
 unsigned int GeometryInfo<3>::child_cell_on_face (const unsigned int face,
-						  const unsigned int subface) {
-  Assert (face<faces_per_cell, ExcInvalidIndex(face,faces_per_cell));
-  Assert (subface<subfaces_per_face, ExcInvalidIndex(subface,subfaces_per_face));
+						  const unsigned int subface)
+{
+  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
+  Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
   
   static const unsigned subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
 								       {4, 5, 6, 7},

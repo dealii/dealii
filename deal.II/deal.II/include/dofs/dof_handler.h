@@ -73,9 +73,9 @@ class DoFDimensionInfo<1> {
  */
 class DoFDimensionInfo<2> {
   public:
-    typedef TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >    raw_line_iterator;
-    typedef TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >       line_iterator;
-    typedef TriaActiveIterator<2,DoFLineAccessor<2,LineAccessor<2> > > active_line_iterator;
+    typedef TriaRawIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >    raw_line_iterator;
+    typedef TriaIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >       line_iterator;
+    typedef TriaActiveIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > active_line_iterator;
     
     typedef TriaRawIterator<2,DoFCellAccessor<2> >               raw_quad_iterator;
     typedef TriaIterator<2,DoFCellAccessor<2> >                  quad_iterator;
@@ -103,13 +103,13 @@ class DoFDimensionInfo<2> {
  */
 class DoFDimensionInfo<3> {
   public:
-    typedef TriaRawIterator<3,DoFLineAccessor<3,LineAccessor<3> > >    raw_line_iterator;
-    typedef TriaIterator<3,DoFLineAccessor<3,LineAccessor<3> > >       line_iterator;
-    typedef TriaActiveIterator<3,DoFLineAccessor<3,LineAccessor<3> > > active_line_iterator;
+    typedef TriaRawIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >    raw_line_iterator;
+    typedef TriaIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >       line_iterator;
+    typedef TriaActiveIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > > active_line_iterator;
 
-    typedef TriaRawIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >    raw_quad_iterator;
-    typedef TriaIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >       quad_iterator;
-    typedef TriaActiveIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > > active_quad_iterator;
+    typedef TriaRawIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >    raw_quad_iterator;
+    typedef TriaIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >       quad_iterator;
+    typedef TriaActiveIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > active_quad_iterator;
 
     typedef TriaRawIterator<3,DoFCellAccessor<3> >               raw_hex_iterator;
     typedef TriaIterator<3,DoFCellAccessor<3> >                  hex_iterator;
@@ -785,7 +785,7 @@ class DoFHandler  :  public Subscriptor,
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first cell, used
+				      *  Iterator to the first cell, used
 				      *  or not, on level #level#. If a level
 				      *  has no cells, a past-the-end iterator
 				      *  is returned.
@@ -796,7 +796,7 @@ class DoFHandler  :  public Subscriptor,
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used cell
+				      *  Iterator to the first used cell
 				      *  on level #level#.
 				      *
 				      *  This function calls #begin_line#
@@ -805,7 +805,7 @@ class DoFHandler  :  public Subscriptor,
     cell_iterator        begin       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  cell on level #level#.
 				      *
 				      *  This function calls #begin_active_line#
@@ -814,7 +814,7 @@ class DoFHandler  :  public Subscriptor,
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -910,7 +910,7 @@ class DoFHandler  :  public Subscriptor,
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first face, used
+				      *  Iterator to the first face, used
 				      *  or not, on level #level#. If a level
 				      *  has no faces, a past-the-end iterator
 				      *  is returned.
@@ -921,7 +921,7 @@ class DoFHandler  :  public Subscriptor,
     raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used face
+				      *  Iterator to the first used face
 				      *  on level #level#.
 				      *
 				      *  This function calls #begin_line#
@@ -930,7 +930,7 @@ class DoFHandler  :  public Subscriptor,
     face_iterator        begin_face       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  face on level #level#.
 				      *
 				      *  This function calls #begin_active_line#
@@ -939,7 +939,7 @@ class DoFHandler  :  public Subscriptor,
     active_face_iterator begin_active_face(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -1036,7 +1036,7 @@ class DoFHandler  :  public Subscriptor,
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first line, used
+				      *  Iterator to the first line, used
 				      *  or not, on level #level#. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
@@ -1044,19 +1044,19 @@ class DoFHandler  :  public Subscriptor,
     raw_line_iterator    begin_raw_line   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used line
+				      *  Iterator to the first used line
 				      *  on level #level#.
 				      */
     line_iterator        begin_line       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  line on level #level#.
 				      */
     active_line_iterator begin_active_line(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -1133,7 +1133,7 @@ class DoFHandler  :  public Subscriptor,
     				     /*@{
 				      */
     				     /**
-				      *  Return iterator to the first quad, used
+				      *  Iterator to the first quad, used
 				      *  or not, on level #level#. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
@@ -1141,19 +1141,19 @@ class DoFHandler  :  public Subscriptor,
     raw_quad_iterator    begin_raw_quad   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used quad
+				      *  Iterator to the first used quad
 				      *  on level #level#.
 				      */
     quad_iterator        begin_quad       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  quad on level #level#.
 				      */
     active_quad_iterator begin_active_quad(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -1230,7 +1230,7 @@ class DoFHandler  :  public Subscriptor,
     				     /*@{
 				      */
     				     /**
-				      *  Return iterator to the first hex, used
+				      *  Iterator to the first hex, used
 				      *  or not, on level #level#. If a level
 				      *  has no hexs, a past-the-end iterator
 				      *  is returned.
@@ -1239,21 +1239,21 @@ class DoFHandler  :  public Subscriptor,
     begin_raw_hex   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used hex
+				      *  Iterator to the first used hex
 				      *  on level #level#.
 				      */
     hex_iterator
     begin_hex       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  hex on level #level#.
 				      */
     active_hex_iterator
     begin_active_hex(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -1564,10 +1564,10 @@ class DoFHandler  :  public Subscriptor,
     vector<int>               vertex_dofs;
     
     
-    friend class DoFLineAccessor<dim, LineAccessor<dim> >;
-    friend class DoFLineAccessor<dim, CellAccessor<dim> >;
-    friend class DoFQuadAccessor<dim, QuadAccessor<dim> >;
-    friend class DoFQuadAccessor<dim, CellAccessor<dim> >;
+    friend class DoFObjectAccessor<1, dim, TriaObjectAccessor<1, dim> >;
+    friend class DoFObjectAccessor<1, dim, CellAccessor<dim> >;
+    friend class DoFObjectAccessor<2, dim, TriaObjectAccessor<2, dim> >;
+    friend class DoFObjectAccessor<2, dim, CellAccessor<dim> >;
     friend class DoFHexAccessor<dim, HexAccessor<dim> >;
     friend class DoFHexAccessor<dim, CellAccessor<dim> >;
 };

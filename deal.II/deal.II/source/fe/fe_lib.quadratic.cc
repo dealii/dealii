@@ -123,7 +123,7 @@ double
 FEQ2<1>::shape_value(const unsigned int i,
 			       const Point<1>     &p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   const double xi = p(0);
   switch (i)
     {
@@ -141,7 +141,7 @@ Tensor<1,1>
 FEQ2<1>::shape_grad(const unsigned int i,
 			      const Point<1>    &p) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
   const double xi = p(0);
 				   // originally, the return type of the
 				   // function was Point<dim>, so we
@@ -164,7 +164,7 @@ Tensor<2,1>
 FEQ2<1>::shape_grad_grad (const unsigned int i,
 				    const Point<1>    &) const
 {
-  Assert((i<total_dofs), ExcInvalidIndex(i));
+  Assert((i<total_dofs), ExcIndexRange(i, 0, total_dofs));
 
   Tensor<2,1> return_value;
   switch (i)
@@ -647,7 +647,7 @@ double
 FEQ2<2>::shape_value (const unsigned int i,
 				const Point<2>    &p) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (i<total_dofs, ExcIndexRange(i, 0, total_dofs));
 
   const double xi = p(0),
 	       eta= p(1);
@@ -673,7 +673,7 @@ Tensor<1,2>
 FEQ2<2>::shape_grad (const unsigned int i,
 			       const Point<2>    &p) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (i<total_dofs, ExcIndexRange(i, 0, total_dofs));
 
   const double xi = p(0),
 	       eta= p(1);
@@ -713,7 +713,7 @@ Tensor<2,2>
 FEQ2<2>::shape_grad_grad (const unsigned int i,
 				    const Point<2>    &p) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (i<total_dofs, ExcIndexRange(i, 0, total_dofs));
 
   const double xi = p(0),
 	       eta= p(1);
@@ -2291,7 +2291,7 @@ double
 FEQ2<3>::shape_value (const unsigned int i,
 				const Point<3>    &p) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (i<total_dofs, ExcIndexRange(i, 0, total_dofs));
 
   const double xi  = p(0),
 	       eta = p(1),
@@ -2385,7 +2385,7 @@ Tensor<1,3>
 FEQ2<3>::shape_grad (const unsigned int i,
 			       const Point<3>    &p) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (i<total_dofs, ExcIndexRange(i, 0, total_dofs));
 
   const double xi  = p(0),
 	       eta = p(1),
@@ -2489,7 +2489,7 @@ Tensor<2,3>
 FEQ2<3>::shape_grad_grad (const unsigned int i,
 				    const Point<3>    &p) const
 {
-  Assert (i<total_dofs, ExcInvalidIndex(i));
+  Assert (i<total_dofs, ExcIndexRange(i, 0, total_dofs));
 
   const double xi  = p(0),
 	       eta = p(1),

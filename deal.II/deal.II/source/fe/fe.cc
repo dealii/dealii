@@ -200,8 +200,10 @@ FiniteElementBase<dim>::FiniteElementBase (const FiniteElementData<dim> &fe_data
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::restrict (const unsigned int child) const {
-  Assert (child<GeometryInfo<dim>::children_per_cell, ExcInvalidIndex(child));
+FiniteElementBase<dim>::restrict (const unsigned int child) const
+{
+  Assert (child<GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
   return restriction[child];
 };
 
@@ -209,8 +211,10 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const {
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::prolongate (const unsigned int child) const {
-  Assert (child<GeometryInfo<dim>::children_per_cell, ExcInvalidIndex(child));
+FiniteElementBase<dim>::prolongate (const unsigned int child) const
+{
+  Assert (child<GeometryInfo<dim>::children_per_cell,
+	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
   return prolongation[child];
 };
 
@@ -218,7 +222,8 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const {
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::constraints () const {
+FiniteElementBase<dim>::constraints () const
+{
   if (dim==1)
     Assert ((interface_constraints.m()==1) && (interface_constraints.n()==1),
 	    ExcWrongInterfaceMatrixSize(interface_constraints.m(),

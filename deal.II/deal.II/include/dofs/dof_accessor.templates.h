@@ -23,7 +23,7 @@
 
 template <int dim, typename BaseClass>
 inline
-int DoFLineAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
+int DoFObjectAccessor<1, dim,BaseClass>::dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -40,7 +40,7 @@ int DoFLineAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 inline
-int DoFLineAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
+int DoFObjectAccessor<1, dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
@@ -59,7 +59,7 @@ int DoFLineAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 template <int dim, typename BaseClass>
 inline
 void
-DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
+DoFObjectAccessor<1, dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (2*dof_handler->get_fe().dofs_per_vertex +
@@ -80,9 +80,9 @@ DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 template <int dim, typename BaseClass>
 inline
-TriaIterator<dim,DoFLineAccessor<dim,BaseClass> >
-DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
-  TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > q (tria,
+TriaIterator<dim,DoFObjectAccessor<1, dim,BaseClass> >
+DoFObjectAccessor<1, dim,BaseClass>::child (const unsigned int i) const {
+  TriaIterator<dim,DoFObjectAccessor<1, dim,BaseClass> > q (tria,
 						       present_level+1,
 						       child_index (i),
 						       dof_handler);
@@ -99,7 +99,7 @@ DoFLineAccessor<dim,BaseClass>::child (const unsigned int i) const {
 template <int dim, typename BaseClass>
 inline
 void
-DoFLineAccessor<dim,BaseClass>::copy_from (const DoFLineAccessor<dim,BaseClass> &a) {
+DoFObjectAccessor<1, dim,BaseClass>::copy_from (const DoFObjectAccessor<1, dim,BaseClass> &a) {
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
@@ -107,11 +107,11 @@ DoFLineAccessor<dim,BaseClass>::copy_from (const DoFLineAccessor<dim,BaseClass> 
 
 
 
-/*------------------------- Functions: DoFQuadAccessor -----------------------*/
+/*------------------------- Functions: DoFObjectAccessor<2, dim> -----------------------*/
 
 template <int dim, typename BaseClass>
 inline
-int DoFQuadAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
+int DoFObjectAccessor<2, dim,BaseClass>::dof_index (const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -127,7 +127,7 @@ int DoFQuadAccessor<dim,BaseClass>::dof_index (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 inline
-int DoFQuadAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
+int DoFObjectAccessor<2, dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 						      const unsigned int i) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
@@ -146,7 +146,7 @@ int DoFQuadAccessor<dim,BaseClass>::vertex_dof_index (const unsigned int vertex,
 template <int dim, typename BaseClass>
 inline
 void
-DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
+DoFObjectAccessor<2, dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
   Assert (dof_indices.size() == (4*dof_handler->get_fe().dofs_per_vertex +
@@ -172,11 +172,11 @@ DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 
 template <int dim, typename BaseClass>
 inline
-TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
-DoFQuadAccessor<dim,BaseClass>::line (const unsigned int i) const {
+TriaIterator<dim,DoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
+DoFObjectAccessor<2, dim,BaseClass>::line (const unsigned int i) const {
   Assert (i<4, ExcIndexRange (i, 0, 4));
 
-  return TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+  return TriaIterator<dim,DoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
     (
       tria,
       present_level,
@@ -189,9 +189,9 @@ DoFQuadAccessor<dim,BaseClass>::line (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 inline
-TriaIterator<dim,DoFQuadAccessor<dim,BaseClass> >
-DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
-  TriaIterator<dim,DoFQuadAccessor<dim,BaseClass> > q (tria,
+TriaIterator<dim,DoFObjectAccessor<2, dim,BaseClass> >
+DoFObjectAccessor<2, dim,BaseClass>::child (const unsigned int i) const {
+  TriaIterator<dim,DoFObjectAccessor<2, dim,BaseClass> > q (tria,
 						       present_level+1,
 						       child_index (i),
 						       dof_handler);
@@ -208,7 +208,7 @@ DoFQuadAccessor<dim,BaseClass>::child (const unsigned int i) const {
 template <int dim, typename BaseClass>
 inline
 void
-DoFQuadAccessor<dim,BaseClass>::copy_from (const DoFQuadAccessor<dim,BaseClass> &a) {
+DoFObjectAccessor<2, dim,BaseClass>::copy_from (const DoFObjectAccessor<2, dim,BaseClass> &a) {
   BaseClass::copy_from (a);
   set_dof_handler (a.dof_handler);
 };
@@ -287,10 +287,10 @@ DoFHexAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const 
 
 template <int dim, typename BaseClass>
 inline
-TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+TriaIterator<dim,DoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
 DoFHexAccessor<dim,BaseClass>::line (const unsigned int i) const {
-  TriaIterator<dim,LineAccessor<dim> > l = BaseClass::line(i);
-  return TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+  TriaIterator<dim,TriaObjectAccessor<1, dim> > l = BaseClass::line(i);
+  return TriaIterator<dim,DoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
     (
       tria,
       present_level,
@@ -303,11 +303,11 @@ DoFHexAccessor<dim,BaseClass>::line (const unsigned int i) const {
 
 template <int dim, typename BaseClass>
 inline
-TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
+TriaIterator<dim,DoFObjectAccessor<2, dim,TriaObjectAccessor<2, dim> > >
 DoFHexAccessor<dim,BaseClass>::quad (const unsigned int i) const {
   Assert (i<6, ExcIndexRange (i, 0, 6));
 
-  return TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
+  return TriaIterator<dim,DoFObjectAccessor<2, dim,TriaObjectAccessor<2, dim> > >
     (
       tria,
       present_level,

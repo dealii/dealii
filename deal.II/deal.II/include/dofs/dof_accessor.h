@@ -109,6 +109,13 @@ class DoFAccessor {
 
 
 
+/**
+ * Common template for line, quad, hex.
+ */
+template<int celldim, int dim, typename BaseClass>
+class DoFObjectAccessor;
+
+
 
 
 
@@ -138,7 +145,7 @@ class DoFAccessor {
  * Unfortunately, we would run into problems, if we wanted a #DoFLineAccessor#
  * in one spatial dimension, in which case a line is also a cell. The traditional
  * solution would be to declare a #DoFCellAccessor<1># which is derived from
- * #DoFLineAccessor<1># and #CellAccessor<1># (the #DoFLineAccessor<dim># cannot
+ * #DoFObjectAccessor<1, 1># and #CellAccessor<1># (the #DoFObjectAccessor<1, dim># cannot
  * itself be derived from #CellAccessor<dim># since a line is not a cell
  * unless in one space dimension), but since a #DoFLineAccessor# and a
  * #CellAccessor# are both derived from #TriaAccessor#, we would have to make
@@ -149,11 +156,11 @@ class DoFAccessor {
  * pass a second template parameter to a #DoFLineAccessor# which tells it
  * which class to be derived from: if we are in one spatial dimension, the
  * base class is to be #CellAccessor<1>#, in two or more dimensions it
- * is a #LineAccessor<dim>#, i.e. am accessor to lines without the missing
+ * is a #TriaObjectAccessor<1, dim>#, i.e. am accessor to lines without the missing
  * functionality needed for cells (neighbors, etc.).
  *
  * This way we can declare a #DoFCellAccessor# in one dimension by deriving
- * from #DoFLineAccessor<1,CellAccessor<1> >#, thus getting the cell
+ * from #DoFObjectAccessor<1, 1,CellAccessor<1> >#, thus getting the cell
  * functionality through the #DoFLineAccessor# instead of through a virtual
  * multiple inheritance of #DoFLineAccessor# and #CellAccessor<1>#.
  *
@@ -162,7 +169,9 @@ class DoFAccessor {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename BaseClass>
-class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
+class DoFObjectAccessor<1, dim, BaseClass> :  public DoFAccessor<dim>,
+					      public BaseClass
+{
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -175,14 +184,14 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
-    DoFLineAccessor ();
+    DoFObjectAccessor ();
     
     				     /**
 				      * Constructor. The #local_data#
 				      * argument is assumed to be a pointer
 				      * to a #DoFHandler<dim># object.
 				      */
-    DoFLineAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (Triangulation<dim> *tria,
 		     const int           level,
 		     const int           index,
 		     const AccessorData *local_data) :
@@ -234,7 +243,7 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * class returns a line accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFLineAccessor<dim,BaseClass> > child (const unsigned int) const;
+    TriaIterator<dim,DoFObjectAccessor<1, dim,BaseClass> > child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell based) vector
@@ -266,11 +275,8 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFLineAccessor<dim,BaseClass> &a);
+    void copy_from (const DoFObjectAccessor<1, dim,BaseClass> &a);
 };
-
-
-
 
 
 
@@ -280,7 +286,9 @@ class DoFLineAccessor :  public DoFAccessor<dim>, public BaseClass {
  * @see DoFLineAccessor
  */
 template <int dim, typename BaseClass>
-class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
+class DoFObjectAccessor<2, dim, BaseClass> :  public DoFAccessor<dim>,
+					      public BaseClass
+{
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -293,14 +301,14 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
-    DoFQuadAccessor ();
+    DoFObjectAccessor ();
 
     				     /**
 				      * Constructor. The #local_data#
 				      * argument is assumed to be a pointer
 				      * to a #DoFHandler<dim># object.
 				      */
-    DoFQuadAccessor (Triangulation<dim> *tria,
+    DoFObjectAccessor (Triangulation<dim> *tria,
 		     const int           level,
 		     const int           index,
 		     const AccessorData *local_data) :
@@ -350,7 +358,7 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Quad#.
 				      */
-    TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+    TriaIterator<dim,DoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
     line (const unsigned int i) const;
     
 				     /**
@@ -360,7 +368,7 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * class returns a quad accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFQuadAccessor<dim,BaseClass> > child (const unsigned int) const;
+    TriaIterator<dim,DoFObjectAccessor<2, dim, BaseClass> > child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell based) vector
@@ -392,7 +400,7 @@ class DoFQuadAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFQuadAccessor<dim,BaseClass> &a);
+    void copy_from (const DoFObjectAccessor<2, dim,BaseClass> &a);
 };
 
 
@@ -475,14 +483,14 @@ class DoFHexAccessor :  public DoFAccessor<dim>, public BaseClass {
 				      *  Return a pointer to the #i#th line
 				      *  bounding this #Hex#.
 				      */
-    TriaIterator<dim,DoFLineAccessor<dim,LineAccessor<dim> > >
+    TriaIterator<dim,DoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
     line (const unsigned int i) const;
 
     				     /**
 				      *  Return a pointer to the #i#th quad
 				      *  bounding this #Hex#.
 				      */
-    TriaIterator<dim,DoFQuadAccessor<dim,QuadAccessor<dim> > >
+    TriaIterator<dim,DoFObjectAccessor<2, dim,TriaObjectAccessor<2, dim> > >
     quad (const unsigned int i) const;
     
 				     /**
@@ -570,27 +578,27 @@ class DoFSubstructAccessor : public DoFAccessor<dim>,
  * with template parameters. This class and #DoFSubstructAccessor<2>#
  * wrap the following names:
  * \begin{verbatim}
- *   DoFSubstructAccessor<1> := DoFLineAccessor<1,CellAccessor<1> >;
- *   DoFSubstructAccessor<2> := DoFQuadAccessor<2,CellAccessor<2> >;
+ *   DoFSubstructAccessor<1> := DoFObjectAccessor<1, 1,CellAccessor<1> >;
+ *   DoFSubstructAccessor<2> := DoFObjectAccessor<2, 2,CellAccessor<2> >;
  * \end{verbatim}
  * We do this rather complex (and needless, provided C++ the needed constructs!)
  * class hierarchy manipulation, since this way we can declare and implement
  * the \Ref{DoFCellAccessor} dimension independent as an inheritance from
  * #DoFSubstructAccessor<dim>#. If we had not declared these
  * types, we would have to write two class declarations, one for
- * #DoFCellAccessor<1>#, derived from #DoFLineAccessor<1,CellAccessor<1> >#
+ * #DoFCellAccessor<1>#, derived from #DoFObjectAccessor<1, 1,CellAccessor<1> >#
  * and one for #DoFCellAccessor<2>#, derived from
- * #DoFQuadAccessor<2,CellAccessor<2> >#.
+ * #DoFObjectAccessor<2, 2,CellAccessor<2> >#.
  */
 template <>
-class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
+class DoFSubstructAccessor<1> :  public DoFObjectAccessor<1, 1,CellAccessor<1> > {
   public:
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef DoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
+    typedef DoFObjectAccessor<1, 1,CellAccessor<1> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -599,7 +607,7 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
 			  const int         level,
 			  const int         index,
 			  const AccessorData *local_data) :
-		    DoFLineAccessor<1,CellAccessor<1> > (tria,level,index,local_data) {};
+		    DoFObjectAccessor<1, 1,CellAccessor<1> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
 				     // what a face_iterator is. Otherwise
@@ -617,14 +625,14 @@ class DoFSubstructAccessor<1> :  public DoFLineAccessor<1,CellAccessor<1> > {
  * @see DoFSubstructAccessor<1>
  */
 template <>
-class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
+class DoFSubstructAccessor<2> : public DoFObjectAccessor<2, 2,CellAccessor<2> > {
   public:
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef DoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
+    typedef DoFObjectAccessor<2, 2,CellAccessor<2> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -633,14 +641,14 @@ class DoFSubstructAccessor<2> : public DoFQuadAccessor<2,CellAccessor<2> > {
 			  const int         level,
 			  const int         index,
 			  const AccessorData *local_data) :
-		    DoFQuadAccessor<2,CellAccessor<2> > (tria,level,index,local_data) {};
+		    DoFObjectAccessor<2, 2,CellAccessor<2> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
 				     // what a face_iterator is. Otherwise
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > > face_iterator;
+    typedef TriaIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > face_iterator;
 };
 
 
@@ -659,7 +667,7 @@ class DoFSubstructAccessor<3> : public DoFHexAccessor<3,CellAccessor<3> > {
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef DoFQuadAccessor<3,CellAccessor<3> >::AccessorData AccessorData;
+    typedef DoFObjectAccessor<2, 3,CellAccessor<3> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -675,18 +683,15 @@ class DoFSubstructAccessor<3> : public DoFHexAccessor<3,CellAccessor<3> > {
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > > face_iterator;
+    typedef TriaIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > face_iterator;
 };
-
-
-
 
 
 
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
- * #DoFLineAccessor<1># and #DoFQuadAccessor<2># for the space dimension
+ * #DoFObjectAccessor<1, 1># and #DoFObjectAccessor<2, 2># for the space dimension
  * one and two, respectively, this class only collects the pieces
  * together by deriving from the appropriate #DoF*Accessor# and the
  * right #CellAccessor<dim># and finally adding two functions which give
@@ -738,7 +743,7 @@ class DoFCellAccessor :  public DoFSubstructAccessor<dim> {
 				      * of this cell.
 				      *
 				      * This function is not implemented in 1D,
-				      * and maps to DoFQuadAccessor::line in 2D.
+				      * and maps to DoFObjectAccessor<2, dim>::line in 2D.
 				      */
     typename DoFSubstructAccessor<dim>::face_iterator
     face (const unsigned int i) const;

@@ -64,9 +64,9 @@ class MGDoFDimensionInfo<1> {
  */
 class MGDoFDimensionInfo<2> {
   public:
-    typedef TriaRawIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > >    raw_line_iterator;
-    typedef TriaIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > >       line_iterator;
-    typedef TriaActiveIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > > active_line_iterator;
+    typedef TriaRawIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >    raw_line_iterator;
+    typedef TriaIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >       line_iterator;
+    typedef TriaActiveIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > active_line_iterator;
     
     typedef TriaRawIterator<2,MGDoFCellAccessor<2> >               raw_quad_iterator;
     typedef TriaIterator<2,MGDoFCellAccessor<2> >                  quad_iterator;
@@ -95,13 +95,13 @@ class MGDoFDimensionInfo<2> {
  */
 class MGDoFDimensionInfo<3> {
   public:
-    typedef TriaRawIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >    raw_line_iterator;
-    typedef TriaIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > >       line_iterator;
-    typedef TriaActiveIterator<3,MGDoFLineAccessor<3,LineAccessor<3> > > active_line_iterator;
+    typedef TriaRawIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >    raw_line_iterator;
+    typedef TriaIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >       line_iterator;
+    typedef TriaActiveIterator<3,MGDoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > > active_line_iterator;
 
-    typedef TriaRawIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >    raw_quad_iterator;
-    typedef TriaIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > >       quad_iterator;
-    typedef TriaActiveIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > > active_quad_iterator;
+    typedef TriaRawIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >    raw_quad_iterator;
+    typedef TriaIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >       quad_iterator;
+    typedef TriaActiveIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > active_quad_iterator;
 
     typedef TriaRawIterator<3,MGDoFCellAccessor<3> >               raw_hex_iterator;
     typedef TriaIterator<3,MGDoFCellAccessor<3> >                  hex_iterator;
@@ -218,7 +218,7 @@ class MGDoFHandler
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first cell, used
+				      *  Iterator to the first cell, used
 				      *  or not, on level #level#. If a level
 				      *  has no cells, a past-the-end iterator
 				      *  is returned.
@@ -229,7 +229,7 @@ class MGDoFHandler
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used cell
+				      *  Iterator to the first used cell
 				      *  on level #level#.
 				      *
 				      *  This function calls #begin_line#
@@ -238,7 +238,7 @@ class MGDoFHandler
     cell_iterator        begin       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  cell on level #level#.
 				      *
 				      *  This function calls #begin_active_line#
@@ -247,7 +247,7 @@ class MGDoFHandler
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -343,7 +343,7 @@ class MGDoFHandler
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first face, used
+				      *  Iterator to the first face, used
 				      *  or not, on level #level#. If a level
 				      *  has no faces, a past-the-end iterator
 				      *  is returned.
@@ -354,7 +354,7 @@ class MGDoFHandler
     raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used face
+				      *  Iterator to the first used face
 				      *  on level #level#.
 				      *
 				      *  This function calls #begin_line#
@@ -363,7 +363,7 @@ class MGDoFHandler
     face_iterator        begin_face       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  face on level #level#.
 				      *
 				      *  This function calls #begin_active_line#
@@ -372,7 +372,7 @@ class MGDoFHandler
     active_face_iterator begin_active_face(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -469,7 +469,7 @@ class MGDoFHandler
 				      */
 				     /*@{*/
 				     /**
-				      *  Return iterator to the first line, used
+				      *  Iterator to the first line, used
 				      *  or not, on level #level#. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
@@ -477,19 +477,19 @@ class MGDoFHandler
     raw_line_iterator begin_raw_line (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used line
+				      *  Iterator to the first used line
 				      *  on level #level#.
 				      */
     line_iterator     begin_line (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  line on level #level#.
 				      */
     active_line_iterator begin_active_line(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -566,7 +566,7 @@ class MGDoFHandler
     				     /*@{
 				      */
     				     /**
-				      *  Return iterator to the first quad, used
+				      *  Iterator to the first quad, used
 				      *  or not, on level #level#. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
@@ -574,19 +574,19 @@ class MGDoFHandler
     raw_quad_iterator    begin_raw_quad   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used quad
+				      *  Iterator to the first used quad
 				      *  on level #level#.
 				      */
     quad_iterator        begin_quad       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  quad on level #level#.
 				      */
     active_quad_iterator begin_active_quad(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -663,7 +663,7 @@ class MGDoFHandler
     				     /*@{
 				      */
     				     /**
-				      *  Return iterator to the first hex, used
+				      *  Iterator to the first hex, used
 				      *  or not, on level #level#. If a level
 				      *  has no hexs, a past-the-end iterator
 				      *  is returned.
@@ -671,19 +671,19 @@ class MGDoFHandler
     raw_hex_iterator    begin_raw_hex   (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first used hex
+				      *  Iterator to the first used hex
 				      *  on level #level#.
 				      */
     hex_iterator        begin_hex       (const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator to the first active
+				      *  Iterator to the first active
 				      *  hex on level #level#.
 				      */
     active_hex_iterator begin_active_hex(const unsigned int level = 0) const;
 
 				     /**
-				      *  Return iterator past the end; this
+				      *  Iterator past the end; this
 				      *  iterator serves for comparisons of
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
@@ -873,11 +873,6 @@ class MGDoFHandler
 	DeclException0 (ExcNoMemory);
 					 /**
 					  * Exception.
-
-					  */
-	DeclException0 (ExcInvalidIndex);
-					 /**
-					  * Exception.
 					  */
 	DeclException1 (ExcInvalidLevel,
 			int,
@@ -963,10 +958,10 @@ class MGDoFHandler
 				      */
     vector<unsigned int>      mg_used_dofs;
 
-    friend class MGDoFLineAccessor<dim, LineAccessor<dim> >;
-    friend class MGDoFLineAccessor<dim, CellAccessor<dim> >;
-    friend class MGDoFQuadAccessor<dim, QuadAccessor<dim> >;
-    friend class MGDoFQuadAccessor<dim, CellAccessor<dim> >;
+    friend class MGDoFObjectAccessor<1, dim, TriaObjectAccessor<1, dim> >;
+    friend class MGDoFObjectAccessor<1, dim, CellAccessor<dim> >;
+    friend class MGDoFObjectAccessor<2, dim, TriaObjectAccessor<2, dim> >;
+    friend class MGDoFObjectAccessor<2, dim, CellAccessor<dim> >;
     friend class MGDoFHexAccessor<dim, HexAccessor<dim> >;
     friend class MGDoFHexAccessor<dim, CellAccessor<dim> >;
 };
@@ -988,7 +983,8 @@ void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
 						  const unsigned int index) {
   Assert ((level >= coarsest_level) && (level <= finest_level),
 	  ExcInvalidLevel(level));
-  Assert (dof_number < dofs_per_vertex, ExcInvalidIndex ());
+  Assert (dof_number < dofs_per_vertex,
+	  ExcIndexRange(dof_number, 0, dofs_per_vertex));
   
   indices[(level-coarsest_level)*dofs_per_vertex + dof_number] = index;
 };
@@ -1003,7 +999,8 @@ int MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
 						 const unsigned int dofs_per_vertex) const {
   Assert ((level >= coarsest_level) && (level <= finest_level),
 	  ExcInvalidLevel(level));
-  Assert (dof_number < dofs_per_vertex, ExcInvalidIndex ());
+  Assert (dof_number < dofs_per_vertex,
+	  ExcIndexRange (dof_number, 0, dofs_per_vertex));
   
   return indices[(level-coarsest_level)*dofs_per_vertex + dof_number];
 };

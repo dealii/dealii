@@ -499,13 +499,6 @@ class FEValuesBase
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcInvalidIndex,
-		    int, int,
-		    << "The index " << arg1
-		    << " is out of range, it should be less than " << arg2);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcAccessToUninitializedField);
 				     /**
 				      * Exception
@@ -1220,9 +1213,10 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 
 template <int dim>
 inline
-const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const {
+const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const
+{
   Assert (selected_dataset<shape_values.size(),
-	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   return shape_values[selected_dataset];
 };
 
@@ -1231,7 +1225,8 @@ const FullMatrix<double> & FEValuesBase<dim>::get_shape_values () const {
 template <int dim>
 inline
 const vector<vector<Tensor<1,dim> > > &
-FEValuesBase<dim>::get_shape_grads () const {
+FEValuesBase<dim>::get_shape_grads () const
+{
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
@@ -1241,7 +1236,8 @@ FEValuesBase<dim>::get_shape_grads () const {
 template <int dim>
 inline
 const vector<vector<Tensor<2,dim> > > &
-FEValuesBase<dim>::get_shape_2nd_derivatives () const {
+FEValuesBase<dim>::get_shape_2nd_derivatives () const
+{
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   return shape_2nd_derivatives;
 };

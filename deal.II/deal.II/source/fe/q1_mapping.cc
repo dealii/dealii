@@ -41,7 +41,7 @@ double
 FEQ1Mapping<1>::shape_value_transform (const unsigned int i,
 					   const Point<1>     &p) const
 {
-  Assert((i<2), ExcInvalidIndex(i));
+  Assert((i<2), ExcIndexRange(i,0,2));
   const double xi = p(0);
   switch (i)
     {
@@ -59,7 +59,7 @@ Tensor<1,1>
 FEQ1Mapping<1>::shape_grad_transform(const unsigned int i,
 					 const Point<1>&) const
 {
-  Assert((i<2), ExcInvalidIndex(i));
+  Assert((i<2), ExcIndexRange(i,0,2));
   switch (i)
     {
     case 0: return Point<1>(-1.);
@@ -162,7 +162,7 @@ double
 FEQ1Mapping<2>::shape_value_transform (const unsigned int i,
 					   const Point<2>& p) const
 {
-  Assert((i<4), ExcInvalidIndex(i));
+  Assert((i<4), ExcIndexRange(i,0,4));
   switch (i)
     {
     case 0: return (1.-p(0)) * (1.-p(1));
@@ -181,7 +181,7 @@ Tensor<1,2>
 FEQ1Mapping<2>::shape_grad_transform (const unsigned int i,
 					  const Point<2>& p) const
 {
-  Assert((i<4), ExcInvalidIndex(i));
+  Assert((i<4), ExcIndexRange(i,0,4));
   switch (i)
     {
     case 0: return Point<2> (p(1)-1., p(0)-1.);
@@ -333,7 +333,7 @@ double
 FEQ1Mapping<3>::shape_value_transform (const unsigned int i,
 					   const Point<3>& p) const
 {
-  Assert((i<8), ExcInvalidIndex(i));
+  Assert((i<8), ExcIndexRange(i,0,8));
   switch (i)
     {
       case 0: return 1.0-p(0)+(-1.0+p(0))*p(1)+(-1.0+p(0)+(1.0-p(0))*p(1))*p(2);
@@ -356,7 +356,7 @@ Tensor<1,3>
 FEQ1Mapping<3>::shape_grad_transform (const unsigned int i,
 					  const Point<3>& p) const
 {
-  Assert((i<8), ExcInvalidIndex(i));
+  Assert((i<8), ExcIndexRange(i,0,8));
   switch (i)
     {
       case 0: return Point<3>(-1.0+p(1)+(1.0-p(1))*p(2),

@@ -84,7 +84,8 @@ class MGDoFAccessor {
 };
 
 
-
+template <int celldim, int dim, typename BaseClass>
+class MGDoFObjectAccessor;
 
 
 /**
@@ -113,7 +114,7 @@ class MGDoFAccessor {
  * Unfortunately, we would run into problems, if we wanted a #DoFLineAccessor#
  * in one spatial dimension, in which case a line is also a cell. The traditional
  * solution would be to declare a #DoFCellAccessor<1># which is derived from
- * #DoFLineAccessor<1># and #CellAccessor<1># (the #DoFLineAccessor<dim># cannot
+ * #DoFObjectAccessor<1, 1># and #CellAccessor<1># (the #DoFObjectAccessor<1, dim># cannot
  * itself be derived from #CellAccessor<dim># since a line is not a cell
  * unless in one space dimension), but since a #DoFLineAccessor# and a
  * #CellAccessor# are both derived from #TriaAccessor#, we would have to make
@@ -124,20 +125,22 @@ class MGDoFAccessor {
  * pass a second template parameter to a #DoFLineAccessor# which tells it
  * which class to be derived from: if we are in one spatial dimension, the
  * base class is to be #CellAccessor<1>#, in two or more dimensions it
- * is a #LineAccessor<dim>#, i.e. am accessor to lines without the missing
+ * is a #TriaObjectAccessor<1, dim>#, i.e. am accessor to lines without the missing
  * functionality needed for cells (neighbors, etc.).
  *
  * This way we can declare a #DoFCellAccessor# in one dimension by deriving
- * from #DoFLineAccessor<1,CellAccessor<1> >#, thus getting the cell
+ * from #DoFObjectAccessor<1, 1,CellAccessor<1> >#, thus getting the cell
  * functionality through the #DoFLineAccessor# instead of through a virtual
  * multiple inheritance of #DoFLineAccessor# and #CellAccessor<1>#.
  *
- * The same concept is used with #DoFQuadAccessor# classes etc.
+ * The same concept is used with #DoFObjectAccessor<2, dim># classes etc.
  *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim, typename BaseClass>
-class MGDoFLineAccessor :  public MGDoFAccessor<dim>, public DoFLineAccessor<dim, BaseClass> {
+class MGDoFObjectAccessor<1, dim, BaseClass> :  public MGDoFAccessor<dim>,
+						public DoFObjectAccessor<1, dim, BaseClass>
+{
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -150,14 +153,14 @@ class MGDoFLineAccessor :  public MGDoFAccessor<dim>, public DoFLineAccessor<dim
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
-    MGDoFLineAccessor ();
+    MGDoFObjectAccessor ();
     
     				     /**
 				      * Constructor. The #local_data#
 				      * argument is assumed to be a pointer
 				      * to a #MGDoFHandler<dim># object.
 				      */
-    MGDoFLineAccessor (Triangulation<dim> *tria,
+    MGDoFObjectAccessor (Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data);
@@ -213,13 +216,13 @@ class MGDoFLineAccessor :  public MGDoFAccessor<dim>, public DoFLineAccessor<dim
 				      * class returns a line accessor without
 				      * access to the MG data.
 				      */
-    TriaIterator<dim,MGDoFLineAccessor<dim,BaseClass> > child (const unsigned int) const;
+    TriaIterator<dim,MGDoFObjectAccessor<1, dim,BaseClass> > child (const unsigned int) const;
     
 				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const MGDoFLineAccessor<dim,BaseClass> &a);
+    void copy_from (const MGDoFObjectAccessor<1, dim,BaseClass> &a);
 };
 
 
@@ -233,7 +236,7 @@ class MGDoFLineAccessor :  public MGDoFAccessor<dim>, public DoFLineAccessor<dim
  * @see DoFLineAccessor
  */
 template <int dim, typename BaseClass>
-class MGDoFQuadAccessor :  public MGDoFAccessor<dim>, public DoFQuadAccessor<dim, BaseClass> {
+class MGDoFObjectAccessor<2, dim, BaseClass> :  public MGDoFAccessor<dim>, public DoFObjectAccessor<2, dim, BaseClass> {
   public:
 				     /**
 				      * Declare the data type that this accessor
@@ -246,14 +249,14 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>, public DoFQuadAccessor<dim
 				      * Default constructor, unused thus
 				      * not implemented.
 				      */
-    MGDoFQuadAccessor ();
+    MGDoFObjectAccessor ();
 
     				     /**
 				      * Constructor. The #local_data#
 				      * argument is assumed to be a pointer
 				      * to a #DoFHandler<dim># object.
 				      */
-    MGDoFQuadAccessor (Triangulation<dim> *tria,
+    MGDoFObjectAccessor (Triangulation<dim> *tria,
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data);
@@ -307,7 +310,7 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>, public DoFQuadAccessor<dim
 				      * Return a pointer to the #i#th line
 				      * bounding this #Quad#.
 				      */
-    TriaIterator<dim,MGDoFLineAccessor<dim,LineAccessor<dim> > >
+    TriaIterator<dim,MGDoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
     line (const unsigned int i) const;
 
 				     /**
@@ -317,13 +320,13 @@ class MGDoFQuadAccessor :  public MGDoFAccessor<dim>, public DoFQuadAccessor<dim
 				      * class returns a quad accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,MGDoFQuadAccessor<dim,BaseClass> > child (const unsigned int) const;
+    TriaIterator<dim,MGDoFObjectAccessor<2, dim, BaseClass> > child (const unsigned int) const;
     
 				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const MGDoFQuadAccessor<dim,BaseClass> &a);
+    void copy_from (const MGDoFObjectAccessor<2, dim,BaseClass> &a);
 };
 
 
@@ -409,14 +412,14 @@ class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, 
 				      * Return a pointer to the #i#th line
 				      * bounding this #Hex#.
 				      */
-    TriaIterator<dim,MGDoFLineAccessor<dim,LineAccessor<dim> > >
+    TriaIterator<dim,MGDoFObjectAccessor<1, dim,TriaObjectAccessor<1, dim> > >
     line (const unsigned int i) const;
 
 				     /**
 				      * Return a pointer to the #i#th quad
 				      * bounding this #Hex#.
 				      */
-    TriaIterator<dim,MGDoFQuadAccessor<dim,QuadAccessor<dim> > >
+    TriaIterator<dim,MGDoFObjectAccessor<2, dim,TriaObjectAccessor<2, dim> > >
     quad (const unsigned int i) const;
 
 				     /**
@@ -454,7 +457,7 @@ class MGDoFHexAccessor :  public MGDoFAccessor<dim>, public DoFHexAccessor<dim, 
  * the compiler) happens to use this class.
  */
 template <int dim>
-class MGDoFSubstructAccessor : public MGDoFLineAccessor<1,CellAccessor<1> > {
+class MGDoFSubstructAccessor : public MGDoFObjectAccessor<1, 1,CellAccessor<1> > {
   public:
     MGDoFSubstructAccessor () {
       Assert (false, ExcInternalError());
@@ -475,27 +478,27 @@ class MGDoFSubstructAccessor : public MGDoFLineAccessor<1,CellAccessor<1> > {
  * with template parameters. This class and #DoFSubstructAccessor<2>#
  * wrap the following names:
  * \begin{verbatim}
- *   MGDoFSubstructAccessor<1> := MGDoFLineAccessor<1,CellAccessor<1> >;
- *   MGDoFSubstructAccessor<2> := MGDoFQuadAccessor<2,CellAccessor<2> >;
+ *   MGDoFSubstructAccessor<1> := MGDoFObjectAccessor<1, 1,CellAccessor<1> >;
+ *   MGDoFSubstructAccessor<2> := MGDoFObjectAccessor<2, 2,CellAccessor<2> >;
  * \end{verbatim}
  * We do this rather complex (and needless, provided C++ the needed constructs!)
  * class hierarchy manipulation, since this way we can declare and implement
  * the \Ref{DoFCellAccessor} dimension independent as an inheritance from
  * #DoFSubstructAccessor<dim>#. If we had not declared these
  * types, we would have to write two class declarations, one for
- * #DoFCellAccessor<1>#, derived from #DoFLineAccessor<1,CellAccessor<1> >#
+ * #DoFCellAccessor<1>#, derived from #DoFObjectAccessor<1, 1,CellAccessor<1> >#
  * and one for #DoFCellAccessor<2>#, derived from
- * #DoFQuadAccessor<2,CellAccessor<2> >#.
+ * #DoFObjectAccessor<2, 2,CellAccessor<2> >#.
  */
 template <>
-class MGDoFSubstructAccessor<1> :  public MGDoFLineAccessor<1,CellAccessor<1> > {
+class MGDoFSubstructAccessor<1> :  public MGDoFObjectAccessor<1, 1,CellAccessor<1> > {
   public:
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef MGDoFLineAccessor<1,CellAccessor<1> >::AccessorData AccessorData;
+    typedef MGDoFObjectAccessor<1, 1,CellAccessor<1> >::AccessorData AccessorData;
 
     				     /**
 				      * Constructor
@@ -504,7 +507,7 @@ class MGDoFSubstructAccessor<1> :  public MGDoFLineAccessor<1,CellAccessor<1> > 
 			    const int         level,
 			    const int         index,
 			    const AccessorData *local_data) :
-		    MGDoFLineAccessor<1,CellAccessor<1> > (tria,level,index,local_data) {};
+		    MGDoFObjectAccessor<1, 1,CellAccessor<1> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
 				     // what a face_iterator is. Otherwise
@@ -522,14 +525,14 @@ class MGDoFSubstructAccessor<1> :  public MGDoFLineAccessor<1,CellAccessor<1> > 
  * @see MGDoFSubstructAccessor<1>
  */
 template <>
-class MGDoFSubstructAccessor<2> : public MGDoFQuadAccessor<2,CellAccessor<2> > {
+class MGDoFSubstructAccessor<2> : public MGDoFObjectAccessor<2, 2,CellAccessor<2> > {
   public:
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef MGDoFQuadAccessor<2,CellAccessor<2> >::AccessorData AccessorData;
+    typedef MGDoFObjectAccessor<2, 2,CellAccessor<2> >::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -538,14 +541,14 @@ class MGDoFSubstructAccessor<2> : public MGDoFQuadAccessor<2,CellAccessor<2> > {
 			    const int         level,
 			    const int         index,
 			    const AccessorData *local_data) :
-		    MGDoFQuadAccessor<2,CellAccessor<2> > (tria,level,index,local_data) {};
+		    MGDoFObjectAccessor<2, 2,CellAccessor<2> > (tria,level,index,local_data) {};
 				     // do this here, since this way the
 				     // CellAccessor has the possibility to know
 				     // what a face_iterator is. Otherwise
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<2,MGDoFLineAccessor<2,LineAccessor<2> > > face_iterator;
+    typedef TriaIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > face_iterator;
 };
 
 
@@ -579,7 +582,7 @@ class MGDoFSubstructAccessor<3> : public MGDoFHexAccessor<3,CellAccessor<3> > {
 				     // it would have to ask the DoFHandler<dim>
 				     // which would need another big include
 				     // file and maybe cyclic interdependence
-    typedef TriaIterator<3,MGDoFQuadAccessor<3,QuadAccessor<3> > > face_iterator;
+    typedef TriaIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > face_iterator;
 };
 
 
@@ -590,7 +593,7 @@ class MGDoFSubstructAccessor<3> : public MGDoFHexAccessor<3,CellAccessor<3> > {
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
- * #DoFLineAccessor<1># and #DoFQuadAccessor<2># for the space dimension
+ * #DoFObjectAccessor<1, 1># and #DoFObjectAccessor<2, 2># for the space dimension
  * one and two, respectively, this class only collects the pieces
  * together by deriving from the appropriate #DoF*Accessor# and the
  * right #CellAccessor<dim># and finally adding two functions which give
@@ -642,7 +645,7 @@ class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
 				      * of this cell.
 				      *
 				      * This function is not implemented in 1D,
-				      * and maps to MGDoFQuadAccessor::line in 2D.
+				      * and maps to MGDoFObjectAccessor<2, dim>::line in 2D.
 				      */
     typename MGDoFSubstructAccessor<dim>::face_iterator
     face (const unsigned int i) const;

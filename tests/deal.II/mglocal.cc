@@ -19,11 +19,25 @@
 #include <grid/dof_accessor.h>
 #include <grid/mg_dof_accessor.h>
 #include <grid/grid_generator.h>
+#include <basic/data_io.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>
 #include <numerics/multigrid.h>
-#include <numerics/multigrid.templates.h>
 #include <numerics/mg_smoother.h>
+MGSmoother* smoother_object;
+#include <numerics/multigrid.templates.h>
+
+#include <fstream>
+
+// Does anybody know why cmath does not do this?
+
+#ifndef M_PI_2
+#define	M_PI_2		1.57079632679489661923
+#endif
+
+
+
+int step_counter = 0;
 
 #include "helmholtz.h"
 
@@ -37,20 +51,8 @@ class RHSFunction
 //    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
 };
 
-class MGSmootherLAC
-  :
-  public MGSmootherBase
-{
-  private:
-    SmartPointer<MGMatrix<SparseMatrix<double> > >matrices;
-  public:
-    MGSmootherLAC(MGMatrix<SparseMatrix<double> >&);
-    
-    virtual void smooth (const unsigned int level,
-			 Vector<double> &u,
-			 const Vector<double> &rhs) const;
-    
-};
+extern void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsigned int level,
+			   ostream &out);
 
 main()
 {
@@ -62,13 +64,13 @@ main()
   FEQ2<2> fe2;
   FEQ3<2> fe3;
   FEQ4<2> fe4;
-  for (unsigned int degree=1;degree<=4;degree++)
+  for (unsigned int degree=1;degree<=1;degree++)
     {
       Triangulation<2> tr;
       MGDoFHandler<2> mgdof(&tr);
       DoFHandler<2>& dof(mgdof);
   
-      GridGenerator::hyper_cube(tr,-1.,1.);
+      GridGenerator::hyper_cube(tr,-M_PI_2,M_PI_2);
   
       FiniteElement<2>* fe;
       switch(degree)
@@ -78,22 +80,28 @@ main()
 	  case 3: fe = &fe3; deallog.push("Q3"); break;
 	  case 4: fe = &fe4; deallog.push("Q4"); break;
 	}
-      
-      for (unsigned int step=0;step < 4; ++step)
+
+      tr.refine_global(1);
+      Triangulation<2>::active_cell_iterator cell = tr.begin_active();
+      cell->set_refine_flag();
+      tr.execute_coarsening_and_refinement();
+
+      tr.refine_global(2);
+      dof.distribute_dofs(*fe);
+      const unsigned int size = dof.n_dofs();
+      deallog << "DoFs " << size << endl;
+      deallog << "Levels: " << tr.n_levels() << endl;
+      for (unsigned int step=1;step < 5; ++step)
 	{
-	  tr.refine_global(1);
-	  dof.distribute_dofs(*fe);
+	  deallog << "smoothing-steps" << step << endl;
+	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
+	  dof.make_sparsity_pattern(structure);
 
 	  ConstraintMatrix hanging_nodes;
 	  dof.make_hanging_node_constraints(hanging_nodes);
 	  hanging_nodes.close();
+	  hanging_nodes.condense(structure);
 
-	  const unsigned int size = dof.n_dofs();
-	  deallog << "DoFs " << size << endl;
-	  deallog << "Levels: " << tr.n_levels() << endl;
-	  
-	  SparseMatrixStruct structure(size, dof.max_couplings_between_dofs());
-	  dof.make_sparsity_pattern(structure);
 	  structure.compress();
 	  
 	  SparseMatrix<double> A(structure);
@@ -101,16 +109,15 @@ main()
 	  
 	  equation.build_all(A,f,dof, quadrature, rhs);
 	  
+	  hanging_nodes.condense(A);
+	  hanging_nodes.condense(f);
+
 	  Vector<double> u;
 	  u.reinit(f);
 	  PrimitiveVectorMemory<Vector<double> > mem;
-	  SolverControl control(100, 1.e-12);
-	  SolverCG<SparseMatrix<double>, Vector<double> >solver(control, mem);
+	  SolverControl control(20, 1.e-12, true);
+	  SolverRichardson<SparseMatrix<double>, Vector<double> >solver(control, mem);
 	  
-	  PreconditionIdentity<Vector<double> > precondition;
-	  solver.solve(A,u,f,precondition);
-	  
-	  u = 0.;
 	  vector<SparseMatrixStruct> mgstruct(tr.n_levels());
 	  MGMatrix<SparseMatrix<double> > mgA(0,tr.n_levels()-1);
 	  for (unsigned int i=0;i<tr.n_levels();++i)
@@ -124,24 +131,31 @@ main()
 	    }
 	  equation.build_mgmatrix(mgA, mgdof, quadrature);
 	  
-	  SolverControl cgcontrol(10,0., false, false);
+	  SolverControl cgcontrol(20,0., false, false);
 	  PrimitiveVectorMemory<Vector<double> > cgmem;
 	  SolverCG<SparseMatrix<double>, Vector<double> > cgsolver(cgcontrol, cgmem);
 	  PreconditionIdentity<Vector<double> > cgprec;
 	  MGCoarseGridLACIteration<SolverCG<SparseMatrix<double>, Vector<double> >,
 	    SparseMatrix<double>, PreconditionIdentity<Vector<double> > >
-	    coarse(cgsolver, mgA[0], cgprec);
+	    coarse(cgsolver, mgA[tr.n_levels()-2], cgprec);
 	  
-	  MGSmootherLAC smoother(mgA);
+	  MGSmootherRelaxation<double>
+	    smoother(mgdof, mgA, &SparseMatrix<double>::template precondition_SSOR<double>,
+		     step, 1.);
+	  smoother_object = &smoother;
+	  
 	  MGTransferPrebuilt transfer;
 	  transfer.build_matrices(mgdof);
 	  
 	  
-	  MG<2> multigrid(mgdof, hanging_nodes, mgA, transfer);
+	  MG<2> multigrid(mgdof, hanging_nodes, mgA, transfer, tr.n_levels()-2);
 	  PreconditionMG<MG<2>, Vector<double> >
 	    mgprecondition(multigrid, smoother, smoother, coarse);
-	  
+
+	   u = 0.;
+	   
 	  solver.solve(A, u, f, mgprecondition);
+	  hanging_nodes.distribute(u);
 	}
       deallog.pop();
     }
@@ -149,26 +163,36 @@ main()
 
 template<int dim>
 double
-RHSFunction<dim>::operator() (const Point<dim>&) const
+RHSFunction<dim>::operator() (const Point<dim>&p) const
 {
-  return 1.;
+//  return 1.;
+  
+  return p(0)*p(0)+p(1)*p(1);
+  
+  return (2.1)*(sin(p(0))* sin(p(1)));
 }
 
-MGSmootherLAC::MGSmootherLAC(MGMatrix<SparseMatrix<double> >& matrix)
-		:
-		matrices(&matrix)
-{}
 
-void
-MGSmootherLAC::smooth (const unsigned int level,
-		       Vector<double> &u,
-		       const Vector<double> &rhs) const
+void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsigned int level,
+		    ostream &out)
 {
-  SolverControl control(2,1.e-300,false,false);
-  PrimitiveVectorMemory<Vector<double> > mem;
-  SolverRichardson<SparseMatrix<double> , Vector<double>  > rich(control, mem);
-  PreconditionRelaxation<SparseMatrix<double> , Vector<double> >
-    prec((*matrices)[level], &SparseMatrix<double> ::template precondition_SSOR<double>, 1.);
+  MGDoFHandler<2>::cell_iterator cell;
+  MGDoFHandler<2>::cell_iterator endc = dofs.end(level);
 
-  rich.solve((*matrices)[level], u, rhs, prec);
+  Vector<double> values(dofs.get_fe().total_dofs);
+  
+  unsigned int cell_index=0;
+  for (cell=dofs.begin(level); cell!=endc; ++cell, ++cell_index) 
+    {
+      cell->get_mg_dof_values(v, values);
+      
+      out << cell->vertex(0) << "  " << values(0) << endl;
+      out << cell->vertex(1) << "  " << values(1) << endl;
+      out << endl;
+      out << cell->vertex(3) << "  " << values(3) << endl;
+      out << cell->vertex(2) << "  " << values(2) << endl;
+      out << endl;
+      out << endl;
+    }
+  out << endl;
 }

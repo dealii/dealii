@@ -37,25 +37,28 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
   const unsigned int face_dofs = dofs->get_fe().dofs_per_face;
   
   d.clear();
-  hanging_nodes.condense(src);
+//  hanging_nodes.condense(src);
   
   vector<int> index(fe_dofs);
   vector<int> mgindex(fe_dofs);
   vector<int> mgfaceindex(face_dofs);
   
-  {
-    ofstream of("CT");
-    DataOut<2> out;
-    out.attach_dof_handler(*dofs);
-    out.add_data_vector(src,"solution");
-    out.write_gnuplot(of,1);
-  }
+//   {
+//     ofstream of("CT");
+//     DataOut<2> out;
+//     out.attach_dof_handler(*dofs);
+//     out.add_data_vector(src,"solution");
+//     out.write_gnuplot(of,1);
+//   }
 
   for (int level = maxlevel ; level >= (int) minlevel ; --level)
     {
       DoFHandler<dim>::active_cell_iterator dc = dofs->DoFHandler<dim>::begin_active(level);
       MGDoFHandler<dim>::active_cell_iterator c = dofs->begin_active(level);
-      for (; c != dofs->end(level) ; ++c, ++dc)
+
+//TODO: Document on difference between #end# and #end_level#
+
+      for (; c != dofs->end_active(level) ; ++c, ++dc)
 	{
 	  dc->get_dof_indices(index);
 	  c->get_mg_dof_indices(mgindex);
@@ -80,13 +83,13 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 	transfer->restrict(level+1, d[level], d[level+1]);
     }
   
-  for (unsigned int i=minlevel; i<= maxlevel; ++i)
-    {
-      char name[10];
-      sprintf(name,"CT%d",i);
-      ofstream of(name);
-      write_gnuplot(*dofs, d[i], i, of);
-    }
+//   for (unsigned int i=minlevel; i<= maxlevel; ++i)
+//     {
+//       char name[10];
+//       sprintf(name,"CT%d",i);
+//       ofstream of(name);
+//       write_gnuplot(*dofs, d[i], i, of);
+//     }
 }
 
 template <int dim> template <typename number>
@@ -98,13 +101,13 @@ MG<dim>::copy_from_mg(Vector<number>& dst) const
   vector<int> index(fe_dofs);
   vector<int> mgindex(fe_dofs);
 
-  for (unsigned int i=minlevel; i<= maxlevel; ++i)
-    {
-      char name[10];
-      sprintf(name,"CF%d",i);
-      ofstream of(name);
-      write_gnuplot(*dofs, s[i], i, of);
-    }
+//   for (unsigned int i=minlevel; i<= maxlevel; ++i)
+//     {
+//       char name[10];
+//       sprintf(name,"CF%d",i);
+//       ofstream of(name);
+//       write_gnuplot(*dofs, s[i], i, of);
+//     }
 
   DoFHandler<dim>::active_cell_iterator dc = dofs->DoFHandler<dim>::begin_active();
   for (MGDoFHandler<dim>::active_cell_iterator c = dofs->begin_active()
@@ -116,13 +119,13 @@ MG<dim>::copy_from_mg(Vector<number>& dst) const
 	dst(index[i]) = s[c->level()](mgindex[i]);
     } 
   hanging_nodes.set_zero(dst);
-  {
-    ofstream of("CF");
-    DataOut<2> out;
-    out.attach_dof_handler(*dofs);
-    out.add_data_vector(dst,"solution");
-    out.write_gnuplot(of,1);
-  }
+//   {
+//     ofstream of("CF");
+//     DataOut<2> out;
+//     out.attach_dof_handler(*dofs);
+//     out.add_data_vector(dst,"solution");
+//     out.write_gnuplot(of,1);
+//   }
 }
 
 template <int dim>

@@ -26,7 +26,7 @@
 
 
 template <int dim, typename BaseClass>
-void DoFLineAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
+void DoFObjectAccessor<1, dim,BaseClass>::set_dof_index (const unsigned int i,
 						    const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -43,7 +43,7 @@ void DoFLineAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 template <int dim, typename BaseClass>
-void DoFLineAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
+void DoFObjectAccessor<1, dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -61,7 +61,7 @@ void DoFLineAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 
 
 template <int dim, typename BaseClass>
-void DoFLineAccessor<dim,BaseClass>::
+void DoFObjectAccessor<1, dim,BaseClass>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -86,7 +86,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 
 
 template <int dim, typename BaseClass>
-void DoFLineAccessor<dim,BaseClass>::
+void DoFObjectAccessor<1, dim,BaseClass>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -119,7 +119,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 
 
 template <int dim, typename BaseClass>
-void DoFQuadAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
+void DoFObjectAccessor<2, dim,BaseClass>::set_dof_index (const unsigned int i,
 						    const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -135,7 +135,7 @@ void DoFQuadAccessor<dim,BaseClass>::set_dof_index (const unsigned int i,
 
 
 template <int dim, typename BaseClass>
-void DoFQuadAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
+void DoFObjectAccessor<2, dim,BaseClass>::set_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const int index) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -153,7 +153,7 @@ void DoFQuadAccessor<dim,BaseClass>::set_vertex_dof_index (const unsigned int ve
 
 
 template <int dim, typename BaseClass>
-void DoFQuadAccessor<dim,BaseClass>::
+void DoFObjectAccessor<2, dim,BaseClass>::
 distribute_local_to_global (const Vector<double> &local_source,
 			    Vector<double>       &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -179,7 +179,7 @@ distribute_local_to_global (const Vector<double> &local_source,
 
 
 template <int dim, typename BaseClass>
-void DoFQuadAccessor<dim,BaseClass>::
+void DoFObjectAccessor<2, dim,BaseClass>::
 distribute_local_to_global (const FullMatrix<double> &local_source,
 			    SparseMatrix<double>     &global_destination) const {
   Assert (dof_handler != 0, ExcInvalidObject());
@@ -785,7 +785,7 @@ DoFCellAccessor<deal_II_dimension>::set_dof_values_by_interpolation(const Vector
 
 
 #if deal_II_dimension == 1
-template class DoFLineAccessor<1,CellAccessor<1> >;
+template class DoFObjectAccessor<1, 1,CellAccessor<1> >;
 template class DoFCellAccessor<1>;
 
 template class TriaRawIterator<1,DoFCellAccessor<1> >;
@@ -794,38 +794,38 @@ template class TriaActiveIterator<1,DoFCellAccessor<1> >;
 #endif
 
 #if deal_II_dimension == 2
-template class DoFLineAccessor<2,LineAccessor<2> >;
-template class DoFQuadAccessor<2,QuadAccessor<2> >;
-template class DoFQuadAccessor<2,CellAccessor<2> >;
+template class DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> >;
+template class DoFObjectAccessor<2, 2,TriaObjectAccessor<2, 2> >;
+template class DoFObjectAccessor<2, 2,CellAccessor<2> >;
 template class DoFCellAccessor<2>;
 
-template class TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
-template class TriaRawIterator<2,DoFQuadAccessor<2,QuadAccessor<2> > >;
+template class TriaRawIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >;
+template class TriaRawIterator<2,DoFObjectAccessor<2, 2,TriaObjectAccessor<2, 2> > >;
 template class TriaRawIterator<2,DoFCellAccessor<2> >;
-template class TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
+template class TriaIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >;
 template class TriaIterator<2,DoFCellAccessor<2> >;
-template class TriaActiveIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
+template class TriaActiveIterator<2,DoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > >;
 template class TriaActiveIterator<2,DoFCellAccessor<2> >;
 #endif
 
 
 
 #if deal_II_dimension == 3
-template class DoFLineAccessor<3,LineAccessor<3> >;
-template class DoFQuadAccessor<3,QuadAccessor<3> >;
+template class DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> >;
+template class DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> >;
 template class DoFHexAccessor<3,HexAccessor<3> >;
 template class DoFHexAccessor<3,CellAccessor<3> >;
 template class DoFCellAccessor<3>;
 
-template class TriaRawIterator<3,DoFLineAccessor<3,LineAccessor<3> > >;
-template class TriaRawIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaRawIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
+template class TriaRawIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
 template class TriaRawIterator<3,DoFHexAccessor<3,HexAccessor<3> > >;
 template class TriaRawIterator<3,DoFCellAccessor<3> >;
-template class TriaIterator<3,DoFLineAccessor<3,LineAccessor<3> > >;
-template class TriaIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
+template class TriaIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
 template class TriaIterator<3,DoFCellAccessor<3> >;
-template class TriaActiveIterator<3,DoFLineAccessor<3,LineAccessor<3> > >;
-template class TriaActiveIterator<3,DoFQuadAccessor<3,QuadAccessor<3> > >;
+template class TriaActiveIterator<3,DoFObjectAccessor<1, 3,TriaObjectAccessor<1, 3> > >;
+template class TriaActiveIterator<3,DoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > >;
 template class TriaActiveIterator<3,DoFCellAccessor<3> >;
 #endif
 

@@ -69,7 +69,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double> &fe_function,
   Assert (fe->n_components == 1,
 	  ExcWrongNoOfComponents());
   Assert (selected_dataset<shape_values.size(),
-	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   Assert (values.size() == n_quadrature_points,
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
 
@@ -97,7 +97,7 @@ void FEValuesBase<dim>::get_function_values (const Vector<double>     &fe_functi
   Assert (n_quadrature_points == values.size(),
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
   Assert (selected_dataset<shape_values.size(),
-	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<values.size();++i)
     Assert (values[i].size() == fe->n_components,
 	    ExcWrongNoOfComponents());
@@ -127,9 +127,9 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const
 {
   Assert (i<shape_gradients.size(),
-	  ExcInvalidIndex (i, shape_gradients.size()));
+	  ExcIndexRange (i, 0, shape_gradients.size()));
   Assert (j<shape_gradients[i].size(),
-	  ExcInvalidIndex (j, shape_gradients[i].size()));
+	  ExcIndexRange (j, 0, shape_gradients[i].size()));
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
 
   return shape_gradients[i][j];
@@ -172,7 +172,7 @@ void FEValuesBase<dim>::get_function_grads (const Vector<double>            &fe_
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
   Assert (selected_dataset<shape_values.size(),
-	  ExcInvalidIndex (selected_dataset, shape_values.size()));
+	  ExcIndexRange (selected_dataset, 0, shape_values.size()));
   for (unsigned i=0;i<gradients.size();++i)
     Assert (gradients[i].size() == fe->n_components,
 	    ExcWrongVectorSize(gradients.size(), n_quadrature_points));
@@ -204,9 +204,9 @@ const Tensor<2,dim> &
 FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 					 const unsigned int j) const {
   Assert (i<shape_2nd_derivatives.size(),
-	  ExcInvalidIndex (i, shape_2nd_derivatives.size()));
+	  ExcIndexRange (i, 0, shape_2nd_derivatives.size()));
   Assert (j<shape_2nd_derivatives[i].size(),
-	  ExcInvalidIndex (j, shape_2nd_derivatives[i].size()));
+	  ExcIndexRange (j, 0, shape_2nd_derivatives[i].size()));
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
 
   return shape_2nd_derivatives[i][j];
@@ -246,8 +246,9 @@ void FEValuesBase<dim>::get_function_2nd_derivatives (const Vector<double>   &fe
 
 template <int dim>
 const Point<dim> &
-FEValuesBase<dim>::quadrature_point (const unsigned int i) const {
-  Assert (i<quadrature_points.size(), ExcInvalidIndex(i,quadrature_points.size()));
+FEValuesBase<dim>::quadrature_point (const unsigned int i) const
+{
+  Assert (i<quadrature_points.size(), ExcIndexRange(i, 0, quadrature_points.size()));
   Assert (update_flags & update_q_points, ExcAccessToUninitializedField());
   
   return quadrature_points[i];
@@ -257,8 +258,9 @@ FEValuesBase<dim>::quadrature_point (const unsigned int i) const {
 
 template <int dim>
 const Point<dim> &
-FEValuesBase<dim>::support_point (const unsigned int i) const {
-  Assert (i<support_points.size(), ExcInvalidIndex(i, support_points.size()));
+FEValuesBase<dim>::support_point (const unsigned int i) const
+{
+  Assert (i<support_points.size(), ExcIndexRange(i, 0, support_points.size()));
   Assert (update_flags & update_support_points, ExcAccessToUninitializedField());
   
   return support_points[i];
@@ -267,8 +269,9 @@ FEValuesBase<dim>::support_point (const unsigned int i) const {
 
 
 template <int dim>
-double FEValuesBase<dim>::JxW (const unsigned int i) const {
-  Assert (i<JxW_values.size(), ExcInvalidIndex(i, JxW_values.size()));
+double FEValuesBase<dim>::JxW (const unsigned int i) const
+{
+  Assert (i<JxW_values.size(), ExcIndexRange(i, 0, JxW_values.size()));
   Assert (update_flags & update_JxW_values, ExcAccessToUninitializedField());
   
   return JxW_values[i];
