@@ -1,0 +1,466 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                 "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" media="screen">
+    <title>The deal.II Testsuite</title>
+    <meta name="author" content="the deal.II authors <authors@dealii.org>">
+    <meta name="keywords" content="deal.II"></head>
+  <body>
+
+
+    <h2>The deal.II Testsuite</h2>
+
+    <p>
+    deal.II has a testsuite that, at the time this article is written,
+    has some 490 small programs that we run every time we make a
+    change to make sure that no existing functionality is broken. The
+    expected output is also stored in our CVS archive, and when you
+    run a test you are notified if a test fails. These days, every
+    time we add a significant piece of functionality, we add at least
+    one new test to the testsuite, and we also do so if we fix a bug,
+    in both cases to make sure that future changes do not break what
+    we have just checked in. In addition, some machines run the tests
+    every night and send the results back home; this is then converted
+    into <a href="http://www.dealii.org/cgi-bin/show_regression.pl"
+    target="body">a webpage showing the status of our regression
+    tests</a>.
+    </p>
+
+    <p>
+    If you develop parts of deal.II, want to add something, or fix a
+    bug in it, we encourage you to use our testsuite. This page
+    documents some aspects of it.
+    </p>
+
+
+    <h3>Running it</h3>
+
+    <p>
+    To run the testsuite, you first need CVS access to our source
+    repository. If you have that, do the following steps:
+    <pre>
+       cd /path/to/deal.II
+       cvs checkout tests
+    </pre>
+    This should generate a <code>tests/</code> directory parallel to
+    the <code>base/</code>, <code>lac/</code>, etc directories. Then
+    do this:
+    <pre>
+       cd tests
+       ./configure
+    </pre>
+    This assumes that you have previously configured your deal.II
+    installation and sets up a few things, in particular it determines
+    which system you are on and which compiler you are using, in order
+    to make sure that the stored correct output for your system and
+    compiler is used to compare against the output of the tests when
+    you run them.
+    </p>
+
+    <p>
+    Once you have done this, you may simply type
+    <code>make</code>. This runs all the tests there are, but stops at
+    the first one that fails to either execute properly or for which
+    the output does not match the expected output found in the CVS
+    archive. This is helpful if you want to figure out if any test is
+    failing at all. Typical output looks like this:
+    <pre>
+      deal.II/tests> make
+      cd base ; make
+      make[1]: Entering directory `/ices/bangerth/p/deal.II/1/deal.II/tests/base'
+      =====linking======= logtest.exe
+      =====Running======= logtest.exe
+      =====Checking====== logtest.output
+      =====OK============ logtest.OK
+      =====linking======= reference.exe
+      =====Running======= reference.exe
+      =====Checking====== reference.output
+      =====OK============ reference.OK
+      =====linking======= quadrature_test.exe
+      ...
+    </pre>
+    </p>
+
+    <p>
+    Sometimes, however, you know that for whatever reason one test
+    always fails on your system, or has already failed before you made
+    any changes to the library that could have caused tests to
+    fail. We also sometimes check in tests that we know presently
+    fail, just to remind us that we need to work on a fix, if we don't
+    have the time to debug the problem properly right away. In this
+    case, you will not want the testsuite to stop at the first test
+    that fails, but will want to run all tests first and then inspect
+    the output to find any fails. There are make targets for this
+    as well. The usual way we use the testsuite is to run all tests
+    like so:
+    <pre>
+      deal.II/tests> make report | tee report
+      =======Report: base =======
+      make[1]: Entering directory `/ices/bangerth/p/deal.II/1/deal.II/tests/base'
+      2005-03-10 21:58 + anisotropic_1
+      2005-03-10 21:58 + anisotropic_2
+      2005-03-10 21:58 + auto_derivative_function
+      2005-03-10 21:58 + data_out_base
+      2005-03-10 21:58 + hierarchical
+      2005-03-10 21:58 + logtest
+      2005-03-10 21:58 + polynomial1d
+      2005-03-10 21:58 + polynomial_test
+      2005-03-10 21:58 + quadrature_selector
+      ...
+    </pre>
+    This generates a report (that we "tee" into a file called "report"
+    and show on screen at the same time). It shows the time at which
+    the tests were started, an indicator of success, and the name of a
+    test. The indicator is either a plus, which means that the test
+    compiled and linked successfully and that the output compared
+    successfully against the stored results. Or it is a minus,
+    indicating that the test failed, which could mean that it didn't
+    compile, it didn't link, or the results were wrong. Since it is
+    often hard to see visually which tests have a minus (we should
+    have used a capital X instead), this command
+    <pre>
+      grep " - " report
+    </pre>
+    picks out the lines that have a minus surrounded by spaces.
+    </p>
+
+    <p>
+    If you want to do a little more than just that, you should
+    consider running
+    <pre>
+      make report+mail | tee report
+    </pre>
+    instead. This does all the same stuff, but also mails the test
+    result to our central mail result server which will in regular
+    intervals (at least once a day) munge these mails and present them
+    on our <a href="http://www.dealii.org/cgi-bin/show_regression.pl"
+    target="body">regression test site</a>. This way, people can
+    get an overview of what tests fail. You may even consider running
+    tests nightly through a cron-job with this command, to have
+    regular test runs.
+    </p>
+
+    <p>
+    If a test failed, you have to find out what exactly went
+    wrong. For this, you will want to go into the directory of that
+    test, and figure out in more detail what went wrong. For example,
+    if above test <code>hierarchical</code> would have failed, you
+    would want to go into the <code>base</code> directory (this is
+    given in the line with the equals signs; there are tests in other
+    directories as well) and then type
+    <pre>
+      make hierarchical.exe
+    </pre>
+    to compile and link the executable. (Note that executables in the
+    tests directories have the extension <code>.exe</code> even on
+    unix systems, as this made writing the makefiles much simpler.) If
+    you can't compile or link, then you probably already know where
+    the problem is, and how to fix it. If you could compile and link
+    the test, you will want to make sure that it executes correctly
+    and produces an output file:
+    <pre>
+      make hierarchical.output
+    </pre>
+    If this produces errors or triggers assertions, then you will want
+    to use a debugger on the executable to figure out what happens. On
+    the other hand, if you are sure that this also worked, you will
+    want to compare the output with the stored output from CVS:
+    <pre>
+      make hierarchical.OK
+    </pre>
+    If the output isn't equal, then you'll get to see something like
+    this:
+    <pre>
+      =====Checking====== hierarchical.output
+      +++++Error+++++++++ hierarchical.OK. Use make verbose=on for the diffs
+    </pre>
+    Because the diffs between the output we get and the output we
+    expected can sometimes be very large, you don't get to see it by
+    default. However, following the suggestion printed, if you type
+    <pre>
+      make hierarchical.OK verbose=on
+    </pre>
+    you get to see it all:
+    <pre>
+      =====Checking====== hierarchical.output
+      12c12
+      < DEAL::0.333 1.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
+      ---
+      > DEAL::0.333 0.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
+      +++++Error+++++++++ hierarchical.OK
+    </pre>
+    In this case, the second number on line 12 is off by one. To find
+    the reason for this, you again should use a debugger or other
+    suitable means, but that of course depends on what changes you
+    have made last and that could have caused this discrepancy.
+    </p>
+
+
+
+    <h3>Adding new tests</h3>
+
+    <p>
+    As mentioned above, we usually add a new test these days every
+    time we add new functionality to the library or fix a bug. If you
+    want to contribute code to the library, you should consider this
+    as well. Here's how: you need a testcase, an entry in the
+    Makefile, and an expected output.
+    .
+    </p>
+
+    <h4>The testcase</h4>
+    <p>
+    For the testcase, we usually start from a template like this:
+    <pre>
+//----------------------------  my_new_test.cc  ---------------------------
+//    $Id$
+//    Version: $Name$ 
+//
+//    Copyright (C) 2005 by the deal.II authors 
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  my_new_test.cc  ---------------------------
+
+
+// a short (a few lines) description of what the program does
+
+#include "../tests.h"
+#include <iostream>
+#include <fstream>
+
+// all include files you need here
+
+
+int main () 
+{
+  std::ofstream logfile("my_new_test.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
+  // your testcode here:
+  int i=0;
+  deallog << i << std::endl;
+
+  return 0;
+}
+    </pre>
+    The basic idea is that you open an output file with the same base
+    name as your test, and then write all output you generate to it,
+    through the <code>deallog</code> stream (which works just like any
+    other <code>std::ostream</code> except that it does a few more
+    things behind the scenes that are helpful in this context). In
+    above case, we only (nonsensically) write a zero to the output
+    file. Most tests actually write computed data to the output file
+    to make sure that whatever we computed is what we got when the
+    test was written first.
+    </p>
+
+    <p>
+    There are a number of directories where you can put tests
+    in. Extensive tests of individual classes or groups of classes
+    have traditionally been into the <code>base/</code>,
+    <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>, or
+    <code>multigrid/</code> directories, depending on where the
+    classes that are tested are located.
+    </p>
+
+    <p>
+    More recently, we have started to create more atomic tests, that
+    are usually very small and test only a single aspect of the
+    library, often only a single function. These tests go into the
+    <code>bits/</code> directory and often have names that are
+    composed of the name of the class being tested and a two-digit
+    number. 
+    </p>
+
+    
+    <h4>An entry in the Makefile</h4>
+
+    <p>
+    In order for the Makefiles to pick up your new test, you have to
+    add it there. In all the directories under <code>tests/</code>
+    where tests reside, there is a separate Makefile that contains a
+    list of the tests to be run in a variable called
+    <code>tests_x</code>. You should add your test to the bottom of
+    this list, by adding the base name of your testfile (i.e. without
+    the extension <code>.cc</code>). Note that the entries can contain
+    wildcards: for example, in the <code>tests/bits/</code> directory,
+    the <code>tests_x</code> variable contains the entry
+    <code>petsc_*</code> which at the time of this writing tests 120
+    different tests that all match this pattern.
+    </p>
+
+    <p>
+    If you have done this, you can try to run
+    <pre>
+      make my_new_test.output
+    </pre>
+    which should compile, link, and run your test. Running your test
+    should generate the desired output file.
+    </p>
+
+
+
+    <h4>An expected output</h4>
+
+    <p>
+    If you run your new test executable, you will get an output file
+    that should be used to compare all future runs with. If the test
+    is relatively simple, it is often a good idea to look at the
+    output and make sure that the output is actually what you had
+    expected. However, if you do complex operations, this may
+    sometimes be impossible, and in this case we are quite happy with
+    any reasonable output file just to make sure that future
+    invokations of the test yield the same results.
+    </p>
+
+    <p>
+    The next step is to copy this output file to the place where the
+    scripts can find it when they compare with newer runs. For this,
+    there are directories 
+    <code>tests/results/i686-pc-linux-gnu+gcc2.95</code>,
+    <code>tests/results/i686-pc-linux-gnu+icc7.1</code>,
+    <code>tests/results/mips-sgi-irix6.5+MIPSpro7.4</code>, etc. that
+    encode on which platform and with which compiler the output was
+    generated. These different directories are necessary since
+    floating point computations are often not exactly reproducible
+    quantitatively if you use different CPUs or compilers, even though
+    they may be qualitatively equivalent. We may therefore have to
+    store multiple output files for the same test.
+    </p>
+
+    <p>
+    Most of the time, you will be able to generate output files only
+    for your own platform and compiler, and that's alright: someone
+    else will create the output files for other platforms
+    eventually. You only have to put your file into the correct
+    directory, which is actually easy to find: there is a link
+    <code>tests/compare</code> that points to the directory that will
+    be used to compare with. If you have put your test
+    <code>my_new_test.cc</code> into <code>tests/bits/</code>, for
+    example, then you chould copy <code>my_new_test.output</code> into
+    <code>tests/compare/bits</code>. 
+    </p>
+
+    <p>
+    At this point you can run
+    <pre>
+      make my_new_test.OK
+    </pre>
+    which should compare the present output with what you have just
+    copied into the compare directory. This should, of course,
+    succeed, since the two files should be identical.
+    </p>
+
+
+
+    <h4>Checking everything in</h4>
+    
+    <p>
+    Tests are a way to make sure everything keeps working. If they
+    aren't automated, they are no good. We are therefore very
+    interested in getting new tests. If you have CVS write access
+    already, you have to add the new test and the expected output
+    file, and to commit them together with the changed Makefile, like
+    so:
+    <pre>
+      cvs add bits/my_new_test.cc compare/bits/my_new_test.output
+      cvs commit -m "New test" bits/my_new_test.cc \
+                   compare/bits/my_new_test.output bits/Makefile
+    </pre>
+    If you don't have CVS write access, talk to us on the mailing
+    list; writing testcase is a worthy and laudable task, and we would
+    like to encourage it by giving people the opportunity to
+    contribute!
+    </p>
+
+
+    <h3>Adding a new system</h3>
+
+    <p>
+    If you are working on a system or with a compiler for which test
+    output files haven't been generated yet, things a slightly more
+    complicated because you have to set up a new directory in
+    <code>tests/results</code> so that <code>tests/compare</code> can
+    point to it. There are several ways to do that.
+    </p>
+
+    <p>
+    First, there are combinations of system and compiler for which we
+    get exactly the same output as for another combination. For
+    example, on an x86 linux, gcc 3.3 produces the same output as gcc
+    3.2. There is no need to have two directories under
+    <code>tests/results</code> that contain the many megabytes of
+    output files twice. If your system is of this type, then your
+    simplest way is to edit <code>tests/results/Makefile</code>: at
+    the bottom of this file is a target <code>.links</code> that
+    allows to create symbolic links from one (existing) directory to a
+    new one. For example, you will find there
+    <pre>
+      linkdirs-i686-pc-linux-gnu+gcc3.3-to-i686-pc-linux-gnu+gcc3.2
+    </pre>
+    which creates a directory <code>i686-pc-linux-gnu+gcc3.3</code>
+    that really is only a link to
+    <code>i686-pc-linux-gnu+gcc3.2</code>.
+    </p>
+
+    <p>
+    The second, and most frequent possibility is that your combination
+    of system and compiler yields output files that are almost always
+    equal to another one, and only a few tests yield different
+    output. In this case, you would generate all output files (using
+    just <code>make</code> in <code>tests/<code> will generate them),
+    then create a new directory in <code>results/<code> for your
+    combination, and populate it with the output files you
+    generated. Then pick the existing directory for which the test
+    results are closest to yours, and in your own copy delete all the
+    output files that are identical to the ones in the other
+    directory. Finally, add a target to the Makefile of the form
+    <pre>
+      linkfiles-mips-sgi-irix6.5+MIPSpro7.4-to-i686-pc-linux-gnu+gcc3.2
+    </pre>
+    What happens in this case is that when you call the makefile, it
+    goes through the <code>mips-sgi-irix6.5+MIPSpro7.4</code> (for
+    output files generated on SGI/Mips systems with the SGI MIPSpro
+    compiler) and for each test for which there is no output file it
+    creates a link to the corresponding output file in
+    <code>i686-pc-linux-gnu+gcc3.2</code>. In this particular case,
+    only 51 output files are presently stored, whereas the other
+    roughly 400 are identical to the ones generated by gcc 3.2 on
+    linux.
+    </p>
+
+    <p>
+    The third possibility is that you entirely populate your directory
+    with your output file. However, this is inefficient. In order to
+    store <i>all</i> output files, it presently takes 28MB; however,
+    this should be unnecessary since most compilers and platforms
+    generate identical output for almost all tests. Thus, populating
+    CVS with large and unnecessary files is not a good idea. It is
+    also an unnecessary burden when tests are added: if entire
+    directories or single output files are linked as shown above, then
+    a new output file has to be added only once to be used by a larger
+    number of platform/compiler combinations, but it has to be added
+    for every fully populated directory. We therefore discourage this
+    option.
+    </p>
+
+    
+    <address>
+      <a href="../mail.html">The deal.II mailing list</a></address>
+<div class="right">
+  <p>
+    <a href="http://validator.w3.org/check?uri=referer"><img border="0"
+        src="http://www.w3.org/Icons/valid-html401"
+        alt="Valid HTML 4.01!" height="31" width="88"></a>
+  </p>
+</div>
+
+  </body>
+</html>
+
