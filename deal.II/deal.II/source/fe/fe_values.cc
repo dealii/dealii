@@ -346,8 +346,9 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 	shape_values[0](i,j) = fe.shape_value(i, unit_quadrature_points[j]);
 	unit_shape_gradients[i][j]
 	  = fe.shape_grad(i, unit_quadrature_points[j]);
-	unit_shape_2nd_derivatives[i][j]
-	  = fe.shape_grad_grad(i, unit_quadrature_points[j]);
+	if (update_flags & update_second_derivatives)
+	  unit_shape_2nd_derivatives[i][j]
+	    = fe.shape_grad_grad(i, unit_quadrature_points[j]);
       };
 
   for (unsigned int i=0; i<n_transform_functions; ++i)
@@ -538,8 +539,9 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 	    = fe.shape_value(i, unit_quadrature_points[face][j]);
 	  unit_shape_gradients[face][i][j]
 	    = fe.shape_grad(i, unit_quadrature_points[face][j]);
-	  unit_shape_2nd_derivatives[face][i][j]
-	    = fe.shape_grad_grad(i, unit_quadrature_points[face][j]);
+	  if (update_flags & update_second_derivatives)
+	    unit_shape_2nd_derivatives[face][i][j]
+	      = fe.shape_grad_grad(i, unit_quadrature_points[face][j]);
 	};
 
   for (unsigned int i=0; i<n_transform_functions; ++i)
@@ -707,8 +709,9 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 	      = fe.shape_grad(i, unit_quadrature_points[face *
 						       GeometryInfo<dim>::
 						       subfaces_per_face+subface][j]);
-	    unit_shape_2nd_derivatives[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
-	      = fe.shape_grad_grad(i, unit_quadrature_points[face *
+	    if (update_flags & update_second_derivatives)
+	      unit_shape_2nd_derivatives[face*GeometryInfo<dim>::subfaces_per_face+subface][i][j]
+		= fe.shape_grad_grad(i, unit_quadrature_points[face *
 							    GeometryInfo<dim>::
 							    subfaces_per_face+subface][j]);
 	  };
