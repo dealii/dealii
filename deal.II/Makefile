@@ -83,7 +83,7 @@ lac: lacg laco
 $(LIBDIR):
 	@mkdir $@
 
-baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR) deps
+baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib : $(LIBDIR) deps
 
 all: deps
 	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d
