@@ -8,12 +8,20 @@ while ($ARGV[0]) {
 }
 
 
+# generate a guard for the file to disallow multiple inclusion
+$guard = `pwd`;
+$guard =~ s![^\w]!_!g;
+$guard .= "__guard";
+print "#ifndef $guard\n";
+print "#define $guard\n";
+print "\n\n";
+
 foreach $file (@input_files) {
     parse_class_declarations ($file);
 };
 
-
-
+print "\n\n";
+print "#endif // $guard\n";
 
 
 
