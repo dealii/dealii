@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@
 /**
  *   @p Quads denote the fundamental entities of triangulations in two dimensions
  *   and the boundaries of hexaeders in three dimensions. They are
- *   characterized by the (global) indices of the dour bounding lines.
+ *   characterized by the (global) indices of the four bounding lines.
  *
  *   A quad itself has one index, as far as the topological part handled in
  *   the triangulation is concerned: the index in the level

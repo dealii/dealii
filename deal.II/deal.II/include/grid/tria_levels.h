@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -143,7 +143,7 @@ class TriangulationLevel<0>
 				      *  Reserve enough space to accomodate
 				      *  @p total_cells cells on this level.
 				      *  Since there are no @p used flags on this
-				      *  level, you have to give to total number
+				      *  level, you have to give the total number
 				      *  of cells, not only the number of newly
 				      *  to accomodate ones, like in the
 				      *  <tt>TriangulationLevel<N>::reserve_space</tt>
@@ -379,7 +379,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
 	std::vector<Quad> quads;
 					 /**
 					  *  Same as for the
-					  *  TriangulationLevel<1>::LinesData@p ::chilren
+					  *  TriangulationLevel<1>::LinesData@p ::children
 					  *  array, but since there
 					  *  are four children, the
 					  *  index points to the first
