@@ -80,73 +80,11 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 
 
 
-ConstraintMatrix::ConstraintMatrix () :
-		lines(),
-		sorted(false)
+ConstraintMatrix::ConstraintMatrix ()
+		:
+		lines (),
+		sorted (false)
 {}
-
-
-void ConstraintMatrix::add_line (const unsigned int line)
-{
-  Assert (sorted==false, ExcMatrixIsClosed());
-
-				   // check whether line already exists;
-				   // it may, but then we need to quit
-  for (unsigned int i=0; i!=lines.size(); ++i)
-    if (lines[i].line == line)
-      return;
-
-				   // push a new line to the end of the
-				   // list
-  lines.push_back (ConstraintLine());
-  lines.back().line = line;
-}
-
-
-
-void
-ConstraintMatrix::add_entry (const unsigned int line,
-                             const unsigned int column,
-                             const double       value)
-{
-  Assert (sorted==false, ExcMatrixIsClosed());
-
-  std::vector<ConstraintLine>::iterator line_ptr;
-  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
-				   // the usual case is that the line where
-				   // a value is entered is the one we
-				   // added last, so we search backward
-  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
-    if (line_ptr->line == line)
-      break;
-
-				   // if the loop didn't break, then
-				   // line_ptr must be begin().
-				   // we have an error if that doesn't
-				   // point to 'line' then
-  Assert (line_ptr->line==line, ExcLineInexistant(line));
-
-				   // if in debug mode, check whether an
-				   // entry for this column already
-				   // exists and if its the same as
-				   // the one entered at present
-				   //
-				   // in any case: exit the function if an
-				   // entry for this column already exists,
-				   // since we don't want to enter it twice
-  for (std::vector<std::pair<unsigned int,double> >::const_iterator
-         p=line_ptr->entries.begin();
-       p != line_ptr->entries.end(); ++p)
-    if (p->first == column)
-      {
-	Assert (p->second == value,
-		ExcEntryAlreadyExists(line, column, p->second, value));
-	return;
-      };
-  
-  line_ptr->entries.push_back (std::make_pair(column,value));
-}
-
 
 
 void
@@ -341,6 +279,15 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
   const bool object_was_sorted = sorted;
   sorted = false;
 
+				   // before we even start: merge the
+				   // two flag arrays
+  if (other_constraints.constraint_line_exists.size() >
+      constraint_line_exists.size())
+    constraint_line_exists.resize (other_constraints.constraint_line_exists.size(),
+				   false);
+  for (unsigned int i=0; i<other_constraints.constraint_line_exists.size(); ++i)
+    if (other_constraints.constraint_line_exists[i] == true)
+      constraint_line_exists[i] = true;
 
 				   // first action is to fold into the
 				   // present object possible
@@ -499,6 +446,9 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 
 void ConstraintMatrix::shift (const unsigned int offset)
 {
+  constraint_line_exists.insert (constraint_line_exists.begin(), offset,
+				 false);
+  
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
        i != lines.end(); i++)
     {
@@ -514,8 +464,16 @@ void ConstraintMatrix::shift (const unsigned int offset)
 
 void ConstraintMatrix::clear ()
 {
-  std::vector<ConstraintLine> tmp;
-  lines.swap (tmp);
+  {
+    std::vector<ConstraintLine> tmp;
+    lines.swap (tmp);
+  }
+  
+  {
+    std::vector<bool> tmp;
+    constraint_line_exists.swap (tmp);
+  }
+  
   sorted = false;
 }
 
@@ -1139,36 +1097,9 @@ unsigned int ConstraintMatrix::n_constraints () const
 
 
 
-bool ConstraintMatrix::is_constrained (const unsigned int index) const 
-{
-  if (lines.size() == 0)
-    return false;
-  
-  if (sorted == true)
-    {
-      ConstraintLine index_comparison;
-      index_comparison.line = index;
-      
-      return std::binary_search (lines.begin (),
-				 lines.end (),
-				 index_comparison);
-    }
-  else
-    {
-      for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
-	   i!=lines.end(); ++i)
-	if (i->line == index)
-	  return true;
-
-      return false;
-    };
-}
-
-
-
 bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const 
 {
-  if (lines.size() == 0)
+  if (is_constrained(index) == false)
     return false;
   
   if (sorted == true)
@@ -1241,6 +1172,7 @@ unsigned int
 ConstraintMatrix::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (lines) +
+	  MemoryConsumption::memory_consumption (constraint_line_exists) +
 	  MemoryConsumption::memory_consumption (sorted));
 }
 

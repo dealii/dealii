@@ -344,6 +344,19 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">ConstraintMatrix</code> class had some
+       algorithms that were linear in the number of constraints. Since these
+       functions had to be called for each constraint, this resulted in a
+       quadratic behavior. To make things worse, these algorithms traversed
+       large memory blocks leading to a vast number of cache misses which made
+       them really slow. This is now fixed: the algorithm is O(1) and should
+       only access single elements in memory, and one 3d testcase is now a
+       full 5 per cent faster on about 10 minutes runtime.
+       <br>
+       (WB 2004/10/04)
+       </p>
+
+  <li> <p>
        New: The <code class="member">GridOut::write_gnuplot</code>
        function now supports curved boundaries also for <code>dim==3</code>.
        <br>

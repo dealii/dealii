@@ -898,6 +898,53 @@ class ConstraintMatrix : public Subscriptor
 				      * much slower.
 				      */
     std::vector<ConstraintLine> lines;
+
+				     /**
+				      * A list of flags that indicate
+				      * whether there is a constraint
+				      * line for a given degree of
+				      * freedom index. Note that this
+				      * class has no notion of how
+				      * many degrees of freedom there
+				      * really are, so if we check
+				      * whether there is a constraint
+				      * line for a given degree of
+				      * freedom, then this vector may
+				      * actually be shorter than the
+				      * index of the DoF we check for.
+				      *
+				      * This field exists since when adding a
+				      * new constraint line we have to figure
+				      * out whether it already
+				      * exists. Previously, we would simply
+				      * walk the unsorted list of constraint
+				      * lines until we either hit the end or
+				      * found it. This algorithm is O(N) if N
+				      * is the number of constraints, which
+				      * makes it O(N^2) when inserting all
+				      * constraints. For large problems with
+				      * many constraints, this could easily
+				      * take 5-10 per cent of the total run
+				      * time. With this field, we can at least
+				      * save this time when checking whether a
+				      * new constraint line already exists.
+				      *
+				      * To make things worse, traversing the
+				      * list of existing constraints requires
+				      * reads from many different places in
+				      * memory. Thus, in large 3d
+				      * applications, the add_line() function
+				      * showed up very prominently in the
+				      * overall compute time, mainly because
+				      * it generated a lot of cache
+				      * misses. This should also be fixed by
+				      * using the O(1) algorithm to access the
+				      * fields of this array.
+				      * 
+				      * The field is useful in a number of
+				      * other contexts as well, though.
+				      */
+    std::vector<bool> constraint_line_exists;
 	
 				     /**
 				      * Store whether the arrays are sorted.
@@ -915,6 +962,103 @@ class ConstraintMatrix : public Subscriptor
 				      */
     static bool check_zero_weight (const std::pair<unsigned int, double> &p);
 };
+
+
+
+/* ---------------- template and inline functions ----------------- */
+
+inline
+void
+ConstraintMatrix::add_line (const unsigned int line)
+{
+  Assert (sorted==false, ExcMatrixIsClosed());
+
+  
+  
+				   // check whether line already
+				   // exists; it may, but then we need
+				   // can just quit
+  if ((line < constraint_line_exists.size())
+      &&
+      (constraint_line_exists[line] == true))
+    return;
+
+				   // if necessary enlarge vector of
+				   // existing entries
+  if (line >= constraint_line_exists.size())
+    constraint_line_exists.resize (line+1, false);
+  constraint_line_exists[line] = true;
+  
+				   // push a new line to the end of the
+				   // list
+  lines.push_back (ConstraintLine());
+  lines.back().line = line;
+}
+
+
+
+inline
+void
+ConstraintMatrix::add_entry (const unsigned int line,
+                             const unsigned int column,
+                             const double       value)
+{
+  Assert (sorted==false, ExcMatrixIsClosed());
+
+  std::vector<ConstraintLine>::iterator line_ptr;
+  const std::vector<ConstraintLine>::const_iterator start=lines.begin();
+
+  				   // the usual case is that the line where
+				   // a value is entered is the one we
+				   // added last, so we search backward
+  for (line_ptr=(lines.end()-1); line_ptr!=start; --line_ptr)
+    if (line_ptr->line == line)
+      break;
+
+				   // if the loop didn't break, then
+				   // line_ptr must be begin().
+				   // we have an error if that doesn't
+				   // point to 'line' then
+  Assert (line_ptr->line==line, ExcLineInexistant(line));
+				   // second check: the respective
+				   // flag in the
+				   // constraint_line_exists field
+				   // must exist
+  Assert (line < constraint_line_exists.size(), ExcInternalError());
+  Assert (constraint_line_exists[line] == true, ExcInternalError());
+  
+
+				   // if in debug mode, check whether an
+				   // entry for this column already
+				   // exists and if its the same as
+				   // the one entered at present
+				   //
+				   // in any case: exit the function if an
+				   // entry for this column already exists,
+				   // since we don't want to enter it twice
+  for (std::vector<std::pair<unsigned int,double> >::const_iterator
+         p=line_ptr->entries.begin();
+       p != line_ptr->entries.end(); ++p)
+    if (p->first == column)
+      {
+	Assert (p->second == value,
+		ExcEntryAlreadyExists(line, column, p->second, value));
+	return;
+      }
+  
+  line_ptr->entries.push_back (std::make_pair(column,value));
+}
+
+
+
+inline
+bool
+ConstraintMatrix::is_constrained (const unsigned int index) const 
+{
+  return ((index < constraint_line_exists.size())
+          &&
+          (constraint_line_exists[index] == true));
+}
 
 
 #endif
