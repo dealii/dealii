@@ -65,7 +65,7 @@ endif
 	@$(CXX) $(flags) -c $< -o $@
 
 
-all: grid_test.check dof_test.check \
+all: grid_test.check dof_test.check data_out.check \
      fe_tables.check gradients.check \
      constraints.check mg.check mglocal.check wave-test-3.check \
      block_matrices.check second_derivatives.check
@@ -126,6 +126,22 @@ endif
 dof_test.testcase: $(dof_test-o-files) $(libdeal3d) $(libraries)
 	@echo =====linking======= $<
 	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+
+############################################################
+
+
+data_out-cc-files = data_out.cc 
+
+ifeq ($(debug-mode),on)
+data_out-o-files = $(data_out-cc-files:.cc=.go)
+else
+data_out-o-files = $(data_out-cc-files:.cc=.o)
+endif
+
+data_out.testcase: $(data_out-o-files) $(libdeal3d) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(flags) -o $@ $^
 
 
 ############################################################
