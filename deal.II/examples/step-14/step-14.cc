@@ -53,7 +53,7 @@
 #  include <strstream>
 #endif
 
-				 // @sect{Evaluating the solution}
+				 // @sect3{Evaluating the solution}
 
 				 // As mentioned in the introduction,
 				 // significant parts of the program
@@ -450,7 +450,7 @@ namespace Evaluation
 namespace LaplaceSolver
 {
 
-				   // @sect{The Laplace solver base class}
+				   // @sect4{The Laplace solver base class}
 
 				   // This class is almost unchanged,
 				   // with the exception that it
