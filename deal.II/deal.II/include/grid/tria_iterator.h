@@ -189,12 +189,17 @@ template <int dim> class Triangulation;
  *   iterator usage. Thus, if you declare pointers to a #const# triangulation
  *   object, you should be well aware that you might involuntarily alter the
  *   data stored in the triangulation.
- *   
+ *
+ *
  *   \subsection{Internals}
  *   
  *   There is a representation of past-the-end-pointers, denoted by special
  *   values of the member variables #present_level# and #present_index#:
- *   If #present_level>=0# and #present_index>=0#, then the object is valid;
+ *   If #present_level>=0# and #present_index>=0#, then the object is valid
+ *   (there is no check whether the triangulation really has that
+ *   many levels or that many cells on the present level when we investigate
+ *   the state of an iterator; however, in many places where an iterator is
+ *   dereferenced we make this check);
  *   if #present_level==-1# and #present_index==-1#, then the iterator points
  *   past the end; in all other cases, the iterator is considered invalid.
  *   You can check this by calling the #state()# function.
@@ -218,6 +223,13 @@ template <int dim> class Triangulation;
  *   {\it before-the-start} value, when running backwards. There is no
  *   distiction between the iterators pointing past the two ends of a vector.
  *   
+ *   By defining only one value to be past-the-end and making all other values
+ *   invalid porvides a second track of security: if we should have forgotten
+ *   a check in the library when an iterator is incremented or decremented,
+ *   we automatically convert the iterator from the allowed state "past-the-end"
+ *   to the disallowed state "invalid" which increases the chance that somehwen
+ *   earlier than for past-the-end iterators an exception is raised.
+ *
  *   @see Triangulation
  *   @see TriaDimensionInfo
  *   @author Wolfgang Bangerth, 1998
