@@ -138,6 +138,24 @@ class SparseLUDecomposition : protected SparseMatrix<number>
                                       * Destruction.
                                       */
     virtual ~SparseLUDecomposition ();
+    
+				     /**
+				      * Parameters for
+				      * SparseDecomposition.
+				      */
+    class AdditionalData
+    {
+      public:
+					 /**
+					  * Constructor.
+					  */
+	AdditionalData (const double strengthen_diagonal=0);
+
+					 /**
+					  * strengthen_diag parameter.
+					  */
+	double strengthen_diagonal;
+    };
 
 				     /**
 				      * Reinitialize the object but
@@ -325,5 +343,18 @@ SparseLUDecomposition<number>::is_decomposed () const
 {
   return decomposed;
 }
+
+
+
+//----------------------------------------------------------------------//
+
+
+template <typename number>
+inline
+SparseLUDecomposition<number>::AdditionalData::AdditionalData (
+  const double strengthen_diagonal):
+		strengthen_diagonal(strengthen_diagonal)
+{}
+
 
 #endif // __deal2__sparse_decomposition_h
