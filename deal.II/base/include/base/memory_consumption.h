@@ -149,6 +149,20 @@ namespace MemoryConsumption
 				   /**
 				    * Determine an estimate of the
 				    * amount of memory in bytes
+				    * consumed by a @p{std::string}
+				    * variable. This function is there
+				    * to work around a bug in Intel's
+				    * ICC compiler which would have
+				    * taken the general template
+				    * instead of the above function
+				    * when presented with a non-const
+				    * string.
+				    */
+  unsigned int memory_consumption (std::string &s);
+
+				   /**
+				    * Determine an estimate of the
+				    * amount of memory in bytes
 				    * consumed by a @p{std::vector} of
 				    * certain elements. It does so by
 				    * looping over all elements of the
