@@ -162,11 +162,15 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 
 
 
-#Rule to generate the dependency file. This file is
-#automagically remade whenever needed, i.e. whenever
-#one of the cc-/h-files changed. Make detects whether
-#to remake this file upon inclusion at the bottom
-#of this file.
+# Rule to generate the dependency file. This file is
+# automagically remade whenever needed, i.e. whenever
+# one of the cc-/h-files changed. Make detects whether
+# to remake this file upon inclusion at the bottom
+# of this file.
+#
+# If the file should turn out to be empty, then blow it
+# away to let make issue a proper error message rather than
+# some obscure follow-up problems
 Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 	@echo "============================ Remaking deal.II/Makefile"
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
@@ -174,6 +178,8 @@ Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
 		> Makefile.dep
+	@if test -s $@ ; then : else rm $@ ; fi
+
 
 # include all the dependencies
 include Makefile.dep

@@ -138,11 +138,17 @@ clean:
 # the executable. This file is automagically remade whenever needed,
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
+#
+# If the file should turn out to be empty, then blow it
+# away to let make issue a proper error message rather than
+# some obscure follow-up problems
 Makefile.dep: $(target).cc Makefile \
               $(shell echo $D/*/include/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> Makefile.dep
+	@if test -s $@ ; then : else rm $@ ; fi
+
 
 # To make the dependencies known to `make', we finally have to include
 # them:
