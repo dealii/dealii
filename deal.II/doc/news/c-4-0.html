@@ -172,6 +172,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> New: There is now a class <code
+       class="class">QuadratureSelector</code> that allows to select a
+       quadrature formula based on a string argument and possibly a
+       number indicating the order of the formula.
+       <br>
+       (Ralf B. Schulz 2002/10/29)
+       </p>
+
   <li> <p> Fixed: The constructor of the <code class="class">QGauss</code> class
        computed positions and weights of quadrature points in long double accuracy.
        However, on machines where long double is the same as double, it therefore
@@ -289,7 +297,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <ol>
   <li> <p>
        Changed: The <code
-<        class="member">SolutionTransfer::interpolate</code>      
+       <class="member">SolutionTransfer::interpolate</code>      
        <br>
        (Brent Bailey, WB 2003/10/22 and RH 2003/10/24)
        </p>
