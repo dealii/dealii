@@ -400,45 +400,19 @@
     <li><h4>Paths to include files</h4>
 
     <dl>
-      <dt> <code>include-path-base</code> </dt>
-      <dd> <p>
-           Same as for lib-path-base, but contains the paths
-           to the include files of the /base library. Note, however,
-	   that since files are usually included as <code>#include
-	   &lt;base/xxx.h&gt;</code>, the value of the
-	   <code>include-path-base</code> only leads up to the directory
-	   directly above the include files. They are thus located in
-	   <code>$(include-path-base)/base</code>.
-           </p>
-      </dd>
+      <dt> <code>INCLUDE</code> </dt>
 
-
-      <dt> <code>include-path-lac</code> </dt>
-      <dd> <p>
-           Same for the /lac library. The files are in
-	   <code>$(include-path-lac)/lac</code>.
-           </p>
-      </dd>
-
-
-      <dt> <code>include-path-deal2</code> </dt>
-      <dd> <p>
-           Same for the /deal.II library. Include files are in
-           <code>$(include-path-deal2)/*</code>.
-	   </p>
-      </dd>
-
-
-      <dt> <code>include-path-contrib-hsl</code> </dt>
-      <dd> <p>
-           If some HSL files are
-           installed, this path points to includes for the
-           declaration of C bindings to these functions.
-	   (See the
-	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
-	   file for more information on installation of HSL
-           subroutines.)
-           </p>
+      <dd> <p> All include paths figured out by the <tt>configure</tt>
+      script are now included into the variable
+      <code>$(INCLUDE)</code> (which include the compiler option
+      <tt>-I</tt> in front of each directory). They are also
+      automatically included in your compiler calls as soon as you use
+      <code>$(CXXFLAGS.g)</code> or <code>$(CXXFLAGS.o)</code>. 
+      </p>
+      
+      <p>An exception to this rule are paths listed below. These are
+      added to the variable <code>$(INCLUDE)</code> only during make.
+      </p>
       </dd>
 
 
@@ -463,13 +437,6 @@
            include files. (See the
 	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
 	   file for more information on installation of METIS.)
-           </p>
-      </dd>
-
-
-      <dt> <code>INCLUDE</code> </dt>
-      <dd> <p>
-           All the include pathes prefixed by -I
            </p>
       </dd>
     </dl>
