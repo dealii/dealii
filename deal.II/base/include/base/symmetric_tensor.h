@@ -200,7 +200,7 @@ class SymmetricTensor<2,dim>
                                       * classes that need it.
                                       */
     static const unsigned int
-    n_tensor_components = (dim*dim + dim)/2;
+    n_independent_tensor_components = (dim*dim + dim)/2;
 
                                      /**
                                       * Declare the type in which we actually
@@ -211,7 +211,7 @@ class SymmetricTensor<2,dim>
                                       * any assumptions about the storage
                                       * format in your application programs.
                                       */
-    typedef Tensor<1,n_tensor_components> StorageType;
+    typedef Tensor<1,n_independent_tensor_components> StorageType;
     
     
                                      /**
@@ -612,7 +612,7 @@ SymmetricTensor<2,dim>::operator * (const SymmetricTensor &s) const
   for (; i<dim; ++i)
     t += data[i] * s.data[i];
 
-  for (; i<n_tensor_components; ++i)
+  for (; i<n_independent_tensor_components; ++i)
     t += 2 * data[i] * s.data[i];
 
   return t;
