@@ -1,9 +1,10 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 201, the deal.II authors
+# Copyright (C) 2001, the deal.II authors
 #
-# Common make rules for test files
+# Common make rules for test files. To be included by the Makefiles
+# in the subdirectories.
 ######################################################################
 
 
@@ -12,33 +13,54 @@ normalize = $D/common/scripts/normalize.pl
 verbose = off
 
 ############################################################
-# Postprocessing
+# First how to create output: by simply running a program.
+# Note that we normalize output to a few digits after
+# the decimal punct, in order to be able to check across
+# different platforms where we might differ in round-off etc.
 ############################################################
 
-%.output:%.testcase
+%.output : %.testcase
 	@echo =====Running======= $<
 	@./$<
 	@perl -pi $(normalize)  $@
 
-ifeq ($(verbose),on)
-%.check:%.output
+
+
+############################################################
+# Postprocessing the output: compare with precomputed
+# files. In default mode, do not show diffs as they are 
+# usually overly verbose. Only if user calls `make' with
+# flag `verbose=on' show the diffs. Also note that we
+# usually let the call to `make# continue even if we
+# find a difference, since the output is clearly marked
+# as a failing test and we normally want to see the results
+# of all tests at once, including those that come after
+# the failed one.
+#
+# if, however, the flag `stop_on_error=on' was given, the
+# check command fails whenever teh output differs from the
+# precomputed file.
+############################################################
+
+
+%.check : %.output
 	@echo '=====Checking======' $< ;
-	@if diff $< $(patsubst %.output,%.checked, $<); then \
-		  echo '=====OK============' $@ ; \
-		  touch $@ ; \
-		else \
-		  echo '+++++Error+++++++++' $@ ; \
-		fi
-else
-%.check:%.output
-	@echo '=====Checking======' $< ;
-	@if diff $< $(patsubst %.output,%.checked, $<) > /dev/null ; then \
-		  echo '=====OK============' $@ ; \
-		  touch $@ ; \
-		else \
-		  echo '+++++Error+++++++++' $@ '   details with "make verbose=on"'; \
-		fi
-endif
+	@if test "x$verbose" = "xon" then \
+		cmd="diff $< $(patsubst %.output,%.checked, $<)" ; \
+	 else \
+		cmd="diff $< $(patsubst %.output,%.checked, $<) > /dev/null" ; \
+	 fi ; \
+	 if eval $$cmd ; then \
+		echo '=====OK============' $@ ; \
+		touch $@ ; \
+	 else \
+		echo '+++++Error+++++++++' $@ ; \
+		if test "x$stop_on_error" = "xon" ; then \
+			false ; \
+		fi ; \
+	 fi
+
+
 
 ############################################################
 # Cleanup targets
