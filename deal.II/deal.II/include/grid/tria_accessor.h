@@ -84,11 +84,7 @@ class TriaAccessor
     TriaAccessor (const Triangulation<dim> *parent =  0,
 		  const int                 level  = -1,
 		  const int                 index  = -1,
-		  const AccessorData       *       =  0)
-                    :
-		    present_level (level),
-		    present_index (index),
-		    tria (parent) {};
+		  const AccessorData       *       =  0);
 
 				     /**
 				      *  Copy operator. Since this is
@@ -297,10 +293,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0)
-                    :
-		    TriaAccessor<dim> (parent, level, index, local_data)
-      {};
+			const AccessorData       *local_data =  0);
 
 				     /**
 				      * Copy the data of a line. Only
@@ -815,10 +808,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0)
-                    :
-		    TriaAccessor<dim> (parent, level, index, local_data)
-      {};
+			const AccessorData       *local_data =  0);
 
 				     /**
 				      *  Copy the data of the given
@@ -1252,10 +1242,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0)
-                    :
-		    TriaAccessor<dim> (parent, level, index, local_data)
-      {};
+			const AccessorData       *local_data =  0);
 
 				     /**
 				      *  Copy the data of the given quad.
@@ -1742,10 +1729,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (const Triangulation<dim> *parent     =  0,
 			const int                 level      = -1,
 			const int                 index      = -1,
-			const AccessorData       *local_data =  0)
-                    :
-		    TriaAccessor<dim> (parent, level, index, local_data)
-      {};
+			const AccessorData       *local_data =  0);
 
 				     /**
 				      *  Copy the data of the given
@@ -2258,10 +2242,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     CellAccessor (const Triangulation<dim> *parent     =  0,
 		  const int                 level      = -1,
 		  const int                 index      = -1,
-		  const AccessorData       *local_data =  0)
-                    :
-		    TriaObjectAccessor<dim,dim> (parent, level, index, local_data)
-      {};
+		  const AccessorData       *local_data =  0);
 
 				     /**
 				      *  Return a pointer to the
@@ -2440,6 +2421,48 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      */
     TriaIterator<dim,TriaObjectAccessor<dim-1, dim> >
     face (const unsigned int i) const;
+
+                                     /**
+                                      * Return an iterator to that
+                                      * cell that neighbors the
+                                      * present cell on the given face
+                                      * and subface number.
+                                      *
+                                      * To succeed, the present cell
+                                      * must not be further refined,
+                                      * and the neighbor on the given
+                                      * face must be further refined
+                                      * exactly once; the returned
+                                      * cell is then a child of that
+                                      * neighbor.
+                                      *
+                                      * The function may not be called
+                                      * in 1d, since there we have no
+                                      * subfaces.  The implementation
+                                      * of this function is rather
+                                      * straightforward in 2d, by
+                                      * first determining which face
+                                      * of the neighbor cell the
+                                      * present cell is bordering on
+                                      * (this is what the
+                                      * @p{neighbor_of_neighbor}
+                                      * function does), and then
+                                      * asking
+                                      * @p{GeometryInfo::child_cell_on_subface}
+                                      * for the index of the
+                                      * child. However, the function
+                                      * is more complicated in 3d,
+                                      * since there faces may have
+                                      * more than one orientation, and
+                                      * we have to use
+                                      * @p{face_orientation} for both
+                                      * this and the neighbor cell to
+                                      * figure out which cell we want
+                                      * to have.
+                                      */
+    TriaIterator<dim,CellAccessor<dim> >
+    neighbor_child_on_subface (const unsigned int face_no,
+                               const unsigned int subface_no) const;
     
 				     /**
 				      * Return the material id of this
@@ -2562,6 +2585,19 @@ template <> void CellAccessor<3>::recursively_set_material_id (const unsigned ch
 template <> bool CellAccessor<3>::point_inside (const Point<3> &) const;
 
 template <> bool CellAccessor<1>::has_boundary_lines () const;
+
+template <>
+TriaIterator<1,CellAccessor<1> >
+CellAccessor<1>::neighbor_child_on_subface (const unsigned int,
+                                            const unsigned int) const;
+template <>
+TriaIterator<2,CellAccessor<2> >
+CellAccessor<2>::neighbor_child_on_subface (const unsigned int,
+                                            const unsigned int) const;
+template <>
+TriaIterator<3,CellAccessor<3> >
+CellAccessor<3>::neighbor_child_on_subface (const unsigned int,
+                                            const unsigned int) const;
 
 template <> double TriaObjectAccessor<2, 2>::measure () const;
 template <> double TriaObjectAccessor<2, 3>::measure () const;

@@ -29,6 +29,19 @@
 
 /*------------------------ Functions: TriaAccessor ---------------------------*/
 
+template <int dim>
+inline
+TriaAccessor<dim>::TriaAccessor (const Triangulation<dim> *parent,
+                                 const int                 level,
+                                 const int                 index,
+                                 const AccessorData       *)
+                :
+                present_level (level),
+                present_index (index),
+                tria (parent)
+{}
+
+
 
 template <int dim>
 inline
@@ -112,6 +125,19 @@ TriaAccessor<dim>::get_triangulation () const
 
 
 /*------------------------ Functions: LineAccessor ---------------------------*/
+
+
+template <int dim>
+inline
+TriaObjectAccessor<1,dim>::
+TriaObjectAccessor (const Triangulation<dim> *parent,
+                    const int                 level,
+                    const int                 index,
+                    const AccessorData       *local_data)
+                :
+                TriaAccessor<dim> (parent, level, index, local_data)
+{}
+
 
 
 template <int dim>
@@ -279,6 +305,19 @@ TriaObjectAccessor<1,dim>::operator -- ()
 
 
 /*------------------------ Functions: QuadAccessor ---------------------------*/
+
+
+template <int dim>
+inline
+TriaObjectAccessor<2,dim>::
+TriaObjectAccessor (const Triangulation<dim> *parent,
+                    const int                 level,
+                    const int                 index,
+                    const AccessorData       *local_data)
+                :
+                TriaAccessor<dim> (parent, level, index, local_data)
+{}
+
 
 
 template <int dim>
@@ -475,6 +514,19 @@ TriaObjectAccessor<2,dim>::operator -- ()
 
 
 /*------------------------ Functions: HexAccessor ---------------------------*/
+
+
+template <int dim>
+inline
+TriaObjectAccessor<3,dim>::
+TriaObjectAccessor (const Triangulation<dim> *parent,
+                    const int                 level,
+                    const int                 index,
+                    const AccessorData       *local_data)
+                :
+                TriaAccessor<dim> (parent, level, index, local_data)
+{}
+
 
 
 template <int dim>
@@ -1052,6 +1104,19 @@ TriaObjectAccessor<celldim,dim>::operator -- ()
 
 
 /*------------------------ Functions: CellAccessor<dim> -----------------------*/
+
+
+template <int dim>
+inline
+CellAccessor<dim>::
+CellAccessor (const Triangulation<dim> *parent,
+              const int                 level,
+              const int                 index,
+              const AccessorData       *local_data)
+                :
+                TriaObjectAccessor<dim,dim> (parent, level, index, local_data)
+{}
+
 
 
 template <>

@@ -1090,9 +1090,10 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 {
   public:
 				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
+				      * Declare the data type that
+				      * this accessor class expects to
+				      * get passed from the iterator
+				      * classes.
 				      */
     typedef typename DoFObjectAccessor<dim, dim>::AccessorData AccessorData;
     
@@ -1105,21 +1106,25 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 		     const AccessorData       *local_data);
 
 				     /**
-				      * Return the @p{i}th neighbor as a DoF cell
-				      * iterator. This function is needed since
-				      * the neighbor function of the base
-				      * class returns a cell accessor without
-				      * access to the DoF data.
+				      * Return the @p{i}th neighbor as
+				      * a DoF cell iterator. This
+				      * function is needed since the
+				      * neighbor function of the base
+				      * class returns a cell accessor
+				      * without access to the DoF
+				      * data.
 				      */
     TriaIterator<dim,DoFCellAccessor<dim> >
     neighbor (const unsigned int) const;
 
     				     /**
-				      * Return the @p{i}th child as a DoF cell
-				      * iterator. This function is needed since
-				      * the child function of the base
-				      * class returns a cell accessor without
-				      * access to the DoF data.
+				      * Return the @p{i}th child as a
+				      * DoF cell iterator. This
+				      * function is needed since the
+				      * child function of the base
+				      * class returns a cell accessor
+				      * without access to the DoF
+				      * data.
 				      */
     TriaIterator<dim,DoFCellAccessor<dim> >
     child (const unsigned int) const;
@@ -1135,43 +1140,70 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
     face (const unsigned int i) const;
 
 				     /**
-				      * Return the interpolation of the given
-				      * finite element function to the present
-				      * cell. In the simplest case, the cell
-				      * is a terminal one, i.e. has no children;
-				      * then, the returned value is the vector
-				      * of nodal values on that cell. You could
-				      * then as well get the desired values
-				      * through the @p{get_dof_values} function
-				      * In the other case, when the cell has
-				      * children, we use the restriction
-				      * matrices provided by the finite element
-				      * class to compute the interpolation
-				      * from the children to the present cell.
+				      * Return the result of the
+				      * @p{neighbor_child_on_subface}
+				      * function of the base class,
+				      * but convert it so that one can
+				      * also access the DoF data (the
+				      * function in the base class
+				      * only returns an iterator with
+				      * access to the triangulation
+				      * data).
+				      */
+    TriaIterator<dim,DoFCellAccessor<dim> >
+    neighbor_child_on_subface (const unsigned int face_no,
+                               const unsigned int subface_no) const;
+
+                                     /**
+				      * Return the interpolation of
+				      * the given finite element
+				      * function to the present
+				      * cell. In the simplest case,
+				      * the cell is a terminal one,
+				      * i.e. has no children; then,
+				      * the returned value is the
+				      * vector of nodal values on that
+				      * cell. You could then as well
+				      * get the desired values through
+				      * the @p{get_dof_values}
+				      * function In the other case,
+				      * when the cell has children, we
+				      * use the restriction matrices
+				      * provided by the finite element
+				      * class to compute the
+				      * interpolation from the
+				      * children to the present cell.
 				      *
-				      * It is assumed that both vectors already
-				      * have the right size beforehand. This
-				      * function assumes the existence of an
-				      * interpolation from child cells to the
-				      * mother cell, denoted by the restriction
-				      * matrices of the finite element class.
-				      * Futhermore, this interpolation should
-				      * be possible for each child alone, i.e.
-				      * it should be possible to compute the
-				      * restriction by writing values obtained
-				      * from each child directly into the output
-				      * vector, without, for example, computing
-				      * an average over all children.
-				      * These properties, however, do not exist
-				      * for all elements; an example is the
-				      * DG(0) element, which represents
-				      * piecewise constant elements: for these
-				      * the restriction to mother cell could
-				      * be the average of the values of the
-				      * children, maybe weighted by the measure
-				      * of each child. It is not yet decided
-				      * what the this function does in these
-				      * cases.
+				      * It is assumed that both
+				      * vectors already have the right
+				      * size beforehand. This function
+				      * assumes the existence of an
+				      * interpolation from child cells
+				      * to the mother cell, denoted by
+				      * the restriction matrices of
+				      * the finite element class.
+				      * Futhermore, this interpolation
+				      * should be possible for each
+				      * child alone, i.e.  it should
+				      * be possible to compute the
+				      * restriction by writing values
+				      * obtained from each child
+				      * directly into the output
+				      * vector, without, for example,
+				      * computing an average over all
+				      * children.  These properties,
+				      * however, do not exist for all
+				      * elements; an example is the
+				      * DG(0) element, which
+				      * represents piecewise constant
+				      * elements: for these the
+				      * restriction to mother cell
+				      * could be the average of the
+				      * values of the children, maybe
+				      * weighted by the measure of
+				      * each child. It is not yet
+				      * decided what the this function
+				      * does in these cases.
 				      *
 				      * Unlike the @p{get_dof_values}
 				      * function, this function is
@@ -1187,57 +1219,73 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      Vector<number>    &interpolated_values) const;
 
 				     /**
-				      * This, again, is the counterpart to
-				      * @p{get_interpolated_dof_values}: you
-				      * specify the dof values on a cell and
-				      * these are interpolated to the children
-				      * of the present cell and set on the
-				      * terminal cells.
+				      * This, again, is the
+				      * counterpart to
+				      * @p{get_interpolated_dof_values}:
+				      * you specify the dof values on
+				      * a cell and these are
+				      * interpolated to the children
+				      * of the present cell and set on
+				      * the terminal cells.
 				      *
-				      * In principle, it works as follows: if
-				      * the cell pointed to by this object is
-				      * terminal, then the dof values are set
-				      * in the global data vector by calling
-				      * the @p{set_dof_values} function;
-				      * otherwise, the values are prolonged
-				      * to each of the children and this
-				      * function is called for each of them.
+				      * In principle, it works as
+				      * follows: if the cell pointed
+				      * to by this object is terminal,
+				      * then the dof values are set in
+				      * the global data vector by
+				      * calling the @p{set_dof_values}
+				      * function; otherwise, the
+				      * values are prolonged to each
+				      * of the children and this
+				      * function is called for each of
+				      * them.
 				      *
-				      * Using the @p{get_interpolated_dof_values}
-				      * and this function, you can compute the
-				      * interpolation of a finite element
-				      * function to a coarser grid by first
-				      * getting the interpolated solution on a
-				      * cell of the coarse grid and afterwards
-				      * redistributing it using this function.
+				      * Using the
+				      * @p{get_interpolated_dof_values}
+				      * and this function, you can
+				      * compute the interpolation of a
+				      * finite element function to a
+				      * coarser grid by first getting
+				      * the interpolated solution on a
+				      * cell of the coarse grid and
+				      * afterwards redistributing it
+				      * using this function.
 				      *
-				      * Note that for continuous finite
-				      * elements, calling this function affects
-				      * the dof values on neighboring cells as
-				      * well. It may also violate continuity
-				      * requirements for hanging nodes, if
-				      * neighboring cells are less refined than
-				      * the present one, or if their children are
-				      * less refined than the children of this
-				      * cell. These requirements
-				      * are not taken care of and must be
-				      * enforced by the user afterwards.
+				      * Note that for continuous
+				      * finite elements, calling this
+				      * function affects the dof
+				      * values on neighboring cells as
+				      * well. It may also violate
+				      * continuity requirements for
+				      * hanging nodes, if neighboring
+				      * cells are less refined than
+				      * the present one, or if their
+				      * children are less refined than
+				      * the children of this
+				      * cell. These requirements are
+				      * not taken care of and must be
+				      * enforced by the user
+				      * afterwards.
 				      *
-				      * It is assumed that both vectors already
-				      * have the right size beforehand. This
-				      * function relies on the existence of a
-				      * natural interpolation property of
-				      * finite element spaces of a cell to
-				      * its children, denoted by the
-				      * prolongation matrices of finite element
-				      * classes. For some elements, the spaces
-				      * on coarse and fine grids are not nested,
-				      * in which case the interpolation to a
-				      * child is not the identity; refer to the
-				      * documentation of the respective finite
-				      * element class for a description of what
-				      * the prolongation matrices represent in
-				      * this case.
+				      * It is assumed that both
+				      * vectors already have the right
+				      * size beforehand. This function
+				      * relies on the existence of a
+				      * natural interpolation property
+				      * of finite element spaces of a
+				      * cell to its children, denoted
+				      * by the prolongation matrices
+				      * of finite element classes. For
+				      * some elements, the spaces on
+				      * coarse and fine grids are not
+				      * nested, in which case the
+				      * interpolation to a child is
+				      * not the identity; refer to the
+				      * documentation of the
+				      * respective finite element
+				      * class for a description of
+				      * what the prolongation matrices
+				      * represent in this case.
 				      *
 				      * Unlike the @p{set_dof_values}
 				      * function, this function is

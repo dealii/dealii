@@ -637,6 +637,24 @@ DoFCellAccessor<3>::face (const unsigned int i) const
 #endif
 
 
+
+template <int dim>
+inline
+TriaIterator<dim,DoFCellAccessor<dim> >
+DoFCellAccessor<dim>::
+neighbor_child_on_subface (const unsigned int face,
+                           const unsigned int subface) const
+{
+  const TriaIterator<dim,CellAccessor<dim> > q
+    = CellAccessor<dim>::neighbor_child_on_subface (face, subface);
+  return TriaIterator<dim,DoFCellAccessor<dim> > (this->tria,
+                                                  q->level (),
+                                                  q->index (),
+                                                  this->dof_handler);
+}
+
+
+
 template <int dim>
 template <class InputVector, typename number>
 void
