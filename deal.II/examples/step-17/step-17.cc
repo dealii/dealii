@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2004 by the deal.II authors */
+/*    Copyright (C) 2000, 2004, 2005 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -997,7 +997,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
                                    // processes, not only the one that
                                    // actually needs the data. This can't be
                                    // avoided, however, with the communication
-                                   // model of MPI: MPi does not have a way to
+                                   // model of MPI: MPI does not have a way to
                                    // query data on another process, both
                                    // sides have to initiate a communication
                                    // at the same time. So even though most of
