@@ -62,6 +62,13 @@
 				 // ``FEValues'' class:
 #include <fe/fe_values.h>
 
+				 // We need one more include from
+				 // standard C++, which is necessary
+				 // when we try to find out the actual
+				 // type behind a pointer to a base
+				 // class. We will explain this in
+				 // slightly more detail below.
+#include <typeinfo>
 #include <fstream>
 
 
@@ -317,32 +324,66 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 
 
 				 // Then we need the class that does
-				 // all the work.
-//.......................
+				 // all the work. It is mostly the
+				 // same as in previous examples, and
+				 // we will discuss the differences
+				 // only when we declare the
+				 // respective functions or variables
+				 // below.
 template <int dim>
 class LaplaceProblem 
 {
   public:
-//.........
+				     // We will use this class in
+				     // several modes: for different
+				     // finite elements, as well as
+				     // for adaptive and global
+				     // refinement. The decision
+				     // whether global or adaptive
+				     // refinement shall be used is
+				     // communicated to the
+				     // constructor of this class
+				     // through an enumeration type,
+				     // which we declare here:
     enum RefinementMode {
 	  global_refinement, adaptive_refinement
     };
     
-//.......
+				     // This is the constructor of the
+				     // class, it takes the finite
+				     // element and the refinement
+				     // mode as parameter and stores
+				     // them in local variables.
     LaplaceProblem (const FiniteElement<dim> &fe,
 		    const RefinementMode      refinement_mode);
+
+				     // The following two functions
+				     // are the same as in previous
+				     // examples.
     ~LaplaceProblem ();
 
     void run ();
     
   private:
-//.......
+				     // As are these:
     void setup_system ();
     void assemble_system ();
     void solve ();
     void refine_grid ();
+
+				     // After the solution has been
+				     // computed, we perform some
+				     // analysis on it, such as
+				     // computing the error in various
+				     // norms. This is done in the
+				     // following function. To enable
+				     // some output, we pass it the
+				     // number of the refinement
+				     // cycle.
     void process_solution (const unsigned int cycle);
 
+				     // Now for the data elements of
+				     // this class:
     Triangulation<dim>                      triangulation;
     DoFHandler<dim>                         dof_handler;
 
@@ -536,8 +577,19 @@ class LaplaceProblem
 
     Vector<double>                          solution;
     Vector<double>                          system_rhs;
-//.............
-    RefinementMode                          refinement_mode;
+
+				     // The second last variable
+				     // stores the refinement mode
+				     // passed to the
+				     // constructor. Since it is only
+				     // set in the constructor, we can
+				     // declare this variable
+				     // constant, to avoid that
+				     // someone sets it involuntarily
+				     // (e.g. in an `if'-statement
+				     // where == was written as = by
+				     // chance).
+    const RefinementMode                    refinement_mode;
 
 				     // For each refinement level some
 				     // important data (like the
@@ -560,7 +612,12 @@ class LaplaceProblem
 
 
 
-//........
+				 // In the constructor of this class,
+				 // we only set the variables passed
+				 // to this object, and associate the
+				 // DoF handler object with the
+				 // triangulation (which is empty at
+				 // present, however).
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const FiniteElement<dim> &fe,
 				     const RefinementMode refinement_mode) :
@@ -982,18 +1039,44 @@ void LaplaceProblem<dim>::solve ()
 };
 
 
-//.....................				 
+				 // Now for the function doing grid
+				 // refinement. Depending on the
+				 // refinement mode passed to the
+				 // constructor, we do global or
+				 // adaptive refinement.
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
   switch (refinement_mode) 
     {
+				       // If global refinement is
+				       // required, this is simple:
       case global_refinement:
       {
 	triangulation.refine_global (1);
 	break;
       };
-       
+
+					// In case of adaptive
+					// refinement, we use the same
+					// functions and classes as in
+					// the previous example
+					// program. Note that one
+					// could treat Neumann
+					// boundaries differently than
+					// Dirichlet boundaries, and
+					// one should in fact do so
+					// here since we have Neumann
+					// boundary conditions on part
+					// of the boundaries, but
+					// since we don't have a
+					// function here that
+					// describes the Neumann
+					// values (we only construct
+					// these values from the exact
+					// solution when assembling
+					// the matrix), we omit this
+					// detail here.
       case adaptive_refinement:
       {
 	Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
@@ -1015,20 +1098,70 @@ void LaplaceProblem<dim>::refine_grid ()
     };
 };
 
-//...............
+
+
+				 // Finally process the solution after
+				 // it has been computed. For this, we
+				 // integrate the error in various
+				 // norms, and we generate tables that
+				 // will be later used to display the
+				 // convergence against the continuous
+				 // solution in a nice format.
 template <int dim>
 void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 {
+				   // In order to integrate the
+				   // difference between computed
+				   // numerical solution and the
+				   // continuous solution (described
+				   // by the ``Solution'' class
+				   // defined at the top of this
+				   // file), we first need a vector
+				   // that will hold the norm of the
+				   // error on each cell. Since
+				   // accuracy with 16 digits is not
+				   // so important for these
+				   // quantities, we sace some memory
+				   // by using ``float'' instead of
+				   // ``double'' values.
   Vector<float> difference_per_cell (triangulation.n_active_cells());
-  
+
+				   // Next we use a function from the
+				   // library which computes the error
+				   // in the L2 norm on each cell. We
+				   // have to pass it the DoF handler
+				   // object, the vector holding the
+				   // nodal values of the numerical
+				   // solution, the continuous
+				   // solution as a function object,
+				   // the vector into which it shall
+				   // place the norm of the error on
+				   // each cell, a quadrature rule by
+				   // which this norm shall be
+				   // computed, and the type of norm
+				   // to be used. Here, we use a Gauss
+				   // formula with three points in
+				   // each space direction, and
+				   // compute the L2 norm.
   VectorTools::integrate_difference (dof_handler,
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
 				     QGauss3<dim>(),
 				     L2_norm);
+				   // Finally, we want to get the
+				   // global L2 norm. This can of
+				   // course be obtained by summing
+				   // the squares of the norms on each
+				   // cell, and taking the square root
+				   // of that value. This is
+				   // equivalent to taking the l2
+				   // (lower case ``l'') norm of the
+				   // vector of norms on each cell:
   const double L2_error = difference_per_cell.l2_norm();
 
+				   // The same procedure is done to
+				   // get the H1 semi-norm:
   VectorTools::integrate_difference (dof_handler,
 				     solution,
 				     Solution<dim>(),
@@ -1037,14 +1170,48 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				     H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
+				   // Finally, we compute the maximum
+				   // norm. Of course, we can't
+				   // actually use the true maximum,
+				   // but only the maximum at the
+				   // quadrature points. Since this
+				   // quite sensitively depends on the
+				   // quadrature rule being used, and
+				   // since we would like to avoid
+				   // false results due to
+				   // super-convergence effects at
+				   // some points, we use a special
+				   // quadrature rule that is obtained
+				   // by iterating the trapezoidal
+				   // rule five times in each space
+				   // direction. Note that the
+				   // constructor of the ``QIterated''
+				   // class takes a one-dimensional
+				   // quadrature rule and a number
+				   // that tells it how often it shall
+				   // use this rule in each space
+				   // direction.
+  QTrapez<1>     q_trapez;
+  QIterated<dim> q_iterated (q_trapez, 5);
+
+				   // Using this special quadrature
+				   // rule, we can now try to find the
+				   // maximal error on each cell:
   VectorTools::integrate_difference (dof_handler,
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     QGauss3<dim>(),
+				     q_iterated,
 				     Linfty_norm);
+				   // Obviously, the maximal error
+				   // globally is the maximum over the
+				   // maximal errors on each cell:
   const double Linfty_error = difference_per_cell.linfty_norm();
 
+				   // After all these errors have been
+				   // computed, we finally write some
+				   // output and put all the data into
+				   // a table.
   const unsigned int n_active_cells=triangulation.n_active_cells();
   const unsigned int n_dofs=dof_handler.n_dofs();
   
@@ -1128,7 +1295,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<6; ++cycle)
+  for (unsigned int cycle=0; cycle<7; ++cycle)
     {
 				       // The first action in each
 				       // iteration of the outer loop
@@ -1217,14 +1384,17 @@ void LaplaceProblem<dim>::run ()
 		cell->face(face)->set_boundary_indicator (1);
 	}
       else
-					 // If this is not the first
-					 // step, the we call
-					 // ``refine_grid'' to
-					 // actually refine the grid
-					 // according to the
-					 // refinement mode passed to
-					 // the constructor.
-	refine_grid ();      
+	{
+					   // If this is not the first
+					   // step, the we call
+					   // ``refine_grid'' to
+					   // actually refine the grid
+					   // according to the
+					   // refinement mode passed to
+					   // the constructor.
+	  refine_grid ();
+	};
+      
 
 				       // The next steps you already
 				       // know from previous
@@ -1269,6 +1439,40 @@ void LaplaceProblem<dim>::run ()
       default:
 	    Assert (false, ExcInternalError());
     };
+
+				   // We augment the filename by a
+				   // postfix denoting the finite
+				   // element which we have used in
+				   // the computation. Finding out
+				   // which finite element we are
+				   // actually using is not that
+				   // simple here, since we only have
+				   // a pointer to the common base
+				   // class of all finite elements,
+				   // but we can use a rather new
+				   // feature of C++ to check whether
+				   // the actual type of the object
+				   // pointed to by ``fe'' is an
+				   // ``FEQ1'', ``FEQ2'', or something
+				   // different.
+  if (typeid(*fe)==typeid(const FEQ1<dim>))
+    filename += "-q1";
+  else
+    if (typeid(*fe)==typeid(const FEQ2<dim>))
+      filename += "-q2";
+    else
+				       // The finite element is
+				       // neither Q1 nor Q2. This
+				       // should not have happened,
+				       // but maybe someone has tried
+				       // to change this in ``main'',
+				       // so it might happen. We catch
+				       // this case and throw an
+				       // exception, since we don't
+				       // know how to name the
+				       // respective output file
+      Assert (false, ExcInternalError());
+    
   filename += ".gmv";
 	    
   ofstream output (filename.c_str());
@@ -1277,7 +1481,70 @@ void LaplaceProblem<dim>::run ()
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
-  data_out.build_patches ();
+
+				   // Now building the intermediate
+				   // format as before is the next
+				   // step. We introduce one more
+				   // feature of deal.II here. The
+				   // background is the following: in
+				   // some of the runs of this
+				   // function, we have used
+				   // biquadratic finite
+				   // elements. However, since almost
+				   // all output formats only support
+				   // bilinear data, the data is
+				   // written only bilinear, and
+				   // information is lost
+				   // therefore. Of course, we can't
+				   // change the format in which
+				   // graphic programs accept their
+				   // inputs, but we can write the
+				   // data differently such that we
+				   // more closely resemble the
+				   // information available in the
+				   // quadratic approximation. We can,
+				   // for example, write each cell as
+				   // four subcells with bilinear data
+				   // each, such that we have nine
+				   // data points for each cell in the
+				   // triangulation. The graphic
+				   // programs will, of course,
+				   // display this data still only
+				   // bilinear, but at least we have
+				   // given some more of the
+				   // information we have.
+				   //
+				   // In order to allow writing more
+				   // than one subcell per actual
+				   // cell, the ``build_patches''
+				   // function accepts a parameter
+				   // (the default is ``1'', which is
+				   // why you haven't seen this
+				   // parameter in previous
+				   // examples). This parameter
+				   // denotes into how many subcells
+				   // per space direction each cell
+				   // shall be subdivided for
+				   // output. For example, if you give
+				   // ``2'', this leads to 4 cells in
+				   // 2D and 8 cells in 3D. For
+				   // quadratic elements, two subcells
+				   // per space direction is obviously
+				   // the right choice, so this is
+				   // what we choose:
+  unsigned int n_subcells;
+  if (typeid(*fe) == typeid(const FEQ1<dim>))
+    n_subcells = 1;
+  else
+    if (typeid(*fe) == typeid(const FEQ2<dim>))
+      n_subcells = 2;
+    else
+      Assert (false, ExcInternalError());
+  
+  data_out.build_patches (n_subcells);
+
+				   // Finally write out the data in
+				   // GMV format.
   data_out.write_gmv (output);
 
 				   // In each cycle values were added to
@@ -1287,14 +1554,39 @@ void LaplaceProblem<dim>::run ()
 				   // and the captions may not be printed
 				   // directly above the specific columns.
   convergence_table.write_text(cout);
-				   // The table can also be written into a tex file.
-				   // The (nicely) formatted table
-				   // can be viewed at after
-				   // calling `latex whole_table' and
-				   // e.g. `xdvi whole_table'.
+				   // The table can also be written
+				   // into a tex file.  The (nicely)
+				   // formatted table can be viewed at
+				   // after calling `latex filename'
+				   // and e.g. `xdvi filename', where
+				   // filename is the name of the file
+				   // which we construct from the name
+				   // of the finite element and the
+				   // refinement mode, as above
   if (true)
     {
-      ofstream table_file("whole_table.tex");
+      string filename = "error";
+      switch (refinement_mode)
+	{
+	  case global_refinement:
+		filename += "-global";
+		break;
+	  case adaptive_refinement:
+		filename += "-adaptive";
+		break;
+	  default:
+		Assert (false, ExcInternalError());
+	};
+      if (typeid(*fe)==typeid(const FEQ1<dim>))
+	filename += "-q1";
+      else
+	if (typeid(*fe)==typeid(const FEQ2<dim>))
+	  filename += "-q2";
+	else
+	  Assert (false, ExcInternalError());
+      filename += ".tex";
+      
+      ofstream table_file(filename.c_str());
       convergence_table.write_tex(table_file);
       table_file.close();
     }
@@ -1363,29 +1655,99 @@ void LaplaceProblem<dim>::run ()
     }
 
 				   // Finally, the convergence chart
-				   // is written:
+				   // is written. The filename is
+				   // again constructed as above.
   convergence_table.write_text(cout);
 
   if (true)
     {
-      ofstream table_file("convergence_table.tex");
+      string filename = "convergence";
+      switch (refinement_mode)
+	{
+	  case global_refinement:
+		filename += "-global";
+		break;
+	  case adaptive_refinement:
+		filename += "-adaptive";
+		break;
+	  default:
+		Assert (false, ExcInternalError());
+	};
+      if (typeid(*fe)==typeid(const FEQ1<dim>))
+	filename += "-q1";
+      else
+	if (typeid(*fe)==typeid(const FEQ2<dim>))
+	  filename += "-q2";
+	else
+	  Assert (false, ExcInternalError());
+      filename += ".tex";
+
+      ofstream table_file(filename.c_str());
       convergence_table.write_tex(table_file);
       table_file.close();
     }
 };
 
 
-//.................
+				 // The main function is mostly as
+				 // before. The only difference is
+				 // that we solve three times, once
+				 // for Q1 and adaptive refinement,
+				 // once for Q1 elements and global
+				 // refinement, and once for Q2
+				 // elements and global refinement.
 int main () 
 {
   try
     {
       deallog.depth_console (0);
 
-      FEQ1<2> fe;
-//      LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
-      LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
-      laplace_problem_2d.run ();
+				       // Now for the three calls to
+				       // the main class. Each call is
+				       // blocked into curly braces in
+				       // order to detroy the
+				       // respective objects (i.e. the
+				       // finite element and the
+				       // LaplaceProblem object) at
+				       // the end of the block and
+				       // before we go to the next
+				       // run.
+      {
+	cout << "Solving with Q1 elements, adaptive refinement" << endl
+	     << "=============================================" << endl
+	     << endl;
+	
+	FEQ1<2> fe;
+	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::adaptive_refinement);
+	laplace_problem_2d.run ();
+
+	cout << endl;
+      };
+	
+      {
+	cout << "Solving with Q1 elements, global refinement" << endl
+	     << "===========================================" << endl
+	     << endl;
+	
+	FEQ1<2> fe;
+	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
+	laplace_problem_2d.run ();
+
+	cout << endl;
+      };
+       
+      {
+	cout << "Solving with Q2 elements, global refinement" << endl
+	     << "===========================================" << endl
+	     << endl;
+	
+	FEQ2<2> fe;
+	LaplaceProblem<2> laplace_problem_2d (fe, LaplaceProblem<2>::global_refinement);
+	laplace_problem_2d.run ();
+
+	cout << endl;
+      };
+       
     }
   catch (exception &exc)
     {
