@@ -400,8 +400,9 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
 	  {
 	    pair<unsigned int, unsigned int>
 	      index = fe.face_system_to_component_index(i);
-						    
-	    boundary_values[face_dofs[i]] = dof_values[i](index.first);
+	    double s = dof_values[i](index.first);
+	    if (s != HUGE_VAL)
+	      boundary_values[face_dofs[i]] = s;
 	  }
       }
 }
