@@ -65,7 +65,7 @@ TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> 
 template <int dim, typename Accessor>
 TriaRawIterator<dim,Accessor> TriaRawIterator<dim,Accessor>::operator ++ (int) {
   TriaRawIterator<dim,Accessor> tmp(*this);
-  this->operator++ ();
+  operator++ ();
   
   return tmp;
 };
@@ -75,7 +75,7 @@ TriaRawIterator<dim,Accessor> TriaRawIterator<dim,Accessor>::operator ++ (int) {
 template <int dim, typename Accessor>
 TriaRawIterator<dim,Accessor> TriaRawIterator<dim,Accessor>::operator -- (int) {
   TriaRawIterator<dim,Accessor> tmp(*this);
-  this->operator-- ();
+  operator-- ();
   
   return tmp;
 };
@@ -182,7 +182,7 @@ TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
 template <int dim, typename Accessor>
 TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator ++ (int) {
   TriaIterator<dim,Accessor> tmp(*this);
-  this->operator++ ();
+  operator++ ();
   
   return tmp;
 };
@@ -202,7 +202,7 @@ TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator -- () {
 template <int dim, typename Accessor>
 TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator -- (int) {
   TriaIterator<dim,Accessor> tmp(*this);
-  this->operator-- ();
+  operator-- ();
   
   return tmp;
 };
@@ -237,10 +237,7 @@ TriaActiveIterator (const TriaRawIterator<dim,Accessor> &i) :
 				   // has_children() is called anyway, even if
 				   // state==past_the_end, and will then
 				   // throw the exception!
-				   //
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
-  if (this->state() != past_the_end) 
+  if (state() != past_the_end) 
     Assert (accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -259,10 +256,7 @@ TriaActiveIterator (const TriaIterator<dim,Accessor> &i) :
 				   // has_children() is called anyway, even if
 				   // state==past_the_end, and will then
 				   // throw the exception!
-  				   //
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
-  if (this->state() != past_the_end) 
+  if (state() != past_the_end) 
     Assert (accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -284,10 +278,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (Triangulation<dim> *parent
 				   // has_children() is called anyway, even if
 				   // state==past_the_end, and will then
 				   // throw the exception!
-				   //
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
-  if (this->state() != past_the_end) 
+  if (state() != past_the_end) 
     Assert (accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -315,10 +306,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 				   // has_chidlren() is called anyway, even if
 				   // state==past_the_end, and will then
 				   // throw the exception!
-				   //
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
-  if (this->state() != past_the_end) 
+  if (state() != past_the_end) 
     Assert (accessor.used() && accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -338,10 +326,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 				   // has_children() is called anyway, even if
 				   // state==past_the_end, and will then
 				   // throw the exception!
-				   //
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
-  if (this->state() != past_the_end) 
+  if (state() != past_the_end) 
     Assert (accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
@@ -352,10 +337,8 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 
 template <int dim, typename Accessor>
 TriaActiveIterator<dim,Accessor> & TriaActiveIterator<dim,Accessor>::operator ++ () {
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
   while (TriaIterator<dim,Accessor>::operator++(),
-	 (this->state() == valid))
+	 (state() == valid))
     if (accessor.has_children() == false)
       return *this;
   return *this;
@@ -366,7 +349,7 @@ TriaActiveIterator<dim,Accessor> & TriaActiveIterator<dim,Accessor>::operator ++
 template <int dim, typename Accessor>
 TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator ++ (int) {
   TriaActiveIterator<dim,Accessor> tmp(*this);
-  this->operator++ ();
+  operator++ ();
   
   return tmp;
 };
@@ -375,10 +358,8 @@ TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator ++ (
 
 template <int dim, typename Accessor>
 TriaActiveIterator<dim,Accessor> & TriaActiveIterator<dim,Accessor>::operator -- () {
-				   // for egcs: write this-> to avoid internal
-				   // compiler error
   while (TriaIterator<dim,Accessor>::operator--(),
-	 (this->state() == valid))
+	 (state() == valid))
     if (accessor.has_children() == false)
       return *this;
   return *this;
@@ -389,7 +370,7 @@ TriaActiveIterator<dim,Accessor> & TriaActiveIterator<dim,Accessor>::operator --
 template <int dim, typename Accessor>
 TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator -- (int) {
   TriaActiveIterator<dim,Accessor> tmp(*this);
-  this->operator-- ();
+  operator-- ();
   
   return tmp;
 };
