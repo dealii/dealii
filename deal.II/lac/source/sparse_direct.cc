@@ -418,7 +418,7 @@ struct SparseDirectMA27::DetachedModeData
           record_communication<T> (child_pid,
                                    CommunicationsLog::put,
                                    N, count, debug_info);
-      };
+      }
 
     
                                      /**
@@ -451,7 +451,7 @@ struct SparseDirectMA27::DetachedModeData
           record_communication<T> (child_pid,
                                    CommunicationsLog::get,
                                    N, count, debug_info);
-      };
+      }
 };
 
 

@@ -239,7 +239,8 @@ namespace Polynomials
   {
     for (int i=degree();i>=0;--i)
       {
-        out << coefficients[i] << " x^" << i << std::endl;
+        out << static_cast<double>(coefficients[i])
+            << " x^" << i << std::endl;
       }
   }
 

@@ -577,10 +577,10 @@ void Vector<Number>::print (std::ostream      &out,
 
   if (across)
     for (unsigned int i=0; i<size(); ++i)
-      out << val[i] << ' ';
+      out << static_cast<double>(val[i]) << ' ';
   else
     for (unsigned int i=0; i<size(); ++i)
-      out << val[i] << std::endl;
+      out << static_cast<double>(val[i]) << std::endl;
   out << std::endl;
   
   AssertThrow (out, ExcIO());

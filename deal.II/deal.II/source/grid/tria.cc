@@ -7051,7 +7051,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   //    loop is rather expensive, so
 				   //    we chose the way presented here
   std::vector<bool> flags_before_loop[2] = {flags_before[0],
-					      flags_before[1]};
+                                            flags_before[1]};
 
 				   // now for what is done in each
 				   // loop: we have to fulfill several
