@@ -10,7 +10,7 @@
     <meta name="keywords" content="deal.II"></head>
   <body>
     <h1>Installation instructions and further information 
-        for <acronym>deal.II</acronym> </h1>
+        on <acronym>deal.II</acronym> </h1>
 	
     This document contains the following sections:
     <ul>
@@ -42,7 +42,7 @@
            the <code>$(wildcard ...)</code> function which prevented
            us from compiling some parts of the library (most of our
            Makefiles are fixed, though). Other make programs
-           (i.e. non-GNU flavours) are not standardized and will
+           (i.e. non-GNU flavors) are not standardized and will
            probably fail to work.
 
       <li> In case you want to generate the documentation from the
@@ -52,7 +52,7 @@
            need <a href="http://www.linuxsupportline.com/~doc++/">Doc++</a>
 	   and LaTeX installed. It is known that Doc++
            version 3.3.13 is broken and generates invalid Tex, but
-           3.4 is ok. Note that the printed documentation of the
+           3.4 is OK. Note that the printed documentation of the
            classes alone is far more than 1000 pages, so you may not
            want to print it usually.
 
@@ -63,7 +63,7 @@
            everywhere, GMV is freely available for most Unix
            platforms. Povray is freely available for almost all
            platforms. AVS is a commercial program available for most
-           Unix flavours.
+           Unix flavors.
     </ul>
 
     Note that we have only tested the library under Unix (extensively
@@ -74,7 +74,7 @@
 
     <p>
 
-    In case you didn't find your favourite graphics format above it
+    In case you didn't find your favorite graphics format above it
     might be of interest that it is quite simple to add it to the list
     of supported ones (take a look at
     /base/include/base/data_out_base.h and
@@ -101,11 +101,11 @@
 
     The most important result of <code>./configure</code> is the
     creation of the file <code>common/Make.global_options</code>. This
-    file contains compiler options, pathes, etc which you may want to
+    file contains compiler options, paths, etc which you may want to
     use in the Makefiles of your own projects. It is definitely a good
     idea to include it into your Makefile, to allow using the same
     flags for compilation between library files and the files of your
-    project, and to access the pathes of the library files. To find
+    project, and to access the paths of the library files. To find
     out about the supported flags, take a look at the file.
 
     <p>
@@ -174,10 +174,10 @@
 
       <li> <code>deal.II/lib/libdeal_II_2d.a</code>: This is the
       library containing all the classes representing finite element
-      methods, such as grid handlind, different finite elements,
+      methods, such as grid handling, different finite elements,
       etc. Thus suffix <code>_2d</code> obviously indicates that this
       particularly library was compiled for two spatial dimensions,
-      but if you told 'make' to do sio, there will also be libraries
+      but if you told 'make' to do so, there will also be libraries
       for one and three spatial dimensions.
     </ul>
 
@@ -198,10 +198,10 @@
       internal states. These assertions have proven to be an
       invaluable mean to finding programming bugs since they will
       almost always abort your program if something goes wrong. In our
-      experience, more than ninty per cent of all errors are invalid
+      experience, more than ninety per cent of all errors are invalid
       parameters (such as vectors having the wrong size, etc) and they
       are usually found almost instantaneously using the file name and
-      line number of where the problem occured.
+      line number of where the problem occurred.
 
       <p>
 
@@ -236,9 +236,9 @@
       allocation has to be made thread-safe; the latter can be done
       for the C++ standard containers by defining
       <code>-D__USE_MALLOC</code>. Note that not all parts of the
-      deal.II library are fully threadsafe (though most are and
-      multithreaded programs are working well and routinely) and that
-      gcc's runtime library is not threadsafe unless you configure gcc
+      deal.II library are fully thread-safe (though most are and
+      multi-threaded programs are working well and routinely) and that
+      gcc's runtime library is not thread-safe unless you configure gcc
       with <code>--enable-threads</code> and recompile it.
 
     <li>
@@ -258,12 +258,12 @@
 
      <p>
 
-     In our experience, if you want to use ACE on SUNs, you should
+     In our experience, if you want to use ACE on Sun, you should
      compile it for pthreads rather than Solaris threads.
 
      <p>
 
-     Note that the multithread support in the library is still
+     Note that the multi-thread support in the library is still
      experimental. 
     </ul>
 
@@ -339,8 +339,11 @@
         libraries shall state the names of the library and their
         principle authors (at present Wolfgang Bangerth and Guido
         Kanschat). All written publications are requested to cite the
-	article <EM>W. Bangerth, G. Kanschat: Concepts for Object-Oriented
-	Finite Element Software - the deal.II Library</EM>.
+        article <a
+        href="http:reports/deal.II-paper/index.html"><EM>W. Bangerth,
+        G. Kanschat: Concepts for Object-Oriented Finite Element
+        Software - the deal.II Library</EM></a>. It has appeared as
+        Preprint 99-43 at the IWR, Universit&auml;t Heidelberg.
     </ul>
 
     Note that since our institute is evaluated at regular intervals,
