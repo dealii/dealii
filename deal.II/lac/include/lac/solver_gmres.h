@@ -16,17 +16,28 @@
  * Minimal Residual Method. The stopping criterion is the norm of the
  * residual.
  *
- * @author Original implementation by the DEAL authors, adapted by Wolfgang Bangerth
+ * You have to give the number of temporary vectors to the constructor which
+ * are to be used to do the orthogonalization. If the number of iterations
+ * needed to solve the problem to the given criterion, an intermediate
+ * solution is computed and a restart is performed. If you don't want to
+ * use the restarted method, you can limit the number of iterations (stated
+ * in the #SolverControl# object given to the constructor) to be below
+ * the number of temporary vectors minus three. Note the subtraction, which
+ * is due to the fact that three vectors are used for other purposes, so
+ * the number of iterations before a restart occurs is less by three than
+ * the total number of temporary vectors.
+ *
+ * @author Original implementation by the DEAL authors; adapted, cleaned and documented by Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
-class SolverPGMRES : public Solver<Matrix, Vector> {
+class SolverGMRES : public Solver<Matrix, Vector> {
   public:
 				     /**
 				      * Constructor.
 				      */
-    SolverPGMRES (SolverControl        &cn,
-		  VectorMemory<Vector> &mem,
-		  const unsigned int    n_tmp_vectors) :
+    SolverGMRES (SolverControl        &cn,
+		 VectorMemory<Vector> &mem,
+		 const unsigned int    n_tmp_vectors) :
 		    Solver<Matrix,Vector> (cn,mem),
 		    n_tmp_vectors (n_tmp_vectors)
       {};
@@ -38,6 +49,12 @@ class SolverPGMRES : public Solver<Matrix, Vector> {
 			       Vector       &x,
 			       const Vector &b);
 
+    DeclException1 (ExcTooFewTmpVectors,
+		    int,
+		    << "The number of temporary vectors you gave ("
+		    << arg1 << ") is too small. It should be at least 10 for "
+		    << "any results, and much more for reasonable ones.");
+    
   protected:
     const unsigned int n_tmp_vectors;
     
@@ -61,14 +78,29 @@ class SolverPGMRES : public Solver<Matrix, Vector> {
 
 
 
-/* ------------------------- Inline functions ----------------------------- */
+/* --------------------- Inline and template functions ------------------- */
+
+
+template <class Matrix, class Vector>
+SolverGMRES<Matrix,Vector>::SolverGMRES (SolverControl        &cn,
+					 VectorMemory<Vector> &mem,
+					 const unsigned int    n_tmp_vectors) :
+		Solver<Matrix,Vector> (cn,mem),
+		n_tmp_vectors (n_tmp_vectors)
+{
+  Assert (n_tmp_vectors >= 10, ExcTooFewTmpVectors (n_tmp_vectors));
+};
+
+
 
 template <class Matrix, class Vector>
 inline
 void
-SolverPGMRES<Matrix,Vector>::givens_rotation (Vector& h, Vector& b,
-					      Vector& ci, Vector& si, 
-					      int col) const
+SolverGMRES<Matrix,Vector>::givens_rotation (Vector &h,
+					     Vector &b,
+					     Vector &ci,
+					     Vector &si, 
+					     int     col) const
 {
   for (int i=0 ; i<col ; i++)
     {
@@ -88,31 +120,13 @@ SolverPGMRES<Matrix,Vector>::givens_rotation (Vector& h, Vector& b,
 }
 
 
-// // restarted method
-// template<class Matrix, class Vector>
-// inline int
-// SolverPGMRES<Matrix,Vector>::solve (Matrix& A, Vector& x, Vector& b)
-// {
-//   int reached, kmax = mem.n()-1;
-//   for(int j=0;;j++)
-//   {
-//     info.usediter() = j*(kmax-1);
-//     reached = dgmres(A,x,b,mem,info);
-//     if(reached) break;
-//   }
-//   if (reached<0) return 1;
-//   return 0;
-// }
-
-
 
 
 template<class Matrix, class Vector>
-inline
 Solver<Matrix,Vector>::ReturnState
-SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
-				    Vector& x,
-				    const Vector& b)
+SolverGMRES<Matrix,Vector>::solve (const Matrix& A,
+				   Vector      & x,
+				   const Vector& b)
 {
 				   // this code was written by the fathers of
 				   // DEAL. I take absolutely no guarantees
@@ -122,7 +136,6 @@ SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
 				   // but whoever wrote this code in the first
 				   // place should get stoned, IMHO! (WB)
 
-  const unsigned int kmax = n_tmp_vectors-1;
 				   // allocate an array of n_tmp_vectors
 				   // temporary vectors from the VectorMemory
 				   // object
@@ -133,22 +146,26 @@ SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
       tmp_vectors[tmp]->reinit (x.size());
     };
 
-// WB  
-//  int k0   = info.usediter();
-  int k0 = 0;
+				   // number of the present iteration; this
+				   // number is not reset to zero upon a
+				   // restart
+  unsigned int accumulated_iterations = 0;
   
 				   // matrix used for the orthogonalization
 				   // process later
-  FullMatrix<double> H(kmax+1, kmax);
+  FullMatrix<double> H(n_tmp_vectors, n_tmp_vectors-1);
 
 				   // some additional vectors, also used
 				   // in the orthogonalization
-  ::Vector<double> gamma(kmax+1), ci(kmax), si(kmax), h(kmax);
+  ::Vector<double> gamma(n_tmp_vectors),
+                   ci   (n_tmp_vectors-1),
+                   si   (n_tmp_vectors-1),
+                   h    (n_tmp_vectors-1);
 
 
   unsigned int dim;
 
-  SolverControl::State reached = SolverControl::iterate;
+  SolverControl::State iteration_state = SolverControl::iterate;
   
 				   // switch to determine whether we want a
 				   // left or a right preconditioner. at
@@ -158,109 +175,132 @@ SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
 
 				   // define two aliases
   Vector &v = *tmp_vectors[0];
-  Vector &p = *tmp_vectors[kmax];
+  Vector &p = *tmp_vectors[n_tmp_vectors-1];
 
-  if (left_precondition)
+  
+				   ///////////////////////////////////
+				   // outer iteration: loop until we
+				   // either reach convergence or the
+				   // maximum number of iterations is
+				   // exceeded. each cycle of this
+				   // loop amounts to one restart
+  do
     {
-      A.residual(p,x,b);
-      A.precondition(v,p);
-    } else {
-      A.residual(v,x,b);
-    };
- 
-  double rho = v.l2_norm();
-  gamma(0) = rho;
-
-  v.scale (1./rho);
-
-				   // inner iteration doing at most as
-				   // many steps as there are temporary
-				   // vectors. the number of steps actually
-				   // been done is propagated outside
-				   // through the #dim# variable
-  for (unsigned int inner_iteration=0;
-       inner_iteration<kmax-1 && (reached==SolverControl::iterate);
-       inner_iteration++)
-    {
-				       // yet another alias
-      Vector& vv = *tmp_vectors[inner_iteration+1];
+				       // reset this vector to the
+				       // right size
+      h.reinit (n_tmp_vectors-1);
       
       if (left_precondition)
 	{
-	  A.vmult(p, *tmp_vectors[inner_iteration]);
-	  A.precondition(vv,p);
+	  A.residual(p,x,b);
+	  A.precondition(v,p);
 	} else {
-	  A.precondition(p,*tmp_vectors[inner_iteration]);
-	  A.vmult(vv,p);
+	  A.residual(v,x,b);
 	};
+ 
+      double rho = v.l2_norm();
+      gamma(0) = rho;
       
-      dim = inner_iteration+1;
+      v.scale (1./rho);
 
-				       /* Orthogonalization */
-      for (unsigned int i=0 ; i<dim ; ++i)
+				       // inner iteration doing at most as
+				       // many steps as there are temporary
+				       // vectors. the number of steps actually
+				       // been done is propagated outside
+				       // through the #dim# variable
+      for (unsigned int inner_iteration=0;
+	   ((inner_iteration < n_tmp_vectors-2)
+	    &&
+	    (iteration_state==SolverControl::iterate));
+	   ++inner_iteration, ++accumulated_iterations)
 	{
-	  h(i) = vv * *tmp_vectors[i];
-	  vv.add(-h(i),*tmp_vectors[i]);
-	};
+					   // yet another alias
+	  Vector& vv = *tmp_vectors[inner_iteration+1];
+	  
+	  if (left_precondition)
+	    {
+	      A.vmult(p, *tmp_vectors[inner_iteration]);
+	      A.precondition(vv,p);
+	    } else {
+	      A.precondition(p,*tmp_vectors[inner_iteration]);
+	      A.vmult(vv,p);
+	    };
+	  
+	  dim = inner_iteration+1;
+	  
+					   /* Orthogonalization */
+	  for (unsigned int i=0 ; i<dim ; ++i)
+	    {
+	      h(i) = vv * *tmp_vectors[i];
+	      vv.add(-h(i),*tmp_vectors[i]);
+	    };
       
-      double s = vv.l2_norm();
-      h(inner_iteration+1) = s;
+	  double s = vv.l2_norm();
+	  h(inner_iteration+1) = s;
     
-				       /* Re-orthogonalization */
-      for (unsigned i=0; i<dim; ++i)
-	{
-	  double htmp = vv * *tmp_vectors[i];
-	  h(i) += htmp;
-	  vv.add(-htmp,*tmp_vectors[i]);
+					   /* Re-orthogonalization */
+	  for (unsigned i=0; i<dim; ++i)
+	    {
+	      double htmp = vv * *tmp_vectors[i];
+	      h(i) += htmp;
+	      vv.add(-htmp,*tmp_vectors[i]);
+	    };
+	  
+	  s = vv.l2_norm();
+	  h(inner_iteration+1) = s;
+	  
+	  vv.scale(1./s);
+	  
+					   /*  Transformation into
+					       triagonal structure  */
+	  givens_rotation(h,gamma,ci,si,inner_iteration);
+	  
+					   /*  append vector on matrix  */
+	  for (unsigned int i=0; i<dim; ++i)
+	    H(i,inner_iteration) = h(i);
+	  
+					   /*  residual  */
+	  rho = fabs(gamma(dim));
+    
+	  iteration_state = control().check (accumulated_iterations, rho);
 	};
-    
-      s = vv.l2_norm();
-      h(inner_iteration+1) = s;
-    
-      vv.scale(1./s);
-    
-				       /*  Transformation into
-					   triagonal structure  */
-      givens_rotation(h,gamma,ci,si,inner_iteration);
 
-				       /*  append vector on matrix  */
-      for (unsigned int i=0; i<dim; ++i)
-	H(i,inner_iteration) = h(i);
+				       // end of inner iteration. now
+				       // calculate the solution from the
+				       // temporary vectors
+      h.reinit(dim);
+      FullMatrix<double> H1(dim+1,dim);
 
-				       /*  residual  */
-      rho = fabs(gamma(dim));
-    
-      reached = control().check (k0+inner_iteration, rho);
-    };
-  
-				   /*  Calculate solution  */
-  h.reinit(dim);
-  FullMatrix<double> H1(dim+1,dim);
+      for (unsigned int i=0; i<dim+1; ++i)
+	for (unsigned int j=0; j<dim; ++j)
+	  H1(i,j) = H(i,j);
 
-  for (unsigned int i=0; i<dim+1; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      H1(i,j) = H(i,j);
+      H1.backward(h,gamma);
 
-  H1.backward(h,gamma);
+      if (left_precondition)
+	for (unsigned int i=0 ; i<dim; ++i)
+	  x.add(h(i), *tmp_vectors[i]);
+      else
+	{
+	  p = 0.;
+	  for (unsigned int i=0; i<dim; ++i)
+	    p.add(h(i), *tmp_vectors[i]);
+	  A.precondition(v,p);
+	  x.add(1.,v);
+	};
 
-  if (left_precondition)
-    for (unsigned int i=0 ; i<dim; ++i)
-      x.add(h(i), *tmp_vectors[i]);
-  else
-    {
-      p = 0.;
-      for (unsigned int i=0; i<dim; ++i)
-	p.add(h(i), *tmp_vectors[i]);
-      A.precondition(v,p);
-      x.add(1.,v);
-    };
+				       // end of outer iteration. restart if
+				       // no convergence and the number of
+				       // iterations is not exceeded
+    }
+  while (iteration_state == SolverControl::iterate);
 
 				   // free the allocated memory before
 				   // leaving
   for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
     memory.free (tmp_vectors[tmp]);
 
-  if (reached)
+  if (iteration_state)
     return success;
   else
     return exceeded;
@@ -272,7 +312,7 @@ SolverPGMRES<Matrix,Vector>::solve (const Matrix& A,
 
 template<class Matrix, class Vector>
 double
-SolverPGMRES<Matrix,Vector>::criterion () 
+SolverGMRES<Matrix,Vector>::criterion () 
 {
 				   // dummy implementation. this function is
 				   // not needed for the present implementation
