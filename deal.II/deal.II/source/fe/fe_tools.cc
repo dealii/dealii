@@ -1454,7 +1454,8 @@ FETools::get_fe_from_name_aux (const std::string &name)
 				       // good. so create finite
 				       // element and return position
 				       // count
-      return std::make_pair (new FE_Q_Hierarchical<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*>
+			     (new FE_Q_Hierarchical<dim>(tmp.first)),
 			     position);
     }
 				   // check other possibilities in
@@ -1470,7 +1471,8 @@ FETools::get_fe_from_name_aux (const std::string &name)
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
       ++position;
-      return std::make_pair (new FE_RaviartThomas<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*>
+			     (new FE_RaviartThomas<dim>(tmp.first)),
 			     position);
     }
   else if (match_at_string_start (name, std::string("FE_Nedelec")))
@@ -1484,7 +1486,8 @@ FETools::get_fe_from_name_aux (const std::string &name)
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
       ++position;
-      return std::make_pair (new FE_Nedelec<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*>
+			     (new FE_Nedelec<dim>(tmp.first)),
 			     position);
     }
   else if (match_at_string_start (name, std::string("FE_DGPNonparametric")))
@@ -1498,7 +1501,8 @@ FETools::get_fe_from_name_aux (const std::string &name)
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
       ++position;
-      return std::make_pair (new FE_DGPNonparametric<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*>
+			     (new FE_DGPNonparametric<dim>(tmp.first)),
 			     position);
     }
   else if (match_at_string_start (name, std::string("FE_DGP")))
@@ -1512,7 +1516,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
       ++position;
-      return std::make_pair (new FE_DGP<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*>(new FE_DGP<dim>(tmp.first)),
 			     position);
     }
   else if (match_at_string_start (name, std::string("FE_DGQ")))
@@ -1526,7 +1530,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
       ++position;
-      return std::make_pair (new FE_DGQ<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*> (new FE_DGQ<dim>(tmp.first)),
 			     position);
     }
   else if (match_at_string_start (name, std::string("FE_Q")))
@@ -1540,7 +1544,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
       ++position;
-      return std::make_pair (new FE_Q<dim>(tmp.first),
+      return std::make_pair (static_cast<FiniteElement<dim>*>(new FE_Q<dim>(tmp.first)),
 			     position);
     }
   
