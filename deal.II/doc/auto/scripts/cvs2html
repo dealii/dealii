@@ -1,7 +1,14 @@
 #!/usr/bin/perl
 #
-# Perl program to transform the 'cvs log' output to something decend.
+# Perl program to transform the 'cvs log' output to HTML
+#
+# Perl program to transform the 'cvs log' output to HTML.
+# The HTML output will show the revision log history, 
+# differences between versions and enable a flexible 
+# configuration of the amount of information the user 
+# like to see from the CVS repository.
 # cvs2html can be used for any type of cvs archive.
+
 #
 # ** Note that the first line might be wrong depending **
 # ** on the location of your perl program.             **
@@ -17,86 +24,36 @@
 #  type cvs2html with no arguments to display basic help
 #  or type cvs2html -h to get more help
 
-# 1.40 1998-05-31  Curtis L. Olson       Remove subdirs that are not 
-#                                        under CVS control
-#
-# 1.41 1998-06-14  Peter Toft and        Remove subdirs that are not
-#                  Curtis L. Olson       under CVS control - one more place
-#                  Aubrey Jaffer         If special characters like '<' '>'
-#                                        are in the log message then they
-#                                        was not shown. Bugfix!
-#
-# 1.42 1998-06-22  Tim Bradshaw          Make the find command an option. 
-#
-# 1.43 1998-98-25  Peter Toft            Minor cleanup and changes in the
-#                                        handling of our mailing list.
-#
-# 1.44 1998-10-11  Michael Krause        Michael removed the calls to find
-#                                        and other GNU utils. Now it 
-#                                        is a pure Perl program!
-#                  Peter Toft            Bugfix, that the chrono-log file
-#                                        is not shown in left column if 
-#                                        single dir.
-#
-# 1.45 1998-10-11  Peter Toft            Bug in the way the chronological
-#                                        log file was sorting the entries.
-#
-# 1.46 1998-10-25  Peter Toft            Help added regarding -s option.
-#                                        Added -C option to do reverse 
-#                                        sort of the chronological log file.
-#                                        Bug in comment corrected.
-#                                        Added time stamp to the log files
-#                                        to show when this HTML pages were
-#                                        made.
-#
-# 1.47 1998-11-01  Peter Toft            Bug fix: Error in the way the 
-#                                        chrono log worked. Wrong indices.
-#
-# 1.48 1998-11-01  Peter Toft            Added a -r option so you can select
-#                                        chrono log output between two 
-#                                        revisions.
-#
-# 1.49 1999-02-28  Mark Cooke            Spelling and fix bug if -r is used
-#                                        and revision does not exist in 
-#                                        repository.
-#
-# 1.50 1999-02-28  Mark Cooke            Parent dir missing patch
-#
-# 1.51             Peter Toft            Error 
-#
-# 1.52 1999-04-10  Peter Toft            Back on track
-#                  Carlo Wood            Generating blocks for files that 
-#                                        have no changes stopped.
-#
-# 1.53 1999-05-25  Carlo Wood            Now the log difference between
-#                                        two revisions are shown if
-#                                        a change has been made (cvs is
-#                                        has flaw, which hereby is taken
-#                                        care of).
-#
-# 1.54 1999-08-01  Michael Krause        Now cvs2html will show the diff
-#                                        to the previous version before 
-#                                        the -D chop off date (only for -D)
-#
-# 1.55 1999-11-03  Kirby Vandivort       Support for author with number in it
-#
-# 1.55 1999-11-03  Kirby Vandivort       Support for author with number in it
-#
-# 1.56 2000-01-04  Tim Bradshaw and 
-#                  Curtis L. Olson       Y2K bug found
-#
-# 1.57 2000-01-04  Peter Toft            Arrgh - once again.
-#
 # 1.58 2000-01-04  Jon Berndt            Added a -i option to invoke 
 #                                        backgound image
 #
 # 1.59 2000-01-12  Dag Brück and         Two additional Y2K bugs in 
 #                  Henrik Carlqvist      the dates presented
+#
+#
+# 1.60 2000-06-05  Peter Toft            Bug -> when using -o DIRNAME
+#                                        acted very bad.
+#                                        Added option -p which will make
+#                                        the chronolog also contain the 
+#                                        cvs log entries
+#
+# 1.61 2000-06-10  Peter Toft            Made option -p work even better
+#                                        Have a look at the chronological 
+#                                        file when using -p -c 
+#
+# 1.62 2000-06-11  Peter Toft            Same chronolog entry (-p) only if time
+#                                        difference is small enough. See the
+#                                        variable $commit_smalltimedifference
+#
+# 1.63 2000-06-11  Peter Toft            Bug fix due to input from 
+#                                        Andreas Wieweg. Line breaks disappeared
+#
+# 1.64 2000-06-11  Peter Toft            Better documentation in the start
+#                                        of the program
 # ---- ----------  --------------------  -------------------------------
 #
 # This program is protected by the GPL, and all modifications of
-# general interest must be emailed to the cvs2html@sslug.dk
-# or to Peter Toft.
+# general interest can be emailed to Peter Toft <pto@sslug.dk>
 #
 # Other people that have contributed directly or indirectly to cvs2html
 #  Henner Zeller <zeller@think.de>
@@ -119,13 +76,14 @@
 # Copyright under GPL 1997,1998,1999,2000 by
 # Peter Toft (pto@sslug.dk) + the persons above
 #
-# Join the cvs2html mailing list by sending an email to
-# sslug-cvs2html-subscribe@sslug.dk, the contents of this mails
-# is of no matter. You will receive an email than you need to 
-# reply to.
+# Join the cvs2html mailing list <sslug-cvs2html@sslug.dk> 
+# by sending an email to <sslug-cvs2html-subscribe@sslug.dk>, 
+# the contents of this mails is of no matter. 
+# You will receive an email than you need to reply to.
 #
 # If you want to unsubscribe from the list - write a mail to
-# sslug-cvs2html-unsubscribe@sslug.dk, and reply to the mail you get.
+# <sslug-cvs2html-unsubscribe@sslug.dk>, and reply to the mail you get.
+# In case of problems contact <pto@sslug.dk>
 # 
 # The URL of cvs2html is:
 
@@ -168,7 +126,7 @@ $backcolor = "#AAAAAA";
 $differencebackground = "#AABBAA";
 
 # Get the options. The ones with a colon means the an extra argument follows.
-&Getopts('r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:i:');
+&Getopts('r:abc:C:d:efhkl:n:N:s:vo:D:E:L:O:w:i:p');
 
 # Colors and font to show the diff type of code changes when using -a
 $diffcolorHeading='#909090';  # color of 'Line'-heading of each diffed file
@@ -187,6 +145,10 @@ $kkon = "";
 # Set $whitespace = "-w" if you want to ignore white space changes
 # in diff
 $whitespace="-w";
+
+# The timedifference in seconds which we consider as the same
+# commit time
+$commit_smalltimedifference = 10;
 
 ###############################################################
 # Subfunctions
@@ -256,7 +218,8 @@ sub showhelp {
 
   print " If -c CFILENAME is specified a chronological sorted list of all log\n";
   print " entries will be saved in CFILENAME (CFILENAME is a full html filename)\n";
-  print " Use -C CFILENAME instead of -c to do reverse sort of the log file.\n\n";
+  print " Use -C CFILENAME instead of -c to do reverse sort of the log file.\n";
+  print " Add -p to include cvs log information into the CFILENAME.\n\n";
 
   print " If -a is specified additional fields and files are generated\n";
   print " containing differences betweeen versions\n";
@@ -569,6 +532,23 @@ sub find_subdirs {
   return @dirs;
 }
 
+
+sub kill_log_header {
+  @llcvslog = ();
+  $headerstill = -1;
+  foreach $ii (0 .. ($#lcvslog-1)) {
+    if ($headerstill == 0) {
+      @llcvslog = (@llcvslog,@lcvslog[$ii]);
+    }
+    else {
+      $headerstill = $headerstill - 1;
+      if (@lcvslog[$ii] =~ '----------------------------') {
+	$headerstill = 2;
+      }
+    }
+  }
+}
+
 #############################################################
 # Lets set up the basics
 #############################################################
@@ -696,7 +676,9 @@ else {
 # Get the name of the repository
 open(INFILE,"<./CVS/Repository")  or die "Error: The file ./CVS/Repository is missing."; ;
 
-($rootdir) = <INFILE> =~/^\Q$fullcvsroot\E(.*)$/;
+#($rootdir) = <INFILE> =~/^\Q$fullcvsroot\E(.*)$/;
+($rootdir) = <INFILE>;
+$rootdir = basename($rootdir);
 close INFILE;
 
 
@@ -712,7 +694,7 @@ if (length($outnamem)>0)
 # is generated (and others if using frames).
 if (-d $outname)
 {
-  $outname = $outname.$rootdir;
+  $outname = $outname."/".$rootdir;
 }
 
 # Split the outname from a possible directory full path
@@ -1558,7 +1540,8 @@ if ($dochrono)
 
   print "Sorting the logfiles\r";
   @cindex = sort sorter @chronoindex;
-  print "Done sorting the logfiles\n";
+      print "Done sorting the logfiles\n";
+
   if ($frames == 1)
   {
     print CHRONOFILE "<table border width=100% BGCOLOR=\"$cellcolor\">";
@@ -1585,17 +1568,53 @@ if ($dochrono)
   {
     $cindexlow=0;
   }
+
+  if ($opt_p) {
+    for ($ii=$cindexlow;$ii<=$chronocounter;$ii++)
+    {
+      if ($opt_c) 
+      {
+	$cind = $ii;
+      }
+      else
+      {
+	$cind = $chronocounter-$ii+$cindexlow;
+      }
+      $index = $cindex[$cind];
+      @lcvslog = `cvs log -N -r$chronoversion[$index] $chrononame[$index]`;
+      @llcvslog = ();
+      $headerstill = -1;
+      foreach $jj (0 .. ($#lcvslog-1)) {
+	if ($headerstill == 0) {
+	  @llcvslog = (@llcvslog,@lcvslog[$jj]);
+	}
+	else {
+	  $headerstill = $headerstill - 1;
+	  if (@lcvslog[$jj] =~ '----------------------------') {
+	    $headerstill = 2;
+	  }
+	}
+      }       
+      $lcvslogar[$index] = join('<br>',@llcvslog);
+      if (length($lcvslogar[$index])<2) {
+	$lcvslogar[$index] = "<i>(Empty log)</i>";
+      }
+    }
+  }
   for ($ii=$cindexlow;$ii<=$chronocounter;$ii++)
   {
     if ($opt_c) 
     {
       $cind = $ii;
+      $cind2 = $ii+1;
     }
     else
     {
       $cind = $chronocounter-$ii+$cindexlow;
+      $cind2 = $cind-1;
     }
     $index = $cindex[$cind];
+    $index2 = $cindex[$cind2];
     $ccc = '<A HREF="'.$chronolinknames[$index].'">'.$chrononame[$index]."</a>";
     if ($frames==0)
     {
@@ -1603,7 +1622,22 @@ if ($dochrono)
     }
     else
     {
-      printf(CHRONOFILE "<tr ALIGN=\"left\"><td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td></tr>\n",$chronoshowtime[$index],$chronoversion[$index],$chronoauthor[$index],$ccc);
+      printf(CHRONOFILE "<tr ALIGN=\"left\"><td><b>%s</b></td> <td>%s</td> <td>%s</td> <td>%s</td></tr>\n",$chronoshowtime[$index],$chronoversion[$index],$chronoauthor[$index],$ccc);
+      if ($opt_p) {
+#	print $chronotimesince0[$index]." ".$chronoshowtime[$index]." ".$chronoshowtime[$index2]." ".abs($chronotimesince0[$index]-$chronotimesince0[$index2])."\n";
+	if ($ii == $chronocounter){
+	  printf(CHRONOFILE "<tr ALIGN=\"left\"><td COLSPAN=4>\n");
+	  print CHRONOFILE  $lcvslogar[$index];
+	  printf(CHRONOFILE "</td></tr>\n");
+
+	} 
+	elsif (($lcvslogar[$index] ne $lcvslogar[$index2]) || (abs($chronotimesince0[$index]-$chronotimesince0[$index2]))>$commit_smalltimedifference)  {
+	  printf(CHRONOFILE "<tr ALIGN=\"left\"><td COLSPAN=4>\n");
+	  print CHRONOFILE  $lcvslogar[$index];
+	  printf(CHRONOFILE "</td></tr>\n");
+	} 
+
+      }
     }
   }
 
