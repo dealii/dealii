@@ -14,6 +14,8 @@
 
 #include <vector>
 
+
+
 /**
  * Implementation of multigrid with matrices.
  * While #MGBase# was only an abstract framework for the v-cycle,
@@ -23,61 +25,83 @@
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template<int dim>
-class MG
-  :
-  public MGBase
+class MG : public MGBase
 {
   public:
-    MG(const MGDoFHandler<dim>&,
-       ConstraintMatrix& hanging_nodes,
-       const MGMatrix<SparseMatrix<double> >&,
-       const MGTransferBase& transfer,
-       unsigned int minlevel = 0, unsigned int maxlevel = 10000);
-    
-				     /** Transfer from dVector to
-				      * MGVector.
+				     /**
+				      * Constructor. Take the object
+				      * describing the multilevel
+				      * hierarchy of degrees of
+				      * freedom, an object describing
+				      * constraints to degrees of
+				      * freedom on the global grid
+				      * (for example for hanging
+				      * nodes), a set of matrices
+				      * which describe the equation
+				      * discretized on each level, and
+				      * an object mediating the
+				      * transfer of solutions between
+				      * different levels.
 				      *
-				      * This function copies data from a
-				      * dVector, that is, data on the
-				      * locally finest level, into the
-				      * corresponding levels of an
-				      * MGVector.
+				      * This function already
+				      * initializes the vectors which
+				      * will be used later on in the
+				      * course of the
+				      * computations. You should
+				      * therefore create objects of
+				      * this type as late as possible.
+				      */
+//TODO: minlevel, maxlevel?
+    MG(const MGDoFHandler<dim>               &mg_dof_handler,
+       ConstraintMatrix                      &constraints,
+       const MGMatrix<SparseMatrix<double> > &level_matrices,
+       const MGTransferBase                  &transfer,
+       const unsigned int                     minlevel = 0,
+       const unsigned int                     maxlevel = 1000000);
+    
+				     /**
+				      * Transfer from a vector on the
+				      * global grid to vectors defined
+				      * on each of the levels
+				      * separately, i.a. an #MGVector#.
 				      */
     template<typename number>
-    void copy_to_mg(const Vector<number>& src);
+    void copy_to_mg (const Vector<number> &src);
 
 				     /**
-				      * Transfer from multi-grid vector to
+				      * Transfer from multi-level vector to
 				      * normal vector.
 				      *
-				      * Copies data from active portions
-				      * of an MGVector into the
-				      * respective positions of a
-				      * Vector<double>. All other entries of
-				      * #src# are zero.
+				      * Copies data from active
+				      * portions of an MGVector into
+				      * the respective positions of a
+				      * #Vector<double>#. In order to
+				      * keep the result consistent,
+				      * constrained degrees of freedom are set to zero.
 				      */
     template<typename number>
-    void copy_from_mg(Vector<number>& dst) const;
+    void copy_from_mg (Vector<number> &dst) const;
 
 				     /**
 				      * Negative #vmult# on a level.
+//TODO: what does this function do?				      
 				      * @see MGBase.
 				      */
-    virtual void level_vmult(unsigned int,
-				Vector<double> &,
-				const Vector<double> &,
-				const Vector<double> &);
+    virtual void level_vmult (const unsigned int    level,
+			      Vector<double>       &dest,
+			      const Vector<double> &src,
+			      const Vector<double> &rhs);
 
 				     /**
 				      * Read-only access to level matrices.
 				      */
-    const SparseMatrix<double>& get_matrix(unsigned int level) const;
+    const SparseMatrix<double>& get_matrix (const unsigned int level) const;
 
   private:
 				     /**
 				      * Associated #MGDoFHandler#.
 				      */
-    SmartPointer<const MGDoFHandler<dim> > dofs;
+    SmartPointer<const MGDoFHandler<dim> > mg_dof_handler;
 
 				     /**
 				      * Matrices for each level.
@@ -85,9 +109,17 @@ class MG
 				      * the constructor of #MG# and can
 				      * be accessed for assembling.
 				      */
-    SmartPointer<const MGMatrix<SparseMatrix<double> > > matrices;
-    ConstraintMatrix& hanging_nodes;
+    SmartPointer<const MGMatrix<SparseMatrix<double> > > level_matrices;
+
+				     /**
+				      * Pointer to the object holding
+				      * constraints.
+				      */
+    SmartPointer<const ConstraintMatrix>                 constraints;
 };
+
+
+
 
 
 /**
@@ -103,13 +135,6 @@ class MGTransferPrebuilt : public MGTransferBase
 {
   public:
 				     /**
-				      * Preliminary constructor
-				      */
-    MGTransferPrebuilt()
-      {}
-    
-    
-				     /**
 				      * Destructor.
 				      */
     virtual ~MGTransferPrebuilt ();
@@ -123,7 +148,10 @@ class MGTransferPrebuilt : public MGTransferBase
 
 				     /**
 				      * Prolongate a vector from level
-				      * #to_level-1# to level #to_level#.
+				      * #to_level-1# to level
+				      * #to_level#. The previous
+				      * content of #dst# is
+				      * overwritten.
 				      *
 				      * #src# is assumed to be a vector with
 				      * as many elements as there are degrees
@@ -133,14 +161,24 @@ class MGTransferPrebuilt : public MGTransferBase
 				      * are degrees of freedom on the finer
 				      * level.
 				      */
-    virtual void prolongate (const unsigned int   to_level,
+    virtual void prolongate (const unsigned int    to_level,
 			     Vector<double>       &dst,
 			     const Vector<double> &src) const;
 
 				     /**
 				      * Restrict a vector from level
 				      * #from_level# to level
-				      * #from_level-1#.
+				      * #from_level-1# and add this
+				      * restriction to
+				      * #dst#. Obviously, if the
+				      * refined region on level
+				      * #from_level# is smaller than
+				      * that on level #from_level-1#,
+				      * some degrees of freedom in
+				      * #dst# are not covered and will
+				      * not be altered. For the other
+				      * degress of freedom, the result
+				      * of the restriction is added.
 				      *
 				      * #src# is assumed to be a vector with
 				      * as many elements as there are degrees
@@ -150,9 +188,9 @@ class MGTransferPrebuilt : public MGTransferBase
 				      * are degrees of freedom on the coarser
 				      * level.
 				      */
-    virtual void restrict (const unsigned int   from_level,
-			   Vector<double>       &dst,
-			   const Vector<double> &src) const;
+    virtual void restrict_and_add (const unsigned int    from_level,
+				   Vector<double>       &dst,
+				   const Vector<double> &src) const;
 
   private:
 
@@ -170,14 +208,20 @@ class MGTransferPrebuilt : public MGTransferBase
 };
 
 
+
+
+/* --------------------------- inline functions --------------------- */
+
+
 template<int dim>
 inline
 const SparseMatrix<double>&
 MG<dim>::get_matrix(unsigned int level) const
 {
-  Assert((level>=minlevel) && (level<maxlevel), ExcIndexRange(level, minlevel, maxlevel));
+  Assert((level>=minlevel) && (level<maxlevel),
+	 ExcIndexRange(level, minlevel, maxlevel));
   
-  return (*matrices)[level];
+  return (*level_matrices)[level];
 }
 
 

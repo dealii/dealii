@@ -11,8 +11,48 @@
 #include <numerics/mg_smoother.h>
 #include <lac/vector.h>
 
-extern void write_gnuplot (const MGDoFHandler<2>& dofs, const Vector<double>& v, unsigned int level,
-			   ostream &out, unsigned int accuracy);
+
+
+/* --------------------------------- MG ------------------------------------ */
+
+template <int dim>
+MG<dim>::MG(const MGDoFHandler<dim>               &mg_dof_handler,
+	    ConstraintMatrix                      &constraints,
+	    const MGMatrix<SparseMatrix<double> > &level_matrices,
+	    const MGTransferBase                  &transfer,
+	    unsigned int minl, unsigned int maxl)
+		:
+		MGBase(transfer, minl,
+		       min(mg_dof_handler.get_tria().n_levels()-1, maxl)),
+		mg_dof_handler(&mg_dof_handler),
+		level_matrices(&level_matrices),
+		constraints(&constraints)
+{
+				   // initialize the objects with
+				   // their correct size
+  for (unsigned int level=minlevel; level<=maxlevel ; ++level)
+    {
+      solution[level].reinit(level_matrices[level].m());
+      defect[level].reinit(level_matrices[level].m());
+    };
+};
+
+
+
+template <int dim>
+void
+MG<dim>::level_vmult(const unsigned int    level,
+		     Vector<double>       &result,
+		     const Vector<double> &u,
+		     const Vector<double> &/* rhs */)
+{
+  (*level_matrices)[level].vmult(result,u);
+  result.scale(-1.);
+}
+
+
+
+
 
 
 /* ----------------------------- MGTransferPrebuilt ------------------------ */
@@ -61,7 +101,7 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 				       // cell
       prolongation_sparsities.back().reinit (mg_dof.n_dofs(level+1),
 					     mg_dof.n_dofs(level),
-// evil hack, must be corrected!!!
+//TODO: evil hack, must be corrected!!!
 					     dofs_per_cell+1);
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
@@ -148,9 +188,9 @@ void MGTransferPrebuilt::prolongate (const unsigned int   to_level,
 
 
 
-void MGTransferPrebuilt::restrict (const unsigned int   from_level,
-				   Vector<double>       &dst,
-				   const Vector<double> &src) const 
+void MGTransferPrebuilt::restrict_and_add (const unsigned int   from_level,
+					   Vector<double>       &dst,
+					   const Vector<double> &src) const 
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
@@ -160,7 +200,7 @@ void MGTransferPrebuilt::restrict (const unsigned int   from_level,
 
 
 // explicit instatations
+template class MG<deal_II_dimension>;
 template
 void MGTransferPrebuilt::build_matrices (const MGDoFHandler<deal_II_dimension> &mg_dof);
 
-template MG<deal_II_dimension>;
