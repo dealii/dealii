@@ -10,9 +10,13 @@ default: makefiles.html makefile.small.html makefile.large.html makefile.rules.h
 
 makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefiles.2.html
 	@cat makefiles.1.html > $@
+	@echo '<li><code>D=$D</code>' >> $@
 	@echo '<li><code>CXX=$(CXX)</code>' >> $@
 	@echo '<li><code>CC=$(CC)</code>' >> $@
+	@echo '<li><code>GXX-VERSION=$(GXX-VERSION)</code>' >> $@
 	@echo '<li><code>PERL=$(PERL)</code>' >> $@
+	@echo '<li><code>DEAL_2_MAJOR=$(DEAL_2_MAJOR)</code>' >> $@
+	@echo '<li><code>DEAL_2_MINOR=$(DEAL_2_MINOR)</code>' >> $@
 	@echo '<li><code>lib-path-base=$(lib-path-base)</code>' >> $@
 	@echo '<li><code>lib-path-lac=$(lib-path-lac)</code>' >> $@
 	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@

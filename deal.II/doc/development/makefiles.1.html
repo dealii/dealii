@@ -36,6 +36,13 @@
     <li><h4>General</h4></h4>
 
     <dl>
+      <dt> <code>D</code> </dt>
+      <dd> <p>
+           Path to the <acronym>deal.II</acronym> library
+           </p>
+      </dd>
+
+
       <dt> <code>CXX</code> </dt>
       <dd> <p>
            Executable name of the C++ compiler
@@ -51,11 +58,40 @@
       </dd>
 
 
+      <dt> <code>GXX-VERSION</code> </dt>
+      <dd> <p>
+           Version of the GNU C++ compiler if that is used
+           </p>
+      </dd>
+
+
       <dt> <code>PERL</code> </dt>
       <dd> <p>
            Executable name of the `perl' program
            </p>
       </dd>
+
+
+      <dt> <code>DEAL_2_MAJOR</code> </dt>
+      <dd> <p>
+           Major version number of the <acronym>deal.II</acronym>
+           library, i.e. the number before the first dot. Note that
+           this version number is also available in programs through a
+           preprocessor variable
+           </p>
+      </dd>    
+
+
+      <dt> <code>DEAL_2_MINOR</code> </dt>
+      <dd> <p>
+           Minor version number of the <acronym>deal.II</acronym>
+	   library, i.e. the number after the first dot; if there are
+           further numbers, like in version 3.0.1, then they are
+           discarded as these versions only fix bugs but do not change
+           features. Note that this version number is also available
+           in programs through a preprocessor variable
+           </p>
+      </dd>    
     </dl>
 
 
