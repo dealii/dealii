@@ -21,7 +21,8 @@
     We have also made preliminary tests with DEC's cxx compiler,
     version 6.0, on a OSF1 V4.0 system. This compiler seems to be
     rather conformant and discovered a number of places where we
-    involuntarily seem to have used gcc's sloppyness. The largest
+    involuntarily seem to have used gcc's sloppyness. These are of
+    course fixed now. The largest
     drawback was that version 6.0 of the compiler did not yet know
     about the standard C++ headers <code>cmath</code>,
     <code>cstdlib</code>, etc, which are included instead of
@@ -31,12 +32,9 @@
     </p>
 
     <p>
-    Unfortunately, we were not able to fully test the library on that
-    system, so there are certainly still a great number of places that
-    need minor fixes. Also, at present the <code>./configure</code>
-    script does not automatically recognize DEC's compiler. If someone
-    would want to provide us with a test account for a couple of days,
-    we would be happy to fix these things.
+    Unfortunately, we were not able to test the library further on that
+    system, so there may still be a number of places that
+    need minor fixes.
     </p>
 
 
