@@ -65,7 +65,7 @@ class Tensor
 				      * Type of stored objects. This
 				      * is a tensor of lower rank.
 				      */
-    typedef typename Tensor<rank_-1,dim> value_type;
+    typedef Tensor<rank_-1,dim> value_type;
 
 				     /**
 				      * Declare an array type which
