@@ -362,6 +362,18 @@ MGTransferSelect<number>::do_copy_to_mg (
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
   std::vector<unsigned int> level_face_indices (dofs_per_face);
 
+				   // Build a vector of the selected
+				   // indices, since traversing all
+				   // indices on each cell is too
+				   // slow.
+  std::vector<unsigned int> selected_indices;
+  selected_indices.reserve(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    if (mg_selected[mg_target_component[fe.system_to_component_index(i).first]])
+      selected_indices.push_back(i);
+  unsigned int selected_component
+    = mg_target_component[fe.system_to_component_index(selected_indices[0]).first];
+
 				   // traverse the grid top-down
 				   // (i.e. starting with the most
 				   // refined grid). this way, we can
@@ -398,36 +410,18 @@ MGTransferSelect<number>::do_copy_to_mg (
 					   // transfer the global
 					   // defect in the vector
 					   // into the level-wise one
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      const unsigned int component
-		= mg_target_component[fe.system_to_component_index(i).first];
-	      if (mg_selected[component])
-		{
-		  const unsigned int level_start
-		    = mg_component_start[level][component];
-		  
-		  dst[level](level_dof_indices[i] - level_start)
-		    = src(global_dof_indices[i] - offset);
-		}
-	    }
+	  const unsigned int level_start
+	    = mg_component_start[level][selected_component];
+	  const typename std::vector<unsigned int>::const_iterator
+	    end = selected_indices.end();
 	  
-// 	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
-// 	    {
-// 	      const typename MGDoFHandler<dim>::face_iterator
-// 		face = level_cell->face(face_n);
-// 	      if (face->has_children())
-// 		{
-// 		  face->get_mg_dof_indices(level_face_indices);
-
-
-						   // Delete values on refinement edge,
-						   // since restriction will add them again.
-//		  for (unsigned int i=0; i<dofs_per_face; ++i)
-//		    dst[level](level_face_indices[i])
-//		      = 0.;
-//		};
-//	    };
+	  for (typename std::vector<unsigned int>::const_iterator
+		 i=selected_indices.begin();
+	       i != end; ++i)
+	    {
+	      dst[level](level_dof_indices[*i] - level_start)
+		= src(global_dof_indices[*i] - offset);
+	    }
 	}
 				       // for that part of the level
 				       // which is further refined:
@@ -436,7 +430,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 				       // one level higher
       if (static_cast<unsigned int>(level) < maxlevel)
 	{
-	  restrict_and_add (level+1, dst[level], dst[level+1]);
+	  ;//	  restrict_and_add (level+1, dst[level], dst[level+1]);
 	}
     };
 }

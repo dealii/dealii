@@ -17,6 +17,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <multigrid/mg_transfer.h>
+#include <multigrid/mg_transfer.templates.h>
 #include <multigrid/multigrid.templates.h>
 
 

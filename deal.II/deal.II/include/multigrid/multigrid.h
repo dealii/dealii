@@ -402,12 +402,18 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
   VECTOR2& dst,
   const VECTOR2& src) const
 {
+  deallog << "copy to" << endl;
+  
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
 		       src);
   
+  deallog << "mg" << endl;
+  
   multigrid->vcycle();
 
+  deallog << "copy from " << endl;
+  
   transfer->copy_from_mg(*mg_dof_handler,
 			 dst,
 			 multigrid->solution);
@@ -421,12 +427,18 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
   VECTOR2& dst,
   const VECTOR2& src) const
 {
+  deallog << "copy to" << endl;
+  
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
 		       src);
+
+  deallog << "mg" << endl;
   
   multigrid->vcycle();
 
+  deallog << "copy from " << endl;
+  
   transfer->copy_from_mg_add(*mg_dof_handler,
 			     dst,
 			     multigrid->solution);

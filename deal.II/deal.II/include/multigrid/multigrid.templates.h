@@ -14,6 +14,11 @@
 #define __deal2__multigrid_templates_h
 #include <multigrid/multigrid.h>
 
+#include <base/logstream.h>
+
+#include "iostream"
+
+using namespace std;
 
 template <class VECTOR>
 void
@@ -39,13 +44,17 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
       return;
     }
 
+//  deallog << "Pre-smooth " << level << endl;
+  
 				   // smoothing of the residual by
 				   // modifying s
   pre_smooth->smooth(level, solution[level], defect[level]);
 
+//  deallog << "vmult " << level << endl;
 				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
-  
+
+//  deallog << "restrict " << level << endl;
 				   // make t rhs of lower level The
 				   // non-refined parts of the
 				   // coarse-level defect already
@@ -62,6 +71,7 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
       defect[l-1] -= t[l-1];
     }
 
+//    deallog << "recursion " << level << endl;
 				   // do recursion
   level_mgstep(level-1);
 
@@ -72,7 +82,7 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
   t[level] = 0.;
 
 				   // do coarse grid correction
-
+//  deallog << "prolongate " << level << endl;
   transfer->prolongate(level, t[level], solution[level-1]);
   
   solution[level] += t[level];
@@ -82,9 +92,10 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int level)
       edge_up->Tvmult(level, t[level], solution[level-1]);
       defect[level] -= t[level];
     }
-  
+//  deallog << "Post-smooth " << level << endl;
 				   // post-smoothing
   post_smooth->smooth(level, solution[level], defect[level]);
+//  deallog << "ready " << level << endl;
 }
 
 

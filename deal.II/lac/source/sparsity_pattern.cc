@@ -330,7 +330,12 @@ SparsityPattern::reinit (const unsigned int               m,
 				   // exactly one element, to have a
 				   // valid pointer to some memory
   if (vec_len == 0)
-    vec_len = 1;
+    {
+      vec_len = 1;
+      if (colnums) delete[] colnums;
+      max_vec_len = vec_len;
+      colnums = new unsigned int[max_vec_len];
+    }
   
   max_row_length = (row_lengths.size() == 0 ?
 		    0 :
@@ -339,7 +344,7 @@ SparsityPattern::reinit (const unsigned int               m,
 
   if (diagonal_optimized && (max_row_length==0) && (m!=0))
     max_row_length = 1;
-
+  
 				   // allocate memory for the rowstart
 				   // values, if necessary
   if (rows > max_dim)

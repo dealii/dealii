@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 
-
+//TODO:[GK] Inline simple functions in 1d and 3d
 
 /* ------------------------ MGDoFLineAccessor --------------------------- */
 
@@ -210,6 +210,7 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 
 
 template <int dim>
+inline
 unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 {
   Assert (this->dof_handler != 0,
@@ -229,6 +230,7 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) co
 
 
 template <int dim>
+inline
 void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
@@ -249,6 +251,7 @@ void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 
 
 template <int dim>
+inline
 unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
@@ -268,6 +271,7 @@ unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned in
 
 
 template <int dim>
+inline
 void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
 							   const unsigned int i,
 							   const unsigned int index) const
@@ -353,6 +357,7 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
 
 
 template <int dim>
+inline
 TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
 MGDoFObjectAccessor<2, dim>::line (const unsigned int i) const
 {
@@ -369,6 +374,7 @@ MGDoFObjectAccessor<2, dim>::line (const unsigned int i) const
 
 
 template <int dim>
+inline
 TriaIterator<dim,MGDoFObjectAccessor<2, dim> >
 MGDoFObjectAccessor<2, dim>::child (const unsigned int i) const
 {
