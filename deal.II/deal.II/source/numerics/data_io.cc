@@ -196,7 +196,7 @@ DataOut<dim>::DataOut () :
 
 
 template <int dim>
-void DataOut<dim>::attach_dof_handler (DoFHandler<dim> &d) {
+void DataOut<dim>::attach_dof_handler (const DoFHandler<dim> &d) {
   dofs = &d;
 };
 

@@ -326,7 +326,7 @@ class DataOut {
 				      * to extract geometry data and the
 				      * mapping between nodes and node values.
 				      */
-    void attach_dof_handler (DoFHandler<dim> &);
+    void attach_dof_handler (const DoFHandler<dim> &);
 
 				     /**
 				      * Add a data vector together with its
@@ -549,7 +549,7 @@ class DataOut {
 				     /**
 				      * Pointer to the dof handler object.
 				      */
-    DoFHandler<dim>   *dofs;
+    const DoFHandler<dim>   *dofs;
 
 				     /**
 				      * List of data elements.
