@@ -485,9 +485,9 @@ void FE_Nedelec<dim>::initialize_unit_support_points ()
 					     // between the vertices
 					     // of each line
 	    this->unit_support_points[line] = (vertex_0 + vertex_1) / 2;
-	    
-	    break;
 	  };
+	    
+	break;
       };
 
       default:
