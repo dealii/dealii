@@ -15,7 +15,7 @@ endif
 
 
 # rules
-$(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT): fparser.h fparser.cc
+$(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT): fparser.cc fparser.h
 	@echo =====function parser==optimized==$(MT)== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c fparser.cc -o $@
 
