@@ -12,7 +12,7 @@
 #include <base/quadrature_lib.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 
 
@@ -30,7 +30,7 @@ int main () {
   FEValues<2> fevalues(fe,q,update_second_derivatives);
   
   
-  dVector val(4);
+  Vector<double> val(4);
 
   cout << "------------------------------------------------------------" << endl
        << "Testing transformation of 2nd derivatives of shape function:" << endl;

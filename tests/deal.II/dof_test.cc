@@ -12,7 +12,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
-#include <lac/dsmatrix.h>
+#include <lac/sparsematrix.h>
 #include <grid/dof_constraints.h>
 
 
@@ -289,8 +289,8 @@ void TestCases<dim>::run (const unsigned int test_case) {
   cout << "    Renumbering degrees of freedom..." << endl;
   dof->renumber_dofs (Cuthill_McKee, false);
     
-  dSMatrixStruct sparsity (dof->n_dofs(),
-			   dof->max_couplings_between_dofs());
+  SparseMatrixStruct sparsity (dof->n_dofs(),
+			       dof->max_couplings_between_dofs());
   
   
   dof->make_sparsity_pattern (sparsity);

@@ -20,7 +20,7 @@
 #include <base/quadrature_lib.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
-#include <lac/dvector.h>
+#include <lac/vector.h>
 
 
 
@@ -40,7 +40,7 @@ int main () {
   fevalues.reinit (dof.begin_active(),b);
   
   
-  dVector val(4);
+  Vector<double> val(4);
 
   cout << "------------------------------------------------------" << endl
        << "Testing transformation of gradients of shape function:" << endl;

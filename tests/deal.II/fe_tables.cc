@@ -1,5 +1,8 @@
 // $Id$
 
+// deal_II_libraries.g=-ldeal_II_2d.g
+// deal_II_libraries=-ldeal_II_2d
+
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.dg.h>
 #include <fe/fe_system.h>
