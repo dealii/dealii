@@ -63,11 +63,11 @@ namespace LAPACKSupport
 				    */
   extern const char T = 'T';
 				   /**
-				    * Interger constant.
+				    * Integer constant.
 				    */
   extern const int zero = 0;
 				   /**
-				    * Interger constant.
+				    * Integer constant.
 				    */
   extern const int one = 1;
 }
