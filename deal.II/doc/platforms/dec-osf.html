@@ -14,6 +14,35 @@
 
     <h1>Installation instructions for DEC OSF V4.0</h1>
 
+
+    <h2>Using DEC's cxx compiler</h2>
+
+    <p>
+    We have also made preliminary tests with DEC's cxx compiler,
+    version 6.0, on a OSF1 V4.0 system. This compiler seems to be
+    rather conformant and discovered a number of places where we
+    involuntarily seem to have used gcc's sloppyness. The largest
+    drawback was that version 6.0 of the compiler did not yet know
+    about the standard C++ headers <code>cmath</code>,
+    <code>cstdlib</code>, etc, which are included instead of
+    <code>math.h</code>, <code>stdlib.h</code>, etc. Otherwise there
+    did not seem unsurmountable obstacles to the use of that
+    compiler. 
+    </p>
+
+    <p>
+    Unfortunately, we were not able to fully test the library on that
+    system, so there are certainly still a great number of places that
+    need minor fixes. Also, at present the <code>./configure</code>
+    script does not automatically recognize DEC's compiler. If someone
+    would want to provide us with a test account for a couple of days,
+    we would be happy to fix these things.
+    </p>
+
+
+
+    <h2>Using gcc as compiler</h2>
+
     <p>
     We have tried to compile <acronym>deal.II</acronym> on DEC Alpha
     workstations under OSF1 V4.0. The main problem seems to be that on
@@ -140,6 +169,8 @@
     snippet. Alternatively, you can insert these lines into one of your
     source files, if you experience the problems described above.
     </p>
+
+
 
   </body>
 </html>
