@@ -271,7 +271,7 @@ class DataOut {
 				      * Provide a data type specifying the
 				      * presently supported output formats.
 				      */
-    enum OutputFormat { ucd, gnuplot, povray };
+    enum OutputFormat { ucd, gnuplot, gnuplot_draft, povray };
     
 				     /**
 				      * Constructor
@@ -354,6 +354,10 @@ class DataOut {
 				      * to the given data format. This function
 				      * simply calles the appropriate
 				      * #write_*# function.
+				      *
+				      * In case of gnuplot output, the
+				      * standard accuracy of 1 is
+				      * chosen.
 				      */
     void write (ostream &out, const OutputFormat output_format) const;
     

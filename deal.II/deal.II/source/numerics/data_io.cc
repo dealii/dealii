@@ -805,6 +805,9 @@ void DataOut<dim>::write (ostream &out,
       case gnuplot:
 	    write_gnuplot (out);
 	    break;
+      case gnuplot_draft:
+	    write_gnuplot_draft (out);
+	    break;
       case povray:
 	    write_povray (out);
 	    break;
@@ -822,6 +825,7 @@ string DataOut<dim>::default_suffix (const OutputFormat output_format) {
       case ucd:
 	    return ".inp";
       case gnuplot:
+      case gnuplot_draft:
 	    return ".gnuplot";
       case povray:
 	    return ".pov";
