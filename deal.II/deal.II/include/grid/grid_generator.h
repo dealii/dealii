@@ -536,6 +536,28 @@ class GridGenerator
 			     const double        outer_radius,
 			     const unsigned int  n_cells = 0);
 
+				     /**
+				      * Produce a domain that is the space
+				      * between two cylinders in 3d, with
+				      * given length, inner and outer radius
+				      * and a given number of elements for
+				      * this initial triangulation. If @p
+				      * n_radial_cells is zero (as is the
+				      * default), then it is computed
+				      * adaptively such that the resulting
+				      * elements have the least aspect
+				      * ratio. The same holds for @p
+				      * n_axial_cells.
+				      *
+				      * The triangulation needs to be void
+				      * upon calling this function.
+				      */
+    static void cylinder_shell (Triangulation<3>   &tria,
+                                const double        length,
+                                const double        inner_radius,
+                                const double        outer_radius,
+                                const unsigned int  n_radial_cells = 0,
+                                const unsigned int  n_axial_cells = 0);
 
 				     /**
 				      * This class produces a half hyper-ball,

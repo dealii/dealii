@@ -57,7 +57,8 @@ tests_x = anna_? \
 	  subdomain_ids_* \
 	  dof_constraints_* \
 	  apply_boundary_values_* \
-	  error_estimator_*
+	  error_estimator_* \
+	  cylinder_shell_*
 
 ifeq ($(USE_CONTRIB_PETSC),yes)
   tests_x += petsc_*

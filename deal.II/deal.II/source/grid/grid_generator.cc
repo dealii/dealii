@@ -1172,6 +1172,86 @@ void GridGenerator::hyper_shell (Triangulation<3>   &,
 }
 
 
+
+void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
+                                    const double        length,
+                                    const double        inner_radius,
+                                    const double        outer_radius,
+                                    const unsigned int  n_radial_cells,
+                                    const unsigned int  n_axial_cells)
+{
+  Assert ((inner_radius > 0) && (inner_radius < outer_radius),
+	  ExcInvalidRadii ());
+  
+  const double pi = deal_II_numbers::PI;
+  
+				   // determine the number of cells
+				   // for the grid. if not provided by
+				   // the user determine it such that
+				   // the length of each cell on the
+				   // median (in the middle between
+				   // the two circles) is equal to its
+				   // radial extent (which is the
+				   // difference between the two
+				   // radii)
+  const unsigned int N_r = (n_radial_cells == 0 ?
+                            static_cast<unsigned int>
+                            (std::ceil((2*pi* (outer_radius + inner_radius)/2) /
+                                       (outer_radius - inner_radius))) :
+                            n_radial_cells);
+  const unsigned int N_z = (n_axial_cells == 0 ?
+                            static_cast<unsigned int>
+                            (std::ceil (length /
+                                        (2*pi*(outer_radius + inner_radius)/2/N_r))) :
+                            n_axial_cells);
+
+				   // set up N vertices on the
+				   // outer and N vertices on
+				   // the inner circle. the
+				   // first N ones are on the
+				   // outer one, and all are
+				   // numbered counter-clockwise
+  std::vector<Point<2> > vertices_2d(2*N_r);
+  for (unsigned int i=0; i<N_r; ++i)
+    {
+      vertices_2d[i] = Point<2>( std::cos(2*pi * i/N_r),
+                                 std::sin(2*pi * i/N_r)) * outer_radius;
+      vertices_2d[i+N_r] = vertices_2d[i] * (inner_radius/outer_radius);
+    };
+
+  std::vector<Point<3> > vertices_3d;
+  vertices_3d.reserve (2*N_r*(N_z+1));
+  for (unsigned int j=0; j<=N_z; ++j)
+    for (unsigned int i=0; i<2*N_r; ++i)
+      {
+        const Point<3> v (vertices_2d[i][0],
+                          vertices_2d[i][1],
+                          j*length/N_z);
+        vertices_3d.push_back (v);
+      }
+                            
+  std::vector<CellData<3> > cells (N_r*N_z, CellData<3>());
+  
+  for (unsigned int j=0; j<N_z; ++j)
+    for (unsigned int i=0; i<N_r; ++i) 
+      {
+        cells[i+j*N_r].vertices[0] = i + j*2*N_r;
+        cells[i+j*N_r].vertices[1] = (i+1)%N_r + j*2*N_r;
+        cells[i+j*N_r].vertices[2] = N_r+((i+1)%N_r) + j*2*N_r;
+        cells[i+j*N_r].vertices[3] = N_r+i + j*2*N_r;
+        
+        cells[i+j*N_r].vertices[4] = i + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[5] = (i+1)%N_r + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[6] = N_r+((i+1)%N_r) + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[7] = N_r+i + (j+1)*2*N_r;
+        
+        cells[i+j*N_r].material_id = 0;
+      }
+  
+  tria.create_triangulation (vertices_3d, cells, SubCellData());
+}
+
+
 #endif
 
 
