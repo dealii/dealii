@@ -1162,9 +1162,10 @@ void ElasticProblem<dim>::refine_grid ()
                                  // Lastly, here is the driver function. It is
                                  // almost unchanged from step-8, with the
                                  // exception that we make sure that output is
-                                 // only generated from the first process, to
-                                 // avoid getting the same lines of output
-                                 // over and over again, once per
+                                 // only generated from the first process (by
+                                 // checking that ``this_mpi_process'' equals
+                                 // zero), to avoid getting the same lines of
+                                 // output over and over again, once per
                                  // process. Apart from this, the only other
                                  // cosmetic change is that we output how many
                                  // degrees of freedom there are per process,
@@ -1193,7 +1194,6 @@ void ElasticProblem<dim>::run ()
 
       setup_system ();
 
-                                       // xxx
       if (this_mpi_process == 0)
         {
           std::cout << "   Number of degrees of freedom: "
