@@ -25,6 +25,8 @@
 #include <lac/sparse_matrix_ez.templates.h>
 
 #include <fstream>
+#include <cstdio>
+
 
 #define PREC_CHECK(solver, method, precond) try \
  { solver.method (A, u, f, precond);  } catch (...) {} \
@@ -157,7 +159,8 @@ int main()
 	      << std::endl;
 
                                    // dump A into a file, and re-read
-                                   // it, then check equality
+                                   // it, then delete tmp file and
+                                   // check equality
   std::ofstream tmp_write ("sparse_matrices.tmp");
   A.block_write (tmp_write);
   tmp_write.close ();
@@ -167,6 +170,8 @@ int main()
   A_tmp.reinit (A.get_sparsity_pattern());
   A_tmp.block_read (tmp_read);
   tmp_read.close ();
+
+  remove ("sparse_matrices.tmp");
 
   for (unsigned int i=0; i<A.n_nonzero_elements(); ++i)
     Assert (std::fabs(A.global_entry(i) - A_tmp.global_entry(i)) <=
