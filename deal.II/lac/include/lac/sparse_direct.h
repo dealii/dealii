@@ -40,7 +40,7 @@
  * HSL subroutines, read the section on external libraries in the
  * deal.II ReadMe file.
  *
- * @section3{Interface and Method}
+ * @sect3{Interface and Method}
  *
  * For the meaning of the three functions @p{initialize},
  * @p{factorize}, and @p{solve}, as well as for the method used in
@@ -56,7 +56,7 @@
  * costly than the decomposition process.
  *
  *
- * @section3{Parameters to the constructor}
+ * @sect3{Parameters to the constructor}
  *
  * The constructor of this class takes several arguments. The meaning
  * is the following: the MA27 functions require the user to allocate
@@ -95,7 +95,7 @@
  * indicated value is far too small and can not be relied upon.
  *
  *
- * @section3{Note on parallelization}
+ * @sect3{Note on parallelization}
  *
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines is not multithreading-capable,
@@ -368,7 +368,7 @@ class SparseDirectMA27 : public Subscriptor
  * storage required by these functions.
  *
  *
- * @section3{Interface and Method}
+ * @sect3{Interface and Method}
  *
  * For the meaning of the three functions @p{initialize},
  * @p{factorize}, and @p{solve}, as well as for the method used in
@@ -384,14 +384,14 @@ class SparseDirectMA27 : public Subscriptor
  * costly than the decomposition process.
  *
  *
- * @section3{Parameters to the constructor}
+ * @sect3{Parameters to the constructor}
  *
  * The constructor of this class takes several arguments. Their
  * meaning is equivalent to those of the constructor of the
  * @ref{SparseDirectMA27} class; see there for more information.
  *
  *
- * @section3{Note on parallelization}
+ * @sect3{Note on parallelization}
  *
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines is not multithreading-capable,
