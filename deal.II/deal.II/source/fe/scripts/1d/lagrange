@@ -10,6 +10,7 @@
 
   phi_polynom := array(0..n_functions-1);
   grad_phi_polynom := array(0..n_functions-1);
+  grad_grad_phi_polynom := array(0..n_functions-1);
   local_mass_matrix := array(0..n_functions-1, 0..n_functions-1);
 
   for i from 0 to n_functions-1 do
@@ -28,6 +29,7 @@
     
     phi_polynom[i] := interp (shifted_support_points, values, xi);
     grad_phi_polynom[i] := diff(phi_polynom[i], xi);
+    grad_grad_phi_polynom[i] := diff(grad_phi_polynom[i], xi);
   od;
 
   phi:= proc(i,x) subs(xi=x, phi_polynom[i]); end;

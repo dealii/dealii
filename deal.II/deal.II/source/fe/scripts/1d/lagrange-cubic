@@ -15,6 +15,7 @@
   readlib(C);
   C(phi_polynom, filename=cubic1d_shape_value);
   C(grad_phi_polynom, filename=cubic1d_shape_grad);
+  C(grad_grad_phi_polynom, filename=cubic1d_shape_grad_grad);
   C(prolongation, filename=cubic1d_prolongation);
   C(restriction, filename=cubic1d_restriction);
   C(local_mass_matrix, optimized, filename=cubic1d_massmatrix);
