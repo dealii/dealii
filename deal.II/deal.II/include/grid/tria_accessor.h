@@ -447,6 +447,21 @@ class LineAccessor :  public TriaAccessor<dim> {
 				      * length!
 				      */
     double diameter () const;
+
+				     /**
+				      * Return the center of the line. This
+				      * is the average of the two vertices,
+				      * which is the obvious definition for
+				      * straight lines. However, if you use
+				      * higher order mappings from the unit
+				      * cell to the real cell (in more than
+				      * one space dimension), the bounding
+				      * lines may not necessarily be straight.
+				      * In that case ask the finite element
+				      * class for the correct place of the
+				      * midpoint of the line in real space.
+				      */
+    Point<dim> center () const;
     
   private:
     				     /**
@@ -722,7 +737,28 @@ class QuadAccessor :  public TriaAccessor<dim> {
 				      * distorted.
 				      */
     double diameter () const;
-    
+
+    				     /**
+				      * Return the center of the quad. The
+				      * center of a quad is defined to be
+				      * the average of the four vertices,
+				      * which is also the point where the
+				      * bilinear mapping places the midpoint
+				      * of the unit quad in real space.
+				      * However, this may not be the point
+				      * of the barycenter of the quad.
+				      *
+				      * Also note that if you use
+				      * higher order mappings from the unit
+				      * cell to the real cell (in more than
+				      * two space dimension), the bounding
+				      * quads may not necessarily be straight.
+				      * In that case ask the finite element
+				      * class for the correct place of the
+				      * midpoint of the quad in real space.
+				      */
+    Point<dim> center () const;
+
   private:
     				     /**
 				      *  Copy operator. This is normally

@@ -300,6 +300,13 @@ double LineAccessor<dim>::diameter () const {
 
 
 
+template <int dim>
+Point<dim> LineAccessor<dim>::center () const {
+  return (vertex(1)+vertex(0))/2.;
+};
+
+
+
 
 
 
@@ -558,6 +565,10 @@ double QuadAccessor<dim>::diameter () const {
 
 
 
+template <int dim>
+Point<dim> QuadAccessor<dim>::center () const {
+  return (vertex(0)+vertex(1)+vertex(2)+vertex(3))/4.;
+};
 
 
 
