@@ -21,6 +21,7 @@
 
 // in strict ANSI C mode, the following constants are not defined by
 // default, so we do it ourselves
+//TODO:[?] Unify the various places where PI is defined to a central instance 
 #ifndef M_PI
 #  define	M_PI		3.14159265358979323846
 #endif
@@ -41,9 +42,10 @@ namespace Functions
   template<int dim>
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
 						   const Point<dim> p)
-    : Function<dim> (1),
-    center(p),
-    radius(r)
+		  :
+		  Function<dim> (1),
+                  center(p),
+                  radius(r)
   {}
 
 
@@ -74,16 +76,17 @@ namespace Functions
   template<int dim>
   CutOffFunctionW1<dim>::CutOffFunctionW1 (const double     r,
 					   const Point<dim> p)
-    : Function<dim> (1),
-    center(p),
-    radius(r)
+		  :
+		  Function<dim> (1),
+                  center(p),
+                  radius(r)
   {}
 
 
   template<int dim>
   double
   CutOffFunctionW1<dim>::value (const Point<dim>   &p,
-			      const unsigned int) const
+				const unsigned int) const
   {
     const double d = center.distance(p);
     return ((d<radius) ? (radius-d) : 0.);
@@ -111,16 +114,17 @@ namespace Functions
   template<int dim>
   CutOffFunctionCinfty<dim>::CutOffFunctionCinfty (const double     r,
 						   const Point<dim> p)
-    : Function<dim> (1),
-    center(p),
-    radius(r)
+		  :
+		  Function<dim> (1),
+                  center(p),
+                  radius(r)
   {}
 
 
   template<int dim>
   double
   CutOffFunctionCinfty<dim>::value (const Point<dim>   &p,
-			      const unsigned int) const
+				    const unsigned int) const
   {
     const double d = center.distance(p);
     const double r = radius;
@@ -156,6 +160,24 @@ namespace Functions
   }
 
 
+
+  template<int dim>
+  Tensor<1,dim>
+  CutOffFunctionCinfty<dim>::gradient (const Point<dim>   &p,
+				       const unsigned int) const
+  {
+    const double d = center.distance(p);
+    const double r = radius;
+    if (d>=r)
+      return Tensor<1,dim>();
+    const double e = -d*d/(r-d)/(r+d);
+    return  ((e<-50) ?
+	     Point<dim>() :
+	     (p-center)/d*(-2.0*r*r/pow(-r*r+d*d,2.0)*d*exp(e)));
+  }
+  
+
+// explicit instantiations  
   template class CutOffFunctionLinfty <1>;
   template class CutOffFunctionLinfty <2>;
   template class CutOffFunctionLinfty <3>;
@@ -167,6 +189,4 @@ namespace Functions
   template class CutOffFunctionCinfty <1>;
   template class CutOffFunctionCinfty <2>;
   template class CutOffFunctionCinfty <3>;
-
-
 }

@@ -877,7 +877,8 @@ namespace Functions
 /**
  * Cut-off function for an arbitrary ball. This is the traditional
  * cut-off function in C-infinity for a ball of certain @p{radius}
- * around @p{center}.
+ * around @p{center}, $f(r)=exp(1-1/(1-r**2/s**2))$, where $r$ is the
+ * distance to the center, and $s$ is the radius of the sphere.
  *
  * @author Guido Kanschat, 2001
  */
@@ -906,6 +907,12 @@ namespace Functions
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
 
+				       /**
+					* Function gradient at one point.
+					*/
+      virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				      const unsigned int  component = 0) const;
+      
     private:
 				       /**
 					* Center of the integration ball.
