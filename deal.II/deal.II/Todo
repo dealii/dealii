@@ -14,9 +14,6 @@ Write monitors to control whether enough memory was allocated for
   (for DoF)
 
 
-Remove gcc2.8 workaround with DoFSubstructAccessor for general <dim>
-
-
 Check usage of vector<>s: functions should assume that the objects have
   the right size already.
 
