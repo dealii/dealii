@@ -993,7 +993,7 @@ void LaplaceMatrix<dim>::assemble (Vector<double>      &rhs,
 		weights[point];
 };
 
-//TODO: check correctness of this function and use FEValues
+
 
 template<int dim>
 void
@@ -1016,16 +1016,12 @@ MatrixCreator<dim>::create_interpolation_matrix(const FiniteElement<dim> &high,
 
   FEValues<dim> fe(high, low_points, UpdateFlags(0));
   
-//TODO: This could be less inefficient by going component by component
-//TODO: Does it work for multi-component?
-
   for (unsigned int i=0; i<low.total_dofs; ++i)
     for (unsigned int j=0; j<high.total_dofs; ++j)
 				       // shape functions need to belong
 				       // to the same component
       if (low.system_to_component_index(i).first ==
 	  high.system_to_component_index(j).first)
-// This is Id at the moment
 	result(i,j) = fe.shape_value(j,i);
 }
 
