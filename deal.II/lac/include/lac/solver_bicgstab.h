@@ -37,9 +37,13 @@
  * The Bicgstab-method has two additional parameters: the first is a
  * boolean, deciding whether to compute the actual residual in each
  * step (@p{true}) or to use the length of the computed orthogonal
- * residual (@{false}, not implemented yet). Remark, that computing
- * the residual causes a third matrix-vector-multiplication, though no
- * additional preconditioning, in each step.
+ * residual (@{false}). Remark, that computing the residual causes a
+ * third matrix-vector-multiplication, though no additional
+ * preconditioning, in each step. The reason for doing this is, that
+ * the size of the orthogonalized residual computed during the
+ * iteration may be larger by orders of magnitude than the true
+ * residual. This is due to numerical instabilities related to badly
+ * conditioned matrices.
  *
  * The second parameter is the size of a breakdown criterion. It is
  * difficult to find a general good criterion, so if things do not
@@ -325,7 +329,11 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
       Vx->add(alpha, y, omega, z);
       r.equ(1., s, -omega, t);
 
-      res = criterion(A, *Vx, *Vb);
+      if (additional_data.exact_residual)
+	res = criterion(A, *Vx, *Vb);
+      else
+	res = r.l2_norm();
+      
       state = control().check(++step, res);
       print_vectors(step, *Vx, r, y);
     }
