@@ -13,6 +13,7 @@
 
 
 #include <lac/sparsity_pattern.h>
+#include <lac/full_matrix.h>
 #include <lac/compressed_sparsity_pattern.h>
 
 #include <iostream>
@@ -495,6 +496,29 @@ SparsityPattern::copy_from (const CompressedSparsityPattern &csp)
 };
 
 
+template <typename number>
+void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
+{
+				   // first init with the number of
+				   // entries per row
+  std::vector<unsigned int> entries_per_row (matrix.m(), 0);
+  for (unsigned int row=0; row<matrix.m(); ++row)
+    for (unsigned int col=0; col<matrix.n(); ++col)
+      if (matrix(row,col) != 0)
+	++entries_per_row[row];
+  reinit (matrix.m(), matrix.n(), entries_per_row);
+
+				   // now set entries
+  for (unsigned int row=0; row<matrix.m(); ++row)
+    for (unsigned int col=0; col<matrix.n(); ++col)
+      if (matrix(row,col) != 0)
+	add (row,col);
+
+				   // finally compress
+  compress ();
+};
+
+
 
 bool
 SparsityPattern::empty () const
@@ -726,3 +750,9 @@ SparsityPattern::memory_consumption () const
 	  max_dim * sizeof(unsigned int) +
 	  max_vec_len * sizeof(unsigned int));
 };
+
+
+
+// explicit instantiations
+template void SparsityPattern::copy_from (const FullMatrix<float> &);
+template void SparsityPattern::copy_from (const FullMatrix<double> &);

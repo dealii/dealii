@@ -21,6 +21,7 @@
 #include <lac/sparsity_pattern.h>
 
 template<typename number> class Vector;
+template<typename number> class FullMatrix;
 
 /**
  * Sparse matrix.
@@ -344,6 +345,19 @@ class SparseMatrix : public Subscriptor
     template <typename ForwardIterator>
     void copy_from (const ForwardIterator begin,
 		    const ForwardIterator end);    
+
+				     /**
+				      * Copy the nonzero entries of a
+				      * full matrix into this
+				      * object. Previous content is
+				      * deleted. Note that the
+				      * underlying sparsity pattern
+				      * must be appropriate to hold
+				      * the nonzero entries of the
+				      * full matrix.
+				      */
+    template <typename somenumber>
+    void copy_from (const FullMatrix<somenumber> &matrix);
     
 				     /**
 				      * Add @p{matrix} scaled by

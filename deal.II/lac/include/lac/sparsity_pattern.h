@@ -21,6 +21,7 @@
 #include <vector>
 
 
+template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 class CompressedSparsityPattern;
 
@@ -467,11 +468,27 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Copy data from an object of
 				      * type
-				      * @ref{CompressedSparsityPattern}. Previous
-				      * content of this object is
-				      * lost.
+				      * @ref{CompressedSparsityPattern}.
+				      * Previous content of this
+				      * object is lost, and the
+				      * sparsity pattern is in
+				      * compressed mode afterwards.
 				      */
     void copy_from (const CompressedSparsityPattern &csp);
+
+				     /**
+				      * Take a full matrix and use its
+				      * nonzero entries to generate a
+				      * sparse matrix entry pattern
+				      * for this object.
+				      *
+				      * Previous content of this
+				      * object is lost, and the
+				      * sparsity pattern is in
+				      * compressed mode afterwards.
+				      */
+    template <typename number>
+    void copy_from (const FullMatrix<number> &matrix);
     
 				     /**
 				      * Return whether the object is empty. It

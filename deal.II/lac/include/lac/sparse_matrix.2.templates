@@ -20,6 +20,9 @@
 template SparseMatrix<TYPEMAT> &
 SparseMatrix<TYPEMAT>::copy_from (const SparseMatrix<TYPE2> &);
 
+template 
+void SparseMatrix<TYPEMAT>::copy_from (const FullMatrix<TYPE2> &);
+
 template void SparseMatrix<TYPEMAT>::add_scaled (const TYPEMAT,
 						 const SparseMatrix<TYPE2> &);
 

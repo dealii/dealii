@@ -16,6 +16,7 @@
 
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
+#include <lac/full_matrix.h>
 
 
 // we only need output streams, but older compilers did not provide
@@ -235,6 +236,24 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   
   return *this;
 };
+
+
+
+template <typename number>
+template <typename somenumber>
+void
+SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
+{
+				   // first delete previous content
+  clear ();
+
+				   // then copy old matrix
+  for (unsigned int row=0; row<matrix.m(); ++row)
+    for (unsigned int col=0; col<matrix.n(); ++col)
+      if (matrix(row,col) != 0)
+	set (row, col, matrix(row,col));
+};
+
 
 
 template <typename number>
