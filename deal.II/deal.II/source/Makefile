@@ -108,4 +108,8 @@ clean:
 		>> ../lib/Makefile_$(deal_II_dimension)d.dep
 
 
+#include the dependency file if a dimension was specified. If not, we
+#don't start a compiler run, so we need not include dependencies anyway.
+ifneq "$(deal_II_dimension)" ""
 include ../lib/Makefile_$(deal_II_dimension)d.dep
+endif
