@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -85,6 +85,20 @@ check_cells (vector<Quadrature<dim>*>& quadratures)
 //      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
       deallog << " is exact for polynomials of degree " << i-1 << endl;
 
+      if (dim==1)
+	{
+					   // check the ordering of
+					   // the quadrature points
+	  bool in_order=true;
+	  for (unsigned int x=1; x<quadrature.n_quadrature_points; ++x)
+	    {
+	      if (points[x](0)<=points[x-1](0))
+		in_order=false;
+	    }
+	  if (!in_order)
+	    for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	      deallog << points[x] << endl;
+	}
     }  
 }
 
