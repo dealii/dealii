@@ -22,8 +22,7 @@ endif
 # make_dependencies whenever we think it may be beneficial
 make_dependencies : make_dependencies.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
-	@$(CXX) $(CXXFLAGS.o) -c $<
-	@$(CXX) $(LDFLAGS) -o $@ make_dependencies.o
+	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
 clean:
 	-rm -f make_dependencies
