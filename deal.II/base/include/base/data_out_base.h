@@ -403,7 +403,7 @@ class DataOutBase
 					  * in the same order, always,
 					  * we better store this.
 					  */
-	unsigned int me;
+	unsigned int patch_index;
 	
 					 /**
 					  * Number of subdivisions with

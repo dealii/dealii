@@ -36,7 +36,7 @@ const unsigned int DataOutBase::Patch<dim,spacedim>::no_neighbor;
 
 template <int dim, int spacedim>
 DataOutBase::Patch<dim,spacedim>::Patch () :
-		me(no_neighbor),
+		patch_index(no_neighbor),
 		n_subdivisions (1)
 
 				   // all the other data has a
@@ -762,7 +762,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		cells_per_patch *= n;
 	    }
 
-	  const unsigned int patch_start = patch->me * cells_per_patch;
+	  const unsigned int patch_start = patch->patch_index * cells_per_patch;
 
 	  for (unsigned int ix=0;ix<n;++ix)
 	    for (unsigned int iy=0;iy<((dim>1) ? n : 1);++iy)
