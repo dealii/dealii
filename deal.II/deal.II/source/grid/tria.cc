@@ -81,7 +81,8 @@ void Triangulation<dim>::clear ()
   for (unsigned int i=0; i<255; ++i)
     {
       boundary[i]->unsubscribe ();
-      boundary[i] = 0;
+      boundary[i] = &straight_boundary;
+      straight_boundary.subscribe ();
     };
 
   number_cache = TriaNumberCache<dim>();
