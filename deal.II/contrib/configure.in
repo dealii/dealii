@@ -27,8 +27,6 @@ cd kdoc/src
 cd $DEAL2_CONTRIB_DIR
 
 
-dnl    Configure the HSL subdir
-AC_CONFIG_SUBDIRS(hsl)
 
 
 dnl -------------------------------------------------------------
