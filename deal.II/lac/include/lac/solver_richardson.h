@@ -85,7 +85,7 @@ class SolverRichardson : public Solver<Matrix, Vector>
     
 				     /**
 				      * Within the iteration loop, the
-				      * square of the residual vector is
+				      * norm of the residual is
 				      * stored in this variable. The
 				      * function #criterion# uses this
 				      * variable to compute the convergence
@@ -93,7 +93,7 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      * norm of the residual vector and thus
 				      * the square root of the #res2# value.
 				      */
-    double res2;
+    double res;
 };
 
 
@@ -129,9 +129,8 @@ SolverRichardson<Matrix,Vector>::solve (const Matrix &A,
 				   // Main loop
   for(int iter=0; conv==SolverControl::iterate; iter++)
     {
-      A.residual(r,x,b);
+      res=A.residual(r,x,b);
 
-      res2 = r*r;
       conv = control().check (iter, criterion());
       if (conv != SolverControl::iterate)
 	break;
@@ -157,7 +156,7 @@ template<class Matrix,class Vector>
 inline double
 SolverRichardson<Matrix,Vector>::criterion()
 {
-  return sqrt(res2);
+  return res;
 }
 
 
