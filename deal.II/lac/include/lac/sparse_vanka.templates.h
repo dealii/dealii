@@ -398,6 +398,17 @@ SparseBlockVanka<number>::SparseBlockVanka (const SparseMatrix<number> &M,
                 dof_masks (n_blocks,
 		           vector<bool>(M.m(), false))
 {
+  compute_dof_masks (M, selected, blocking_strategy);
+};
+
+
+
+template <typename number>
+void
+SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
+					     const vector<bool>         &selected,
+					     const BlockingStrategy      blocking_strategy) 
+{
   Assert (n_blocks > 0, ExcInternalError());
 
   const unsigned int n_inverses = count (selected.begin(),

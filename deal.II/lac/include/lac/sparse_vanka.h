@@ -499,14 +499,29 @@ class SparseBlockVanka : public SparseVanka<number>
 
 				     /**
 				      * In this field, we precompute
-				      * the first and the one after
-				      * the last index of each
-				      * block. This computation is
-				      * done in the constructor, to
-				      * avoid recomputing each time
-				      * the preconditioner is called.
+				      * for each block which degrees
+				      * of freedom belong to it. Thus,
+				      * if #dof_masks[i][j]==true#,
+				      * then DoF #j# belongs to block
+				      * #i#. Of course, no other
+				      * #dof_masks[l][j]# may be
+				      * #true# for #l!=i#. This
+				      * computation is done in the
+				      * constructor, to avoid
+				      * recomputing each time the
+				      * preconditioner is called.
 				      */
     vector<vector<bool> > dof_masks;
+
+				     /**
+				      * Compute the contents of the
+				      * field #dof_masks#. This
+				      * function is called from the
+				      * constructor.
+				      */
+    void compute_dof_masks (const SparseMatrix<number> &M,
+			    const vector<bool>         &selected,
+			    const BlockingStrategy      blocking_strategy);
 };
 
 
