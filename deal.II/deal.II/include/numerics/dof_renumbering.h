@@ -227,10 +227,11 @@ class DoFRenumbering
 				      * vector.
 				      */    
     template <int dim>
-    static std::vector<unsigned int>
-    compute_Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
-			   const bool                       reversed_numbering = false,
-			   const bool                       use_constraints    = false,
+    static void
+    compute_Cuthill_McKee (std::vector<unsigned int>&,
+			   const DoFHandler<dim>&,
+			   const bool reversed_numbering = false,
+			   const bool use_constraints    = false,
 			   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
 
 				     /**
@@ -487,9 +488,10 @@ class DoFRenumbering
 				      * vector.
 				      */
     template <int dim>
-    static std::vector<unsigned int>
-    compute_sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
-				     const std::vector<bool> &selected_dofs);
+    static void
+    compute_sort_selected_dofs_back (std::vector<unsigned int>&,
+				     const DoFHandler<dim>&,
+				     const std::vector<bool>&selected_dofs);
 
 				     /**
 				      * Renumber the degrees of
@@ -509,8 +511,9 @@ class DoFRenumbering
 				      * vector.
 				      */   
     template <int dim>
-    static std::vector<unsigned int>
-    compute_random (DoFHandler<dim> &dof_handler);
+    static void
+    compute_random (std::vector<unsigned int>&,
+		    const DoFHandler<dim> &dof_handler);
 
 				     /**
 				      * Exception

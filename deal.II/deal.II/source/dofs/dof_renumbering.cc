@@ -53,14 +53,16 @@ extern "C" long int lrand48 (void);
 
 template <int dim>
 void
-DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
-			       const bool                       reversed_numbering,
-			       const bool                       use_constraints,
-			       const std::vector<unsigned int> &starting_indices)
+DoFRenumbering::Cuthill_McKee (
+  DoFHandler<dim>& dof_handler,
+  const bool       reversed_numbering,
+  const bool       use_constraints,
+  const std::vector<unsigned int>& starting_indices)
 {
-  std::vector<unsigned int> renumbering
-    =compute_Cuthill_McKee(dof_handler, reversed_numbering,
-			   use_constraints, starting_indices);
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DoFHandler<dim>::invalid_dof_index);
+  compute_Cuthill_McKee(renumbering, dof_handler, reversed_numbering,
+			use_constraints, starting_indices);
 
 				   // actually perform renumbering;
 				   // this is dimension specific and
@@ -71,11 +73,13 @@ DoFRenumbering::Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
 
 
 template <int dim>
-std::vector<unsigned int>
-DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_handler,
-				       const bool                       reversed_numbering,
-				       const bool                       use_constraints,
-				       const std::vector<unsigned int> &starting_indices)
+void
+DoFRenumbering::compute_Cuthill_McKee (
+  std::vector<unsigned int>& new_indices,
+  const DoFHandler<dim>&     dof_handler,
+  const bool                 reversed_numbering,
+  const bool                 use_constraints,
+  const std::vector<unsigned int>& starting_indices)
 {
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(),
@@ -93,8 +97,8 @@ DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_hand
   const unsigned int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; invalid_dof_index means
 				   // that no new number was chosen yet
-  std::vector<unsigned int> new_number(sparsity.n_rows(),
-				       DoFHandler<dim>::invalid_dof_index);
+  Assert(new_indices.size() == n_dofs,
+	 ExcDimensionMismatch(new_indices.size(), n_dofs));
   
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
@@ -163,7 +167,7 @@ DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_hand
 
 				   // enumerate the first round dofs
   for (unsigned int i=0; i!=last_round_dofs.size(); ++i)
-    new_number[last_round_dofs[i]] = next_free_number++;
+    new_indices[last_round_dofs[i]] = next_free_number++;
 
   bool all_dofs_renumbered = false;
 
@@ -197,7 +201,7 @@ DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_hand
 				       // eliminate dofs which are
 				       // already numbered
       for (int s=next_round_dofs.size()-1; s>=0; --s)
-	if (new_number[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
+	if (new_indices[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
 	  next_round_dofs.erase (next_round_dofs.begin() + s);
 
 				       // check whether there are any new
@@ -237,7 +241,7 @@ DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_hand
 				       // front:
       std::multimap<unsigned int, int>::iterator i;
       for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i) 
-	new_number[i->second] = next_free_number++;
+	new_indices[i->second] = next_free_number++;
 
 				       // after that: copy this round's
 				       // dofs for the next round
@@ -261,29 +265,28 @@ DoFRenumbering::compute_Cuthill_McKee (DoFHandler<dim>                 &dof_hand
 				   // In any case, if not all DoFs
 				   // have been reached, renumbering
 				   // will not be possible
-  if (std::find (new_number.begin(), new_number.end(), DoFHandler<dim>::invalid_dof_index)
+  if (std::find (new_indices.begin(), new_indices.end(), DoFHandler<dim>::invalid_dof_index)
       !=
-      new_number.end())
+      new_indices.end())
     Assert (false, ExcRenumberingIncomplete());
   Assert (next_free_number == n_dofs,
 	  ExcRenumberingIncomplete());
 #endif
 
   if (reversed_numbering)
-    for (std::vector<unsigned int>::iterator i=new_number.begin();
-	 i!=new_number.end(); ++i)
+    for (std::vector<unsigned int>::iterator i=new_indices.begin();
+	 i!=new_indices.end(); ++i)
       *i = n_dofs-*i-1;
-
-  return new_number;
 }
 
 
 #ifdef ENABLE_MULTIGRID
 template <int dim>
-void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler,
-				    const unsigned int               level,
-				    const bool                       reversed_numbering,
-				    const std::vector<unsigned int> &starting_indices)
+void DoFRenumbering::Cuthill_McKee (
+  MGDoFHandler<dim>               &dof_handler,
+  const unsigned int               level,
+  const bool                       reversed_numbering,
+  const std::vector<unsigned int> &starting_indices)
 {
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(level),
@@ -293,7 +296,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
   const unsigned int n_dofs = sparsity.n_rows();
 				   // store the new dof numbers; invalid_dof_index means
 				   // that no new number was chosen yet
-  std::vector<unsigned int> new_number(n_dofs, DoFHandler<dim>::invalid_dof_index);
+  std::vector<unsigned int> new_indices(n_dofs, DoFHandler<dim>::invalid_dof_index);
   
 				   // store the indices of the dofs renumbered
 				   // in the last round. Default to starting
@@ -344,7 +347,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 
 				   // enumerate the first round dofs
   for (unsigned int i=0; i!=last_round_dofs.size(); ++i)
-    new_number[last_round_dofs[i]] = next_free_number++;
+    new_indices[last_round_dofs[i]] = next_free_number++;
 
   bool all_dofs_renumbered = false;
 
@@ -378,7 +381,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 				       // eliminate dofs which are
 				       // already numbered
       for (int s=next_round_dofs.size()-1; s>=0; --s)
-	if (new_number[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
+	if (new_indices[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
 	  next_round_dofs.erase (next_round_dofs.begin() + s);
 
 				       // check whether there are any new
@@ -416,7 +419,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 				       ////
       std::multimap<unsigned int, int>::iterator i;
       for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i) 
-	new_number[i->second] = next_free_number++;
+	new_indices[i->second] = next_free_number++;
 
 				       // after that: copy this round's
 				       // dofs for the next round
@@ -425,31 +428,32 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>               &dof_handler
 
 #ifdef DEBUG
 				   //  test for all indices numbered
-  if (std::find (new_number.begin(), new_number.end(),
+  if (std::find (new_indices.begin(), new_indices.end(),
 		 DoFHandler<dim>::invalid_dof_index)
       !=
-      new_number.end())
+      new_indices.end())
     Assert (false, ExcRenumberingIncomplete());
   Assert (next_free_number == n_dofs,
 	  ExcRenumberingIncomplete());
 #endif
 
   if (reversed_numbering)
-    for (std::vector<unsigned int>::iterator i=new_number.begin(); i!=new_number.end(); ++i)
+    for (std::vector<unsigned int>::iterator i=new_indices.begin(); i!=new_indices.end(); ++i)
       *i = n_dofs-*i;
 
 				   // actually perform renumbering;
 				   // this is dimension specific and
 				   // thus needs an own function
-  dof_handler.renumber_dofs (level, new_number);
+  dof_handler.renumber_dofs (level, new_indices);
 }
 #endif
 
 
 template <int dim>
 void
-DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
-                                const std::vector<unsigned int> &component_order_arg)
+DoFRenumbering::component_wise (
+  DoFHandler<dim>                 &dof_handler,
+  const std::vector<unsigned int> &component_order_arg)
 {
   std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
 					 DoFHandler<dim>::invalid_dof_index);
@@ -464,9 +468,10 @@ DoFRenumbering::component_wise (DoFHandler<dim>                 &dof_handler,
 
 template <int dim>
 void
-DoFRenumbering::compute_component_wise (std::vector<unsigned int>& new_indices,
-					const DoFHandler<dim>&     dof_handler,
-					const std::vector<unsigned int> &component_order_arg)
+DoFRenumbering::compute_component_wise (
+  std::vector<unsigned int>& new_indices,
+  const DoFHandler<dim>&     dof_handler,
+  const std::vector<unsigned int> &component_order_arg)
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   const FiniteElement<dim> &fe     = dof_handler.get_fe();
@@ -618,9 +623,10 @@ DoFRenumbering::compute_component_wise (std::vector<unsigned int>& new_indices,
 
 
 template <int dim>
-void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
-				     unsigned int level,
-				     const std::vector<unsigned int> &component_order_arg)
+void DoFRenumbering::component_wise (
+  MGDoFHandler<dim>& dof_handler,
+  unsigned int level,
+  const std::vector<unsigned int> &component_order_arg)
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   const FiniteElement<dim> &fe     = dof_handler.get_fe();
@@ -770,11 +776,13 @@ void DoFRenumbering::component_wise (MGDoFHandler<dim>& dof_handler,
 
 template <int dim>
 void
-DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
-					 const std::vector<bool> &selected_dofs)
+DoFRenumbering::sort_selected_dofs_back (
+  DoFHandler<dim>         &dof_handler,
+  const std::vector<bool> &selected_dofs)
 {
-  std::vector<unsigned int> renumbering
-    =compute_sort_selected_dofs_back(dof_handler, selected_dofs);
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DoFHandler<dim>::invalid_dof_index);
+  compute_sort_selected_dofs_back(renumbering, dof_handler, selected_dofs);
 
   dof_handler.renumber_dofs(renumbering);
 }
@@ -782,9 +790,11 @@ DoFRenumbering::sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
 
 
 template <int dim>
-std::vector<unsigned int>
-DoFRenumbering::compute_sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
-						 const std::vector<bool> &selected_dofs)
+void
+DoFRenumbering::compute_sort_selected_dofs_back (
+  std::vector<unsigned int>& new_indices,
+  const DoFHandler<dim>&     dof_handler,
+  const std::vector<bool>&   selected_dofs)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   Assert (selected_dofs.size() == n_dofs,
@@ -792,7 +802,9 @@ DoFRenumbering::compute_sort_selected_dofs_back (DoFHandler<dim>         &dof_ha
 
 				   // re-sort the dofs according to
 				   // their selection state
-  std::vector<unsigned int> new_dof_indices (n_dofs);
+  Assert (new_indices.size() == n_dofs,
+	  ExcDimensionMismatch(new_indices.size(), n_dofs));
+  
   const unsigned int   n_selected_dofs = count (selected_dofs.begin(),
 						selected_dofs.end(),
 						false);
@@ -802,18 +814,18 @@ DoFRenumbering::compute_sort_selected_dofs_back (DoFHandler<dim>         &dof_ha
   for (unsigned int i=0; i<n_dofs; ++i)
     if (selected_dofs[i] == false)
       {
-	new_dof_indices[i] = next_unselected;
+	new_indices[i] = next_unselected;
 	++next_unselected;
       }
     else
       {
-	new_dof_indices[i] = next_selected;
+	new_indices[i] = next_selected;
 	++next_selected;
       };
   Assert (next_unselected == n_selected_dofs, ExcInternalError());
   Assert (next_selected == n_dofs, ExcInternalError());
 
-  return new_dof_indices;
+  return new_indices;
 }
 
 
@@ -895,9 +907,10 @@ DoFRenumbering::compute_cell_wise_dg (
 
 #ifdef ENABLE_MULTIGRID
 template <int dim>
-void DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
-				   const unsigned int level,
-				   const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
+void DoFRenumbering::cell_wise_dg (
+  MGDoFHandler<dim>& dof,
+  const unsigned int level,
+  const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
 {
   Assert(cells.size() == dof.get_tria().n_cells(level),
 	 ExcDimensionMismatch(cells.size(),
@@ -977,7 +990,6 @@ struct CompCells
       }
 };
 
-//TODO:[RH or other] Remove necessity of copying a BIG vector renumbering
 
 template <int dim>
 void
@@ -995,7 +1007,7 @@ DoFRenumbering::downstream_dg (DoFHandler<dim>& dof,
 template <int dim>
 void
 DoFRenumbering::compute_downstream_dg (
-  std::vector<unsigned int>& renumbering,
+  std::vector<unsigned int>& new_indices,
   const DoFHandler<dim>& dof,
   const Point<dim>& direction)
 {
@@ -1009,7 +1021,7 @@ DoFRenumbering::compute_downstream_dg (
   copy (begin, end, ordered_cells.begin());
   sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
-  compute_cell_wise_dg(renumbering, dof, ordered_cells);
+  compute_cell_wise_dg(new_indices, dof, ordered_cells);
 }
 
 
@@ -1039,25 +1051,28 @@ template <int dim>
 void
 DoFRenumbering::random (DoFHandler<dim> &dof_handler)
 {
-  std::vector<unsigned int> renumbering
-    =compute_random(dof_handler);
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DoFHandler<dim>::invalid_dof_index);
+  compute_random(renumbering, dof_handler);
 
   dof_handler.renumber_dofs(renumbering);
 }
 
 
 template <int dim>
-std::vector<unsigned int>
-DoFRenumbering::compute_random (DoFHandler<dim> &dof_handler)
+void
+DoFRenumbering::compute_random (
+  std::vector<unsigned int>& new_indices,
+  const DoFHandler<dim> &dof_handler)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
+  Assert(new_indices.size() == n_dofs,
+	 ExcDimensionMismatch(new_indices.size(), n_dofs));
   
-  std::vector<unsigned int> new_indices (n_dofs);
   for (unsigned i=0; i<n_dofs; ++i)
     new_indices[i] = i;
   
   std::random_shuffle (new_indices.begin(), new_indices.end());
-  return new_indices;
 }
 
 
@@ -1072,9 +1087,10 @@ void DoFRenumbering::Cuthill_McKee<deal_II_dimension>
  const std::vector<unsigned int>&);
 
 template
-std::vector<unsigned int>
+void
 DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension>
-(DoFHandler<deal_II_dimension>&,
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension>&,
  const bool,
  const bool,
  const std::vector<unsigned int>&);
@@ -1130,9 +1146,10 @@ void DoFRenumbering::sort_selected_dofs_back<deal_II_dimension>
  const std::vector<bool> &);
 
 template
-std::vector<unsigned int>
+void
 DoFRenumbering::compute_sort_selected_dofs_back<deal_II_dimension>
-(DoFHandler<deal_II_dimension> &,
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
 
 template
@@ -1140,9 +1157,10 @@ void DoFRenumbering::random<deal_II_dimension>
 (DoFHandler<deal_II_dimension> &);
 
 template
-std::vector<unsigned int>
+void
 DoFRenumbering::compute_random<deal_II_dimension>
-(DoFHandler<deal_II_dimension> &);
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension> &);
 
 #ifdef ENABLE_MULTIGRID
 template
