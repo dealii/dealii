@@ -85,9 +85,9 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
-				      * Compute a basis of the tangent
-				      * space at each vertex of the
-				      * given face.
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
 				      *
 				      * Refer to the general
 				      * documentation of this class
@@ -95,8 +95,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			      typename Boundary<dim>::FaceVertexTangents &face_vertex_tangents) const;
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
 
 				     /**
 				      * Return the center of the ball.
@@ -201,11 +201,10 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
 				     typename std::vector<Point<dim> > &points) const;
 
-
 				     /**
-				      * Compute a basis of the tangent
-				      * space at each vertex of the
-				      * given face.
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
 				      *
 				      * Refer to the general
 				      * documentation of this class
@@ -213,8 +212,8 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			      typename Boundary<dim>::FaceVertexTangents &face_vertex_tangents) const;
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
 };
 
 

@@ -64,8 +64,8 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 template <int dim>
 void
 Boundary<dim>::
-get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &,
-			  FaceVertexTangents                               &) const
+get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
+			 FaceVertexNormals                                &) const
 {
   Assert (false, ExcPureVirtualFunctionCalled());
 };
@@ -203,8 +203,8 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 template <>
 void
 StraightBoundary<1>::
-get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
-			  FaceVertexTangents &) const
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 FaceVertexNormals &) const
 {
   Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
 };
@@ -217,13 +217,15 @@ get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
 template <>
 void
 StraightBoundary<2>::
-get_tangents_at_vertices (const Triangulation<2>::face_iterator &face,
-			  Boundary<2>::FaceVertexTangents &face_vertex_tangents) const
+get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
+			 Boundary<2>::FaceVertexNormals &face_vertex_normals) const
 {
   const unsigned int dim=2;
   const Tensor<1,dim> tangent = face->vertex(1) - face->vertex(0);
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-    face_vertex_tangents.tangents[vertex][0] = tangent;
+				     // compute normals from tangent
+    face_vertex_normals[vertex] = Point<dim>(tangent[1],
+					     -tangent[0]);
 };
 
 #endif
@@ -238,17 +240,29 @@ StraightBoundary<3>::
 get_tangents_at_vertices (const Triangulation<3>::face_iterator &face,
 			  Boundary<3>::FaceVertexTangents &face_vertex_tangents) const
 {
-  face_vertex_tangents.tangents[0][0] = face->vertex(1)-face->vertex(0);
-  face_vertex_tangents.tangents[0][1] = face->vertex(3)-face->vertex(0);
+  const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face;
   
-  face_vertex_tangents.tangents[1][0] = face->vertex(0)-face->vertex(1);
-  face_vertex_tangents.tangents[1][1] = face->vertex(2)-face->vertex(1);
-  
-  face_vertex_tangents.tangents[2][0] = face->vertex(1)-face->vertex(2);
-  face_vertex_tangents.tangents[2][1] = face->vertex(3)-face->vertex(2);
-  
-  face_vertex_tangents.tangents[3][0] = face->vertex(0)-face->vertex(3);
-  face_vertex_tangents.tangents[3][1] = face->vertex(2)-face->vertex(3);  
+  for (unsigned int vertex=0; vertex<vertices_per_face; ++vertex)
+    {
+				       // first define the two tangent
+				       // vectors at the vertex by
+				       // using the two lines
+				       // radiating away from this
+				       // vertex
+      const Tensor<1,3> tangents[2]
+	= { face->vertex((vertex+1) % vertices_per_face)
+	      - face->vertex(vertex),
+	    face->vertex((vertex+vertices_per_face-1) % vertices_per_face)
+	      - face->vertex(vertex)      };
+
+				       // then compute the normal by
+				       // taking the cross
+				       // product. since the normal is
+				       // not required to be
+				       // normalized, no problem here
+      cross_product (face_vertex_normals[vertex],
+		     tangents[0], tangents[1]);
+    };
 };
 
 #endif

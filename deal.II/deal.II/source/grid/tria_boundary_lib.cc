@@ -219,8 +219,8 @@ HyperBallBoundary<dim>::get_intermediate_points_on_quad (
 template <>
 void
 HyperBallBoundary<1>::
-get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
-			  FaceVertexTangents &) const
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 FaceVertexNormals &) const
 {
   Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
 };
@@ -228,116 +228,16 @@ get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
 #endif
 
 
-#if deal_II_dimension == 2
-
-template <>
+template <int dim>
 void
-HyperBallBoundary<2>::
-get_tangents_at_vertices (const Triangulation<2>::face_iterator &face,
-			  Boundary<2>::FaceVertexTangents &face_vertex_tangents) const
+HyperBallBoundary<dim>::
+get_normals_at_vertices (const Triangulation<dim>::face_iterator &face,
+			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
-  const unsigned int dim=2;
-				   // construct a tangential vector at
-				   // each of the vertices
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-    {
-      const Tensor<1,dim> radius = face->vertex(vertex)-center;
-      face_vertex_tangents.tangents[vertex][0] = Point<dim>(radius[1], -radius[0]);
-    };
+    face_vertex_normals[vertex] = face->vertex(vertex)-center;
 };
 
-#endif
-
-
-
-#if deal_II_dimension == 3
-
-template <>
-void
-HyperBallBoundary<3>::
-get_tangents_at_vertices (const Triangulation<3>::face_iterator &face,
-			  Boundary<3>::FaceVertexTangents &face_vertex_tangents) const
-{
-  const unsigned int dim=3;
-				   // construct two tangential vectors
-				   // at each of the vertices
-  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-    {
-				       // first take the radial vector
-      const Tensor<1,dim> radius = face->vertex(vertex)-center;
-				       // next we need to construct
-				       // two vectors that are
-				       // perpendicular to the radial
-				       // vector. to do so, first get
-				       // _one_ vector that is
-				       // perpendicular to the radial
-				       // one, and construct the
-				       // second by cross product.
-				       // construct the first
-				       // perpendicular vector by
-				       // forming the cross product of
-				       // the radial vector with
-				       // _some_ vector that is not
-				       // parallel to the radial
-				       // vector
-				       //
-				       // the problem therefore
-				       // reduces to finding an
-				       // auxiliary vector that is not
-				       // linearly dependent to the
-				       // radial vector. this we do as
-				       // follows (note that we know
-				       // that the length of the
-				       // radius vector is non-zero):
-				       //
-				       // 1. find the smallest
-				       // component of r by modulus
-				       //
-				       // 2. exchange the other two
-				       // components and change the
-				       // sign of one.
-				       //
-				       // this guarantees that the
-				       // scalar product of r and aux
-				       // is the square of the
-				       // smallest entry squared,
-				       // which is obviously less than
-				       // the sum of the entries
-				       // squared; the latter would
-				       // indicate that r and aux are
-				       // linearly dependent
-      Tensor<1,dim> aux = radius;
-      if ((std::fabs(radius[0]) < std::fabs(radius[1])) &&
-	  (std::fabs(radius[0]) < std::fabs(radius[2])))
-	{
-	  swap (aux[1], aux[2]);
-	  aux[1] = -aux[1];
-	}
-      else
-	if ((std::fabs(radius[1]) < std::fabs(radius[0])) &&
-	    (std::fabs(radius[1]) < std::fabs(radius[2])))
-	  {
-	    swap (aux[0], aux[2]);
-	    aux[0] = -aux[0];
-	  }
-	else
-	  {
-	    swap (aux[0], aux[1]);
-	    aux[0] = -aux[0];
-	  };
-
-				       // now construct the two
-				       // tangents by forming cross
-				       // products as discussed above
-      cross_product (face_vertex_tangents.tangents[vertex][0],
-		     radius, aux);
-      cross_product (face_vertex_tangents.tangents[vertex][1],
-		     face_vertex_tangents.tangents[vertex][0],
-		     radius);
-    };
-};
-
-#endif
 
 
 template <int dim>
@@ -472,8 +372,8 @@ get_intermediate_points_on_quad (const Triangulation<1>::quad_iterator &,
 template <>
 void
 HalfHyperBallBoundary<1>::
-get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
-			  Boundary<1>::FaceVertexTangents &) const
+get_normals_at_vertices (const Triangulation<1>::face_iterator &,
+			 Boundary<1>::FaceVertexNormals &) const
 {
   Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
 };
@@ -484,8 +384,8 @@ get_tangents_at_vertices (const Triangulation<1>::face_iterator &,
 template <int dim>
 void
 HalfHyperBallBoundary<dim>::
-get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			  typename Boundary<dim>::FaceVertexTangents &face_vertex_tangents) const
+get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
 				   // check whether center of object is
 				   // at x==0, since then it belongs
@@ -493,9 +393,9 @@ get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face
 				   // boundary
   const Point<dim> quad_center = face->center();
   if (quad_center(0) == center(0))
-    StraightBoundary<dim>::get_tangents_at_vertices (face, face_vertex_tangents);
+    StraightBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
   else
-    HyperBallBoundary<dim>::get_tangents_at_vertices (face, face_vertex_tangents);
+    HyperBallBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
 };
 
 

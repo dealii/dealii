@@ -70,7 +70,7 @@ template <int dim> class Triangulation;
  *   @ref{HyperBallBoundary} creating a hyperball with given radius
  *   around a given center point.
  *
- *   @author Wolfgang Bangerth, 1999, Ralf Hartmann, 2001
+ *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001
  */
 template <int dim>
 class Boundary : public Subscriptor
@@ -78,45 +78,29 @@ class Boundary : public Subscriptor
   public:
 
 				     /**
-				      * Structure keeping information
-				      * about the tangents at the
-				      * vertices of a face of a
-				      * cell. Thus, there are
+				      * Type keeping information about
+				      * the normals at the vertices of
+				      * a face of a cell. Thus, there
+				      * are
 				      * @p{GeometryInfo<dim>::vertices_per_face}
-				      * data sets of @p{dim-1} tangent
-				      * vectors each, that define the
-				      * tangent space of the boundary
-				      * at a given vertex. Note that
-				      * the vectors stored in this
-				      * object does not require that
-				      * the tangent vectors actually
-				      * form an orthogonal basis (as
-				      * long as they form a basis,
-				      * i.e. are not degenerate), not
-				      * are they required to be normed
-				      * somehow.
+				      * normal vectors, that define
+				      * the tangent spaces of the
+				      * boundary at the vertices. Note
+				      * that the vectors stored in
+				      * this object are not required
+				      * to be normalized, nor to
+				      * actually point outward, as one
+				      * often will only want to check
+				      * for orthogonality to define
+				      * the tangent plane; if a
+				      * function requires the normals
+				      * to be normalized, then it must
+				      * do so itself.
 				      *
 				      * For obvious reasons, this
-				      * class is not useful in 1d.
+				      * type is not useful in 1d.
 				      */
-    struct FaceVertexTangents 
-    {
-					 /**
-					  * Number of tangent vectors
-					  * that define the tangential
-					  * space. The value is equal
-					  * to @p{dim-1}, with a
-					  * non-sensical value for 1d.
-					  */
-	static const unsigned int n_tangents = (dim>1 ? dim-1 : static_cast<unsigned int>(-1));
-
-					 /**
-					  * Array of tangent vectors,
-					  * as described above.
-					  */
-	Tensor<1,dim> tangents[GeometryInfo<dim>::vertices_per_face][n_tangents];
-    };
-    
+    typedef Tensor<1,dim> FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
 	
 				     /**
 				      * Destructor. Does nothing here, but
@@ -126,37 +110,43 @@ class Boundary : public Subscriptor
     virtual ~Boundary ();
 
 				     /**
-				      * Return the point which shall become
-				      * the new middle vertex of the two
-				      * children of a regular line. In 2D,
-				      * this line is a line at the boundary,
-				      * while in 3d, it is bounding a face
-				      * at the boundary (the lines therefore
-				      * is also on the boundary).
+				      * Return the point which shall
+				      * become the new middle vertex
+				      * of the two children of a
+				      * regular line. In 2D, this line
+				      * is a line at the boundary,
+				      * while in 3d, it is bounding a
+				      * face at the boundary (the
+				      * lines therefore is also on the
+				      * boundary).
 				      */
     virtual Point<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const = 0;
 
 				     /**
-				      * Return the point which shall become
-				      * the common point of the four children
-				      * of a quad at the boundary in three
-				      * or more spatial dimensions. This
-				      * function therefore is only useful in
-				      * at least three dimensions and should
-				      * not be called for lower dimensions.
+				      * Return the point which shall
+				      * become the common point of the
+				      * four children of a quad at the
+				      * boundary in three or more
+				      * spatial dimensions. This
+				      * function therefore is only
+				      * useful in at least three
+				      * dimensions and should not be
+				      * called for lower dimensions.
 				      *
-				      * This function is called after the
-				      * four lines bounding the given @p{quad}
-				      * are refined, so you may want to use
-				      * the information provided by
-				      * @p{quad->line(i)->child(j)}, @p{i=0...3},
-				      * @p{j=0,1}.
+				      * This function is called after
+				      * the four lines bounding the
+				      * given @p{quad} are refined, so
+				      * you may want to use the
+				      * information provided by
+				      * @p{quad->line(i)->child(j)},
+				      * @p{i=0...3}, @p{j=0,1}.
 				      *
-				      * Because in 2D, this function is not
-				      * needed, it is not made pure virtual,
-				      * to avoid the need to overload it.
-				      * The default implementation throws
+				      * Because in 2D, this function
+				      * is not needed, it is not made
+				      * pure virtual, to avoid the
+				      * need to overload it.  The
+				      * default implementation throws
 				      * an error in any case, however.
 				      */
     virtual Point<dim>
@@ -225,18 +215,14 @@ class Boundary : public Subscriptor
 				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
-				      * Compute a basis of the tangent
-				      * space at each vertex of the
-				      * given face. It is not
-				      * necessary to compute
-				      * derivatives in any particular
-				      * direction at each vertex, as
-				      * long as the returned basis
-				      * actually spans a space of
-				      * dimension @p{dim-1}. Also, it
-				      * is not required that the
-				      * tangent vectors be normed
-				      * somehow.
+				      * Compute the normal vectors to
+				      * the boundary at each vertex of
+				      * the given face. It is not
+				      * required that the normal
+				      * vectors be normed
+				      * somehow. Neither is it
+				      * required that the normals
+				      * actually point outward.
 				      *
 				      * This function is
 				      * needed to compute data for C1
@@ -248,17 +234,17 @@ class Boundary : public Subscriptor
 				      * mappings.
 				      *
 				      * Note that when computing
-				      * tangents at a vertex where the
-				      * boundary is not
+				      * normal vectors at a vertex
+				      * where the boundary is not
 				      * differentiable, you have to
 				      * make sure that you compute the
-				      * one-sided derivatives,
-				      * i.e. derivatives with respect
-				      * to the given face.
+				      * one-sided limits, i.e. limit
+				      * with respect to points inside
+				      * the given face.
 				      */
     virtual void
-    get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			      FaceVertexTangents &face_vertex_tangents) const;
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     FaceVertexNormals &face_vertex_normals) const;
       
 			     
 				     /**
@@ -277,42 +263,50 @@ class Boundary : public Subscriptor
 
 
 /**
- *   Specialisation of @ref{Boundary}<dim>, which places the new point right
- *   into the middle of the given points. The middle is defined as the
- *   arithmetic mean of the points.
+ *   Specialisation of @ref{Boundary}<dim>, which places the new point
+ *   right into the middle of the given points. The middle is defined
+ *   as the arithmetic mean of the points.
  *
- *   This class does not really describe a boundary in the usual sense. By
- *   placing new points in the middle of old ones, it rather assumes that the
- *   boundary of the domain is given by the polygon/polyhedron defined by the
- *   boundary of the initial coarse triangulation.
+ *   This class does not really describe a boundary in the usual
+ *   sense. By placing new points in the middle of old ones, it rather
+ *   assumes that the boundary of the domain is given by the
+ *   polygon/polyhedron defined by the boundary of the initial coarse
+ *   triangulation.
  *
- *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
+ *   @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
  */
 template <int dim>
 class StraightBoundary : public Boundary<dim>
 {
   public:
 				     /**
-				      * Let the new point be the arithmetic
-				      * mean of the two vertices of the line.
+				      * Let the new point be the
+				      * arithmetic mean of the two
+				      * vertices of the line.
 				      *
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
-				      * base class for more information.
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class for more
+				      * information.
 				      */
     virtual Point<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
 
 				     /**
-				      * Let the new point be the arithmetic mean
-				      * of the four vertices of this quad and
-				      * the four midpoints of the lines, which
-				      * are already created at the time of calling
-				      * this function.
+				      * Let the new point be the
+				      * arithmetic mean of the four
+				      * vertices of this quad and the
+				      * four midpoints of the lines,
+				      * which are already created at
+				      * the time of calling this
+				      * function.
 				      *
-				      * Refer to the general documentation of
-				      * this class and the documentation of the
-				      * base class for more information.
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class for more
+				      * information.
 				      */
     virtual Point<dim>
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
@@ -350,9 +344,9 @@ class StraightBoundary : public Boundary<dim>
 				     typename std::vector<Point<dim> > &points) const;
 
 				     /**
-				      * Compute a basis of the tangent
-				      * space at each vertex of the
-				      * given face.
+				      * Compute the normals to the
+				      * boundary at the vertices of
+				      * the given face.
 				      *
 				      * Refer to the general
 				      * documentation of this class
@@ -360,8 +354,8 @@ class StraightBoundary : public Boundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_tangents_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			      typename Boundary<dim>::FaceVertexTangents &face_vertex_tangents) const;
+    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
 };
 
 

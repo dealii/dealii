@@ -68,7 +68,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 
       if (line->at_boundary())
 	{
-					   // first get the tangential
+					   // first get the normal
 					   // vectors at the two
 					   // vertices of this line
 					   // from the boundary
@@ -76,8 +76,8 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 	  const Boundary<dim> &boundary
 	    = line->get_triangulation().get_boundary(line->boundary_indicator());
 
-	  Boundary<dim>::FaceVertexTangents face_vertex_tangents;
-	  boundary.get_tangents_at_vertices (line, face_vertex_tangents);
+	  Boundary<dim>::FaceVertexNormals face_vertex_normals;
+	  boundary.get_normals_at_vertices (line, face_vertex_normals);
 
 					   // then transform them into
 					   // interpolation points for
@@ -118,7 +118,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 					   // coefficients from the
 					   // tangentials. for that,
 					   // first rotate the
-					   // tangentials of @p{s(t)}
+					   // tangents of @p{s(t)}
 					   // into the global
 					   // coordinate system. they
 					   // are @p{A (1,c)} and @p{A
@@ -133,7 +133,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 					   // have to make sure by
 					   // matching @p{b,c} that
 					   // these tangentials are
-					   // parallel to those
+					   // orthogonal to the normals
 					   // returned by the boundary
 					   // object
 	  const Tensor<1,2> coordinate_vector = line->vertex(1) - line->vertex(0);
@@ -142,14 +142,14 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 	  coordinate_axis /= h;
 
 	  const double alpha = std::atan2(coordinate_axis[1], coordinate_axis[0]);
-	  const double b = ((face_vertex_tangents.tangents[0][0][0] * sin(alpha)
-			     -face_vertex_tangents.tangents[0][0][1] * cos(alpha)) /
-			    (face_vertex_tangents.tangents[0][0][0] * cos(alpha)
-			     +face_vertex_tangents.tangents[0][0][1] * sin(alpha))),
-		       c = ((face_vertex_tangents.tangents[1][0][0] * sin(alpha)
-			     -face_vertex_tangents.tangents[1][0][1] * cos(alpha)) /
-			    (face_vertex_tangents.tangents[1][0][0] * cos(alpha)
-			     +face_vertex_tangents.tangents[1][0][1] * sin(alpha)));
+	  const double b = ((face_vertex_normals[0][1] * sin(alpha)
+			     +face_vertex_normals[0][0] * cos(alpha)) /
+			    (face_vertex_normals[0][1] * cos(alpha)
+			     -face_vertex_normals[0][0] * sin(alpha))),
+		       c = ((face_vertex_normals[1][1] * sin(alpha)
+			     +face_vertex_normals[1][0] * cos(alpha)) /
+			    (face_vertex_normals[1][1] * cos(alpha)
+			     -face_vertex_normals[1][0] * sin(alpha)));
 
 					   // next evaluate the so
 					   // determined cubic
