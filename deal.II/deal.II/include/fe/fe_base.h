@@ -114,8 +114,22 @@ class FiniteElementData
     const unsigned int dofs_per_cell;
 
 				     /**
-				      * Number of components and dimension of
-				      * the image space.
+				      * Number of vector components of
+				      * this finite element, and
+				      * dimension of the image
+				      * space. For vector-valued
+				      * finite elements (i.e. when
+				      * this number is greater than
+				      * one), the number of vector
+				      * components is in many cases
+				      * equal to the number of base
+				      * elements glued together with
+				      * the help of the @ref{FESystem}
+				      * class. However, for elements
+				      * like the Nedelec element, the
+				      * number is greater than one
+				      * even though we only have one
+				      * base element.
 				      */
     const unsigned int components;
 
