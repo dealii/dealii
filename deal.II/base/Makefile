@@ -88,11 +88,11 @@ $(LIBDIR)/libbase.g.a: $(forward-declarations) $(go-files)
 
 $(LIBDIR)/libbase.so: $(forward-declarations) $(o-files)
 	@echo =====base=============optimized==$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
 
 $(LIBDIR)/libbase.g.so: $(forward-declarations) $(go-files)
 	@echo =====base=============debug======$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
 
 
 

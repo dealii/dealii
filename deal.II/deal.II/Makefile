@@ -118,29 +118,29 @@ $(LIBDIR)/libdeal_II_3d.a: $(o-files-3d)
 
 $(LIBDIR)/libdeal_II_1d.g.so: $(go-files-1d)
 	@echo =====deal.II====1d====debug======$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-1d)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files-1d)
 
 $(LIBDIR)/libdeal_II_1d.so: $(o-files-1d)
 	@echo =====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-1d)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files-1d)
 
 
 $(LIBDIR)/libdeal_II_2d.g.so: $(go-files-2d)
 	@echo =====deal.II====2d====debug======$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-2d)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files-2d)
 
 $(LIBDIR)/libdeal_II_2d.so: $(o-files-2d)
 	@echo =====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-2d)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files-2d)
 
 
 $(LIBDIR)/libdeal_II_3d.g.so: $(go-files-3d)
 	@echo =====deal.II====3d====debug======$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(go-files-3d)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files-3d)
 
 $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 	@echo =====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)
-	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files-3d)
+	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files-3d)
 
 
 

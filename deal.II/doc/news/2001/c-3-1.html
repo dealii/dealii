@@ -27,12 +27,20 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       Change: If in multithreaded mode, the ACE library is now
+       Changed: The libraries are no more linked using the C++
+       compilation flags, but rather using LDFLAGS. Some compilers
+       object to compilation flags on the linker line.
+       <br>
+       (WB 2001/05/23)
+       </p>
+
+  <li> <p>
+       Changed: If in multithreaded mode, the ACE library is now
        automatically added to the <code>$(LIBS)</code> Makefile
        variable. There is no need anymore for a special clause in your
        Makefile.
        <br>
-       (WB 2001/05/22)
+       (WB 2001/05/23)
        </p>
 
   <li> <p>
