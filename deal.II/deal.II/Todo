@@ -18,6 +18,7 @@ Write monitors to control whether enough memory was allocated for
   the vectors (i.e. after a process, whether size()==capacity()).
   (for DoF)
 
+
 Write Triangulation::mesh_function.
 
 
@@ -27,17 +28,21 @@ Unify CellAccessor<1> and <2> by renaming
   and deriving CellAccessor<dim> from SubstructAccessor<dim,dim>
   Do the same with DoFLineAccessor and DoFQuadAccessor
 
+
 Unify FEValues<dim> and FEFaceValues<dim> to FEValues<dim,subdim>
   and use partial specialization.
 
 
 Add support for fast assemblage of mass matrices.
 
+
 Make AssemblerData a local class to Assembler again if gcc2.8 supports it.
 
+
 Let ParameterHandler and DataIn/Out throw exceptions. Make more tests
-  on the input.
+  on the input. Same for output: check whether file could be created etc.
   
+
 Replace function objects by mem_fun, fun_ptr, ... when member function
   templates are supported.
 
@@ -45,11 +50,7 @@ Replace function objects by mem_fun, fun_ptr, ... when member function
 Remove gcc2.8 workaround with DoFSubstructAccessor
 
 
-Use the C++ standard string classes instead of the libg++ String
-  class.
-
-
-Check usage of vectors: functions should assume that the objects have
+Check usage of vector<>s: functions should assume that the objects have
   the right size already.
 
 
@@ -76,7 +77,7 @@ Try to find out what happens if DoFAccessor::get_dof_values is
   that.
 
 
-Change <iostream> in <ostream> in grid/point.h and
+Change <iostream> to <ostream> in grid/point.h and
   grid/tria_iterator.h when this becomes possible.
 
 
@@ -84,6 +85,11 @@ Find and fix the bug in Tria::refine_fixed_fraction
 
 
 Fill in docs for the timer class.
+
+
+Use a correct strategy to output the reduction rate for adaptively
+  refined grids in examples/error-estimation
+
 
 
 
