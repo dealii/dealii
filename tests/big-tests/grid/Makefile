@@ -23,7 +23,7 @@ run-parameters  = 2 1
 
 # To execute additional action apart from running the program, fill
 # in this list:
-additional-run-action = grid_test 2 2 ; grid_test 2 3 ; grid_test 2 4 ; grid_test 3 1 ; grid_test 3 2 ; grid_test 3 3 ; grid_test 3 4 ; gnuplot make_ps
+additional-run-action = grid_test 2 2 ; grid_test 2 3 ; grid_test 2 4 ; grid_test 3 1 ; grid_test 3 2 ; grid_test 3 3 ; grid_test 3 4
 
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the

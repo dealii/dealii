@@ -291,6 +291,7 @@ void test (const int test_case) {
   filename += ('0'+dim);
   filename += "d.";
   filename += ('0'+test_case);
+  filename += ".eps";
   
   ofstream out(filename.c_str());
   GridOut grid_out;
