@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ JobIdentifier::JobIdentifier()
 // It should be possible not to check DEBUG, but there is this
 // tedious -ansi, which causes problems with linux headers
   
-#if (HAVE_GETHOSTNAME && (!DEBUG))
+#if defined(HAVE_GETHOSTNAME) && !defined(DEBUG)
   char name[100];
   gethostname(name,99);
   id += std::string(name) + std::string(" ");
