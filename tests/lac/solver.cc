@@ -99,7 +99,8 @@ int main()
       testproblem.five_point(A);
 
       PreconditionIdentity prec_no;
-      PreconditionRichardson prec_richardson(0.6);
+      PreconditionRichardson prec_richardson;
+      prec_richardson.initialize(0.6);
       PreconditionSOR<> prec_sor;
       prec_sor.initialize(A, 1.2);
       PreconditionSSOR<> prec_ssor;
