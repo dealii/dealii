@@ -46,13 +46,6 @@ using namespace std;
 
 
 
-static inline double sqr (const double x)
-{
-  return x*x;
-};
-
-
-
 template <int dim>
 inline double sqr_point (const Tensor<1,dim> &p)
 {
