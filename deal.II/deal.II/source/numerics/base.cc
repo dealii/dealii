@@ -12,6 +12,7 @@
 #include <basic/function.h>
 #include <fe/fe.h>
 #include <fe/quadrature.h>
+#include <lac/dvector.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 

@@ -10,6 +10,7 @@
 #include <fe/fe_values.h>
 #include <numerics/matrices.h>
 #include <numerics/assembler.h>
+#include <lac/dvector.h>
 #include <lac/dsmatrix.h>
 
 #include <algorithm>

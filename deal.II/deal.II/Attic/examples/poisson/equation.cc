@@ -3,7 +3,7 @@
 
 
 #include "poisson.h"
-
+#include <lac/dvector.h>
 
 
 

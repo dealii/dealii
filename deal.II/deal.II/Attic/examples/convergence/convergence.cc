@@ -17,6 +17,7 @@
 #include <numerics/base.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
+#include <lac/dvector.h>
 
 #include <map>
 #include <fstream>

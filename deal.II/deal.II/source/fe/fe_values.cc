@@ -9,7 +9,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_accessor.h>
-
+#include <lac/dvector.h>
 
 
 /*------------------------------- FEValuesBase ---------------------------*/

@@ -18,6 +18,7 @@
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/error_estimator.h>
+#include <lac/dvector.h>
 
 #include <map.h>
 #include <fstream.h>
