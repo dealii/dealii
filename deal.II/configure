@@ -3122,15 +3122,13 @@ rm -f conftest.$ac_objext conftest.$ac_ext
             CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
           fi
 
-                              if test "x$GXX_VERSION" = "xintel_icc8" ; then
-            CXXFLAGSO="$CXXFLAGSO -vec_report0"
-          fi
-
-          	                                                                                  if test "x$GXX_VERSION" != "xintel_icc5" -a \
-                  "x$GXX_VERSION" != "xintel_icc6" ; then
+          	                                                                                  if test "x$GXX_VERSION" = "xintel_icc7"; then
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias"
-          fi
+                                                  else if test "x$GXX_VERSION" = "xintel_icc8" ; then
+            CXXFLAGSG="$CXXFLAGSG -strict_ansi"
+            CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
+          fi fi
 
 	  	  	  case "$target" in
 	    *86*)

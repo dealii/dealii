@@ -463,12 +463,6 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
           fi
 
-          dnl To avoid the annoying `LOOP WAS VECTORIZED' remarks use
-          dnl -vec_report0 for reducing output
-          if test "x$GXX_VERSION" = "xintel_icc8" ; then
-            CXXFLAGSO="$CXXFLAGSO -vec_report0"
-          fi
-
           dnl We would really like to use  -ansi -Xc, since that
 	  dnl is _very_ picky about standard C++, and is thus very efficient
           dnl in detecting slight standard violations, but these flags are
@@ -478,12 +472,18 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl
           dnl Second thing: icc7 allows using alias information for 
           dnl optimization. Use this.
-          if test "x$GXX_VERSION" != "xintel_icc5" -a \
-                  "x$GXX_VERSION" != "xintel_icc6" ; then
+          if test "x$GXX_VERSION" = "xintel_icc7"; then
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias"
-          fi
-
+          dnl For icc8:
+          dnl 1/ set most pickiest check: strict_ansi
+          dnl 2/ to avoid the annoying `LOOP WAS VECTORIZED' remarks
+          dnl    use -vec_report0 for reducing output
+          else if test "x$GXX_VERSION" = "xintel_icc8" ; then
+            CXXFLAGSG="$CXXFLAGSG -strict_ansi"
+            CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
+          fi fi
+	
 	  dnl If we are on an x86 platform, add -tpp6 -axiMK to optimization
 	  dnl flags
 	  case "$target" in
