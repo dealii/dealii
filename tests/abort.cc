@@ -26,7 +26,7 @@ namespace  deal_II_exceptions
 {
   namespace internals 
   {
-    extern unsigned int n_treated_exceptions;
+    unsigned int n_treated_exceptions;
   }
 }
 
