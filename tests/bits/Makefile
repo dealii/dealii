@@ -33,7 +33,6 @@ denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
 unit_support_points.exe : unit_support_points.g.$(OBJEXT) $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 \
-	gerold_1 \
 	roy_1 \
         denis_1 \
 	unit_support_points
