@@ -215,7 +215,12 @@ namespace internal
 					  * ends are reversed.
 					  */
 	bool operator==(const MSide& s2) const;
-  
+
+					 /**
+					  * Return the opposite.
+					  */
+	bool operator!=(const MSide& s2) const;
+	
 	unsigned int v0;
 	unsigned int v1;
 	unsigned int Q0;

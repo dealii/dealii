@@ -1319,6 +1319,13 @@ namespace internal
       return false;
     }
 
+
+    bool
+    MSide::operator!= (const MSide& s2) const
+    {
+      return !(*this == s2);
+    }
+    
     
     struct MQuad::MakeQuad : public std::binary_function<CellData<2>,
 		                                         std::vector<MSide>,
@@ -1417,9 +1424,7 @@ namespace internal
 		  ss.lsn1=i;
 		}
 	      else
-		{
-		  exit(0);
-		}
+		AssertThrow (false, ExcInternalError());
 	    }
 	  qctr++;
 	}
