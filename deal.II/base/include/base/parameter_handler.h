@@ -1317,10 +1317,13 @@ class ParameterHandler
 				      * function.
 				      *
 				      * The function generates an
-				      * exception if an entry with
-				      * this name already exists, or
-				      * if the default value doesn't
-				      * match the given pattern.
+				      * exception if the default value
+				      * doesn't match the given
+				      * pattern. An entry can be
+				      * declared more than once
+				      * without generating an error,
+				      * for example to override an
+				      * earlier default value.
 				      */
     void declare_entry (const std::string           &entry,
                         const std::string           &default_value,

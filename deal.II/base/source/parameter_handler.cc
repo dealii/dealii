@@ -661,17 +661,20 @@ ParameterHandler::declare_entry (const std::string           &entry,
 {
   Section* p = get_present_defaults_subsection ();
 
-				   // assertions:
-				   // entry must not already exist
-  Assert (p->entries.find (entry) == p->entries.end(),
-	  ExcEntryAlreadyExists (entry));
-				   // Default must match Pattern
+				   // default must match Pattern
   Assert (pattern.match (default_value),
 	  ExcDefaultDoesNotMatchPattern(default_value,
 					pattern.description()));
+
+				   // if the entry already existed,
+				   // make sure we don't create a
+				   // memory leak
+  if (p->entries.find (entry) != p->entries.end())
+    delete p->entries[entry].pattern;
   
-                                   // entry doesn't yet exist, but
-                                   // map::operator[] will create it
+                                   // if the entry didn't yet exist,
+                                   // but map::operator[] will create
+                                   // it
   p->entries[entry].value         = default_value;
   p->entries[entry].documentation = documentation;
   p->entries[entry].pattern       = pattern.clone();
@@ -873,7 +876,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         unsigned int longest_value = 0;
         for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr) 
           longest_value
-            = std::max ((size_t) longest_value,         
+            = std::max (static_cast<size_t> (longest_value),
                         (pc->entries.find(ptr->first) != pc->entries.end()
                          ?
                          pc->entries[ptr->first].value

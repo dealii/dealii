@@ -84,8 +84,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> Changed: The <code
+       class="member">ParameterHandler::declare_entry</code> function
+       now allows to redeclare an entry that has already been
+       declared. This can be used to override a default value
+       previously set.
+       <br>
+       (WB 2002/09/03)
+       </p>
+
   <li> <p> Improved: The <code
-       class="member">ParameterHandler::declare_entry</code> now takes an
+       class="member">ParameterHandler::declare_entry</code> function now takes an
        additional parameter (defaulting to the empty string) that can be used
        to document the intent of a parameter. This string, together with the
        default value of an entry, is written to the output by the <code
