@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, 2002, 2003, 2004, the deal.II authors
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -169,8 +169,7 @@ show-tests:
 
 Makefile.depend: $(shell echo *.cc)
 	@echo =====Dependencies== $@
-	@$D/common/scripts/make_dependencies $(INCLUDE) $^ \
-		| $(PERL) -pi -e 's/\.o:/.g.o:/g;' > $@
+	@$D/common/scripts/make_dependencies $(INCLUDE) $^ > $@
 
 Makefile.tests: $(shell echo *.cc) Makefile
 	@echo =====Targets======= $@
