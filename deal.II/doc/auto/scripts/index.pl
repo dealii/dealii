@@ -30,8 +30,9 @@ print << 'EOT'
 Remark: Lowercase is sorted behind uppercase and destructors are isolated at
 the end.
 <hr>
-<TABLE CELLPADDING=9 CELLSPACING=0 RULES=ROWS BORDER=6>
-<TR><TH><B>function/class</B><TD ALIGN=CENTER><B>in class</B></TR>
+<TABLE CELLPADDING=5 CELLSPACING=0 RULES=ROWS BORDER=2>
+<TR><TH WIDTH=300><B>function/class</B><TH ALIGN=CENTER WIDTH=300><B>in class</B></TR>
+</TABLE>
 EOT
     ;
 foreach $entry (sort @entries)
@@ -40,10 +41,10 @@ foreach $entry (sort @entries)
     @c = split '\+', @l[0];
     @f = split "#", @l[1];
 
-    print "<TR><TH ALIGN=left><A HREF = \"$l[2]/@f[0]\">@c[0]</A><TD>@c[1]</TR>\n";
+    print '<TABLE CELLPADDING=5 CELLSPACING=0 RULES=ROWS BORDER=2>';
+    print "\n<TR><TH ALIGN=left WIDTH=300><A HREF = \"$l[2]/@f[0]\">@c[0]</A><TD WIDTH=300>@c[1]</TR></TABLE>\n";
 }
 print << 'EOT'
-</TABLE>
 </BODY>
 </HTML>
 EOT
