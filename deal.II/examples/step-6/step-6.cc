@@ -22,11 +22,19 @@
 #include <grid/tria_boundary_lib.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <fe/fe_lib.lagrange.h>
 #include <fe/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+				 // From the following include file we
+				 // will import the declaration of the
+				 // quadratic finite element class,
+				 // which in analogy to ``FEQ1'' for
+				 // the linear element is called
+				 // ``FEQ2''. The Lagrange elements of
+				 // poynomial degrees one through four
+				 // are all declared in this file.
+#include <fe/fe_lib.lagrange.h>
 
 				 // We will not read the grid from a
 				 // file as in the previous example,
@@ -82,6 +90,12 @@ class LaplaceProblem
 {
   public:
     LaplaceProblem ();
+				     // For educational purposes, we
+				     // add a destructor here. The
+				     // reason why we do so will be
+				     // explained in the definition of
+				     // this function.
+    ~LaplaceProblem ();
     void run ();
     
   private:
@@ -92,8 +106,13 @@ class LaplaceProblem
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
-    FEQ1<dim>            fe;
     DoFHandler<dim>      dof_handler;
+
+				     // In order to use the quadratic
+				     // element, we only have to
+				     // replace the declaration of the
+				     // ``fe'' variable like this:
+    FEQ2<dim>            fe;
 
 				     // This is the new variable in
 				     // the main class. We need an
@@ -166,10 +185,145 @@ LaplaceProblem<dim>::LaplaceProblem () :
 {};
 
 
+				 // Here comes the added destructor of
+				 // the class. The reason why we
+				 // needed to do so is a subtle change
+				 // in the order of data elements in
+				 // the class as compared to all
+				 // previous examples: the
+				 // ``dof_handler'' object was defined
+				 // before and not after the ``fe''
+				 // object. Of course we could have
+				 // left this order unchanged, but we
+				 // would like to show what happens if
+				 // the order is reversed since this
+				 // produces a rather nasty effect and
+				 // results in an error which is
+				 // difficult to track down if one
+				 // does not know what happens.
+				 //
+				 // Basically what happens is the
+				 // following: when we distribute the
+				 // degrees of freedom using the
+				 // function call
+				 // ``dof_handler.distribute_dofs()'',
+				 // the ``dof_handler'' also stores a
+				 // pointer to the finite element in
+				 // use. Since this pointer is used
+				 // every now and then until either
+				 // the degrees of freedom are
+				 // re-distributed using another
+				 // finite element object or until the
+				 // ``dof_handler'' object is
+				 // detroyed, it would be unwise if we
+				 // would allow the finite element
+				 // object to be deleted before
+				 // ``dof_handler'' object. To
+				 // disallow this, the DoF handler
+				 // increases a counter inside the
+				 // finite element object which counts
+				 // how many objects use that finite
+				 // element (this is what the
+				 // ``Subscriptor'' class is used for,
+				 // in case you want something like
+				 // this for your own programs). The
+				 // finite element object will refuse
+				 // its destruction if that counter is
+				 // larger than zero, since then some
+				 // other objects might rely on the
+				 // persistence of the finite element
+				 // object. An exception will then be
+				 // thrown and the program will
+				 // usually abort upon the attempt to
+				 // destroy the finite element.
+				 //
+				 // As a sidenote, we remark that
+				 // these exception are not
+				 // particularly popular among
+				 // programmers, since they only tell
+				 // us that some other object is still
+				 // using the object that is presently
+				 // destructed, but not which one. It
+				 // is therefore often rather
+				 // time-consuming to find out where
+				 // the problem exactly is, although
+				 // it is then usually straightforward
+				 // to remedy the situation. However,
+				 // we believe that the effort to find
+				 // invalid references to objects that
+				 // do no longer exist is less if the
+				 // problem is detected once the
+				 // reference becomes invalid, rather
+				 // than when non-existent objects are
+				 // actually accessed again, since
+				 // then usually only invalid data is
+				 // accessed, but no error is
+				 // immediately raised.
+				 //
+				 // Coming back to the present
+				 // situation, if we did not write
+				 // this destructor, the compiler will
+				 // generate code that triggers
+				 // exactly the behavious sketched
+				 // above. The reason is that member
+				 // variables of the
+				 // ``LaplaceProblem'' class are
+				 // destructed bottom-up, as always in
+				 // C++. Thus, the finite element
+				 // object will be destructed before
+				 // the DoF handler object, since its
+				 // declaration is below the one of
+				 // the DoF handler. This triggers the
+				 // situation above, and an exception
+				 // will be raised when the ``fe''
+				 // object is destructed. What needs
+				 // to be done is to tell the
+				 // ``dof_handler'' object to release
+				 // its lock to the finite element. Of
+				 // course, the ``dof_handler'' will
+				 // only release its lock if it really
+				 // does not need the finite element
+				 // any more, i.e. when all finite
+				 // element related data is deleted
+				 // from it. For this purpose, the
+				 // ``DoFHandler'' class has a
+				 // function ``clear'' which deletes
+				 // all degrees of freedom, releases
+				 // its lock to the finite element and
+				 // sets its internal pointer to a
+				 // null pointer. After this, you can
+				 // safely destruct the finite element
+				 // object since its internal counter
+				 // is then zero.
+				 //
+				 // For completeness, we add the
+				 // output of the exception that would
+				 // be triggered without this
+				 // destructor to the end of the
+				 // results section of this example.
+template <int dim>
+LaplaceProblem<dim>::~LaplaceProblem () 
+{
+  dof_handler.clear ();
+};
+
+
 
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
+				   // To distribute degrees of
+				   // freedom, the ``dof_handler''
+				   // variable takes only the finite
+				   // element object. In this case, it
+				   // will distribute one degree of
+				   // freedom per vertex, one per line
+				   // and one in the interior of the
+				   // cell. You need not specify these
+				   // details since they are encoded
+				   // into the finite element object
+				   // from which the ``dof_handler''
+				   // gets the necessary information.
   dof_handler.distribute_dofs (fe);
 
 				   // After setting up all the degrees
@@ -206,6 +360,13 @@ void LaplaceProblem<dim>::setup_system ()
 				   // added any more.
   hanging_node_constraints.close ();
 
+				   // Since we use higher order finite
+				   // elements, the maximum number of
+				   // entries per line of the matrix
+				   // is larger than for the linear
+				   // elements. The
+				   // ``max_couplings_between_dofs()''
+				   // function takes care of this:
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   dof_handler.max_couplings_between_dofs());
@@ -251,15 +412,43 @@ template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
   const Coefficient<dim> coefficient;
-
+				   // Since we use a higher order
+				   // finite element, we also need to
+				   // adjust the order of the
+				   // quadrature formula in order to
+				   // integrate the matrix entries
+				   // with sufficient accuracy. For
+				   // the quadratic polynomials of
+				   // which the finite element which
+				   // we use consist, a Gauss formula
+				   // with three points in each
+				   // direction is sufficient.
   QGauss3<dim>  quadrature_formula;
 
+				   // The ``FEValues'' object
+				   // automatically adjusts the
+				   // computation of values to the
+				   // finite element. In fact, the
+				   // ``FEValues'' class does not do
+				   // many computations itself, but
+				   // mostly delegates its work to the
+				   // finite element class to which
+				   // its first parameter
+				   // belongs. That class then knows
+				   // how to compute the values of
+				   // shape functions, etc.
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
 				       update_gradients |
 				       update_q_points  |
 				       update_JxW_values));
 
+				   // Here it comes handy that we have
+				   // introduced an abbreviation for
+				   // the number of degrees of freedom
+				   // per cell before: the following
+				   // value will be set to 9 (in 2D)
+				   // now, where it was 4 before.
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
 
@@ -270,6 +459,20 @@ void LaplaceProblem<dim>::assemble_system ()
 
   vector<double>     coefficient_values (n_q_points);
 
+				   // We can now go on with assembling
+				   // the matrix and right hand
+				   // side. Note that this code is
+				   // copied without change from the
+				   // previous example, even though we
+				   // are now using another finite
+				   // element. The actual difference
+				   // in what is done is inside the
+				   // call to ``fe_values.reinit
+				   // (cell)'', but you need not care
+				   // about what happens there. For
+				   // the user of the ``fe_values''
+				   // object, the actual finite
+				   // element type is transparent.
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 					endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -316,6 +519,11 @@ void LaplaceProblem<dim>::assemble_system ()
 	};
     };
 
+				   // As almost all the stuff before,
+				   // the interpolation of boundary
+				   // values works also for higher
+				   // order elements, but you need not
+				   // change your code for that:
   map<int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -468,12 +676,35 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // error estimator class can't know
 				   // itself which quadrature formula
 				   // might be appropriate, we have to
-				   // pass one to the function. Note
-				   // that since the quadrature has to
-				   // take place along faces, the
-				   // dimension of the quadrature
-				   // formula is ``dim-1'' rather then
-				   // ``dim''.
+				   // pass one to the function (of
+				   // course, the order of the
+				   // quadrature formula should be
+				   // adapted to the finite element
+				   // under consideration). Note that
+				   // since the quadrature has to take
+				   // place along faces, the dimension
+				   // of the quadrature formula is
+				   // ``dim-1'' rather then ``dim''.
+				   //
+				   // (What constitutes a suitable
+				   // quadrature rule here of course
+				   // depends on knowledge of the way
+				   // the error estimator evaluates
+				   // the solution field. As said
+				   // above, the jump of the gradient
+				   // is integrated over each face,
+				   // which would be a quadratic
+				   // function on each face for the
+				   // quadratic elements in use in
+				   // this example. In fact, however,
+				   // it is the square of the jump of
+				   // the gradient, as explained in
+				   // the documentation of that class,
+				   // and that is a quartic function,
+				   // for which a 3 point Gauss
+				   // formula is sufficient since it
+				   // integrates polynomials up to
+				   // order 5 exactly.)
   KellyErrorEstimator<dim>::estimate (dof_handler,
 				      QGauss3<dim-1>(),
 				      neumann_boundary,
@@ -631,11 +862,16 @@ void LaplaceProblem<dim>::run ()
 	};
       
 
-      cout << "   Number of active cells: "
+      cout << "   Number of active cells:       "
 	   << triangulation.n_active_cells()
 	   << endl;
 
       setup_system ();
+
+      cout << "   Number of degrees of freedom: "
+	   << dof_handler.n_dofs()
+	   << endl;
+      
       assemble_system ();
       solve ();
       output_results (cycle);
