@@ -19,6 +19,15 @@
 #include <algorithm>
 
 
+/*
+  Note that in this file, we use std::fabs, std::sqrt, etc
+  everywhere. The reason is that we want to use those version of these
+  functions that take a variable of the template type "Number", rather
+  than the C standard function which accepts and returns a double. The
+  C++ standard library therefore offers overloaded versions of these
+  functions taking floats, or long doubles, with the importance on the
+  additional accuracy when using long doubles.
+ */
 
 template <typename Number>
 static inline Number sqr (const Number x)

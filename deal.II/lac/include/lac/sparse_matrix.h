@@ -266,7 +266,7 @@ class SparseMatrix : public Subscriptor
 				      * case, then the result of this
 				      * operation will not be a
 				      * symmetric matrix, since it
-				      * only explicitely symmetrizes
+				      * only explicitly symmetrizes
 				      * by looping over the lower left
 				      * triangular part for efficiency
 				      * reasons; if there are entries
@@ -724,7 +724,7 @@ class SparseMatrix : public Subscriptor
 				      * readability, elements not in
 				      * the matrix are displayed as
 				      * empty space, while matrix
-				      * elements which are explicitely
+				      * elements which are explicitly
 				      * set to zero are displayed as
 				      * such.
 				      *

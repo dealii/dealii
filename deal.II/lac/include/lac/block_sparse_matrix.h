@@ -37,7 +37,7 @@ template <typename Number> class BlockVector;
  * preconditioners, where each block belongs to a specific component
  * of the equation you are presently discretizing.
  *
- * Note that the number of blocks and rows are implicitely determined
+ * Note that the number of blocks and rows are implicitly determined
  * by the sparsity pattern objects used.
  *
  *

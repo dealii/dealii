@@ -77,7 +77,7 @@ template <typename number> class Vector;
  * unconstrained nodes, the latter on the constrained ones).
  *
  * In iterative solvers, it is not actually necessary to compute $A_X$
- * explicitely, since only matrix-vector operations need to be
+ * explicitly, since only matrix-vector operations need to be
  * performed. This can be done in a three-step procedure that first
  * clears all elements in the incoming vector that belong to
  * constrained nodes, then performs the product with the matrix $A$,

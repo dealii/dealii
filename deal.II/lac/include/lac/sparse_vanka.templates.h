@@ -278,7 +278,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
 					 //   row (as stored in the
 					 //   SparsityPattern object
 					 //
-					 // since we do not explicitely
+					 // since we do not explicitly
 					 // consider nonsysmmetric sparsity
 					 // patterns, the first element
 					 // of each entry simply denotes

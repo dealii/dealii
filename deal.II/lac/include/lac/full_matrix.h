@@ -64,28 +64,46 @@ class FullMatrix : public vector2d<number>
 {
   public:
 				     /**
-				      * Constructor. Initialize the matrix as
-				      * a square matrix with dimension @p{n}.
+				      * Constructor. Initialize the
+				      * matrix as a square matrix with
+				      * dimension @p{n}.
 				      *
 				      * In order to avoid the implicit
-				      * conversion of integers and other types
-				      * to a matrix, this constructor is
-				      * declared @p{explicit}.
+				      * conversion of integers and
+				      * other types to a matrix, this
+				      * constructor is declared
+				      * @p{explicit}.
 				      *
-				      * By default, no memory is allocated.
+				      * By default, no memory is
+				      * allocated.
 				      */
     explicit FullMatrix (const unsigned int n = 0);
     
 				     /**
-				      * Constructor. Initialize the matrix as
-				      * a rectangular matrix.
+				      * Constructor. Initialize the
+				      * matrix as a rectangular
+				      * matrix.
 				      */
     FullMatrix (const unsigned int rows, const unsigned int cols);
     
 				     /** 
-				      * Copy constructor. This constructor does
-				      * a deep copy of the matrix. Therefore,
-				      * it poses an efficiency problem.
+				      * Copy constructor. This
+				      * constructor does a deep copy
+				      * of the matrix. Therefore, it
+				      * poses a possible efficiency
+				      * problem, if for example,
+				      * function arguments are passed
+				      * by value rather than by
+				      * reference. Unfortunately, we
+				      * can't mark this copy
+				      * constructor @p{explicit},
+				      * since that prevents the use of
+				      * this class in containers, such
+				      * as @p{std::vector}. The
+				      * responsibility to check
+				      * performance of programs must
+				      * therefore remains with the
+				      * user of this class.
 				      */
     FullMatrix (const FullMatrix&);
 
@@ -101,11 +119,13 @@ class FullMatrix : public vector2d<number>
 
     
 				     /**
-				      * Comparison operator. Be careful with
-				      * this thing, it may eat up huge amounts
-				      * of computing time! It is most commonly
-				      * used for internal consistency checks
-				      * of programs.
+				      * Comparison operator. Be
+				      * careful with this thing, it
+				      * may eat up huge amounts of
+				      * computing time! It is most
+				      * commonly used for internal
+				      * consistency checks of
+				      * programs.
 				      */
     bool operator == (const FullMatrix<number> &) const;
 
@@ -114,14 +134,16 @@ class FullMatrix : public vector2d<number>
 				      *
 				      * The matrix @p{src} is copied
 				      * into the target. The optional
-				      * values @p{i} and @p{j} determine the
-				      * upper left corner of the image
-				      * of @p{src}.
+				      * values @p{i} and @p{j}
+				      * determine the upper left
+				      * corner of the image of
+				      * @p{src}.
 				      *
 				      * This function requires that
 				      * @p{i+src.m()<=m()} and
-				      * @p{j+src.n()<=n()}, that is, the
-				      * image fits into the space of @p{this}.
+				      * @p{j+src.n()<=n()}, that is,
+				      * the image fits into the space
+				      * of @p{this}.
 				      */
     template<typename number2>
     void fill (const FullMatrix<number2> &src,
@@ -130,7 +152,8 @@ class FullMatrix : public vector2d<number>
     
 
 				     /**
-				      * Make function of base class available.
+				      * Make function of base class
+				      * available.
 				      */
     template<typename number2>
     void fill (const number2*);
@@ -278,7 +301,8 @@ class FullMatrix : public vector2d<number>
 		const bool             adding=false) const;
     
 				     /**
-				      * Transpose matrix-vector-multiplication.
+				      * Transpose
+				      * matrix-vector-multiplication.
 				      * See @p{vmult} above.
 				      */
     template<typename number2>
@@ -476,43 +500,87 @@ class FullMatrix : public vector2d<number>
 				      * Swap  A(i,1-n) <-> A(j,1-n).
 				      * Swap rows i and j of this
 				      */
-    void swap_row (const unsigned int i, const unsigned int j);
+    void swap_row (const unsigned int i,
+		   const unsigned int j);
 
 				     /**
 				      *  Swap  A(1-n,i) <-> A(1-n,j).
 				      *  Swap columns i and j of this
 				      */
-    void swap_col (const unsigned int i, const unsigned int j);
+    void swap_col (const unsigned int i,
+		   const unsigned int j);
+
+				     /**
+				      *  A(i,i)+=B(i,1-n). Addition of complete
+				      *  rows of B to diagonal-elements of this ; <p>
+				      *  ( i = 1 ... m )
+				      */
+    template<typename number2>
+    void add_diag (const number               s,
+		   const FullMatrix<number2> &B);
+
+				     /**
+				      * Add constant to diagonal
+				      * elements of this, i.e. add a
+				      * multiple of the identity
+				      * matrix.
+				      */
+    void diagadd (const number s);
 
 				     /**
 				      * $w=b-A*v$.
 				      * Residual calculation , returns
-				      * the $l_2$-norm $|w|$
+				      * the $l_2$-norm $|w|$.
 				      */
     template<typename number2, typename number3>
-    double residual (Vector<number2>      & w,
-		     const Vector<number2>& v,
-		     const Vector<number3>& b) const;
+    double residual (Vector<number2>       &w,
+		     const Vector<number2> &v,
+		     const Vector<number3> &b) const;
 
 				     /**
 				      * Forward elimination of lower
 				      * triangle.  Inverts the lower
-				      * triangle of a quadratic
-				      * matrix.
+				      * triangle of a quadratic matrix
+				      * for a given right hand side.
 				      *
 				      * If the matrix has more columns
 				      * than rows, this function only
 				      * operates on the left square
 				      * submatrix. If there are more
 				      * rows, the upper square part of
-				      * the matrix is considered
+				      * the matrix is considered.
+				      *
+				      * Note that this function does
+				      * not fit into this class at
+				      * all, since it assumes that the
+				      * elements of this object do not
+				      * represent a matrix, but rather
+				      * a decomposition into two
+				      * factors. Therefore, if this
+				      * assumption holds, all
+				      * functions like multiplication
+				      * by matrices or vectors, norms,
+				      * etc, have no meaning any
+				      * more. Conversely, if these
+				      * functions have a meaning on
+				      * this object, then the
+				      * @p{forward} function has no
+				      * meaning. This bifacial
+				      * property of this class is
+				      * probably a design mistake and
+				      * may once go away by separating
+				      * the @p{forward} and
+				      * @p{backward} functions into a
+				      * class of their own.
 				      */
     template<typename number2>
     void forward (Vector<number2>       &dst,
 		  const Vector<number2> &src) const;
 
 				     /**
-				      * Backward elimination of upper triangle.
+				      * Backward elimination of upper
+				      * triangle.
+				      *
 				      * @see forward
 				      */
     template<typename number2>
@@ -544,21 +612,6 @@ class FullMatrix : public vector2d<number>
 			  Vector<number2> &src);
 
 				     /**
-				      *  A(i,i)+=B(i,1-n). Addition of complete
-				      *  rows of B to diagonal-elements of this ; <p>
-				      *  ( i = 1 ... m )
-				      */
-    template<typename number2>
-    void add_diag (const number               s,
-		   const FullMatrix<number2> &B);
-
-				     /**
-				      *  A(i,i)+=s  i=1-m.
-				      * Add constant to diagonal elements of this
-				      */
-    void diagadd (const number s);
-
-				     /**
 				      * Output of the matrix in
 				      * user-defined format.
 				      */
@@ -574,7 +627,7 @@ class FullMatrix : public vector2d<number>
 				      * readability, elements not in
 				      * the matrix are displayed as
 				      * empty space, while matrix
-				      * elements which are explicitely
+				      * elements which are explicitly
 				      * set to zero are displayed as
 				      * such.
 				      *
