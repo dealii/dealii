@@ -14,10 +14,20 @@
 
 #include <lac/sparse_direct.h>
 #include <base/memory_consumption.h>
+#include <base/thread_management.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 
 #include <iostream>
+#include <list>
+#include <typeinfo>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
+
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -202,6 +212,127 @@ namespace HSL
 
 
 
+namespace CommunicationsLog
+{
+  enum Direction { put, get };
+  
+  struct Record 
+  {
+      Direction             direction;
+      const std::type_info* type;
+      unsigned int          count;
+      unsigned int          scheduled_bytes;
+      unsigned int          completed_bytes;
+      std::string           description;
+  };
+
+  std::list<Record> communication_log;
+
+  
+  template <typename T>
+  void record_communication (const Direction    direction,
+                             const unsigned int count,
+                             const unsigned int completed_bytes,
+                             const std::string &descr)
+  {
+    Record record = {direction, &typeid(T), count,
+                     sizeof(T)*count, completed_bytes, descr};
+    communication_log.push_back (record);
+  };
+
+
+  void list_communication () 
+  {
+    std::cerr << "++++++++++++++++++++++++++++++" << std::endl
+              << "Communiction log history:" << std::endl;
+    
+    for (std::list<Record>::const_iterator i=communication_log.begin();
+         i!=communication_log.end(); ++i)
+      std::cerr << "++ "
+                << (i->direction == put ? "put" : "get")
+                << " "
+                << i->count << " objects of type "
+                << i->type->name()
+                << ", " << i->completed_bytes
+                << " of " << i->scheduled_bytes
+                << " bytes completed, description="
+                << i->description
+                << std::endl;
+    std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
+  };  
+};
+
+
+
+/**
+ * Output an error message and terminate the program.
+ */
+void die (const std::string &text)
+{
+  std::cerr << "+++++ detached_ma27 driver: " << text
+            << std::endl;
+  CommunicationsLog::list_communication ();
+  abort ();
+};
+
+
+/**
+ * Output an error message and terminate the program. Write two error
+ * codes.
+ */
+template <typename T1, typename T2>
+void die (const std::string &text, const T1 t1, const T2 t2)
+{
+  std::cerr << "+++++ detached_ma27 driver: " << text
+            << " code1=" << t1 << ", code2=" << t2
+            << std::endl;
+  CommunicationsLog::list_communication ();
+  abort ();
+};
+
+
+
+/**
+ * loop and check every once in a while whether the mother process is
+ * still existing or has died without giving us due notice. if the
+ * latter is the case, then also exit this process
+ *
+ * check by calling "ps -p PID", where PID is the pid of the
+ * parent. if the return value is non-null, then ps couldn't find out
+ * about the parent process, so it is apparently gone
+ */
+extern "C"
+void monitor_child_liveness (const pid_t child_pid) 
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream s;
+  s << "ps -p " << child_pid;
+  const char * const command = s.str().c_str();
+#else
+  std::ostrstream s;
+  s << "ps -p " << child_pid << std::ends;
+  const char * const command = s.str();
+#endif
+  
+  while (true)
+    {
+      int ret = std::system (command);
+      if (ret < 0)
+        die ("Monitor process couldn't start 'ps'!");
+      else
+        if (ret != 0)
+          die ("Child process seems to have died!");
+
+                                       // ok, master still running,
+                                       // take a little rest and then
+                                       // ask again
+      sleep (10);
+    };
+};
+
+
+Threads::ThreadManager child_liveness_watchers;
+
 
 
 /* -------------------------- MA27 ---------------------------- */
@@ -234,44 +365,48 @@ struct SparseDirectMA27::DetachedModeData
     pid_t child_pid;
 
     template <typename T>
-    void put (const T *t, const size_t N, const char */*debug_info*/) const
+    void put (const T *t, const size_t N, const char *debug_info) const
       {
-        try_write:
-        int ret = write (server_client_pipe[1],
-                         reinterpret_cast<const char *> (t),
-                         sizeof(T) * N);
-                                         // if write call was
-                                         // interrupted, just
-                                         // retry
-        if ((ret<0) && (errno==EINTR))
-          goto try_write;
+                                         // repeat writing until syscall is
+                                         // not interrupted
+        int ret;
+        do
+          ret = write (server_client_pipe[1],
+                       reinterpret_cast<const char *> (t),
+                       sizeof(T) * N);
+        while ((ret<0) && (errno==EINTR));
+        if (ret < 0)
+          die ("error on client side in 'put'", ret, errno);
+        if (ret < static_cast<signed int>(sizeof(T)*N))
+          die ("not everything was written", ret, sizeof(T)*N);
         
-        std::fflush (NULL);
+        fflush (NULL);
+        CommunicationsLog::
+          record_communication<T> (CommunicationsLog::put, N, ret, debug_info);
       };
 
+    
     template <typename T>
-    void get (T *t, const size_t N, const char */*debug_info*/) const
+    void get (T *t, const size_t N, const char *debug_info) const
       {
         unsigned int count = 0;
         while (count < sizeof(T)*N)
           {
-            try_read:
-            int ret = read (client_server_pipe[0],
-                            reinterpret_cast<char *> (t) + count,
-                            sizeof(T) * N - count);
-                                             // if read call was
-                                             // interrupted, just
-                                             // retry
-            if ((ret<0) && (errno==EINTR))
-              goto try_read;
-
-                                             // however, if something
-                                             // more serious happened,
-                                             // then note this!
-            AssertThrow (ret >= 0, ExcReadError(ret, errno));
+            int ret;
+            do
+              ret = read (client_server_pipe[0],
+                          reinterpret_cast<char *> (t) + count,
+                          sizeof(T) * N - count);
+            while ((ret<0) && (errno==EINTR));
             
-            count += ret;
+            if (ret < 0)
+              die ("error on client side in 'get'", ret, errno);
+            else
+              count += ret;
           };
+        
+        CommunicationsLog::
+          record_communication<T> (CommunicationsLog::get, N, count, debug_info);
       };    
 };
 
@@ -407,6 +542,10 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // him this information
       const pid_t parent_pid = getpid();
       detached_mode_data->put (&parent_pid, 1, "parent_pid");
+
+      Threads::spawn (child_liveness_watchers,
+                      Threads::encapsulate(&monitor_child_liveness)
+                      .collect_args (detached_mode_data->child_pid));
     };
   
   
