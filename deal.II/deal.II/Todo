@@ -131,3 +131,9 @@ Move the TriaNumberCache into the Triangulation class once the
 
 Why is dof_renumbering.h in include/numerics, but dof_renumbering.cc
   in source/dofs??
+
+
+DataOut determines whether something is a DoF or cell vector by the
+  size of the vector. This will fail if someone is using DG0 elements,
+  since there the number of elements of both types of vectors is the
+  same, but the ordering will usually differ.
