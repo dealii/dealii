@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <set>
+#include <cmath>
 
 
 
@@ -220,7 +221,15 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 					   // points and finally all of its
 					   // entries in the cell matrix and
 					   // vector should be zero. If not, we
-					   // throw an error
+					   // throw an error (note: because of
+					   // the evaluation of the shape
+					   // functions only up to machine
+					   // precision, the term "must be zero"
+					   // really should mean: "should be
+					   // very small". since this is only an
+					   // assertion and not part of the
+					   // code, we may choose "very small"
+					   // quite arbitrarily)
 					   //
 					   // the main problem here is that the
 					   // matrix or vector entry should also
@@ -257,13 +266,19 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>    &
 			   dof_to_boundary_mapping[dofs[j]],
 			   cell_matrix(i,j));
 	      else
-		Assert (cell_matrix(i,j)==0, ExcInternalError ());
+		{
+		  Assert (fabs(cell_matrix(i,j)) <= 1e-10,
+			  ExcInternalError ());
+		};
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    if (dofs_on_face.find(dofs[j]) != dofs_on_face.end())
 	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
 	    else
-	      Assert (cell_vector(j)==0, ExcInternalError());
+	      {
+		Assert (fabs(cell_vector(j)) <= 1e-10,
+			ExcInternalError());
+	      };
 	};
 };
 
