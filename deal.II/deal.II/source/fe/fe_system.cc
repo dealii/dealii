@@ -24,8 +24,8 @@ void
 FESystem<dim>::build_cell_table()
 {
   unsigned total_index = 0;
-  for (unsigned base=0 ; base < n_base_elements() ; ++base)
-    for (unsigned m = 0; m < element_multiplicity(base); ++m)
+  for (unsigned int base=0 ; base < n_base_elements() ; ++base)
+    for (unsigned int m = 0; m < element_multiplicity(base); ++m)
       component_to_base_table[total_index++] = base;
 
 				   // Initialize index table
@@ -34,23 +34,24 @@ FESystem<dim>::build_cell_table()
   
 				   // 1. Vertices
   total_index = 0;
-  for (unsigned vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_cell ;
+  for (unsigned int vertex_number= 0 ;
+       vertex_number < GeometryInfo<dim>::vertices_per_cell ;
        ++vertex_number)
     {
       unsigned comp_start = 0;
-      for(unsigned base = 0; base < n_base_elements() ;
+      for(unsigned int base = 0; base < n_base_elements() ;
 	  ++base)
 	{
-	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	  for (unsigned int m = 0; m < element_multiplicity(base); ++m)
 	    {
-	      for (unsigned local_index = 0 ;
+	      for (unsigned int local_index = 0 ;
 		   local_index < base_element(base).dofs_per_vertex ;
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
-		    (comp_start+m,
-		     vertex_number*base_element(base).dofs_per_vertex+local_index);
+		    = make_pair (comp_start+m,
+				 vertex_number*base_element(base).dofs_per_vertex
+				 +local_index);
 		}
 	    }
 	  comp_start += element_multiplicity(base);
@@ -58,17 +59,17 @@ FESystem<dim>::build_cell_table()
     }
   
 				   // 2. Lines
-  for (unsigned line_number= 0 ; ((line_number != GeometryInfo<dim>::lines_per_cell) &&
+  for (unsigned int line_number= 0 ; ((line_number != GeometryInfo<dim>::lines_per_cell) &&
 				  (GeometryInfo<dim>::lines_per_cell > 0));
        ++line_number)
     {
       unsigned comp_start = 0;
-      for(unsigned base = 0; base < n_base_elements() ;
+      for(unsigned int base = 0; base < n_base_elements() ;
 	  ++base)
 	{
-	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	  for (unsigned int m = 0; m < element_multiplicity(base); ++m)
 	    {
-	      for (unsigned local_index = 0 ;
+	      for (unsigned int local_index = 0 ;
 		   local_index < base_element(base).dofs_per_line ;
 		   ++local_index)
 		{
@@ -84,25 +85,25 @@ FESystem<dim>::build_cell_table()
     }
   
 				   // 3. Quads
-  for (unsigned quad_number= 0 ; ((quad_number != GeometryInfo<dim>::quads_per_cell) &&
-				  (GeometryInfo<dim>::quads_per_cell > 0));
+  for (unsigned int quad_number= 0 ;
+       ((quad_number != GeometryInfo<dim>::quads_per_cell) &&
+	(GeometryInfo<dim>::quads_per_cell > 0));
        ++quad_number)
     {
-      unsigned comp_start = 0;
-      for(unsigned base = 0; base < n_base_elements() ;
+      unsigned int comp_start = 0;
+      for(unsigned int base = 0; base < n_base_elements() ;
 	  ++base)
 	{
-	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	  for (unsigned int m = 0; m < element_multiplicity(base); ++m)
 	    {
-	      for (unsigned local_index = 0 ;
+	      for (unsigned int local_index = 0 ;
 		   local_index < base_element(base).dofs_per_quad ;
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
-		    (comp_start+m,
-		     quad_number*base_element(base).dofs_per_quad
-		     +local_index+base_element(base).first_quad_index);
+		    = make_pair (comp_start+m,
+				 quad_number*base_element(base).dofs_per_quad
+				 +local_index+base_element(base).first_quad_index);
 		}
 	    }
 	  comp_start += element_multiplicity(base);
@@ -110,25 +111,25 @@ FESystem<dim>::build_cell_table()
     }
   
 				   // 4. Hex
-  for (unsigned hex_number= 0 ; ((hex_number != GeometryInfo<dim>::hexes_per_cell) &&
-				 (GeometryInfo<dim>::hexes_per_cell > 0));
+  for (unsigned int hex_number= 0 ;
+       ((hex_number != GeometryInfo<dim>::hexes_per_cell) &&
+	(GeometryInfo<dim>::hexes_per_cell > 0));
        ++hex_number)
     {
-      unsigned comp_start = 0;
-      for(unsigned base = 0; base < n_base_elements() ;
+      unsigned int comp_start = 0;
+      for(unsigned int base = 0; base < n_base_elements() ;
 	  ++base)
 	{
-	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	  for (unsigned int m = 0; m < element_multiplicity(base); ++m)
 	    {
-	      for (unsigned local_index = 0 ;
+	      for (unsigned int local_index = 0 ;
 		   local_index < base_element(base).dofs_per_hex ;
 		   ++local_index)
 		{
 		  system_to_component_table[total_index++]
-		    = pair<unsigned,unsigned>
-		    (comp_start+m,
-		     hex_number*base_element(base).dofs_per_hex
-		     +local_index+base_element(base).first_hex_index);
+		    = make_pair (comp_start+m,
+				 hex_number*base_element(base).dofs_per_hex
+				 +local_index+base_element(base).first_hex_index);
 		}
 	    }
 	  comp_start += element_multiplicity(base);
@@ -140,11 +141,11 @@ FESystem<dim>::build_cell_table()
 				   // Initialize mapping from components to
 				   // linear index. Fortunately, this is
 				   // the inverse of what we just did.
-  for (unsigned comp=0 ; comp<n_components ; ++comp)
+  for (unsigned int comp=0 ; comp<n_components ; ++comp)
     component_to_system_table[comp]
       .resize(base_element(component_to_base_table[comp]).total_dofs);
 
-  for (unsigned sys=0 ; sys < total_dofs ; ++sys)
+  for (unsigned int sys=0 ; sys < total_dofs ; ++sys)
     component_to_system_table[system_to_component_table[sys].first]
       [system_to_component_table[sys].second] = sys;
 }
@@ -155,8 +156,8 @@ void
 FESystem<dim>::build_face_table()
 {
   unsigned total_index = 0;
-  for (unsigned base=0 ; base < n_base_elements() ; ++base)
-    for (unsigned m = 0; m < element_multiplicity(base); ++m)
+  for (unsigned int base=0 ; base < n_base_elements() ; ++base)
+    for (unsigned int m = 0; m < element_multiplicity(base); ++m)
       component_to_base_table[total_index++] = base;
 
 				   // Initialize index table
@@ -165,16 +166,16 @@ FESystem<dim>::build_face_table()
   
 				   // 1. Vertices
   total_index = 0;
-  for (unsigned vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_face ;
+  for (unsigned int vertex_number= 0 ; vertex_number < GeometryInfo<dim>::vertices_per_face ;
        ++vertex_number)
     {
-      unsigned comp_start = 0;
-      for(unsigned base = 0; base < n_base_elements() ;
+      unsigned int comp_start = 0;
+      for(unsigned int base = 0; base < n_base_elements() ;
 	  ++base)
 	{
-	  for (unsigned m = 0; m < element_multiplicity(base); ++m)
+	  for (unsigned int m = 0; m < element_multiplicity(base); ++m)
 	    {
-	      for (unsigned local_index = 0 ;
+	      for (unsigned int local_index = 0 ;
 		   local_index < base_element(base).dofs_per_vertex ;
 		   ++local_index)
 		{
