@@ -36,25 +36,7 @@ delete-files = grid* sparsity* *.eps
 ###############################################################################
 # Internals
 
-CXX       = c++
-INCLUDE   = -I../../include -I../../../lac/include \
-            -I../../../base/include -I../../../mia/include
-CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti -fno-exceptions \
-            $(INCLUDE)
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
-           -funroll-loops -felide-constructors -fnonnull-objects \
-           -fno-rtti -fno-exceptions $(INCLUDE)
-
-
-# if on specific systems, change compiler path
-ifeq ($(shell uname),Linux)
-CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
-endif
-
-ifeq ($(shell uname),SunOS)
-CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
-endif
+include ../../Make.global_options
 
 
 # get lists of files we need
