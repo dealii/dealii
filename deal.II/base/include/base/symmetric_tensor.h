@@ -40,6 +40,10 @@ namespace internal
     template <int rank, int dim>
     struct StorageType;
 
+                                     /**
+                                      * Specialization of StorageType for
+                                      * rank-2 tensors.
+                                      */
     template <int dim>
     struct StorageType<2,dim> 
     {
@@ -52,7 +56,7 @@ namespace internal
                                           * classes that need it.
                                           */
         static const unsigned int
-        n_independent_tensor_components = (dim*dim + dim)/2;
+        n_independent_components = (dim*dim + dim)/2;
 
                                          /**
                                           * Declare the type in which we actually
@@ -63,7 +67,7 @@ namespace internal
                                           * any assumptions about the storage
                                           * format in your application programs.
                                           */
-        typedef Tensor<1,n_independent_tensor_components> base_tensor_type;
+        typedef Tensor<1,n_independent_components> base_tensor_type;
     };
     
     
@@ -632,7 +636,7 @@ SymmetricTensor<2,dim>::operator * (const SymmetricTensor &s) const
   for (; i<dim; ++i)
     t += data[i] * s.data[i];
 
-  for (; i<internal::SymmetricTensor::StorageType<2,dim>::n_independent_tensor_components; ++i)
+  for (; i<internal::SymmetricTensor::StorageType<2,dim>::n_independent_components; ++i)
     t += 2 * data[i] * s.data[i];
 
   return t;
