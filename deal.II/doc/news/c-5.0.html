@@ -99,6 +99,21 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: The <code class="class">CompressedSparsityPattern</code>
+       class used one of the C++ standard containers to store the column
+       indices of nonzero entries in a sparse matrix. This proved to be
+       inefficient since it requires the allocation of 20 bytes each time an
+       element was added, which for large matrices can be millions of
+       times. The new storage format uses a more compact data structure, and a
+       cache that requires memory allocation only every 8 additions, on
+       average. This should significantly reduce the total amount of memory
+       required as well as memory fragmentation. It also cuts run-time for
+       element addition by more than half.
+       <br> 
+       (WB 2004/06/21)
+       </p>
+
+  <li> <p>
        Fixed: <code
        class="member">CompressedSparsityPattern::max_entries_per_row()</code>
        ignored the first row and thus sometimes returned a value that was too
