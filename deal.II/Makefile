@@ -140,7 +140,7 @@ TAGS: $(filter-out %/forward_declarations.h,                                \
 	@cd $D/common ; etags $^
 
 
-clean: clean-base clean-lac clean-dealII clean-doc
+clean: clean-base clean-lac clean-dealII clean-doc clean-examples
 	-rm -f TODO common/TAGS
 
 clean-base:
@@ -155,8 +155,11 @@ clean-dealII:
 clean-doc:
 	cd $D/doc ; $(MAKE) clean
 
+clean-examples:
+	cd $D/examples ; $(MAKE) clean
 
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc printable-doc tex-doc \
-        clean clean-base clean-lac clean-dealII clean-doc TAGS TODO
+        clean clean-base clean-lac clean-dealII \
+	clean-doc clean-examples TAGS TODO
