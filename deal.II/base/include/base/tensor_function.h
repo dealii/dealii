@@ -61,6 +61,13 @@ class VectorFunction //<dim>
 				      * already has the right size, i.e.
 				      * the same size as the #n_components#
 				      * array.
+				      *
+				      * Usually only #value_list# is called,
+				      * e.g. by #FEValues#. So, to avoid 
+				      * multiple calling of this virtual function
+				      * by #value_list#, implement the vectorfunction
+				      * directly in #value_list# of the derived
+				      * class.
 				      */
     virtual void value (const Point<dim>  &p, Vector<double> &values) const;
 
@@ -71,6 +78,10 @@ class VectorFunction //<dim>
 				      * already has the right size, i.e.
 				      * the same size as the #points#
 				      * array.
+				      *
+				      * This function uses multiple calling
+				      * of the virtual function #value# (see there).
+				      * If possible, overload this function.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
 			     vector<Vector<double> > &values) const;
