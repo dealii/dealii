@@ -430,7 +430,7 @@ namespace Evaluation
     std::ostrstream filename;
 #endif
     filename << output_name_base << "-"
-	     << refinement_cycle
+	     << this->refinement_cycle
 	     << ".eps"
 	     << std::ends;
 #ifdef HAVE_STD_STRINGSTREAM
@@ -931,8 +931,8 @@ namespace LaplaceSolver
   PrimalSolver<dim>::output_solution () const
   {
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
+    data_out.attach_dof_handler (this->dof_handler);
+    data_out.add_data_vector (this->solution, "solution");
     data_out.build_patches ();
 
 #ifdef HAVE_STD_STRINGSTREAM
@@ -941,7 +941,7 @@ namespace LaplaceSolver
     std::ostrstream filename;
 #endif
     filename << "solution-"
-	     << refinement_cycle
+	     << this->refinement_cycle
 	     << ".gnuplot"
 	     << std::ends;
 #ifdef HAVE_STD_STRINGSTREAM
@@ -960,7 +960,7 @@ namespace LaplaceSolver
   PrimalSolver<dim>::
   assemble_rhs (Vector<double> &rhs) const 
   {
-    FEValues<dim> fe_values (*fe, *quadrature, 
+    FEValues<dim> fe_values (*this->fe, *this->quadrature, 
 			     UpdateFlags(update_values    |
 					 update_q_points  |
 					 update_JxW_values));
@@ -973,8 +973,8 @@ namespace LaplaceSolver
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+      cell = this->dof_handler.begin_active(),
+      endc = this->dof_handler.end();
     for (; cell!=endc; ++cell)
       {
 	cell_rhs.clear ();
@@ -1040,7 +1040,7 @@ namespace LaplaceSolver
   void
   RefinementGlobal<dim>::refine_grid ()
   {
-    triangulation->refine_global (1);
+    this->triangulation->refine_global (1);
   };
 
 
@@ -1082,13 +1082,13 @@ namespace LaplaceSolver
   void
   RefinementKelly<dim>::refine_grid ()
   {
-    Vector<float> estimated_error_per_cell (triangulation->n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
+    Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
+    KellyErrorEstimator<dim>::estimate (this->dof_handler,
 					QGauss3<dim-1>(),
 					typename FunctionMap<dim>::type(),
-					solution,
+					this->solution,
 					estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
+    GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error_per_cell,
 						     0.3, 0.03);
     triangulation->execute_coarsening_and_refinement ();
@@ -1173,11 +1173,11 @@ namespace LaplaceSolver
 				     // library. What exactly is
 				     // computed can be read in the
 				     // documentation of that class.
-    Vector<float> estimated_error (triangulation->n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
+    Vector<float> estimated_error (this->triangulation->n_active_cells());
+    KellyErrorEstimator<dim>::estimate (this->dof_handler,
 					*face_quadrature,
 					typename FunctionMap<dim>::type(),
-					solution,
+					this->solution,
 					estimated_error);
 
 				     // Now we are going to weight
@@ -1191,7 +1191,7 @@ namespace LaplaceSolver
       estimated_error(cell_index)
 	*= weighting_function->value (cell->center());
     
-    GridRefinement::refine_and_coarsen_fixed_number (*triangulation,
+    GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
 						     estimated_error,
 						     0.3, 0.03);
     triangulation->execute_coarsening_and_refinement ();
@@ -2275,7 +2275,7 @@ namespace LaplaceSolver
   DualSolver<dim>::
   assemble_rhs (Vector<double> &rhs) const 
   {
-    dual_functional->assemble_rhs (dof_handler, rhs);
+    dual_functional->assemble_rhs (this->dof_handler, rhs);
   };
 
 
@@ -2710,7 +2710,7 @@ namespace LaplaceSolver
 				     // First call the function that
 				     // computes the cell-wise and
 				     // global error:
-    Vector<float> error_indicators (triangulation->n_active_cells());
+    Vector<float> error_indicators (this->triangulation->n_active_cells());
     estimate_error (error_indicators);
 
 				     // Then note that marking cells
@@ -2734,7 +2734,7 @@ namespace LaplaceSolver
 				     // smallest indicators that make
 				     // up for the bottom 2 per cent
 				     // of the error.
-    GridRefinement::refine_and_coarsen_fixed_fraction (*triangulation,
+    GridRefinement::refine_and_coarsen_fixed_fraction (*this->triangulation,
 						       error_indicators,
 						       0.8, 0.02);
     triangulation->execute_coarsening_and_refinement ();
@@ -2864,7 +2864,7 @@ namespace LaplaceSolver
     std::ostrstream filename;
 #endif
     filename << "solution-"
-	     << refinement_cycle
+	     << this->refinement_cycle
 	     << ".gnuplot"
 	     << std::ends;
 #ifdef HAVE_STD_STRINGSTREAM
