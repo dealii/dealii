@@ -158,6 +158,90 @@ void GridGenerator::hyper_cube (Triangulation<dim> &tria,
 }
 
 
+template <int dim>
+void
+GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
+                                      const unsigned int  repetitions,
+                                      const double        left,
+                                      const double        right)
+{
+  Assert (repetitions >= 1, ExcInvalidRepetitions(repetitions));
+  
+                                   // first generate the necessary
+                                   // points
+  const double delta = (right-left)/repetitions;
+  std::vector<Point<dim> > points;
+  switch (dim)
+    {
+      case 1:
+            for (unsigned int x=0; x<=repetitions; ++x)
+              points.push_back (Point<dim> (left+x*delta));
+            break;
+
+      case 2:
+            for (unsigned int y=0; y<=repetitions; ++y)
+              for (unsigned int x=0; x<=repetitions; ++x)
+                points.push_back (Point<dim> (left+x*delta,
+                                              left+y*delta));
+            break;
+
+      case 3:
+            for (unsigned int z=0; z<=repetitions; ++z)
+              for (unsigned int y=0; y<=repetitions; ++y)
+                for (unsigned int x=0; x<=repetitions; ++x)
+                  points.push_back (Point<dim> (left+x*delta,
+                                                left+y*delta,
+                                                left+z*delta));
+            break;
+
+      default:
+            Assert (false, ExcNotImplemented());
+    }
+
+                                   // next create the cells
+				   // Prepare cell data
+  std::vector<CellData<dim> > cells;
+  switch (dim)
+    {
+      case 1:
+            cells.resize (repetitions);
+            for (unsigned int x=0; x<repetitions; ++x)
+              {
+                cells[x].vertices[0] = x;
+                cells[x].vertices[1] = x+1;
+                cells[x].material_id = 0;
+              }
+            break;
+
+      case 2:
+            cells.resize (repetitions*repetitions);
+            for (unsigned int y=0; y<repetitions; ++y)
+              for (unsigned int x=0; x<repetitions; ++x)
+                {
+                  const unsigned int c = x+y*repetitions;
+                  cells[c].vertices[0] = y*(repetitions+1)+x;
+                  cells[c].vertices[1] = y*(repetitions+1)+x+1;
+                  cells[c].vertices[2] = (y+1)*(repetitions+1)+x+1;
+                  cells[c].vertices[3] = (y+1)*(repetitions+1)+x;
+                  cells[c].material_id = 0;
+                }
+            break;
+
+      default:
+                                             // should be trivial to
+                                             // do for 3d as well, but
+                                             // am too tired at this
+                                             // point of the night to
+                                             // do that...
+                                             //
+                                             // contributions are welcome!
+            Assert (false, ExcNotImplemented());
+    }
+
+  tria.create_triangulation (points, cells, SubCellData());  
+}
+
+
 #if deal_II_dimension == 1
 
 void GridGenerator::hyper_cube_slit (Triangulation<1> &,
@@ -1013,6 +1097,13 @@ template void
 GridGenerator::hyper_cube<deal_II_dimension> (Triangulation<deal_II_dimension> &,
 					      const double,
 					      const double);
+
+template void
+GridGenerator::subdivided_hyper_cube<deal_II_dimension> (Triangulation<deal_II_dimension> &,
+                                                         const unsigned int,
+                                                         const double,
+                                                         const double);
+
 
 #if deal_II_dimension != 1
 template void
