@@ -344,6 +344,8 @@ namespace PETScWrappers
                             &row_values[0], INSERT_VALUES);
             }
           compress ();
+
+//TODO: We should use the appropriate option with MatSetOption here indicating that we do not intend to add any further matrix entries. Maybe this would accelerate some things as well
         }
     }
     
