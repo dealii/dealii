@@ -20,7 +20,7 @@ PolynomialsP<dim>::PolynomialsP (const unsigned int k)
 		PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(k)),
 		k(k)
 {
-  std::vector<unsigned int> index_map(n());
+  std::vector<unsigned int> index_map(this->n());
   create_polynomial_ordering(index_map);
   set_polynomial_ordering(index_map);
 }
@@ -30,10 +30,11 @@ template <>
 void PolynomialsP<1>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size()==n(), ExcDimensionMismatch(index_map.size(), n()));
+  Assert(index_map.size()==this->n(),
+	 ExcDimensionMismatch(index_map.size(), this->n()));
 
 				   // identity
-  for (unsigned int i=0; i<n(); ++i)
+  for (unsigned int i=0; i<this->n(); ++i)
     index_map[i]=i;
 }
 
@@ -53,7 +54,8 @@ template <>
 void PolynomialsP<2>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size()==n(), ExcDimensionMismatch(index_map.size(), n()));
+  Assert(index_map.size()==this->n(),
+	 ExcDimensionMismatch(index_map.size(), this->n()));
   Assert(k<=5, ExcNotImplemented());
   
 				   // Given the number i of the
@@ -62,7 +64,7 @@ void PolynomialsP<2>::create_polynomial_ordering(
 				   // index_map[i] gives the number of
 				   // the polynomial in
 				   // PolynomialSpace.
-  for (unsigned int i=0; i<n(); ++i)
+  for (unsigned int i=0; i<this->n(); ++i)
     index_map[i]=imap2[k][i];
 }
 
@@ -78,7 +80,8 @@ template <>
 void PolynomialsP<3>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size()==n(), ExcDimensionMismatch(index_map.size(), n()));
+  Assert(index_map.size()==this->n(),
+	 ExcDimensionMismatch(index_map.size(), this->n()));
   Assert(k<=3, ExcNotImplemented());
   
 				   // Given the number i of the
@@ -87,7 +90,7 @@ void PolynomialsP<3>::create_polynomial_ordering(
 				   // index_map[i] gives the number of
 				   // the polynomial in
 				   // PolynomialSpace.
-  for (unsigned int i=0; i<n(); ++i)
+  for (unsigned int i=0; i<this->n(); ++i)
     index_map[i]=imap3[k][i];
 }
 
