@@ -107,6 +107,25 @@ class BlockSparseMatrix : public Subscriptor
 				      */
     virtual void reinit (const BlockSparsityPattern<rows,columns> &sparsity);
 
+    
+				     /**
+				      * Access the block with the
+				      * given coordinates.
+				      */
+    SparseMatrix<number> &
+    block (const unsigned int row,
+	   const unsigned int column);
+    
+    
+				     /**
+				      * Access the block with the
+				      * given coordinates. Version for
+				      * constant objects.
+				      */
+    const SparseMatrix<number> &
+    block (const unsigned int row,
+	   const unsigned int column) const;    
+
 				     /**
 				      * Release all memory and return
 				      * to a state just like after
@@ -312,6 +331,29 @@ BlockSparseMatrix<number,rows,columns>::reinit (const BlockSparsityPattern<rows,
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
       sub_objects[r][c].reinit (sparsity.block(r,c));
+};
+
+
+
+
+template <int rows, int columns>
+inline
+SparseMatrix<number>
+BlockSparseMatrix<number,rows,columns>::block (const unsigned int row,
+					       const unsigned int column)
+{
+  return sub_objects[row][column];
+};
+
+
+
+template <int rows, int columns>
+inline
+const SparseMatrix<number> &
+BlockSparseMatrix<number,rows,columns>::block (const unsigned int row,
+					       const unsigned int column) const
+{
+  return sub_objects[row][column];
 };
 
 
