@@ -261,11 +261,18 @@ SparsityPattern::reinit (const unsigned int m,
 				   // this number is larger than
 				   // #max_vec_len#, then we will need
 				   // to reallocate memory
-  const unsigned int vec_len = accumulate (row_lengths.begin(),
-					   row_lengths.end(), 0);
+				   //
+				   // note that the number of elements
+				   // is bounded by the number of
+				   // columns
+  unsigned int vec_len = 0;
+  for (unsigned int i=0; i<m; ++i)
+    vec_len += min(row_lengths[i], n);
+
   max_row_length = (row_lengths.size() == 0 ?
 		    0 :
-		    *max_element(row_lengths.begin(), row_lengths.end()));
+		    min (*max_element(row_lengths.begin(), row_lengths.end()),
+			 n));
 
 
 				   // allocate memory for the rowstart
