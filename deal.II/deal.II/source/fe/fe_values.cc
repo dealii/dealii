@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -371,11 +371,11 @@ void FEValuesBase<dim>::get_function_values (
 {
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe->n_components() == 1,
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(fe->n_components(), 1));
   Assert (values.size() == n_quadrature_points,
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -410,14 +410,14 @@ void FEValuesBase<dim>::get_function_values (
 				   // This function fills a single
 				   // component only
   Assert (fe->n_components() == 1,
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(fe->n_components(), 1));
 				   // One index for each dof
   Assert (indices.size() == dofs_per_cell,
 	  ExcDimensionMismatch(indices.size(), dofs_per_cell));
 				   // This vector has one entry for
 				   // each quadrature point
   Assert (values.size() == n_quadrature_points,
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
   
 				   // initialize with zero
   std::fill_n (values.begin(), n_quadrature_points, 0);
@@ -446,22 +446,23 @@ void FEValuesBase<dim>::get_function_values (
 				   // This vector must correspond to a
 				   // complete discretization
 //  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
-//	  ExcWrongVectorSize(fe_function.size(),
+//	  ExcDimensionMismatch(fe_function.size(),
 //			     present_cell->get_dof_handler().n_dofs()));
 				   // One entry per quadrature point
   Assert (values.size() == n_quadrature_points,
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
 				   // Assert that we can write all
 				   // components into the result
 				   // vectors
   for (unsigned i=0;i<values.size();++i)
-    Assert (values[i].size() == n_components, ExcWrongNoOfComponents());
+    Assert (values[i].size() == n_components,
+	    ExcDimensionMismatch(values[i].size(), n_components));
   
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
     
 				   // get function values of dofs
 				   // on this cell
@@ -500,7 +501,7 @@ void FEValuesBase<dim>::get_function_values (
 {
 				   // One value per quadrature point
   Assert (n_quadrature_points == values.size(),
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
   
   const unsigned int n_components = fe->n_components();
   
@@ -566,11 +567,11 @@ get_function_grads (const InputVector           &fe_function,
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
 
   Assert (fe->n_components() == 1,
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(fe->n_components(), 1));
   Assert (gradients.size() == n_quadrature_points,
-	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+	  ExcDimensionMismatch(gradients.size(), n_quadrature_points));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -607,14 +608,14 @@ void FEValuesBase<dim>::get_function_grads (
 				   // This function fills a single
 				   // component only
   Assert (fe->n_components() == 1,
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(fe->n_components(), 1));
 				   // One index for each dof
   Assert (indices.size() == dofs_per_cell,
 	  ExcDimensionMismatch(indices.size(), dofs_per_cell));
 				   // This vector has one entry for
 				   // each quadrature point
   Assert (values.size() == n_quadrature_points,
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
   
 				   // initialize with zero
   std::fill_n (values.begin(), n_quadrature_points, Tensor<1,dim>());
@@ -642,15 +643,16 @@ get_function_grads (const InputVector                         &fe_function,
 		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (n_quadrature_points == gradients.size(),
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(gradients.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
   for (unsigned i=0; i<gradients.size(); ++i)
-    Assert (gradients[i].size() == n_components, ExcWrongNoOfComponents());
+    Assert (gradients[i].size() == n_components,
+	    ExcDimensionMismatch(gradients[i].size(), n_components));
 
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -696,7 +698,7 @@ void FEValuesBase<dim>::get_function_grads (
 {
 				   // One value per quadrature point
   Assert (n_quadrature_points == values.size(),
-	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
   
   const unsigned int n_components = fe->n_components();
   
@@ -760,12 +762,12 @@ get_function_2nd_derivatives (const InputVector           &fe_function,
 			      std::vector<Tensor<2,dim> > &second_derivatives) const
 {
   Assert (fe->n_components() == 1,
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(fe->n_components(), 1));
   Assert (second_derivatives.size() == n_quadrature_points,
-	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
+	  ExcDimensionMismatch(second_derivatives.size(), n_quadrature_points));
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -800,15 +802,16 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 			      std::vector<std::vector<Tensor<2,dim> > > &second_derivs) const
 {
   Assert (n_quadrature_points == second_derivs.size(),
-	  ExcWrongNoOfComponents());
+	  ExcDimensionMismatch(second_derivs.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
   for (unsigned i=0;i<second_derivs.size();++i)
-    Assert (second_derivs[i].size() == n_components, ExcWrongNoOfComponents());
+    Assert (second_derivs[i].size() == n_components,
+	    ExcDimensionMismatch(second_derivs[i].size(), n_components));
 
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcWrongVectorSize(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
