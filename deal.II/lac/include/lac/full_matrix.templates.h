@@ -105,6 +105,7 @@ FullMatrix<number>::reinit (const FullMatrix<number2> &B)
 };
 
 
+
 template <typename number>
 template <typename number2>
 void
@@ -232,6 +233,7 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
     }
   }
 }
+
 
 
 template <typename number>
@@ -367,6 +369,8 @@ void FullMatrix<number>::gsmult (Vector<number2>& dst, const Vector<number2>& sr
   }
 }
 
+
+
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::Tvmult (Vector<number2>& dst, const Vector<number2>& src, const bool adding) const
@@ -387,6 +391,8 @@ void FullMatrix<number>::Tvmult (Vector<number2>& dst, const Vector<number2>& sr
     else dst(i) += s;
   }
 }
+
+
 
 template <typename number>
 template <typename number2, typename number3>
@@ -412,6 +418,8 @@ double FullMatrix<number>::residual (Vector<number2>& dst, const Vector<number2>
   return sqrt(res);
 }
 
+
+
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::forward (Vector<number2>& dst, const Vector<number2>& src) const
@@ -431,6 +439,8 @@ void FullMatrix<number>::forward (Vector<number2>& dst, const Vector<number2>& s
     }
 }
 
+
+
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::backward (Vector<number2>& dst, const Vector<number2>& src) const
@@ -445,6 +455,8 @@ void FullMatrix<number>::backward (Vector<number2>& dst, const Vector<number2>& 
       dst(i) = s/el(i,i);
     }
 }
+
+
 
 template <typename number>
 template <typename number2>
@@ -463,6 +475,8 @@ FullMatrix<number>::operator = (const FullMatrix<number2>& m)
   return *this;
 }
 
+
+
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::fill (const FullMatrix<number2>& src,
@@ -476,6 +490,8 @@ void FullMatrix<number>::fill (const FullMatrix<number2>& src,
       el(ii+i,jj+j) = src.el(ii,jj);
 }
 
+
+
 template <typename number>
 void FullMatrix<number>::add_row (const unsigned int i,
 			const number s, const unsigned int j)
@@ -483,6 +499,8 @@ void FullMatrix<number>::add_row (const unsigned int i,
   for (unsigned int k=0; k<m(); ++k)
     el(i,k) += s*el(j,k);
 }
+
+
 
 template <typename number>
 void FullMatrix<number>::add_row (const unsigned int i, const number s,
@@ -494,6 +512,8 @@ void FullMatrix<number>::add_row (const unsigned int i, const number s,
     el(i,l) += s*el(j,l) + t*el(k,l);
 }
 
+
+
 template <typename number>
 void FullMatrix<number>::add_col (const unsigned int i, const number s,
 			const unsigned int j)
@@ -501,6 +521,8 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
   for (unsigned int k=0; k<n(); ++k)
     el(k,i) += s*el(k,j);
 }
+
+
 
 template <typename number>
 void FullMatrix<number>::add_col (const unsigned int i, const number s,
@@ -510,6 +532,8 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
   for (unsigned int l=0; l<n(); ++l)
     el(l,i) += s*el(l,j) + t*el(l,k);
 }
+
+
 
 template <typename number>
 void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
@@ -521,6 +545,8 @@ void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
   }
 }
 
+
+
 template <typename number>
 void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
 {
@@ -531,6 +557,8 @@ void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
   }
 }
 
+
+
 template <typename number>
 void FullMatrix<number>::diagadd (const number src)
 {
@@ -538,6 +566,8 @@ void FullMatrix<number>::diagadd (const number src)
   for (unsigned int i=0; i<n(); ++i)
     el(i,i) += src;
 }
+
+
 
 template <typename number>
 template <typename number2>
@@ -557,6 +587,8 @@ void FullMatrix<number>::mmult (FullMatrix<number2>& dst, const FullMatrix<numbe
       }
 }
 
+
+
 /*void FullMatrix<number>::mmult (FullMatrix& dst, const FullMatrix& src) const
 {
   Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
@@ -574,6 +606,8 @@ void FullMatrix<number>::mmult (FullMatrix<number2>& dst, const FullMatrix<numbe
 	dst.el(i,j) = s;
       }
 }*/
+
+
 
 template <typename number>
 template <typename number2>
@@ -593,6 +627,8 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>& dst, const FullMatrix<numb
 	dst.el(i,j) = s;
       }
 }
+
+
 
 /*void FullMatrix<number>::Tmmult(FullMatrix& dst, const FullMatrix& src) const
 {
@@ -670,6 +706,7 @@ double FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u, cons
 };
 
 
+
 template <typename number>
 number FullMatrix<number>::l1_norm () const
 {
@@ -686,6 +723,7 @@ number FullMatrix<number>::l1_norm () const
     }
   return max;
 };
+
 
 
 template <typename number>
@@ -706,6 +744,7 @@ number FullMatrix<number>::linfty_norm () const
 };
 
 
+
 template <typename number>
 void
 FullMatrix<number>::print (ostream& s, int w, int p) const
@@ -717,6 +756,8 @@ FullMatrix<number>::print (ostream& s, int w, int p) const
       s << endl;
     }
 }
+
+
 
 template <typename number>
 template <typename number2>
@@ -957,6 +998,8 @@ FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
   }
 }
 
+
+
 template <typename number>
 template <typename number2>
 void
@@ -1081,6 +1124,7 @@ FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
 }
 
 
+
 template <typename number>
 bool
 FullMatrix<number>::operator == (const FullMatrix<number> &m) const
@@ -1093,6 +1137,7 @@ FullMatrix<number>::operator == (const FullMatrix<number> &m) const
       if (el(i,j) != m.el(i,j)) return false;
   return true;
 };
+
 
 
 template <typename number>
@@ -1121,6 +1166,8 @@ FullMatrix<number>::determinant () const
     };
 };
 
+
+
 template <typename number>
 double
 FullMatrix<number>::norm2 () const
@@ -1130,6 +1177,7 @@ FullMatrix<number>::norm2 () const
     s += val[i]*val[i];
   return s;
 }
+
 
 
 template <typename number>
@@ -1428,6 +1476,8 @@ FullMatrix<number>::householder(Vector<number2>& src)
     el(j,j) = dj;
   }
 }
+
+
 
 template <typename number>
 template <typename number2>
