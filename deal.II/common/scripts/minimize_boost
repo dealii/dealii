@@ -3,16 +3,16 @@
 # author: Ralf Hartmann, 2004
 
 
-echo "Running $(pwd)/minimize_boost"
+echo Running `pwd`/minimize_boost
 
 # path of the (original) boost library, e.g.
-O="/home/rhartman/tmp/boost-1.30.2"
+O=/home/atlas2/hartmann/tmp
 # directory of the deal.II library
-Dtmp="$(pwd)/../.."
+Dtmp=`pwd`/../..
 cd $Dtmp && \
-D="$(pwd)"
+D=`pwd`
 # minimized boost library in deal.II
-B="$D/contrib/boost/include"
+B=$D/contrib/boost/include
 
 # when following files compile we assume that the whole library compiles
 F="$D/lib/base/data_out_base.g.o $D/lib/base/polynomial.g.o $D/lib/base/subscriptor.g.o $D/lib/base/thread_management.g.o"
