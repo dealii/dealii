@@ -50,7 +50,15 @@ class SparseMIC : public SparseLUDecomposition<number>
                                       */
     SparseMIC (const SparsityPattern &sparsity);
     
-    typedef SparseLUDecomposition<number>::AdditionalData AdditionalData;
+				     /**
+				      * Make the @p{AdditionalData}
+				      * type in the base class
+				      * accessible to this class as
+				      * well.
+				      */
+    typedef
+    typename SparseLUDecomposition<number>::AdditionalData
+    AdditionalData;
 
 				     /**
 				      * Reinitialize the object but
