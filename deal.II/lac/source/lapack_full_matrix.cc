@@ -101,7 +101,7 @@ LAPACKFullMatrix<number>::vmult (
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
   
-  gemv("N", &mm, &nn, &alpha, data(), &mm, v.val, &one, &beta, w.val, &one);
+  gemv("N", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
 }
 
 
@@ -119,7 +119,7 @@ LAPACKFullMatrix<number>::Tvmult (
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
   
-  gemv("T", &mm, &nn, &alpha, data(), &mm, v.val, &one, &beta, w.val, &one);
+  gemv("T", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
 }
 
 #else
