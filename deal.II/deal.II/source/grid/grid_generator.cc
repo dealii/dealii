@@ -246,11 +246,12 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
 
 template <int dim>
 void
-GridGenerator::subdivided_hyper_rectangle (Triangulation<dim>              &tria,
-					   const std::vector<unsigned int> &repetitions,
-					   const Point<dim>                &p_1,
-					   const Point<dim>                &p_2,
-					   const bool                       colorize)
+GridGenerator::
+subdivided_hyper_rectangle (Triangulation<dim>              &tria,
+                            const std::vector<unsigned int> &repetitions,
+                            const Point<dim>                &p_1,
+                            const Point<dim>                &p_2,
+                            const bool                       colorize)
 {
 				   // contributed by Joerg R. Weimar
 				   // (j.weimar@jweimar.de) 2003
@@ -315,38 +316,60 @@ GridGenerator::subdivided_hyper_rectangle (Triangulation<dim>              &tria
   switch (dim)
     {
       case 1:
-            cells.resize (repetitions[0]);
+      {
+        cells.resize (repetitions[0]);
+        for (unsigned int x=0; x<repetitions[0]; ++x)
+          {
+            cells[x].vertices[0] = x;
+            cells[x].vertices[1] = x+1;
+            cells[x].material_id = 0;
+          }
+        break;
+      }
+      
+      case 2:
+      {
+        cells.resize (repetitions[1]*repetitions[0]);
+        for (unsigned int y=0; y<repetitions[1]; ++y)
+          for (unsigned int x=0; x<repetitions[0]; ++x)
+            {
+              const unsigned int c = x+y*repetitions[0];
+              cells[c].vertices[0] = y*(repetitions[0]+1)+x;
+              cells[c].vertices[1] = y*(repetitions[0]+1)+x+1;
+              cells[c].vertices[2] = (y+1)*(repetitions[0]+1)+x+1;
+              cells[c].vertices[3] = (y+1)*(repetitions[0]+1)+x;
+              cells[c].material_id = 0;
+            }
+        break;
+      }
+      
+      case 3:
+      {
+        const unsigned int n_x  = (repetitions[0]+1);
+        const unsigned int n_xy = (repetitions[0]+1)*(repetitions[1]+1);
+        
+        cells.resize (repetitions[2]*repetitions[1]*repetitions[0]);
+        for (unsigned int z=0; z<repetitions[1]; ++z)
+          for (unsigned int y=0; y<repetitions[1]; ++y)
             for (unsigned int x=0; x<repetitions[0]; ++x)
               {
-                cells[x].vertices[0] = x;
-                cells[x].vertices[1] = x+1;
-                cells[x].material_id = 0;
+                const unsigned int c = x+y*repetitions[0] +
+                                       z*repetitions[0]*repetitions[1];
+                cells[c].vertices[0] = z*n_xy + y*n_x + x;
+                cells[c].vertices[1] = z*n_xy + y*n_x + x+1;
+                cells[c].vertices[2] = (z+1)*n_xy + y*n_x + x+1;
+                cells[c].vertices[3] = (z+1)*n_xy + y*n_x + x;
+                cells[c].vertices[4] = z*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[5] = z*n_xy + (y+1)*n_x + x+1;
+                cells[c].vertices[6] = (z+1)*n_xy + (y+1)*n_x + x+1;
+                cells[c].vertices[7] = (z+1)*n_xy + (y+1)*n_x + x;
+                cells[c].material_id = 0;
               }
-            break;
+        break;
+        
+      }
 
-      case 2:
-            cells.resize (repetitions[1]*repetitions[0]);
-            for (unsigned int y=0; y<repetitions[1]; ++y)
-              for (unsigned int x=0; x<repetitions[0]; ++x)
-                {
-                  const unsigned int c = x+y*repetitions[0];
-                  cells[c].vertices[0] = y*(repetitions[0]+1)+x;
-                  cells[c].vertices[1] = y*(repetitions[0]+1)+x+1;
-                  cells[c].vertices[2] = (y+1)*(repetitions[0]+1)+x+1;
-                  cells[c].vertices[3] = (y+1)*(repetitions[0]+1)+x;
-                  cells[c].material_id = 0;
-                }
-            break;
-
-      default:	    	    	    	    	
-      	    	    	    	    	     // copied from hyper_rectangle:
-                                             // should be trivial to
-                                             // do for 3d as well, but
-                                             // am too tired at this
-                                             // point of the night to
-                                             // do that...
-                                             //
-                                             // contributions are welcome!
+      default:
             Assert (false, ExcNotImplemented());
     }
 
@@ -362,16 +385,12 @@ GridGenerator::subdivided_hyper_rectangle (Triangulation<dim>              &tria
 				       // use a large epsilon to
 				       // compare numbers to avoid
 				       // roundoff problems.
-      double epsilon = 0.01*delta[0];
-      if (dim > 1)
-        epsilon = std::min(epsilon,0.01*delta[1]);
-    
-      if (dim > 2)
-        epsilon = std::min(epsilon,0.01*delta[2]);
+      const double epsilon
+        = 0.01 * *std::min_element (&delta[0], &delta[dim]);
     
                                        // actual code is external since
                                        // 1-D is different from 2/3D.
-      colorize_subdivided_hyper_rectangle (tria,p1,p2,epsilon);
+      colorize_subdivided_hyper_rectangle (tria, p1, p2, epsilon);
     }
 }
 
