@@ -1,0 +1,35 @@
+This file is internal information only. It lists the steps to be done
+when a new release shall be issued:
+
+1/ if a x.y.0 release, create a branch:
+    cvs tag all files with the tag Base-x-y
+    cvs tag -r all files with the tag Branch-x-y
+
+2/ tell your friends to tag their programs
+
+3/ change the content of the `Version' file on both HEAD and branch
+
+4/ test the branch thoroughly
+
+5/ rename the changes file and create a new one for the next release
+
+6/ adjust news.html. Crosslink changes file. If necessary link an
+  announcement. Do these things on both HEAD and branch. Be sure to
+  have the changes file on both HEAD and branch.
+
+7/ adjust download.html on both HEAD and branch.
+
+8/ run `make validate-xrefs' on the branch to check that the changes
+  do not point to nirvana
+
+10/ cvs tag all files with Version-x-y-z
+
+11/ tell your friends to tag their programs
+
+12/ cvs export -r Version-x-y-z and form a tarball of that
+
+13/ put it on the web server
+
+14/ wait overnight
+
+15/ announce the release
