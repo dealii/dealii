@@ -357,7 +357,21 @@ namespace Patterns
 
   std::string List::description () const
   {
-    return std::string("list of <") + pattern->description() + ">";
+#ifdef HAVE_STD_STRINGSTREAM
+    std::ostringstream description;	
+#else
+    std::ostrstream description;
+#endif
+	
+    description << "list of <" << pattern->description() << ">" 
+                << " of length " << min_elements << "..." << max_elements
+                << " (inclusive)";
+
+#ifndef HAVE_STD_STRINGSTREAM
+    description << std::ends;
+#endif
+
+    return description.str();
   };
 
 
