@@ -51,8 +51,7 @@
  *
  * @author Guido Kanschat, 1999
  */
-template <class Matrix = SparseMatrix<double>,
-          class Vector = Vector<double> >
+template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
 class SolverQMRS : public Solver<Matrix,Vector>
 {
   public:

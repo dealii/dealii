@@ -36,8 +36,7 @@
  * has a default argument, so you may call it without the additional
  * parameter.
  */
-template <class Matrix = SparseMatrix<double>,
-          class Vector = Vector<double> >
+template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
 class SolverBicgstab : public Solver<Matrix,Vector>
 {
   public:

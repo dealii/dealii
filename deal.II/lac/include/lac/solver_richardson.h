@@ -37,8 +37,7 @@
  *
  * @author Ralf Hartmann
  */
-template <class Matrix = SparseMatrix<double>,
-          class Vector = Vector<double> >
+template <class Matrix = SparseMatrix<double>, class Vector = Vector<double> >
 class SolverRichardson : public Solver<Matrix, Vector>
 {
   public:
