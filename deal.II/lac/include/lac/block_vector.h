@@ -69,7 +69,7 @@ namespace BlockVectorIterators
 					* iterators. There, the
 					* vector must not be constant.
 					*/
-      typedef Vector<number>      Vector;
+      typedef ::Vector<number>      Vector;
 
 				       /**
 					* Type of the block vector
