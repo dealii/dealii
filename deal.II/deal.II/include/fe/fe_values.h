@@ -438,7 +438,12 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * input vector may be either a
 				      * @p{Vector<double>},
 				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double,...>}.
+				      * @p{BlockVector<double>}. It
+				      * represents a global vector of
+				      * DoF values associated with the
+				      * @ref{DofHandler} object with
+				      * which this @ref{FEValues}
+				      * object was last initialized.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector& fe_function,
@@ -458,7 +463,12 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * input vector may be either a
 				      * @p{Vector<double>},
 				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double,...>}.
+				      * @p{BlockVector<double>}. It
+				      * represents a global vector of
+				      * DoF values associated with the
+				      * @ref{DofHandler} object with
+				      * which this @ref{FEValues}
+				      * object was last initialized.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
@@ -544,7 +554,18 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * input vector may be either a
 				      * @p{Vector<double>},
 				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double,...>}.
+				      * @p{BlockVector<double>}. It
+				      * represents a global vector of
+				      * DoF values associated with the
+				      * @ref{DofHandler} object with
+				      * which this @ref{FEValues}
+				      * object was last initialized.
+				      *
+				      * The output are the gradients
+				      * of the function represented by
+				      * these DoF values, as computed
+				      * in real space (as opposed to
+				      * on the unit cell).
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector      &fe_function,
@@ -573,7 +594,18 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * input vector may be either a
 				      * @p{Vector<double>},
 				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double,...>}.
+				      * @p{BlockVector<double>}. It
+				      * represents a global vector of
+				      * DoF values associated with the
+				      * @ref{DofHandler} object with
+				      * which this @ref{FEValues}
+				      * object was last initialized.
+				      *
+				      * The output are the gradients
+				      * of the function represented by
+				      * these DoF values, as computed
+				      * in real space (as opposed to
+				      * on the unit cell).
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector               &fe_function,
@@ -660,7 +692,18 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * input vector may be either a
 				      * @p{Vector<double>},
 				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double,...>}.
+				      * @p{BlockVector<double>}. It
+				      * represents a global vector of
+				      * DoF values associated with the
+				      * @ref{DofHandler} object with
+				      * which this @ref{FEValues}
+				      * object was last initialized.
+				      *
+				      * The output are the second derivatives
+				      * of the function represented by
+				      * these DoF values, as computed
+				      * in real space (as opposed to
+				      * on the unit cell).
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector& fe_function,
@@ -687,7 +730,18 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * input vector may be either a
 				      * @p{Vector<double>},
 				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double,...>}.
+				      * @p{BlockVector<double>}. It
+				      * represents a global vector of
+				      * DoF values associated with the
+				      * @ref{DofHandler} object with
+				      * which this @ref{FEValues}
+				      * object was last initialized.
+				      *
+				      * The output are the second derivatives
+				      * of the function represented by
+				      * these DoF values, as computed
+				      * in real space (as opposed to
+				      * on the unit cell).
 				      */
     template <class InputVector>
     void get_function_2nd_derivatives (const InputVector      &fe_function,
