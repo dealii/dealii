@@ -73,6 +73,11 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof)
 
 
 
+MGSmoother::~MGSmoother () 
+{};
+
+
+
 void
 MGSmoother::set_zero_interior_boundary (const unsigned int  level,
 					Vector<float>      &u) const
