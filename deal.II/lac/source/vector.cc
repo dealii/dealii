@@ -1,4 +1,4 @@
-//----------------------------  std::vector.cc  ---------------------------
+//----------------------------  vector.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  std::vector.cc  ---------------------------
+//----------------------------  vector.cc  ---------------------------
 
 
 #include <lac/vector.templates.h>
