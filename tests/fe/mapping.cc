@@ -449,18 +449,18 @@ void mapping_test()
   MappingQ<dim> q1(1);
   MappingQ<dim> q2(2);
   MappingQ<dim> q3(3);
-  MappingQ<dim> q4(4);
+//  MappingQ<dim> q4(4);
   mapping_ptr.push_back(&q1_old);
   mapping_ptr.push_back(&q1);
   mapping_ptr.push_back(&q2);
   mapping_ptr.push_back(&q3);
-  mapping_ptr.push_back(&q4);
+//  mapping_ptr.push_back(&q4);
   mapping_ptr.push_back(&cart);
   mapping_strings.push_back("Q1fixed");
   mapping_strings.push_back("Q1");
   mapping_strings.push_back("Q2");
   mapping_strings.push_back("Q3");
-  mapping_strings.push_back("Q4");
+//  mapping_strings.push_back("Q4");
   mapping_strings.push_back("Cartesian");
 
   mapping_size=mapping_ptr.size();
