@@ -232,7 +232,7 @@ Point<4>::Point (const double, const double) {
 
 template <>
 inline
-Point<4>::Point (const double x, const double y, const double z) {
+Point<4>::Point (const double, const double, const double) {
   Assert (false, ExcInvalidConstructorCalled());
 };
 
