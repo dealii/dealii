@@ -77,7 +77,7 @@ clean:
 #of this file.
 Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo ============================ Remaking base/Makefile
-	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
+	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
 		> Makefile.dep
 
 

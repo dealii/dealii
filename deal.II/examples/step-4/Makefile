@@ -143,7 +143,7 @@ Makefile.dep: $(target).cc Makefile \
                            $(include-path-lac)/lac/*.h      \
                            $(include-path-deal2)/*/*.h)
 	@echo ============================ Remaking $@
-	@$(PERL) $D/common/scripts/make_dependencies.pl  $(INCLUDE) -B. $(target).cc \
+	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> Makefile.dep
 
 # To make the dependencies known to `make', we finally have to include

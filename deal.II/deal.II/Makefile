@@ -169,7 +169,7 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #of this file.
 Makefile.dep: $(cc-files) $(h-files) Makefile
 	@echo "============================ Remaking deal.II/Makefile"
-	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
+	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
