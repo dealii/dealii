@@ -97,7 +97,6 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 
-// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
 template <int dim>
 void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 					  const DoFHandler<dim>    &dof,
@@ -110,7 +109,7 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_q_points);
-
+  
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
@@ -118,8 +117,13 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
+  Assert(coefficient->n_components==1 ||
+	 coefficient->n_components==n_components, ExcComponentMismatch());
+  
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
   std::vector<double> coefficient_values (n_q_points);
+  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
+							  Vector<double> (n_components));
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
@@ -136,18 +140,39 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
       
       if (coefficient != 0)
 	{
-	  coefficient->value_list (fe_values.get_quadrature_points(),
-				   coefficient_values);
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		if ((n_components==1) ||
-		    (fe.system_to_component_index(i).first ==
-		     fe.system_to_component_index(j).first))
-		  cell_matrix(i,j) += (values(i,point) *
-				       values(j,point) *
-				       weights[point] *
-				       coefficient_values[point]);
+	  if (coefficient->n_components==1)
+	    {
+	      coefficient->value_list (fe_values.get_quadrature_points(),
+				       coefficient_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(i).first ==
+			 fe.system_to_component_index(j).first))
+		      cell_matrix(i,j) += (values(i,point) *
+					   values(j,point) *
+					   weights[point] *
+					   coefficient_values[point]);
+	    }
+	  else
+	    {
+	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
+					      coefficient_vector_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  {
+		    const unsigned int component_i=
+		      fe.system_to_component_index(i).first;
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if ((n_components==1) ||
+			  (fe.system_to_component_index(j).first == component_i))
+			cell_matrix(i,j) += (values(i,point) *
+					     values(j,point) *
+					     weights[point] *
+					     coefficient_vector_values[point](component_i));    
+		  }
+	    }
 	}
       else
 	for (unsigned int point=0; point<n_q_points; ++point)
@@ -223,7 +248,6 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 
-// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
 template <int dim>
 void
 MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
@@ -249,10 +273,15 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
+  Assert(coefficient->n_components==1 ||
+	 coefficient->n_components==n_components, ExcComponentMismatch());
+  
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>      local_rhs (dofs_per_cell);
   std::vector<double> rhs_values (fe_values.n_quadrature_points);
   std::vector<double> coefficient_values (n_q_points);
+  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
+							  Vector<double> (n_components));
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
@@ -271,23 +300,47 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
       
       if (coefficient != 0)
 	{
-	  coefficient->value_list (fe_values.get_quadrature_points(),
-				   coefficient_values);
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  if ((n_components==1) ||
-		      (fe.system_to_component_index(i).first ==
-		       fe.system_to_component_index(j).first))
-		    cell_matrix(i,j) += (values(i,point) *
-					 values(j,point) *
-					 weights[point] *
-					 coefficient_values[point]);
-		local_rhs(i) += values(i,point) *
-				rhs_values[point] *
-				weights[point];
-	      };
+	  if (coefficient->n_components==1)
+	    {
+	      coefficient->value_list (fe_values.get_quadrature_points(),
+				       coefficient_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  {
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if ((n_components==1) ||
+			  (fe.system_to_component_index(i).first ==
+			   fe.system_to_component_index(j).first))
+			cell_matrix(i,j) += (values(i,point) *
+					     values(j,point) *
+					     weights[point] *
+					     coefficient_values[point]);
+		    local_rhs(i) += values(i,point) *
+				    rhs_values[point] *
+				    weights[point];
+		  }
+	    }
+	  else
+	    {
+	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
+					      coefficient_vector_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  {
+		    const unsigned int component_i=
+		      fe.system_to_component_index(i).first;
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if ((n_components==1) ||
+			  (fe.system_to_component_index(j).first == component_i))
+			cell_matrix(i,j) += (values(i,point) *
+					     values(j,point) *
+					     weights[point] *
+					     coefficient_vector_values[point](component_i));
+		    local_rhs(i) += values(i,point) *
+				    rhs_values[point] *
+				    weights[point];
+		  }	      
+	    }
 	}
       else
 	for (unsigned int point=0; point<n_q_points; ++point)
@@ -769,7 +822,6 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 
 
 
-// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
 template <int dim>
 void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 					     const DoFHandler<dim>    &dof,
@@ -791,8 +843,13 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
+  Assert(coefficient->n_components==1 ||
+	 coefficient->n_components==n_components, ExcComponentMismatch());
+
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
   std::vector<double> coefficient_values (n_q_points);
+  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
+							  Vector<double> (n_components));
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
@@ -810,18 +867,40 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
       
       if (coefficient != 0)
 	{
-	  coefficient->value_list (fe_values.get_quadrature_points(),
-				   coefficient_values);
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		if ((n_components==1) ||
-		    (fe.system_to_component_index(i).first ==
-		     fe.system_to_component_index(j).first))
-		  cell_matrix(i,j) += (grads[i][point] *
-				       grads[j][point] *
-				       weights[point] *
-				       coefficient_values[point]);
+	  if (coefficient->n_components==1)
+	    {
+	      coefficient->value_list (fe_values.get_quadrature_points(),
+				       coefficient_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(i).first ==
+			 fe.system_to_component_index(j).first))
+		      cell_matrix(i,j) += (grads[i][point] *
+					   grads[j][point] *
+					   weights[point] *
+					   coefficient_values[point]);
+	    }
+	  else
+	    {
+	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
+					      coefficient_vector_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  {
+		    const unsigned int component_i=
+		      fe.system_to_component_index(i).first;
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if ((n_components==1) ||
+			  (fe.system_to_component_index(j).first == component_i))
+			cell_matrix(i,j) += (grads[i][point] *
+					     grads[j][point] *
+					     weights[point] *
+					     coefficient_vector_values[point](component_i));
+	      
+		  }
+	    }
 	}
       else
 	for (unsigned int point=0; point<n_q_points; ++point)
@@ -935,7 +1014,6 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 
 
 
-// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
 template <int dim>
 void
 MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
@@ -962,10 +1040,15 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
+  Assert(coefficient->n_components==1 ||
+	 coefficient->n_components==n_components, ExcComponentMismatch());
+
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>      local_rhs (dofs_per_cell);
   std::vector<double> rhs_values (fe_values.n_quadrature_points);
   std::vector<double> coefficient_values (n_q_points);
+  std::vector<Vector<double> > coefficient_vector_values (n_q_points,
+							  Vector<double> (n_components));
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
@@ -986,23 +1069,47 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
       
       if (coefficient != 0)
 	{
-	  coefficient->value_list (fe_values.get_quadrature_points(),
-				   coefficient_values);
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	      {
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  if ((n_components==1) ||
-		      (fe.system_to_component_index(i).first ==
-		       fe.system_to_component_index(j).first))
-		    cell_matrix(i,j) += (grads[i][point] *
-					 grads[j][point] *
-					 weights[point] *
-					 coefficient_values[point]);
-		local_rhs(i) += values(i,point) *
-				rhs_values[point] *
-				weights[point];
-	      };
+	  if (coefficient->n_components==1)
+	    {
+	      coefficient->value_list (fe_values.get_quadrature_points(),
+				       coefficient_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  {
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if ((n_components==1) ||
+			  (fe.system_to_component_index(i).first ==
+			   fe.system_to_component_index(j).first))
+			cell_matrix(i,j) += (grads[i][point] *
+					     grads[j][point] *
+					     weights[point] *
+					     coefficient_values[point]);
+		    local_rhs(i) += values(i,point) *
+				    rhs_values[point] *
+				    weights[point];
+		  }
+	    }
+	  else
+	    {
+	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
+					      coefficient_vector_values);
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  {
+		    const unsigned int component_i=
+		      fe.system_to_component_index(i).first;		    
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if ((n_components==1) ||
+			  (fe.system_to_component_index(j).first == component_i))
+			cell_matrix(i,j) += (grads[i][point] *
+					     grads[j][point] *
+					     weights[point] *
+					     coefficient_vector_values[point](component_i));
+		    local_rhs(i) += values(i,point) *
+				    rhs_values[point] *
+				    weights[point];
+		  }
+	    }
 	}
       else
 	for (unsigned int point=0; point<n_q_points; ++point)
