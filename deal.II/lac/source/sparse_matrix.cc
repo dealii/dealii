@@ -14,7 +14,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cmath>
-
+#include <numeric>
 
 
 SparseMatrixStruct::SparseMatrixStruct () :
@@ -44,7 +44,8 @@ SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &s) :
 
 
 
-SparseMatrixStruct::SparseMatrixStruct (const unsigned int m, const unsigned int n,
+SparseMatrixStruct::SparseMatrixStruct (const unsigned int m,
+					const unsigned int n,
 					const unsigned int max_per_row) 
 		: max_dim(0),
 		  max_vec_len(0),
@@ -64,6 +65,93 @@ SparseMatrixStruct::SparseMatrixStruct (const unsigned int n,
 		  colnums(0)
 {
   reinit (n,n,max_per_row);
+};
+
+
+SparseMatrixStruct::SparseMatrixStruct (const SparseMatrixStruct &original,
+					const unsigned int        max_per_row,
+					const unsigned int        extra_off_diagonals)
+		: max_dim(0),
+		  max_vec_len(0),
+		  rowstart(0),
+		  colnums(0)
+{
+  Assert (original.rows==original.cols, ExcNotSquare());
+  Assert (original.is_compressed(), ExcNotCompressed());
+  
+  reinit (original.rows, original.cols, max_per_row);
+
+				   // now copy the entries from
+				   // the other object
+  for (unsigned int row=0; row<original.rows; ++row)
+    {
+				       // copy the elements of this row
+				       // of the other object 
+				       // 
+				       // note that the first object actually
+				       // is the main-diagonal element,
+				       // which we need not copy
+				       //
+				       // we do the copying in two steps:
+				       // first we note that the elements in
+				       // #original# are sorted, so we may
+				       // first copy all the elements up to
+				       // the first side-diagonal one which
+				       // is to be filled in. then we insert
+				       // the side-diagonals, finally copy
+				       // the rest from that element onwards
+				       // which is not a side-diagonal any
+				       // more.
+      const int * const
+	original_row_start = &original.colnums[original.rowstart[row]] + 1;
+				       // thw following requires that
+				       // #original# be compressed since
+				       // otherwise there might be -1's
+      const int * const
+	original_row_end   = &original.colnums[original.rowstart[row+1]];
+
+      const int * const
+	original_last_before_side_diagonals = lower_bound (original_row_start,
+							   original_row_end,
+							   static_cast<int>
+							   (row
+							    -extra_off_diagonals));
+      const int * const
+	original_first_after_side_diagonals = upper_bound (original_row_start,
+							   original_row_end,
+							   static_cast<int>
+							   (row
+							    +extra_off_diagonals));
+
+      int * next_free_slot = &colnums[rowstart[row]] + 1;
+
+				       // copy elements before side-diagonals
+      next_free_slot = copy (original_row_start,
+			     original_last_before_side_diagonals,
+			     next_free_slot);
+
+				       // insert left and right side-diagonals
+      for (unsigned int i=1; i<=min(row,extra_off_diagonals);
+	   ++i, ++next_free_slot)
+	*next_free_slot = row-i;
+      for (unsigned int i=1; i<=min(extra_off_diagonals, rows-row-1);
+	   ++i, ++next_free_slot)
+	*next_free_slot = row+i;
+
+				       // copy rest
+      next_free_slot = copy (original_first_after_side_diagonals,
+			     original_row_end,
+			     next_free_slot);
+
+				       // this error may happen if the
+				       // sum of previous elements per row
+				       // and those of the new diagonals
+				       // exceeds the maximum number of
+				       // elements per row given to this
+				       // constructor
+      Assert (next_free_slot <= &colnums[rowstart[row+1]],
+	      ExcNotEnoughSpace (0,rowstart[row+1]-rowstart[row]));
+    };
 };
 
 
@@ -256,9 +344,9 @@ SparseMatrixStruct::operator () (const unsigned int i, const unsigned int j) con
 
 				   // all other entries are sorted, so
 				   // we can use a binary seach algorithm
-  const int* p = lower_bound (&colnums[rowstart[i]+1],
-			      &colnums[rowstart[i+1]],
-			      static_cast<signed int>(j));
+  const int * const p = lower_bound (&colnums[rowstart[i]+1],
+				     &colnums[rowstart[i+1]],
+				     static_cast<signed int>(j));
   if ((*p == static_cast<signed int>(j)) &&
       (p != &colnums[rowstart[i+1]]))
     return (p - &colnums[0]);

@@ -89,13 +89,39 @@ class SparseMatrixStruct
 				      * Make a copy with extra off-diagonals.
 				      *
 				      * This constructs objects intended for
-				      * the application of the ILU(n)-method.
+				      * the application of the ILU(n)-method
+				      * or other incomplete decompositions.
 				      * Therefore, additional to the original
-				      * entry structure, space for #extra_cols#
-				      * side-diagonals is provided.
+				      * entry structure, space for
+				      * #extra_off_diagonals#
+				      * side-diagonals is provided on both
+				      * sides of the main diagonal.
+				      *
+				      * #max_per_row# is the maximum number of
+				      * nonzero elements per row which this
+				      * structure is to hold. It is assumed
+				      * that this number is sufficiently large
+				      * to accomodate both the elements in
+				      * #original# as well as the new
+				      * off-diagonal elements created by this
+				      * constructor. You will usually want to
+				      * give the same number as you gave for
+				      * #original# plus the number of side
+				      * diagonals times two. You may however
+				      * give a larger value if you wish to add
+				      * further nonzero entries for the
+				      * decomposition based on other criteria
+				      * than their being on side-diagonals.
+				      *
+				      * This function requires that #original#
+				      * refer to a square matrix structure.
+				      * It shall be compressed. The matrix 
+				      * structure is not compressed
+				      * after this function finishes.
 				      */
     SparseMatrixStruct(const SparseMatrixStruct& original,
-		       unsigned int extra_cols);
+		       const unsigned int        max_per_row,
+		       const unsigned int        extra_off_diagonals);
     
 				     /**
 				      * Destructor.
@@ -364,7 +390,11 @@ class SparseMatrixStruct
 				      * Exception
 				      */
     DeclException0 (ExcInvalidConstructorCall);
-
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNotSquare);
+    
   private:
     unsigned int max_dim;
     unsigned int rows, cols;
@@ -430,7 +460,7 @@ class SparseMatrix
     
 				     /**
 				      * Constructor. Takes the given matrix
-				      * sparisty structure to represent the
+				      * sparsity structure to represent the
 				      * sparsity pattern of this matrix. You
 				      * can change the sparsity pattern later
 				      * on by calling the #reinit# function.
@@ -514,6 +544,7 @@ class SparseMatrix
 				      * To remember: the matrix is of dimension
 				      * $m \times n$.
 				      */
+
     unsigned int n () const;
 
 				     /**
@@ -641,6 +672,12 @@ class SparseMatrix
 				      */
     number diag_element (const unsigned int i) const;
 
+				     /**
+				      * Same as above, but return a writeable
+				      * reference. You're sure what you do?
+				      */
+    number & diag_element (const unsigned int i);
+    
     				     /**
 				      * This is kind of an expert mode: get
 				      * access to the #i#th element of this
@@ -991,6 +1028,21 @@ number SparseMatrix<number>::operator () (const unsigned int i, const unsigned i
 template <typename number>
 inline
 number SparseMatrix<number>::diag_element (const unsigned int i) const {
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  Assert (m() == n(), ExcMatrixNotSquare());
+  Assert (i<max_len, ExcInvalidIndex1(i));
+  
+				   // Use that the first element in each
+				   // row of a square matrix is the main
+				   // diagonal
+  return val[cols->rowstart[i]];
+};
+
+
+
+template <typename number>
+inline
+number & SparseMatrix<number>::diag_element (const unsigned int i) {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (m() == n(), ExcMatrixNotSquare());
   Assert (i<max_len, ExcInvalidIndex1(i));

@@ -530,9 +530,9 @@ Vector<Number>& Vector<Number>::operator = (const Vector<Number>& v)
 {
   if (v.dim != dim)
     reinit (v.dim, true);
-
   if (dim!=0)
     copy (v.begin(), v.end(), begin());
+  
   return *this;
 }
 

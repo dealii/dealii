@@ -143,12 +143,8 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  number                 *val_ptr = &val[0];
-  const somenumber    *matrix_ptr = &matrix.val[0];
-  const number     *const end_ptr = &val[cols->vec_len];
-
-  while (val_ptr != end_ptr)
-    *val_ptr++ = *matrix_ptr++;
+  copy (&matrix.val[0], &matrix.val[cols->vec_len],
+	&val[0]);
   
   is_ilu = false;
   return *this;
