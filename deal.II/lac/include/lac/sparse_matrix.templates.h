@@ -14,6 +14,8 @@
 #define __deal2__sparse_matrix_templates_h
 
 
+//TODO[WB]: the threaded functions can now be converted to return a value, rather than use an additional argument
+
 #include <base/template_constraints.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
