@@ -119,6 +119,25 @@ void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit
 
 
 template <>
+void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_sparsity () 
+{
+  sparsity_pattern.reinit (dof_handler.n_dofs(),
+			   dof_handler.n_dofs(),
+			   dof_handler.max_couplings_between_dofs());
+};
+
+
+
+template <>
+void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_vectors () 
+{
+  solution.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
+};
+
+
+
+template <>
 void LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >::reinit_sparsity () 
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
@@ -247,8 +266,11 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::solve ()
   PrimitiveVectorMemory<Vector> vector_memory;
   SolverCG<Vector>        cg (solver_control, vector_memory);
 
+  PreconditionRelaxation<Matrix,Vector> preconditioner
+    (system_matrix, &Matrix::precondition_Jacobi, 0.8);
+  
   cg.solve (system_matrix, solution, system_rhs,
-	    PreconditionIdentity());
+	    preconditioner);
 };
 
 
@@ -295,6 +317,18 @@ int main ()
   
   if (true)
     {
+      LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>
+	laplace_problem;  
+      laplace_problem.run ();
+      
+      solutions.push_back (vector<double>());
+      solutions.back().resize (laplace_problem.solution.size());
+      for (unsigned int i=0; i<laplace_problem.solution.size(); ++i)
+	solutions.back()[i] = laplace_problem.solution(i);
+    };
+  
+  if (true)
+    {
       LaplaceProblem<BlockVector<2,double>,BlockSparseMatrix<double,2,2>,BlockSparsityPattern<2,2> >
 	laplace_problem;  
       laplace_problem.run ();
@@ -318,22 +352,33 @@ int main ()
     };
 
   const unsigned int n_datasets = solutions.size();
+  deallog << "Checking " << n_datasets << " data sets." << endl;
+  
   for (unsigned int i=1; i<n_datasets; ++i)
     Assert (solutions[i].size() == solutions[i].size(),
 	    ExcInternalError());
+  
   logfile.precision(16);
   for (unsigned int i=1; i<n_datasets; ++i)
-    for (unsigned int j=0; j<solutions[0].size(); ++j)
-      if ( fabs(solutions[i][j] - solutions[0][j]) >
-	   1e-12*fabs(solutions[i][j] + solutions[0][j]))
-	{
-	  deallog << "Discrepancy: i=" << i << ", j=" << j
-		  << ", sol[i][j]=" << solutions[i][j]
-		  << ", sol[0][j]=" << solutions[0][j]
-		  << endl;
-	  deallog << flush;
-	  Assert (false, ExcInternalError());
-	};
+    {
+				       // relative accuracy. data set
+				       // 1 is computed using floats
+				       // instead of doubles, so lower
+				       // our requirements
+      const double accuracy = (i==1 ? 1e-6 : 1e-12);
+      
+      for (unsigned int j=0; j<solutions[0].size(); ++j)
+	if ( fabs(solutions[i][j] - solutions[0][j]) >
+	     accuracy*fabs(solutions[i][j] + solutions[0][j]))
+	  {
+	    deallog << "Discrepancy: i=" << i << ", j=" << j
+		    << ", sol[i][j]=" << solutions[i][j]
+		    << ", sol[0][j]=" << solutions[0][j]
+		    << endl;
+	    deallog << flush;
+	    Assert (false, ExcInternalError());
+	  };
+    };
   
     
   return 0;
