@@ -96,6 +96,17 @@ BlockSparseMatrix<number>::operator = (const double d)
 
 
 template <typename number>
+inline
+void
+BlockSparseMatrix<number>::clear () 
+{
+  BlockMatrixBase<SparseMatrix<number> >::clear();
+  sparsity_pattern = 0;
+}
+
+
+
+template <typename number>
 void
 BlockSparseMatrix<number>::
 reinit (const BlockSparsityPattern &sparsity)

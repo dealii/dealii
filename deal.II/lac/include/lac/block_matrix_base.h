@@ -327,20 +327,6 @@ class BlockMatrixBase : public Subscriptor
     copy_from (const BlockMatrixType &source);
 
     				     /**
-				      * Release all memory and return
-				      * to a state just like after
-				      * having called the default
-				      * constructor. It also forgets
-				      * the sparsity pattern it was
-				      * previously tied to.
-				      *
-				      * This calls SparseMatrix::clear on all
-				      * sub-matrices and then resets this
-				      * object to have no blocks at all.
-				      */
-    void clear ();
-
-    				     /**
 				      * Access the block with the
 				      * given coordinates.
 				      */
@@ -700,6 +686,27 @@ class BlockMatrixBase : public Subscriptor
                     << arg3 << ',' << arg4 << "] have differing column numbers.");
 
   protected:
+    				     /**
+				      * Release all memory and return
+				      * to a state just like after
+				      * having called the default
+				      * constructor. It also forgets
+				      * the sparsity pattern it was
+				      * previously tied to.
+				      *
+				      * This calls clear for all
+				      * sub-matrices and then resets this
+				      * object to have no blocks at all.
+				      *
+				      * This function is protected
+				      * since it may be necessary to
+				      * release additional structures.
+				      * A derived class can make it
+				      * public again, if it is
+				      * sufficient.
+				      */
+    void clear ();
+
                                      /**
                                       * Index arrays for rows and columns.
                                       */
