@@ -24,6 +24,9 @@
 
                                  // This is needed for C++ output:
 #include <fstream>
+				 // And this for the declarations of the
+				 // `sqrt' and `fabs' functions:
+#include <cmath>
 
 
 
