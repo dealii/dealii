@@ -48,7 +48,8 @@ kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
 ifeq ($(shell uname),SunOS)
-DOCPP = /home/people/wolf/Config/doc++/doc++
+#DOCPP = /home/people/wolf/Config/doc++/doc++
+DOCPP = /home/people/kanschat/bin/doc++
 else
 DOCPP = doc++
 endif
@@ -170,7 +171,7 @@ latex/deal_II_technical_reference.tex: latex/base.tex1 latex/lac.tex1 latex/deal
 
 # generate postscript files from a latex output file
 %.ps: %.dvi
-	dvips $< -o $@
+	cd latex ; dvips $(notdir $<) -o $(notdir $@)
 
 
 
