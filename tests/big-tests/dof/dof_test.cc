@@ -285,7 +285,8 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 	boundary = (test_case==2 ?
 		    static_cast<Boundary<dim>*>(new Ball<dim>()) :
 		    static_cast<Boundary<dim>*>(new CurvedLine<dim>()));
-	tria->set_boundary (boundary);
+	tria->set_boundary (0, *boundary);
+	tria->set_boundary (1, *boundary);
 	
 					 // refine once
 	tria->begin_active()->set_refine_flag();
@@ -397,6 +398,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 				   // finite element object
   dof->clear ();
   tria->set_boundary (0);
+  tria->set_boundary (1);
   if (boundary)
     delete boundary;
 };
