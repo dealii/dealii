@@ -202,7 +202,7 @@ FE_Nedelec<dim>::clone() const
 template <int dim>
 double
 FE_Nedelec<dim>::shape_value_component (const unsigned int i,
-					const Point<dim> &p,
+					const Point<dim>  &p,
 					const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
@@ -462,30 +462,39 @@ FE_Nedelec<dim>::shape_grad_grad_component (const unsigned int i,
 template <int dim>
 void FE_Nedelec<dim>::initialize_unit_support_points ()
 {
-//TODO: fix for higher orders. correct now for lowest order, all dimensions  
-// is this correct? all DoFs on lines, none on faces or bubbles?
-
-				   // all degrees of freedom are on
-				   // edges, and their order is the
-				   // same as the edges themselves
-  this->unit_support_points.resize(GeometryInfo<dim>::lines_per_cell * degree);
-  unsigned int index = 0;
-  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+  switch (degree)
     {
-      const unsigned int
-	vertex_index_0 = GeometryInfo<dim>::vertices_adjacent_to_line(line,0),
-	vertex_index_1 = GeometryInfo<dim>::vertices_adjacent_to_line(line,1);
-      
-      const Point<dim>
-	vertex_0 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_0),
-	vertex_1 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_1);
+      case 1:
+      {
+					 // all degrees of freedom are
+					 // on edges, and their order
+					 // is the same as the edges
+					 // themselves
+	this->unit_support_points.resize(GeometryInfo<dim>::lines_per_cell);
+	for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	  {
+	    const unsigned int
+	      vertex_index_0 = GeometryInfo<dim>::vertices_adjacent_to_line(line,0),
+	      vertex_index_1 = GeometryInfo<dim>::vertices_adjacent_to_line(line,1);
+	    
+	    const Point<dim>
+	      vertex_0 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_0),
+	      vertex_1 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_1);
+	    
+					     // place dofs right
+					     // between the vertices
+					     // of each line
+	    this->unit_support_points[line] = (vertex_0 + vertex_1) / 2;
+	    
+	    break;
+	  };
+      };
 
-				       // place dofs equispaced
-				       // between the vertices of each
-				       // line
-      for (unsigned int d=0; d<degree; ++d, ++index)
-	this->unit_support_points[index]
-	  = (vertex_0*(d+1) + vertex_1*(degree-d)) / (degree+1);
+      default:
+					     // no higher order
+					     // elements implemented
+					     // right now
+	    Assert (false, ExcNotImplemented());
     };
 };
 
@@ -504,29 +513,37 @@ void FE_Nedelec<1>::initialize_unit_face_support_points ()
 template <int dim>
 void FE_Nedelec<dim>::initialize_unit_face_support_points ()
 {
-//TODO: fix for higher orders. correct now for lowest order, all dimensions  
-// is this correct? all DoFs on lines, none on faces or bubbles?
-				   // do this the same as above, but
-				   // for one dimension less
-  this->unit_face_support_points.resize(GeometryInfo<dim-1>::lines_per_cell * degree);
-  unsigned int index = 0;
-  for (unsigned int line=0; line<GeometryInfo<dim-1>::lines_per_cell; ++line)
+  switch (degree)
     {
-      const unsigned int
-	vertex_index_0 = GeometryInfo<dim-1>::vertices_adjacent_to_line(line,0),
-	vertex_index_1 = GeometryInfo<dim-1>::vertices_adjacent_to_line(line,1);
+      case 1:
+      {
+					 // do this the same as above, but
+					 // for one dimension less
+	this->unit_face_support_points.resize(GeometryInfo<dim-1>::lines_per_cell);
+	for (unsigned int line=0; line<GeometryInfo<dim-1>::lines_per_cell; ++line)
+	  {
+	    const unsigned int
+	      vertex_index_0 = GeometryInfo<dim-1>::vertices_adjacent_to_line(line,0),
+	      vertex_index_1 = GeometryInfo<dim-1>::vertices_adjacent_to_line(line,1);
       
-      const Point<dim-1>
-	vertex_0 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_0),
-	vertex_1 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_1);
+	    const Point<dim-1>
+	      vertex_0 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_0),
+	      vertex_1 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_1);
 
-				       // place dofs equispaced
-				       // between the vertices of each
-				       // line
-      for (unsigned int d=0; d<degree; ++d, ++index)
-	this->unit_face_support_points[index]
-	  = (vertex_0*(d+1) + vertex_1*(degree-d)) / (degree+1);
-    };
+					     // place dofs right
+					     // between the vertices of each
+					     // line
+	      this->unit_face_support_points[line] = (vertex_0 + vertex_1) / 2;
+	  };
+	break;
+      };
+
+      default:
+					     // no higher order
+					     // elements implemented
+					     // right now
+	    Assert (false, ExcNotImplemented());
+    };	    
 };
 
 
@@ -535,15 +552,15 @@ template <int dim>
 std::vector<unsigned int>
 FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree)
 {
-//TODO: fix for higher orders. correct now for lowest order, all dimensions  
-  std::vector<unsigned int> dpo(dim+1, 0U);
-// can this be done in a dimension independent and degree independent way?  
-// if DoFs are located only on lines, the the following is the correct way
+  Assert (degree == 1, ExcNotImplemented());
 
-				   // put all degrees of freedom on
-				   // the lines, and in particular
-				   // @p{degree} DoFs per line:
+				   // for degree==1, put all degrees
+				   // of freedom on the lines, and in
+				   // particular @p{degree} DoFs per
+				   // line:
+  std::vector<unsigned int> dpo(dim+1, 0U);
   dpo[1] = degree;
+
   return dpo;
 }
 
@@ -551,15 +568,12 @@ FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree)
 
 template <int dim>
 UpdateFlags
-FE_Nedelec<dim>::update_once (const UpdateFlags flags) const
+FE_Nedelec<dim>::update_once (const UpdateFlags) const
 {
-//TODO: think about what this actually means here???  
-				   // for this kind of elements, only
-				   // the values can be precomputed
-				   // once and for all. set this flag
-				   // if the values are requested at
-				   // all
-  return (update_default | (flags & update_values));
+				   // even the values have to be
+				   // computed on the real cell, so
+				   // nothing can be done in advance
+  return update_default;
 }
 
 
@@ -568,12 +582,12 @@ template <int dim>
 UpdateFlags
 FE_Nedelec<dim>::update_each (const UpdateFlags flags) const
 {
-//TODO: think about what this actually means here???  
-
   UpdateFlags out = update_default;
 
+  if (flags & update_values)
+    out |= update_values             | update_covariant_transformation;
   if (flags & update_gradients)
-    out |= update_gradients | update_covariant_transformation;
+    out |= update_gradients          | update_covariant_transformation;
   if (flags & update_second_derivatives)
     out |= update_second_derivatives | update_covariant_transformation;
 
@@ -588,78 +602,63 @@ FE_Nedelec<dim>::update_each (const UpdateFlags flags) const
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
-FE_Nedelec<dim>::get_data (const UpdateFlags      /*update_flags*/,
-			   const Mapping<dim>    &/*mapping*/,
-			   const Quadrature<dim> &/*quadrature*/) const
+FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
+			   const Mapping<dim>    &mapping,
+			   const Quadrature<dim> &quadrature) const
 {
-  return 0;
-//TODO
-//  				   // generate a new data object and
-//  				   // initialize some fields
-//    InternalData* data = new InternalData;
+ 				   // generate a new data object and
+ 				   // initialize some fields
+   InternalData* data = new InternalData;
 
-//  				   // check what needs to be
-//  				   // initialized only once and what
-//  				   // on every cell/face/subface we
-//  				   // visit
-//    data->update_once = update_once(update_flags);
-//    data->update_each = update_each(update_flags);
-//    data->update_flags = data->update_once | data->update_each;
+ 				   // check what needs to be
+ 				   // initialized only once and what
+ 				   // on every cell/face/subface we
+ 				   // visit
+   data->update_once = update_once(update_flags);
+   data->update_each = update_each(update_flags);
+   data->update_flags = data->update_once | data->update_each;
 
-//    const UpdateFlags flags(data->update_flags);
-//    const unsigned int n_q_points = quadrature.n_quadrature_points;
+   const UpdateFlags flags(data->update_flags);
+   const unsigned int n_q_points = quadrature.n_quadrature_points;
 
-//  				   // some scratch arrays
-//    std::vector<double> values(0);
-//    std::vector<Tensor<1,dim> > grads(0);
-//    std::vector<Tensor<2,dim> > grad_grads(0);
+ 				   // initialize fields only if really
+ 				   // necessary. otherwise, don't
+ 				   // allocate memory
+   if (flags & update_values)
+     data->shape_values.reinit (dofs_per_cell, n_q_points);
 
-//  				   // initialize fields only if really
-//  				   // necessary. otherwise, don't
-//  				   // allocate memory
-//    if (flags & update_values)
-//      {
-//        values.resize (dofs_per_cell);
-//        data->shape_values.resize(dofs_per_cell,
-//  				std::vector<double>(n_q_points));
-//      }
+   if (flags & update_gradients)
+     data->shape_gradients.reinit (dofs_per_cell, n_q_points);
 
-//    if (flags & update_gradients)
-//      {
-//        grads.resize (dofs_per_cell);
-//        data->shape_gradients.resize(dofs_per_cell,
-//  				   std::vector<Tensor<1,dim> >(n_q_points));
-//      }
+ 				   // if second derivatives through
+ 				   // finite differencing is required,
+ 				   // then initialize some objects for
+ 				   // that
+   if (flags & update_second_derivatives)
+     data->initialize_2nd (this, mapping, quadrature);
 
-//  				   // if second derivatives through
-//  				   // finite differencing is required,
-//  				   // then initialize some objects for
-//  				   // that
-//    if (flags & update_second_derivatives)
-//      data->initialize_2nd (this, mapping, quadrature);
-
-//  				   // next already fill those fields
-//  				   // of which we have information by
-//  				   // now. note that the shape
-//  				   // gradients are only those on the
-//  				   // unit cell, and need to be
-//  				   // transformed when visiting an
-//  				   // actual cell
-//    if (flags & (update_values | update_gradients))
-//      for (unsigned int i=0; i<n_q_points; ++i)
-//        {
-//  	polynomial_space.compute(quadrature.point(i),
-//  				 values, grads, grad_grads);
+ 				   // next already fill those fields
+ 				   // of which we have information by
+ 				   // now. note that the shape values
+ 				   // and gradients are only those on
+ 				   // the unit cell, and need to be
+ 				   // transformed when visiting an
+ 				   // actual cell
+   for (unsigned int i=0; i<dofs_per_cell; ++i)
+     for (unsigned int q=0; q<n_q_points; ++q)
+       {
+	 if (flags & update_values)
+	   for (unsigned int c=0; c<dim; ++c)
+	     data->shape_values[i][q][c]
+	       = shape_value_component(i,quadrature.point(q),c);
 	
-//  	if (flags & update_values)
-//  	  for (unsigned int k=0; k<dofs_per_cell; ++k)
-//  	    data->shape_values[renumber[k]][i] = values[k];
-	
-//  	if (flags & update_gradients)
-//  	  for (unsigned int k=0; k<dofs_per_cell; ++k)
-//  	    data->shape_gradients[renumber[k]][i] = grads[k];
-//        }
-//    return data;
+	 if (flags & update_gradients)
+	   for (unsigned int c=0; c<dim; ++c)
+	     data->shape_gradients[i][q][c]
+	       = shape_grad_component(i,quadrature.point(q),c);
+       }
+   
+   return data;
 }
 
 
@@ -671,45 +670,80 @@ FE_Nedelec<dim>::get_data (const UpdateFlags      /*update_flags*/,
 
 template <int dim>
 void
-FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &/*mapping*/,
-				 const typename DoFHandler<dim>::cell_iterator &/*cell*/,
-				 const Quadrature<dim>                &/*quadrature*/,
-				 typename Mapping<dim>::InternalDataBase &/*mapping_data*/,
-				 typename Mapping<dim>::InternalDataBase &/*fedata*/,
-				 FEValuesData<dim>                    &/*data*/) const
+FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
+				 const typename DoFHandler<dim>::cell_iterator &cell,
+				 const Quadrature<dim>                &quadrature,
+				 typename Mapping<dim>::InternalDataBase &mapping_data,
+				 typename Mapping<dim>::InternalDataBase &fedata,
+				 FEValuesData<dim>                    &data) const
 {
-//TODO!!  
-//  				   // convert data object to internal
-//  				   // data for this class. fails with
-//  				   // an exception if that is not
-//  				   // possible
-//    InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-  
-//    const UpdateFlags flags(fe_data.current_update_flags());
+ 				   // convert data object to internal
+ 				   // data for this class. fails with
+ 				   // an exception if that is not
+ 				   // possible
+  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-//    for (unsigned int k=0; k<dofs_per_cell; ++k)
-//      {
-//        if (flags & update_values)
-//  	for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
-//  	  data.shape_values(k,i) = fe_data.shape_values[k][i];
-      
-//    if (flags & update_gradients)
-//      {
-//  	  Assert (data.shape_gradients[k].size() <=
-//  		  fe_data.shape_gradients[k].size(),
-//  		  ExcInternalError());
-      
-//  	mapping.transform_covariant(data.shape_gradients[k],
-//  				    fe_data.shape_gradients[k],
-//  				    mapping_data, 0);
-//      };
-  
-//    }
+				   // get the flags indicating the
+				   // fields that have to be filled
+  const UpdateFlags flags(fe_data.current_update_flags());
 
-//    if (flags & update_second_derivatives)
-//      compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
+				  
+				   // fill shape function
+				   // values. these are vector-valued,
+				   // so we have to transform
+				   // them. since the output format
+				   // (in data.shape_values) is a
+				   // sequence of doubles (one for
+				   // each non-zero shape function
+				   // value, and for each quadrature
+				   // point, rather than a sequence of
+				   // small vectors, we have to use a
+				   // number of conversions
+  if (flags & update_values)
+    {
+      std::vector<Tensor<1,dim> > shape_values (n_q_points);
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+					   // first transform shape
+					   // values...
+	  Assert (fe_data.shape_values[k].size() == n_q_points,
+		  ExcInternalError());
+	  mapping.transform_contravariant(&*shape_values.begin(),
+					  &*shape_values.end(),
+					  fe_data.shape_values[k].begin(),
+					  mapping_data);
+
+					   // then copy over to target:
+	  Assert (data.shape_values[k].size() == n_q_points*dim,
+		  ExcInternalError());
+	  unsigned index = 0;
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    for (unsigned int d=0; d<dim; ++d, ++index)
+	      data.shape_values[k][index] = shape_values[q][d];
+	};
+    };
   
-//    fe_data.first_cell = false;
+      
+  if (flags & update_gradients)
+    {
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	{
+	  Assert (false, ExcNotImplemented());
+// 	  Assert (data.shape_gradients[k].size() <=
+// 		  fe_data.shape_gradients[k].size(),
+// 		  ExcInternalError());	  
+// 	  mapping.transform_covariant(data.shape_gradients[k].begin(),
+// 				      data.shape_gradients[k].end(),
+// 				      fe_data.shape_gradients[k].begin(),
+// 				      mapping_data);
+	};
+    }
+
+  if (flags & update_second_derivatives)
+    compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+  
+  fe_data.first_cell = false;
 }
 
 
