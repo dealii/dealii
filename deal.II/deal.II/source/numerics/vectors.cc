@@ -94,8 +94,9 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
   }
 }
 
-#if deal_II_dimension == 1
 
+
+#if deal_II_dimension == 1
 
 template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
@@ -248,11 +249,58 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
 
 template <>
 void
-VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
-					     const FunctionMap &,
-					     map<int,double>   &)
+VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &dof,
+					     const FunctionMap &dirichlet_bc,
+					     map<int,double>   &boundary_values)
 {
-  Assert (false, ExcNotImplemented());
+  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+	  ExcInvalidBoundaryIndicator());
+
+  const FiniteElement<1> &fe = dof.get_fe();
+  Assert (fe.dofs_per_vertex == 1, ExcInvalidFE());
+
+				   // check whether boundary values at the
+				   // left boundary of the line are requested
+  if (dirichlet_bc.find(0) != dirichlet_bc.end())
+    {
+				       // first find the leftmost active
+				       // cell by first traversing the coarse
+				       // grid to its left end and then going
+				       // to the children
+      DoFHandler<1>::cell_iterator leftmost_cell = dof.begin(0);
+      while (leftmost_cell->neighbor(0).state() == valid)
+	leftmost_cell = leftmost_cell->neighbor(0);
+
+      while (leftmost_cell->has_children())
+	leftmost_cell = leftmost_cell->child(0);
+
+				       // now set the value of the leftmost
+				       // degree of freedom
+      boundary_values[leftmost_cell->vertex_dof_index(0,0)]
+	= dirichlet_bc.find(0)->second->operator()(leftmost_cell->vertex(0));
+    };
+
+				   // same for the right boundary of
+				   // the line are requested
+  if (dirichlet_bc.find(1) != dirichlet_bc.end())
+    {
+				       // first find the leftmost active
+				       // cell by first traversing the coarse
+				       // grid to its left end and then going
+				       // to the children
+      DoFHandler<1>::cell_iterator rightmost_cell = dof.last(0);
+      while (rightmost_cell->neighbor(1).state() == valid)
+	rightmost_cell = rightmost_cell->neighbor(1);
+
+      while (rightmost_cell->has_children())
+	rightmost_cell = rightmost_cell->child(1);
+
+				       // now set the value of the rightmost
+				       // degree of freedom
+      boundary_values[rightmost_cell->vertex_dof_index(1,0)]
+	= dirichlet_bc.find(1)->second->operator()(rightmost_cell->vertex(1));
+    };
+  
 };
 
 template <>
