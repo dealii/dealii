@@ -389,14 +389,22 @@ SparsityPattern::compress ()
 				       // among themselves (this handles
 				       // both cases, quadratic and
 				       // rectangular matrices)
-      Assert (find (&new_colnums[rowstart[line]+1],
-		    &new_colnums[next_row_start],
-		    new_colnums[rowstart[line]]) ==
-	      &new_colnums[next_row_start],
+				       //
+				       // the only exception here is
+				       // if the row contains no
+				       // entries at all
+      Assert ((rowstart[line] == rowstart[line+1])
+	      ||
+	      (find (&new_colnums[rowstart[line]+1],
+		     &new_colnums[next_row_start],
+		     new_colnums[rowstart[line]]) ==
+	       &new_colnums[next_row_start]),
 	      ExcInternalError());
-      Assert (adjacent_find(&new_colnums[rowstart[line]+1],
-			    &new_colnums[next_row_start]) ==
-	      &new_colnums[next_row_start],
+      Assert ((rowstart[line] == rowstart[line+1])
+	      ||
+	      (adjacent_find(&new_colnums[rowstart[line]+1],
+			     &new_colnums[next_row_start]) ==
+	       &new_colnums[next_row_start]),
 	      ExcInternalError());
     };
 
