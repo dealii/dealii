@@ -16,6 +16,10 @@
 # name and listing the modified file names.
 #
 # For example:
-#DEFAULT		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
-deal.* ( echo %s | mail -s "Commit deal" kanschat wolf)
+DEFAULT		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/default
+^deal.*		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/deal
+^mia.*		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/mia
+^lac.*		(echo ""; who am i; echo %s; date; cat) >> $CVSROOT/LOG/lac
+
+
 
