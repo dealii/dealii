@@ -201,9 +201,9 @@ class GridGenerator
 				      */
     template <int dim>
     static void hyper_rectangle (Triangulation<dim> &tria,
-				 const Point<dim>& p1,
-				 const Point<dim>& p2,
-				 const bool colorize = false);
+				 const Point<dim>   &p1,
+				 const Point<dim>   &p2,
+				 const bool          colorize = false);
 
 				     /**
 				      * Hypercube with a layer of
