@@ -4,7 +4,7 @@
 #include <base/point.h>
 #include <base/function_lib.h>
 
-//TODO: Derivatives in 3d wrong
+//TODO: Derivatives in 3d wrong (GK!)
 
 template<int dim>
 double
