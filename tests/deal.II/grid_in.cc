@@ -36,10 +36,6 @@ void test ()
   std::ifstream in ("grid_in.in");
   gi.read_ucd (in);
   
-  static const HyperBallBoundary<dim> x;
-  tria.set_boundary (0, x);
-//  tria.refine_global(1);
-  
   GridOut grid_out;
   grid_out.write_ucd (tria, logfile);
 };
