@@ -22,29 +22,6 @@
 #include <grid/geometry_info.h>
 #include <base/subscriptor.h>
 
-/**
- * Declare some symbolic names for mesh smoothing algorithms. The meaning of
- * these flags is documented in the #Triangulation# class.
- */
-enum MeshSmoothing {
-      none                               = 0x0,
-      limit_level_difference_at_vertices = 0x1,     
-      eliminate_unrefined_islands        = 0x2,
-
-      eliminate_refined_inner_islands    = 0x100,
-      eliminate_refined_boundary_islands = 0x200,
-      do_not_produce_unrefined_islands   = 0x400,
-      
-      smoothing_on_refinement            = (limit_level_difference_at_vertices |
-					    eliminate_unrefined_islands),
-      smoothing_on_coarsening            = (eliminate_refined_inner_islands |
-					    eliminate_refined_boundary_islands |
-					    do_not_produce_unrefined_islands),
-      
-      maximum_smoothing                  = 0xffff
-};
-
-
 /*------------------------------------------------------------------------*/
 
 
@@ -1003,6 +980,16 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     It prohibits the coarsening of a cell if 'most of the neighbors' will
  *     be refined after the step.
  *
+ * \item #patch_level_1#:
+ *     Ensures patch level 1. As result the triangulation consists of
+ *     patches, i.e. of cells that are refined once. It follows that
+ *     if at least one of the children of a cell is or will be refined
+ *     than all children need to be refined. If the #path_level_1# flag
+ *     is set, than the flags #eliminate_unrefined_islands#,
+ *     #eliminate_refined_inner_islands# and
+ *     #eliminate_refined_boundary_islands# will be ignored as they will
+ *     be fulfilled automatically.
+ *
  *   \item #smoothing_on_refinement#:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     refinement by flagging some more cells for refinement.
@@ -1582,6 +1569,32 @@ class Triangulation : public TriaDimensionInfo<dim>,
     static const StraightBoundary<dim>& straight_boundary;
 
   public:
+    
+/**
+ * Declare some symbolic names for mesh smoothing algorithms. The meaning of
+ * these flags is documented in the #Triangulation# class.
+ */
+    enum MeshSmoothing
+    {
+	  none                               = 0x0,
+	  limit_level_difference_at_vertices = 0x1,     
+	  eliminate_unrefined_islands        = 0x2,
+	  patch_level_1                      = 0x4,
+	  
+	  eliminate_refined_inner_islands    = 0x100,
+	  eliminate_refined_boundary_islands = 0x200,
+	  do_not_produce_unrefined_islands   = 0x400,
+	  
+	  smoothing_on_refinement            = (limit_level_difference_at_vertices |
+						eliminate_unrefined_islands),
+	  smoothing_on_coarsening            = (eliminate_refined_inner_islands |
+						eliminate_refined_boundary_islands |
+						do_not_produce_unrefined_islands),
+	  
+	  maximum_smoothing                  = 0xffff
+    };
+    
+
     typedef typename TriaDimensionInfo<dim>::raw_line_iterator raw_line_iterator;
     typedef typename TriaDimensionInfo<dim>::line_iterator line_iterator;
     typedef typename TriaDimensionInfo<dim>::active_line_iterator active_line_iterator;

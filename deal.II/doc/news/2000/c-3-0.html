@@ -340,6 +340,35 @@
        <p>
        (John Burnell, WB 2000/05/17)
        </p>
+
+  <li> <p>
+       Changed: enum 
+       <code class="class">MeshSmoothing</code> is moved into the 
+       <code class="class">Triangulation</code> class.
+       </p>
+
+       <p>
+       (Ralf Hartmann 2000/05/18)
+       </p>
+
+  <li> <p> 
+       New: <code class="member">Triangulation<dim>::patch_level_1</code>
+       is a new mesh smoothing. A mesh of patch level 1 consists of
+       patches, i.e. they consists of cells that are all refined at
+       least once.
+       </p>
+
+       <p>
+       Changed: As follows from the existence of this new smoothing,
+       <code class="member">maximum_smoothing</code> will include this
+       smoothing.
+       </p>
+
+       <p>
+       (Ralf Hartmann 2000/05/18)
+       </p>
+
+
 </ol>
 
 <hr>

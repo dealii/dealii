@@ -322,7 +322,8 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 template <>
 void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 					     const vector<CellData<2> > &c,
-					     const SubCellData          &subcelldata) {
+					     const SubCellData          &subcelldata)
+{
   const unsigned int dim=2;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -5915,16 +5916,17 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   // are done the first. the following
 				   // order is chosen:
 				   //
-				   // 0/ do not coarsen a cell if 'most of
-				   //    the neighbors' will be refined after
-				   //    the step. This is to prevent occurence
-				   //    of unrefined islands.
+				   // 0/ do not coarsen a cell if
+				   //    'most of the neighbors' will be
+				   //    refined after the step. This is
+				   //    to prevent occurence of
+				   //    unrefined islands.
 				   // 1/ eliminate refined islands in the
 				   //    interior and at the boundary. since
 				   //    they don't do much harm besides
-				   //    increasing the number of degrees of
-				   //    freedom, doing this has a rather low
-				   //    priority.
+				   //    increasing the number of degrees
+				   //    of freedom, doing this has a
+				   //    rather low priority.
   				   // 2/ limit the level difference of
 				   //    neighboring cells at each vertex.
   				   // 3/ eliminate unrefined islands. this
@@ -5933,33 +5935,48 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				   //    properties not only of the unrefined
 				   //    island, but also of the surrounding
 				   //    patch.
-  				   // 4/ take care of the requirement that no
+				   // 4/ ensure patch level 1. Then the
+				   //    triangulation consists of patches,
+				   //    i.e. of cells that are
+				   //    refined once. It follows that if
+				   //    least one of the children of a cell
+				   //    is or will be refined than all children
+				   //    need to be refined. This step
+				   //    only sets refinement flags and does
+				   //    not set coarsening flags.
+				   //    If the path_level_1 flag is set, than
+				   //    eliminate_unrefined_islands,
+				   //    eliminate_refined_inner_islands and
+				   //    eliminate_refined_boundary_islands will
+				   //    be fulfilled automatically and do not
+				   //    need to be enforced separately.
+  				   // 5/ take care of the requirement that no
 				   //    double refinement is done at each face
-  				   // 5/ take care that no double refinement
+  				   // 6/ take care that no double refinement
 				   //    is done at each line in 3d or higher
 				   //    dimensions.
-				   // 6/ make sure that all children of each
+				   // 7/ make sure that all children of each
 				   //    cell are either flagged for coarsening
 				   //    or none of the children is
 				   //
 				   // For some of these steps, it is known that
 				   // they interact. Namely, it is not possible
-				   // to guarantee that after step 5 another
-				   // step 4 would have no effect; the same
+				   // to guarantee that after step 6 another
+				   // step 5 would have no effect; the same
 				   // holds for the opposite order and also
-				   // when taking into account step 6. however,
+				   // when taking into account step 7. however,
 				   // it is important to guarantee that step
 				   // five or six do not undo something that
-				   // step 4 did, and step 6 not something of
-				   // step 5, otherwise the requirements will
+				   // step 5 did, and step 7 not something of
+				   // step 6, otherwise the requirements will
 				   // not be satisfied even if the loop
 				   // terminates. this is accomplished by
-				   // the fact that steps 4 and 5 only *add*
+				   // the fact that steps 5 and 6 only *add*
 				   // refinement flags and delete coarsening
-				   // flags (therefore, step 5
+				   // flags (therefore, step 6
 				   // can't undo something that step 4 already
-				   // did), and step 6 only deletes coarsening
-				   // flags, never adds some. step 6 needs also
+				   // did), and step 7 only deletes coarsening
+				   // flags, never adds some. step 7 needs also
 				   // take care that it won't tag cells for
 				   // refinement for which some neighbors
 				   // are more refined or will be refined.
@@ -5973,7 +5990,10 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				       //    the neighbors' will be refined after
 				       //    the step. This is to prevent the
 				       //    occurence of unrefined islands.
-      if (smooth_grid & do_not_produce_unrefined_islands)
+				       //    If patch_level_1 is set, this will
+				       //    be automatically fulfilled.
+      if (smooth_grid & do_not_produce_unrefined_islands &&
+	  !(smooth_grid & patch_level_1))
 	{
 	  cell_iterator       cell;
 	  const cell_iterator endc = end();
@@ -6065,8 +6085,11 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				       //    increasing the number of degrees of
 				       //    freedom, doing this has a rather low
 				       //    priority.
+				       //    If patch_level_1 is set, this will
+				       //    be automatically fulfilled.
       if (smooth_grid & (eliminate_refined_inner_islands |
-			 eliminate_refined_boundary_islands)) 
+			 eliminate_refined_boundary_islands) &&
+	  !(smooth_grid & patch_level_1)) 
 	{
 	  cell_iterator       cell;
 	  const cell_iterator endc = end();
@@ -6278,8 +6301,177 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 	    };
 	};
 
+
 				       /////////////////////////////////
 				       // STEP 4:
+				       //    ensure patch level 1.
+				       //
+				       //    Introduce some terminology:
+				       //    - a cell that is refined
+				       //      once is a patch of
+				       //      level 1 simply called patch.
+				       //    - a cell that is globally
+				       //      refined twice is called
+				       //      a patch of level 2.
+				       //    - patch level n says that
+				       //      the triangulation consists
+				       //      of patches of level n.
+				       //      This does make sence only
+				       //      if the grid is already at
+				       //      least n times globally
+				       //      refined.
+				       //
+				       //    E.g. from patch level 1
+				       //    follows: if at least one
+				       //    of the children of a cell
+				       //    is or will be refined
+				       //    than enforce all
+				       //    children to be
+				       //    refined.
+
+				       //    This step 4 only
+				       //    sets refinement flags and
+				       //    does not set coarsening
+				       //    flags.
+      if (smooth_grid & patch_level_1) 
+	{
+					   // An important assumption
+					   // (A) is that before
+					   // calling this function
+					   // the grid was already of
+					   // patch level 2.
+
+					   // loop over all cells
+					   // whose children are all
+					   // active.  (By assumption
+					   // (A) either all or none
+					   // of the children are
+					   // active).  If the refine
+					   // flag of at least one of
+					   // the children is set then
+					   // set_refine_flag and
+					   // clear_coarsen_flag of
+					   // all children.
+	  unsigned int n_children=GeometryInfo<dim>::children_per_cell;
+	  for (cell_iterator cell = begin(); cell != end(); ++cell)
+	    if (!cell->active() && cell->child(0)->active())
+	      {
+						 // cell is found to
+						 // be a patch
+		bool any_refine_flag_set=false;
+		for (unsigned int i=0; i<n_children; ++i)
+		  {
+		    cell_iterator child=cell->child(i);
+						     // check consistency:
+						     // cell is really a patch,
+						     // i.e. no child is refined.
+		    Assert(child->active(), ExcInternalError());
+		    
+		    if (child->refine_flag_set())
+		      {
+			any_refine_flag_set=true;
+			break;
+		      }
+		  }
+		if (any_refine_flag_set)
+		  {
+		    for (unsigned int i=0; i<n_children; ++i)
+		      {
+			cell_iterator child=cell->child(i);
+
+			child->clear_coarsen_flag();
+			child->set_refine_flag();
+		      }
+		  }
+	      }
+
+					   // Loop over all patches of
+					   // level 2, i.e. over all
+					   // cells whose
+					   // grandchildren are all
+					   // active.  Coarsen the
+					   // children (and remove the
+					   // grandchildren) only if
+					   // all cell->grandchild(i)
+	                                   //       ->coarsen_flag_set()
+					   // are set.
+	  for (cell_iterator cell = begin(); cell != end(); ++cell)	    
+	    if (!cell->active() &&
+		!cell->child(0)->active() &&
+		cell->child(0)->child(0)->active())
+	      {
+						 // count all coarsen
+						 // flags of the
+						 // grandchildren.
+		unsigned int n_coarsen_flags=0;
+						 // cell is not a
+						 // patch (of level 1)
+						 // as it has a
+						 // grandchild.  Is
+						 // cell a patch of
+						 // level 2??
+						 // Therefore: find
+						 // out whether all
+						 // cell->child(i) are
+						 // patches
+		for (unsigned int c=0; c<n_children; ++c)
+		  {
+		    cell_iterator child=cell->child(c);
+						     // check
+						     // consistency:
+						     // cell is not a
+						     // patch of level
+						     // 1.
+		    Assert(!child->active(), ExcInternalError());
+		    
+		    if (child->child(0)->active())
+		      {
+							 // child is
+							 // found to
+							 // be a patch
+			for (unsigned int cc=0; cc<n_children; ++cc)
+			  {
+			    cell_iterator grand_child=child->child(cc);
+							     // check
+							     // consistency:
+							     // child is
+							     // a patch
+			    Assert(grand_child->active(), ExcInternalError());
+
+			    if (grand_child->coarsen_flag_set())
+			      ++n_coarsen_flags;
+			  }
+		      }
+		  }
+		
+		if (n_coarsen_flags!=n_children*n_children)
+		  {
+						     // clear all grandchildren's
+						     // coarsen_flags
+		    for (unsigned int c=0; c<n_children; ++c)
+		      {
+			cell_iterator child=cell->child(c);
+			Assert(!child->active(), ExcInternalError());
+		    
+			if (child->child(0)->active())
+			  {
+			    for (unsigned int cc=0; cc<n_children; ++cc)
+			      {
+				cell_iterator grand_child=child->child(cc);
+				Assert(grand_child->active(), ExcInternalError());
+				
+				grand_child->clear_coarsen_flag();
+			      }
+			  }
+		      } 
+		  }
+	      }
+	}
+      
+      
+
+				       /////////////////////////////////
+				       // STEP 5:
 				       //    take care of the requirement that no
 				       //    double refinement is done at each face
       for (active_cell_iterator cell = last_active(); cell != end(); --cell)
@@ -6321,14 +6513,14 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 	  };
 
 				       //////////////////////////////////////
-				       // STEP 5:
+				       // STEP 6:
 				       //    take care that no double refinement
 				       //    is done at each line in 3d or higher
 				       //    dimensions.
       prepare_refinement_dim_dependent ();
       
 				       //////////////////////////////////////
-				       // STEP 6:
+				       // STEP 7:
 				       //    make sure that all children of each
 				       //    cell are either flagged for coarsening
 				       //    or none of the children is
