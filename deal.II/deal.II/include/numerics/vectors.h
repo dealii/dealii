@@ -734,7 +734,6 @@ class VectorTools
 				      * be computed and later
 				      * subtracted.
 				      */
-//TODO:[GK] Implementation of subtract_mean_value is missing.    
     static void subtract_mean_value(Vector<double>          &v,
 				    const std::vector<bool> &p_select);
     
