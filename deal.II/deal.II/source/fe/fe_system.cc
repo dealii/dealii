@@ -662,7 +662,8 @@ FESystem<dim>::build_cell_table()
   unsigned total_index = 0;
   for (unsigned int base=0 ; base < n_base_elements() ; ++base)
     for (unsigned int m = 0; m < element_multiplicity(base); ++m)
-      component_to_base_table[total_index++] = base;
+      for (unsigned int k=0; k<base_element(base).n_components(); ++k)
+	component_to_base_table[total_index++] = base;
   Assert (total_index == component_to_base_table.size(),
 	  ExcInternalError());
 
