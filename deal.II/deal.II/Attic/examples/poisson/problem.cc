@@ -530,7 +530,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   if (!set_boundary_values (prm))
     return;
   
-  FELinear<dim>                   fe;
+  FEQ1<dim>                   fe;
   PoissonEquation<dim>            equation (*rhs);
   QGauss2<dim>                    quadrature;
   

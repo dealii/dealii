@@ -435,7 +435,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 	solution_function = new Solution<dim>::Kink ();
   
   
-  FELinear<dim>         fe;
+  FEQ1<dim>         fe;
   QGauss3<dim>          quadrature;
   PoissonEquation<dim> *equation;
   

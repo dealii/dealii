@@ -449,22 +449,22 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 	  boundary_quadrature = new QGauss2<dim-1>();
 	  break;
     case 1:
-	  fe         = new FELinear<dim>();
+	  fe         = new FEQ1<dim>();
 	  quadrature = new QGauss3<dim>();
 	  boundary_quadrature = new QGauss2<dim-1>();
 	  break;
     case 2:
-	  fe         = new FEQuadraticSub<dim>();
+	  fe         = new FEQ2<dim>();
 	  quadrature = new QGauss4<dim>();
 	  boundary_quadrature = new QGauss3<dim-1>();
 	  break;
     case 3:
-	  fe         = new FECubicSub<dim>();
+	  fe         = new FEQ3<dim>();
 	  quadrature = new QGauss5<dim>();
 	  boundary_quadrature = new QGauss4<dim-1>();
 	  break;
     case 4:
-	  fe         = new FEQuarticSub<dim>();
+	  fe         = new FEQ4<dim>();
 	  quadrature = new QGauss6<dim>();
 	  boundary_quadrature = new QGauss5<dim-1>();
 	  break;

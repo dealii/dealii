@@ -351,7 +351,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 
 
   cout << "    Distributing degrees of freedom..." << endl;
-  FELinear<dim> fe;
+  FEQ1<dim> fe;
   dof->distribute_dofs (fe);
 
   cout << "    Renumbering degrees of freedom..." << endl;
