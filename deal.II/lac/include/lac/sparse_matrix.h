@@ -906,6 +906,19 @@ class SparseMatrix : public virtual Subscriptor
 				      * let <i>dst = M*src</i> with
 				      * <i>M</i> being this matrix.
                                       *
+				      * Note that while this function can
+				      * operate on all vectors that offer
+				      * iterator classes, it is only really
+				      * effective for objects of type @ref
+				      * Vector. For all classes for which
+				      * iterating over elements, or random
+				      * member access is expensive, this
+				      * function is not efficient. In
+				      * particular, if you want to multiply
+				      * with BlockVector objects, you should
+				      * consider using a BlockSparseMatrix as
+				      * well.
+				      * 
                                       * Source and destination must
                                       * not be the same vector.
 				      */
@@ -921,6 +934,19 @@ class SparseMatrix : public virtual Subscriptor
 				      * same as vmult() but takes
 				      * the transposed matrix.
                                       *
+				      * Note that while this function can
+				      * operate on all vectors that offer
+				      * iterator classes, it is only really
+				      * effective for objects of type @ref
+				      * Vector. For all classes for which
+				      * iterating over elements, or random
+				      * member access is expensive, this
+				      * function is not efficient. In
+				      * particular, if you want to multiply
+				      * with BlockVector objects, you should
+				      * consider using a BlockSparseMatrix as
+				      * well.
+				      * 
                                       * Source and destination must
                                       * not be the same vector.
 				      */
@@ -935,6 +961,19 @@ class SparseMatrix : public virtual Subscriptor
 				      * with <i>M</i> being this
 				      * matrix.
                                       *
+				      * Note that while this function can
+				      * operate on all vectors that offer
+				      * iterator classes, it is only really
+				      * effective for objects of type @ref
+				      * Vector. For all classes for which
+				      * iterating over elements, or random
+				      * member access is expensive, this
+				      * function is not efficient. In
+				      * particular, if you want to multiply
+				      * with BlockVector objects, you should
+				      * consider using a BlockSparseMatrix as
+				      * well.
+				      * 
                                       * Source and destination must
                                       * not be the same vector.
 				      */
@@ -952,6 +991,19 @@ class SparseMatrix : public virtual Subscriptor
 				      * but takes the transposed
 				      * matrix.
                                       *
+				      * Note that while this function can
+				      * operate on all vectors that offer
+				      * iterator classes, it is only really
+				      * effective for objects of type @ref
+				      * Vector. For all classes for which
+				      * iterating over elements, or random
+				      * member access is expensive, this
+				      * function is not efficient. In
+				      * particular, if you want to multiply
+				      * with BlockVector objects, you should
+				      * consider using a BlockSparseMatrix as
+				      * well.
+				      * 
                                       * Source and destination must
                                       * not be the same vector.
 				      */
@@ -1256,15 +1308,15 @@ class SparseMatrix : public virtual Subscriptor
     const_iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Final iterator of row
-				      * <tt>r</tt>. This is the version for
-				      * constant matrices.
+				      * Final iterator of row <tt>r</tt>. It
+				      * points to the first element past the
+				      * end of line @p r, or past the end of
+				      * the entire sparsity pattern. This is
+				      * the version for constant matrices.
 				      *
 				      * Note that the end iterator is not
 				      * necessarily dereferencable. This is in
-				      * particular the case if the row after
-				      * the one for which this is the end
-				      * iterator is empty, or if it is the end
+				      * particular the case if it is the end
 				      * iterator for the last row of a matrix.
 				      */
     const_iterator end (const unsigned int r) const;
@@ -1285,15 +1337,15 @@ class SparseMatrix : public virtual Subscriptor
     iterator begin (const unsigned int r);
 
 				     /**
-				      * Final iterator of row
-				      * <tt>r</tt>. This is the version for
-				      * non-constant matrices.
+				      * Final iterator of row <tt>r</tt>. It
+				      * points to the first element past the
+				      * end of line @p r, or past the end of
+				      * the entire sparsity pattern. This is
+				      * the version for non-constant matrices.
 				      *
 				      * Note that the end iterator is not
 				      * necessarily dereferencable. This is in
-				      * particular the case if the row after
-				      * the one for which this is the end
-				      * iterator is empty, or if it is the end
+				      * particular the case if it is the end
 				      * iterator for the last row of a matrix.
 				      */
     iterator end (const unsigned int r);
@@ -2149,7 +2201,17 @@ typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return const_iterator(this, r+1, 0);
+
+                                   // place the iterator on the first entry
+                                   // past this line, or at the end of the
+                                   // matrix
+  for (unsigned int i=r+1; i<m(); ++i)
+    if (cols->row_length(i) > 0)
+      return const_iterator(this, i, 0);
+
+                                   // if there is no such line, then take the
+                                   // end iterator of the matrix
+  return end();
 }
 
 
@@ -2175,7 +2237,17 @@ typename SparseMatrix<number>::iterator
 SparseMatrix<number>::end (const unsigned int r)
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return iterator(this, r+1, 0);
+
+                                   // place the iterator on the first entry
+                                   // past this line, or at the end of the
+                                   // matrix
+  for (unsigned int i=r+1; i<m(); ++i)
+    if (cols->row_length(i) > 0)
+      return iterator(this, i, 0);
+
+                                   // if there is no such line, then take the
+                                   // end iterator of the matrix
+  return end();
 }
 
 

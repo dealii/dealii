@@ -666,14 +666,14 @@ class SparsityPattern : public Subscriptor
     iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Final iterator of row
-				      * <tt>r</tt>.
+				      * Final iterator of row <tt>r</tt>. It
+				      * points to the first element past the
+				      * end of line @p r, or past the end of
+				      * the entire sparsity pattern.
 				      *
 				      * Note that the end iterator is not
 				      * necessarily dereferencable. This is in
-				      * particular the case if the row after
-				      * the one for which this is the end
-				      * iterator is empty, or if it is the end
+				      * particular the case if it is the end
 				      * iterator for the last row of a matrix.
 				      */
     iterator end (const unsigned int r) const;
@@ -1792,7 +1792,17 @@ SparsityPattern::iterator
 SparsityPattern::end (const unsigned int r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
-  return iterator(this, r+1, 0);
+
+                                   // place the iterator on the first entry
+                                   // past this line, or at the end of the
+                                   // matrix
+  for (unsigned int i=r+1; i<n_rows(); ++i)
+    if (row_length(i) > 0)
+      return iterator(this, i, 0);
+
+                                   // if there is no such line, then take the
+                                   // end iterator of the matrix
+  return end();
 }
 
 
