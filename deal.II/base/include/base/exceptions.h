@@ -13,6 +13,10 @@
 #ifndef __deal2__exceptions_h
 #define __deal2__exceptions_h
 
+/**
+ * @file
+ * Here, the deal.II exception handling is located.
+ */ 
 
 #include <base/config.h>
 
@@ -619,9 +623,7 @@ namespace deal_II_exceptions
 
 
 /**
- * See the <tt>ExceptionBase</tt> class for a detailed description.
- *
- * @ref ExceptionBase
+ * Declare an exception class derived from ExceptionBase without parameters.
  * @author Wolfgang Bangerth, November 1997
  */
 #define DeclException0(Exception0)  \
@@ -630,10 +632,8 @@ class Exception0 :  public ExceptionBase {}
 
 
 /**
-  *  Declare an exception class with
+  *  Declare an exception class derived from ExceptionBase with
   *  one additional parameter.
-  *
-  *  @ref ExceptionBase
   */
 #define DeclException1(Exception1, type1, outsequence)                \
 class Exception1 : public ExceptionBase {                             \
@@ -650,10 +650,8 @@ class Exception1 : public ExceptionBase {                             \
 
 
 /**
- *  Declare an exception class with
+ *  Declare an exception class derived from ExceptionBase with
  *  two additional parameters.
- *
- *  @ref ExceptionBase
  */
 #define DeclException2(Exception2, type1, type2, outsequence)         \
 class Exception2 : public ExceptionBase {                             \
@@ -672,10 +670,8 @@ class Exception2 : public ExceptionBase {                             \
 
 
 /**
- *  Declare an exception class with
+ *  Declare an exception class derived from ExceptionBase with
  *  three additional parameters.
- *
- *  @ref ExceptionBase
  */
 #define DeclException3(Exception3, type1, type2, type3, outsequence)  \
 class Exception3 : public ExceptionBase {                             \
@@ -695,10 +691,8 @@ class Exception3 : public ExceptionBase {                             \
 
 
 /**
- *  Declare an exception class with
+ *  Declare an exception class derived from ExceptionBase with
  *  four additional parameters.
- *
- *  @ref ExceptionBase
  */
 #define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
 class Exception4 : public ExceptionBase {                             \
@@ -720,10 +714,8 @@ class Exception4 : public ExceptionBase {                             \
 
 
 /**
- *  Declare an exception class with
+ *  Declare an exception class derived from ExceptionBase with
  *  five additional parameters.
- *
- *  @ref ExceptionBase
  */
 #define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
 class Exception5 : public ExceptionBase {                             \
@@ -759,6 +751,14 @@ namespace StandardExceptions
 				   /**
 				    * Exception denoting a division by
 				    * zero.
+				    *
+				    * @note Unfortunately, automatic
+				    * detection of division by zero is
+				    * very hardware dependent and
+				    * requires severe hacking on some
+				    * architectures. Therefore, this
+				    * exception is only raised if the
+				    * test s performed explicitly.
 				    */
   DeclException0 (ExcDivideByZero);
 
@@ -777,6 +777,10 @@ namespace StandardExceptions
 
 				   /**
 				    * An error occured opening the named file.
+				    *
+				    * The constructor takes a single
+				    * argument of type <tt>char*</tt>
+				    * naming the file.
 				    */
   DeclException1 (ExcFileNotOpen,
 		  char*,
@@ -879,6 +883,10 @@ namespace StandardExceptions
 				    * functionality is not possible in
 				    * the given dimension. Mostly used
 				    * to throw function calls in 1d.
+				    *
+				    * The constructor takes a single
+				    * <tt>int</tt>, denoting the
+				    * dimension.
 				    */
   DeclException1 (ExcImpossibleInDim,
 		  int,
@@ -889,6 +897,10 @@ namespace StandardExceptions
 				    * whenever the sizes of two
 				    * objects were assumed to be
 				    * equal, but were not.
+				    *
+				    * Parameters to the constructor
+				    * are the first and second size,
+				    * both of type <tt>int</tt>.
 				    */
   DeclException2 (ExcDimensionMismatch,
 		  int, int,
@@ -902,6 +914,14 @@ namespace StandardExceptions
 				    * example, you might try to access
 				    * an element of a vector which
 				    * does not exist.
+				    *
+				    * The constructor takes three
+				    * <tt>int</tt>, namely
+				    * <ol>
+				    * <li> the violating index
+				    * <li> the lower bound
+				    * <li> the upper bound plus one
+				    * </ol>
 				    */
   DeclException3 (ExcIndexRange, int, int, int,
 		  << "Index " << arg1 << " is not in ["
