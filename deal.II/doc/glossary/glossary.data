@@ -1,5 +1,8 @@
 active cell: a triangulation cell that is not refined further
 
+cell: element of a subdivision, being of the same dimension as the
+domain of computation
+
 boundary component: part of the domain in physical space. Denotes
 either function for a curved boundary or the selection of a <<boundary
 condition>>
@@ -12,7 +15,7 @@ object>>s, indicating the number of a <<boundary component>>
 
 hex: hexahedron, mapping of the unit cube into the domain
 
-locally finest level: all active cells, i.e. the finest cell at each
+locally finest level: all <<active cell>>s, i.e. the finest cell at each
 point of the domain
 
 quad: quadrilateral, mapping of the unit square into the domain
