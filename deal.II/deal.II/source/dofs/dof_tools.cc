@@ -586,16 +586,63 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			    {
 			      const bool j_non_zero_i = support_on_face (j, face);
 			      const bool j_non_zero_e  =support_on_face (j, neighbor_face);
-			      if (flux_dof_mask(i,j) == 'f'
-				  || (flux_dof_mask(i,j) == 'a'
-				       && i_non_zero_i && j_non_zero_e))
-				sparsity.add (dofs_on_this_cell[i],
-					      dofs_on_other_cell[j]);
-			      if (flux_dof_mask(j,i) == 'f'
-				  || (flux_dof_mask(j,i) == 'a'
-				      && i_non_zero_e && j_non_zero_i))
-				sparsity.add (dofs_on_other_cell[i],
-					      dofs_on_this_cell[j]);
+
+			      if (flux_dof_mask(i,j)==0)
+				flux_dof_mask(i,j) = 'n';
+			  
+			      if (flux_dof_mask(i,j) == 'f')
+				{
+				  sparsity.add (dofs_on_this_cell[i],
+						dofs_on_other_cell[j]);
+				  sparsity.add (dofs_on_other_cell[i],
+						dofs_on_this_cell[j]);
+				  sparsity.add (dofs_on_this_cell[i],
+						dofs_on_this_cell[j]);
+				  sparsity.add (dofs_on_other_cell[i],
+						dofs_on_other_cell[j]);
+				}
+			      if (flux_dof_mask(i,j) == 'a')
+				{
+				  if (i_non_zero_i && j_non_zero_e)
+				    sparsity.add (dofs_on_this_cell[i],
+						  dofs_on_other_cell[j]);
+				  if (i_non_zero_e && j_non_zero_i)
+				    sparsity.add (dofs_on_other_cell[i],
+						  dofs_on_this_cell[j]);
+				  if (i_non_zero_i && j_non_zero_i)
+				    sparsity.add (dofs_on_this_cell[i],
+						  dofs_on_this_cell[j]);
+				  if (i_non_zero_e && j_non_zero_e)
+				    sparsity.add (dofs_on_other_cell[i],
+						  dofs_on_other_cell[j]);
+				}
+			      
+			      if (flux_dof_mask(j,i) == 'f')
+				{
+				  sparsity.add (dofs_on_this_cell[j],
+						dofs_on_other_cell[i]);
+				  sparsity.add (dofs_on_other_cell[j],
+						dofs_on_this_cell[i]);
+				  sparsity.add (dofs_on_this_cell[j],
+						dofs_on_this_cell[i]);
+				  sparsity.add (dofs_on_other_cell[j],
+						dofs_on_other_cell[i]);
+				}
+			      if (flux_dof_mask(j,i) == 'a')
+				{
+				  if (j_non_zero_i && i_non_zero_e)
+				    sparsity.add (dofs_on_this_cell[j],
+						  dofs_on_other_cell[i]);
+				  if (j_non_zero_e && i_non_zero_i)
+				    sparsity.add (dofs_on_other_cell[j],
+						  dofs_on_this_cell[i]);
+				  if (j_non_zero_i && i_non_zero_i)
+				    sparsity.add (dofs_on_this_cell[j],
+						  dofs_on_this_cell[i]);
+				  if (j_non_zero_e && i_non_zero_e)
+				    sparsity.add (dofs_on_other_cell[j],
+						  dofs_on_other_cell[i]); 
+				}
 			    }
 			}
 		      sub_neighbor->face(neighbor_face)->set_user_flag ();
