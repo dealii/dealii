@@ -1198,10 +1198,11 @@ void Triangulation<3>::create_hypercube (const double left,
 
   const Point<3> vertices[8] = { Point<3>(left,left,left),
 				 Point<3>(right,left,left),
-				 Point<3>(right,right,left),
-				 Point<3>(left,right,left),
-				 Point<3>(left,left,right),
 				 Point<3>(right,left,right),
+				 Point<3>(left,left,right),
+
+				 Point<3>(left,right,left),				 
+				 Point<3>(right,right,left),
 				 Point<3>(right,right,right),
 				 Point<3>(left,right,right)};
   const int cell_vertices[1][8] = { { 0,1,2,3,4,5,6,7 } };
