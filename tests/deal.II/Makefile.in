@@ -40,13 +40,13 @@ mglocal.exe                  : mglocal.go                            $(lib-2d)  
 second_derivatives.exe       : second_derivatives.go                 $(lib-2d)           $(libraries)
 wave-test-3.exe              : wave-test-3.go                        $(lib-2d)           $(libraries)
 support_point_map.exe        : support_point_map.go        $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-
+filtered_matrix.exe          : filtered_matrix.go          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 
 
 tests = grid_test dof_test data_out derivatives gradients constraints mg \
         mglocal block_matrices second_derivatives derivative_approximation \
         matrices error_estimator intergrid_constraints intergrid_map \
-        wave-test-3 dof_renumbering support_point_map
+        wave-test-3 dof_renumbering support_point_map filtered_matrix
 
 ############################################################
 

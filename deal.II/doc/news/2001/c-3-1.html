@@ -250,6 +250,17 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
+       New: The <code class="class">FilteredMatrix</code> class is a
+       replacement for the <code
+       class="class">MatrixTools::apply_boundary_values</code>
+       function for cases where you would like to solve several times
+       with the same matrix, either for different right hand sides, or
+       for different boundary values.
+       <br>
+       (WB 2001/04/27)
+       </p>
+
+  <li> <p>
        New: There is now a function <code
        class="member">Vector::scale(Vector)</code>
        that scales each element of the vector by the corresponding

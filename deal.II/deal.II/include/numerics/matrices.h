@@ -502,24 +502,27 @@ class MatrixCreator
  *
  * @sect3{Boundary conditions}
  *
- * The @p{apply_boundary_values} function inserts boundary conditions of
- * into a system of equations.  To actually do this you have to specify
- * a list of degree of freedom indices along with the values these degrees of
- * freedom shall assume. To see how to get such a list, see the discussion
- * of the @ref{VectorTools}@p{::interpolate_boundary_values} function.
+ * The @p{apply_boundary_values} function inserts boundary conditions
+ * of into a system of equations.  To actually do this you have to
+ * specify a list of degree of freedom indices along with the values
+ * these degrees of freedom shall assume. To see how to get such a
+ * list, see the discussion of the
+ * @ref{VectorTools}@p{::interpolate_boundary_values} function.
  *
- * The inclusion into the assemblage process is as follows: when the matrix and
- * vectors are set up, a list of nodes subject to dirichlet bc is made and
- * matrix and vectors are changed accordingly. This is done by deleting all
- * entries in the matrix in the line of this degree of freedom, setting the
- * main diagonal entry to one and the right hand side element to the
- * boundary value at this node. This forces this node's value to be as specified.
- * To decouple the remaining linear system of equations and to make the system
+ * The inclusion into the assemblage process is as follows: when the
+ * matrix and vectors are set up, a list of nodes subject to dirichlet
+ * bc is made and matrix and vectors are changed accordingly. This is
+ * done by deleting all entries in the matrix in the line of this
+ * degree of freedom, setting the main diagonal entry to one and the
+ * right hand side element to the boundary value at this node. This
+ * forces this node's value to be as specified.  To decouple the
+ * remaining linear system of equations and to make the system
  * symmetric again (at least if it was before), one Gauss elimination
- * step is performed with this line, by adding this (now almost empty) line to
- * all other lines which couple with the given degree of freedom and thus
- * eliminating all coupling between this degree of freedom and others. Now
- * also the column consists only of zeroes, apart from the main diagonal entry.
+ * step is performed with this line, by adding this (now almost empty)
+ * line to all other lines which couple with the given degree of
+ * freedom and thus eliminating all coupling between this degree of
+ * freedom and others. Now also the column consists only of zeroes,
+ * apart from the main diagonal entry.
  *
  * Finding which rows contain an entry in the column for which we are
  * presently performing a Gauss elimination step is either difficult
@@ -558,14 +561,15 @@ class MatrixCreator
  * would be @p{O(N*sqrt(N)*log(m))} for the general case; the latter
  * is too expensive to be performed.
  *
- * It seems as if we had to make clear not to overwrite the lines of other
- * boundary nodes when doing the Gauss elimination step. However, since we
- * reset the right hand side when passing such a node, it is not a problem
- * to change the right hand side values of other boundary nodes not yet
- * processed. It would be a problem to change those entries of nodes already
- * processed, but since the matrix entry of the present column on the row
- * of an already processed node is zero, the Gauss step does not change
- * the right hand side. We need therefore not take special care of other
+ * It seems as if we had to make clear not to overwrite the lines of
+ * other boundary nodes when doing the Gauss elimination
+ * step. However, since we reset the right hand side when passing such
+ * a node, it is not a problem to change the right hand side values of
+ * other boundary nodes not yet processed. It would be a problem to
+ * change those entries of nodes already processed, but since the
+ * matrix entry of the present column on the row of an already
+ * processed node is zero, the Gauss step does not change the right
+ * hand side. We need therefore not take special care of other
  * boundary nodes.
  * 
  * To make solving faster, we preset the solution vector with the
@@ -585,6 +589,17 @@ class MatrixCreator
  * set the entry to the mean of the other diagonal entries, but this
  * seems to be too expensive.
  *
+ * In some cases, it might be interesting to solve several times with
+ * the same matrix, but for different right hand sides or boundary
+ * values. However, since the modification for boundary values of the
+ * right hand side vector depends on the original matrix, this is not
+ * possible without storing the original matrix somewhere and applying
+ * the @p{apply_boundary_conditions} function to a copy of it each
+ * time we want to solve. In that case, you can use the
+ * @ref{FilteredMatrix} class in the @p{LAC} sublibrary. There you can
+ * also find a formal (mathematical) description of the process of
+ * modifying the matrix and right hand side vectors for boundary
+ * values.
  * 
  * @author Wolfgang Bangerth, 1998, 2000
  */
@@ -597,6 +612,11 @@ class MatrixTools : public MatrixCreator<dim>
 				      * to the system matrix and vectors
 				      * as described in the general
 				      * documentation.
+				      *
+				      * For a replacement function,
+				      * see the documentation of the
+				      * @ref{FilteredMatrix} class in
+				      * the @p{LAC} sublibrary.
 				      */
     template <typename number>
     static void
@@ -614,6 +634,11 @@ class MatrixTools : public MatrixCreator<dim>
 				      * documentation. This function
 				      * works for block sparse
 				      * matrices and block vectors
+				      *
+				      * For a replacement function,
+				      * see the documentation of the
+				      * @ref{FilteredMatrix} class in
+				      * the @p{LAC} sublibrary.
 				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
