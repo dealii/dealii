@@ -102,6 +102,11 @@ Patterns::Bool::clone () const {
 
 
 
+Patterns::Anything::Anything ()
+{};
+
+
+
 bool Patterns::Anything::match (const string &) const {
   return true;
 };

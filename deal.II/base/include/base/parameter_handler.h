@@ -130,6 +130,13 @@ struct Patterns {
 				      */
     class Anything : public PatternBase {
       public:
+					 /**
+					  * Allow for at least one non-virtual
+					  * function in this class, as
+					  * otherwise sometimes no virtual
+					  * table is emitted.
+					  */
+	Anything ();
 	virtual bool match (const string &test_string) const;
 	virtual string description () const;
 	virtual PatternBase * clone () const;
