@@ -558,7 +558,7 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::empty;
+    PreconditionBlockSOR<MATRIX, inverse_type>::empty;
 
 				     /**
 				      * Make function of base class public again.
