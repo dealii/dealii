@@ -112,6 +112,12 @@ class FETools
 					const FiniteElement<dim> &fe2,
 					FullMatrix<number> &difference_matrix);
 
+    template <int dim, typename number>
+    static void get_projection_matrix(const FiniteElement<dim> &fe1,
+				      const FiniteElement<dim> &fe2,
+				      FullMatrix<number> &matrix);
+
+    
 				     /**
 				      * Gives the interpolation of a the
 				      * @p{dof1}-function @p{u1} to a

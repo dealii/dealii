@@ -18,6 +18,7 @@
 #include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
+#include <grid/grid_generator.h>
 #include <fe/fe_tools.h>
 #include <fe/fe.h>
 #include <fe/fe_q.h>
@@ -307,6 +308,38 @@ void FETools::get_interpolation_difference_matrix (const FiniteElement<dim> &fe1
   
 				   // compute difference
   difference_matrix.add (-1, interpolation_matrix);
+}
+
+
+template <int dim, typename number>
+void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
+				     const FiniteElement<dim> &fe2,
+				     FullMatrix<number> &interpolation_matrix)
+{
+  Assert (fe1.n_components() == fe2.n_components(),
+	  ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
+  Assert(interpolation_matrix.m()==fe2.dofs_per_cell &&
+	 interpolation_matrix.n()==fe1.dofs_per_cell,
+	 ExcMatrixDimensionMismatch(interpolation_matrix.m(),
+				    interpolation_matrix.n(),
+				    fe2.dofs_per_cell,
+				    fe1.dofs_per_cell));
+  
+  unsigned int m = fe1.dofs_per_cell;
+  unsigned int n = fe2.dofs_per_cell;
+				   // First, create a mass matrix. We
+				   // cannot use MatrixTools, since we
+				   // want to have a FullMatrix.
+				   //
+				   // This happens in the target space
+  FullMatrix<double> mass (n, n);
+  Triangulation<dim> tr;
+  GridGenerator::hyper_cube(tr);
+  DoFHandler<dim> dof;
+  dof.distribute_dofs(tr, fe2);
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin();
+
+				   // Set up FEValues. Here, we 
 }
 
 
