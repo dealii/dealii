@@ -26,6 +26,8 @@ template <int dim> class Mapping;
 template <int dim> class DoFHandler;
 class ConstraintMatrix;
 
+//TODO:[WB] replace template functions and specializations with overloaded functions
+
 
 /**
  *  Denote which norm/integral is to be computed. The following possibilities

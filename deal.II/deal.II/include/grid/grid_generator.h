@@ -21,6 +21,8 @@ template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 
 
+//TODO:[WB] replace template functions and specializations with overloaded functions
+
 #include <map>
 
 /**
