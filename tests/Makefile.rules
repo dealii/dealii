@@ -67,7 +67,7 @@ endif
 ############################################################
 
 
-%.check : %.output
+%.OK : %.output
 	@echo '=====Checking======' $<
 	@perl -pi $(normalize)  $<
 	@if test "x$(verbose)" = "xon" ; then \
@@ -100,7 +100,7 @@ endif
 report:
 	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
 	for test in $(sort $(tests)) ; do \
-		if (($(MAKE) $$test.check stop_on_error=on 2>&1) > /dev/null); then \
+		if (($(MAKE) $$test.OK stop_on_error=on 2>&1) > /dev/null); then \
 			echo $$today + $$test ; \
 		else \
 			echo $$today - $$test ; \
@@ -114,7 +114,7 @@ report:
 # perform a check. Do it in alphabetical order for better
 # overview
 ############################################################
-run-tests: $(tests:%=%.check)
+run-tests: $(tests:%=%.OK)
 
 
 
