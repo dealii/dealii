@@ -74,7 +74,7 @@ int main()
   //  logfile.precision (3);
   deallog.attach(logfile);
 //  deallog.log_execution_time(true);
-//  deallog.depth_console(0);
+  deallog.depth_console(0);
 
   deallog << "Test" << std::endl;
   
