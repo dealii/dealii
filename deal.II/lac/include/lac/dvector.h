@@ -88,6 +88,11 @@ class dVector : public VectorBase
 				      *  U = U * V        . Scalar Produkt
 				      */
     double operator*(const dVector& V) const;
+
+				     /**
+				      * Return square of the norm.
+				      */
+    double norm_sqr () const;
     
 				     /**
 				      * Change  Dimension. <p>
@@ -260,6 +265,13 @@ class dVector : public VectorBase
     void print (ostream &) const;
 				     //@}
 
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcDimensionsDontMatch,
+		    int, int,
+		    << "The dimensions " << arg1 << " and " << arg2
+		    << " do not match here.");
 				     /**
 				      * Exception
 				      */

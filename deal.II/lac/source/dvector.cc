@@ -72,100 +72,171 @@ dVector::~dVector()
   if (val) delete[] val;
 }
 
+
+
 double dVector::operator * (const dVector& v) const
 {
-  int i;
-  double s;
-  for (i = 0, s = 0.; i < dim; i++)
-  {
-	 s += val[i] * v.val[i];
-  }
-  return s;
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  
+  double sum0 = 0,
+	 sum1 = 0,
+	 sum2 = 0,
+	 sum3 = 0;
+
+				   // use modern processors better by
+				   // allowing pipelined commands to be
+				   // executed in parallel
+  for (int i=0; i<(dim/4); ++i) 
+    {
+      sum0 += val[4*i] * v.val[4*i];
+      sum1 += val[4*i+1] * v.val[4*i+1];
+      sum2 += val[4*i+2] * v.val[4*i+2];
+      sum3 += val[4*i+3] * v.val[4*i+3];
+    };
+				   // add up remaining elements
+  for (int i=(dim/4)*4; i<dim; ++i)
+    sum0 += val[i] * v.val[i];
+  
+  return sum0+sum1+sum2+sum3;
 }
+
+
+
+double dVector::norm_sqr () const
+{
+  double sum0 = 0,
+	 sum1 = 0,
+	 sum2 = 0,
+	 sum3 = 0;
+
+				   // use modern processors better by
+				   // allowing pipelined commands to be
+				   // executed in parallel
+  for (int i=0; i<(dim/4); ++i) 
+    {
+      sum0 += val[4*i] * val[4*i];
+      sum1 += val[4*i+1] * val[4*i+1];
+      sum2 += val[4*i+2] * val[4*i+2];
+      sum3 += val[4*i+3] * val[4*i+3];
+    };
+				   // add up remaining elements
+  for (int i=(dim/4)*4; i<dim; ++i)
+    sum0 += val[i] * val[i];
+  
+  return sum0+sum1+sum2+sum3;
+}
+
+
 
 void dVector::add(const double v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] += v;
+  for (int i = 0; i < dim; i++) val[i] += v;
 }
+
+
 
 void dVector::add(const dVector& v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] += v(i);
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  for (int i = 0; i < dim; i++) val[i] += v(i);
 }
+
+
 
 void dVector::add(double a, const dVector& v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] += a * v(i);
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  for (int i = 0; i < dim; i++) val[i] += a * v(i);
 }
+
+
 
 void dVector::add(double a, const dVector& v, double b, const dVector& w)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] += a * v.val[i] + b * w.val[i];
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
+  for (int i = 0; i < dim; i++) val[i] += a * v.val[i] + b * w.val[i];
 }
+
+
 
 void dVector::sadd(double x, const dVector& v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] = x * val[i] + v.val[i];
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  for (int i = 0; i < dim; i++) val[i] = x * val[i] + v.val[i];
 }
+
+
 
 void dVector::sadd(double x, double a, const dVector& v)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] = x * val[i] + a * v.val[i];
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  for (int i = 0; i < dim; i++) val[i] = x * val[i] + a * v.val[i];
 }
+
+
 
 void dVector::sadd(double x, double a, const dVector& v, double b, const dVector& w)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] = x * val[i] + a * v.val[i] + b * w.val[i];
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
+  for (int i = 0; i < dim; i++) val[i] = x * val[i] + a * v.val[i] + b * w.val[i];
 }
+
+
 
 void dVector::sadd(double x, double a, const dVector& v, 
 		   double b, const dVector& w, double c, const dVector& y)
 {
-  int i;
-  for (i = 0; i < dim; i++) val[i] = x * val[i] + a * v.val[i] + b * w.val[i] 
-			      + c * y.val[i];
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  Assert (dim == w.dim, ExcDimensionsDontMatch(dim, w.dim));
+  Assert (dim == y.dim, ExcDimensionsDontMatch(dim, y.dim));
+  for (int i = 0; i < dim; i++)
+    val[i] = x * val[i] + a * v.val[i] + b * w.val[i] 
+	     + c * y.val[i];
 }
+
+
 
 void dVector::equ(double a, const dVector& u, double b, const dVector& v)
 {
-  int i;
-  for (i=0;i<dim;i++) val[i] = a*u.val[i] + b*v.val[i];
+  Assert (dim == v.dim, ExcDimensionsDontMatch(dim, v.dim));
+  for (int i=0;i<dim;i++) val[i] = a*u.val[i] + b*v.val[i];
 }
+
+
 
 void dVector::equ(double a)
 {
-  int i;
-  for (i=0;i<dim;i++) val[i] *= a;
+  for (int i=0;i<dim;i++) val[i] *= a;
 }
+
+
 
 void dVector::equ(double a, const dVector& u)
 {
-  int i;
-  for (i=0;i<dim;i++) val[i] = a*u.val[i];
+  Assert (dim == u.dim, ExcDimensionsDontMatch(dim, u.dim));
+  for (int i=0;i<dim;i++) val[i] = a*u.val[i];
 }
+
+
 
 dVector& dVector::operator = (double s)
 {
-  int i;
-  for (i=0;i<dim;i++) val[i] = s;
+  for (int i=0;i<dim;i++) val[i] = s;
   return *this;
 }
+
+
 
 dVector& dVector::operator = (const dVector& v)
 {
   if (v.dim != dim) reinit(v,1);
 
-  int i;
-  for (i=0;i<dim;i++) val[i] = v.val[i];
+  for (int i=0;i<dim;i++) val[i] = v.val[i];
   return *this;
 }
+
 
 void dVector::cadd(int i, const VectorBase& V, double s, int j)
 {
@@ -187,6 +258,8 @@ void dVector::cadd(int i, const VectorBase& V, double s, int j, double t, int k)
 
   val[i] += s*v.val[j] + t*v.val[k];
 }
+
+
 
 void dVector::cadd(int i, const VectorBase& V, double s, int j,
 		   double t, int k, double q, int l, double r, int m)
