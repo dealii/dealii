@@ -1,16 +1,23 @@
 Build tests are organized such that they can be run individually
 from a cron-job or by hand.
 
+I) Instructions for installing a new test
 
-The standard setup is as follows:
+- Generate a config file ???.cfg in configurations
+- Run 'make' in this directory
+- Create a directory $DIR for the tests.
+- Copy $DEAL/contrib/config/config.guess and build-??? there.
+- Add a line to your crontab like
 
-1) Create a directory $DIR for the tests.
-2) Copy $DEAL/contrib/config/config.guess and build-template there.
-3) In $DIR, make modified copies of build-template
-	for each of your tests. Make sure they are executable
-4) Add a line to your crontab like
-
-17 3 * * * (cd $DIR; build-XXX)
+17 3 * * * (cd $DIR; /usr/local/bin/bash build-??? > /dev/null)
 
 	where build-XXX is the modified version of build-template.
 	This would start the build test each night at 3:17.
+
+
+
+II) Instructions for writing configuration files
+
+These files are perl scripts, operating on 'template'.
+
+Refer to existing files for examples.
