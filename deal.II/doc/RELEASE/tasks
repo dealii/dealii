@@ -3,24 +3,27 @@ when a new release shall be issued:
 
 0/ cvs update -d -P
 
-1/ if a x.y.0 release, create a branch:
+*** Caveat: for a minor version x.y.Z,
+*** 1-3 must be performed on Branch-x-y
+*** AND on HEAD
+
+1/ rename the changes file and create a new one for the next release
+
+2/ adjust news.html. Crosslink changes file. If necessary link an
+  announcement.
+
+3/ adjust download.html.
+
+4/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
 
-2/  cvs update -P -r Branch-<x>-<y>
+5/  cvs update -P -r Branch-<x>-<y>
 	or
 	cvs checkout -P -r Branch-<x>-<y> deal.II
 
-3/ change the content of the `Version' file on both HEAD and branch
+6/ change the content of the `Version' file on both HEAD and branch
 
-4/ test the branch thoroughly
-
-5/ rename the changes file and create a new one for the next release
-
-6/ adjust news.html. Crosslink changes file. If necessary link an
-  announcement. Do these things on both HEAD and branch. Be sure to
-  have the changes file on both HEAD and branch.
-
-7/ adjust download.html on both HEAD and branch.
+7/ test the branch thoroughly
 
 8/ run `make validate-xrefs' on the branch to check that the changes
   do not point to nirvana
