@@ -58,11 +58,11 @@ void test ()
                                    // this test, above assertion is ok, but an
                                    // elementwise one is not (we fail in the
                                    // first line)
-  Assert (it.row() == it2.row(), ExcInternalError());
-  Assert (it.block_row() == it2.block_row(), ExcInternalError());
-  Assert (it.column() == it2.column(), ExcInternalError());
-  Assert (it.block_column() == it2.block_column(), ExcInternalError());
-  Assert (it.index() == it2.index(), ExcInternalError());
+  Assert (it->row() == it2->row(), ExcInternalError());
+  Assert (it->block_row() == it2->block_row(), ExcInternalError());
+  Assert (it->column() == it2->column(), ExcInternalError());
+  Assert (it->block_column() == it2->block_column(), ExcInternalError());
+  Assert (it->index() == it2->index(), ExcInternalError());
    
   deallog << "OK" << std::endl;
 }
