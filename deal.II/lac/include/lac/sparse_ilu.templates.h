@@ -186,6 +186,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 	       j<&column_numbers[rowstart_indices[row+1]];
 	       ++j)
 	    {
+//TODO:[WB] make code faster by using the following comment	      
 					       // note: this inner loop could
 					       // be made considerable faster
 					       // if we consulted the row

@@ -109,6 +109,7 @@ class PrimitiveVectorMemory : public VectorMemory<Vector>
  * 
  * @author Guido Kanschat, 1999
  */
+//TODO:[GK,WB] GrowingVectorMemory is not thread-safe. use a mutex to synchronise
 template<class Vector = ::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<Vector>
 {

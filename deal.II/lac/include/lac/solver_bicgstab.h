@@ -284,6 +284,7 @@ typename Solver<VECTOR>::ReturnState
 SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 				const PRECONDITIONER& precondition)
 {
+//TODO:[GK] Implement "use the length of the computed orthogonal residual" in the BiCGStab method.
   SolverControl::State state = SolverControl::iterate;
   alpha = omega = rho = 1.;
 

@@ -367,6 +367,7 @@ class Vector
 				      * Scale each element of the vector by the
 				      * given factor.
 				      */
+//TODO:[?] Why not have an operator *= instead of/in addition to `scale'?    
     void scale (const Number factor);
     
 				     /**
