@@ -91,7 +91,7 @@ sub parse_class_declarations {
 		# file that are global, but that would mean parsing
 		# the include files instead of just searching for
 		# small bits...
-		if ( ! ($declaration =~ /EpsFlags|Patch/ ))
+		if ( ! ($declaration =~ /EpsFlags|Patch|Mem_Fun_Data/ ))
 		{
 		    print $declaration, ";\n";
 		}
