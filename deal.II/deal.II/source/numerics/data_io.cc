@@ -339,6 +339,20 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	      default:
 		    Assert (false, ExcNotImplemented());
 	    };
+
+					   // it follows a list of the
+					   // vertices of each cell. in 1d
+					   // this is simply a list of the
+					   // two vertices, in 2d its counter
+					   // clockwise, as usual in this
+					   // library. in 3d, the same applies
+					   // (special thanks to AVS for
+					   // numbering their vertices in a
+					   // way compatible to deal.II!)
+					   //
+					   // technical reference:
+					   // AVS Developer's Guide, Release 4,
+					   // May, 1992, p. E6
 	  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 	       ++vertex)
 	    out << cell->vertex_dof_index(vertex,0) << ' ';
@@ -671,6 +685,9 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 	  case 2:
 		out << "<x> <y> ";
 		break;
+	  case 3:
+		out << "<x> <y> <z>";
+		break;
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
@@ -731,6 +748,73 @@ void DataOut<dim>::write_gnuplot_draft (ostream &out) const
 
 		break;
 
+	  case 3:
+						 // three dimension: output
+						 // grid and data as a sequence
+						 // of lines in 4d
+
+						 // first we plot the front face
+		for (unsigned int vertex=0; vertex<4; ++vertex) 
+		  {
+		    out << cell->vertex(vertex) << "   ";
+		    for (unsigned int i=0; i!=data.size(); ++i)
+		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    out << endl;
+		  };
+						 // first vertex again
+		out << cell->vertex(0) << "   ";
+		for (unsigned int i=0; i!=data.size(); ++i)
+		  out << (*data[i].data)(cell->vertex_dof_index(0,0))
+		      << ' ';
+		out << endl
+		    << endl
+		    << endl;      // end of front face; two newlines, since this
+						 // stops continuous drawing
+						 // of lines
+
+						 // first we back the front face
+		for (unsigned int vertex=4; vertex<8; ++vertex) 
+		  {
+		    out << cell->vertex(vertex) << "   ";
+		    for (unsigned int i=0; i!=data.size(); ++i)
+		      out << (*data[i].data)(cell->vertex_dof_index(vertex,0))
+			  << ' ';
+		    out << endl;
+		  };
+						 // first vertex again
+		out << cell->vertex(4) << "   ";
+		for (unsigned int i=0; i!=data.size(); ++i)
+		  out << (*data[i].data)(cell->vertex_dof_index(4,0))
+		      << ' ';
+		out << endl
+		    << endl
+		    << endl;      // end of back face; two newlines, since this
+						 // stops continuous drawing
+						 // of lines
+
+						 // finally, we plot a
+						 // continuous line along
+						 // the vertices 0, 4, 7, 3, 2,
+						 // 6, 5, 1 to show the other
+						 // four lines
+		for (unsigned int vertex=0; vertex<8; ++vertex)
+		  {
+		    static const unsigned int vertex_list[8]
+		      = { 0, 4, 7, 3, 2, 6, 5, 1 };
+		    
+		    out << cell->vertex(vertex_list[vertex]) << "   ";
+		    for (unsigned int i=0; i!=data.size(); ++i)
+		      out << (*data[i].data)(cell->vertex_dof_index(vertex_list[vertex],0))
+			  << ' ';
+		    out << endl;
+		  };
+						 // again: stop drawing
+		out << endl << endl;
+		
+		
+		break;
+		
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
