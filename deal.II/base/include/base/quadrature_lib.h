@@ -18,7 +18,7 @@
 
 
 /**
- * Gauß-Legendre quadrature of arbitrary order.
+ * Gauss-Legendre quadrature of arbitrary order.
  *
  * The coefficients of these quadrature rules are computed by the
  * function found in @p{Numerical Recipies}.
@@ -33,7 +33,7 @@ class QGauss : public Quadrature<dim>
 				    * Generate a formula with @p{p}
 				    * quadrature points (order @p{2p-1}).
 				    */
-    QGauss (unsigned int p);
+    QGauss (const unsigned int p);
 };
 
 
