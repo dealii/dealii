@@ -114,6 +114,20 @@ inconvenience this causes.
 
 <ol>
 
+<li>
+   <p> New: The <code class="member">
+   TableHandler::write_tex</code> now accepts the additional boolean
+   argument <code class="member">with_header</code> which is set to
+   false by default and permits to write the table in "ready to be
+   included" way (i.e. without the \documentclass{...},
+   \begin{document} and \end{document} stuff).<br> In addition to
+   this, there are two new members in the above class: <code
+   class="member"> TableHandler::tex_set_table_caption</code> and
+   <code class="member"> TableHandler::tex_set_table_label</code> to
+   add a caption and a label to the tex generated table.  <br> (Luca
+   Heltai 2004/10/29)
+   </p>
+
   <li> <p>
        Fixed: <code
        class="member">DataOutBase<2,3>::write_tecplot</code> did not
