@@ -93,6 +93,10 @@
    friends of the enclosing class. */
 #undef DEAL_II_NESTED_CLASS_FRIEND_BUG
 
+/* Defined if the compiler does not allow to make a class a friend to which we
+   do not have access. */
+#undef DEAL_II_NESTED_NESTED_FRIEND_BUG
+
 /* Path to the deal.II directory */
 #undef DEAL_II_PATH
 
