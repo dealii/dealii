@@ -43,7 +43,11 @@ Check all places where condensation of matrices/vectors and
 
 
 No support points for non-Lagrangian elements? Check for Langrange in
-interpolation?
+  interpolation? Interpolation functions do not really make sense if
+  node values are momenta of the trial functions. For these cases,
+  something els must be devised. Still, to allow for upwind-ordering,
+  it would be good to assign a point to the functions, maybe a kind
+  of center of mass.
 
 
 Think about the problem pointed at in the documentation of
