@@ -408,7 +408,11 @@ inline void
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::clear ()
 {
   smoothers.clear();
-  matrices.clear();
+  
+  unsigned int i=matrices.get_minlevel(),
+       max_level=matrices.get_maxlevel();
+  for (; i<=max_level; ++i)
+    matrices[i]=0;
 }
 
 
