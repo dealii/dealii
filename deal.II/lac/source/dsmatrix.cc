@@ -406,11 +406,14 @@ dSMatrix::vmult (dVector& dst, const dVector& src) const
   Assert(n() == src.size(), ExcDimensionsDontMatch(n(),src.size()));
 
   const unsigned int n_rows = m();
+  const double *val_ptr = &val[cols->rowstart[0]];
+  const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
   for (unsigned int row=0; row<n_rows; ++row)
     {
       double s = 0.;
-      for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j) 
-	s += val[j] * src(cols->colnums[j]);
+      const double *val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * src(*colnum_ptr++);
       dst(row) = s;
     }
 }
@@ -445,12 +448,17 @@ dSMatrix::matrix_norm (const dVector& v) const
   Assert(n() == v.size(), ExcDimensionsDontMatch(n(),v.size()));
 
   double sum = 0.;
-  for (unsigned int i=0;i<m();i++)
+  const unsigned int n_rows = m();
+  const double *val_ptr = &val[cols->rowstart[0]];
+  const int *colnum_ptr = &cols->colnums[cols->rowstart[0]];
+  for (unsigned int row=0; row<n_rows; ++row)
     {
       double s = 0.;
-      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j) 
-	s += val[j] * v(cols->colnums[j]);
-      sum += s*v(i);
+      const double *val_end_of_row = &val[cols->rowstart[row+1]];
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * v(*colnum_ptr++);
+
+      sum += s*v(row);
     };
 
   return sum;
