@@ -52,6 +52,10 @@ dof_tools_15a.exe       : dof_tools_15a.g.$(OBJEXT)       $(libraries)
 dof_tools_15b.exe       : dof_tools_15b.g.$(OBJEXT)       $(libraries)
 dof_tools_15c.exe       : dof_tools_15c.g.$(OBJEXT)       $(libraries)
 dof_tools_15d.exe       : dof_tools_15d.g.$(OBJEXT)       $(libraries)
+dof_tools_16a.exe       : dof_tools_16a.g.$(OBJEXT)       $(libraries)
+dof_tools_16b.exe       : dof_tools_16b.g.$(OBJEXT)       $(libraries)
+dof_tools_16c.exe       : dof_tools_16c.g.$(OBJEXT)       $(libraries)
+dof_tools_16d.exe       : dof_tools_16d.g.$(OBJEXT)       $(libraries)
 gerold_1.exe            : gerold_1.g.$(OBJEXT)            $(libraries)
 roy_1.exe               : roy_1.g.$(OBJEXT)               $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)             $(libraries)
@@ -65,6 +69,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
         dof_tools_07 dof_tools_08 dof_tools_09 dof_tools_10 \
 	dof_tools_11 dof_tools_12 dof_tools_13 dof_tools_14 \
         dof_tools_15a dof_tools_15b dof_tools_15c dof_tools_15d \
+        dof_tools_16a dof_tools_16b dof_tools_16c dof_tools_16d \
 	roy_1 \
         denis_1 \
 	unit_support_points parameter_handler_1
