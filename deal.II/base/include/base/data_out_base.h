@@ -348,6 +348,29 @@ class DataOutBase
 					  * in the triangulation.
 					  */
 	Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
+
+					 /**
+					  * Numbers of neighbors of a patch.
+					  * OpenDX format requires
+					  * neighbor information for
+					  * advanced output. Here the
+					  * neighborship relationship
+					  * of patches is
+					  * stored. During output,
+					  * this must be transformed
+					  * into neighborship of
+					  * sub-grid cells.
+					  */
+	unsigned int neighbors[GeometryInfo<dim>::faces_per_cell];
+
+					 /**
+					  * Number of this
+					  * patch. Since we are not
+					  * sure patches are handled
+					  * in the same order, always,
+					  * we better store this.
+					  */
+	unsigned int me;
 	
 					 /**
 					  * Number of subdivisions with
@@ -430,7 +453,7 @@ class DataOutBase
 					  * should yield the same value for all
 					  * patches provided.
 					  */
-	vector2d<double> data;
+	vector2d<float> data;
 	
 					 /**
 					  * Default constructor. Sets
