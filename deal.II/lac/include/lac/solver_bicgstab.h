@@ -27,8 +27,7 @@
  * parameter.
  */
 template<class Matrix, class Vector>
-class SolverBicgstab //<Matrix,Vector>
-  : public Solver<Matrix,Vector>
+class SolverBicgstab : public Solver<Matrix,Vector>
 {
   public:
     				     /**
