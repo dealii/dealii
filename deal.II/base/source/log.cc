@@ -59,21 +59,18 @@ LogStream::get_file_stream()
 void
 LogStream::push (const string& text)
 {
-				   // strange enough: if make this
-				   // function non-inline with
-				   // gcc2.8, we get very strange
-				   // compiler errors...
   string pre=prefixes.top();
   pre += text;
   pre += string(":");
   prefixes.push(pre);
-}
+};
+
 
 
 void LogStream::pop ()
 {
   prefixes.pop();
-}
+};
 
 
 
