@@ -292,7 +292,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 	  cell=next_cell(cell);
 	};
     };
-};
+}
 
 
 
@@ -306,7 +306,7 @@ void DataOutRotation<3>::build_some_patches (Data)
 				   // to output/compute in four space
 				   // dimensions?
   Assert (false, ExcNotImplemented());
-};
+}
 
 #endif
 
@@ -399,7 +399,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
   else
                                      // just one thread
     build_some_patches(thread_data[0]);
-};
+}
 
 
 
@@ -408,7 +408,7 @@ typename DoFHandler<dim>::cell_iterator
 DataOutRotation<dim>::first_cell () 
 {
   return this->dofs->begin_active ();
-};
+}
 
 
 template <int dim>
@@ -421,7 +421,7 @@ DataOutRotation<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &
   typename DoFHandler<dim>::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
-};
+}
 
 
 // explicit instantiations

@@ -39,13 +39,13 @@ DataOutStack<dim>::DataVector::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (data) +
 	  MemoryConsumption::memory_consumption (names));
-};
+}
 
 
 
 template <int dim>
 DataOutStack<dim>::~DataOutStack ()
-{};
+{}
 
 
 template <int dim>
@@ -69,14 +69,14 @@ void DataOutStack<dim>::new_parameter_value (const double p,
     Assert (i->data.size() == 0,
 	    ExcDataNotCleared ());
   
-};
+}
 
 
 template <int dim>
 void DataOutStack<dim>::attach_dof_handler (const DoFHandler<dim> &dof) 
 {
   dof_handler = &dof;
-};
+}
 
 
 template <int dim>
@@ -86,7 +86,7 @@ void DataOutStack<dim>::declare_data_vector (const std::string &name,
   std::vector<std::string> names;
   names.push_back (name);
   declare_data_vector (names, vector_type);
-};
+}
 
 
 template <int dim>
@@ -126,7 +126,7 @@ void DataOutStack<dim>::declare_data_vector (const std::vector<std::string> &nam
 	    cell_data.back().names = names;
 	    break;
     };
-};
+}
 
 
 template <int dim>
@@ -137,7 +137,7 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
   std::vector<std::string> names;
   names.push_back (name);
   add_data_vector (vec, names);
-};
+}
 
 
 template <int dim>
@@ -191,7 +191,7 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
       Assert (data_vector != cell_data.end(),
 	      ExcVectorNotDeclared (names[0]));
     };
-};
+}
 
 
 template <int dim>
@@ -320,7 +320,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 	    };
 	};
     };
-};
+}
 
 
 template <int dim>
@@ -335,7 +335,7 @@ void DataOutStack<dim>::finish_parameter_value ()
   for (typename std::vector<DataVector>::iterator i=cell_data.begin();
        i!=cell_data.end(); ++i)
     i->data.reinit (0);
-};
+}
 
 
 
@@ -350,7 +350,7 @@ DataOutStack<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (patches) +
 	  MemoryConsumption::memory_consumption (dof_data) +
 	  MemoryConsumption::memory_consumption (cell_data));
-};
+}
 
 
 
@@ -359,7 +359,7 @@ const std::vector< ::DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;
-};
+}
 
 
 
@@ -375,7 +375,7 @@ std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
     names.insert (names.end(), dataset->names.begin(), dataset->names.end());
   
   return names;
-};
+}
 
 
 // explicit instantiations

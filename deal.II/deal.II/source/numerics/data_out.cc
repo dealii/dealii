@@ -640,7 +640,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 		    Threads::encapsulate (&DataOut<dim>::build_some_patches)
 		    .collect_args (this, thread_data[l]));
   thread_manager.wait();
-};
+}
 
 
 template <int dim>
@@ -648,7 +648,7 @@ typename DoFHandler<dim>::cell_iterator
 DataOut<dim>::first_cell () 
 {
   return this->dofs->begin_active ();
-};
+}
 
 
 template <int dim>
@@ -661,7 +661,7 @@ DataOut<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell)
   typename DoFHandler<dim>::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
-};
+}
 
 
 // explicit instantiations
