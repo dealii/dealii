@@ -723,6 +723,9 @@ DoFTools::extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 	  ExcWrongSize (component_select.size(),
 			dof_handler.get_fe().n_components()));
 
+				   // clear and reset array by default
+				   // values
+  selected_dofs.clear ();
   selected_dofs.resize (dof_handler.n_dofs(), false);
   vector<unsigned int> face_dof_indices (dof_handler.get_fe().dofs_per_face);
   for (DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
@@ -751,6 +754,9 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1> &dof_handler,
 	  ExcWrongSize (component_select.size(),
 			dof_handler.get_fe().n_components()));
 	  
+				   // clear and reset array by default
+				   // values
+  selected_dofs.clear ();
   selected_dofs.resize (dof_handler.n_dofs(), false);
 
   Assert (dof_handler.get_fe().dofs_per_face == dof_handler.get_fe().dofs_per_vertex,
