@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -123,7 +123,9 @@ namespace GridOutFlags
     scaling(1.,1.),
     fill_style (20),
     line_style(0),
-    boundary_style(0)
+    line_thickness(1),
+    boundary_style(0),
+    boundary_thickness(3)
   {}
 }  // end namespace GridOutFlags
 
@@ -183,19 +185,18 @@ GridOut::default_suffix (const OutputFormat output_format)
 {
   switch (output_format) 
     {
+      case none:
+	return "";
       case dx:
         return ".dx";
       case gnuplot: 
-	    return ".gnuplot";
-
+	return ".gnuplot";
       case ucd: 
-	    return ".inp";
-
+	return ".inp";
       case eps: 
-	    return ".eps";
-
+	return ".eps";
       case xfig:
-	    return ".fig";
+	return ".fig";
       default: 
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
@@ -207,6 +208,9 @@ GridOut::default_suffix (const OutputFormat output_format)
 GridOut::OutputFormat
 GridOut::parse_output_format (const std::string &format_name)
 {
+  if (format_name == "none" || format_name == "false")
+    return none;
+
   if (format_name == "dx")
     return dx;
 
@@ -231,7 +235,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names () 
 {
-  return "dx|gnuplot|eps|ucd|xfig";
+  return "none|dx|gnuplot|eps|ucd|xfig";
 }
 
 

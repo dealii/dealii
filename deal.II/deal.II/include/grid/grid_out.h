@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -399,7 +399,7 @@ namespace GridOutFlags
 	   const double       turn_angle      = 30);
   };
 				   /**
-				    * Flags fog XFig output.
+				    * Flags for XFig output.
 				    */
   struct XFig
   {
@@ -458,11 +458,28 @@ namespace GridOutFlags
 					* is forwarded to XFig.
 					*/
       int line_style;
-                                       /**
+      
+				       /**
+					* Thickness of border lines of
+					* polygons. Default is 1.
+					*
+					* Set this to zero to avoid
+					* border lines for very fine
+					* meshes.
+					*/
+      int line_thickness;
+      
+				       /**
 					* Style for drawing lines at the
 					* boundary. Defaults to solid (0).
 					*/
       int boundary_style;
+      
+				       /**
+					* Thickness of boundary
+					* lines. Default is 3.
+					*/
+      int boundary_thickness;
       
 				       /**
 					* Constructor.
@@ -475,18 +492,9 @@ namespace GridOutFlags
 
 
 /**
- * This class provides a means to output a triangulation to a file in different
- * formats. Presently provided are functions to write it in GNUPLOT and
- * encapsulated postscript format, as well as in UCD format.
- * There are also function to dispatch to
- * the different output functions based on a parameter given, e.g., through
- * a parameter file, thus making user programs invariant of the number and
- * names of the file formats implemented in this class. The main advantage of
- * this class over the DataOut class is that it does not have to mess around
- * with actual data vectors and that no DoFHandler object is needed to
- * write the pure geometrical information involved here.
- *
- * Available output formats can be found in the functions with names <tt>write_...</tt>
+ * This class provides a means to output a triangulation to a file in
+ * different formats. See the enum GridOut::OutputFormat for a list of formats
+ * and the corresponding output function names.
  *
  * @sect3{Usage}
  * Usage is simple: either you use the direct form
@@ -560,11 +568,29 @@ class GridOut
 {
   public:
 				     /**
-				      * Declaration of a name for each of the
-				      * different output formats.
+				      * Declaration of a name for each
+				      * of the different output
+				      * formats. These are used by the
+				      * generic output function
+				      * write() to determine the
+				      * actual output format.
 				      */
-    enum OutputFormat { dx, gnuplot, eps, ucd, xfig };
-
+    enum OutputFormat
+    {
+					   /// Do nothing in write()
+	  none,
+					   /// write() calls write_dx()
+	  dx,
+					   /// write() calls write_gnuplot()
+	  gnuplot,
+					   /// write() calls write_eps()
+	  eps,
+					   /// write() calls write_ucd()
+	  ucd,
+					   /// write() calls write_xfig()
+	  xfig
+    };
+    
 				     /**
 				      * Write triangulation in OpenDX
 				      * format.
