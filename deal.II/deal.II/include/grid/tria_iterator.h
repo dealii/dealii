@@ -447,8 +447,19 @@ class TriaRawIterator : public bidirectional_iterator<Accessor,int> {
 				      */
     DeclException0 (ExcAdvanceInvalidObject);
 				     /*@}*/
-//  protected:  // don't know why we can't declare this protected (gcc2.7/8 chokes!?)
+  protected:
+				     /**
+				      * Object holding the real data.
+				      */
     Accessor accessor;
+
+
+				     // actually, I don't know why we need these
+				     // classes to be friends, since they are
+				     // derived classes anyway. but gcc and
+				     // even egcs1.1.1 don't get it right
+    friend class TriaIterator<dim,Accessor>;
+    friend class TriaActiveIterator<dim,Accessor>;
 };
 
 
