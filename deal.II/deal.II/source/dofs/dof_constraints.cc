@@ -1114,6 +1114,35 @@ bool ConstraintMatrix::is_constrained (const unsigned int index) const
 
 
 
+bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const 
+{
+  if (sorted == true)
+    {
+      ConstraintLine index_comparison;
+      index_comparison.line = index;
+
+      const std::vector<ConstraintLine>::const_iterator
+	p = std::lower_bound (lines.begin (),
+			      lines.end (),
+			      index_comparison);
+      return ((p->line == index) &&
+	      (p->entries.size() == 1) &&
+	      (p->entries[0].second == 1.0));
+    }
+  else
+    {
+      for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
+	   i!=lines.end(); ++i)
+	if (i->line == index)
+	  return ((i->entries.size() == 1) &&
+		  (i->entries[0].second == 1.0));
+
+      return false;
+    };
+};
+
+
+
 unsigned int ConstraintMatrix::max_constraint_indirections () const 
 {
   unsigned int return_value = 0;

@@ -302,6 +302,29 @@ class ConstraintMatrix : public Subscriptor
     bool is_constrained (const unsigned int index) const;
 
 				     /**
+				      * Return whether the dof is
+				      * constrained, and whether it is
+				      * constrained to only one other
+				      * degree of freedom with weight
+				      * one. The function therefore
+				      * returns whether the degree of
+				      * freedom would simply be
+				      * eliminated in favor of exactly
+				      * one other degree of freedom.
+				      *
+				      * The function returns @p{false}
+				      * if either the degree of
+				      * freedom is not constrained at
+				      * all, or if it is constrained
+				      * to more than one other degree
+				      * of freedom, or if it is
+				      * constrained to only one degree
+				      * of freedom but with a weight
+				      * different from one.
+				      */
+    bool is_identity_constrained (const unsigned int index) const;
+    
+				     /**
 				      * Return the maximum number of
 				      * other dofs that one dof is
 				      * constrained to. For example,
@@ -322,37 +345,45 @@ class ConstraintMatrix : public Subscriptor
 				      * constrained to.
 				      */
     unsigned int max_constraint_indirections () const;
-    
+
 				     /**
-				      * Condense a given sparsity pattern. This
-				      * function assumes the uncondensed
-				      * matrix struct to be compressed and the
-				      * one to be filled to be empty. The
-				      * condensed structure is compressed
-				      * afterwards.
+				      * Condense a given sparsity
+				      * pattern. This function assumes
+				      * the uncondensed matrix struct
+				      * to be compressed and the one
+				      * to be filled to be empty. The
+				      * condensed structure is
+				      * compressed afterwards.
 				      *
-				      * The constraint matrix object must be
-				      * closed to call this function.
+				      * The constraint matrix object
+				      * must be closed to call this
+				      * function.
 				      */
     void condense (const SparsityPattern &uncondensed,
 		   SparsityPattern       &condensed) const;
 
 
 				     /**
-				      * This function does much the same as
-				      * the above one, except that it condenses
-				      * the matrix struct 'in-place'. It does
-				      * not remove nonzero entries from the
-				      * matrix but adds those needed for the
-				      * process of distribution of the
-				      * constrained degrees of freedom.
+				      * This function does much the
+				      * same as the above one, except
+				      * that it condenses the matrix
+				      * struct 'in-place'. It does not
+				      * remove nonzero entries from
+				      * the matrix but adds those
+				      * needed for the process of
+				      * distribution of the
+				      * constrained degrees of
+				      * freedom.
 				      *
-				      * Since this function adds new nonzero
-				      * entries to the sparsity pattern, the
-				      * argument must not be compressed. However
-				      * the constraint matrix must be closed.
-				      * The matrix struct is compressed at the
-				      * end of the function.
+				      * Since this function adds new
+				      * nonzero entries to the
+				      * sparsity pattern, the argument
+				      * must not be
+				      * compressed. However the
+				      * constraint matrix must be
+				      * closed.  The matrix struct is
+				      * compressed at the end of the
+				      * function.
 				      */
     void condense (SparsityPattern &sparsity) const;
 
