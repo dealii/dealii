@@ -38,6 +38,26 @@ report+mail:
 	@rm testresults
 
 
+# compilation of tests only, no execution of tests
+
+build: build-base build-lac build-fe build-deal.II build-bits
+
+build-base: abort.o
+	cd base ; $(MAKE) exe
+
+build-lac: abort.o
+	cd lac ; $(MAKE) exe
+
+build-fe: abort.o
+	cd fe ; $(MAKE) exe
+
+build-bits: abort.o
+	cd bits ; $(MAKE) exe
+
+build-deal.II: abort.o
+	cd deal.II ; $(MAKE) exe
+
+
 # collect all header files, and for each try to do the following:
 # generate a file tmp.cc that contains nothing but "#include <xxx>"
 # with this particular header file. then try to compile it. this 
