@@ -82,8 +82,7 @@ MappingQ1<dim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
 
 template<>
 const unsigned int MappingQ1<deal_II_dimension>::vertex_mapping[2] =
-{ 0, 1
-    };
+{ 0, 1 };
 
 
 template<>
@@ -119,9 +118,7 @@ MappingQ1<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 
 template<> const unsigned int
 MappingQ1<2>::vertex_mapping[4] =
-{
-  0, 1, 3, 2
-    };
+{ 0, 1, 3, 2 };
 
 
 template<>
@@ -166,9 +163,7 @@ MappingQ1<2>::compute_shapes_virtual (const std::vector<Point<2> > &unit_points,
 
 template<>
 const unsigned int MappingQ1<deal_II_dimension>::vertex_mapping[8] =
-{
-  0, 1, 4, 5, 3, 2, 7, 6
-    };
+{ 0, 1, 4, 5, 3, 2, 7, 6 };
 
 
 template<>
