@@ -855,36 +855,106 @@ MinimizationProblem<dim>::output_results () const
 
 
 
+                                 // The function to compute error indicator
+                                 // and refine the mesh accordingly is a
+                                 // little more interesting. In particular, it
+                                 // shows some more of the techniques usually
+                                 // used in 1d applications. First, note that
+                                 // this again is a specialization that only
+                                 // works in 1d. However, to make later
+                                 // extension to higher space dimensions
+                                 // simpler, we define a constant integer
+                                 // ``dim'' at the beginning of the function;
+                                 // by using this constant as template
+                                 // argument in all places, we are actually
+                                 // able to write most of the code as if it
+                                 // were dimension independent, thus
+                                 // minimizing the amount of later changes.
 template <>
 void MinimizationProblem<1>::refine_grid ()
 {
   const unsigned int dim = 1;
   
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> error_indicators (triangulation.n_active_cells());
 
+                                   // Then define the quadrature formula, and
+                                   // what values we will want to extract from
+                                   // the solution. Here, we use the two-point
+                                   // trapezoidal rule, i.e. we evaluate the
+                                   // residual only at the end points of the
+                                   // cells. Incidentally, this also makes
+                                   // evaluating the jump terms between cells
+                                   // simpler. Note that for the error
+                                   // indicators, we not only need values and
+                                   // gradients of the solution, but also its
+                                   // second derivatives, as well as the
+                                   // physical location of quadrature points.
   QTrapez<dim> quadrature;
   FEValues<dim> fe_values (fe, quadrature,
                            update_values   | update_gradients |
                            update_second_derivatives |
                            update_q_points | update_JxW_values);
 
+                                   // The error indicator formula presented in
+                                   // the introduction requires us to compute
+                                   // jumps of the solution and gradient
+                                   // across cell boundaries. Since the
+                                   // solution itself is continuous, we only
+                                   // need to evaluate the gradient on the
+                                   // neighbor cells. To avoid some of the
+                                   // work needed to reinitialize a
+                                   // ``FEValues'' object on a cell, we define
+                                   // another such object here that we will
+                                   // only use for the neighbor cells. The
+                                   // data we need from the side of the
+                                   // present cell is provided by above
+                                   // object.
   FEValues<dim> neighbor_fe_values (fe, quadrature,
                                     update_gradients);
 
+                                   // Then, as before, we need objects holding
+                                   // values and derivatives of the solution
+                                   // at quadrature points. Here, we also need
+                                   // second derivatives, which is simple,
+                                   // however:
   std::vector<double> local_values (quadrature.n_quadrature_points);
   std::vector<Tensor<1,dim> > local_gradients (quadrature.n_quadrature_points);
   std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature.n_quadrature_points);
 
+                                   // With all this, we can start the loop
+                                   // over all cells. Since we need to write
+                                   // the result for each cell into
+                                   // consecutive elements of a vector, we
+                                   // also keep a running index ``cell_index''
+                                   // that we increase with each cell treated.
   DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active (),
     endc = dof_handler.end ();
-  for (unsigned int index = 0; cell!=endc; ++cell, ++index)
+  for (unsigned int cell_index = 0; cell!=endc; ++cell, ++cell_index)
     {
+                                       // After initializing the ``FEValues''
+                                       // object on each cell, use it to
+                                       // evaluate solution and first and
+                                       // second derivatives of it at the
+                                       // quadrature points:
       fe_values.reinit (cell);
       fe_values.get_function_values (present_solution, local_values);
       fe_values.get_function_grads (present_solution, local_gradients);
       fe_values.get_function_2nd_derivatives (present_solution, local_2nd_derivs);
 
+                                       // Given the formula in the
+                                       // introduction, the computation of the
+                                       // cell residuals should actually be
+                                       // relatively obvious. The result,
+                                       // multiplied by the appropriate power
+                                       // of the cell's size is then written
+                                       // into the vector of error indicators.
+                                       //
+                                       // Note that in the following
+                                       // computations, we have already made
+                                       // use of the fact that we are in 1d,
+                                       // since we extract the gradient as a
+                                       // scalar value.
       double cell_residual_norm = 0;
       for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
         {
@@ -903,9 +973,72 @@ void MinimizationProblem<1>::refine_grid ()
           cell_residual_norm += (local_residual_value * local_residual_value *
                                  fe_values.JxW(q));
         }
+      error_indicators(cell_index) = cell_residual_norm *
+                                     cell->diameter() * cell->diameter();
 
-      estimated_error_per_cell(index) = cell_residual_norm *
-                                        cell->diameter() * cell->diameter();
+                                       // The next step is to evaluate the
+                                       // jump terms. To make computations
+                                       // somewhat simpler (and to free up the
+                                       // ``local_*'' variables for use on
+                                       // neighboring elements), we define
+                                       // some convenience variables for the
+                                       // positions of the left and right cell
+                                       // boundary point, as well as the
+                                       // values and gradients at these
+                                       // points.
+                                       //
+                                       // To be cautious, we don't blindly
+                                       // trust that the trapezoidal rule has
+                                       // its evaluation points as the left
+                                       // and right end point of the cell (it
+                                       // could in principle have them in the
+                                       // reverse order, i.e. the zeroth point
+                                       // is at x=1, and the first one at
+                                       // x=0), and use an assertion to
+                                       // actually check for this. If this
+                                       // would not be the case, an exception
+                                       // of the (predefined) class
+                                       // ``ExcInternalError'' would be
+                                       // thrown. Of course, this does not
+                                       // happen in this program, but it shows
+                                       // a way of defensive coding: if you
+                                       // are not sure of an assumption, guard
+                                       // it by a test. This also guards us
+                                       // against possible future changes in
+                                       // the library: the quadrature classes
+                                       // do not promise any particular order
+                                       // of their quadrature points, so the
+                                       // ``QTrapez'' class could in principle
+                                       // change the order of its two
+                                       // evaluation points. In that case,
+                                       // your code would tell you that
+                                       // something changed, rather than
+                                       // computing a wrong result when you
+                                       // upgrade to a new version of the
+                                       // library. (The point made here is
+                                       // theoretical: we are not going to
+                                       // change the order of evaluation
+                                       // points; the intent is simply how to
+                                       // add some defensive touches to a
+                                       // program that make sure that it
+                                       // really does what it is hoped to do.)
+                                       //
+                                       // Given that we are now sure that
+                                       // ``x_left'' and ``x_right'',
+                                       // extracted from the zeroth and first
+                                       // quadrature point, are indeed the
+                                       // left and right vertex of the cell,
+                                       // we can also be sure that the values
+                                       // we extract for ``u_left'' et al. are
+                                       // the ones we expect them to be, since
+                                       // the order of these values must of
+                                       // course match the order of the
+                                       // quadrature points.
+      const double x_left  = fe_values.quadrature_point(0)[0];
+      const double x_right = fe_values.quadrature_point(1)[0];
+
+      Assert (x_left  == cell->vertex(0)[0], ExcInternalError());
+      Assert (x_right == cell->vertex(1)[0], ExcInternalError());
 
       const double u_left  = local_values[0];
       const double u_right = local_values[1];
@@ -913,30 +1046,78 @@ void MinimizationProblem<1>::refine_grid ()
       const double u_prime_left  = local_gradients[0][0];
       const double u_prime_right = local_gradients[1][0];
 
-      const double x_left  = fe_values.quadrature_point(0)[0];
-      const double x_right = fe_values.quadrature_point(1)[0];
-
-      Assert (x_left  == cell->vertex(0)[0], ExcInternalError());
-      Assert (x_right == cell->vertex(1)[0], ExcInternalError());
-
+                                       // Next, we have to check whether this
+                                       // cell has a left neighbor:
       if (cell->at_boundary(0) == false)
         {
+                                           // If so, find its left
+                                           // neighbor. We do so by asking for
+                                           // the cell that is immediately
+                                           // adjacent to the left (the zeroth
+                                           // neighbor in 1d). However, this
+                                           // may be a cell that in itself has
+                                           // children, so to get to the
+                                           // active left neighbor, we have to
+                                           // recursively check whether that
+                                           // cell has children, and if so
+                                           // take its right child, since that
+                                           // is adjacent to the left of the
+                                           // present cell. Note that unless
+                                           // you are in 1d, there is no safe
+                                           // way to assume that the first
+                                           // child of the zeroth neighbor is
+                                           // indeed adjacent to the present
+                                           // cell. Rather, more than one of
+                                           // the children of a neighbor may
+                                           // be adjacent to the present
+                                           // cell. Also note that in two or
+                                           // higher space dimensions, a
+                                           // neighbor of an active cell may
+                                           // only be at most once refined,
+                                           // since we have the rule that
+                                           // there can only be one hanging
+                                           // node per face. This rule does
+                                           // not exist in 1d: neighboring
+                                           // cells may have totally
+                                           // independent refinement
+                                           // levels. Thus, we really need the
+                                           // ``while'' loop, not only an
+                                           // ``if'' clause.
           DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
           while (left_neighbor->has_children())
             left_neighbor = left_neighbor->child(1);
-          
+
+                                           // With the so-found neighbor,
+                                           // initialize the second
+                                           // ``FEValues'' object to it,
+                                           // extract the gradients of the
+                                           // solution there, and from this
+                                           // get the gradient at the
+                                           // interface (this is the first
+                                           // element of ``local_gradients'',
+                                           // since the right end point of the
+                                           // neighbor cell has index 1) as a
+                                           // scalar value (this is the zeroth
+                                           // component of
+                                           // ``local_gradients[1]''.
           neighbor_fe_values.reinit (left_neighbor);
           neighbor_fe_values.get_function_grads (present_solution, local_gradients);
 
           const double neighbor_u_prime_left = local_gradients[1][0];
 
+                                           // Then compute the jump, and add a
+                                           // suitable multiple to the error
+                                           // indicator for this cell:
           const double left_jump = std::pow(x_left-std::pow(u_left,3), 2) *
                                    (std::pow(neighbor_u_prime_left,5) -
                                     std::pow(u_prime_left,5));
-          estimated_error_per_cell(index) += left_jump * left_jump *
-                                             cell->diameter();
+          error_indicators(cell_index) += left_jump * left_jump *
+                                          cell->diameter();
         }
 
+                                       // Once we have done the left neighbor,
+                                       // we can play exactly the same game
+                                       // with the right neighbor:
       if (cell->at_boundary(1) == false)
         {
           DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
@@ -951,14 +1132,14 @@ void MinimizationProblem<1>::refine_grid ()
           const double right_jump = std::pow(x_right-std::pow(u_right,3), 2) *
                                    (std::pow(neighbor_u_prime_right,5) -
                                     std::pow(u_prime_right,5));
-          estimated_error_per_cell(index) += right_jump * right_jump *
-                                             cell->diameter();
+          error_indicators(cell_index) += right_jump * right_jump *
+                                          cell->diameter();
         }
       
     } 
   
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						   estimated_error_per_cell,
+						   error_indicators,
 						   0.3, 0.03);
 
   SolutionTransfer<dim,double> solution_transfer(dof_handler);
