@@ -30,9 +30,9 @@ int main ()
   
   std::string name;
   name = "FE_Q(1)";
-  fe1 = FETools::get_fe_from_name(name);
-  fe2 = FETools::get_fe_from_name(name);
-  fe3 = FETools::get_fe_from_name(name);
+  fe1 = FETools::get_fe_from_name<1>(name);
+  fe2 = FETools::get_fe_from_name<2>(name);
+  fe3 = FETools::get_fe_from_name<3>(name);
   
   deallog << "Read " << name << std::endl;
   deallog << "Generated :" << std::endl;
