@@ -25,6 +25,11 @@
 #include <fe/fe_lib.lagrange.h>
 #include <grid/grid_out.h>
 
+#ifdef DEAL_II_USE_MT
+#  include <base/thread_management.h>
+#  include <base/multithread_info.h>
+#endif
+
 #include <dofs/dof_constraints.h>
 
 #include <numerics/error_estimator.h>
@@ -43,6 +48,9 @@ class AdvectionProblem
   private:
     void setup_system ();
     void assemble_system ();
+    void assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
+				   const DoFHandler<dim>::active_cell_iterator &begin);
+    
     void solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
@@ -59,6 +67,10 @@ class AdvectionProblem
 
     Vector<double>       solution;
     Vector<double>       system_rhs;
+
+#ifdef DEAL_II_USE_MT
+    ACE_Thread_Mutex     assembler_lock;
+#endif
 };
 
 
@@ -256,6 +268,39 @@ void AdvectionProblem<dim>::setup_system ()
 template <int dim>
 void AdvectionProblem<dim>::assemble_system () 
 {
+#ifdef DEAL_II_USE_MT
+  const unsigned int n_threads = multithread_info.n_default_threads;
+  ACE_Thread_Manager thread_manager;
+
+				   // define starting and end point
+				   // for each thread
+  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+  vector<pair<active_cell_iterator,active_cell_iterator> >
+    thread_ranges = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
+								dof_handler.end (),
+								n_threads);
+
+  for (unsigned int thread=0; thread<n_threads; ++thread)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate(&AdvectionProblem<2>::assemble_system_interval)
+		    .collect_args (this,
+				   thread_ranges[thread].first,
+				   thread_ranges[thread].second));
+  thread_manager.wait ();  
+#else
+  assemble_system_interval (dof_handler.begin_active(),
+			    dof_handler.end());
+#endif
+};
+
+
+
+template <int dim>
+void
+AdvectionProblem<dim>::
+assemble_system_interval (const DoFHandler<dim>::active_cell_iterator &begin,
+			  const DoFHandler<dim>::active_cell_iterator &end) 
+{
   AdvectionField<dim> advection_field;
   RightHandSide<dim>  right_hand_side;
   BoundaryValues<dim> boundary_values;
@@ -288,9 +333,8 @@ void AdvectionProblem<dim>::assemble_system ()
   vector<double>       face_boundary_values (n_face_q_points);
   vector<Point<dim> >  face_advection_directions (n_face_q_points);
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  DoFHandler<dim>::active_cell_iterator cell;
+  for (cell=begin; cell!=end; ++cell)
     {
       cell_matrix.clear ();
       cell_rhs.clear ();
@@ -368,6 +412,9 @@ void AdvectionProblem<dim>::assemble_system ()
 	  
 
       cell->get_dof_indices (local_dof_indices);
+#ifdef DEAL_II_USE_MT
+      assembler_lock.acquire ();
+#endif
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -377,6 +424,9 @@ void AdvectionProblem<dim>::assemble_system ()
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	};
+#ifdef DEAL_II_USE_MT
+      assembler_lock.release ();
+#endif
     };
 
   hanging_node_constraints.condense (system_matrix);
