@@ -1102,7 +1102,7 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 						 fe_values.get_JxW_values().begin(),
 						 0.0);
 		      if (norm == L2_norm)
-			diff=sqrt(diff);
+			diff=std::sqrt(diff);
  		      break;
 		case L1_norm:
 		      if (weight != 0)
@@ -1128,11 +1128,11 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 			  psi_scalar[q] = psi_values[q].l1_norm();		      
 
 						       // Integration on one cell
-		      diff = inner_product (psi_scalar.begin(), psi_scalar.end(),
-					    fe_values.get_JxW_values().begin(),
-					    0.0);
+		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0);
 		      if (norm == L2_norm)
-			diff=sqrt(diff);
+			diff=std::sqrt(diff);
  		      break;
  		case Linfty_norm:
 		      if (weight != 0)
@@ -1239,7 +1239,7 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
  	    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
 					fe_values.get_JxW_values().begin(),
 					0.0);
- 	    diff = sqrt(diff);
+ 	    diff = std::sqrt(diff);
 
  	    break;
  	  };
