@@ -18,9 +18,9 @@
 #include <base/smartpointer.h>
 #include <base/logstream.h>
 #include <lac/vector_memory.h>
+#include <lac/block_vector.h>
 #include <vector>
 
-template <typename> class BlockVector;
 
 
 /**

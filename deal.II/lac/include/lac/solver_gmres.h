@@ -22,6 +22,7 @@
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/full_matrix.h>
+#include <lac/vector.h>
 
 #include <vector>
 #include <cmath>
