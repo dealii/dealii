@@ -1414,19 +1414,21 @@ template class LaplaceMatrix<deal_II_dimension>;
 
 template
 void
-MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
-					 SparseMatrix<double>  &matrix,
-					 Vector<double>   &solution,
-					 Vector<double>   &right_hand_side,
-					 const bool        preserve_symmetry);
+MatrixTools<deal_II_dimension>::
+apply_boundary_values (const map<unsigned int,double> &boundary_values,
+		       SparseMatrix<double>  &matrix,
+		       Vector<double>   &solution,
+		       Vector<double>   &right_hand_side,
+		       const bool        preserve_symmetry);
 
 template
 void
-MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundary_values,
-					 SparseMatrix<float>  &matrix,
-					 Vector<float>   &solution,
-					 Vector<float>   &right_hand_side,
-					 const bool       preserve_symmetry);
+MatrixTools<deal_II_dimension>::
+apply_boundary_values (const map<unsigned int,double> &boundary_values,
+		       SparseMatrix<float>  &matrix,
+		       Vector<float>   &solution,
+		       Vector<float>   &right_hand_side,
+		       const bool       preserve_symmetry);
 
 template
 void
