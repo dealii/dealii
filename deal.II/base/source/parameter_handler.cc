@@ -491,15 +491,16 @@ bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
   				   // now every existing whitespace
 				   // should be exactly one ' ';
 				   // if at end or beginning: delete
-  if ((line.length() != 0) && (line[0] == ' '))  line.erase (line[0]);
+  if ((line.length() != 0) && (line[0] == ' '))  line.erase (0, 1);
 				   // if line is now empty: leave
   if (line.length() == 0) return true;
 
-  if (line[line.length()-1] == ' ')  line.erase (line[line.size()-1]);
+  if (line[line.length()-1] == ' ')
+    line.erase (line.size()-1, 1);
 
 				   // enter subsection
-  if ((line.find ("SUBSECTION") != string::npos) ||
-      (line.find ("subsection") != string::npos))
+  if ((line.find ("SUBSECTION ") == 0) ||
+      (line.find ("subsection ") == 0))
     {
 				       // delete this prefix
       line.erase (0, string("subsection").length()+1);
@@ -523,28 +524,29 @@ bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
       return true;
     };
   
-
 				   // exit subsection
-  if ((line.find ("END") != string::npos) ||
-      (line.find ("end") != string::npos))
+  if ((line.find ("END") == 0) ||
+      (line.find ("end") == 0))
     if (subsection_path.size() == 0) 
       {
-	cerr << "Line " << lineno << ": There is no subsection to leave here!" << endl;
+	cerr << "Line " << lineno
+	     << ": There is no subsection to leave here!" << endl;
 	return false;
       }
     else
       return leave_subsection ();
 
-
 				   // regular entry
-  if ((line.find ("SET") != string::npos) ||
-      (line.find ("set") != string::npos)) 
+  if ((line.find ("SET ") == 0) ||
+      (line.find ("set ") == 0)) 
     {
 				       // erase "set" statement and eliminate
 				       // spaces around the '='
       line.erase (0, 4);
-      line.replace (line.find(" ="), 2, "=");
-      line.replace (line.find("= "), 2, "=");
+      if (line.find(" =") != string::npos)
+	line.replace (line.find(" ="), 2, "=");
+      if (line.find("= ") != string::npos)
+	line.replace (line.find("= "), 2, "=");
 
 				       // extract entry name and value
       string entry_name  (line, 0, line.find('='));
