@@ -51,8 +51,6 @@ void MGDoFHandler<dim>::MGVertexDoFs::init (const unsigned int cl,
 
 template <int dim>
 MGDoFHandler<dim>::MGVertexDoFs::~MGVertexDoFs () {
-  Assert (indices != 0, ExcInternalError ());
-  
   delete[] indices;
 };
 
@@ -865,6 +863,7 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
 
 				   // reserve space for the MG dof numbers
   reserve_space ();
+  mg_used_dofs.resize (tria->n_levels(), 0);
 
 				   // clear user flags because we will
 				   // need them
@@ -875,8 +874,8 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
   for (unsigned int level=0; level<tria->n_levels(); ++level)
     {
       unsigned int next_free_dof = 0;   
-      active_cell_iterator cell = begin(level),
-			   endc = end(level);
+      cell_iterator cell = begin(level),
+		    endc = end(level);
 
       for (; cell != endc; ++cell) 
 	next_free_dof = distribute_dofs_on_cell (cell, next_free_dof);
@@ -891,8 +890,8 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe) {
 
 template <>
 unsigned int
-MGDoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
-					  unsigned int          next_free_dof) {
+MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
+					  unsigned int   next_free_dof) {
 
 				   // distribute dofs of vertices
   if (selected_fe->dofs_per_vertex > 0)
@@ -946,8 +945,8 @@ MGDoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
 
 template <>
 unsigned int
-MGDoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
-					  unsigned int          next_free_dof) {
+MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
+					  unsigned int   next_free_dof) {
   if (selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
@@ -1374,12 +1373,12 @@ void MGDoFHandler<2>::reserve_space () {
                                    // their size
   for (unsigned int i=0; i<mg_levels.size(); ++i)
     delete mg_levels[i];
-  mg_levels.resize (0);
+  mg_levels.clear ();
 
 				   // also delete vector of vertex indices
 				   // this calls the destructor which
 				   // must free the space
-  mg_vertex_dofs.resize (0);
+  mg_vertex_dofs.clear ();
   
   
 				   ////////////////////////////

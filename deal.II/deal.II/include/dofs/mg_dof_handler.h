@@ -823,9 +823,13 @@ class MGDoFHandler : public DoFHandler<dim> {
 				      * #distribute_dofs# function since
 				      * it can not be implemented dimension
 				      * independent.
+				      *
+				      * Note that unlike for the usual dofs,
+				      * here all cells and not only active
+				      * ones are allowed.
 				      */
-    unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
-					  unsigned int next_free_dof);
+    unsigned int distribute_dofs_on_cell (cell_iterator &cell,
+					  unsigned int   next_free_dof);
     
 				     /**
 				      * Actually do the renumbering prepared
