@@ -97,11 +97,6 @@ Remove the workaround with the BoundaryHelper class which was
   (previous ones worked flawless)
 
 
-Check the pattern matching in the parameter handler module using
-  the C++ exception handling mechanism rather than Asserts, since
-  this should be on also when debug mode is off.
-
-
 I suppose the [mg_]get_dof_values really belongs to the
   [MG]Line/QuadAccessor classes, but now it is in the
   [MG]CellAccessor. Correct this some time.
