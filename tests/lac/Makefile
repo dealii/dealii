@@ -154,7 +154,7 @@ target1: $(target1-o-files) $(libraries)
 	@rm $@.bak
 
 %.check:%.output
-	@-diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
+	@diff $< $(patsubst %.output,%.checked, $<) && echo '=====OK============'
 ############################################################
 # Cleanup targets
 ############################################################
