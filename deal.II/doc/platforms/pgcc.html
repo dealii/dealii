@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet" media="screen">
+    <link href="../print.css" rel="StyleSheet" media="print">
+    <title>The deal.II Readme -- Installation Instructions</title>
+    <meta name="author" content="Wolfgang Bangerth <deal@iwr.uni-heidelberg.de>">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Installation instructions for the Portland Group pgcc compiler</h1>
+
+    <p>
+    This compiler is not supported yet, or maybe we should say this
+    differently: this compiler does not support C++ enough to allow
+    compilation of the library. The first obstacle is that as of
+    version 3.3-2, the compiler does not come with C++ style headers
+    <code>&lt;cmath&rt;</code>, <code>&lt;cstdlib&rt;</code>, etc. If
+    such a file is placed into the respective include directory,
+    containing in include statement for the respective C style header
+    (no "c" in front, but a ".h" at the end), then at least the
+    preprocessor works, but we are stuck with uses of the math
+    functions in namespace "std", such as <code>std::sin</code>. This
+    would require changes all over the code, or writing a standard
+    compliant header file, both of which we are not willing to do as
+    this is just a lack of C++ conformance of the compiler, not of the
+    library.
+    </p>
+
+    <p>
+    However, even if we do this in a couple of places, we get
+    consistent errors with this perfectly legal piece of code:
+    <code>
+    <pre>
+#include <map>
+
+void g (double);
+void f() 
+{
+  std::map<int,double> m;
+  for (std::map<int,double>::const_iterator i=m.begin(); i!=m.end(); ++i)
+    g(i->second);
+};
+    </pre>
+    </code>
+    leading to this message:
+    <code>
+    <pre>
+tmp/x> pgCC -c x.cc
+"x.cc", line 8: error: expression must have pointer type
+      g(i->second);
+        ^
+
+1 error detected in the compilation of "x.cc".
+    </pre>
+    </code>
+    </p>
+
+    <p>
+    Furthermore, we consistently got this error:
+    <code>
+    <pre>
+"/home/wolf/p/deal.II/3/deal.II/base/include/base/memory_consumption.h", line 482: internal error:
+          assertion failed at: "../src/types.c", line 4669
+
+    unsigned int memory_consumption (const T (&v)[N])
+                 ^
+
+1 catastrophic error detected in the compilation of "source/data_out_base.cc".
+Compilation aborted.
+pgCC-Fatal-/home/wolf/bin/pgcc/linux86/bin/pgcpp1 TERMINATED by signal 6
+    </pre>
+    </code>
+    At this point we thought we'd better use our time for something
+    better and wait for the next version of the compiler.
+    </p>
+
+
+  </body>
+</html>
