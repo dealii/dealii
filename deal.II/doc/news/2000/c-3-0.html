@@ -114,6 +114,21 @@
 <h3>lac</h3>
 
 <ol>
+  <li> <p> 
+       New: For recognizing a diverging solver before the maximum
+       number of steps is reached, <code
+       class="class">SolverControl</code> returns <code
+       class="member">failure</code> also if the residual increases
+       the start residual by a specific factor. This factor is given
+       to the <code class="class">SolverControl</code> by the <code
+       class="member">set_failure_criterion</code> function. After
+       calling the latter function the checking of this additional
+       failure criterion may again be disabled by calling <code
+       class="member">clear_failure_criterion</code>.
+       <br>
+       (Ralf Hartmann 2000/06/26)
+       </p>
+
   <li> <p>
        Improved: The interface of preconditioner classes has changed.
        Preconditioners are now considered linear operators like
@@ -295,6 +310,17 @@
 
 <ol>
   <li> <p>
+       New: The new function <code class="member">get_face</code>
+       of <code class="class">FEFaceValues</code> and <code
+       class="class">FESubfaceValues</code> returns an iterator of the
+       present face. This is the face, for that the <code
+       class="class">FE(Sub)FaceValues</code> object was reinited
+       the last time.
+       <br>
+       (Ralf Hartmann 2000/06/26)
+       </p>
+
+  <li> <p>
        New: classes <code class="class">FEDG_Px</code> implement
        complete polynomial spaces of degree <em>x</em> on
        quadrilaterals. Since they have less degrees of freedom than
@@ -303,6 +329,7 @@
        still incomplete.
        <br>
        (GK 2000/06/20)
+       </p>
 
   <li> <p>
        Fix: slight bug in 
