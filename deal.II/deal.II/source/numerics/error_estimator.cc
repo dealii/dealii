@@ -47,46 +47,16 @@ double sqr (const double x)
 };
 
 
-#if deal_II_dimension == 1
-
-// provide zero pointers to be used in the initialization of 
-// invalid references
-namespace 
-{
-  const Mapping<1> * const           invalid_mapping         = 0;
-  const DoFHandler<1> * const        invalid_dof_handler     = 0;
-  const Quadrature<0> * const        invalid_face_quadrature = 0;
-  const FunctionMap<1>::type * const invalid_function_map    = 0;
-  const std::vector<const Vector<double> *> * const invalid_solutions = 0;
-  std::map<DoFHandler<1>::face_iterator,std::vector<double> >
-  * const invalid_face_integrals = 0;
-}
-
-
-template <>
-KellyErrorEstimator<1>::PerThreadData::
-PerThreadData(const DoFHandler<1>                 &,
-              const Quadrature<0>                 &,
-              const unsigned int)
-{
-  Assert (false, ExcInternalError());
-}
-
-#else
 
 template <int dim>
 KellyErrorEstimator<dim>::PerThreadData::
-PerThreadData(const DoFHandler<dim>   &dof_handler,
-              const Quadrature<dim-1> &quadrature,
-              const unsigned int       n_solution_vectors)
+PerThreadData (const unsigned int n_solution_vectors,
+	       const unsigned int n_components,
+	       const unsigned int n_q_points)
 {
-  const unsigned int n_components = dof_handler.get_fe().n_components();
-  
 				   // Init the size of a lot of vectors
 				   // needed in the calculations once
 				   // per thread.
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
-  
   normal_vectors.resize(n_q_points);
   coefficient_values1.resize(n_q_points);
   coefficient_values.resize(n_q_points);
@@ -114,7 +84,6 @@ PerThreadData(const DoFHandler<dim>   &dof_handler,
     coefficient_values[qp].reinit(n_components);
 }
 
-#endif
 
 
 
@@ -652,9 +621,9 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 				   // components
   std::vector<PerThreadData*> data_structures (n_threads);
   for (unsigned int i=0; i<n_threads; ++i)
-    data_structures[i] = new PerThreadData (dof_handler,
-                                            quadrature,
-                                            solutions.size());
+    data_structures[i] = new PerThreadData (solutions.size(),
+					    dof_handler.get_fe().n_components(),
+                                            quadrature.n_quadrature_points);
   
 				   // split all cells into threads if
 				   // multithreading is used and run
@@ -797,7 +766,7 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
   const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
   const unsigned int n_q_points         = quadrature.n_quadrature_points,
 		     n_components       = dof_handler.get_fe().n_components(),
-		     n_solution_vectors = n_solution_vectors;
+		     n_solution_vectors = solutions.size();
   
   
 				   // initialize data of the restriction
