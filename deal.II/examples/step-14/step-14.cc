@@ -671,7 +671,6 @@ namespace LaplaceSolver
 					linear_system.matrix,
 					solution,
 					linear_system.rhs);
-
   };
 
 
@@ -3622,22 +3621,23 @@ struct Framework
 				     // simple use.
     struct ProblemDescription 
     {
-					 // First allow the degrees of
-					 // the piecewise polynomials
-					 // by which the primal and
-					 // dual problems will be
-					 // discretized. They default
-					 // to (bi-, tri-)linear
-					 // ansatz functions for the
-					 // primal, and (bi-,
-					 // tri-)quadratic ones for
-					 // the dual problem. If a
-					 // refinement criterion is
-					 // chosen that does not need
-					 // the solution of a dual
-					 // problem, the value of the
-					 // dual finite element degree
-					 // is of course ignored.
+					 // First allow for the
+					 // degrees of the piecewise
+					 // polynomials by which the
+					 // primal and dual problems
+					 // will be discretized. They
+					 // default to (bi-,
+					 // tri-)linear ansatz
+					 // functions for the primal,
+					 // and (bi-, tri-)quadratic
+					 // ones for the dual
+					 // problem. If a refinement
+					 // criterion is chosen that
+					 // does not need the solution
+					 // of a dual problem, the
+					 // value of the dual finite
+					 // element degree is of
+					 // course ignored.
 	unsigned int primal_fe_degree;
 	unsigned int dual_fe_degree;
 
