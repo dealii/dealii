@@ -566,10 +566,11 @@ BlockTrianglePrecondition<MATRIX>::do_row (
   unsigned int row_num) const
 {
   typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
-    m = entries.begin();
+    m = this->entries.begin();
   typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
-    end = entries.end();
-  typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator diagonal = end;  
+    end = this->entries.end();
+  typename std::vector<typename BlockMatrixArray<MATRIX>::Entry>::const_iterator
+    diagonal = end;  
   
   static Vector<number> aux;
   aux.reinit(dst.block(row_num), true);
