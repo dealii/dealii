@@ -46,10 +46,17 @@
  * each degree of freedom, depending for example on the local neighborhood of
  * the respective node on a computational grid.
  *
- * The right hand side is built up in the same way, i.e. by copying all entries
- * that coupled with the one under present consideration, but it is augmented
- * by all degrees of freedom coupling with the degrees from the set described
- * above (i.e. the DoFs coupling second order to the present one).
+ * The right hand side is built up in the same way, i.e. by copying
+ * all entries that coupled with the one under present consideration,
+ * but it is augmented by all degrees of freedom coupling with the
+ * degrees from the set described above (i.e. the DoFs coupling second
+ * order to the present one). The reason for this is, that the local
+ * problems to be solved shall have Dirichlet boundary conditions on
+ * the second order coupling DoFs, so we have to take them into
+ * account but eliminate them before actually solving; this
+ * elimination is done by the modification of the right hand side, and
+ * in the end these degrees of freedom do not occur in the matrix and
+ * solution vector any more at all.
  *
  * This local system is solved and the values are updated into the
  * destination vector.
@@ -91,8 +98,7 @@
  * whether this might pose some problems in the inversion of the local matrices.
  * Maybe someone would like to check this.
  *
- * @author Guido Kanschat, 1999
- */
+ * @author Guido Kanschat, documentation mostly by Wolfgang Bangerth; 1999 */
 template<typename number>
 class SparseVanka
 {
