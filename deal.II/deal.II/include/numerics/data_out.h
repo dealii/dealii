@@ -645,7 +645,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * for finding neighbors.
 				      */
     typedef std::map<typename DoFHandler<dim>::cell_iterator,
-      typename std::vector<::DataOutBase::Patch<dim> >::iterator>
+      typename std::vector< ::DataOutBase::Patch<dim> >::iterator>
       PatchMap;
     
 				     /**

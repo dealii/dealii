@@ -49,7 +49,7 @@ void DataOutFaces<dim>::build_some_patches (Data data)
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   unsigned int face_number = 0;
-  typename std::vector<::DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
+  typename std::vector< ::DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
   FaceDescriptor face=first_face();
 
 				   // get first face in this thread
@@ -173,7 +173,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      std::vector<::DataOutBase::Patch<dim-1,dim> > dummy;
+      std::vector< ::DataOutBase::Patch<dim-1,dim> > dummy;
       this->patches.swap (dummy);
     };
   

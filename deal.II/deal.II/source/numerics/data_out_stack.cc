@@ -247,7 +247,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 
 				   // now loop over all cells and
 				   // actually create the patches
-  typename std::vector<::DataOutBase::Patch<dim+1> >::iterator
+  typename std::vector< ::DataOutBase::Patch<dim+1> >::iterator
     patch = patches.begin() + (patches.size()-n_patches);
   unsigned int cell_number = 0;
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
@@ -355,7 +355,7 @@ DataOutStack<dim>::memory_consumption () const
 
 
 template <int dim>
-const typename std::vector<::DataOutBase::Patch<dim+1> > &
+const typename std::vector< ::DataOutBase::Patch<dim+1> > &
 DataOutStack<dim>::get_patches () const
 {
   return patches;
