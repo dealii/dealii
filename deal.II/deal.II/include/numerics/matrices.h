@@ -388,14 +388,6 @@ class MatrixCreator
 				      * Exception
 				      */
     DeclException0 (ExcComponentMismatch);    
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcDimensionsDontMatch,
-		    int, int,
-		    << "The dimensions " << arg1 << " and " << arg2
-		    << " don't match.");
-
   private:
 				     /**
 				      * Convenience abbreviation for

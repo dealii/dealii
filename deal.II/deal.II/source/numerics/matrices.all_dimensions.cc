@@ -31,11 +31,11 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    const bool        preserve_symmetry)
 {
   Assert (matrix.n() == matrix.m(),
-	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
+	  ExcDimensionMismatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
-	  ExcDimensionsDontMatch(matrix.n(), right_hand_side.size()));
+	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
-	  ExcDimensionsDontMatch(matrix.n(), solution.size()));
+	  ExcDimensionMismatch(matrix.n(), solution.size()));
 				   // if no boundary values are to be applied
 				   // simply return
   if (boundary_values.size() == 0)
@@ -199,11 +199,11 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
   const unsigned int blocks = matrix.n_block_rows();
   
   Assert (matrix.n() == matrix.m(),
-	  ExcDimensionsDontMatch(matrix.n(), matrix.m()));
+	  ExcDimensionMismatch(matrix.n(), matrix.m()));
   Assert (matrix.n() == right_hand_side.size(),
-	  ExcDimensionsDontMatch(matrix.n(), right_hand_side.size()));
+	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
-	  ExcDimensionsDontMatch(matrix.n(), solution.size()));
+	  ExcDimensionMismatch(matrix.n(), solution.size()));
   Assert (matrix.n_block_rows() == matrix.n_block_cols(),
 	  ExcMatrixNotBlockSquare());
   Assert (matrix.get_sparsity_pattern().get_row_indices() == 

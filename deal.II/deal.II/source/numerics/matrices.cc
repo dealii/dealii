@@ -149,9 +149,6 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
       cell_matrix.clear ();
       cell->get_dof_indices (dof_indices);
       
-      const FullMatrix<double>  &values    = fe_values.get_shape_values ();
-      const std::vector<double> &weights   = fe_values.get_JxW_values ();
-      
       if (coefficient != 0)
 	{
 	  if (coefficient->n_components==1)
@@ -159,46 +156,66 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 	      coefficient->value_list (fe_values.get_quadrature_points(),
 				       coefficient_values);
 	      for (unsigned int point=0; point<n_q_points; ++point)
-		for (unsigned int i=0; i<dofs_per_cell; ++i) 
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    if ((n_components==1) ||
-			(fe.system_to_component_index(i).first ==
-			 fe.system_to_component_index(j).first))
-		      cell_matrix(i,j) += (values(i,point) *
-					   values(j,point) *
-					   weights[point] *
-					   coefficient_values[point]);
+		{
+		  const double weight = fe_values.JxW(point);
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    {
+		      const double v = fe_values.shape_value(i,point);
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			{
+			  const double u = fe_values.shape_value(j,point);
+			  
+			  if ((n_components==1) ||
+			      (fe.system_to_component_index(i).first ==
+			       fe.system_to_component_index(j).first))
+			    cell_matrix(i,j) +=
+			      (u * v * weight * coefficient_values[point]);
+			}
+		    }
+		}
 	    }
 	  else
 	    {
 	      coefficient->vector_value_list (fe_values.get_quadrature_points(),
 					      coefficient_vector_values);
 	      for (unsigned int point=0; point<n_q_points; ++point)
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  {
-		    const unsigned int component_i=
-		      fe.system_to_component_index(i).first;
-		    for (unsigned int j=0; j<dofs_per_cell; ++j)
-		      if ((n_components==1) ||
-			  (fe.system_to_component_index(j).first == component_i))
-			cell_matrix(i,j) += (values(i,point) *
-					     values(j,point) *
-					     weights[point] *
-					     coefficient_vector_values[point](component_i));    
-		  }
+		{
+		  const double weight = fe_values.JxW(point);
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    {
+		      const double v = fe_values.shape_value(i,point);
+		      const unsigned int component_i=
+			fe.system_to_component_index(i).first;
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			{
+			  const double u = fe_values.shape_value(j,point);
+			  if ((n_components==1) ||
+			      (fe.system_to_component_index(j).first == component_i))
+			    cell_matrix(i,j) +=
+			      (u * v * weight *
+			       coefficient_vector_values[point](component_i));
+			}
+		    }
+		}
 	    }
 	}
       else
 	for (unsigned int point=0; point<n_q_points; ++point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i) 
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if ((n_components==1) ||
-		  (fe.system_to_component_index(i).first ==
-		   fe.system_to_component_index(j).first))
-		cell_matrix(i,j) += (values(i,point) *
-				     values(j,point) *
-				     weights[point]);
-
+	  {
+	    const double weight = fe_values.JxW(point);
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      {
+		const double v = fe_values.shape_value(i,point); 
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  {
+		    const double u = fe_values.shape_value(j,point);
+		    if ((n_components==1) ||
+			(fe.system_to_component_index(i).first ==
+			 fe.system_to_component_index(j).first))
+		      cell_matrix(i,j) += (u * v * weight);
+		  }
+	      }
+	  }
 				       // transfer everything into the
 				       // global object
       mutex.acquire ();
