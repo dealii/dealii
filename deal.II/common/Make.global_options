@@ -13,7 +13,7 @@ vpath %.a $D/deal.II/lib
 CXX       = c++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
-CXXFLAGS.g= -DDEBUG -ggdb -Wall -W -pedantic -Wconversion \
+CXXFLAGS.g= -DDEBUG -ggdb -Wall -W -Wconversion \
             -Winline -Woverloaded-virtual -fno-builtin\
 	    -fno-vtable-thunks \
             $(INCLUDE)
