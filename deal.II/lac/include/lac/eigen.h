@@ -206,8 +206,8 @@ EigenPower<VECTOR>::solve (double       &value,
 
   deallog.push("Power method");
 
-  VECTOR* Vy = memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
-  VECTOR* Vr = memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
+  VECTOR* Vy = this->memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
+  VECTOR* Vr = this->memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
   
   double length = x.l2_norm ();
   double old_length = 0.;
@@ -250,19 +250,19 @@ EigenPower<VECTOR>::solve (double       &value,
 
 				       // Check the change of the eigenvalue
 				       // Brrr, this is not really a good criterion
-      conv = control().check (iter, fabs(1./length-1./old_length));
+      conv = this->control().check (iter, fabs(1./length-1./old_length));
     }
   
-  memory.free(Vy);
-  memory.free(Vr);
+  this->memory.free(Vy);
+  this->memory.free(Vr);
 
   deallog.pop();
 
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 }
 
@@ -300,14 +300,14 @@ EigenInverse<VECTOR>::solve (double       &value,
   ReductionControl inner_control (A.m(), 1.e-16, 1.e-8, false, false);
   PreconditionIdentity prec;
   SolverCG<VECTOR>
-    solver(inner_control, memory);
+    solver(inner_control, this->memory);
 
 				   // Next step for recomputing the shift
   unsigned int goal = 10;
   
 				   // Auxiliary vector
-  VECTOR* Vy = memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
-  VECTOR* Vr = memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
+  VECTOR* Vy = this->memory.alloc (); VECTOR& y = *Vy; y.reinit (x);
+  VECTOR* Vr = this->memory.alloc (); VECTOR& r = *Vr; r.reinit (x);
   
   double length = x.l2_norm ();
   double old_length = 0.;
@@ -357,23 +357,23 @@ EigenInverse<VECTOR>::solve (double       &value,
 	  y.equ (value, x);
 	  double res = A.residual (r,x,y);
 					   // Check the residual
-	  conv = control().check (iter, res);
+	  conv = this->control().check (iter, res);
 	} else {
-	  conv = control().check (iter, fabs(1./value-1./old_value));
+	  conv = this->control().check (iter, fabs(1./value-1./old_value));
 	}
       old_value = value;
     }
 
-  memory.free(Vy);
-  memory.free(Vr);
+  this->memory.free(Vy);
+  this->memory.free(Vr);
   
   deallog.pop();
 
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 }
 

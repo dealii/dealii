@@ -231,11 +231,11 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
   deallog.push("QMRS");
   
 				   // Memory allocation
-  Vv  = memory.alloc();
-  Vp  = memory.alloc();
-  Vq  = memory.alloc();
-  Vt  = memory.alloc();
-  Vd  = memory.alloc();
+  Vv  = this->memory.alloc();
+  Vp  = this->memory.alloc();
+  Vq  = this->memory.alloc();
+  Vt  = this->memory.alloc();
+  Vd  = this->memory.alloc();
 
   Vx = &x;
   Vb = &b;
@@ -260,20 +260,20 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
   while (state);
     
 				   // Deallocate Memory
-  memory.free(Vv);
-  memory.free(Vp);
-  memory.free(Vq);
-  memory.free(Vt);
-  memory.free(Vd);
+  this->memory.free(Vv);
+  this->memory.free(Vp);
+  this->memory.free(Vq);
+  this->memory.free(Vt);
+  this->memory.free(Vd);
  
 				   // Output
   deallog.pop();
 
 				   // in case of failure: throw
 				   // exception
-  if (control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (control().last_step(),
-					control().last_value());
+  if (this->control().last_check() != SolverControl::success)
+    throw SolverControl::NoConvergence (this->control().last_step(),
+					this->control().last_value());
 				   // otherwise exit as normal
 };
 
@@ -316,7 +316,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
   v.sadd(-1.,1.,b);
   res = v.l2_norm();
 
-  if (control().check(step, res) == SolverControl::success)
+  if (this->control().check(step, res) == SolverControl::success)
     return false;
 
   p = v;
@@ -360,7 +360,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
 	}
       else
 	res = sqrt((it+1)*tau);
-      state = control().check(step,res);
+      state = this->control().check(step,res);
       if ((state == SolverControl::success)
       || (state == SolverControl::failure))
 	return false;

@@ -86,7 +86,6 @@ void MGTransferPrebuilt<number>::build_matrices (
       prolongation_sparsities[level].reinit (sizes[level+1],
 					     sizes[level],
 					     dofs_per_cell+1);
-#endif
       
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -123,6 +122,7 @@ void MGTransferPrebuilt<number>::build_matrices (
       prolongation_sparsities[level].compress ();
 
       prolongation_matrices[level].reinit (prolongation_sparsities[level]);
+#endif
 
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);

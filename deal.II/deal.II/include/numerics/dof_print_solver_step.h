@@ -124,7 +124,7 @@ DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
 #endif
 
   filename << basename
-	   << std::setw(3) << setfill('0') << step
+	   << std::setw(3) << std::setfill('0') << step
 	   << out.default_suffix();
 
 #ifndef HAVE_STD_STRINGSTREAM
