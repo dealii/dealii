@@ -300,59 +300,100 @@ dnl it may be that we don't need one (but we check below, when we must
 dnl have it).
 
 dnl Next try to find out something about the name and version of the compiler
-F77_VERSION_STRING=`($F77 -v 2>&1)`
-if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
-  dnl Yes, this is a GNU g77 version. find out the right version
-  G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
-  case "$G77_VERSION_STRING" in
-    *"egcs-1.1"*)
-	AC_MSG_RESULT(compiler is egcs-1.1)
-	F77_VERSION=egcs1.1
-	;;
-    *2.95*)
-	AC_MSG_RESULT(compiler is gcc-2.95)
-	F77_VERSION=gcc2.95
-	;;
-    *2.96*)
-	AC_MSG_RESULT(compiler is gcc-2.96)
-	F77_VERSION=gcc2.96
-	;;
-    *2.97*)
-	AC_MSG_RESULT(compiler is gcc-2.97)
-	F77_VERSION=gcc2.97
-	;;
-    *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-	dnl These compilers are too old to support a useful subset
-	dnl of modern C++, so we don't support them
-	AC_MSG_RESULT(compiler is $G77_VERSION_STRING)
-	AC_MSG_ERROR(compiler is not supported)
-	;;
-    *)
-	AC_MSG_RESULT(compiler is unknown but accepted gcc version)
-	F77_VERSION=other
-	;;
-  esac
+if test "x$F77" != "x" ; then
+  F77_VERSION_STRING=`($F77 -v 2>&1)`
+  if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
+    dnl Yes, this is a GNU g77 version. find out the right version
+    G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
+    case "$G77_VERSION_STRING" in
+      *"egcs-1.1"*)
+	  AC_MSG_RESULT(compiler is egcs-1.1)
+  	  F77_VERSION=egcs1.1
+	  ;;
+      *2.95*)
+	  AC_MSG_RESULT(compiler is gcc-2.95)
+	  F77_VERSION=gcc2.95
+	  ;;
+      *2.96*)
+	  AC_MSG_RESULT(compiler is gcc-2.96)
+	  F77_VERSION=gcc2.96
+	  ;;
+      *2.97*)
+	  AC_MSG_RESULT(compiler is gcc-2.97)
+	  F77_VERSION=gcc2.97
+	  ;;
+      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
+	  dnl These compilers are too old to support a useful subset
+	  dnl of modern C++, so we don't support them
+	  AC_MSG_RESULT(compiler is $G77_VERSION_STRING)
+	  AC_MSG_ERROR(compiler is not supported)
+	  ;;
+      *)
+	  AC_MSG_RESULT(compiler is unknown but accepted gcc version)
+	  F77_VERSION=other
+	  ;;
+    esac
 
-  dnl For g77 versions, it is simple which flags to use since we already
-  dnl know them mostly from the C++ compiler
-  F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
-  F77FLAGSO="$FFLAGS -O2"
+    dnl For g77 versions, it is simple which flags to use since we already
+    dnl know them mostly from the C++ compiler
+    F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
+    F77FLAGSO="$FFLAGS -O2"
 
-  dnl Some flags can only be set for some compilers as others either
-  dnl did not accept them or were buggy on them (see the explanation
-  dnl for CXXFLAGS for an explanation of some of these cases)
-  if test "x$F77_VERSION" != "xegcs1.1" ; then
-    F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
+    dnl Some flags can only be set for some compilers as others either
+    dnl did not accept them or were buggy on them (see the explanation
+    dnl for CXXFLAGS for an explanation of some of these cases)
+    if test "x$F77_VERSION" != "xegcs1.1" ; then
+      F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
+    fi
+
+    dnl If necessary, add shared lib flags
+    if test $enableshared = yes ; then
+      F77FLAGSG="$F77FLAGSG -fPIC"
+      F77FLAGSO="$F77FLAGSO -fPIC"
+    fi
+
+    dnl Then we have to set the set of libraries we have to link with
+    dnl when linking C++ and Fortran code with the C++ compiler. For
+    dnl g77, this is only libg2c
+    F77LDFLAGS="-lg2c"
+
+  else
+
+    dnl No GNU g77 version, something else. Try to find out what it is:
+    if test -n "`echo $F77_VERSION_STRING | grep \"XL Fortran for AIX\"`" ; then
+      dnl This is the "XL Fortran for AIX" compiler, but we have no set
+      dnl of reasonable compiler flags for it, so sorry!
+      F77_VERSION=AIXF77
+      AC_MSG_RESULT(compiler is AIX Fortran77)
+
+    else
+
+      dnl Umh, still something else unknown. Try to find it out by a different
+      dnl method (-V instead of -v):
+      F77_VERSION_STRING=`($F77 -V 2>&1)`
+      if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" ; then
+
+        dnl OK, this is the Sun Fortran77 compiler
+	AC_MSG_RESULT(compiler is Sun WorkShop f77)
+	F77_VERSION="SunF77"
+	F77FLAGSG="$FFLAGS -silent -g"
+	F77FLAGSO="$FFLAGS -silent -O3 -w"
+	F77LDFLAGS="-lF77 -lsunmath -lM77"
+
+	dnl If necessary, add shared lib flags
+	if test $enableshared = yes ; then
+	  F77FLAGSG="$F77FLAGSG -PIC"
+	  F77FLAGSO="$F77FLAGSO -PIC"
+	fi
+
+      else
+
+	dnl Now, this is a hard case, we have no more clues...
+        F77_VERSION=
+	AC_MSG_RESULT(compiler is unkown. no flags set!)
+      fi
+    fi
   fi
-
-  dnl Then we have to set the set of libraries we have to link with
-  dnl when linking C++ and Fortran code with the C++ compiler. For
-  dnl g77, this is only libg2c
-  F77LDFLAGS=-lg2c
-
-else
-  dnl No GNU g77 version, something else. Don't set anything
-  F77_VERSION
 fi
 AC_SUBST(F77_VERSION)
 AC_SUBST(F77FLAGSO)

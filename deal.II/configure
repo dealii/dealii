@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.42 
+# From configure.in Revision: 1.43 
 
 
 
@@ -1476,47 +1476,80 @@ fi
 
 fi
 
-F77_VERSION_STRING=`($F77 -v 2>&1)`
-if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
-    G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
-  case "$G77_VERSION_STRING" in
-    *"egcs-1.1"*)
-	echo "$ac_t""compiler is egcs-1.1" 1>&6
-	F77_VERSION=egcs1.1
-	;;
-    *2.95*)
-	echo "$ac_t""compiler is gcc-2.95" 1>&6
-	F77_VERSION=gcc2.95
-	;;
-    *2.96*)
-	echo "$ac_t""compiler is gcc-2.96" 1>&6
-	F77_VERSION=gcc2.96
-	;;
-    *2.97*)
-	echo "$ac_t""compiler is gcc-2.97" 1>&6
-	F77_VERSION=gcc2.97
-	;;
-    *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-			echo "$ac_t""compiler is $G77_VERSION_STRING" 1>&6
-	{ echo "configure: error: compiler is not supported" 1>&2; exit 1; }
-	;;
-    *)
-	echo "$ac_t""compiler is unknown but accepted gcc version" 1>&6
-	F77_VERSION=other
-	;;
-  esac
+if test "x$F77" != "x" ; then
+  F77_VERSION_STRING=`($F77 -v 2>&1)`
+  if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" ; then
+        G77_VERSION_STRING="`($F77 -v 2>&1) | grep \"gcc version\"`"
+    case "$G77_VERSION_STRING" in
+      *"egcs-1.1"*)
+	  echo "$ac_t""compiler is egcs-1.1" 1>&6
+  	  F77_VERSION=egcs1.1
+	  ;;
+      *2.95*)
+	  echo "$ac_t""compiler is gcc-2.95" 1>&6
+	  F77_VERSION=gcc2.95
+	  ;;
+      *2.96*)
+	  echo "$ac_t""compiler is gcc-2.96" 1>&6
+	  F77_VERSION=gcc2.96
+	  ;;
+      *2.97*)
+	  echo "$ac_t""compiler is gcc-2.97" 1>&6
+	  F77_VERSION=gcc2.97
+	  ;;
+      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
+	  	  	  echo "$ac_t""compiler is $G77_VERSION_STRING" 1>&6
+	  { echo "configure: error: compiler is not supported" 1>&2; exit 1; }
+	  ;;
+      *)
+	  echo "$ac_t""compiler is unknown but accepted gcc version" 1>&6
+	  F77_VERSION=other
+	  ;;
+    esac
 
-      F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
-  F77FLAGSO="$FFLAGS -O2"
+            F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
+    F77FLAGSO="$FFLAGS -O2"
 
-        if test "x$F77_VERSION" != "xegcs1.1" ; then
-    F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
+                if test "x$F77_VERSION" != "xegcs1.1" ; then
+      F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
+    fi
+
+        if test $enableshared = yes ; then
+      F77FLAGSG="$F77FLAGSG -fPIC"
+      F77FLAGSO="$F77FLAGSO -fPIC"
+    fi
+
+                F77LDFLAGS="-lg2c"
+
+  else
+
+        if test -n "`echo $F77_VERSION_STRING | grep \"XL Fortran for AIX\"`" ; then
+                  F77_VERSION=AIXF77
+      echo "$ac_t""compiler is AIX Fortran77" 1>&6
+
+    else
+
+                  F77_VERSION_STRING=`($F77 -V 2>&1)`
+      if test -n "`echo $F77_VERSION_STRING | grep \"WorkShop Compilers\"`" ; then
+
+        	echo "$ac_t""compiler is Sun WorkShop f77" 1>&6
+	F77_VERSION="SunF77"
+	F77FLAGSG="$FFLAGS -silent -g"
+	F77FLAGSO="$FFLAGS -silent -O3 -w"
+	F77LDFLAGS="-lF77 -lsunmath -lM77"
+
+		if test $enableshared = yes ; then
+	  F77FLAGSG="$F77FLAGSG -PIC"
+	  F77FLAGSO="$F77FLAGSO -PIC"
+	fi
+
+      else
+
+	        F77_VERSION=
+	echo "$ac_t""compiler is unkown. no flags set!" 1>&6
+      fi
+    fi
   fi
-
-        F77LDFLAGS=-lg2c
-
-else
-    F77_VERSION
 fi
 
 
@@ -1527,7 +1560,7 @@ fi
 # Extract the first word of "perl", so it can be a program name with args.
 set dummy perl; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1531: checking for $ac_word" >&5
+echo "configure:1564: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_PERL'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1579,7 +1612,7 @@ fi
 if test $enablemultithreading = yes ; then
   
   echo $ac_n "checking for platform specific thread flags""... $ac_c" 1>&6
-echo "configure:1583: checking for platform specific thread flags" >&5
+echo "configure:1616: checking for platform specific thread flags" >&5
   
   for i in threads mt pthread pthreads mthreads Kthread kthread invalid_last_entry; do
     CXXFLAGS="$CXXFLAGSG -$i"
@@ -1615,7 +1648,7 @@ echo "configure:1583: checking for platform specific thread flags" >&5
 
   
   echo $ac_n "checking for platform specific multi-threading defines""... $ac_c" 1>&6
-echo "configure:1619: checking for platform specific multi-threading defines" >&5
+echo "configure:1652: checking for platform specific multi-threading defines" >&5
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -1624,7 +1657,7 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
   cat > conftest.$ac_ext <<EOF
-#line 1628 "configure"
+#line 1661 "configure"
 #include "confdefs.h"
 
 #if !defined (_REENTRANT) && !defined (_THREAD_SAFE)
@@ -1638,7 +1671,7 @@ int main() {
    
 ; return 0; }
 EOF
-if { (eval echo configure:1642: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1675: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""not necessary"" 1>&6
@@ -1680,7 +1713,7 @@ fi
 
 if test $withmultithreading != no ; then
   echo $ac_n "checking for ACE""... $ac_c" 1>&6
-echo "configure:1684: checking for ACE" >&5
+echo "configure:1717: checking for ACE" >&5
   if test -d $withmultithreading ; then
     echo "$ac_t""found" 1>&6
   else
@@ -1700,7 +1733,7 @@ if test "${with_blas+set}" = set; then
   withval="$with_blas"
   if test $withval != no ; then
     echo $ac_n "checking for BLAS""... $ac_c" 1>&6
-echo "configure:1704: checking for BLAS" >&5
+echo "configure:1737: checking for BLAS" >&5
     if test -r $withval ; then
       echo "$ac_t""found" 1>&6
     else
@@ -1716,7 +1749,7 @@ EOF
   
 else
   echo $ac_n "checking for main in -lblas""... $ac_c" 1>&6
-echo "configure:1720: checking for main in -lblas" >&5
+echo "configure:1753: checking for main in -lblas" >&5
 ac_lib_var=`echo blas'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1724,14 +1757,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lblas  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1728 "configure"
+#line 1761 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:1735: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1768: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1763,7 +1796,7 @@ if test "${with_lapack+set}" = set; then
   withval="$with_lapack"
   if test $withval != no ; then
     echo $ac_n "checking for LAPACK""... $ac_c" 1>&6
-echo "configure:1767: checking for LAPACK" >&5
+echo "configure:1800: checking for LAPACK" >&5
     if test -r $withval ; then
       echo "$ac_t""found" 1>&6
     else
@@ -1779,7 +1812,7 @@ EOF
   
 else
   echo $ac_n "checking for dgels_ in -llapack""... $ac_c" 1>&6
-echo "configure:1783: checking for dgels_ in -llapack" >&5
+echo "configure:1816: checking for dgels_ in -llapack" >&5
 ac_lib_var=`echo lapack'_'dgels_ | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1787,7 +1820,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-llapack  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1791 "configure"
+#line 1824 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 #ifdef __cplusplus
@@ -1801,7 +1834,7 @@ int main() {
 dgels_()
 ; return 0; }
 EOF
-if { (eval echo configure:1805: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1838: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1868,7 +1901,7 @@ else
 fi
 
 echo $ac_n "checking for kdoc""... $ac_c" 1>&6
-echo "configure:1872: checking for kdoc" >&5
+echo "configure:1905: checking for kdoc" >&5
 if test "$kdocdir" != ${DEAL2_DIR}/contrib/kdoc/bin ; then
   if test -r $kdocdir/kdoc ; then
     echo "$ac_t""found" 1>&6
@@ -1904,7 +1937,7 @@ if test "$docxx" = to-be-determined ; then
   # Extract the first word of ""doc++"", so it can be a program name with args.
 set dummy "doc++"; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1908: checking for $ac_word" >&5
+echo "configure:1941: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_docxx'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1938,7 +1971,7 @@ fi
 
 else
   echo $ac_n "checking for doc++""... $ac_c" 1>&6
-echo "configure:1942: checking for doc++" >&5
+echo "configure:1975: checking for doc++" >&5
   if test -x "$docxx" ; then
     echo "$ac_t""yes" 1>&6
   else
@@ -1953,7 +1986,7 @@ fi
 
 
   echo $ac_n "checking whether getrusage is properly declared""... $ac_c" 1>&6
-echo "configure:1957: checking whether getrusage is properly declared" >&5
+echo "configure:1990: checking whether getrusage is properly declared" >&5
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -1962,7 +1995,7 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
   cat > conftest.$ac_ext <<EOF
-#line 1966 "configure"
+#line 1999 "configure"
 #include "confdefs.h"
 
 #include <sys/resource.h>
@@ -1974,7 +2007,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:1978: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2011: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
@@ -1992,7 +2025,7 @@ fi
 rm -f conftest*
 
     echo $ac_n "checking whether isnan is declared with debug flags""... $ac_c" 1>&6
-echo "configure:1996: checking whether isnan is declared with debug flags" >&5
+echo "configure:2029: checking whether isnan is declared with debug flags" >&5
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -2003,7 +2036,7 @@ cross_compiling=$ac_cv_prog_cxx_cross
   CXXFLAGS=$CXXFLAGSG
   deal_II_isnan_flag=""
   cat > conftest.$ac_ext <<EOF
-#line 2007 "configure"
+#line 2040 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2015,7 +2048,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:2019: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2052: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
@@ -2031,7 +2064,7 @@ rm -f conftest*
 
   if test "x$deal_II_isnan_flag" = "x" ; then
             cat > conftest.$ac_ext <<EOF
-#line 2035 "configure"
+#line 2068 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2043,7 +2076,7 @@ int main() {
       
 ; return 0; }
 EOF
-if { (eval echo configure:2047: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2080: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	  echo "$ac_t"""yes"" 1>&6
@@ -2063,7 +2096,7 @@ rm -f conftest*
     for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
       CXXFLAGS="$CXXFLAGSG $testflag"
       cat > conftest.$ac_ext <<EOF
-#line 2067 "configure"
+#line 2100 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2075,7 +2108,7 @@ int main() {
 	
 ; return 0; }
 EOF
-if { (eval echo configure:2079: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2112: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	  	  	  deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
@@ -2088,7 +2121,7 @@ fi
 rm -f conftest*
 
                         cat > conftest.$ac_ext <<EOF
-#line 2092 "configure"
+#line 2125 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2100,7 +2133,7 @@ int main() {
 	
 ; return 0; }
 EOF
-if { (eval echo configure:2104: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2137: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	  	  	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN $testflag"
@@ -2122,7 +2155,7 @@ rm -f conftest*
   fi
 
     echo $ac_n "checking whether isnan is declared with optimized flags""... $ac_c" 1>&6
-echo "configure:2126: checking whether isnan is declared with optimized flags" >&5
+echo "configure:2159: checking whether isnan is declared with optimized flags" >&5
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -2133,7 +2166,7 @@ cross_compiling=$ac_cv_prog_cxx_cross
   CXXFLAGS=$CXXFLAGSO
   deal_II_isnan_flag=""
   cat > conftest.$ac_ext <<EOF
-#line 2137 "configure"
+#line 2170 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2145,7 +2178,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:2149: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2182: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	echo "$ac_t"""yes"" 1>&6
@@ -2161,7 +2194,7 @@ rm -f conftest*
 
   if test "x$deal_II_isnan_flag" = "x" ; then
             cat > conftest.$ac_ext <<EOF
-#line 2165 "configure"
+#line 2198 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2173,7 +2206,7 @@ int main() {
       
 ; return 0; }
 EOF
-if { (eval echo configure:2177: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2210: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	  echo "$ac_t"""yes"" 1>&6
@@ -2193,7 +2226,7 @@ rm -f conftest*
     for testflag in -D_ISOC99_SOURCE -D__EXTENSIONS__ ; do 
       CXXFLAGS="$CXXFLAGSO $testflag"
       cat > conftest.$ac_ext <<EOF
-#line 2197 "configure"
+#line 2230 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2205,7 +2238,7 @@ int main() {
 	
 ; return 0; }
 EOF
-if { (eval echo configure:2209: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2242: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	  	  	  deal_II_isnan_flag="-DHAVE_ISNAN $testflag"
@@ -2218,7 +2251,7 @@ fi
 rm -f conftest*
 
                         cat > conftest.$ac_ext <<EOF
-#line 2222 "configure"
+#line 2255 "configure"
 #include "confdefs.h"
 
 #include <cmath>
@@ -2230,7 +2263,7 @@ int main() {
 	
 ; return 0; }
 EOF
-if { (eval echo configure:2234: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2267: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
 	  	  	  deal_II_isnan_flag="-DHAVE_UNDERSCORE_ISNAN $testflag"
@@ -2265,16 +2298,16 @@ cross_compiling=$ac_cv_prog_cxx_cross
 
 CXXFLAGS="$CXXFLAGSG"
 echo $ac_n "checking for consistency of CXXFLAGSG flags""... $ac_c" 1>&6
-echo "configure:2269: checking for consistency of CXXFLAGSG flags" >&5
+echo "configure:2302: checking for consistency of CXXFLAGSG flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2271 "configure"
+#line 2304 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:2278: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2311: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6
@@ -2292,16 +2325,16 @@ rm -f conftest*
 
 CXXFLAGS="$CXXFLAGSO"
 echo $ac_n "checking for consistency of CXXFLAGSO flags""... $ac_c" 1>&6
-echo "configure:2296: checking for consistency of CXXFLAGSO flags" >&5
+echo "configure:2329: checking for consistency of CXXFLAGSO flags" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2298 "configure"
+#line 2331 "configure"
 #include "confdefs.h"
 
 int main() {
 ;
 ; return 0; }
 EOF
-if { (eval echo configure:2305: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2338: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   
     echo "$ac_t""yes" 1>&6
