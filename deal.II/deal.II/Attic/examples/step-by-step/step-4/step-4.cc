@@ -1,4 +1,5 @@
 /* $Id$ */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 				 // The first few (many?) include
 				 // files have already been used in
@@ -68,7 +69,7 @@ class LaplaceProblem
     void make_grid_and_dofs ();
     void assemble_system ();
     void solve ();
-    void output_results ();
+    void output_results () const;
 
     Triangulation<dim>   triangulation;
     FEQ1<dim>            fe;
@@ -490,7 +491,7 @@ void LaplaceProblem<dim>::solve ()
 				 // example. No changes here for
 				 // dimension independentce either.
 template <int dim>
-void LaplaceProblem<dim>::output_results () 
+void LaplaceProblem<dim>::output_results () const
 {
   DataOut<dim> data_out;
 

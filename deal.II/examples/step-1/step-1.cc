@@ -1,6 +1,9 @@
 /* $Id$ */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
-                                 // Needed for the Triangulation class:
+                                 // The most fundamental class in the
+                                 // library is the ``Triangulation''
+                                 // class, which is declared here:
 #include <grid/tria.h>
                                  // We need the following two includes
                                  // for loops over cells and/or faces:
@@ -40,7 +43,7 @@ void first_grid ()
                                    // dimensions. Likewise, there are
                                    // version working in one ("<1>")
                                    // and three ("<3>") space
-                                   // dimension, or for all
+                                   // dimensions, or for all
                                    // dimensions. We will see such
                                    // constructs in later examples,
                                    // where we show how to program

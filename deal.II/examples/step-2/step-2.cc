@@ -1,4 +1,5 @@
 /* $Id$ */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 				 // The following includes are just
 				 // like for the previous program, so

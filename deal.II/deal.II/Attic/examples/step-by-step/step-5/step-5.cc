@@ -1,4 +1,5 @@
 /* $Id$ */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 				 // Again, the first few include files
 				 // are already known, so we won't
@@ -66,7 +67,7 @@ class LaplaceProblem
     void setup_system ();
     void assemble_system ();
     void solve ();
-    void output_results (const unsigned int cycle);
+    void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
     FEQ1<dim>            fe;
@@ -635,7 +636,7 @@ void LaplaceProblem<dim>::solve ()
 				 // filename for each refinement
 				 // cycle.
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle)
+void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   DataOut<dim> data_out;
 

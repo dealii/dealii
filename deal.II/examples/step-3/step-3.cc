@@ -1,4 +1,5 @@
 /* $Id$ */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 				 // These include files are already
 				 // known to you. They declare the
@@ -111,7 +112,7 @@ class LaplaceProblem
     void make_grid_and_dofs ();
     void assemble_system ();
     void solve ();
-    void output_results ();
+    void output_results () const;
 
 				     // And then we have the member
 				     // variables. There are variables
@@ -732,7 +733,7 @@ void LaplaceProblem::solve ()
 				 // have no such postprocessing here,
 				 // but we would like to write the
 				 // solution to a file.
-void LaplaceProblem::output_results () 
+void LaplaceProblem::output_results () const
 {
 				   // To write the output to a file,
 				   // we need an object which knows
