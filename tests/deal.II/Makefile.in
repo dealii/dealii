@@ -353,6 +353,7 @@ wave-test-3.output: wave-test-3.testcase
 		s/value.*//;\
 		s/%%Creation Date:.*//;\
 		s/# Time =.*//; \
+		s/# Date =.*//; \
 		s/^\s+Time =.*//;\
 		s/^\s+Date =.*//;'  $@
 
