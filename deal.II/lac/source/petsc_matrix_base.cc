@@ -102,6 +102,12 @@ namespace PETScWrappers
   MatrixBase::operator = (const double d)
   {
     Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());    
+
+                                     // flush previously cached elements. this
+                                     // seems to be necessary since petsc
+                                     // 2.2.1, at least for parallel vectors
+                                     // (see test bits/petsc_64)
+    compress ();
     
     const int ierr = MatZeroEntries (matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

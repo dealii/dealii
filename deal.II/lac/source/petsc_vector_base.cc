@@ -121,6 +121,12 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
+                                     // flush previously cached elements. this
+                                     // seems to be necessary since petsc
+                                     // 2.2.1, at least for parallel vectors
+                                     // (see test bits/petsc_65)
+    compress ();
+    
     const int ierr = VecSet (&s, vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
