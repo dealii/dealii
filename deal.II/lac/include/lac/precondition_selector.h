@@ -18,6 +18,10 @@
 #include <base/smartpointer.h>
 #include <string>
 
+template <class number> class Vector;
+template <class number> class SparseMatrix;
+
+
 /**
  * Selects the preconditioner. The constructor of this class takes 
  * the name of the preconditioning and the damping parameter 
