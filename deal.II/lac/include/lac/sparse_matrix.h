@@ -810,9 +810,6 @@ class SparseMatrix
 				     //
     template <typename somenumber>
     void SOR (Vector<somenumber>& dst, const number om = 1.) const;
-				     //
-    template <typename somenumber>
-    void precondition (Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
 				     /**
 				      * Return a (constant) reference to the

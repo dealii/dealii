@@ -428,15 +428,6 @@ SparseMatrix<number>::precondition_SOR (Vector<somenumber>& dst, const Vector<so
 
 template <typename number>
 template <typename somenumber>
-void SparseMatrix<number>::precondition (Vector<somenumber> &dst, const Vector<somenumber> &src) const {
-  Assert (m() == n(), ExcMatrixNotSquare());
-  dst=src;
-};
-
-
-
-template <typename number>
-template <typename somenumber>
 void
 SparseMatrix<number>::SOR (Vector<somenumber>& dst, const number om) const
 {
