@@ -406,12 +406,21 @@ int main (int argc, char **argv)
         basename = std::string (basename.begin()+basename.rfind("/")+1,
                                 basename.end());
       
-      std::cout << basepath << "/" << basename << ".o "
-                << basepath << "/" << basename << ".g.o: \\"
+      std::cout << basepath << "/" << basename << ".o: \\"
                 << std::endl
                 << "\t\t" << *file;
       
       const std::set<std::string> includes = get_all_includes (*file);
+
+      for (std::set<std::string>::const_iterator i=includes.begin();
+           i!=includes.end(); ++i)
+        std::cout << "\\\n\t\t" << *i;
+      std::cout << std::endl;
+
+      std::cout << basepath << "/" << basename << ".g.o: \\"
+                << std::endl
+                << "\t\t" << *file;
+      
       for (std::set<std::string>::const_iterator i=includes.begin();
            i!=includes.end(); ++i)
         std::cout << "\\\n\t\t" << *i;
