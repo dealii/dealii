@@ -188,13 +188,10 @@ template <int dim>
 UpdateFlags
 FE_DGPNonparametric<dim>::update_each (const UpdateFlags flags) const
 {
-  UpdateFlags out = flags & update_values;
+  UpdateFlags out = flags;
 
-  if (flags & update_gradients)
-    out |= update_gradients | update_covariant_transformation;
-
-  if (flags & update_second_derivatives)
-    out |= update_second_derivatives | update_covariant_transformation;
+  if (flags & (update_values | update_gradients | update_second_derivatives))
+    out |= update_q_points ;
 
   return out;
 }
@@ -235,12 +232,10 @@ FE_DGPNonparametric<dim>::get_data (const UpdateFlags      update_flags,
       data->grads.resize (this->dofs_per_cell);
     }
 
-				   // if second derivatives through
-				   // finite differencing is required,
-				   // then initialize some objects for
-				   // that
   if (flags & update_second_derivatives)
-    data->initialize_2nd (this, mapping, quadrature);
+    {
+      data->grad_grads.resize (this->dofs_per_cell);
+    }
   return data;
 }
 
@@ -280,12 +275,10 @@ FE_DGPNonparametric<dim>::fill_fe_values (const Mapping<dim>                   &
 	      data.shape_values[k][i] = fe_data.values[k];
 	    if (flags & update_gradients)
 	      data.shape_gradients[k][i] = fe_data.grads[k];
+	    if (flags & update_second_derivatives)
+	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
 	  }
       }
-  
-  if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
-  
   fe_data.first_cell = false;
 }
 
@@ -322,17 +315,10 @@ FE_DGPNonparametric<dim>::fill_fe_face_values (const Mapping<dim>               
 	      data.shape_values[k][i] = fe_data.values[k];
 	    if (flags & update_gradients)
 	      data.shape_gradients[k][i] = fe_data.grads[k];
+	    if (flags & update_second_derivatives)
+	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
 	  }
       }
-
-				   // offset determines which data set
-				   // to take (all data sets for all
-				   // faces are stored contiguously)
-  const unsigned int offset = face * quadrature.n_quadrature_points;
-  
-  if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-  
   fe_data.first_cell = false;
 }
 
@@ -370,18 +356,10 @@ FE_DGPNonparametric<dim>::fill_fe_subface_values (const Mapping<dim>            
 	      data.shape_values[k][i] = fe_data.values[k];
 	    if (flags & update_gradients)
 	      data.shape_gradients[k][i] = fe_data.grads[k];
+	    if (flags & update_second_derivatives)
+	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
 	  }
       }
-  
-				   // offset determines which data set
-				   // to take (all data sets for all
-				   // sub-faces are stored contiguously)
-  const unsigned int offset = (face * GeometryInfo<dim>::subfaces_per_face + subface)
-			      * quadrature.n_quadrature_points;
-
-  if (flags & update_second_derivatives)
-    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-  
   fe_data.first_cell = false;
 }
 

@@ -32,7 +32,7 @@
 #  define ENDSTRING << std::ends
 #endif
 
-#define PRECISION 2
+#define PRECISION 5
 
 char fname[50];
 
@@ -90,6 +90,7 @@ plot_faces(Mapping<dim> &mapping,
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
 			      UpdateFlags(update_q_points
+					  | update_JxW_values
 					  | update_normal_vectors));
 
   for (unsigned int face_nr=0;
@@ -98,17 +99,16 @@ plot_faces(Mapping<dim> &mapping,
     {
       fe_values.reinit(cell, face_nr);
 
-      const std::vector<Point<dim> > &normals
-	=fe_values.get_normal_vectors();
-
       unsigned int k=0;
       for (unsigned int ny=0; ny<((dim>2) ? nq : 1); ++ny)
 	{
 	  for (unsigned int nx=0; nx<nq; ++nx)
 	    {
-	      Point<dim> x = fe_values.quadrature_point(k);
-	      Tensor<1,dim> n = normals[k];
-	      deallog << x << '\t' << n << std::endl;
+	      const Point<dim> x = fe_values.quadrature_point(k);
+	      const Point<dim>& n = fe_values.normal_vector(k);
+	      const double ds = fe_values.JxW(k);
+	      
+	      deallog << x << '\t' << n << '\t' << ds << std::endl;
 	      ++k;
 	    }
 	  deallog << std::endl;

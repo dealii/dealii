@@ -12,6 +12,7 @@
 #include <grid/grid_generator.h>
 #include <fe/fe_q.h>
 #include <fe/fe_dgp.h>
+#include <fe/fe_dgp_nonparametric.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_system.h>
@@ -25,6 +26,13 @@
 
 char fname[50];
 
+////////////////////////////////////////////////////////////////////////////
+// Plot shape function values at quarature points inside the cell [0,1]^d
+//
+// Output values in each line are
+//
+// x (y) (z) value[0]+1 value[1]+1 ...
+////////////////////////////////////////////////////////////////////////////
 template<int dim>
 inline void
 plot_shape_functions(Mapping<dim>& mapping,
@@ -34,21 +42,23 @@ plot_shape_functions(Mapping<dim>& mapping,
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 0., 1.);
-  typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(finel);
+  typename DoFHandler<dim>::cell_iterator c = dof.begin();
 
   const unsigned int div = 11;
 
   QTrapez<1> q_trapez;
   QIterated<dim> q(q_trapez, div);
-  FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_values |
-						  update_gradients |
-						  update_second_derivatives));
-  fe.reinit(c);
-  
-  sprintf(fname, "Shapes%dd-%s", dim, name);
+  FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_values
+						  | update_gradients
+						  | update_second_derivatives));
+
+  sprintf(fname, "Cell%dd-%s", dim, name);
+//  cerr << "\n" << fname << "\n";
   deallog.push(fname);
 
+  fe.reinit(c);
+  
   unsigned int k=0;
   for (unsigned int mz=0;mz<=((dim>2) ? div : 0) ;++mz)
     {
@@ -126,7 +136,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 							  | update_second_derivatives
 							  | update_q_points));
 
-  sprintf(fname, "ShapesFace%dd-%s", dim, name);
+  sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);
   
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
@@ -425,10 +435,10 @@ void plot_FE_DGQ_shape_functions()
   plot_face_shape_functions(m, q3, "DGQ3");
   test_compute_functions(m, q3, "DGQ3");
 
-  FE_DGQ<dim> q4(4);
-  plot_shape_functions(m, q4, "DGQ4");
-  plot_face_shape_functions(m, q4, "DGQ4");
-  test_compute_functions(m, q4, "DGQ4");
+//    FE_DGQ<dim> q4(4);
+//    plot_shape_functions(m, q4, "DGQ4");
+//    plot_face_shape_functions(m, q4, "DGQ4");
+//    test_compute_functions(m, q4, "DGQ4");
 
 //    FE_DGQ<dim> q5(5);
 //    plot_shape_functions(m, q5, "DGQ5");
@@ -465,10 +475,10 @@ void plot_FE_DGP_shape_functions()
   plot_face_shape_functions(m, p3, "DGP3");
   test_compute_functions(m, p3, "DGP3");
       
-  FE_DGP<dim> p4(4);
-  plot_shape_functions(m, p4, "DGP4");
-  plot_face_shape_functions(m, p4, "DGP4");
-  test_compute_functions(m, p4, "DGP4");
+//    FE_DGP<dim> p4(4);
+//    plot_shape_functions(m, p4, "DGP4");
+//    plot_face_shape_functions(m, p4, "DGP4");
+//    test_compute_functions(m, p4, "DGP4");
 
 //    FE_DGP<dim> p5(5);
 //    plot_shape_functions(m, p5, "DGP5");
@@ -482,6 +492,33 @@ void plot_FE_DGP_shape_functions()
 //    plot_shape_functions(m, p9, "DGP9");
 //    FE_DGP<dim> p10(10);
 //    plot_shape_functions(m, p10, "DGP10");
+}
+
+
+template<int dim>
+void plot_FE_DGPNonparametric_shape_functions()
+{
+  MappingQ1<dim> m;
+
+  FE_DGPNonparametric<dim> p0(0);
+  plot_shape_functions(m, p0, "DGPNonparametric0");
+  plot_face_shape_functions(m, p0, "DGPNonparametric0");
+
+  FE_DGPNonparametric<dim> p1(1);
+  plot_shape_functions(m, p1, "DGPNonparametric1");
+  plot_face_shape_functions(m, p1, "DGPNonparametric1");
+
+  FE_DGPNonparametric<dim> p2(2);
+  plot_shape_functions(m, p2, "DGPNonparametric2");
+  plot_face_shape_functions(m, p2, "DGPNonparametric2");
+      
+//    FE_DGPNonparametric<dim> p3(3);
+//    plot_shape_functions(m, p3, "DGPNonparametric3");
+//    plot_face_shape_functions(m, p3, "DGPNonparametric3");
+      
+//    FE_DGPNonparametric<dim> p4(4);
+//    plot_shape_functions(m, p4, "DGPNonparametric4");
+//    plot_face_shape_functions(m, p4, "DGPNonparametric4");
 }
 
 
@@ -566,10 +603,14 @@ main()
   plot_FE_DGP_shape_functions<1>();
   plot_FE_DGP_shape_functions<2>();
   plot_FE_DGP_shape_functions<3>();
-
+  
+  plot_FE_DGPNonparametric_shape_functions<1>();
+  plot_FE_DGPNonparametric_shape_functions<2>();
+  plot_FE_DGPNonparametric_shape_functions<3>();
+  
   plot_FE_Nedelec_shape_functions<2>();
   plot_FE_Nedelec_shape_functions<3>();
-
+  
   plot_FE_System_shape_functions<1>();
   plot_FE_System_shape_functions<2>();
   plot_FE_System_shape_functions<3>();
