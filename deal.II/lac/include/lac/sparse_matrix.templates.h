@@ -1018,11 +1018,17 @@ SparseMatrix<number>::PSOR (
     {
       const unsigned int row = permutation[urow];
       somenumber s = dst(row);
+      
       for (unsigned int j=cols->rowstart[row]; j<cols->rowstart[row+1]; ++j)
 	{
 	  const unsigned int col = cols->colnums[j];
 	  if (inverse_permutation[col] < urow)
-	    s -= val[j] * dst(col);
+	    {
+	      s -= val[j] * dst(col);
+	    }
+	  
+	  std::cerr << std::endl;
+	  
 	}
 
       dst(row) = s * om / val[cols->rowstart[row]];
