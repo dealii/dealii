@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003 by the deal.II authors */
+/*    Copyright (C) 2002, 2003, 2004 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -175,7 +175,7 @@ namespace Evaluation
 				   // to be a little bit more careful
 				   // here. What we do is to loop over
 				   // all cells, even if we have found
-				   // the point already on once cell,
+				   // the point already on one cell,
 				   // and use the mean value of the
 				   // gradient at the vertex taken
 				   // from all adjacent cells.

@@ -452,7 +452,7 @@ void ElasticProblem<dim>::setup_system ()
                                  // contributions into the global matrix or
                                  // right hand side vector, we actually have
                                  // to transfer these entries to the other
-                                 // process. Furtunately, we don't have to do
+                                 // process. Fortunately, we don't have to do
                                  // this by hand, PETSc does all this for us
                                  // by caching these elements locally, and
                                  // sending them to the other processes as
