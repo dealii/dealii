@@ -1,7 +1,7 @@
 # $Id$
 
 
-KDOCFLAGS   = -I../kdoc ../../../deal.II/doc/kdoc/kdoc -a -p
+KDOCFLAGS   = -I../../../deal.II/doc/kdoc ../../../deal.II/doc/kdoc/kdoc -a -p
 kdoc.inc  = $(wildcard ../include/lac/*.h)
 
 
