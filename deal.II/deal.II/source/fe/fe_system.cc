@@ -63,7 +63,6 @@ FESystem<dim>::InternalData::~InternalData()
 
 
 template <int dim>
-inline
 typename FiniteElementBase<dim>::InternalDataBase &
 FESystem<dim>::
 InternalData::get_fe_data (const unsigned int base_no) const
@@ -76,7 +75,7 @@ InternalData::get_fe_data (const unsigned int base_no) const
 
 
 template <int dim>
-inline void
+void
 FESystem<dim>::
 InternalData::set_fe_data (const unsigned int base_no,
 			   typename FiniteElementBase<dim>::InternalDataBase *ptr)
@@ -89,7 +88,7 @@ InternalData::set_fe_data (const unsigned int base_no,
 
 
 template <int dim>
-inline FEValuesData<dim> &
+FEValuesData<dim> &
 FESystem<dim>::
 InternalData::get_fe_values_data (const unsigned int base_no) const
 {
@@ -102,7 +101,7 @@ InternalData::get_fe_values_data (const unsigned int base_no) const
 
 
 template <int dim>
-inline void
+void
 FESystem<dim>::
 InternalData::set_fe_values_data (const unsigned int base_no,
 				  FEValuesData<dim> *ptr)
@@ -115,7 +114,7 @@ InternalData::set_fe_values_data (const unsigned int base_no,
 
 
 template <int dim>
-inline void
+void
 FESystem<dim>::
 InternalData::delete_fe_values_data (const unsigned int base_no)
 {

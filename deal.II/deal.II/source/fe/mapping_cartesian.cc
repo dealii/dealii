@@ -548,7 +548,6 @@ Point<dim> MappingCartesian<dim>::transform_real_to_unit_cell (
 
 template <int dim>
 template <typename tensor_>
-inline
 void
 MappingCartesian<dim>::
 contravariant_transformation (typename std::vector<tensor_>       &dst,
@@ -586,7 +585,6 @@ contravariant_transformation (typename std::vector<tensor_>       &dst,
 
 template <int dim>
 template <typename tensor_>
-inline
 void
 MappingCartesian<dim>::
 covariant_transformation (typename std::vector<tensor_>       &dst,

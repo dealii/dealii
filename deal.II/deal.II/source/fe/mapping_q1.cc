@@ -41,7 +41,7 @@ MappingQ1<dim>::InternalData::InternalData (const unsigned int n_shape_functions
 
 
 
-template<int dim> inline
+template<int dim>
 double
 MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 				     const unsigned int shape_nr) const
@@ -54,7 +54,7 @@ MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 
 
 
-template<int dim> inline
+template <int dim>
 double &
 MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 				     const unsigned int shape_nr)
@@ -66,7 +66,7 @@ MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 }
 
 
-template<int dim> inline
+template <int dim>
 Tensor<1,dim>
 MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 					  const unsigned int shape_nr) const
@@ -79,7 +79,7 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 
 
 
-template<int dim> inline
+template <int dim>
 Tensor<1,dim> &
 MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 					  const unsigned int shape_nr)
@@ -1013,7 +1013,6 @@ void MappingQ1<dim>::transform_real_to_unit_cell_internal (
 
 template <int dim>
 template <typename tensor_>
-inline
 void
 MappingQ1<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
 					      const std::vector<tensor_> &src,
@@ -1047,7 +1046,6 @@ MappingQ1<dim>::contravariant_transformation (std::vector<tensor_>       &dst,
 
 template <int dim>
 template <typename tensor_>
-inline
 void
 MappingQ1<dim>::covariant_transformation (std::vector<tensor_>       &dst,
 					  const std::vector<tensor_> &src,
