@@ -105,6 +105,62 @@ class MGLevelObject : public Subscriptor
 };
 
 
+/**
+ * Multilevel matrix base. This class sets up the interface needed by
+ * multilevel algorithms. It has no relation to the actual matrix type
+ * and takes the vector class as only template argument.
+ *
+ * Usually, the derived class @ref{MGMatrix}, operating on an
+ * @ref{MGLevelObject} of matrices will be sufficient for applications.
+ *
+ * @author Guido Kanschat, 2002
+ */
+template <class VECTOR>
+class MGMatrixBase : public Subscriptor
+{
+  public:
+				   /*
+				    * Virtual destructor.
+				    */
+  virtual ~MGMatrixBase();
+
+				   /**
+				    * Matrix-vector-multiplication on
+				    * a certain level.
+				    */
+  virtual void vmult(unsigned int level, VECTOR& dst,
+		     const VECTOR& src) const = 0;
+};
+
+
+/**
+ * Multilevel matrix. This class implements the interface defined by
+ * @ref{MGMatrixBase}, using @ref{MGLevelObject} of an arbitrary
+ * matrix class.
+ *
+ * @author Guido Kanschat, 2002
+ */
+template <class MATRIX, class VECTOR>
+class MGMatrix : public MGMatrixBase<VECTOR>,
+  public SmartPointer<MGLevelObject<MATRIX> >
+{
+  public:
+				     /**
+				      * Constructor. The argument is
+				      * handed over to the
+				      * @p{SmartPointer} constructor.
+				      */
+    MGMatrix (MGLevelObject<MATRIX>* = 0);
+    
+				     /**
+				      * Matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void vmult(unsigned int level, VECTOR& dst,
+		       const VECTOR& src) const;
+    
+};
+
 
 /**
  * Coarse grid solver using LAC iterative methods.
@@ -296,6 +352,26 @@ MGLevelObject<Object>::get_maxlevel () const
 {
   return minlevel + objects.size() - 1;
 };
+
+/*----------------------------------------------------------------------*/
+
+template <class MATRIX, class VECTOR>
+MGMatrix<MATRIX, VECTOR>::MGMatrix (MGLevelObject<MATRIX>* p)
+		:
+		SmartPointer<MGLevelObject<MATRIX> > (p)
+{}
+
+
+
+template <class MATRIX, class VECTOR>
+void
+MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
+				 VECTOR& dst,
+				 const VECTOR& src) const
+{
+  const MGLevelObject<MATRIX>& m = **this;
+  m[level].vmult(dst, src);
+}
 
 
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */

@@ -87,6 +87,7 @@ class Multigrid : public Subscriptor
 				      */
   template <int dim>
     Multigrid(const MGDoFHandler<dim>& mg_dof_handler,
+	      const MGMatrixBase<VECTOR>& matrix,
 	      const MGTransfer<VECTOR>& transfer,
 	      const MGSmoother<VECTOR>& pre_smooth,
 	      const MGSmoother<VECTOR>& post_smooth,
@@ -114,9 +115,8 @@ class Multigrid : public Subscriptor
 				      * function is done in
 				      * @p{level_mgstep}.
 				      */
-    template <class MATRIX, class COARSE>
-    void vcycle(const MGLevelObject<MATRIX>& matrix,
-		const COARSE&                cgs);
+    template <class COARSE>
+    void vcycle(const COARSE& cgs);
 
 				     /**
 				      * Print a level vector using
@@ -143,10 +143,9 @@ class Multigrid : public Subscriptor
 				      * is used to solve the matrix of
 				      * this level.
 				      */
-    template <class MATRIX, class COARSE>
-    void level_mgstep (const unsigned int           level,
-		       const MGLevelObject<MATRIX>& matrix,
-		       const COARSE&                cgs);
+    template <class COARSE>
+    void level_mgstep (const unsigned int level,
+		       const COARSE&      cgs);
 				     /**
 				      * Level for coarse grid solution.
 				      */
@@ -179,6 +178,11 @@ class Multigrid : public Subscriptor
 
   private:
 				     /**
+				      * The matrix for each level.
+				      */
+    SmartPointer<const MGMatrixBase<VECTOR> > matrix;
+    
+				     /**
 				      * Object for grid tranfer.
 				      */
     SmartPointer<const MGTransfer<VECTOR> > transfer;
@@ -200,7 +204,7 @@ class Multigrid : public Subscriptor
     DeclException2(ExcSwitchedLevels, int, int,
 		   << "minlevel and maxlevel switched, should be: "
 		   << arg1 << "<=" << arg2);
-    template<int dim, class MATRIX, class VECTOR2, class TRANSFER, class COARSE> friend class PreconditionMG;
+    template<int dim, class VECTOR2, class TRANSFER, class COARSE> friend class PreconditionMG;
 };
 
 
@@ -216,7 +220,7 @@ class Multigrid : public Subscriptor
  *
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */
-template<int dim, class MATRIX, class VECTOR, class TRANSFER, class COARSE>
+template<int dim, class VECTOR, class TRANSFER, class COARSE>
 class PreconditionMG : public Subscriptor
 {
   public:
@@ -228,7 +232,6 @@ class PreconditionMG : public Subscriptor
 				      */
     PreconditionMG(const MGDoFHandler<dim>&     mg_dof,
 		   Multigrid<VECTOR>&           mg,
-		   const MGLevelObject<MATRIX>& matrix,
 		   const TRANSFER& transfer,
 		   const COARSE&                coarse);
     
@@ -282,15 +285,6 @@ class PreconditionMG : public Subscriptor
 				      */
     SmartPointer<Multigrid<VECTOR> > multigrid;
     
-				     /**
-				      * Matrices for each level. The
-				      * matrices are prepared by the
-				      * constructor of @p{Multigrid} and
-				      * can be accessed for
-				      * assembling.
-				      */
-    SmartPointer<const MGLevelObject<MATRIX> > level_matrices;
-
 				   /**
 				    * Object for grid tranfer.
 				    */
@@ -311,6 +305,7 @@ class PreconditionMG : public Subscriptor
 template <class VECTOR>
 template <int dim>
 Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
+			      const MGMatrixBase<VECTOR>& matrix,
 			      const MGTransfer<VECTOR>& transfer,
 			      const MGSmoother<VECTOR>& pre_smooth,
 			      const MGSmoother<VECTOR>& post_smooth,
@@ -318,23 +313,23 @@ Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim>& mg_dof_handler,
 			      const unsigned int max_level)
 		:
 		minlevel(min_level),
-  maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,
-		    max_level)),
-  defect(minlevel,maxlevel),
-  solution(minlevel,maxlevel),
-  t(minlevel,maxlevel),
-  transfer(&transfer),
-  pre_smooth(&pre_smooth),
-  post_smooth(&post_smooth)
+		maxlevel(std::min(mg_dof_handler.get_tria().n_levels()-1,
+				  max_level)),
+		defect(minlevel,maxlevel),
+		solution(minlevel,maxlevel),
+		t(minlevel,maxlevel),
+		matrix(&matrix),
+		transfer(&transfer),
+		pre_smooth(&pre_smooth),
+		post_smooth(&post_smooth)
 {
 };
 
 
 template <class VECTOR>
-template <class MATRIX, class COARSE>
+template <class COARSE>
 void
 Multigrid<VECTOR>::level_mgstep(const unsigned int        level,
-				const MGLevelObject<MATRIX>& matrix,
 				const COARSE &coarse_grid_solver)
 {
 #ifdef MG_DEBUG
@@ -364,7 +359,7 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int        level,
 #endif
   
 				   // t = -A*solution[level]
-  matrix[level].vmult(t[level], solution[level]);
+  matrix->vmult(level, t[level], solution[level]);
   t[level].scale(-1);
   
 				   // make t rhs of lower level
@@ -383,7 +378,7 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int        level,
 //  edge_vmult(level, defect[level-1], defect[level]);
   
 				   // do recursion
-  level_mgstep(level-1, matrix, coarse_grid_solver);
+  level_mgstep(level-1, coarse_grid_solver);
 
 				   // reset size of the auxiliary
 				   // vector, since it has been
@@ -415,10 +410,9 @@ Multigrid<VECTOR>::level_mgstep(const unsigned int        level,
 
 
 template <class VECTOR>
-template <class MATRIX, class COARSE>
+template <class COARSE>
 void
-Multigrid<VECTOR>::vcycle(const MGLevelObject<MATRIX>& matrix,
-			  const COARSE &coarse_grid_solver)
+Multigrid<VECTOR>::vcycle(const COARSE &coarse_grid_solver)
 {
 				   // The defect vector has been
 				   // initialized by copy_to_mg. Now
@@ -432,7 +426,7 @@ Multigrid<VECTOR>::vcycle(const MGLevelObject<MATRIX>& matrix,
       t[level].reinit(defect[level]);
     }
 
-  level_mgstep (maxlevel, matrix, coarse_grid_solver);
+  level_mgstep (maxlevel, coarse_grid_solver);
 //  abort ();
 }
 
@@ -440,25 +434,23 @@ Multigrid<VECTOR>::vcycle(const MGLevelObject<MATRIX>& matrix,
 /* ------------------------------------------------------------------- */
 
 
-template<int dim, class MATRIX, class VECTOR, class TRANSFER, class COARSE>
-PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>
+template<int dim, class VECTOR, class TRANSFER, class COARSE>
+PreconditionMG<dim, VECTOR, TRANSFER, COARSE>
 ::PreconditionMG(const MGDoFHandler<dim>&      mg_dof_handler,
 		 Multigrid<VECTOR>& mg,
-		 const MGLevelObject<MATRIX>& matrix,
 		 const TRANSFER&              transfer,
 		 const COARSE&                coarse)
 		:
   mg_dof_handler(&mg_dof_handler),
   multigrid(&mg),
-  level_matrices(&matrix),
   transfer(&transfer),
   coarse(&coarse)
 {}
 
 
-template<int dim, class MATRIX, class VECTOR, class TRANSFER, class COARSE>
+template<int dim, class VECTOR, class TRANSFER, class COARSE>
 void
-PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::vmult (
+PreconditionMG<dim, VECTOR, TRANSFER, COARSE>::vmult (
   VECTOR& dst,
   const VECTOR& src) const
 {
@@ -466,7 +458,7 @@ PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::vmult (
 		       multigrid->defect,
 		       src);
   
-  multigrid->vcycle(*level_matrices, *coarse);
+  multigrid->vcycle(*coarse);
 
   transfer->copy_from_mg(*mg_dof_handler,
 			 dst,
@@ -474,9 +466,9 @@ PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::vmult (
 }
 
 
-template<int dim, class MATRIX, class VECTOR, class TRANSFER, class COARSE>
+template<int dim, class VECTOR, class TRANSFER, class COARSE>
 void
-PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::vmult_add (
+PreconditionMG<dim, VECTOR, TRANSFER, COARSE>::vmult_add (
   VECTOR& dst,
   const VECTOR& src) const
 {
@@ -484,7 +476,7 @@ PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::vmult_add (
 		       multigrid->defect,
 		       src);
   
-  multigrid->vcycle(*level_matrices, *coarse);
+  multigrid->vcycle(*coarse);
 
   transfer->copy_from_mg_add(*mg_dof_handler,
 			     dst,
@@ -492,9 +484,9 @@ PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::vmult_add (
 }
 
 
-template<int dim, class MATRIX, class VECTOR, class TRANSFER, class COARSE>
+template<int dim, class VECTOR, class TRANSFER, class COARSE>
 void
-PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::Tvmult (
+PreconditionMG<dim, VECTOR, TRANSFER, COARSE>::Tvmult (
   VECTOR&,
   const VECTOR&) const
 {
@@ -502,9 +494,9 @@ PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::Tvmult (
 }
 
 
-template<int dim, class MATRIX, class VECTOR, class TRANSFER, class COARSE>
+template<int dim, class VECTOR, class TRANSFER, class COARSE>
 void
-PreconditionMG<dim, MATRIX, VECTOR, TRANSFER, COARSE>::Tvmult_add (
+PreconditionMG<dim, VECTOR, TRANSFER, COARSE>::Tvmult_add (
   VECTOR&,
   const VECTOR&) const
 {

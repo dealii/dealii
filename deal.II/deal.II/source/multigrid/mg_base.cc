@@ -26,9 +26,19 @@
  {};
 
 
+ template <class VECTOR>
+ MGMatrixBase<VECTOR>::~MGMatrixBase()
+ {};
+
+
  // Explicit instantiations
 
  template class MGTransfer<Vector<double> >;
  template class MGTransfer<Vector<float> >;
  template class MGTransfer<BlockVector<double> >;
  template class MGTransfer<BlockVector<float> >;
+
+ template class MGMatrixBase<Vector<double> >;
+ template class MGMatrixBase<Vector<float> >;
+ template class MGMatrixBase<BlockVector<double> >;
+ template class MGMatrixBase<BlockVector<float> >;
