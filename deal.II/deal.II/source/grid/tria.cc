@@ -6327,11 +6327,29 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 						     // between the two versions of
 						     // the eliminate_refined_*_islands
 						     // flag
-		    if ((unrefined_neighbors == total_neighbors) &&
+						     //
+						     // the last check
+						     // is whether
+						     // there are any
+						     // neighbors at
+						     // all. if not
+						     // so, then we
+						     // are (e.g.) on
+						     // the coarsest
+						     // grid with one
+						     // cell, for
+						     // which, of
+						     // course, we do
+						     // not remove the
+						     // refine flag.
+		    if ((unrefined_neighbors == total_neighbors)
+			&&
 			(((unrefined_neighbors==GeometryInfo<dim>::faces_per_cell) &&
 			  (smooth_grid & eliminate_refined_inner_islands)) ||
 			 ((unrefined_neighbors<GeometryInfo<dim>::faces_per_cell) &&
-			  (smooth_grid & eliminate_refined_boundary_islands)) ))
+			  (smooth_grid & eliminate_refined_boundary_islands)) )
+			&&
+			(total_neighbors != 0))
 		      if (!cell->active())
 			for (unsigned int c=0;
 			     c<GeometryInfo<dim>::children_per_cell; ++c)
