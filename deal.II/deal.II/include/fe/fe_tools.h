@@ -53,7 +53,7 @@ class FETools
 				      * Note, that if the finite element
 				      * space @p{fe1} is a subset of
 				      * the finite element space
-				      * @p{fe2} than the @p{interpolation_matrix}
+				      * @p{fe2} then the @p{interpolation_matrix}
 				      * is an embedding matrix.
 				      */
     template <int dim, typename number>
@@ -456,6 +456,11 @@ class FETools
 				      * Exception
 				      */
     DeclException0 (ExcInvalidFE);
+
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcFEMustBePrimitive);
     
 				     /**
 				      * Exception
