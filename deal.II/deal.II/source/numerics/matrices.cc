@@ -679,7 +679,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 
 
 
-/*
+
 template <int dim>
 template <int blocks>
 void
@@ -784,10 +784,10 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					   // element is the first of
 					   // this row.
 	  const unsigned int 
-	    last  = local_sparsity.rowstart[block_index.second+1],
+	    last  = local_sparsity.get_rowstart_indices()[block_index.second+1],
 	    first = (block_col == block_index.first ?
-		     local_sparsity.rowstart[block_index.second]+1 :
-		     local_sparsity.rowstart[block_index.second]);
+		     local_sparsity.get_rowstart_indices()[block_index.second]+1 :
+		     local_sparsity.get_rowstart_indices()[block_index.second]);
 	  
 	  for (unsigned int j=first; j<last; ++j)
 	    matrix.block(block_index.first,block_col).global_entry(j) = 0.;
@@ -876,20 +876,22 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 					       // the present block
 	      const unsigned int
 		first = (block_index.first == block_row ?
-			 transpose_sparsity.rowstart[block_index.second]+1 :
-			 transpose_sparsity.rowstart[block_index.second]),
-		last  = transpose_sparsity.rowstart[block_index.second+1];
+			 transpose_sparsity.get_rowstart_indices()[block_index.second]+1 :
+			 transpose_sparsity.get_rowstart_indices()[block_index.second]),
+		last  = transpose_sparsity.get_rowstart_indices()[block_index.second+1];
 	      
 	      for (unsigned int j=first; j<last; ++j)
 		{
-		  const unsigned int row = transpose_sparsity.colnums[j];
+		  const unsigned int row = transpose_sparsity.get_column_numbers()[j];
 
 						   // find the position of
 						   // element
 						   // (row,dof_number)
 		  const unsigned int *
-		    p = lower_bound(&transpose_sparsity.colnums[transpose_sparsity.rowstart[row]+1],
-				    &transpose_sparsity.colnums[transpose_sparsity.rowstart[row+1]],
+		    p = lower_bound(&transpose_sparsity.get_column_numbers()
+				    [transpose_sparsity.get_rowstart_indices()[row]+1],
+				    &transpose_sparsity.get_column_numbers()
+				    [transpose_sparsity.get_rowstart_indices()[row+1]],
 				    block_index.second);
 
 						   // check whether this line has
@@ -902,11 +904,15 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
 						   //
 						   // there should be such an entry!
 		  Assert ((*p == block_index.second) &&
-			  (p != &transpose_sparsity.colnums[transpose_sparsity.rowstart[row+1]]),
+			  (p != &transpose_sparsity.get_column_numbers()
+			   [transpose_sparsity.get_rowstart_indices()[row+1]]),
 			  ExcInternalError());
 		  
 		  const unsigned int global_entry
-		    = (p - &transpose_sparsity.colnums[transpose_sparsity.rowstart[0]]);
+		    = (p
+		       -
+		       &transpose_sparsity.get_column_numbers()
+		       [transpose_sparsity.get_rowstart_indices()[0]]);
 		  
 						   // correct right hand side
 		  right_hand_side.block(block_row)(row)
@@ -923,7 +929,7 @@ MatrixTools<dim>::apply_boundary_values (const map<unsigned int,double> &boundar
       solution.block(block_index.first)(block_index.second) = dof->second;
     };
 };
-*/
+
 
 
 template <int dim>
@@ -1338,7 +1344,7 @@ template class MatrixTools<deal_II_dimension>;
 template class MassMatrix<deal_II_dimension>;
 template class LaplaceMatrix<deal_II_dimension>;
 
-/*
+
 template
 void
 MatrixTools<deal_II_dimension>::
@@ -1357,4 +1363,4 @@ apply_boundary_values (const map<unsigned int,double> &,
 		       BlockVector<3,double>          &,
 		       const bool);
 
-*/
+
