@@ -39,8 +39,9 @@ void Polynomial::value (const double    x,
 			vector<double> &values) const
 {
   Assert (values.size() > 0, ExcEmptyArray());
-  const unsigned int m=coefficients.size();
-
+  const unsigned int values_size=values.size();
+  
+  
 				   // if we only need the value, then
 				   // call the other function since
 				   // that is significantly faster
@@ -48,7 +49,7 @@ void Polynomial::value (const double    x,
 				   // and free memory, which is really
 				   // expensive compared to all the
 				   // other operations!)
-  if (m == 1)
+  if (values_size == 1)
     {
       values[0] = value(x);
       return;
@@ -57,9 +58,10 @@ void Polynomial::value (const double    x,
 				   // if there are derivatives needed,
 				   // then do it properly by the
 				   // full Horner scheme
+  const unsigned int m=coefficients.size();
   vector<double> a(coefficients);
   unsigned int j_faculty=1;
-  for (unsigned int j=0; j<values.size(); ++j)
+  for (unsigned int j=0; j<values_size; ++j)
     {      
       for (int k=m-1; k>=static_cast<int>(j); --k)
 	a[k]+=x*a[k+1];
