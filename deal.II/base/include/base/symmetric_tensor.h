@@ -110,7 +110,7 @@ namespace internal
                                             * access as well as the row we
                                             * point to as arguments.
                                             */
-          RowAccessor (const base_tensor_type  &tensor,
+          RowAccessor (base_tensor_type  &tensor,
                        const unsigned int  row);
 
                                            /**
@@ -120,14 +120,14 @@ namespace internal
                                             * of the element (in case this is
                                             * a constant tensor).
                                             */
-          reference operator[] (const unsigned int column) const;
+          reference operator[] (const unsigned int column);
           
         private:
                                            /**
                                             * Reference to the tensor we
                                             * access.
                                             */
-          const base_tensor_type &base_tensor;
+          base_tensor_type &base_tensor;
 
                                            /**
                                             * Index of the row we access.
@@ -374,7 +374,7 @@ namespace internal
     {
       template <int dim, bool constness>
       RowAccessor<dim,constness>::
-      RowAccessor (const base_tensor_type &base_tensor,
+      RowAccessor (base_tensor_type  &base_tensor,
                    const unsigned int row)
                       :
                       base_tensor (base_tensor),
@@ -388,7 +388,7 @@ namespace internal
       template <int dim, bool constness>
       typename RowAccessor<dim,constness>::reference
       RowAccessor<dim,constness>::
-      operator[] (const unsigned int column) const
+      operator[] (const unsigned int column)
       {
         Assert (column < dim, ExcIndexRange (column, 0, dim));
 
@@ -426,7 +426,8 @@ namespace internal
           }
 
         Assert (false, ExcInternalError());
-        return 0;
+        static double dummy_but_referenceable = 0;
+        return dummy_but_referenceable;
       }
     }
   }
