@@ -368,6 +368,16 @@ template <int dim>
 void FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 {
   present_cell = cell;
+
+				   // assert that the finite elements
+				   // passed to the constructor and
+				   // used by the DoFHandler used by
+				   // this cell, are the same
+  Assert (static_cast<const FiniteElementData<dim>&>(*fe)
+	  ==
+	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+	  ExcFEDontMatch());
+  
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians)          ||
@@ -550,6 +560,18 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 {
   present_cell  = cell;
   selected_dataset = face_no;
+
+				   // assert that the finite elements
+				   // passed to the constructor and
+				   // used by the DoFHandler used by
+				   // this cell, are the same
+  Assert (static_cast<const FiniteElementData<dim>&>(*fe)
+	  ==
+	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+	  ExcFEDontMatch());
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians)          ||
@@ -722,6 +744,20 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   
   present_cell  = cell;
   selected_dataset = face_no*(1<<(dim-1)) + subface_no;
+
+				   // assert that the finite elements
+				   // passed to the constructor and
+				   // used by the DoFHandler used by
+				   // this cell, are the same
+  Assert (static_cast<const FiniteElementData<dim>&>(*fe)
+	  ==
+	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
+	  ExcFEDontMatch());
+  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
+	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+    
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags & update_jacobians)          ||

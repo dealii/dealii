@@ -582,6 +582,10 @@ class FEValuesBase
 				      * Exception
 				      */
     DeclException0 (ExcInvalidUpdateFlag);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFEDontMatch);
     
   protected:
 				     /**
