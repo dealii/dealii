@@ -252,7 +252,7 @@ void
 BlockMatrixArray<MATRIX>::vmult (BlockVector<VECTOR>& dst,
 				 const BlockVector<VECTOR>& src) const
 {
-  dst.equ = 0.;
+  dst = 0.;
   vmult_add (dst, src);
 }
 
