@@ -582,7 +582,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				this->dofs_per_cell));
   Assert (interpolation_matrix.n() == source_fe.dofs_per_cell,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				source_fe.dofs_per_cell));
   
   
