@@ -67,18 +67,19 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				   // place. for simplicity add the
 				   // initial direction at the end
 				   // again
-//TODO:[?] Unify the various places where PI is defined to a central instance  
-  const double pi = 3.141592653589793238462;
   std::vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
-      angle_directions[i][0] = std::cos(2*pi*i/n_patches_per_circle);
-      angle_directions[i][1] = std::sin(2*pi*i/n_patches_per_circle);
+      angle_directions[i][0] = std::cos(2*deal_II_numbers::PI *
+                                        i/n_patches_per_circle);
+      angle_directions[i][1] = std::sin(2*deal_II_numbers::PI *
+                                        i/n_patches_per_circle);
     };
   
   
   unsigned int cell_number = 0;
-  typename std::vector< ::DataOutBase::Patch<dim+1> >::iterator patch = this->patches.begin();
+  typename std::vector< ::DataOutBase::Patch<dim+1> >::iterator
+    patch = this->patches.begin();
   typename DoFHandler<dim>::cell_iterator cell=first_cell();
 
 				   // get first cell in this thread

@@ -20,20 +20,6 @@
 #include <cmath>
 
 
-// in strict ANSI C mode, the following constants are not defined by
-// default, so we do it ourselves
-//TODO:[?] Unify the various places where PI is defined to a central instance 
-#ifndef M_PI
-#  define	M_PI		3.14159265358979323846
-#endif
-
-#ifndef M_PI_2
-#  define	M_PI_2		1.57079632679489661923
-#endif
-
-#ifndef M_E
-#  define       M_E             2.7182818284590452354
-#endif
 
 namespace Functions
 {
@@ -239,7 +225,7 @@ namespace Functions
 	if (d>=r)
 	  return 0.;
 	const double e = -r*r/(r*r-d*d);
-	return  ((e<-50) ? 0. : M_E * exp(e));
+	return  ((e<-50) ? 0. : deal_II_numbers::E * exp(e));
       }
     return 0.;
   }
@@ -267,7 +253,7 @@ namespace Functions
 	      values[i] = 0.;
 	    } else {
 	      const double e = -r*r/(r*r-d*d);
-	      values[i] = (e<-50) ? 0. : M_E * exp(e);
+	      values[i] = (e<-50) ? 0. : deal_II_numbers::E * exp(e);
 	    }
 	}
     else
@@ -294,7 +280,7 @@ namespace Functions
 	  {
 	    e = -r*r/(r*r-d*d);
 	    if (e>-50)
-	      val = M_E * exp(e);
+	      val = deal_II_numbers::E * exp(e);
 	  }
 
 	if (this->selected==CutOffFunctionBase<dim>::no_component)

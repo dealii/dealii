@@ -1760,8 +1760,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 						   // the height field, I don't know
 						   // it.
 		  EpsCell2d eps_cell;
-//TODO:[?] Unify the various places where PI is defined to a central instance  
-		  const double pi = 3.141592653589793238462;
+		  const double pi = deal_II_numbers::PI;
 		  const double cx = -std::cos(pi-flags.azimut_angle * 2*pi / 360.),
 			       cz = -std::cos(flags.turn_angle * 2*pi / 360.),
 			       sx = std::sin(pi-flags.azimut_angle * 2*pi / 360.),

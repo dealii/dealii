@@ -371,8 +371,7 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
   
-//TODO:[?] Unify the various places where PI is defined to a central instance  
-  const double pi = 3.141592653589793238462;
+  const double pi = deal_II_numbers::PI;
   
 				   // determine the number of cells
 				   // for the grid. if not provided by
@@ -465,7 +464,7 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
   
-  const double pi     = 3.14159265359;
+  const double pi     = deal_II_numbers::PI;
 				   // determine the number of cells
 				   // for the grid. if not provided by
 				   // the user determine it such that

@@ -275,8 +275,6 @@ C DEFINE A TEST MATRIX
   
 */
 
-//TODO:[?] Unify the various places where PI is defined to a central instance  
-  const double pi = 3.141592653589793238462;
   const double am = trace(d) / 3.;
 
 				   // s := d - trace(d) I
@@ -328,8 +326,8 @@ C DEFINE A TEST MATRIX
 	{
 	  const double theta = std::acos(XX) / 3.;
 	  EE[0] = am + R*std::cos(theta);
-	  EE[1] = am + R*std::cos(theta + 2./3.*pi);
-	  EE[2] = am + R*std::cos(theta + 4./3.*pi);
+	  EE[1] = am + R*std::cos(theta + 2./3.*deal_II_numbers::PI);
+	  EE[2] = am + R*std::cos(theta + 4./3.*deal_II_numbers::PI);
 	};
     };
 
