@@ -2,6 +2,7 @@
 #include <lac/vector.h>
 
 #include <algorithm>
+#include <cmath>
 
 //----------------------------------------------------------------------//
 
