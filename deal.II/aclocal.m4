@@ -364,4 +364,4 @@ AC_DEFUN(DEAL_II_HAVE_STD_ITERATOR, dnl
     [
       AC_MSG_RESULT(no)
     ])
-)>>>>>>> 1.18.2.1
+)
