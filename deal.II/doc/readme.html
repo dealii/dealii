@@ -319,7 +319,9 @@
       deal.II library are fully thread-safe (though most are and
       multi-threaded programs are working well and routinely) and that
       gcc's runtime library is not thread-safe unless you configure gcc
-      with <code>--enable-threads</code> and recompile it.
+      with <code>--enable-threads</code> and recompile it. Using a gcc
+      that was not configured with this option may lead to errors in
+      your threaded programs that are extremely hard to find.
       </p>
 
     <li>
