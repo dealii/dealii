@@ -273,7 +273,7 @@ PACKAGE_BUGREPORT=
 
 ac_unique_file="deal.II"
 ac_subdirs_all="$ac_subdirs_all contrib tests"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD LDFLAGSPIC enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared lib_suffix AR RANLIB ac_ct_RANLIB enablemultigrid TECPLOT_LIBRARY_PATH TECPLOT_INCLUDE_PATH USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR USE_CONTRIB_METIS DEAL_II_METIS_DIR kdocdir kdocversion DOXYGEN PERL subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR DEAL_II_PATH DEAL2_DIR build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX GXX_VERSION CXXFLAGSG CXXFLAGSO CXXFLAGSPIC SHLIBLD LDFLAGSPIC enablemultithreading withmultithreading F77 F77_VERSION F77FLAGSO F77FLAGSG F77FLAGSPIC F77LIBS enableshared lib_suffix AR RANLIB ac_ct_RANLIB enablemultigrid TECPLOT_LIBRARY_PATH TECPLOT_INCLUDE_PATH USE_CONTRIB_HSL USE_CONTRIB_PETSC DEAL_II_PETSC_DIR DEAL_II_PETSC_ARCH DEAL_II_PETSC_VERSION_MAJOR DEAL_II_PETSC_VERSION_MINOR DEAL_II_PETSC_VERSION_SUBMINOR USE_CONTRIB_METIS DEAL_II_METIS_DIR kdocdir kdocversion DOXYGEN DOT DEAL_II_HAVE_DOT PERL subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -8163,6 +8163,50 @@ fi
   fi
 
 
+  # Extract the first word of "dot", so it can be a program name with args.
+set dummy dot; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DOT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DOT"; then
+  ac_cv_prog_DOT="$DOT" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DOT="dot"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+DOT=$ac_cv_prog_DOT
+if test -n "$DOT"; then
+  echo "$as_me:$LINENO: result: $DOT" >&5
+echo "${ECHO_T}$DOT" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  if test "x$DOT" = "x" ; then
+    DEAL_II_HAVE_DOT=NO;
+  else
+    DEAL_II_HAVE_DOT=YES;
+  fi
+
+
+
+
 
 # Extract the first word of "perl", so it can be a program name with args.
 set dummy perl; ac_word=$2
@@ -8855,6 +8899,8 @@ s,@DEAL_II_METIS_DIR@,$DEAL_II_METIS_DIR,;t t
 s,@kdocdir@,$kdocdir,;t t
 s,@kdocversion@,$kdocversion,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
+s,@DOT@,$DOT,;t t
+s,@DEAL_II_HAVE_DOT@,$DEAL_II_HAVE_DOT,;t t
 s,@PERL@,$PERL,;t t
 s,@subdirs@,$subdirs,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t

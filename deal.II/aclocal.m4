@@ -3541,6 +3541,27 @@ AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
       doxygen_not_found=yes;
     fi
   fi
+
+  dnl Doxygen needs 'dot' for inheritance graph generation
+  DEAL_II_CHECK_DOT
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check for DOT.
+dnl
+dnl Usage: DEAL_II_CHECK_DOT
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_DOT, dnl
+[
+  AC_CHECK_PROG(DOT,dot,dot)
+  if test "x$DOT" = "x" ; then
+    DEAL_II_HAVE_DOT=NO;
+  else
+    DEAL_II_HAVE_DOT=YES;
+  fi
 ])
 
 
