@@ -1151,9 +1151,9 @@ GridGenerator::cylinder (Triangulation<3> &tria,
 	  if (cell->face(i)->boundary_indicator() == 255)
 	    continue;
 	  
-	  if (cell->face(i)->center()(0) > 1.-1.e-5)
+	  if (cell->face(i)->center()(0) > half_length-1.e-5)
 	    cell->face(i)->set_boundary_indicator(2);
-	  else if (cell->face(i)->center()(0) < -1.+1.e-5)
+	  else if (cell->face(i)->center()(0) < -half_length+1.e-5)
 	    cell->face(i)->set_boundary_indicator(1);
 	}
       ++cell;

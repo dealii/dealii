@@ -360,8 +360,18 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       Improved: Now the FE_Q class supports elements of arbitrary
-       polynomial degree also in 3D.
+       Fixed: The <code>GridGenerator::cylinder</code> function in 3d
+       assigned the wrong boundary value to the top and bottom part of
+       the cylinder if the half length of the cylinder was not equal
+       to 1. This is now fixed.
+       <br>
+       (Ralf Schulz 2004/10/27)
+       </p>
+
+  <li> <p>
+       Improved: Now the <code>FE_Q</code> class supports hanging node
+       constraints for elements of arbitrary polynomial degree also in
+       3D.
        <br>
        (Oliver Kayser-Herold 2004/10/21)
        </p>
