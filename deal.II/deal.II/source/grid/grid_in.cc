@@ -42,8 +42,6 @@ template <int dim>
 void GridIn<dim>::read_ucd (istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
-  Assert ((1<=dim) && (dim<=2), ExcNotImplemented());
-
   AssertThrow (in, ExcIO());
   
 				   // skip comments at start of file
@@ -99,7 +97,8 @@ void GridIn<dim>::read_ucd (istream &in)
       in >> cell_type;
 
       if (((cell_type == "line") && (dim == 1)) ||
-	  ((cell_type == "quad") && (dim == 2)))
+	  ((cell_type == "quad") && (dim == 2)) ||
+	  ((cell_type == "hex" ) && (dim == 3)))
 					 // found a cell
 	{
 					   // allocate and read indices
@@ -157,8 +156,10 @@ void GridIn<dim>::read_ucd (istream &in)
 
   AssertThrow (in, ExcIO());
 
-				   // do some clean-up on vertices
+				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
+				   // ... and cells
+  GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 };
 
@@ -319,14 +320,10 @@ void GridIn<dim>::read_dbmesh (istream &in)
 
   AssertThrow (in, ExcIO());
 
-				   // do some clean-up on vertices
+				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
-
-  ofstream x1("x1");
-  debug_output_grid (cells, vertices, x1);
+				   // ...and cells
   GridReordering<dim>::reorder_cells (cells);
-  ofstream x2("x2");
-  debug_output_grid (cells, vertices, x2);
   tria->create_triangulation (vertices, cells, subcelldata);
 };
 
