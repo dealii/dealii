@@ -64,10 +64,19 @@ class FE_Poly : public FiniteElement<dim>
 				     /**
 				      * Constructor.
 				      */
-    FE_Poly (const POLY& poly_space,
+    FE_Poly (unsigned int degree,
+	     const POLY& poly_space,
 	     const FiniteElementData<dim> &fe_data,
 	     const std::vector<bool> &restriction_is_additive_flags,
 	     const std::vector<std::vector<bool> > &nonzero_components);
+
+				     /**
+				      * Return the polynomial degree
+				      * of this finite element,
+				      * i.e. the value passed to the
+				      * constructor.
+				      */
+    unsigned int get_degree () const;
 
 				     /**
 				      * Return the value of the
@@ -388,6 +397,11 @@ class FE_Poly : public FiniteElement<dim>
 					  */      
 	Table<2,Tensor<1,dim> > shape_gradients;
     };
+    
+				     /**
+				      * Degree of the polynomials.
+				      */  
+    const unsigned int degree;
 
                                      /**
                                       * The polynomial space. Its type

@@ -111,6 +111,7 @@ template <int dim>
 FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 		:
 		FE_Poly<PolynomialsP<dim>, dim> (
+		  degree,
 		  PolynomialsP<dim>(degree),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
@@ -118,6 +119,7 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 		    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
   Assert(this->poly_space.n()==this->dofs_per_cell, ExcInternalError());
+  Assert(this->poly_space.degree()==this->degree, ExcInternalError());
   
 				   // DG doesn't have constraints, so
 				   // leave them empty
@@ -152,7 +154,7 @@ FE_DGPMonomial<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_DGPMonomial<" << dim << ">(" << get_degree() << ")";
+  namebuf << "FE_DGPMonomial<" << dim << ">(" << this->degree << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -166,7 +168,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_DGPMonomial<dim>::clone() const
 {
-  return new FE_DGPMonomial<dim>(get_degree());
+  return new FE_DGPMonomial<dim>(this->degree);
 }
 
 
@@ -211,7 +213,7 @@ void
 FE_DGPMonomial<dim>::initialize_embedding ()
 {
   std::vector<Point<dim> > unit_points(this->dofs_per_cell);
-  generate_unit_points(get_degree(), unit_points);
+  generate_unit_points(this->degree, unit_points);
   
   FullMatrix<double> cell_interpolation (this->dofs_per_cell,
 					 this->dofs_per_cell);
@@ -245,7 +247,7 @@ FE_DGPMonomial<dim>::initialize_embedding ()
 				       // cut off very small values
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	  if (std::fabs(this->prolongation[child](i,j)) < 2e-14*get_degree()*dim)
+	  if (std::fabs(this->prolongation[child](i,j)) < 2e-14*this->degree*dim)
 	    this->prolongation[child](i,j) = 0.;      
     }
 }
@@ -286,7 +288,7 @@ bool
 FE_DGPMonomial<1>::has_support_on_face (const unsigned int,
 					const unsigned int face_index) const
 {
-  return face_index==1 || (face_index==0 && get_degree()==0);
+  return face_index==1 || (face_index==0 && this->degree==0);
 }
 
 #endif

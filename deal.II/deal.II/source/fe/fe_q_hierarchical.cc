@@ -39,13 +39,13 @@ template <int dim>
 FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		  degree,
 		  Polynomials::Hierarchical::generate_complete_basis(degree),
 		  FiniteElementData<dim>(get_dpo_vector(degree),1, degree),
 		  std::vector<bool> (FiniteElementData<dim>(
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, false),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
-						    degree(degree),
 						    face_renumber(face_lexicographic_to_hierarchic_numbering (degree))
 {
   this->poly_space.set_numbering(invert_numbering(
@@ -1094,15 +1094,6 @@ FE_Q_Hierarchical<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
   return 0;
-}
-
-
-
-template <int dim>
-unsigned int
-FE_Q_Hierarchical<dim>::get_degree () const
-{
-  return degree;
 }
 
 

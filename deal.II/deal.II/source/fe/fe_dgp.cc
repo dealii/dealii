@@ -24,12 +24,12 @@ template <int dim>
 FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		:
 		FE_Poly<PolynomialSpace<dim>, dim> (
+		  degree,
 		  PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
-		    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true))),
-						    degree(degree)
+		    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
 				   // if defined, copy over matrices
 				   // from precomputed arrays
@@ -145,16 +145,6 @@ FE_DGP<dim>::memory_consumption () const
   Assert (false, ExcNotImplemented ());
   return 0;
 }
-
-
-
-template <int dim>
-unsigned int
-FE_DGP<dim>::get_degree () const
-{
-  return degree;
-}
-
 
 
 

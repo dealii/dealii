@@ -52,14 +52,6 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-
-				     /**
-				      * Return the polynomial degree
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      */
-    unsigned int get_degree () const;
     
 				     /**
 				      * Check for non-zero values on a face.
@@ -161,11 +153,6 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * @p{FiniteElementData}.
 				      */
     static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
-  
-				     /**
-				      * Degree of the polynomials.
-				      */  
-    const unsigned int degree;
     
 				     /**
 				      * Allow access from other dimensions.

@@ -255,14 +255,6 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-
-				     /**
-				      * Return the polynomial degree
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      */
-    unsigned int get_degree () const;
     
 				     /**
 				      * Return the matrix
@@ -491,11 +483,6 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * constructor.
 				      */
     void initialize_unit_face_support_points ();
-    
-				     /**
-				      * Degree of the polynomials.
-				      */  
-    const unsigned int degree;
              
 				     /**
 				      * Mapping from hierarchic to

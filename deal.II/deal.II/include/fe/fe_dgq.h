@@ -54,14 +54,6 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-
-				     /**
-				      * Return the polynomial degree
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      */
-    unsigned int get_degree () const;
     
 				     /**
 				      * Return the matrix
@@ -212,11 +204,6 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     void rotate_indices (std::vector<unsigned int> &indices,
 			 const char                 direction) const;
-  
-				     /**
-				      * Degree of the polynomials.
-				      */  
-    const unsigned int degree;
     
 				     /**
 				      * Allow access from other dimensions.

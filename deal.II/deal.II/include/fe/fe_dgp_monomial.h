@@ -54,14 +54,6 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * appropriate values.
 				      */
     virtual std::string get_name () const;
-
-				     /**
-				      * Return the polynomial degree
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      */
-    unsigned int get_degree () const;
     
 				     /**
 				      * Return the matrix
@@ -160,13 +152,6 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 };
 
 /*@}*/
-
-template <int dim>
-inline unsigned int
-FE_DGPMonomial<dim>::get_degree () const
-{
-  return this->poly_space.degree();
-}
 
 
 #endif

@@ -136,12 +136,12 @@ template <int dim>
 FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		  degree,
 		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
-		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
-						    degree(degree)
+		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
 				   // generate permutation/rotation
 				   // index sets to generate some
@@ -620,16 +620,6 @@ FE_DGQ<dim>::memory_consumption () const
   Assert (false, ExcNotImplemented ());
   return 0;
 }
-
-
-
-template <int dim>
-unsigned int
-FE_DGQ<dim>::get_degree () const
-{
-  return degree;
-}
-
 
 
 

@@ -16,10 +16,7 @@
 #include <base/config.h>
 #include <base/tensor_product_polynomials.h>
 #include <fe/fe_poly.h>
-#include <fe/fe.h>
-//#include <lac/full_matrix.h>
 
-template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
 
@@ -253,14 +250,6 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-
-				     /**
-				      * Return the polynomial degree
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      */
-    unsigned int get_degree () const;
     
 				     /**
 				      * Check for non-zero values on a face.
@@ -446,11 +435,6 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * constructor.
 				      */
     void initialize_unit_face_support_points ();
-    
-				     /**
-				      * Degree of the polynomials.
-				      */  
-    const unsigned int degree;
              
 				     /**
 				      * Mapping from lexicographic to
