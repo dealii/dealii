@@ -207,9 +207,10 @@ FE_DGPNonparametric<dim>::update_each (const UpdateFlags flags) const
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
-FE_DGPNonparametric<dim>::get_data (const UpdateFlags      update_flags,
-		       const Mapping<dim>    &mapping,
-		       const Quadrature<dim> &quadrature) const
+FE_DGPNonparametric<dim>::get_data (
+  const UpdateFlags      update_flags,
+  const Mapping<dim>&    mapping,
+  const Quadrature<dim>& quadrature) const
 {
 				   // generate a new data object
   InternalData* data = new InternalData;

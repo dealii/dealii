@@ -15,6 +15,7 @@
 #include <base/quadrature.h>
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe_tools.h>
@@ -123,11 +124,11 @@ void FETools::get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
 }
 
 
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::interpolate(const DoFHandler<dim> &dof1,
-			  const Vector<number> &u1,
+			  const InVector &u1,
 			  const DoFHandler<dim> &dof2,
-			  Vector<number> &u2)
+			  OutVector &u2)
 {
   ConstraintMatrix dummy;
   dummy.close();
@@ -135,12 +136,12 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 }
 
   
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::interpolate(const DoFHandler<dim> &dof1,
-			  const Vector<number> &u1,
+			  const InVector &u1,
 			  const DoFHandler<dim> &dof2,
 			  const ConstraintMatrix &constraints,
-			  Vector<number> &u2)
+			  OutVector &u2)
 {
   Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
   Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
@@ -161,10 +162,10 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
   const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
   const unsigned int dofs_per_cell2=dof2.get_fe().dofs_per_cell;
   
-  Vector<number> u1_local(dofs_per_cell1);
-  Vector<number> u2_local(dofs_per_cell2);
+  Vector<double> u1_local(dofs_per_cell1);
+  Vector<double> u2_local(dofs_per_cell2);
 
-  FullMatrix<number> interpolation_matrix(dofs_per_cell2,
+  FullMatrix<double> interpolation_matrix(dofs_per_cell2,
 					  dofs_per_cell1);
   FETools::get_interpolation_matrix(dof1.get_fe(), dof2.get_fe(),
 				    interpolation_matrix);
@@ -210,11 +211,11 @@ void FETools::interpolate(const DoFHandler<dim> &dof1,
 }
 
 
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::back_interpolate(const DoFHandler<dim> &dof1,
-			       const Vector<number> &u1,
+			       const InVector &u1,
 			       const FiniteElement<dim> &fe2,
-			       Vector<number> &u1_interpolated)
+			       OutVector &u1_interpolated)
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
@@ -234,13 +235,13 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
   const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
 
-  Vector<number> u1_local(dofs_per_cell1);
-  Vector<number> u1_int_local(dofs_per_cell1);
+  Vector<double> u1_local(dofs_per_cell1);
+  Vector<double> u1_int_local(dofs_per_cell1);
   
   typename DoFHandler<dim>::active_cell_iterator cell = dof1.begin_active(),
 						 endc = dof1.end();
 
-  FullMatrix<number> interpolation_matrix(dofs_per_cell1, dofs_per_cell1);
+  FullMatrix<double> interpolation_matrix(dofs_per_cell1, dofs_per_cell1);
   FETools::get_back_interpolation_matrix(dof1.get_fe(), fe2,
 					 interpolation_matrix);
   for (; cell!=endc; ++cell) 
@@ -259,13 +260,13 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
 
   
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 			       const ConstraintMatrix &constraints1,
-			       const Vector<number> &u1,
+			       const InVector &u1,
 			       const DoFHandler<dim> &dof2,
 			       const ConstraintMatrix &constraints2,
-			       Vector<number> &u1_interpolated)
+			       OutVector &u1_interpolated)
 {
 				   // For discontinuous elements
 				   // without constraints take the
@@ -297,11 +298,11 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
 
   
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
-				       const Vector<number> &u1,
+				       const InVector &u1,
 				       const FiniteElement<dim> &fe2,
-				       Vector<number> &u1_difference)
+				       OutVector &u1_difference)
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
@@ -321,10 +322,10 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 
   const unsigned int dofs_per_cell=dof1.get_fe().dofs_per_cell;
 
-  Vector<number> u1_local(dofs_per_cell);
-  Vector<number> u1_diff_local(dofs_per_cell);
+  Vector<double> u1_local(dofs_per_cell);
+  Vector<double> u1_diff_local(dofs_per_cell);
   
-  FullMatrix<number> difference_matrix(dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
   FETools::get_interpolation_difference_matrix(dof1.get_fe(), fe2,
 					       difference_matrix);
   
@@ -347,13 +348,13 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 
 
 
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 				       const ConstraintMatrix &constraints1,
-				       const Vector<number> &u1,
+				       const InVector &u1,
 				       const DoFHandler<dim> &dof2,
 				       const ConstraintMatrix &constraints2,
-				       Vector<number> &u1_difference)
+				       OutVector &u1_difference)
 {
  				   // For discontinuous elements
 				   // without constraints take the
@@ -370,11 +371,11 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 }
 
   
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::extrapolate(const DoFHandler<dim> &dof1,
-			  const Vector<number> &u1,
+			  const InVector &u1,
 			  const DoFHandler<dim> &dof2,
-			  Vector<number> &u2)
+			  OutVector &u2)
 {
   ConstraintMatrix dummy;
   dummy.close();
@@ -383,12 +384,12 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 
 
 
-template <int dim, typename number>
+template <int dim, class InVector, class OutVector>
 void FETools::extrapolate(const DoFHandler<dim> &dof1,
-			  const Vector<number> &u1,
+			  const InVector &u1,
 			  const DoFHandler<dim> &dof2,
 			  const ConstraintMatrix &constraints,
-			  Vector<number> &u2)
+			  OutVector &u2)
 {
   Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
 	 ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
@@ -396,12 +397,13 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
   Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
   Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
-  Vector<number> u3(dof2.n_dofs());
+  OutVector u3;
+  u3.reinit(u2);
   interpolate(dof1, u1, dof2, constraints, u3);
 
   const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
   const Triangulation<dim> &tria=dof1.get_tria();
-  Vector<number> dof_values(dofs_per_cell);
+  Vector<double> dof_values(dofs_per_cell);
   
   for (unsigned int level=0; level<tria.n_levels()-1; ++level)
     {
@@ -854,6 +856,8 @@ FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
+//TODO:[RH] Why do the instantiations for float and double differ?
+
 template
 void FETools::get_interpolation_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,
@@ -870,55 +874,6 @@ void FETools::get_interpolation_difference_matrix<deal_II_dimension>
  const FiniteElement<deal_II_dimension> &,
  FullMatrix<double> &);
 template
-void FETools::interpolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<double> &,
- const DoFHandler<deal_II_dimension> &,
- Vector<double> &);
-template
-void FETools::interpolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<double> &,
- const DoFHandler<deal_II_dimension> &,
- const ConstraintMatrix &,
- Vector<double> &);
-template
-void FETools::back_interpolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<double> &,
- const FiniteElement<deal_II_dimension> &,
- Vector<double> &);
-template
-void FETools::back_interpolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const ConstraintMatrix &, 
- const Vector<double> &,
- const DoFHandler<deal_II_dimension> &,
- const ConstraintMatrix &,
- Vector<double> &);
-template
-void FETools::interpolation_difference<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<double> &,
- const FiniteElement<deal_II_dimension> &,
- Vector<double> &);
-template
-void FETools::interpolation_difference<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const ConstraintMatrix &,
- const Vector<double> &,
- const DoFHandler<deal_II_dimension> &,
- const ConstraintMatrix &,
- Vector<double> &);
-template
-void FETools::extrapolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<double> &,
- const DoFHandler<deal_II_dimension> &,
- Vector<double> &);
-
-
-template
 void FETools::get_interpolation_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,
  const FiniteElement<deal_II_dimension> &,
@@ -933,30 +888,114 @@ void FETools::get_interpolation_difference_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,
  const FiniteElement<deal_II_dimension> &,
  FullMatrix<float> &);
+
+
 template
 void FETools::interpolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<float> &,
- const DoFHandler<deal_II_dimension> &,
- Vector<float> &);
+(const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &, Vector<double> &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<double> &);
 template
 void FETools::back_interpolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<float> &,
- const FiniteElement<deal_II_dimension> &,
- Vector<float> &);
+(const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const FiniteElement<deal_II_dimension> &, Vector<double> &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<double> &);
 template
 void FETools::interpolation_difference<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<float> &,
- const FiniteElement<deal_II_dimension> &,
- Vector<float> &);
+(const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const FiniteElement<deal_II_dimension> &, Vector<double> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<double> &);
 template
 void FETools::extrapolate<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &,
- const Vector<float> &,
- const DoFHandler<deal_II_dimension> &,
- Vector<float> &);
+(const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const DoFHandler<deal_II_dimension> &, Vector<double> &);
+
+
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &, Vector<float> &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const FiniteElement<deal_II_dimension> &, Vector<float> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const FiniteElement<deal_II_dimension> &, Vector<float> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const DoFHandler<deal_II_dimension> &, Vector<float> &);
+
+
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ BlockVector<double> &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const FiniteElement<deal_II_dimension> &, BlockVector<double> &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ BlockVector<double> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const FiniteElement<deal_II_dimension> &, BlockVector<double> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ BlockVector<double> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
+
+
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
+
+
 template
 void
 FETools::hierarchic_to_lexicographic_numbering<deal_II_dimension>

@@ -164,11 +164,11 @@ class FETools
 				      * your hanging node constraints
 				      * object.
 				      */
-    template <int dim, typename number>
-    static void interpolate (const DoFHandler<dim> &dof1,
-			     const Vector<number>  &u1,
-			     const DoFHandler<dim> &dof2,
-			     Vector<number>        &u2);
+    template <int dim, class InVector, class OutVector>
+    static void interpolate (const DoFHandler<dim>& dof1,
+			     const InVector&        u1,
+			     const DoFHandler<dim>& dof2,
+			     OutVector&             u2);
     
 				     /**
 				      * Gives the interpolation of a
@@ -203,12 +203,12 @@ class FETools
 				      * at the DoF values on the
 				      * discontinuities.
 				      */
-    template <int dim, typename number>
-    static void interpolate (const DoFHandler<dim>  &dof1,
-			     const Vector<number>   &u1,
-			     const DoFHandler<dim>  &dof2,
-			     const ConstraintMatrix &constraints,
-			     Vector<number>         &u2);
+    template <int dim, class InVector, class OutVector>
+    static void interpolate (const DoFHandler<dim>&  dof1,
+			     const InVector&         u1,
+			     const DoFHandler<dim>&  dof2,
+			     const ConstraintMatrix& constraints,
+			     OutVector&              u2);
     
 
 				     /**
@@ -237,11 +237,11 @@ class FETools
 				      * function is simply an identity
 				      * mapping.
 				      */
-    template <int dim, typename number>
-    static void back_interpolate (const DoFHandler<dim>    &dof1,
-				  const Vector<number>     &u1,
-				  const FiniteElement<dim> &fe2,
-				  Vector<number>           &u1_interpolated);
+    template <int dim, class InVector, class OutVector>
+    static void back_interpolate (const DoFHandler<dim>&    dof1,
+				  const InVector&           u1,
+				  const FiniteElement<dim>& fe2,
+				  OutVector&                u1_interpolated);
 
 				     /**
 				      * Gives the interpolation of the
@@ -270,13 +270,13 @@ class FETools
 				      * function is simply an identity
 				      * mapping.
 				      */
-    template <int dim, typename number>
-    static void back_interpolate (const DoFHandler<dim>    &dof1,
-				  const ConstraintMatrix   &constraints1,
-				  const Vector<number>     &u1,
-				  const DoFHandler<dim>    &dof2,
-				  const ConstraintMatrix   &constraints2,
-				  Vector<number>           &u1_interpolated);
+    template <int dim, class InVector, class OutVector>
+    static void back_interpolate (const DoFHandler<dim>&  dof1,
+				  const ConstraintMatrix& constraints1,
+				  const InVector&         u1,
+				  const DoFHandler<dim>&  dof2,
+				  const ConstraintMatrix& constraints2,
+				  OutVector&              u1_interpolated);
 
 				     /**
 				      * Gives $(Id-I_h)z1$ for a given
@@ -294,11 +294,11 @@ class FETools
 				      * additional
 				      * @p{ConstraintMatrix} object.
 				      */
-    template <int dim, typename number>
+    template <int dim, class InVector, class OutVector>
     static void interpolation_difference(const DoFHandler<dim> &dof1,
-					 const Vector<number> &z1,
+					 const InVector &z1,
 					 const FiniteElement<dim> &fe2,
-					 Vector<number> &z1_difference);    
+					 OutVector &z1_difference);    
     
 				     /**
 				      * Gives $(Id-I_h)z1$ for a given
@@ -317,13 +317,13 @@ class FETools
 				      * nodes (locally refined grids)
 				      * are involved.
 				      */
-    template <int dim, typename number>
-    static void interpolation_difference(const DoFHandler<dim> &dof1,
-					 const ConstraintMatrix &constraints1,
-					 const Vector<number> &z1,
-					 const DoFHandler<dim> &dof2,
-					 const ConstraintMatrix &constraints2,
-					 Vector<number> &z1_difference);    
+    template <int dim, class InVector, class OutVector>
+    static void interpolation_difference(const DoFHandler<dim>&  dof1,
+					 const ConstraintMatrix& constraints1,
+					 const InVector&         z1,
+					 const DoFHandler<dim>&  dof2,
+					 const ConstraintMatrix& constraints2,
+					 OutVector&              z1_difference);    
 
 				     /**
 				      * Gives the patchwise
@@ -352,11 +352,11 @@ class FETools
 				      * @p{ConstraintMatrix} argument,
 				      * see below.
 				      */
-    template <int dim, typename number>
-    static void extrapolate(const DoFHandler<dim> &dof1,
-			    const Vector<number>  &z1,
-			    const DoFHandler<dim> &dof2,
-			    Vector<number>        &z2);    
+    template <int dim, class InVector, class OutVector>
+    static void extrapolate(const DoFHandler<dim>& dof1,
+			    const InVector&        z1,
+			    const DoFHandler<dim>& dof2,
+			    OutVector&             z2);    
 
 				     /**
 				      * Gives the patchwise
@@ -380,12 +380,12 @@ class FETools
 				      * solution to a piecewise
 				      * quadratic solution.
 				      */
-    template <int dim, typename number>
-    static void extrapolate(const DoFHandler<dim> &dof1,
-			    const Vector<number>  &z1,
-			    const DoFHandler<dim> &dof2,
-			    const ConstraintMatrix &constraints,
-			    Vector<number>        &z2);    
+    template <int dim, class InVector, class OutVector>
+    static void extrapolate(const DoFHandler<dim>&  dof1,
+			    const InVector&         z1,
+			    const DoFHandler<dim>&  dof2,
+			    const ConstraintMatrix& constraints,
+			    OutVector&              z2);    
 
 				     /**
 				      * The numbering of the degrees
