@@ -1,15 +1,10 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998
-
-# Global options for all compilations (compilations in /source now
-# use other options! THEY REALLY SHOULD NOT (gk))
+# Copyright W. Bangerth, G. Kanschat, University of Heidelberg, 1998, 1999
 
 # This file uses the variable $D, which is the deal home directory,
 # that is, the parent directory of this directory.
 #
 # Please set $D to the right path before including this file!
-
-deal_II_dimension=2
 
 vpath %.a $D/base/lib
 vpath %.a $D/lac/lib
@@ -18,20 +13,12 @@ vpath %.a $D/deal.II/lib
 CXX       = c++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
-CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
+CXXFLAGS.g= -ansi -DDEBUG -ggdb -Wall -W -pedantic -Wconversion \
             -Winline -Woverloaded-virtual \
-            $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
+            $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -felide-constructors -fnonnull-objects \
-           $(INCLUDE) \
-           -Ddeal_II_dimension=$(deal_II_dimension)
-
-%.go : %.cc Makefile
-	@echo "======================== Compiling (DEBUG):" $<
-	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc Makefile
-	@echo "======================== Compiling (OPT):  " $<
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+           $(INCLUDE)
 
 
 
