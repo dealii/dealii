@@ -25,6 +25,12 @@ Quadrature<0>::Quadrature (const unsigned int)
 
 
 
+template <>
+Quadrature<0>::~Quadrature ()
+{};
+
+
+
 template <int dim>
 Quadrature<dim>::Quadrature (const unsigned int n_q) :
 		n_quadrature_points(n_q),
