@@ -89,7 +89,7 @@ FE_DGP<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_DGP<" << dim << ">(" << degree << ")";
+  namebuf << "FE_DGP<" << dim << ">(" << this->degree << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -103,7 +103,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_DGP<dim>::clone() const
 {
-  return new FE_DGP<dim>(degree);
+  return new FE_DGP<dim>(this->degree);
 }
 
 

@@ -466,7 +466,7 @@ FE_Q<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_Q<" << dim << ">(" << degree << ")";
+  namebuf << "FE_Q<" << dim << ">(" << this->degree << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -480,7 +480,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_Q<dim>::clone() const
 {
-  return new FE_Q<dim>(degree);
+  return new FE_Q<dim>(this->degree);
 }
 
 
@@ -565,7 +565,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
       for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
         sum += interpolation_matrix(i,j);
 
-      Assert (std::fabs(sum-1) < 2e-14*degree*dim,
+      Assert (std::fabs(sum-1) < 2e-14*this->degree*dim,
               ExcInternalError());
     }
 }
@@ -581,22 +581,22 @@ template <int dim>
 void FE_Q<dim>::initialize_unit_support_points ()
 {
 				   // number of points: (degree+1)^dim
-  unsigned int n = degree+1;
+  unsigned int n = this->degree+1;
   for (unsigned int i=1; i<dim; ++i)
-    n *= degree+1;
+    n *= this->degree+1;
   
   this->unit_support_points.resize(n);
 
   const std::vector<unsigned int> &index_map_inverse=
     this->poly_space.get_numbering_inverse();
   
-  const double step = 1./degree;
+  const double step = 1./this->degree;
   Point<dim> p;
   
   unsigned int k=0;
-  for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0; ix<=degree; ++ix)
+  for (unsigned int iz=0; iz <= ((dim>2) ? this->degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((dim>1) ? this->degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=this->degree; ++ix)
 	{
 	  p(0) = ix * step;
 	  if (dim>1)
@@ -626,22 +626,22 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
   const unsigned int codim = dim-1;
   
 				   // number of points: (degree+1)^codim
-  unsigned int n = degree+1;
+  unsigned int n = this->degree+1;
   for (unsigned int i=1; i<codim; ++i)
-    n *= degree+1;
+    n *= this->degree+1;
   
   this->unit_face_support_points.resize(n);
 
   const std::vector<unsigned int> &face_index_map_inverse=
     FE_Q_Helper::invert_numbering(face_index_map);
   
-  const double step = 1./degree;
+  const double step = 1./this->degree;
   Point<codim> p;
   
   unsigned int k=0;
-  for (unsigned int iz=0; iz <= ((codim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0; iy <= ((codim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0; ix<=degree; ++ix)
+  for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=this->degree; ++ix)
 	{
 	  p(0) = ix * step;
 	  if (codim>1)
@@ -1018,7 +1018,7 @@ FE_Q<2>::initialize_constraints ()
 				   // need inside deal.II
   TensorProductPolynomials<dim-1>
     face_polynomials (Polynomials::LagrangeEquidistant::
-		      generate_complete_basis (degree));
+		      generate_complete_basis (this->degree));
   Assert (face_polynomials.n() == this->dofs_per_face, ExcInternalError());
   
   const unsigned int n_small_functions = this->interface_constraints_size()[0];
@@ -1221,11 +1221,11 @@ FE_Q<2>::initialize_constraints ()
 				   // constraint matrices, so make the
 				   // check
   if (dim == 3)
-    if (degree < Matrices::n_constraint_matrices+1)
+    if (this->degree < Matrices::n_constraint_matrices+1)
       {
 	FullMatrix<double> x;
 	x.TableBase<2,double>::reinit (this->interface_constraints_size());
-	x.fill (Matrices::constraint_matrices[degree-1]);
+	x.fill (Matrices::constraint_matrices[this->degree-1]);
 
 	for (unsigned int i=0; i<x.m(); ++i)
 	  for (unsigned int j=0; j<x.n(); ++j)
@@ -1258,11 +1258,11 @@ FE_Q<3>::initialize_constraints ()
                                    // well, but until this happens we
                                    // rather prefer to go back to the
                                    // precomputed matrices in 3d
-  if (degree < Matrices::n_constraint_matrices+1)
+  if (this->degree < Matrices::n_constraint_matrices+1)
     {
       this->interface_constraints
         .TableBase<2,double>::reinit (this->interface_constraints_size());
-      this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
+      this->interface_constraints.fill (Matrices::constraint_matrices[this->degree-1]);
     }
 }
 
@@ -1341,15 +1341,15 @@ FE_Q<dim>::initialize_embedding ()
                                                // growth in
                                                // degree*dim, times a
                                                // small constant.
-	      if (std::fabs(cell_value) < 2e-14*degree*dim)
+	      if (std::fabs(cell_value) < 2e-14*this->degree*dim)
 		cell_interpolation(j, i) = 0.;
 	      else
 		cell_interpolation(j, i) = cell_value;
 
-	      if (std::fabs(subcell_value) < 2e-14*degree*dim)
+	      if (std::fabs(subcell_value) < 2e-14*this->degree*dim)
 		subcell_interpolation(j, i) = 0.;
 	      else
-		if (std::fabs(subcell_value-1) < 2e-14*degree*dim)
+		if (std::fabs(subcell_value-1) < 2e-14*this->degree*dim)
 		  subcell_interpolation(j, i) = 1.;
 		else			
 						   // we have put our
@@ -1389,7 +1389,7 @@ FE_Q<dim>::initialize_embedding ()
 					 // here
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	  if (std::fabs(this->prolongation[child](i,j)) < 2e-14*degree*dim)
+	  if (std::fabs(this->prolongation[child](i,j)) < 2e-14*this->degree*dim)
 	    this->prolongation[child](i,j) = 0.;
 
 				       // and make sure that the row
@@ -1401,7 +1401,7 @@ FE_Q<dim>::initialize_embedding ()
 	  double sum = 0;
 	  for (unsigned int col=0; col<this->dofs_per_cell; ++col)
 	    sum += this->prolongation[child](row,col);
-	  Assert (std::fabs(sum-1.) < 2e-14*degree*dim,
+	  Assert (std::fabs(sum-1.) < 2e-14*this->degree*dim,
 		  ExcInternalError());
 	};
     }
@@ -1470,7 +1470,7 @@ FE_Q<dim>::initialize_restriction ()
         {
           const double val
             = this->poly_space.compute_value(mother_dof, p_cell);
-          if (std::fabs (val-1.) < 2e-14*degree*dim)
+          if (std::fabs (val-1.) < 2e-14*this->degree*dim)
                                              // ok, this is the right
                                              // dof
             break;
@@ -1478,14 +1478,14 @@ FE_Q<dim>::initialize_restriction ()
                                              // make sure that all
                                              // other shape functions
                                              // are zero there
-            Assert (std::fabs(val) < 2e-14*degree*dim,
+            Assert (std::fabs(val) < 2e-14*this->degree*dim,
                     ExcInternalError());
         }
                                        // check also the shape
                                        // functions after tat
       for (unsigned int j=mother_dof+1; j<this->dofs_per_cell; ++j)
         Assert (std::fabs (this->poly_space.compute_value(j, p_cell))
-                < 2e-14*degree*dim,
+                < 2e-14*this->degree*dim,
                 ExcInternalError());
 
                                        // then find the children on
@@ -1517,15 +1517,15 @@ FE_Q<dim>::initialize_restriction ()
                 {
                   const double val
                     = this->poly_space.compute_value(child_dof, p_subcell);
-                  if (std::fabs (val-1.) < 2e-14*degree*dim)
+                  if (std::fabs (val-1.) < 2e-14*this->degree*dim)
                     break;
                   else
-                    Assert (std::fabs(val) < 2e-14*degree*dim,
+                    Assert (std::fabs(val) < 2e-14*this->degree*dim,
                             ExcInternalError());
                 }
               for (unsigned int j=child_dof+1; j<this->dofs_per_cell; ++j)
                 Assert (std::fabs (this->poly_space.compute_value(j, p_subcell))
-                        < 2e-14*degree*dim,
+                        < 2e-14*this->degree*dim,
                         ExcInternalError());
 
                                                // so now that we have

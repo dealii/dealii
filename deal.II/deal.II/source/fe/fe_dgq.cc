@@ -334,7 +334,7 @@ FE_DGQ<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_DGQ<" << dim << ">(" << degree << ")";
+  namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -348,7 +348,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_DGQ<dim>::clone() const
 {
-  return new FE_DGQ<dim>(degree);
+  return new FE_DGQ<dim>(this->degree);
 }
 
 
@@ -375,7 +375,7 @@ void
 FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 			     const char                 direction) const
 {
-  const unsigned int n = degree+1;
+  const unsigned int n = this->degree+1;
   unsigned int s = n;
   for (unsigned int i=1;i<dim;++i)
     s *= n;
@@ -528,7 +528,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
       for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
         sum += interpolation_matrix(i,j);
 
-      Assert (std::fabs(sum-1) < 5e-14*std::max(degree,1U)*dim,
+      Assert (std::fabs(sum-1) < 5e-14*std::max(this->degree,1U)*dim,
               ExcInternalError());
     }
 }
@@ -550,7 +550,7 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
-  unsigned int n = degree+1;
+  unsigned int n = this->degree+1;
   unsigned int n2 = n*n;
   
   switch (dim)
@@ -571,7 +571,7 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
     {
       if (face_index==0 && shape_index < n)
 	return true;
-      if (face_index==1 && (shape_index % n) == degree)
+      if (face_index==1 && (shape_index % n) == this->degree)
 	return true;
       if (face_index==2 && shape_index >= this->dofs_per_cell-n)
 	return true;

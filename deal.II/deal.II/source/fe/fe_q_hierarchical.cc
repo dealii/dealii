@@ -108,7 +108,7 @@ FE_Q_Hierarchical<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_Q_Hierarchical<" << dim << ">(" << degree << ")";
+  namebuf << "FE_Q_Hierarchical<" << dim << ">(" << this->degree << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -122,7 +122,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_Q_Hierarchical<dim>::clone() const
 {
-  return new FE_Q_Hierarchical<dim>(degree);
+  return new FE_Q_Hierarchical<dim>(this->degree);
 }
 
 
@@ -197,6 +197,7 @@ FE_Q_Hierarchical<dim>::
 initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
 {
   const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
+  const unsigned int degree=this->degree;
 
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
@@ -431,9 +432,9 @@ template <int dim>
 void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
 {
 				   // number of points: (degree+1)^dim
-  unsigned int n = degree+1;
+  unsigned int n = this->degree+1;
   for (unsigned int i=1; i<dim; ++i)
-    n *= degree+1;
+    n *= this->degree+1;
   
   this->unit_support_points.resize(n);
 
@@ -466,9 +467,9 @@ void FE_Q_Hierarchical<dim>::initialize_unit_support_points ()
                                    // FE_Q), so there's not much we
                                    // can do here.
   unsigned int k=0;
-  for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0; ix<=degree; ++ix)
+  for (unsigned int iz=0; iz <= ((dim>2) ? this->degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((dim>1) ? this->degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=this->degree; ++ix)
 	{
 	  if (ix==0)
 	    p(0) =  0.;
@@ -516,18 +517,18 @@ void FE_Q_Hierarchical<dim>::initialize_unit_face_support_points ()
   const unsigned int codim = dim-1;
   
 				   // number of points: (degree+1)^codim
-  unsigned int n = degree+1;
+  unsigned int n = this->degree+1;
   for (unsigned int i=1; i<codim; ++i)
-    n *= degree+1;
+    n *= this->degree+1;
   
   this->unit_face_support_points.resize(n);
   
   Point<codim> p;
   
   unsigned int k=0;
-  for (unsigned int iz=0; iz <= ((codim>2) ? degree : 0) ; ++iz)
-    for (unsigned int iy=0; iy <= ((codim>1) ? degree : 0) ; ++iy)
-      for (unsigned int ix=0; ix<=degree; ++ix)
+  for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=this->degree; ++ix)
 	{
 	  if (ix==0)
 	    p(0) =  0.;
@@ -984,8 +985,8 @@ template <int dim>
 std::vector<unsigned int> 
 FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 {
-  Assert ((sub_degree>0) && (sub_degree<=degree),
-	  ExcIndexRange(sub_degree, 1, degree));
+  Assert ((sub_degree>0) && (sub_degree<=this->degree),
+	  ExcIndexRange(sub_degree, 1, this->degree));
 
   if (dim==1)
     {
@@ -1004,7 +1005,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 
       return embedding_dofs;
     }
-  else if (sub_degree==degree)
+  else if (sub_degree==this->degree)
     {
       std::vector<unsigned int> embedding_dofs (this->dofs_per_cell);
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -1035,7 +1036,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 	      const unsigned int line = (i - GeometryInfo<dim>::vertices_per_cell - j) / (sub_degree-1);
 
 	      embedding_dofs[i] = GeometryInfo<dim>::vertices_per_cell + 
-				  line * (degree-1) + j;
+				  line * (this->degree-1) + j;
 	    }
 					   // quad
 	  else if (i<(GeometryInfo<dim>::vertices_per_cell + 
@@ -1050,9 +1051,9 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 					 GeometryInfo<dim>::lines_per_cell * (sub_degree-1) - k * (sub_degree-1) - j) / ( (sub_degree-1) * (sub_degree-1) );
 
 	      embedding_dofs[i] = GeometryInfo<dim>::vertices_per_cell + 
-				  GeometryInfo<dim>::lines_per_cell * (degree-1) +
-				  face * (degree-1) * (degree-1) +
-				  k * (degree-1) + j;
+				  GeometryInfo<dim>::lines_per_cell * (this->degree-1) +
+				  face * (this->degree-1) * (this->degree-1) +
+				  k * (this->degree-1) + j;
 	    }
 					   // hex
 	  else if (i<(GeometryInfo<dim>::vertices_per_cell + 
@@ -1071,9 +1072,9 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 				      GeometryInfo<dim>::quads_per_cell * (sub_degree-1) * (sub_degree-1) - j - k * (sub_degree-1)) / ( (sub_degree-1) * (sub_degree-1) );
         
 	      embedding_dofs[i] = GeometryInfo<dim>::vertices_per_cell + 
-				  GeometryInfo<dim>::lines_per_cell * (degree-1) +
-				  GeometryInfo<dim>::quads_per_cell * (degree-1) * (degree-1) +
-				  l * (degree-1) * (degree-1) + k * (degree-1) + j;
+				  GeometryInfo<dim>::lines_per_cell * (this->degree-1) +
+				  GeometryInfo<dim>::quads_per_cell * (this->degree-1) * (this->degree-1) +
+				  l * (this->degree-1) * (this->degree-1) + k * (this->degree-1) + j;
 	    }
 	}
 
