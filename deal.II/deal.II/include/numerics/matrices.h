@@ -13,6 +13,8 @@
 #include <base/exceptions.h>
 #include <map>
 
+
+// forward declarations
 template <int dim> class Quadrature;
 
 template<typename number> class Vector;
@@ -25,7 +27,8 @@ template <typename Number> class BlockVector;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
-template <int dim> class Equation;
+
+
 
 /**
  * Provide a class which assembles certain standard matrices for a given
@@ -85,8 +88,11 @@ template <int dim> class Equation;
  *   the different components. It will furthermore accept a single
  *   coefficient through the @ref{Function} parameter for all
  *   components. If you want different coefficients for the different
- *   parameters, you need to pass a function object representing the
- *   respective number of components.
+ *   parameters, you have to assemble the matrix yourself, sorry; the
+ *   implementation of the function will serve as a good starting
+ *   point, though. (You may also modify the implementation to accept
+ *   vector-valued functions and send this implementation to us -- we
+ *   will then include this implementation into the library.)
  *
  * @item @p{create_laplace_matrix}: there are two versions of this; the
  *   one which takes the @ref{Function} object creates
@@ -98,9 +104,10 @@ template <int dim> class Equation;
  *   This function uses the @ref{LaplaceMatrix} class.
  *
  *   If the finite element in use presently has more than only one
- *   component, this function may not be overly useful and presently
- *   throws an error.
- * @end{itemize}
+ *   component, this function may not be overly useful. It assembles a
+ *   Laplace matrix block for each component (with the same
+ *   coefficient for each component). These blocks are not coupled.  *
+ *   @end{itemize}
  *
  * All created matrices are `raw': they are not condensed, i.e. hanging
  * nodes are not eliminated. The reason is that you may want to add
@@ -294,6 +301,7 @@ class MatrixCreator
 };
 
 
+
 /**
  * Provide a collection of functions operating on matrices. These include
  * the application of boundary conditions to a linear system of equations
@@ -417,9 +425,9 @@ class MatrixTools : public MatrixCreator<dim>
 				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   BlockSparseMatrix<double> &matrix,
-			   BlockVector<double> &solution,
-			   BlockVector<double> &right_hand_side,
+			   BlockSparseMatrix<double>           &matrix,
+			   BlockVector<double>                 &solution,
+			   BlockVector<double>                 &right_hand_side,
 			   const bool           eliminate_columns = true);
     
 				     /**
@@ -439,257 +447,6 @@ class MatrixTools : public MatrixCreator<dim>
     DeclException0 (ExcBlocksDontMatch);
 };
 
-
-/**
- * Equation class to be passed to the @ref{Assembler} if you want to make up the
- * mass matrix for your problem. The mass matrix is the matrix with
- * $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$.
- *
- * You may pass a coefficient function to the constructor. If you do so, the
- * assemble routines compute the matrix
- * $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$
- * instead. The coefficient will in many cases be a strictly positive function.
- *
- * The class also has functions to create a right hand side
- * $f_i = \int_\Omega f(x) \phi_i(x) dx$. The function $f(x)$ has to be
- * given to the constructor; if none is given, an error is issued if you
- * try to create a right hand side vector. The function to create right
- * hand side vectors is the same for all the matrix class in this file,
- * since it does not depend on the operator.
- *
- * The defaults for both right hand side and coefficient function is a
- * @p{NULL} pointer. If you need a coefficient but no right hand side object,
- * simply pass a @p{NULL} pointer to the constructor for its first argument.
- *
- *
- * @sect3{Other possibilities}
- *
- * You will usually want to use this object only if you have coefficients
- * which vary over each cell. If you have coefficients which are constant
- * on each cell or even on the whole domain, you can get the local mass
- * matrix easier by calling the @ref{FiniteElement}@p{::get_local_mass_matrix} and
- * then scaling this one on each cell. This has the additional benefit that
- * the mass matrix is evaluated exactly, i.e. not using a quadrature formula
- * and is normally much faster since it can be precomputed and needs only
- * be scaled appropriately.
- *
- * The useful use of this object is therefore probable one of the following
- * cases:
- * @begin{itemize}
- * @item Mass lumping: use an @ref{Assembler} object and a special quadrature
- *   formula to voluntarily evaluate the mass matrix incorrect. For example
- *   by using the trapezoidal formula, the mass matrix will become a
- *   diagonal (at least if no hanging nodes are considered). However, there
- *   may be easier ways to set up the resulting matrix, for example by
- *   scaling the diagonal elements of the unit matrix by the area element
- *   of the respective cell.
- *
- * @item Nonconstant coefficient: if the coefficient varies considerably over
- *   each element, there is no way around this class. However, there are many
- *   cases where it is sufficient to assume that the function be constant on
- *   each cell (taking on its mean value throughout the cell for example, or
- *   more easily computed, its value at the center of mass of the element).
- *   A proper analysis of the error introduced by an assumed constant
- *   coefficient may be worth the effort.
- *
- *   Nonconstant coefficients to the mass matrix occur in mechanical problems
- *   if the density or other mechanical properties vary with the space
- *   coordinate.
- *
- * @item Simple plugging together of system matrices: if the system matrix has
- *    the form $s_{ij} = m_{ij} + \alpha a_{ij}$, for example, with $M$ and
- *    $A$ being the mass and laplace matrix, respectively (this matrix $S$
- *    occurs in the discretization of the heat and the wave equation, amoung
- *    others), once could conceive an equation object in which the @p{assemble}
- *    functions do nothing but sum up the contributions delivered by the
- *    @p{assemble} functions of the @ref{MassMatrix} and @ref{LaplaceMatrix} classes.
- *    Since numerical quadrature is necessary here anyway, this way is
- *    justifyable to quickly try something out. In the further process it
- *    may be useful to replace this behaviour by more sophisticated methods,
- *    however.
- * @end{itemize}
- */
-template <int dim>
-class MassMatrix :  public Equation<dim> {
-  public:
-				     /**
-				      * Constructor. Pass a function object if
-				      * you want to create a right hand side
-				      * vector, pass a function pointer (default
-				      * is a NULL pointer). It is your duty to
-				      * guarantee that the function object for
-				      * the right hand side lives at least as
-				      * long as this object does.
-				      *
-				      * You may also pass a function describing
-				      * the weight to the integral (see the
-				      * general docs for more information). The
-				      * same applies for this object as said
-				      * above.
-				      */
-    MassMatrix (const Function<dim> * const rhs = 0,
-		const Function<dim> * const a = 0);
-
-				     /**
-				      * Assemble the cell matrix and right hand
-				      * side vector for this cell. You need to
-				      * give a right hand side object to the
-				      * constructor to use this function. If
-				      * a coefficient was given to the
-				      * constructor, it is used.
-				      *
-				      * This function assumes the cell matrix
-				      * and right hand side to have the right
-				      * size and to be empty.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Construct the cell matrix for this cell.
-				      * If a coefficient was given to the
-				      * constructor, it is used.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Only construct the right hand side
-				      * vector for this cell. You need to give
-				      * a right hand side function to the
-				      * constructor in order to call this
-				      * function.
-				      */
-    virtual void assemble (Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNoRHSSelected);
-    
-  protected:
-				     /**
-				      * Pointer to a function describing the
-				      * right hand side of the problem. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const right_hand_side;
-
-				     /**
-				      * Pointer to a function describing the
-				      * coefficient to the integral for the
-				      * matrix entries. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const coefficient;
-};
-
-
-/**
- * Equation class to be passed to the @ref{Assembler} if you want to make up the
- * laplace matrix for your problem. The laplace matrix is the matrix with
- * $a_{ij} = \int_\Omega \nabla\phi_i(x) \cdot \nabla\phi_j(x) dx$.
- *
- * You may pass a coefficient function to the constructor. If you do so, the
- * assemble routines compute the matrix
- * $m_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \cdot \nabla\phi_j(x) dx$
- * instead. The coefficient will in many cases be a strictly positive function.
- *
- * The class also has functions to create a right hand side
- * $f_i = \int_\Omega f(x) \phi_i(x) dx$. The function $f(x)$ has to be
- * given to the constructor; if none is given, an error is issued if you
- * try to create a right hand side vector. The function to create right
- * hand side vectors is the same for all the matrix class in this file,
- * since it does not depend on the operator.
- *
- * The defaults for both right hand side and coefficient function is a
- * @p{NULL} pointer. If you need a coefficient but no right hand side object,
- * simply pass a @p{NULL} pointer to the constructor for its first argument.
- */
-template <int dim>
-class LaplaceMatrix :  public Equation<dim> {
-  public:
-				     /**
-				      * Constructor. Pass a function object if
-				      * you want to create a right hand side
-				      * vector, pass a function pointer (default
-				      * is a NULL pointer). It is your duty to
-				      * guarantee that the function object for
-				      * the right hand side lives at least as
-				      * long as this object does.
-				      *
-				      * You may also pass a function describing
-				      * the weight to the integral (see the
-				      * general docs for more information). The
-				      * same applies for this object as said
-				      * above.
-				      */
-    LaplaceMatrix (const Function<dim> * const rhs = 0,
-		   const Function<dim> * const a = 0);
-
-				     /**
-				      * Assemble the cell matrix and right hand
-				      * side vector for this cell. You need to
-				      * give a right hand side object to the
-				      * constructor to use this function. If
-				      * a coefficient was given to the
-				      * constructor, it is used.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Construct the cell matrix for this cell.
-				      * If a coefficient was given to the
-				      * constructor, it is used.
-				      */
-    virtual void assemble (FullMatrix<double>  &cell_matrix,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Only construct the right hand side
-				      * vector for this cell. You need to give
-				      * a right hand side function to the
-				      * constructor in order to call this
-				      * function.
-				      */
-    virtual void assemble (Vector<double>      &rhs,
-			   const FEValues<dim> &fe_values,
-			   const typename DoFHandler<dim>::cell_iterator &) const;
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNoRHSSelected);
-    
-  protected:
-				     /**
-				      * Pointer to a function describing the
-				      * right hand side of the problem. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const right_hand_side;
-
-    				     /**
-				      * Pointer to a function describing the
-				      * coefficient to the integral for the
-				      * matrix entries. Should
-				      * be zero if not given to the constructor
-				      * and should then not be used.
-				      */
-    const Function<dim> * const coefficient;
-};
 
 
 #endif

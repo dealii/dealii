@@ -20,7 +20,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
-#include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <dofs/dof_tools.h>
