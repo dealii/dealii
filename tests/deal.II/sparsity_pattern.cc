@@ -1,8 +1,8 @@
 //----------------------------  sparsity_pattern.cc  ---------------------------
-//    sparsity_pattern.cc,v 1.3 2003/04/09 15:49:53 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

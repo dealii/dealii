@@ -1,8 +1,8 @@
 //----------------------------  support_point_map.cc  ---------------------------
-//    support_point_map.cc,v 1.6 2003/04/09 15:49:54 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2000, 2001, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

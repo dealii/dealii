@@ -1,5 +1,5 @@
 //----------------------------  constraints.cc  ---------------------------
-//    constraints.cc,v 1.24 2004/02/04 01:53:47 wolf Exp
+//    $Id$
 //    Version: 
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004 by the deal.II authors

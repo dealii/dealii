@@ -1,4 +1,4 @@
-/* intergrid_constraints.cc,v 1.9 2003/07/03 10:31:47 guido Exp */
+/* $Id$
 /* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 /* 
    Purpose: check some things with the intergrid map

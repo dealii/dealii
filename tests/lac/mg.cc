@@ -1,8 +1,8 @@
 //----------------------------  mg.cc  ---------------------------
-//    mg.cc,v 1.23 2003/01/08 17:58:21 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

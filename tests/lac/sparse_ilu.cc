@@ -1,8 +1,8 @@
 //----------------------------  sparse_ilu.cc  ---------------------------
-//    sparse_ilu.cc,v 1.10 2003/04/30 23:08:40 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

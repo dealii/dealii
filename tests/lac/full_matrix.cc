@@ -1,8 +1,8 @@
 //----------------------------  full_matrix.cc,v  ---------------------------
-//    full_matrix.cc,v 1.12 2003/07/18 12:16:47 guido Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

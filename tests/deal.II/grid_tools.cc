@@ -1,8 +1,8 @@
 //----------------------------  grid_test.cc  ---------------------------
-//    grid_tools.cc,v 1.5 2003/04/09 15:49:53 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

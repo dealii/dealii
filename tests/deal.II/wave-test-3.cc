@@ -1,8 +1,8 @@
 //----------------------------  wave-test-3.cc  ---------------------------
-//    wave-test-3.cc,v 1.45 2003/04/09 15:49:54 wolf Exp
+//    $Id$
 //    Version: 
 //
-//    std::copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by Wolfgang Bangerth
+//    std::copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by Wolfgang Bangerth
 //
 //    This file is subject to QPL and may not be  distributed
 //    without std::copyright and license information. Please refer

@@ -1,4 +1,4 @@
-// helmholtz.h,v 1.2 2000/02/09 20:01:34 wolf Exp
+// $Id$
 
 #include "../tests.h"
 #include <multigrid/mg_base.h>
