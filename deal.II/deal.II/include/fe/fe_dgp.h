@@ -23,14 +23,14 @@ template <int dim> class MappingQ;
 
 
 /**
- * Discontinuous tensor product elements based on equidistant support points.
+ * Discontinuous finite elements based on Legendre polynomials.
  *
- * This is a discontinuous finite element using interpolating tensor
- * product polynomials. The shape functions are Lagrangian
- * interpolants of an equidistant grid of points on the unit cell. The
- * points are numbered in lexicographical order, @p{x} running fastest.
+ * This finite element implements complete polynomial spaces, that is,
+ * $d$-dimensional polynomials of order $k$. The underlying
+ * polynomials form a Legendre basis on the unit square. Thus, the
+ * mass matrix is diagonal, if the grid cells are parallelograms.
  *
- * @author Guido Kanschat, Ralf Hartmann, 2001
+ * @author Guido Kanschat, 2001, 2002
  */
 template <int dim>
 class FE_DGP : public FiniteElement<dim>
