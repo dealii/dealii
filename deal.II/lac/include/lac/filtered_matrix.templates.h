@@ -404,8 +404,12 @@ void
 FilteredMatrix<BlockSparseMatrix<double>,BlockVector<double> >::
 allocate_tmp_vector () 
 {
+  std::vector<unsigned int> block_sizes (matrix->n_block_rows());
+  for (unsigned int i=0; i<block_sizes.size(); ++i)
+    block_sizes[i] = matrix->block(i,i).n();
+  
   tmp_mutex.acquire ();
-  tmp_vector.reinit (matrix->n());
+  tmp_vector.reinit (block_sizes);
   tmp_mutex.release ();
 };
 
@@ -416,8 +420,12 @@ void
 FilteredMatrix<BlockSparseMatrix<float>,BlockVector<float> >::
 allocate_tmp_vector () 
 {
+  std::vector<unsigned int> block_sizes (matrix->n_block_rows());
+  for (unsigned int i=0; i<block_sizes.size(); ++i)
+    block_sizes[i] = matrix->block(i,i).n();
+  
   tmp_mutex.acquire ();
-  tmp_vector.reinit (matrix->n());
+  tmp_vector.reinit (block_sizes);
   tmp_mutex.release ();
 };
 
