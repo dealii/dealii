@@ -20,7 +20,7 @@ PolynomialsP<dim>::PolynomialsP (const unsigned int k)
 		PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(k)),
 		k(k)
 {
-  vector<unsigned int> index_map(n());
+  std::vector<unsigned int> index_map(n());
   create_polynomial_ordering(index_map);
   set_polynomial_ordering(index_map);
 }
@@ -28,7 +28,7 @@ PolynomialsP<dim>::PolynomialsP (const unsigned int k)
 
 template <>
 void PolynomialsP<1>::create_polynomial_ordering(
-  vector<unsigned int> &index_map) const
+  std::vector<unsigned int> &index_map) const
 {
   Assert(index_map.size()==n(), ExcDimensionMismatch(index_map.size(), n()));
 
@@ -51,7 +51,7 @@ const unsigned int imap2[6][21]=
 
 template <>
 void PolynomialsP<2>::create_polynomial_ordering(
-  vector<unsigned int> &index_map) const
+  std::vector<unsigned int> &index_map) const
 {
   Assert(index_map.size()==n(), ExcDimensionMismatch(index_map.size(), n()));
   Assert(k<=5, ExcNotImplemented());
@@ -76,7 +76,7 @@ const unsigned int imap3[4][20]=
 
 template <>
 void PolynomialsP<3>::create_polynomial_ordering(
-  vector<unsigned int> &index_map) const
+  std::vector<unsigned int> &index_map) const
 {
   Assert(index_map.size()==n(), ExcDimensionMismatch(index_map.size(), n()));
   Assert(k<=3, ExcNotImplemented());

@@ -78,7 +78,7 @@ class PolynomialSpace
 				      * <tt>index_map.size()==n()</tt>. Stores
 				      * a copy of <tt>index_map</tt>.
 				      */
-    void set_polynomial_ordering(const vector<unsigned int> &index_map);
+    void set_polynomial_ordering(const std::vector<unsigned int> &index_map);
     
 				     /**
 				      * Computes the value and the

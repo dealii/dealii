@@ -79,7 +79,7 @@ class PolynomialsP: public PolynomialSpace<dim>
 				     /**
 				      * Fills the <tt>index_map</tt>.
 				      */
-    void create_polynomial_ordering(vector<unsigned int> &index_map) const;
+    void create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
 
 				     /**
 				      * Degree <tt>k<tt> of the

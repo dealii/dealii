@@ -117,7 +117,7 @@ PolynomialSpace<dim>::output_indices(std::ostream &out) const
       out << i << "\t";
       for (unsigned int d=0; d<dim; ++d)
 	out << ix[d] << " ";
-      out << endl;
+      out << std::endl;
     }
 }
 
@@ -126,7 +126,7 @@ PolynomialSpace<dim>::output_indices(std::ostream &out) const
 template <int dim>
 void
 PolynomialSpace<dim>::set_polynomial_ordering(
-  const vector<unsigned int> &imap)
+  const std::vector<unsigned int> &imap)
 {
   Assert(imap.size()==index_map.size(),
 	 ExcDimensionMismatch(imap.size(), index_map.size()));
