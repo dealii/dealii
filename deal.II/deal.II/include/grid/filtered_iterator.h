@@ -952,7 +952,7 @@ operator () (const BaseIterator &bi) const
 
 template <typename BaseIterator>
 template <typename Predicate>
-FilteredIterator<BaseIterator>::PredicateBase *
+typename FilteredIterator<BaseIterator>::PredicateBase *
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
 clone () const
 {
