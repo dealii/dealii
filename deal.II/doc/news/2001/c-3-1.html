@@ -281,6 +281,26 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New: The static <code class="member">interpolate</code>, <code
+       class="member">create_right_hand_side</code>, <code
+       class="member">interpolate_boundary_values</code>, <code
+       class="member">integrate_difference</code> and <code
+       class="member">compute_mean_value</code> member functions of
+       the class <code class="class">VectorTools</code> are extended
+       to work on arbitrary mappings. All these functions now take a
+       <code class="class">Mapping</code> object as additional
+       argument. 
+       <br>
+       For backward compatibility there exist second versions of
+       each of these functions that still don't have a <code
+       class="class">Mapping</code> argument. These functions
+       implicitely use a mapping of the class <code
+       class="class">MappingQ1</code>.
+       <br>
+       (RH 2001/03/27)
+
+  <li> <p>
+       </p>
        New: <code class="class">Boundary</code> and derived classes
        now have a function <code
        class="member">get_tangents_at_vertices</code> that returns a
