@@ -16,7 +16,7 @@ clean-objects: clean-base clean-lac clean-1d clean-2d clean-3d
 
 # clean targets for the individual subdirectories.
 # extract dir name from target
-clean-%:
+clean-base clean-lac clean-1d clean-2d clean-3d:
 	-cd $(@:clean-%=%) ; rm *.o
 
 
