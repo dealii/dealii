@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
 # Copyright (C) 2000, 2001 by the deal.II authors
@@ -8,187 +9,28 @@
 ############################################################
 
 D = @DEAL2_DIR@
-
 include $D/common/Make.global_options
-
-
-############################################################
-# Set debug-mode as a default
-############################################################
-
 debug-mode = on
 
+libraries = $(lib-lac.g)  \
+            $(lib-base.g)
 
-############################################################
-# Define library names
-############################################################
-
-libs.g   = $(lib-lac.g)      \
-           $(lib-base.g)
-libs     = $(lib-lac.o)      \
-           $(lib-base.o)
-
-
-############################################################
-# Select compiler flags according to debug-mode
-############################################################
-
-ifeq ($(debug-mode),on)
-libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
-endif
-
-ifeq ($(debug-mode),off)
-libraries = $(libs)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS) -Wno-missing-noreturn
-endif
-
-
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  libraries += $(lib-ACE)
-endif
-
-
-%.go : %.cc Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
-
-
-all: logtest.check reference.check tensor.check quadrature_test.check timer.check
-exe: $(all:.check=.testcase)
-output: $(all:.check=.output)
-
-abort.o : abort.cc
-	@$(CXX)  -c $< -o $@
-
-############################################################
-# Typical block for building a running program
-#
-# 1. provide a list of source files in ...-cc-files
-#
-# 2. generate the list of object files according to debug-mode
-#
-# 3. make executable
-#
-# 4. Explicit dependencies of object files (will be automatic soon)
-#
-############################################################
-
-logtest-cc-files = logtest.cc
-
-ifeq ($(debug-mode),on)
-logtest-o-files = $(logtest-cc-files:.cc=.go)
-else
-logtest-o-files = $(logtest-cc-files:.cc=.o)
-endif
-
-logtest.testcase: $(logtest-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
-
+default: run-tests 
 
 ############################################################
 
-
-tensor-cc-files = tensor.cc
-
-ifeq ($(debug-mode),on)
-tensor-o-files = $(tensor-cc-files:.cc=.go)
-else
-tensor-o-files = $(tensor-cc-files:.cc=.o)
-endif
-
-tensor.testcase: $(tensor-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
+logtest.exe        : $(libraries) logtest.go
+polynomial_test.exe: $(libraries) polynomial_test.go
+quadrature_test.exe: $(libraries) quadrature_test.go
+reference.exe      : $(libraries) reference.go abort.go
+tensor.exe         : $(libraries) tensor.go
+timer.exe          : $(libraries) timer.go
 
 
+tests = logtest quadrature_test reference tensor timer
 
 ############################################################
 
-
-reference-cc-files = reference.cc
-
-ifeq ($(debug-mode),on)
-reference-o-files = $(reference-cc-files:.cc=.go) abort.o
-else
-reference-o-files = $(reference-cc-files:.cc=.o) abort.o
-endif
-
-reference.testcase: $(reference-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-quadrature_test-cc-files = quadrature_test.cc
-
-ifeq ($(debug-mode),on)
-quadrature_test-o-files = $(quadrature_test-cc-files:.cc=.go)
-else
-quadrature_test-o-files = $(quadrature_test-cc-files:.cc=.o)
-endif
-
-quadrature_test.testcase: $(quadrature_test-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-timer-cc-files = timer.cc
-
-ifeq ($(debug-mode),on)
-timer-o-files = $(timer-cc-files:.cc=.go)
-else
-timer-o-files = $(timer-cc-files:.cc=.o)
-endif
-
-timer.testcase: $(timer-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-polynomial_test-cc-files = polynomial_test.cc
-
-ifeq ($(debug-mode),on)
-polynomial_test-o-files = $(polynomial_test-cc-files:.cc=.go)
-else
-polynomial_test-o-files = $(polynomial_test-cc-files:.cc=.o)
-endif
-
-polynomial_test.testcase: $(polynomial_test-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
-
-
-############################################################
-# Continue with other targets if needed
-############################################################
-
-
-target1-cc-files = t1.cc t2.cc t3.cc
-
-ifeq ($(debug-mode),on)
-target1-o-files = $(target1-cc-files:.cc=.go)
-else
-target1-o-files = $(target1-cc-files:.cc=.o)
-endif
-
-target1: $(target1-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
 
 include ../Makefile.rules
 include Makefile.depend

@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
 # Copyright (C) 2000, 2001 by the deal.II authors
@@ -8,216 +9,36 @@
 ############################################################
 
 D = @DEAL2_DIR@
-
 include $D/common/Make.global_options
-
-normalize = $D/common/scripts/normalize.pl
-
-############################################################
-# Set debug-mode as a default
-############################################################
-
 debug-mode = on
 
+libraries = $(lib-deal2-1d.g) \
+            $(lib-deal2-2d.g) \
+            $(lib-deal2-3d.g) \
+            $(lib-lac.g)  \
+            $(lib-base.g)
 
-############################################################
-# Define library names
-############################################################
+default: run-tests dat-checks
 
-libs.g   = $(lib-deal2-1d.g) \
-           $(lib-deal2-2d.g) \
-           $(lib-deal2-3d.g) \
-           $(lib-lac.g)      \
-           $(lib-base.g)
-libs     = $(lib-deal2-1d.o) \
-           $(lib-deal2-2d.o) \
-           $(lib-deal2-3d.o) \
-           $(lib-lac.o)      \
-           $(lib-base.o)
+# additional in this directory: some tests write more than one output
+# file. check these as well after all tests have been run. actually, 
+# check each output file; files that are checked twice don't matter
+dat-checks: run-tests
+	@$(MAKE) `echo *.output | perl -pi -e 's/output/check/g;'`
 
 
 ############################################################
-# Select compiler flags according to debug-mode
-############################################################
 
-ifeq ($(debug-mode),on)
-libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS)
-endif
+derivatives.exe    : $(libraries) derivatives.go
+fe_data_test.exe   : $(libraries) fe_data_test.go
+mapping.exe        : $(libraries) mapping.go
+mapping_c1.exe     : $(libraries) mapping_c1.go
+shapes.exe         : $(libraries) shapes.go
 
-ifeq ($(debug-mode),off)
-libraries = $(libs)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS)
-endif
-
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  libraries += $(lib-ACE)
-endif
-
-
-
-%.go : %.cc Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -g -c $< -o $@
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -g -c $< -o $@
-
-
-all: check
-
-############################################################
-# Typical block for building a running program
-#
-# 1. provide a list of source files in ...-cc-files
-#
-# 2. generate the list of object files according to debug-mode
-#
-# 3. make executable
-#
-# 4. Explicit dependencies of object files (will be automatic soon)
-#
-############################################################
-
-fe_data_test-cc-files = fe_data_test.cc
-
-ifeq ($(debug-mode),on)
-fe_data_test-o-files = $(fe_data_test-cc-files:.cc=.go)
-else
-fe_data_test-o-files = $(fe_data_test-cc-files:.cc=.o)
-endif
-
-fe_data_test.testcase: $(fe_data_test-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
+tests = derivatives fe_data_test mapping mapping_c1 shapes
 
 ############################################################
 
-shapes-cc-files = shapes.cc
-
-ifeq ($(debug-mode),on)
-shapes-o-files = $(shapes-cc-files:.cc=.go)
-else
-shapes-o-files = $(shapes-cc-files:.cc=.o)
-endif
-
-shapes.testcase: $(shapes-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-
-derivatives-cc-files = derivatives.cc
-
-ifeq ($(debug-mode),on)
-derivatives-o-files = $(derivatives-cc-files:.cc=.go)
-else
-derivatives-o-files = $(derivatives-cc-files:.cc=.o)
-endif
-
-derivatives.testcase: $(derivatives-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-
-embedding-cc-files = embedding.cc
-
-ifeq ($(debug-mode),on)
-embedding-o-files = $(embedding-cc-files:.cc=.go)
-else
-embedding-o-files = $(embedding-cc-files:.cc=.o)
-endif
-
-embedding: $(embedding-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
-
-############################################################
-
-interpolation-cc-files = interpolation.cc
-
-ifeq ($(debug-mode),on)
-interpolation-o-files = $(interpolation-cc-files:.cc=.go)
-else
-interpolation-o-files = $(interpolation-cc-files:.cc=.o)
-endif
-
-interpolation: $(interpolation-o-files) $(libraries)
-	@$(CXX) $(LDFLAGS) -g -o $@ $^
-
-############################################################
-
-mapping-cc-files = mapping.cc
-
-ifeq ($(debug-mode),on)
-mapping-o-files = $(mapping-cc-files:.cc=.go)
-else
-mapping-o-files = $(mapping-cc-files:.cc=.o)
-endif
-
-mapping.testcase: $(mapping-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-
-mapping_c1-cc-files = mapping_c1.cc
-
-ifeq ($(debug-mode),on)
-mapping_c1-o-files = $(mapping_c1-cc-files:.cc=.go)
-else
-mapping_c1-o-files = $(mapping_c1-cc-files:.cc=.o)
-endif
-
-mapping_c1.testcase: $(mapping_c1-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-
-internals-cc-files = internals.cc
-
-ifeq ($(debug-mode),on)
-internals-o-files = $(internals-cc-files:.cc=.go)
-else
-internals-o-files = $(internals-cc-files:.cc=.o)
-endif
-
-internals: $(internals-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-
-performance-cc-files = performance.cc
-
-ifeq ($(debug-mode),on)
-performance-o-files = $(performance-cc-files:.cc=.go)
-else
-performance-o-files = $(performance-cc-files:.cc=.o)
-endif
-
-performance: $(performance-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-############################################################
-# Continue with other targets if needed
-############################################################
-
-check: fe_data_test.check mapping.check mapping_c1.check derivatives.check shapes.check
-	@echo Checking results
-	$(MAKE) dodiff
-
-dat = $(wildcard *.output)
-check = $(dat:.output=.check)
-
-dodiff: $(check)
 
 include ../Makefile.rules
 include Makefile.depend
-
-.PHONY: clean veryclean check

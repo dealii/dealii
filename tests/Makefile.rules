@@ -12,14 +12,36 @@ normalize = $D/common/scripts/normalize.pl
 
 verbose = off
 
+
 ############################################################
-# First how to create output: by simply running a program.
+# First how to create executables, including all necessary
+# flags:
+############################################################
+
+# If in multithread mode, add the ACE library to the libraries which
+# we need to link with:
+ifneq ($(with-multithreading),no)
+  LIBS += $(lib-ACE)
+endif
+
+flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
+
+%.go : %.cc Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.exe :
+	@echo =====linking======= $@
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^ $(LIBS)
+
+
+############################################################
+# Next how to create output: by simply running a program.
 # Note that we normalize output to a few digits after
 # the decimal punct, in order to be able to check across
 # different platforms where we might differ in round-off etc.
 ############################################################
 
-%.output : %.testcase
+%.output : %.exe
 	@echo =====Running======= $<
 	@./$<
 	@perl -pi $(normalize)  $@
@@ -63,6 +85,16 @@ verbose = off
 
 
 ############################################################
+# After all these general rules, here is the target to be
+# executed by make: for each entry in the list $(tests)
+# perform a check.
+############################################################
+run-tests: $(tests:%=%.check)
+
+
+
+
+############################################################
 # Cleanup targets
 ############################################################
 
@@ -70,15 +102,16 @@ clean:
 	rm -f Makefile.depend *.o *.go *.output
 
 veryclean: clean
-	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
+	rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
+
+
+
 
 ############################################################
 # Automatic generation of dependencies
 ############################################################
 
-all-cc-files = $(shell echo *.cc)
-
-Makefile.depend: $(all-cc-files)
+Makefile.depend: $(shell echo *.cc)
 	@echo =====Dependencies== $@
 	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
 	@perl -pi -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@

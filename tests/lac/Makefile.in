@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
 # Copyright (C) 2000, 2001 by the deal.II authors
@@ -8,234 +9,29 @@
 ############################################################
 
 D = @DEAL2_DIR@
-
 include $D/common/Make.global_options
-
-
-############################################################
-# Set debug-mode as a default
-############################################################
-
 debug-mode = on
 
+libraries = $(lib-lac.g)  \
+            $(lib-base.g)
 
-############################################################
-# Define library names
-############################################################
-
-libs.g   = $(lib-lac.g)      \
-           $(lib-base.g)
-libs     = $(lib-lac.o)      \
-           $(lib-base.o)
-
-
-############################################################
-# Select compiler flags according to debug-mode
-############################################################
-
-ifeq ($(debug-mode),on)
-libraries = $(libs.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS) -Wno-missing-noreturn
-endif
-
-ifeq ($(debug-mode),off)
-libraries = $(libs)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS) -Wno-missing-noreturn
-endif
-
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  libraries += $(lib-ACE)
-endif
-
-
-
-%.go : %.cc Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
-
-
-# multigrid classes will be fixed.
-all: vector-vector.check block_vector.check block_matrices.check full_matrix.check solver.check
-exe: $(all:.check=.testcase) benchmark
-run: $(all:.check=.output)
-
-
-
-############################################################
-# Typical block for building a running program
-#
-# 1. provide a list of source files in ...-cc-files
-#
-# 2. generate the list of object files according to debug-mode
-#
-# 3. make executable
-#
-# 4. Explicit dependencies of object files (will be automatic soon)
-#
-############################################################
-
-vector-vector-cc-files = vector-vector.cc
-
-ifeq ($(debug-mode),on)
-vector-vector-o-files = $(vector-vector-cc-files:.cc=.go)
-else
-vector-vector-o-files = $(vector-vector-cc-files:.cc=.o)
-endif
-
-vector-vector.testcase: $(vector-vector-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
+default: run-tests 
 
 ############################################################
 
-block_matrices-cc-files = block_matrices.cc
-
-ifeq ($(debug-mode),on)
-block_matrices-o-files = $(block_matrices-cc-files:.cc=.go)
-else
-block_matrices-o-files = $(block_matrices-cc-files:.cc=.o)
-endif
-
-block_matrices.testcase: $(block_matrices-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+block_matrices.exe : $(libraries) block_matrices.go
+block_vector.exe   : $(libraries) block_vector.go abort.go
+full_matrix.exe    : $(libraries) full_matrix.go
+solver.exe         : $(libraries) solver.go testmatrix.go
+sparse_ilu.exe     : $(libraries) sparse_ilu.go testmatrix.go
+vector-vector.exe  : $(libraries) vector-vector.go
+#mgbase.exe         : $(libraries) mgbase.go
+#mg.exe             : $(libraries) mg.go testmatrix.go
 
 
-############################################################
-
-block_vector-cc-files = block_vector.cc
-
-ifeq ($(debug-mode),on)
-block_vector-o-files = $(block_vector-cc-files:.cc=.go) ../base/abort.o
-else
-block_vector-o-files = $(block_vector-cc-files:.cc=.o) ../base/abort.o
-endif
-
-block_vector.testcase: $(block_vector-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
+tests = block_matrices block_vector full_matrix solver sparse_ilu vector-vector
 
 ############################################################
-
-
-solver-cc-files = solver.cc testmatrix.cc
-
-ifeq ($(debug-mode),on)
-solver-o-files = $(solver-cc-files:.cc=.go)
-else
-solver-o-files = $(solver-cc-files:.cc=.o)
-endif
-
-solver.testcase: $(solver-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-sparse_ilu-cc-files = sparse_ilu.cc testmatrix.cc
-
-ifeq ($(debug-mode),on)
-sparse_ilu-o-files = $(sparse_ilu-cc-files:.cc=.go)
-else
-sparse_ilu-o-files = $(sparse_ilu-cc-files:.cc=.o)
-endif
-
-sparse_ilu.testcase: $(sparse_ilu-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-full_matrix-cc-files = full_matrix.cc
-
-ifeq ($(debug-mode),on)
-full_matrix-o-files = $(full_matrix-cc-files:.cc=.go)
-else
-full_matrix-o-files = $(full_matrix-cc-files:.cc=.o)
-endif
-
-full_matrix.testcase: $(full_matrix-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-
-############################################################
-
-
-mgbase-cc-files = mgbase.cc
-
-ifeq ($(debug-mode),on)
-mgbase-o-files = $(mgbase-cc-files:.cc=.go)
-else
-mgbase-o-files = $(mgbase-cc-files:.cc=.o)
-endif
-
-mgbase.testcase: $(mgbase-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-
-############################################################
-
-
-mg-cc-files = mg.cc testmatrix.cc
-
-ifeq ($(debug-mode),on)
-mg-o-files = $(mg-cc-files:.cc=.go)
-else
-mg-o-files = $(mg-cc-files:.cc=.o)
-endif
-
-mg.testcase: $(mg-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-
-############################################################
-# Continue with other targets if needed
-############################################################
-
-
-benchmark-cc-files = benchmark.cc
-
-ifeq ($(debug-mode),on)
-benchmark-o-files = $(benchmark-cc-files:.cc=.go)
-else
-benchmark-o-files = $(benchmark-cc-files:.cc=.o)
-endif
-
-benchmark.testcase: $(benchmark-o-files) $(libraries)
-	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-############################################################
-# Continue with other targets if needed
-############################################################
-
-
-target1-cc-files = t1.cc t2.cc t3.cc
-
-ifeq ($(debug-mode),on)
-target1-o-files = $(target1-cc-files:.cc=.go)
-else
-target1-o-files = $(target1-cc-files:.cc=.o)
-endif
-
-target1: $(target1-o-files) $(libraries)
-	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
 include ../Makefile.rules

@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
 # Copyright (C) 2000, 2001 by the deal.II authors
@@ -8,392 +9,45 @@
 ############################################################
 
 D = @DEAL2_DIR@
-
 include $D/common/Make.global_options
-
-############################################################
-# Set debug-mode as a default
-############################################################
-
 debug-mode = on
 
+libraries = $(lib-lac.g)  \
+            $(lib-base.g)
+lib-1d    = $(lib-deal2-1d.g)
+lib-2d    = $(lib-deal2-2d.g)
+lib-3d    = $(lib-deal2-3d.g)
 
-############################################################
-# Define library names
-############################################################
-
-libs.g   = $(lib-deal2-2d.g) \
-           $(lib-lac.g)      \
-           $(lib-base.g)
-libs     = $(lib-deal2-2d.o) \
-           $(lib-lac.o)      \
-           $(lib-base.o)
-
-
-############################################################
-# Select compiler flags according to debug-mode
-############################################################
-
-ifeq ($(debug-mode),on)
-libraries = $(libs.g)
-libdeal3d = $(lib-deal2-3d.g)
-libdeal1d = $(lib-deal2-1d.g)
-flags     = $(CXXFLAGS.g) $(CXXFLAGS)
-endif
-
-ifeq ($(debug-mode),off)
-libraries = $(libs)
-libdeal3d = $(lib-deal2-3d.o)
-libdeal1d = $(lib-deal2-1d.o)
-flags     = $(CXXFLAGS.o) $(CXXFLAGS)
-endif
-
-
-# If in multithread mode, add the ACE library to the libraries which
-# we need to link with:
-ifneq ($(with-multithreading),no)
-  libraries += $(lib-ACE)
-endif
-
-
-%.go : %.cc Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
-
-
-all: grid_test.check dof_test.check data_out.check \
-     derivatives.check gradients.check \
-     constraints.check mg.check mglocal.check \
-     block_matrices.check second_derivatives.check \
-     derivative_approximation.check matrices.check \
-     error_estimator.check \
-     intergrid_constraints.check intergrid_map.check wave-test-3.check
-
-exe: $(all:.check=.testcase) benchmark
-run: $(all:.check=.output)
-############################################################
-# Typical block for building a running program
-#
-# 1. provide a list of source files in ...-cc-files
-#
-# 2. generate the list of object files according to debug-mode
-#
-# 3. make executable
-#
-# 4. Explicit dependencies of object files (will be automatic soon)
-#
-############################################################
-
-template-cc-files = template.cc 
-
-ifeq ($(debug-mode),on)
-template-o-files = $(template-cc-files:.cc=.go)
-else
-template-o-files = $(template-cc-files:.cc=.o)
-endif
-
-template.testcase: $(template-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
+default: run-tests 
 
 ############################################################
 
-constraints-cc-files = constraints.cc 
+block_matrices.exe           : $(libraries)           $(lib-2d)           block_matrices.go
+constraints.exe              : $(libraries)           $(lib-2d) $(lib-3d) constraints.go
+data_out.exe                 : $(libraries)           $(lib-2d) $(lib-3d) data_out.go
+derivative_approximation.exe : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) derivative_approximation.go
+derivatives.exe              : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) derivatives.go
+dof_test.exe                 : $(libraries)           $(lib-2d) $(lib-3d) dof_test.go
+error_estimator.exe          : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) error_estimator.go
+gradients.exe                : $(libraries)           $(lib-2d)           gradients.go
+grid_test.exe                : $(libraries)           $(lib-2d) $(lib-3d) grid_test.go
+intergrid_constraints.exe    : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) intergrid_constraints.go
+intergrid_map.exe            : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) intergrid_map.go
+matrices.exe                 : $(libraries) $(lib-1d) $(lib-2d) $(lib-3d) matrices.go
+mg.exe                       : $(libraries)           $(lib-2d)           mg.go
+mglocal.exe                  : $(libraries)           $(lib-2d)           mglocal.go
+second_derivatives.exe       : $(libraries)           $(lib-2d)           second_derivatives.go
+wave-test-3.exe              : $(libraries)           $(lib-2d)           wave-test-3.go
 
-ifeq ($(debug-mode),on)
-constraints-o-files = $(constraints-cc-files:.cc=.go)
-else
-constraints-o-files = $(constraints-cc-files:.cc=.o)
-endif
-
-constraints.testcase: $(constraints-o-files) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
 
 
-############################################################
-
-dof_test-cc-files = dof_test.cc 
-
-ifeq ($(debug-mode),on)
-dof_test-o-files = $(dof_test-cc-files:.cc=.go)
-else
-dof_test-o-files = $(dof_test-cc-files:.cc=.o)
-endif
-
-dof_test.testcase: $(dof_test-o-files) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
+tests = grid_test dof_test data_out derivatives gradients constraints mg \
+        mglocal block_matrices second_derivatives derivative_approximation \
+        matrices error_estimator intergrid_constraints intergrid_map \
+        wave-test-3
 
 ############################################################
 
 
-data_out-cc-files = data_out.cc 
-
-ifeq ($(debug-mode),on)
-data_out-o-files = $(data_out-cc-files:.cc=.go)
-else
-data_out-o-files = $(data_out-cc-files:.cc=.o)
-endif
-
-data_out.testcase: $(data_out-o-files) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g -o $@ $^ $(LIBS)
-
-
-############################################################
-
-derivatives-cc-files = derivatives.cc 
-
-ifeq ($(debug-mode),on)
-derivatives-o-files = $(derivatives-cc-files:.cc=.go)
-else
-derivatives-o-files = $(derivatives-cc-files:.cc=.o)
-endif
-
-derivatives.testcase: $(derivatives-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-derivative_approximation-cc-files = derivative_approximation.cc 
-
-ifeq ($(debug-mode),on)
-derivative_approximation-o-files = $(derivative_approximation-cc-files:.cc=.go)
-else
-derivative_approximation-o-files = $(derivative_approximation-cc-files:.cc=.o)
-endif
-
-derivative_approximation.testcase: $(derivative_approximation-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-############################################################
-
-error_estimator-cc-files = error_estimator.cc 
-
-ifeq ($(debug-mode),on)
-error_estimator-o-files = $(error_estimator-cc-files:.cc=.go)
-else
-error_estimator-o-files = $(error_estimator-cc-files:.cc=.o)
-endif
-
-error_estimator.testcase: $(error_estimator-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-############################################################
-
-matrices-cc-files = matrices.cc 
-
-ifeq ($(debug-mode),on)
-matrices-o-files = $(matrices-cc-files:.cc=.go)
-else
-matrices-o-files = $(matrices-cc-files:.cc=.o)
-endif
-
-matrices.testcase: $(matrices-o-files) $(libdeal1d) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-############################################################
-
-gradients-cc-files = gradients.cc 
-
-ifeq ($(debug-mode),on)
-gradients-o-files = $(gradients-cc-files:.cc=.go)
-else
-gradients-o-files = $(gradients-cc-files:.cc=.o)
-endif
-
-gradients.testcase: $(gradients-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-grid_test-cc-files = grid_test.cc 
-
-ifeq ($(debug-mode),on)
-grid_test-o-files = $(grid_test-cc-files:.cc=.go)
-else
-grid_test-o-files = $(grid_test-cc-files:.cc=.o)
-endif
-
-grid_test.testcase: $(grid_test-o-files) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-grid_generator-cc-files = grid_generator.cc 
-
-ifeq ($(debug-mode),on)
-grid_generator-o-files = $(grid_generator-cc-files:.cc=.go)
-else
-grid_generator-o-files = $(grid_generator-cc-files:.cc=.o)
-endif
-
-grid_generator.testcase: $(grid_generator-o-files) $(libdeal3d) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-second_derivatives-cc-files = second_derivatives.cc 
-
-ifeq ($(debug-mode),on)
-second_derivatives-o-files = $(second_derivatives-cc-files:.cc=.go)
-else
-second_derivatives-o-files = $(second_derivatives-cc-files:.cc=.o)
-endif
-
-second_derivatives.testcase: $(second_derivatives-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-wave-test-3-cc-files = wave-test-3.cc 
-
-ifeq ($(debug-mode),on)
-wave-test-3-o-files = $(wave-test-3-cc-files:.cc=.go)
-else
-wave-test-3-o-files = $(wave-test-3-cc-files:.cc=.o)
-endif
-
-wave-test-3.testcase: $(wave-test-3-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-mglocal-cc-files = mglocal.cc
-
-ifeq ($(debug-mode),on)
-mglocal-o-files = $(mglocal-cc-files:.cc=.go)
-else
-mglocal-o-files = $(mglocal-cc-files:.cc=.o)
-endif
-
-mglocal.testcase: $(mglocal-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-
-############################################################
-
-
-mg-cc-files = mg.cc 
-
-ifeq ($(debug-mode),on)
-mg-o-files = $(mg-cc-files:.cc=.go)
-else
-mg-o-files = $(mg-cc-files:.cc=.o)
-endif
-
-mg.testcase: $(mg-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-
-############################################################
-
-
-block_matrices-cc-files = block_matrices.cc 
-
-ifeq ($(debug-mode),on)
-block_matrices-o-files = $(block_matrices-cc-files:.cc=.go)
-else
-block_matrices-o-files = $(block_matrices-cc-files:.cc=.o)
-endif
-
-block_matrices.testcase: $(block_matrices-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-
-
-intergrid_map-cc-files = intergrid_map.cc 
-
-ifeq ($(debug-mode),on)
-intergrid_map-o-files = $(intergrid_map-cc-files:.cc=.go)
-else
-intergrid_map-o-files = $(intergrid_map-cc-files:.cc=.o)
-endif
-
-intergrid_map.testcase: $(intergrid_map-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(lib-deal2-1d.g) $(lib-deal2-3d.g) $(LIBS)
-
-
-############################################################
-
-
-intergrid_constraints-cc-files = intergrid_constraints.cc 
-
-ifeq ($(debug-mode),on)
-intergrid_constraints-o-files = $(intergrid_constraints-cc-files:.cc=.go)
-else
-intergrid_constraints-o-files = $(intergrid_constraints-cc-files:.cc=.o)
-endif
-
-intergrid_constraints.testcase: $(intergrid_constraints-o-files) $(libraries)
-	@echo =====linking======= $<
-	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(lib-deal2-1d.g) $(lib-deal2-3d.g) $(LIBS)
-
-
-############################################################
-# Continue with other targets if needed
-############################################################
-
-
-benchmark-cc-files = benchmark.cc
-
-ifeq ($(debug-mode),on)
-benchmark-o-files = $(benchmark-cc-files:.cc=.go)
-else
-benchmark-o-files = $(benchmark-cc-files:.cc=.o)
-endif
-
-benchmark.testcase: $(benchmark-o-files) $(libraries)
-	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-############################################################
-# Continue with other targets if needed
-############################################################
-
-
-target1-cc-files = t1.cc t2.cc t3.cc
-
-ifeq ($(debug-mode),on)
-target1-o-files = $(target1-cc-files:.cc=.go)
-else
-target1-o-files = $(target1-cc-files:.cc=.o)
-endif
-
-target1: $(target1-o-files) $(libraries)
-	$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
-
-
-############################################################
-############################################################
 include ../Makefile.rules
 include Makefile.depend
