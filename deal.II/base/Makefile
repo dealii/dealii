@@ -70,20 +70,20 @@ endif
 
 
 lib/libbase.a: $(forward-declarations) $(o-files)
-	@echo =====base=============debug========= Updating library:   $@
+	@echo =====base=============debug========= Linking library:   $@
 	@ar ruv $@ $(o-files)
 
 lib/libbase.g.a: $(forward-declarations) $(go-files)
-	@echo =====base=============optimized===== Updating library:   $@
+	@echo =====base=============optimized===== Linking library:   $@
 	@ar ruv $@ $(go-files)
 
 
 lib/libbase.so: $(forward-declarations) $(o-files)
-	@echo =====base=============optimized===== Updating library:   $@
+	@echo =====base=============optimized===== Linking library:   $@
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
 
 lib/libbase.g.so: $(forward-declarations) $(go-files)
-	@echo =====base=============debug========= Updating library:   $@
+	@echo =====base=============debug========= Linking library:   $@
 	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
 
 

@@ -44,20 +44,20 @@ endif
 
 
 lib/liblac.a: $(forward-declarations) $(o-files)
-	@echo =====lac==============optimized===== Updating library:   $@
+	@echo =====lac==============optimized===== Linking library:   $@
 	@ar ruv $@ $(o-files)
 
 lib/liblac.g.a: $(forward-declarations) $(go-files)
-	@echo =====lac==============debug========= Updating library:   $@
+	@echo =====lac==============debug========= Linking library:   $@
 	@ar ruv $@ $(go-files)
 
 
 lib/liblac.so: $(forward-declarations) $(o-files)
-	@echo =====lac==============optimized===== Updating library:   $@
+	@echo =====lac==============optimized===== Linking library:   $@
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
 
 lib/liblac.g.so: $(forward-declarations) $(go-files)
-	@echo =====lac==============debug========= Updating library:   $@
+	@echo =====lac==============debug========= Linking library:   $@
 	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
 
 
