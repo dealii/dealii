@@ -2013,9 +2013,11 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 				   // the unit support points to
 				   // enquire the location of the
 				   // support points in real space
-  Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points(),
-			  std::vector<double> (dofs_per_cell,
-					       1./dofs_per_cell));
+				   //
+				   // the weights of the quadrature
+				   // rule are set to invalid values
+				   // by the used constructor.
+  Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points());
   FEValues<dim> fe_values (mapping, dof_handler.get_fe(),
 			   q_dummy, update_q_points);
   typename DoFHandler<dim>::active_cell_iterator

@@ -53,7 +53,6 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
 				   // FEValues objects with slightly
 				   // shifted positions
   std::vector<Point<dim> > diff_points (quadrature.n_quadrature_points);
-  std::vector<double>      diff_weights (quadrature.n_quadrature_points, 0);
   
   differences.resize(2*dim);
   for (unsigned int d=0; d<dim; ++d)
@@ -69,14 +68,14 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
 				       // gradients, not more
       for (unsigned int i=0; i<diff_points.size(); ++i)
 	diff_points[i] = quadrature.point(i) + shift;
-      const Quadrature<dim> plus_quad (diff_points, diff_weights);
+      const Quadrature<dim> plus_quad (diff_points);
       differences[d] = new FEValues<dim> (mapping, *element,
 					  plus_quad, update_gradients);
 
 				       // now same in minus-direction
       for (unsigned int i=0; i<diff_points.size(); ++i)
 	diff_points[i] = quadrature.point(i) - shift;
-      const Quadrature<dim> minus_quad (diff_points, diff_weights);
+      const Quadrature<dim> minus_quad (diff_points);
       differences[d+dim] = new FEValues<dim> (mapping, *element,
 					      minus_quad, update_gradients); 
     }

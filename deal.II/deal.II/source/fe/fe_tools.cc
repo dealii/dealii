@@ -49,11 +49,9 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
 				   // Initialize FEValues for fe1 at
 				   // the unit support points of the
 				   // fe2 element.
-  std::vector<double> phantom_weights(fe2.dofs_per_cell,1.);
   const typename std::vector<Point<dim> > &
     fe2_support_points = fe2.get_unit_support_points ();
-  Quadrature<dim> fe2_support_points_quadrature(fe2_support_points,
-						phantom_weights);
+  Quadrature<dim> fe2_support_points_quadrature(fe2_support_points);
 
 				   // This is a bad workaround as we
 				   // can't ask the FEs for their
@@ -67,7 +65,8 @@ void FETools::get_interpolation_matrix(const FiniteElement<dim> &fe1,
   GridGenerator::hyper_cube(tria);
   dof_handler.distribute_dofs(fe1);
   MappingQ1<dim> mapping_q1;
-  FEValues<dim> fe_values(mapping_q1, fe1, fe2_support_points_quadrature, update_values);
+  FEValues<dim> fe_values(mapping_q1, fe1, fe2_support_points_quadrature,
+			  update_values);
   fe_values.reinit(dof_handler.begin_active());
   
   for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	

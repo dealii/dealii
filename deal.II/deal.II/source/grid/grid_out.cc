@@ -289,7 +289,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
       for (unsigned int i=0; i<n_points; ++i)
 	boundary_points[i](0)= 1.*(i+1)/(n_points+1);
 
-      Quadrature<dim-1> quadrature(boundary_points, std::vector<double> (n_points, 1));
+      Quadrature<dim-1> quadrature(boundary_points);
       q_projector = new QProjector<dim> (quadrature, false);
     }
   
@@ -604,8 +604,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	    for (unsigned int i=0; i<n_points; ++i)
 	      boundary_points[i](0) = 1.*(i+1)/(n_points+1);
 	    
-	    Quadrature<dim-1> quadrature (boundary_points,
-					  std::vector<double> (n_points, 1));
+	    Quadrature<dim-1> quadrature (boundary_points);
 	    QProjector<dim> q_projector (quadrature, false);
 
 					     // next loop over all

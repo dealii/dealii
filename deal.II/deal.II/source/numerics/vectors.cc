@@ -147,8 +147,6 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
   Assert(dof_to_rep_index_table.size()==fe.dofs_per_cell, ExcInternalError());
 
   std::vector<unsigned int> dofs_on_cell (fe.dofs_per_cell);
-  std::vector<double>       dummy_weights (fe.dofs_per_cell);
-
   std::vector<Point<dim> >  rep_points (n_rep_points);
 
 				   // get space for the values of the
@@ -163,7 +161,7 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
 
 				   // Make a quadrature rule from support points
 				   // to feed it into FEValues
-  Quadrature<dim> support_quadrature(unit_support_points, dummy_weights);
+  Quadrature<dim> support_quadrature(unit_support_points);
 
 				   // Transformed support points are computed by
 				   // FEValues
@@ -703,8 +701,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 				   // used in this function
   Assert (unit_support_points.size() != 0, ExcNonInterpolatingFE());
 
-  std::vector<double> dummy_weights (unit_support_points.size());
-  Quadrature<dim-1> aux_quad (unit_support_points, dummy_weights);
+  Quadrature<dim-1> aux_quad (unit_support_points);
   FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
