@@ -141,11 +141,13 @@ void GridRefinement::refine (Triangulation<dim> &tria,
 				   // smallest value in criteria
 				   // greater 0
   if (new_threshold==0)
-    for (unsigned int index=0; index<n_cells; ++index)
-      if (criteria(index)>0
-	  && (criteria(index)<new_threshold
-	      || new_threshold==0))
+    {
+      new_threshold = criteria(0);
+      for (unsigned int index=1; index<n_cells; ++index)
+	if (criteria(index)>0
+	    && (criteria(index)<new_threshold))
 	new_threshold=criteria(index);
+    }
   
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) >= new_threshold)
