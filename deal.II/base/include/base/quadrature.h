@@ -410,6 +410,8 @@ template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
 			   const Quadrature<1> &);
 template <>
+Quadrature<0>::~Quadrature ();
+template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
 			   const Quadrature<1> &);
 template <>
