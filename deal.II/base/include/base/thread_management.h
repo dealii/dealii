@@ -2958,7 +2958,7 @@ namespace Threads
       boost::shared_ptr<internal::thread_description<RT> > thread_descriptor;
 
 #if !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) && !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
-      template <typename RT_> friend struct internal::wrapper_base;
+      template <typename, typename> friend struct internal::wrapper_base;
 #endif
   };
 
