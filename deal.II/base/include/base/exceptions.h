@@ -403,7 +403,7 @@ void __IssueError_Assert (const char *file,
   std::cerr << "--------------------------------------------------------"
 	    << std::endl;
   
-  abort ();
+  std::abort ();
 };
 
 
@@ -490,7 +490,7 @@ void __IssueError_Throw (const char *file,
 #define AssertThrow(cond, exc)                                    \
   {                                                               \
     if (!(cond))                                                  \
-      abort ();                                                   \
+      std::abort ();                                              \
   }
 #endif
 

@@ -24,7 +24,7 @@ JobIdentifier dealjobid;
 
 JobIdentifier::JobIdentifier()
 {
-  time_t t = time(0);
+  time_t t = std::time(0);
   id = std::string(program_id());
 
 //TODO:[GK] try to avoid this hack
@@ -35,7 +35,7 @@ JobIdentifier::JobIdentifier()
   id += std::string(name) + std::string(" ");
 #endif
 
-  id += std::string(ctime(&t));
+  id += std::string(std::ctime(&t));
 }
 
 

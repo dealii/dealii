@@ -585,7 +585,7 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
 {
   std::string s = get (entry_string);
   char *endptr;
-  long int i = strtol (s.c_str(), &endptr, 10);
+  long int i = std::strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
   AssertThrow ((s.c_str()!='\0') || (*endptr == '\0'),
 	       ExcConversionError(s));
@@ -599,7 +599,7 @@ double ParameterHandler::get_double (const std::string &entry_string) const
 {
   std::string s = get (entry_string);
   char *endptr;
-  double d = strtod (s.c_str(), &endptr);
+  double d = std::strtod (s.c_str(), &endptr);
 				   // assert there was no error
   AssertThrow ((s.c_str()!='\0') || (*endptr == '\0'),
 	       ExcConversionError(s));

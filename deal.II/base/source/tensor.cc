@@ -42,8 +42,8 @@ template <int rank_, int dim>
 void
 Tensor<rank_, dim>::unroll( Vector<double>& result) const
 {
-  Assert(result.size()==pow(dim,rank_),
-	 ExcWrongVectorSize(static_cast<unsigned int>(pow(dim,rank_)),
+  Assert(result.size()==std::pow(static_cast<double>(dim),rank_),
+	 ExcWrongVectorSize(static_cast<unsigned int>(std::pow(static_cast<double>(dim),rank_)),
 			    result.size()));
 
   unsigned index = 0;

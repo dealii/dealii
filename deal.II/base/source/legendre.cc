@@ -36,8 +36,10 @@ namespace
 
 template <typename number>
 void
-Legendre<number>::compute_coefficients (unsigned int k)
+Legendre<number>::compute_coefficients (const unsigned int k_)
 {
+  unsigned int k = k_;
+
 				   // first make sure that no other
 				   // thread intercepts the operation
 				   // of this function

@@ -42,7 +42,7 @@ QGauss<1>::QGauss (unsigned int n)
 
   for (unsigned int i=1;i<=m;++i)
     {
-      z = cos(M_PI * (i-.25)/(n+.5));
+      z = std::cos(M_PI * (i-.25)/(n+.5));
 
 				       // Newton-iteration
       do
@@ -78,7 +78,7 @@ QGauss2<1>::QGauss2 () :
 		Quadrature<1> (2)
 {
 				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./3.), sqrt(1./3.) };
+  static const double xpts_normal[] = { -std::sqrt(1./3.), std::sqrt(1./3.) };
 				   // weights on [-1,1]
   static const double wts_normal[]  = { 1., 1. };
 
@@ -101,9 +101,9 @@ QGauss3<1>::QGauss3 () :
 		Quadrature<1> (3)
 {
 				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(3./5.),
+  static const double xpts_normal[] = { -std::sqrt(3./5.),
 					0.,
-					sqrt(3./5.) };
+					std::sqrt(3./5.) };
 				   // weights on [-1,1]
   static const double wts_normal[]  = { 5./9.,
 					8./9.,
@@ -130,15 +130,15 @@ QGauss4<1>::QGauss4 () :
 		Quadrature<1> (4)
 {
 				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./7.*(3+4*sqrt(0.3))),
-					-sqrt(1./7.*(3-4*sqrt(0.3))),
-					+sqrt(1./7.*(3-4*sqrt(0.3))),
-					+sqrt(1./7.*(3+4*sqrt(0.3)))  };
+  static const double xpts_normal[] = { -std::sqrt(1./7.*(3+4*std::sqrt(0.3))),
+					-std::sqrt(1./7.*(3-4*std::sqrt(0.3))),
+					+std::sqrt(1./7.*(3-4*std::sqrt(0.3))),
+					+std::sqrt(1./7.*(3+4*std::sqrt(0.3)))  };
 				   // weights on [-1,1]
-  static const double wts_normal[]  = { 1./2. - 1./12.*sqrt(10./3.),
-					1./2. + 1./12.*sqrt(10./3.),
-					1./2. + 1./12.*sqrt(10./3.),
-					1./2. - 1./12.*sqrt(10./3.)  };
+  static const double wts_normal[]  = { 1./2. - 1./12.*std::sqrt(10./3.),
+					1./2. + 1./12.*std::sqrt(10./3.),
+					1./2. + 1./12.*std::sqrt(10./3.),
+					1./2. - 1./12.*std::sqrt(10./3.)  };
 
 				   // points and weights on [0,1]
   static const double xpts[] = { (xpts_normal[0]+1)/2.,
@@ -163,17 +163,17 @@ QGauss5<1>::QGauss5 () :
 		Quadrature<1> (5)
 {
 				   // points on [-1,1]
-  static const double xpts_normal[] = { -sqrt(1./9.*(5.+2*sqrt(10./7.))),
-					-sqrt(1./9.*(5.-2*sqrt(10./7.))),
+  static const double xpts_normal[] = { -std::sqrt(1./9.*(5.+2*std::sqrt(10./7.))),
+					-std::sqrt(1./9.*(5.-2*std::sqrt(10./7.))),
 					0,
-					+sqrt(1./9.*(5.-2*sqrt(10./7.))),
-					+sqrt(1./9.*(5.+2*sqrt(10./7.)))  };
+					+std::sqrt(1./9.*(5.-2*std::sqrt(10./7.))),
+					+std::sqrt(1./9.*(5.+2*std::sqrt(10./7.)))  };
 				   // weights on [-1,1]
-  static const double wts_normal[]  = { 0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)),
-					0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
+  static const double wts_normal[]  = { 0.3*(+0.7+5.*std::sqrt(0.7))/(+2.+5.*std::sqrt(0.7)),
+					0.3*(-0.7+5.*std::sqrt(0.7))/(-2.+5.*std::sqrt(0.7)),
 					128./225.,
-					0.3*(-0.7+5.*sqrt(0.7))/(-2.+5.*sqrt(0.7)),
-					0.3*(+0.7+5.*sqrt(0.7))/(+2.+5.*sqrt(0.7)) };
+					0.3*(-0.7+5.*std::sqrt(0.7))/(-2.+5.*std::sqrt(0.7)),
+					0.3*(+0.7+5.*std::sqrt(0.7))/(+2.+5.*std::sqrt(0.7)) };
 
 				   // points and weights on [0,1]
   static const double xpts[] = { (xpts_normal[0]+1)/2.,
