@@ -64,10 +64,12 @@ foreach $file (@input_files) {
     $basename = $1;
     $basename =~ s,^(.*/)?([^/]*),$2,g;
 
+    @include_file_list = sort (split (' ', $include_files{$file}));
+
     # write rule for the .o file
     print "lib/o/$basename.o:";
     print "\\\n    $file";
-    foreach $f (split (' ', $include_files{$file})) {
+    foreach $f (@include_file_list) {
 	print "\\\n    $f";
     }
     print "\n";
@@ -75,7 +77,7 @@ foreach $file (@input_files) {
     # write rule for the .go file
     print "lib/go/$basename.go:";
     print "\\\n    $file";
-    foreach $f (split (' ', $include_files{$file})) {
+    foreach $f (@include_file_list) {
 	print "\\\n    $f";
     }
     print "\n";
