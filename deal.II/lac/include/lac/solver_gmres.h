@@ -301,10 +301,7 @@ SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
 					 const AdditionalData &data) :
 		Solver<VECTOR> (cn,mem),
 		additional_data(data)
-{
-  Assert (additional_data.max_n_tmp_vectors >= 10, 
-	  ExcTooFewTmpVectors (additional_data.max_n_tmp_vectors));
-};
+{};
 
 
 template <class VECTOR>
