@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.90 
+# From configure.in Revision: 1.91 
 
 
 
@@ -2213,10 +2213,10 @@ cross_compiling=$ac_cv_prog_cxx_cross
 #include "confdefs.h"
 
 #include <ostream>
+void f (const std::ostream &out);
     
 int main() {
 
-	std::ostream &cout_reference = std::cout;
     
 ; return 0; }
 EOF
