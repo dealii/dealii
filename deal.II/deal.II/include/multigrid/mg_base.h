@@ -156,7 +156,17 @@ class MGTransferBase : public Subscriptor
 				     /**
 				      * Restrict a vector from level
 				      * #from_level# to level
-				      * #from_level-1#.
+				      * #from_level-1# and add this
+				      * restriction to
+				      * #dst#. Obviously, if the
+				      * refined region on level
+				      * #from_level# is smaller than
+				      * that on level #from_level-1#,
+				      * some degrees of freedom in
+				      * #dst# are not covered and will
+				      * not be altered. For the other
+				      * degress of freedom, the result
+				      * of the restriction is added.
 				      *
 				      * #src# is assumed to be a vector with
 				      * as many elements as there are degrees
@@ -166,9 +176,9 @@ class MGTransferBase : public Subscriptor
 				      * are degrees of freedom on the coarser
 				      * level.
 				      */
-    virtual void restrict (const unsigned int    from_level,
-			   Vector<double>       &dst,
-			   const Vector<double> &src) const = 0;
+    virtual void restrict_and_add (const unsigned int    from_level,
+				   Vector<double>       &dst,
+				   const Vector<double> &src) const = 0;
 };
 
 
