@@ -14,6 +14,9 @@
 #define __deal2__filtered_iterator_h
 
 
+#include <base/config.h>
+#include <base/exceptions.h>
+
 
 /**
  * In this namespace a number of classes is declared that may be used
