@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 by the deal.II authors
+//    Copyright (C) 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -383,6 +383,17 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+// we should be declaring the following function friend, but gcc2.95
+// does not allow us to do that at present...
+//  				       /**
+//  					* Declare a function that uses
+//  					* the @ref{ArgCollector} as
+//  					* friend.
+//  					*/
+//        friend
+//        FunData0<void>::ArgCollector
+//        encapsulate (void (*fun_ptr)());
   };
 
 
@@ -485,6 +496,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_>
+      friend
+      typename FunData1<Arg1_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_));
   };
 
 
@@ -590,6 +611,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_>
+      friend
+      typename FunData2<Arg1_,Arg2_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_));
   };
 
   
@@ -697,6 +728,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_>
+      friend
+      typename FunData3<Arg1_,Arg2_,Arg3_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_,Arg2_,Arg3_));
   };
 
 
@@ -807,6 +848,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
+      friend
+      typename FunData4<Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_));
   };
 
 
@@ -921,6 +972,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
+      friend
+      typename FunData5<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_, Arg5_));
   };
 
 
@@ -1037,6 +1098,17 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
+      friend
+      typename FunData6<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
+				   Arg4_, Arg5_, Arg6_));
   };
   
   
@@ -1156,6 +1228,17 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_>
+      friend
+      typename FunData7<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
+						       Arg4_, Arg5_, Arg6_, Arg7_));
   };
   
   
@@ -1278,6 +1361,18 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_>
+      friend
+      typename FunData8<Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,void>::ArgCollector
+      encapsulate (void (*fun_ptr)(Arg1_, Arg2_, Arg3_,
+						       Arg4_, Arg5_, Arg6_,
+						       Arg7_, Arg8_));
   };
   
   
@@ -1393,6 +1488,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_>
+      friend
+      typename MemFunData0<Class,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)());
   };
 
 
@@ -1518,6 +1623,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_>
+      friend
+      typename MemFunData1<Class,Arg1_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_));
   };
 
 
@@ -1647,6 +1762,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_>
+      friend
+      typename MemFunData2<Class,Arg1_,Arg2_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_));
   };
 
   
@@ -1779,6 +1904,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_>
+      friend 
+      typename MemFunData3<Class,Arg1_,Arg2_,Arg3_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_,Arg2_,Arg3_));
   };
 
 
@@ -1915,6 +2050,16 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_>
+      friend
+      typename MemFunData4<Class,Arg1_,Arg2_,Arg3_,Arg4_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_, Arg4_));
   };
 
 
@@ -2055,6 +2200,17 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_>
+      friend 
+      typename MemFunData5<Class,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
+					   Arg4_, Arg5_));
   };
   
 
@@ -2199,6 +2355,17 @@ namespace Threads
 					    */
 	  FunPtr fun_ptr;
       };
+
+				       /**
+					* Declare a function that uses
+					* the @ref{ArgCollector} as
+					* friend.
+					*/
+      template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_>
+      friend 
+      typename MemFunData6<Class,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,void>::ArgCollector
+      encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
+					   Arg4_, Arg5_, Arg6_));
   };
   
   
