@@ -155,6 +155,25 @@ void DataOut_DoFData<dim>::clear_data_vectors ()
 
 
 template <int dim>
+void DataOut_DoFData<dim>::clear_input_data_references ()
+{
+  for (unsigned int i=0; i<dof_data.size(); ++i)
+    dof_data[i].data = 0;
+  
+  for (unsigned int i=0; i<cell_data.size(); ++i)
+    cell_data[i].data = 0;
+
+  if (dofs != 0)
+    {
+      dofs->unsubscribe ();
+      dofs = 0;
+    };
+};
+
+
+
+
+template <int dim>
 void DataOut_DoFData<dim>::clear ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
