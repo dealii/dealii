@@ -53,6 +53,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: class <code class="class">SparsityPattern</code> can
+       handle rows of length zero now. For quadratic matrices, these
+       rows are changed to length one, since a diagonal element must
+       be stored.
+       <br>
+       (GK 2001/10/11)
+       </p>
+
+  <li> <p>
        New: The <code class="class">BlockVector</code> now has a
        full-fledged random access iterator type, working in exactly
        the same way as the iterators of the C++ standard containers.

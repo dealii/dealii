@@ -15,6 +15,15 @@
 
 <ol>
   <li> <p>
+       Fixed: class <code class="class">SparsityPattern</code> can
+       handle rows of length zero now. For quadratic matrices, these
+       rows are changed to length one, since a diagonal element must
+       be stored.
+       <br>
+       (GK 2001/10/11)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="class">DataOutBase::EpsFlags</code>
        class forgot to declare the reverse grey scale function as one
        possible input for the color function for the
