@@ -20,6 +20,7 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_dof_tools.h>
 #include <fe/fe.h>
 #include <numerics/dof_renumbering.h>
@@ -242,7 +243,8 @@ template <int dim>
 void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 				    const unsigned int          level,
 				    const bool                  reversed_numbering,
-				    const vector<unsigned int> &starting_indices) {
+				    const vector<unsigned int> &starting_indices)
+{
 				   // make the connection graph
   SparsityPattern sparsity (dof_handler.n_dofs(level),
 			    dof_handler.max_couplings_between_dofs());
@@ -587,6 +589,62 @@ DoFRenumbering::cell_wise_dg (DoFHandler<dim>& dof,
   dof.renumber_dofs(reverse);
 }
 
+
+
+template <int dim>
+void
+DoFRenumbering::cell_wise_dg (MGDoFHandler<dim>& dof,
+			      unsigned int level,
+			      const vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
+{
+  Assert(cells.size() == dof.get_tria().n_cells(level),
+	 ExcDimensionMismatch(cells.size(),
+			      dof.get_tria().n_cells(level)));
+  switch (dim)
+    {
+      case 3:
+	    Assert(dof.get_fe().n_dofs_per_quad()==0,
+		   ExcNotDGFEM());
+      case 2:
+	    Assert(dof.get_fe().n_dofs_per_line()==0,
+		   ExcNotDGFEM());
+      default:
+	    Assert(dof.get_fe().n_dofs_per_vertex()==0,
+		   ExcNotDGFEM());
+    }
+
+  unsigned int n_global_dofs = dof.n_dofs(level);
+  unsigned int n_cell_dofs = dof.get_fe().n_dofs_per_cell();
+
+  vector<unsigned int> new_order(n_global_dofs);
+  vector<unsigned int> cell_dofs(n_cell_dofs);
+
+  unsigned int global_index = 0;
+  
+  typename vector<typename MGDoFHandler<dim>::cell_iterator>::const_iterator cell;
+
+  for(cell = cells.begin(); cell != cells.end(); ++cell)
+    {
+      Assert ((*cell)->level() == (int) level, ExcInternalError());
+
+      (*cell)->get_mg_dof_indices(cell_dofs);
+      sort(cell_dofs.begin(), cell_dofs.end());
+
+      for (unsigned int i=0;i<n_cell_dofs;++i)
+	{
+	  new_order[global_index++] = cell_dofs[i];
+	}
+    }
+  Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
+
+  vector<unsigned int> reverse(new_order.size());
+
+  for (unsigned int i=0;i<new_order.size(); ++i)
+    reverse[new_order[i]] = i;
+
+  dof.renumber_dofs(level, reverse);
+}
+
 /**
  * Provide comparator for DoFCellAccessors
  */
@@ -637,6 +695,27 @@ DoFRenumbering::downstream_dg (DoFHandler<dim>& dof,
 
 
 
+template <int dim>
+void
+DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
+			       const unsigned int level,
+			       const Point<dim>& direction)
+{
+  vector<typename MGDoFHandler<dim>::cell_iterator>
+    ordered_cells(dof.get_tria().n_cells(level));
+  CompCells<dim> comparator(direction);
+  
+  typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
+  typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
+  
+  copy (begin, end, ordered_cells.begin());
+  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+
+  cell_wise_dg(dof, level, ordered_cells);
+}
+
+
+
 // explicit instantiations
 template
 void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension>&,
@@ -660,7 +739,17 @@ void DoFRenumbering::cell_wise_dg (DoFHandler<deal_II_dimension>&,
 				   const vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
+void DoFRenumbering::cell_wise_dg (MGDoFHandler<deal_II_dimension>&,
+				   unsigned int,
+				   const vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template
 void DoFRenumbering::downstream_dg (DoFHandler<deal_II_dimension>&,
+				    const Point<deal_II_dimension>&);
+
+template
+void DoFRenumbering::downstream_dg (MGDoFHandler<deal_II_dimension>&,
+				    unsigned int,
 				    const Point<deal_II_dimension>&);
 
 template

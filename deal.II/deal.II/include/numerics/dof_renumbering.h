@@ -285,6 +285,19 @@ class DoFRenumbering
     
 
 				     /**
+				      * Cell-wise renumbering on one
+				      * level for DG elements. See the
+				      * other function with the same
+				      * name.
+				      */
+    template <int dim>
+    static void
+    cell_wise_dg (MGDoFHandler<dim>                                       &dof_handler,
+		  const unsigned int                                       level,
+		  const vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+    
+
+				     /**
 				      * Cell-wise downstream numbering
 				      * with respect to a constant
 				      * flow direction.
@@ -314,6 +327,19 @@ class DoFRenumbering
     template <int dim>
     static void
     downstream_dg (DoFHandler<dim>  &dof_handler,
+		   const Point<dim> &direction);
+
+				     /**
+				      * Cell-wise downstream numbering
+				      * with respect to a constant
+				      * flow direction on one
+				      * level. See the other function
+				      * with the same name.
+				      */
+    template <int dim>
+    static void
+    downstream_dg (MGDoFHandler<dim>  &dof_handler,
+		   const unsigned int level,
 		   const Point<dim> &direction);
 
 				     /**
