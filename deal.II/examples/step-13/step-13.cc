@@ -1687,10 +1687,23 @@ namespace LaplaceSolver
 				 // this, the following two classes
 				 // are probably straightforward from
 				 // the previous examples.
+				 //
+				 // As in previous examples, the C++
+				 // language forces us to declare and
+				 // define a constructor to the
+				 // following classes even though they
+				 // are empty. This is due to the fact
+				 // that the base class has no default
+				 // constructor (i.e. one without
+				 // arguments), even though it has a
+				 // constructor which has default
+				 // values for all arguments.
 template <int dim>
 class Solution : public Function<dim>
 {
   public:
+    Solution () : Function<dim> () {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const;
 };
@@ -1714,6 +1727,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
   public:
+    RightHandSide () {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const;
 };
