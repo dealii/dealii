@@ -25,9 +25,12 @@ default: run-tests
 anna_1.exe              : anna_1.go              $(libraries)
 anna_2.exe              : anna_2.go              $(libraries)
 anna_3.exe              : anna_3.go              $(libraries)
+anna_5.exe              : anna_5.go              $(libraries)
+gerold_1.exe            : gerold_1.go            $(libraries)
 roy_1.exe               : roy_1.go               $(libraries)
 
-tests = anna_1 anna_2 anna_3 \
+tests = anna_1 anna_2 anna_3 anna_5 \
+	gerold_1 \
 	roy_1
 
 ############################################################
