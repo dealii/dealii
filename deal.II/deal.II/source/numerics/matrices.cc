@@ -117,7 +117,8 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
-  Assert(coefficient->n_components==1 ||
+  Assert(coefficient == 0 ||
+	 coefficient->n_components==1 ||
 	 coefficient->n_components==n_components, ExcComponentMismatch());
   
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -273,7 +274,8 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
-  Assert(coefficient->n_components==1 ||
+  Assert(coefficient == 0 ||
+	 coefficient->n_components==1 ||
 	 coefficient->n_components==n_components, ExcComponentMismatch());
   
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -477,7 +479,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	  ExcInternalError());
   Assert (n_components == boundary_functions.begin()->second->n_components,
 	  ExcComponentMismatch());
-  Assert (coefficient->n_components==1 ||
+  Assert (coefficient ==0 ||
+	  coefficient->n_components==1 ||
 	  coefficient->n_components==n_components, ExcComponentMismatch());
 #ifdef DEBUG
   if (true)
@@ -872,7 +875,8 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
-  Assert(coefficient->n_components==1 ||
+  Assert(coefficient == 0 ||
+	 coefficient->n_components==1 ||
 	 coefficient->n_components==n_components, ExcComponentMismatch());
 
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -1069,7 +1073,8 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
   const FiniteElement<dim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
-  Assert(coefficient->n_components==1 ||
+  Assert(coefficient == 0 ||
+	 coefficient->n_components==1 ||
 	 coefficient->n_components==n_components, ExcComponentMismatch());
 
   FullMatrix<double>  cell_matrix (dofs_per_cell, dofs_per_cell);
