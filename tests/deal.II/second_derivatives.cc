@@ -54,13 +54,23 @@ Vector<double> val(4);
 				   // shape functions. first loop:
 				   // unit cell, second loop:
 				   // one vertex moved
-  for (unsigned int loop=0; loop<2; ++loop)
+  for (unsigned int loop=0; loop<=2; ++loop)
     {
       deallog << "Test loop: " << loop << endl;
 	  
       				   // move one vertex of the only cell
       if (loop==1)
-	tria.begin_active()->vertex(2)(0) = 2;
+	{
+	  tria.begin_active()->vertex(1)(0) = 2;
+	  tria.begin_active()->vertex(2)(0) = 2;
+	}
+      if (loop==2)
+	{
+	  tria.begin_active()->vertex(2)(0) = 3;
+	  tria.begin_active()->vertex(2)(1) = 3;
+	}
+      
+
       fevalues.reinit (dof.begin_active());
       
       for (unsigned int vertex=0; vertex<4; ++vertex)
