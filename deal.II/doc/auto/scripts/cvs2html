@@ -28,6 +28,9 @@
 # Changelog        
 # Ver  Date        Who did it            What happened
 # -------------------------------------------------------------------------
+# 1.68 2000-09-20  Wolfgang Bangerth     Patch to avoid HTML syntax
+#                                        problems and link error.
+#
 # 1.67 2000-08-21  Kirby Vandivort       Update to cvs2html to fix html 
 #                                        markup display in cvs comments
 #
@@ -62,9 +65,6 @@
 # 1.59 2000-01-12  Dag Brück and         Two additional Y2K bugs in 
 #                  Henrik Carlqvist      the dates presented
 #
-# 1.58 2000-01-04  Jon Berndt            Added a -i option to invoke 
-#                                        backgound image
-#
 # ---- ----------  --------------------  -------------------------------
 #
 # This program is protected by the GPL, and all modifications of
@@ -87,6 +87,8 @@
 #  Carlo Wood <carlo@runaway.xs4all.nl>
 #  Kirby Vandivort <kvandivo@ks.uiuc.edu>
 #  Dag Brück <dag@Dynasim.se>
+#  Wolfgang Bangerth <wolfgang.bangerth@iwr.uni-heidelberg.de>
+
 
 
 #
