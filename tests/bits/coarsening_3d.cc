@@ -25,14 +25,6 @@
 
 #include <fstream>
 
-namespace PhantomGeometry 
-{
-  const double r1 = 5;
-  const double r2 = 10;
-  const double dz = 2;
-  
-  const double r0 = r1/(1.+std::sqrt(2.0));
-}
 
 
 void create_coarse_grid (Triangulation<3> &coarse_grid)
@@ -58,11 +50,11 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
     vertices.push_back (outer_points[i]);
 
                                    // then points on lower surface
-  vertices.push_back (Point<3>(0,0,-PhantomGeometry::dz));
+  vertices.push_back (Point<3>(0,0,-1));
   for (unsigned int i=0; i<8; ++i)
     vertices.push_back (outer_points[i]
                         +
-                        Point<3>(0,0,-PhantomGeometry::dz));
+                        Point<3>(0,0,-1));
 
   const unsigned int n_vertices_per_surface = 9;
   Assert (vertices.size() == n_vertices_per_surface*2,
@@ -80,7 +72,7 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
         { 1, 0, 7, 8 } };
       
                                    // now create cells out of this
-  for (unsigned int i=0; i<3; ++i)
+  for (unsigned int i=0; i<4; ++i)
     {
       CellData<3> cell;
       for (unsigned int j=0; j<4; ++j)
@@ -94,6 +86,7 @@ void create_coarse_grid (Triangulation<3> &coarse_grid)
 
                                    // finally generate a triangulation
                                    // out of this
+  GridReordering<3>::reorder_cells (cells);
   coarse_grid.create_triangulation (vertices, cells, sub_cell_data);
 }
 
