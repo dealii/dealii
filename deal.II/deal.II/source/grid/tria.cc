@@ -3844,13 +3844,17 @@ void Triangulation<1>::execute_refinement () {
 	      first_child->set_neighbor (0, cell->neighbor(0));
 	    else
 	      if (cell->neighbor(0)->active())
-						 // since the neighbors level is
-						 // always <=level, if the
-						 // cell is active, then there
-						 // are no cells to the left which
-						 // may want to know about this
-						 // new child cell.
-		first_child->set_neighbor (0, cell->neighbor(0));
+		{
+						   // since the neighbors level is
+						   // always <=level, if the
+						   // cell is active, then there
+						   // are no cells to the left which
+						   // may want to know about this
+						   // new child cell.
+		  Assert (cell->neighbor(0)->level() <= cell->level(),
+			  ExcInternalError());
+		  first_child->set_neighbor (0, cell->neighbor(0));
+		}
 	      else
 						 // left neighbor is refined
 		{
@@ -3859,12 +3863,14 @@ void Triangulation<1>::execute_refinement () {
 		  first_child->set_neighbor (0, cell->neighbor(0)->child(1));
 
 						   // reset neighbor info of
-						   // leftmost descendant of the
+						   // all right descendant of the
 						   // left neighbor of cell
 		  cell_iterator left_neighbor = cell->neighbor(0);
-		  while (left_neighbor->active() == false)
-		    left_neighbor = left_neighbor->child(1);
-		  left_neighbor->set_neighbor(1, first_child);
+		  while (left_neighbor->has_children())
+		    {
+		      left_neighbor = left_neighbor->child(1);
+		      left_neighbor->set_neighbor (1, first_child);
+		    };
 		};
 	    
 					     // insert second child
@@ -3876,16 +3882,23 @@ void Triangulation<1>::execute_refinement () {
 	      second_child->set_neighbor (1, cell->neighbor(1));
 	    else
 	      if (cell->neighbor(1)->active())
-		second_child->set_neighbor (1, cell->neighbor(1));
+		{
+		  Assert (cell->neighbor(1)->level() <= cell->level(),
+			  ExcInternalError());
+		  second_child->set_neighbor (1, cell->neighbor(1));
+		}
 	      else
 						 // right neighbor is refined
+						 // same as above
 		{
 		  second_child->set_neighbor (1, cell->neighbor(1)->child(0));
 		  
 		  cell_iterator right_neighbor = cell->neighbor(1);
-		  while (right_neighbor->active() == false)
-		    right_neighbor = right_neighbor->child(0);
-		  right_neighbor->set_neighbor(0, second_child);
+		  while (right_neighbor->has_children())
+		    {
+		      right_neighbor = right_neighbor->child(0);
+		      right_neighbor->set_neighbor (0, second_child);
+		    };
 		};
 	  };      
     };
