@@ -397,6 +397,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSPIC="-Kpic"
           ;;
 
+      kai_cc)
+          CXXFLAGSG="$CXXFLAGS --strict -D__KAI_STRICT --max_pending_instantiations 32 --display_error_number -g +K0 --no_implicit_typename"
+          CXXFLAGSO="$CXXFLAGS +K3 -O2 --abstract_float --abstract_pointer -w --display_error_number --max_pending_instantiations 32 --display_error_number"
+          CXXFLAGSPIC="-fPIC"
+	  ;;
+
       hp_aCC)
 	  dnl ??? disable warning 655 (about all-inlined functions) which
 	  dnl triggers for each and every of our DeclExceptionX calls ???
