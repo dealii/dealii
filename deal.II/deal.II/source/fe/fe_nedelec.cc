@@ -1269,18 +1269,41 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
     {
       case 1:
       {
-                                         // only on non-adjacent faces
-                                         // are the values actually
-                                         // zero. list these in a
-                                         // table
-        const unsigned int opposite_faces_2d[GeometryInfo<2>::faces_per_cell]
-          = { 2, 3, 0, 1};
-        const unsigned int opposite_faces_3d[GeometryInfo<3>::faces_per_cell]
-          = { 1, 0, 4, 5, 2, 3};
         switch (dim)
           {
-            case 2:  return (face_index != opposite_faces_2d[shape_index]);
-            case 3:  return (face_index != opposite_faces_3d[shape_index]);
+            case 2:
+            {
+                                               // only on the one
+                                               // non-adjacent face
+                                               // are the values
+                                               // actually zero. list
+                                               // these in a table
+              const unsigned int
+                opposite_faces[GeometryInfo<2>::faces_per_cell]
+                = { 2, 3, 0, 1};
+              
+              return (face_index != opposite_faces[shape_index]);
+            };
+            
+            case 3:
+            {
+                                               // the shape functions
+                                               // are zero on the two
+                                               // faces opposite the
+                                               // two faces adjacent
+                                               // to the line the
+                                               // shape function is
+                                               // defined on
+              const unsigned int
+                opposite_faces[GeometryInfo<3>::lines_per_cell][2]
+                = { {1,4}, {1,5}, {1,2}, {1,3}, {0,4}, {1,5},
+                    {1,2}, {1,3}, {3,4}, {4,5}, {2,5}, {2,3}};
+              
+              return ((face_index != opposite_faces[shape_index][0])
+                      &&
+                      (face_index != opposite_faces[shape_index][1]));
+            };
+            
             default: Assert (false, ExcNotImplemented());
           };
       };
