@@ -1164,7 +1164,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				     Solution<dim>(),
 				     difference_per_cell,
 				     QGauss3<dim>(),
-				     L2_norm);
+				     VectorTools::L2_norm);
 				   // Finally, we want to get the
 				   // global L2 norm. This can of
 				   // course be obtained by summing
@@ -1183,7 +1183,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				     Solution<dim>(),
 				     difference_per_cell,
 				     QGauss3<dim>(),
-				     H1_seminorm);
+				     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
 				   // Finally, we compute the maximum
@@ -1218,7 +1218,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				     Solution<dim>(),
 				     difference_per_cell,
 				     q_iterated,
-				     Linfty_norm);
+				     VectorTools::Linfty_norm);
 				   // Obviously, the maximal error
 				   // globally is the maximum over the
 				   // maximal errors on each cell:

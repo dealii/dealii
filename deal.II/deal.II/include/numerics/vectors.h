@@ -30,35 +30,6 @@ class ConstraintMatrix;
 
 
 
-/**
- *  Denote which norm/integral is to be computed. The following possibilities
- *  are implemented:
- *  @begin{itemize}
- *  @item @p{mean}: the function or difference of functions is integrated
- *    on each cell.
- *  @item @p{L1_norm}: the absolute value of the function is integrated.
- *  @item @p{L2_norm}: the square of the function is integrated on each
- *    cell; afterwards the root is taken of this value.
- *  @item @p{Linfty_norm}: the maximum absolute value of the function.
- *  @item @p{H1_seminorm}: the square of the function gradient is
- *    integrated on each cell; afterwards the root is taken of this
- *  value.
- *  @item @p{H1_norm}: the square of the function plus the square of
- *    the function gradient is integrated on each cell; afterwards the
- *    root is taken of this. I.e. the square of this norm is the
- *    square of the @p{L2_norm} plus the square of the
- *    @p{H1_seminorm}.
- *  @end{itemize}
- */
-enum NormType {
-      mean,
-      L1_norm,
-      L2_norm,
-      Linfty_norm,
-      H1_seminorm,
-      H1_norm
-};
-
 
 /**
  * Provide a class which offers some operations on vectors. Amoung these are
@@ -259,7 +230,7 @@ enum NormType {
  * 
  *   Presently, there is the possibility to compute the following values from the
  *   difference, on each cell: @p{mean}, @p{L1_norm}, @p{L2_norm}, @p{Linfty_norm},
- *   @p{H1_seminorm} and @p{H1_norm}, see @p{NormType}.
+ *   @p{H1_seminorm} and @p{H1_norm}, see @p{VectorTools::NormType}.
  *   For the mean difference value, the reference function minus the numerical
  *   solution is computed, not the other way round.
  *
@@ -314,6 +285,57 @@ enum NormType {
 class VectorTools
 {
   public:
+
+				     /**
+				      *  Denote which norm/integral is
+				      *  to be computed by the
+				      *  @p{integrate_difference}
+				      *  function of this class. The
+				      *  following possibilities are
+				      *  implemented:
+				      *  @begin{itemize}
+				      * @item @p{mean}: the function
+				      *    or difference of functions
+				      *    is integrated on each cell.
+				      *  @item @p{L1_norm}: the
+				      *  absolute value of the
+				      *  function is integrated.
+				      * @item @p{L2_norm}: the square
+				      *    of the function is
+				      *    integrated on each cell;
+				      *    afterwards the root is
+				      *    taken of this value.
+				      *  @item @p{Linfty_norm}: the
+				      *  maximum absolute value of the
+				      *  function.
+				      * @item @p{H1_seminorm}: the
+				      *    square of the function
+				      *    gradient is integrated on
+				      *    each cell; afterwards the
+				      *    root is taken of this *
+				      *    value.
+				      * @item @p{H1_norm}: the square
+				      *    of the function plus the
+				      *    square of the function
+				      *    gradient is integrated on
+				      *    each cell; afterwards the
+				      *    root is taken of
+				      *    this. I.e. the square of
+				      *    this norm is the square of
+				      *    the @p{L2_norm} plus the
+				      *    square of the
+				      *    @p{H1_seminorm}.
+				      *  @end{itemize}
+				      */
+    enum NormType {
+	  mean,
+	  L1_norm,
+	  L2_norm,
+	  Linfty_norm,
+	  H1_seminorm,
+	  H1_norm
+    };
+    
 				     /**
 				      * Compute the interpolation of
 				      * @p{function} at the support

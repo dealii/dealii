@@ -561,7 +561,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				     ZeroFunction<dim>(),
 				     norm_per_cell,
 				     QGauss<dim>(gauss_degree+1),
-				     H1_seminorm);
+				     VectorTools::H1_seminorm);
 				   // Then, the function just called
 				   // returns its results as a vector
 				   // of values each of which denotes
