@@ -167,7 +167,7 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #one of the cc-/h-files changed. Make detects whether
 #to remake this file upon inclusion at the bottom
 #of this file.
-Makefile.dep: $(cc-files) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 	@echo "============================ Remaking deal.II/Makefile"
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \

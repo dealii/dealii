@@ -75,7 +75,7 @@ clean:
 #one of the cc-/h-files changed. Make detects whether
 #to remake this file upon inclusion at the bottom
 #of this file.
-Makefile.dep: $(cc-files) $(h-files) Makefile
+Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 	@echo ============================ Remaking base/Makefile
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/base" $(cc-files) \
 		> Makefile.dep
