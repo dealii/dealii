@@ -256,9 +256,21 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     if test "x$DEAL_II_ADVANCE_WARNING" = "xyes" ; then
       CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-W //g;'`"
     fi
+
+    dnl In order to link shared libraries, almost all versions of gcc can
+    dnl use CXX, i.e. the C++ compiler. The exception is gcc2.95, for which
+    dnl we have to use the C compiler, unless we want to get linker errors
+    SHLIBLD="$CXX"
+    if test "$GXX_VERSION" = "gcc2.95"; then
+      SHLIBLD="$CC"
+    fi
   
   else
-    dnl Non-gcc compilers
+    dnl Non-gcc compilers. By default, use the C++ compiler also for linking
+    dnl shared libraries. If some compiler cannot do that and needs something
+    dnl different, then this must be specified in the respective section
+    dnl below, overriding this define:
+    SHLIBLD="$CXX"
   
     case "$GXX_VERSION" in
       ibm_xlc)

@@ -22,6 +22,7 @@ D                    = @DEAL2_DIR@
 CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
+SHLIBLD              = @SHLIBLD@
 LDFLAGS              = @LDFLAGS@
 F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
