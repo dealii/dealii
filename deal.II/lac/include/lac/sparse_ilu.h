@@ -79,8 +79,16 @@ class SparseILU : public SparseLUDecomposition<number>
                                       * argument.
                                       */
     SparseILU (const SparsityPattern &sparsity);
-    
-    typedef typename SparseLUDecomposition<number>::AdditionalData AdditionalData;
+
+				     /**
+				      * Make the @p{AdditionalData}
+				      * type in the base class
+				      * accessible to this class as
+				      * well.
+				      */
+    typedef
+    typename SparseLUDecomposition<number>::AdditionalData
+    AdditionalData;
 
 				     /**
 				      * Perform the incomplete LU
