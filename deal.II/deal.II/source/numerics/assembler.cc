@@ -51,7 +51,7 @@ AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
 				   dVector                  &rhs_vector,
 				   const Quadrature<dim>    &quadrature,
 				   const FiniteElement<dim> &fe,
-				   const FEValues<dim>::UpdateStruct &update_flags) :
+				   const UpdateFields       &update_flags) :
 		dof(dof),
 		assemble_matrix(assemble_matrix),
 		assemble_rhs(assemble_rhs),

@@ -106,7 +106,7 @@ struct AssemblerData {
 		   dVector                  &rhs_vector,
 		   const Quadrature<dim>    &quadrature,
 		   const FiniteElement<dim> &fe,
-		   const FEValues<dim>::UpdateStruct &update_flags);
+		   const UpdateFields       &update_flags);
     
 				     /**
 				      * Pointer to the dof handler object
@@ -151,7 +151,7 @@ struct AssemblerData {
 				      * FEValues object need to be reinitialized
 				      * on each cell.
 				      */
-    const FEValues<dim>::UpdateStruct update_flags;
+    const UpdateFields update_flags;
 };
 
 

@@ -251,9 +251,8 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   n_dofs.push_back (dof->n_dofs());
 
   cout << "    Assembling matrices..." << endl;
-  FEValues<dim>::UpdateStruct update_flags;
-  update_flags.q_points  = update_flags.gradients  = true;
-  update_flags.jacobians = update_flags.JxW_values = true;
+  UpdateFields update_flags = UpdateFields(update_q_points  | update_gradients |
+					   update_jacobians | update_JxW_values);
   
   ProblemBase<dim>::DirichletBC dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
@@ -372,7 +371,7 @@ void PoissonProblem<dim>::print_history () const {
 int main () {
   PoissonProblem<2> problem;
 
-  for (unsigned int level=1; level<10; ++level)
+  for (unsigned int level=1; level<9; ++level)
     problem.run (level);
 
   cout << endl << "Printing convergence history to <gnuplot.history>..." << endl;

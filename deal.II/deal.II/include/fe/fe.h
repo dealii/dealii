@@ -17,6 +17,54 @@ template <int dim> class Quadrature;
 
 
 /**
+  Provide a set of flags which tells the #FEValues<>::reinit# function, which
+  fields are to be updated for each cell. E.g. if you do not need the
+  gradients since you want to assemble the mass matrix, you can switch that
+  off. By default, all flags are off, i.e. no reinitialization will be done.
+ 
+  A variable of this type has to be passed to the constructor of the
+  #FEValues# object. You can select more than one flag by concatenation
+  using the #|# (bitwise #or#) operator.
+  */
+enum UpdateFields {
+				       /**
+					* Default: update nothing.
+					*/
+      update_default  = 0,
+				       /**
+					* Compute quadrature points in real
+					* space (not on unit cell).
+					*/
+      update_q_points = 1,
+				       /**
+					* Transform gradients on unit cell to
+					* gradients on real cell.
+					*/
+      update_gradients = 2,
+				       /**
+					* Compute jacobian matrices of the
+					* transform between unit and real cell
+					* in the evaluation points.
+					*/
+      update_jacobians = 4,
+				       /**
+					* Compute the JxW values (Jacobian
+					* determinant at the quadrature point
+					* times the weight of this point).
+					*/
+      update_JxW_values = 8,
+				       /**
+					* Compute the points on the real cell
+					* on which the ansatz functions are
+					* located.
+					*/
+      update_ansatz_points = 16
+};
+
+
+
+
+/**
   Represent a finite element evaluated with a specific quadrature rule.
   This class is an optimization which avoids evaluating the shape functions
   at the quadrature points each time a quadrature takes place. Rather, the
@@ -28,7 +76,7 @@ template <int dim> class Quadrature;
 
   The unit cell is defined to be the tensor product of the interval $[0,1]$
   in the present number of dimensions. In part of the literature, the convention
-  is used that the unit cell be the tensor product of the intervale $[-1,1]$,
+  is used that the unit cell be the tensor product of the interval $[-1,1]$,
   which is to distinguished properly.
 
   Objects of this class store a multitude of different values needed to
@@ -41,7 +89,9 @@ template <int dim> class Quadrature;
 
   The Jacobian matrix is defined to be
   $$ J_{ij} = {d\xi_i \over dx_j} $$
-  which is the form needed to compute the gradient on the real cell from
+  where the $\xi_i$ are the coordinates on the unit cell and the $x_i$ are
+  the coordinates on the real cell.
+  This is the form needed to compute the gradient on the real cell from
   the gradient on the unit cell. If we want to transform the area element
   $dx dy$ from the real to the unit cell, we have to take the determinant of
   the inverse matrix, which is the reciprocal value of the determinant of the
@@ -50,7 +100,7 @@ template <int dim> class Quadrature;
   The #FEValues# object keeps track of those fields which really need to
   be computed, since the computation of the gradients of the ansatz functions
   on each real cell can be quite an expensive thing if it is not needed. The
-  object knows about which fields are needed by the #UpdateStruct# object
+  object knows about which fields are needed by the #UpdateFields# object
   passed through the constructor. In debug mode, the accessor functions, which
   return values from the different fields, check whether the required field
   was initialized, thus avoiding use of unitialized data.
@@ -58,55 +108,6 @@ template <int dim> class Quadrature;
 template <int dim>
 class FEValues {
   public:
-				     /**
-				      * Provide a structure which tells the
-				      * #reinit# function, which fields are
-				      * to be updated for each cell. E.g. if
-				      * you do not need the gradients since
-				      * you want to assemble the mass matrix,
-				      * you can switch that off. By default,
-				      * all flags are off, i.e. no
-				      * reinitialization will be done.
-				      *
-				      * A structure of this type has to be
-				      * passed to the constructor of the
-				      * #FEValues# object. 
-				      */
-    struct UpdateStruct {
-					 /**
-					  * Constructor. Sets all fields to
-					  * false.
-					  */
-	UpdateStruct ();
-					 /**
-					  * Compute quadrature points in real
-					  * space (not on unit cell).
-					  */
-	bool q_points;
-					 /**
-					  * Transform gradients on unit cell to
-					  * gradients on real cell.
-					  */
-	bool gradients;
-					 /**
-					  * Compute jacobian matrices of the
-					  * transform between unit and real cell
-					  * in the evaluation points.
-					  */
-	bool jacobians;
-					 /**
-					  * Compute the JxW values (Jacobian
-					  * determinant at the quadrature point
-					  * times the weight of this point).
-					  */
-	bool JxW_values;
-					 /**
-					  * Compute the points on the real cell
-					  * on which the ansatz functions are
-					  * located.
-					  */
-	bool ansatz_points;
-    };
 
     
     
@@ -129,7 +130,7 @@ class FEValues {
 				      */
     FEValues (const FiniteElement<dim> &,
 	      const Quadrature<dim> &,
-	      const UpdateStruct &);
+	      const UpdateFields);
 
 				     /**
 				      * Return the value of the #i#th shape
@@ -339,7 +340,7 @@ class FEValues {
 				      * Store which fields are to be updated by
 				      * the reinit function.
 				      */
-    UpdateStruct         update_flags;
+    UpdateFields         update_flags;
 };
 
 
@@ -907,7 +908,7 @@ template <int dim>
 inline
 const vector<vector<Point<dim> > > &
 FEValues<dim>::get_shape_grads () const {
-  Assert (update_flags.gradients, ExcAccessToUninitializedField());
+  Assert (update_flags | update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
 
@@ -917,7 +918,7 @@ template <int dim>
 inline
 const vector<Point<dim> > &
 FEValues<dim>::get_quadrature_points () const {
-  Assert (update_flags.q_points, ExcAccessToUninitializedField());
+  Assert (update_flags | update_q_points, ExcAccessToUninitializedField());
   return quadrature_points;
 };
 
@@ -927,7 +928,7 @@ template <int dim>
 inline
 const vector<Point<dim> > &
 FEValues<dim>::get_ansatz_points () const {
-  Assert (update_flags.ansatz_points, ExcAccessToUninitializedField());
+  Assert (update_flags | update_ansatz_points, ExcAccessToUninitializedField());
   return ansatz_points;
 };
 
@@ -937,7 +938,7 @@ template <int dim>
 inline
 const vector<double> &
 FEValues<dim>::get_JxW_values () const {
-  Assert (update_flags.JxW_values, ExcAccessToUninitializedField());
+  Assert (update_flags | update_JxW_values, ExcAccessToUninitializedField());
   return JxW_values;
 };
 

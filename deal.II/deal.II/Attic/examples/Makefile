@@ -25,7 +25,8 @@ ifeq ($(shell uname),SunOS)
 CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
 endif
 
-cc-files = grid/grid_test.cc dof/dof_test.cc poisson/poisson.cc convergence/convergence.cc
+cc-files = grid/grid_test.cc dof/dof_test.cc poisson/poisson.cc \
+           convergence/convergence.cc error-estimation/error-estimation
 o-files  = $(cc-files:.cc=.o)
 h-files  = $(wildcard ../include/*.h)
 
@@ -50,8 +51,12 @@ convergence/convergence: convergence/convergence.o $(LIBFILES.g)
 	@echo ================= Linking $@
 	@$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS) ../../mia/control.o
 
+error-estimation/error-estimation: error-estimation/error-estimation.o $(LIBFILES.g)
+	@echo ================= Linking $@
+	@$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS) ../../mia/control.o
 
-run: run_grid_test run_dof_test run_poisson_test run_convergence_test
+
+run: run_grid_test run_dof_test run_poisson_test run_convergence_test run_error_test
 
 run_grid_test:
 	cd grid ; grid_test 4 ; mv grid.1 grid.4
@@ -71,14 +76,19 @@ run_convergence_test:
 	cd convergence ; convergence
 	cd convergence ; gnuplot make_ps
 
+run_error_test:
+	cd error-estimation ; error-estimation
+	cd error-estimation ; gnuplot make_ps
+
 clean:
 	cd grid ; rm -f grid.[1234] *.eps *.o *~ grid_test
 	cd dof  ; rm -f grid.* sparsity.* *.o *~ dof_test
 	cd poisson ; make clean
 	cd convergence ; rm -f *.o convergence *~ *.eps gnuplot.*
+	cd error-estimation ; rm -f *.o error-estimation *~ *.eps gnuplot.*
 
 
-.PHONY: run run_grid_test run_dof_test run_poisson_test run_convergence_test clean
+.PHONY: run run_grid_test run_dof_test run_poisson_test run_convergence_test run_error_test clean
 
 
 #Rule to generate the dependency file. This file is

@@ -432,10 +432,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << dof->n_dofs() << " degrees of freedom." << endl;
 
   cout << "    Assembling matrices..." << endl;
-  FEValues<dim>::UpdateStruct update_flags;
-  update_flags.q_points  = update_flags.gradients  = true;
-  update_flags.jacobians = update_flags.JxW_values = true;
-  
+  UpdateFields update_flags = UpdateFields(update_gradients | update_JxW_values);
   ProblemBase<dim>::DirichletBC dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
   assemble (equation, quadrature, fe, update_flags, dirichlet_bc);

@@ -290,11 +290,11 @@ class ProblemBase {
 				      * For what exactly happens here, refer to
 				      * the general doc of this class.
 				      */
-    virtual void assemble (const Equation<dim>               &equation,
-			   const Quadrature<dim>             &q,
-			   const FiniteElement<dim>          &fe,
-			   const FEValues<dim>::UpdateStruct &update_flags,
-			   const DirichletBC                 &dirichlet_bc = DirichletBC());
+    virtual void assemble (const Equation<dim>      &equation,
+			   const Quadrature<dim>    &q,
+			   const FiniteElement<dim> &fe,
+			   const UpdateFields       &update_flags,
+			   const DirichletBC        &dirichlet_bc = DirichletBC());
     
 				     /**
 				      * Solve the system of equations.

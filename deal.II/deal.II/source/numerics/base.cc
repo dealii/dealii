@@ -73,11 +73,11 @@ ProblemBase<dim>::~ProblemBase () {};
 
 
 template <int dim>
-void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
-				 const Quadrature<dim>             &quadrature,
-				 const FiniteElement<dim>          &fe,
-				 const FEValues<dim>::UpdateStruct &update_flags,
-				 const DirichletBC                 &dirichlet_bc) {
+void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
+				 const Quadrature<dim>    &quadrature,
+				 const FiniteElement<dim> &fe,
+				 const UpdateFields       &update_flags,
+				 const DirichletBC        &dirichlet_bc) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   system_sparsity.reinit (dof_handler->n_dofs(),
@@ -164,12 +164,11 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 
   difference.reinit (tria->n_active_cells());
   
-  FEValues<dim>::UpdateStruct update_flags;
-  update_flags.q_points   = true;
-  update_flags.jacobians  = true;
-  update_flags.JxW_values = true;
+  UpdateFields update_flags = UpdateFields (update_q_points  |
+					    update_jacobians |
+					    update_JxW_values);
   if ((norm==H1_seminorm) || (norm==H1_norm))
-    update_flags.gradients = true;
+    update_flags = UpdateFields (update_flags | update_gradients);
   FEValues<dim> fe_values(fe, q, update_flags);
   
 				   // loop over all cells
