@@ -80,6 +80,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       New: The <code>config.h</code> file now declares a variable <code
+       class="member">deal_II_numbers::invalid_unsigned_int</code>.
+       It is a representation of the largest number that can be put into an
+       unsigned integer. This value is widely used throughout the library as a
+       marker for an invalid unsigned integer value, such as an invalid array
+       index, an invalid array size, and the like.
+       <br> 
+       (WB 2003/10/24)
+       </p>
+
+  <li> <p>
        Augmented: The <code
        class="member">GeometryInfo::child_cell_on_face</code> 
        results in a result that might not be what you expect in 3d in some
