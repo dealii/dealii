@@ -45,8 +45,18 @@
  * computational speed against memory. One of the few other
  * possibilities is to use a good preconditioner.
  *
- * The use of the #AdditionalData# struct is described in the #solver#
- * base class.
+ * Like all other solver classes, this class has a local structure called
+ * #AdditionalData# which is used to pass additional parameters to the
+ * solver, like damping parameters or the number of temporary vectors. We
+ * use this additional structure instead of passing these values directly
+ * to the constructor because this makes the use of the #SolverSelector# and
+ * other classes much easier and guarantees that these will continue to
+ * work even if number or type of the additional parameters for a certain
+ * solver changes.
+ *
+ * For the GMRes method, the #AdditionalData# structure contains the number
+ * of temporary vectors as commented upon above. By default, the number
+ * of these vectors is set to 30.
  *
  * @author Wolfgang Bangerth
  */
@@ -61,8 +71,14 @@ class SolverGMRES : public Solver<Matrix, Vector>
 				      */
     struct AdditionalData 
     {
+					 /**
+					  * Constructor. By default,
+					  * set the number of temporary
+					  * vectors to 30.
+					  */
 	AdditionalData(const unsigned int max_n_tmp_vectors=30):
-			max_n_tmp_vectors(max_n_tmp_vectors) {};
+			max_n_tmp_vectors(max_n_tmp_vectors)
+	  {};
 	
 					 /**
 					  * Maximum number of

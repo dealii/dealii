@@ -91,14 +91,16 @@ template <class Vector> class VectorMemory;
  * };
  * \end{verbatim}
  *
+ *
  * \subsection{AdditionalData}
+ *
  * Several solvers need additional data, like the damping parameter #omega# of the
- * #SolverRichardson# class or the maximum number of tmp vectors of the #SolverGMRES#.
+ * #SolverRichardson# class or the maximum number of temporary vectors of the #SolverGMRES#.
  * To have a standardized constructor for each solver class the #struct AdditionalData#
- * has been introduced to each solver class. Some solver needs no additional data, like
- * the SolverCG or SolverBicgstab. For these solvers the struct #AdditionalData# is empty
- * and the calling
- * of the constructor has not change as a default #AdditionalData# is set by default. 
+ * has been introduced to each solver class. Some solvers need no additional data, like
+ * #SolverCG# or #SolverBicgstab#. For these solvers the struct #AdditionalData# is empty
+ * and calling the constructor may be done without giving the additional structure as
+ * an argument as a default #AdditionalData# is set by default. 
  *
  * Now the generating of a solver looks like
  * \begin{verbatim}
@@ -113,6 +115,14 @@ template <class Vector> class VectorMemory;
  *                               // CG with default AdditionalData
  * SolverCG solver_cg (solver_control, vector_memory);
  * \end{verbatim}
+ *
+ * Using a unified constructor parameter list for all solvers was introduced when the
+ * #SolverSelector# class was written; the unified interface enabled us to use this
+ * class unchanged even if the number of types of parameters to a certain solver
+ * changes and it is still possible in a simple way to give these additional data to
+ * the #SolverSelector# object for each solver which it may use.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997, 1998, 1999
  */
 template <class Matrix, class Vector>
 class Solver

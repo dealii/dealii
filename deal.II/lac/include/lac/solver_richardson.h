@@ -16,8 +16,18 @@
  * Implementation of the richardson iteration method. The stopping criterion
  * is the norm of the residual.
  *
- * The use of the #AdditionalData# struct is described in the #solver#
- * base class.
+ * Like all other solver classes, this class has a local structure called
+ * #AdditionalData# which is used to pass additional parameters to the
+ * solver, like damping parameters or the number of temporary vectors. We
+ * use this additional structure instead of passing these values directly
+ * to the constructor because this makes the use of the #SolverSelector# and
+ * other classes much easier and guarantees that these will continue to
+ * work even if number or type of the additional parameters for a certain
+ * solver changes.
+ *
+ * For the Richardson method, the additional data is the damping parameter,
+ * which is the only content of the #AdditionalData# structure. By default,
+ * the constructor of the structure sets it to one.
  *
  * @author Ralf Hartmann
  */
@@ -32,8 +42,14 @@ class SolverRichardson : public Solver<Matrix, Vector>
 				      */
     struct AdditionalData 
     {
+					 /**
+					  * Constructor. By default,
+					  * set the damping parameter
+					  * to one.
+					  */
 	AdditionalData(double omega=1):
-			omega(omega) {};
+			omega(omega)
+	  {};
 	
 					 /**
 					  * Relaxation parameter.

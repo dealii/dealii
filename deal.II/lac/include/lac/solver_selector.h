@@ -18,6 +18,8 @@
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
 
+
+
 /**
  * By calling the #solve# function of this #SolverSelector#, it selects
  * the #solve# function of that #Solver# that was specified in the constructor
@@ -190,6 +192,7 @@ class SolverSelector
 };
 
 
+
 /* --------------------- Inline and template functions ------------------- */
 
 
@@ -199,12 +202,14 @@ SolverSelector<Matrix, Vector>::SolverSelector(string solver_name,
 					       VectorMemory<Vector> &vector_memory) :
 		solver_name(solver_name),
 		control(&control),
-		vector_memory(&vector_memory)  {}
+		vector_memory(&vector_memory)
+{};
 
-		
+
+
 template <class Matrix, class Vector>
 SolverSelector<Matrix, Vector>::~SolverSelector()
-{}
+{};
 
 
 
@@ -240,7 +245,7 @@ SolverSelector<Matrix, Vector>::solve(const Matrix &A,
     Assert(false,ExcSolverDoesNotExist(solver_name));
 
   return Solver<Matrix,Vector>::breakdown;
-}
+};
 
 
 
@@ -248,7 +253,7 @@ template <class Matrix, class Vector>
 string SolverSelector<Matrix, Vector>::get_solver_names()
 {
   return "richardson|cg|bicgstab|gmres";
-}
+};
 
 
 /*----------------------------   solver_selector.h     ---------------------------*/

@@ -14,10 +14,23 @@
 
 /**
  * Preconditioned cg method.
- * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  *
- * The use of the #AdditionalData# struct is described in the #solver#
- * base class.
+ * Like all other solver classes, this class has a local structure called
+ * #AdditionalData# which is used to pass additional parameters to the
+ * solver, like damping parameters or the number of temporary vectors. We
+ * use this additional structure instead of passing these values directly
+ * to the constructor because this makes the use of the #SolverSelector# and
+ * other classes much easier and guarantees that these will continue to
+ * work even if number or type of the additional parameters for a certain
+ * solver changes.
+ *
+ * However, since the CG method does not need additional data, the respective
+ * structure is empty and does not offer any functionality. The constructor
+ * has a default argument, so you may call it without the additional
+ * parameter.
+ *
+ *
+ * @author Original implementation by G. Kanschat, R. Becker and F.-T. Suttmeier, reworking and  documentation by Wolfgang Bangerth
  */
 template<class Matrix, class Vector>
 class SolverCG : public Solver<Matrix,Vector>
