@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,6 +79,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // we shall not set
 				       // matrix.global_entry(
 				       //     sparsity_rowstart[dof.first])
+//TODO[GK]: This is going to break when the diagonal element of the matrix is not stored
       const unsigned int last = sparsity_rowstart[dof_number+1];
       for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
 	matrix.global_entry(j) = 0.;
