@@ -5,10 +5,11 @@
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
-#include <map.h>
-#include <iostream.h>
-#include <algo.h>
-#include <time.h>
+#include <map>
+#include <iostream>
+#include <iomanip>
+#include <algorithm>
+#include <ctime>
 
 
 
@@ -267,10 +268,13 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	  << time->tm_mon+1 << "/"
 	  << time->tm_mday << endl
 	  << "# Time =  "
-	  << time->tm_hour << ":" << time->tm_min << ":" << time->tm_sec << endl
+	  << time->tm_hour << ":"
+	  << setw(2) << time->tm_min << ":"
+	  << setw(2) << time->tm_sec << endl
 	  << "#" << endl
 	  << "# For a description of the UCD format see the AVS Developer's guide."
-	  << endl;
+	  << endl
+	  << "#" << endl;
     };
 
 				   // start with ucd data
