@@ -35,7 +35,7 @@ F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
 F77LIBS              = @F77LIBS@
 NEEDS_F77LIBS        = @NEEDS_F77LIBS@
-LIBS                 = @LIBS@ @BLAS_LIB@ @HSL_LIB@
+LIBS                 = @LIBS@ @TECPLOT_LIB@ @BLAS_LIB@ @HSL_LIB@
 LIBDIR               = $D/lib
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
@@ -54,9 +54,6 @@ DEAL_II_PETSC_VERSION_SUBMINOR = @DEAL_II_PETSC_VERSION_SUBMINOR@
 USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
 DEAL_II_METIS_DIR    = @DEAL_II_METIS_DIR@
 
-TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
-TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
-
 TARGET               = @target@
 
 # if FORTRAN sublibs are used, add F77 libs to linker flags
@@ -64,9 +61,6 @@ ifeq ($(NEEDS_F77LIBS),yes)
   LDFLAGS += $(F77LDFLAGS)
   LIBS    += $(F77LIBS)
 endif
-
-# if Tecplot is used, link against tecio.a
-LIBS += $(TECIO_LIBRARY)
 
 ######################################################
 # now configuration for compiler flags, pathes, etc
@@ -137,21 +131,13 @@ endif
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 
-include-path-base            = $D/base/include
-include-path-lac             = $D/lac/include
-include-path-deal2           = $D/deal.II/include
-include-path-contrib-boost   = $D/contrib/boost/include
-include-path-tecplot         = $(TECIO_INCLUDE)
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
 include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 
-INCLUDE           = $(addprefix -I, $(include-path-base) \
-                                    $(include-path-lac)  \
-                                    $(include-path-deal2)\
-			            $(include-path-contrib-boost)\
-				    $(include-path-tecplot)) \
-	@UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@
+INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
+	  -I$D/contrib/boost/include \
+	  @TECPLOT_INCLUDE_DIR@ @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@
 
 # add PETSc and METIS include path if necessary. this rule
 # (and the one further down below to get correct flags) should eventually

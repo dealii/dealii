@@ -4060,21 +4060,19 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 [
-  AC_CHECK_FILE($TECHOME/lib/tecio.a,
-		TECPLOT_LIBRARY_PATH=$TECHOME/lib/tecio.a)
-  AC_CHECK_FILE($TEC80HOME/lib/tecio.a,
-		TECPLOT_LIBRARY_PATH=$TEC80HOME/lib/tecio.a)
-  AC_CHECK_FILE($TEC90HOME/lib/tecio.a,
-		TECPLOT_LIBRARY_PATH=$TEC90HOME/lib/tecio.a)
-  AC_CHECK_FILE($TECHOME/include/TECIO.h,
-		TECPLOT_INCLUDE_PATH=$TECHOME/include)
-  AC_CHECK_FILE($TEC80HOME/include/TECIO.h,
-	        TECPLOT_INCLUDE_PATH=$TEC80HOME/include)
-  AC_CHECK_FILE($TEC90HOME/include/TECIO.h,
-	        TECPLOT_INCLUDE_PATH=$TEC90HOME/include)
+  for i [ in $TECHOME $TEC80HOME $TEC90HOME ] ; do
+    AC_CHECK_FILE($i/lib/tecio.a,
+		  TECPLOT_LIB=$i/lib/tecio.a)
+    AC_CHECK_FILE($i/include/TECIO.h,
+		  TECPLOT_INCLUDE_DIR=-I$i/include,
+		  TECPLOT_LIB="")
+    if test "x$TECPLOT_LIB" != "x" ; then
+      break
+    fi
+  done
 
-  if (test -r "$TECPLOT_LIBRARY_PATH" && \
-      test -r "$TECPLOT_INCLUDE_PATH/TECIO.h") ; then
+  if (test -r "$TECPLOT_LIB" && \
+      test -r "$TECPLOT_INCLUDE_DIR/TECIO.h") ; then
     AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
 	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
   fi
@@ -4302,9 +4300,9 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
   if test "x$1" != "xyes" ; then
     AC_MSG_RESULT(external version not yet supported)
   else
-    AC_SUBST(UMFPACK_LIB, '$(LIBDIR)/liblac_umfpack.$(lib-suffix)')
-    AC_SUBST(UMFPACK_LIBG, '$(LIBDIR)/liblac_umfpack.g.$(lib-suffix)')
-    AC_SUBST(UMFPACK_INCLUDE_DIR,'-I$D/contrib/umfpack/UMFPACK/Include')
+    UMFPACK_LIB ='$(LIBDIR)/liblac_umfpack.$(lib-suffix)'
+    UMFPACK_LIBG='$(LIBDIR)/liblac_umfpack.g.$(lib-suffix)'
+    UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     AC_MSG_RESULT(using included version)
   fi
   AC_DEFINE(HAVE_UMFPACK,1,[UMFPACK is $1])
@@ -4321,16 +4319,12 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
   if test "x$1" != "xyes" ; then
     AC_CHECK_LIB($1, daxpy_,
-      [
-        AC_SUBST(BLAS_LIB,"-l$1")
-      ],
+        BLAS_LIB="-l$1",
       AC_MSG_RESULT(not found),
       $F77LIBS)
   else
     AC_CHECK_LIB(blas, daxpy_,
-      [
-        AC_SUBST(BLAS_LIB,"-lblas")
-      ],
+        BLAS_LIB="-lblas",
       AC_MSG_RESULT(not found),
       $F77LIBS)
   fi

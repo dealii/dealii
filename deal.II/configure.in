@@ -316,8 +316,8 @@ AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring additional libs ----------------)
 
 DEAL_II_CONFIGURE_TECPLOT
-AC_SUBST(TECPLOT_LIBRARY_PATH)
-AC_SUBST(TECPLOT_INCLUDE_PATH)
+AC_SUBST(TECPLOT_LIB)
+AC_SUBST(TECPLOT_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_HSL
 AC_SUBST(USE_CONTRIB_HSL)
@@ -341,9 +341,10 @@ AC_ARG_WITH(umfpack,
   [  --with-umfpack=umfpack-root-directory,
       use contributed UMFPack is no directory is given.
       Default is not to use UMFPack],
-  DEAL_II_WITH_UMFPACK($withval),
-  withumfpack=no)
-
+  DEAL_II_WITH_UMFPACK($withval))
+AC_SUBST(UMFPACK_LIB)
+AC_SUBST(UMFPACK_LIBG)
+AC_SUBST(UMFPACK_INCLUDE_DIR)
 
 dnl Check for LAPACK
 AC_CHECK_LIB(lapack, degsl_)
@@ -351,8 +352,8 @@ AC_CHECK_LIB(lapack, degsl_)
 dnl Check for blas. Must be after UMFPack and LAPACK!
 AC_ARG_WITH(blas,
   [  --with-blas=blaslib use the blas library],
-  DEAL_II_WITH_BLAS($withval),
-  withblas=no)
+  DEAL_II_WITH_BLAS($withval))
+AC_SUBST(BLAS_LIB)
 
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags
@@ -540,8 +541,6 @@ AC_OUTPUT([common/Make.global_options
            common/Makefile.template 
            common/scripts/make_dependencies.pl
            doc/Makefile 
-           doc/auto/Makefile 
-           doc/auto/kdoc/Makefile
 	   doc/doxygen/Makefile
            doc/doxygen/options.dox])
 
