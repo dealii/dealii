@@ -360,6 +360,19 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
+       New: The functions <code
+       class="member">DoFTools::map_dof_to_boundary_indices</code>,
+       <code class="member">DoFTools::make_boundary_sparsity_pattern</code>,
+       <code class="member">DoFHandler::n_boundary_dofs</code>,
+       <code
+       class="member">DoFHandler::max_couplings_between_boundary_dofs</code>,
+       and <code class="member">VectorTools::project_boundary_values</code>,
+       are now also implemented in 1d.
+       <br>
+       (WB 2001/04/29)
+       </p>
+
+  <li> <p>
        New: Implement the <code
        class="member">VectorTools::interpolate_boundary_values</code>
        a second time, this time taking a <code
