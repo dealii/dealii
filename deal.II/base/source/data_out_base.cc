@@ -1379,7 +1379,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
       };
 
 
-///////////////////////////////
+				   ///////////////////////////////
 				   // first make up a list of used
 				   // vertices along with their
 				   // coordinates
