@@ -62,6 +62,26 @@ class vector2d : public Subscriptor
     {
       public:
 					 /**
+					  * Typedef iterator and other
+					  * types to the elements of
+					  * this row. Since this class
+					  * represents rows of
+					  * constant objects,
+					  * @p{iterator} and
+					  * @p{const_iterator} have
+					  * the same type.
+					  */
+	typedef const T value_type;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+	typedef value_type* iterator;
+	typedef const value_type* const_iterator;
+	typedef value_type& reference;
+	typedef const value_type& const_reference;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
+	
+					 /**
 					  * Constructor.
 					  */
 	ConstRowAccessor (const vector2d<T>  &parent,
@@ -70,7 +90,20 @@ class vector2d : public Subscriptor
 					 /**
 					  * Access operator.
 					  */
-	T  operator [] (const unsigned int column) const;
+	const_reference operator [] (const unsigned int column) const;
+
+					 /**
+					  * Return an iterator to the
+					  * first element of this row.
+					  */
+	const_iterator begin () const;
+
+					 /**
+					  * Return an interator to the
+					  * element past the end of
+					  * this row.
+					  */
+	const_iterator end () const;
 	
       protected:
 					 /**
@@ -113,6 +146,26 @@ class vector2d : public Subscriptor
     {
       public:
 					 /**
+					  * Typedef constant and
+					  * non-constant iterator
+					  * types to the elements of
+					  * this row, as well as all
+					  * the other types usually
+					  * required for the standard
+					  * library algorithms.
+					  */
+	typedef T value_type;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+	typedef value_type* iterator;
+	typedef const value_type* const_iterator;
+	typedef value_type& reference;
+	typedef const value_type& const_reference;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
+
+	
+					 /**
 					  * Constructor.
 					  */
 	NonConstRowAccessor (vector2d<T>        &parent,
@@ -122,7 +175,36 @@ class vector2d : public Subscriptor
 					 /**
 					  * Access operator.
 					  */
-	T & operator [] (const unsigned int column) const;
+	reference operator [] (const unsigned int column) const;
+
+					 /**
+					  * Return an iterator to the
+					  * first element of this
+					  * row. Constant version.
+					  */
+	const_iterator begin () const;
+
+					 /**
+					  * Return an iterator to the
+					  * first element of this
+					  * row. Non-constant version.
+					  */
+	iterator begin ();
+	
+					 /**
+					  * Return an interator to the
+					  * element past the end of
+					  * this row. Constant version.
+					  */
+	const_iterator end () const;
+	
+					 /**
+					  * Return an interator to the
+					  * element past the end of
+					  * this row. Non-constant
+					  * version.
+					  */
+	iterator end ();
 	
       private:
 					 /**
@@ -240,10 +322,19 @@ class vector2d : public Subscriptor
     
 				     /**
 				      * Return the value of the
-				      * element at position @p{(i,j)}.
+				      * element at position @p{(i,j)}
+				      * as a constant reference.
+				      *
+				      * We return the requested value
+				      * as a constant reference rather
+				      * than by value since this
+				      * object may hold data types
+				      * that may be large, and we
+				      * don't know here whether
+				      * copying is expensive or not.
 				      */
-    T operator() (const unsigned int i,
-		  const unsigned int j) const;
+    const T & operator() (const unsigned int i,
+			  const unsigned int j) const;
     
 				     /**
 				      * Return a read-write reference to
@@ -325,14 +416,23 @@ class vector2d : public Subscriptor
   
 				     /**
 				      * Return the value of the
-				      * element @p{(i,j)}.
+				      * element @p{(i,j)} as a
+				      * read-only reference.
 				      *
 				      * This function does no bounds
 				      * checking and is only to be
 				      * used internally and in
 				      * functions already checked.
+				      *
+				      * We return the requested value
+				      * as a constant reference rather
+				      * than by value since this
+				      * object may hold data types
+				      * that may be large, and we
+				      * don't know here whether
+				      * copying is expensive or not.
 				      */
-    T el (const unsigned int i, const unsigned int j) const;    
+    const T & el (const unsigned int i, const unsigned int j) const;    
   
 				     /**
 				      * Direct read-only access to
@@ -413,6 +513,26 @@ operator [] (const unsigned int column) const
 
 template <typename T>
 inline
+typename vector2d<T>::ConstRowAccessor::const_iterator
+vector2d<T>::ConstRowAccessor::begin () const
+{
+  return row_start;
+};
+
+
+
+template <typename T>
+inline
+typename vector2d<T>::ConstRowAccessor::const_iterator
+vector2d<T>::ConstRowAccessor::end () const
+{
+  return row_start+parent.n_cols();
+};
+
+
+
+template <typename T>
+inline
 vector2d<T>::NonConstRowAccessor::
 NonConstRowAccessor (vector2d<T>        &parent,
 		     const unsigned int  row)
@@ -424,6 +544,7 @@ NonConstRowAccessor (vector2d<T>        &parent,
 };
 
 
+
 template <typename T>
 inline
 T &
@@ -432,6 +553,36 @@ operator [] (const unsigned int column) const
 {
   Assert (column < parent.n_cols(), ExcInternalError());
   return *(row_start+column);
+};
+
+
+
+template <typename T>
+inline
+typename vector2d<T>::NonConstRowAccessor::iterator
+vector2d<T>::NonConstRowAccessor::begin ()
+{
+  return row_start;
+};
+
+
+
+template <typename T>
+inline
+typename vector2d<T>::NonConstRowAccessor::const_iterator
+vector2d<T>::NonConstRowAccessor::end () const
+{
+  return row_start+parent.n_cols();
+};
+
+
+
+template <typename T>
+inline
+typename vector2d<T>::NonConstRowAccessor::iterator
+vector2d<T>::NonConstRowAccessor::end ()
+{
+  return row_start+parent.n_cols();
 };
 
 
@@ -653,7 +804,7 @@ vector2d<T>::el (const unsigned int i, const unsigned int j)
 
 
 template <typename T>
-inline T
+inline const T &
 vector2d<T>::el (const unsigned int i, const unsigned int j) const
 {
   return val[i*n_cols()+j];
@@ -662,7 +813,7 @@ vector2d<T>::el (const unsigned int i, const unsigned int j) const
 
 
 template <typename T>
-inline T
+inline const T &
 vector2d<T>::operator() (const unsigned int i, const unsigned int j) const
 {  
   Assert (i<num_rows, ExcIndexRange (i, 0, num_rows));

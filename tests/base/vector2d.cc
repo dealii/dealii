@@ -48,6 +48,10 @@ main ()
 	Assert (Ti[i][j] == Ti(i,j), ExcInternalError());
 	Assert (Ti[i][j] == Td(i,j), ExcInternalError());
 
+	Assert (Td[i].begin()+j == Td(i,j), ExcInternalError());
+	Assert (Ti[i].begin()+j == Ti(i,j), ExcInternalError());
+	Assert (Ti[i].begin()+j == Td(i,j), ExcInternalError());
+
 	logfile << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
       };
 };
