@@ -65,7 +65,7 @@ void check ()
 
   if (dim > 1)
     check_el (FESystem<dim> (FE_Nedelec<dim>(1), 2));
-};
+}
 
 
 int main () 
@@ -79,4 +79,4 @@ int main ()
 //  check<3> ();  
   
   return 0;
-};
+}

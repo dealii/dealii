@@ -95,9 +95,5 @@ int main()
     }
 
   deallog << "gradient_phi_min: " << gradient_phi_min << std::endl;
-  deallog << "gradient_phi_max: " << gradient_phi_max << std::endl;
-
-  //////////////////////
-  
-  
-};
+  deallog << "gradient_phi_max: " << gradient_phi_max << std::endl; 
+}
