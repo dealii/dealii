@@ -228,7 +228,7 @@ class DerivativeApproximation
 				   const DoFHandler<dim> &dof,
 				   const Vector<double>  &solution,
 				   Vector<float>         &derivative_norm,
-				   const unsigned int     component);
+				   const unsigned int     component = 0);
     
     				     /**
 				      * Calls the @p{interpolate}
