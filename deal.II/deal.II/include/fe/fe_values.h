@@ -2381,6 +2381,55 @@ FEValuesBase<dim>::get_cell () const
   return *present_cell;
 }
 
+
+template <int dim>
+inline
+const std::vector<Point<dim> > &
+FEValuesBase<dim>::get_quadrature_points () const
+{
+  Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
+  return this->quadrature_points;
+}
+
+
+
+template <int dim>
+inline
+const std::vector<double> &
+FEValuesBase<dim>::get_JxW_values () const
+{
+  Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  return this->JxW_values;
+}
+
+
+
+template <int dim>
+inline
+const Point<dim> &
+FEValuesBase<dim>::quadrature_point (const unsigned int i) const
+{
+  Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
+  Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
+  
+  return this->quadrature_points[i];
+}
+
+
+
+
+template <int dim>
+inline
+double
+FEValuesBase<dim>::JxW (const unsigned int i) const
+{
+  Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
+  
+  return this->JxW_values[i];
+}
+
+
 /*------------------------ Inline functions: FEValues ----------------------------*/
 
 
