@@ -523,7 +523,9 @@ class DataOutBase
 					  * one does what one usually wants:
 					  * it shifts colors from black (lowest
 					  * value) through blue, green and red
-					  * to white (highest value).
+					  * to white (highest value). For the
+					  * exact defition of the color scale
+					  * refer to the impementation.
 					  *
 					  * This function was originally written
 					  * by Stefan Nauber.
