@@ -127,7 +127,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   Vector<number> tmp(criteria);
   const double total_error = tmp.l1_norm();
 
-  Vector<float> partial_sums(criteria.size());
+  Vector<number> partial_sums(criteria.size());
   
 				   // sort the largest criteria to the
 				   // beginning of the vector
@@ -135,7 +135,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
   partial_sum (tmp.begin(), tmp.end(), partial_sums.begin());
 
 				   // compute thresholds
-  const Vector<float>::const_iterator
+  const typename Vector<number>::const_iterator
     q = lower_bound (partial_sums.begin(), partial_sums.end(),
 		     top_fraction*total_error),
     p = upper_bound (partial_sums.begin(), partial_sums.end(),
