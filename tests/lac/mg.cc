@@ -108,7 +108,7 @@ main()
   deallog.attach(logfile);
   
   PrimitiveVectorMemory<Vector<double>  > mem;
-  SolverControl control(100, 1.e-5, true);
+  SolverControl control(100, 1.e-14, true);
 
   const unsigned int base = 3;
   const unsigned int maxlevel = 8;
