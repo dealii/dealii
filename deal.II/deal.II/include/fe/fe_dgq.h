@@ -59,6 +59,12 @@ template <int dim> class MappingQ;
  *     0---1---2        0---1---2
  *  @endverbatim
  *
+ * Note, however, that these are just the Lagrange interpolation
+ * points of the shape functions. Even though they may physically be
+ * on the surface of the cell, they are logically in the interior
+ * since there are no continuity requirements for these shape
+ * functions across cell boundaries.
+ *
  * @author Ralf Hartmann, 2001, 2004, Guido Kanschat 2001
  */
 template <int dim>
