@@ -11,14 +11,14 @@ DEAL::Construct C
 DEAL::Construct D
 DEAL::Destruct D
 --------------------------------------------------------
-An error occurred in line <29> of file <source/subscriptor.cc> in function
+An error occurred in line <31> of file <source/subscriptor.cc> in function
     Subscriptor::~Subscriptor()
 The violated condition was: 
     counter == 0
 The name and call sequence of the exception was:
-    ExcInUse(counter)
+    ExcInUse(counter, classname )
 Additional Information: 
-This object is still used by 1 other objects.
+Object of class 4Test is still used by 1 other objects.
 --------------------------------------------------------
 DEAL::Destruct C
 DEAL::Destruct B
