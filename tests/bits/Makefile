@@ -61,7 +61,8 @@ tests_x = anna_? \
 	  error_estimator_* \
 	  cylinder_shell_* \
 	  grid_in_* \
-	  compressed_sparsity_pattern_*
+	  compressed_sparsity_pattern_* \
+	  point_difference_*
 
 # tests for the hp branch:
 #	  fe_collection_*

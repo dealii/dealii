@@ -74,13 +74,9 @@ void test ()
     begin = A.begin(),
     end = A.end();
 
-  deallog << begin->row() << ' ' << begin->index() << ' '
+  deallog << begin->row() << ' '
           << begin->column() << ' ' << begin->block_row() << ' '
           << begin->block_column()
-          << std::endl;
-  deallog << end->row() << ' ' << end->index() << ' '
-          << end->column() << ' ' << end->block_row() << ' '
-          << end->block_column()
           << std::endl;
 
                                    // this matrix certainly has entries
