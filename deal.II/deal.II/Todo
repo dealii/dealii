@@ -18,11 +18,6 @@ Check usage of vector<>s: functions should assume that the objects have
   the right size already.
 
 
-Update DoFHandler::distribute_cell_to_dof_vector for higher order
-  elements (it can presently only handle elements with the only dofs
-  on the vertices).
-
-
 Remove FiniteElementData<>::operator == and let it be generated
   implicitely.
 
