@@ -59,6 +59,11 @@ void test ()
 	deallog << as[i][j] << ' ' << bs[i][i] << std::endl;
       }
 
+				   // test distributivity of
+				   // multiplication
+  Assert ((as*ts)*as == as*(ts*as), ExcInternalError());
+  
+  
 				   // also test that the elasticity
 				   // tensor is positive definite
   deallog << as * ts * as << std::endl;
