@@ -476,6 +476,25 @@ DataOutBase::VtkFlags::memory_consumption () const
 
 
 
+void DataOutBase::Deal_II_IntermediateFlags::declare_parameters (ParameterHandler &/*prm*/)
+{}
+
+
+
+void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (ParameterHandler &/*prm*/)
+{}
+
+
+unsigned int
+DataOutBase::Deal_II_IntermediateFlags::memory_consumption () const
+{
+				   // only simple data elements, so
+				   // use sizeof operator
+  return sizeof (*this);
+}
+
+
+
 unsigned int DataOutBase::memory_consumption ()
 {
   return 0;
@@ -3874,6 +3893,30 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 
 
 
+template <int dim, int spacedim>
+void
+DataOutBase::
+write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
+			    const std::vector<std::string>          &data_names,
+			    const Deal_II_IntermediateFlags         &/*flags*/,
+			    std::ostream                            &out) 
+{
+  out << "[deal.II intermediate format graphics data]" << std::endl
+      << "[written by deal.II version "
+      << DEAL_II_MAJOR << '.' << DEAL_II_MINOR << "]" << std::endl;
+
+  out << data_names.size() << std::endl;
+  for (unsigned int i=0; i<data_names.size(); ++i)
+    out << data_names[i] << std::endl;
+  
+  out << patches.size() << std::endl;
+  for (unsigned int i=0; i<patches.size(); ++i)
+    out << patches[i] << std::endl;
+
+  out << std::endl;
+} 
+
+
 
 template <int dim, int spacedim>
 void
@@ -4055,6 +4098,16 @@ void DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const
 
 
 template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::
+write_deal_II_intermediate (std::ostream &out) const 
+{
+  DataOutBase::write_deal_II_intermediate (get_patches(), get_dataset_names(),
+					   deal_II_intermediate_flags, out);
+}
+
+
+
+template <int dim, int spacedim>
 void
 DataOutInterface<dim,spacedim>::write (std::ostream &out,
 				       const OutputFormat output_format_) const
@@ -4099,6 +4152,10 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
 	    
       case vtk:
 	    write_vtk (out);
+	    break;
+
+      case deal_II_intermediate:
+	    write_deal_II_intermediate (out);
 	    break;
 	    
       default:
@@ -4191,6 +4248,15 @@ DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags)
 
 
 template <int dim, int spacedim>
+void
+DataOutInterface<dim,spacedim>::set_flags (const Deal_II_IntermediateFlags &flags) 
+{
+  deal_II_intermediate_flags = flags;
+}
+
+
+
+template <int dim, int spacedim>
 std::string
 DataOutInterface<dim,spacedim>::
 default_suffix (const OutputFormat output_format_) const
@@ -4227,6 +4293,9 @@ default_suffix (const OutputFormat output_format_) const
 	    
       case vtk:
 	    return ".vtk";
+	    
+      case deal_II_intermediate:
+	    return ".d2";
 	    
       default: 
 	    Assert (false, ExcNotImplemented()); 
@@ -4268,6 +4337,9 @@ parse_output_format (const std::string &format_name)
   if (format_name == "vtk")
     return vtk;
   
+  if (format_name == "deal.II intermediate")
+    return deal_II_intermediate;
+  
   AssertThrow (false, ExcInvalidState ());
 
 				   // return something invalid
@@ -4280,7 +4352,7 @@ template <int dim, int spacedim>
 std::string
 DataOutInterface<dim,spacedim>::get_output_format_names ()
 {
-  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk";
+  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk|deal.II intermediate";
 }
 
 
@@ -4322,6 +4394,11 @@ DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm)
 
   prm.enter_subsection ("Vtk output parameters");
   VtkFlags::declare_parameters (prm);
+  prm.leave_subsection ();
+
+
+  prm.enter_subsection ("deal.II intermediate output parameters");
+  Deal_II_IntermediateFlags::declare_parameters (prm);
   prm.leave_subsection ();
 }
 
@@ -4365,6 +4442,10 @@ DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm)
   prm.enter_subsection ("Vtk output parameters");
   vtk_flags.parse_parameters (prm);
   prm.leave_subsection ();
+
+  prm.enter_subsection ("deal.II intermediate output parameters");
+  deal_II_intermediate_flags.parse_parameters (prm);
+  prm.leave_subsection ();
 }
 
 
@@ -4381,7 +4462,42 @@ DataOutInterface<dim,spacedim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (eps_flags) +
 	  MemoryConsumption::memory_consumption (gmv_flags) +
 	  MemoryConsumption::memory_consumption (tecplot_flags) +
-	  MemoryConsumption::memory_consumption (vtk_flags));
+	  MemoryConsumption::memory_consumption (vtk_flags) +
+	  MemoryConsumption::memory_consumption (deal_II_intermediate_flags));
+}
+
+
+
+template <int dim, int spacedim>
+std::ostream &
+operator << (std::ostream                           &out,
+	     const DataOutBase::Patch<dim,spacedim> &patch)
+{
+				   // write a header line
+  out << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]"
+      << std::endl;
+
+				   // then write all the data that is
+				   // in this patch
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    out << patch.vertices[i] << " ";
+  out << std::endl;
+
+  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+    out << patch.neighbors[i] << " ";
+  out << std::endl;
+
+  out << patch.patch_index << ' ' << patch.n_subdivisions
+      << std::endl;
+
+  out << patch.data.n_rows() << ' ' << patch.data.n_cols() << std::endl;
+  for (unsigned int i=0; i<patch.data.n_rows(); ++i)
+    for (unsigned int j=0; j<patch.data.n_cols(); ++j)
+      out << patch.data[i][j] << ' ';
+  out << std::endl;
+  out << std::endl;
+
+  return out;
 }
 
 
@@ -4409,4 +4525,35 @@ template class DataOutBase::Patch<2,3>;
 
 template class DataOutInterface<3,4>;
 template class DataOutBase::Patch<3,4>;
+
+// output operators
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<1,1> &patch);
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<2,2> &patch);
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<3,3> &patch);
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<4,4> &patch);
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<1,2> &patch);
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<2,3> &patch);
+template
+std::ostream &
+operator << (std::ostream                  &out,
+	     const DataOutBase::Patch<3,4> &patch);
+
 
