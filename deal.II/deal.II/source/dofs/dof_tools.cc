@@ -824,12 +824,15 @@ void DoFTools::make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 		  ExcInternalError());
 	  
 	  next_index = 0;
-	  Assert ((face->child(0)->vertex_dof_index(2,0) ==
-		   face->child(1)->vertex_dof_index(3,0)) &&
-		  (face->child(0)->vertex_dof_index(2,0) ==
-		   face->child(2)->vertex_dof_index(0,0)) &&
-		  (face->child(0)->vertex_dof_index(2,0) ==
-		   face->child(3)->vertex_dof_index(1,0)),
+
+					   // assert some consistency
+					   // assumptions
+	  Assert ((face->child(0)->vertex_index(2) ==
+		   face->child(1)->vertex_index(3)) &&
+		  (face->child(0)->vertex_index(2) ==
+		   face->child(2)->vertex_index(0)) &&
+		  (face->child(0)->vertex_index(2) ==
+		   face->child(3)->vertex_index(1)),
 		  ExcInternalError());
 	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 	    dofs_on_children[next_index++]
