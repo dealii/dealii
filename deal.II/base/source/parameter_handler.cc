@@ -246,7 +246,7 @@ bool ParameterHandler::read_input (const string &filename)
     {
       cerr << "ParameterHandler::read_input: could not open file <"
 	   << filename << "> for reading." << endl
-	   << "Trying to make file ;<"
+	   << "Trying to make file <"
 	   << filename << "> with default values for you." << endl;
 
       ofstream output (filename.c_str());
