@@ -61,18 +61,22 @@ void ConstraintMatrix::add_entry (const unsigned int line,
 				   // point to 'line' then
   Assert (line_ptr->line==line, ExcLineInexistant(line));
 
-
-#ifdef DEBUG
 				   // if in debug mode, check whether an
 				   // entry for this column already
 				   // exists and if its the same as
 				   // the one entered at present
+				   //
+				   // in any case: exit the function if an
+				   // entry for this column already exists,
+				   // since we don't want to enter it twice
   for (vector<pair<unsigned int,double> >::const_iterator p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)
     if (p->first == column)
-      Assert (p->second == value,
-	      ExcEntryAlreadyExists(line, column, p->second, value));
-#endif
+      {
+	Assert (p->second == value,
+		ExcEntryAlreadyExists(line, column, p->second, value));
+	return;
+      };
   
   line_ptr->entries.push_back (make_pair(column,value));
 };
