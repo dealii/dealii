@@ -450,6 +450,21 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 
 
 
+void ConstraintMatrix::shift (const unsigned int offset)
+{
+  for (std::vector<ConstraintLine>::iterator i = lines.begin();
+       i != lines.end(); i++)
+    {
+      i->line += offset;
+      for (std::vector<std::pair<unsigned int,double> >::iterator 
+	     j = i->entries.begin();
+	   j != i->entries.end(); j++)
+	j->first += offset;
+    }
+}
+
+
+
 void ConstraintMatrix::clear ()
 {
   std::vector<ConstraintLine> tmp;

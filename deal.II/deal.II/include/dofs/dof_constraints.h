@@ -272,6 +272,28 @@ class ConstraintMatrix : public Subscriptor
 				      * boundary.
 				      */
     void merge (const ConstraintMatrix &other_constraints);
+
+				     /**
+				      * Shift all entries of this
+				      * matrix down @p{offset} rows
+				      * and over @p{offset} columns.
+				      *
+				      * This function is useful if you
+				      * are building block matrices,
+				      * where all blocks are built by
+				      * the same @p{DoFHandler}
+				      * object, i.e. the matrix size
+				      * is larger than the number of
+				      * degrees of freedom. Since
+				      * several matrix rows and
+				      * columns correspond to the same
+				      * degrees of freedom, you'd
+				      * generate several constraint
+				      * objects, then shift them, and
+				      * finally @p{merge} them
+				      * together again.
+				      */
+    void shift (const unsigned int offset);
     
 				     /**
 				      * Clear all entries of this matrix. Reset
