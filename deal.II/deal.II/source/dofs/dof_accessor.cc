@@ -523,6 +523,7 @@ template class DoFQuadAccessor<2,CellAccessor<2> >;
 template class DoFCellAccessor<2>;
 
 template class TriaRawIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
+template class TriaRawIterator<2,DoFQuadAccessor<2,QuadAccessor<2> > >;
 template class TriaRawIterator<2,DoFCellAccessor<2> >;
 template class TriaIterator<2,DoFLineAccessor<2,LineAccessor<2> > >;
 template class TriaIterator<2,DoFCellAccessor<2> >;
