@@ -79,7 +79,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit (const unsigned int r,
 				   // set new sizes
   rows = r;
   columns = c;
-  sub_objects.resize (rows, std::vector<SmartPointer<SparsityPatternBase> > (columns));
+  sub_objects.reinit (rows, columns);
 
 				   // allocate new objects
   for (unsigned int i=0; i<rows; ++i)

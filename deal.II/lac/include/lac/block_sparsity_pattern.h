@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/table.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
@@ -357,7 +358,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Array of sparsity patterns.
 				      */
-    std::vector<std::vector<SmartPointer<SparsityPatternBase> > > sub_objects;
+    Table<2,SmartPointer<SparsityPatternBase> > sub_objects;
 
 				     /**
 				      * Object storing and managing

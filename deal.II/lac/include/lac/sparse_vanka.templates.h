@@ -487,8 +487,7 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 					 // Lagrange dofs of each
 					 // block access the different
 					 // dofs
-	std::vector<std::vector<unsigned int> >
-	  access_count (n_blocks, std::vector<unsigned int>(M.m(), 0));
+	Table<2,unsigned int> access_count (n_blocks, M.m());
 	
 					 // set-up the map that will
 					 // be used to store the

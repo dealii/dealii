@@ -107,8 +107,7 @@ reinit (const BlockSparsityPattern &sparsity)
   sparsity_pattern = &sparsity;
   rows = sparsity.n_block_rows();
   columns = sparsity.n_block_cols();
-  sub_objects = std::vector<std::vector<SmartPointer<SparseMatrix<number> > > >
-		(rows, std::vector<SmartPointer<SparseMatrix<number> > > (columns, 0));
+  sub_objects.reinit (rows, columns);
 
 				   // and reinitialize the blocks
   for (unsigned int r=0; r<rows; ++r)
