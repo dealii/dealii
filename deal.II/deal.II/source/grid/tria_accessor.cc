@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2168,42 +2168,44 @@ neighbor_child_on_subface (const unsigned int face,
 template <>
 TriaIterator<3,CellAccessor<3> >
 CellAccessor<3>::
-neighbor_child_on_subface (const unsigned int face,
-                           const unsigned int subface) const
+neighbor_child_on_subface (const unsigned int face_no,
+                           const unsigned int subface_no) const
 {
   Assert (!this->has_children(),
           ExcMessage ("The present cell must not have children!"));
-  Assert (!this->at_boundary(face),
+  Assert (!this->at_boundary(face_no),
           ExcMessage ("The present cell must have a valid neighbor!"));
-  Assert (this->neighbor(face)->level() == this->level(),
+  const TriaIterator<3,CellAccessor<3> > neighbor=this->neighbor(face_no);
+  Assert (neighbor->level() == this->level(),
           ExcMessage ("The neighbor must be on the same level as this cell!"));
-  Assert (this->neighbor(face)->has_children() == true,
+  Assert (this->neighbor(face_no)->has_children() == true,
           ExcMessage ("The neighbor must have children!"));
-  
-  static const unsigned int subface_translation[4]
-    = { 0, 3, 2, 1 };
-                                   // see whether face and
-                                   // the neighbor's
-                                   // counterface share the
-                                   // same indexing of
-                                   // children. if not so,
-                                   // translate child
-                                   // indices
-  const unsigned int neighbor_neighbor
-    = this->neighbor_of_neighbor (face);
-  const bool face_orientations_match
-    = (this->neighbor(face)->face_orientation(neighbor_neighbor) ==
-       this->face_orientation(face));
-  const unsigned int neighbor_child_index
-    = (GeometryInfo<3>::
-       child_cell_on_face(neighbor_neighbor,
-                          (face_orientations_match ?
-                           subface :
-                           subface_translation[subface])));
-  TriaIterator<3,CellAccessor<3> > neighbor_child=
-    this->neighbor(face)->child(neighbor_child_index);
 
-  Assert(this->face(face)->child(subface)==
+  const unsigned int neighbor_neighbor
+    = this->neighbor_of_neighbor (face_no);
+  const bool face_orientations_match
+    = (neighbor->face_orientation(neighbor_neighbor) == this->face_orientation(face_no));
+  unsigned int neighbor_child_index=0;
+  if (face_orientations_match)
+    neighbor_child_index=GeometryInfo<3>::child_cell_on_face(
+      neighbor_neighbor, subface_no);
+  else
+    {
+				   // face and neighbor's face do not
+				   // share same indexing of children:
+				   // search the specific child among
+				   // all children
+      const TriaIterator<3,TriaObjectAccessor<2, 3> > subface=
+	this->face(face_no)->child(subface_no);
+      for (; neighbor_child_index<GeometryInfo<3>::children_per_cell; ++neighbor_child_index)
+	if (neighbor->child(neighbor_child_index)->face(neighbor_neighbor)==subface)
+	  break;
+    }
+  
+  TriaIterator<3,CellAccessor<3> > neighbor_child=
+    neighbor->child(neighbor_child_index);
+
+  Assert(this->face(face_no)->child(subface_no)==
 	 neighbor_child->face(neighbor_neighbor), ExcInternalError());
   
   return neighbor_child;
