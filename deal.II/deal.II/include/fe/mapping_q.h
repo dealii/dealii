@@ -225,7 +225,7 @@ class MappingQ : public MappingQ1<dim>
 				      * functions located on bounding
 				      * lines to the vector
 				      * @p{a}. Points located on the
-				      * line but on vertices are not
+				      * line but not on vertices are not
 				      * included.
 				      *
 				      * Needed by the
@@ -252,13 +252,14 @@ class MappingQ : public MappingQ1<dim>
 				      * functions located on bounding
 				      * faces (quads in 3d) to the
 				      * vector @p{a}. Points located
-				      * on the line but on vertices
+				      * on the quad but not on vertices
 				      * are not included.
 				      *
 				      * Needed by the
 				      * @p{compute_support_points_laplace}
-				      * function. For @p{dim=1} and 2
-				      * this function is empty.
+				      * function. For @p{dim=1} and
+				      * @p{dim=2} this function is
+				      * empty.
 				      *
 				      * This function is made virtual
 				      * in order to allow derived
