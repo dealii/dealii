@@ -809,7 +809,7 @@ namespace Functions
 					* only.
 					*/
       CutOffFunctionBase (const double radius = 1.,
-			  Point<dim> = Point<dim>(),
+			  const Point<dim> = Point<dim>(),
 			  const unsigned int n_components = 1,
 			  const unsigned int select = no_component);
       

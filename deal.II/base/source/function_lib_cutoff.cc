@@ -46,12 +46,12 @@ namespace Functions
   CutOffFunctionBase<dim>::CutOffFunctionBase (const double r,
 					       const Point<dim> p,
 					       const unsigned int n_components,
-					       unsigned int select)
+					       const unsigned int select)
 		  :
 		  Function<dim> (n_components),
-    center(p),
-    radius(r),
-    selected(select)
+                  center(p),
+                  radius(r),
+                  selected(select)
   {}
 
 
