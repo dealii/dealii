@@ -61,6 +61,20 @@ class dVector;
    sum up the contributions of the faces (which are the integrated
    square of the jumps) of each cell and take the square root.
 
+   We store the contribution of each face in a #map#, as provided by the
+   C++ standard library, with the iterator pointing to that face being the
+   key into the map. In fact, we do not store the indicator per face, but
+   only the integral listed above. When looping the second time over all
+   cells, we have to sum up the contributions of the faces, multiply them
+   with $\frac h{24}$ and take the square root. By doing the multiplication
+   with $h$ in the second loop, we avoid problems to decide with which $h$
+   to multiply, that of the cell on the one or that of the cell on the other
+   side of the face.
+
+   $h$ is taken to be the greatest length of the diagonals of the cell. For
+   more or less uniform cells without deformed angles, this coincides with
+   the diameter of the cell.
+   
 
    {\bf Boundary values}
    
@@ -201,7 +215,23 @@ class KellyErrorEstimator {
 					     FaceIntegrals       &face_integrals,
 					     const dVector       &solution);
 
-    static void integrate_over_irregular_face ();
+				     /**
+				      * The same applies as for the function
+				      * above, except that integration is
+				      * over face #face_no# of #cell#, where
+				      * the respective neighbor is refined,
+				      * so that the integration is a bit more
+				      * complex.
+				      */
+    static void integrate_over_irregular_face (const active_cell_iterator &cell,
+					       const unsigned int   face_no,
+					       const FiniteElement<dim> &fe,
+					       const Boundary<dim>      &boundary,
+					       const unsigned int    n_q_points,
+					       FEFaceValues<dim>    &fe_face_values,
+					       FESubfaceValues<dim> &fe_subface_values,
+					       FaceIntegrals        &face_integrals,
+					       const dVector        &solution);
 };
 
 

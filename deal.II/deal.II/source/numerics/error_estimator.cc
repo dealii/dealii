@@ -9,6 +9,7 @@
 #include <grid/dof.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
+#include <grid/geometry_info.h>
 #include <lac/dvector.h>
 
 #include <numeric>
@@ -80,12 +81,15 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
   FEFaceValues<dim> fe_face_values_neighbor (fe, quadrature,
 					     UpdateFlags(update_gradients |
 							 update_jacobians));
-
+  FESubfaceValues<dim> fe_subface_values (fe, quadrature,
+					  UpdateFlags(update_gradients |
+						      update_jacobians));
+  
 				   // loop over all cells
   const active_cell_iterator endc = dof.end();
   for (active_cell_iterator cell = dof.begin_active(); cell!=endc; ++cell)
 				     // loop over all faces of this cell
-    for (unsigned int face_no=0; face_no<2*dim; ++face_no)
+    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
       {
 					 // if we already visited this
 					 // face: do nothing
@@ -139,7 +143,11 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 					   // special computations which do
 					   // not fit into the framework of
 					   // the above function
-	  integrate_over_irregular_face ();
+	  integrate_over_irregular_face (cell, face_no, fe, boundary,
+					 n_q_points,
+					 fe_face_values_cell,
+					 fe_subface_values,
+					 face_integrals, solution);
       };
 
 
@@ -154,12 +162,13 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
   for (active_cell_iterator cell=dof.begin_active(); cell!=endc; ++cell, ++present_cell)
     {
 				       // loop over all faces of this cell
-      for (unsigned int face_no=0; face_no<2*dim; ++face_no) 
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no) 
 	{
 	  Assert (face_integrals.find(cell->face(face_no)) !=
 		  face_integrals.end(),
 		  ExcInternalError());
-	  error(present_cell) += face_integrals[cell->face(face_no)];
+	  error(present_cell) += (face_integrals[cell->face(face_no)] *
+				  cell->diameter() / 24);
 	};
 	   
       error(present_cell) = sqrt(error(present_cell));
@@ -198,7 +207,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 			     FEFaceValues<dim>          &fe_face_values_neighbor,
 			     FaceIntegrals              &face_integrals,
 			     const dVector              &solution) {
-  DoFHandler<dim>::face_iterator face = cell->face(face_no);
+  const DoFHandler<dim>::face_iterator face = cell->face(face_no);
   
 				   // initialize data of the restriction
 				   // of this cell to the present face
@@ -230,18 +239,19 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 				       // find which number the current
 				       // face has relative to the neighboring
 				       // cell
-      for (neighbor_neighbor=0; neighbor_neighbor<2*dim; ++neighbor_neighbor)
+      for (neighbor_neighbor=0; neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
+	   ++neighbor_neighbor)
 	if (neighbor->neighbor(neighbor_neighbor) == cell)
 	  break;
       
-      Assert (neighbor_neighbor<dim*2, ExcInternalError());
+      Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       
 				       // get restriction of finite element
 				       // function of #neighbor# to the
 				       // common face.
       fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
 				      fe, boundary);
-      
+
 				       // get a list of the gradients of
 				       // the finite element solution
 				       // restricted to the neighbor cell
@@ -321,19 +331,144 @@ integrate_over_regular_face (const active_cell_iterator &cell,
   
 				   // perform integration by multiplication
 				   // with weights and summation.
-  face_integrals[face] = (inner_product (phi.begin(), phi.end(),
-					 fe_face_values_cell.get_JxW_values().begin(),
-					 0.0) *
-			  cell->diameter() / 24);
+  face_integrals[face] = inner_product (phi.begin(), phi.end(),
+					fe_face_values_cell.get_JxW_values().begin(),
+					0.0);
 };
 
 
 
 
+void KellyErrorEstimator<1>::
+integrate_over_irregular_face (const active_cell_iterator &,
+			       const unsigned int          ,
+			       const FiniteElement<1>     &,
+			       const Boundary<1>          &,
+			       const unsigned int          ,
+			       FEFaceValues<1>            &,
+			       FESubfaceValues<1>         &,
+			       FaceIntegrals              &,
+			       const dVector              &) {
+  Assert (false, ExcInternalError());
+};
+
+
+
 template <int dim>
 void KellyErrorEstimator<dim>::
-integrate_over_irregular_face () {
-  Assert (false, ExcInternalError());
+integrate_over_irregular_face (const active_cell_iterator &cell,
+			       const unsigned int          face_no,
+			       const FiniteElement<dim>   &fe,
+			       const Boundary<dim>        &boundary,
+			       const unsigned int          n_q_points,
+			       FEFaceValues<dim>          &fe_face_values,
+			       FESubfaceValues<dim>       &fe_subface_values,
+			       FaceIntegrals              &face_integrals,
+			       const dVector              &solution) {
+  const DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
+  Assert (neighbor.state() == valid, ExcInternalError());
+  Assert (neighbor->has_children(), ExcInternalError());
+  Assert (neighbor->child(0)->has_children()==false,
+	  ExcInternalError());
+				   // set up a vector of the gradients
+				   // of the finite element function
+				   // on this cell at the quadrature
+				   // points
+				   //
+				   // let psi be a short name for
+				   // [grad u_h]
+  vector<Point<dim> > psi(n_q_points);
+
+				   // store which number #cell# has in the
+				   // list of neighbors of #neighbor#
+  unsigned int neighbor_neighbor;
+  for (neighbor_neighbor=0; neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
+       ++neighbor_neighbor)
+    if (neighbor->neighbor(neighbor_neighbor) == cell)
+      break;
+  Assert (neighbor_neighbor<GeometryInfo<dim>::faces_per_cell, ExcInternalError());
+  
+				   // loop over all subfaces
+  for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face;
+       ++subface_no)
+    {
+				       // get an iterator pointing to the
+				       // cell behind the present subface
+      const active_cell_iterator neighbor_child
+	= neighbor->child(GeometryInfo<dim>::
+			  child_cell_on_face(neighbor_neighbor,subface_no));
+      Assert (neighbor_child->face(neighbor_neighbor) ==
+	      cell->face(face_no)->child(subface_no),
+	      ExcInternalError());
+            
+				       // restrict the finite element on the
+				       // present cell to the subface and
+				       // store the gradient of the solution
+				       // in psi
+      fe_subface_values.reinit (cell, face_no, subface_no,
+				fe, boundary);
+      fe_subface_values.get_function_grads (solution, psi);
+
+				       // restrict the finite element on the
+				       // neighbor cell to the common #subface#.
+				       // store the gradient in #neighbor_psi#
+      vector<Point<dim> > neighbor_psi (n_q_points);
+      fe_face_values.reinit (neighbor_child, neighbor_neighbor,
+			     fe, boundary);
+      fe_face_values.get_function_grads (solution, neighbor_psi);
+      
+				       // compute the jump in the gradients
+      transform (psi.begin(), psi.end(),
+		 neighbor_psi.begin(),
+		 psi.begin(),
+		 minus<Point<dim> >());
+
+      				   // next we have to multiply this with
+				   // the normal vector. Since we have
+				   // taken the difference of gradients
+				   // for internal faces, we may chose
+				   // the normal vector of one cell,
+				   // taking that of the neighbor
+				   // would only change the sign. We take
+				   // the outward normal.
+				   //
+				   // let phi be the name of the integrand
+      vector<double> phi(n_q_points,0);
+      const vector<Point<dim> > &normal_vectors(fe_face_values.
+						get_normal_vectors());
+  
+      for (unsigned int point=0; point<n_q_points; ++point)
+	phi[point] = psi[point]*normal_vectors[point];
+				       // take the square of the phi[i]
+				       // for integration
+      transform (phi.begin(), phi.end(),
+		 phi.begin(), ptr_fun(sqr));
+
+				       // perform integration by multiplication
+				       // with weights and summation.
+      face_integrals[neighbor_child->face(neighbor_neighbor)]
+	= inner_product (phi.begin(), phi.end(),
+			 fe_face_values.get_JxW_values().
+			 begin(),
+			 0.0);
+    };
+
+  
+  				   // finally loop over all subfaces to
+				   // collect the contributions of the
+				   // subfaces and store them with the
+				   // mother face
+  double sum=0;
+  DoFHandler<dim>::face_iterator face = cell->face(face_no);
+  for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face;
+       ++subface_no) 
+    {
+      Assert (face_integrals.find(face->child(subface_no)) !=
+	      face_integrals.end(),
+	      ExcInternalError());
+      sum += face_integrals[face->child(subface_no)];
+    };
+  face_integrals[face] = sum;
 };
 
 
