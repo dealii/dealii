@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,8 +38,8 @@ template <int dim> class MappingQ;
  *        /|       |       /       /|
  *       / |       |      /       / |
  *      /  |       |     /       /  |
- *     2   |       |    2-------3   |
- *     |   4-------5    |       |   5
+ *     4   |       |    4-------5   |
+ *     |   2-------3    |       |   3
  *     |  /       /     |       |  /
  *     | /       /      |       | /
  *     |/       /       |       |/
@@ -47,17 +47,18 @@ template <int dim> class MappingQ;
  *  @endverbatim
  * and <tt>FE_DGQ(2)</tt>:
  *  @verbatim
- *        24--25---26       24---25--26
+ *         24--25--26       24--25--26
  *        /|       |       /       /|
- *      15 |       |     15  16   17|
- *      /  21 22   23    /       /  23
- *     6   |       |    6---7---8   |
- *     |  18--19---20   |       |   20
- *     3  /       /     3   4   5  /
- *     | 9  10   11     |       | 11
+ *      21 |       |     21  22  23 |
+ *      /  15  16  17    /       /  17
+ *    18   |       |   18--19--20   |
+ *     |12 6---7---8    |       |14 8
+ *     9  /       /     9  10  11  /
+ *     | 3   4   5      |       | 5
  *     |/       /       |       |/
  *     0---1---2        0---1---2
  *  @endverbatim
+ * with node 13 being placed in the interior of the hex.
  *
  * Note, however, that these are just the Lagrange interpolation
  * points of the shape functions. Even though they may physically be
