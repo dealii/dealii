@@ -4,7 +4,7 @@ D=../..
 
 cc-files = $(wildcard *.cc)
 o-files  = $(addprefix ../lib/o/, $(cc-files:.cc=.o))
-go-files = $(addprefix ../lib/o/, $(cc-files:.cc=.go))
+go-files = $(addprefix ../lib/go/, $(cc-files:.cc=.go))
 h-files  = $(wildcard ../include/*/*.h)
 
 forward-declarations = $D/lac/include/lac/forward-declarations.h
@@ -12,7 +12,7 @@ forward-declarations = $D/lac/include/lac/forward-declarations.h
 include $D/deal.II/Make.global_options
 
 
-../lib/o/%.go :
+../lib/go/%.go :
 	@echo ============================ Compiling with debugging information:   $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ../lib/o/%.o :
@@ -53,7 +53,7 @@ clean:
 ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/liblac $(INCLUDE) $(cc-files)               \
-		| perl -p -e 's!^.*\((.*)\):!../lib/o/$$1:!g;' \
+		| perl -p -e 's!^.*\((.*\.(g?o))\):!../lib/$$2/$$1:!g;' \
 		> ../lib/Makefile.dep
 else
 	@echo ============================ Not remaking Makefile since in nested mode
