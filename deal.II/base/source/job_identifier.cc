@@ -15,7 +15,7 @@
 #include <base/job_identifier.h>
 #include <ctime>
 
-#if HAVE_UNISTD_H
+#if HAVE_GET_HOSTNAME
 # include <unistd.h>
 #endif
 
