@@ -21,7 +21,6 @@
 #include <base/function.h>
 #include <base/point.h>
 #include <base/function_time.h>
-#include <base/forward_declarations.h>
 
 
 /**

@@ -14,12 +14,14 @@
 #define __deal2__function_h
 
 
-#include <base/forward_declarations.h>
 #include <base/exceptions.h>
 #include <base/function_time.h>
 #include <base/subscriptor.h>
 #include <vector>
 
+template <int dim> class Point;
+template <int rank_, int dim> class Tensor;
+template<typename number> class Vector;
 
 /**
  * This class is a model for a general function. It serves the purpose

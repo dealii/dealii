@@ -14,13 +14,14 @@
 #define __deal2__data_out_base_h
 
 
-#include <base/forward_declarations.h>
 #include <base/point.h>
 #include <lac/full_matrix.h>
 #include <grid/geometry_info.h>
 #include <iostream>
 #include <vector>
 #include <string>
+
+class ParameterHandler;
 
 
 /**
