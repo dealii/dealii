@@ -14,10 +14,23 @@
 <h2>Changes between versions 3.1 and 3.1.1</h2>
 
 <ol>
+  <li> <p> 
+       Removed: The explicite instantiations of <code
+       class="class">SparseMatrix<long double></code> are removed as a
+       prerelease of gcc3.0 fails to compile it. Despite of this
+       SparseMatrix<long double></code> still can be used if the user
+       includes <code>lac/include/lac/sparse_matrix.templates.h</code>
+       into his source file and uses a different compiler, e.g. gcc
+       2.95.2 or a future version of gcc3.0 (that will then hopefully
+       fixed).
+       <br>
+       (RH 2001/03/14)
+       </p>
+
   <li> <p>
-       We now unconditionally include
+       Changed: We now unconditionally include
        <code>deal.II/include/grid/tria_accessor.templates.h</code>
-       (which containts some inline functions for triangulation
+       (which contains some inline functions for triangulation
        accessor classes) into 
        <code>deal.II/include/grid/tria_accessor.h</code> to work
        around a problem with gcc3.0 which does not place a copy of
@@ -28,7 +41,7 @@
        </p>
 
   <li> <p>
-       The class <code class="class">GridReordering::Cell</code> has
+       New: The class <code class="class">GridReordering::Cell</code> has
        now a copy constructor to work around a bug in a gcc3.0
        snapshot.
        <br>
