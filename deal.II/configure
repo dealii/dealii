@@ -2639,6 +2639,11 @@ echo "${ECHO_T}C++ compiler is gcc-3.1" >&6
 echo "${ECHO_T}C++ compiler is gcc-3.2" >&6
   	GXX_VERSION=gcc3.2
   	;;
+      *3.3*)
+  	echo "$as_me:$LINENO: result: C++ compiler is gcc-3.3" >&5
+echo "${ECHO_T}C++ compiler is gcc-3.3" >&6
+  	GXX_VERSION=gcc3.3
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	  	  	echo "$as_me:$LINENO: result: C++ compiler is $GXX_VERSION_STRING" >&5
 echo "${ECHO_T}C++ compiler is $GXX_VERSION_STRING" >&6
@@ -2922,8 +2927,8 @@ rm -f conftest.$ac_objext conftest.$ac_ext
 	  ;;
 
       hp_aCC)
-	  	            CXXFLAGSG="$CXXFLAGS -g1 +p +w -z -Aa -AA"
-          CXXFLAGSO="$CXXFLAGS -z +O2 -Aa -AA"
+	  	            CXXFLAGSG="$CXXFLAGS -g1"
+          CXXFLAGSO="$CXXFLAGS -z +O2"
           CXXFLAGSPIC="+Z"
 	  # for linking shared libs, -b is also necessary...
           ;;
@@ -5853,8 +5858,13 @@ echo "${ECHO_T}F77 compiler is gcc-3.1" >&6
 echo "${ECHO_T}F77 compiler is gcc-3.2" >&6
   	  F77_VERSION=gcc3.2
   	  ;;
+        *3.3*)
+  	  echo "$as_me:$LINENO: result: F77 compiler is gcc-3.3" >&5
+echo "${ECHO_T}F77 compiler is gcc-3.3" >&6
+  	  F77_VERSION=gcc3.3
+  	  ;;
         *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-  	    	    	  echo "$as_me:$LINENO: result: F77 compiler is $G77_VERSION_STRING" >&5
+  	    	  	  	  	    	  echo "$as_me:$LINENO: result: F77 compiler is $G77_VERSION_STRING" >&5
 echo "${ECHO_T}F77 compiler is $G77_VERSION_STRING" >&6
   	  { { echo "$as_me:$LINENO: error: F77 compiler is not supported" >&5
 echo "$as_me: error: F77 compiler is not supported" >&2;}
@@ -5908,7 +5918,7 @@ echo "${ECHO_T}F77 compiler is unkown. no flags set!" >&6
 
 
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.0 | gcc3.1 | gcc3.2)
+    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc3.0123)
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
 
