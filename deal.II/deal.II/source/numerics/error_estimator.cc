@@ -319,6 +319,17 @@ integrate_over_regular_face (const active_cell_iterator &cell,
   for (unsigned int point=0; point<n_q_points; ++point)
     phi[point] = psi[point]*normal_vectors[point];
 
+				   // if a coefficient was given: use that
+				   // to scale the jump in the gradient
+  if (coefficient != 0)
+    {
+      vector<double>      coefficient_values (n_q_points);
+      coefficient->value_list (fe_face_values_cell.get_quadrature_points(),
+			       coefficient_values);
+      for (unsigned int point=0; point<n_q_points; ++point)
+	phi[point] *= coefficient_values[point];
+    };
+      
   
   if (face->at_boundary() == true)
 				     // neumann boundary face. compute
@@ -341,17 +352,6 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 	phi[point] -= g[point];
     };
   
-				   // if a coefficient was given: use that
-				   // to scale the jump in the gradient
-  if (coefficient != 0)
-    {
-      vector<double>      coefficient_values (n_q_points);
-      coefficient->value_list (fe_face_values_cell.get_quadrature_points(),
-			       coefficient_values);
-      for (unsigned int point=0; point<n_q_points; ++point)
-	phi[point] *= coefficient_values[point];
-    };
-      
   
 				   // now phi contains the following:
 				   // - for an internal face, phi=[a du/dn]
