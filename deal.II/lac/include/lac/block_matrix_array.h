@@ -444,6 +444,8 @@ class BlockTrianglePrecondition : private BlockMatrixArray<MATRIX>
 };
 
 /*@}*/
+
+///@if NoDoc
 //----------------------------------------------------------------------//
 
 template <class MATRIX>
@@ -804,5 +806,6 @@ BlockTrianglePrecondition<MATRIX>::Tvmult_add (
   Assert (false, ExcNotImplemented());
 }
 
+///@endif
 
 #endif
