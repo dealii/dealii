@@ -158,12 +158,7 @@ protected:
 };
 
 
-
-
-
-
-
-
+/*-------------------------Inline functions -------------------------------*/
 
 
 inline unsigned int iVector::n() const

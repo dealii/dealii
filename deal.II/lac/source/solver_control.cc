@@ -29,8 +29,18 @@ SolverControl::check (const unsigned int step,
   
   lstep  = step;
   lvalue = check_value;
-  if (step>=maxsteps) return failure;
-  if (check_value <= tol) return success;
+  if (step>=maxsteps)
+    {
+      deallog << "Failure step " << step
+	      << " value " << check_value << endl;
+      return failure;
+    }
+  if (check_value <= tol)
+    {
+      deallog << "Convergence step " << step
+	      << " value " << check_value << endl;      
+      return success;
+    }
   return iterate;
 };
 

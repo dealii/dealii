@@ -12,18 +12,21 @@
  * Bicgstab algorithm by van der Vorst.
  */
 template<class Matrix, class Vector>
-class SolverBicgstab : public Solver<Matrix,Vector>
+class SolverBicgstab //<Matrix,Vector>
+  : public Solver<Matrix,Vector>
 {
-public:
-  SolverBicgstab(SolverControl &cn, VectorMemory<Vector> &mem) :
-		    Solver<Matrix,Vector>(cn,mem) {};
+  public:
+				     /**
+				      * Constructor.
+				      */
+    SolverBicgstab(SolverControl &cn, VectorMemory<Vector> &mem);
 
-				   /**
-				    * Solve primal problem only.
-				    */
-  virtual ReturnState solve (const Matrix &A,
-			     Vector       &x,
-			     const Vector &b);
+				     /**
+				      * Solve primal problem only.
+				      */
+    virtual ReturnState solve (const Matrix &A,
+			       Vector       &x,
+			       const Vector &b);
 
   protected:
 				     /**
@@ -31,44 +34,105 @@ public:
 				      */
     virtual double criterion();
 
-				   /**
-				    * Auxiliary vectors.
-				    */
-  Vector *Vx, *Vr, *Vrbar, *Vp, *Vy, *Vz, *Vs, *Vt, *Vv;
-  const Vector *Vb;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vx;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vr;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vrbar;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vp;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vy;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vz;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vs;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vt;
+				     /**
+				      * Auxiliary vector.
+				      */
+    Vector *Vv;
+				     /**
+				      * Right hand side vector.
+				      */
+    const Vector *Vb;
   
-				   /**
-				    * Pointer to the system matrix.
-				    */
-  const Matrix *MA;
+				     /**
+				      * Pointer to the system matrix.
+				      */
+    const Matrix *MA;
   
-				   /**
-				    * Auxiliary values.
-				    */
-  double alpha, beta, omega, rho, rhobar;
+				     /**
+				      * Auxiliary value.
+				      */
+    double alpha;
+				     /**
+				      * Auxiliary value.
+				      */
+    double beta;
+				     /**
+				      * Auxiliary value.
+				      */
+    double omega;
+				     /**
+				      * Auxiliary value.
+				      */
+    double rho;
+				     /**
+				      * Auxiliary value.
+				      */
+    double rhobar;
   
-				   /**
-				    * Current iteration step.
-				    */
-  unsigned step;
+				     /**
+				      * Current iteration step.
+				      */
+    unsigned int step;
   
-				   /**
-				    * Residual.
-				    */
-  double res;
+				     /**
+				      * Residual.
+				      */
+    double res;
   
-private:
-				   /**
-				    * Everything before the iteration loop.
-				    */
-  SolverControl::State start();
+  private:
+				     /**
+				      * Everything before the iteration loop.
+				      */
+    SolverControl::State start();
 
-				   /**
-				    * The iteration loop itself.
-				    */
-  ReturnState iterate();
+				     /**
+				      * The iteration loop itself.
+				      */
+    ReturnState iterate();
   
 };
+
+/*-------------------------Inline functions -------------------------------*/
+
+template<class Matrix, class Vector>
+SolverBicgstab<Matrix, Vector>::SolverBicgstab(SolverControl &cn,
+					       VectorMemory<Vector> &mem)
+		:
+		Solver<Matrix,Vector>(cn,mem)
+{}
+
 
 template<class Matrix, class Vector> double
 SolverBicgstab<Matrix, Vector>::criterion()
@@ -105,37 +169,38 @@ SolverBicgstab<Matrix, Vector>::iterate()
   Vector& v = *Vv;
   
   do
-  {
-    rhobar = r*rbar;
-    beta   = rhobar * alpha / (rho * omega);
-    rho    = rhobar;
-    p.sadd(beta, 1., r, -beta*omega, v);
-    MA->precondition(y,p);
-    MA->vmult(v,y);
-    rhobar = rbar * v;
+    {
+      rhobar = r*rbar;
+      beta   = rhobar * alpha / (rho * omega);
+      rho    = rhobar;
+      p.sadd(beta, 1., r, -beta*omega, v);
+      MA->precondition(y,p);
+      MA->vmult(v,y);
+      rhobar = rbar * v;
 
-    if (fabs(rhobar) < 1.e-19) return ReturnState(breakdown);
+      if (fabs(rhobar) < 1.e-19) return ReturnState(breakdown);
     
-    alpha = rho/rhobar;
-    s.equ(1., r, -alpha, v);
-    MA->precondition(z,s);
-    MA->vmult(t,z);
-    rhobar = t*s;
-    omega = rhobar/(t*t);
-    Vx->add(alpha, y, omega, z);
-    r.equ(1., s, -omega, t);
+      alpha = rho/rhobar;
+      s.equ(1., r, -alpha, v);
+      MA->precondition(z,s);
+      MA->vmult(t,z);
+      rhobar = t*s;
+      omega = rhobar/(t*t);
+      Vx->add(alpha, y, omega, z);
+      r.equ(1., s, -omega, t);
 
-    state = control().check(++step, criterion());
-  }
+      state = control().check(++step, criterion());
+    }
   while (state == SolverControl::iterate);
   if (state == SolverControl::success) return success;
   return exceeded;
 }
 
+
 template<class Matrix, class Vector> Solver<Matrix,Vector>::ReturnState
 SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
-		      Vector       &x,
-		      const Vector &b)
+				      Vector       &x,
+				      const Vector &b)
 {
   deallog.push("Bicgstab");
   Vr    = memory.alloc(); Vr->reinit(x);
@@ -156,11 +221,11 @@ SolverBicgstab<Matrix, Vector>::solve(const Matrix &A,
   ReturnState state;
   
   do 
-  {
-    deallog << "Go!" << endl;
-    if (start() == SolverControl::success) break;  
-    state = iterate();
-  }
+    {
+      deallog << "Go!" << endl;
+      if (start() == SolverControl::success) break;  
+      state = iterate();
+    }
   while (state == breakdown);
 
   memory.free(Vr);
