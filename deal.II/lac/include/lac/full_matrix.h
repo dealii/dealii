@@ -110,30 +110,6 @@ class FullMatrix : public vector2d<number>
     bool operator == (const FullMatrix<number> &) const;
 
 				     /**
-				      * Assignment operator.
-				      * Copy all elements of @p{src}
-				      * into the matrix. The size is
-				      * adjusted if needed.
-				      *
-				      * We can't use the other, templatized
-				      * version since if we don't declare
-				      * this one, the compiler will happily
-				      * generate a predefined copy
-				      * operator which is not what we want.
-				      */
-//    FullMatrix<number>& operator = (const FullMatrix<number>& src);
-
-				     /**
-				      * Assignment operator.
-				      * Copy all elements of @p{src}
-				      * into the matrix. The size is
-				      * adjusted if needed.
-				      */
-//    template<typename number2>
-//    FullMatrix<number>& operator = (const FullMatrix<number2>& src);
-
-
-				     /**
 				      * Fill rectangular block.
 				      *
 				      * The matrix @p{src} is copied
@@ -157,10 +133,11 @@ class FullMatrix : public vector2d<number>
 				      * Make function of base class available.
 				      */
     template<typename number2>
-      void fill (const number2*);
+    void fill (const number2*);
     
 				     /**
-				      * Fill with permutation of another matrix.
+				      * Fill with permutation of
+				      * another matrix.
 				      *
 				      * The matrix @p{src} is copied
 				      * into the target. The two
@@ -177,34 +154,9 @@ class FullMatrix : public vector2d<number>
 				      * columns by this method.
 				      */
     template<typename number2>
-    void fill_permutation (const FullMatrix<number2> &src,
-	       const std::vector<unsigned int>& p_rows,
-	       const std::vector<unsigned int>& p_cols);
-
-				     /**
-				      * Set dimension to $m\times n$ and
-				      * allocate memory if necessary. Forget
-				      * the previous content of the matrix.
-				      */
-//    void reinit (const unsigned int m,
-//		 const unsigned int n);
-    
-				     /**
-				      * Set dimension to $n\times n$ and
-				      * allocate memory if necessary. Forget
-				      * the previous content of the matrix.
-				      */
-//    void reinit (const unsigned int n);
-    
-				     /**
-				      * Set dimension to $m(B)\times n(B)$ and
-				      * allocate memory if necessary. Forget
-				      * the previous content of the matrix.
-				      * However, this function does not copy
-				      * the contents of @p{B}.
-				      */
-//    template<typename number2>
-//    void reinit (const FullMatrix<number2> &B);
+    void fill_permutation (const FullMatrix<number2>       &src,
+			   const std::vector<unsigned int> &p_rows,
+			   const std::vector<unsigned int> &p_cols);
     
 				     /**
 				      * Number of rows of this matrix.
@@ -221,11 +173,13 @@ class FullMatrix : public vector2d<number>
     unsigned int n () const;
 
     				     /**
-				      * Return whether the matrix contains only
-				      * elements with value zero. This function
-				      * is mainly for internal consistency
-				      * checks and should seldomly be used when
-				      * not in debug mode since it uses quite
+				      * Return whether the matrix
+				      * contains only elements with
+				      * value zero. This function is
+				      * mainly for internal
+				      * consistency checks and should
+				      * seldomly be used when not in
+				      * debug mode since it uses quite
 				      * some time.
 				      */
     bool all_zero () const;
