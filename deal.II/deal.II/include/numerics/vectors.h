@@ -163,6 +163,13 @@ enum NormType {
  *   evaluated at points which are not on the boundary and you should make
  *   sure that the returned values are reasonable in some sense anyway.
  *
+ *   In 1d the situation is a bit different since there faces (i.e. vertices) have
+ *   no boundary indicator. It is assumed that if the boundary indicator zero
+ *   is given in the list of boundary functions, the left boundary point is to be
+ *   interpolated while the right boundary point is associated with the boundary
+ *   index 1 in the map. The respective boundary functions are then evaluated at
+ *   the place of the respective boundary point.
+ *
  * \item Projection of boundary values:
  *   The #project_boundary_values# function acts similar to the
  *   #interpolate_boundary_values# function, apart from the fact that it does
@@ -266,9 +273,6 @@ class VectorTools //<dim>
 				      * Data type for vector valued boundary function map.
 				      */
     typedef map<unsigned char,const VectorFunction<dim>*> VectorFunctionMap;
-
-//    typedef map<pair<unsigned char, unsigned int> ,const Function<dim>*>
-//    VectorFunctionMap;
     
 				     /**
 				      * Compute the interpolation of
@@ -361,7 +365,7 @@ class VectorTools //<dim>
 				      * #boundary_values# contained values
 				      * before, the new ones are added, or
 				      * the old one overwritten if a node
-				      * of the boundary part to be prjected
+				      * of the boundary part to be projected
 				      * on already was in the variable.
 				      *
 				      * See the general doc for more
