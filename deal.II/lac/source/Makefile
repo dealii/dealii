@@ -8,8 +8,12 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects $(INCLUDE)
 
 ifeq ($(shell uname),SunOS)
-CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
-CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
+#CXXFLAGS  := -V2.7.2.3 $(CXXFLAGS)
+#CXXFLAGS.g:= -V2.7.2.3 $(CXXFLAGS.g)
+INCLUDE2.8  =  -I/usr/local/source/libstdc++-2.8.0/libstdc++ \
+               -I/usr/local/source/libstdc++-2.8.0/libio
+CXXFLAGS  := $(CXXFLAGS) -fno-rtti -fno-exceptions $(INCLUDE2.8)
+CXXFLAGS.g:= $(CXXFLAGS.g) -W -fno-rtti -fno-exceptions $(INCLUDE2.8)
 endif
 
 
@@ -30,6 +34,7 @@ h-files  = $(wildcard ../include/*/*.h)
 
 
 lib: lib.g.a lib.a
+
 
 lib.a: ../lib/liblac.a($(o-files))
 

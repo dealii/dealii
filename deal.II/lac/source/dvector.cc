@@ -14,28 +14,28 @@ dVector::dVector() :
 {}
 
 
-dVector::dVector(int n)
+dVector::dVector(int n) :
+		dim(n),
+		maxdim(n),
+		val(0)
 {
   Assert (n>0, ExcInvalidNumber(n));
 
-  dim = n;
-  maxdim = n;
   if (n)
     {
       val = new double[maxdim];
       Assert (val != 0, ExcOutOfMemory());
       clear ();
     }
-  else
-    val = 0;
 }
 
 
-dVector::dVector(const dVector& v)
+dVector::dVector(const dVector& v) :
+		VectorBase(v),
+		dim(v.n()),
+		maxdim(v.n()),
+		val(0)
 {
-  dim = v.n();
-  maxdim = v.n();
-
   if (dim)
     {
       val = new double[maxdim];
@@ -43,8 +43,6 @@ dVector::dVector(const dVector& v)
       for (int i=0; i<dim; i++)
 	val[i] = v.val[i];
     }
-  else
-    val = 0;
 }
 
 

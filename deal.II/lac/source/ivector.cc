@@ -8,27 +8,32 @@
 
 
 
-iVector::iVector()
+iVector::iVector() :
+		dim(1),
+		maxdim(1),
+		val(new int[1])
 {
-  dim=maxdim=1;
-  val = new int[1];
   Assert (val != 0, ExcOutOfMemory());
   clear ();
 }
 
-iVector::iVector(int n)
+
+iVector::iVector(int n) :
+		dim(n),
+		maxdim(n),
+		val(new int[n])
 {
   Assert (n>0, ExcInvalidNumber(n));
 
-  dim = n;
-  maxdim = n;
-  val = new int[maxdim];
   Assert (val != 0, ExcOutOfMemory());
   clear ();
 }
 
 
-iVector::iVector(const iVector& v)
+iVector::iVector(const iVector& v) :
+		dim(v.dim),
+		maxdim(v.maxdim),
+		val(0)
 {
   reinit(v.dim,1);
   int i;
@@ -43,7 +48,7 @@ void iVector::reinit(int n, int fast)
   Assert (n>0, ExcInvalidNumber(n));
   if (n>maxdim)
   {
-    delete[] val;
+    if (val != 0) delete[] val;
     val = new int[n];
     Assert (val != 0, ExcOutOfMemory());
     maxdim = n;

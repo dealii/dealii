@@ -9,7 +9,7 @@
 
 
 
-dFMatrix::dFMatrix (const dFMatrix &m)
+dFMatrix::dFMatrix (const dFMatrix &m) 
 {
   init (m.dim_image, m.dim_range);
   for (int i=0; i!=dim_image*dim_range; ++i)
@@ -941,7 +941,7 @@ void dFMatrix::invert (const dFMatrix &M) {
 			t01 = M.el(0,1)*M.el(2,0),
 			t04 = M.el(0,2)*M.el(2,0),
 			t07 = 1.0/(t4*M.el(2,2)-t6*M.el(2,1)-t8*M.el(2,2)+
-				   t00*M.el(2,1)+t01*M.el(1,2)-t04*M.el(1,1));
+ 				   t00*M.el(2,1)+t01*M.el(1,2)-t04*M.el(1,1));
 	    el(0,0) = (M.el(1,1)*M.el(2,2)-M.el(1,2)*M.el(2,1))*t07;
 	    el(0,1) = -(M.el(0,1)*M.el(2,2)-M.el(0,2)*M.el(2,1))*t07;
 	    el(0,2) = -(-M.el(0,1)*M.el(1,2)+M.el(0,2)*M.el(1,1))*t07;
