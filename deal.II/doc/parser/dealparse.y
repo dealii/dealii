@@ -21,10 +21,13 @@ void yyerror(const char* s)
 %}
 
 %token CLASS
+%token TYPEDEF
 %token ACCESS
 %token IDENTIFIER
 %token FARG
 %token CONST
+%token STATIC
+%token MUTABLE
 %token VIRTUAL
 %token ENUM
 %token FRIEND
@@ -39,10 +42,12 @@ void yyerror(const char* s)
 %token COMTEMP
 %token DECLEXCEPTION
 %token INLINE
+%token ENDOFDECL
 %%
 
 all:  declaration_list
   | declaration_list INLINE { return 0; }
+  | declaration_list ENDOFDECL { return 0; }
 ;
 
 declaration_list: declaration
@@ -50,12 +55,14 @@ declaration_list: declaration
   | declaration_list ';'
 ;
 
-declaration: class_declaration ';'
+declaration:
+  class_declaration ';'
   | function_declaration ';'
   | function_declaration '{' '}' ';'
   | function_declaration '{' '}'
   | variable_declaration ';'
   | enum_declaration ';'
+  | typedef_declaration ';'
   | template_declaration class_declaration ';'
     { cout << setw(OUTW) << "Template-Description:" << $1 << endl; }
   | template_declaration function_declaration ';'
@@ -67,12 +74,27 @@ variable_declaration:
   vartype identifier
     { cout << setw(OUTW) << "Variable-Declaration:" << $2 << endl
 	   << setw(OUTW) << "Type:" << $1 << endl
+	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl
 	   << setw(OUTW) << "Access:" << access_stack.top() << endl; }
   | vartype identifier array_dimensions
     { cout << setw(OUTW) << "Variable-Declaration:" << $2 << endl
 	   << setw(OUTW) << "Type:" << $1 << endl
+	   << setw(OUTW) << "In-Class:" << class_stack.top() << endl
 	   << setw(OUTW) << "Access:" << access_stack.top() << endl
 	   << setw(OUTW) << "Array-Dimension:" << $3 << endl; }
+  | variable_declaration '=' expression
+;
+
+typedef_declaration:
+    TYPEDEF vartype identifier
+      { cout << setw(OUTW) << "Typedef:" << $3 << endl
+	     << setw(OUTW) << "Type:" << $2 << endl
+	     << setw(OUTW) << "Access:" << access_stack.top() << endl; }
+    | TYPEDEF vartype identifier array_dimensions
+      { cout << setw(OUTW) << "Typedef:" << $3 << endl
+	     << setw(OUTW) << "Type:" << $2 << endl
+	     << setw(OUTW) << "Access:" << access_stack.top() << endl
+	     << setw(OUTW) << "Array-Dimension:" << $4 << endl; }
 ;
 
 array_dimensions:
@@ -108,9 +130,12 @@ function_name:
   identifier
   | '~' identifier { $$ = string("~") + $2; }
   | OPERATOR operator { $$ = string("operator") + $2; }
+  | OPERATOR vartype { $$ = string("operator") + $2; }
+  
 ;
 
 operator: OP
+  | operator '=' { $$ = $1 + string("="); }
   | '='
   | '&'
   | '*'
@@ -136,11 +161,13 @@ argument:
   | vartype identifier { $$ = $1 + SPC + $2; }
   | vartype identifier '=' default_arg
     { $$ = $1 + SPC + $2 + string(" = ") + $4; }
+  | CLASS IDENTIFIER { $$ = $1 + SPC + $2; }
+  | vartype '(' identifier ')' argument_declaration
+    { $$ = $1 + $2 + $3 + $4 + string(" (") + $5 + string(")"); }
 ;
 
 default_arg:
-    literal
-    | identifier
+  expression
 ;
 
 enum_declaration:
@@ -148,7 +175,8 @@ enum_declaration:
 ;
 
 enum_list: /* empty */
-    |  enum_list ',' enumerator
+    | enumerator
+    |  enum_list ',' enumerator { $$ = $1 + string("@") + $3; }
 ;
 
 enumerator: IDENTIFIER
@@ -210,6 +238,12 @@ member_declaration:
       cout << setw(OUTW) << "Virtual:" << "pure" << endl;
     }
   | ACCESS ':' { access_stack.top() = $1; }
+  | friend_declaration
+;
+
+friend_declaration:
+  FRIEND /* declaration { cout << setw(OUTW) << "Friend:" << endl; } */
+  | TEMPLATE '<' '>' FRIEND /*declaration { cout << setw(OUTW) << "Friend:" << endl; } */
 ;
 
 vartype:
@@ -219,6 +253,8 @@ vartype:
 /*  | vartype CONST { $$ = $1 +  string(" const"); } */
   | vartype '&' { $$ = $1 + string("&"); }
   | vartype '*' { $$ = $1 + string("*"); }
+  | STATIC vartype { $$ = string("static ") + $2; }
+  | MUTABLE vartype { $$ = string("mutable ") + $2; }
 ;
 
 virtualopt: VIRTUAL { $$ = string("virtual"); }
@@ -239,6 +275,7 @@ expression:
   | OP expression { $$ = $1 + $2; }
   | expression OP expression { $$ = $1 + $2 + $3; }
   | expression INT { $$ = $1 + $2; }
+  | identifier argument_declaration { $$ = $1 + $2; }
 ;
 
 literal:
@@ -260,6 +297,7 @@ template_arglist:
 template_arg:
   vartype
   | expression
+  | CLASS IDENTIFIER { $$ = $1 + SPC + $2; }
 ;
 
 template_declaration:
@@ -280,7 +318,7 @@ deal_exception_arg: identifier
 ;
 
 deal_exception_output_declaration: OP
-  | deal_exception_output_declaration IDENTIFIER
+  | deal_exception_output_declaration vartype
   | deal_exception_output_declaration literal
   | deal_exception_output_declaration OP
 ;

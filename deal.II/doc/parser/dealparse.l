@@ -22,12 +22,18 @@ INT   [+-]?[0-9]+
 WHITE [ \t\n\f\v]
 CLASS (class)|(struct)|(union)
 ACCESS (public)|(protected)|(private)
-OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)
+OP \+|\-|\/|\||\^|(==)|(!=)|(<<)|(>>)|(->)
 
 %%
 
+ /* Commentary template arguments for the parser */
 
 "//<"               { return COMTEMP; }
+
+ /* End of declaration section */
+
+\n?"/*"[-* ]*[Ii]nline.* { return ENDOFDECL; }
+
 
 \n?"/*"             { yy_push_state(COMMENT); }
 <COMMENT>.
@@ -49,7 +55,7 @@ DeclException[0-9]  { return(DECLEXCEPTION); }
 
  /* Ignore friend declarations so far */
 
-friend[^;]+; {}
+friend[^;]+; { return FRIEND; }
 
  /*** keywords ***/
 
@@ -57,9 +63,13 @@ const    { return CONST; }
 virtual  { return VIRTUAL; }
 operator { return OPERATOR; }
 unsigned { return UNSIGNED; }
+static   { return STATIC; }
+mutable  { return MUTABLE; }
 template { return TEMPLATE; }
 enum     { return ENUM; }
 friend   { return FRIEND; }
+typedef  { return TYPEDEF; }
+typename {}
 
 {CLASS}  { yylval = string(yytext); return CLASS; }
 {ACCESS} { yylval = string(yytext); return ACCESS; }
