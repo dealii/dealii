@@ -1,13 +1,8 @@
 # $Id$
 
-CXX       = c++
-INCLUDE   = -I../include -I../../base/include
-CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual \
-            $(INCLUDE)
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
-           -felide-constructors -fnonnull-objects \
-           $(INCLUDE)
+D=../..
+
+include $D/deal.II/Make.global_options
 
 cc-files = $(wildcard *.cc)
 o-files  = $(cc-files:.cc=.o)
@@ -16,12 +11,10 @@ h-files  = $(wildcard ../include/*/*.h)
 
 
 %.go : %.cc Makefile
-	@echo ============================ Compiling with debugging information:   $<
-	@echo $(CXX) ... -c $< -o $@
+	@echo ======== DEBUG =================== $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 %.o : %.cc Makefile
-	@echo ============================ Compiling with optimization:   $<
-	@echo $(CXX) ... -c $< -o $@
+	@echo ======== OPTIMIZE ================ $<
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
