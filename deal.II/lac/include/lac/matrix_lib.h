@@ -275,7 +275,7 @@ ProductMatrix<VECTOR>::ProductMatrix (
   const MATRIX1& mat1,
   const MATRIX2& mat2,
   VectorMemory<VECTOR>& m)
-  : mem(&m)
+  : mem(&m, typeid(*this).name())
 {
   m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1);
   m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2);

@@ -157,7 +157,7 @@ PointerMatrixBase<VECTOR>::~PointerMatrixBase ()
 template<class MATRIX, class VECTOR>
 PointerMatrix<MATRIX, VECTOR>::PointerMatrix (const MATRIX* M)
   :
-  m(M)
+  m(M, typeid(*this).name())
 {}
 
 template<class MATRIX, class VECTOR>

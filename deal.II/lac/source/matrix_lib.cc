@@ -27,8 +27,9 @@ ProductSparseMatrix<number, vnumber>::ProductSparseMatrix(
   const MatrixType& mat2,
   VectorMemory<VectorType>& mem)
 		:
-		m1(&mat1), m2(&mat2),
-		mem(&mem)
+		m1(&mat1, typeid(*this).name()),
+		m2(&mat2, typeid(*this).name()),
+		mem(&mem, typeid(*this).name())
 {
   Assert(mat1.n() == mat2.m(), ExcDimensionMismatch(mat1.n(),mat2.m()));
 }
