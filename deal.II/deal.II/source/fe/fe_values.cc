@@ -121,14 +121,16 @@ FEValuesBase<dim>::~FEValuesBase ()
 
 template <int dim>
 template <class InputVector, typename number>
-void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
-					     typename std::vector<number>    &values) const
+void FEValuesBase<dim>::get_function_values (const InputVector            &fe_function,
+					     typename std::vector<number> &values) const
 {
   Assert (update_flags & update_values, ExcAccessToUninitializedField());
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (values.size() == n_quadrature_points,
 	  ExcWrongVectorSize(values.size(), n_quadrature_points));
+  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -150,9 +152,10 @@ void FEValuesBase<dim>::get_function_values (const InputVector &fe_function,
 };
 
 
+
 template <int dim>
 template <class InputVector, typename number>
-void FEValuesBase<dim>::get_function_values (const InputVector       &fe_function,
+void FEValuesBase<dim>::get_function_values (const InputVector                     &fe_function,
 					     typename std::vector<Vector<number> > &values) const
 {
   Assert (n_quadrature_points == values.size(),
@@ -161,7 +164,9 @@ void FEValuesBase<dim>::get_function_values (const InputVector       &fe_functio
     Assert (values[i].size() == fe->n_components(),
 	    ExcWrongNoOfComponents());
   Assert (update_flags & update_values, ExcAccessToUninitializedField());
-
+  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
+    
 				   // get function values of dofs
 				   // on this cell
   Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
@@ -193,6 +198,7 @@ FEValuesBase<dim>::get_shape_values () const
 };
 
 
+
 template <int dim>
 const typename FEValuesData<dim>::GradientVector &
 FEValuesBase<dim>::get_shape_grads () const
@@ -200,6 +206,7 @@ FEValuesBase<dim>::get_shape_grads () const
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
   return shape_gradients;
 };
+
 
 
 
@@ -235,8 +242,10 @@ FEValuesBase<dim>::get_JxW_values () const
 
 template <int dim>
 template <class InputVector>
-void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
-					    typename std::vector<Tensor<1,dim> > &gradients) const
+void
+FEValuesBase<dim>::
+get_function_grads (const InputVector                    &fe_function,
+		    typename std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
 
@@ -244,6 +253,8 @@ void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 	  ExcWrongNoOfComponents());
   Assert (gradients.size() == n_quadrature_points,
 	  ExcWrongVectorSize(gradients.size(), n_quadrature_points));
+  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -271,8 +282,10 @@ void FEValuesBase<dim>::get_function_grads (const InputVector      &fe_function,
 
 template <int dim>
 template <class InputVector>
-void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_function,
-					    typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
+void
+FEValuesBase<dim>::
+get_function_grads (const InputVector                                           &fe_function,
+		    typename std::vector<typename std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (n_quadrature_points == gradients.size(),
 	  ExcWrongNoOfComponents());
@@ -280,6 +293,8 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
     Assert (gradients[i].size() == fe->n_components(),
 	    ExcWrongVectorSize(gradients[i].size(), fe->n_components()));
   Assert (update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -309,14 +324,18 @@ void FEValuesBase<dim>::get_function_grads (const InputVector               &fe_
 
 template <int dim>
 template <class InputVector>
-void FEValuesBase<dim>::get_function_2nd_derivatives (const InputVector      &fe_function,
-						      typename std::vector<Tensor<2,dim> > &second_derivatives) const
+void
+FEValuesBase<dim>::
+get_function_2nd_derivatives (const InputVector                    &fe_function,
+			      typename std::vector<Tensor<2,dim> > &second_derivatives) const
 {
   Assert (fe->n_components() == 1,
 	  ExcWrongNoOfComponents());
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcWrongVectorSize(second_derivatives.size(), n_quadrature_points));
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -346,7 +365,7 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_2nd_derivatives (const InputVector               &fe_function,
+get_function_2nd_derivatives (const InputVector                                           &fe_function,
 			      typename std::vector<typename std::vector<Tensor<2,dim> > > &second_derivs) const
 {
   Assert (n_quadrature_points == second_derivs.size(),
@@ -355,6 +374,8 @@ get_function_2nd_derivatives (const InputVector               &fe_function,
     Assert (second_derivs[i].size() == fe->n_components(),
 	    ExcWrongVectorSize(second_derivs[i].size(), fe->n_components()));
   Assert (update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (fe_function.size() == present_cell->get_dof_handler().n_dofs(),
+	  ExcWrongVectorSize(fe_function.size(), present_cell->get_dof_handler().n_dofs()));
 
 				   // get function values of dofs
 				   // on this cell
