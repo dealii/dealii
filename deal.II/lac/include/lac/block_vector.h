@@ -1334,7 +1334,7 @@ namespace BlockVectorIterators
 				     // that we run into a gcc bug where
 				     // it complains that we return a
 				     // reference to a temporary
-    const reference p = parent->block(current_block)(index_within_block);
+    reference p = parent->block(current_block)(index_within_block);
     return p;
   };
 
@@ -1350,7 +1350,7 @@ namespace BlockVectorIterators
 				     // that we run into a gcc bug where
 				     // it complains that we return a
 				     // reference to a temporary
-    const reference p = parent->block(current_block)(index_within_block);
+    reference p = parent->block(current_block)(index_within_block);
     return &p;
   };
   
@@ -1369,7 +1369,7 @@ namespace BlockVectorIterators
     if ((global_index+d >= next_break_backward) &&
 	(global_index+d <= next_break_forward))
       {
-	const reference p = parent->block(current_block)(index_within_block + d);
+	reference p = parent->block(current_block)(index_within_block + d);
 	return p;
       };
     
@@ -1381,7 +1381,7 @@ namespace BlockVectorIterators
 				     // search for the block. this can
 				     // be done through the parent
 				     // class as well.
-    const reference p = (*parent)(global_index+d);
+    reference p = (*parent)(global_index+d);
     return p;
   };
 
