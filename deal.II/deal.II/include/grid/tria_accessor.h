@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -324,6 +324,14 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  down in the documentation of
 				      *  the @ref{Triangulation}
 				      *  class.
+				      *
+				      *  Note that the returned value is only
+				      *  the index of the geometrical
+				      *  vertex. It has nothing to do with
+				      *  possible degrees of freedom
+				      *  associated with it. For this, see the
+				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -819,6 +827,14 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Return the index of vertex
 				      *  @p{i=0,1} of a line.
+				      *
+				      *  Note that the returned value is only
+				      *  the index of the geometrical
+				      *  vertex. It has nothing to do with
+				      *  possible degrees of freedom
+				      *  associated with it. For this, see the
+				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -1257,6 +1273,14 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  @p{(i+3)%4}. See also the
 				      *  introduced convention
 				      *  (@ref{Triangulation}).
+				      *
+				      *  Note that the returned value is only
+				      *  the index of the geometrical
+				      *  vertex. It has nothing to do with
+				      *  possible degrees of freedom
+				      *  associated with it. For this, see the
+				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 
@@ -1745,6 +1769,14 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  down in the documentation of
 				      *  the @ref{Triangulation}
 				      *  class.
+				      *
+				      *  Note that the returned value is only
+				      *  the index of the geometrical
+				      *  vertex. It has nothing to do with
+				      *  possible degrees of freedom
+				      *  associated with it. For this, see the
+				      *  @p{DoFAccessor::vertex_dof_index}
+				      *  functions.
 				      */ 
     int vertex_index (const unsigned int i) const;
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,13 +106,17 @@ class BlockIndices;
  * arguments refer to the first possibility above, those taking only one do
  * their job in-place and refer to the second possibility.
  *
- * Condensing vectors works exactly as described above for matrices.
+ * Condensing vectors works exactly as described above for matrices. Note that
+ * condensation is an idempotent operation, i.e. doing it more than once on a
+ * vector or matrix yields the same result as doing it only once: once an
+ * object has been condensed, further condensation operations don't change it
+ * any more.
  *
  * After solving the condensed system of equations, the solution vector has to
- * be redistributed. This is done by the two @p{distribute} function, one working
- * with two vectors, one working in-place. The operation of distribution undoes
- * the condensation process in some sense, but it should be noted that it is not
- * the inverse operation.
+ * be redistributed. This is done by the two @p{distribute} function, one
+ * working with two vectors, one working in-place. The operation of
+ * distribution undoes the condensation process in some sense, but it should
+ * be noted that it is not the inverse operation.
  *
  * @author Wolfgang Bangerth, 1998
  */
