@@ -326,11 +326,18 @@ namespace PETScWrappers
 
                                        /**
                                         * Set the element (<i>i,j</i>)
-                                        * to @p value. Throws an
-                                        * error if the entry does not
-                                        * exist. Still, it is allowed to
-                                        * store zero values in
-                                        * non-existent fields.
+                                        * to @p value.
+					*
+					* If the present object (from
+					* a derived class of this one)
+					* happens to be a sparse
+					* matrix, then this function
+					* adds a new entry to the
+					* matrix if it didn't exist
+					* before, very much in
+					* contrast to the SparseMatrix
+					* class which throws an error
+					* if the entry does not exist.
                                         */
       void set (const unsigned int i,
                 const unsigned int j,
@@ -338,11 +345,18 @@ namespace PETScWrappers
 
                                        /**
                                         * Add @p value to the
-                                        * element (<i>i,j</i>).  Throws
-                                        * an error if the entry does not
-                                        * exist. Still, it is allowed to
-                                        * store zero values in
-                                        * non-existent fields.
+                                        * element (<i>i,j</i>).
+					*
+					* If the present object (from
+					* a derived class of this one)
+					* happens to be a sparse
+					* matrix, then this function
+					* adds a new entry to the
+					* matrix if it didn't exist
+					* before, very much in
+					* contrast to the SparseMatrix
+					* class which throws an error
+					* if the entry does not exist.
                                         */
       void add (const unsigned int i,
                 const unsigned int j,

@@ -86,6 +86,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <code>PETScWrappers::MatrixBase</code> class
+       documented that adding or setting a value that hasn't been in
+       the sparsity pattern before will lead to an exception being
+       thrown. This is of course wrong: PETSc allocates matrix entries
+       dynamically, as needed. The documentation is now fixed.
+       <br> 
+       (WB, 2005/03/03)
+       </p>
+
+  <li> <p>
        New: The <code>SparseMatrix</code> iterators had no <code>operator
        &gt;</code>, only an <code>operator &lt;</code>. The missing operator
        is now implemented. The same holds for the <code>FullMatrix</code>
