@@ -1727,7 +1727,7 @@ class FiniteElement : public FiniteElementBase<dim>
 				      *
 				      * Some finite elements,
 				      * especially in higher
-				      * dimensions, may chose not to
+				      * dimensions, may choose not to
 				      * implement this function
 				      * because the computational
 				      * effort is growing rapidly, for
