@@ -4,7 +4,7 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/fe_update_flags.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 #include <numerics/error_estimator.h>
 #include <grid/dof.h>
 #include <grid/tria_iterator.h>

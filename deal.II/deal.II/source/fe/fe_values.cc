@@ -4,7 +4,7 @@
 
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>

@@ -9,7 +9,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria.h>
 #include <grid/geometry_info.h>
-#include <fe/quadrature_lib.h>
+#include <base/quadrature_lib.h>
 #include <fe/fe_values.h>
 #include <fe/fe.h>
 #include <lac/dvector.h>

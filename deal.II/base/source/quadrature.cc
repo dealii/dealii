@@ -2,7 +2,7 @@
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
 
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 
 
 template <int dim>
@@ -93,8 +93,6 @@ const vector<double> & Quadrature<dim>::get_weights () const {
 };
 
 
-
-#if deal_II_dimension == 2
 
 template <>
 void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
@@ -196,7 +194,6 @@ void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
       };
 };
 
-#endif
 
 
 

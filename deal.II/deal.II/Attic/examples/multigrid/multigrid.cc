@@ -9,12 +9,12 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary.h>
 #include <grid/dof_constraints.h>
-#include <basic/function.h>
+#include <base/function.h>
 #include <basic/data_io.h>
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.criss_cross.h>
 #include <fe/fe_update_flags.h>
-#include <fe/quadrature_lib.h>
+#include <base/quadrature_lib.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>

@@ -6,7 +6,7 @@
 /*----------------------------   quadrature_lib.h     ---------------------------*/
 
 
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 
 
 /**

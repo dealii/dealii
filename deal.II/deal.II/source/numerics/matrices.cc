@@ -1,11 +1,11 @@
 /*      $Id$                 */
 
-#include <basic/function.h>
+#include <base/function.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <numerics/matrices.h>

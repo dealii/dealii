@@ -2,17 +2,13 @@
 /* Copyright W. Bangerth, University of Heidelberg, 1998 */
 
 
-#include <fe/quadrature_lib.h>
+#include <base/quadrature_lib.h>
 #include <cmath>
 
 
 // please note: for a given dimension, we need the quadrature formulae
 // for all lower dimensions as well. That is why in this file the check
 // is for deal_II_dimension >= any_number and not for ==
-
-
-
-#if deal_II_dimension >= 1
 
 template <>
 QGauss2<1>::QGauss2 () :
@@ -333,13 +329,6 @@ QIteratedTrapez<1>::QIteratedTrapez (const unsigned n) :
   weights[n] = .5/n;
 }
 
-#endif
-
-
-
-
-#if deal_II_dimension >= 2
-
 // construct the quadrature formulae in higher dimensions by
 // tensor product of lower dimensions
 
@@ -417,17 +406,15 @@ QIteratedTrapez<dim>::QIteratedTrapez (const unsigned n) :
 
 
 // explicite specialization
-template class QGauss2<deal_II_dimension>;
-template class QGauss3<deal_II_dimension>;
-template class QGauss4<deal_II_dimension>;
-template class QGauss5<deal_II_dimension>;
-template class QGauss6<deal_II_dimension>;
-template class QGauss7<deal_II_dimension>;
-template class QGauss8<deal_II_dimension>;
-template class QMidpoint<deal_II_dimension>;
-template class QSimpson<deal_II_dimension>;
-template class QTrapez<deal_II_dimension>;
-template class QIteratedTrapez<deal_II_dimension>;
+template class QGauss2<2>;
+template class QGauss3<2>;
+template class QGauss4<2>;
+template class QGauss5<2>;
+template class QGauss6<2>;
+template class QGauss7<2>;
+template class QGauss8<2>;
+template class QMidpoint<2>;
+template class QSimpson<2>;
+template class QTrapez<2>;
+template class QIteratedTrapez<2>;
 
-
-#endif

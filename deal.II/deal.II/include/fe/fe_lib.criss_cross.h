@@ -7,7 +7,7 @@
 
 
 #include <fe/fe.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 
 
 /**

@@ -3,7 +3,7 @@
 
 
 #include <fe/fe_linear_mapping.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_boundary.h>

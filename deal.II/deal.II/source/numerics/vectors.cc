@@ -3,14 +3,14 @@
 
 
 
-#include <basic/function.h>
+#include <base/function.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 #include <numerics/assembler.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>

@@ -9,9 +9,9 @@
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
-#include <basic/function.h>
+#include <base/function.h>
 #include <fe/fe.h>
-#include <fe/quadrature.h>
+#include <base/quadrature.h>
 #include <lac/dvector.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>

@@ -1,7 +1,7 @@
 /*      $Id$                 */
 
 
-#include <basic/function.h>
+#include <base/function.h>
 #include <vector>
 
 
@@ -152,6 +152,12 @@ void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
 
 // explicit instantiations
 
-template class Function<deal_II_dimension>;
-template class ZeroFunction<deal_II_dimension>;
-template class ConstantFunction<deal_II_dimension>;
+template class Function<1>;
+template class ZeroFunction<1>;
+template class ConstantFunction<1>;
+template class Function<2>;
+template class ZeroFunction<2>;
+template class ConstantFunction<2>;
+template class Function<3>;
+template class ZeroFunction<3>;
+template class ConstantFunction<3>;
