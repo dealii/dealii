@@ -519,21 +519,6 @@ void LaplaceProblem<dim>::assemble_system ()
 	};
     };
 
-				   // As almost all the stuff before,
-				   // the interpolation of boundary
-				   // values works also for higher
-				   // order elements, but you need not
-				   // change your code for that:
-  map<int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
-					    0,
-					    ZeroFunction<dim>(),
-					    boundary_values);
-  MatrixTools<dim>::apply_boundary_values (boundary_values,
-					   system_matrix,
-					   solution,
-					   system_rhs);
-
 				   // After the system of equations
 				   // has been assembled just as for
 				   // the previous examples, we still
@@ -557,6 +542,27 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // are invalid. They are set to
 				   // reasonable values in the
 				   // ``solve'' function.
+
+				   // As almost all the stuff before,
+				   // the interpolation of boundary
+				   // values works also for higher
+				   // order elements, but you need not
+				   // change your code for that. We
+				   // note that for proper results, it
+				   // is important that the
+				   // elimination of boundary nodes
+				   // from the system of equations
+				   // happens *after* the elimination
+				   // of hanging nodes.
+  map<int,double> boundary_values;
+  VectorTools::interpolate_boundary_values (dof_handler,
+					    0,
+					    ZeroFunction<dim>(),
+					    boundary_values);
+  MatrixTools<dim>::apply_boundary_values (boundary_values,
+					   system_matrix,
+					   solution,
+					   system_rhs);
 };
 
 
