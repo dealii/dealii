@@ -101,7 +101,6 @@ class LaplaceProblem
 				     // file):
     void run ();
     
-  private:
 				     // Then there are some member
 				     // functions that mostly do what
 				     // their names suggest. Since
