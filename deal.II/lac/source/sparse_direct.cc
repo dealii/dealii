@@ -309,6 +309,8 @@ void monitor_child_liveness (const pid_t child_pid)
 {
   while (true)
     {
+      std::cerr << "+++ monitoring child " << child_pid << std::endl;
+      
       int ret = kill (child_pid, 0);
       if (ret != 0)
         if ((ret == -1) && (errno == ESRCH))
