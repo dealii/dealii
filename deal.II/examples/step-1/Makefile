@@ -8,8 +8,7 @@
 target   = $(basename $(shell echo step-*.cc))
 
 # All dependencies between files should be updated by the included
-# file Makefile.dep if necessary. Object files are compiled into
-# the archives ./Obj.a and ./Obj.g.a. By default, the debug version
+# file Makefile.dep if necessary. By default, the debug version
 # is used to link. It you don't like that, change the following
 # variable to "off"
 debug-mode = on
@@ -28,8 +27,12 @@ include $D/common/Make.global_options
 
 
 # list of libraries needed to link with
-libs     = -ldeal_II_2d  -llac -lbase
-libs.g   = -ldeal_II_2d.g -llac.g -lbase.g
+libs.g   = $(lib-deal2-2d.g) \
+	   $(lib-lac.g)      \
+           $(lib-base.g)
+libs     = $(lib-deal2-2d.o) \
+	   $(lib-lac.o)      \
+           $(lib-base.o)
 
 
 # check whether we use debug mode or not

@@ -51,8 +51,14 @@ h-files     = $(filter-out *%, $(shell echo *.h))
 lib-h-files = $(filter-out *%, $(shell echo ../../include/*.h))
 
 # list of libraries needed to link with
-libs     = ./Obj.a   -ldeal_II_2d   -llac -lbase
-libs.g   = ./Obj.g.a -ldeal_II_2d.g -llac.g -lbase.g
+libs.g   = ./Obj.g.a         \
+           $(lib-deal2-2d.g) \
+	   $(lib-lac.g)      \
+           $(lib-base.g)
+libs     = ./Obj.a           \
+           $(lib-deal2-2d.o) \
+	   $(lib-lac.o)      \
+           $(lib-base.o)
 
 
 # check whether we use debug mode or not

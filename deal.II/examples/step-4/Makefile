@@ -29,8 +29,14 @@ include $D/common/Make.global_options
 
 # list of libraries needed to link with. this example needs the 3d
 # part as well
-libs.o   = -ldeal_II_2d   -ldeal_II_2d   -llac -lbase
-libs.g   = -ldeal_II_2d.g -ldeal_II_3d.g -llac.g -lbase.g
+libs.g   = $(lib-deal2-2d.g) \
+           $(lib-deal2-3d.g) \
+	   $(lib-lac.g)      \
+           $(lib-base.g)
+libs.o   = $(lib-deal2-2d.o) \
+           $(lib-deal2-3d.o) \
+	   $(lib-lac.o)      \
+           $(lib-base.o)
 
 
 # check whether we use debug mode or not
