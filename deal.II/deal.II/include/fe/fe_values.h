@@ -25,6 +25,7 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <fe/fe.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
 
