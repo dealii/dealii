@@ -88,6 +88,7 @@ class ElasticProblem
     const unsigned int this_partition;
 
     unsigned int local_dofs;
+    std::vector<bool> partition_is_dof_owner;
 
     static unsigned int get_n_partitions (const MPI_Comm &mpi_communicator);
     static unsigned int get_this_partition (const MPI_Comm &mpi_communicator);
@@ -213,6 +214,16 @@ void ElasticProblem<dim>::setup_system ()
   local_dofs
     = DoFTools::count_dofs_with_subdomain_association (dof_handler,
                                                        this_partition);
+
+  {
+    partition_is_dof_owner.resize (dof_handler.n_dofs());
+    std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+    DoFTools::get_subdomain_association (dof_handler,
+                                         subdomain_association);
+    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+      partition_is_dof_owner[i] = (subdomain_association[i] ==
+                                   this_partition);
+  }
   
   
   hanging_node_constraints.clear ();
@@ -374,7 +385,14 @@ void ElasticProblem<dim>::solve ()
   
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
-  hanging_node_constraints.distribute (solution);
+
+  PETScWrappers::Vector localized_solution (solution);
+  hanging_node_constraints.distribute (localized_solution);
+  
+  for (unsigned int i=0; i<localized_solution.size(); ++i)
+    if (partition_is_dof_owner[i] == true)
+      solution(i) = static_cast<PetscScalar>(localized_solution(i));
+  solution.compress ();  
 
   if (this_partition == 0)
     std::cout << "   Solver converged in "
@@ -390,13 +408,16 @@ void ElasticProblem<dim>::refine_grid ()
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
                                    // XXX
-  typename FunctionMap<dim>::type neumann_boundary;
-  Assert (false, ExcNotImplemented());
-//   KellyErrorEstimator<dim>::estimate (dof_handler,
-// 				      QGauss2<dim-1>(),
-// 				      neumann_boundary,
-// 				      solution,
-// 				      estimated_error_per_cell);
+  {
+    PETScWrappers::Vector localized_solution (solution);
+    
+    typename FunctionMap<dim>::type neumann_boundary;
+    KellyErrorEstimator<dim>::estimate (dof_handler,
+                                        QGauss2<dim-1>(),
+                                        neumann_boundary,
+                                        localized_solution,
+                                        estimated_error_per_cell);
+  }
 
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
@@ -447,6 +468,12 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
                 Assert (false, ExcInternalError());
         };
 
+                                       // xxx
+      std::vector<unsigned int> p (triangulation.n_active_cells());
+      GridTools::get_subdomain_association (triangulation, p);
+      Vector<double> x(p.begin(), p.end());
+      
+      data_out.add_data_vector (x, "partitioning");
       data_out.add_data_vector (global_solution, solution_names);
       data_out.build_patches ();
       data_out.write_gmv (output);
@@ -458,7 +485,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void ElasticProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<12; ++cycle)
+  for (unsigned int cycle=0; cycle<10; ++cycle)
     {
                                        // xxx
       if (this_partition == 0)
