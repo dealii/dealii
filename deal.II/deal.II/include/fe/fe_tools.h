@@ -171,17 +171,28 @@ class FETools
 				      * @p{dof2} need to be @ref{DoFHandler}
 				      * based on the same triangulation.
 				      *
-				      * This function is interesting for
-				      * e.g. extrapolating patchwise a
-				      * piecewise linear dual solution
-				      * to a piecewise quadratic dual
-				      * solution.
+				      * This function is interesting
+				      * for e.g. extrapolating
+				      * patchwise a piecewise linear
+				      * solution to a piecewise
+				      * quadratic solution.
+				      *
+				      * Note that the resulting field
+				      * does not satisfy continuity
+				      * requirements of the given
+				      * finite elements. You have to
+				      * apply
+				      * @ref{ConstraintMatrix}@p{::distribute}
+				      * with the hanging node
+				      * constraints of the second DoF
+				      * handler object to make the
+				      * output continuous again.
 				      */
     template <int dim, typename number>
     static void extrapolate(const DoFHandler<dim> &dof1,
-			    const Vector<number> &z1,
+			    const Vector<number>  &z1,
 			    const DoFHandler<dim> &dof2,
-			    Vector<number> &z2);    
+			    Vector<number>        &z2);    
   
   
 				     /**
