@@ -10,7 +10,7 @@ vpath %.a $D/base/lib
 vpath %.a $D/lac/lib
 vpath %.a $D/deal.II/lib
 
-CXX       = c++
+CXX       = g++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
 CXXFLAGS.g= -DDEBUG -ggdb -Wall -W -Wconversion \
@@ -24,10 +24,10 @@ CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
 
 
 
-#%.go : %.cc #Makefile
-#	@echo =====debug========= $<
-#	@$(CXX) $(flags) -c $< -o $@
-#%.o : %.cc #Makefile
-#	@echo =====optimized===== $<
-#	@$(CXX) $(flags) -c $< -o $@
+%.go : %.cc #Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc #Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
 
