@@ -563,13 +563,7 @@ namespace BlockVectorIterators
 					*/
       void move_backward ();
 
-				       /**
-					* Make all other iterators
-					* friend, i.e. including the
-					* one with opposite constness.
-					*/
-      template <class N, bool B>
-      friend class Iterator<N,B>;
+      friend class InverseConstnessIterator;
   };
 };
 
@@ -1132,11 +1126,11 @@ class BlockVector
     unsigned int num_blocks;
 
 				     /**
-				      * Make the iterator classes
-				      * friends.
+				      * Make the iterator class a
+				      * friend.
 				      */
-    template <typename T1, bool B>
-    friend class BlockVectorIterators::Iterator<T1,B>;
+    friend class iterator;
+    friend class const_iterator;
 
     template <typename Number2> friend class BlockVector;
 };
