@@ -20,6 +20,41 @@
 
 namespace Threads 
 {
+                                   // counter and access mutex for the
+                                   // number of threads
+  volatile unsigned int n_existing_threads_counter = 1;
+  ThreadMutex  n_existing_threads_mutex;
+
+  
+  void register_new_thread () 
+  {
+    n_existing_threads_mutex.acquire ();
+    ++n_existing_threads_counter;
+    n_existing_threads_mutex.release ();
+  };
+
+
+  
+  void deregister_new_thread () 
+  {
+    n_existing_threads_mutex.acquire ();
+    --n_existing_threads_counter;
+    Assert (n_existing_threads_counter >= 1,
+            ExcInternalError());
+    n_existing_threads_mutex.release ();
+  };
+
+
+  
+  unsigned int n_existing_threads () 
+  {
+    n_existing_threads_mutex.acquire ();
+    const unsigned int n = n_existing_threads_counter;
+    n_existing_threads_mutex.release ();
+    return n;
+  };
+  
+  
 #ifndef DEAL_II_USE_MT
   void DummyThreadManager::spawn (const FunPtr fun_ptr,
 				  void *       fun_data,
@@ -54,7 +89,7 @@ namespace Threads
   };
   
 
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
+#ifdef DEAL_II_USE_MT_POSIX_NO_BARRIERS    
   PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
 					  const char         *,
 					  void               *)
@@ -148,6 +183,7 @@ namespace Threads
 
     tid_list.push_back (pthread_t());
 
+                                     // start new thread
     const int error
       = pthread_create (&tid_list.back(), 0, fun_ptr, fun_data);
 
@@ -308,8 +344,19 @@ namespace Threads
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,
 			  0);    
-#  endif    
+#  endif
+    
+                                     // if truly in MT mode, increase
+                                     // thread number counter
+    ++n_existing_thread_counter;
+
 #else
+                                     // if not in MT mode, then simply
+                                     // call the respective
+                                     // serializing function, that
+                                     // executes the given function
+                                     // and return. don't have to
+                                     // adjust the number of threads
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,
 			  0);

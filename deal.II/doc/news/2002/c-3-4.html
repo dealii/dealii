@@ -123,6 +123,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: The <code class="member">Threads::n_existing_threads</code>
+       function returns the present number of existing threads, allowing an
+       assessment whether it is useful to spawn new threads or rather perform
+       the operation in question sequentially.
+       <br>
+       (WB 2002/09/08)
+       </p>
+
+  <li> <p> 
        Extended: Previously, the <code class="class">Threads::PosixThreadBarrier</code>
        class could not be used at all (they threw exceptions), if your system
        did not have the respective POSIX functions. This restriction is lifted

@@ -4566,6 +4566,56 @@ namespace Threads
 		const FunEncapsulation &fun_encapsulation,
 		const unsigned int      n_threads);
 
+                                   /**
+                                    * Return the number of presently
+                                    * existing threads. This function
+                                    * may be useful in a situation
+                                    * where a large number of threads
+                                    * are concurrently, and you want
+                                    * to decide whether creation of
+                                    * another thread is reasonable or
+                                    * whether running the respective
+                                    * operation sequentially is more
+                                    * useful since already many more
+                                    * threads than processors are
+                                    * running.
+                                    *
+                                    * Note that the function returns
+                                    * the total number of threads, not
+                                    * those actually running. Some of
+                                    * the threads may be waiting for
+                                    * locks and mutexes, or may be
+                                    * sleeping until they are
+                                    * delivered with data to work on.
+                                    * 
+                                    * Upon program start, this number
+                                    * is one. It is increased each
+                                    * time a thread is created using
+                                    * the @ref{Threads::spawn} or
+                                    * @ref{Threads::spawn_n}
+                                    * functions. It is decreased once
+                                    * a thread terminates by returning
+                                    * from the function that was
+                                    * spawned.
+                                    *
+                                    * Note that this means that only
+                                    * threads created and terminated
+                                    * through the interfaces of this
+                                    * namespace are taken care of. If
+                                    * threads are created by directly
+                                    * calling the respective functions
+                                    * of the operating system
+                                    * (e.g. @p{pthread_create} for the
+                                    * POSIX thread interface), or if
+                                    * they are killed (e.g. either
+                                    * through @p{pthread_exit} from
+                                    * the spawned thread, or
+                                    * @p{pthread_kill} from another
+                                    * thread), then these events are
+                                    * not registered and counted for
+                                    * the result of this function.
+                                    */
+  unsigned int n_existing_threads ();
 
 				   /**
 				    * Split the range @p{[begin,end)}
@@ -4662,6 +4712,29 @@ namespace Threads
 		      << "leak somewhere.");
   };
 
+
+                                   /**
+                                    * The following function is used
+                                    * for internal bookkeeping of the
+                                    * number of existing threads. It
+                                    * is not thought for use in
+                                    * application programs, but only
+                                    * for use in the template
+                                    * functions below.
+                                    */
+  void register_new_thread ();
+  
+                                   /**
+                                    * The following function is used
+                                    * for internal bookkeeping of the
+                                    * number of existing threads. It
+                                    * is not thought for use in
+                                    * application programs, but only
+                                    * for use in the template
+                                    * functions below.
+                                    */
+  void deregister_new_thread ();  
+  
 };   // end declarations of namespace Threads
 
 
@@ -4724,8 +4797,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)();
+    deregister_new_thread ();
   
     return 0;
   }
@@ -4802,8 +4879,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -4884,8 +4965,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -4972,9 +5057,13 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3);
-  
+    deregister_new_thread ();
+
     return 0;
   }
 
@@ -5065,8 +5154,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5163,8 +5256,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5267,8 +5364,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5377,8 +5478,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5494,8 +5599,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5615,8 +5724,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5744,8 +5857,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5837,8 +5954,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)();
+    deregister_new_thread ();
   
     return 0;
   }
@@ -5929,8 +6050,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6025,8 +6150,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6129,8 +6258,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6240,8 +6373,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6356,8 +6493,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6479,8 +6620,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6610,8 +6755,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6744,8 +6893,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -6884,8 +7037,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    deregister_new_thread ();
   
     return 0;
   }
@@ -7030,8 +7187,12 @@ namespace Threads
 				     // @p{fun_data}
     fun_data->lock.release ();
 
-				     // call the function
+				     // register new thread, call the
+				     // function, and upon its return,
+				     // de-register it again
+    register_new_thread ();
     (object->*fun_ptr)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    deregister_new_thread ();
   
     return 0;
   }
