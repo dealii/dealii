@@ -1257,8 +1257,8 @@ AC_DEFUN(DEAL_II_CHECK_LOCAL_TYPEDEF_COMP, dnl
       AC_MSG_RESULT(yes. trying to work around)
       AC_DEFINE(DEAL_II_LOCAL_TYPEDEF_COMP_WORKAROUND, 1, 
                 [Define if we have to work around a bug in Sun's Forte compiler.
-See the aclocal.m4 file in the top-level directory for a description
-of this bug.])
+                 See the aclocal.m4 file in the top-level directory for a
+                 description of this bug.])
     ])
 ])
 
@@ -1322,9 +1322,67 @@ AC_DEFUN(DEAL_II_CHECK_TEMPLATE_SPEC_ACCESS, dnl
       AC_MSG_RESULT(yes. trying to work around)
       AC_DEFINE(DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND, 1, 
                 [Define if we have to work around a bug in Sun's Forte compiler.
-See the aclocal.m4 file in the top-level directory for a description
-of this bug.])
+                 See the aclocal.m4 file in the top-level directory for a
+                 description of this bug.])
     ])
+])
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Versions of GCC before 3.0 had a problem with the explicit
+dnl instantiation of member templates when the member was in fact
+dnl an operator. In that case, they needed the "template" keyword,
+dnl which is actually not allowed at this place. Test case is
+dnl 
+dnl /* ----------------------------------------------- */
+dnl struct X
+dnl {
+dnl     template <typename T2>
+dnl     X operator = (T2 &);
+dnl };
+dnl 
+dnl template X X::operator=<> (float &);
+dnl /* ---------------------------------------------------------- */
+dnl
+dnl The compiler only groks this if the "operator=" is prepended
+dnl by "template". We detect this, and either set the 
+dnl DEAL_II_MEMBER_OP_TEMPLATE_INST to "template" or nothing, so
+dnl that it gets expanded to the right string needed in this place.
+dnl
+dnl Usage: DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_MEMBER_OP_TEMPLATE_INST, dnl
+[
+  AC_MSG_CHECKING(for template member operator instantiation bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+	struct X
+	{
+	    template <typename T2>
+	    X operator = (T2 &);
+	};
+
+	template X X::operator=<> (float &);
+    ],
+    [],
+    [
+      AC_MSG_RESULT(no)
+      x=""
+    ],
+    [
+      AC_MSG_RESULT(yes. trying to work around)
+      x="template"
+    ])
+  AC_DEFINE_UNQUOTED(DEAL_II_MEMBER_OP_TEMPLATE_INST, $x, 
+                     [Define if we have to work around a bug in gcc with
+                      explicitly instantiating template member operators.
+                      See the aclocal.m4 file in the top-level directory
+                      for a description of this bug.])
 ])
 
 

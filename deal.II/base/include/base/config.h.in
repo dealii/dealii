@@ -49,6 +49,11 @@
 /* Major version number of deal.II */
 #undef DEAL_II_MAJOR
 
+/* Define if we have to work around a bug in gcc with explicitly instantiating
+   template member operators. See the aclocal.m4 file in the top-level
+   directory for a description of this bug. */
+#undef DEAL_II_MEMBER_OP_TEMPLATE_INST
+
 /* Minor version number of deal.II */
 #undef DEAL_II_MINOR
 

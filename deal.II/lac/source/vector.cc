@@ -16,18 +16,18 @@
 
 // explicit instantiations
 template class Vector<double>;
-template Vector<double>& Vector<double>::template operator=<>(const Vector<float>&);
-template double Vector<double>::template operator*<>(const Vector<float>&) const;
-template double Vector<double>::template operator*<>(const Vector<double>&) const;
+template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<float>&);
+template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<float>&) const;
+template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<double>&) const;
 template void Vector<double>::reinit<>(const Vector<double>&, const bool);
 template void Vector<double>::reinit<>(const Vector<float>&, const bool);
 template void Vector<double>::equ<>(const double, const Vector<double>&);
 template void Vector<double>::equ<>(const double, const Vector<float>&);
 
 template class Vector<float>;
-template Vector<float>& Vector<float>::template operator=<>(const Vector<double>&);
-template float Vector<float>::template operator*<>(const Vector<float>&) const;
-template float Vector<float>::template operator*<>(const Vector<double>&) const;
+template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<double>&);
+template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<float>&) const;
+template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<>(const Vector<double>&) const;
 template void Vector<float>::reinit<>(const Vector<double>&, const bool);
 template void Vector<float>::reinit<>(const Vector<float>&, const bool);
 template void Vector<float>::equ<>(const float, const Vector<double>&);

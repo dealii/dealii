@@ -17,11 +17,11 @@
 // explicit instantiations
 template class Vector<long double>;
 
-template Vector<long double>& Vector<long double>::template operator=<>(const Vector<double>&);
-template Vector<long double>& Vector<long double>::template operator=<>(const Vector<float>&);
-template long double Vector<long double>::template operator *<> (const Vector<long double> &) const;
-template long double Vector<long double>::template operator *<> (const Vector<double> &) const;
-template long double Vector<long double>::template operator *<> (const Vector<float> &) const;
+template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<double>&);
+template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<float>&);
+template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<long double> &) const;
+template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<double> &) const;
+template long double Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<float> &) const;
 template void Vector<long double>::reinit<>(const Vector<long double>&, const bool);
 template void Vector<long double>::reinit<>(const Vector<double>&, const bool);
 template void Vector<long double>::reinit<>(const Vector<float>&, const bool);
@@ -29,13 +29,13 @@ template void Vector<long double>::equ<>(const long double, const Vector<long do
 template void Vector<long double>::equ<>(const long double, const Vector<double>&);
 template void Vector<long double>::equ<>(const long double, const Vector<float>&);
 
-template Vector<double>& Vector<double>::template operator=<>(const Vector<long double>&);
-template double Vector<double>::template operator *<> (const Vector<long double> &) const;
+template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<long double>&);
+template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<long double> &) const;
 template void Vector<double>::reinit<>(const Vector<long double>&, const bool);
 template void Vector<double>::equ<>(const double, const Vector<long double>&);
 
-template Vector<float>& Vector<float>::template operator=<>(const Vector<long double>&);
-template float Vector<float>::template operator *<> (const Vector<long double> &) const;
+template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(const Vector<long double>&);
+template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<> (const Vector<long double> &) const;
 template void Vector<float>::reinit<>(const Vector<long double>&, const bool);
 template void Vector<float>::equ<>(const float, const Vector<long double>&);
 

@@ -15,7 +15,7 @@
 
 // explicit instantiations
 template class BlockVector<double>;
-template BlockVector<double>& BlockVector<double>::template operator=<>(
+template BlockVector<double>& BlockVector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(
   const BlockVector<float>&);
 template void BlockVector<double>::reinit<>(const BlockVector<double>&, const bool);
 template void BlockVector<double>::reinit<>(const BlockVector<float>&, const bool);
@@ -23,7 +23,7 @@ template void BlockVector<double>::equ<>(const double, const BlockVector<double>
 template void BlockVector<double>::equ<>(const double, const BlockVector<float>&);
 
 template class BlockVector<float>;
-template BlockVector<float>& BlockVector<float>::template operator=<>(
+template BlockVector<float>& BlockVector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<>(
   const BlockVector<double>&);
 template void BlockVector<float>::reinit<>(const BlockVector<double>&, const bool);
 template void BlockVector<float>::reinit<>(const BlockVector<float>&, const bool);
