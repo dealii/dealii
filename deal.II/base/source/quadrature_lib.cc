@@ -331,67 +331,45 @@ QIteratedTrapez<1>::QIteratedTrapez (const unsigned n) :
 
 // construct the quadrature formulae in higher dimensions by
 // tensor product of lower dimensions
-
-// note: the tensor product code has not been tested for more than
-// two space dimensions, so we leave in these Assert'ions until
-// that is done
 template <int dim>
 QGauss2<dim>::QGauss2 () :  Quadrature<dim> (QGauss2<dim-1>(), QGauss2<1>())  {};
 
 template <int dim>
 QGauss3<dim>::QGauss3 () :
-		Quadrature<dim> (QGauss3<dim-1>(), QGauss3<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QGauss3<dim-1>(), QGauss3<1>()){};
 
 template <int dim>
 QGauss4<dim>::QGauss4 () :
-		Quadrature<dim> (QGauss4<dim-1>(), QGauss4<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QGauss4<dim-1>(), QGauss4<1>()){};
 
 template <int dim>
 QGauss5<dim>::QGauss5 () :
-		Quadrature<dim> (QGauss5<dim-1>(), QGauss5<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QGauss5<dim-1>(), QGauss5<1>()){};
 
 template <int dim>
 QGauss6<dim>::QGauss6 () :
-		Quadrature<dim> (QGauss6<dim-1>(), QGauss6<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QGauss6<dim-1>(), QGauss6<1>()){};
 
 template <int dim>
 QGauss7<dim>::QGauss7 () :
-		Quadrature<dim> (QGauss7<dim-1>(), QGauss7<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QGauss7<dim-1>(), QGauss7<1>()){};
 
 template <int dim>
 QGauss8<dim>::QGauss8 () :
-		Quadrature<dim> (QGauss8<dim-1>(), QGauss8<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QGauss8<dim-1>(), QGauss8<1>()){};
 
 
 template <int dim>
 QMidpoint<dim>::QMidpoint () :
-		Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QMidpoint<dim-1>(), QMidpoint<1>()){};
 
 template <int dim>
 QSimpson<dim>::QSimpson () :
-		Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QSimpson<dim-1>(), QSimpson<1>()){};
 
 template <int dim>
 QTrapez<dim>::QTrapez () :
-		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){
-  Assert (dim<3, ExcInternalError());
-};
+		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
 
 template <int dim>
 QIteratedTrapez<dim>::QIteratedTrapez (const unsigned n) :
