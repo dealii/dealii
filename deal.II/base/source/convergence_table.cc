@@ -54,7 +54,7 @@ void ConvergenceTable::evaluate_convergence_rates(const string &data_column_key,
 
   Assert(columns.count(rate_key), ExcInternalError());  
   columns[rate_key].flag=1;
-  set_precision(rate_key, 3);
+  set_precision(rate_key, 2);
 
   string superkey=data_column_key;
   if (!supercolumns.count(superkey))
@@ -120,7 +120,7 @@ void ConvergenceTable::evaluate_convergence_rates(const string &data_column_key,
 
   Assert(columns.count(rate_key), ExcInternalError());  
   columns[rate_key].flag=1;
-  set_precision(rate_key, 3);
+  set_precision(rate_key, 2);
   
 				   // set the superkey equal to the key
   string superkey=data_column_key;
