@@ -68,7 +68,7 @@ int main ()
   
   GrowingVectorMemory<Vector<double> > simple_mem;
   
-  BlockMatrixArray<FullMatrix<float>, double> matrix(2, 2, simple_mem);
+  BlockMatrixArray<double> matrix(2, 2, simple_mem);
   
   matrix.enter(A,0,0,2.);
   matrix.enter(B1,0,1,-1.);
@@ -108,7 +108,7 @@ int main ()
   FullMatrix<float> Cinv(2,2);
   Cinv.invert(C);
   
-  BlockTrianglePrecondition<FullMatrix<float>, double>
+  BlockTrianglePrecondition<double>
     precondition(2, simple_mem);
   precondition.enter(Ainv,0,0,.5);
   precondition.enter(Cinv,1,1);
