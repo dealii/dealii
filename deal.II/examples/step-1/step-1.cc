@@ -194,6 +194,9 @@ void second_grid ()
 
 
 
+				 // Main function. Only call the two
+				 // subfunctions, which produce the
+				 // two grids.
 int main () 
 {
   first_grid ();
