@@ -447,13 +447,27 @@ class VectorTools //<dim>
 				     /**
 				      * Compute the error for the solution of a system.
 				      * See the other #integrate_difference#.
+				      *
+				      * The additional argument #weight# allows
+				      * to evaluate weighted norms. This is useful
+				      * for weighting the error of different parts
+				      * differently. A special use is
+				      * to have #weight=0# in some parts of the 
+				      * domain, e.g. at
+				      * the location of a shock and #weight=1#
+				      * elsewhere. This allows convergence tests
+				      * in smooth parts of in general discontinuous
+				      * solutions.
+				      * By default, no weighting function is given,
+				      * i.e. weight=1 in the whole domain.
 				      */
     static void integrate_difference (const DoFHandler<dim>   &dof,
  				      const Vector<double>     &fe_function,
  				      const VectorFunction<dim>&exact_solution,
  				      Vector<float>            &difference,
  				      const Quadrature<dim>    &q,
- 				      const NormType           &norm);
+ 				      const NormType           &norm,
+				      const Function<dim>      *weight=0);
     
 
 				     /**
