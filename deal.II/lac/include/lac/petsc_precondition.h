@@ -144,6 +144,51 @@ namespace PETScWrappers
       
 
 /**
+ * A class that implements the interface to use the PETSc Block Jacobi
+ * preconditioner.
+ *
+ * @author Wolfgang Bangerth, 2004
+ */
+  class PreconditionBlockJacobi : public PreconditionerBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional flags to the
+                                        * preconditioner.
+                                        */      
+      struct AdditionalData
+      {};
+
+                                       /**
+                                        * Constructor. Take the matrix which
+                                        * is used to form the preconditioner,
+                                        * and additional flags if there are
+                                        * any.
+                                        */
+      PreconditionBlockJacobi (const MatrixBase     &matrix,
+                               const AdditionalData &additional_data = AdditionalData());
+      
+    protected:
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular preconditioner.
+                                        */
+      const AdditionalData additional_data;
+
+                                       /**
+                                        * Function that takes a Krylov
+                                        * Subspace Preconditioner context
+                                        * object, and sets the type of
+                                        * preconditioner that is appropriate
+                                        * for the present class.
+                                        */
+      virtual void set_preconditioner_type (PC &pc) const;      
+  };
+
+      
+
+/**
  * A class that implements the interface to use the PETSc SOR
  * preconditioner.
  *

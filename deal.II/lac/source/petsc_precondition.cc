@@ -63,6 +63,29 @@ namespace PETScWrappers
   }
   
 
+/* ----------------- PreconditionJacobi -------------------- */
+
+
+  PreconditionBlockJacobi::
+  PreconditionBlockJacobi (const MatrixBase     &matrix,
+                           const AdditionalData &additional_data)
+                  :
+                  PreconditionerBase (matrix),
+                  additional_data (additional_data)
+  {}
+
+  
+  void
+  PreconditionBlockJacobi::set_preconditioner_type (PC &pc) const
+  {
+                                     // set the right type for the
+                                     // preconditioner
+    int ierr;
+    ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+  
+
 /* ----------------- PreconditionSOR -------------------- */
 
   PreconditionSOR::AdditionalData::
