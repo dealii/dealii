@@ -106,7 +106,8 @@ struct AssemblerData {
 		   dVector                  &rhs_vector,
 		   const Quadrature<dim>    &quadrature,
 		   const FiniteElement<dim> &fe,
-		   const UpdateFields       &update_flags);
+		   const UpdateFields       &update_flags,
+		   const Boundary<dim>      &boundary);
     
 				     /**
 				      * Pointer to the dof handler object
@@ -151,7 +152,16 @@ struct AssemblerData {
 				      * FEValues object need to be reinitialized
 				      * on each cell.
 				      */
-    const UpdateFields update_flags;
+    const UpdateFields       update_flags;
+
+				     /**
+				      * Store a pointer to the object describing
+				      * the boundary of the domain. This is
+				      * necessary, since we may want to use
+				      * curved faces of cells at the boundary
+				      * when using higher order elements.
+				      */
+    const Boundary<dim>     &boundary;
 };
 
 
@@ -229,13 +239,13 @@ class Assembler : public DoFCellAccessor<dim> {
 				      * Pointer to the matrix to be assembled
 				      * by this object.
 				      */
-    dSMatrix               &matrix;
+    dSMatrix         &matrix;
 
 				     /**
 				      * Pointer to the vector to be assembled
 				      * by this object.
 				      */
-    dVector                &rhs_vector;
+    dVector          &rhs_vector;
 
 				     /**
 				      * Pointer to the finite element used for
@@ -258,6 +268,15 @@ class Assembler : public DoFCellAccessor<dim> {
 				      * quadrature points.
 				      */
     FEValues<dim>     fe_values;
+
+				     /**
+				      * Store a pointer to the object describing
+				      * the boundary of the domain. This is
+				      * necessary, since we may want to use
+				      * curved faces of cells at the boundary
+				      * when using higher order elements.
+				      */
+    const Boundary<dim> &boundary;
 };
 
     

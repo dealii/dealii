@@ -4,7 +4,7 @@
 #include <fe/quadrature.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
-
+#include <grid/tria_boundary.h>
 
 
 
@@ -52,8 +52,8 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 template <int dim>
 double FEValues<dim>::shape_value (const unsigned int i,
 				   const unsigned int j) const {
-  Assert (i<(unsigned int)shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
-  Assert (j<(unsigned int)shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
+  Assert (i<shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
+  Assert (j<shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
 
   return shape_values(i,j);
 };
@@ -64,8 +64,8 @@ template <int dim>
 const Point<dim> &
 FEValues<dim>::shape_grad (const unsigned int i,
 			   const unsigned int j) const {
-  Assert (i<(unsigned int)shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
-  Assert (j<(unsigned int)shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
+  Assert (i<shape_values.m(), ExcInvalidIndex (i, shape_values.m()));
+  Assert (j<shape_values.n(), ExcInvalidIndex (j, shape_values.n()));
   Assert (update_flags | update_gradients, ExcAccessToUninitializedField());
 
   return shape_gradients[i][j];
@@ -105,7 +105,8 @@ double FEValues<dim>::JxW (const unsigned int i) const {
 
 template <int dim>
 void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
-			    const FiniteElement<dim>                         &fe) {
+			    const FiniteElement<dim>                         &fe,
+			    const Boundary<dim>                              &boundary) {
 				   // fill jacobi matrices and real
 				   // quadrature points
   if ((update_flags | update_jacobians) ||
@@ -117,7 +118,8 @@ void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &ce
 		       ansatz_points,
 		       update_flags | update_ansatz_points,
 		       quadrature_points,
-		       update_flags | update_q_points);
+		       update_flags | update_q_points,
+		       boundary);
 
 				   // compute gradients on real element if
 				   // requested
@@ -149,8 +151,7 @@ void FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &ce
 				   // determinant
   if (update_flags | update_JxW_values) 
     {
-      Assert (update_flags | update_jacobians,
-	      ExcCannotInitializeField());
+      Assert (update_flags | update_jacobians, ExcCannotInitializeField());
       for (unsigned int i=0; i<n_quadrature_points; ++i)
 	JxW_values[i] = weights[i] / jacobi_matrices[i].determinant();
     };
@@ -239,7 +240,8 @@ void FiniteElementBase<dim>::fill_fe_values (const typename Triangulation<dim>::
 					     vector<Point<dim> > &,
 					     const bool,
 					     vector<Point<dim> > &,
-					     const bool) const {
+					     const bool,
+					     const Boundary<dim> &) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
@@ -247,6 +249,7 @@ void FiniteElementBase<dim>::fill_fe_values (const typename Triangulation<dim>::
 
 template <int dim>
 void FiniteElementBase<dim>::face_ansatz_points (const typename Triangulation<dim>::face_iterator &,
+						 const Boundary<dim> &,
 						 vector<Point<dim> > &) const {
   Assert (false, ExcPureFunctionCalled());
 };
@@ -271,7 +274,8 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 				       vector<Point<1> > &ansatz_points,
 				       const bool         compute_ansatz_points,
 				       vector<Point<1> > &q_points,
-				       const bool         compute_q_points) const {
+				       const bool         compute_q_points,
+				       const Boundary<1> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -313,6 +317,7 @@ void FiniteElement<1>::fill_fe_values (const Triangulation<1>::cell_iterator &ce
 
 
 void FiniteElement<1>::face_ansatz_points (const typename Triangulation<1>::face_iterator &,
+					   const Boundary<1> &,
 					   vector<Point<1> > &) const {
 				   // is this function useful in 1D?
   Assert (false, ExcPureFunctionCalled());
@@ -336,13 +341,15 @@ void FiniteElement<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				       vector<Point<2> > &,
 				       const bool,
 				       vector<Point<2> > &,
-				       const bool) const {
+				       const bool,
+				       const Boundary<2> &) const {
   Assert (false, ExcPureFunctionCalled());
 };
 
 
 
 void FiniteElement<2>::face_ansatz_points (const typename Triangulation<2>::face_iterator &,
+					   const Boundary<2> &,
 					   vector<Point<2> > &) const {
 				   // is this function useful in 1D?
   Assert (false, ExcPureFunctionCalled());

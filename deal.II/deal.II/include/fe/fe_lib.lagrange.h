@@ -80,7 +80,8 @@ class FELinear : public FiniteElement<dim> {
 				 vector<Point<dim> > &ansatz_points,
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
-				 const bool           compute_q_points) const;
+				 const bool           compute_q_points,
+				 const Boundary<dim> &boundary) const;
 
 				     /**
 				      * Return the ansatz points this FE has
@@ -95,6 +96,7 @@ class FELinear : public FiniteElement<dim> {
 				      * elements.
 				      */
     virtual void face_ansatz_points (const Triangulation<dim>::face_iterator &face,
+				     const Boundary<dim>  &boundary,
 				     vector<Point<dim> >  &ansatz_points) const;
 };
 
@@ -164,7 +166,8 @@ class FEQuadratic : public FiniteElement<dim> {
 				 vector<Point<dim> > &ansatz_points,
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
-				 const bool           compute_q_points) const;
+				 const bool           compute_q_points,
+				 const Boundary<dim> &boundary) const;
 };
 
 
@@ -233,7 +236,8 @@ class FECubic : public FiniteElement<dim> {
 				 vector<Point<dim> > &ansatz_points,
 				 const bool           compute_ansatz_points,
 				 vector<Point<dim> > &q_points,
-				 const bool           compute_q_points) const;
+				 const bool           compute_q_points,
+				 const Boundary<dim> &boundary) const;
 };
 
 

@@ -77,7 +77,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				 const Quadrature<dim>    &quadrature,
 				 const FiniteElement<dim> &fe,
 				 const UpdateFields       &update_flags,
-				 const DirichletBC        &dirichlet_bc) {
+				 const DirichletBC        &dirichlet_bc,
+				 const Boundary<dim>      &boundary) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   
   system_sparsity.reinit (dof_handler->n_dofs(),
@@ -105,7 +106,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 			   right_hand_side,
 			   quadrature,
 			   fe,
-			   update_flags);
+			   update_flags,
+			   boundary);
   active_assemble_iterator assembler (tria,
 				      tria->begin_active()->level(),
 				      tria->begin_active()->index(),
@@ -127,7 +129,7 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 				   // in the docs
   apply_dirichlet_bc (system_matrix, solution,
 		      right_hand_side,
-		      dirichlet_bc, fe);
+		      dirichlet_bc, fe, boundary);
   
 };
 
@@ -158,7 +160,8 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
 					     dVector                  &difference,
 					     const Quadrature<dim>    &q,
 					     const FiniteElement<dim> &fe,
-					     const NormType           &norm) const {
+					     const NormType           &norm,
+					     const Boundary<dim>      &boundary) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
   Assert (fe == dof_handler->get_selected_fe(), ExcInvalidFE());
 
@@ -187,7 +190,7 @@ void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_sol
     {
       double diff=0;
 				       // initialize for this cell
-      fe_values.reinit (tria_cell, fe);
+      fe_values.reinit (tria_cell, fe, boundary);
 
       switch (norm) 
 	{
@@ -375,7 +378,8 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 					   dVector  &solution,
 					   dVector  &right_hand_side,
 					   const DirichletBC &dirichlet_bc,
-					   const FiniteElement<dim> &fe) {
+					   const FiniteElement<dim> &fe,
+					   const Boundary<dim>      &boundary) {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
   Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
 	  ExcInvalidBoundaryIndicator());
@@ -387,7 +391,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 				   // the lines in 2D being subject to
 				   // different bc's), the last value is taken
   map<int,double> boundary_values;
-  make_boundary_value_list (dirichlet_bc, fe, boundary_values);
+  make_boundary_value_list (dirichlet_bc, fe, boundary, boundary_values);
 
   map<int,double>::const_iterator dof, endd;
   const unsigned int n_dofs   = (unsigned int)matrix.m();
@@ -477,6 +481,7 @@ void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
 void
 ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
 					  const FiniteElement<1> &,
+					  const Boundary<1> &,
 					  map<int,double>   &) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
   Assert (false, ExcNotImplemented());
@@ -487,8 +492,9 @@ ProblemBase<1>::make_boundary_value_list (const DirichletBC &,
 
 template <int dim>
 void
-ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
+ProblemBase<dim>::make_boundary_value_list (const DirichletBC        &dirichlet_bc,
 					    const FiniteElement<dim> &fe,
+					    const Boundary<dim>      &boundary,
 					    map<int,double>   &boundary_values) const {
   Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
 
@@ -521,7 +527,7 @@ ProblemBase<dim>::make_boundary_value_list (const DirichletBC &dirichlet_bc,
 	face_dofs.erase (face_dofs.begin(), face_dofs.end());
 	dof_values.erase (dof_values.begin(), dof_values.end());
 	face->get_dof_indices (face_dofs);
-	fe.face_ansatz_points (tface, dof_locations);
+	fe.face_ansatz_points (tface, boundary, dof_locations);
 	(*function_ptr).second->value_list (dof_locations, dof_values);
 
 					 // enter into list

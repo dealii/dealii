@@ -20,7 +20,8 @@ template <int dim> class DataOut;
 template <int dim> class Function;
 template <int dim> class Equation;
 template <int dim> class Assembler;
-
+template <int dim> class Boundary;
+template <int dim> class StraightBoundary;
 
 
 
@@ -78,6 +79,13 @@ enum NormType {
       induced by hanging nodes.
   \end{itemize}
 
+  The #assemble# function needs an object describing the boundary of the domain,
+  since for higher order finite elements, we may be tempted to use curved faces
+  of cells for better approximation of the boundary. In this case, the
+  transformation from the unit cell to the real cell requires knowledge of
+  the exact boundary of the domain. By default it is assumed that the
+  boundary be approximated by straight segments.
+  
 
   {\bf Solving}
 
@@ -294,7 +302,8 @@ class ProblemBase {
 			   const Quadrature<dim>    &q,
 			   const FiniteElement<dim> &fe,
 			   const UpdateFields       &update_flags,
-			   const DirichletBC        &dirichlet_bc = DirichletBC());
+			   const DirichletBC        &dirichlet_bc = DirichletBC(),
+			   const Boundary<dim>      &boundary = StraightBoundary<dim>());
     
 				     /**
 				      * Solve the system of equations.
@@ -315,7 +324,8 @@ class ProblemBase {
 			       dVector                  &difference,
 			       const Quadrature<dim>    &q,
 			       const FiniteElement<dim> &fe,
-			       const NormType           &norm) const;
+			       const NormType           &norm,
+			       const Boundary<dim> &boundary=StraightBoundary<dim>()) const;
     
 				     /**
 				      * Initialize the #DataOut# object with
@@ -358,6 +368,7 @@ class ProblemBase {
 				      */
     virtual void make_boundary_value_list (const DirichletBC        &dirichlet_bc,
 					   const FiniteElement<dim> &fe,
+					   const Boundary<dim>      &boundary,
 					   map<int,double>          &boundary_values) const;
     
 				     /**
@@ -433,7 +444,8 @@ class ProblemBase {
 			     dVector           &solution,
 			     dVector           &right_hand_side,
 			     const DirichletBC &dirichlet_bc,
-			     const FiniteElement<dim> &fe);
+			     const FiniteElement<dim> &fe,
+			     const Boundary<dim>      &boundary);
     
     friend class Assembler<dim>;
 };

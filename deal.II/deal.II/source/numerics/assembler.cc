@@ -51,7 +51,8 @@ AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
 				   dVector                  &rhs_vector,
 				   const Quadrature<dim>    &quadrature,
 				   const FiniteElement<dim> &fe,
-				   const UpdateFields       &update_flags) :
+				   const UpdateFields       &update_flags,
+				   const Boundary<dim>      &boundary) :
 		dof(dof),
 		assemble_matrix(assemble_matrix),
 		assemble_rhs(assemble_rhs),
@@ -59,7 +60,8 @@ AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
 		rhs_vector(rhs_vector),
 		quadrature(quadrature),
 		fe(fe),
-		update_flags(update_flags) {};
+		update_flags(update_flags),
+		boundary(boundary) {};
 
 
 
@@ -80,7 +82,8 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 		fe(((AssemblerData<dim>*)local_data)->fe),
 		fe_values (((AssemblerData<dim>*)local_data)->fe,
 			   ((AssemblerData<dim>*)local_data)->quadrature,
-			   ((AssemblerData<dim>*)local_data)->update_flags)
+			   ((AssemblerData<dim>*)local_data)->update_flags),
+		boundary(((AssemblerData<dim>*)local_data)->boundary)
 {
   Assert (matrix.m() == dof_handler->n_dofs(), ExcInvalidData());
   Assert (matrix.n() == dof_handler->n_dofs(), ExcInvalidData());
@@ -98,7 +101,8 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
   fe_values.reinit (Triangulation<dim>::cell_iterator (tria,
 						       present_level,
 						       present_index),
-		    fe);
+		    fe,
+		    boundary);
   const unsigned int n_dofs = dof_handler->get_selected_fe().total_dofs;
 
 				   // clear cell matrix

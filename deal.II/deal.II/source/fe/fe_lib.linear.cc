@@ -85,17 +85,19 @@ void FELinear<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				  vector<Point<1> > &ansatz_points,
 				  const bool         compute_ansatz_points,
 				  vector<Point<1> > &q_points,
-				  const bool         compute_q_points) const {
+				  const bool         compute_q_points,
+				  const Boundary<1> &boundary) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
-				    q_points, compute_q_points);
+				    q_points, compute_q_points, boundary);
 };
 
 
 
 void FELinear<1>::face_ansatz_points (const Triangulation<1>::face_iterator &,
+				      const Boundary<1> &,
 				      vector<Point<1> > &) const {
   Assert (false, ExcPureFunctionCalled());
 };
@@ -246,7 +248,8 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 				  vector<Point<2> > &ansatz_points,
 				  const bool         compute_ansatz_points,
 				  vector<Point<2> > &q_points,
-				  const bool         compute_q_points) const {
+				  const bool         compute_q_points,
+				  const Boundary<2> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -335,6 +338,7 @@ void FELinear<2>::fill_fe_values (const Triangulation<2>::cell_iterator &cell,
 
 template <int dim>
 void FELinear<dim>::face_ansatz_points (const typename Triangulation<dim>::face_iterator &face,
+					const Boundary<dim>  &,
 					vector<Point<dim> >  &ansatz_points) const {
   Assert (ansatz_points.size() == (1<<(dim-1)),
 	  typename FiniteElementBase<dim>::ExcWrongFieldDimension (ansatz_points.size(),
@@ -362,12 +366,13 @@ void FEQuadratic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell
 				     vector<Point<1> > &ansatz_points,
 				     const bool         compute_ansatz_points,
 				     vector<Point<1> > &q_points,
-				     const bool         compute_q_points) const {
+				     const bool         compute_q_points,
+				     const Boundary<1> &boundary) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
-				    q_points, compute_q_points);
+				    q_points, compute_q_points, boundary);
 };
 
 
@@ -418,7 +423,8 @@ void FEQuadratic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				     vector<Point<2> > &ansatz_points,
 				     const bool,
 				     vector<Point<2> > &q_points,
-				     const bool) const {
+				     const bool,
+				     const Boundary<2> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
@@ -446,12 +452,13 @@ void FECubic<1>::fill_fe_values (const Triangulation<1>::cell_iterator &cell,
 				 vector<Point<1> > &ansatz_points,
 				 const bool         compute_ansatz_points,
 				 vector<Point<1> > &q_points,
-				 const bool         compute_q_points) const {
+				 const bool         compute_q_points,
+				 const Boundary<1> &boundary) const {
 				   // simply pass down
   FiniteElement<1>::fill_fe_values (cell, unit_points,
 				    jacobians, compute_jacobians,
 				    ansatz_points, compute_ansatz_points,
-				    q_points, compute_q_points);
+				    q_points, compute_q_points, boundary);
 };
 
 
@@ -494,7 +501,8 @@ void FECubic<2>::fill_fe_values (const Triangulation<2>::cell_iterator &,
 				 vector<Point<2> > &ansatz_points,
 				 const bool,
 				 vector<Point<2> > &q_points,
-				 const bool) const {
+				 const bool,
+				 const Boundary<2> &) const {
   Assert (jacobians.size() == unit_points.size(),
 	  ExcWrongFieldDimension(jacobians.size(), unit_points.size()));
   Assert (q_points.size() == unit_points.size(),
