@@ -1,11 +1,12 @@
-# Copyright (C) 1999, 2000, 2002 by the deal.II group
+# Copyright (C) 1999, 2000, 2002, 2005 by the deal.II group
 # $Id$
 
 print <<'EOT'
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
     <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
-    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
     <title>Makefile fro deal.II</title>
     <meta name="author" content="the deal.II authors <authors@dealii.org>">
     <meta name="keywords" content="deal.II Makefile"></head>
