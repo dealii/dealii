@@ -158,7 +158,8 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   dSMatrix mass_matrix (sparsity);
   dVector tmp (mass_matrix.n());
   MatrixCreator<dim>::create_mass_matrix (dof, fe, boundary, mass_matrix);
-  VectorTools<dim>::create_right_hand_side (dof, fe, q, boundary, function, tmp);
+  VectorTools<dim>::create_right_hand_side (dof, fe, q, boundary,
+					    function, tmp);
 
   constraints.condense (mass_matrix);
   MatrixTools<dim>::apply_boundary_values (boundary_values,
@@ -172,6 +173,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 
 				   // solve
   cg (mass_matrix, vec, tmp);
+  
 				   // distribute solution
   constraints.distribute (vec);
 };
