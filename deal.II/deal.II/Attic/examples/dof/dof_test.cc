@@ -409,7 +409,7 @@ void TestCases<dim>::run (ParameterHandler &prm) {
 int main (int argc, char **argv) {
   if (argc!=3) 
     {
-      cout << "Usage: grid_test dimension parameterfile" << endl << endl;
+      cerr << "Usage: dof_test dimension parameterfile" << endl << endl;
       return 1;
     };
 
