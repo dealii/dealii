@@ -58,9 +58,9 @@ template <int dim> class FESubfaceValues;
  *  @sect3{Implementation}
  *
  *  In principle, the implementation of the error estimation is simple: let
- *  $$ \eta_K^2 =
- *  \frac h{24} \int_{\partial K} \left[a \frac{\partial u_h}{\partial n}\right]^2 do
- *  $$
+ *  \f[
+ *  \eta_K^2 = \frac h{24} \int_{\partial K} \left[a \frac{\partial u_h}{\partial n}\right]^2 do
+ *  \f]
  *  be the error estimator for cell $K$. $[\cdot]$ denotes the jump of the
  *  argument at the face. In the paper of Ainsworth, $h$ is divided by $24$,
  *  but this factor is a bit esoteric, stemming from interpolation estimates
@@ -143,7 +143,7 @@ template <int dim> class FESubfaceValues;
  *
  *  @item The face belongs to a Neumann boundary.  In this case, the
  *    contribution of the face $F\in\partial K$ looks like
- *    $$ \int_F \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds $$
+ *    \f[ \int_F \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds \f]
  *    where $g$ is the Neumann boundary function. If the finite element is
  *    vector-valued, then obviously the function denoting the Neumann boundary
  *    conditions needs to be vector-valued as well.
