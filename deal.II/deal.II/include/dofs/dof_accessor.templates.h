@@ -1,11 +1,12 @@
-//----------------------------  dof_accessor.templates.h  ---------------------------
+//-------------------  dof_accessor.templates.h  ---------------------------
+//    $Id$
 //    Version: $Name$
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_accessor.templates.h  ---------------------------
+//-------------------  dof_accessor.templates.h  ---------------------------
 #ifndef __deal2__dof_accessor_templates_h
 #define __deal2__dof_accessor_templates_h
 
