@@ -300,6 +300,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Removed: The <code
+       class="member">FiniteElement::component_to_system_index</code> function
+       and its counterpart for faces is gone. This data did not make much sense
+       in the case of elements that are non-zero in more than one vector
+       component, such as the Nedelec element. The respective information can
+       also be obtained from other sources provided by the finite element
+       classes, if so necessary.
+       <br>
+       (WB 2002/09/16)
+
+  <li> <p> 
        Changed: The <code
        class="member">FiniteElement::restriction_is_additive</code> function
        used to take an argument that denoted the vector component of a finite
