@@ -26,7 +26,7 @@ default: run-tests dat-checks
 dat-checks: run-tests
 	@$(MAKE) do-checks
 
-check-files = $(subst .output, .check, $(wildcard *.output))
+check-files = $(subst .output,.check, $(wildcard *.output))
 do-checks: $(check-files)
 
 ############################################################
