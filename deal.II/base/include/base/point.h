@@ -27,7 +27,7 @@
  * It is the preferred object to be passed to functions which operate on
  * points in spaces of a priori unknown dimension: rather than using functions
  * like <tt>double f(double x)</tt> and <tt>double f(double x, double y)</tt>,
- * you use double <tt>f(Point<dim> &p)</tt>.
+ * you use <tt>double f(Point<dim> &p)</tt>.
  *
  * <tt>Point</tt> also serves as a starting point for the implementation of
  * the geometrical primitives like cells, edges, or faces.
