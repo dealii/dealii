@@ -373,25 +373,36 @@ estimate_some (const Mapping<dim>                  &mapping,
 {
   const unsigned int n_solution_vectors = solutions.size();
   
-				   // make up a fe face values object for the
-				   // restriction of the finite element function
-				   // to a face, for the present cell and its
-				   // neighbor. In principle we would only need
-				   // one at a time, but this way we can
-				   // have more fine grained access to what
-				   // values really need to be computed (we
-				   // need not compute all values on the
-				   // neighbor cells, so using two objects
+				   // make up a fe face values object
+				   // for the restriction of the
+				   // finite element function to a
+				   // face, for the present cell and
+				   // its neighbor. In principle we
+				   // would only need one at a time,
+				   // but this way we can have more
+				   // fine grained access to what
+				   // values really need to be
+				   // computed (we need not compute
+				   // all values on the neighbor
+				   // cells, so using two objects
 				   // gives us a performance gain).
+                                   //
+                                   // in debug mode, make sure that
+                                   // some data matches, so compute
+                                   // quadrature points always
   FEFaceValues<dim> fe_face_values_cell (mapping,
 					 dof_handler.get_fe(),
 					 quadrature,
-					 UpdateFlags(update_gradients      |
-						     update_JxW_values     |
-						     ((!neumann_bc.empty() ||
-						       (coefficients != 0))  ?
-						      update_q_points : 0) |
-						     update_normal_vectors)); 
+                                         UpdateFlags(
+                                           update_gradients      |
+                                           update_JxW_values     |
+                                           ((!neumann_bc.empty() ||
+                                             (coefficients != 0))  ?
+                                            update_q_points : 0) |
+#ifdef DEBUG
+                                           update_q_points |
+#endif
+                                           update_normal_vectors));
   FEFaceValues<dim> fe_face_values_neighbor (mapping,
 					     dof_handler.get_fe(),
 					     quadrature,
@@ -399,7 +410,12 @@ estimate_some (const Mapping<dim>                  &mapping,
   FESubfaceValues<dim> fe_subface_values (mapping,
 					  dof_handler.get_fe(),
 					  quadrature,
-					  update_gradients);
+					  UpdateFlags(
+                                            update_gradients
+#ifdef DEBUG
+                                            | update_q_points
+#endif
+                                            ));
 
 
   active_cell_iterator cell = dof_handler.begin_active();
@@ -987,43 +1003,57 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
     {
 				       // get an iterator pointing to the
 				       // cell behind the present subface
-      const bool orientation_flag
-        = (dim != 3 ?
-           true :
-           cell->get_face_orientation(face_no) == true
-           &&
-           neighbor->get_face_orientation(neighbor_neighbor) == true);
       static const unsigned int subface_translation[4]
         = { 0, 3, 2, 1 };
+                                       // see whether face and
+                                       // the neighbor's
+                                       // counterface share the
+                                       // same indexing of
+                                       // children. if not so,
+                                       // translate child
+                                       // indices
+      const bool face_orientations_match
+        = (neighbor->face_orientation(neighbor_neighbor) ==
+           cell->face_orientation(face_no));
       const unsigned int neighbor_child_index
         = (GeometryInfo<dim>::
            child_cell_on_face(neighbor_neighbor,
-                              (orientation_flag ?
+                              (face_orientations_match ?
                                subface_no :
                                subface_translation[subface_no])));
       const active_cell_iterator neighbor_child
 	= neighbor->child(neighbor_child_index);
-      Assert (neighbor_child->face(neighbor_neighbor) ==
-	      cell->face(face_no)->child(subface_no),
-	      ExcInternalError());
       Assert (!neighbor->child(neighbor_child_index)->has_children(),
 	      ExcInternalError());
       
-				       // restrict the finite element on the
-				       // present cell to the subface and
-				       // store the gradient of the solution
-				       // in psi
+				       // restrict the finite element
+				       // on the present cell to the
+				       // subface
       fe_subface_values.reinit (cell, face_no, subface_no);
 
+				       // restrict the finite element
+				       // on the neighbor cell to the
+				       // common @p{subface}.
+      fe_face_values.reinit (neighbor_child, neighbor_neighbor);
+
+                                       // make sure that quadrature
+                                       // points match
+      for (unsigned int q=0; q<n_q_points; ++q)
+        Assert ((fe_face_values.quadrature_point(q) -
+                 fe_subface_values.quadrature_point(q)).square()
+                <
+                1.e-15 * (fe_face_values.quadrature_point(q).square() + 
+                          fe_subface_values.quadrature_point(q).square()),
+                ExcInternalError());
+
+                                       // store the gradient of the
+				       // solution in psi
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	fe_subface_values.get_function_grads (*solutions[n], per_thread_data.psi[n]);
 
-				       // restrict the finite element on the
-				       // neighbor cell to the common @p{subface}.
-				       // store the gradient in @p{neighbor_psi}
-      
-      fe_face_values.reinit (neighbor_child, neighbor_neighbor);
-
+                                       // store the gradient from the
+				       // neighbor's side in
+				       // @p{neighbor_psi}
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	fe_face_values.get_function_grads (*solutions[n], per_thread_data.neighbor_psi[n]);
       
@@ -1070,7 +1100,7 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 	  if (coefficients->n_components == 1)
 	    {
 	      coefficients->value_list (fe_face_values.get_quadrature_points(),
-					     per_thread_data.coefficient_values1);
+                                        per_thread_data.coefficient_values1);
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
 		for (unsigned int component=0; component<n_components; ++component)
 		  for (unsigned int point=0; point<n_q_points; ++point)

@@ -6124,12 +6124,12 @@ Triangulation<3>::execute_refinement ()
                                              // opposite direction, so
                                              // store that up front
             const bool face_orientation[6]
-              = { hex->get_face_orientation (0),
-                  hex->get_face_orientation (1),
-                  hex->get_face_orientation (2),
-                  hex->get_face_orientation (3),
-                  hex->get_face_orientation (4),
-                  hex->get_face_orientation (5) };
+              = { hex->face_orientation (0),
+                  hex->face_orientation (1),
+                  hex->face_orientation (2),
+                  hex->face_orientation (3),
+                  hex->face_orientation (4),
+                  hex->face_orientation (5) };
                     
 	    const unsigned int line_indices[30]
 	      = {
@@ -6535,7 +6535,7 @@ Triangulation<3>::execute_refinement ()
             for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
               for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s)
                 new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
-                  ->set_face_orientation(f, hex->get_face_orientation(f));
+                  ->set_face_orientation(f, hex->face_orientation(f));
             
 
 					     /////////////////////////////////
@@ -6684,9 +6684,9 @@ Triangulation<3>::execute_refinement ()
                                                          // all
                                                          // wrong...)
                         const bool orient
-                          = (neighbor->get_face_orientation(nb_nb)
+                          = (neighbor->face_orientation(nb_nb)
                              &&
-                             hex->get_face_orientation(face));
+                             hex->face_orientation(face));
                         
                         static const unsigned int
                           child_switch_table[GeometryInfo<dim>::subfaces_per_face]

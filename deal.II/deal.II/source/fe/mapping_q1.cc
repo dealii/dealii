@@ -62,7 +62,7 @@ namespace internal
                                                // face or subface
         case 3:
               return ((face_no +
-                       (cell->get_face_orientation(face_no) == true ?
+                       (cell->face_orientation(face_no) == true ?
                         0 : GeometryInfo<dim>::faces_per_cell))
                       * n_quadrature_points);
 
@@ -90,6 +90,11 @@ namespace internal
     Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
             ExcInternalError());
     Assert (n_quadrature_points > 0, ExcInternalError());
+
+    Assert (cell->has_children() == false,
+            ExcMessage ("You can't use subface data for cells that are "
+                        "already refined. Iterate over their children "
+                        "instead in these cases."));
     
     switch (dim)
       {
@@ -103,10 +108,11 @@ namespace internal
         case 3:
               return (((face_no * GeometryInfo<dim>::subfaces_per_face +
                         subface_no)
-                       + (cell->get_face_orientation(face_no) == true ?
+                       + (cell->face_orientation(face_no) == true ?
                           0 :
                           GeometryInfo<dim>::faces_per_cell *
-                          GeometryInfo<dim>::subfaces_per_face))
+                          GeometryInfo<dim>::subfaces_per_face)
+                       )
                       * n_quadrature_points);
         default:
               Assert (false, ExcInternalError());

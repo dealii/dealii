@@ -250,15 +250,6 @@ unsigned int TriaObjectAccessor<1, dim>::number_of_children () const
 
 
 
-template <int dim>
-bool
-TriaObjectAccessor<1,dim>::get_face_orientation (const unsigned int) const
-{
-  Assert (false, ExcInternalError());
-  return true;
-}
-
-
 /*------------------------ Functions: QuadAccessor ---------------------------*/
 
 template <int dim>
@@ -678,15 +669,6 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 
 
 
-template <int dim>
-bool
-TriaObjectAccessor<2,dim>::get_face_orientation (const unsigned int) const
-{
-  Assert (false, ExcInternalError());
-  return true;
-}
-
-
 
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
 
@@ -715,14 +697,14 @@ int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
     { 0, 3, 2, 1 };
   if (corner<4)
     {
-      if (get_face_orientation(0) == true)
+      if (face_orientation(0) == true)
         return quad(0)->vertex_index(corner);
       else
         return quad(0)->vertex_index(vertex_translation[corner]);
     }
   else
     {
-      if (get_face_orientation(1) == true)
+      if (face_orientation(1) == true)
         return quad(1)->vertex_index(corner-4);
       else
         return quad(1)->vertex_index(vertex_translation[corner-4]);
@@ -1662,28 +1644,6 @@ unsigned int TriaObjectAccessor<3, dim>::number_of_children () const
 	sum += child(c)->number_of_children();
       return sum;
     };
-}
-
-
-
-template <int dim>
-bool
-TriaObjectAccessor<3, dim>::
-get_face_orientation (const unsigned int face) const
-{
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  Assert (face<GeometryInfo<3>::faces_per_cell,
-          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
-  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
-          < this->tria->levels[this->present_level]
-          ->hexes.face_orientations.size(),
-          ExcInternalError());
-          
-  return (this->tria->levels[this->present_level]
-          ->hexes.face_orientations[this->present_index *
-                                    GeometryInfo<3>::faces_per_cell
-                                    +
-                                    face]);
 }
 
 

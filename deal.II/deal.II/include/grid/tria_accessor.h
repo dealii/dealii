@@ -676,20 +676,28 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     unsigned int number_of_children () const;
 
                                      /**
-                                      * Enquire some information about
-                                      * whether the face with the
-                                      * given number is in standard
-                                      * orientation or not. This
-                                      * information is only useful
-                                      * (and available) in 3d, see the
+                                      * Return whether the face with
+                                      * index @p{face} has its normal
+                                      * pointing in the standard
+                                      * direction (@p{true}) or
+                                      * whether it is the opposite
+                                      * (@p{false}). Which is the
+                                      * standard direction is
+                                      * documented with the
+                                      * @ref{Triangulation} class. In
+                                      * 1d and 2d, this is always
+                                      * @p{true}, but in 3d it may be
+                                      * different, see the respective
+                                      * discussion in the
                                       * documentation of the
-                                      * respective class. For all
-                                      * other dimensions, this
-                                      * function should not be called
-                                      * and triggers and assertion if
-                                      * done so.
+                                      * @ref{Triangulation} class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
                                       */
-    bool get_face_orientation (const unsigned int face) const;
+    bool face_orientation (const unsigned int face) const;
     
   private:
     				     /**
@@ -1135,20 +1143,28 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     unsigned int number_of_children () const;
     
                                      /**
-                                      * Enquire some information about
-                                      * whether the face with the
-                                      * given number is in standard
-                                      * orientation or not. This
-                                      * information is only useful
-                                      * (and available) in 3d, see the
+                                      * Return whether the face with
+                                      * index @p{face} has its normal
+                                      * pointing in the standard
+                                      * direction (@p{true}) or
+                                      * whether it is the opposite
+                                      * (@p{false}). Which is the
+                                      * standard direction is
+                                      * documented with the
+                                      * @ref{Triangulation} class. In
+                                      * 1d and 2d, this is always
+                                      * @p{true}, but in 3d it may be
+                                      * different, see the respective
+                                      * discussion in the
                                       * documentation of the
-                                      * respective class. For all
-                                      * other dimensions, this
-                                      * function should not be called
-                                      * and triggers and assertion if
-                                      * done so.
+                                      * @ref{Triangulation} class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
                                       */
-    bool get_face_orientation (const unsigned int face) const;
+    bool face_orientation (const unsigned int face) const;
 
   private:
     				     /**
@@ -1616,20 +1632,28 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     unsigned int number_of_children () const;
 
                                      /**
-                                      * Enquire some information about
-                                      * whether the face with the
-                                      * given number is in standard
-                                      * orientation or not. This
-                                      * information is only useful
-                                      * (and available) in 3d, see the
+                                      * Return whether the face with
+                                      * index @p{face} has its normal
+                                      * pointing in the standard
+                                      * direction (@p{true}) or
+                                      * whether it is the opposite
+                                      * (@p{false}). Which is the
+                                      * standard direction is
+                                      * documented with the
+                                      * @ref{Triangulation} class. In
+                                      * 1d and 2d, this is always
+                                      * @p{true}, but in 3d it may be
+                                      * different, see the respective
+                                      * discussion in the
                                       * documentation of the
-                                      * respective class. For all
-                                      * other dimensions, this
-                                      * function should not be called
-                                      * and triggers and assertion if
-                                      * done so.
+                                      * @ref{Triangulation} class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
                                       */
-    bool get_face_orientation (const unsigned int face) const;
+    bool face_orientation (const unsigned int face) const;
 
   private:
     				     /**
@@ -2098,7 +2122,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     unsigned int number_of_children () const;
 
                                      /**
-                                      * Return whether the quad with
+                                      * Return whether the face with
                                       * index @p{face} has its normal
                                       * pointing in the standard
                                       * direction (@p{true}) or
@@ -2106,6 +2130,12 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
                                       * (@p{false}). Which is the
                                       * standard direction is
                                       * documented with the
+                                      * @ref{Triangulation} class.  In
+                                      * 1d and 2d, this is always
+                                      * @p{true}, but in 3d it may be
+                                      * different, see the respective
+                                      * discussion in the
+                                      * documentation of the
                                       * @ref{Triangulation} class.
                                       *
                                       * This function is really only
@@ -2113,7 +2143,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
                                       * library unless you absolutely
                                       * know what this is all about.
                                       */
-    bool get_face_orientation (const unsigned int face) const;
+    bool face_orientation (const unsigned int face) const;
 
                                      /**
                                       * Set whether the quad with

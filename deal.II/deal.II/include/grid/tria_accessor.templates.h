@@ -25,6 +25,8 @@
 #include <cmath>
 
 
+//TODO[WB]: TriaObjectAccessor<dim,N> should never be used since we have specializations. Can we remove the implementations of functions, or what are they there for?
+
 /*------------------------ Functions: TriaAccessor ---------------------------*/
 
 
@@ -209,6 +211,16 @@ TriaObjectAccessor<1,dim>::max_refinement_depth () const
   const unsigned int depths[2] = { child(0)->max_refinement_depth() + 1,
 				   child(1)->max_refinement_depth() + 1  };
   return std::max (depths[0], depths[1]);
+}
+
+
+
+template <int dim>
+inline
+bool
+TriaObjectAccessor<1,dim>::face_orientation (const unsigned int) const
+{
+  return true;
 }
 
 
@@ -402,6 +414,16 @@ TriaObjectAccessor<2,dim>::max_refinement_depth () const
 
 template <int dim>
 inline
+bool
+TriaObjectAccessor<2,dim>::face_orientation (const unsigned int) const
+{
+  return true;
+}
+
+
+
+template <int dim>
+inline
 void
 TriaObjectAccessor<2,dim>::operator ++ ()
 {
@@ -534,7 +556,7 @@ TriaObjectAccessor<3,dim>::line (const unsigned int i) const
       { 4, 3, 0 }};
 
   return (this->quad(lookup_table[i][0])
-          ->line(get_face_orientation(lookup_table[i][0]) ?
+          ->line(face_orientation(lookup_table[i][0]) ?
                  lookup_table[i][1] :
                  lookup_table[i][2]));
 }
@@ -592,7 +614,7 @@ TriaObjectAccessor<3,dim>::line_index (const unsigned int i) const
       { 4, 3, 0 }};
 
   return (this->quad(lookup_table[i][0])
-          ->line_index(get_face_orientation(lookup_table[i][0]) ?
+          ->line_index(face_orientation(lookup_table[i][0]) ?
                        lookup_table[i][1] :
                        lookup_table[i][2]));
 }
@@ -668,6 +690,29 @@ TriaObjectAccessor<3,dim>::max_refinement_depth () const
 			     std::max (depths[2], depths[3])),
 		   std::max (std::max (depths[4], depths[5]),
 			     std::max (depths[6], depths[7])));
+}
+
+
+
+template <int dim>
+inline
+bool
+TriaObjectAccessor<3, dim>::
+face_orientation (const unsigned int face) const
+{
+  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (face<GeometryInfo<3>::faces_per_cell,
+          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
+  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
+          < this->tria->levels[this->present_level]
+          ->hexes.face_orientations.size(),
+          ExcInternalError());
+          
+  return (this->tria->levels[this->present_level]
+          ->hexes.face_orientations[this->present_index *
+                                    GeometryInfo<3>::faces_per_cell
+                                    +
+                                    face]);
 }
 
 
