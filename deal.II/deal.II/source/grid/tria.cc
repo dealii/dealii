@@ -3260,7 +3260,7 @@ void Triangulation<dim>::prepare_coarsening () {
 
 
 
-#ifdef deal_II_dimension == 2
+#if deal_II_dimension == 2
 
 void Triangulation<2>::delete_cell (cell_iterator &cell) {
   const unsigned int dim=2;
