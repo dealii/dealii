@@ -19,9 +19,6 @@
 #define TYPEMAT double
 
 template class SparseMatrixEZ<TYPEMAT>;
-template void SparseMatrixEZ<TYPEMAT>::print_statistics(std::ostream&, bool);
-template void SparseMatrixEZ<TYPEMAT>::print_statistics(LogStream&, bool);
-
 
 #define TYPE2 float
 

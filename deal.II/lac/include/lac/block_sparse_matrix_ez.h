@@ -257,6 +257,18 @@ class BlockSparseMatrixEZ : public Subscriptor
 		     const BlockVector<somenumber> &src) const;
 
     
+				     /**
+				      * Print statistics. If @p{full}
+				      * is @p{true}, prints a
+				      * histogram of all existing row
+				      * lengths and allocated row
+				      * lengths. Otherwise, just the
+				      * relation of allocated and used
+				      * entries is shown.
+				      */
+    template <class STREAM>
+    void print_statistics (STREAM& s, bool full = false);
+
   private:
 				     /**
 				      * Object storing and managing
@@ -493,6 +505,65 @@ BlockSparseMatrixEZ<Number>::Tvmult_add (
 	block(row,col).Tvmult_add (dst.block(col),
 				   src.block(row));
     };
+}
+
+
+template <typename number>
+template <class STREAM>
+inline
+void
+BlockSparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
+{
+  unsigned int used_total = 0;
+  unsigned int allocated_total = 0;
+  unsigned int reserved_total = 0;
+  std::vector<unsigned int> used_by_line_total;
+  
+  unsigned int used;
+  unsigned int allocated;
+  unsigned int reserved;
+  std::vector<unsigned int> used_by_line;
+
+  for (unsigned int i=0;i<n_block_rows();++i)
+    for (unsigned int j=0;j<n_block_cols();++j)
+      {
+	used_by_line.clear();
+	out << "block:\t" << i << '\t' << j << std::endl;
+	block(i,j).compute_statistics (used, allocated, reserved,
+				       used_by_line, full);
+	
+	out << "used:" << used << std::endl
+	    << "allocated:" << allocated << std::endl
+	    << "reserved:" << reserved << std::endl;
+
+	used_total += used;
+	allocated_total += allocated;
+	reserved_total += reserved;
+	
+	if (full)
+	  {
+	    used_by_line_total.resize(used_by_line.size());
+	    for (unsigned int i=0; i< used_by_line.size();++i)
+	      if (used_by_line[i] != 0)
+		{
+		  out << "row-entries\t" << i
+		      << "\trows\t" << used_by_line[i]
+		      << std::endl;
+		  used_by_line_total[i] += used_by_line[i];
+		}
+	  }
+      }
+  out << "Total" << std::endl
+      << "used:" << used_total << std::endl
+      << "allocated:" << allocated_total << std::endl
+      << "reserved:" << reserved_total << std::endl;
+  for (unsigned int i=0; i< used_by_line_total.size();++i)
+    if (used_by_line_total[i] != 0)
+      {
+	out << "row-entries\t" << i
+	    << "\trows\t" << used_by_line_total[i]
+	    << std::endl;
+      }
 }
 
 

@@ -387,8 +387,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * The matrix will have no
 				      * entries at this point. The
 				      * optional parameters
-				      * @p{default_row_length} and
-				      * @p{default_increment} allow
+				      * @p{default_row_length},
+				      * @p{default_increment} and
+				      * @p{reserve} allow
 				      * for preallocating
 				      * memory. Providing these
 				      * properly is essential for an
@@ -398,7 +399,8 @@ class SparseMatrixEZ : public Subscriptor
     void reinit (const unsigned int n_rows,
 		 const unsigned int n_columns,
 		 unsigned int default_row_length = 0,
-		 unsigned int default_increment = 1);
+		 unsigned int default_increment = 1,
+		 unsigned int reserve = 0);
 
 				     /**
 				      * Release all memory and return
@@ -920,7 +922,26 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     template <class STREAM>
     void print_statistics (STREAM& s, bool full = false);
-    
+
+				     /**
+				      * Compute numbers of entries.
+				      *
+				      * In the first three arguments,
+				      * this function returns the
+				      * number of entries used,
+				      * allocated and reserved by this
+				      * matrix.
+				      *
+				      * If the final argument is true,
+				      * the number of entries in each
+				      * line is printed as well.
+				      */
+    void compute_statistics (unsigned int& used,
+			     unsigned int& allocated,
+			     unsigned int& reserved,
+			     std::vector<unsigned int>& used_by_line,
+			     const bool compute_by_line) const;
+			     
 				     /**
 				      * Exception for applying
 				      * inverse-type operators to
@@ -1557,6 +1578,35 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 	  ++b2;
 	}
       ++b1;
+    }
+}
+
+
+template <typename number>
+template <class STREAM>
+inline
+void
+SparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
+{
+  unsigned int used;
+  unsigned int allocated;
+  unsigned int reserved;
+  std::vector<unsigned int> used_by_line;
+
+  compute_statistics (used, allocated, reserved, used_by_line, full);
+
+  out << "SparseMatrixEZ:used      entries:" << used << std::endl
+      << "SparseMatrixEZ:allocated entries:" << allocated << std::endl
+      << "SparseMatrixEZ:reserved  entries:" << reserved << std::endl;
+
+  if (full)
+    {
+      for (unsigned int i=0; i< used_by_line.size();++i)
+	if (used_by_line[i] != 0)
+	  out << "SparseMatrixEZ:entries\t" << i
+	      << "\trows\t" << used_by_line[i]
+	      << std::endl;
+      
     }
 }
 
