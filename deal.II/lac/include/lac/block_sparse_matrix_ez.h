@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ template <typename Number> class BlockVector;
  * are functions for the multiplication with @p{BlockVector} and
  * access to the individual blocks.
  *
- * @author Guido Kanschat, 2002
+ * @author Guido Kanschat, 2002, 2003
  */
 template<typename Number>
 class BlockSparseMatrixEZ : public Subscriptor
