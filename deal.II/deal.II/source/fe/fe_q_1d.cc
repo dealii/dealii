@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,9 +13,16 @@
 
 
 
+// only compile this file if in 1d
+#if deal_II_dimension == 1
+
+
+#include <fe/fe_q.h>
+
 // Transfer matrices for finite elements
 
-namespace FE_Q_1d {
+namespace FE_Q_1d
+{
   static const double q1_into_q1_refined_0[] =
   {
 	1., 0.,
@@ -102,3 +109,5 @@ FE_Q<1>::Matrices::n_constraint_matrices = 0;
 const double * const
 FE_Q<1>::Matrices::constraint_matrices[] = { 0 };
 
+
+#endif // #if deal_II_dimension == 1
