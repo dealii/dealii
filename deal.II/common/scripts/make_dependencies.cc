@@ -385,20 +385,7 @@ int main (int argc, char **argv)
                                    // they include themselves. for
                                    // each file on the command line,
                                    // we can thus form a complete
-                                   // include tree. do exactly this by
-                                   // populating the all_includes
-                                   // variable. we walk over the list
-                                   // of all these files, but since
-                                   // the tree is constructed
-                                   // recursively, it may happen that
-                                   // for some later filenames the
-                                   // all_includes is already
-                                   // built. the function then returns
-                                   // immediately
-//   for (std::map<std::string,std::set<std::string> >::const_iterator
-//          file = direct_includes.begin(); file!=direct_includes.end(); ++file)
-//     complete_tree (file->first);
-
+                                   // include tree.
   for (std::vector<std::string>::const_iterator file=filenames.begin();
        file != filenames.end(); ++file)
     {
