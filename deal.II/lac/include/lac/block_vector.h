@@ -573,14 +573,17 @@ namespace BlockVectorIterators
  * A vector composed of several blocks each representing a vector of
  * its own.
  *
- * The @p{BlockVector} is a collection of normal LAC-@p{Vector}s. Each of
+ * The @p{BlockVector} is a collection of normal LAC-@ref{Vector}s. Each of
  * the vectors inside can have a different size. The special case of a
  * block vector with constant block size is supported by constructor
- * and reinit functions.
+ * and @p{reinit} functions.
  *
- * The functionality of @p{BlockVector} includes everything a @p{Vector}
- * can do, plus the access to a single @p{Vector} inside the
- * @p{BlockVector} by @p{block(i)}.
+ * The functionality of @p{BlockVector} includes everything a
+ * @p{Vector} can do, plus the access to a single @p{Vector} inside
+ * the @p{BlockVector} by @p{block(i)}. It also has a complete random
+ * access iterator, just as the LAC-@ref{Vector} class or the standard
+ * C++ library template @p{std::vector}. Therefore, all algorithms
+ * working on iterators also work with objects of this class.
  *
  *
  * @sect2{On template instantiations}
@@ -594,7 +597,7 @@ namespace BlockVectorIterators
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001
  */
 template <typename Number>
 class BlockVector
@@ -605,12 +608,8 @@ class BlockVector
 				      * all containers. These types
 				      * parallel those in the @p{C++}
 				      * standard libraries
-				      * @p{vector<...>} class. The
-				      * @p{iterator} types are not
-				      * declared at present, since
-				      * there are no iterators
-				      * implemented that cycle through
-				      * the individual sub-vectors.
+				      * @p{vector<...>} class. This
+				      * includes iterator types.
 				      */
     typedef Number                  value_type;
     typedef value_type             *pointer;
