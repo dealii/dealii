@@ -108,10 +108,7 @@ class ParameterHandler;
  * Since Data Explorer (DX) is distributed as OpenSource, there is a
  * well-accessible visualization tool for all (at least Unix-based)
  * platforms. Therefore, output in its natural file format is
- * included. Right now, this output is very basic, since the
- * functionality of @p{DataOutBase} and derived classes has to be
- * enhanced to use all of its features. Still, using some
- * sophisticated networks, most can be recovered.
+ * included.
  *
  * 
  * @sect3{UCD format}
@@ -509,16 +506,19 @@ class DataOutBase
 					  * locally refined grids.
 					  */
 	bool write_multigrid;
+
 					 /**
 					  * Write neighbor information.
 					  */
 	bool write_neighbors;
+
 					 /**
 					  * Constructor.
 					  */
 	DXFlags (const bool write_multigrid = false,
 		 const bool write_neighbors = false);
-public:
+
+      public:
 					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
