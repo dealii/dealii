@@ -2823,11 +2823,6 @@ void Triangulation<2>::execute_refinement () {
 
 
 
-template <int dim>
-void Triangulation<dim>::execute_coarsening () {
-  Assert (false, ExcInternalError());
-};
-
 
 
 template <int dim>
