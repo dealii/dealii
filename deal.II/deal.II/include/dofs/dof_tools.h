@@ -248,8 +248,9 @@ class DoFTools
 				      * considered.
 				      */
     template<int dim>
-    static void make_flux_sparsity_pattern (const DoFHandler<dim> &dof_handler,
-					    SparsityPattern       &sparsity_pattern);
+    static void
+    make_flux_sparsity_pattern (const DoFHandler<dim> &dof_handler,
+				SparsityPattern       &sparsity_pattern);
     
 				     /**
 				      * Make up the constraints which
@@ -353,22 +354,35 @@ class DoFTools
 				      * the number of components in the
 				      * finite element used by #dof#.
 				      */
-    template<int dim>
-    static void extract_dofs(const DoFHandler<dim> &dof_handler,
-			     const vector<bool>    &select,
-			     vector<bool>          &selected_dofs);
+    template <int dim>
+    static void
+    extract_dofs(const DoFHandler<dim> &dof_handler,
+		 const vector<bool>    &select,
+		 vector<bool>          &selected_dofs);
 
 				     /**
 				      * Do the same thing as #extract_dofs#
 				      * for one level of a multi-grid DoF
 				      * numbering.
 				      */
-    template<int dim>
-    static void extract_level_dofs(const unsigned int       level,
-				   const MGDoFHandler<dim> &dof,
-				   const vector<bool>      &select,
-				   vector<bool>            &selected_dofs);
+    template <int dim>
+    static void
+    extract_level_dofs(const unsigned int       level,
+		       const MGDoFHandler<dim> &dof,
+		       const vector<bool>      &select,
+		       vector<bool>            &selected_dofs);
 
+
+    template <int dim>
+    static void
+    compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
+				   const unsigned int                  coarse_component,
+				   const DoFHandler<dim>              &fine_grid,
+				   const unsigned int                  fine_component,
+				   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				   ConstraintMatrix                   &constraints);
+
+				   
 				     /**
 				      * Exception
 				      */
@@ -385,6 +399,10 @@ class DoFTools
 		    << "is invalid with respect to the number "
 		    << "of components in the finite element "
 		    << "(" << arg2 << ")");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFiniteElementsDontMatch);
 };
 
 
