@@ -1,3 +1,5 @@
+/* $Id$ */
+
 				 // These include files are already
 				 // known to you. They declare the
 				 // classes which handle
@@ -75,29 +77,65 @@
 #include <fstream>
 
 
+				 // Instead of the procedural
+				 // programming of previous examples,
+				 // we encapsulate everything into a
+				 // class for this program. The class
+				 // consists of functions which do
+				 // certain aspects of a finite
+				 // element program, a `main' function
+				 // which controls what is done first
+				 // and what is done next, and a list
+				 // of member variables.
 class LaplaceProblem 
 {
   public:
+				     // This is the constructor:
     LaplaceProblem ();
+
+				     // And the top-level function,
+				     // which is called from the
+				     // outside to start the whole
+				     // program (see the `main'
+				     // function at the bottom of this
+				     // file):
+    void run ();
     
+  private:
+				     // Then there are some member
+				     // functions that mostly do what
+				     // their names suggest. Since
+				     // they do not need to be called
+				     // from outside, they are made
+				     // private to this class.
+  private:
     void make_grid_and_dofs ();
     void assemble_system ();
     void solve ();
     void output_results ();
 
-    void run ();
-    
-  private:
-    Triangulation<2> triangulation;
-    FEQ1<2>          fe;
-    DoFHandler<2>    dof_handler;
-    
+				     // And then we have the member
+				     // variables. There are variables
+				     // describing the triangulation
+				     // and the numbering of the
+				     // degrees of freedom...
+    Triangulation<2>     triangulation;
+    DoFHandler<2>        dof_handler;
+    FEQ1<2>              fe;
+
+				     // ...variables for the sparsity
+				     // pattern and values of the
+				     // system matrix resulting from
+				     // the discretization of the
+				     // Laplace equation...
     SparseMatrixStruct   sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       system_rhs;
-
+				     // ...and variables which will
+				     // hold the right hand side and
+				     // solution vectors.
     Vector<double>       solution;
+    Vector<double>       system_rhs;
 };
 
 
@@ -153,8 +191,8 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // the one cell which made up the
 				   // initial grid. Of course, on the
 				   // next coarser level, the number
-				   // of cells is one quarter of the
-				   // cells on the finest level,
+				   // of cells is one quarter that of
+				   // the cells on the finest level,
 				   // i.e. 256, then 64, 16, 4, and
 				   // 1. We can get the total number
 				   // of cells like this:
