@@ -11,7 +11,6 @@
 //
 //----------------------------  grid_reordering.cc  ---------------------------
 
-
 #include <base/thread_management.h>
 #include <grid/grid_reordering.h>
 
@@ -22,11 +21,6 @@
 namespace internal
 {
 // static variables
-#if deal_II_dimension == 2
-  const unsigned int GridReorderingInfo<2>::rotational_states_of_cells;
-  const unsigned int GridReorderingInfo<2>::rotational_states_of_faces;
-#endif
-
 #if deal_II_dimension == 3
   const unsigned int GridReorderingInfo<3>::rotational_states_of_cells;
   const unsigned int GridReorderingInfo<3>::rotational_states_of_faces;
@@ -42,6 +36,19 @@ const unsigned int GridReordering<dim>::FaceData::invalid_adjacent_cell;
 
 
 
+#if deal_II_dimension == 1
+
+void GridReordering<1>::reorder_cells (const std::vector<CellData<1> > &)
+{
+				   // there should not be much to do
+				   // in 1d...
+}
+
+#endif
+
+
+
+#if deal_II_dimension == 3
 
 template <int dim>
 GridReordering<dim>::Cell::Cell () :
@@ -99,122 +106,6 @@ GridReordering<dim>::Cell::insert_faces (std::map<Face,FaceData> &/*global_faces
 }
 
 
-#if deal_II_dimension == 2
-
-template <>
-void
-GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
-{
-  const unsigned int dim = 2;
-
-				   // first compute index numbers for
-				   // the faces in usual order as
-				   // defined by the order of vertices
-				   // in the cell object
-  Face new_faces[GeometryInfo<dim>::faces_per_cell]
-    = { { { this->vertices[0], this->vertices[1] } },
-        { { this->vertices[1], this->vertices[2] } },
-	{ { this->vertices[3], this->vertices[2] } },
-	{ { this->vertices[0], this->vertices[3] } } };
-
-				   // then insert them into the global
-				   // list and store iterators to
-				   // them. note that if the face
-				   // already exists, then the stored
-				   // data is not touched.
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    faces[0][face] = global_faces.insert (std::make_pair(new_faces[face],
-							 FaceData())).first;
-
-
-				   // then for each of the faces also
-				   // insert the reverse form and
-				   // store pointers to them. note
-				   // that the rotational state in
-				   // which all faces are reverted is
-				   // `2'
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    {
-      std::swap (new_faces[face].vertices[0],
-		 new_faces[face].vertices[1]);
-      faces[2][face] = global_faces.insert (std::make_pair(new_faces[face],
-							   FaceData())).first;
-    };
-
-				   // then finally fill in rotational
-				   // states 1 and 3 of the cell. the
-				   // faces of these states can be
-				   // obtained from states 0 and 2
-  faces[1][0] = faces[2][0];
-  faces[1][1] = faces[0][1];
-  faces[1][2] = faces[2][2];
-  faces[1][3] = faces[0][3];
-  
-  faces[3][0] = faces[0][0];
-  faces[3][1] = faces[2][1];
-  faces[3][2] = faces[0][2];
-  faces[3][3] = faces[2][3];
-  
-
-				   // finally fill the crosslink and
-				   // other fields of the new
-				   // entries. note that since
-				   // rotational states 0 and 2 of the
-				   // cell are exactly reverted, we
-				   // only have to operate on the face
-				   // pointers of these two states to
-				   // reach all possible faces and
-				   // permutations thereof
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    {
-      if (faces[0][face]->second.adjacent_cells[0] ==
-	  FaceData::invalid_adjacent_cell)
-	{
-					   // face had not been
-					   // inserted by previous
-					   // cells, since first
-					   // adjacent cell is still
-					   // untouched. provide
-					   // xlinks to rotated faces
-	  faces[0][face]->second.reverse_faces[0] = faces[2][face];
-	  faces[2][face]->second.reverse_faces[0] = faces[0][face];
-
-					   // and insert this cell as
-					   // adjacent_cell of the faces
-	  faces[0][face]->second.adjacent_cells[0] = cell_no;
-	  faces[2][face]->second.adjacent_cells[0] = cell_no;
-	}
-      else
-	{
-					   // face had already been
-					   // inserted. make sure that
-					   // it was in the same way:
-	  Assert (faces[0][face]->second.reverse_faces[0] == faces[2][face],
-		  ExcInternalError());	  
-	  Assert (faces[2][face]->second.reverse_faces[0] == faces[0][face],
-		  ExcInternalError());
-
-					   // now insert ourselves as
-					   // second
-					   // adjacent_cell. the
-					   // respective slots must
-					   // necessarily be empty
-					   // still
-	  Assert (faces[0][face]->second.adjacent_cells[1] ==
-		  FaceData::invalid_adjacent_cell,
-		  ExcInternalError());
-	  Assert (faces[2][face]->second.adjacent_cells[1] ==
-		  FaceData::invalid_adjacent_cell,
-		  ExcInternalError());
-	  faces[0][face]->second.adjacent_cells[1] = cell_no;
-	  faces[2][face]->second.adjacent_cells[1] = cell_no;
-	};
-    };
-}
-
-#endif
-
-#if deal_II_dimension == 3
 
 template <>
 void
@@ -543,7 +434,6 @@ GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces)
 			 [cell_orientation_faces[rot][face].first];
 }
 
-#endif
 
 
 template <int dim>
@@ -1293,25 +1183,466 @@ void GridReordering<dim>::reorder_cells (std::vector<CellData<dim> > &original_c
     Assert (i->second.use_count == 0, ExcInternalError());
 }
 
+#endif // deal_II_dimension == 3
 
+#if deal_II_dimension == 2
 
-#if deal_II_dimension == 1
-
-template <>
-void GridReordering<1>::reorder_cells (std::vector<CellData<1> > &)
+namespace internal
 {
-				   // there should not be much to do
-				   // in 1d...
+  namespace GridReordering2d
+  {
+// -- Definition Of conectivity information --
+    const int ConnectGlobals::EdgeToNode[4][2]=
+    { {0,1},{1,2},{2,3},{3,0} };
+
+    const int ConnectGlobals::NodeToEdge[4][2]=
+    { {3,0},{0,1},{1,2},{2,3} };
+
+    const int ConnectGlobals::DefaultOrientation[4][2]=
+    {{0,1},{1,2},{3,2},{0,3}};
+
+
+
+
+    struct MSide::SideRectify : public std::unary_function<MSide,void>
+    {
+	void operator() (MSide &s) const
+	  {
+	    if (s.v0>s.v1)
+	      std::swap (s.v0, s.v1);
+	  }	    
+    };
+
+
+    struct MSide::SideSortLess : public std::binary_function<MSide,MSide,bool>
+    {
+	bool operator()(const MSide &s1, const MSide &s2) const
+	  {
+	    int s1vmin,s1vmax;
+	    int s2vmin,s2vmax;
+	    if (s1.v0<s1.v1)
+	      {
+		s1vmin=s1.v0;
+		s1vmax=s1.v1;
+	      }
+	    else
+	      {
+		s1vmin=s1.v1;
+		s1vmax=s1.v0;
+	      }
+	    if (s2.v0<s2.v1)
+	      {
+		s2vmin=s2.v0;
+		s2vmax=s2.v1;
+	      }
+	    else
+	      {
+		s2vmin=s2.v1;
+		s2vmax=s2.v0;
+	      }
+
+	    if(s1vmin<s2vmin)
+	      return true;
+	    if(s1vmin>s2vmin)
+	      return false;
+	    return s1vmax<s2vmax;
+	  }
+    };
+    
+
+/**
+ * Returns an MSide corresponding to the
+ * specified side of a deal.II CellData<2> object.
+ */
+    MSide quadside(const CellData<2> &q, unsigned int i)
+    {
+      Assert (i<4, ExcInternalError());
+      return MSide(q.vertices[ConnectGlobals::EdgeToNode[i][0]],
+		   q.vertices[ConnectGlobals::EdgeToNode[i][1]]);
+    }
+
+
+/**
+ * Wrapper class for the quadside() function
+ */
+    struct QuadSide: public std::binary_function<CellData<2>,int,MSide>
+    {
+	MSide operator()(const CellData<2>& q, int i) const
+	  {
+	    return quadside(q,i);
+	  }
+    };
+ 
+    
+
+    MQuad::MQuad (const unsigned int v0,
+		  const unsigned int v1,
+		  const unsigned int v2,
+		  const unsigned int v3,
+		  const unsigned int s0,
+		  const unsigned int s1,
+		  const unsigned int s2,
+		  const unsigned int s3,
+		  const CellData<2>  &cd)
+		    :
+		    original_cell_data (cd)
+    {
+      v[0]=v0;
+      v[1]=v1;
+      v[2]=v2;
+      v[3]=v3;
+      side[0]=s0;
+      side[1]=s1;
+      side[2]=s2;
+      side[3]=s3;
+    }
+
+
+    MSide::MSide (const unsigned int initv0,
+		  const unsigned int initv1)
+		    :
+		    v0(initv0), v1(initv1),
+		    Q0(static_cast<unsigned int>(-1)),Q1(static_cast<unsigned int>(-1)),
+		    lsn0(static_cast<unsigned int>(-1)),lsn1(static_cast<unsigned int>(-1)),
+		    Oriented(false)
+    {};
+
+    
+    
+    bool
+    MSide::operator== (const MSide& s2) const
+    {
+      if ((v0==s2.v0)&&(v1==s2.v1)) {return true;}
+      if ((v0==s2.v1)&&(v1==s2.v0)) {return true;}
+      return false;
+    }
+
+    
+    struct MQuad::MakeQuad : public std::binary_function<CellData<2>,
+		                                         std::vector<MSide>,
+		                                         MQuad>
+    {
+	MQuad operator()(const CellData<2> &q,
+			 const std::vector<MSide> &elist) const
+	  {
+					     //Assumes that the sides
+					     //are in the vector.. Bad
+					     //things will happen if
+					     //they are not!
+	    return MQuad(q.vertices[0],q.vertices[1], q.vertices[2], q.vertices[3],
+			 std::distance(elist.begin(),
+				       std::lower_bound(elist.begin(), elist.end(),
+							quadside(q,0),
+							MSide::SideSortLess() )),
+			 std::distance(elist.begin(),
+				       std::lower_bound(elist.begin(), elist.end(),
+							quadside(q,1),
+							MSide::SideSortLess() )),
+			 std::distance(elist.begin(),
+				       std::lower_bound(elist.begin(), elist.end(),
+							quadside(q,2),
+							MSide::SideSortLess() )),
+			 std::distance(elist.begin(),
+				       std::lower_bound(elist.begin(), elist.end(),
+							quadside(q,3),
+							MSide::SideSortLess() )),
+			 q);
+	  }
+	    
+    };
+
+
+    
+    void
+    GridReordering::reorient(std::vector<CellData<2> > &quads)
+    {
+      build_graph(quads);
+      orient();
+      get_quads(quads);
+    }
+
+
+    void
+    GridReordering::build_graph (const std::vector<CellData<2> > &inquads)
+    {
+				       //Reserve some space 
+      sides.reserve(4*inquads.size());
+      mquads.reserve(inquads.size());
+  
+				       //Insert all the sides into the side vector
+      for (int i=0;i<4;++i)
+	{
+	  std::transform(inquads.begin(),inquads.end(),
+			 std::back_inserter(sides), std::bind2nd(QuadSide(),i));
+	}
+  
+				       //Change each edge so that v0<v1
+      std::for_each(sides.begin(),sides.end(),
+		    MSide::SideRectify() );
+  
+				       //Sort them by Sidevertices.
+      std::sort(sides.begin(),sides.end(),
+		MSide::SideSortLess());
+  
+				       //Remove duplicates 
+      sides.erase(std::unique(sides.begin(),sides.end()),
+		  sides.end());
+
+				       // Swap trick to shrink the
+				       // side vector
+      std::vector<MSide>(sides).swap(sides);
+  
+				       //Assigns the correct sides to
+				       //each quads
+      transform(inquads.begin(),inquads.end(), back_inserter(mquads),
+		std::bind2nd(MQuad::MakeQuad(),sides) );
+  
+				       // Assign the quads to their sides also.
+      int qctr=0;
+      for(std::vector<MQuad>::iterator it=mquads.begin(); it!=mquads.end(); ++it)
+	{
+	  for(int i=0;i<4;++i)
+	    {
+	      MSide &ss =sides[(*it).side[i]];
+	      if(ss.Q0==static_cast<unsigned int>(-1))
+		{
+		  ss.Q0=qctr;
+		  ss.lsn0=i;
+		}
+	      else if (ss.Q1==static_cast<unsigned int>(-1))
+		{
+		  ss.Q1=qctr;
+		  ss.lsn1=i;
+		}
+	      else
+		{
+		  exit(0);
+		}
+	    }
+	  qctr++;
+	}
+    }
+
+
+    void GridReordering::orient()
+    {
+				       // do what the comment in the
+				       // class declaration says
+      unsigned int qnum=0;
+      while(get_unoriented_quad(qnum))
+	{
+	  unsigned int lsn=0;
+	  while(get_unoriented_side(qnum,lsn))
+	    {
+	      orient_side(qnum,lsn);
+	      unsigned int qqnum=qnum;
+	      while(side_hop(qqnum,lsn))
+		{
+						   // switch this face
+		  lsn = (lsn+2)%4;
+		  if (!is_oriented_side(qqnum,lsn))
+		    orient_side(qqnum,lsn);
+		  else
+						     //We've found a
+						     //cycle.. and
+						     //oriented all
+						     //quads in it.
+		    break;
+		}
+	    }
+	}
+    }
+
+
+    void
+    GridReordering::orient_side(const unsigned int quadnum,
+				const unsigned int localsidenum)
+    {
+      MQuad &quad = mquads[quadnum];
+      int op_side_l = (localsidenum+2)%4;
+      MSide &side = sides[mquads[quadnum].side[localsidenum]];
+      const MSide &op_side =sides[mquads[quadnum].side[op_side_l]]; 
+  
+				       //is the opposite side oriented?    
+      if (op_side.Oriented)
+	{
+					   //YES - Make the orientations match
+					   //Is op side in default orientation?
+	  if (op_side.v0==quad.v[ConnectGlobals::DefaultOrientation[op_side_l][0]])
+	    {
+					       //YES
+	      side.v0=quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
+	      side.v1=quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
+	    }
+	  else
+	    {
+					       //NO, its reversed
+	      side.v0=quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
+	      side.v1=quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
+	    }
+	}
+      else
+	{
+					   //NO
+					   //Just use the default orientation      
+	  side.v0=quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
+	  side.v1=quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
+	}
+      side.Oriented=true;  
+    }
+
+
+
+    bool
+    GridReordering::is_fully_oriented_quad(const unsigned int quadnum) const
+    {
+      return (
+	(sides[mquads[quadnum].side[0]].Oriented)&&
+	(sides[mquads[quadnum].side[1]].Oriented)&&
+	(sides[mquads[quadnum].side[2]].Oriented)&&
+	(sides[mquads[quadnum].side[3]].Oriented) 
+      );
+    }
+
+
+
+    bool
+    GridReordering::is_oriented_side(const unsigned int quadnum,
+				     const unsigned int lsn) const
+    {
+      return (sides[mquads[quadnum].side[lsn]].Oriented);
+    }
+
+
+
+
+    bool
+    GridReordering::get_unoriented_quad(unsigned int &UnOrQLoc) const
+    {
+      while( (UnOrQLoc<mquads.size()) &&
+	     is_fully_oriented_quad(UnOrQLoc) )
+	UnOrQLoc++;
+      return (UnOrQLoc!=mquads.size());
+    }
+
+
+
+    bool
+    GridReordering::get_unoriented_side (const unsigned int quadnum,
+					 unsigned int &lsn) const
+    {
+      const MQuad &mq = mquads[quadnum];
+      if(!sides[mq.side[0]].Oriented)
+	{
+	  lsn=0;
+	  return true;
+	}
+      if(!sides[mq.side[1]].Oriented)
+	{
+	  lsn=1;
+	  return true;
+	}
+      if(!sides[mq.side[2]].Oriented)
+	{
+	  lsn=2;
+	  return true;
+	}
+      if(!sides[mq.side[3]].Oriented)
+	{
+	  lsn=3;
+	  return true;
+	}
+      return false;
+    }
+
+
+    bool
+    GridReordering::side_hop (unsigned int &qnum, unsigned int &lsn) const
+    {
+      const MQuad &mq=mquads[qnum];
+      const MSide &s = sides[mq.side[lsn]];
+      unsigned int opquad=0;
+      if (s.Q0==qnum)
+	{
+	  opquad=s.Q1;
+	  lsn =s.lsn1;
+	}
+      else
+	{
+	  opquad=s.Q0;
+	  lsn=s.lsn0;
+	}
+  
+      if (opquad!=static_cast<unsigned int>(-1))
+	{
+	  qnum = opquad;
+	  return true;
+	}
+  
+      return false;
+    }
+
+
+    void
+    GridReordering::get_quads (std::vector<CellData<2> > &outquads) const
+    {
+      outquads.clear();
+      outquads.reserve(mquads.size());
+      for(unsigned int qn=0;qn<mquads.size();++qn)
+	{
+					   // initialize CellData object with
+					   // previous contents, and the
+					   // overwrite all the fields that
+					   // might have changed in the
+					   // process of rotating things
+	  CellData<2> q = mquads[qn].original_cell_data;
+	  
+					   //Are the sides oriented? 
+	  assert(is_fully_oriented_quad(qn));
+	  bool s[4]; //whether side 1 ,2, 3, 4 are in the default orientation
+	  for(int sn=0;sn<4;sn++)
+	    {
+	      s[sn]=is_side_default_oriented(qn,sn);
+	    }
+					   // Are they oriented in the "deal way"?
+	  assert(s[0]==s[2]);
+	  assert(s[1]==s[3]);
+					   // How much we rotate them by.
+	  int rotn = 2*(s[0]?1:0)+ ((s[0]^s[1])?1:0);
+
+	  for(int i=0;i<4;++i)
+	    {
+	      q.vertices[(i+rotn)%4]=mquads[qn].v[i];
+	    }
+	  outquads.push_back(q);
+	}
+
+    }
+
+    bool
+    GridReordering::is_side_default_oriented (const unsigned int qnum,
+					      const unsigned int lsn) const
+    {
+      return (sides[mquads[qnum].side[lsn]].v0 ==
+	      mquads[qnum].v[ConnectGlobals::DefaultOrientation[lsn][0]]);
+    }
+  } // namespace GridReordering2
+} // namespace internal
+
+
+void GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
+{
+  internal::GridReordering2d::GridReordering().reorient(original_cells);
 }
 
 #endif
 
 
-
 // explicit instantiations. only require the main function, it should
 // then claim whatever templates it needs. note that in 1d, the
-// respective function is already specialized
-#if deal_II_dimension >= 2
+// respective function is already specialized, and in 2d we have an
+// explicit specialization of the whole class
+#if deal_II_dimension == 3
 template
 void
 GridReordering<deal_II_dimension>::

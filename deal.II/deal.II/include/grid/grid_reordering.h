@@ -38,39 +38,6 @@ namespace internal
 /**
  * Class declaring some dimension dependent numbers which are needed
  * for the grid reordering class. This is the specialization for the
- * 2d case.
- *
- * @author Wolfgang Bangerth, 2000
- */
-  template <>
-  class GridReorderingInfo<2>
-  {
-    public:
-				       /**
-					* Number of possible valid
-					* orientations of a cell. They
-					* are the state in which it was
-					* delivered and three possible
-					* rotations in counter-clockwise
-					* sense, thus a total of four.
-					*/
-      static const unsigned int rotational_states_of_cells = 4;
-
-				       /**
-					* Number of possible
-					* orientations of a face in
-					* 2d. It is the face and the
-					* face with vertices exchanged,
-					* thus two.
-					*/
-      static const unsigned int rotational_states_of_faces = 2;
-  };
-
-
-
-/**
- * Class declaring some dimension dependent numbers which are needed
- * for the grid reordering class. This is the specialization for the
  * 3d case.
  *
  * @author Wolfgang Bangerth, 2000
@@ -110,7 +77,341 @@ namespace internal
  
 }
 
+
+
+
+
+namespace internal
+{
+/**
+ * Implement the algorithm described in the documentation of the
+ * GridReordering<2> class.
+ *
+ * @author Michael Anderson, 2003
+ */
+  namespace GridReordering2d
+  {
+/**
+ * Defines a variety of variables related to the connectivity of a
+ * simple quad element. This includes the nodes on each edge, which
+ * edges come into each node and what the default deal.II directions
+ * are for the quad.
+ *
+ * @begin{verbatim}
+ *       s2
+ *       
+ *     +-->--+       
+ *     |3   2|     
+ * s3  ^     ^ s1   
+ *     |0   1|     
+ *     +-->--+               
+ *   
+ *       s0           
+ * @end{verbatim}
+ *
+ * @author Michael Anderson, 2003
+ */ 
+    class ConnectGlobals
+    {
+      public:
+					 /**	
+					  * The nodes on each edge in
+					  * anti-clockwise order
+					  * { {0,1},{1,2},{2,3},{3,0} }
+					  */
+	static const int EdgeToNode[4][2];
+
+					 /**
+					  * The edges comin into each
+					  * node, in anti-clockwise
+					  * order
+					  * { {3,0},{0,1},{1,2},{2,3} }
+					  */
+	static const int NodeToEdge[4][2];
   
+					 /**
+					  * The nodes on each edge in
+					  * "default direction order".
+					  * {{0,1},{1,2},{3,2},{0,3}}
+					  */
+	static const int DefaultOrientation[4][2];
+    };
+
+
+/**
+ * An enriched quad with information about how the mesh fits together
+ * so that we can move around the mesh efficiently.
+ *
+ * @author Michael Anderson, 2003
+ */
+    class MQuad
+    {
+      public:
+					 /**
+					  * v0 - v3 are indexes of the vertices of the quad,
+					  * s0 - s3   are indexes for the sides of the quad
+					  */
+	MQuad (const unsigned int  v0,
+	       const unsigned int  v1,
+	       const unsigned int  v2,
+	       const unsigned int  v3,
+	       const unsigned int  s0,
+	       const unsigned int  s1,
+	       const unsigned int  s2,
+	       const unsigned int  s3,
+	       const CellData<2>  &cd);
+	
+					 /**
+					  * Stores the vertex numbers
+					  */
+	unsigned int v[4];
+					 /**
+					  * Stores the side numbers
+					  */
+	unsigned int side[4]; 
+
+					 /**
+					  * Copy of the @p{CellData} object
+					  * from which we construct the
+					  * data of this object.
+					  */
+	CellData<2>  original_cell_data;
+	
+					 /**
+					  * Makes an MQuad from the
+					  * given CellData and MSide
+					  * list.  Is derived from
+					  * binary_function to be
+					  * usable with STL
+					  * containers.
+					  *
+					  * Also assumes that the
+					  * edges listed present in
+					  * the CellData are already
+					  * present in the elist
+					  * vector.
+					  */ 
+	struct MakeQuad;
+    };
+
+/**
+ * The enriched side class containing connectivity information.
+ * Orientation is from v0 to v1; Initially this should have v0<v1.
+ * After global orientation could be either way.
+ *
+ * @author Michael Anderson, 2003
+ */
+    struct MSide
+    {
+					 /**
+					  * Constructor.
+					  */
+	MSide (const unsigned int initv0,
+	       const unsigned int initv1);
+
+					 /**
+					  * Return whether the sides
+					  * are equal, even if their
+					  * ends are reversed.
+					  */
+	bool operator==(const MSide& s2) const;
+  
+	unsigned int v0;
+	unsigned int v1;
+	unsigned int Q0;
+	unsigned int Q1;
+
+					 /**
+					  * Local side numbers on quads 0 and 1.
+					  */
+	int lsn0, lsn1;
+	bool Oriented;
+
+					 /**
+					  * This class makes a MSide have v0<v1
+					  */
+	struct SideRectify;
+
+					 /**
+					  * Provides a side ordering,
+					  * s1<s2, without assuming
+					  * v0<v1 in either of the
+					  * sides.
+					  */
+	struct SideSortLess;
+    };
+
+
+
+/**
+ * Implement the 2d algorithm for grid reordering described in the
+ * documentation of the @ref{GridReordering} class.
+ *
+ * @author Michael Anderson, 2003
+ */   
+    class GridReordering
+    {
+      public:
+
+					 /**
+					  * Do the work intended by
+					  * this class.
+					  */
+	void reorient(std::vector<CellData<2> > &quads);
+      private:
+	
+					 /** 
+					  * Sets up the internal data
+					  * structures so that the we can
+					  * do side hopping and face
+					  * switching efficiently. This
+					  * means we need a whole bunch of
+					  * connectivity information
+					  */
+	void build_graph (const std::vector<CellData<2> > &inquads);
+
+					 /** 
+					  * Orient the internal data
+					  * into deal.II format The
+					  * orientation algorith is as
+					  * follows
+					  *
+					  * 1) Find an unoriented quad (A)
+					  *
+					  * 2) Orient an un_oriented side (s) of (A)
+					  *
+					  * 3) side hop on (s) of (A) to get (B)
+					  *
+					  * 4) if opposite side to (s)
+					  * of (B) is unoriented
+					  * orient it
+					  *
+					  * 5) repeat 3) and 4) until
+					  * side-hoppong fails (we've
+					  * reached a boundary) or (s)
+					  * has already been oriented
+					  * (we've closed a loop or
+					  * unoriented sides).
+					  *
+					  * 6) Repeat 2), 3) ,4) and
+					  * 5) on other unoriented
+					  * sides of (A)
+					  *
+					  * 7) Choose a new unoriented
+					  * A.
+					  */
+	void orient();
+  
+					 /**
+					  * Get the (now correctly
+					  * oriented if we've called
+					  * orient) quads.
+					  */
+	void get_quads(std::vector<CellData<2> > &outquads) const;
+
+					 /**
+					  * Orient_side(qnum,lsn)
+					  * orients the local side lsn
+					  * of the quad qnum in the
+					  * triangulation. If the side
+					  * opposite lsn is oriented
+					  * then lsn is oriented to
+					  * match it. Otherwise it is
+					  * oriented in the "default"
+					  * direction for the quad.
+					  */
+	void orient_side (const unsigned int quadnum,
+			  const unsigned int localsidenum);
+ 
+					 /**
+					  * Returns true if all sides
+					  * of the quad quadnum are
+					  * oriented.
+					  */
+	bool is_fully_oriented_quad (const unsigned int quadnum) const;
+  
+					 /**
+					  * Returns true if the side lsn
+					  * of the quad quadnum is
+					  * oriented.
+					  */
+	bool is_oriented_side (const unsigned int quadnum,
+			       const unsigned int lsn) const;
+
+					 /**
+					  * Returns true is the side is
+					  * oriented in the "default"
+					  * direction
+					  */
+	bool is_side_default_oriented (const unsigned int qnum,
+				       const unsigned int lsn) const;
+  
+					 /**
+					  * Increases UnOrQLoc from
+					  * it's original value to the
+					  * next quad with an
+					  * unoriented side. Returns
+					  * true if there was another
+					  * unoriented quad.
+					  */
+	bool get_unoriented_quad (unsigned int &UnOrQLoc) const;
+
+					 /**
+					  * Sets sidenum to the local
+					  * sidenumber of an
+					  * unoriented side of the
+					  * quad quadnum. Returns true
+					  * if such a side exists.
+					  */
+	bool get_unoriented_side (const unsigned int quadnum,
+				  unsigned int &sidenum) const;
+  
+					 /**
+					  * side_hop(&qnum, &lsn) has
+					  * qnum being the quadnumber
+					  * of a quad in the
+					  * triangulation, and a local
+					  * side number. side_hop then
+					  * sets qnum to the
+					  * quadnumber across the
+					  * other side of the side,
+					  * and sets lsn so that
+					  * quads[qnum].sides[lsn] is
+					  * the same before and after
+					  * the call.  if there is no
+					  * other quad on the other
+					  * side of the current quad,
+					  * then side_hop returns
+					  * false.
+					  */
+	bool side_hop (unsigned int &qnum,
+		       unsigned int &lsn) const;
+  
+					 /**
+					  * Sets lsn so that it points
+					  * to the opposite side of
+					  * the current quad (qnum)
+					  * that it was originally
+					  * pointing to.
+					  */
+	bool switch_faces (unsigned int &qnum,
+			   unsigned int &lsn) const;
+
+					 /**
+					  * A list of enriched
+					  * sides/edges of the mesh.
+					  */
+	std::vector<MSide> sides;
+					 /**
+					  * A list of enriched quads
+					  * in the mesh.
+					  */
+	std::vector<MQuad> mquads;
+    };
+  }  // namespace GridReordering2d
+}  // namespace internal
+
+
 
 
 /**
@@ -171,7 +472,7 @@ namespace internal
  *   |   |   |
  *   o---o---o
  * @end{verbatim}
- * (The reader is aked to try to find a conforming choice of line
+ * (The reader is asked to try to find a conforming choice of line
  * directions; it will soon be obvious that there can't exists such a
  * thing, even if we allow that there might be cells with clockwise
  * and counterclockwise orientation of the lines at the same time.)
@@ -191,12 +492,28 @@ namespace internal
  * The purpose of this class is now to find an ordering for a given
  * set of cells such that the generated triangulation satisfies all
  * the requirements stated above. To this end, we will first show some
- * examples why this is a difficult problem, and then develop an
- * algorithm that finds such a reordering. Note that the algorithm
+ * examples why this is a difficult problem, and then develop
+ * algorithms that finds such a reordering. Note that the algorithm
  * operates on a set of @ref{CellData} objects that are used to
  * describe a mesh to the triangulation class. These objects are, for
  * example, generated by the @ref{GridIn} class, when reading in grids
  * from input files.
+ *
+ * As a last question for this first section: is it guaranteed that
+ * such orientations of faces always exist for a given subdivision of
+ * a domain into cells? The linear complexity algorithm described
+ * below for 2d also proves that the answer is yes for 2d. For 3d, the
+ * answer is no (which also underlines that using such orientations
+ * might be an -- unfortunately uncurable -- misfeature of deal.II). A
+ * simple counter-example in 3d illustrates this: take a string of 3d
+ * cells and bend it together to a torus. Since opposing lines in a
+ * cell need to have the same direction, there is a simple ordering
+ * for them, for example all lines radially outward, tangentially
+ * clockwise, and axially upward. However, if before joining the two
+ * ends of the string of cells, the string is twisted by 180 degrees,
+ * then no such orientation is possible any more, as can easily be
+ * checked. In effect, some meshes cannot be used in deal.II,
+ * unfortunately.
  *
  *
  * @sect3{Examples of problems}
@@ -305,8 +622,8 @@ namespace internal
  * requirements of deal.II triangulations are met.
  *
  * These two examples demonstrate that if we have added a certain
- * number of cells in some oeirntation of faces and can't add the next
- * one without introducingfaces that had already been added in another
+ * number of cells in some orientation of faces and can't add the next
+ * one without introducing faces that had already been added in another
  * direction, then it might not be sufficient to only rotate cells in
  * the neighborhood of the the cell that we failed to add. It might be
  * necessary to go back a long way and rotate cells that have been
@@ -325,8 +642,8 @@ namespace internal
  * rotated cell 1, then we would have to rotate the cells 1 through
  * N-1 as well).
  *
- * The only solution to this problem seems to be the following: if
- * cell N can't be added, the try to rotate cell N-1. If we can't
+ * A brute force approach to this problem is the following: if
+ * cell N can't be added, then try to rotate cell N-1. If we can't
  * rotate cell N-1 any more, then try to rotate cell N-2 and try to
  * add cell N with all orientations of cell N-1. And so
  * on. Algorithmically, we can visualize this by a tree structure,
@@ -361,7 +678,7 @@ namespace internal
  * that has already been added, then there are already only two
  * possible orientations left, so the total number of checks we have
  * to make until we find a valid way is significantly smaller than
- * @p{4**N}. However, an algorithm is still exponential in time and
+ * @p{4**N}. However, the algorithm is still exponential in time and
  * linear in memory (we only have to store the information for the
  * present path in form of a stack of orientations of cells that have
  * already been added).
@@ -371,26 +688,162 @@ namespace internal
  * very first cells there to find a way to add all cells in a
  * consistent fashion.
  *
- * This discouraging situation is geatly improved by the fact that we
- * can find an algorithm that in practice is usually only roughly
- * linear in time and memory. We will describe this algorithm in the
- * following.
+ * This discouraging situation is greatly improved by the fact that we
+ * have an alternative algorithm for 2d that is always linear in
+ * runtime (discovered and implemented by Michael Anderson of TICAM,
+ * University of Texas, in 2003), and that for 3d we can find an
+ * algorithm that in practice is usually only roughly linear in time
+ * and memory. We will describe these algorithms in the following.
+ *
+ *
+ * @sect3{The 2d linear complexity algorithm}
+ *
+ * The algorithm uses the fact that opposite faces of a cell need to
+ * have the same orientation. So you start with one arbitrary line,
+ * choose an orientation. Then the orientation of the opposite face is
+ * already fixed. Then go to the two cells across the two faces we
+ * have fixed: for them, one face is fixed, so we can also fix the
+ * opposite face. Go on with doing so. Eventually, we have done this
+ * for a string of cells. Then take one of the non-fixed faces of a
+ * cell which has already two fixed faces and do all this again.
+ *
+ * In more detail, the algorithm is best illustrated using an
+ * example. We consider the mesh below:
+ * @begin{verbatim}
+ *   9------10-------11
+ *   |      |        /|
+ *   |      |       / |
+ *   |      |      /  |
+ *   6------7-----8   |
+ *   |      |     |   |
+ *   |      |     |   |
+ *   |      |     |   |
+ *   3------4-----5   |
+ *   |      |      \  |
+ *   |      |       \ |
+ *   |      |        \|
+ *   0------1---------2
+ * @end{verbatim}
+ * First a cell is chosen ( (0,1,4,3) in this case). A single side of the cell
+ * is oriented arbitrarily (3->4). This choice of orientation is then propogated
+ * through the mesh, across sides and elements. (0->1), (6->7) and (9->10).
+ * The involves edge-hopping and face hopping, giving a path through the mesh
+ * shown in dots.
+ * @begin{verbatim}
+ *   9-->--10-------11
+ *   |  .  |        /|
+ *   |  .  |       / |
+ *   |  .  |      /  |
+ *   6-->--7-----8   |
+ *   |  .  |     |   |
+ *   |  .  |     |   |
+ *   |  .  |     |   |
+ *   3-->--4-----5   |
+ *   |  .  |      \  |
+ *   |  X  |       \ |
+ *   |  .  |        \|
+ *   0-->--1---------2
+ * @end{verbatim}
+ * This is then repeated for the other sides of the chosen element, orienting
+ * more sides of the mesh.
+ * @begin{verbatim}
+ *   9-->--10-------11
+ *   |     |        /|
+ *   v.....v.......V |
+ *   |     |      /. |
+ *   6-->--7-----8 . |
+ *   |     |     | . |
+ *   |     |     | . |
+ *   |     |     | . |
+ *   3-->--4-----5 . |
+ *   |     |      \. |
+ *   ^..X..^.......^ |
+ *   |     |        \|
+ *   0-->--1---------2
+ * @end{verbatim}
+ * Once an element has been completely oriented it need not be considered
+ * further. These elements are filled with o's in the diagrams. We then move
+ * to the next element.
+ * @begin{verbatim}
+ *   9-->--10->-----11
+ *   | ooo |  .     /|
+ *   v ooo v  .    V |
+ *   | ooo |  .   /  |
+ *   6-->--7-->--8   |
+ *   |     |  .  |   |
+ *   |     |  .  |   |
+ *   |     |  .  |   |
+ *   3-->--4-->--5   |
+ *   | ooo |  .   \  |
+ *   ^ ooo ^  X    ^ |
+ *   | ooo |  .     \|
+ *   0-->--1-->------2
+ * @end{verbatim}
+ * Repeating this gives
+ * @begin{verbatim}
+ *   9-->--10->-----11
+ *   | ooo | oooooo /|
+ *   v ooo v ooooo V |
+ *   | ooo | oooo /  |
+ *   6-->--7-->--8   |
+ *   |     |     |   |
+ *   ^.....^..X..^...^
+ *   |     |     |   |
+ *   3-->--4-->--5   |
+ *   | ooo | oooo \  |
+ *   ^ ooo ^ ooooo ^ |
+ *   | ooo | oooooo \|
+ *   0-->--1-->------2
+ * @end{verbatim}
+ * and the final oriented mesh is
+ * @begin{verbatim}
+ *   9-->--10->-----11
+ *   |     |        /|
+ *   v     v       V |
+ *   |     |      /  |
+ *   6-->--7-->--8   |
+ *   |     |     |   |
+ *   ^     ^     ^   ^
+ *   |     |     |   |
+ *   3-->--4-->--5   |
+ *   |     |      \  |
+ *   ^     ^       ^ |
+ *   |     |        \|
+ *   0-->--1-->-------2
+ * @end{verbatim}
+ * It is obvious that this algorithm has linear run-time, since it
+ * only ever touches each face exactly once.
+ *
+ * The algorithm just described is implemented in a specialization of
+ * this class for the 2d case. Note that in principle, it should be
+ * possible to extend this algorithm to 3d as well, using sheets
+ * instead of strings of cells to work on. If a grid is reorientable,
+ * then such an algorithm should be able to do so in linear time; if
+ * it is not orientable, then it should abort in linear time as
+ * well. However, this has not yet been implemented. Rather, we use
+ * the backtracking and branch pruning algorithm for 3d described
+ * below; this algorithm predates the 2d linear complexity algorithm
+ * and was initially also used in 2d.
+ *
+ *
+ * @sect3{The 3d branch reshuffling and pruning algorithm}
  *
  * The first observation is that although there are counterexamples,
- * problems are usually local. For example, in the second example, if
- * we had numbered the cells in a way that neighboring cells have
- * similar cell numbers, then the amount pf backtracking needed is
- * greatly reduced. Therefore, in the implementation of the algorithm,
- * the first step is to renumber the cells in a Cuthill-McKee fashion:
- * start with the cell with the least number of neighbors and assign
- * to it the cell number zero. Then find all neighbors of this cell
- * and assign to them consecutive further numbers. Then find their
- * neighbors that have not yet been numbered and assign to them
- * numbers, and so on. Graphically, this represents finding zones of
- * cells consecutively further away from the initial cells and number
- * them in this front-marching way. This already greatly improves
- * locality of problems and consequently reduced the necessary amount
- * of backtracking.
+ * problems are usually local. For example, in the second example
+ * mentioned above, if we had numbered the cells in a way that
+ * neighboring cells have similar cell numbers, then the amount of
+ * backtracking needed is greatly reduced. Therefore, in the
+ * implementation of the algorithm, the first step is to renumber the
+ * cells in a Cuthill-McKee fashion: start with the cell with the
+ * least number of neighbors and assign to it the cell number
+ * zero. Then find all neighbors of this cell and assign to them
+ * consecutive further numbers. Then find their neighbors that have
+ * not yet been numbered and assign to them numbers, and so
+ * on. Graphically, this represents finding zones of cells
+ * consecutively further away from the initial cells and number them
+ * in this front-marching way. This already greatly improves locality
+ * of problems and consequently reduced the necessary amount of
+ * backtracking.
  *
  * The second point is that we can use some methods to prune the tree,
  * which usually lead to a valid orientation of all cells very
@@ -408,13 +861,15 @@ namespace internal
  * neighbor of N with the largest cell index and which has already
  * been added.
  *
- * Unfortunately, this method can fail to yield a valid path through the
- * tree if not applied with care. Consider the following situation,
- * initially extracted from a mesh of 950 cells generated
+ * Unfortunately, this method can fail to yield a valid path through
+ * the tree if not applied with care. Consider the following
+ * situation, initially extracted from a mesh of 950 cells generated
  * automatically by the program BAMG (this program usually generates
  * meshes that are quite badly balanced, often have many -- sometimes
  * 10 or more -- neighbors of one vertex, and exposed several problems
- * in the initial algorithm):
+ * in the initial algorithm; note also that the example is in 2d where
+ * we now have the much better algorithm described above, but the same
+ * observations also apply to 3d):
  * @begin{verbatim}
  * 13----------14----15
  * | \         |     |
@@ -518,7 +973,7 @@ namespace internal
  * the triangulation from this data using the
  * @ref{Triangulation}@p{<dim>::create_triangulation} function.
  *
- * @author Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, 2000, Michael Anderson 2003
  */
 template <int dim>
 class GridReordering
@@ -946,14 +1401,51 @@ class GridReordering
 
 
 
+/**
+ * This is the specialization of the general template for 1d. In 1d,
+ * there is actually nothing to be done.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+template <>
+class GridReordering<1>
+{
+  public:
+				     /**
+				      * Do nothing, since in 1d no
+				      * reordering is necessary.
+				      */
+    static void reorder_cells (const std::vector<CellData<1> > &);
+};
+
+
+
+/**
+ * This specialization of the general template implements the
+ * 2d-algorithm described in the documentation of the general
+ * template.
+ *
+ * @author Michael Anderson, 2003
+ */
+template <>
+class GridReordering<2>
+{
+  public:
+				     /**
+				      *  This is the main function,
+				      *  doing what is announced in
+				      *  the general documentation of
+				      *  this class.
+				      */
+    static void reorder_cells (std::vector<CellData<2> > &original_cells);
+};
+
+
+
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
-void GridReordering<2>::Cell::insert_faces (std::map<Face,FaceData> &global_faces);
-template <>
 void GridReordering<3>::Cell::insert_faces (std::map<Face,FaceData> &global_faces);
-template <>
-void GridReordering<1>::reorder_cells (std::vector<CellData<1> > &);
 
 
 #endif
