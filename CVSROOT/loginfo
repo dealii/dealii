@@ -20,7 +20,7 @@ DEFAULT		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CV
 #
 # The various DEAL libraries
 #
-^deal.II/base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base.html; chmod a+r $CVSROOT/LOG/base.html
+^deal.II/base.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/base.html > /tmp/Tbase; mv /tmp/Tbase $CVSROOT/LOG/base.html; chmod a+r $CVSROOT/LOG/base-2000.html
 #
 ^reports.*		(echo $USER %s; date; cat) | /home/people/cvs/script/log.pl | cat - $CVSROOT/LOG/reports.html > /tmp/Treports; mv /tmp/Treports $CVSROOT/LOG/reports.html; chmod a+r $CVSROOT/LOG/reports.html
 #
