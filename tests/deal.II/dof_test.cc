@@ -32,41 +32,47 @@
 
 
 template <int dim>
-class Ball :
-  public StraightBoundary<dim> {
+class Ball
+  :
+  public StraightBoundary<dim>
+{
   public:
     virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const {
-      Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line(line);
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+      {
+	Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line(line);
       
-      for (int i=0; i<dim; ++i)
-	middle(i) -= .5;
-      middle *= sqrt(dim) / (sqrt(middle.square())*2);
-      for (int i=0; i<dim; ++i)
-	middle(i) += .5;
+	for (int i=0; i<dim; ++i)
+	  middle(i) -= .5;
+	middle *= sqrt(dim) / (sqrt(middle.square())*2);
+	for (int i=0; i<dim; ++i)
+	  middle(i) += .5;
       
-      return middle;
-    };
+	return middle;
+      };
 
     
     virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const {
-      Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+      {
+	Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
       
-      for (int i=0; i<dim; ++i)
-	middle(i) -= .5;
-      middle *= sqrt(dim) / (sqrt(middle.square())*2);
-      for (int i=0; i<dim; ++i)
-	middle(i) += .5;
+	for (int i=0; i<dim; ++i)
+	  middle(i) -= .5;
+	middle *= sqrt(dim) / (sqrt(middle.square())*2);
+	for (int i=0; i<dim; ++i)
+	  middle(i) += .5;
       
-      return middle;
-    };
+	return middle;
+      };
 };
 
 
 template <int dim>
-class CurvedLine :
-  public StraightBoundary<dim> {
+class CurvedLine
+  :
+  public StraightBoundary<dim>
+{
   public:
     virtual Point<dim>
     get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
@@ -164,7 +170,8 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 
 
 template <int dim>
-class TestCases {
+class TestCases
+{
   public:
     TestCases ();
     virtual ~TestCases ();
@@ -175,6 +182,8 @@ class TestCases {
   private:
     Triangulation<dim> *tria;
     DoFHandler<dim>    *dof;
+    CurvedLine<dim> curved_line;
+    Ball<dim> ball;
 };
 
 
@@ -194,7 +203,8 @@ TestCases<dim>::~TestCases ()
 
 
 template <int dim>
-void TestCases<dim>::create_new () {
+void TestCases<dim>::create_new ()
+{
   if (dof  != 0) delete dof;
   if (tria != 0) delete tria;
 
@@ -209,13 +219,13 @@ void TestCases<dim>::create_new () {
 
 
 template <int dim>
-void TestCases<dim>::run (const unsigned int test_case) {
+void TestCases<dim>::run (const unsigned int test_case)
+{
   cout << "Dimension = " << dim
        << ", Test case = " << test_case << endl
        << endl;
   
   cout << "    Making grid..." << endl;  
-  Boundary<dim> *boundary = 0;
   
   switch (test_case) 
     {
@@ -254,10 +264,8 @@ void TestCases<dim>::run (const unsigned int test_case) {
 	  };
 	
 					 // set the boundary function
-	boundary = (test_case==2 ?
-		    static_cast<Boundary<dim>*>(new Ball<dim>()) :
-		    static_cast<Boundary<dim>*>(new CurvedLine<dim>()));
-	tria->set_boundary (boundary);
+	tria->set_boundary(1, (test_case==2)
+			   ? ((Boundary<dim>&)ball) : ((Boundary<dim>&)curved_line));
 	
 					 // refine once
 	tria->begin_active()->set_refine_flag();
@@ -325,9 +333,6 @@ void TestCases<dim>::run (const unsigned int test_case) {
 				   // release the lock that dof has to the
 				   // finite element object
   dof->clear ();
-  tria->set_boundary (0);
-  if (boundary)
-    delete boundary;
 };
 
 

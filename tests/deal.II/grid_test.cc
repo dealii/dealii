@@ -216,9 +216,9 @@ void test (const int test_case) {
 	Ball<dim>       ball;
 	CurvedLine<dim> curved_line;
 	if (test_case==2)
-	  tria.set_boundary (&ball);
+	  tria.set_boundary (1, ball);
 	else
-	  tria.set_boundary (&curved_line);
+	  tria.set_boundary (1, curved_line);
 	
 					 // refine once
 	tria.begin_active()->set_refine_flag();
