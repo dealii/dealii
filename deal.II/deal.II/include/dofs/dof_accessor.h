@@ -177,14 +177,210 @@ class DoFObjectAccessor_Inheritance<dim,dim>
 /**
  * Common template for line, quad, hex.
  *
+ * Access to the degrees of freedom located on lines.
+ * This class follows mainly the route laid out by the accessor library
+ * declared in the triangulation library (\Ref{TriaAccessor}). It enables
+ * the user to access the degrees of freedom on the lines (there are similar
+ * versions for the DoFs on quads, etc), where the dimension of the underlying
+ * triangulation does not really matter (i.e. this accessor works with the
+ * lines in 1D-, 2D-, etc dimensions).
+ *
+ *
+ * \subsection{Usage}
+ *
+ * The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
+ * declare typedefs to iterators using the accessors declared in this class
+ * hierarchy tree. Usage is best to happens through these typedefs, since they
+ * are more secure to changes in the class naming and template interface as well
+ * as they provide easier typing (much less complicated names!).
+ * 
+ * 
+ * \subsection{Notes about the class hierarchy structure}
+ *
+ * Inheritance from #DoFObjectAccessor_Inheritance<1,dim>::BaseClass# yields
+ * inheritance from #CellAccessor<1># if #dim==1# and from
+ * #TriaObjectAccessor<1,dim># for all other #dim# values. Thus, an object
+ * of this class shares all features of cells in one dimension, but behaves
+ * like an ordinary line in all other cases.
+ *
+ * @author Wolfgang Bangerth, 1998
  * Internal: inheritance is necessary for the general template due to
  * a compiler error.
  * @author Guido Kanschat, 1999
  */
 template<int celldim, int dim>
 class DoFObjectAccessor : public DoFAccessor<dim>,
-			  public DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass
-{};
+			  public TriaObjectAccessor<celldim,dim>//DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass
+{  public:
+				     /**
+				      * Data type  passed by the iterator class.
+				      */
+    typedef DoFHandler<dim> AccessorData;
+
+				     /**
+				      * Declare base class as a local typedef
+				      * for simpler access.
+				      */
+    typedef TriaObjectAccessor<celldim,dim> BaseClass;
+    
+				     /**
+				      * Default constructor. Unused, thus
+				      * not implemented.
+				      */
+    DoFObjectAccessor ();
+
+    				     /**
+				      * Constructor. The #local_data#
+				      * argument is assumed to be a pointer
+				      * to a #DoFHandler<dim># object.
+				      */
+    DoFObjectAccessor (Triangulation<dim> *tria,
+		    const int           level,
+		    const int           index,
+		    const AccessorData *local_data) :
+		    DoFAccessor<dim> (local_data),
+		    DoFObjectAccessor_Inheritance<celldim,dim>::BaseClass (tria,level,index) {};
+    
+				     /**
+				      * Index of the #i#th degree
+				      * of freedom of this object.
+				      */
+    int dof_index (const unsigned int i) const;
+
+    				     /**
+				      * Set the index of the #i#th degree
+				      * of freedom of this object to #index#.
+				      */
+    void set_dof_index (const unsigned int i, const int index) const;
+
+				     /**
+				      * Index of the #i#th degree
+				      * on the #vertex#th vertex.
+				      */
+    int vertex_dof_index (const unsigned int vertex,
+			  const unsigned int i) const;
+
+				     /**
+				      * Set the index of the #i#th degree
+				      * on the #vertex#th vertex to #index#.
+				      */
+    void set_vertex_dof_index (const unsigned int vertex,
+			       const unsigned int i,
+			       const int          index) const;
+
+    				     /**
+				      * Return the indices of the dofs of this
+				      * quad in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
+				      */
+    void get_dof_indices (vector<int> &dof_indices) const;
+
+    				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function. This
+				      * function is only callable for active
+				      * cells.
+				      */
+    template <typename number>
+    void get_dof_values (const Vector<number> &values,
+			 Vector<number>       &local_values) const;
+
+				     /**
+				      * This function is the counterpart to
+				      * #get_dof_values#: it takes a vector
+				      * of values for the degrees of freedom
+				      * of the cell pointed to by this iterator
+				      * and writes these values into the global
+				      * data vector #values#. This function
+				      * is only callable for active cells.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
+				      */
+    template <typename number>
+    void set_dof_values (const Vector<number> &local_values,
+			 Vector<number>       &values) const;
+
+    				     /**
+				      *  Pointer to the #i#th line
+				      *  bounding this Object.
+				      */
+    TriaIterator<dim,DoFObjectAccessor<1, dim> >
+    line (const unsigned int i) const;
+
+    				     /**
+				      *  Pointer to the #i#th quad
+				      *  bounding this Object.
+				      */
+    TriaIterator<dim,DoFObjectAccessor<2, dim> >
+    quad (const unsigned int i) const;
+    
+				     /**
+				      * #i#th child as a #DoFObjectAccessor#
+				      * iterator. This function is needed since
+				      * the child function of the base
+				      * class returns a hex accessor without
+				      * access to the DoF data.
+				      */
+    TriaIterator<dim,DoFObjectAccessor<celldim, dim> > child (const unsigned int) const;
+
+				     /**
+				      * Distribute a local (cell based) vector
+				      * to a global one by mapping the local
+				      * numbering of the degrees of freedom
+				      * to the global one and entering the
+				      * local values into the global vector.
+				      *
+				      * The elements are {\it added} up to
+				      * the elements in the global vector,
+				      * rather than just set, since this is
+				      * usually what one wants.
+				      */
+    void distribute_local_to_global (const Vector<double> &local_source,
+				     Vector<double>       &global_destination) const;
+
+				     /**
+				      * This function does much the same as the
+				      * #distribute_local_to_global(dVector,dVector)#
+				      * function, but operates on matrices
+				      * instead of vectors. The sparse matrix
+				      * is supposed to have non-zero entry
+				      * slots where required.
+				      */
+    void distribute_local_to_global (const FullMatrix<double> &local_source,
+				     SparseMatrix<double>     &global_destination) const;
+    
+				     /**
+				      * Implement the copy operator needed
+				      * for the iterator classes.
+				      */
+    void copy_from (const DoFObjectAccessor<celldim, dim> &a);
+};
 
 
 
@@ -213,7 +409,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
 
 
 /**
- * Grant access to the degrees of freedom located on lines.
+ * Access to the degrees of freedom located on lines.
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (\Ref{TriaAccessor}). It enables
  * the user to access the degrees of freedom on the lines (there are similar
@@ -405,7 +601,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom located on quads.
  *
- * @see DoFLineAccessor
+ * @see DoFObjectAccessor
  */
 template <int dim>
 class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
@@ -582,7 +778,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom located on hexes.
  *
- * @see DoFLineAccessor
+ * @see DoFObjectAccessor
  */
 template <int dim>
 class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
@@ -622,13 +818,13 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     
 				     /**
 				      * Return the index of the #i#th degree
-				      * of freedom of this quad.
+				      * of freedom of this hex.
 				      */
     int dof_index (const unsigned int i) const;
 
     				     /**
 				      * Set the index of the #i#th degree
-				      * of freedom of this quad to #index#.
+				      * of freedom of this hex to #index#.
 				      */
     void set_dof_index (const unsigned int i, const int index) const;
 
@@ -649,7 +845,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 
     				     /**
 				      * Return the indices of the dofs of this
-				      * quad in the standard ordering: dofs
+				      * hex in the standard ordering: dofs
 				      * on vertex 0, dofs on vertex 1, etc,
 				      * dofs on line 0, dofs on line 1, etc,
 				      * dofs on quad 0, etc.
@@ -804,8 +1000,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
 				      * class returns a cell accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> >
-    neighbor (const unsigned int) const;
+    TriaIterator<dim,DoFCellAccessor<dim> > neighbor (const unsigned int) const;
 
     				     /**
 				      * Return the #i#th child as a DoF cell
@@ -814,8 +1009,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
 				      * class returns a cell accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> >
-    child (const unsigned int) const;
+    TriaIterator<dim,DoFCellAccessor<dim> > child (const unsigned int) const;
 
     				     /**
 				      * Return an iterator to the #i#th face
@@ -824,8 +1018,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim> {
 				      * This function is not implemented in 1D,
 				      * and maps to DoFObjectAccessor<2, dim>::line in 2D.
 				      */
-    TriaIterator<dim, DoFObjectAccessor<dim-1, dim> >
-    face (const unsigned int i) const;
+    TriaIterator<dim, DoFObjectAccessor<dim-1, dim> > face (const unsigned int i) const;
 
 				     /**
 				      * Return the interpolation of the given
