@@ -222,6 +222,7 @@ DataOutBase::EpsFlags::default_color_function (const double x,
 };
 
 
+
 DataOutBase::EpsFlags::RgbValues
 DataOutBase::EpsFlags::grey_scale_color_function (const double x,
 						  const double xmin,
@@ -230,6 +231,19 @@ DataOutBase::EpsFlags::grey_scale_color_function (const double x,
   DataOutBase::EpsFlags::RgbValues rgb_values;
   rgb_values.red = rgb_values.blue = rgb_values.green
 		 = (x-xmin)/(xmax-xmin);
+  return rgb_values;
+};
+
+
+
+DataOutBase::EpsFlags::RgbValues
+DataOutBase::EpsFlags::reverse_grey_scale_color_function (const double x,
+							  const double xmin,
+							  const double xmax)
+{
+  DataOutBase::EpsFlags::RgbValues rgb_values;
+  rgb_values.red = rgb_values.blue = rgb_values.green
+		 = 1-(x-xmin)/(xmax-xmin);
   return rgb_values;
 };
 

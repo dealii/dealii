@@ -891,6 +891,24 @@ class DataOutBase
 						    const double max_value);
 	
 					 /**
+					  * This is one more
+					  * alternative color function
+					  * producing a grey scale
+					  * between white (lowest
+					  * values) and black (highest
+					  * values), i.e. the scale is
+					  * reversed to the previous
+					  * one. You may use it by
+					  * setting the
+					  * @p{color_function}
+					  * variable to the address of
+					  * this function.
+					  */
+	static RgbValues reverse_grey_scale_color_function (const double value,
+							    const double min_value,
+							    const double max_value);
+	
+					 /**
 					  * Constructor.
 					  */
 	EpsFlags (const unsigned int  height_vector = 0,
