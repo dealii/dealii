@@ -64,7 +64,7 @@ if ($test)
 		   'sullivan@mathcom.com',
 		   'Ian_MacPhedran@engr.usask.ca',
 		   'roger@maths.grace.cri.nz',
-		   'oon-digest@oonumerics.org',
+#		   'oon-digest@oonumerics.org',
 		   'scicomp@uni-erlangen.de',
 		   'im-net-digest@iwr.uni-heidelberg.de',
 		   'na.digest@na-net.ornl.gov',
