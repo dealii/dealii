@@ -56,27 +56,27 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	AC_MSG_RESULT(C++ compiler is gcc-2.97)
   	GXX_VERSION=gcc2.97
   	;;
-      *3.0*)
+      *version\ 3.0*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.0)
   	GXX_VERSION=gcc3.0
   	;;
-      *3.1*)
+      *version\ 3.1*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.1)
   	GXX_VERSION=gcc3.1
   	;;
-      *3.2*)
+      *version\ 3.2*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.2)
   	GXX_VERSION=gcc3.2
   	;;
-      *3.3*)
+      *version\ 3.3*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.3)
   	GXX_VERSION=gcc3.3
   	;;
-      *3.4*)
+      *version\ 3.4*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.4)
   	GXX_VERSION=gcc3.4
   	;;
-      *3.5*)
+      *version\ 3.5*)
   	AC_MSG_RESULT(C++ compiler is gcc-3.5)
   	GXX_VERSION=gcc3.5
   	;;
