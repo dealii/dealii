@@ -263,9 +263,9 @@ Number Vector<Number>::lp_norm (const Number p) const
     };
 				   // add up remaining elements
   while (ptr != end())
-    sum0 += pow(std::fabs(*ptr++), p);
+    sum0 += std::pow(std::fabs(*ptr++), p);
   
-  return pow(sum0+sum1+sum2+sum3, 1./p);
+  return std::pow(sum0+sum1+sum2+sum3, 1./p);
 };
 
 
