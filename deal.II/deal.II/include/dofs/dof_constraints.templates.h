@@ -160,6 +160,11 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
   Assert (sparsity.is_compressed() == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
 	  ExcMatrixNotSquare());
+
+  double average_diagonal = 0;
+  for (unsigned int i=0; i<uncondensed.m(); ++i)
+    average_diagonal += std::fabs (uncondensed.diag_element(i));
+  average_diagonal /= uncondensed.m();
   
 				   // store for each index whether it
 				   // must be distributed or not. If entry
@@ -264,7 +269,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 				     .entries[q].second);
 		
 		uncondensed.global_entry(j) = (row == sparsity.get_column_numbers()[j] ?
-					       1. : 0. );
+					       average_diagonal : 0. );
 	      };
 	  };
     };
@@ -291,6 +296,12 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 	  ExcMatrixNotSquare());
   Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
 	  ExcMatrixNotSquare());
+
+  double average_diagonal = 0;
+  for (unsigned int b=0; b<uncondensed.n_block_rows(); ++b)
+    for (unsigned int i=0; i<uncondensed.block(b,b).m(); ++i)
+      average_diagonal += std::fabs (uncondensed.block(b,b).diag_element(i));
+  average_diagonal /= uncondensed.m();
 
   const BlockIndices &
     index_mapping = sparsity.get_column_indices();
@@ -472,7 +483,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 					     lines[distribute[global_col]].entries[q].second);
 		
 			uncondensed.block(block_row,block_col).global_entry(j)
-			  = (row == global_col ? 1. : 0. );
+			  = (row == global_col ? average_diagonal : 0. );
 		      };
 		  };
 	    };
