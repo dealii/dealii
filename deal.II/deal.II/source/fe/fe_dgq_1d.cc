@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,6 +27,15 @@ namespace FE_DGQ_1d
 	1., 1.
   };
 
+
+                                   // the left node on the left child gets the
+                                   // value of the left node of the mother
+                                   // cell. the right node gets the mean value
+                                   // of the two nodes on the mother cell.
+                                   //
+                                   // note that the values for the right child
+                                   // cell are determined by permutation in
+                                   // the constructor of FE_DGQ
   static const double dgq1_into_dgq1_refined[] =
   {
 	1., 0.,
