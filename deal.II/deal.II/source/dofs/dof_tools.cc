@@ -1139,9 +1139,12 @@ DoFTools::count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
   Threads::ThreadManager thread_manager;
   for (unsigned int i=0; i<n_components; ++i)
     {
+      void (*fun_ptr) (const DoFHandler<dim>      &,
+		       const std::vector<bool>    &,
+		       std::vector<bool>          &) = &DoFTools::template extract_dofs<dim>;
       component_select[i][i] = true;
       Threads::spawn (thread_manager,
-		      Threads::encapsulate (&DoFTools::template extract_dofs<dim>)
+		      Threads::encapsulate (fun_ptr)
 		      .collect_args (dof_handler, component_select[i],
 				     dofs_in_component[i]));
     };
@@ -1739,9 +1742,18 @@ DoFTools::compute_intergrid_weights_2 (const DoFHandler<dim>              &coars
 								 multithread_info.n_default_threads);
 
   Threads::ThreadManager thread_manager;
+  void (*fun_ptr) (const DoFHandler<dim>              &,
+		   const unsigned int                  ,
+		   const InterGridMap<DoFHandler,dim> &,
+		   const std::vector<Vector<double> > &,
+		   const std::vector<int>             &,
+		   std::vector<std::map<unsigned int, float> > &,
+		   const typename DoFHandler<dim>::active_cell_iterator &,
+		   const typename DoFHandler<dim>::active_cell_iterator &)
+    = &DoFTools::template compute_intergrid_weights_3<dim>;
   for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate (&DoFTools::template compute_intergrid_weights_3<dim>)
+		    Threads::encapsulate (fun_ptr)
 		    .collect_args (coarse_grid, coarse_component,
 				   coarse_to_fine_grid_map, parameter_dofs,
 				   weight_mapping, weights,

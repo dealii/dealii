@@ -471,11 +471,16 @@ approximate_derivative (const Mapping<dim>    &mapping,
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
   Threads::ThreadManager thread_manager;
+  void (*fun_ptr) (const Mapping<dim>    &,
+		   const DoFHandler<dim> &,
+		   const Vector<double>  &,
+		   const unsigned int     ,
+		   const IndexInterval   &,
+		   Vector<float>         &)
+    = &DerivativeApproximation::template approximate<DerivativeDescription,dim>;
   for (unsigned int i=0; i<n_threads; ++i)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate
-		    (&DerivativeApproximation::
-		     template approximate<DerivativeDescription,dim>)
+		    Threads::encapsulate(fun_ptr)
 		    .collect_args (mapping, dof_handler, solution, component,
 				   index_intervals[i],
 				   derivative_norm));
