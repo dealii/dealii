@@ -777,10 +777,11 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
   const FiniteElement<dim> &fe           = dof.get_fe();
   const unsigned int        n_components = fe.n_components();
   const bool                fe_is_system = (n_components != 1);
-  
-  Assert ((function_map.size() == 0) ||
-	  (n_components == function_map.begin()->second->n_components),
-	  ExcInvalidFE());
+
+  for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
+       i!=function_map.end(); ++i)
+    Assert (n_components == i->second->n_components,
+	    ExcInvalidFE());
 
 				   // set the component mask to either
 				   // the original value or a vector
