@@ -448,7 +448,18 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     void vmult (Vector<number2>&, const Vector<number2>&) const;
 
 				     /**
-				      * Transpose of @ref{vmult}
+				      * Backward application of @ref{vmult}.
+				      *
+				      * In the current implementation,
+				      * this is not the transpose of
+				      * @ref{vmult}. It is a
+				      * transposed Gauss-Seidel
+				      * algorithm applied to the whole
+				      * matrix, but the diagonal
+				      * blocks being inverted are not
+				      * transposed. Therefore, it is
+				      * the transposed, if the
+				      * diagonal blocks are symmetric.
 				      */
     template <typename number2>
     void Tvmult (Vector<number2>&, const Vector<number2>&) const;
