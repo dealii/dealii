@@ -609,8 +609,13 @@ void GridOut::write (const Triangulation<dim> &tria,
 
 
 
-// explicit instantiations. note that write instantiates all the other
-// functions as needed
+// explicit instantiations
+template void GridOut::write_ucd (const Triangulation<deal_II_dimension> &,
+ 				  ostream &);
+template void GridOut::write_gnuplot (const Triangulation<deal_II_dimension> &,
+ 				      ostream &);
+template void GridOut::write_eps (const Triangulation<deal_II_dimension> &,
+ 				  ostream &);
 template void GridOut::write (const Triangulation<deal_II_dimension> &,
 			      ostream &,
 			      OutputFormat);
