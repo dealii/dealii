@@ -21,59 +21,63 @@
 
 namespace PETScWrappers
 {
-
-
-  ParallelVector::ParallelVector ()
+  namespace MPI
   {
-                                     // this is an invalid empty vector, so we
-                                     // can just as well create a sequential
-                                     // one to avoid all the overhead incurred
-                                     // by parallelism
-    const int n = 0;
-    const int ierr
-      = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
+
+    Vector::Vector ()
+    {
+                                       // this is an invalid empty vector, so we
+                                       // can just as well create a sequential
+                                       // one to avoid all the overhead incurred
+                                       // by parallelism
+      const int n = 0;
+      const int ierr
+        = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
 
 
 
-  ParallelVector::ParallelVector (const unsigned int n,
-                                  const unsigned int local_size,
-                                  const MPI_Comm    &communicator)
-                  :
-                  communicator (communicator)
-  {
-    ParallelVector::create_vector (n, local_size);
-  }
+    Vector::Vector (const unsigned int n,
+                    const unsigned int local_size,
+                    const MPI_Comm    &communicator)
+                    :
+                    communicator (communicator)
+    {
+      Vector::create_vector (n, local_size);
+    }
 
   
 
-  ParallelVector::ParallelVector (const VectorBase &v,
-                                  const unsigned int local_size,
-                                  const MPI_Comm    &communicator)
-                  :
-                  communicator (communicator)
-  {
-    ParallelVector::create_vector (v.size(), local_size);
+    Vector::Vector (const VectorBase &v,
+                    const unsigned int local_size,
+                    const MPI_Comm    &communicator)
+                    :
+                    communicator (communicator)
+    {
+      Vector::create_vector (v.size(), local_size);
 
-    VectorBase::operator = (v);
-  }
+      VectorBase::operator = (v);
+    }
 
   
-  void
-  ParallelVector::create_vector (const unsigned int  n,
-                                 const unsigned int  local_size)
-  {
-    Assert (local_size < n, ExcIndexRange (local_size, 0, n));
+    void
+    Vector::create_vector (const unsigned int  n,
+                           const unsigned int  local_size)
+    {
+      Assert (local_size < n, ExcIndexRange (local_size, 0, n));
 
-    const int ierr
-      = VecCreateMPI (PETSC_COMM_SELF, local_size, n, &vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+      const int ierr
+        = VecCreateMPI (PETSC_COMM_SELF, local_size, n, &vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
+
   }
+
 }
 
 #else
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {} }
+  namespace { void dummy () {} }
 #endif // DEAL_II_USE_PETSC
