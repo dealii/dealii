@@ -15,6 +15,9 @@
 // the class BlockMatrixArray had no local type value_type that is
 // needed in some places. in particular, this is needed for
 // PreconditionBlockSSOR
+//
+// the test also didn't link before, due to some functions that were
+// either missing or in the wrong place
 
 #include <base/logstream.h>
 #include <lac/block_matrix_array.h>
