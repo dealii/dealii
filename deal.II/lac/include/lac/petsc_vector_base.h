@@ -327,6 +327,13 @@ namespace PETScWrappers
 					*/
       std::pair<unsigned int, unsigned int> local_range () const;
 
+				       /**
+					* Return whether @p index is
+					* in the local range or not,
+					* see also local_range().
+					*/
+      bool in_local_range (const unsigned int index) const;
+
                                        /**
                                         * Provide access to a given element,
                                         * both read and write.
@@ -847,6 +854,20 @@ namespace PETScWrappers
     }
   }
   
+
+
+  inline
+  bool
+  VectorBase::in_local_range (const unsigned int index) const
+  {
+    int begin, end;
+    const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
+					   &begin, &end);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    return (index >= static_cast<unsigned int>(begin)) && (index < static_cast<unsigned int>(end));
+  }
+
 
 
   inline
