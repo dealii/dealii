@@ -10,7 +10,9 @@
 #I think I have removed any non-supported cross-references, so you
 #should be able to compile with an arbitrary number of processes.
 
+D=../..
 
+include $D/deal.II/Make.global_options
 
 cc-files = $(wildcard */*.cc)
 h-files  = $(wildcard ../include/*/*.h)
@@ -28,17 +30,6 @@ o-files-2d  = $(addprefix ../lib/2d/o/,  $(tmp1:.cc=_2d.o) )
 go-files-2d = $(addprefix ../lib/2d/go/, $(tmp1:.cc=_2d.go))
 o-files-3d  = $(addprefix ../lib/3d/o/,  $(tmp1:.cc=_3d.o) )
 go-files-3d = $(addprefix ../lib/3d/go/, $(tmp1:.cc=_3d.go))
-
-
-CXX       = c++
-INCLUDE   = -I../include -I../../lac/include \
-            -I../../base/include -I../../mia/include
-CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual \
-            $(INCLUDE)
-CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
-           -felide-constructors -fnonnull-objects \
-           $(INCLUDE)
 
 ../lib/1d/go/%.go :
 	@echo ==============1d======debug============= $<
