@@ -1,6 +1,6 @@
 /* $Id$ */
 
-#include "../include/data_out_stack.h"
+#include <basic/data_out_stack.h>
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
 #include <grid/dof.h>
