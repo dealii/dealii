@@ -3,7 +3,7 @@
 # Makefile for the whole library
 
 # include global options and pathes
-include Make.global_options
+include common/Make.global_options
 
 
 help:
@@ -129,11 +129,11 @@ TAGS: $(filter-out %/forward_declarations.h,                                \
                                $D/lac/source/*.cc $D/lac/include/*/*.h      \
                                $D/deal.II/source/*/*.cc $D/deal.II/include/*/*.h \
                                $D/tests/*/*.cc $D/tests/*/*.h ))
-	@etags $^
+	@cd $D/common ; etags $^
 
 
 clean: clean-base clean-lac clean-dealII clean-doc
-	-rm -f TODO TAGS
+	-cd $D/common ; rm -f TODO TAGS
 
 clean-base:
 	cd $D/base ; $(MAKE) clean
