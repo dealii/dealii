@@ -14,7 +14,10 @@
 
 #include <base/quadrature_lib.h>
 #include <cmath>
-#include <limits>
+
+#ifdef HAVE_STD_NUMERIC_LIMITS
+#  include <limits>
+#endif
 
 
 // please note: for a given dimension, we need the quadrature formulae
@@ -46,9 +49,21 @@ QGauss<1>::QGauss (const unsigned int n)
                                    // of the accuracy of double there,
                                    // while on other machines we'd
                                    // like to go further down
+#ifdef HAVE_STD_NUMERIC_LIMITS    
   const long double tolerance
     = std::max (static_cast<long double>(std::numeric_limits<double>::epsilon() / 100),
                 static_cast<long double>(std::numeric_limits<long double>::epsilon() * 5));
+#else
+				   // well, if there is no <limits>
+				   // header, then we can do not much
+				   // better than just checking by
+				   // hand that long double is not the
+				   // same as double and set some
+				   // values by hand
+  const long double tolerance
+    = (sizeof(long double) != sizeof(double) ? 1.e-19 : 5e-16);
+#endif
+
   
   for (unsigned int i=1; i<=m; ++i)
     {
