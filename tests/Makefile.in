@@ -18,6 +18,12 @@ deal.II:
 big-tests:
 	cd big-tests ; $(MAKE)
 
+report:
+	@for i in base lac fe deal.II ; do \
+		echo =======Report: $i ======= ; \
+		cd $$i ; $(MAKE) report ; cd .. ; \
+	done
+
 
 clean: clean-base clean-lac clean-deal.II clean-fe clean-big
 
