@@ -219,9 +219,10 @@ class SolverGMRES : public Solver<VECTOR>
 					  * array of @p{VECTOR} of
 					  * length @p{max_size}.
 					  */
-	TmpVectors(unsigned int max_size,
-		   VectorMemory<VECTOR>& vmem);
-					 /**
+	TmpVectors(const unsigned int    max_size,
+		   VectorMemory<VECTOR> &vmem);
+
+                                         /**
 					  * Delete all allocated vectors.
 					  */
 	~TmpVectors();
@@ -232,7 +233,7 @@ class SolverGMRES : public Solver<VECTOR>
 					  * unused before, an error
 					  * occurs.
 					  */
-	VECTOR& operator[] (unsigned int i) const;
+	VECTOR& operator[] (const unsigned int i) const;
 	
 					 /**
 					  * Get vector number
@@ -244,18 +245,22 @@ class SolverGMRES : public Solver<VECTOR>
 					  * used to reinit it to the
 					  * proper dimensions.
 					  */
-	VECTOR& operator() (unsigned int i,
-			    const VECTOR& temp);
+	VECTOR& operator() (const unsigned int i,
+			    const VECTOR      &temp);
 	
       private:
 					 /**
-					  * Pool were vectors are obtained from.
+					  * Pool were vectors are
+					  * obtained from.
 					  */
-	VectorMemory<VECTOR>& mem;
+	VectorMemory<VECTOR> &mem;
+        
 					 /**
-					  * Field for storing the vectors.
+					  * Field for storing the
+					  * vectors.
 					  */
 	std::vector<VECTOR*> data;
+        
 					 /**
 					  * Offset of the first
 					  * vector. This is for later
@@ -264,7 +269,8 @@ class SolverGMRES : public Solver<VECTOR>
 					  */
 	unsigned int offset;
     };
-				     /**
+
+    				     /**
 				      * No copy constructor.
 				      */
     SolverGMRES (const SolverGMRES<VECTOR>&);
@@ -275,8 +281,9 @@ class SolverGMRES : public Solver<VECTOR>
 
 template <class VECTOR>
 inline
-SolverGMRES<VECTOR>::TmpVectors::TmpVectors (unsigned int max_size,
-				 VectorMemory<VECTOR>& vmem)
+SolverGMRES<VECTOR>::TmpVectors::
+TmpVectors (const unsigned int    max_size,
+            VectorMemory<VECTOR> &vmem)
 		:
 		mem(vmem),
 		data (max_size, 0),
@@ -297,7 +304,7 @@ SolverGMRES<VECTOR>::TmpVectors::~TmpVectors ()
 
 template <class VECTOR>
 inline VECTOR&
-SolverGMRES<VECTOR>::TmpVectors::operator[] (unsigned int i) const
+SolverGMRES<VECTOR>::TmpVectors::operator[] (const unsigned int i) const
 {
   Assert (i+offset<data.size(),
 	  ExcIndexRange(i,-offset, data.size()-offset));
@@ -311,8 +318,8 @@ SolverGMRES<VECTOR>::TmpVectors::operator[] (unsigned int i) const
 
 template <class VECTOR>
 inline VECTOR&
-SolverGMRES<VECTOR>::TmpVectors::operator() (unsigned int i,
-					     const VECTOR& temp)
+SolverGMRES<VECTOR>::TmpVectors::operator() (const unsigned int i,
+					     const VECTOR      &temp)
 {
   Assert (i+offset<data.size(),
 	  ExcIndexRange(i,-offset, data.size()-offset));
@@ -328,8 +335,8 @@ SolverGMRES<VECTOR>::TmpVectors::operator() (unsigned int i,
 
 template <class VECTOR>
 SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
-					 VectorMemory<VECTOR> &mem,
-					 const AdditionalData &data) :
+                                  VectorMemory<VECTOR> &mem,
+                                  const AdditionalData &data) :
 		Solver<VECTOR> (cn,mem),
 		additional_data(data)
 {}
