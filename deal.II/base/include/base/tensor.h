@@ -140,6 +140,11 @@ class Tensor
 				      */
     Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
 
+				       /**
+					* Invert all entries of a tensor.
+					*/
+    Tensor<rank_,dim>   operator - () const;
+    
 				     /**
 				      * Fill a vector with all tensor elements.
 				      *
@@ -335,6 +340,20 @@ Tensor<rank_,dim>::operator - (const Tensor<rank_,dim> &t) const
   
   for (unsigned int i=0; i<dim; ++i)
     tmp.subtensor[i] -= t.subtensor[i];
+
+  return tmp;
+};
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim>
+Tensor<rank_,dim>::operator - () const
+{
+  Tensor<rank_,dim> tmp;
+  
+  for (unsigned int i=0; i<dim; ++i)
+    tmp.subtensor[i] = -subtensor[i];
 
   return tmp;
 };

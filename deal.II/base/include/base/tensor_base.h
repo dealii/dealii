@@ -191,6 +191,11 @@ class Tensor<1,dim> {
 				      */
     Tensor<1,dim>   operator - (const Tensor<1,dim> &) const;
 
+				       /**
+					* Tensor with inverted entries.
+					*/
+    Tensor<1,dim>   operator - () const;
+    
 				     /**
 				      * Reset all values to zero.
 				      */
@@ -412,6 +417,18 @@ inline
 Tensor<1,dim> Tensor<1,dim>::operator - (const Tensor<1,dim> &p) const
 {
   return (Tensor<1,dim>(*this) -= p);
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> Tensor<1,dim>::operator - () const
+{
+  Tensor<1,dim> result;
+  for (unsigned int i=0; i<dim; ++i)
+      result.values[i] = -values[i];
+  return result;
 };
 
 

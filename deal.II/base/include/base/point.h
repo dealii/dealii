@@ -93,6 +93,11 @@ class Point : public Tensor<1,dim>
 				      */
     double & operator () (const unsigned int index);
 
+/*
+ * Plus and minus operators are re-implemented from Tensor<1,dim>
+ * to avoid additional casting.
+ */
+					 
 				     /**
 				      *  Add two point vectors. If possible, use
 				      *  @p{operator +=} instead since this does not
@@ -107,6 +112,11 @@ class Point : public Tensor<1,dim>
 				      */
     Point<dim>   operator - (const Point<dim> &) const;
 
+				       /**
+					* The opposite vector.
+					*/
+    Point<dim>   operator - () const;
+    
 				     /**
 				      *  Multiply by a factor. If possible, use
 				      *  @p{operator *=} instead since this does not
@@ -292,6 +302,15 @@ inline
 Point<dim> Point<dim>::operator - (const Point<dim> &p) const 
 {
   return (Point<dim>(*this) -= p);
+};
+
+
+
+template <int dim>
+inline
+Point<dim> Point<dim>::operator - () const 
+{
+  return (Point<dim>(*this) -(*(Tensor<1,dim>*)this));
 };
 
 
