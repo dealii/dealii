@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -95,7 +95,7 @@ main ()
 	  C(i+1,i) = sin(i+1);
 	  C(i,i+1) = -sin(i+1);
 	  
-	  C.print_formatted (logfile);
+	  C.print_formatted (logfile,3,false);
 	  deallog << "l1-norm: " << C.l1_norm() << std::endl;
 	  D = C;
 	  D.gauss_jordan();
@@ -108,7 +108,7 @@ main ()
 	  C.Tmmult(A,H);
 	}
       
-      A.print_formatted (logfile);
+      A.print_formatted (logfile,3,false);
       
       Vector<double> u(5);
       GrowingVectorMemory<Vector<double> > mem;
@@ -135,7 +135,7 @@ main ()
 	}
       H = A;
       H.gauss_jordan();
-      H.print_formatted (logfile);
+      H.print_formatted (logfile,3,false);
       if (true)
 	{
 	  u = 1.;
