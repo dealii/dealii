@@ -1263,7 +1263,7 @@ namespace BlockVectorIterators
   Iterator<number,constness>::
   Iterator (const InverseConstnessIterator &c)
 		  :
-		  parent (c.parent),
+		  parent (const_cast<BlockVectorType*>(c.parent)),
 		  global_index (c.global_index),
 		  current_block (c.current_block),
 		  index_within_block (c.index_within_block),
