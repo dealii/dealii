@@ -65,7 +65,146 @@ class BlockSparseMatrix : public Subscriptor
 				      * the STL container classes.
 				      */
     typedef number value_type;
+
+    class const_iterator;
+    				     /**
+				      * Accessor class for iterators
+				      */
+    class Accessor
+    {
+      public:
+					 /**
+					  * Constructor. Since we use
+					  * accessors only for read
+					  * access, a const matrix
+					  * pointer is sufficient.
+					  */
+	Accessor (const BlockSparseMatrix<number>*,
+		  unsigned int row,
+		  unsigned short index);
+	
+					 /**
+					  * Row number of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int row() const;
+	
+					 /**
+					  * Index in row of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned short index() const;
+	
+					 /**
+					  * Column number of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int column() const;
+	
+					 /**
+					  * Value of this matrix entry.
+					  */
+	number value() const;
+	
+      protected:
+					 /**
+					  * The matrix accessed.
+					  */
+	const BlockSparseMatrix<number>* matrix;
+	
+					 /**
+					  * Iterator of the underlying matrix class.
+					  */
+	typename SparseMatrix<number>::const_iterator base_iterator;
+	
+					 /**
+					  * Number of block where row lies in.
+					  */
+	unsigned int block_row;
+	
+					 /**
+					  * First row of block.
+					  */
+	unsigned int row_start;	
+	
+					 /**
+					  * Number of block column where column lies in.
+					  */
+	unsigned int block_col;
+	
+					 /**
+					  * First column of block.
+					  */
+	unsigned int col_start;
+	
+					 /**
+					  * Index in whole row.
+					  */
+	unsigned int a_index;
+
+	friend class const_iterator;
+    };
     
+				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator : private Accessor
+      {
+	public:
+					   /**
+					    * Constructor.
+					    */ 
+	const_iterator(const BlockSparseMatrix<number>*,
+		       unsigned int row,
+		       unsigned short index);
+	  
+					   /**
+					    * Prefix increment.
+					    */
+	const_iterator& operator++ ();
+
+					   /**
+					    * Postfix increment.
+					    */
+	const_iterator& operator++ (int);
+
+					   /**
+					    * Dereferencing operator.
+					    */
+	const Accessor& operator* () const;
+
+					   /**
+					    * Dereferencing operator.
+					    */
+	const Accessor* operator-> () const;
+
+					   /**
+					    * Comparison. True, if
+					    * both iterators point to
+					    * the same matrix
+					    * position.
+					    */
+	bool operator == (const const_iterator&) const;
+					   /**
+					    * Inverse of @p{==}.
+					    */
+	bool operator != (const const_iterator&) const;
+
+					   /**
+					    * Comparison
+					    * operator. Result is true
+					    * if either the first row
+					    * number is smaller or if
+					    * the row numbers are
+					    * equal and the first
+					    * index is smaller.
+					    */
+	bool operator < (const const_iterator&) const;
+      };
+
 				     /**
 				      * Constructor; initializes the
 				      * matrix to be empty, without
@@ -496,6 +635,28 @@ class BlockSparseMatrix : public Subscriptor
     get_sparsity_pattern () const;
 
 				     /**
+				      * STL-like iterator with the
+				      * first entry.
+				      */
+    const_iterator begin () const;
+
+				     /**
+				      * Final iterator.
+				      */
+    const_iterator end () const;
+    
+				     /**
+				      * STL-like iterator with the
+				      * first entry of row @p{r}.
+				      */
+    const_iterator begin (unsigned int r) const;
+
+				     /**
+				      * Final iterator of row @p{r}.
+				      */
+    const_iterator end (unsigned int r) const;
+    
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
@@ -548,12 +709,238 @@ class BlockSparseMatrix : public Subscriptor
 				      * Array of sub-matrices.
 				      */
     Table<2,SmartPointer<SparseMatrix<number> > > sub_objects;
+
+    friend class Accessor;
+    friend class const_iterator;
 };
 
 
 
 
 /* ------------------------- Template functions ---------------------- */
+
+template <typename number>
+inline
+BlockSparseMatrix<number>::Accessor::Accessor (
+  const BlockSparseMatrix<number>* matrix,
+  unsigned int r,
+  unsigned short i)
+		: matrix(matrix),
+		  base_iterator(matrix->block(0,0).begin()),
+		  block_row(0),
+		  row_start(0),
+		  block_col(0),
+		  col_start(0),
+		  a_index(0)
+{
+  Assert (i==0, ExcNotImplemented());
+
+  if (r < matrix->m())
+    {
+      pair<unsigned int,unsigned int> indices = matrix->sparsity_pattern
+						->get_row_indices().global_to_local(r);
+      block_row = indices.first;
+      base_iterator = matrix->block(indices.first, 0).begin(indices.second);
+      row_start = matrix->sparsity_pattern
+		  ->get_row_indices().local_to_global(block_row, 0);
+    }
+  else
+    {
+      block_row = matrix->n_block_rows();
+      base_iterator = matrix->block(0, 0).begin();
+    }
+}
+
+
+template <typename number>
+inline
+unsigned int
+BlockSparseMatrix<number>::Accessor::row() const
+{
+  return row_start + base_iterator->row();
+}
+
+
+template <typename number>
+inline
+short unsigned int
+BlockSparseMatrix<number>::Accessor::index() const
+{
+  return a_index;
+}
+
+
+template <typename number>
+inline
+unsigned int
+BlockSparseMatrix<number>::Accessor::column() const
+{
+  return col_start + base_iterator->column();
+}
+
+
+template <typename number>
+inline
+number
+BlockSparseMatrix<number>::Accessor::value () const
+{
+  return base_iterator->value();
+}
+
+
+//----------------------------------------------------------------------//
+
+
+template <typename number>
+inline
+BlockSparseMatrix<number>::const_iterator::const_iterator(
+  const BlockSparseMatrix<number>* m,
+  unsigned int r,
+  unsigned short i)
+		: BlockSparseMatrix<number>::Accessor(m, r, i)
+{}
+
+
+
+template <typename number>
+inline
+typename BlockSparseMatrix<number>::const_iterator&
+BlockSparseMatrix<number>::const_iterator::operator++ ()
+{
+  Assert (block_row<matrix->n_block_rows(), ExcIteratorPastEnd());
+
+				   // Remeber current row inside block
+  unsigned int local_row = base_iterator->row();
+				   // Advance inside block
+  ++base_iterator;
+  ++a_index;
+				   // If end of row inside block,
+				   // advance to next block
+  if (base_iterator == matrix->block(block_row, block_col).end(local_row))
+    {
+      if (block_col<matrix->n_block_cols()-1)
+	{
+					   // Advance to next block in
+					   // row
+	  ++block_col;
+	  col_start = matrix->sparsity_pattern
+		      ->get_column_indices().local_to_global(block_col, 0);
+	}
+      else
+	{
+					   // Advance to first block
+					   // in next row
+	  block_col = 0;
+	  col_start = 0;
+	  a_index = 0;
+	  ++local_row;
+	  if (local_row>=matrix->block(block_row,0).m())
+	    {
+					       // If final row in
+					       // block, go to next
+					       // block row
+	      local_row = 0;
+	      ++block_row;
+	      if (block_row<matrix->n_block_rows())
+		row_start = matrix->sparsity_pattern
+			    ->get_row_indices().local_to_global(block_row, 0);
+	    }
+	}
+				       // Finally, set base_iterator
+				       // to start of row determined
+				       // above
+      if (block_row<matrix->n_block_rows())
+	base_iterator = matrix->block(block_row, block_col).begin(local_row);
+      else
+					 // Set base_iterator to a
+					 // defined state for
+					 // comparison. This is the
+					 // end() state.
+	base_iterator = matrix->block(0, 0).begin();
+    }
+  return *this;
+}
+
+
+
+//  template <typename number>
+//  inline
+//  const_iterator&
+//  BlockSparseMatrix<number>::const_iterator::operator++ (int)
+//  {
+//    Assert (false, ExcNotImplemented());
+//  }
+
+
+
+
+template <typename number>
+inline
+const typename BlockSparseMatrix<number>::Accessor&
+BlockSparseMatrix<number>::const_iterator::operator* () const
+{
+  return *this;
+}
+
+
+template <typename number>
+inline
+const typename BlockSparseMatrix<number>::Accessor*
+BlockSparseMatrix<number>::const_iterator::operator-> () const
+{
+  return this;
+}
+
+
+
+template <typename number>
+inline
+bool
+BlockSparseMatrix<number>::const_iterator::operator == (const const_iterator& i) const
+{
+  if (matrix != i->matrix)
+    return false;
+  
+  if (block_row == i->block_row
+      && block_col == i->block_col
+      && base_iterator == i->base_iterator)
+    return true;
+  return false;
+}
+
+
+
+template <typename number>
+inline
+bool
+BlockSparseMatrix<number>::const_iterator::operator != (const const_iterator& i) const
+{
+  return !(*this == i);
+}
+
+
+
+template <typename number>
+inline
+bool
+BlockSparseMatrix<number>::const_iterator::operator < (const const_iterator& i) const
+{
+  if (block_row<i->block_row)
+    return true;
+  if (block_row == i->block_row)
+    {
+      if (base_iterator->row() < i->base_iterator->row())
+	return true;
+      if (base_iterator->row() == i->base_iterator->row())
+	{
+	  if (a_index < i->a_index)
+	    return true;
+	}
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------//
 
 
 template <typename number>
@@ -926,5 +1313,39 @@ precondition_Jacobi (BlockVector<somenumber>          &dst,
 				    omega);
 };
 
+
+template <typename number>
+inline
+typename BlockSparseMatrix<number>::const_iterator
+BlockSparseMatrix<number>::begin () const
+{
+  return const_iterator(this, 0, 0);
+}
+
+template <typename number>
+inline
+typename BlockSparseMatrix<number>::const_iterator
+BlockSparseMatrix<number>::end () const
+{
+  return const_iterator(this, m(), 0);
+}
+
+template <typename number>
+inline
+typename BlockSparseMatrix<number>::const_iterator
+BlockSparseMatrix<number>::begin (unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r, 0);
+}
+
+template <typename number>
+inline
+typename BlockSparseMatrix<number>::const_iterator
+BlockSparseMatrix<number>::end (unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r+1, 0);
+}
 
 #endif    // __deal2__block_sparse_matrix_h
