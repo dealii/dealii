@@ -1311,17 +1311,25 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 #endif
 
 
-				   // now we know that the weights in each
-				   // row constitute a constraint. enter this
-				   // into the constraints object
+				   // now we know that the weights in
+				   // each row constitute a
+				   // constraint. enter this into the
+				   // constraints object
 				   //
-				   // first task: for each parameter dof on
-				   // the parameter grid, find a representant
-				   // on the fine, global grid. this is
-				   // possible since we use conforming
-				   // finite element. we take this representant
-				   // to be the first element in this row with
-				   // weight identical to one
+				   // first task: for each parameter
+				   // dof on the parameter grid, find
+				   // a representant on the fine,
+				   // global grid. this is possible
+				   // since we use conforming finite
+				   // element. we take this
+				   // representant to be the first
+				   // element in this row with weight
+				   // identical to one. the
+				   // representant will become an
+				   // unconstrained degree of freedom,
+				   // while all others will be
+				   // constrained to this dof (and
+				   // possibly others)
   vector<int> representants(weights.m(), -1);
   for (unsigned int parameter_dof=0; parameter_dof<weights.m(); ++parameter_dof)
     {
