@@ -152,8 +152,8 @@ clean:
 # since object files are placed in the present directory for this
 # application. All these things are made in the next rule:
 Makefile.dep: $(target).cc Makefile \
-              $(shell echo $(include-path-base)/*.h    \
-                           $(include-path-lac)/*.h     \
+              $(shell echo $(include-path-base)/base/*.h    \
+                           $(include-path-lac)/lac/*.h     \
                            $(include-path-deal2)/*/*.h)
 	@echo ============================ Remaking Makefile
 	@perl $D/common/scripts/make_dependencies.pl  $(INCLUDE) $(target).cc \
