@@ -48,6 +48,15 @@
 
     <dl>
       <dt>
+          <strong>2002/11/27: Modified Incomplete Cholesky decomposition</strong>
+      </dt>
+      <dd>
+          There is now a Modified Incomplete Cholesky (MIC) decomposition in
+	  deal.II, which has been kindly contributed by
+	  <a href="mailto:cheffo@riflexo.com">Stephen Kolaroff</a>.
+      </dd>
+
+      <dt>
           <strong>2002/10/14: Red Hat's gcc 2.96 supported</strong>
       </dt>
       <dd>
@@ -90,7 +99,7 @@
       <dd>
           <acronym>deal.II</acronym> supports vector-valued finite
           elements for a long time, but only by composing them of
-          scalar elements. This excludes Nedelec or Raviart-Thomas
+          scalar elements. This excluded Nedelec or Raviart-Thomas
           type elements, for which every shape function is
           vector-valued and non-zero in all components. Support for
           such elements is now available, and will be part of the next
