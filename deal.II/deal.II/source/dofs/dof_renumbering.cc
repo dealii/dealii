@@ -163,7 +163,7 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
 	continue;
 
 
-// store for each coordination
+				       // store for each coordination
 				       // number the dofs with these
 				       // coordination number
       multimap<unsigned int, int> dofs_by_coordination;
@@ -187,7 +187,9 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
 	  dofs_by_coordination.insert (new_entry);
 	};
       
-				       ////
+				       // assign new DoF numbers to
+				       // the elements of the present
+				       // front:
       multimap<unsigned int, int>::iterator i;
       for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i) 
 	new_number[i->second] = next_free_number++;
@@ -200,8 +202,25 @@ void DoFRenumbering::Cuthill_McKee (DoFHandler<dim>            &dof_handler,
 //TODO: Allow incomplete renumbering for non-discretization values
 
 #ifdef DEBUG
-				   //  test for all indices numbered
-  if (find (new_number.begin(), new_number.end(), DoFHandler<dim>::invalid_dof_index) != new_number.end())
+				   // test for all indices
+				   // numbered. this mostly tests
+				   // whether the
+				   // front-marching-algorithm (which
+				   // Cuthill-McKee actually is) has
+				   // reached all points. it should
+				   // usually do so, but might not for
+				   // two reasons:
+				   //
+				   // - The algorithm above has a bug, or
+				   // - The domain is not connected and
+				   // consists of separate parts.
+				   //
+				   // In any case, if not all DoFs
+				   // have been reached, renumbering
+				   // will not be possible
+  if (find (new_number.begin(), new_number.end(), DoFHandler<dim>::invalid_dof_index)
+      !=
+      new_number.end())
     Assert (false, ExcRenumberingIncomplete());
   Assert (next_free_number == n_dofs,
 	  ExcRenumberingIncomplete());
