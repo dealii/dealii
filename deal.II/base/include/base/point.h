@@ -155,8 +155,11 @@ class Point : public Tensor<1,dim>
     double              square () const;
     
 				     /**
-				      * Returns the distance of <tt>this</tt> 
-				      * point to the point <tt>p</tt>.
+				      * Returns the Euclidian distance of
+				      * <tt>this</tt> point to the point
+				      * <tt>p</tt>, i.e. the <tt>l_2</tt> norm
+				      * of the difference between the vectors
+				      * representing the two points.
 				      */
     double distance (const Point<dim> &p) const;
 
