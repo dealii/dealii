@@ -438,6 +438,41 @@ if test "$enablemultithreading" = yes ; then
 fi
 
 
+
+dnl --------------------------------------------------------------
+dnl Check for possibly disabled backward compatibility functions
+dnl --------------------------------------------------------------
+AC_ARG_ENABLE(compat-blocker,
+[  --enable-compat-blocker=mapping Block functions that implicitely assume a Q1 mapping],
+    enable_compat_blocker=$enableval,
+    enable_compat_blocker="")
+dnl Replace the comma-separated list by a space-separated one
+disable_compat=`echo $enable_compat_blocker | perl -pi -e 's/,/ /g;'`
+dnl Check that each entry is an allowed one
+for i in $disable_compat ; do 
+  case $i in
+    mapping)
+	AC_MSG_RESULT(Disabling backward compatibility feature: "$i")
+	;;
+    *) 
+	AC_MSG_ERROR(Backward compatibility feature "$i" unknown)
+	;;
+  esac
+done
+dnl Now for each known feature, either disable it or enable it.
+dnl Default is to enable.
+for i in mapping ; do
+  uppercase=`echo $i | perl -pi -e 'tr/a-z/A-Z/;'`
+  flag=DEAL_II_COMPAT_$uppercase
+  if test -n "`echo $disable_compat | grep $i`"  ; then
+    AC_DEFINE_UNQUOTED($flag,false)
+  else
+    AC_DEFINE_UNQUOTED($flag,true)
+  fi
+done
+
+
+
 dnl --------------------------------------------------------------
 dnl Various kludges for various systems: some systems need special
 dnl treatment for some things. Since they sometimes depend on 
