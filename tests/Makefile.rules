@@ -50,11 +50,19 @@ endif
 # Since the test suite is usually run automatically, we
 # impose a maximum run time of 30 CPU minutes for each
 # program.
+#
+# In the line after we execute the program, we make sure that
+# the program terminated without error code; otherwise delete
+# the output file and stop the make command. This is done so
+# that when you run make for that output file again later
+# then make would not say that the output file is up to
+# date and does not need to be regenerated
 ############################################################
 
 %.output : %.exe
 	@echo =====Running======= $<
-	@ulimit -t 2400 ; ./$<
+	@ulimit -t 2400 ; ./$< ; \
+	  if test ! $$? == 0 ; then rm $@ ; false ; fi
 	@perl -pi $(normalize)  $@
 
 
