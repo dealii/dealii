@@ -13,6 +13,11 @@
 #ifndef __deal2__mg_dof_tools_h
 #define __deal2__mg_dof_tools_h
 
+template <class Object> class MGLevelObject;
+template <int dim> class MGDoFHandler;
+template <typename number> class Vector;
+template <typename number> class BlockVector;
+template <class number> class FullMatrix;
 
 #include <base/config.h>
 
@@ -26,11 +31,11 @@
  * for more information.
  *
  * All member functions are static, so there is no need to create an
- * object of class @p{MGDoFTools}.
+ * object of class @p{MGTools}.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000
  */
-class MGDoFTools 
+class MGTools
 {
   public:
 				     /**
@@ -47,7 +52,7 @@ class MGDoFTools
 				      * hanging nodes here, since only
 				      * one level is considered.
 				      */
-    template <int dim>
+    template <int dim, class SparsityPattern>
     static void
     make_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
 			   SparsityPattern         &sparsity,
@@ -59,7 +64,7 @@ class MGDoFTools
 				      * @see make_sparsity_pattern
 				      * $see DoFTools
 				      */
-    template <int dim>
+    template <int dim, class SparsityPattern>
     static void
     make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
 				SparsityPattern         &sparsity,
@@ -72,7 +77,7 @@ class MGDoFTools
 				      * @see{make_flux_sparsity_pattern}
 				      * @see{DoFTools}
 				      */
-    template <int dim>
+    template <int dim, class SparsityPattern>
     static void
     make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof_handler,
 				     SparsityPattern         &sparsity,
@@ -95,7 +100,7 @@ class MGDoFTools
 				      * for the couplings occuring in
 				      * fluxes.
 				      */
-    template <int dim>
+    template <int dim, class SparsityPattern>
     static void
     make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 				SparsityPattern       &sparsity,
@@ -103,6 +108,63 @@ class MGDoFTools
 				const FullMatrix<double>& int_mask,
 				const FullMatrix<double>& flux_mask);
 
+				     /**
+				      * Count the dofs component-wise
+				      * on each level.
+				      *
+				      * Result is a vector containing
+				      * for each level a vector
+				      * containing the number of dofs
+				      * for each component (access is
+				      * @p{result[level][component]}).
+				      */
+    template <int dim>
+      static void count_dofs_per_component (const MGDoFHandler<dim>& mg_dof,
+					    std::vector<std::vector<unsigned int> >& result);
+    
+    
+				     /**
+				      * Ajust vectors on all levels to
+				      * correct size.  Here, we just
+				      * count the numbers of degrees
+				      * of freedom on each level and
+				      * @p{reinit} each level vector
+				      * to this length.
+				      */
+    template <int dim, typename number>
+      static void
+      reinit_vector (const MGDoFHandler<dim>& mg_dof,
+		     MGLevelObject<Vector<number> >& vector);
+
+				     /**
+				      * Adjust block-vectors on all
+				      * levels to correct size.  Count
+				      * the numbers of degrees of
+				      * freedom on each level
+				      * component-wise. Then, assign
+				      * each block of @p{vector} the
+				      * corresponding size.
+				      *
+				      * The boolean field @p{selected}
+				      * allows restricting this
+				      * operation to certain
+				      * components. In this case,
+				      * @p{vector} will only have as
+				      * many blocks as there are true
+				      * values in @p{selected} (no
+				      * blocks of length zero are
+				      * padded in).
+				      *
+				      * Degrees of freedom must be
+				      * sorted by component in order
+				      * to obtain reasonable results
+				      * from this function.
+				      */
+    template <int dim, typename number>
+      static void
+      reinit_vector (const MGDoFHandler<dim>& mg_dof,
+		     MGLevelObject<BlockVector<number> >& vector,
+		     const vector<bool>& selected);
 };
 
 

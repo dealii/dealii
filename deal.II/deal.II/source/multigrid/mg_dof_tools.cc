@@ -12,17 +12,29 @@
 //----------------------------  mg_dof_tools.cc  ---------------------------
 
 
+#include <base/multithread_info.h>
+#include <base/thread_management.h>
 #include <lac/sparsity_pattern.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <lac/block_sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/sparsity_pattern.h>
+#include <lac/block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_dof_tools.h>
+#include <multigrid/mg_base.h>
+#include <dofs/dof_tools.h>
 #include <fe/fe.h>
 
+//#include <multigrid/mg_tools.templates.h>
 
-template <int dim>
-void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
+#include <algorithm>
+#include <numeric>
+
+template <int dim, class SparsityPattern>
+void MGTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
 					SparsityPattern         &sparsity,
 					const unsigned int       level)
 {
@@ -50,9 +62,9 @@ void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
 
 
-template<int dim>
+template<int dim, class SparsityPattern>
 void
-MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 					SparsityPattern       &sparsity,
 					const unsigned int level)
 {
@@ -106,9 +118,9 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
 
 
-template<int dim>
+template<int dim, class SparsityPattern>
 void
-MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
+MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 					     SparsityPattern       &sparsity,
 					     const unsigned int level)
 {
@@ -164,9 +176,10 @@ MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 
 
 
-template<int dim>
+//TODO: Replace FullMatrix by vector2d<bool>
+template<int dim, class SparsityPattern>
 void
-MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 					SparsityPattern       &sparsity,
 					const unsigned int level,
 					const FullMatrix<double>& int_mask,
@@ -262,23 +275,281 @@ MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
 
 
+template <int dim>
+void
+MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
+				      std::vector<std::vector<unsigned int> >& result)
+{
+  const unsigned int nlevels = dof_handler.get_tria().n_levels();
+  
+  Assert (result.size() == nlevels,
+	  ExcDimensionMismatch(result.size(), nlevels));
+
+  const unsigned int n_components = dof_handler.get_fe().n_components();
+  for (unsigned int l=0;l<nlevels;++l)
+    {
+      result[l].resize (n_components);
+      
+				       // special case for only one
+				       // component. treat this first
+				       // since it does not require any
+				       // computations
+      if (n_components == 1)
+	{
+	  result[l][0] = dof_handler.n_dofs(l);
+	} else {
+					   // otherwise determine the number
+					   // of dofs in each component
+					   // separately. do so in parallel
+	  std::vector<std::vector<bool> >
+	    dofs_in_component (n_components,
+			       std::vector<bool>(dof_handler.n_dofs(l),
+						 false));
+	  std::vector<std::vector<bool> >
+	    component_select (n_components,
+			      std::vector<bool>(n_components, false));
+	  Threads::ThreadManager thread_manager;
+	  for (unsigned int i=0; i<n_components; ++i)
+	    {
+	      void (*fun_ptr) (const unsigned int       level,
+			       const MGDoFHandler<dim>    &,
+			       const std::vector<bool>    &,
+			       std::vector<bool>          &)
+		= &DoFTools::template extract_level_dofs<dim>;
+	      component_select[i][i] = true;
+	      Threads::spawn (thread_manager,
+			      Threads::encapsulate (fun_ptr)
+			      .collect_args (l, dof_handler, component_select[i],
+					     dofs_in_component[i]));
+	    };
+	  thread_manager.wait();
+	  
+					   // next count what we got
+	  for (unsigned int i=0; i<n_components; ++i)
+	      result[l][i] = std::count(dofs_in_component[i].begin(),
+					dofs_in_component[i].end(),
+					true);
+	  
+					   // finally sanity check
+	  Assert (std::accumulate (result[l].begin(),
+				   result[l].end(), 0U)
+		  ==
+		  dof_handler.n_dofs(l),
+		  ExcInternalError());
+	}
+    }
+}
+
+
+
+template<int dim, typename number>
+void
+MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
+			   MGLevelObject<Vector<number> >& v)
+{
+  for (unsigned int level=v.get_minlevel();
+       level<=v.get_maxlevel();++level)
+    {
+      unsigned int n = mg_dof.n_dofs (level);
+      v[level].reinit(n);
+    }
+
+}
+
+
+
+
+
+template<int dim, typename number>
+void
+MGTools::reinit_vector (const MGDoFHandler<dim>& mg_dof,
+			   MGLevelObject<BlockVector<number> >& v,
+			   const std::vector<bool>& selected)
+{
+  const unsigned int ncomp = mg_dof.get_fe().n_components();
+  
+  if (selected.size() == 0)
+    {
+      selected.resize(ncomp);
+      fill_n (selected.begin(), ncomp, true);
+    }
+
+  Assert (selected.size() == ncomp,
+	  ExcDimensionMismatch(selected.size(), ncomp));
+
+  unsigned int n_selected = std::accumulate (selected.begin(),
+					     selected.end(),
+					     0U);
+			     
+  std::vector<std::vector<unsigned int> >
+    ndofs(mg_dof.n_levels(), ncomp);
+
+  count_dofs_per_component (mg_dof, ndofs);
+  
+  for (unsigned int level=v.get_minlevel();
+       level<=v.get_maxlevel();++level)
+    {
+      v[level].reinit(n_selected);
+      unsigned int k=0;
+      for (unsigned int i=0;i<ncomp;++i)
+	if (selected[i])
+	  v[level].block(k++).reinit(ndofs[level][i]);
+    }
+}
+
+
+
+
 
 // explicit instantiations
-template void MGDoFTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
-						 SparsityPattern &,
-						 const unsigned int);
-template void MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
-						      SparsityPattern &,
-						      const unsigned int);
+template void
+MGTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				SparsityPattern &,
+				const unsigned int);
 
-template void MGDoFTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<deal_II_dimension> &,
-							   SparsityPattern &,
-							   const unsigned int);
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     SparsityPattern &,
+				     const unsigned int);
+
+template void
+MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<deal_II_dimension> &,
+					  SparsityPattern &,
+					  const unsigned int);
+
+template void
+MGTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				CompressedSparsityPattern &,
+				const unsigned int);
+
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     CompressedSparsityPattern &,
+				     const unsigned int);
+
+template void
+MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<deal_II_dimension> &,
+					  CompressedSparsityPattern &,
+					  const unsigned int);
+
+template void
+MGTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				BlockSparsityPattern &,
+				const unsigned int);
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     BlockSparsityPattern &,
+				     const unsigned int);
+
+template void
+MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<deal_II_dimension> &,
+					  BlockSparsityPattern &,
+					  const unsigned int);
+
+template void
+MGTools::make_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				CompressedBlockSparsityPattern &,
+				const unsigned int);
+
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     CompressedBlockSparsityPattern &,
+				     const unsigned int);
+
+template void
+MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<deal_II_dimension> &,
+					  CompressedBlockSparsityPattern &,
+					  const unsigned int);
 
 #if deal_II_dimension > 1
-template void MGDoFTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
-						      SparsityPattern &,
-						      const unsigned int,
-						      const FullMatrix<double>&,
-						      const FullMatrix<double>&);
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     SparsityPattern &,
+				     const unsigned int,
+				     const FullMatrix<double>&,
+				     const FullMatrix<double>&);
+
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     CompressedSparsityPattern &,
+				     const unsigned int,
+				     const FullMatrix<double>&,
+				     const FullMatrix<double>&);
+
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     BlockSparsityPattern &,
+				     const unsigned int,
+				     const FullMatrix<double>&,
+				     const FullMatrix<double>&);
+
+template void
+MGTools::make_flux_sparsity_pattern (const MGDoFHandler<deal_II_dimension> &,
+				     CompressedBlockSparsityPattern &,
+				     const unsigned int,
+				     const FullMatrix<double>&,
+				     const FullMatrix<double>&);
+
 #endif
+
+template void MGTools::reinit_vector (const MGDoFHandler<deal_II_dimension>&,
+				      MGLevelObject<Vector<double> >&);
+template void MGTools::reinit_vector (const MGDoFHandler<deal_II_dimension>&,
+				      MGLevelObject<Vector<float> >&);
+
+
+//  template void MGTools::copy_to_mg (const MGDoFHandler<deal_II_dimension>&,
+//  				   const MGTransferBase<Vector<double> >&,
+//  				   MGLevelObject<Vector<double> >&,
+//  				   const Vector<double>&);
+
+//  template void MGTools::copy_from_mg(const MGDoFHandler<deal_II_dimension>&,
+//  				    Vector<double>&,
+//  				    const MGLevelObject<Vector<double> >&);
+
+//  template void MGTools::copy_from_mg_add(const MGDoFHandler<deal_II_dimension>&,
+//  					Vector<double>&,
+//  					const MGLevelObject<Vector<double> >&);
+
+//  template void MGTools::copy_to_mg (const MGDoFHandler<deal_II_dimension>&,
+//  				   const MGTransferBase<Vector<double> >&,
+//  				   MGLevelObject<Vector<double> >&,
+//  				   const Vector<float>&);
+
+//  template void MGTools::copy_from_mg(const MGDoFHandler<deal_II_dimension>&,
+//  				    Vector<double>&,
+//  				    const MGLevelObject<Vector<float> >&);
+
+//  template void MGTools::copy_from_mg_add(const MGDoFHandler<deal_II_dimension>&,
+//  					Vector<double>&,
+//  					const MGLevelObject<Vector<float> >&);
+
+//  template void MGTools::copy_to_mg (const MGDoFHandler<deal_II_dimension>&,
+//  				   const MGTransferBase<Vector<double> >&,
+//  				   MGLevelObject<Vector<double> >&,
+//  				   const BlockVector<double>&);
+
+//  template void MGTools::copy_from_mg(const MGDoFHandler<deal_II_dimension>&,
+//  				    BlockVector<double>&,
+//  				    const MGLevelObject<Vector<double> >&);
+
+//  template void MGTools::copy_from_mg_add(const MGDoFHandler<deal_II_dimension>&,
+//  					BlockVector<double>&,
+//  					const MGLevelObject<Vector<double> >&);
+
+//  template void MGTools::copy_to_mg (const MGDoFHandler<deal_II_dimension>&,
+//  				   const MGTransferBase<Vector<double> >&,
+//  				   MGLevelObject<Vector<double> >&,
+//  				   const BlockVector<float>&);
+
+//  template void MGTools::copy_from_mg(const MGDoFHandler<deal_II_dimension>&,
+//  				    BlockVector<double>&,
+//  				    const MGLevelObject<Vector<float> >&);
+
+//  template void MGTools::copy_from_mg_add(const MGDoFHandler<deal_II_dimension>&,
+//  					BlockVector<double>&,
+//  					const MGLevelObject<Vector<float> >&);
+
+template void MGTools::count_dofs_per_component (const MGDoFHandler<deal_II_dimension>&,
+						 std::vector<std::vector<unsigned int> >&);
+

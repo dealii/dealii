@@ -18,10 +18,13 @@
 #include <multigrid/mg_dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
-#include <multigrid/multigrid.h>
+//#include <multigrid/multigrid.h>
 #include <multigrid/mg_smoother.h>
 #include <multigrid/mg_smoother.templates.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 
 #include <algorithm>
 
@@ -29,23 +32,11 @@
 //////////////////////////////////////////////////////////////////////
 
 
-MGSmootherBase::~MGSmootherBase()
-{};
-
-
-//////////////////////////////////////////////////////////////////////
-
-
-void
-MGSmootherIdentity::smooth (const unsigned int,
-			    Vector<double>       &,
-			    const Vector<double> &) const
-{};
-
 
 #if deal_II_dimension == 1
 
-MGSmoother::MGSmoother (const MGDoFHandler<1> &/*mg_dof*/, unsigned int steps)
+MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<1> &/*mg_dof*/,
+					    unsigned int steps)
 		:
 		steps(steps)
 {
@@ -58,7 +49,8 @@ MGSmoother::MGSmoother (const MGDoFHandler<1> &/*mg_dof*/, unsigned int steps)
 #if deal_II_dimension > 1
 
 template <int dim>
-MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
+MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
+					    unsigned int steps)
 		:
 		steps(steps)
 {
@@ -121,9 +113,10 @@ MGSmoother::MGSmoother (const MGDoFHandler<dim> &mg_dof, unsigned int steps)
 
 //////////////////////////////////////////////////////////////////////
 
+template <class VECTOR>
 void
-MGSmoother::set_zero_interior_boundary (const unsigned int  level,
-					Vector<double>      &u) const
+MGSmootherContinuous::set_zero_interior_boundary (const unsigned int level,
+						  VECTOR&            u) const
 {
   if (level==0)
     return;
@@ -140,22 +133,89 @@ MGSmoother::set_zero_interior_boundary (const unsigned int  level,
 // don't do the following instantiation in 1d, since there is a specialized
 // function there
 #if deal_II_dimension > 1
-template MGSmoother::MGSmoother (const MGDoFHandler<deal_II_dimension>&, unsigned int);
+template MGSmootherContinuous::MGSmootherContinuous (const MGDoFHandler<deal_II_dimension>&, unsigned int);
 #endif
 
 template
-MGSmootherRelaxation<float>
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>        &mg_dof,
-		       const MGLevelObject<SparseMatrix<float> > &matrix,
-		       const function_ptr                            relaxation,
-		       const unsigned int                            steps,
-		       const double                                  omega);
+void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
+					     Vector<double>&) const;
 
 template
-MGSmootherRelaxation<double>
-::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>         &mg_dof,
-		       const MGLevelObject<SparseMatrix<double> > &matrix,
-		       const function_ptr                             relaxation,
-		       const unsigned int                             steps,
-		       const double                                   omega);
+void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
+					     Vector<float>&) const;
+
+template
+void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
+					     BlockVector<double>&) const;
+
+template
+void MGSmootherContinuous::set_zero_interior_boundary (const unsigned int,
+					     BlockVector<float>&) const;
+
+
+  
+template
+MGSmootherRelaxation<SparseMatrix<float>, Vector<float> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<SparseMatrix<float> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+template
+MGSmootherRelaxation<SparseMatrix<float>, Vector<double> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<SparseMatrix<float> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+template
+MGSmootherRelaxation<SparseMatrix<double>, Vector<float> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<SparseMatrix<double> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+template
+MGSmootherRelaxation<SparseMatrix<double>, Vector<double> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<SparseMatrix<double> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+
+template
+MGSmootherRelaxation<BlockSparseMatrix<float>, BlockVector<float> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<BlockSparseMatrix<float> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+template
+MGSmootherRelaxation<BlockSparseMatrix<float>, BlockVector<double> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<BlockSparseMatrix<float> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+template
+MGSmootherRelaxation<BlockSparseMatrix<double>, BlockVector<float> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<BlockSparseMatrix<double> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
+
+template
+MGSmootherRelaxation<BlockSparseMatrix<double>, BlockVector<double> >
+::MGSmootherRelaxation(const MGDoFHandler<deal_II_dimension>&,
+		       const MGLevelObject<BlockSparseMatrix<double> >&,
+		       const function_ptr,
+		       const unsigned int,
+		       const double);
 

@@ -1,26 +1,28 @@
 // $Id$
 
 
-template<typename number>
+template<class MATRIX, class VECTOR>
 template<int dim>
-MGSmootherRelaxation<number>::MGSmootherRelaxation (const MGDoFHandler<dim>                       &mg_dof,
-						    const MGLevelObject<SparseMatrix<number> > &matrix,
-						    const function_ptr                             relaxation,
-						    const unsigned int                             steps,
-						    const double                                   omega)
+MGSmootherRelaxation<MATRIX, VECTOR>
+::MGSmootherRelaxation (const MGDoFHandler<dim>&     mg_dof,
+			const MGLevelObject<MATRIX>& matrix,
+			const function_ptr           relaxation,
+			const unsigned int           steps,
+			const double                 omega)
 		:
-		MGSmoother(mg_dof, steps),
+		MGSmootherContinuous(mg_dof, steps),
 		matrix(&matrix),
 		relaxation(relaxation),
 		omega(omega)
 {};
 
 
-template<typename number>
+template<class MATRIX, class VECTOR>
 void
-MGSmootherRelaxation<number>::smooth (const unsigned int   level,
-				      Vector<double>       &u,
-				      const Vector<double> &rhs) const
+MGSmootherRelaxation<MATRIX, VECTOR>
+::smooth (const unsigned int level,
+	  VECTOR&            u,
+	  const VECTOR&      rhs) const
 {
   h1.reinit(u);
   h2.reinit(u);

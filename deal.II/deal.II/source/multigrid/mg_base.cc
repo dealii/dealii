@@ -14,139 +14,22 @@
 
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_smoother.h>
+#include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 #include <iostream>
 #include <cmath>
 
 
-MGBase::~MGBase ()
-{}
-
-
-MGBase::MGBase(const MGTransferBase &transfer,
-	       const unsigned        minlevel,
-	       const unsigned        maxlevel)
-		:
-		maxlevel(maxlevel),
-		minlevel(minlevel),
-		defect(minlevel,maxlevel),
-		solution(minlevel,maxlevel),
-		t(minlevel,maxlevel),
-		transfer(&transfer)
-{
-  Assert(minlevel <= maxlevel,
-	 ExcSwitchedLevels(minlevel, maxlevel));
-}
-
-
-void
-MGBase::vcycle(const MGSmootherBase     &pre_smooth,
-	       const MGSmootherBase     &post_smooth,
-	       const MGCoarseGridSolver &coarse_grid_solver)
-{
-  level_mgstep (maxlevel, pre_smooth, post_smooth, coarse_grid_solver);
-//  abort ();
-}
-
-
-void
-MGBase::level_mgstep(const unsigned int        level,
-		     const MGSmootherBase     &pre_smooth,
-		     const MGSmootherBase     &post_smooth,
-		     const MGCoarseGridSolver &coarse_grid_solver)
-{
-#ifdef MG_DEBUG
-  char *name = new char[100];
-  sprintf(name, "MG%d-defect",level);
-  print_vector(level, defect[level], name);
-#endif
-
-  solution[level] = 0.;
-  
-  if (level == minlevel)
-    {
-      coarse_grid_solver(level, solution[level], defect[level]);
-#ifdef MG_DEBUG
-      sprintf(name, "MG%d-solution",level);
-      print_vector(level, solution[level], name);
-#endif
-      return;
-    }
-
-			   // smoothing of the residual by modifying s
-  pre_smooth.smooth(level, solution[level], defect[level]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-pre",level);
-  print_vector(level, solution[level], name);
-#endif
-  
-  t[level] = 0.;
-
-				   // t = -A*solution[level]
-  level_vmult(level, t[level], solution[level], defect[level]);
-  
-				   // make t rhs of lower level
-				   // The non-refined parts of the
-				   // coarse-level defect already contain
-				   // the global defect, the refined parts
-				   // its restriction.
-  for (unsigned int l = level;l>minlevel;--l)
-    {
-      t[l-1] = 0.;
-      transfer->restrict_and_add (l, t[l-1], t[l]);
-      defect[l-1] += t[l-1];
-    }
-
-				   // add additional DG contribution
-//  edge_vmult(level, defect[level-1], defect[level]);
-  
-				   // do recursion
-  level_mgstep(level-1, pre_smooth, post_smooth, coarse_grid_solver);
-
-				   // reset size of the auxiliary
-				   // vector, since it has been
-				   // resized in the recursive call to
-				   // level_mgstep directly above
-  t[level] = 0.;
-
-				   // do coarse grid correction
-
-  transfer->prolongate(level, t[level], solution[level-1]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-cgc",level);
-  print_vector(level, t, name);
-#endif
-
-  solution[level] += t[level];
-  
-				   // post-smoothing
-  post_smooth.smooth(level, solution[level], defect[level]);
-
-#ifdef MG_DEBUG
-  sprintf(name, "MG%d-post",level);
-  print_vector(level, solution[level], name);
-
-  delete[] name;
-#endif
-}
-
-
-void
-MGBase::edge_vmult (const unsigned int,
-		    Vector<double>&,
-		    const Vector<double>&)
-{}
-
 //////////////////////////////////////////////////////////////////////
 
-MGCoarseGridSolver::~MGCoarseGridSolver()
-{};
+//  template <class VECTOR>
+//  MGTransferBase<VECTOR>::~MGTransferBase()
+//  {};
 
 
-//////////////////////////////////////////////////////////////////////
+//  // Explicit instantiations
 
-MGTransferBase::~MGTransferBase()
-{};
-
-
+//  template class MGTransferBase<Vector<double> >;
+//  template class MGTransferBase<Vector<float> >;
+//  template class MGTransferBase<BlockVector<double> >;
+//  template class MGTransferBase<BlockVector<float> >;
