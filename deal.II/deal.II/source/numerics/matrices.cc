@@ -42,7 +42,7 @@ using namespace std;
 
 
 //TODO: Comment?? Use proper mapping!
-static const MappingQ1<deal_II_dimension> mapping;
+static const MappingQ1<deal_II_dimension> mapping_q1;
 
 
 
@@ -169,7 +169,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
 					  update_q_points);
-  FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
+  FEFaceValues<dim> fe_values (mapping_q1, fe, q, update_flags);
 
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
