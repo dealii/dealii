@@ -15,8 +15,9 @@ help:
 	@echo "=  base lac: debug and optimized libraries base and lac              ="
 	@echo "=  1dg 2dg 3dg: (1) and deal.II debug version for specified dimension="
 	@echo "=  1d 2d 3d: (2) and deal.II for specified dimension                 ="
-	@echo "=  all: base, lac, 1d, 2d and 3d                                     ="
-	@echo "=  debug: baseg, lacg, 1dg, 2dg and 3dg                              ="
+	@echo "=  contrib: make additional libraries in contrib, if there are any   ="
+	@echo "=  all: base, lac, 1d, 2d and 3d, contrib                            ="
+	@echo "=  debug: baseg, lacg, 1dg, 2dg and 3dg, contrib                     ="
 	@echo "=  online-doc: generate the documentation in HTML format             ="
 	@echo "=  printable-doc: generate the documentation in Postscript format.   ="
 	@echo "=      You need to have Doc++ and LaTeX installed for that.          ="
@@ -71,7 +72,7 @@ lac:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
-all:
+all: contrib
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
@@ -83,12 +84,15 @@ all:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
-debug:
+debug: contrib
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
 	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) libg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 2dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 1dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
+
+contrib:
+	cd $D/contrib ; $(MAKE)
 
 
 online-doc:
@@ -163,6 +167,6 @@ clean-examples:
 
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
-        online-doc printable-doc tex-doc \
+        online-doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
 	clean-doc clean-examples TAGS TODO

@@ -85,7 +85,8 @@
            Name and version of the Fortran 77 compiler. Possible
 	   names presently include <code>egcs1.1</code>,
 	   <code>gcc2.95</code>, <code>gcc2.96</code>,
-           <code>gcc2.97</code>, <code>SunF77</code>;
+           <code>gcc2.97</code>, <code>SunF77</code>,
+	   <code>AIXF77</code>, <code>MIPSproF77</code>;
 	   there may be others in the future, if we have access to
            other systems
            </p>
@@ -119,6 +120,15 @@
            in programs through a preprocessor variable
            </p>
       </dd>    
+
+
+      <dt> <code>USE_CONTRIB_HSL</code> </dt>
+      <dd> <p>
+           <code>yes</code> indicates whether some subroutines from
+           the HSL have been explicitely installed and shall be used
+           by the library. <code>no</code> otherwise.
+           </p>
+      </dd>    
     </dl>
 
 
@@ -143,6 +153,15 @@
       <dt> <code>lib-path-deal2</code> </dt>
       <dd> <p>
            Same for the /deal.II library
+           </p>
+      </dd>
+
+
+      <dt> <code>lib-path-contrib-hsl</code> </dt>
+      <dd> <p>
+           Path to the place where the HSL subroutine functions are
+           linked into a library. Note that this library is only
+           available if it is installed explicitely by the user.
            </p>
       </dd>
 
@@ -193,6 +212,13 @@
            Same for the deal.II libraries in the various dimensions
            </p>
       </dd>
+
+      <dt> <code>lib-contrib-hsl</code> </dt>
+      <dd> <p>
+           Path and name of the library that contains the HSL
+           subroutines explicitely installed.
+           </p>
+      </dd>
     </dl>
 
 
@@ -217,6 +243,15 @@
       <dd> <p>
            Same for the /lac library. The files are in
 	   <code>$(include-path-lac)/lac</code>.
+           </p>
+      </dd>
+
+
+      <dt> <code>include-path-contrib-hsl</code> </dt>
+      <dd> <p>
+           If some HSL files are
+           installed, this path points to includes for the
+           declaration of C bindings to these functions.
            </p>
       </dd>
 
@@ -283,15 +318,6 @@
            Linker flags when linking Fortran 77 code into the
            executable where the main part is C++. This includes
            libraries as <code>libg2c</code> for g77, or vendor libraries
-           </p>
-      </dd>
-
-
-      <dt> <code>LIBS</code> </dt>
-      <dd> <p>
-           Additional libraries found by configure and needed to be
-           linked with based on the flags given to
-           <code>./configure</code>, e.g. BLAS or LAPACK
            </p>
       </dd>
     </dl>

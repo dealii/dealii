@@ -545,6 +545,38 @@ if test "$withmultithreading" != no ; then
 fi
 AC_SUBST(withmultithreading)
 
+
+
+dnl ------------------------------------------------------------
+dnl   Check whether some of the HSL functions have been dropped
+dnl   into their respective place in the contrib subdir.
+dnl   Check for the following functions to be there:
+dnl     MA27: needs files ma27.f
+dnl     MA47: needs files ma47.f ma47.dep
+dnl ------------------------------------------------------------
+AC_MSG_CHECKING(for HSL subroutines)
+hsl_subroutines=""
+if test -r contrib/hsl/source/ma27.f ; then
+  hsl_subroutines="$hsl_subroutines MA27"
+  AC_DEFINE(HAVE_HSL_MA27)
+fi
+
+if test -r contrib/hsl/source/ma47.f -a -r contrib/hsl/source/ma47dep.f ; then
+  hsl_subroutines="$hsl_subroutines MA47"
+  AC_DEFINE(HAVE_HSL_MA47)
+fi
+
+AC_MSG_RESULT($hsl_subroutines)
+
+if test "x$hsl_subroutines" != "x" ; then
+  USE_CONTRIB_HSL=yes
+else
+  USE_CONTRIB_HSL=no
+fi
+AC_SUBST(USE_CONTRIB_HSL)
+
+
+
 dnl ------------------------------------------------------------
 dnl   Check for LAPACK and BLAS
 dnl   Consider this part experimental!

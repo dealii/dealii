@@ -2,8 +2,8 @@
 # Makefile for the /contrib subdirectory
 
 
-# by default do nothing
-default:
+# by default make sublibs
+default: hsl
 
 
 # targets for the kdoc package
@@ -13,7 +13,13 @@ kdoc-install:
 kdoc-clean:
 	cd kdoc ; $(MAKE) clean
 
+hsl:
+	cd hsl ; $(MAKE)
 
 
 # generic targets
 clean: kdoc-clean
+	cd hsl ; $(MAKE) clean
+
+
+.PHONY: default kdoc-install kdoc-clean hsl clean

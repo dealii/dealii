@@ -19,9 +19,11 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>PERL=$(PERL)</code>' >> $@
 	@echo '<li><code>DEAL_II_MAJOR=$(DEAL_II_MAJOR)</code>' >> $@
 	@echo '<li><code>DEAL_II_MINOR=$(DEAL_II_MINOR)</code>' >> $@
+	@echo '<li><code>USE_CONTRIB_HSL=$(USE_CONTRIB_HSL)</code>' >> $@
 	@echo '<li><code>lib-path-base=$(lib-path-base)</code>' >> $@
 	@echo '<li><code>lib-path-lac=$(lib-path-lac)</code>' >> $@
 	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@
+	@echo '<li><code>lib-path-contrib-hsl=$(lib-path-contrib-hsl)</code>' >> $@
 	@echo '<li><code>LIBPATH=$(LIBPATH)</code>' >> $@
 	@echo '<li><code>lib-base.o=$(lib-base.o)</code>' >> $@
 	@echo '<li><code>lib-base.g=$(lib-base.g)</code>' >> $@
@@ -33,9 +35,11 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>lib-deal2-2d.g=$(lib-deal2-2d.g)</code>' >> $@
 	@echo '<li><code>lib-deal2-3d.o=$(lib-deal2-3d.o)</code>' >> $@
 	@echo '<li><code>lib-deal2-3d.g=$(lib-deal2-3d.g)</code>' >> $@
+	@echo '<li><code>lib-contrib-hsl=$(lib-contrib-hsl)</code>' >> $@
 	@echo '<li><code>include-path-base=$(include-path-base)</code>' >> $@
 	@echo '<li><code>include-path-lac=$(include-path-lac)</code>' >> $@
 	@echo '<li><code>include-path-deal2=$(include-path-deal2)</code>' >> $@
+	@echo '<li><code>include-path-contrib-hsl=$(include-path-contrib-hsl)</code>' >> $@
 	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.o=$(CXXFLAGS.o)</code>' >> $@
@@ -43,7 +47,6 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>F77FLAGS.o=$(F77FLAGS.o)</code>' >> $@
 	@echo '<li><code>LDFLAGS=$(LDFLAGS)</code>' >> $@
 	@echo '<li><code>F77LDFLAGS=$(F77LDFLAGS)</code>' >> $@
-	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
 	@echo '<li><code>ACE_ROOT=$(ACE_ROOT)</code>' >> $@
 	@echo '<li><code>lib-ACE=$(lib-ACE)</code>' >> $@
 	@echo '<li><code>with-multithreading=$(with-multithreading)</code>' >> $@
