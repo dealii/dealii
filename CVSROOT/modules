@@ -27,4 +27,3 @@
 newdeal &common &base &lac &deal.II &doc
 mg reports/multigrid
 gk projects/gk
-base -i make base
