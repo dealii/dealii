@@ -25,7 +25,7 @@
 
 
 
-//TODO:[WB] move build_renumbering to FiniteElementData class
+//TODO:[RH] move build_renumbering to FiniteElementData class
 
 template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)

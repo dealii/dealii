@@ -19,6 +19,7 @@ template <typename number> class FullMatrix;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
 template <typename number> class Vector;
+template <int dim> class FE_Q;
 
 #include <base/exceptions.h>
 
@@ -193,8 +194,77 @@ class FETools
 			    const Vector<number>  &z1,
 			    const DoFHandler<dim> &dof2,
 			    Vector<number>        &z2);    
-  
-  
+
+				     /**
+				      * The numbering of the degrees
+				      * of freedom in continous finite
+				      * elements is hierarchic,
+				      * i.e. in such a way that we
+				      * first number the vertex dofs,
+				      * in the order of the vertices
+				      * as defined by the
+				      * triangulation, then the line
+				      * dofs in the order and
+				      * respecting the direction of
+				      * the lines, then the dofs on
+				      * quads, etc. However, we could
+				      * have, as well, numbered them
+				      * in a lexicographic way,
+				      * i.e. with indices first
+				      * running in x-direction, then
+				      * in y-direction and finally in
+				      * z-direction. Discontinuous
+				      * elements of class @ref{FE_DGQ}
+				      * are numbered in this way, for
+				      * example.
+				      *
+				      * This function constructs a
+				      * table which lexicographic
+				      * index each degree of freedom
+				      * in the hierarchic numbering
+				      * would have. It operates on the
+				      * continuous finite element
+				      * given as first argument, and
+				      * outputs the lexicographic
+				      * indices in the second.
+				      *
+				      * Note that since this function
+				      * uses specifics of the
+				      * continuous finite elements, it
+				      * can only operate on objects of
+				      * type @ref{FE_Q}.
+				      *
+				      * It is assumed that the size of
+				      * the output argument already
+				      * matches the correct size,
+				      * which is equal to the number
+				      * of degrees of freedom in the
+				      * finite element.
+				      */
+    template <int dim>
+    static void
+    hierarchic_to_lexicographic_numbering (const FE_Q<dim>           &fe,
+					   std::vector<unsigned int> &h2l);
+
+				     /**
+				      * This is the reverse function
+				      * to the above one, generating
+				      * the map from the lexicographic
+				      * to the hierarchical
+				      * numbering. All the remarks
+				      * made about the above function
+				      * are also valid here.
+				      */
+    template <int dim>
+    static void
+    lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
+					   std::vector<unsigned int> &l2h);
+    
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidFE);
+    
 				     /**
 				      * Exception
 				      */

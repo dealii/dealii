@@ -574,6 +574,18 @@ documentation, etc</a>.
 
 <ol>
   <li> <p> 
+       New: There are now two functions
+       <code
+       class="member">FETools::hierarchic_to_lexicographic_numbering</code>
+       and <code
+       class="member">FETools::lexicographic_to_hierarchic_numbering</code>
+       which map the hierarchical numbering used in continuous finite
+       element classes to a lexicographical numbering and back.
+       <br>
+       (WB 2001/08/31)
+       </p>
+
+  <li> <p> 
        New: <code class="member">ConstraintMatrix::close</code>
        now simply returns instead of throwing an exception, if the
        matrix was already closed.
