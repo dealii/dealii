@@ -913,21 +913,22 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
 	  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
 
-      Quad faces[GeometryInfo<dim>::faces_per_cell];
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        {
 				       // given a face line number
 				       // (0-3) on a specific face we
 				       // get the cell line number
 				       // (0-11) through the
 				       // face_to_cell_lines function
-      for$(unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	faces[face]=Quad (
-	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,0)]]->index(),
-	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,1)]]->index(),
-	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,2)]]->index(),
-	  needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,3)]]->index());
-
-      for (unsigned int quad=0; quad<6; ++quad)
-        {
+	  Quad quad(needed_lines[line_list[GeometryInfo<dim>::
+					  face_to_cell_lines(face,0)]]->index(),
+		    needed_lines[line_list[GeometryInfo<dim>::
+					  face_to_cell_lines(face,1)]]->index(),
+		    needed_lines[line_list[GeometryInfo<dim>::
+					  face_to_cell_lines(face,2)]]->index(),
+		    needed_lines[line_list[GeometryInfo<dim>::
+					  face_to_cell_lines(face,3)]]->index());
+	  
                                            // insert quad, with
                                            // invalid iterator
                                            //
@@ -966,14 +967,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // new one and instead
                                            // later set the
                                            // face_orientation flag
-          const Quad test_quad (faces[quad].line(3),
-                                faces[quad].line(2),
-                                faces[quad].line(1),
-                                faces[quad].line(0));
+          const Quad test_quad (quad.line(3), quad.line(2),
+				quad.line(1), quad.line(0));
           if (needed_quads.find (test_quad) == needed_quads.end())
-            needed_quads[faces[quad]] = end_quad();
+            needed_quads[quad] = end_quad();
         }
-    };
+    }
 
 
 				   /////////////////////////////////
@@ -996,8 +995,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // now set the iterator for
 					   // this quad
 	  q->second = quad;
-	};
-    };
+	}
+    }
 
 				   /////////////////////////////////
 				   // finally create the cells
@@ -1029,16 +1028,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	    line_list[line]=std::make_pair(
 	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
 	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
-
 	  
-	  Quad faces[GeometryInfo<dim>::faces_per_cell];
-	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	    faces[face]=Quad (
-	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,0)]]->index(),
-	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,1)]]->index(),
-	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,2)]]->index(),
-	      needed_lines[line_list[GeometryInfo<dim>::face_to_cell_lines(face,3)]]->index());
-
 					   // get the iterators
 					   // corresponding to the
 					   // faces. also store
@@ -1046,27 +1036,36 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // reversed or not
 	  quad_iterator face_iterator[GeometryInfo<dim>::faces_per_cell];
           bool face_orientation[GeometryInfo<dim>::faces_per_cell];
-          for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-            if (needed_quads.find (faces[f]) != needed_quads.end())
-              {
-                face_iterator[f] = needed_quads[faces[f]];
-                face_orientation[f] = true;
-              }
-            else
-              {
-                                                 // face must be
-                                                 // available in
-                                                 // reverse order then
-                const Quad test_quad (faces[f].line(3),
-                                      faces[f].line(2),
-                                      faces[f].line(1),
-                                      faces[f].line(0));
-                Assert (needed_quads.find (test_quad) != needed_quads.end(),
-                        ExcInternalError());
-                face_iterator[f] = needed_quads[test_quad];
-                face_orientation[f] = false;
-              }
-
+          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    {
+	      Quad quad(needed_lines[line_list[GeometryInfo<dim>::
+					      face_to_cell_lines(face,0)]]->index(),
+			needed_lines[line_list[GeometryInfo<dim>::
+					      face_to_cell_lines(face,1)]]->index(),
+			needed_lines[line_list[GeometryInfo<dim>::
+					      face_to_cell_lines(face,2)]]->index(),
+			needed_lines[line_list[GeometryInfo<dim>::
+					      face_to_cell_lines(face,3)]]->index());
+	      
+	      if (needed_quads.find (quad) != needed_quads.end())
+		{
+		  face_iterator[face] = needed_quads[quad];
+		  face_orientation[face] = true;
+		}
+	      else
+		{
+						   // face must be
+						   // available in
+						   // reverse order then
+		  const Quad test_quad (quad.line(3), quad.line(2),
+					quad.line(1), quad.line(0));
+		  Assert (needed_quads.find (test_quad) != needed_quads.end(),
+			  ExcInternalError());
+		  face_iterator[face] = needed_quads[test_quad];
+		  face_orientation[face] = false;
+		}
+	    }
+	  
 					   // make the cell out of
 					   // these iterators
 	  cell->set (Hexahedron(face_iterator[0]->index(),
@@ -1166,7 +1165,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  clear_despite_subscriptions();
 	  
 	  AssertThrow (false, ExcInternalError());
-	};
+	}
 
 				       // if only one cell: quad is at
 				       // boundary -> give it the
@@ -1177,7 +1176,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       else
 					 // interior quad -> 255
       	quad->set_boundary_indicator (255);
-    };
+    }
 
 				   /////////////////////////////////////////
 				   // next find those lines which are at
@@ -1325,7 +1324,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       
  
 				       // Set up 2 quads that are
-				       // built up fromt the lines for
+				       // built up from the lines for
 				       // reasons of comparison to
 				       // needed_quads.  The second
 				       // quad is the reversed version
@@ -1359,10 +1358,10 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	    {
 	      quad_compare_1.set_line(i,   line[i]->index());
 	      quad_compare_2.set_line(3-i, line[i]->index());
-	    };
+	    }
  	      
  	  ++n_rotations;
- 	};  
+ 	}
  
       if (n_rotations==4)
 	{
