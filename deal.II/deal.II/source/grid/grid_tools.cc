@@ -103,7 +103,11 @@ GridTools::diameter (const Triangulation<1> &tria)
 
 
 // define some transformations in an anonymous namespace
-namespace 
+#ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+  namespace TRANS
+#else
+  namespace
+#endif
 {
   template <int dim>
   class ShiftPoint
@@ -167,7 +171,11 @@ void
 GridTools::shift (const Point<dim>   &shift_vector,
 		  Triangulation<dim> &triangulation)
 {
+#ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+  transform (TRANS::ShiftPoint<dim>(shift_vector), triangulation);
+#else
   transform (ShiftPoint<dim>(shift_vector), triangulation);
+#endif  
 }
 
 
@@ -177,7 +185,11 @@ void
 GridTools::rotate (const double      angle,
 		   Triangulation<2> &triangulation)
 {
+#ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+  transform (TRANS::Rotate2d(angle), triangulation);
+#else
   transform (Rotate2d(angle), triangulation);
+#endif  
 }
 
 #endif
@@ -189,7 +201,11 @@ GridTools::scale (const double        scaling_factor,
 		  Triangulation<dim> &triangulation)
 {
   Assert (scaling_factor>0, ExcScalingFactorNotPositive (scaling_factor));
+#ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
+  transform (TRANS::ScalePoint<dim>(scaling_factor), triangulation);
+#else
   transform (ScalePoint<dim>(scaling_factor), triangulation);
+#endif  
 }
 
 
