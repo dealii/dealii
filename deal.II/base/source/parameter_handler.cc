@@ -1,12 +1,10 @@
 /* $Id$ */
 
 #include <basic/parameter_handler.h>
-#include <fstream.h>
-#include <iomanip.h>
+#include <fstream>
+#include <iomanip>
+#include <cstdlib>
 
-extern "C" {
-#include <stdlib.h>
-}
 
 
 

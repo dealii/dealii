@@ -5,9 +5,9 @@
 #include <grid/tria.h>
 #include <basic/magic_numbers.h>
 #include <basic/data_io.h>
-#include <iostream.h>
-#include <algo.h>
-#include <map.h>
+#include <iostream>
+#include <algorithm>
+#include <map>
 #include <cmath>
 
 

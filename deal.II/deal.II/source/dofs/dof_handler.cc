@@ -8,7 +8,7 @@
 #include <grid/tria.h>
 #include <lac/dsmatrix.h>
 #include <multimap.h>
-#include <algo.h>
+#include <algorithm>
 
 
 

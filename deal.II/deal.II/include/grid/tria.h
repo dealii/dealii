@@ -4,7 +4,7 @@
 #define __tria_H
 /*----------------------------   tria.h     ---------------------------*/
 
-#include <vector.h>
+#include <vector>
 #include <grid/tria_line.h>
 #include <grid/tria_quad.h>
 #include <grid/point.h>

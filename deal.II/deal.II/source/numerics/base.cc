@@ -12,8 +12,9 @@
 #include "../../../mia/vectormemory.h"
 #include "../../../mia/cg.h"
 
-#include <map.h>
-#include <algo.h>
+#include <map>
+#include <numeric>
+#include <algorithm>
 #include <cmath>
 
 

@@ -4,7 +4,7 @@
 #define __dof_H
 /*----------------------------   dof.h     ---------------------------*/
 
-#include <vector.h>
+#include <vector>
 #include <fe/fe.h>
 #include <base/exceptions.h>
 

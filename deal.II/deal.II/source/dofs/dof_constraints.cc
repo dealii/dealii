@@ -1,11 +1,11 @@
 /* $Id$ */
 
 
-#include <algo.h>
 #include <grid/dof_constraints.h>
 #include <lac/dsmatrix.h>
 #include <lac/dvector.h>
-#include <iostream.h>
+#include <iostream>
+#include <algorithm>
 
 
 

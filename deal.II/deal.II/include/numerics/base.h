@@ -8,7 +8,7 @@
 #include <lac/dsmatrix.h>
 #include <base/exceptions.h>
 #include <grid/dof_constraints.h>
-
+#include <map>
 
 
 // forward declaration
@@ -21,7 +21,6 @@ template <int dim> class Function;
 template <int dim> class Equation;
 template <int dim> class Assembler;
 
-template <class Key, class T, class Compare = less<Key>, class Alloc = alloc> class map;
 
 
 

@@ -8,7 +8,7 @@
 #include <grid/dof_accessor.h>
 #include <fe/fe.h>
 #include <base/exceptions.h>
-#include <vector.h>
+#include <vector>
 
 
 // forward declarations

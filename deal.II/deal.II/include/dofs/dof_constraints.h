@@ -5,7 +5,7 @@
 /*----------------------------   dof_constraints.h     ---------------------------*/
 
 
-#include <vector.h>
+#include <vector>
 #include <pair.h>
 #include <base/exceptions.h>
 
