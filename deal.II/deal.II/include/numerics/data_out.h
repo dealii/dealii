@@ -715,14 +715,19 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * DataEntryBase since the latter is a
                                       * private member of DataOut_DoFData.
 				      *
-				      * For whatever weird reason, it
-				      * is also not enough to make
-				      * just DataEntry a friend, but
-				      * we have to fully qualify it...
+				      * For whatever weird reason, it is also
+				      * not enough to make just DataEntry a
+				      * friend, but we have to fully qualify
+				      * it for icc, while gcc 2.95 insists on
+				      * the non-qualified version...
                                       */
+#  ifdef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
+    template <typename> friend class DataEntry;
+#  else
     template <int N1, int N2, int N3>
     template <typename>
     friend class DataOut_DoFData<N1,N2,N3>::DataEntry;
+#  endif
 #endif
 };
 
