@@ -37,8 +37,7 @@
  */
 class LogStream
 {
-//  private:
-  public:
+  private:
     
 				     /**
 				      * Stack of strings which are printed
@@ -94,7 +93,7 @@ class LogStream
 				      * prefixes for output to a file.
 				      */
     unsigned int file_depth;
-  
+    
   public:
 				     /**
 				      * Standard constructor, since we
@@ -159,10 +158,11 @@ class LogStream
     void depth_file (unsigned int n);
 
 				     /**
-				      * Output a character constant through
+				      * Output a constant something through
 				      * this stream.
 				      */
-    LogStream & operator << (const char *);
+    template <typename T>
+    LogStream & operator << (const T &t);
     
 				     /**
 				      * Output a function. This really is not
@@ -212,38 +212,31 @@ LogStream::push (const string& text)
 
 
 template <class T>
-inline void
-writestuff(LogStream& s, const T& t)
-{
- 				   // print the object #t# to each of the
- 				   // two streams, if necessary
-  if (s.prefixes.size() <= s.std_depth)
-    *(s.std_out) << t;
-
-  if (s.file && (s.prefixes.size() <= s.file_depth))
-    *(s.file) << t;
-};
-
-
-
-
-template <class T>
 inline LogStream&
-operator << (LogStream& s, const T& t)
+LogStream::operator << (const T& t)
 {
 				   // if the previous command was an
 				   // #endl#, print the topmost prefix
 				   // and a colon
-  if (s.was_endl)
+  if (was_endl)
     {
-      writestuff(s, s.prefixes.top());
-      writestuff(s,':');
-      s.was_endl = false;
+      if (prefixes.size() <= std_depth)
+	*std_out << prefixes.top() << ':';
+
+      if (file && (prefixes.size() <= file_depth))
+	*file << prefixes.top() << ':';
+
+      was_endl = false;
     };
 
 				   // print the rest of the message
-  writestuff(s,t);
-  return s;
+  if (prefixes.size() <= std_depth)
+    *std_out << t;
+
+  if (file && (prefixes.size() <= file_depth))
+    *file << t;
+
+  return *this;
 }
 
 
@@ -261,16 +254,15 @@ operator << (LogStream& s, const T& t)
  */
 inline void endl(LogStream& s)
 {
-				   // there seems to be no proper way to
-				   // pass a pointer to an overloaded
-				   // function through a template parameter,
-				   // since the compiler can't know which of
-				   // the functions it is; do the overload
-				   // resolution by hand like this:
-  ostream& (*p) (ostream &) = &endl;
-  writestuff (s, p);
+  if (s.prefixes.size() <= s.std_depth)
+    *s.std_out << endl;
+
+  if (s.file && (s.prefixes.size() <= s.file_depth))
+    *s.file << endl;
+
   s.was_endl = true;
-}
+};
+
 
 /**
  * The standard log object of DEAL.

@@ -56,20 +56,6 @@ void LogStream::depth_file(unsigned n)
 
 
 
-LogStream& LogStream::operator << (const char* c)
-{
-  if (was_endl)
-    {
-      writestuff(*this, prefixes.top());
-      writestuff(*this, ':');
-    }
-  was_endl = false;
-  writestuff (*this, c);
-  return *this;
-}
-
-
-
 LogStream&
 LogStream::operator << (void (f)(LogStream &))
 {
