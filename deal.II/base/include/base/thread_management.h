@@ -3498,7 +3498,7 @@ namespace Threads
 
 
   template <typename Arg1>
-  FunData1<Arg1,void>::ArgCollector
+  typename FunData1<Arg1,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1))
   {
     return fun_ptr;
@@ -3507,7 +3507,7 @@ namespace Threads
 
   
   template <typename Arg1, typename Arg2>
-  FunData2<Arg1,Arg2,void>::ArgCollector
+  typename FunData2<Arg1,Arg2,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2))
   {
     return fun_ptr;
@@ -3516,7 +3516,7 @@ namespace Threads
 
   
   template <typename Arg1, typename Arg2, typename Arg3>
-  FunData3<Arg1,Arg2,Arg3,void>::ArgCollector
+  typename FunData3<Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3))
   {
     return fun_ptr;
@@ -3525,7 +3525,7 @@ namespace Threads
 
   
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  FunData4<Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
+  typename FunData4<Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4))
   {
     return fun_ptr;
@@ -3534,7 +3534,7 @@ namespace Threads
 
   
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
+  typename FunData5<Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5))
   {
     return fun_ptr;
@@ -3543,7 +3543,7 @@ namespace Threads
 
   
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
+  typename FunData6<Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6))
   {
     return fun_ptr;
@@ -3552,7 +3552,7 @@ namespace Threads
 
   
   template <class Class>
-  MemFunData0<Class,void>::ArgCollector
+  typename MemFunData0<Class,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)())
   {
     return fun_ptr;
@@ -3561,7 +3561,7 @@ namespace Threads
 
 
   template <class Class, typename Arg1>
-  MemFunData1<Class,Arg1,void>::ArgCollector
+  typename MemFunData1<Class,Arg1,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1))
   {
     return fun_ptr;
@@ -3570,7 +3570,7 @@ namespace Threads
 
   
   template <class Class, typename Arg1, typename Arg2>
-  MemFunData2<Class,Arg1,Arg2,void>::ArgCollector
+  typename MemFunData2<Class,Arg1,Arg2,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2))
   {
     return fun_ptr;
@@ -3579,7 +3579,7 @@ namespace Threads
 
   
   template <class Class, typename Arg1, typename Arg2, typename Arg3>
-  MemFunData3<Class,Arg1,Arg2,Arg3,void>::ArgCollector
+  typename MemFunData3<Class,Arg1,Arg2,Arg3,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3))
   {
     return fun_ptr;
@@ -3588,7 +3588,7 @@ namespace Threads
 
   
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
+  typename MemFunData4<Class,Arg1,Arg2,Arg3,Arg4,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4))
   {
     return fun_ptr;
@@ -3597,7 +3597,7 @@ namespace Threads
 
   
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-  MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
+  typename MemFunData5<Class,Arg1,Arg2,Arg3,Arg4,Arg5,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5))
   {
     return fun_ptr;
@@ -3606,7 +3606,7 @@ namespace Threads
 
   
   template <class Class, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-  MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
+  typename MemFunData6<Class,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,void>::ArgCollector
   encapsulate (void (Class::*fun_ptr)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6))
   {
     return fun_ptr;
