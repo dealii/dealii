@@ -1307,19 +1307,19 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
 
                                    // face 0
   for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (1, i));
+    ret_val.push_back (std::make_pair (1U, i));
   
                                    // face 1
   for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (0, (degree+2)*i+1));
+    ret_val.push_back (std::make_pair (0U, (degree+2)*i+1));
   
                                    // face 2
   for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (1, (degree+1)+i));
+    ret_val.push_back (std::make_pair (1U, (degree+1)+i));
   
                                    // face 3
   for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (0, (degree+2)*i));
+    ret_val.push_back (std::make_pair (0U, (degree+2)*i));
 
                                    // then go on with interior bubble
                                    // functions, first for the
@@ -1331,7 +1331,7 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
         const unsigned int index_in_component = (x+2) + y*(degree+2);
         Assert (index_in_component < (degree+1)*(degree+2),
                 ExcInternalError());
-        ret_val.push_back (std::make_pair(0, index_in_component));
+        ret_val.push_back (std::make_pair(0U, index_in_component));
       }
   for (unsigned int x=0; x<degree+1; ++x)
     for (unsigned int y=0; y<degree; ++y)
@@ -1339,7 +1339,7 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
         const unsigned int index_in_component = 2*(degree+1) + y + x*degree;
         Assert (index_in_component < (degree+1)*(degree+2),
                 ExcInternalError());
-        ret_val.push_back (std::make_pair(1, index_in_component));
+        ret_val.push_back (std::make_pair(1U, index_in_component));
       }
 
 #ifdef DEBUG  
