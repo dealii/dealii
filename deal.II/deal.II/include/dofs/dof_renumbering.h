@@ -436,6 +436,19 @@ class DoFRenumbering
     downstream_dg (DoFHandler<dim>  &dof_handler,
 		   const Point<dim> &direction);
 
+				     /**
+				      * Cell-wise downstream numbering
+				      * with respect to a constant
+				      * flow direction on one
+				      * level. See the other function
+				      * with the same name.
+				      */
+    template <int dim>
+    static void
+    downstream_dg (MGDoFHandler<dim>  &dof_handler,
+		   const unsigned int level,
+		   const Point<dim> &direction);
+
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
@@ -452,18 +465,51 @@ class DoFRenumbering
 			   const DoFHandler<dim>  &dof_handler,
 			   const Point<dim> &direction);
 
+//TODO:[GK] Documentation!    
 				     /**
-				      * Cell-wise downstream numbering
-				      * with respect to a constant
-				      * flow direction on one
-				      * level. See the other function
-				      * with the same name.
+				      * Cell-wise clockwise numbering.
+				      *
+				      * This function produces a
+				      * clockwise ordering of the
+				      * mesh cells and calls
+				      * @ref{cell_wise_dg}.
+				      * Therefore, it only works with
+				      * Discontinuous Galerkin Finite
+				      * Elements, i.e. all degrees of
+				      * freedom have to be associated
+				      * with the interior of the cell.
 				      */
     template <int dim>
     static void
-    downstream_dg (MGDoFHandler<dim>  &dof_handler,
+    clockwise_dg (DoFHandler<dim>  &dof_handler,
+		   const Point<dim> &center);
+
+				     /**
+				      * Cell-wise clockwise numbering
+				      * on one level. See the other
+				      * function with the same name.
+				      */
+    template <int dim>
+    static void
+    clockwise_dg (MGDoFHandler<dim>  &dof_handler,
 		   const unsigned int level,
-		   const Point<dim> &direction);
+		   const Point<dim> &center);
+
+    				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{clockwise_dg}
+				      * functions. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static void
+    compute_clockwise_dg (std::vector<unsigned int>&,
+			   const DoFHandler<dim>  &dof_handler,
+			   const Point<dim> &center);
 
 				     /**
 				      * Sort those degrees of freedom

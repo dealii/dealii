@@ -973,7 +973,6 @@ DoFRenumbering::compute_downstream_dg (
 }
 
 
-#ifdef ENABLE_MULTIGRID
 template <int dim>
 void DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 				    const unsigned int level,
@@ -991,7 +990,93 @@ void DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 
   cell_wise_dg(dof, level, ordered_cells);
 }
-#endif
+
+
+
+/**
+ * Provide comparator for DoFCellAccessors
+ */
+
+template <int dim>
+struct ClockCells
+{
+				     /**
+				      * Center of rotation.
+				      */
+    const Point<dim>& center;
+				     /**
+				      * Constructor.
+				      */
+    ClockCells (const Point<dim>& center) :
+		    center(center) 
+      {}
+				     /**
+				      * Return true if c1 < c2.
+				      */    
+    bool operator () (const typename DoFHandler<dim>::cell_iterator& c1,
+		      const typename DoFHandler<dim>::cell_iterator&c2) const
+      {
+	
+	const Point<dim> v1 = c1->center() - center;
+	const Point<dim> v2 = c2->center() - center;
+	const double s1 = atan2(v1(0), v1(1));
+	const double s2 = atan2(v2(0), v2(1));
+	return (s1>s2);
+      }
+};
+
+
+template <int dim>
+void
+DoFRenumbering::clockwise_dg (DoFHandler<dim>& dof,
+			       const Point<dim>& center)
+{
+  std::vector<unsigned int> renumbering(dof.n_dofs());
+  compute_clockwise_dg(renumbering, dof, center);
+
+  dof.renumber_dofs(renumbering);
+}
+
+
+
+template <int dim>
+void
+DoFRenumbering::compute_clockwise_dg (
+  std::vector<unsigned int>& new_indices,
+  const DoFHandler<dim>& dof,
+  const Point<dim>& center)
+{
+  std::vector<typename DoFHandler<dim>::cell_iterator>
+    ordered_cells(dof.get_tria().n_active_cells());
+  ClockCells<dim> comparator(center);
+  
+  typename DoFHandler<dim>::active_cell_iterator begin = dof.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator end = dof.end();
+  
+  copy (begin, end, ordered_cells.begin());
+  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+
+  compute_cell_wise_dg(new_indices, dof, ordered_cells);
+}
+
+
+template <int dim>
+void DoFRenumbering::clockwise_dg (MGDoFHandler<dim>& dof,
+				    const unsigned int level,
+				    const Point<dim>& center)
+{
+  std::vector<typename MGDoFHandler<dim>::cell_iterator>
+    ordered_cells(dof.get_tria().n_cells(level));
+  ClockCells<dim> comparator(center);
+  
+  typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
+  typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
+  
+  std::copy (begin, end, ordered_cells.begin());
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+
+  cell_wise_dg(dof, level, ordered_cells);
+}
 
 
 
@@ -1089,6 +1174,31 @@ DoFRenumbering::compute_downstream_dg<deal_II_dimension>
  const Point<deal_II_dimension>&);
 
 template
+void DoFRenumbering::downstream_dg<deal_II_dimension>
+(MGDoFHandler<deal_II_dimension>&,
+ const unsigned int,
+ const Point<deal_II_dimension>&);
+
+template
+void
+DoFRenumbering::clockwise_dg<deal_II_dimension>
+(DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&);
+
+template
+void
+DoFRenumbering::compute_clockwise_dg<deal_II_dimension>
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&);
+
+template
+void DoFRenumbering::clockwise_dg<deal_II_dimension>
+(MGDoFHandler<deal_II_dimension>&,
+ const unsigned int,
+ const Point<deal_II_dimension>&);
+
+template
 void DoFRenumbering::sort_selected_dofs_back<deal_II_dimension>
 (DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
@@ -1110,7 +1220,6 @@ DoFRenumbering::compute_random<deal_II_dimension>
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension> &);
 
-#ifdef ENABLE_MULTIGRID
 template
 void DoFRenumbering::Cuthill_McKee<deal_II_dimension>
 (MGDoFHandler<deal_II_dimension>&,
@@ -1124,10 +1233,3 @@ void DoFRenumbering::cell_wise_dg<deal_II_dimension>
  const unsigned int,
  const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
 
-template
-void DoFRenumbering::downstream_dg<deal_II_dimension>
-(MGDoFHandler<deal_II_dimension>&,
- const unsigned int,
- const Point<deal_II_dimension>&);
-
-#endif
