@@ -40,7 +40,7 @@ class LogStream
 				      * to #cerr#, but can be set to another
 				      * stream through the constructor.
 				      */
-    ostream  &std;
+    ostream  *std;
 
 				     /**
 				      * Pointer to a stream, where a copy of
@@ -156,6 +156,18 @@ class LogStream
 				      * Declare this function as a friend.
 				      */
     friend void endl (LogStream &);
+
+				     /**
+				      * Kludge to make one of the egcs snapshots
+				      * happy, since it produces an internal
+				      * compiler error when accessing #s.std#.
+				      * Remove this function at the first
+				      * possible time.
+				      */
+    ostream & get_std_stream () {
+      return *std;
+    };
+    
 };
 
 
@@ -171,7 +183,7 @@ writestuff(LogStream& s, const T& t)
  				   // print the object #t# to each of the
  				   // two streams, if necessary
   if (s.prefixes.size() <= s.std_depth)
-    s.std << t;
+    s.get_std_stream() << t;
 
   if (s.file && (s.prefixes.size() <= s.file_depth))
     *(s.file) << t;
@@ -233,3 +245,4 @@ extern LogStream deallog;
 /* end of #ifndef __logstream_H */
 #endif
 /*----------------------------   logstream.h     ---------------------------*/
+
