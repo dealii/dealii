@@ -318,16 +318,32 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       New: The static <code class="member">create_mass_matrix</code>,
+       New: The following functions are extended to work
+       on arbitrary mappings:
+       <br>
+       The static <code class="member">create_mass_matrix</code>,
        <code class="member">create_boundary_mass_matrix</code> and
        <code class="member">create_laplace_matrix</code> member
-       functions of the class <code class="class">MatrixCreator</code>
-       and the static <code class="member">project</code> and <code
-       class="member">project_boundary_values</code> member functions
-       of <code class="class">VectorTools</code> are extended to work
-       on arbitrary mappings. All these functions now take a <code
-       class="class">Mapping</code> object as additional argument.
+       functions of the class <code class="class">MatrixCreator</code>,
        <br>
+       the static <code class="member">project</code> and <code
+       class="member">project_boundary_values</code> member functions
+       of the class <code class="class">VectorTools</code>,
+       <br>
+       the two versions of the static <code
+       class="member">estimate</code> member functions of the class
+       <code class="class">KellyErrorEstimator</code>,
+       <br>
+       and the static <code class="member">approximate_gradient</code>
+       and <code class="member">approximate_second_derivative</code>
+       member functions of the class <code
+       class="class">DerivativeApproximation</code>.
+       </p>
+
+       <p>
+       All these functions now take a <code
+       class="class">Mapping</code> object as additional argument.
+       <br>      
        For backward compatibility there exist second versions of
        each of these functions that still don't have a <code
        class="class">Mapping</code> argument. These functions
@@ -559,9 +575,9 @@ documentation, etc</a>.
   <li> <p>
        New: The constructor of the <code class="class">FEValues</code>
        and <code class="class">FE(Sub)FaceValues</code> classes now
-       take a pointer to <code class="class">Mapping</code> object as
-       additional argument. This is the new possibility to combine a
-       <code class="class">FiniteElement</code> with an arbitrary
+       take a reference of a <code class="class">Mapping</code> object
+       as additional argument. This is the new possibility to combine
+       a <code class="class">FiniteElement</code> with an arbitrary
        <code class="class">Mapping</code>, see also <a
        href="#new_fe_mapping_design">New FE and Mapping Design</a>.
        </p>
