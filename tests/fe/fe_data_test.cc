@@ -22,6 +22,8 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
 
+//TODO: Find support_on_face problems for test-no. > 7
+//TODO: Check support_on_face in 3D
 
 template<int dim>
 void test_fe_datas()
@@ -77,7 +79,7 @@ void test_fe_datas()
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
       deallog << "components=" << fe_data->components << std::endl;
 
-      for (unsigned int f=0;f<GeometryInfo<dim>>faces_per_cell;++f)
+      for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
 	  deallog << "support on face " << f << ':';
 	  for (unsigned int s=0;s<fe_data->dofs_per_cell;++s)
