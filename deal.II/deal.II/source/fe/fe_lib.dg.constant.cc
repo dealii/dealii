@@ -160,19 +160,15 @@ FEDGConstant<dim>::get_support_points (const typename DoFHandler<dim>::cell_iter
 };
 
 
-
 template <int dim>
 void
 FEDGConstant<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
-					const Boundary<dim>  &,
-					vector<Point<dim> >  &support_points) const {
-  Assert (false, ExcNotImplemented());
-
-  Assert ((support_points.size() == dofs_per_face) &&
-	  (support_points.size() == GeometryInfo<dim>::vertices_per_face),
-	  ExcWrongFieldDimension (support_points.size(),
-				  GeometryInfo<dim>::vertices_per_face));
+					    const Boundary<dim>  &,
+					    vector<Point<dim> >  &support_points) const {
+  Assert ((support_points.size() == 0),
+	  ExcWrongFieldDimension (support_points.size(),0));
 };
+
 
 
 template <int dim>

@@ -120,8 +120,6 @@ class FEDGConstant : public FELinearMapping<dim> {
  * weak formulation of your discontinuous Galerkin scheme.
  * @author Ralf Hartmann, 1998
  */
-
-
 template <int dim>
 class FEDGLinear : public FELinear<dim>{
   public:
@@ -129,6 +127,15 @@ class FEDGLinear : public FELinear<dim>{
 				      * Constructor
 				      */
     FEDGLinear();
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const;
+
 
 				     /**
 				      * This function returns an error since the
@@ -160,8 +167,6 @@ class FEDGLinear : public FELinear<dim>{
  * weak formulation of your discontinuous Galerkin scheme.
  * @author Ralf Hartmann, 1998
  */
-
-
 template <int dim>
 class FEDGQuadraticSub : public FEQuadraticSub<dim>{
   public:
@@ -169,6 +174,14 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
 				      * Constructor
 				      */
     FEDGQuadraticSub();
+				 
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * This function returns an error since the
@@ -201,8 +214,6 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
  * weak formulation of your discontinuous Galerkin scheme.
  * @author Ralf Hartmann, 1998
  */
-
-
 template <int dim>
 class FEDGCubicSub : public FECubicSub<dim>{
   public:
@@ -210,6 +221,14 @@ class FEDGCubicSub : public FECubicSub<dim>{
 				      * Constructor
 				      */
     FEDGCubicSub();
+
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * This function returns an error since the
@@ -241,8 +260,6 @@ class FEDGCubicSub : public FECubicSub<dim>{
  * weak formulation of your discontinuous Galerkin scheme.
  * @author Ralf Hartmann, 1998
  */
-
-
 template <int dim>
 class FEDGQuarticSub : public FEQuarticSub<dim>{
   public:
@@ -251,6 +268,14 @@ class FEDGQuarticSub : public FEQuarticSub<dim>{
 				      */
     FEDGQuarticSub();
 
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
+    virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const;
+				     
 				     /**
 				      * This function returns an error since the
 				      * correct use of the restriction
