@@ -10,6 +10,7 @@
 #include <basic/function.h>
 #include <basic/data_io.h>
 #include <fe/fe_lib.h>
+#include <fe/fe_lib.criss_cross.h>
 #include <fe/quadrature_lib.h>
 #include <numerics/base.h>
 #include <numerics/assembler.h>
@@ -241,8 +242,17 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   create_new ();
   
   cout << "Refinement level = " << level
-       << ", using elements of order " << order
-       << endl;
+       << ", using elements of type <";
+  switch (order)
+    {
+      case 0:
+	    cout << "criss-cross";
+	    break;
+      default:
+	    cout << "Lagrange-" << order;
+	    break;
+    };
+  cout << ">" << endl;
   
   cout << "    Making grid... ";
   tria->create_hyper_ball ();
@@ -263,6 +273,11 @@ int PoissonProblem<dim>::run (const unsigned int level) {
   Quadrature<dim>      *quadrature;
   Quadrature<dim-1>    *boundary_quadrature;
   switch (order) {
+    case 0:
+	  fe         = new FECrissCross<dim>();
+	  quadrature = new QCrissCross1<dim>();
+	  boundary_quadrature = new QGauss2<dim-1>();
+	  break;
     case 1:
 	  fe         = new FELinear<dim>();
 	  quadrature = new QGauss3<dim>();
@@ -359,19 +374,19 @@ int PoissonProblem<dim>::run (const unsigned int level) {
 					  h1_seminorm_error_per_dof);
       dof->distribute_cell_to_dof_vector (h1_error_per_cell, h1_error_per_dof);
 
-      dVector projected_solution;
-      ConstraintMatrix constraints;
-      constraints.close ();
-      VectorTools<dim>::project (*dof, constraints, *fe,
-				 StraightBoundary<dim>(), *quadrature, 
-				 sol, projected_solution, false,
-				 *boundary_quadrature);
-      cout << "    Calculating L2 error of projected solution... ";
-      VectorTools<dim>::integrate_difference (*dof_handler,
-					      projected_solution, sol,
-					      l2_error_per_cell,
-					      *quadrature, *fe, L2_norm);
-      cout << l2_error_per_cell.l2_norm() << endl;
+//       dVector projected_solution;
+//       ConstraintMatrix constraints;
+//       constraints.close ();
+//       VectorTools<dim>::project (*dof, constraints, *fe,
+// 				 StraightBoundary<dim>(), *quadrature, 
+// 				 sol, projected_solution, false,
+// 				 *boundary_quadrature);
+//       cout << "    Calculating L2 error of projected solution... ";
+//       VectorTools<dim>::integrate_difference (*dof_handler,
+// 					      projected_solution, sol,
+// 					      l2_error_per_cell,
+// 					      *quadrature, *fe, L2_norm);
+//       cout << l2_error_per_cell.l2_norm() << endl;
 
 
       string filename;
@@ -384,7 +399,6 @@ int PoissonProblem<dim>::run (const unsigned int level) {
       DataOut<dim> out;
       ofstream o(filename.c_str());
       fill_data (out);
-      out.add_data_vector (projected_solution, "projected u");
       out.add_data_vector (l1_error_per_dof, "L1-Error");
       out.add_data_vector (l2_error_per_dof, "L2-Error");
       out.add_data_vector (linfty_error_per_dof, "Linfty-Error");
@@ -455,7 +469,7 @@ void PoissonProblem<dim>::print_history (string filename) const {
 
 
 int main () {
-  for (unsigned int order=1; order<5; ++order) 
+  for (unsigned int order=0; order<5; ++order) 
     {
       PoissonProblem<2> problem (order);
       
@@ -468,6 +482,9 @@ int main () {
       string filename;
       switch (order) 
 	{
+	  case 0:
+		filename = "criss_cross";
+		break;
 	  case 1:
 		filename = "linear";
 		break;
