@@ -248,10 +248,9 @@ class MappingCartesian : public Mapping<dim>
 				      * Do the computation for the
 				      * @p{fill_*} functions.
 				      */
-    void compute_fill (const typename DoFHandler<dim>::cell_iterator
-		       &cell,
-		       unsigned int face_no,
-		       unsigned int sub_no,
+    void compute_fill (const typename DoFHandler<dim>::cell_iterator &cell,
+		       const unsigned int face_no,
+		       const unsigned int sub_no,
 		       InternalData& data,
 		       std::vector<Point<dim> > &quadrature_points,
 		       std::vector<Point<dim> >& normal_vectors) const;

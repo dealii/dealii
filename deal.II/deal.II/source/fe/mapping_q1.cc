@@ -374,7 +374,7 @@ MappingQ1<dim>::get_data (const UpdateFlags update_flags,
 
 template <int dim>
 void
-MappingQ1<dim>::compute_face_data (UpdateFlags update_flags,
+MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 				   const Quadrature<dim>& q,
 				   const unsigned int n_original_q_points,
 				   InternalData& data) const

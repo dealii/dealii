@@ -260,9 +260,9 @@ class FESystem : public FiniteElement<dim>
 				      * independent of the cell.
 				      */
     virtual typename Mapping<dim>::InternalDataBase*
-    get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
-	      const Quadrature<dim>& quadrature) const ;
+    get_data (const UpdateFlags      update_flags,
+	      const Mapping<dim>    &mapping,
+	      const Quadrature<dim> &quadrature) const ;
 
 				     /**
 				      * Implementation of the same
@@ -574,7 +574,7 @@ class FESystem : public FiniteElement<dim>
 					  * (see e.g. @p{FE_Q}
 					  * classes).
 					  */
-	void delete_fe_values_data(unsigned int base_no);
+	void delete_fe_values_data (const unsigned int base_no);
 	
       private:
 	

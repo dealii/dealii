@@ -1758,7 +1758,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * approximation by a piecewise
 				      * straight line.
 				      */
-    void set_boundary (unsigned int         number,
+    void set_boundary (const unsigned int   number,
 		       const Boundary<dim> &boundary_object = *straight_boundary);
 
 				     /**
@@ -1768,7 +1768,7 @@ class Triangulation : public TriaDimensionInfo<dim>,
 				      * the same as in
 				      * @p{set_boundary}
 				      */
-    const Boundary<dim> & get_boundary (unsigned int number) const;
+    const Boundary<dim> & get_boundary (const unsigned int number) const;
     
 				     /**
 				      *  Copy a triangulation. This

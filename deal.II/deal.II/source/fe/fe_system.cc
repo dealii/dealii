@@ -321,10 +321,12 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
-FESystem<dim>::get_data (UpdateFlags      flags,
+FESystem<dim>::get_data (const UpdateFlags      flags_,
 			 const Mapping<dim>    &mapping,
 			 const Quadrature<dim> &quadrature) const
 {
+  UpdateFlags flags = flags_;
+  
   InternalData* data = new InternalData(n_base_elements());
 
   data->update_once = update_once (flags);

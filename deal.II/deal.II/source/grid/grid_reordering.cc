@@ -714,8 +714,10 @@ template <int dim>
 inline
 void GridReordering<dim>::track_back (typename std::vector<Cell> &cells,
 				      RotationStack              &rotation_states,
-				      unsigned int                track_back_to_cell)
+				      const unsigned              tbtc)
 {
+  unsigned int track_back_to_cell = tbtc;
+  
   top_of_function:
   
   Assert (track_back_to_cell > 0, ExcInternalError());
