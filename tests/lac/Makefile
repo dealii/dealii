@@ -1,8 +1,6 @@
-# Generated automatically from Makefile.in by configure.
-# Generated automatically from Makefile.in by configure.
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -15,6 +13,8 @@ debug-mode = on
 
 libraries = $(lib-lac.g)  \
             $(lib-base.g)
+libraries_o = $(lib-lac.o)  \
+            $(lib-base.o)
 
 default: run-tests 
 
@@ -26,6 +26,7 @@ block_vector_iterator.exe : block_vector_iterator.go                        $(li
 full_matrix.exe           : full_matrix.go                                  $(libraries)
 matrix_out.exe            : matrix_out.go                                   $(libraries)
 solver.exe                : solver.go                         testmatrix.go $(libraries)
+sparse_matrices.exe       : sparse_matrices.go                testmatrix.go $(libraries)
 sparsity_pattern.exe      : sparsity_pattern.go               testmatrix.go $(libraries)
 sparse_ilu.exe            : sparse_ilu.go                     testmatrix.go $(libraries)
 vector-vector.exe         : vector-vector.go                                $(libraries)
@@ -33,7 +34,8 @@ vector-vector.exe         : vector-vector.go                                $(li
 #mg.exe                   : mg.go                             testmatrix.go $(libraries)
 
 
-tests = block_matrices block_vector block_vector_iterator full_matrix \
+tests = sparse_matrices block_matrices block_vector block_vector_iterator \
+        full_matrix \
         matrix_out solver sparsity_pattern sparse_ilu vector-vector
 
 ############################################################

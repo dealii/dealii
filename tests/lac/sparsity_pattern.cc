@@ -33,7 +33,7 @@ main ()
 				   // generate usual sparsity pattern
   const unsigned int N = 15;
   SparsityPattern sp1((N-1)*(N-1), (N-1)*(N-1), 5);
-  FDMatrix(N,N).build_structure (sp1);
+  FDMatrix(N,N).five_point_structure (sp1);
   sp1.compress ();
   deallog << sp1.n_rows() << " " << sp1.n_cols() << " "
 	  << sp1.bandwidth() << " " << sp1.n_nonzero_elements()

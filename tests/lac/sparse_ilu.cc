@@ -46,10 +46,10 @@ int main()
 				       // Make matrix
       FDMatrix testproblem(size, size);
       SparsityPattern structure(dim, dim, 5);
-      testproblem.build_structure(structure);
+      testproblem.five_point_structure(structure);
       structure.compress();
       SparseMatrix<double>  A(structure);
-      testproblem.laplacian(A);
+      testproblem.five_point(A);
 
       
       for (unsigned int test=0; test<2; ++test)

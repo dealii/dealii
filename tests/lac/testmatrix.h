@@ -19,13 +19,24 @@ class FDMatrix
 				     /**
 				      * Generate the matrix structure.
 				      */
-    void build_structure(SparsityPattern& structure) const;
+    void five_point_structure(SparsityPattern& structure) const;
+    
+				     /**
+				      * Generate the matrix structure.
+				      */
+    void nine_point_structure(SparsityPattern& structure) const;
     
 				     /**
 				      * Fill the matrix with values.
 				      */
-    template <typename number>
-    void laplacian(SparseMatrix<number>&) const;
+    template <typename MATRIX>
+    void five_point(MATRIX&) const;
+
+				     /**
+				      * Fill the matrix with values.
+				      */
+    template <typename MATRIX>
+    void nine_point(MATRIX&) const;
 
     template <typename number>
     void gnuplot_print(std::ostream&, const Vector<number>&) const;

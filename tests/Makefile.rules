@@ -27,6 +27,10 @@ endif
 %.go : %.cc Makefile
 	@echo =====debug========= $<
 	@$(CXX) $(flags) -c $< -o $@
+
+%.o : %.cc Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 %.exe :
 	@echo =====linking======= $@
 	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)

@@ -72,10 +72,10 @@ int main()
 				       // Make matrix
       FDMatrix testproblem(size, size);
       SparsityPattern structure(dim, dim, 5);
-      testproblem.build_structure(structure);
+      testproblem.five_point_structure(structure);
       structure.compress();
       SparseMatrix<double>  A(structure);
-      testproblem.laplacian(A);
+      testproblem.five_point(A);
 
       PreconditionIdentity prec_no;
       PreconditionSOR<> prec_sor;

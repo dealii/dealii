@@ -8,7 +8,7 @@ SparseMatrixEZ<number>::Row::set(unsigned int column,
 				 const number& value)
 {
 				   // Store end of vector
-  const std::vector<Entry>::const_iterator end_col = end();
+  const typename std::vector<Entry>::iterator end_col = end();
 
 				   // Create Entry for inserting
   const Entry e(column, value);
@@ -16,7 +16,7 @@ SparseMatrixEZ<number>::Row::set(unsigned int column,
 				   // Find position for inserting
 				   // should return first Entry with
 				   // higher column number.
-  std::vector<Entry>::iterator col = lower_bound(begin(), end, e);
+  typename std::vector<Entry>::iterator col = lower_bound(begin(), end_col, e);
 
 				   // Insert Entry if column did not exist.
 				   // Edit existing entry otherwise.
@@ -24,7 +24,7 @@ SparseMatrixEZ<number>::Row::set(unsigned int column,
     values.push_back(e);
   else
     if (col->column == column)
-      col->values = value;
+      col->value = value;
     else
       values.insert(col, e);
 }
@@ -35,15 +35,15 @@ void
 SparseMatrixEZ<number>::Row::add(unsigned int column,
 				 const number& value)
 {
-  const std::vector<Entry>::const_iterator end_col = end();
+  const typename std::vector<Entry>::const_iterator end_col = end();
 
 				   // Create Entry for inserting
-  const Entry e(column, value);
+  const typename SparseMatrixEZ<number>::Entry e(column, value);
   
 				   // Find position for inserting
 				   // should return first Entry with
 				   // higher column number.
-  std::vector<Entry>::iterator col = lower_bound(begin(), end, e);
+  typename std::vector<Entry>::iterator col = lower_bound(begin(), end, e);
 
 				   // Insert Entry if column did not exist.
 				   // Edit existing entry otherwise.
@@ -67,7 +67,7 @@ SparseMatrixEZ<number>::SparseMatrixEZ()
 
 
 template <typename number>
-SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ&)
+SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number>&)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -116,7 +116,7 @@ SparseMatrixEZ<number>::clear()
 
 template <typename number>
 bool
-SparseMatrixEZ<number>::empty()
+SparseMatrixEZ<number>::empty() const
 {
   return ((n_columns == 0) && (rows.size()==0));
 }
@@ -131,12 +131,12 @@ SparseMatrixEZ<number>::vmult (Vector<somenumber>& dst,
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
-  std::vector<Row>::const_iterator row = rows.begin();
-  const std::vector<Row>::const_iterator end_row = rows.end();
+  typename std::vector<Row>::const_iterator row = rows.begin();
+  const typename std::vector<Row>::const_iterator end_row = rows.end();
   for (unsigned int i=0; row != end_row; ++i, ++row)
     {
-      std::vector<Entry>::const_iterator col = row->begin();
-      const std::vector<Entry>::const_iterator end_col = row->end();
+      typename std::vector<Entry>::const_iterator col = row->begin();
+      const typename std::vector<Entry>::const_iterator end_col = row->end();
 
       double s = 0.;
       for (;col != end_col; ++col)
@@ -166,12 +166,12 @@ SparseMatrixEZ<number>::vmult_add (Vector<somenumber>& dst,
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
 
-  std::vector<Row>::const_iterator row = rows.begin();
-  const std::vector<Row>::const_iterator end_row = rows.end();
+  typename std::vector<Row>::const_iterator row = rows.begin();
+  const typename std::vector<Row>::const_iterator end_row = rows.end();
   for (unsigned int i=0; row != end_row; ++i, ++row)
     {
-      std::vector<Entry>::const_iterator col = row->begin();
-      const std::vector<Entry>::const_iterator end_col = row->end();
+      typename std::vector<Entry>::const_iterator col = row->begin();
+      const typename std::vector<Entry>::const_iterator end_col = row->end();
 
       double s = 0.;
       for (;col != end_col; ++col)
@@ -189,28 +189,26 @@ SparseMatrixEZ<number>::Tvmult_add (Vector<somenumber>& dst,
   Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
-  std::vector<Row>::const_iterator row = rows.begin();
-  const std::vector<Row>::const_iterator end_row = rows.end();
+  typename std::vector<Row>::const_iterator row = rows.begin();
+  const typename std::vector<Row>::const_iterator end_row = rows.end();
   for (unsigned int i=0; row != end_row; ++i, ++row)
     {
-      std::vector<Entry>::const_iterator col = row->begin();
-      const std::vector<Entry>::const_iterator end_col = row->end();
+      typename std::vector<Entry>::const_iterator col = row->begin();
+      const typename std::vector<Entry>::const_iterator end_col = row->end();
 
-      double s = 0.;
       for (;col != end_col; ++col)
 	dst(col->column) += col->value * src(i);
     }
 }
 
 template <typename number>
-template <typename somenumber>
 unsigned int
 SparseMatrixEZ<number>::memory_consumption() const
 {
   unsigned int result = sizeof (*this)
 			+ sizeof(Row) * sizeof (rows);
 
-  for (std::vector<Row>::const_iterator r = rows.begin();
+  for (typename std::vector<Row>::const_iterator r = rows.begin();
        r != rows.end(); ++r)
     result += r->size() * sizeof(Entry);
 
