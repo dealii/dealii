@@ -853,6 +853,7 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
 {
 				   // there are no points on bounding
 				   // lines which are to be added
+  Assert (dim > 1, ExcImpossibleInDim(dim));
 }
 
 #endif
@@ -1053,7 +1054,7 @@ void
 MappingQ<dim>::add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
 				       std::vector<Point<dim> > &) const
 {
-  Assert(false, ExcInternalError());
+  Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 
 
