@@ -109,23 +109,23 @@ VectorFunction<dim>::Extractor::gradient_list (const vector<Point<dim> > &points
 // TensorFunction
 //////////////////////////////////////////////////////////////////////
 
-template <int rank_, int dim>
-TensorFunction<rank_, dim>::TensorFunction (const double initial_time)
+template <int rank, int dim>
+TensorFunction<rank, dim>::TensorFunction (const double initial_time)
 		:
-		VectorFunction<dim>(pow(dim,rank_), initial_time)
+		VectorFunction<dim>(pow(dim,rank), initial_time)
 {};
 
 
 
-template <int rank_, int dim>
-TensorFunction<rank_, dim>::~TensorFunction ()
+template <int rank, int dim>
+TensorFunction<rank, dim>::~TensorFunction ()
 {};
 
 
 
-// template <int rank_, int dim>
+// template <int rank, int dim>
 // double
-// TensorFunction<rank_, dim>::operator () (TensorIndex<rank_> i,
+// TensorFunction<rank, dim>::operator () (TensorIndex<rank> i,
 // 					 const Point<dim> &) const
 // {
 //   int k=i(0);
@@ -136,19 +136,19 @@ TensorFunction<rank_, dim>::~TensorFunction ()
 // };
 
 
-template <int rank_, int dim>
-Tensor<rank_,dim>
-TensorFunction<rank_, dim>::operator() (const Point<dim> &) const
+template <int rank, int dim>
+Tensor<rank,dim>
+TensorFunction<rank, dim>::operator() (const Point<dim> &) const
 {
   Assert (false, ExcPureFunctionCalled());
-  return Tensor<rank_,dim>();
+  return Tensor<rank,dim>();
 };
 
 
-template <int rank_, int dim>
+template <int rank, int dim>
 void
-TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > &points,
-				 vector<Tensor<rank_,dim> > &values) const
+TensorFunction<rank, dim>::value_list (const vector<Point<dim> > &points,
+				 vector<Tensor<rank,dim> > &values) const
 {
   Assert (values.size() == points.size(),
 	  ExcVectorHasWrongSize(values.size(), points.size()));
@@ -158,20 +158,20 @@ TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > &points,
 };
 
 
-template <int rank_, int dim>
-Tensor<rank_+1,dim>
-TensorFunction<rank_, dim>::gradient (const Point<dim> &) const
+template <int rank, int dim>
+Tensor<rank+1,dim>
+TensorFunction<rank, dim>::gradient (const Point<dim> &) const
 {
   Assert (false, ExcPureFunctionCalled());
-  return Tensor<rank_+1,dim>();
+  return Tensor<rank+1,dim>();
 };
 
 
 
-template <int rank_, int dim>
+template <int rank, int dim>
 void
-TensorFunction<rank_, dim>::gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<rank_+1,dim> > &gradients) const
+TensorFunction<rank, dim>::gradient_list (const vector<Point<dim> > &points,
+				    vector<Tensor<rank+1,dim> > &gradients) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcVectorHasWrongSize(gradients.size(), points.size()));
@@ -181,17 +181,17 @@ TensorFunction<rank_, dim>::gradient_list (const vector<Point<dim> > &points,
 };
 
 
-template <int rank_, int dim> void
-TensorFunction<rank_, dim>::value (const Point<dim>  &p,
+template <int rank, int dim> void
+TensorFunction<rank, dim>::value (const Point<dim>  &p,
 				   Vector<double> &erg) const
 {
-  Tensor<rank_,dim> h = operator()(p);
+  Tensor<rank,dim> h = operator()(p);
   h.unroll(erg);
 }
 
 
-template <int rank_, int dim> void
-TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > & points,
+template <int rank, int dim> void
+TensorFunction<rank, dim>::value_list (const vector<Point<dim> > & points,
 				 vector<Vector<double> > & values) const
 {
   Assert (values.size() == points.size(),
@@ -203,8 +203,8 @@ TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > & points,
 }
 
 
-template <int rank_, int dim> void
-TensorFunction<rank_, dim>::gradient_list (const vector<Point<dim> > &,
+template <int rank, int dim> void
+TensorFunction<rank, dim>::gradient_list (const vector<Point<dim> > &,
 				    vector<vector<Tensor<1,dim> > > &) const
 {
   Assert (false, ExcPureFunctionCalled());

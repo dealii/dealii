@@ -18,7 +18,7 @@
 
 template <typename number> class Vector;
 template <int dim> class VectorFunction;
-template <int rank_, int dim> class TensorFunction;
+template <int rank, int dim> class TensorFunction;
 
 /**
  * Base class for multi-valued functions.
@@ -177,8 +177,8 @@ class VectorFunction //<dim>
  *
  *  @author Guido Kanschat, 1999
  */
-template <int rank_, int dim>
-class TensorFunction //<rank_ , dim>
+template <int rank, int dim>
+class TensorFunction //<rank , dim>
   :
   public VectorFunction<dim>
 {
@@ -200,7 +200,7 @@ class TensorFunction //<rank_ , dim>
 				      * Return the value of the function
 				      * at the given point.
 				      */
-    virtual Tensor<rank_, dim> operator () (const Point<dim> &p) const;
+    virtual Tensor<rank, dim> operator () (const Point<dim> &p) const;
 
 				     /**
 				      * Set #values# to the point values
@@ -211,19 +211,19 @@ class TensorFunction //<rank_ , dim>
 				      * array.
 				      */
     virtual void value_list (const vector<Point<dim> > &points,
-			     vector<Tensor<rank_,dim> > &values) const;
+			     vector<Tensor<rank,dim> > &values) const;
 
 //				   /**
 //				    * Return one component of the value.
 //				    */
-//  virtual double operator() (TensorIndex<rank_> i, const Point<dim>& p) const;
+//  virtual double operator() (TensorIndex<rank> i, const Point<dim>& p) const;
   
 
 				     /**
 				      * Return the gradient of the function
 				      * at the given point.
 				      */
-    virtual Tensor<rank_+1,dim> gradient (const Point<dim> &p) const;
+    virtual Tensor<rank+1,dim> gradient (const Point<dim> &p) const;
 
 				     /**
 				      * Set #gradients# to the gradients of
@@ -233,7 +233,7 @@ class TensorFunction //<rank_ , dim>
 				      * the same size as the #points# array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
-				vector<Tensor<rank_+1,dim> > &gradients) const;
+				vector<Tensor<rank+1,dim> > &gradients) const;
 
 				     /**
 				      * See #VectorFunction#.
