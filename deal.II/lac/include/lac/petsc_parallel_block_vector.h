@@ -346,12 +346,11 @@ namespace PETScWrappers
                     :
                     BlockVectorBase<Vector > ()
     {
-      components.resize (v.num_blocks);
-      block_indices = v.block_indices;
-      num_blocks = v.num_blocks;
+      this->components.resize (v.n_blocks());
+      this->block_indices = v.block_indices;
     
-      for (unsigned int i=0; i<num_blocks; ++i)
-        components[i] = v.components[i];
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->components[i] = v.components[i];
     }
 
 
@@ -404,13 +403,12 @@ namespace PETScWrappers
                          const std::vector<unsigned int> &local_sizes,
                          const bool                       fast)
     {
-      block_indices.reinit (block_sizes);
-      num_blocks = block_sizes.size();
-      if (components.size() != num_blocks)
-        components.resize(num_blocks);
+      this->block_indices.reinit (block_sizes);
+      if (this->components.size() != this->n_blocks())
+        this->components.resize(this->n_blocks());
   
-      for (unsigned int i=0; i<num_blocks; ++i)
-        components[i].reinit(communicator, block_sizes[i],
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->components[i].reinit(communicator, block_sizes[i],
                              local_sizes[i], fast);
     }
 
@@ -420,12 +418,11 @@ namespace PETScWrappers
     BlockVector::reinit (const BlockVector& v,
                          const bool fast)
     {
-      block_indices = v.get_block_indices();
-      num_blocks = v.n_blocks();
-      if (components.size() != num_blocks)
-        components.resize(num_blocks);
+      this->block_indices = v.get_block_indices();
+      if (this->components.size() != this->n_blocks())
+        this->components.resize(this->n_blocks());
   
-      for (unsigned int i=0;i<num_blocks;++i)
+      for (unsigned int i=0;i<this->n_blocks();++i)
         block(i).reinit(v.block(i), fast);
     }
 
@@ -444,12 +441,12 @@ namespace PETScWrappers
     void
     BlockVector::swap (BlockVector &v)
     {
-      Assert (num_blocks == v.num_blocks,
-              ExcDimensionMismatch(num_blocks, v.num_blocks));
+      Assert (this->n_blocks() == v.n_blocks(),
+              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
   
-      for (unsigned int i=0; i<num_blocks; ++i)
-        components[i].swap (v.components[i]);
-      ::swap (block_indices, v.block_indices);
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->components[i].swap (v.components[i]);
+      ::swap (this->block_indices, v.block_indices);
     }
 
   

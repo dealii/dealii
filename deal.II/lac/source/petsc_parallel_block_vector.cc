@@ -29,8 +29,8 @@ namespace PETScWrappers
       Assert (v.get_block_indices() == this->get_block_indices(),
               ExcNonMatchingBlockVectors());
 
-      for (unsigned int i=0; i<num_blocks; ++i)
-        block(i) = v.block(i);
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->block(i) = v.block(i);
       
       return *this;
     }

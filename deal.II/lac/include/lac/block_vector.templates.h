@@ -42,11 +42,10 @@ BlockVector<Number>::BlockVector (const BlockVector<Number>& v)
                 :
                 BlockVectorBase<Vector<Number> > ()
 {
-  this->components.resize (v.num_blocks);
+  this->components.resize (v.n_blocks());
   this->block_indices = v.block_indices;
-  this->num_blocks = v.num_blocks;
   
-  for (unsigned int i=0; i<this->num_blocks; ++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i] = v.components[i];
 }
 
@@ -78,11 +77,10 @@ void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
 				  const bool                       fast)
 {
   this->block_indices.reinit (n);
-  this->num_blocks = n.size();
-  if (this->components.size() != this->num_blocks)
-    this->components.resize(this->num_blocks);
+  if (this->components.size() != this->n_blocks())
+    this->components.resize(this->n_blocks());
   
-  for (unsigned int i=0; i<this->num_blocks; ++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     this->components[i].reinit(n[i], fast);
 }
 
@@ -93,11 +91,10 @@ void BlockVector<Number>::reinit (const BlockVector<Number2>& v,
                                   const bool fast)
 {
   this->block_indices = v.get_block_indices();
-  this->num_blocks = v.n_blocks();
-  if (this->components.size() != this->num_blocks)
-    this->components.resize(this->num_blocks);
+  if (this->components.size() != this->n_blocks())
+    this->components.resize(this->n_blocks());
   
-  for (unsigned int i=0;i<this->num_blocks;++i)
+  for (unsigned int i=0;i<this->n_blocks();++i)
     this->block(i).reinit(v.block(i), fast);
 }
 
@@ -111,10 +108,10 @@ BlockVector<Number>::~BlockVector ()
 template <typename Number>
 void BlockVector<Number>::swap (BlockVector<Number> &v)
 {
-  Assert (this->num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(this->num_blocks, v.num_blocks));
+  Assert (this->n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0; i<this->num_blocks; ++i)
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
     ::swap (this->components[i], v.components[i]);
   ::swap (this->block_indices, v.block_indices);
 }
@@ -127,7 +124,7 @@ void BlockVector<Number>::print (std::ostream       &out,
 				 const bool          scientific,
 				 const bool          across) const
 {
-  for (unsigned int i=0;i<this->num_blocks;++i)
+  for (unsigned int i=0;i<this->n_blocks();++i)
     {
       if (across)
 	out << 'C' << i << ':';
@@ -142,7 +139,7 @@ void BlockVector<Number>::print (std::ostream       &out,
 template <typename Number>
 void BlockVector<Number>::block_write (std::ostream &out) const
 {
-  for (unsigned int i=0;i<this->num_blocks;++i)
+  for (unsigned int i=0;i<this->n_blocks();++i)
     this->components[i].block_write(out);
 }
 
@@ -151,7 +148,7 @@ void BlockVector<Number>::block_write (std::ostream &out) const
 template <typename Number>
 void BlockVector<Number>::block_read (std::istream &in)
 {
-  for (unsigned int i=0;i<this->num_blocks;++i)
+  for (unsigned int i=0;i<this->n_blocks();++i)
     this->components[i].block_read(in);
 }
 
@@ -160,7 +157,7 @@ template <typename Number>
 unsigned int
 BlockVector<Number>::memory_consumption () const
 {
-  unsigned int mem = sizeof(this->num_blocks);
+  unsigned int mem = sizeof(this->n_blocks());
   for (unsigned int i=0; i<this->components.size(); ++i)
     mem += MemoryConsumption::memory_consumption (this->components[i]);
   mem += MemoryConsumption::memory_consumption (this->block_indices);

@@ -995,14 +995,6 @@ class BlockVectorBase
 				      * different blocks.
 				      */
     BlockIndices block_indices;
-    
-				     /**
-				      * The number of blocks. This
-				      * number is redundant to
-				      * <tt>components.size()</tt> and stored
-				      * here for convenience.
-				      */
-    unsigned int num_blocks;
 
 				     /**
 				      * Make the iterator class a
@@ -1616,7 +1608,7 @@ inline
 unsigned int
 BlockVectorBase<VectorType>::n_blocks () const
 {
-  return num_blocks;
+  return block_indices.size();
 }
 
 
@@ -1625,7 +1617,7 @@ inline
 typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block (const unsigned int i)
 {
-  Assert(i<num_blocks, ExcIndexRange(i,0,num_blocks));
+  Assert(i<n_blocks(), ExcIndexRange(i,0,n_blocks()));
 
   return components[i];
 }
@@ -1637,7 +1629,7 @@ inline
 const typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block (const unsigned int i) const
 {
-  Assert(i<num_blocks, ExcIndexRange(i,0,num_blocks));
+  Assert(i<n_blocks(), ExcIndexRange(i,0,n_blocks()));
 
   return components[i];
 }
@@ -1658,9 +1650,9 @@ inline
 void
 BlockVectorBase<VectorType>::collect_sizes ()
 {
-  std::vector<unsigned int> sizes (num_blocks);
+  std::vector<unsigned int> sizes (n_blocks());
 
-  for (unsigned int i=0; i<num_blocks; ++i)
+  for (unsigned int i=0; i<n_blocks(); ++i)
     sizes[i] = block(i).size();
 
   block_indices.reinit(sizes);
@@ -1684,7 +1676,7 @@ inline
 void
 BlockVectorBase<VectorType>::clear ()
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i].clear();
 }
 
@@ -1734,7 +1726,7 @@ template <class VectorType>
 bool
 BlockVectorBase<VectorType>::all_zero () const
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     if (components[i].all_zero() == false)
       return false;
 
@@ -1747,7 +1739,7 @@ template <class VectorType>
 bool
 BlockVectorBase<VectorType>::is_non_negative () const
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     if (components[i].is_non_negative() == false)
       return false;
 
@@ -1761,11 +1753,11 @@ typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::
 operator * (const BlockVectorBase<VectorType>& v) const
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
   value_type sum = 0.;
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i]*v.components[i];
     
   return sum;
@@ -1777,7 +1769,7 @@ typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::norm_sqr () const
 {
   value_type sum = 0.;
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].norm_sqr();
     
   return sum;
@@ -1790,7 +1782,7 @@ typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::mean_value () const
 {
   value_type sum = 0.;
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].mean_value() * components[i].size();
   
   return sum/size();
@@ -1803,7 +1795,7 @@ typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::l1_norm () const
 {
   value_type sum = 0.;
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].l1_norm();
     
   return sum;
@@ -1825,7 +1817,7 @@ typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::linfty_norm () const
 {
   value_type sum = 0.;
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       value_type newval = components[i].linfty_norm();
       if (sum<newval)
@@ -1850,10 +1842,10 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator -= (const BlockVectorBase<VectorType>& v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i] -= v.components[i];
     }
@@ -1865,7 +1857,7 @@ BlockVectorBase<VectorType>::operator -= (const BlockVectorBase<VectorType>& v)
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(a);
     }
@@ -1876,10 +1868,10 @@ void BlockVectorBase<VectorType>::add (const value_type a)
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const BlockVectorBase<VectorType>& v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(v.components[i]);
     }
@@ -1891,10 +1883,10 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType>& v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(a, v.components[i]);
     }
@@ -1908,13 +1900,13 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const value_type b,
                                        const BlockVectorBase<VectorType>& w)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
-  Assert (num_blocks == w.num_blocks,
-	  ExcDimensionMismatch(num_blocks, w.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  Assert (n_blocks() == w.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
   
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(a, v.components[i], b, w.components[i]);
     }
@@ -1926,10 +1918,10 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType>& v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, v.components[i]);
     }
@@ -1941,10 +1933,10 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i]);
     }
@@ -1958,12 +1950,12 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const value_type b,
                                         const BlockVectorBase<VectorType>& w)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
-  Assert (num_blocks == w.num_blocks,
-	  ExcDimensionMismatch(num_blocks, w.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  Assert (n_blocks() == w.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i], b, w.components[i]);
     }
@@ -1979,14 +1971,14 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const value_type c,
                                         const BlockVectorBase<VectorType>& y)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));  
-  Assert (num_blocks == w.num_blocks,
-	  ExcDimensionMismatch(num_blocks, w.num_blocks));
-  Assert (num_blocks == y.num_blocks,
-	  ExcDimensionMismatch(num_blocks, y.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));  
+  Assert (n_blocks() == w.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+  Assert (n_blocks() == y.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), y.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].sadd(x, a, v.components[i],
 			 b, w.components[i], c, y.components[i]);
@@ -1999,9 +1991,9 @@ template <class VectorType>
 template <class BlockVector2>
 void BlockVectorBase<VectorType>::scale (const BlockVector2 &v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
-  for (unsigned int i=0;i<num_blocks;++i)
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i].scale(v.block(i));
 }
 
@@ -2013,12 +2005,12 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const value_type b,
                                        const BlockVectorBase<VectorType>& w)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
-  Assert (num_blocks == w.num_blocks,
-	  ExcDimensionMismatch(num_blocks, w.num_blocks));  
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  Assert (n_blocks() == w.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), w.n_blocks()));  
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].equ( a, v.components[i], b, w.components[i]);
     }
@@ -2030,10 +2022,10 @@ template <class BlockVector2>
 void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i].equ( a, v.components[i]);
 }
 
@@ -2042,7 +2034,7 @@ template <class VectorType>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i] = s;
     
   return *this;
@@ -2053,10 +2045,10 @@ template <class VectorType>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType>& v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i] = v.components[i];
     }
@@ -2069,10 +2061,10 @@ template <class VectorType2>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType2> &v)
 {
-  Assert (num_blocks == v.num_blocks,
-	  ExcDimensionMismatch(num_blocks, v.num_blocks));
+  Assert (n_blocks() == v.n_blocks(),
+	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i] = v.components[i];
   
   return *this;
@@ -2090,7 +2082,7 @@ operator == (const BlockVectorBase<VectorType2> &v) const
   Assert (block_indices == v.block_indices,
           ExcNotmatchingBlockSizes());
   
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     if ( ! (components[i] == v.components[i]))
       return false;
 
@@ -2104,7 +2096,7 @@ inline
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i] *= factor;
 
   return *this;
@@ -2117,7 +2109,7 @@ inline
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
-  for (unsigned int i=0;i<num_blocks;++i)
+  for (unsigned int i=0;i<n_blocks();++i)
     components[i] /= factor;
 
   return *this;
