@@ -857,9 +857,7 @@ virtual double evaluate ();
     double integrated_value, weighted_value;
 };
 
-
-template <int dim> class DataOutStack;
-
+#include <numerics/data_out_stack.h>
 
 /**
  * This class has some data members which are shared between the different
@@ -1646,7 +1644,6 @@ class WaveParameters
 
 
 template <int dim> class WaveParameters;
-template <int dim> class DataOutStack;
 class SweepInfo;
 
 
