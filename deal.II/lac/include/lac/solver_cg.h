@@ -231,7 +231,8 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
       print_vectors(it, x, g, d);
       
       conv = control().check(it,res);
-      if (conv) break;
+      if (conv)
+	break;
       
       precondition(h,g);
       
@@ -243,15 +244,13 @@ SolverCG<VECTOR>::solve (const MATRIX &A,
     };
 
 
-// Deallocate Memory
- 
+				   // Deallocate Memory
   memory.free(Vr);
   memory.free(Vp);
   memory.free(Vz);
   memory.free(VAp);
  
-  // Output
-
+				   // Output
   deallog.pop();
  
   if (conv == SolverControl::failure)
