@@ -106,6 +106,13 @@ MGBase::level_mgstep(const unsigned int        level,
   
 				   // do recursion
   level_mgstep(level-1, pre_smooth, post_smooth, coarse_grid_solver);
+
+				   // reset size of the auxiliary
+				   // vector, since it has been
+				   // resized in the recursive call to
+				   // level_mgstep directly above
+  t.reinit(solution[level].size());
+
 				   // do coarse grid correction
   transfer->prolongate(level, t, solution[level-1]);
   solution[level] += t;
