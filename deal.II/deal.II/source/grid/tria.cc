@@ -3134,7 +3134,7 @@ bool Triangulation<dim>::prepare_coarsening () {
 				   // from coarsen to user flags and back.
 				   // we do the check by saving the flags
 				   // before and after the operation and
-				   // compare them
+				   // comparing them
   vector<bool> flags_before;
   save_coarsen_flags (flags_before);
   
@@ -3312,7 +3312,8 @@ bool Triangulation<dim>::prepare_coarsening () {
 						   // flagged for coarsening,
 						   // we can't coarsen this cell
 		  {
-		    cell_iterator child_neighbor = cell->child(child)->neighbor(neighbor);
+		    cell_iterator child_neighbor = cell->child(child)->
+						   neighbor(neighbor);
 		    if ((child_neighbor.state() == valid) &&
 			(child_neighbor->level() == cell->level()+1) &&
 			(child_neighbor->active() == false) &&
