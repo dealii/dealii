@@ -1,4 +1,4 @@
-/* base/include/base/config.h.in.  Generated automatically from configure.in by autoheader.  */
+/* base/include/base/config.h.in.  Generated from configure.in by autoheader.  */
 
 
 //----------------------------  config.h  ---------------------------
@@ -77,6 +77,11 @@
    */
 #undef DEAL_II_TEMPLATE_SPEC_ACCESS_WORKAROUND
 
+/* Defined if the compiler refuses to allow a typedef to a template template
+   class template parameter. For the exact failure mode, look at aclocal.m4 in
+   the top-level directory. */
+#undef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
+
 /* Define if we have to work around a bug in Intel's icc compiler in which the
    compiler refuses to consider a template when given a pointer to a constant
    member function. See the aclocal.m4 file in the top-level directory for a
@@ -105,7 +110,7 @@
 /* Define if the compiler provides __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
-/* Define if you have the `gethostname' function. */
+/* Define to 1 if you have the `gethostname' function. */
 #undef HAVE_GETHOSTNAME
 
 /* Availability of the MA27 algorithm from HSL */
@@ -142,10 +147,30 @@
    by the preprocessor variable. */
 #undef NO_HAVE_GETRUSAGE
 
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
 /* Define if we have to work around a bug in IBM's xlC compiler. See the
    aclocal.m4 file in the top-level directory for a description of this bug.
    */
 #undef XLC_WORK_AROUND_STD_BUG
+
+/* If already available, do not define at all. Otherwise, define to __func__
+   if that is available. In all other cases, indicate that no information
+   about the present function is available for this compiler. */
+#undef __PRETTY_FUNCTION__
 
 
 
