@@ -3352,7 +3352,6 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
             CXXFLAGSG="$CXXFLAGSG -Xc -ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias"
                                                   else if test "x$GXX_VERSION" = "xintel_icc8" ; then
-            CXXFLAGSG="$CXXFLAGSG -strict_ansi"
             CXXFLAGSO="$CXXFLAGSO -ansi_alias -vec_report0"
           fi fi
 
