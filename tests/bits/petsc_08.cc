@@ -12,7 +12,7 @@
 //----------------------------  petsc_08.cc  ---------------------------
 
 
-// check petsc_wrappers::SparseMatrix::l2_norm
+// check petsc_wrappers::SparseMatrix::frobenius_norm
 
 #include "../tests.h"
 #include <lac/petsc_sparse_matrix.h>    
