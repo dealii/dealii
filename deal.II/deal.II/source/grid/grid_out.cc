@@ -221,8 +221,6 @@ void GridOut::write_eps (const Triangulation<3> &tria,
 				   // loop over all lines and compute their
 				   // projection on the plane perpendicular
 				   // to the direction of sight
-  cout << "=======================================" << endl;
-  
   if (true)
     {
 				       // direction of view equals the unit 
@@ -231,23 +229,12 @@ void GridOut::write_eps (const Triangulation<3> &tria,
 				       //
 				       // we chose here the viewpoint as in
 				       // gnuplot
+      const double z_angle    = 60;
+      const double turn_angle = 30;
       const double pi = 3.1415926536;
-      const double x1 = sin(90.0 * 2.*pi / 360.),
-		   x2 = sin(0.0 * 2.*pi / 360.),
-		   x3 = cos(0.0 * 2.*pi / 360.),
-		   x4 = cos(90.0 * 2.*pi / 360.);
-
-      cerr << "x1=" << x1 << "  "
-	   << "x2=" << x2 << "  "
-	   << "x3=" << x3 << "  "
-	   << "x4=" << x4 << "  " << endl;
-      
-	
-      const Point<3> view_direction(-sin(90.0 * 2.*pi / 360.) * sin(0.0 * 2.*pi / 360.),
-				    +sin(90.0 * 2.*pi / 360.) * cos(0.0 * 2.*pi / 360.),
-				    -cos(90.0 * 2.*pi / 360.));
-      cout << "=======================================" << endl;
-      cout << view_direction << endl;
+      const Point<3> view_direction(-sin(z_angle * 2.*pi / 360.) * sin(turn_angle * 2.*pi / 360.),
+				    +sin(z_angle * 2.*pi / 360.) * cos(turn_angle * 2.*pi / 360.),
+				    -cos(z_angle * 2.*pi / 360.));
       
 				       // decide about the two unit vectors
 				       // in this plane. we chose the first one
