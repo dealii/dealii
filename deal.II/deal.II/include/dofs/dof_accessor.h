@@ -130,11 +130,11 @@ class DoFObjectAccessor<0, dim, BaseClass> : public DoFAccessor<dim>,
 					     public BaseClass
 {
   public:
-    typedef void* AccessorData;
+    typedef void AccessorData;
     DoFObjectAccessor (Triangulation<dim> *,
-		     const int,
-		     const int,
-		     const AccessorData *)
+		       const int,
+		       const int,
+		       const AccessorData *)
       {}
 };
 

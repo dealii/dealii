@@ -56,7 +56,7 @@ class TriaAccessor
     TriaAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
-		  const void         * = 0) :
+		  const AccessorData * = 0) :
 		    present_level (level),
 		    present_index (index),
 		    tria (parent) {};
@@ -237,9 +237,13 @@ class TriaAccessor
 
 
 /**
- * Common template for line, quad, hex.
+ * Common template for line, quad, hex accessors.
  * According to #celldim# objects of this class represent lines,
- quadrilaterals, or hexahedra in #dim# space dimensions.
+ * quadrilaterals, or hexahedra in #dim# space dimensions. Concrete implementations
+ * are done for specialized #celldim# template parameter. For easier access,
+ * we nevertheless document all functions of the specialized classes here as
+ * well. However, they are not implemented.
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template<int celldim, int dim>
@@ -254,7 +258,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		 const int           level      = -1,
 		 const int           index      = -1,
-		 const void         *local_data = 0) :
+		 const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -601,8 +605,10 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
+
+
 /**
- * Closure class.
+ * Closure class to stop induction of classes.
  */
 template<int dim>
 class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
@@ -629,7 +635,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
-		  const void         *local_data = 0) :
+		  const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -927,6 +933,8 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
+
+
 /**
  *   Accessor to dereference the data of quads. This accessor is used to
  *   point to quads in #dim# space dimensions (only #dim>=2# seems reasonable
@@ -946,7 +954,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
-		  const void         *local_data = 0) :
+		  const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1303,7 +1311,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     TriaObjectAccessor (Triangulation<dim> *parent     = 0,
 		 const int           level      = -1,
 		 const int           index      = -1,
-		 const void         *local_data = 0) :
+		 const AccessorData *local_data = 0) :
 		    TriaAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
@@ -1691,7 +1699,7 @@ class TriaSubstructAccessor<1> :  public TriaObjectAccessor<1, 1> {
     TriaSubstructAccessor (Triangulation<1> *tria,
 			   const int         level,
 			   const int         index,
-			   const void       *local_data) :
+			   const AccessorData *local_data) :
 		    TriaObjectAccessor<1, 1> (tria,level,index,local_data) {};
 
     				     // do this here, since this way the
@@ -1724,7 +1732,7 @@ class TriaSubstructAccessor<2> : public TriaObjectAccessor<2, 2> {
     TriaSubstructAccessor (Triangulation<2> *tria,
 			   const int         level,
 			   const int         index,
-			   const void       *local_data) :
+			   const AccessorData *local_data) :
 		    TriaObjectAccessor<2, 2> (tria,level,index,local_data) {};
 
     				     // do this here, since this way the
@@ -1759,7 +1767,7 @@ class TriaSubstructAccessor<3> : public TriaObjectAccessor<3, 3> {
     TriaSubstructAccessor (Triangulation<3> *tria,
 			   const int         level,
 			   const int         index,
-			   const void       *local_data) :
+			   const AccessorData *local_data) :
 		    TriaObjectAccessor<3, 3> (tria,level,index,local_data) {};
 
     				     // do this here, since this way the
@@ -1805,7 +1813,7 @@ class CellAccessor :  public TriaSubstructAccessor<dim> {
     CellAccessor (Triangulation<dim> *parent     = 0,
 		  const int           level      = -1,
 		  const int           index      = -1,
-		  const void         *local_data = 0) :
+		  const AccessorData *local_data = 0) :
 		    TriaSubstructAccessor<dim> (parent, level, index, local_data) {};
 
 				     /**
