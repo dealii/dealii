@@ -19,7 +19,7 @@
 
 #ifdef DEAL_II_USE_PETSC
 
-#include <petscsles.h>
+#include <petscksp.h>
 
 
 namespace PETScWrappers
