@@ -1387,13 +1387,13 @@ inline
 typename SparseMatrix<number>::const_iterator&
 SparseMatrix<number>::const_iterator::operator++ ()
 {
-  Assert (a_row < matrix->m(), ExcIteratorPastEnd());
+  Assert (this->a_row < matrix->m(), ExcIteratorPastEnd());
   
-  ++a_index;
-  if (a_index >= matrix->get_sparsity_pattern().row_length(a_row))
+  ++this->a_index;
+  if (this->a_index >= this->matrix->get_sparsity_pattern().row_length(this->a_row))
     {
-      a_index = 0;
-      a_row++;
+      this->a_index = 0;
+      this->a_row++;
     }
   return *this;
 }
@@ -1423,7 +1423,7 @@ bool
 SparseMatrix<number>::const_iterator::operator == (
   const const_iterator& other) const
 {
-  return (row() == other->row() && index() == other->index());
+  return (this->row() == other->row() && this->index() == other->index());
 }
 
 
@@ -1443,8 +1443,8 @@ bool
 SparseMatrix<number>::const_iterator::operator < (
   const const_iterator& other) const
 {
-  return (row() < other->row() ||
-	  (row() == other->row() && index() < other->index()));
+  return (this->row() < other->row() ||
+	  (this->row() == other->row() && this->index() < other->index()));
 }
 
 
