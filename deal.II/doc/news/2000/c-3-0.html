@@ -373,6 +373,18 @@
 
 <ol>
 
+  <li> <p> 
+       Fix: Include missing assertions in <code
+       class="member">FEValuesBase::get_function_*</code>. This
+       uncovers an error in <code
+       class="member">DataOut<dim>::build_some_patches</code> that
+       would have occured (at the latest) after the implementation of
+       new <code class="class">FiniteElements</code> which shape
+       values dependent on the geometry of the real cell.
+       <br>
+       (Ralf Hartmann 2000/07/20)
+       </p>
+
   <li> <p>
        New: Class <code class="class">DoFRenumbering</code> now has
        functions for cell-wise downstream renumbering for
@@ -382,6 +394,7 @@
        class.
        <br>
        (GK 2000 Jour de Bastille)
+       </p>
 
   <li> <p>
        New: Function <code class="class">VectorTools</code><code
