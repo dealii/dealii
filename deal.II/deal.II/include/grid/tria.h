@@ -1141,7 +1141,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   line, quad, etc. You can access these user pointers through the
  *   functions @p{user_pointer()}, @p{clear_user_pointer()} and
  *   @p{set_user_pointer(p)} in the accessor classes. These pointers are
- *   neither used nor changed by the library and are @p NULL by
+ *   neither used nor changed by the library and are @p{NULL} by
  *   default. Thus, their handling is the sole responsibility of the
  *   application program.  Especially, the pointers are not inherited
  *   to children upon refinement. Still, after a remeshing they are
