@@ -1,0 +1,232 @@
+/* $Id$ */
+/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+
+
+
+
+#include <lac/vector.h>
+#include <grid/tria.h>
+#include <grid/dof.h>
+#include <grid/tria_accessor.h>
+#include <grid/dof_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_boundary.h>
+#include <basic/data_io.h>
+#include <base/function.h>
+#include <fe/fe_lib.lagrange.h>
+#include <base/quadrature_lib.h>
+#include <numerics/base.h>
+#include <numerics/assembler.h>
+
+#include <map>
+#include <fstream>
+#include <cmath>
+#include <cstdlib>
+
+
+
+
+
+template <int dim>
+class RightHandSide :  public Function<dim> 
+{
+  public:
+    double operator () (const Point<dim> &p) const 
+      {
+	double x = 6;
+	for (unsigned int d=0; d<dim; ++d)
+	  if (p(d) < 0.5)
+	    x *= -1;
+	
+	return x;
+      };
+};
+
+
+
+template <int dim>
+class PoissonEquation :  public Equation<dim> {
+  public:
+    PoissonEquation (const Function<dim>  &rhs,
+		     const Vector<double> &last_solution) :
+		    Equation<dim>(1),
+		    right_hand_side (rhs),
+		    last_solution(last_solution) {};
+
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   Vector<double>      &rhs,
+			   const FEValues<dim> &fe_values,
+			   const DoFHandler<dim>::cell_iterator &cell) const;
+    virtual void assemble (FullMatrix<double>  &cell_matrix,
+			   const FEValues<dim> &fe_values,
+			   const DoFHandler<dim>::cell_iterator &cell) const;
+    virtual void assemble (Vector<double>      &rhs,
+			   const FEValues<dim> &fe_values,
+			   const DoFHandler<dim>::cell_iterator &cell) const;
+  protected:
+    const Function<dim>  &right_hand_side;
+    const Vector<double> &last_solution;
+};
+
+
+
+
+
+
+template <int dim>
+class NonlinearProblem : public ProblemBase<dim> {
+  public:
+    NonlinearProblem ();
+    void run ();
+
+  protected:
+    Triangulation<dim> *tria;
+    DoFHandler<dim>    *dof;
+
+    Vector<double>      last_solution;
+};
+
+
+
+
+template <int dim>
+void PoissonEquation<dim>::assemble (FullMatrix<double>  &cell_matrix,
+				     Vector<double>      &rhs,
+				     const FEValues<dim> &fe_values,
+				     const DoFHandler<dim>::cell_iterator &) const {
+  const vector<vector<Tensor<1,dim> > >&gradients = fe_values.get_shape_grads ();
+  const FullMatrix<double> &values    = fe_values.get_shape_values ();
+  vector<double>            rhs_values (fe_values.n_quadrature_points);
+  const vector<double> &weights   = fe_values.get_JxW_values ();
+  
+  vector<Tensor<1,dim> >   last_solution_grads(fe_values.n_quadrature_points);
+  fe_values.get_function_grads (last_solution, last_solution_grads);
+
+  
+  right_hand_side.value_list (fe_values.get_quadrature_points(), rhs_values);
+   
+  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+      {
+	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	  cell_matrix(i,j) += (gradients[i][point] *
+			       gradients[j][point]) *
+			      weights[point] /
+			      sqrt(1+last_solution_grads[i]*last_solution_grads[i]);
+	rhs(i) += values(i,point) *
+		  rhs_values[point] *
+		  weights[point];
+      };
+};
+
+
+
+
+template <int dim>
+void PoissonEquation<dim>::assemble (FullMatrix<double>  &,
+				     const FEValues<dim> &,
+				     const DoFHandler<dim>::cell_iterator &) const {
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+
+template <int dim>
+void PoissonEquation<dim>::assemble (Vector<double>      &,
+				     const FEValues<dim> &,
+				     const DoFHandler<dim>::cell_iterator &) const {
+  Assert (false, ExcPureVirtualFunctionCalled());
+};
+
+
+
+
+template <int dim>
+NonlinearProblem<dim>::NonlinearProblem () :
+		tria(0), dof(0) {};
+
+
+
+template <int dim>
+void NonlinearProblem<dim>::run () {
+
+				   // first reset everything to a virgin state
+  clear ();
+  
+  tria = new Triangulation<dim>();
+  dof = new DoFHandler<dim> (tria);
+  set_tria_and_dof (tria, dof);
+
+
+  RightHandSide<dim>    rhs;
+  ZeroFunction<dim>     boundary_values;
+  StraightBoundary<dim> boundary;
+  
+  FELinear<dim>                   fe;
+  PoissonEquation<dim>            equation (rhs, last_solution);
+  QGauss2<dim>                    quadrature;
+  
+  ProblemBase<dim>::FunctionMap dirichlet_bc;
+  dirichlet_bc[0] = &boundary_values;
+
+
+  cout << "    Making grid... ";
+  tria->create_hypercube ();
+  tria->refine_global (6);
+  cout << tria->n_active_cells() << " active cells." << endl;
+  
+  cout << "    Distributing dofs... "; 
+  dof->distribute_dofs (fe);
+  cout << dof->n_dofs() << " degrees of freedom." << endl;
+
+				   // set the starting values for the iteration
+				   // to a constant value of 1
+  last_solution.reinit (dof->n_dofs());
+  for (unsigned int i=0; i<dof->n_dofs(); ++i)
+    last_solution(i) = 1;
+  
+
+				   // here comes the fixed point iteration
+  for (unsigned int nonlinear_step=0; nonlinear_step<40; ++nonlinear_step)
+    {
+      cout << "    Nonlinear step " << nonlinear_step << endl;
+      cout << "        Assembling matrices..." << endl;
+      assemble (equation, quadrature, fe,
+		UpdateFlags(update_gradients | update_JxW_values |
+			    update_q_points),
+		dirichlet_bc, boundary);
+
+      cout << "        Solving..." << endl;
+      solve ();
+
+      if (nonlinear_step % 4 == 0)
+	{
+	  string filename = "nonlinear.";
+	  filename += ('0' + (nonlinear_step/4));
+	  filename += ".gnuplot";
+	  cout << "        Writing to file <" << filename << ">..." << endl;
+	  
+	  DataOut<dim> out;
+	  ofstream gnuplot(filename.c_str());
+	  fill_data (out);
+	  out.write_gnuplot (gnuplot);
+	  gnuplot.close ();
+	};
+
+      last_solution = solution;
+    };
+  
+  delete dof;
+  delete tria;
+  
+  cout << endl;
+};
+
+
+
+
+int main ()
+{
+  NonlinearProblem<2> problem;
+  problem.run ();
+};
