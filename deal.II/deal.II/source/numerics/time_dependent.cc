@@ -203,11 +203,7 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 
 
-void TimeDependent::end_sweep (const unsigned int
-#ifdef DEAL_II_USE_MT
-			       n_threads
-#endif
-)
+void TimeDependent::end_sweep (const unsigned int n_threads)
 {
 #ifdef DEAL_II_USE_MT
 				   // set up the data needed by each
@@ -233,6 +229,10 @@ void TimeDependent::end_sweep (const unsigned int
   thread_manager.wait();
   
 #else
+				   // ignore this parameter, but don't
+				   // let the compiler warn
+  (void) n_threads;
+				   // now do the work
   end_sweep (0, timesteps.size());
 #endif
 }
