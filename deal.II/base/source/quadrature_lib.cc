@@ -32,7 +32,7 @@ number abs (const number a)
 
 
 template <>
-QGauss<1>::QGauss (unsigned int n)
+QGauss<1>::QGauss (const unsigned int n)
   : Quadrature<1> (n)
 {
   const unsigned int m = (n+1)/2;
