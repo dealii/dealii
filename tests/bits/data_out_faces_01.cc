@@ -47,13 +47,8 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out_faces.write_tecplot (deallog.get_file_stream());
   data_out_faces.write_vtk (deallog.get_file_stream());
 
-                                   // the following is only
-                                   // implemented for 2d
-  if (dim == 2)
-    {
-      data_out_faces.write_povray (deallog.get_file_stream());
-      data_out_faces.write_eps (deallog.get_file_stream());
-    }  
+				   // povray and eps cannot presently
+				   // write out face data
 }
 
 
