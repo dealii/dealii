@@ -37,6 +37,48 @@ SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
 {}
 
 
+template <typename number>
+SparseMIC<number>::~SparseMIC()
+{
+  clear();
+}
+
+
+template <typename number>
+void SparseMIC<number>::clear()
+{
+  if (true)
+    {
+      std::vector<number> tmp;
+      tmp.swap (diag);
+    };
+  if (true)
+    {
+      std::vector<number> tmp;
+      tmp.swap (inv_diag);
+    };
+  if (true)
+    {
+      std::vector<number> tmp;
+      tmp.swap (inner_sums);
+    };
+
+  SparseLUDecomposition<number>::clear();
+}
+
+
+template <typename number>
+template <typename somenumber>
+inline
+void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
+				    const AdditionalData data)
+{
+  SparseLUDecomposition<number>::initialize(matrix, data);
+
+  decompose(matrix, data.strengthen_diagonal);
+}
+
+
 
 template <typename number>
 void

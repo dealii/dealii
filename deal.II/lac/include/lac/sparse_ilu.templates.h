@@ -34,22 +34,36 @@ SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
 
 
 
+
 template <typename number>
 template <typename somenumber>
 void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
 				    const AdditionalData data)
 {
-  SparseLUDecomposition<number>::decompose (matrix, data.strengthen_diagonal);
+  SparseLUDecomposition<number>::initialize(matrix, data);
+      
+  decompose(matrix, data.strengthen_diagonal);
+}
+
+
+
+template <typename number>
+template <typename somenumber>
+inline
+void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
+				   const double strengthen_diagonal)
+{
+  SparseLUDecomposition<number>::decompose (matrix, strengthen_diagonal);
   Assert (matrix.m()==matrix.n(), ExcMatrixNotSquare ());
   Assert (this->m()==this->n(),   ExcMatrixNotSquare ());
   Assert (matrix.m()==this->m(),  ExcSizeMismatch(matrix.m(), this->m()));
   
-  Assert (data.strengthen_diagonal>=0,
-	  ExcInvalidStrengthening (data.strengthen_diagonal));
+  Assert (strengthen_diagonal>=0,
+	  ExcInvalidStrengthening (strengthen_diagonal));
 
   this->copy_from (matrix);
 
-  if (data.strengthen_diagonal>0)
+  if (strengthen_diagonal>0)
     this->strengthen_diagonal_impl();
 
   const SparsityPattern             &sparsity = this->get_sparsity_pattern();
@@ -147,6 +161,7 @@ void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
 				   // it...
   this->diag_element(this->m()-1) = 1./this->diag_element(this->m()-1);
 }
+
 
 
 

@@ -29,7 +29,8 @@
  * where X is a diagonal matrix, defined by the condition rowsum(A) =
  * rowsum(B).
  * 
- * @author Stephen "Cheffo" Kolaroff, 2002.
+ * @author Stephen "Cheffo" Kolaroff, 2002, unified interface: Ralf
+ * Hartmann 2003.
  */
 template <typename number>
 class SparseMIC : public SparseLUDecomposition<number>
@@ -49,7 +50,20 @@ class SparseMIC : public SparseLUDecomposition<number>
                                       * argument.
                                       */
     SparseMIC (const SparsityPattern &sparsity);
-    
+
+                                     /**
+                                      * Destruction.
+                                      */
+    virtual ~SparseMIC();
+
+				     /**
+				      * Deletes all member
+				      * variables. Leaves the class in
+				      * the state that it had directly
+				      * after calling the constructor
+				      */
+    virtual void clear();
+
 				     /**
 				      * Make the @p{AdditionalData}
 				      * type in the base class
@@ -61,38 +75,18 @@ class SparseMIC : public SparseLUDecomposition<number>
     AdditionalData;
 
 				     /**
-				      * Reinitialize the object but
-				      * keep to the sparsity pattern
-				      * previously used.  This may be
-				      * necessary if you @p{reinit}'d
-				      * the sparsity structure and
-				      * want to update the size of the
-				      * matrix.
-				      *
-				      * After this method is invoked,
-				      * this object is out of synch
-				      * (not decomposed state).
-				      *
-				      * This function only releases
-				      * some memory and calls the
-				      * respective function of the
-				      * base class.
+				      * This method is deprecated, and
+				      * left for backward
+				      * compability. It will be
+				      * removed in later versions.
 				      */
     void reinit ();
 
 				     /**
-				      * Reinitialize the sparse matrix
-				      * with the given sparsity
-				      * pattern. The latter tells the
-				      * matrix how many nonzero
-				      * elements there need to be
-				      * reserved.
-				      *
-				      *
-				      * This function only releases
-				      * some memory and calls the
-				      * respective function of the
-				      * base class.
+				      * This method is deprecated, and
+				      * left for backward
+				      * compability. It will be
+				      * removed in later versions.
 				      */
     void reinit (const SparsityPattern &sparsity);
 
@@ -104,31 +98,10 @@ class SparseMIC : public SparseLUDecomposition<number>
 		     const AdditionalData parameters);
 
     				     /**
-				      * Perform the incomplete LU
-				      * factorization of the given
-				      * matrix.
-				      *
-				      * Note that the sparsity
-				      * structures of the
-				      * decomposition and the matrix
-				      * passed to this function need
-				      * not be equal, but that the
-				      * pattern used by this matrix
-				      * needs to contain all elements
-				      * used by the matrix to be
-				      * decomposed.  Fill-in is thus
-				      * allowed.
-				      *
-				      * If @p{strengthen_diagonal}
-				      * parameter is greater than
-				      * zero, this method invokes the
-				      * @p{strengthen_diagonal_impl}
-				      * function of the base class.
-				      *
-				      * Refer to
-				      * @ref{SparseLUDecomposition}
-				      * documentation for state
-				      * management.
+				      * This method is deprecated, and
+				      * left for backward
+				      * compability. It will be
+				      * removed in later versions.
 				      */
     template <typename somenumber>
     void decompose (const SparseMatrix<somenumber> &matrix,
@@ -139,10 +112,8 @@ class SparseMIC : public SparseLUDecomposition<number>
 				      * i.e. do one forward-backward step
 				      * $dst=(LU)^{-1}src$.
 				      *
-				      * Refer to
-				      * @ref{SparseLUDecomposition}
-				      * documentation for state
-				      * management.
+				      * Call @p{initialize} before
+				      * calling this function.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,
@@ -211,17 +182,6 @@ class SparseMIC : public SparseLUDecomposition<number>
                                       */
     number get_rowsum (const unsigned int row) const;
 };
-
-
-
-template <typename number>
-template <typename somenumber>
-inline
-void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
-				    const AdditionalData data)
-{
-  decompose(matrix, data.strengthen_diagonal);
-}
 
 
 

@@ -59,24 +59,28 @@
  * corresponding ``.templates.h'' file and instantiate the respective
  * class yourself.
  *
- * @author Wolfgang Bangerth, 1999, based on a similar implementation by Malte Braack
+ * @author Wolfgang Bangerth, 1999, based on a similar implementation
+ * by Malte Braack; unified interface: Ralf Hartmann
  */
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>
 {
   public:
                                      /**
-                                      * Constructor. Does nothing, so
-                                      * you have to call @p{reinit}
-                                      * sometimes afterwards.
+                                      * Constructor. Does nothing.
+				      *
+				      * Call the @p{initialize}
+				      * function before using this
+				      * object as preconditioner
+				      * (@p{vmult}).
                                       */
     SparseILU ();
 
                                      /**
-                                      * Constructor. Initialize the
-                                      * sparsity pattern of this
-                                      * object with the given
-                                      * argument.
+				      * This method is deprecated, and
+				      * left for backward
+				      * compability. It will be
+				      * removed in later versions.
                                       */
     SparseILU (const SparsityPattern &sparsity);
 
@@ -95,48 +99,51 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * factorization of the given
 				      * matrix.
 				      *
-				      * Note that the sparsity
-				      * structures of the
-				      * decomposition and the matrix
-				      * passed to this function need
-				      * not be equal, but that the
-				      * pattern used by this matrix
-				      * needs to contain all elements
-				      * used by the matrix to be
-				      * decomposed.  Fill-in is thus
-				      * allowed.
+				      * This function needs to be
+				      * called before an object of
+				      * this class is used as
+				      * preconditioner.
 				      *
-				      * If the
-				      * @p{AdditionalData::strengthen_diagonal}
-				      * parameter is greater than
-				      * zero, this method invokes
-				      * @p{get_strengthen_diagonal_impl
-				      * ()}.
+				      * For more details about
+				      * possible parameters, see the
+				      * class documentation of
+				      * SparseLUDecomposition and the
+				      * documentation of the
+				      * @p{SparseLUDecomposition::AdditionalData}
+				      * class.
 				      *
-				      * Refer to
-				      * @ref{SparseLUDecomposition}
-				      * documentation for state
-				      * management.
+				      * According to the
+				      * @p{parameters}, this function
+				      * creates a new SparsityPattern
+				      * or keeps the previous sparsity
+				      * or takes the sparsity given by
+				      * the user to @p{data}. Then,
+				      * this function performs the LU
+				      * decomposition.
+				      *
+				      * After this function is called
+				      * the preconditioner is ready to
+				      * be used.
 				      */
     template <typename somenumber>
     void initialize (const SparseMatrix<somenumber> &matrix,
 		     const AdditionalData parameters);
 
 				     /**
-				      * Same as @p{initialize}. This method
-				      * is deprecated, and left for
-				      * backward compability. It may
-				      * be removed in later versions.
+				      * This method is deprecated, and
+				      * left for backward
+				      * compability. It will be
+				      * removed in later versions.
 				      */
     template <typename somenumber>
     void decompose (const SparseMatrix<somenumber> &matrix,
 		    const double                    strengthen_diagonal=0.);
 
 				     /**
-				      * Same as @p{vmult}. This method
-				      * is deprecated, and left for
-				      * backward compability. It may
-				      * be removed in later versions.
+				      * This method is deprecated, and
+				      * left for backward
+				      * compability. It will be
+				      * removed in later versions.
 				      */
     template <typename somenumber>
     void apply_decomposition (Vector<somenumber>       &dst,
@@ -147,10 +154,8 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * i.e. do one forward-backward step
 				      * $dst=(LU)^{-1}src$.
 				      *
-				      * Refer to
-				      * @ref{SparseLUDecomposition}
-				      * documentation for state
-				      * management.
+				      * The @p{initialize} function
+				      * needs to be called beforehand.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,
@@ -196,15 +201,6 @@ SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 }
 
 
-
-template <typename number>
-template <typename somenumber>
-inline
-void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
-				   const double strengthen_diagonal)
-{
-  initialize(matrix, AdditionalData(strengthen_diagonal));
-}
 
 
 #endif // __deal2__sparse_ilu_h

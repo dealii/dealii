@@ -18,7 +18,8 @@ template<typename number>
 SparseLUDecomposition<number>::SparseLUDecomposition()
                 :
                 SparseMatrix<number>(),
-                decomposed(false)
+                decomposed(false),
+                own_sparsity(0)
 {}
 
 
@@ -27,15 +28,92 @@ template<typename number>
 SparseLUDecomposition<number>::
 SparseLUDecomposition (const SparsityPattern& sparsity) :
                 SparseMatrix<number>(sparsity),
-                decomposed(false)
+                decomposed(false),
+                own_sparsity(0)
 {}
 
 
 
 template<typename number>
 SparseLUDecomposition<number>::~SparseLUDecomposition()
-{}
+{
+  clear();
+}
 
+
+template<typename number>
+void SparseLUDecomposition<number>::clear()
+{
+  decomposed = false;
+  
+  std::vector<const unsigned int*> tmp;
+  tmp.swap (prebuilt_lower_bound);
+
+  SparseMatrix<number>::clear();
+  
+  if (own_sparsity)
+    {
+      delete own_sparsity;
+      own_sparsity=0;
+    }
+}
+
+
+
+template<typename number>
+template <typename somenumber>
+void SparseLUDecomposition<number>::initialize (
+  const SparseMatrix<somenumber> &matrix,
+  const AdditionalData data)
+{
+  const SparsityPattern &matrix_sparsity=matrix.get_sparsity_pattern();
+  
+  if (data.use_this_sparsity)
+    reinit(*data.use_this_sparsity);
+  else if (data.use_previous_sparsity &&
+	   !this->empty() &&
+	   (this->m()==matrix.m()))
+    {
+				       // Use the sparsity that was
+				       // previously used. This is
+				       // particularly useful when
+				       // matrix entries change but
+				       // not the sparsity, as for the
+				       // case of several Newton
+				       // iteration steps on an
+				       // unchanged grid.
+      reinit(this->get_sparsity_pattern());
+    }
+  else if (data.extra_off_diagonals==0)
+    {
+				       // Use same sparsity as matrix
+      reinit(matrix_sparsity);
+    }
+  else
+    {
+				       // Create new sparsity
+
+				       // for the case that
+				       // own_sparsity wasn't deleted
+				       // before (e.g. by clear()), do
+				       // it here
+      if (own_sparsity)
+	{
+					   // release the sparsity
+	  SparseMatrix<number>::clear();
+					   // delete it
+	  delete own_sparsity;
+	}
+      
+				       // and recreate
+      own_sparsity=new SparsityPattern(matrix_sparsity,
+				       matrix_sparsity.max_entries_per_row()
+				       +2*data.extra_off_diagonals,
+				       data.extra_off_diagonals);
+      own_sparsity->compress();
+      reinit(*own_sparsity);
+    }
+}
 
 
 template<typename number>
