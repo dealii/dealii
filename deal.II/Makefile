@@ -65,6 +65,11 @@ laco:
 3do:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
+deps: 
+	cd $D/base ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/lac ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) Makefile.dep
+
 base: baseg baseo forward
 lac: lacg laco forward
 1d: 1dg 1do forward
@@ -81,9 +86,14 @@ $(LIBDIR):
 
 baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR)
 
-all: contrib base lac 2d 1d 3d forward
-debug: contrib baseg lacg 2dg 1dg 3dg forward
-optimized: contrib baseo laco 2do 1do 3do forward
+all: deps
+	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d forward
+
+debug: deps
+	$(MAKE) $(MAKEOPTIONS) contrib baseg lacg 2dg 1dg 3dg forward
+
+optimized: deps
+	$(MAKE) $(MAKEOPTIONS) contrib baseo laco 2do 1do 3do forward
 
 contrib:
 	cd $D/contrib ; $(MAKE)
