@@ -18,18 +18,19 @@
 #include <base/exceptions.h>
 
 /**
- *   @p{Hexahedron}s denote the fundamental entities of triangulations in three
- *   dimensions. They are
- *   characterized by the (global) indices of the six bounding quadrilaterals.
+ *   @p{Hexahedron}s denote the fundamental entities of triangulations
+ *   in three dimensions. They are characterized by the (global)
+ *   indices of the six bounding quadrilaterals.
  *
- *   A heaxhedron itself has one index, as far as the topological part handled in
- *   the triangulation is concerned: the index in the level
- *   it belongs to. The level index is implicitly given by the position
- *   in the @p{hexes.hexes} list attached to the information of each level
- *   of the triangulation.
+ *   A heaxhedron itself has one index, as far as the topological part
+ *   handled in the triangulation is concerned: the index in the level
+ *   it belongs to. The level index is implicitly given by the
+ *   position in the @p{hexes.hexes} list attached to the information
+ *   of each level of the triangulation.
  *
- *   For conventions on the numbering of faces, lines and vertices within a
- *   hexahedron, refer to the documentation of the @ref{Triangulation} class.
+ *   For conventions on the numbering of faces, lines and vertices
+ *   within a hexahedron, refer to the documentation of the
+ *   @ref{Triangulation} class.
  *
  *   @author Wolfgang Bangerth, 1998
  */
@@ -39,12 +40,13 @@ class Hexahedron
 
 				     /**
 				      *  Construct a Hex with quad
-				      *  indices @p{i0} through @p{i5}. By default,
-				      *  indices are set to -1, i.e. an
+				      *  indices @p{i0} through
+				      *  @p{i5}. By default, indices
+				      *  are set to -1, i.e. an
 				      *  invalid value.
 				      *
-				      *  No convention is set as of now on the
-				      *  order of quads
+				      *  No convention is set as of
+				      *  now on the order of quads
 				      */
     Hexahedron (const int i0 = -1,
 		const int i1 = -1,
@@ -54,14 +56,15 @@ class Hexahedron
 		const int i5 = -1);
     
 				     /**
-				      *  Return the index of quad @p{i}=0
-				      *  through 5.
+				      *  Return the index of quad
+				      *  @p{i}=0 through 5.
 				      */
     int quad (const int i) const;
     
 				     /**
-				      *  Set the index of the @p{i}th quad to
-				      *  @p{index}. @p{i}=0 through 5.
+				      *  Set the index of the @p{i}th
+				      *  quad to @p{index}. @p{i}=0
+				      *  through 5.
 				      */
     void set_quad (const int i, const int index);
     
@@ -80,6 +83,14 @@ class Hexahedron
 		    << "Indices for the quad number must be 0 through 5, "
 		    << "but you gave " << arg1); 
   protected:
+                                     /**
+                                      * Indices of the six quads that
+                                      * bound this hexahedron. The
+                                      * level index is implicitly
+                                      * given by the level of this
+                                      * hexahedron, so this is only
+                                      * the index within this level.
+                                      */
     int quads[6];
 };
 
