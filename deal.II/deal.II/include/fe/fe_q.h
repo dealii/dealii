@@ -78,6 +78,7 @@ class FE_Q : public FiniteElement<dim>
 				      */
     virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &) const;
 
+//TODO: make get_renumber private or move it some other place    
 				     /**
 				      * Read-only access to the
 				      * renumber vector.

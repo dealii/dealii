@@ -952,7 +952,11 @@ FE_Q<dim>::get_data (const UpdateFlags      update_flags,
   std::vector<double> values(0);
   std::vector<Tensor<1,dim> > grads(0);
   std::vector<Tensor<2,dim> > grad_grads(0);
-  
+
+				   // check what needs to be
+				   // initialized only once and what
+				   // on every cell/face/subface we
+				   // visit
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;

@@ -23,21 +23,6 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_values.h>
 
-static std::vector<bool> dummy(1,true);
-
-// Embedding matrices (produced by tests/fe/embedding with postprocessing)
-
-#if (deal_II_dimension == 1)
-#include "mat_dgq.1"
-#endif
-
-#if (deal_II_dimension == 2)
-#include "mat_dgq.2"
-#endif
-
-#if (deal_II_dimension == 3)
-#include "mat_dgq.3"
-#endif
 
 
 template <int dim>
@@ -52,36 +37,44 @@ FE_DGQ<dim>::InternalData::~InternalData ()
 
 
 template <int dim>
-FE_DGQ<dim>::FE_DGQ (unsigned int degree):
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1), dummy),
-				      degree(degree),
-				      poly(0)
+FE_DGQ<dim>::FE_DGQ (unsigned int degree)
+		:
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
+				    std::vector<bool>(1,true)),
+		degree(degree),
+		poly(0)
 {
   if (degree==0)
     {
-      std::vector<Polynomial<double> > v(
-	1, Polynomial<double> (std::vector<double> (1,1.)));
+				       // create constant polynomial
+      std::vector<Polynomial<double> >
+	v(1, Polynomial<double> (std::vector<double> (1,1.)));
       poly = new TensorProductPolynomials<dim> (v);
     }
   else
     {
+				       // create array of Lagrange polynomials
       std::vector<LagrangeEquidistant> v;
       for (unsigned int i=0;i<=degree;++i)
 	v.push_back(LagrangeEquidistant(degree,i));
       poly = new TensorProductPolynomials<dim> (v);
     }
-  
-  Assert (degree <= 10, ExcNotImplemented());
-  
+
+				   // generate permutation/rotation index sets to generate some matrices from others
   std::vector<unsigned int> right;
   std::vector<unsigned int> top;
   rotate_indices (right, 'Z');
   if (dim>2)
     rotate_indices (top, 'X');
 
-  if (embedding[degree] != 0)
+				   // if defined, copy over matrices
+				   // from precomputed arrays and
+				   // generate all other matrices by
+				   // permutations
+  if ((degree < Matrices::n_embedding_matrices) &&
+      (Matrices::embedding[degree] != 0))
     {
-      prolongation[0].fill (embedding[degree]);
+      prolongation[0].fill (Matrices::embedding[degree]);
       switch (dim)
 	{
 	  case 1:
@@ -113,17 +106,21 @@ FE_DGQ<dim>::FE_DGQ (unsigned int degree):
 						  top, top);
 		break;
 	  default:
-		for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-		  prolongation[i].reinit(0);
+		Assert (false, ExcNotImplemented());
 	}
-    } else {
-      for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-	prolongation[i].reinit(0);
     }
-  
-  if (projection_matrices[degree] != 0)
+  else
+				     // matrix undefined, set size to zero
+    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+      prolongation[i].reinit(0);
+
+				   // same as above: copy over matrix
+				   // from predefined values and
+				   // generate all others by rotation
+  if ((degree < Matrices::n_projection_matrices) &&
+      (Matrices::projection_matrices[degree] != 0))
     {
-      restriction[0].fill (projection_matrices[degree]);
+      restriction[0].fill (Matrices::projection_matrices[degree]);
       switch (dim)
 	{
 	  case 1:
@@ -155,18 +152,26 @@ FE_DGQ<dim>::FE_DGQ (unsigned int degree):
 						 top, top);
 		break;
 	  default:
-		for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-		  restriction[i].reinit(0);
+		Assert (false, ExcNotImplemented());
 	}
     }
-}
+  else
+				     // matrix undefined, set size to zero
+    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+      restriction[i].reinit(0);
+};
+
 
 
 template <int dim>
 FE_DGQ<dim>::~FE_DGQ ()
 {
+				   // delete poly member and set it to
+				   // zero to prevent accidental use
   delete poly;
+  poly = 0;
 }
+
 
 
 template <int dim>
@@ -177,6 +182,7 @@ FE_DGQ<dim>::clone() const
 }
 
 
+
 template <int dim>
 void
 FE_DGQ<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
@@ -185,6 +191,8 @@ FE_DGQ<dim>::get_unit_support_points (std::vector<Point<dim> > &points) const
     compute_support_points (points, degree);
   else
     {
+				       // constant elements, take
+				       // midpoint
       points.resize(1);
       for (unsigned int i=0; i<dim; ++i)
 	points[0](i)=0.5;
@@ -196,11 +204,13 @@ template <int dim>
 void
 FE_DGQ<dim>::get_unit_face_support_points (std::vector<Point<dim-1> > &points) const
 {
+				   // no face support points
   points.resize(0);
 }
 
+
 //----------------------------------------------------------------------
-// Auxilliary functions
+// Auxiliary functions
 //----------------------------------------------------------------------
 
 
@@ -218,16 +228,12 @@ FE_DGQ<dim>::get_dpo_vector(unsigned int deg)
 
 template <int dim>
 UpdateFlags
-FE_DGQ<dim>::update_once (UpdateFlags flags) const
+FE_DGQ<dim>::update_once (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
-//  cerr << "FE_DGQ:Once: " << hex << flags << ' ';
-
   if (flags & update_values)
     out |= update_values;
-
-//  cerr << out << dec << endl;
 
   return out;
 }
@@ -235,18 +241,15 @@ FE_DGQ<dim>::update_once (UpdateFlags flags) const
 
 template <int dim>
 UpdateFlags
-FE_DGQ<dim>::update_each (UpdateFlags flags) const
+FE_DGQ<dim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
-//  cerr << "FE_DGQ:Each: " << hex << flags << ' ';
-
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
+
   if (flags & update_second_derivatives)
     out |= update_second_derivatives;
-
-//  cerr << out << dec << endl;
 
   return out;
 }
@@ -254,18 +257,18 @@ FE_DGQ<dim>::update_each (UpdateFlags flags) const
 
 template <int dim>
 void
-FE_DGQ<dim>::compute_support_points (std::vector<Point<dim> >& support_points,
-				     unsigned int degree)
+FE_DGQ<dim>::compute_support_points (std::vector<Point<dim> > &support_points,
+				     const unsigned int degree)
 {
   Assert(degree>0, ExcInternalError());
 				   // number of points: (degree+1)^dim
-  unsigned int n= degree+1;
+  unsigned int n = degree+1;
   for (unsigned int i=1;i<dim;++i)
     n *= degree+1;
 
   support_points.resize(n);
   
-  double step = 1./degree;
+  const double step = 1./degree;
   Point<dim> p;
   
   unsigned int k=0;
@@ -286,8 +289,8 @@ FE_DGQ<dim>::compute_support_points (std::vector<Point<dim> >& support_points,
 
 template <int dim>
 void
-FE_DGQ<dim>::rotate_indices (std::vector<unsigned int>& numbers,
-			     const char direction) const
+FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
+			     const char                 direction) const
 {
   const unsigned int n = degree+1;
   unsigned int s = n;
@@ -302,7 +305,9 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int>& numbers,
 				       // Mirror around midpoint
       for (unsigned int i=n;i>0;)
 	numbers[l++]=--i;
-    } else {
+    }
+  else
+    {
       switch (direction)
 	{
 					   // Rotate xy-plane
@@ -352,6 +357,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int>& numbers,
 		      }
 		break;
 	  default:
+//TODO: direction='y' is default, but is not implemented?!		
 		Assert (false, ExcNotImplemented ());
 	}
     }
@@ -363,10 +369,11 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int>& numbers,
 //----------------------------------------------------------------------
 // Data field initialization
 //----------------------------------------------------------------------
+
 template <int dim>
 Mapping<dim>::InternalDataBase*
-FE_DGQ<dim>::get_data (const UpdateFlags update_flags,
-		       const Mapping<dim>& mapping,
+FE_DGQ<dim>::get_data (const UpdateFlags      update_flags,
+		       const Mapping<dim>    &mapping,
 		       const Quadrature<dim> &quadrature) const
 {
   InternalData* data = new InternalData;
@@ -374,24 +381,29 @@ FE_DGQ<dim>::get_data (const UpdateFlags update_flags,
   std::vector<Tensor<1,dim> > grads(0);
   std::vector<Tensor<2,dim> > grad_grads(0);
   
+				   // check what needs to be
+				   // initialized only once and what
+				   // on every cell/face/subface we
+				   // visit
   data->update_once = update_once(update_flags);
   data->update_each = update_each(update_flags);
   data->update_flags = data->update_once | data->update_each;
 
   const UpdateFlags flags(data->update_flags);
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
   
   if (flags & update_values)
     {
       values.resize (dofs_per_cell);
       data->shape_values.resize(dofs_per_cell,
-				std::vector<double>(quadrature.n_quadrature_points));
+				std::vector<double>(n_q_points));
     }
 
   if (flags & update_gradients)
     {
       grads.resize (dofs_per_cell);
       data->shape_gradients.resize(dofs_per_cell,
-				   std::vector<Tensor<1,dim> >(quadrature.n_quadrature_points));
+				   std::vector<Tensor<1,dim> >(n_q_points));
     }
 
 				   // if second derivatives through
@@ -403,10 +415,10 @@ FE_DGQ<dim>::get_data (const UpdateFlags update_flags,
   
   
   if (flags & (update_values | update_gradients))
-    for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
+    for (unsigned int i=0; i<n_q_points; ++i)
       {
 	poly->compute(quadrature.point(i), values, grads, grad_grads);
-	for (unsigned int k=0;k<dofs_per_cell; ++k)
+	for (unsigned int k=0; k<dofs_per_cell; ++k)
 	  {
 	    if (flags & update_values)
 	      data->shape_values[k][i] = values[k];
@@ -422,33 +434,36 @@ FE_DGQ<dim>::get_data (const UpdateFlags update_flags,
 //----------------------------------------------------------------------
 // Fill data of FEValues
 //----------------------------------------------------------------------
+
 template <int dim>
 void
 FE_DGQ<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 			     const DoFHandler<dim>::cell_iterator &cell,
 			     const Quadrature<dim>                &quadrature,
-			     Mapping<dim>::InternalDataBase      &mapping_data,
-			     Mapping<dim>::InternalDataBase      &fedata,
+			     Mapping<dim>::InternalDataBase       &mapping_data,
+			     Mapping<dim>::InternalDataBase       &fedata,
 			     FEValuesData<dim>                    &data) const
 {
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  for (unsigned int k=0;k<dofs_per_cell;++k)
+  for (unsigned int k=0; k<dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	{
-	  if (flags & update_values)
-	    data.shape_values(k,i)
-	      = fe_data.shape_values[k][i];
-	}
+	if (flags & update_values)
+	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)
 	mapping.transform_covariant(data.shape_gradients[k],
 				    fe_data.shape_gradients[k],
 				    mapping_data, 0);
     }
+  
   if (flags & update_second_derivatives)
     compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
   
@@ -459,35 +474,41 @@ FE_DGQ<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 
 template <int dim>
 void
-FE_DGQ<dim>::fill_fe_face_values (const Mapping<dim> &mapping,
+FE_DGQ<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
 				  const DoFHandler<dim>::cell_iterator &cell,
-				  const unsigned int face,
-				  const Quadrature<dim-1>& quadrature,
-				  Mapping<dim>::InternalDataBase& mapping_data,
-				  Mapping<dim>::InternalDataBase& fedata,
-				  FEValuesData<dim>& data) const
+				  const unsigned int                    face,
+				  const Quadrature<dim-1>              &quadrature,
+				  Mapping<dim>::InternalDataBase       &mapping_data,
+				  Mapping<dim>::InternalDataBase       &fedata,
+				  FEValuesData<dim>                    &data) const
 {
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-  unsigned int offset = face * quadrature.n_quadrature_points;
+
+				   // offset determines which data set
+				   // to take (all data sets for all
+				   // faces are stored contiguously)
+  const unsigned int offset = face * quadrature.n_quadrature_points;
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0;k<dofs_per_cell;++k)
+  for (unsigned int k=0; k<dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	{
-	  if (flags & update_values)
-	    data.shape_values(k,i)
-	      = fe_data.shape_values[k][i+offset];
-	}
+	if (flags & update_values)
+	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
 	mapping.transform_covariant(data.shape_gradients[k],
 				    fe_data.shape_gradients[k],
 				    mapping_data, offset);
-      if (flags & update_second_derivatives)
-	compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
     }
+
+  if (flags & update_second_derivatives)
+    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
   
   fe_data.first_cell = false;
 }
@@ -496,37 +517,43 @@ FE_DGQ<dim>::fill_fe_face_values (const Mapping<dim> &mapping,
 
 template <int dim>
 void
-FE_DGQ<dim>::fill_fe_subface_values (const Mapping<dim> &mapping,
+FE_DGQ<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
 				     const DoFHandler<dim>::cell_iterator &cell,
-				     const unsigned int face,
-				     const unsigned int subface,
-				     const Quadrature<dim-1>& quadrature,
-				     Mapping<dim>::InternalDataBase& mapping_data,
-				     Mapping<dim>::InternalDataBase& fedata,
-				     FEValuesData<dim>& data) const
+				     const unsigned int                    face,
+				     const unsigned int                    subface,
+				     const Quadrature<dim-1>              &quadrature,
+				     Mapping<dim>::InternalDataBase       &mapping_data,
+				     Mapping<dim>::InternalDataBase       &fedata,
+				     FEValuesData<dim>                    &data) const
 {
+				   // convert data object to internal
+				   // data for this class. fails with
+				   // an exception if that is not
+				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-  unsigned int offset = (face * GeometryInfo<dim>::subfaces_per_face
-			 + subface) * quadrature.n_quadrature_points;
+  
+				   // offset determines which data set
+				   // to take (all data sets for all
+				   // sub-faces are stored contiguously)
+  const unsigned int offset = (face * GeometryInfo<dim>::subfaces_per_face + subface)
+			      * quadrature.n_quadrature_points;
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  for (unsigned int k=0;k<dofs_per_cell;++k)
+  for (unsigned int k=0; k<dofs_per_cell; ++k)
     {
       for (unsigned int i=0;i<quadrature.n_quadrature_points;++i)
-	{
-	  if (flags & update_values)
-	    data.shape_values(k,i)
-	      = fe_data.shape_values[k][i+offset];
-	}
+	if (flags & update_values)
+	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
 	mapping.transform_covariant(data.shape_gradients[k],
 				    fe_data.shape_gradients[k],
 				    mapping_data, offset);
-      if (flags & update_second_derivatives)
-	compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
     }
+  
+  if (flags & update_second_derivatives)
+    compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
   
   fe_data.first_cell = false;
 }
@@ -539,6 +566,16 @@ FE_DGQ<dim>::memory_consumption () const
   Assert (false, ExcNotImplemented ());
   return 0;
 }
+
+
+
+template <int dim>
+unsigned int
+FE_DGQ<dim>::get_degree () const
+{
+  return degree;
+};
+
 
 
 

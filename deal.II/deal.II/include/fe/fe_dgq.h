@@ -19,8 +19,10 @@
 template <int dim> class TensorProductPolynomials;
 template <int dim> class MappingQ;
 
+
 /**
  * Discontinuous tensor product elements based on equidistant support points.
+//TODO: Document node numbering etc. copy from old documentation 
  */
 template <int dim>
 class FE_DGQ : public FiniteElement<dim>
@@ -68,6 +70,15 @@ class FE_DGQ : public FiniteElement<dim>
 				      * if the function is not overloaded.
 				      */
     virtual void get_unit_face_support_points (std::vector<Point<dim-1> > &) const;
+
+
+				     /**
+				      * Return the polynomial degree
+				      * of this finite element,
+				      * i.e. the value passed to the
+				      * constructor.
+				      */
+    unsigned int get_degree () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -146,6 +157,54 @@ class FE_DGQ : public FiniteElement<dim>
 			    FEValuesData<dim>& data) const ;
 
   private:
+
+				     /**
+				      * Declare a nested class which
+				      * will has static definitions of
+				      * various matrices such as
+				      * constraint and embedding
+				      * matrices. The definition of
+				      * the various static fields are
+				      * in the files @p{fe_q_[123]d.cc}
+				      * in the source directory.
+				      */
+    struct Matrices
+    {
+					 /**
+					  * Pointers to the embedding
+					  * matrices, one for each
+					  * polynomial degree starting
+					  * from constant elements
+					  */
+	static const double * const embedding[];
+
+					 /**
+					  * Number of elements (first
+					  * index) the above field
+					  * has. Equals the highest
+					  * polynomial degree plus one
+					  * for which the embedding
+					  * matrices have been
+					  * computed.
+					  */
+	static const unsigned int n_embedding_matrices;
+
+					 /**
+					  * As @p{embedding} but for
+					  * projection matrices.
+					  */
+	static const double * const projection_matrices[];
+
+					 /**
+					  * As
+					  * @p{n_embedding_matrices}
+					  * but for projection
+					  * matrices.
+					  */
+	static const unsigned int n_projection_matrices;
+    };
+
+    
 				     /**
 				      * Only for internal use. Its
 				      * full name is
@@ -172,15 +231,16 @@ class FE_DGQ : public FiniteElement<dim>
 				      * Compute support points, only
 				      * for @p{degree>0}.
 				      */
-    static void compute_support_points (std::vector<Point<dim> >& support_points,
-					unsigned int degree);
+    static void compute_support_points (std::vector<Point<dim> > &support_points,
+					const                     unsigned int degree);
 
 				     /**
 				      * Compute renumbering for rotation
 				      * of degrees of freedom.
+//TODO: meaning of direction=[zZxXyY]				      
 				      */
-    void rotate_indices (std::vector<unsigned int>& indices,
-			 const char direction = 'y') const;
+    void rotate_indices (std::vector<unsigned int> &indices,
+			 const char                 direction = 'y') const;
   
 				     /**
 				      * Degree of the polynomials.
