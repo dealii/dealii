@@ -12,7 +12,7 @@ default:
 
 
 # clean everything
-clean: clean-objects
+clean: clean-objects clean-bin
 
 # only clean object files, not libraries and executables
 clean-objects:  clean-base clean-lac \
@@ -28,6 +28,9 @@ clean-base clean-lac clean-1d clean-2d clean-3d:
 
 clean-contrib:
 	-rm contrib/*/*.$(OBJEXT)
+
+clean-bin:
+	-rm bin/detached_ma27
 
 distclean: clean
 	-rm -f lib* bin/*
