@@ -1,0 +1,81 @@
+subsection Grid
+  set Initial refinement           = 4
+  set Coarse mesh                  = square
+
+  subsection Refinement
+    set Refinement fraction            = 0.95
+    set Coarsening fraction            = 0.01
+    set Compare indicators globally    = false
+    set Maximum refinement             = 0
+    set Adapt mesh to dual solution    = true
+    set Primal to dual weight          = 4
+    set Initial energy estimator sweeps= 0
+  end
+
+  subsection Mesh smoothing
+    set Cell number correction steps = 2
+    set Top cell number deviation    = 0.1
+    set Bottom cell number deviation = 0.06
+  end
+
+  set Renumber dofs                = true
+end
+
+
+
+subsection Equation data
+  set Coefficient                  = kink
+  set Initial u                    = bump
+  set Initial v                    = zero
+  set Boundary                     = zero
+end
+
+
+
+subsection Discretization
+  set Primal FE                    = linear
+  set Dual FE                      = quadratic
+  subsection Time stepping
+    set Primal method              = theta
+    set Dual method                = theta
+    set Theta                      = 0.5
+    set Time step                  = 0.028
+    set End time                   = 0.7
+  end
+end
+
+
+
+subsection Solver
+  set Preconditioning              = ssor
+  set Extrapolate old solutions    = false
+end
+
+
+
+subsection Output
+  set Format                       = eps
+  set Directory                    = tmp
+  set Directory for temporaries    = tmp
+  set Write solutions              = all sweeps
+  set Write steps interval         = 25
+  set Write stacked time steps     = false
+  set Write error as cell data     = true
+
+  subsection Error statistics
+    set Produce error statistics   = false
+    set Number of intervals        = 25
+    set Interval spacing           = logarithmic
+  end
+end
+
+
+
+subsection Goal
+  set Goal                         = Huyghens wave
+  set Evaluate                     = Huyghens wave
+end
+
+
+set Refinement criterion           = dual estimator
+set Sweeps                         = 3
