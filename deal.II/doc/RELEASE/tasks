@@ -5,8 +5,6 @@ when a new release shall be issued:
     cvs tag all files with the tag Base-x-y
     cvs tag -r all files with the tag Branch-x-y
 
-2/ tell your friends to tag their programs
-
 10/ cvs tag all files with Version-x-y-z
 
 11/ tell your friends to tag their programs
