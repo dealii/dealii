@@ -64,10 +64,14 @@
 	   names presently include <code>egcs1.1</code>,
 	   <code>gcc2.95</code>, <code>gcc2.96</code>,
            <code>gcc2.97</code>, <code>gcc3.0</code>,
+           <code>gcc3.1</code>, <code>gcc3.2</code>,
+           <code>gcc3.3</code>, <code>gcc3.4</code>,
+           <code>gcc3.5</code>,
            <code>ibm_xlc</code>, <code>MIPSpro</code>,
 	   <code>sun_workshop</code>, <code>sun_forte</code>,
            <code>intel_icc5</code>, <code>intel_icc6</code>, 
-           <code>intel_icc7</code>, <code>compaq_cxx</code>. Not all of
+           <code>intel_icc7</code>, <code>compaq_cxx</code>, and
+           probably a few more as well. Not all of
            these compilers are actually supported (see the 
            <a href="../readme.html" target="body">ReadMe file</a> for a
            list of supported compilers and platforms), it is only a list of
@@ -76,6 +80,14 @@
            should read <code>CXX-VERSION</code>), since
            it is also used even if the compiler is not the GNU C++
            compiler.
+           </p>
+      </dd>
+
+
+      <dt> <code>CC-VERSION</code> </dt>
+      <dd> <p>
+           Name and version of the CC compiler. Possible names are
+           similar to the ones listed above.
            </p>
       </dd>
 
@@ -450,6 +462,16 @@
            C++ compiler flags for optimized mode
            </p>
       </dd>
+
+      <dt> <code>CCFLAGS</code> </dt>
+      <dd> <p>
+           C compiler flags. Since we only compiler C code for
+           third-party libraries for which we assume that they and our
+           interfaces to them are bug free, these flags are always for
+           optimized mode.
+           </p>
+      </dd>
+
 
       <dt> <code>F77FLAGS.g</code> </dt>
       <dd> <p>

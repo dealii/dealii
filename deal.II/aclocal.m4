@@ -709,6 +709,318 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Determine the C compiler in use. Return the name and possibly
+dnl version of this compiler in CC_VERSION. This function is almost
+dnl identifical to DEAL_II_DETERMINE_CXX_BRAND and tehrefore lacks
+dnl a lot of the comments found there to keep it short
+dnl
+dnl Usage: DEAL_II_DETERMINE_CC_BRAND
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
+[
+  if test "$GCC" = "yes" ; then
+    CC_VERSION_STRING=`($CC -v 2>&1) | grep "gcc version"`
+    if test "x$CC_VERSION_STRING" = "x" ; then
+      GC=no
+    fi
+  fi
+
+  if test "$GCC" = yes ; then
+    dnl find out the right version
+    CC_VERSION_STRING=`($CC -v 2>&1) | grep "gcc version"`
+    case "$CC_VERSION_STRING" in
+      *"egcs-1.1"*)
+  	AC_MSG_RESULT(C compiler is egcs-1.1)
+  	CC_VERSION=egcs1.1
+  	;;
+      *2.95*)
+  	AC_MSG_RESULT(C compiler is gcc-2.95)
+  	CC_VERSION=gcc2.95
+  	;;
+      *2.96*)
+  	AC_MSG_ERROR(C compiler reports faulty gcc 2.96. Please install a new compiler)
+  	CC_VERSION=gcc2.96
+  	;;
+      *2.97*)
+  	AC_MSG_RESULT(C compiler is gcc-2.97)
+  	CC_VERSION=gcc2.97
+  	;;
+      *version\ 3.0*)
+  	AC_MSG_RESULT(C compiler is gcc-3.0)
+  	CC_VERSION=gcc3.0
+  	;;
+      *version\ 3.1*)
+  	AC_MSG_RESULT(C compiler is gcc-3.1)
+  	CC_VERSION=gcc3.1
+  	;;
+      *version\ 3.2*)
+  	AC_MSG_RESULT(C compiler is gcc-3.2)
+  	CC_VERSION=gcc3.2
+  	;;
+      *version\ 3.3*)
+  	AC_MSG_RESULT(C compiler is gcc-3.3)
+  	CC_VERSION=gcc3.3
+  	;;
+      *version\ 3.4*)
+  	AC_MSG_RESULT(C compiler is gcc-3.4)
+  	CC_VERSION=gcc3.4
+  	;;
+      *version\ 3.5*)
+  	AC_MSG_RESULT(C compiler is gcc-3.5)
+  	CC_VERSION=gcc3.5
+  	;;
+      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
+  	AC_MSG_RESULT(C compiler is $CC_VERSION_STRING)
+  	AC_MSG_ERROR(C compiler is not supported)
+  	;;
+      *)
+  	AC_MSG_RESULT(C compiler is unknown but accepted gcc version)
+  	CC_VERSION=gcc-other
+  	;;
+    esac
+  else
+    dnl Check other (non-gcc) compilers
+  
+    dnl Check for IBM xlC. For some reasons, depending on some environment
+    dnl variables, moon position, and other reasons unknown to me, the
+    dnl compiler displays different names in the first line of output, so
+    dnl check various possibilities
+    is_ibm_xlc="`($CC 2>&1) | egrep 'VisualAge C|C Set ++|C for AIX Compiler'`"
+    if test "x$is_ibm_xlc" != "x"  ; then
+      dnl Ah, this is IBM's C compiler. Unfortunately, we don't presently
+      dnl know how to check the version number, so assume that is sufficiently
+      dnl high...
+      AC_MSG_RESULT(C compiler is IBM xlC)
+      CC_VERSION=ibm_xlc
+    else
+  
+      dnl Check whether we are dealing with the MIPSpro C compiler
+      mips_pro="`($CC -version 2>&1) | grep MIPSpro`"
+      if test "x$mips_pro" != "x" ; then
+        case "$mips_pro" in
+          *7.0* | *7.1* | *7.2* | *7.3*)
+            dnl MIPSpro 7.3 does not support standard C++, therefore it is not
+            dnl able to compile deal.II. Previous compiler versions neither.
+            AC_MSG_RESULT(C compiler is $mips_pro)
+            AC_MSG_ERROR(This compiler is not supported)
+            CC_VERSION=MIPSpro7.3
+            ;;
+          *7.4)
+            AC_MSG_RESULT(C compiler is MIPSpro compiler 7.4)
+            AC_MSG_ERROR(This compiler is not supported. Use MIPSPro compiler 7.4x)
+            CC_VERSION=MIPSpro7.4
+            ;;
+          *7.41* | *7.42* | *7.43* | *7.44*)
+            AC_MSG_RESULT(C compiler is MIPSpro compiler 7.4x)
+            CC_VERSION=MIPSpro7.4x
+            ;;
+          *"7.5"*)
+            AC_MSG_RESULT(C compiler is MIPSpro compiler 7.5)
+            CC_VERSION=MIPSpro7.5
+            ;;
+          *)
+            AC_MSG_RESULT(C compiler is unknown version but accepted MIPSpro compiler version)
+            CC_VERSION=MIPSpro-other
+            ;;
+        esac
+      else
+  
+        dnl Intel's ICC C compiler? On Linux, it uses -V, on Windows
+	dnl it is -help
+	dnl
+	dnl Annoyingly, ecc6.0 prints its version number on a separate
+	dnl line (the previous one ends with the string "applications"),
+	dnl so join this one to the previous one with a little bit of
+	dnl perl.
+        is_intel_icc1="`($CC -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        is_intel_icc2="`($CC -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        is_intel_ecc="`($CC -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
+        if test "x$is_intel_icc" != "x" ; then
+	  version5="`echo $is_intel_icc | grep 'Version 5'`"
+	  version6="`echo $is_intel_icc | grep 'Version 6'`"
+	  version7="`echo $is_intel_icc | grep 'Version 7'`"
+	  version8="`echo $is_intel_icc | grep 'Version 8'`"
+          if test "x$version5" != "x" ; then
+            AC_MSG_RESULT(C compiler is Intel ICC 5)
+            CC_VERSION=intel_icc5
+          else if test "x$version6" != "x" ; then
+            AC_MSG_RESULT(C compiler is Intel ICC 6)
+            CC_VERSION=intel_icc6
+          else if test "x$version7" != "x" ; then
+            AC_MSG_RESULT(C compiler is Intel ICC 7)
+            CC_VERSION=intel_icc7
+          else if test "x$version8" != "x" ; then
+            AC_MSG_RESULT(C compiler is Intel ICC 8)
+            CC_VERSION=intel_icc8
+          else
+            AC_MSG_RESULT(C compiler is Intel ICC)
+            CC_VERSION=intel_icc
+          fi fi fi fi
+        else
+  
+          dnl Or DEC's cxx compiler?
+          is_dec_cxx="`($CC -V 2>&1) | grep 'Compaq C'`"
+          if test "x$is_dec_cxx" != "x" ; then
+            AC_MSG_RESULT(C compiler is Compaq cxx)
+            CC_VERSION=compaq_cxx
+          else
+  
+      	    dnl Sun Workshop?
+            is_sun_cc="`($CC -V 2>&1) | grep 'Sun WorkShop'`"
+            if test "x$is_sun_cc" != "x" ; then
+              AC_MSG_RESULT(C compiler is Sun Workshop compiler)
+              CC_VERSION=sun_workshop
+            else
+  
+  	      dnl Sun Forte?
+              is_sun_forte_cc="`($CC -V 2>&1) | grep 'Forte'`"
+              if test "x$is_sun_forte_cc" != "x" ; then
+                AC_MSG_RESULT(C compiler is Sun Forte compiler)
+                CC_VERSION=sun_forte
+              else
+  
+  	        dnl Portland Group C?
+  	        is_pgcc="`($CC -V 2>&1) | grep 'Portland Group'`"
+  	        if test "x$is_pgcc" != "x" ; then
+  	          AC_MSG_RESULT(C compiler is Portland Group C)
+  	          CC_VERSION=portland_group
+  	        else
+  
+  	          dnl HP aCC?
+  	          is_aCC="`($CC -V 2>&1) | grep 'aCC'`"
+  	          if test "x$is_aCC" != "x" ; then
+  	            AC_MSG_RESULT(C compiler is HP aCC)
+  	            CC_VERSION=hp_aCC
+  	          else
+  
+  	            dnl Borland C
+  	            is_bcc="`($CC -h 2>&1) | grep 'Borland'`"
+  	            if test "x$is_bcc" != "x" ; then
+  	              AC_MSG_RESULT(C compiler is Borland C)
+  	              CC_VERSION=borland_bcc
+  	            else
+  
+  	              dnl KAI C? It seems as if the documented options
+		      dnl -V and --version are not always supported, so give
+	              dnl the whole thing a second try by looking for /KCC/
+	 	      dnl somewhere in the paths that are output by -v. This
+	              dnl is risky business, since this combination of
+	              dnl characters might appear on other installations
+                      dnl of other compilers as well, so put this test to
+                      dnl the very end of the detection chain for the
+                      dnl various compilers
+  	              is_kai_cc="`($CC --version 2>&1) | grep 'KAI C'`"
+  	              is_kai_cc="$is_kai_cc`($CC -v 2>&1) | grep /KCC/`"
+  	              if test "x$is_kai_cc" != "x" ; then
+  	                AC_MSG_RESULT(C compiler is KAI C)
+  	                CC_VERSION=kai_cc
+  	              else
+  
+                        dnl  Aw, nothing suitable found...
+                        AC_MSG_ERROR([Unrecognized compiler -- sorry])
+                        exit 1
+                      fi
+                    fi
+                  fi
+                fi
+              fi
+  	    fi
+          fi
+        fi
+      fi
+    fi
+  fi
+])
+
+
+
+
+
+dnl -------------------------------------------------------------
+dnl Set C compiler flags to their default values. They will be 
+dnl modified according to other options in later steps of
+dnl configuration
+dnl
+dnl CFLAGS  : flags for optimized mode
+dnl
+dnl Usage: DEAL_II_SET_CC_FLAGS
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
+[
+  dnl First the flags for gcc compilers
+  if test "$GCC" = yes ; then
+    CFLAGS="$CFLAGS -O3 -funroll-loops -funroll-all-loops -fstrict-aliasing"
+    dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
+    dnl anything to avoid a warning. on AIX make sure we always pass -lpthread
+    dnl because this seems to be somehow required to make things work. Likewise
+    dnl DEC OSF.
+    case "$target" in
+      *aix* )
+	CFLAGSPIC=
+	;;
+
+      *dec-osf* )
+	CFLAGSPIC="-fPIC"
+	;;
+
+      *)
+	CFLAGSPIC="-fPIC"
+	;;
+    esac
+
+  else
+    dnl Non-gcc compilers. By default, use the C compiler also for linking
+    dnl shared libraries. If some compiler cannot do that and needs something
+    dnl different, then this must be specified in the respective section
+    dnl below, overriding this define:
+    SHLIBLD="$CC"
+  
+    case "$CC_VERSION" in
+      ibm_xlc)
+          CFLAGS="$CFLAGS -O2"
+          CFLAGSPIC="-fPIC"
+          ;;
+  
+      MIPSpro*)
+          CFLAGSO="$CFLAGS -O2"
+          CFLAGSPIC="-KPIC"
+          ;;
+  
+      intel_icc*)
+          CFLAGS="$CFLAGS -O2 -unroll"
+          CFLAGSPIC="-KPIC"
+
+          dnl To reduce output, use -opt_report_levelmin where possible,
+          dnl i.e. post icc5
+          if test "x$CC_VERSION" != "xintel_icc5" ; then
+            CFLAGS="$CFLAGS -opt_report_levelmin"
+          fi
+
+          CFLAGS="$CFLAGS -ansi_alias -vec_report0"
+	
+	  dnl If we are on an x86 platform, add -tpp6 to optimization
+	  dnl flags
+	  case "$target" in
+	    *86*)
+		CFLAGSO="$CFLAGS -tpp6"
+		;;
+	  esac
+          ;;
+
+      *)
+          AC_MSG_ERROR(No compiler options for this C compiler
+                       specified at present)
+          ;;
+    esac
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Determine the F77 compiler in use. Return the name and possibly
 dnl version of this compiler in F77_VERSION.
 dnl

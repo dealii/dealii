@@ -98,7 +98,9 @@ dnl
 dnl Note that on MIPS systems, the AC_PROG_CXX call erroneously sets
 dnl -g in CXXFLAGS, which is not exactly what we want, so we store
 dnl the old value temporarily
+OLDCFLAGS=$CFLAGS
 AC_PROG_CC
+CFLAGS=$OLDCFLAGS
 AC_PATH_PROG(CC,$CC)
 
 OLDCXXFLAGS="$CXXFLAGS"
@@ -125,6 +127,14 @@ AC_SUBST(LDFLAGSPIC)
 AC_SUBST(OBJEXT)
 AC_SUBST(EXEEXT)
 
+dnl Do the same for the C compiler. we only use the C compiler for third-party
+dnl code and only for things we optimize, so no need to determine debug flags
+dnl and similar things
+DEAL_II_DETERMINE_CC_BRAND
+DEAL_II_SET_CC_FLAGS
+
+AC_SUBST(CC_VERSION)
+AC_SUBST(CFLAGS)
 
 
 

@@ -25,6 +25,8 @@ D                    = @DEAL2_DIR@
 CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
+CC                   = @CC@
+CC-VERSION           = @CC_VERSION@
 SHLIBLD              = @SHLIBLD@
 AR                   = @AR@
 RANLIB               = @RANLIB@
@@ -203,3 +205,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
 endif
+
+
+# compile flags for C compiler
+CFLAGS = @CFLAGS@
