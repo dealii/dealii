@@ -21,7 +21,7 @@
 #include <grid/geometry_info.h>
 #include <grid/magic_numbers.h>
 #include <lac/vector.h>
-#include <iostream>
+
 #include <algorithm>
 #include <numeric>
 #include <map>
@@ -891,14 +891,11 @@ struct QuadComparator
 
 
 template <>
-void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
-					     const std::vector<CellData<3> > &c,
-					     const SubCellData               &subcelldata)
+void
+Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
+                                        const std::vector<CellData<3> > &c,
+                                        const SubCellData               &subcelldata)
 {
-//TODO:[?]Add tests in Triangulation<3>::create_triangulation for faces (quads)
-//    which are entered twice: once and once again in a rotated or
-//    mirrored direction.
-  
   const unsigned int dim=3;
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -988,24 +985,11 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  std::make_pair (cells[cell].vertices[3], cells[cell].vertices[7])
 	  };
 
-				       // in the 2d code, some tests
-				       // were performed which may
-				       // heal a problem with quads
-				       // that are rotated such that
-				       // the lines don't fit snuggly
-				       // any more. I don't know how
-				       // to do this in 3d also, so I
-				       // leve it for future student
-				       // generations.
-				       //
-				       // however, check that the line
-				       // does not exist in the other
-				       // direction
       for (unsigned int line=0; line<12; ++line)
 	{
 					   // assert that the line was
 					   // not already inserted in
-					   // reverse order.
+					   // reverse order
 	  if (! (needed_lines.find(std::make_pair(line_vertices[line].second,
 						  line_vertices[line].first))
 		 ==
@@ -1048,7 +1032,7 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // now for some sanity-checks:
 				   //
 				   // check that every vertex has at
-				   // least two adjacent lines
+				   // least tree adjacent lines
   if (true) 
     {
       std::vector<unsigned short int> vertex_touch_count (v.size(), 0);
@@ -1135,7 +1119,7 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // the faces are quads which
 				       // consist of four numbers
 				       // denoting the index of the
-				       // four lines bounding th
+				       // four lines bounding the
 				       // quad. we can get this index
 				       // by asking @p{needed_lines}
 				       // for an iterator to this
@@ -1150,7 +1134,7 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // course)
 				       //
 				       // to make things easier, we
-				       // don't creare the lines
+				       // don't create the lines
 				       // (pairs of their vertex
 				       // indices) in place, but
 				       // before they are really
@@ -1207,21 +1191,51 @@ void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		    needed_lines[line_list[11]]->index(),
 		    needed_lines[line_list[3]]->index())    };
 
-				       // in the 2d code, some tests
-				       // were performed which may
-				       // heal a problem with hexes
-				       // that are rotated such that
-				       // the quads don't fit snuggly
-				       // any more. I don't know how
-				       // to do this in here, so I
-				       // leve it for future student
-				       // generations.
       for (unsigned int quad=0; quad<6; ++quad)
-					 // insert quad, with invalid
-					 // iterator if quad already
-					 // exists, then nothing bad
-					 // happens here
-	needed_quads[faces[quad]] = end_quad();
+        {
+                                           // insert quad, with
+                                           // invalid iterator if quad
+                                           // already exists, then
+                                           // nothing bad happens
+                                           // here, as this will then
+                                           // simply become an
+                                           // interior face of the
+                                           // triangulation. however,
+                                           // we will run into major
+                                           // trouble if the face was
+                                           // already inserted in the
+                                           // opposite
+                                           // direction. there are
+                                           // really only two
+                                           // orientations for a face
+                                           // to be in, since the edge
+                                           // directions are already
+                                           // set. thus, vertex 0 is
+                                           // the one from which two
+                                           // edges originate, and
+                                           // vertex 2 is the one to
+                                           // which they converge. we
+                                           // are then left with
+                                           // orientations 0-1-2-3 and
+                                           // 0-3-2-1 for the order of
+                                           // vertices. the
+                                           // corresponding quad can
+                                           // be easily constructed by
+                                           // exchanging lines. we do
+                                           // so here, just to check
+                                           // that that flipped quad
+                                           // isn't already in the
+                                           // triangulation
+          const Quad test_quad (faces[quad].line(3),
+                                faces[quad].line(2),
+                                faces[quad].line(1),
+                                faces[quad].line(0));
+          AssertThrow (needed_quads.find (test_quad) ==
+                       needed_quads.end(),
+                       ExcInternalError());
+          
+          needed_quads[faces[quad]] = end_quad();
+        }
     };
 
 
