@@ -460,6 +460,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: There are now functions <code
+       class="member">ConstraintMatrix::distribute_local_to_global</code> that
+       take a local matrix or vector and distribute it to a global one, but
+       taking care of constrained degrees of freedom; in that case, the
+       respective entries are already distributed to the final place in the
+       global matrix or vector. That way, the final call to the <code
+       class="member">ConstraintMatrix::condense</code> function can be
+       avoided.
+       <br>
+       (WB 2004/03/15)
+       </p>
+
   <li> <p> New: The new functions <code
        class="member">SparsityPattern::partition</code>, <code
        class="member">GridTools::partition_triangulation</code>, <code
