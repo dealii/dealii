@@ -62,11 +62,11 @@ $(LIBDIR)/liblac.g.a: $(go-files)
 
 $(LIBDIR)/liblac.so: $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
-	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
+	@$(CXX) $(LDFLAGS) -shared -o $@ $(o-files)
 
 $(LIBDIR)/liblac.g.so: $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
-	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
+	@$(CXX) $(LDFLAGS) -shared -o $@ $(go-files)
 
 
 

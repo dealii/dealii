@@ -89,11 +89,11 @@ $(LIBDIR)/libbase.g.a: $(go-files)
 
 $(LIBDIR)/libbase.so: $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@$(CC) $(LDFLAGS) -shared -o $@ $(o-files)
+	@$(CXX) $(LDFLAGS) -shared -o $@ $(o-files)
 
 $(LIBDIR)/libbase.g.so: $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(CC) $(LDFLAGS) -shared -o $@ $(go-files)
+	@$(CXX) $(LDFLAGS) -shared -o $@ $(go-files)
 
 
 
