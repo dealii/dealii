@@ -311,7 +311,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        New: There are now functions <code
        class="member">CellAccessor::neighbor_child_on_subface</code> and <code
        class="member">DoFCellAccessor::neighbor_child_on_subface</code>
->>>>>>> 1.41
        that should be called instead of using <code
        class="member">GeometryInfo::child_cell_on_face</code> in most cases.
        <br> 
@@ -319,7 +318,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p>
->>>>>>> 1.36
        New: <code class="class">GridGenerator</code> has a new
        function <code class="member">subdivided_hyper_rectangle</code> 
        which generates a rectangle with given corner points and possibly 
@@ -328,6 +326,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        with square cells.
        <br> 
        (Joerg Weimar 2003/09/09)
+       </p>
+
+  <li> <p>
+       Improved: The 3d grid reordering code in the <code
+       class="class">GridReordering</code> class now uses an algorithm
+       that is linear in the number of elements. The old code was
+       exponential, so this is a vast improvement.
+       <br> 
+       (Michael Anderson 2003/09/23)
        </p>
 
   <li> <p>
