@@ -22,9 +22,10 @@ default: run-tests
 
 ############################################################
 
-mg1.exe                       : mg1.g.$(OBJEXT)     $(lib-2d)           $(libraries)
+transfer.exe      : transfer.g.$(OBJEXT) $(lib-2d)           $(libraries)
+mg1.exe           : mg1.g.$(OBJEXT)      $(lib-2d)           $(libraries)
 
-tests = mg1
+tests = transfer
 
 ############################################################
 
