@@ -960,6 +960,11 @@ class TimeStepBase_Tria :  public TimeStepBase
     struct RefinementFlags;
     struct RefinementData;
 
+				     /**
+				      * Extension of the enum in the base
+				      * cass denoting the next action to be
+				      * done.
+				      */
     enum {
 	  grid_refinement = 0x1000
     };
@@ -1201,6 +1206,13 @@ class TimeStepBase_Tria :  public TimeStepBase
 
 
 
+/**
+ * This structure is used to tell the #TimeStepBase_Tria# class how grids should
+ * be handled. It has flags defining the moments where grids shall be
+ * re-made and when they may be deleted. Also, one variable states whether
+ * grids should be kept in memory or should be deleted between to uses to
+ * save memory.
+ */
 template <int dim>
 struct TimeStepBase_Tria<dim>::Flags
 {
@@ -1274,19 +1286,134 @@ struct TimeStepBase_Tria<dim>::Flags
 
 
 
+
 /**
- * Terminology:
- * Correction: change the number of cells on this grid according to a criterion
- *     that the number of cells may be only a certain fraction more or less
- *     then the number of cells on the previous grid.
- * Adaption: flag some cells such that there are no to grave differences.
+ * This structure is used to tell the #TimeStepBase_Tria# class how grids should
+ * be refined. Before we explain all the different variables, fist some terminology:
+ * \begin{itemize}
+ * \item Correction: after having flagged some cells of the triangulation for
+ *   following some given criterion, we may want to change the number of flagged
+ *   cells on this grid according to another criterion that the number of cells
+ *   may be only a certain fraction more or less then the number of cells on
+ *   the previous grid. This change of refinement flags will be called
+ *   "correction" in the sequel.
+ * \item Adaption: in order to make the change between one grid and the next not
+ *   to large, we may want to flag some additional cells on one of the two
+ *   grids such that there are not too grave differences. This process will
+ *   be called "adaption".
+ * \end{itemize}
+ *
+ *
+ * \subsection{Description of flags}
+ *
+ * \begin{itemize}
+ * \item #max_refinement_level#: Cut the refinement of cells at a given level.
+ *   This flag does not influence the flagging of cells, so not more cells
+ *   on the coarser levels are flagged than usual. Rather, the flags are all
+ *   set, but when it comes to the actual refinement, the maximum refinement
+ *   level is truncated.
+ *
+ *   This option is only really useful when you want to compare global
+ *   refinement with adaptive refinement when you don't want the latter
+ *   to refine more than the global refinement.
+ *
+ * \item #first_sweep_with_correction#: When using cell number correction
+ *   as defined above, it may be worth while to start with this only in
+ *   later sweeps, not already in the first one. If this variable is
+ *   zero, then start with the first sweep, else with a higher one. The
+ *   rationale for only starting later is that we do not want to block the
+ *   development of grids at the beginning and only impose restrictions in
+ *   the sweeps where we start to be interested in the actual results of
+ *   the computations.
+ *
+ * \item #min_cells_for_correction#: If we want a more free process of
+ *   grid development, we may want to impose less rules for grids with few
+ *   cells also. This variable sets a lower bound for the cell number of
+ *   grids where corrections are to be performed.
+ *
+ * \item #cell_number_corridor_top#: Fraction of the number of cells by
+ *   which the number of cells of one grid may be higher than that on the
+ *   previous grid. Common values are 10 per cent (i.e. 0.1). The naming
+ *   of the variable results from the goal to define a target corridor
+ *   for the number of cells after refinement has taken place.
+ *
+ * \item #cell_number_corridor_bottom#: Fraction of the number of cells by
+ *   which the number of cells of one grid may be lower than that on the
+ *   previous grid. Common values are 5 per cent (i.e. 0.05). Usually this
+ *   number will be smaller than #cell_number_corridor_top# since an
+ *   increase of the number of cells is not harmful (though it increases
+ *   the numerical amount of work needed to solve the problem) while a
+ *   sharp decrease may reduce the accuracy of the final result even if
+ *   the time steps computed before the decrease were computed to high
+ *   accuracy.
+ *
+ *   Note however, that if you compute the dual problem as well, then the time
+ *   direction is reversed, so the two values defining the cell number
+ *   corridor should be about equal.
+ *
+ * \item #correction_relaxations#: This is a list of pairs of number with the
+ *   following meaning: just as for #min_cells_for_correction#, it may be
+ *   worth while to reduce the requirements upon grids if the have few cells.
+ *   The present variable stores a list of cell numbers along with some values
+ *   which tell us that the cell number corridor should be enlarged by a
+ *   certain factor. For example, if this list was #((100 5) (200 3) (500 2))#,
+ *   this would mean that for grids with a cell number below 100, the
+ *   #cell_number_corridor_*# variables are to be multiplied by 5 before they
+ *   are applied, for cell numbers below 200 they are to be multiplied by 3,
+ *   and so on.
+ *
+ *   #correction_relaxations# is actually a vector of such list. Each entry
+ *   in this vector denotes the relaxation rules for one sweep. The last
+ *   entry defines the relaxation rules for all following sweeps. This
+ *   scheme is adopted to allow for stricter corrections in later sweeps
+ *   while the relaxations may be more generous in the first sweeps.
+ *
+ * \item #cell_number_correction_steps#: Usually, if you want the number of
+ *   cells to be corrected, the target corridor for the cell number is computed
+ *   and some additional cells are flagged or flags are removed. But since
+ *   the cell number resulting after flagging and deflagging can not be
+ *   easily computed, it will usually not be within the corridor. We therefore
+ *   need to iteratively get to our goal. Usually, three or four iterations are
+ *   needed, but using this variable, you can reduce the allowed number of
+ *   iterations; breaking the loop after two iterations yields good results
+ *   regularly. Setting the variable to zero will result in no correction
+ *   steps at all.
+ *
+ * \item #mirror_flags_to_previous_grid#: If a cell on the present grid is
+ *   flagged for refinement, also flag the corresponding cell on the previous
+ *   grid. This is useful if, for example, error indicators are computed for
+ *   space-time cells, but are stored for the second grid only. Now, since the
+ *   first grid has the same contributions to the indicators as the second, it
+ *   may be useful to flag both if necessary. This is done if the present
+ *   variable is set.
+ *
+ * \item #adapt_grids#: adapt the present grid to the previous one in the sense
+ *   defined above. What is actually done here is the following: if going from
+ *   the previous to the present grid would result in double refinement or
+ *   double coarsening of some cells, then we try to flag these cells for
+ *   refinement or coarsening such as to avoid the double step. Obviously, more
+ *   than double refinement of coarsening is also caught.
+ *
+ *   Grid adaption can try to avoid such changes between two grids, but it can
+ *   never promise that they don't occur. This is because the next grid may
+ *   change the present one, but then again there may be jumps in refinement
+ *   level between the present and the previous one; this could only be avoided
+ *   by looping iteratively through all grids, back and forth, until nothing
+ *   changes anymore, which is obviously impossible if there are many time steps
+ *   with very large grids.
+ * \end{itemize}
  */
 template <int dim>
 struct TimeStepBase_Tria<dim>::RefinementFlags
 {
+				     /**
+				      * Typedef of a data type describing some
+				      * relaxations of the correction process.
+				      * See the general description of this
+				      * class for more information.
+				      */
     typedef vector<vector<pair<unsigned int, double> > >   CorrectionRelaxations;
-    static CorrectionRelaxations default_correction_relaxations;
-    
+
 				     /**
 				      * Constructor. The default values are
 				      * chosen such that almost no restriction
@@ -1343,6 +1470,10 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      */
     const double        cell_number_corridor_top, cell_number_corridor_bottom;
 
+				     /**
+				      * List of relaxations to the correction
+				      * step.
+				      */
     const vector<vector<pair<unsigned int,double> > > correction_relaxations;
     
 				     /**
@@ -1381,6 +1512,9 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
 				      */
     const bool          mirror_flags_to_previous_grid;
 
+				     /**
+				      * Adapt this grid to the previous one.
+				      */
     const bool          adapt_grids;
     
 				     /**
@@ -1389,10 +1523,24 @@ struct TimeStepBase_Tria<dim>::RefinementFlags
     DeclException1 (ExcInvalidValue,
 		    int,
 		    << "The following value does not fulfil the requirements: " << arg1);
+
+  private:
+				     /**
+				      * Default values for the relaxations:
+				      * no relaxations.
+				      */
+    static CorrectionRelaxations default_correction_relaxations;    
 };
 
 
 
+
+/**
+ * Structure given to the actual refinement function, telling it which
+ * thresholds to take for coarsening and refinement. The actual refinement
+ * criteria are loaded by calling the virtual function
+ * #get_tria_refinement_criteria#.
+ */
 template <int dim>
 struct TimeStepBase_Tria<dim>::RefinementData 
 {
