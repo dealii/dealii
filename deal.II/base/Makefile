@@ -46,12 +46,12 @@ endif
 
 $(LIBDIR)/libbase.a: $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@ar ru $@ $(o-files)
+	@$(AR) ru $@ $(o-files)
 	@$(RANLIB) $@
 
 $(LIBDIR)/libbase.g.a: $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@ar ru $@ $(go-files)
+	@$(AR) ru $@ $(go-files)
 	@$(RANLIB) $@
 
 
