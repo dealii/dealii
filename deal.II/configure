@@ -3908,8 +3908,8 @@ fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 
 
-  echo "$as_me:$LINENO: checking for templates and pointers to const member functions bug" >&5
-echo $ECHO_N "checking for templates and pointers to const member functions bug... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for const member function pointers bug" >&5
+echo $ECHO_N "checking for const member function pointers bug... $ECHO_C" >&6
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
