@@ -1144,10 +1144,14 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
 	    {
 	      weight->value_list (fe_values.get_quadrature_points(),
 				  weight_values);
-//	      for (unsigned int k=0;k<n_q_points;++k)
-//		weight_vectors[k] = weight_values[k];
+	      for (unsigned int k=0;k<n_q_points;++k)
+		weight_vectors[k] = weight_values[k];
 	    }
+	} else {
+	  for (unsigned int k=0;k<n_q_points;++k)
+	    weight_vectors[k] = 1.;
 	}
+      
       
       if (update_flags & update_values)
 	{
@@ -1207,173 +1211,116 @@ VectorTools::integrate_difference (const Mapping<dim>    &mapping,
       switch (norm)
 	{
 	  case mean:
-	    if (weight != 0)
-	      {
-						 // Different weights for
-						 // each component?
-		if (weight->n_components > 1)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    {
-		      psi_scalar[q] = 0;
-						       // weighted mean value
-		      for (unsigned int i=0; i<n_components; ++i)
-			psi_scalar[q] += psi_values[q](i)
-					 * weight_vectors[q](i);
-		    }
-		else // weight->n_components == 1
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    {
-		      psi_scalar[q] = 0;
-						       // weighted mean value
-		      for (unsigned int i=0; i<n_components; ++i)
-			psi_scalar[q] += psi_values[q](i)
-					 * weight_values[q];
-		    }
-	      }
-	    else // no weight function
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+					     // Compute values in
+					     // quadrature points
+	    for (unsigned int k=0; k<n_components; ++k)
 	      for (unsigned int q=0; q<n_q_points; ++q)
-		{
-		  psi_scalar[q] = 0;
-						   // mean value
-		  for (unsigned int i=0; i<n_components; ++i)
-		    psi_scalar[q] += psi_values[q](i);
-		}
-	    
-					     // Integration on one cell
+		  psi_scalar[q] += psi_values[q](k)
+				   * weight_vectors[q](k);
+
+					     // Integrate
 	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
 				       fe_values.get_JxW_values().begin(),
 				       0.0);
 	    break;
-					     // Compute (weighted) squares
-					     // in each quadrature point
+	  case Lp_norm:
+	  case L1_norm:
+	  case W1p_norm:
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+					     // Compute values in
+					     // quadrature points
+	    for (unsigned int k=0; k<n_components; ++k)
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		  psi_scalar[q] += std::pow(psi_values[q](k)*psi_values[q](k),
+					    exponent/2.)
+				   * weight_vectors[q](k);
+	    
+					     // Integrate
+	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+				       fe_values.get_JxW_values().begin(),
+				       0.0);
+					     // Compute the root only,
+					     // if no derivative
+					     // values are added later
+	    if (!(update_flags & update_gradients))
+	      diff = std::pow(diff, 1./exponent);
+	    break;
 	  case L2_norm:
 	  case H1_norm:
-	    if (weight != 0)
-	      {
-						 // Different weights for
-						 // each component?
-		if (weight->n_components > 1)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    {
-		      psi_scalar[q] = 0;
-						       // weighted scalar product
-		      for (unsigned int i=0; i<n_components; ++i)
-			psi_scalar[q] += psi_values[q](i)*psi_values[q](i)
-					 * weight_vectors[q](i);
-		    }
-		else // weight->n_components == 1
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    psi_scalar[q] = psi_values[q].norm_sqr()
-				    * weight_values[q];
-	      }
-	    else // no weight function
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+					     // Compute values in
+					     // quadrature points
+	    for (unsigned int k=0; k<n_components; ++k)
 	      for (unsigned int q=0; q<n_q_points; ++q)
-		psi_scalar[q] = psi_values[q].norm_sqr();
-	    
-					     // Integration on one cell
+		  psi_scalar[q] += psi_values[q](k)*psi_values[q](k)
+				   * weight_vectors[q](k);
+
+					     // Integrate
 	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
 				       fe_values.get_JxW_values().begin(),
 				       0.0);
-	    if (norm == L2_norm)
-	      diff=std::sqrt(diff);
-	    break;
-	  case L1_norm:
-	    if (weight != 0)
-	      {
-						 // Different weights for
-						 // each component?
-		if (weight->n_components > 1)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    {
-		      psi_scalar[q] = 0;
-						       // weighted scalar product
-		      for (unsigned int i=0; i<n_components; ++i)
-			psi_scalar[q] += std::fabs(psi_values[q](i))
-					 * weight_vectors[q](i);
-		    }
-		else // weight->n_components == 1
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    psi_scalar[q] = psi_values[q].l1_norm()
-				    * weight_values[q];
-	      }
-	    else // no weight function
-	      for (unsigned int q=0; q<n_q_points; ++q)
-		psi_scalar[q] = psi_values[q].l1_norm();		      
-	    
-					     // Integration on one cell
-	    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-				       fe_values.get_JxW_values().begin(),
-				       0.0);
+					     // Compute the root only,
+					     // if no derivative
+					     // values are added later
 	    if (norm == L2_norm)
 	      diff=std::sqrt(diff);
 	    break;
 	  case Linfty_norm:
-	    if (weight != 0)
-	      {
-						 // Different weights for
-						 // each component?
-		if (weight->n_components > 1)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    {
-		      psi_scalar[q] = 0;
-		      for (unsigned int i=0; i<n_components; ++i)
-			{
-			  double newval = std::fabs(psi_values[q](i))
-					  * weight_vectors[q](i);
-			  if (psi_scalar[q]<newval)
-			    psi_scalar[q] = newval;
-			}
-		    }
-		else // weight->n_components == 1
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    psi_scalar[q] = psi_values[q].linfty_norm()
-				    * weight_values[q];
-	      }
-	    else // no weight function
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+	    for (unsigned int k=0; k<n_components; ++k)
 	      for (unsigned int q=0; q<n_q_points; ++q)
-		psi_scalar[q] = psi_values[q].linfty_norm();
-	    
+		{
+		  double newval = std::fabs(psi_values[q](k))
+				  * weight_vectors[q](k);
+		  if (psi_scalar[q]<newval)
+		    psi_scalar[q] = newval;
+		}
 					     // Maximum on one cell
 	    diff = *std::max_element (psi_scalar.begin(), psi_scalar.end());
 	    break;
 	  case H1_seminorm:
+	  case W1p_seminorm:
 	    break;
 	  default:
 	    Assert (false, ExcNotImplemented());
+	    break;
 	}
-      
-      if (norm == H1_seminorm || norm == H1_norm)
+
+      switch (norm)
 	{
-					   // take square of integrand
-	  std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-	  
-	  for (unsigned int k=0; k<n_components; ++k)
-	    if (weight != 0)
-	      {
-						 // Different weights for
-						 // each component?
-		if (weight->n_components > 1)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    {
-						       // weighted scalar product
-		      psi_scalar[q] += sqr_point(psi_grads[q][k])
-				       * weight_vectors[q](k);
-		    }
-		else // weight->n_components == 1
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    psi_scalar[q] = sqr_point(psi_grads[q][k])
-				    * weight_values[q];
-	      }
-	    else // no weight function
+	  case W1p_seminorm:
+	  case W1p_norm:
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+	    for (unsigned int k=0; k<n_components; ++k)
 	      for (unsigned int q=0; q<n_q_points; ++q)
-		psi_scalar[q] += sqr_point(psi_grads[q][k]);
-	  
+		psi_scalar[q] += std::pow(sqr_point(psi_grads[q][k]),
+					  exponent/2.)
+				 * weight_vectors[q](k);
+	    
+	    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+					fe_values.get_JxW_values().begin(),
+					0.0);
+	    diff = std::pow(diff, 1./exponent);
+	    break;
+	  case H1_seminorm:
+	  case H1_norm:
+					     // take square of integrand
+	    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+	    for (unsigned int k=0; k<n_components; ++k)
+	      for (unsigned int q=0; q<n_q_points; ++q)
+		psi_scalar[q] += sqr_point(psi_grads[q][k])
+				 * weight_vectors[q](k);
+
  					     // add seminorm to L_2 norm or
  					     // to zero
-	  diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-				      fe_values.get_JxW_values().begin(),
-				      0.0);
-	  diff = std::sqrt(diff);	  
+	    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+					fe_values.get_JxW_values().begin(),
+					0.0);
+	    diff = std::sqrt(diff);
+	    break;
+	  default:
+	    break;
  	}
 				       // append result of this cell
  				       // to the end of the vector
@@ -1573,7 +1520,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1582,7 +1530,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1592,7 +1541,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1601,7 +1551,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1611,7 +1562,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1620,7 +1572,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1630,7 +1583,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1639,7 +1593,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1649,7 +1604,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1658,7 +1614,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1668,7 +1625,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1677,7 +1635,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1687,7 +1646,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1696,7 +1656,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<float>                       &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -1706,7 +1667,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 template
 void VectorTools::integrate_difference<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
@@ -1715,7 +1677,8 @@ void VectorTools::integrate_difference<deal_II_dimension>
  Vector<double>                      &,
  const Quadrature<deal_II_dimension> &,
  const NormType                      &,
- const Function<deal_II_dimension>   *);
+ const Function<deal_II_dimension>   *,
+ const double);
 #if deal_II_dimension != 1
 template
 void VectorTools::project_boundary_values<deal_II_dimension>
