@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,11 +24,11 @@
  * microsecond. 
  *
  *
- * @sect3{Usage}
+ * @section TimerUsage Usage
  *
  * Use of this class is as you might expect by looking at the member
  * functions:
- * @begin{verbatim}
+ * @code
  *   Time timer;
  *   timer.start ();
  *
@@ -41,13 +41,16 @@
  *
  *   // reset timer for the next thing it shall do
  *   timer.reset();
- * @end{verbatim}
+ * @endcode
  *
  * Alternatively, you can also restart the timer instead of resetting
- * it. The times between successive calls to <tt>start/stop</tt> will then be
+ * it. The times between successive calls to start()/ stop() will then be
  * accumulated.
  *
- * Note: the implementation of this class is system dependent.
+ * @note Implementation of this class is system
+ * dependent. Unfortunately, it does not work with multithreading
+ * right now. In this case, we would like to sum up the time needed by
+ * all children. Furthermore, a wall clock option would be nice.
  *
  * @author G. Kanschat, W. Bangerth
  */
@@ -92,22 +95,22 @@ class Timer
   private:
 
 				     /**
-				      * Value of the user time when <tt>start</tt>
+				      * Value of the user time when start()
 				      * was called the last time or when the
-				      * object was created and no <tt>stop</tt> was
+				      * object was created and no stop() was
 				      * issued in between.
 				      */
     double              start_time;
 
 
 				     /**
-				      * Similar to <tt>start_time</tt>, but
+				      * Similar to #start_time, but
 				      * needed for children threads
 				      * in multithread mode. Value of
-				      * the user time when <tt>start</tt>
+				      * the user time when start()
 				      * was called the last time or
 				      * when the object was created
-				      * and no <tt>stop</tt> was issued in
+				      * and no stop() was issued in
 				      * between.
 				      *
 				      * For some reason (error in
@@ -116,7 +119,7 @@ class Timer
 				      * <tt>getrusage(RUSAGE_CHILDREN,.)</tt>
 				      * gives always 0 (at least
 				      * on Solaris7). Hence the
-				      * <tt>Timer</tt> class still does not
+				      * Timer class still does not
 				      * yet work for multithreading
 				      * mode.
 				      */
@@ -124,7 +127,7 @@ class Timer
 
 				     /**
 				      * Accumulated time for all previous
-				      * <tt>start</tt>/<tt>stop</tt> cycles. The time for
+				      * start()/stop() cycles. The time for
 				      * the present cycle is not included.
 				      */
     double              cumulative_time;

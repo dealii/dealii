@@ -70,6 +70,8 @@
  * necessary to provide a class Point@<0@> to make the compiler
  * happy. This class also does nothing.
  *
+ * @ref Instantiations: few
+ *
  * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim>
