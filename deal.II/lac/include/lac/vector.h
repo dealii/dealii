@@ -279,7 +279,6 @@ class Vector
                                       * given in the discussion about making
                                       * the constructor explicit work.
                                       *
-                                      *
                                       * Since the semantics of assigning a
                                       * scalar to a vector are not
                                       * immediately clear, this operator
@@ -916,17 +915,6 @@ Vector<Number> & Vector<Number>::operator /= (const Number factor)
   return *this;
 }
 
-
-
-
-template <typename Number>
-inline
-Vector<Number> & Vector<Number>::operator = (const Number s)
-{
-  Assert (dim!=0, ExcEmptyVector());
-  std::fill (begin(), end(), s);
-  return *this;
-}
 
 
 
