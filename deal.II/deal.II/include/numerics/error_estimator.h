@@ -622,4 +622,184 @@ class KellyErrorEstimator
 
 
 
+/**
+ * This is a specialization of the general template for 1d. The implementation
+ * is sufficiently different for 1d to justify this specialization. The basic
+ * difference between 1d and all other space dimensions is that in 1d, there
+ * are no faces of cells, just the vertices between line segments, so we have
+ * to compute the jump terms differently. However, this class offers exactly
+ * the same public functions as the general template, so that a user will not
+ * see any difference.
+ *
+ * @author Wolfgang Bangerth, 1998, 2004.
+ */
+template <>
+class KellyErrorEstimator<1>
+{
+  public:
+				     /**
+				      * Implementation of the error
+				      * estimator described above. You
+				      * may give a coefficient, but
+				      * there is a default value which
+				      * denotes the constant
+				      * coefficient with value
+				      * one. The coefficient function
+				      * may either be a scalar one, in
+				      * which case it is used for all
+				      * components of the finite
+				      * element, or a vector-valued
+				      * one with as many components as
+				      * there are in the finite
+				      * element; in the latter case,
+				      * each component is weighted by
+				      * the respective component in
+				      * the coefficient.
+				      *
+				      * You might give a list of
+				      * components you want to
+				      * evaluate, in case the finite
+				      * element used by the
+				      * @ref{DoFHandler} object is
+				      * vector-valued. You then have
+				      * to set those entries to true
+				      * in the bit-vector
+				      * @p{component_mask} for which the
+				      * respective component is to be
+				      * used in the error
+				      * estimator. The default is to
+				      * use all components, which is
+				      * done by either providing a
+				      * bit-vector with all-set
+				      * entries, or an empty
+				      * bit-vector.
+				      *
+				      * The estimator supports
+				      * multithreading and splits the
+				      * cells to
+				      * @p{multithread_info.n_default_threads}
+				      * (default) threads. The number
+				      * of threads to be used in
+				      * multithreaded mode can be set
+				      * with the last parameter of the
+				      * error estimator.
+				      * Multithreading is only
+				      * implemented in two and three
+				      * dimensions.
+				      */
+    template <typename InputVector>
+    static void estimate (const Mapping<1>      &mapping,
+			  const DoFHandler<1>   &dof,
+			  const Quadrature<0> &quadrature,
+			  const FunctionMap<1>::type &neumann_bc,
+			  const InputVector       &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<1>     *coefficients   = 0,
+			  const unsigned int       n_threads = multithread_info.n_default_threads);
+
+				     /**
+				      * Calls the @p{estimate}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<1>()}.
+				      */    
+    template <typename InputVector>
+    static void estimate (const DoFHandler<1>   &dof,
+			  const Quadrature<0> &quadrature,
+			  const FunctionMap<1>::type &neumann_bc,
+			  const InputVector       &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<1>     *coefficients   = 0,
+			  const unsigned int       n_threads = multithread_info.n_default_threads);
+    
+				     /**
+				      * Same function as above, but
+				      * accepts more than one solution
+				      * vectors and returns one error
+				      * vector for each solution
+				      * vector. For the reason of
+				      * existence of this function,
+				      * see the general documentation
+				      * of this class.
+				      *
+				      * Since we do not want to force
+				      * the user of this function to
+				      * copy around their solution
+				      * vectors, the vector of
+				      * solution vectors takes
+				      * pointers to the solutions,
+				      * rather than being a vector of
+				      * vectors. This makes it simpler
+				      * to have the solution vectors
+				      * somewhere in memory, rather
+				      * than to have them collected
+				      * somewhere special. (Note that
+				      * it is not possible to
+				      * construct of vector of
+				      * references, so we had to use a
+				      * vector of pointers.)
+				      */
+    template <typename InputVector>
+    static void estimate (const Mapping<1>          &mapping,
+			  const DoFHandler<1>       &dof,
+			  const Quadrature<0>     &quadrature,
+			  const FunctionMap<1>::type &neumann_bc,
+			  const std::vector<const InputVector *> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<1>         *coefficients   = 0,
+			  const unsigned int           n_threads = multithread_info.n_default_threads);
+
+				     /**
+				      * Calls the @p{estimate}
+				      * function, see above, with
+				      * @p{mapping=MappingQ1<1>()}.
+				      */
+    template <typename InputVector>
+    static void estimate (const DoFHandler<1>       &dof,
+			  const Quadrature<0>     &quadrature,
+			  const FunctionMap<1>::type &neumann_bc,
+			  const std::vector<const InputVector *> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<1>         *coefficients   = 0,
+			  const unsigned int           n_threads = multithread_info.n_default_threads);
+
+    
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryIndicator);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidComponentMask);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidCoefficient);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidBoundaryFunction);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcIncompatibleNumberOfElements,
+		    int, int,
+		    << "The number of elements " << arg1 << " and " << arg2
+		    << " of the vectors do not match!");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcInvalidSolutionVector);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoSolutions);
+};
+
+
+
 #endif
