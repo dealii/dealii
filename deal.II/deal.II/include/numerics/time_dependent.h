@@ -624,11 +624,40 @@ class TimeDependent
     virtual void start_sweep (const unsigned int sweep_no);
 
 				     /**
-				      * Analogon to the above function,
-				      * calling #end_sweep# of each time
-				      * step object.
+				      * Analogon to the above
+				      * function, calling #end_sweep#
+				      * of each time step object. The
+				      * same applies with respect to
+				      * the #virtual#ness of this
+				      * function as for the previous
+				      * one.
+				      *
+				      * This function does not
+				      * guarantee that #end_sweep# is
+				      * called for successive time
+				      * steps, rather the order of
+				      * time steps for which the
+				      * function is called is
+				      * arbitrary. You should
+				      * therefore not assume that that
+				      * function has been called for
+				      * previous time steps
+				      * already. If in multithread
+				      * mode, the #end_sweep# function
+				      * of several time steps is
+				      * called at once, so you should
+				      * use synchronization
+				      * mechanisms, if your program
+				      * requires so.
+				      *
+				      * The parameter denotes the
+				      * number of threads that shall
+				      * be spawned in parallel. It
+				      * defaults to only one thread,
+				      * and the value is ignored if
+				      * not in multithread mode.
 				      */
-    virtual void end_sweep ();
+    virtual void end_sweep (const unsigned int n_threads = 1);
 
 				     /**
 				      * Exception.
@@ -676,7 +705,16 @@ class TimeDependent
 				      * for more information.
 				      */
     const TimeSteppingData timestepping_data_postprocess;  
-    
+
+  private:
+
+				     /**
+				      * Do the work of #end_sweep()#
+				      * for some timesteps only. This
+				      * is useful in multithread mode.
+				      */
+    void * end_sweep (const unsigned int begin_timestep,
+		      const unsigned int end_timestep);
 };
 
 

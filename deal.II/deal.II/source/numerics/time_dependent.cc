@@ -7,6 +7,11 @@
 #include <grid/tria_iterator.h>
 #include <lac/vector.h>
 
+#ifdef DEAL_II_USE_MT
+#  include <base/thread_manager.h>
+#  define NTHREADS 4
+#endif
+
 #include <functional>
 #include <algorithm>
 #include <numeric>
@@ -198,10 +203,48 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 
 
-void TimeDependent::end_sweep ()
+void TimeDependent::end_sweep (const unsigned int
+#ifdef DEAL_II_USE_MT
+			       n_threads
+#endif
+)
 {
-  for (unsigned int step=0; step<timesteps.size(); ++step)
+#ifdef DEAL_II_USE_MT
+				   // set up the data needed by each
+				   // thread
+  typedef ThreadManager::Mem_Fun_Data2<TimeDependent,unsigned int,unsigned int> MemFunData;
+  vector<MemFunData> mem_fun_data (n_threads,
+				   MemFunData(this, 0, 0, &end_sweep));
+  const unsigned int stride = timesteps.size() / n_threads;
+  for (unsigned int i=0; i<n_threads; ++i)
+    {
+      mem_fun_data[i].arg1 = i*stride;
+      mem_fun_data[i].arg2 = (i+1)*stride;
+    };
+  mem_fun_data.back().arg2 = timesteps.size();
+
+				   // spawn the threads...
+  ThreadManager thread_manager;
+  for (unsigned int i=0; i<n_threads; ++i)
+    thread_manager.spawn (&mem_fun_data[i],
+			  THR_SCOPE_SYSTEM | THR_DETACHED);
+
+				   // ...and wait for their return
+  thread_manager.wait();
+  
+#else
+  end_sweep (0, timesteps.size());
+#endif
+}
+
+
+
+void * TimeDependent::end_sweep (const unsigned int begin,
+				 const unsigned int end)
+{     
+  for (unsigned int step=begin; step<end; ++step)
     timesteps[step]->end_sweep ();
+  return 0;
 };
   
 
