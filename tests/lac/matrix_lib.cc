@@ -40,14 +40,23 @@ void check_sparse_product(const SparseMatrix<number>& m1, SparseMatrix<number>& 
   GrowingVectorMemory<Vector<double> > mem;
   
   ProductSparseMatrix<number, number> product(m1, m2, mem);
+  
   product.vmult(w,v);
-
   for (unsigned int i=0;i<w.size();++i)
     deallog << ' ' << w(i);
   deallog << std::endl;
-
-  product.Tvmult(v,w);
   
+  product.vmult_add(w,v);
+  for (unsigned int i=0;i<w.size();++i)
+    deallog << ' ' << w(i);
+  deallog << std::endl;
+  
+  product.Tvmult(v,w);
+  for (unsigned int i=0;i<v.size();++i)
+    deallog << ' ' << v(i);
+  deallog << std::endl;
+  
+  product.Tvmult_add(v,w);
   for (unsigned int i=0;i<v.size();++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
