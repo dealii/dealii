@@ -1,88 +1,88 @@
 
 DEAL::LagrangeEquidistant polynoms:
 DEAL::Polynomial p of order 1
-DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(1.00000)   ok
-DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(1.00000)   ok
+DEAL:: p_0(0.00)   ok
+DEAL:: p_0(1.00)   ok
+DEAL:: p_1(0.00)   ok
+DEAL:: p_1(1.00)   ok
 DEAL::Polynomial p of order 2
-DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(0.500000)   ok
-DEAL:: p_0(1.00000)   ok
-DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(0.500000)   ok
-DEAL:: p_1(1.00000)   ok
-DEAL:: p_2(0.00000)   ok
-DEAL:: p_2(0.500000)   ok
-DEAL:: p_2(1.00000)   ok
+DEAL:: p_0(0.00)   ok
+DEAL:: p_0(0.50)   ok
+DEAL:: p_0(1.00)   ok
+DEAL:: p_1(0.00)   ok
+DEAL:: p_1(0.50)   ok
+DEAL:: p_1(1.00)   ok
+DEAL:: p_2(0.00)   ok
+DEAL:: p_2(0.50)   ok
+DEAL:: p_2(1.00)   ok
 DEAL::Polynomial p of order 3
-DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(0.333333)   ok
-DEAL:: p_0(0.666667)   ok
-DEAL:: p_0(1.00000)   ok
-DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(0.333333)   ok
-DEAL:: p_1(0.666667)   ok
-DEAL:: p_1(1.00000)   ok
-DEAL:: p_2(0.00000)   ok
-DEAL:: p_2(0.333333)   ok
-DEAL:: p_2(0.666667)   ok
-DEAL:: p_2(1.00000)   ok
-DEAL:: p_3(0.00000)   ok
-DEAL:: p_3(0.333333)   ok
-DEAL:: p_3(0.666667)   ok
-DEAL:: p_3(1.00000)   ok
+DEAL:: p_0(0.00)   ok
+DEAL:: p_0(0.33)   ok
+DEAL:: p_0(0.66)   ok
+DEAL:: p_0(1.00)   ok
+DEAL:: p_1(0.00)   ok
+DEAL:: p_1(0.33)   ok
+DEAL:: p_1(0.66)   ok
+DEAL:: p_1(1.00)   ok
+DEAL:: p_2(0.00)   ok
+DEAL:: p_2(0.33)   ok
+DEAL:: p_2(0.66)   ok
+DEAL:: p_2(1.00)   ok
+DEAL:: p_3(0.00)   ok
+DEAL:: p_3(0.33)   ok
+DEAL:: p_3(0.66)   ok
+DEAL:: p_3(1.00)   ok
 DEAL::Polynomial p of order 4
-DEAL:: p_0(0.00000)   ok
-DEAL:: p_0(0.250000)   ok
-DEAL:: p_0(0.500000)   ok
-DEAL:: p_0(0.750000)   ok
-DEAL:: p_0(1.00000)   ok
-DEAL:: p_1(0.00000)   ok
-DEAL:: p_1(0.250000)   ok
-DEAL:: p_1(0.500000)   ok
-DEAL:: p_1(0.750000)   ok
-DEAL:: p_1(1.00000)   ok
-DEAL:: p_2(0.00000)   ok
-DEAL:: p_2(0.250000)   ok
-DEAL:: p_2(0.500000)   ok
-DEAL:: p_2(0.750000)   ok
-DEAL:: p_2(1.00000)   ok
-DEAL:: p_3(0.00000)   ok
-DEAL:: p_3(0.250000)   ok
-DEAL:: p_3(0.500000)   ok
-DEAL:: p_3(0.750000)   ok
-DEAL:: p_3(1.00000)   ok
-DEAL:: p_4(0.00000)   ok
-DEAL:: p_4(0.250000)   ok
-DEAL:: p_4(0.500000)   ok
-DEAL:: p_4(0.750000)   ok
-DEAL:: p_4(1.00000)   ok
-
+DEAL:: p_0(0.00)   ok
+DEAL:: p_0(0.25)   ok
+DEAL:: p_0(0.50)   ok
+DEAL:: p_0(0.75)   ok
+DEAL:: p_0(1.00)   ok
+DEAL:: p_1(0.00)   ok
+DEAL:: p_1(0.25)   ok
+DEAL:: p_1(0.50)   ok
+DEAL:: p_1(0.75)   ok
+DEAL:: p_1(1.00)   ok
+DEAL:: p_2(0.00)   ok
+DEAL:: p_2(0.25)   ok
+DEAL:: p_2(0.50)   ok
+DEAL:: p_2(0.75)   ok
+DEAL:: p_2(1.00)   ok
+DEAL:: p_3(0.00)   ok
+DEAL:: p_3(0.25)   ok
+DEAL:: p_3(0.50)   ok
+DEAL:: p_3(0.75)   ok
+DEAL:: p_3(1.00)   ok
+DEAL:: p_4(0.00)   ok
+DEAL:: p_4(0.25)   ok
+DEAL:: p_4(0.50)   ok
+DEAL:: p_4(0.75)   ok
+DEAL:: p_4(1.00)   ok
+DEAL::
 DEAL::Test derivatives computed by the Horner scheme:
-DEAL::x=0.00000,    all derivatives: ok
-DEAL::x=0.100000,    all derivatives: ok
-DEAL::x=0.200000,    all derivatives: ok
-DEAL::x=0.300000,    all derivatives: ok
-DEAL::x=0.400000,    all derivatives: ok
-DEAL::x=0.500000,    all derivatives: ok
-DEAL::x=0.600000,    all derivatives: ok
-DEAL::x=0.700000,    all derivatives: ok
-DEAL::x=0.800000,    all derivatives: ok
-DEAL::x=0.900000,    all derivatives: ok
-DEAL::x=1.00000,    all derivatives: ok
-
+DEAL::x=0.00,    all derivatives: ok
+DEAL::x=0.10,    all derivatives: ok
+DEAL::x=0.20,    all derivatives: ok
+DEAL::x=0.30,    all derivatives: ok
+DEAL::x=0.40,    all derivatives: ok
+DEAL::x=0.50,    all derivatives: ok
+DEAL::x=0.60,    all derivatives: ok
+DEAL::x=0.70,    all derivatives: ok
+DEAL::x=0.80,    all derivatives: ok
+DEAL::x=0.90,    all derivatives: ok
+DEAL::x=1.00,    all derivatives: ok
+DEAL::
 DEAL::Test of TensorProductPolynomials:
 DEAL::2D Example:
-DEAL::v_1=-0.0222483
-DEAL::v_exact=-0.0222483
-DEAL::grad_v_1=0.0409194 0.457688
-DEAL::grad_exact=0.0409194 0.457688
-DEAL::grad_grads_1[0][0]=0.380885
-DEAL::grad2_exact[0][0]=0.380885
-DEAL::grad_grads_1[0][1]=-0.841786
-DEAL::grad2_exact[0][1]=-0.841786
-DEAL::grad_grads_1[1][0]=-0.841786
-DEAL::grad2_exact[1][0]=-0.841786
-DEAL::grad_grads_1[1][1]=1.22543
-DEAL::grad2_exact[1][1]=1.22543
+DEAL::v_1=-0.02
+DEAL::v_exact=-0.02
+DEAL::grad_v_1=0.04 0.45
+DEAL::grad_exact=0.04 0.45
+DEAL::grad_grads_1[0][0]=0.38
+DEAL::grad2_exact[0][0]=0.38
+DEAL::grad_grads_1[0][1]=-0.84
+DEAL::grad2_exact[0][1]=-0.84
+DEAL::grad_grads_1[1][0]=-0.84
+DEAL::grad2_exact[1][0]=-0.84
+DEAL::grad_grads_1[1][1]=1.22
+DEAL::grad2_exact[1][1]=1.22
