@@ -188,7 +188,7 @@ template <typename number> class Vector;
  *
  * @author Wolfgang Bangerth 2001
  */
-template <class Matrix, class Vector=::Vector<typename Matrix::value_type> >
+template <class MATRIX, class VECTOR=Vector<typename MATRIX::value_type> >
 class FilteredMatrix : public Subscriptor
 {
   public:
@@ -197,7 +197,7 @@ class FilteredMatrix : public Subscriptor
 				      * analogy to the STL container
 				      * classes.
 				      */
-    typedef typename Matrix::value_type value_type;
+    typedef typename MATRIX::value_type value_type;
 
 				     /**
 				      * Typedef defining a type that
@@ -228,7 +228,7 @@ class FilteredMatrix : public Subscriptor
 				      * Constructor. Use the given
 				      * matrix for future operations.
 				      */
-    FilteredMatrix (const Matrix &matrix);
+    FilteredMatrix (const MATRIX &matrix);
 
 				     /**
 				      * Copy operator. Take over
@@ -245,14 +245,14 @@ class FilteredMatrix : public Subscriptor
 				      * function if constraits were
 				      * previously added.
 				      */
-    void set_referenced_matrix (const Matrix &m);
+    void set_referenced_matrix (const MATRIX &m);
     
 				     /**
 				      * Return a reference to the
 				      * matrix that is used by this
 				      * object.
 				      */
-    const Matrix & get_referenced_matrix () const;
+    const MATRIX & get_referenced_matrix () const;
 
 				     /**
 				      * Add a list of constraints to
@@ -308,7 +308,7 @@ class FilteredMatrix : public Subscriptor
 				      * parameter to @p{true} to use a
 				      * faster algorithm.
 				      */
-    void apply_constraints (Vector     &v,
+    void apply_constraints (VECTOR     &v,
 			    const bool  matrix_is_symmetric) const;
 
 				     /**
@@ -334,8 +334,8 @@ class FilteredMatrix : public Subscriptor
 				      * matrix is the filtered one to
 				      * which we store a reference.)
 				      */
-    void vmult (Vector       &dst,
-		const Vector &src) const;
+    void vmult (VECTOR       &dst,
+		const VECTOR &src) const;
     
 				     /**
 				      * Matrix-vector multiplication:
@@ -354,8 +354,8 @@ class FilteredMatrix : public Subscriptor
 				      * function only works for square
 				      * matrices.
 				      */
-    void Tvmult (Vector       &dst,
-		 const Vector &src) const;
+    void Tvmult (VECTOR       &dst,
+		 const VECTOR &src) const;
   
 				     /**
 				      * Return the square of the norm
@@ -390,7 +390,7 @@ class FilteredMatrix : public Subscriptor
 				      * have eliminated Dirichlet
 				      * boundary values.
 				      */
-    value_type matrix_norm_square (const Vector &v) const;
+    value_type matrix_norm_square (const VECTOR &v) const;
 
 				     /**
 				      * Compute the residual of an
@@ -415,9 +415,9 @@ class FilteredMatrix : public Subscriptor
 				      * do not contribute to the
 				      * residual at all.
 				      */
-    value_type residual (Vector       &dst,
-			 const Vector &x,
-			 const Vector &b) const;
+    value_type residual (VECTOR       &dst,
+			 const VECTOR &x,
+			 const VECTOR &b) const;
     
 				     /**
 				      * Apply the Jacobi
@@ -429,8 +429,8 @@ class FilteredMatrix : public Subscriptor
 				      * multiplies the result with the
 				      * damping factor @p{omega}.
 				      */
-    void precondition_Jacobi (Vector           &dst,
-			      const Vector     &src,
+    void precondition_Jacobi (VECTOR           &dst,
+			      const VECTOR     &src,
 			      const value_type  omega = 1.) const;
 
 				     /**
@@ -480,7 +480,7 @@ class FilteredMatrix : public Subscriptor
 				      * it using the @p{SmartPointer}
 				      * class.
 				      */
-    SmartPointer<const Matrix> matrix;
+    SmartPointer<const MATRIX> matrix;
 
 				     /**
 				      * Sorted list of pairs denoting
@@ -504,7 +504,7 @@ class FilteredMatrix : public Subscriptor
 				      * have to synchronise access to
 				      * this vector.
 				      */
-    mutable Vector tmp_vector;
+    mutable VECTOR tmp_vector;
 
 				     /**
 				      * Mutex used to synchronise use
@@ -518,7 +518,7 @@ class FilteredMatrix : public Subscriptor
 				      * that belong to constrained
 				      * degrees of freedom.
 				      */
-    void pre_filter (Vector &v) const;
+    void pre_filter (VECTOR &v) const;
 
 				     /**
 				      * Do the postfiltering step,
@@ -529,8 +529,8 @@ class FilteredMatrix : public Subscriptor
 				      * diagonal for these degrees of
 				      * freedom.
 				      */
-    void post_filter (const Vector &in,
-		      Vector       &out) const;
+    void post_filter (const VECTOR &in,
+		      VECTOR       &out) const;
 
 				     /**
 				      * Based on the size of the
@@ -557,7 +557,7 @@ class FilteredMatrix : public Subscriptor
 				      * algorithm.
 				      *
 				      * This function needs to be
-				      * specialised for the different
+				      * specialized for the different
 				      * matrix types.
 				      */
     void get_column_entries (const unsigned int           index,
@@ -569,10 +569,10 @@ class FilteredMatrix : public Subscriptor
 /*---------------------- Inline functions -----------------------------------*/
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 inline
 bool
-FilteredMatrix<Matrix,Vector>::PairComparison::
+FilteredMatrix<MATRIX,VECTOR>::PairComparison::
 operator () (const IndexValuePair &i1,
 	     const IndexValuePair &i2) const
 {
@@ -581,10 +581,10 @@ operator () (const IndexValuePair &i1,
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 template <class ConstraintList>
 void
-FilteredMatrix<Matrix,Vector>::
+FilteredMatrix<MATRIX,VECTOR>::
 add_constraints (const ConstraintList &new_constraints)
 {
 				   // add new constraints to end
@@ -603,28 +603,28 @@ add_constraints (const ConstraintList &new_constraints)
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 inline
-const Matrix &
-FilteredMatrix<Matrix,Vector>::get_referenced_matrix () const
+const MATRIX &
+FilteredMatrix<MATRIX,VECTOR>::get_referenced_matrix () const
 {
   return *matrix;
 }
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 inline
-unsigned int FilteredMatrix<Matrix,Vector>::m () const
+unsigned int FilteredMatrix<MATRIX,VECTOR>::m () const
 {
   return matrix->m();
 }
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 inline
-unsigned int FilteredMatrix<Matrix,Vector>::n () const
+unsigned int FilteredMatrix<MATRIX,VECTOR>::n () const
 {
   return matrix->n();
 }

@@ -1,4 +1,4 @@
-//----------------------------  filtered_matrix.templates.h  ---------------------------
+//----------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  filtered_matrix.templates.h  ---------------------------
+//----------------------------------------------------------------------------
 #ifndef __deal2__filtered_matrix_templates_h
 #define __deal2__filtered_matrix_templates_h
 
@@ -23,15 +23,15 @@
 #include <lac/block_vector.h>
 
 
-template <class Matrix, class Vector>
-FilteredMatrix<Matrix,Vector>::
+template <class MATRIX, class VECTOR>
+FilteredMatrix<MATRIX,VECTOR>::
 FilteredMatrix () 
 {}
 
 
 
-template <class Matrix, class Vector>
-FilteredMatrix<Matrix,Vector>::
+template <class MATRIX, class VECTOR>
+FilteredMatrix<MATRIX,VECTOR>::
 FilteredMatrix (const FilteredMatrix &fm)
 		:
 		Subscriptor (),
@@ -42,18 +42,18 @@ FilteredMatrix (const FilteredMatrix &fm)
 
 
 
-template <class Matrix, class Vector>
-FilteredMatrix<Matrix,Vector>::
-FilteredMatrix (const Matrix &m)
+template <class MATRIX, class VECTOR>
+FilteredMatrix<MATRIX,VECTOR>::
+FilteredMatrix (const MATRIX &m)
 {
   set_referenced_matrix (m);
 }
 
 
 
-template <class Matrix, class Vector>
-FilteredMatrix<Matrix,Vector> &
-FilteredMatrix<Matrix,Vector>::operator = (const FilteredMatrix &fm)
+template <class MATRIX, class VECTOR>
+FilteredMatrix<MATRIX,VECTOR> &
+FilteredMatrix<MATRIX,VECTOR>::operator = (const FilteredMatrix &fm)
 {
   set_referenced_matrix (*fm.matrix);
   constraints = fm.constraints;
@@ -62,10 +62,10 @@ FilteredMatrix<Matrix,Vector>::operator = (const FilteredMatrix &fm)
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::
-set_referenced_matrix (const Matrix &m)
+FilteredMatrix<MATRIX,VECTOR>::
+set_referenced_matrix (const MATRIX &m)
 {
   matrix = &m;
   allocate_tmp_vector ();
@@ -73,9 +73,9 @@ set_referenced_matrix (const Matrix &m)
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::clear_constraints () 
+FilteredMatrix<MATRIX,VECTOR>::clear_constraints () 
 {
 				   // swap vectors to release memory
   std::vector<IndexValuePair> empty;
@@ -84,10 +84,10 @@ FilteredMatrix<Matrix,Vector>::clear_constraints ()
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::
-apply_constraints (Vector     &v,
+FilteredMatrix<MATRIX,VECTOR>::
+apply_constraints (VECTOR     &v,
 		   const bool  matrix_is_symmetric) const
 {
 				   // array that will hold the pairs
@@ -141,9 +141,9 @@ apply_constraints (Vector     &v,
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::pre_filter (Vector &v) const
+FilteredMatrix<MATRIX,VECTOR>::pre_filter (VECTOR &v) const
 {
 				   // iterate over all constraints and
 				   // zero out value
@@ -155,10 +155,10 @@ FilteredMatrix<Matrix,Vector>::pre_filter (Vector &v) const
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::post_filter (const Vector &in,
-					    Vector       &out) const
+FilteredMatrix<MATRIX,VECTOR>::post_filter (const VECTOR &in,
+					    VECTOR       &out) const
 {
 				   // iterate over all constraints and
 				   // set value correctly
@@ -170,10 +170,10 @@ FilteredMatrix<Matrix,Vector>::post_filter (const Vector &in,
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::vmult (Vector       &dst,
-				      const Vector &src) const
+FilteredMatrix<MATRIX,VECTOR>::vmult (VECTOR       &dst,
+				      const VECTOR &src) const
 {
   tmp_mutex.acquire ();
 				   // first copy over src vector and
@@ -190,11 +190,11 @@ FilteredMatrix<Matrix,Vector>::vmult (Vector       &dst,
 
 
 
-template <class Matrix, class Vector>
-typename FilteredMatrix<Matrix,Vector>::value_type
-FilteredMatrix<Matrix,Vector>::residual (Vector       &dst,
-					 const Vector &x,
-					 const Vector &b) const
+template <class MATRIX, class VECTOR>
+typename FilteredMatrix<MATRIX,VECTOR>::value_type
+FilteredMatrix<MATRIX,VECTOR>::residual (VECTOR       &dst,
+					 const VECTOR &x,
+					 const VECTOR &b) const
 {
   tmp_mutex.acquire ();
 				   // first copy over x vector and
@@ -225,10 +225,10 @@ FilteredMatrix<Matrix,Vector>::residual (Vector       &dst,
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::Tvmult (Vector       &dst,
-				       const Vector &src) const
+FilteredMatrix<MATRIX,VECTOR>::Tvmult (VECTOR       &dst,
+				       const VECTOR &src) const
 {
   tmp_mutex.acquire ();
 				   // first copy over src vector and
@@ -245,9 +245,9 @@ FilteredMatrix<Matrix,Vector>::Tvmult (Vector       &dst,
 
   
 
-template <class Matrix, class Vector>
-typename FilteredMatrix<Matrix,Vector>::value_type
-FilteredMatrix<Matrix,Vector>::matrix_norm_square (const Vector &v) const
+template <class MATRIX, class VECTOR>
+typename FilteredMatrix<MATRIX,VECTOR>::value_type
+FilteredMatrix<MATRIX,VECTOR>::matrix_norm_square (const VECTOR &v) const
 {
   tmp_mutex.acquire ();
   tmp_vector = v;
@@ -267,11 +267,11 @@ FilteredMatrix<Matrix,Vector>::matrix_norm_square (const Vector &v) const
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 void
-FilteredMatrix<Matrix,Vector>::
-precondition_Jacobi (Vector           &dst,
-		     const Vector     &src,
+FilteredMatrix<MATRIX,VECTOR>::
+precondition_Jacobi (VECTOR           &dst,
+		     const VECTOR     &src,
 		     const value_type  omega) const
 {
 				   // first precondition as usual,
@@ -292,9 +292,9 @@ precondition_Jacobi (Vector           &dst,
 
 
 
-template <class Matrix, class Vector>
+template <class MATRIX, class VECTOR>
 unsigned int
-FilteredMatrix<Matrix,Vector>::memory_consumption () const
+FilteredMatrix<MATRIX,VECTOR>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (matrix) +
 	  MemoryConsumption::memory_consumption (constraints) +
