@@ -151,36 +151,43 @@ int main(int, char)
     pols.push_back(LagrangeEquidistant(p, i));
   
   TensorProductPolynomials<2> tp_pol(pols);
-  vector<double> vs(n_tensor_pols);
-  vector<Tensor<1,2> > grads(n_tensor_pols);
-  vector<Tensor<2,2> > grad_grads(n_tensor_pols);
 
   double v_exact;
   Tensor<1,2> grad_exact;
   Tensor<2,2> grad_grad_exact;
   
-  double xi=0.35;
-  double eta=0.62;
-  Point<2> point(xi,eta);
-  tp_pol.compute(point, vs, grads, grad_grads);
-
+  Point<2> point(0.35,0.62);
 				   // 4th shape function of Q3<2> is
 				   // equivalent to its 1st shape
 				   // function in lexicographical
 				   // order.
   Q3_4th_shape_function_values_and_grads_dim2(point, v_exact, grad_exact, grad_grad_exact);
-
+  
   unsigned int i=1;
-  deallog << "v_" << i << "=" << vs[i] << std::endl;
+  double v=tp_pol.compute_value(i, point);
+  Tensor<1,2> grad=tp_pol.compute_grad(i, point);
+  Tensor<2,2> grad_grad=tp_pol.compute_grad_grad(i, point);
+
+  vector<double> vs(n_tensor_pols);
+  vector<Tensor<1,2> > grads(n_tensor_pols);
+  vector<Tensor<2,2> > grad_grads(n_tensor_pols);
+  tp_pol.compute(point, vs, grads, grad_grads);
+
+
+  deallog << "v=" << v << std::endl;
+  deallog << "vs[" << i << "]=" << vs[i] << std::endl;
   deallog << "v_exact=" << v_exact << std::endl;
-  deallog << "grad_v_" << i << "=" << grads[i] << std::endl;
+  deallog << "grad=" << grad << std::endl;
+  deallog << "grads[" << i << "]=" << grads[i] << std::endl;
   deallog << "grad_exact=" << grad_exact << std::endl;
   for (unsigned int j=0; j<grad_grads[i].dimension; ++j)
     for (unsigned int k=0; k<grad_grads[i].dimension; ++k)
       {
-	deallog << "grad_grads_" << i<< "[" << j << "][" << k << "]="
+	deallog << "grad_grad[" << j << "][" << k << "]="
+		<< grad_grad[j][k] << std::endl;
+	deallog << "grad_grads[" << i<< "][" << j << "][" << k << "]="
 		<< grad_grads[i][j][k] << std::endl;
-	deallog << "grad2_exact[" << j << "][" << k << "]="
+	deallog << "grad_grad_exact[" << j << "][" << k << "]="
 		<< grad_grad_exact[j][k] << std::endl;
       }
 }

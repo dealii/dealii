@@ -77,15 +77,21 @@ DEAL::ok
 DEAL::
 DEAL::Test of TensorProductPolynomials:
 DEAL::2D Example:
-DEAL::v_1=-0.02
+DEAL::v=-0.02
+DEAL::vs[1]=-0.02
 DEAL::v_exact=-0.02
-DEAL::grad_v_1=0.04 0.45
+DEAL::grad=0.04 0.45
+DEAL::grads[1]=0.04 0.45
 DEAL::grad_exact=0.04 0.45
-DEAL::grad_grads_1[0][0]=0.38
-DEAL::grad2_exact[0][0]=0.38
-DEAL::grad_grads_1[0][1]=-0.84
-DEAL::grad2_exact[0][1]=-0.84
-DEAL::grad_grads_1[1][0]=-0.84
-DEAL::grad2_exact[1][0]=-0.84
-DEAL::grad_grads_1[1][1]=1.22
-DEAL::grad2_exact[1][1]=1.22
+DEAL::grad_grad[0][0]=0.38
+DEAL::grad_grads[1][0][0]=0.38
+DEAL::grad_grad_exact[0][0]=0.38
+DEAL::grad_grad[0][1]=-0.84
+DEAL::grad_grads[1][0][1]=-0.84
+DEAL::grad_grad_exact[0][1]=-0.84
+DEAL::grad_grad[1][0]=-0.84
+DEAL::grad_grads[1][1][0]=-0.84
+DEAL::grad_grad_exact[1][0]=-0.84
+DEAL::grad_grad[1][1]=1.22
+DEAL::grad_grads[1][1][1]=1.22
+DEAL::grad_grad_exact[1][1]=1.22
