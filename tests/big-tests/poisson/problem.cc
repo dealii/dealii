@@ -340,7 +340,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
     {
       case 1:
 	    boundary = new StraightBoundary<dim>();
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    make_zoom_in_grid ();
 	    break;
       case 2:
@@ -350,7 +350,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	    static const Point<dim> origin;
 	    boundary = new HyperBallBoundary<dim>(origin, 1.);
 	    GridGenerator::hyper_ball (*tria, origin, 1.);
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    break;
       };
       case 3:
@@ -358,22 +358,22 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
       {
 	    boundary = new CurvedLine<dim>();
 	    GridGenerator::hyper_cube (*tria);
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    break;
       };
       case 4:
 	    boundary = new StraightBoundary<dim>();
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    make_random_grid ();
 	    break;
       case 5:
 	    boundary = new StraightBoundary<dim>();
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    GridGenerator::hyper_cube (*tria);
 	    break;
       case 6:
 	    boundary = new StraightBoundary<dim>();
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    GridGenerator::hyper_cube (*tria);
 	    tria->refine_global (1);
 	    for (unsigned int i=0; i<5; ++i)
@@ -385,7 +385,7 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	    break;
       case 7:
 	    boundary = new StraightBoundary<dim>();
-	    tria->set_boundary (boundary);
+	    tria->set_boundary (0, *boundary);
 	    GridGenerator::hyper_L (*tria);
 	    break;
       default:
