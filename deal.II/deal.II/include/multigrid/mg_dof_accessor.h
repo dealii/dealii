@@ -19,6 +19,13 @@
 
 template <int dim> class MGDoFHandler;
 
+template <int celldim, int dim> class MGDoFObjectAccessor;
+template <int dim>              class MGDoFObjectAccessor<0, dim>;
+template <int dim>              class MGDoFObjectAccessor<1, dim>;
+template <int dim>              class MGDoFObjectAccessor<2, dim>;
+template <int dim>              class MGDoFObjectAccessor<3, dim>;
+
+
 /**
  * Define the basis for accessors to the degrees of freedom for
  * a multigrid DoF handler object.

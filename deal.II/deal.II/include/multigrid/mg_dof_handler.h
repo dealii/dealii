@@ -22,6 +22,10 @@
 
 template <int dim> class MGDoFCellAccessor;
 template <int celldim, int dim> class MGDoFObjectAccessor;
+template <int dim>              class MGDoFObjectAccessor<0, dim>;
+template <int dim>              class MGDoFObjectAccessor<1, dim>;
+template <int dim>              class MGDoFObjectAccessor<2, dim>;
+template <int dim>              class MGDoFObjectAccessor<3, dim>;
 
 /**
  * Define some types which differ between the dimensions. This class
