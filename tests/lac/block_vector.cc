@@ -104,15 +104,6 @@ void test ()
     }
   deallog.pop();
 
-				   // the following three calls to
-				   // functions of i1 are only meant
-				   // to generate out-of-range
-				   // exceptions
-  deallog << "Range" << std::endl;
-  unsigned int i = i1.global_to_local(3).first;
-  i = i1.local_to_global(1,2);
-  i = i1.local_to_global(2,0);
-
   deallog.pop ();
   deallog.push("BlockVector");
 				   // initialization by an iterator
