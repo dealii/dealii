@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -168,6 +168,23 @@ class PreconditionRelaxation : public Subscriptor
 {
   public:
 				     /**
+				      * Class for parameters.
+				      */
+    class AdditionalData
+    {
+      public:
+					 /**
+					  * Constructor.
+					  */
+	AdditionalData (const double relaxation = 1.);
+
+					 /**
+					  * Relaxation parameter.
+					  */
+	double relaxation;	
+    };
+    
+				     /**
 				      * Initialize matrix and
 				      * relaxation parameter. The
 				      * matrix is just stored in the
@@ -177,7 +194,8 @@ class PreconditionRelaxation : public Subscriptor
 				      * than 2 for numerical
 				      * reasons. It defaults to 1.
 				      */
-    void initialize (const MATRIX& A, const double omega = 1.);
+    void initialize (const MATRIX& A,
+		     AdditionalData parameters = AdditionalData());
     
   protected:
 				     /**
@@ -188,7 +206,7 @@ class PreconditionRelaxation : public Subscriptor
 				     /**
 				      * Relaxation parameter.
 				      */
-    double omega;
+    double relaxation;
 };
 
 
@@ -531,10 +549,10 @@ PreconditionIdentity::Tvmult_add (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 inline void
 PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
-					    const double  o)
+					    AdditionalData parameters)
 {
   A = &rA;
-  omega = o;
+  relaxation = parameters.relaxation;
 }
 
 //----------------------------------------------------------------------//
@@ -545,7 +563,7 @@ inline void
 PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_Jacobi (dst, src, this->omega);
+  this->A->precondition_Jacobi (dst, src, this->relaxation);
 }
 
 
@@ -556,7 +574,7 @@ inline void
 PreconditionJacobi<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_Jacobi (dst, src, this->omega);
+  this->A->precondition_Jacobi (dst, src, this->relaxation);
 }
 
 
@@ -568,7 +586,7 @@ inline void
 PreconditionSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_SOR (dst, src, this->omega);
+  this->A->precondition_SOR (dst, src, this->relaxation);
 }
 
 
@@ -579,7 +597,7 @@ inline void
 PreconditionSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_TSOR (dst, src, this->omega);
+  this->A->precondition_TSOR (dst, src, this->relaxation);
 }
 
 
@@ -591,7 +609,7 @@ inline void
 PreconditionSSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_SSOR (dst, src, this->omega);
+  this->A->precondition_SSOR (dst, src, this->relaxation);
 }
 
 
@@ -602,7 +620,7 @@ inline void
 PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
-  this->A->precondition_SSOR (dst, src, this->omega);
+  this->A->precondition_SSOR (dst, src, this->relaxation);
 }
 
 
@@ -625,6 +643,18 @@ PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR& dst,
 {
   (matrix.*precondition)(dst, src);
 }
+
+//----------------------------------------------------------------------//
+
+template<class MATRIX>
+inline
+PreconditionRelaxation<MATRIX>::AdditionalData::
+AdditionalData (const double relaxation)
+		:
+		relaxation (relaxation)
+{}
+
+
 
 //////////////////////////////////////////////////////////////////////
 

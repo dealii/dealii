@@ -86,6 +86,33 @@ class PreconditionBlock : public virtual Subscriptor
     
   public:
 				     /**
+				      * Parameters for block preconditioners.
+				      */
+    class AdditionalData
+    {
+      public:
+					 /**
+					  * Constructor. Block size
+					  * must be given since there
+					  * is no reasonable default
+					  * parameter.
+					  */
+	AdditionalData (const unsigned int block_size,
+			const double relaxation = 1.);
+
+					 /**
+					  * Relaxation parameter.
+					  */
+	double relaxation;
+	
+					 /**
+					  * Block size.
+					  */
+	unsigned int block_size;
+    };
+    
+    
+				     /**
 				      * Constructor.
 				      */
     PreconditionBlock();
@@ -108,9 +135,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * parameter for derived classes
 				      * may be provided.
 				      */
-    void initialize (const MATRIX& A,
-		     const unsigned int block_size,
-		     const double relaxation = 1.);
+    void initialize (const MATRIX& A, AdditionalData parameters);
 
 				     /**
 				      * Deletes the inverse diagonal
@@ -555,6 +580,17 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 };
 
 //----------------------------------------------------------------------//
+
+template<class MATRIX, typename inverse_type>
+inline
+PreconditionBlock<MATRIX, inverse_type>::AdditionalData::
+AdditionalData (const unsigned int block_size,
+		const double relaxation)
+		:
+		relaxation (relaxation),
+		block_size(block_size)
+{}
+
 
 template<class MATRIX, typename inverse_type>
 inline bool

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,17 +57,19 @@ void PreconditionBlock<MATRIX,inverse_type>::clear ()
 
 
 template <class MATRIX, typename inverse_type>
-void PreconditionBlock<MATRIX,inverse_type>::initialize (const MATRIX &M,
-							 const unsigned int bsize,
-							 const double relax)
+void PreconditionBlock<MATRIX,inverse_type>::initialize (
+  const MATRIX &M,
+  AdditionalData parameters)
 {
+  const unsigned int bsize = parameters.block_size;
+  
   clear();
   Assert (M.m() == M.n(), ExcMatrixNotSquare());
   A = &M;
   Assert (bsize>0, ExcIndexRange(bsize, 1, M.m()));
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
   blocksize=bsize;
-  relaxation = relax;
+  relaxation = parameters.relaxation;
 }
 
 
