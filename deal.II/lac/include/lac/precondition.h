@@ -7,6 +7,10 @@
 
 /**
  * No preconditioning.
+ * This class halps you, if you want to use a linear solver without
+ * preconditioning. Since this is a strange idea, the documentation
+ * here stays quite short.
+ *
  * @author Guido Kanschat, 1999
  */
 template<class VECTOR>
@@ -74,7 +78,11 @@ class PreconditionUseMatrix
 
 /**
  * Preconditioner for builtin relaxation methods.
- * Uses methods of #SparseMatrix#.
+ * Application of this preconditioner involves
+ * use of the #precondition_...# methods of #SparseMatrix#.
+ *
+ * Construction of objects of this class is quite strange, so read the
+ * documentation of the constructor for an example.
  * @author Guido Kanschat, 1999
  */
 template<class MATRIX, class VECTOR>
@@ -95,8 +103,16 @@ class PreconditionRelaxation
 				      * for later use and selects a
 				      * preconditioning method, which
 				      * must be a member function of
-				      * that matrix.
-				      */
+				      * that matrix. An example of a
+				      * typical usage is this:
+	* \begin{verbatim}
+	* SparseMatrix<float> A;
+	* Vector<double> u;
+	* PreconditioningRelaxation<SparseMatrix<float>,Vector<double> >
+	*    precondition_ssor(A, &SparseMatrix<float>::template
+	*       precondition_SSOR<double>, 1.2);
+	* \end{verbatim}
+	*/
     PreconditionRelaxation(const MATRIX & M, function_ptr method,
 			   double omega = 1.);
     
