@@ -4347,15 +4347,9 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
   if test "x$1" != "xyes" ; then
-    AC_CHECK_LIB($1, daxpy_,
-        BLAS_LIB="-l$1",
-      AC_MSG_RESULT(not found),
-      $F77LIBS)
+    AC_CHECK_LIB($1, daxpy_,BLAS_LIB="-l$1",,$F77LIBS)
   else
-    AC_CHECK_LIB(blas, daxpy_,
-        BLAS_LIB="-lblas",
-      AC_MSG_RESULT(not found),
-      $F77LIBS)
+    AC_CHECK_LIB(blas, daxpy_,BLAS_LIB="-lblas",,$F77LIBS)
   fi
   AC_DEFINE(HAVE_BLAS)
   AC_SUBST(NEEDS_F77LIBS, "yes")
