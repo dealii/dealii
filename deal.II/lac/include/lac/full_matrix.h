@@ -52,7 +52,7 @@ template<typename number> class Vector;
  *
  * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
  *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2001
+ * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
 template<typename number>
 class FullMatrix : public Table<2,number>
@@ -396,6 +396,32 @@ class FullMatrix : public Table<2,number>
     void add (const number               s,
 	      const FullMatrix<number2> &B);
 
+				     /**
+				      * Add rectangular block.
+				      *
+				      * A rectangular block of the
+				      * matrix <tt>src</tt> is added to
+				      * <tt>this</tt>. The upper left
+				      * corner of the block being
+				      * copied is
+				      * <tt>(src_offset_i,src_offset_j)</tt>.
+				      * The upper left corner of the
+				      * copied block is
+				      * <tt>(dst_offset_i,dst_offset_j)</tt>.
+				      * The size of the rectangular
+				      * block being copied is the
+				      * maximum size possible,
+				      * determined either by the size
+				      * of <tt>this</tt> or <tt>src</tt>.
+				      */
+    template<typename number2>
+    void add (const FullMatrix<number2> &src,
+	      const double factor,
+	      const unsigned int dst_offset_i = 0,
+	      const unsigned int dst_offset_j = 0,
+	      const unsigned int src_offset_i = 0,
+	      const unsigned int src_offset_j = 0);
+    
 				     /**
 				      * Weighted addition of the
 				      * transpose of <tt>B</tt> to <tt>this</tt>.

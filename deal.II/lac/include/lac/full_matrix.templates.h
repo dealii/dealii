@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -864,6 +864,30 @@ FullMatrix<number>::add (const number               s,
       val[i] += s * srcval[i];
   }
 }
+
+template <typename number>
+template <typename number2>
+void FullMatrix<number>::add (const FullMatrix<number2> &src,
+			      const double factor,
+			      const unsigned int dst_offset_i,
+			      const unsigned int dst_offset_j,
+			      const unsigned int src_offset_i,
+			      const unsigned int src_offset_j)
+{
+				   // Compute maximal size of copied block
+  const unsigned int rows = (m() - dst_offset_i >= src.m() - src_offset_i)
+			    ? src.m()
+			    : m();
+  const unsigned int cols = (n() - dst_offset_j >= src.n() - src_offset_j)
+			    ? src.n()
+			    : n();
+  
+  for (unsigned int i=0; i<rows ; ++i)
+    for (unsigned int j=0; j<cols ; ++j)
+      this->el(dst_offset_i+i,dst_offset_j+j)
+	+= factor * src.el(src_offset_i+i,src_offset_j+j);
+}
+
 
 
 template <typename number>
