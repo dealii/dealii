@@ -188,13 +188,20 @@
  * standard library to do its work.
  *
  *
+ * @sect2{Other renumberings}
+ *
+ * Apart from the ones discussed above, there are a number of other
+ * renumbering schemes implemented in this class. Refer to the detailed
+ * function listings for each of the functions of this class.
+ * 
+ *
  * @sect2{Multigrid DoF numbering}
  *
  * Most algorithms also work on multigrid degree of freedom numberings. Refer
  * to the actual function declarations to get more information on this.
  *
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004
  */
 class DoFRenumbering 
 {
