@@ -233,7 +233,8 @@ void DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_data_vect
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_input_data_references ()
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+clear_input_data_references ()
 {
   for (unsigned int i=0; i<dof_data.size(); ++i)
     {
@@ -252,6 +253,46 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_input_data_ref
       dofs->unsubscribe ();
       dofs = 0;
     };
+}
+
+
+
+template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+void
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+merge_patches (const DataOut_DoFData &source)
+{
+  const std::vector<Patch> source_patches = source.get_patches ();
+  Assert (patches.size () != 0,        ExcNoPatches ());
+  Assert (source_patches.size () != 0, ExcNoPatches ());
+                                   // check equality of component
+                                   // names
+  Assert (get_dataset_names() == source.get_dataset_names(),
+          ExcIncompatibleDatasetNames());
+                                   // make sure patches are compatible
+  Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
+          ExcIncompatiblePatchLists());
+  Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
+          ExcIncompatiblePatchLists());
+  Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
+          ExcIncompatiblePatchLists());
+
+                                   // merge patches. store old number
+                                   // of elements, since we need to
+                                   // adjust patch numbers, etc
+                                   // afterwards
+  const unsigned int old_n_patches = patches.size();
+  patches.insert (patches.end(),
+                  source_patches.begin(),
+                  source_patches.end());
+                                   // adjust patch numbers
+  for (unsigned int i=old_n_patches; i<patches.size(); ++i)
+    patches[i].patch_index += old_n_patches;
+                                   // adjust patch neighbors
+  for (unsigned int i=old_n_patches; i<patches.size(); ++i)
+    for (unsigned int n=0; n<GeometryInfo<patch_dim>::faces_per_cell; ++n)
+      if (patches[i].neighbors[n] != Patch::no_neighbor)
+        patches[i].neighbors[n] += old_n_patches;
 }
 
 

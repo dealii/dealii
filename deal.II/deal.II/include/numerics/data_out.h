@@ -272,7 +272,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * class to see which characters
 				      * are valid and which are not.
 				      */
-  template <class VECTOR>
+    template <class VECTOR>
     void add_data_vector (const VECTOR                   &data,
 			  const std::vector<std::string> &names,
 			  const DataVectorType            type = type_automatic);
@@ -301,7 +301,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * underscore and the number of
 				      * each component to @p{name}
 				      */
-  template <class VECTOR>
+    template <class VECTOR>
     void add_data_vector (const VECTOR         &data,
 			  const std::string    &name,
 			  const DataVectorType  type = type_automatic);
@@ -342,6 +342,47 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      */
     void clear_input_data_references ();
 
+                                     /**
+                                      * This function can be used to
+                                      * merge the patches that were
+                                      * created using the
+                                      * @p{build_patches} function of
+                                      * the object given as argument
+                                      * into the list of patches
+                                      * created by this object. This
+                                      * is sometimes handy if one has,
+                                      * for example, a domain
+                                      * decomposition algorithm where
+                                      * each block is represented by a
+                                      * @ref{DoFHandler} of its own,
+                                      * but one wants to output the
+                                      * solution on all the blocks at
+                                      * the same time.
+                                      *
+                                      * For this to work, the given
+                                      * argument and this object need
+                                      * to have the same number of
+                                      * output vectors, and they need
+                                      * to use the same number of
+                                      * subdivisions per patch. The
+                                      * output will probably look
+                                      * rather funny if patches in
+                                      * both objects overlap in space.
+                                      *
+                                      * If you call
+                                      * @ref{build_patches} for this
+                                      * object after merging in
+                                      * patches, the previous state is
+                                      * overwritten, and the merged-in
+                                      * patches are lost.
+                                      *
+                                      * This function will fail if
+                                      * either this or the other
+                                      * object did not yet set up any
+                                      * patches.
+                                      */
+    void merge_patches (const DataOut_DoFData &source);
+    
 				     /**
 				      * Release the pointers to the
 				      * data vectors and the DoF
@@ -400,7 +441,19 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 		    << "You have to give one name per component in your "
 		    << "data vector. The number you gave was " << arg1
 		    << ", but the number of components is " << arg2);
-
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcNoPatches);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcIncompatibleDatasetNames);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcIncompatiblePatchLists);
+    
   protected:
     				     /**
 				      * Declare an entry in the list of
