@@ -42,6 +42,16 @@ inconvenience this causes.
 
 
 <ol>
+  <li> <p>Changed: <code class="class">BlockMatrixArray</code>
+  received a second template argument <tt>number</tt>, equal to the
+  same argument of the used <code
+  class="class">BlockVector</code>. Furthermore, its constructor
+  requires an additional argument of type <code
+  class="class">VectorMemory&lt;Vector&lt;number&gt; &gt;</code>
+  providing space for auxiliary vectors.
+  <br> (GK 2005/03/14)
+  </p>
+
   <li> <p>Changed: The <code class="class">GeometryInfo</code>::<code
   class="member">vertices_adjacent_to_line</code> function has been
   renamed to <code class="class">GeometryInfo</code>::<code
