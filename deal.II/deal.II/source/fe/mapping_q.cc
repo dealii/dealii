@@ -294,9 +294,17 @@ MappingQ<dim>::fill_fe_face_values (const typename DoFHandler<dim>::cell_iterato
 				   // check whether this cell needs
 				   // the full mapping or can be
 				   // treated by a reduced Q1 mapping,
-				   // e.g. if the cell is in the
-				   // interior of the domain
-//TODO: (comment needed) shouldn't we ask whether the face is at the boundary, rather than the cell?
+				   // e.g. if the cell is entirely in
+				   // the interior of the domain. note
+				   // that it is not sufficient to ask
+				   // whether the present _face_ is in
+				   // the interior, as the mapping on
+				   // the face depends on the mapping
+				   // of the cell, which in turn
+				   // depends on the fact whether
+				   // _any_ of the faces of this cell
+				   // is at the boundary, not only the
+				   // present face
   data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
 					|| cell->has_boundary_lines());
 
@@ -341,9 +349,17 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 				   // check whether this cell needs
 				   // the full mapping or can be
 				   // treated by a reduced Q1 mapping,
-				   // e.g. if the cell is in the
-				   // interior of the domain
-//TODO: (comment needed) shouldn't we ask whether the face is at the boundary, rather than the cell?  
+				   // e.g. if the cell is entirely in
+				   // the interior of the domain. note
+				   // that it is not sufficient to ask
+				   // whether the present _face_ is in
+				   // the interior, as the mapping on
+				   // the face depends on the mapping
+				   // of the cell, which in turn
+				   // depends on the fact whether
+				   // _any_ of the faces of this cell
+				   // is at the boundary, not only the
+				   // present face
   data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
 					|| cell->has_boundary_lines());
 
