@@ -29,10 +29,12 @@ SparseILU<number>::SparseILU ()
 {};
 
 
+
 template <typename number>
 SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
 		SparseMatrix<number> (sparsity)
 {};
+
 
 
 template <typename number>
@@ -42,11 +44,13 @@ void SparseILU<number>::reinit ()
 };
 
 
+
 template <typename number>
 void SparseILU<number>::reinit (const SparsityPattern &sparsity)
 {
   SparseMatrix<number>::reinit (sparsity);
 };
+
 
 
 template <typename number>
@@ -61,7 +65,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
 
 
-// first thing: copy over all elements
+				   // first thing: copy over all elements
 				   // of #matrix# to the present object
 				   //
 				   // note that some elements in this
@@ -112,7 +116,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
       };
 
 
-// now work only on this
+				   // now work only on this
 				   // matrix
   const SparsityPattern             &sparsity = get_sparsity_pattern();
   const unsigned int * const rowstart_indices = sparsity.get_rowstart_indices();
@@ -134,7 +138,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 */
 
 
-// i := row
+				   // i := row
   for (unsigned int row=1; row<m(); ++row)
     {
 				       // invert diagonal element of the
@@ -264,6 +268,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
       };
 */      
 };
+
 
 
 template <typename number>
