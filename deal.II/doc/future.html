@@ -18,6 +18,38 @@
     like to implement in future versions. Among these are the following
     topics:
     <ul>
+    <li> <p> <strong>Finite elements and mappings:</strong> Currently
+         (Dez 00-Feb 01) we (Ralf Hartmann and Guido Kanschat) totally
+         reimplement all finite elements and the mapping between the
+         unit cell and the real cells. As result the Lagrange finite
+         elements will be easily extendable to higher degree. E.g. for
+         discontinous FEs we've already hardcoded Q1-Q10. Furthermore
+         in future we won't be restricted to Q1 mapping as before, but
+         we will have Qp mappings of arbitrary degree p. This allows
+         to approximate curved boundaries not only by straight lines
+         (linear approximation) but also by quadratic, cubic, etc
+         approximation. The finite elements will be able to be
+         combined with arbitrary mappings. So in future we can use
+         subparametric, iso- as well as superparametric elements. Last
+         but not least the new implementation will allow the use of
+         non-conforming elements whose shape functions depend on the
+         shape of the real cell (See item 'Non-conforming elements').
+    	 </p>
+
+    	 <p>
+	 The new implementation uses a totally new structure of
+	 communication between FEValues, the FiniteElements and the
+	 Mappings. Despite of this the new structure will almost not be
+	 'visible' to the user of <acronym>deal.II</acronym> as we try
+	 to retain the interface to the user (mainly that of FEValues)
+	 as far as possible.
+    	 </p>
+
+    	 <p>
+	 This new functionality will be included in the next major
+	 version of <acronym>deal.II</acronym>.
+	 </p>
+
     <li> <p>
          <strong>Multigrid:</strong> We are working on an
          implementation of multigrid methods for
