@@ -118,7 +118,21 @@ mesh_3d_12.exe          : mesh_3d_12.g.$(OBJEXT)           $(libraries)
 mesh_3d_13.exe          : mesh_3d_13.g.$(OBJEXT)           $(libraries)
 mesh_3d_14.exe          : mesh_3d_14.g.$(OBJEXT)           $(libraries)
 mesh_3d_15.exe          : mesh_3d_15.g.$(OBJEXT)           $(libraries)
+mesh_3d_16.exe          : mesh_3d_16.g.$(OBJEXT)           $(libraries)
+normals_1.exe           : normals_1.g.$(OBJEXT)            $(libraries)
+normals_2.exe           : normals_2.g.$(OBJEXT)            $(libraries)
+normals_3.exe           : normals_3.g.$(OBJEXT)            $(libraries)
+normals_4.exe           : normals_4.g.$(OBJEXT)            $(libraries)
+mapping_cartesian_1.exe : mapping_cartesian_1.g.$(OBJEXT)  $(libraries)
 q_points.exe            : q_points.g.$(OBJEXT)             $(libraries)
+q_point_sum_1.exe       : q_point_sum_1.g.$(OBJEXT)        $(libraries)
+q_point_sum_2.exe       : q_point_sum_2.g.$(OBJEXT)        $(libraries)
+q_point_sum_3.exe       : q_point_sum_3.g.$(OBJEXT)        $(libraries)
+q_point_sum_4.exe       : q_point_sum_4.g.$(OBJEXT)        $(libraries)
+volume_1.exe            : volume_1.g.$(OBJEXT)             $(libraries)
+volume_2.exe            : volume_2.g.$(OBJEXT)             $(libraries)
+volume_3.exe            : volume_3.g.$(OBJEXT)             $(libraries)
+volume_4.exe            : volume_4.g.$(OBJEXT)             $(libraries)
 
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
@@ -151,6 +165,11 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	mesh_3d_1 mesh_3d_2 mesh_3d_3 mesh_3d_4 mesh_3d_5 \
 	mesh_3d_6 mesh_3d_7 mesh_3d_8 mesh_3d_9 mesh_3d_10 \
 	mesh_3d_11 mesh_3d_12 mesh_3d_13 mesh_3d_14 mesh_3d_15 \
+	mesh_3d_16 \
+	normals_1 normals_2 normals_3 normals_4 \
+	q_point_sum_1 q_point_sum_2 q_point_sum_3 q_point_sum_4 \
+	volume_1 volume_2 volume_3 volume_4 \
+	mapping_cartesian_1 \
 	q_points
 
 ############################################################
