@@ -1,4 +1,4 @@
-//----------------------------  constraints.cc  ---------------------------
+//----------------------------  grid_in.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  constraints.cc  ---------------------------
+//----------------------------  grid_in.cc  ---------------------------
 
 
 #include <dofs/dof_handler.h>
