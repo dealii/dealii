@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,9 @@
 //----------------------------  mg_dof_handler.cc  ---------------------------
 
 
-/* Author: Ralf Hartmann, 2005 */
+/* Author: Ralf Hartmann, 2005; the MGDoFHandler class had troubles
+   when the triangulation had unused vertices before, make sure that
+   this is now fixed. */
 
 #include <base/logstream.h>
 #include <grid/tria.h>
