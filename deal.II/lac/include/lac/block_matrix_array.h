@@ -16,7 +16,20 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
+#include <base/vector2d.h>
+
 #include <vector>
+#include <map>
+#include <string>
+
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#  define STRINGSTREAM std::ostringstream
+#else
+#  include <strstream>
+#  define STRINGSTREAM std::ostrstream
+#endif
+
 
 template <typename> class BlockVector;
 
@@ -106,7 +119,13 @@ class BlockMatrixArray : public Subscriptor
     template <class VECTOR>
     void Tvmult_add (BlockVector<VECTOR>& dst,
 		     const BlockVector<VECTOR>& src) const;
-  
+
+				     /**
+				      * Print the block structure as a
+				      * LaTeX-array.
+				      */
+    void print_latex (ostream& out) const;
+    
   private:
 				     /**
 				      * Internal data structure.
@@ -349,5 +368,50 @@ BlockMatrixArray<MATRIX>::n_block_cols () const
 
 
 
+template <class MATRIX>
+inline
+void
+BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
+{
+  out << "\\begin{array}{"
+      << string(n_block_cols(), 'c')
+      << "}" << endl;
+
+  vector2d<string> array(n_block_rows(), n_block_cols());
+  typedef map<const MATRIX*, string> NameMap;
+  NameMap matrix_names;
+  
+  typename vector<Entry>::const_iterator m = entries.begin();
+  typename vector<Entry>::const_iterator end = entries.end();
+
+  unsigned int matrix_number = 0;
+  for (; m != end ; ++m)
+    {
+      if (matrix_names.find(m->matrix) == matrix_names.end())
+	{
+	  pair<NameMap::iterator, bool> x =
+	    matrix_names.insert(
+	      pair<const MATRIX*, string> (m->matrix, string("M")));
+	  STRINGSTREAM stream;
+	  stream << matrix_number++;
+	  x.first->second += stream.str();
+	}
+
+      STRINGSTREAM stream;
+      if (m->prefix != 1.)
+	stream << " " << m->prefix << 'x';
+      stream << matrix_names.find(m->matrix)->second;
+      if (m->transpose)
+	stream << "^T";
+      array(m->row, m->col) += stream.str();
+    }
+  for (unsigned int i=0;i<n_block_rows();++i)
+    for (unsigned int j=0;j<n_block_cols();++j)
+      cout << array(i,j) << '\t'
+	   << ((j==n_block_cols()-1)
+	       ? "\\\\\n"
+	       : "&\t");
+  cout << "\\end{array}" << endl;
+}
 
 #endif
