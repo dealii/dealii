@@ -273,8 +273,7 @@ namespace BlockVectorIterators
 					* converting a constant to a
 					* non-constant iterator.
 					*/
-      template <bool constness2>
-      Iterator (const Iterator<number,constness2> &c);
+      Iterator (const InverseConstnessIterator &c);
 
     private:
 				       /**
@@ -1260,10 +1259,9 @@ namespace BlockVectorIterators
 
 
   template <typename number, bool constness>
-  template <bool constness2>
   inline
   Iterator<number,constness>::
-  Iterator (const Iterator<number,constness2> &c)
+  Iterator (const InverseConstnessIterator &c)
 		  :
 		  parent (c.parent),
 		  global_index (c.global_index),
@@ -1272,8 +1270,12 @@ namespace BlockVectorIterators
 		  next_break_forward (c.next_break_forward),
 		  next_break_backward (c.next_break_backward)
   {
-    Assert (! ((constness==false) && (constness2==true)),
-	    ExcCastingAwayConstness());
+				     // if constness==false, then the
+				     // constness of the iterator we
+				     // got is true and we are trying
+				     // to cast away the
+				     // constness. disallow this
+    Assert (constness==false, ExcCastingAwayConstness());
   };
   
 
