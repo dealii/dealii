@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,13 +28,13 @@ std::string output_file_name = "dof_tools_18d.output";
                                    // something)
 void
 make_masks (const unsigned int n,
-            FullMatrix<double> &m1,
-            FullMatrix<double> &m2)
+            Table<2, DoFTools::Coupling> &m1,
+            Table<2, DoFTools::Coupling> &m2)
 {
   m1.reinit (n,n);
   m2.reinit (n,n);
   for (unsigned int i=0; i<n; ++i)
-    m1(i,0) = m1(0,i) = m2(i,0) = m2(0,i) = m1(i,i) = m2(i,i) = 1.;
+    m1(i,0) = m1(0,i) = m2(i,0) = m2(0,i) = m1(i,i) = m2(i,i) = DoFTools::nonzero;
 }
 
   
@@ -57,7 +57,8 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().is_primitive() != true)
     return;
   
-  FullMatrix<double> mask_int, mask_ext;
+  Table<2, DoFTools::Coupling> mask_int;
+  Table<2, DoFTools::Coupling> mask_ext;
   make_masks (dof_handler.get_fe().n_components(),
               mask_int, mask_ext);
   

@@ -1,4 +1,4 @@
-//----------------------------  mg_dof_tools.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,11 +9,12 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mg_dof_tools.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__mg_dof_tools_h
 #define __deal2__mg_dof_tools_h
 
 #include <base/config.h>
+#include <dofs/dof_tools.h>
 #include <multigrid/mg_dof_handler.h>
 
 #include <vector>
@@ -36,9 +37,9 @@ template <class number> class FullMatrix;
  * for more information.
  *
  * All member functions are static, so there is no need to create an
- * object of class @p MGTools.
+ * object of class MGTools.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999-2003
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999 - 2005
  */
 class MGTools
 {
@@ -113,8 +114,27 @@ class MGTools
     make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 				SparsityPattern       &sparsity,
 				const unsigned int level,
-				const FullMatrix<double> &int_mask,
-				const FullMatrix<double> &flux_mask);
+				const Table<2,DoFTools::Coupling> &int_mask,
+				const Table<2,DoFTools::Coupling> &flux_mask);
+
+				     /**
+				      * Create sparsity pattern for
+				      * the fluxes at refinement
+				      * edges. The matrix maps a
+				      * function of the fine level
+				      * space @p level to the coarser
+				      * space. This is the version
+				      * restricting the pattern to the
+				      * elements actually needed.
+				      *
+				      * make_flux_sparsity_pattern()
+				      */
+    template <int dim, class SparsityPattern>
+    static void
+    make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof_handler,
+				     SparsityPattern         &sparsity,
+				     const unsigned int       level,
+				     const Table<2,DoFTools::Coupling> &flux_mask);
 
 				     /**
 				      * Count the dofs component-wise

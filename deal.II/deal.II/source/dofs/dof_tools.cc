@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <base/multithread_info.h>
 #include <base/thread_management.h>
 #include <base/quadrature_lib.h>
+#include <base/table.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
@@ -472,10 +473,10 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<1> &dof,
 
 template <int dim, class SparsityPattern>
 void
-DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
-				      SparsityPattern       &sparsity,
-				      const FullMatrix<double> &int_mask,
-				      const FullMatrix<double> &flux_mask)
+DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim>& dof,
+				      SparsityPattern&       sparsity,
+				      const Table<2,Coupling>& int_mask,
+				      const Table<2,Coupling>& flux_mask)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const FiniteElement<dim>& fe = dof.get_fe();
@@ -485,14 +486,14 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
   Assert (sparsity.n_cols() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
-  Assert (int_mask.m() == n_comp,
-	  ExcDimensionMismatch (int_mask.m(), n_comp));
-  Assert (int_mask.n() == n_comp,
-	  ExcDimensionMismatch (int_mask.n(), n_comp));
-  Assert (flux_mask.m() == n_comp,
-	  ExcDimensionMismatch (flux_mask.m(), n_comp));
-  Assert (flux_mask.n() == n_comp,
-	  ExcDimensionMismatch (flux_mask.n(), n_comp));
+  Assert (int_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (int_mask.n_rows(), n_comp));
+  Assert (int_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (int_mask.n_cols(), n_comp));
+  Assert (flux_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_rows(), n_comp));
+  Assert (flux_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
   
   const unsigned int total_dofs = fe.dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
@@ -501,56 +502,16 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
   
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 						 endc = dof.end();
-
-
-//TODO[GK]: would someone explain what the letters 'f', 'a', and 'n' mean?
-//Even better would, of course, be to change this to an enum
-  Table<2,char> int_dof_mask(total_dofs, total_dofs);
-  Table<2,char> flux_dof_mask(total_dofs, total_dofs);
-
+  
+  Table<2,Coupling> int_dof_mask(total_dofs, total_dofs);
+  Table<2,Coupling> flux_dof_mask(total_dofs, total_dofs);
+  
+  compute_dof_couplings(int_dof_mask, int_mask, fe);
+  compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  
   for (unsigned int i=0; i<total_dofs; ++i)
-    {
-      const unsigned int ii
-        = (dof.get_fe().is_primitive(i) ?
-           dof.get_fe().system_to_component_index(i).first
-           :
-           (std::find (dof.get_fe().get_nonzero_components(i).begin(),
-                       dof.get_fe().get_nonzero_components(i).end(),
-                       true)
-            -
-           dof.get_fe().get_nonzero_components(i).begin())
-           );
-      Assert (ii < dof.get_fe().n_components(),
-              ExcInternalError());
-
-      for (unsigned int j=0; j<total_dofs; ++j)
-	{
-          const unsigned int jj
-            = (dof.get_fe().is_primitive(j) ?
-               dof.get_fe().system_to_component_index(j).first
-               :
-               (std::find (dof.get_fe().get_nonzero_components(j).begin(),
-                           dof.get_fe().get_nonzero_components(j).end(),
-                           true)
-                -
-                dof.get_fe().get_nonzero_components(j).begin())
-               );
-          Assert (jj < dof.get_fe().n_components(),
-                  ExcInternalError());          
-
-//TODO[GK]: the documentation only says that non-zeroness counts, but here
-//individual values are tested. this should be documented. Even better, rather
-//than passing in a matrix of doubles, we should pass in a Table<2,some-enum>
-	  if (int_mask(ii,jj) != 0)
-	    int_dof_mask(i,j) = 'f';
-	  if (flux_mask(ii,jj) == 1.)
-	    flux_dof_mask(i,j) = 'a';
-	  if (flux_mask(ii,jj) == 2.)
-	    flux_dof_mask(i,j) = 'f';
-	}
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
-	support_on_face(i,f) = fe.has_support_on_face(i,f);
-    }
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
+      support_on_face(i,f) = fe.has_support_on_face(i,f);
   
 				   // Clear user flags because we will
 				   // need them. But first we save
@@ -570,7 +531,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				       // make sparsity pattern for this cell
       for (unsigned int i=0; i<total_dofs; ++i)
 	for (unsigned int j=0; j<total_dofs; ++j)
-	  if (int_dof_mask(i,j))
+	  if (int_dof_mask(i,j) != none)
 	    sparsity.add (dofs_on_this_cell[i],
 			  dofs_on_this_cell[j]);
 
@@ -593,13 +554,13 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 		    {
 		      const bool j_non_zero_i = support_on_face (j, face);
 		      
-		      if (flux_dof_mask(i,j) == 'f')
+		      if (flux_dof_mask(i,j) == always)
                         sparsity.add (dofs_on_this_cell[i],
                                       dofs_on_this_cell[j]);
-		      if (flux_dof_mask(i,j) == 'a')
-                        if (i_non_zero_i && j_non_zero_i)
-                          sparsity.add (dofs_on_this_cell[i],
-                                        dofs_on_this_cell[j]);
+		      if (flux_dof_mask(i,j) == nonzero
+			  && i_non_zero_i && j_non_zero_i)
+			sparsity.add (dofs_on_this_cell[i],
+				      dofs_on_this_cell[j]);
 		    }
 		}
 	    }
@@ -611,10 +572,10 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 					       // by coarser cells
 	      if (neighbor->level() < cell->level())
 		continue;
-
+	      
 	      const unsigned int
                 neighbor_face = cell->neighbor_of_neighbor(face);
-
+	      
 	      if (neighbor->has_children())
 		{
 		  for (unsigned int sub_nr = 0;
@@ -634,11 +595,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			    {
 			      const bool j_non_zero_i = support_on_face (j, face);
 			      const bool j_non_zero_e  =support_on_face (j, neighbor_face);
-
-			      if (flux_dof_mask(i,j)==0)
-				flux_dof_mask(i,j) = 'n';
-			  
-			      if (flux_dof_mask(i,j) == 'f')
+			      if (flux_dof_mask(i,j) == always)
 				{
 				  sparsity.add (dofs_on_this_cell[i],
 						dofs_on_other_cell[j]);
@@ -649,7 +606,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				  sparsity.add (dofs_on_other_cell[i],
 						dofs_on_other_cell[j]);
 				}
-			      if (flux_dof_mask(i,j) == 'a')
+			      if (flux_dof_mask(i,j) == nonzero)
 				{
 				  if (i_non_zero_i && j_non_zero_e)
 				    sparsity.add (dofs_on_this_cell[i],
@@ -665,7 +622,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 						  dofs_on_other_cell[j]);
 				}
 			      
-			      if (flux_dof_mask(j,i) == 'f')
+			      if (flux_dof_mask(j,i) == always)
 				{
 				  sparsity.add (dofs_on_this_cell[j],
 						dofs_on_other_cell[i]);
@@ -676,7 +633,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				  sparsity.add (dofs_on_other_cell[j],
 						dofs_on_other_cell[i]);
 				}
-			      if (flux_dof_mask(j,i) == 'a')
+			      if (flux_dof_mask(j,i) == nonzero)
 				{
 				  if (j_non_zero_i && i_non_zero_e)
 				    sparsity.add (dofs_on_this_cell[j],
@@ -707,10 +664,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			{
 			  const bool j_non_zero_i = support_on_face (j, face);
 			  const bool j_non_zero_e = support_on_face (j, neighbor_face);
-			  if (flux_dof_mask(i,j)==0)
-			    flux_dof_mask(i,j) = 'n';
-			  
-			  if (flux_dof_mask(i,j) == 'f')
+			  if (flux_dof_mask(i,j) == always)
 			    {
 			      sparsity.add (dofs_on_this_cell[i],
 					    dofs_on_other_cell[j]);
@@ -721,7 +675,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			      sparsity.add (dofs_on_other_cell[i],
 					    dofs_on_other_cell[j]);
 			    }
-			  if (flux_dof_mask(i,j) == 'a')
+			  if (flux_dof_mask(i,j) == nonzero)
 			    {
 			      if (i_non_zero_i && j_non_zero_e)
 				sparsity.add (dofs_on_this_cell[i],
@@ -737,7 +691,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 					      dofs_on_other_cell[j]); 
 			    }
 
-			  if (flux_dof_mask(j,i) == 'f')
+			  if (flux_dof_mask(j,i) == always)
 			    {
 			      sparsity.add (dofs_on_this_cell[j],
 					    dofs_on_other_cell[i]);
@@ -748,7 +702,7 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 			      sparsity.add (dofs_on_other_cell[j],
 					    dofs_on_other_cell[i]);
 			    }
-			  if (flux_dof_mask(j,i) == 'a')
+			  if (flux_dof_mask(j,i) == nonzero)
 			    {
 			      if (j_non_zero_i && i_non_zero_e)
 				sparsity.add (dofs_on_this_cell[j],
@@ -2817,6 +2771,62 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 }
 
 
+template <int dim>
+void
+DoFTools::compute_dof_couplings(
+  Table<2,Coupling>&        dof_couplings,
+  const Table<2,Coupling>&  component_couplings,
+  const FiniteElement<dim>& fe)
+{
+  Assert(component_couplings.n_rows() == fe.n_components(),
+	 ExcDimensionMismatch(component_couplings.n_rows(),
+			      fe.n_components()));
+  Assert(component_couplings.n_cols() == fe.n_components(),
+	 ExcDimensionMismatch(component_couplings.n_cols(),
+			      fe.n_components()));
+  
+  const unsigned int n_dofs = fe.dofs_per_cell;
+
+  Assert(dof_couplings.n_rows() == n_dofs,
+	 ExcDimensionMismatch(dof_couplings.n_rows(), n_dofs));
+  Assert(dof_couplings.n_cols() == n_dofs,
+	 ExcDimensionMismatch(dof_couplings.n_cols(), n_dofs));
+
+  for (unsigned int i=0; i<n_dofs; ++i)
+    {
+      const unsigned int ii
+        = (fe.is_primitive(i) ?
+           fe.system_to_component_index(i).first
+           :
+           (std::find (fe.get_nonzero_components(i).begin(),
+                       fe.get_nonzero_components(i).end(),
+                       true)
+            -
+           fe.get_nonzero_components(i).begin())
+           );
+      Assert (ii < fe.n_components(),
+              ExcInternalError());
+
+      for (unsigned int j=0; j<n_dofs; ++j)
+	{
+          const unsigned int jj
+            = (fe.is_primitive(j) ?
+               fe.system_to_component_index(j).first
+               :
+               (std::find (fe.get_nonzero_components(j).begin(),
+                           fe.get_nonzero_components(j).end(),
+                           true)
+                -
+                fe.get_nonzero_components(j).begin())
+               );
+          Assert (jj < fe.n_components(),
+                  ExcInternalError());          
+
+	  dof_couplings(i,j) = component_couplings(ii,jj);
+	}
+    }
+}
+
 
 // explicit instantiations
 template void
@@ -3001,26 +3011,26 @@ template void
 DoFTools::make_flux_sparsity_pattern<deal_II_dimension,SparsityPattern>
 (const DoFHandler<deal_II_dimension>& dof,
  SparsityPattern    &,
- const FullMatrix<double>&,
- const FullMatrix<double>&);
+ const Table<2,Coupling>&,
+ const Table<2,Coupling>&);
 template void
 DoFTools::make_flux_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension>& dof,
  CompressedSparsityPattern    &,
- const FullMatrix<double>&,
- const FullMatrix<double>&);
+ const Table<2,Coupling>&,
+ const Table<2,Coupling>&);
 template void
 DoFTools::make_flux_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
 (const DoFHandler<deal_II_dimension>& dof,
  BlockSparsityPattern    &,
- const FullMatrix<double>&,
- const FullMatrix<double>&);
+ const Table<2,Coupling>&,
+ const Table<2,Coupling>&);
 template void
 DoFTools::make_flux_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
 (const DoFHandler<deal_II_dimension>& dof,
  CompressedBlockSparsityPattern    &,
- const FullMatrix<double>&,
- const FullMatrix<double>&);
+ const Table<2,Coupling>&,
+ const Table<2,Coupling>&);
 #endif
 
 
@@ -3138,3 +3148,10 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension>
 (const Mapping<deal_II_dimension>       &mapping,
  const DoFHandler<deal_II_dimension>    &dof_handler,
  std::vector<Point<deal_II_dimension> > &support_points);
+
+template
+void
+DoFTools::compute_dof_couplings<deal_II_dimension>(
+  Table<2,Coupling>&       dof_couplings,
+  const Table<2,Coupling>& component_couplings,
+  const FiniteElement<deal_II_dimension>&      fe);

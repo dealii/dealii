@@ -1,15 +1,15 @@
-//----------------------------  mg_dof_tools.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mg_dof_tools.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/multithread_info.h>
@@ -181,54 +181,52 @@ MGTools::make_flux_sparsity_pattern_edge (
 
 
 
-//TODO[GK]: Replace FullMatrix by Table<2,char>
+
+
+
 template<int dim, class SparsityPattern>
 void
 MGTools::make_flux_sparsity_pattern (
   const MGDoFHandler<dim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
-  const FullMatrix<double> &int_mask,
-  const FullMatrix<double> &flux_mask)
+  const Table<2,DoFTools::Coupling> &int_mask,
+  const Table<2,DoFTools::Coupling> &flux_mask)
 {
+  const FiniteElement<dim>& fe = dof.get_fe();
   const unsigned int n_dofs = dof.n_dofs(level);
-  const unsigned int n_comp = dof.get_fe().n_components();
+  const unsigned int n_comp = fe.n_components();
   
   Assert (sparsity.n_rows() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
   Assert (sparsity.n_cols() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
-  Assert (int_mask.m() == n_comp,
-	  ExcDimensionMismatch (int_mask.m(), n_comp));
-  Assert (int_mask.n() == n_comp,
-	  ExcDimensionMismatch (int_mask.n(), n_comp));
-  Assert (flux_mask.m() == n_comp,
-	  ExcDimensionMismatch (flux_mask.m(), n_comp));
-  Assert (flux_mask.n() == n_comp,
-	  ExcDimensionMismatch (flux_mask.n(), n_comp));
+  Assert (int_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (int_mask.n_rows(), n_comp));
+  Assert (int_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (int_mask.n_cols(), n_comp));
+  Assert (flux_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_rows(), n_comp));
+  Assert (flux_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
   
-  const unsigned int total_dofs = dof.get_fe().dofs_per_cell;
+  const unsigned int total_dofs = fe.dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(total_dofs);
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
+  Table<2,bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
+  
   typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
+  Table<2,DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
+  Table<2,DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
 
-  std::vector<std::vector<bool> > int_dof_mask(total_dofs,
-				 std::vector<bool>(total_dofs, false));
-  std::vector<std::vector<bool> > flux_dof_mask(total_dofs,
-				 std::vector<bool>(total_dofs, false));
+  DoFTools::compute_dof_couplings(int_dof_mask, int_mask, fe);
+  DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  
   for (unsigned int i=0; i<total_dofs; ++i)
-    for (unsigned int j=0; j<total_dofs; ++j)
-      {
-	unsigned int ii = dof.get_fe().system_to_component_index(i).first;
-	unsigned int jj = dof.get_fe().system_to_component_index(j).first;
-	
-	if (int_mask(ii,jj) != 0)
-	  int_dof_mask[i][j] = true;
-	if (flux_mask(ii,jj) != 0)
-	  flux_dof_mask[i][j] = true;
-      }
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
+      support_on_face(i,f) = fe.has_support_on_face(i,f);
   
 				   // Clear user flags because we will
 				   // need them. But first we save
@@ -248,7 +246,7 @@ MGTools::make_flux_sparsity_pattern (
 				       // make sparsity pattern for this cell
       for (unsigned int i=0; i<total_dofs; ++i)
 	for (unsigned int j=0; j<total_dofs; ++j)
-	  if (int_dof_mask[i][j])
+	  if (int_dof_mask[i][j] != DoFTools::none)
 	    sparsity.add (dofs_on_this_cell[i],
 			  dofs_on_this_cell[j]);
 
@@ -261,35 +259,187 @@ MGTools::make_flux_sparsity_pattern (
 	  if (cell_face->user_flag_set ())
 	    continue;
 
-	  if (! cell->at_boundary (face) )
+	  if (cell->at_boundary (face) )
+	    {
+	      for (unsigned int i=0; i<total_dofs; ++i)
+		{
+		  const bool i_non_zero_i = support_on_face (i, face);
+		  for (unsigned int j=0; j<total_dofs; ++j)
+		    {
+		      const bool j_non_zero_i = support_on_face (j, face);
+		      
+		      if (flux_dof_mask(i,j) == DoFTools::always)
+                        sparsity.add (dofs_on_this_cell[i],
+                                      dofs_on_this_cell[j]);
+		      if (flux_dof_mask(i,j) == DoFTools::nonzero
+			  && i_non_zero_i && j_non_zero_i)
+			sparsity.add (dofs_on_this_cell[i],
+				      dofs_on_this_cell[j]);
+		    }
+		}
+	    }
+	  else
 	    {
 	      typename MGDoFHandler<dim>::cell_iterator
 		neighbor = cell->neighbor(face);
-
+	      
 	      if (neighbor->level() < cell->level())
 		continue;
-
+	      
 	      unsigned int neighbor_face = cell->neighbor_of_neighbor(face);
-
+	      
 	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
 	      for (unsigned int i=0; i<total_dofs; ++i)
 		{
+		  const bool i_non_zero_i = support_on_face (i, face);
+		  const bool i_non_zero_e = support_on_face (i, neighbor_face);
 		  for (unsigned int j=0; j<total_dofs; ++j)
-		    if (flux_dof_mask[i][j])
-		      {
-			sparsity.add (dofs_on_this_cell[i],
-				      dofs_on_other_cell[j]);
-			sparsity.add (dofs_on_other_cell[i],
-				      dofs_on_this_cell[j]);
-		      }
+		    {
+		      const bool j_non_zero_i = support_on_face (j, face);
+		      const bool j_non_zero_e = support_on_face (j, neighbor_face);
+		      if (flux_dof_mask(i,j) == DoFTools::always)
+			{
+			  sparsity.add (dofs_on_this_cell[i],
+					dofs_on_other_cell[j]);
+			  sparsity.add (dofs_on_other_cell[i],
+					dofs_on_this_cell[j]);
+			  sparsity.add (dofs_on_this_cell[i],
+					dofs_on_this_cell[j]);
+			  sparsity.add (dofs_on_other_cell[i],
+					dofs_on_other_cell[j]);
+			}
+		      if (flux_dof_mask(i,j) == DoFTools::nonzero)
+			{
+			  if (i_non_zero_i && j_non_zero_e)
+			    sparsity.add (dofs_on_this_cell[i],
+					  dofs_on_other_cell[j]);
+			  if (i_non_zero_e && j_non_zero_i)
+			    sparsity.add (dofs_on_other_cell[i],
+					  dofs_on_this_cell[j]);
+			  if (i_non_zero_i && j_non_zero_i)
+			    sparsity.add (dofs_on_this_cell[i],
+					  dofs_on_this_cell[j]);
+			  if (i_non_zero_e && j_non_zero_e)
+			    sparsity.add (dofs_on_other_cell[i],
+					  dofs_on_other_cell[j]); 
+			}
+		      
+		      if (flux_dof_mask(j,i) == DoFTools::always)
+			{
+			  sparsity.add (dofs_on_this_cell[j],
+					dofs_on_other_cell[i]);
+			  sparsity.add (dofs_on_other_cell[j],
+					dofs_on_this_cell[i]);
+			  sparsity.add (dofs_on_this_cell[j],
+					dofs_on_this_cell[i]);
+			  sparsity.add (dofs_on_other_cell[j],
+					dofs_on_other_cell[i]);
+			}
+		      if (flux_dof_mask(j,i) == DoFTools::nonzero)
+			{
+			  if (j_non_zero_i && i_non_zero_e)
+			    sparsity.add (dofs_on_this_cell[j],
+					  dofs_on_other_cell[i]);
+			  if (j_non_zero_e && i_non_zero_i)
+			    sparsity.add (dofs_on_other_cell[j],
+					  dofs_on_this_cell[i]);
+			  if (j_non_zero_i && i_non_zero_i)
+			    sparsity.add (dofs_on_this_cell[j],
+					  dofs_on_this_cell[i]);
+			  if (j_non_zero_e && i_non_zero_e)
+			    sparsity.add (dofs_on_other_cell[j],
+					  dofs_on_other_cell[i]); 
+			}
+		    }
 		}
 	      neighbor->face(neighbor_face)->set_user_flag (); 
 	    }
 	}
     }
-
+  
 				   // finally restore the user flags
   const_cast<Triangulation<dim> &>(dof.get_tria()).load_user_flags(user_flags);
+}
+
+
+
+template<int dim, class SparsityPattern>
+void
+MGTools::make_flux_sparsity_pattern_edge (
+  const MGDoFHandler<dim> &dof,
+  SparsityPattern       &sparsity,
+  const unsigned int level,
+  const Table<2,DoFTools::Coupling> &flux_mask)
+{
+  const FiniteElement<dim>& fe = dof.get_fe();
+  const unsigned int n_comp = fe.n_components();
+  
+  Assert ((level>=1) && (level<dof.get_tria().n_levels()),
+	  ExcIndexRange(level, 1, dof.get_tria().n_levels()));
+
+  const unsigned int fine_dofs = dof.n_dofs(level);
+  const unsigned int coarse_dofs = dof.n_dofs(level-1);
+  
+  // Matrix maps from fine level to coarse level
+
+  Assert (sparsity.n_rows() == coarse_dofs,
+	  ExcDimensionMismatch (sparsity.n_rows(), coarse_dofs));
+  Assert (sparsity.n_cols() == fine_dofs,
+	  ExcDimensionMismatch (sparsity.n_cols(), fine_dofs));
+  Assert (flux_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_rows(), n_comp));
+  Assert (flux_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
+
+  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+  Table<2,bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
+  
+  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+					    endc = dof.end(level);
+
+   Table<2,DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
+
+   DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
+  
+  for (unsigned int i=0; i<total_dofs; ++i)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
+      support_on_face(i,f) = fe.has_support_on_face(i,f);
+  
+  for (; cell!=endc; ++cell)
+    {
+      cell->get_mg_dof_indices (dofs_on_this_cell);
+				       // Loop over all interior neighbors
+      for (unsigned int face = 0;
+	   face < GeometryInfo<dim>::faces_per_cell;
+	   ++face)
+	{
+	  // Neighbor is coarser
+
+	  if ( (! cell->at_boundary(face)) &&
+	       (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
+	    {
+	      typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face);
+	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
+
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    {
+		      if (flux_dof_mask(i,j) != DoFTools::none)
+			{
+			  sparsity.add (dofs_on_other_cell[i],
+					dofs_on_this_cell[j]);
+			  sparsity.add (dofs_on_other_cell[j],
+					dofs_on_this_cell[i]);
+			}
+		    }
+		}
+	    }
+	} 
+    }
 }
 
 
@@ -567,29 +717,29 @@ template void
 MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
 				       SparsityPattern &,
 				       const unsigned int,
-				       const FullMatrix<double>&,
-				       const FullMatrix<double>&);
+				       const Table<2,DoFTools::Coupling>&,
+				       const Table<2,DoFTools::Coupling>&);
 
 template void
 MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
 				       CompressedSparsityPattern &,
 				       const unsigned int,
-				       const FullMatrix<double>&,
-				       const FullMatrix<double>&);
+				       const Table<2,DoFTools::Coupling>&,
+				       const Table<2,DoFTools::Coupling>&);
 
 template void
 MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
 				       BlockSparsityPattern &,
 				       const unsigned int,
-				       const FullMatrix<double>&,
-				       const FullMatrix<double>&);
+				       const Table<2,DoFTools::Coupling>&,
+				       const Table<2,DoFTools::Coupling>&);
 
 template void
 MGTools::make_flux_sparsity_pattern<deal_II_dimension> (const MGDoFHandler<deal_II_dimension> &,
 				       CompressedBlockSparsityPattern &,
 				       const unsigned int,
-				       const FullMatrix<double>&,
-				       const FullMatrix<double>&);
+				       const Table<2,DoFTools::Coupling>&,
+				       const Table<2,DoFTools::Coupling>&);
 
 #endif
 

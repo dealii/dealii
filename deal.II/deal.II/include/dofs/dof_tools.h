@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,11 +22,12 @@
 #include <set>
 #include <map>
 
+template<int dim, class T> class Table;
 class SparsityPattern;
 template <typename number> class Vector;
-template <typename number> class FullMatrix;
 template <int dim> class Function;
 template <int dim> class Point;
+template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
@@ -141,11 +142,30 @@ template <int dim> class Mapping;
  * don't do it here) and not relevant in this context.
  *
  *
- * @author Wolfgang Bangerth and others, 1998, 1999, 2000, 2001
+ * @author Wolfgang Bangerth, Guido Kanschat and others, 1998 - 2005
  */
 class DoFTools
 {
   public:
+				     /**
+				      * The flags used in tables by certain
+				      * <tt>make_*_pattern</tt>
+				      * functions to determine whether
+				      * two components of the solution
+				      * couple in the interior of mesh
+				      * cells or at the boundary.
+				      */
+    enum Coupling
+    {
+					   /// The two components do not couple
+	  none,
+					   /// The two components do couple
+	  always,
+/// The two components couple only if their shape functions can be nonzero on this face
+	  nonzero
+    };
+    
+    
 				     /**
 				      * Locate non-zero entries of the
 				      * system matrix.
@@ -471,8 +491,8 @@ class DoFTools
     static void
     make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 				SparsityPattern       &sparsity,
-				const FullMatrix<double>& int_mask,
-				const FullMatrix<double>& flux_mask);
+				const Table<2,Coupling>& int_mask,
+				const Table<2,Coupling>& flux_mask);
     
 				     /**
 				      * Make up the constraints which
@@ -1386,6 +1406,18 @@ class DoFTools
 				 std::vector<std::map<unsigned int, float> > &weights,
 				 const typename DoFHandler<dim>::active_cell_iterator &begin,
 				 const typename DoFHandler<dim>::active_cell_iterator &end);
+
+				     /**
+				      * Compute coupling of dofs from
+				      * coupling of components.
+				      */
+    template <int dim>
+    static void compute_dof_couplings (
+      Table<2,Coupling>& dof_couplings,
+      const Table<2,Coupling>& component_couplings,
+      const FiniteElement<dim>& fe);
+
+    friend class MGTools;
 };
 
 
