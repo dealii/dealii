@@ -571,6 +571,59 @@ void dFMatrix::Tmmult (dFMatrix& dst, const dFMatrix& src) const
       }
 }*/
 
+
+
+double dFMatrix::matrix_norm (const dVector &v) const {
+  Assert(m() == v.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
+
+  double sum = 0.;
+  const unsigned int n_rows = m();
+  const double *val_ptr = &val[0];
+  const double *v_ptr;
+  
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      double s = 0.;
+      const double * const val_end_of_row = val_ptr+n_rows;
+      v_ptr = v.begin();
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * *v_ptr++;
+
+      sum += s* v(row);
+    };
+
+  return sum;
+};
+
+
+
+double dFMatrix::matrix_scalar_product (const dVector &u, const dVector &v) const {
+  Assert(m() == u.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
+
+  double sum = 0.;
+  const unsigned int n_rows = m();
+  const unsigned int n_cols = n();
+  const double *val_ptr = &val[0];
+  const double *v_ptr;
+  
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      double s = 0.;
+      const double * const val_end_of_row = val_ptr+n_cols;
+      v_ptr = v.begin();
+      while (val_ptr != val_end_of_row)
+	s += *val_ptr++ * *v_ptr++;
+
+      sum += s* u(row);
+    };
+
+  return sum;
+};
+
+
+
 void dFMatrix::print (FILE* f, const char* format) const
 {
   if (!format) format = " %5.2f";

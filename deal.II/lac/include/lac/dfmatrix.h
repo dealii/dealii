@@ -238,6 +238,38 @@ class dFMatrix
     void Tvmult (dVector& w, const dVector& v, const bool adding=false) const;
 
 				     /**
+				      * Return the norm of the vector #v# with
+				      * respect to the norm induced by this
+				      * matrix, i.e. $\left<v,Mv\right>$. This
+				      * is useful, e.g. in the finite element
+				      * context, where the $L_2$ norm of a
+				      * function equals the matrix norm with
+				      * respect to the mass matrix of the vector
+				      * representing the nodal values of the
+				      * finite element function.
+				      *
+				      * Note the order in which the matrix
+				      * appears. For non-symmetric matrices
+				      * there is a difference whether the
+				      * matrix operates on the first
+				      * or on the second operand of the
+				      * scalar product.
+				      *
+				      * Obviously, the matrix needs to be square
+				      * for this operation.
+				      */
+    double matrix_norm (const dVector &v) const;
+
+				     /**
+				      * Build the matrix scalar product
+				      * #u^T M v#. This function is mostly
+				      * useful when building the cellwise
+				      * scalar product of two functions in
+				      * the finite element context.
+				      */
+    double matrix_scalar_product (const dVector &u, const dVector &v) const;
+    
+				     /**
 				      * A=Inverse(A). Inversion of this by
 				      * Gauss-Jordan-algorithm
 				      */
