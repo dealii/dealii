@@ -217,6 +217,8 @@ void TableHandler::set_scientific (const std::string &key,
 
 void TableHandler::write_text(std::ostream &out) const
 {
+  AssertThrow (out, ExcIO());  
+  
   std::vector<std::string> sel_columns;
   get_selected_columns(sel_columns);
 
@@ -331,6 +333,8 @@ void TableHandler::write_text(std::ostream &out) const
 
 void TableHandler::write_tex(std::ofstream &out) const
 {
+  AssertThrow (out, ExcIO());
+  
   out << "\\documentclass[10pt]{report}" << std::endl
       << "\\usepackage{float}" << std::endl << std::endl << std::endl
       << "\\begin{document}" << std::endl
