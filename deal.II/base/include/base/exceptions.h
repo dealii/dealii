@@ -884,7 +884,8 @@ namespace StandardExceptions
   DeclException0 (ExcNotInitialized);
 
 				     /**
-				      * Exception
+				      * The object is in a state not
+				      * suitable for this operation.
 				      */
     DeclException0 (ExcInvalidState);
     
@@ -903,6 +904,12 @@ namespace StandardExceptions
 		  << "Impossible in " << arg1 << "d.");
 
 				   /**
+				    * A number is zero, but it should
+				    * not be here.
+				    */
+  DeclException0(ExcZero);
+  
+				   /**
 				    * This exception is raised
 				    * whenever the sizes of two
 				    * objects were assumed to be
@@ -917,7 +924,9 @@ namespace StandardExceptions
 		  << "Dimension " << arg1 << " not equal to " << arg2);
 
 				     /**
-				      * Exception.
+				      * The first dimension should be
+				      * either equal to the second or
+				      * the third, but it is neither.
 				      */
     DeclException3 (ExcDimensionMismatch2,
 		    int, int, int,
