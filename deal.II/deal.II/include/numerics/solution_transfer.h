@@ -43,7 +43,7 @@ template <int dim> class DoFHandler;
  * \begin{verbatim}
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
  *                                     // some refinement e.g.
- * tria->refine_and_coarsen_fixed_fraction(error_indicator, 0.3, 0);
+ * tria->refine_and_coarsen_fixed_fraction(error_indicator, 0.3, 0.05);
  *                                     // very important:
  * tria->prepare_coarsening_and_refinement();
  * soltrans.prepare_for_coarsening_and_refinement(solution);
@@ -264,7 +264,6 @@ class SolutionTransfer
     enum PreparationState {
 	  none, pure_refinement, coarsening_and_refinement
     } prepared_for;
-
 
 				     /**
 				      * Is used for #prepare_for_refining#
