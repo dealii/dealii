@@ -15,8 +15,6 @@
 #include <base/thread_management.h>
 
 
-#ifdef DEAL_II_USE_MT
-
 
 namespace Threads 
 {
@@ -154,9 +152,15 @@ namespace Threads
 				     // once it has copied all data
     fun_data.fun_data_base->lock.acquire ();
 				     // now start the new thread
+#ifdef DEAL_II_USE_MT
     thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
 			  (void*)&fun_data,
 			  THR_SCOPE_SYSTEM | THR_DETACHED);
+#else
+    thread_manager.spawn (*fun_data.fun_data_base->thread_entry_point,
+			  (void*)&fun_data,
+			  0);
+#endif
   };
 
 
@@ -212,4 +216,3 @@ namespace Threads
 
 
 
-#endif // DEAL_II_USE_MT
