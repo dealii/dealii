@@ -141,7 +141,7 @@ main ()
   tmp_read.close ();
 
                                    // delete temporary file
-  remove ("sparsity_pattern.tmp");
+  std::remove ("sparsity_pattern.tmp");
   
 				   // now check for equivalence of sp3 and sp4
   for (unsigned int row=0; row<sp3.n_rows(); ++row)

@@ -218,7 +218,7 @@ int main()
   A_tmp.block_read (tmp_read);
   tmp_read.close ();
 
-  remove ("sparse_matrices.tmp");
+  std::remove ("sparse_matrices.tmp");
 
   for (unsigned int i=0; i<A.n_nonzero_elements(); ++i)
     if (std::fabs(A.global_entry(i) - A_tmp.global_entry(i)) <=

@@ -32,7 +32,7 @@ void random_matrix(FullMatrix<double>& A)
   for (unsigned int i=0; i<A.m();++i)
     for (unsigned int j=0; j<A.n();++j)
       {
-	double rnd = rand();
+	double rnd = std::rand();
 	rnd /= RAND_MAX;
 	A(i,j) = (i==j) ? A.m()+rnd : rnd;
       }
@@ -46,7 +46,7 @@ main ()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  srand(3391466);
+  std::srand(3391466);
 
   FullMatrix<double> T(3,3,entries);
   T.print_formatted(logfile, 0, false);
@@ -92,9 +92,9 @@ main ()
 					   // Setup rotation matrix
 	  C.clear();
 	  C.diagadd(1.);
-	  C(i,i) = C(i+1,i+1) = cos(i+1);
-	  C(i+1,i) = sin(i+1);
-	  C(i,i+1) = -sin(i+1);
+	  C(i,i) = C(i+1,i+1) = std::cos(i+1.);
+	  C(i+1,i) = std::sin(i+1.);
+	  C(i,i+1) = -std::sin(i+1.);
 	  
 	  C.print_formatted (logfile,3,false);
 	  deallog << "l1-norm: " << C.l1_norm() << std::endl;

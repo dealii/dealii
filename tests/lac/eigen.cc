@@ -47,8 +47,8 @@ int main()
 				    * Satz 4.1.1)
 				    */
   const double h = 1./size;
-  const double s = std::sin(M_PI*h/2.);
-  const double c = std::cos(M_PI*h/2.);
+  const double s = std::sin(deal_II_numbers::PI*h/2.);
+  const double c = std::cos(deal_II_numbers::PI*h/2.);
   const double lambda_max = 8.*c*c;
   const double lambda_min = 8.*s*s;
   

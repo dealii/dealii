@@ -84,7 +84,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
     sum += 4.*i*i;
   deallog << d2.norm_sqr() << '\t' << sum << std::endl;
 
-  sum = sqrt(sum);
+  sum = std::sqrt(sum);
   deallog << d2.l2_norm() << '\t' << sum << std::endl;
 
   sum = 0.;

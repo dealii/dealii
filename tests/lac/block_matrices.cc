@@ -175,7 +175,7 @@ void test ()
 				   // now check what came out
   for (unsigned int row=0; row<19; ++row)
     {
-      std::vector<double> t(29, 0);
+      std::vector<double> t(29, 0.);
 				       // first check which elements
 				       // in this row exist
       for (unsigned int i=0; i<10; ++i)

@@ -18,7 +18,9 @@
 #include <time.h>
 
 #define ITER 100
-main()
+
+
+int main()
 {
   Vector<double> u;
   Vector<double> v;
