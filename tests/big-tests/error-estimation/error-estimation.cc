@@ -30,7 +30,16 @@ class PoissonEquation :  public Equation<dim> {
   public:
     PoissonEquation (const Function<dim> &rhs) :
 		    Equation<dim>(1),
-		    right_hand_side (rhs)  {};
+		    right_hand_side (rhs),
+		    coefficient (default_coefficient),
+		    use_coefficient(false) {};
+
+    PoissonEquation (const Function<dim> &rhs,
+		     const Function<dim> &coefficient ) :
+		    Equation<dim>(1),
+		    right_hand_side (rhs),
+		    coefficient (coefficient),
+		    use_coefficient(true) {};
 
     virtual void assemble (dFMatrix            &cell_matrix,
 			   dVector             &rhs,
@@ -43,24 +52,29 @@ class PoissonEquation :  public Equation<dim> {
 			   const FEValues<dim> &fe_values,
 			   const Triangulation<dim>::cell_iterator &cell) const;
   protected:
+    const bool           use_coefficient;
     const Function<dim> &right_hand_side;
+    const Function<dim> &coefficient;
+
+    static const ConstantFunction<dim> default_coefficient;
 };
 
+
+const ConstantFunction<2> PoissonEquation<2>::default_coefficient(1);
 
 
 
 
 
 template <int dim>
-class PoissonProblem : public ProblemBase<dim>,
-		       public MultipleParameterLoop::UserClass {
+class PoissonProblem : public ProblemBase<dim>, public MultipleParameterLoop::UserClass {
   public:
     enum RefineMode {
 	  global, true_error, error_estimator
     };
     
     PoissonProblem ();
-
+    
     void clear ();
     void create_new (const unsigned int);
     void declare_parameters (ParameterHandler &prm);
@@ -74,7 +88,8 @@ class PoissonProblem : public ProblemBase<dim>,
     
     Function<dim>      *rhs;
     Function<dim>      *solution_function;
-
+    Function<dim>      *coefficient;
+			   
     Boundary<dim>      *boundary;
     
     vector<double> l2_error, linfty_error;
@@ -101,6 +116,17 @@ class Solution {
 	virtual double operator () (const Point<dim> &p) const;
 	virtual Point<dim> gradient (const Point<dim> &p) const;
     };
+
+    class Kink : public Function<dim> {
+      public:
+	class Coefficient : public Function<dim> {
+	  public:
+	    virtual double operator () (const Point<dim> &p) const;
+	};
+	
+	virtual double operator () (const Point<dim> &p) const;
+	virtual Point<dim> gradient (const Point<dim> &p) const;
+    };
 };
 
 
@@ -123,9 +149,20 @@ class RHS {
     				     /**
 				      *	Right hand side constructed such that
 				      * the exact solution is
-				      * $r^{2/3} sin(2\phi)$.
+				      * $r^{2/3}$.
 				      */
     class Singular : public Function<dim> {
+      public:
+	virtual double operator () (const Point<dim> &p) const;
+    };
+
+    				     /**
+				      *	Right hand side constructed such that
+				      * the exact solution is
+				      * $(1+4\theta(f))*f$ with
+				      * $f=y-x**2$.
+				      */
+    class Kink : public Function<dim> {
       public:
 	virtual double operator () (const Point<dim> &p) const;
     };
@@ -158,14 +195,43 @@ Point<2> Solution<2>::Singular::gradient (const Point<2> &p) const {
 
 
 
+
+inline double theta(const double x) {
+  return (x>0 ? 1 : 0);
+};
+
+
+double Solution<2>::Kink::operator () (const Point<2> &p) const {
+  const double s = p(1)-p(0)*p(0);
+  return (1+4*theta(s))*s;
+};
+
+
+Point<2> Solution<2>::Kink::gradient (const Point<2> &p) const {
+  const double s = p(1)-p(0)*p(0);
+  return (1+4*theta(s))*Point<2>(-2*p(0),1);
+};
+
+
+double Solution<2>::Kink::Coefficient::operator () (const Point<2> &p) const {
+  const double s = p(1)-p(0)*p(0);
+  return 1./(1.+4.*theta(s));
+};
+
+
+
 double RHS<2>::GaussShape::operator () (const Point<2> &p) const {
   return (480.-6400.*p.square())*p(0)*p(1)*exp(-40.*p.square());
 };
 
 
-
 double RHS<2>::Singular::operator () (const Point<2> &p) const {
   return -4./9. * pow(p.square(), -2./3.);
+};
+
+
+double RHS<2>::Kink::operator () (const Point<2> &) const {
+  return 2;
 };
 
 
@@ -180,17 +246,23 @@ void PoissonEquation<2>::assemble (dFMatrix            &cell_matrix,
 				   dVector             &rhs,
 				   const FEValues<2>   &fe_values,
 				   const Triangulation<2>::cell_iterator &) const {
-  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-      {
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
-	  cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
-			       fe_values.shape_grad(j,point)) *
-			      fe_values.JxW(point);
-	rhs(i) += fe_values.shape_value(i,point) *
-		  right_hand_side(fe_values.quadrature_point(point)) *
-		  fe_values.JxW(point);
-      };
+  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point) 
+    {
+      const double c = (use_coefficient ?
+			coefficient(fe_values.quadrature_point(point)) :
+			1);
+      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+	{
+	  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	    cell_matrix(i,j) += (fe_values.shape_grad(i,point) *
+				 fe_values.shape_grad(j,point)) *
+				fe_values.JxW(point) *
+				c;
+	  rhs(i) += fe_values.shape_value(i,point) *
+		    right_hand_side(fe_values.quadrature_point(point)) *
+		    fe_values.JxW(point);
+	};
+    };
 };
 
 
@@ -222,40 +294,20 @@ void PoissonEquation<dim>::assemble (dVector             &,
 template <int dim>
 PoissonProblem<dim>::PoissonProblem () :
 		tria(0), dof(0), rhs(0),
-		solution_function(0), boundary(0) {};
+		solution_function(0), coefficient(0),
+		boundary(0) {};
 
 
 
 
 template <int dim>
 void PoissonProblem<dim>::clear () {
-  if (tria != 0) {
-    delete tria;
-    tria = 0;
-  };
-  
-  if (dof != 0) {
-    delete dof;
-    dof = 0;
-  };
-
-  if (rhs != 0) 
-    {
-      delete rhs;
-      rhs = 0;
-    };
-
-  if (solution_function != 0) 
-    {
-      delete solution_function;
-      solution_function = 0;
-    };
-
-  if (boundary != 0)
-    {
-      delete boundary;
-      boundary = 0;
-    };
+  if (tria != 0)              { delete tria;              tria = 0;              };
+  if (dof != 0)               { delete dof;               dof = 0;               };
+  if (rhs != 0)               { delete rhs;               rhs = 0;               };
+  if (solution_function != 0) { delete solution_function; solution_function = 0; };
+  if (coefficient != 0)       { delete coefficient;       coefficient = 0;       };
+  if (boundary != 0)          { delete boundary;          boundary = 0;          };
   
   l2_error.clear ();
   linfty_error.clear ();
@@ -283,7 +335,8 @@ void PoissonProblem<dim>::create_new (const unsigned int) {
 
 template <int dim>
 void PoissonProblem<dim>::declare_parameters (ParameterHandler &prm) {
-  prm.declare_entry ("Test case", "Gauss shape", "Gauss shape\\|Singular");
+  prm.declare_entry ("Test case", "Gauss shape",
+		     "Gauss shape\\|Singular\\|Kink");
   prm.declare_entry ("Initial refinement", "2",
 		     ParameterHandler::RegularExpressions::Integer);
   prm.declare_entry ("Refinement criterion", "estimated error",
@@ -345,17 +398,29 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   else
     if (prm.get("Test case")=="Singular")
       rhs             = new RHS<dim>::Singular();
+    else
+      if (prm.get("Test case")=="Kink")
+	rhs             = new RHS<dim>::Kink();
   
   if (prm.get("Test case")=="Gauss shape")
     solution_function = new Solution<dim>::GaussShape ();
   else
     if (prm.get("Test case")=="Singular")
       solution_function = new Solution<dim>::Singular ();
+    else
+      if (prm.get("Test case")=="Kink")
+	solution_function = new Solution<dim>::Kink ();
   
   
-  FELinear<dim>                   fe;
-  PoissonEquation<dim>            equation (*rhs);
-  QGauss3<dim>                    quadrature;
+  FELinear<dim>         fe;
+  QGauss3<dim>          quadrature;
+  PoissonEquation<dim> *equation;
+  
+  static Solution<dim>::Kink::Coefficient kink_coefficient;
+  if (prm.get("Test case")=="Kink")
+    equation = new PoissonEquation<dim>(*rhs, kink_coefficient);
+  else
+    equation = new PoissonEquation<dim>(*rhs);
 
   unsigned int refine_step = 0;
   const unsigned int max_cells = prm.get_integer("Maximum cells");
@@ -376,7 +441,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
       ProblemBase<dim>::FunctionMap dirichlet_bc;
       dirichlet_bc[0] = solution_function;
-      assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
+      assemble (*equation, quadrature, fe, update_flags, dirichlet_bc);
 
       cout << "    Solving..." << endl;
       solve ();
@@ -485,6 +550,8 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   
   print_history (prm, refine_mode);
   cout << endl << endl << endl;
+
+  delete equation;
 };
 
 
