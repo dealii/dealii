@@ -48,7 +48,7 @@ kdoc.library-files.rerun = $(kdoc.library-files:%.kdoc=%.kdoc.rerun)
 
 KDOCFLAGS   = -I../scripts/kdoc ../scripts/kdoc/kdoc -a -p
 ifeq ($(shell uname),SunOS)
-DOCPP = /home/people/kanschat/bin/doc++
+DOCPP = /home/people/wolf/Config/doc++/doc++
 else
 DOCPP = doc++
 endif
@@ -61,9 +61,19 @@ default: kdoc kdoc/names.html
 # changes in the last 100 days
 all: default cvslog
 
+
+#################################################################################
+##  targets for cvslog generated HTML output    
+#################################################################################
+
 cvslog:
 	cd ../.. ; perl doc/auto/scripts/cvs2html -o doc/auto/cvs-backlog/newdeal -a -k -D 100
 
+
+
+#################################################################################
+##  targets for kdoc generated HTML output    
+#################################################################################
 
 # make the .kdoc files twice: once without and a second time with
 # crossreferencing the other libraries
@@ -100,6 +110,12 @@ $(kdoc.library-files.rerun):
 kdoc/names.html: $(kdoc.libray-files)
 	@cd kdoc ; perl ../scripts/index.pl *.kdoc > names.html
 
+
+
+
+#################################################################################
+##  targets for DOC++ generated latex output    
+#################################################################################
 
 # generate the input file for doc++
 %.doc++: Makefile
@@ -157,9 +173,37 @@ latex/deal_II_technical_reference.tex: latex/base.tex1 latex/lac.tex1 latex/deal
 	dvips $< -o $@
 
 
+
+
+#################################################################################
+##  targets for DOC++ generated HTML output    
+#################################################################################
+doc++: doc++/base/index.html doc++/lac/index.html doc++/dealII/index.html
+
+# generate one of the html-output files; this needs the respective
+# include file for DOC++
+#
+# delete the .doc++ files immediately again, since they are no more 
+# used and since this forces make to re-make the .html-file each time
+# we ask for it; the right way to do so would be to use dependencies,
+# but it is hard to compute them from the '%'-sign used in the rule
+doc++/%/index.html: %.doc++
+	cp $^ $(patsubst %/index.html,%,$@)
+	cd $(patsubst %/index.html,%,$@) ; perl -pi -e 's!: ../!: ../../!g;' $^
+	cd $(patsubst %/index.html,%,$@) ; $(DOCPP) -p -H -u -G -S -a $^
+	cd $(patsubst %/index.html,%,$@) ; rm $^
+	rm $^
+
+
+
+
+#################################################################################
+##  administrativa
+#################################################################################
 clean:
 	-rm -f kdoc/names.html kdoc/*.kdoc kdoc/*/*.html cvs-backlog/*.html \
-		latex/base.* latex/lac.* latex/dealII.* latex/deal_II_technical_reference.*
+		latex/base.* latex/lac.* latex/dealII.* latex/deal_II_technical_reference.* \
+		doc++/base/* doc++/lac/* doc++/dealII/*
 
 
-.PHONY: default all kdoc $(kdoc.library-files) $(kdoc.library-files.rerun) clean
+.PHONY: default all kdoc $(kdoc.library-files) $(kdoc.library-files.rerun) doc++ clean
