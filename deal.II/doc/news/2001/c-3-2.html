@@ -121,6 +121,15 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       Fixed: The <code>GridRefinement::refine_fixed_fraction</code>
+       function sometimes had problems when indicators vary over
+       several orders of magnitude, due to roundoff. This is now
+       fixed. 
+       <br>
+       (WB 2001/11/05)
+       </p>
+
+  <li> <p>
        New: <code>DoFTools::extract_subdomain_dofs</code> selects
        those degrees of freedom which are located on cells with a
        specified subdomain id.
