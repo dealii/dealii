@@ -154,7 +154,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * newly created or @p{clear()}
 				      * was called on it before.
 				      *
-				      * Multiply calles the
+				      * Repeatedly calls the
 				      * @p{restore(unsigned int)}
 				      * function in a loop over all
 				      * refinement steps.
