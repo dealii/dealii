@@ -5,7 +5,8 @@ include ../common/Make.global_options
 
 
 # by default make sublibs
-default: hsl
+default: hsl umfpack
+
 
 ifeq ($(USE_CONTRIB_HSL),yes)
 hsl:
