@@ -96,7 +96,11 @@ In VectorTools::project_boundary_values, no condensation of sparsity
   solution vectors is performed, This is ok for dim<3 because then
   there are no constrained nodes on the boundary, but is not
   acceptable for higher dimensions. Fix this.
-  
+
+
+Remove the this-> coding in tria_iterator.templates.h. These were
+  introduced in order to avoid an internal compiler error in an
+  egcs  snapshot.
 
 
 
