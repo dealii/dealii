@@ -19,7 +19,7 @@ h-files      = $(wildcard ../include/*/*.h)
 
 forward-declarations = $D/base/include/base/forward-declarations.h
 
-include $D/deal.II/Make.global_options
+include $D/common/Make.global_options
 
 
 # urgh, this is a weird hack, since this function uses the $@ variable
@@ -50,7 +50,7 @@ maybe-define-dimension  = $(patsubst %,-Ddata_out_dimension=%,$(maybe-define-dim
 ../lib/o/%.o :
 	@echo =================== Compiling with optimization:   $< \
 	      "   " $(patsubst -Ddata_out_dimension=%,dimension=%,$(maybe-define-dimension))
-	@$(CXX) $(CXXFLAGS) $(maybe-define-dimension) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) $(maybe-define-dimension) -c $< -o $@
 
 
 lib: ../lib/libbase.g.a ../lib/libbase.a

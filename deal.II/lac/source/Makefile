@@ -9,7 +9,7 @@ h-files  = $(wildcard ../include/*/*.h)
 
 forward-declarations = $D/lac/include/lac/forward-declarations.h
 
-include $D/deal.II/Make.global_options
+include $D/common/Make.global_options
 
 
 ../lib/go/%.go :
@@ -17,7 +17,7 @@ include $D/deal.II/Make.global_options
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ../lib/o/%.o :
 	@echo ============================ Compiling with optimization:   $<
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 lib: ../lib/liblac.g.a ../lib/liblac.a

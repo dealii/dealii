@@ -13,20 +13,21 @@ vpath %.a $D/deal.II/lib
 CXX       = c++
 INCLUDE   = -I$D/deal.II/include -I$D/lac/include \
             -I$D/base/include
-CXXFLAGS.g= -DDEBUG -ggdb -Wall -W -Wconversion \
+CXXFLAGS.g= -ansi -DDEBUG -ggdb -Wall -W -Wconversion \
             -Winline -Woverloaded-virtual -fno-builtin\
-	    -fno-vtable-thunks \
+	    -fno-vtable-thunks -ftemplate-depth-32\
             $(INCLUDE)
 CXXFLAGS.o= -O2 -Wuninitialized -ffast-math \
             -felide-constructors -fnonnull-objects \
-	    -fno-vtable-thunks \
+	    -fno-vtable-thunks -ftemplate-depth-32\
             $(INCLUDE)
 
 
 
-%.go : %.cc #Makefile
-	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
-%.o : %.cc #Makefile
-	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
+#%.go : %.cc #Makefile
+#	@echo =====debug========= $<
+#	@$(CXX) $(flags) -c $< -o $@
+#%.o : %.cc #Makefile
+#	@echo =====optimized===== $<
+#	@$(CXX) $(flags) -c $< -o $@
+
