@@ -30,12 +30,12 @@ CXX       = c++
 INCLUDE   = -I../include -I../../lac/include \
             -I../../base/include -I../../mia/include
 CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
-            -Winline -Woverloaded-virtual -fno-rtti  -frepo\
+            -Winline -Woverloaded-virtual -fno-rtti \
             $(INCLUDE) -Ddeal_II_dimension=$(deal_II_dimension)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
            -fno-rtti $(INCLUDE) \
-           -Ddeal_II_dimension=$(deal_II_dimension) -frepo
+           -Ddeal_II_dimension=$(deal_II_dimension)
 
 ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc/bin/c++
@@ -61,8 +61,6 @@ endif
 all: ../lib/libdeal_II.g.a ../lib/libdeal_II.a
 
 ../lib/libdeal_II.g.a: $(go-files)
-	@echo ============================ Second compiler run
-	-@$(CXX) $(CXXFLAGS) -o second-run $(go-files)
 	@echo ============================ Updating library:   $@
 	@ar ruv $@ $(go-files)
 
