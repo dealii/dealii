@@ -278,28 +278,59 @@ class SparseMatrix : public Subscriptor
 		     const SparseMatrix<somenumber> &matrix);
     
 				     /**
-				      * Return the value of the entry (i,j).
-				      * This may be an expensive operation
-				      * and you should always take care
-				      * where to call this function.
-				      * In order to avoid abuse, this function
-				      * throws an exception if the wanted
-				      * element does not exist in the matrix.
+				      * Return the value of the entry
+				      * (i,j).  This may be an
+				      * expensive operation and you
+				      * should always take care where
+				      * to call this function.  In
+				      * order to avoid abuse, this
+				      * function throws an exception
+				      * if the required element does
+				      * not exist in the matrix.
+				      *
+				      * In case you want a function
+				      * that returns zero instead (for
+				      * entries that are not in the
+				      * sparsity pattern of the
+				      * matrix), use the #el#
+				      * function.
 				      */
-    number operator () (const unsigned int i, const unsigned int j) const;
+    number operator () (const unsigned int i,
+			const unsigned int j) const;
+
+				     /**
+				      * This function is mostly like
+				      * #operator()# in that it
+				      * returns the value of the
+				      * matrix entry #(i,j)#. The only
+				      * difference is that if this
+				      * entry does not exist in the
+				      * sparsity pattern, then instead
+				      * of raising an exception, zero
+				      * is returned. While this may be
+				      * convenient in some cases, note
+				      * that it is simple to write
+				      * algorithms that are slow
+				      * compared to an optimal
+				      * solution, since the sparsity
+				      * of the matrix is not used.
+				      */
+    number el (const unsigned int i,
+	       const unsigned int j) const;
 
 				     /**
 				      * Return the main diagonal element in
 				      * the #i#th row. This function throws an
 				      * error if the matrix is not square.
 				      *
-				      * This function is considerably faster
-				      * than the #operator()#, since for
-				      * square matrices, the diagonal entry is
-				      * always the first to be stored in each
-				      * row and access therefore does not
-				      * involve searching for the right column
-				      * number.
+				      * This function is considerably
+				      * faster than the #operator()#,
+				      * since for square matrices, the
+				      * diagonal entry is always the
+				      * first to be stored in each row
+				      * and access therefore does not
+				      * involve searching for the
+				      * right column number.
 				      */
     number diag_element (const unsigned int i) const;
 
@@ -848,6 +879,23 @@ number SparseMatrix<number>::operator () (const unsigned int i,
 	  ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
 };
+
+
+
+template <typename number>
+inline
+number SparseMatrix<number>::el (const unsigned int i,
+				 const unsigned int j) const
+{
+  Assert (cols != 0, ExcMatrixNotInitialized());
+  const unsigned int index = cols->operator()(i,j);
+
+  if (index != SparsityPattern::invalid_entry)
+    return val[index];
+  else
+    return 0;
+};
+
 
 
 template <typename number>
