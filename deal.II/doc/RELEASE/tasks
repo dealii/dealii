@@ -50,7 +50,7 @@ when a new release shall be issued:
 
 12/ put it on the web server.
 
-13/ Add links to navbar.html and toc.html on homepage.
+13/ Add links to download.html, navbar.html and toc.html on homepage.
 
 14/ Log in as deal and execute "makedoc_version x.y.z"
     Report errors!!!
