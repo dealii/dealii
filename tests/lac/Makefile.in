@@ -79,6 +79,22 @@ run: $(all:.check=.output)
 #
 ############################################################
 
+vector-vector-cc-files = vector-vector.cc
+
+ifeq ($(debug-mode),on)
+vector-vector-o-files = $(vector-vector-cc-files:.cc=.go)
+else
+vector-vector-o-files = $(vector-vector-cc-files:.cc=.o)
+endif
+
+vector-vector.testcase: $(vector-vector-o-files) $(libraries)
+	@echo =====linking======= $<
+	@$(CXX) $(LDFLAGS) -g  -o $@ $^ $(LIBS)
+
+
+############################################################
+
+
 solver-cc-files = solver.cc testmatrix.cc
 
 ifeq ($(debug-mode),on)
