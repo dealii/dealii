@@ -27,8 +27,9 @@ void test ()
                                    // create a sparsity pattern with totally
                                    // empty lines (not even diagonals, since
                                    // not quadratic)
-  SparsityPattern sparsity(2,3,1);
+  SparsityPattern sparsity(4,5,1);
   sparsity.add (1,1);
+  sparsity.add (3,1);
   sparsity.compress ();
 
                                    // attach a sparse matrix to it
