@@ -1,8 +1,8 @@
 
-#include <iostream>
+#include <fstream>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
-
+#include <base/logstream.h>
 
 class Test : public Subscriptor
 {
@@ -11,19 +11,19 @@ public:
   Test(const char* n) :
 		  name(n)
       {
-	cout << "Construct " << name << endl;
+	deallog << "Construct " << name << endl;
       }
   ~Test()
       {
-	cout << "Destruct " << name << endl;
+	deallog << "Destruct " << name << endl;
       }	  
   void f()
   {
-    cout << "mutable" << endl;
+    deallog << "mutable" << endl;
   }
   void f() const
   {
-    cout << "const" << endl;
+    deallog << "const" << endl;
   }
 };
 
@@ -31,6 +31,10 @@ public:
 
 main()
 {
+  ofstream logfile("reference.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  cerr = logfile;
   Test a("A");
   const Test b("B");
   SmartPointer<Test>       r=&a;
@@ -40,19 +44,19 @@ main()
   SmartPointer<const Test> u=&b;
 
   
-  cout << "a ";
+  deallog << "a ";
   a.f();            // should print "mutable", since #a# is not const
-  cout << "b ";
+  deallog << "b ";
   b.f();            // should print "const", since #b# is const
-  cout << "r ";
+  deallog << "r ";
   r->f();           // should print "mutable", since it points to the non-const #a#
-  cout << "s ";
+  deallog << "s ";
   s->f();           // should print "const", since it points to the const #b#
 				   // but we made it const
-  cout << "t ";
+  deallog << "t ";
   t->f();           // should print "mutable", since #b# is const, but
 				   // we casted the constness away
-  cout << "u ";
+  deallog << "u ";
   u->f();           // should print "const" since #b# is const
 				   // Now try if subscriptor works
   {

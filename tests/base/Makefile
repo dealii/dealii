@@ -1,49 +1,158 @@
-# $Id$
+############################################################
+# Directory with the DEAL distribution
+############################################################
+
+D = ../..
+
+
+############################################################
+# Include general settings for including DEAL libraries
+############################################################
+
+include $D/common/Make.global_options
+
+
+############################################################
+# Set debug-mode as a default
+############################################################
+
+debug-mode = on
+
+
+############################################################
+# Define library names
+############################################################
+
+libs   = -llac -lbase
+libs.g = -llac.g -lbase.g
+
+
+############################################################
+# Select compiler flags according to debug-mode
+############################################################
+
+ifeq ($(debug-mode),on)
+libraries = $(libs.g)
+flags     = $(CXXFLAGS.g) $(CXXFLAGS)
+endif
+
+ifeq ($(debug-mode),off)
+libraries = $(libs)
+flags     = $(CXXFLAGS.o) $(CXXFLAGS)
+endif
+
+all: logtest.check reference.check tensor.check
+exe: $(all:.check=.testcase)
+output: $(all:.check=.output)
+############################################################
+# Typical block for building a running program
 #
-# Set root directory of DEAL distribution.
-# This is only one letter to make the rest MORE readable.
+# 1. provide a list of source files in ...-cc-files
+#
+# 2. generate the list of object files according to debug-mode
+#
+# 3. make executable
+#
+# 4. Explicit dependencies of object files (will be automatic soon)
+#
+############################################################
 
-D=../..
+logtest-cc-files = logtest.cc
 
-include $D/deal.II/Make.global_options
+ifeq ($(debug-mode),on)
+logtest-o-files = $(logtest-cc-files:.cc=.go)
+else
+logtest-o-files = $(logtest-cc-files:.cc=.o)
+endif
 
-%.go : %.cc
-	@echo ============================ Compiling with debugging information:   $<
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-%.o : %.cc
-	@echo ============================ Compiling with optimization:   $<
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-
-
-vpath %.a: $D/base/lib
-vpath %.a: $D/lac/lib
-vpath %.a: $D/deal.II/lib
-
-test: run-reference run-logtest run-tensor
+logtest.testcase: $(logtest-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
 
 
-reference: reference.go -lbase.g
-	$(CXX) $(CXXFLAGS) -o $@ $^
+############################################################
 
-run-reference: reference
-	-./reference
 
-logtest: logtest.go -lbase.g
-	$(CXX) $(CXXFLAGS) -o $@ $^
+tensor-cc-files = tensor.cc
 
-run-logtest: logtest
-	-./logtest
+ifeq ($(debug-mode),on)
+tensor-o-files = $(tensor-cc-files:.cc=.go)
+else
+tensor-o-files = $(tensor-cc-files:.cc=.o)
+endif
 
-tensor: tensor.go -lbase.g -llac.g
-	$(CXX) $(CXXFLAGS) -o $@ $^
+tensor.testcase: $(tensor-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
 
-run-tensor: tensor
-	-./tensor
 
+
+############################################################
+
+
+reference-cc-files = reference.cc
+
+ifeq ($(debug-mode),on)
+reference-o-files = $(reference-cc-files:.cc=.go)
+else
+reference-o-files = $(reference-cc-files:.cc=.o)
+endif
+
+reference.testcase: $(reference-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+
+
+############################################################
+# Continue with other targets if needed
+############################################################
+
+
+############################################################
+# Continue with other targets if needed
+############################################################
+
+
+target1-cc-files = t1.cc t2.cc t3.cc
+
+ifeq ($(debug-mode),on)
+target1-o-files = $(target1-cc-files:.cc=.go)
+else
+target1-o-files = $(target1-cc-files:.cc=.o)
+endif
+
+target1: $(target1-o-files) $(libraries)
+	$(CXX) $(flags) -o $@ $^
+
+
+############################################################
+# Postprocessing
+############################################################
+
+%.output:%.testcase
+	$<
+	@perl -pi.bak -e 's/JobId.*//;s/value.*//;' $@
+	@rm $@.bak
+
+%.check:%.output
+	@-diff $< $(patsubst %.output,%.checked, $<)
+############################################################
+# Cleanup targets
+############################################################
 
 clean:
-	-rm *.o *.go reference logtest tensor
+	rm -f *.o *.go *.output
 
+veryclean: clean
+	rm -f *.testcase *.inp *.gpl *.eps *.gnuplot
 
+############################################################
+# Automatic generation of dependencies
+############################################################
 
-.PHONY: test run-reference run-logtest run-tensor clean
+all-cc-files = $(wildcard *.cc)
+
+Make.depend: $(all-cc-files)
+	@echo =====Dependecies=== Make.depend
+	@$(CXX) $(flags) $^ -M > $@
+	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
+
+include Make.depend

@@ -1,8 +1,12 @@
 #include <base/logstream.h>
-
+#include <fstream>
 
 main()
 {
+  ofstream logfile("logtest.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+
   deallog << "Test" << endl;
   deallog.push("l1");
   deallog << "Test1" << endl;

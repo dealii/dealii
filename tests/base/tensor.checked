@@ -1,0 +1,13 @@
+
+DEAL::unrolled: 1 2 3 3 4 5 6 7 8
+DEAL::t=
+DEAL::1 2 3 
+DEAL::3 4 5 
+DEAL::6 7 8 
+
+DEAL::tt=
+DEAL::25 31 37 
+DEAL::45 57 69 
+DEAL::75 96 117 
+
+DEAL::Result OK.
