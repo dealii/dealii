@@ -220,7 +220,7 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == n_components,
 	  ExcDimensionMismatch (return_value.size(), n_components));
 
-  std::fill_n (return_value.begin(), n_components, 0.0);
+  std::fill (return_value.begin(), return_value.end(), 0.0);
 };
 
 
@@ -231,7 +231,7 @@ void ZeroFunction<dim>::value_list (const typename std::vector<Point<dim> > &poi
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
 
-  fill_n (values.begin(), points.size(), 0.);
+  std::fill (values.begin(), values.end(), 0.);
 };
 
 
@@ -246,7 +246,7 @@ void ZeroFunction<dim>::vector_value_list (const typename std::vector<Point<dim>
     {
       Assert (values[i].size() == n_components,
 	      ExcDimensionMismatch(values[i].size(), n_components));
-      std::fill_n (values[i].begin(), n_components, 0.);
+      std::fill (values[i].begin(), values[i].end(), 0.);
     };
 };
 
@@ -328,7 +328,7 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == n_components,
 	  ExcDimensionMismatch (return_value.size(), n_components));
 
-  std::fill_n (return_value.begin(), n_components, function_value);
+  std::fill (return_value.begin(), return_value.end(), function_value);
 };
 
 
@@ -340,7 +340,7 @@ void ConstantFunction<dim>::value_list (const typename std::vector<Point<dim> > 
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
 
-  fill_n (values.begin(), points.size(), function_value);
+  std::fill (values.begin(), values.end(), function_value);
 };
 
 
@@ -355,7 +355,7 @@ void ConstantFunction<dim>::vector_value_list (const typename std::vector<Point<
     {
       Assert (values[i].size() == n_components,
 	      ExcDimensionMismatch(values[i].size(), n_components));
-      std::fill_n (values[i].begin(), n_components, function_value);
+      std::fill (values[i].begin(), values[i].end(), function_value);
     };
 };
 
@@ -389,7 +389,7 @@ void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == n_components,
 	  ExcDimensionMismatch (return_value.size(), n_components));
 
-  std::fill_n (return_value.begin(), n_components, 0.);
+  std::fill (return_value.begin(), return_value.end(), 0.);
   return_value(selected) = function_value;
 }
 
@@ -406,7 +406,7 @@ void ComponentSelectFunction<dim>::vector_value_list (const typename std::vector
     {
       Assert (values[i].size() == n_components,
 	      ExcDimensionMismatch(values[i].size(), n_components));
-      std::fill_n (values[i].begin(), n_components, 0.);
+      std::fill (values[i].begin(), values[i].end(), 0.);
       values[i](selected) = function_value;
     }
 }
