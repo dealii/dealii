@@ -204,8 +204,8 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 					   // direction between
 					   // the centers of two
 					   // cells
-	  Point<dim> y        = neighbor_center - this_center;
-	  double     distance = sqrt(y.square());
+	  Point<dim>   y        = neighbor_center - this_center;
+	  const double distance = sqrt(y.square());
 					   // normalize y
 	  y /= distance;
 	  
@@ -234,23 +234,17 @@ GradientEstimator::estimate_threaded (const DoFHandler<dim> &dof_handler,
 				       // otherwise we would not have
 				       // all components of the
 				       // gradient
-      if (determinant(Y) != 0)
-	{
-					   // compute Y^-1 g
-	  Point<dim> gradient;
-	  Tensor<2,dim> Y_inverse = invert(Y);
-	  
-					   // compute Y^-1 g
-	  for (unsigned int i=0; i<dim; ++i)
-	    for (unsigned int j=0; j<dim; ++j)
-	      gradient[i] += Y_inverse[i][j] * projected_gradient[j];
+      AssertThrow (determinant(Y) != 0,
+		   ExcInsufficientDirections());
 
-	  *error_on_this_cell = sqrt(gradient.square());
-	}
-      else
-					 // not all search directions
-					 // available
-	AssertThrow (false, ExcInsufficientDirections());
+                                       // compute Y^-1 g
+      Point<dim> gradient;
+      Tensor<2,dim> Y_inverse = invert(Y);
+      
+                                       // compute Y^-1 g
+      contract (gradient, Y_inverse, projected_gradient);
+
+      *error_on_this_cell = sqrt(gradient.square());
     };
 };
 
