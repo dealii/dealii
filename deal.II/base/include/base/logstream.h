@@ -54,7 +54,7 @@ class LogStream
 				      * to #cerr#, but can be set to another
 				      * stream through the constructor.
 				      */
-    ostream  *std;
+    ostream  *std_out;
 
 				     /**
 				      * Pointer to a stream, where a copy of
@@ -65,9 +65,34 @@ class LogStream
 				      * by the #attach# function.
 				      */
     ostream  *file;
-    
+
+				     /**
+				      * Flag which stores whether the
+				      * last operation was a
+				      * newline-generation. We use this flag
+				      * to generate the list of prefixes at
+				      * the next output, rather than
+				      * immediately after the newline, since
+				      * this might disturb the screen lay-out.
+				      */
     bool was_endl;
+
+				     /**
+				      * Value denoting the number of
+				      * prefixes to be printed to the
+				      * standard output. If more than
+				      * this number of prefixes is
+				      * pushed to the stack, then no
+				      * output will be generated until
+				      * the number of prefixes shrinks
+				      * back below this number.
+				      */
     unsigned int std_depth;
+
+				     /**
+				      * Same for the maximum depth of
+				      * prefixes for output to a file.
+				      */
     unsigned int file_depth;
   
   public:
@@ -162,15 +187,6 @@ class LogStream
 				      * Declare this function as a friend.
 				      */
     friend void endl (LogStream &);
-
-				     /**
-				      * Kludge to make one of the egcs snapshots
-				      * happy. Necessary since it produces an internal
-				      * compiler error when accessing #s.std#.
-				      * Remove this function at the first
-				      * possible time.
-				      */
-    ostream & get_std_stream ();
 };
 
 
@@ -193,12 +209,7 @@ LogStream::push (const string& text)
   prefixes.push(pre);
 }
 
-inline
-ostream &
-LogStream::get_std_stream ()
-{
-  return *std;
-}
+
 
 template <class T>
 inline void
@@ -207,12 +218,11 @@ writestuff(LogStream& s, const T& t)
  				   // print the object #t# to each of the
  				   // two streams, if necessary
   if (s.prefixes.size() <= s.std_depth)
-    s.get_std_stream() << t;
+    *(s.std_out) << t;
 
   if (s.file && (s.prefixes.size() <= s.file_depth))
     *(s.file) << t;
-}
-;
+};
 
 
 

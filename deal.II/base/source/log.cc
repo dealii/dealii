@@ -10,7 +10,7 @@ LogStream deallog;
 
 
 LogStream::LogStream()
-		: std(&cerr), file(0), was_endl(true),
+		: std_out(&cerr), file(0), was_endl(true),
 		  std_depth(10000), file_depth(10000)
 {
   prefixes.push("DEAL:");
