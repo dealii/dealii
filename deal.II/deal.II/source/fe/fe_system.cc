@@ -257,6 +257,120 @@ FESystem<dim>::build_face_table()
 
 
 template <int dim>
+void FESystem<dim>::build_interface_constraints () 
+{
+				   // the layout of the constraints matrix is
+				   // described in the FiniteElement class. you
+				   // may want to look there first before trying
+				   // to understand the following, especially
+				   // the mapping of the #n# index.
+				   //
+				   // in order to map it to the fe-system class,
+				   // we have to know which base element a
+				   // degree of freedom within a vertex, line,
+				   // etc belongs to. this can be accomplished
+				   // by the system_to_component_index
+				   // function in conjunction with the
+				   // numbers first_{line,quad,...}_index
+  for (unsigned int n=0; n<interface_constraints.n(); ++n)
+    for (unsigned int m=0; m<interface_constraints.m(); ++m)
+      {
+					 // for the pair (n,m) find out which
+					 // component they belong to and
+					 // the number therein
+					 //
+					 // first value in pair is component,
+					 // second is index
+	const pair<unsigned int, unsigned int> n_index
+	  = face_system_to_component_index (n);
+
+	pair<unsigned int, unsigned int> m_index;
+	switch (dim)
+	  {
+	    case 1:
+	    {
+					       // we should never get here!
+					       // (in 1d, the constraints matrix
+					       // should be of size zero)
+	      Assert (false, ExcInternalError());
+	      break;
+	    };
+
+	    case 2:
+	    {
+					       // the indices m=0..d_v-1 are
+					       // from the center vertex.
+					       // their order is the same
+					       // as for the first vertex
+					       // of the whole cell, so we
+					       // can use the
+					       // system_to_component_index
+					       // function (using the
+					       // face_s_t_c_i function would
+					       // yield the same)
+	      if (m < dofs_per_vertex)
+		m_index = system_to_component_index (m);
+	      else
+						 // then come the two sets of
+						 // line indices
+		{
+		  const unsigned int index_in_line
+		    = (m-dofs_per_vertex) % dofs_per_line;
+		  const unsigned int sub_line
+		    = (m-dofs_per_vertex) / dofs_per_line;
+		  Assert (sub_line < 2, ExcInternalError());
+		  
+						   // get the component by
+						   // asking s_t_c_index and
+						   // tweaking the index a bit
+		  m_index.first = system_to_component_index
+				  (GeometryInfo<2>::vertices_per_cell * dofs_per_vertex
+				   + index_in_line).first;
+						   // first find out the how-many'th
+						   // line index of that component
+						   // this was
+		  m_index.second = (system_to_component_index
+				    (GeometryInfo<2>::vertices_per_cell * dofs_per_vertex
+				     + index_in_line).second
+				    - base_element (m_index.first).first_line_index)
+						   // then add the number of dofs
+						   // per vertex to get the index
+						   // on the first line
+				   + base_element(m_index.first).dofs_per_vertex
+						   // if on the second line: add
+						   // some more
+				   + base_element(m_index.first).dofs_per_line * sub_line;
+		};
+	      break;
+	    };
+
+	    case 3:
+						   // it should be straightforward
+						   // to implement this for 3d from
+						   // the code above, but I haven't
+						   // done it yet.
+		  
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  };
+
+					 // now that we gathered all information:
+					 // use it to build the matrix. note
+					 // that if n and m belong to different
+					 // components, there definitely will be
+					 // no coupling
+	if (n_index.first == m_index.first)
+	  interface_constraints(m,n)
+	    = base_element(n_index.first).constraints()(m_index.second,
+							n_index.second);
+      };
+};
+
+
+
+
+
+template <int dim>
 void FESystem<dim>::initialize ()
 {
   build_cell_table();
@@ -265,26 +379,27 @@ void FESystem<dim>::initialize ()
 				   // finite elements to the matrices of
 				   // this object
   for (unsigned int component=0; component<n_components; ++component)
+				     // transform restriction and
+				     // prolongation matrices
     for (unsigned int i=0; i<base_element(component_to_base_table[component]).total_dofs; ++i)
       for (unsigned int j=0; j<base_element(component_to_base_table[component]).total_dofs; ++j)
 					 // only fill block diagonals, no
 					 // intermixing of subelements
-	{
-	  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-	    {
-	      restriction[child] (component_to_system_index (component,i),
-				  component_to_system_index (component, j))
-		= base_element(component_to_base_table[component]).restrict(child)(i,j);
-	      prolongation[child] (component_to_system_index (component,i),
-				   component_to_system_index (component, j))
-		= base_element(component_to_base_table[component]).prolongate(child)(i,j);
-	    };
+	for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+	  {
+	    restriction[child] (component_to_system_index (component,i),
+				component_to_system_index (component, j))
+	      = base_element(component_to_base_table[component]).restrict(child)(i,j);
+	    prolongation[child] (component_to_system_index (component,i),
+				 component_to_system_index (component, j))
+	      = base_element(component_to_base_table[component]).prolongate(child)(i,j);
+	  };
 
-// still to do:	  
-//	  interface_constraints (// component_to_system_index (component,i),
-// 				 component_to_system_index (component, j))
-// 	    = base_element(component_to_base_table[component]).constraints()(i,j);
-	};
+
+				   // now set up the interface constraints.
+				   // this is kind'o hairy, so don't try
+				   // to do it dimension independent
+  build_interface_constraints ();
 };
 
 

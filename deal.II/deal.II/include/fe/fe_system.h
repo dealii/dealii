@@ -474,6 +474,11 @@ class FESystem //<dim>
 				      * Used by #initialize#.
 				      */
     void build_face_table();
+
+				     /**
+				      * Used by #initialize#.
+				      */
+    void build_interface_constraints ();
     
 				     /**
 				      *Exception.
