@@ -129,7 +129,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
                 else
   
   	          dnl KAI C++?
-  	          is_kai_cc="`($CXX -V 2>&1) | grep 'KAI C++'`"
+  	          is_kai_cc="`($CXX --version 2>&1) | grep 'KAI C++'`"
   	          if test "x$is_kai_cc" != "x" ; then
   	            AC_MSG_RESULT(C++ compiler is KAI C++)
   	            GXX_VERSION=kai_cc
