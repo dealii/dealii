@@ -174,7 +174,7 @@ namespace deal_II_exceptions
 				      * displayed if the value is
 				      * zero.
 				      */
-    static unsigned int n_treated_exceptions;
+    unsigned int n_treated_exceptions;
   
 
     void issue_error_assert (const char *file,
@@ -241,7 +241,7 @@ namespace deal_II_exceptions
       if (std::uncaught_exception() == true)
 	{
 					   // only display message once
-	  if (n_treated_exceptions == 0)
+	  if (n_treated_exceptions <= 1)
 	    std::cerr << "******** Program is not aborted since another exception is active! ********"
 		      << std::endl;
 	}
