@@ -37,7 +37,17 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
   Assert (m.max_len==0, ExcInvalidConstructorCall());
 };
 
+template <typename number>
+SparseMatrix<number>&
+SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
+{
+  Assert (m.cols==0, ExcInvalidConstructorCall());
+  Assert (m.val==0, ExcInvalidConstructorCall());
+  Assert (m.max_len==0, ExcInvalidConstructorCall());
 
+  return *this;
+};
+  
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :

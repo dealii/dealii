@@ -609,6 +609,11 @@ class SparseMatrix : public Subscriptor
 				      * structure.
 				      */
     virtual ~SparseMatrix ();
+				     /** 
+				      * Pseudo operator only copying empty objects.
+				      */
+    SparseMatrix<number>& operator = (const SparseMatrix<number> &);
+
     
 
 				     /**
@@ -1048,12 +1053,6 @@ class SparseMatrix : public Subscriptor
 				     // make all other sparse matrices
 				     // friends
     template <typename somenumber> friend class SparseMatrix<somenumber>;
-
-				     /** 
-				      * Made #operator =# private to
-				      * avoid improper use.
-				      */
-    SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
 };
 
