@@ -77,5 +77,5 @@ DEAL::Eigen
 -0.022 -0.021 0.054 -0.030 0.234 
 DEAL::Eigen
 DEAL::Eigen
-DEAL::t19GrowingVectorMemory1Zt6Vector1Zd:Overall allocated vectors: 8
-DEAL::t19GrowingVectorMemory1Zt6Vector1Zd:Maximum allocated vectors: 2
+DEAL::GrowingVectorMemory:Overall allocated vectors: 8
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
