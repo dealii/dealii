@@ -31,6 +31,8 @@
        with gcc version 2.96!</a>
   <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
        Windows platform?</a>       
+  <li> <a href="#parallel">Does <acronym>deal.II</acronym> support parallel
+       computing?</a>
   <li> <a href="#perl-bug">I can't build the online documentation under Cygwin!</a>
   <li> <a href="#triangles">Can I use/implement triangles/tetrahedra
        in <acronym>deal.II</acronym>?</a> 
@@ -231,6 +233,44 @@
 
 
 
+  <a name="parallel">
+  <h3>Does <acronym>deal.II</acronym> support parallel computing?</a></h3>
+
+  <p>
+  Yes. If you use the <code>--with-multithreading
+  --enable-multithreading</code> flags when you run <code>./configure</code>
+  (see the <a href="readme.html" target="body">README</a> file), then the
+  library will be set up to use multiple threads for various tasks, and you
+  can also use multiple threads in your program. See the example programs
+  to see how to do the latter. On machines with more than one processor
+  (i.e. SMP machines), using this functionality makes a lot of sense and can
+  significantly accelerate a program.
+  </p>
+
+  <p>
+  By default, <acronym>deal.II</acronym> does not support operations on
+  clusters of computers that communicate via MPI. However, it also doesn't
+  prohibit you from doing so in your application programs (and there are a
+  number of programs that actually do this), it just doesn't implement
+  anything that actively uses MPI functionality.
+  </p>
+
+  <p>
+  On the other hand, newer versions of <acronym>deal.II</acronym> have
+  interfaces to the <a href="http://www.mcs.anl.gov/petsc/">PETSc</a> library
+  that implements a lot of functionality for distributed linear algebra,
+  i.e. for operations on vectors and matrices that are distributed across a
+  cluster of machines coupled via MPI. By using these wrapper classes for
+  linear algebra, it is possible to implement programs that work on truly
+  large problems by distributing computations.
+  </p>
+
+  <p>
+  For questions how to set up <acronym>deal.II</acronym> to use PETSc, refer
+  to the <a href="readme.html">readme file</a>.
+  </p>
+
+
   <a name="triangles"></a>
   <h3>Can I use/implement triangles/tetrahedra in
   <acronym>deal.II</acronym>?</h3>
@@ -265,7 +305,7 @@
   <p>
   To give only a very brief overview of what is possible, here is a
   list of the nontrivial problems that were treated by the programs
-  that only the main authors wrote to date:
+  that the main authors alone wrote to date:
   <ul>
   <li> Time-dependent acoustic and elastic wave equation, including
        nonlocal absorbing boundary conditions;
@@ -273,7 +313,11 @@
        element method;
   <li> General hyperbolic problems including Euler flow, using the
        discontinuous Galerkin finite element method;
-  <li> Distributed parameter estimation problems.
+  <li> Distributed parameter estimation problems;
+  <li> Mixed finite element discretization of a mortar multiblock formulation
+       of the Laplace equation;
+  <li> Large-deformation elasto-plasticity in the simulation of plate
+       tectonics.
   </ul>
   </p>
 

@@ -69,6 +69,7 @@ deps: common/scripts/make_dependencies
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/lib && $(MAKE) $(MAKEOPTIONS) external-links
 
 common/scripts/make_dependencies:
 	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)

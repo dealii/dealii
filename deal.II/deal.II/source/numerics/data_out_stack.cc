@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -387,9 +387,19 @@ std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
 
 // explicit instantiations
 template class DataOutStack<deal_II_dimension>;
+
 template void DataOutStack<deal_II_dimension>::
 add_data_vector<double> (const Vector<double> &vec,
 			 const std::string    &name);
+
+template void DataOutStack<deal_II_dimension>::
+add_data_vector<double> (const Vector<double> &vec,
+			 const std::vector<std::string> &names);
+
 template void DataOutStack<deal_II_dimension>::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
+
+template void DataOutStack<deal_II_dimension>::
+add_data_vector<float> (const Vector<float> &vec,
+			 const std::vector<std::string> &names);

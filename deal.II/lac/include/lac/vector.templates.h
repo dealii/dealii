@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,6 +72,38 @@ Vector<Number>::Vector (const Vector<Number>& v)
 // }
 
 
+#ifdef DEAL_II_USE_PETSC
+
+template <typename Number>
+Vector<Number>::Vector (const PETScWrappers::VectorBase &v)
+                :
+		dim(v.size()),
+		maxdim(v.size()),
+		val(0)
+{
+  if (dim)
+    {
+      val = new Number[maxdim];
+      Assert (val != 0, ExcOutOfMemory());
+
+                                       // get a representation of the vector
+                                       // and copy it
+      PetscScalar *start_ptr;
+      int ierr = VecGetArray (v, &start_ptr);
+      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));
+      
+      std::copy (start_ptr, start_ptr+dim, begin());
+
+                                       // restore the representation of the
+                                       // vector
+      ierr = VecRestoreArray (v, &start_ptr);
+      AssertThrow (ierr == 0, PETScWrappers::VectorBase::ExcPETScError(ierr));      
+    }
+}
+
+#endif
+
+
 template <typename Number>
 template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2>& v, const bool fast)
@@ -93,7 +125,8 @@ Vector<Number>::swap (Vector<Number> &v)
 
 
 template <typename Number>
-bool Vector<Number>::all_zero () const
+bool
+Vector<Number>::all_zero () const
 {
   Assert (dim!=0, ExcEmptyVector());
   
@@ -104,6 +137,23 @@ bool Vector<Number>::all_zero () const
       return false;
   return true;
 }
+
+
+
+template <typename Number>
+bool
+Vector<Number>::is_non_negative () const
+{
+  Assert (dim!=0, ExcEmptyVector());
+  
+  const_iterator p = begin(),
+		 e = end();
+  while (p!=e)
+    if (*p++ < 0.0)
+      return false;
+  return true;
+}
+
 
 
 template <typename Number>
@@ -201,6 +251,7 @@ Number Vector<Number>::mean_value () const
   
   return (sum0+sum1+sum2+sum3)/size();
 }
+
 
 
 template <typename Number>
@@ -555,6 +606,23 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 
 
 template <typename Number>
+template <typename Number2>
+bool
+Vector<Number>::operator == (const Vector<Number2>& v) const
+{
+  Assert (dim!=0, ExcEmptyVector());
+  Assert (dim == v.size(), ExcDimensionMismatch(dim, v.size()));
+
+  for (unsigned int i=0; i<dim; ++i)
+    if (val[i] != v.val[i])
+      return false;
+
+  return true;
+}
+
+
+
+template <typename Number>
 void Vector<Number>::print (const char* format) const
 {
   Assert (dim!=0, ExcEmptyVector());
@@ -573,6 +641,7 @@ void Vector<Number>::print (std::ostream      &out,
 			    const bool         across) const
 {
   Assert (dim!=0, ExcEmptyVector());
+  AssertThrow (out, ExcIO());
 
   out.precision (precision);
   if (scientific)

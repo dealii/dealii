@@ -17,6 +17,10 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+#ifdef DEAL_II_USE_PETSC
+#  include <lac/petsc_vector_base.h>
+#endif
+
 #include <cstdio>
 
 /*! @addtogroup Vectors
@@ -73,23 +77,24 @@ class Vector
 				      */
 				     //@{
 				     /**
-				      *  Dummy-Constructor. Dimension=0
+				      *  Constructor. Create a vector of
+				      *  dimension zero.
 				      */
     Vector ();
     
 				     /**
-				      * Copy-Constructor. Dimension set to
-				      * that of V, all components are copied
-				      * from V.
+				      * Copy-constructor. Sets the dimension
+                                      * to that of the given vector, and
+                                      * copies all elements.
 				      *
 				      * We would like to make this
 				      * constructor explicit, but STL
 				      * insists on using it implicitly.
 				      */
-    Vector (const Vector<Number>& V);
+    Vector (const Vector<Number> &v);
 
 
-// note: I disabled this function for the time being, since egcs1.1.2
+// note: I disabled this function for the time being, since gcc2.95
 // does not respect the "explicit" keyword for template constructors.
 // this leads to unwanted conversions and in some places to automatically
 // generated temporaries, where this is not a good idea. [WB]
@@ -105,11 +110,31 @@ class Vector
 //     template <typename OtherNumber>
 //     explicit
 //     Vector (const Vector<OtherNumber> &v);
+
+#ifdef DEAL_II_USE_PETSC
+                                     /**
+                                      * Another copy constructor: copy the
+                                      * values from a PETSc wrapper vector
+                                      * class. This copy constructor is only
+                                      * available if PETSc was detected during
+                                      * configuration time.
+                                      */
+    Vector (const PETScWrappers::VectorBase &v);
+#endif
     
 				     /**
 				      * Constructor. Set dimension to
 				      * @p{n} and initialize all
 				      * elements with zero.
+				      *
+				      * The constructor is made explicit to
+				      * avoid accidents like this:
+				      * @p{v=0;}. Presumably, the user wants
+				      * to set every element of the vector to
+				      * zero, but instead, what happens is
+				      * this call: @p{v=Vector<number>(0);},
+				      * i.e. the vector is replaced by one of
+				      * length zero.
 				      */
     explicit Vector (const unsigned int n);
 
@@ -121,7 +146,8 @@ class Vector
 				      * to the @p{std::vector} class.
 				      */
     template <typename InputIterator>
-    Vector (const InputIterator first, const InputIterator last);
+    Vector (const InputIterator first,
+            const InputIterator last);
     
 				     /**
 				      * Destructor, deallocates
@@ -131,31 +157,56 @@ class Vector
 				      */
     virtual ~Vector ();
 
-				     /**
+                                     /**
+                                      * This function does nothing but is
+                                      * there for compatibility with the
+                                      * @p{PETScWrappers::Vector} class.
+                                      * 
+                                      * For the PETSc vector wrapper class,
+                                      * thios function compresses the
+                                      * underlying representation of the PETSc
+                                      * object, i.e. flushes the buffers of
+                                      * the vector object if it has any. This
+                                      * function is necessary after writing
+                                      * into a vector element-by-element and
+                                      * before anything else can be done on
+                                      * it.
+                                      *
+                                      * However, for the implementation of
+                                      * this class, it is immaterial and thus
+                                      * an empty function.
+                                      */
+    void compress () const;
+
+    				     /**
 				      * Set all entries to zero. Equivalent to
-				      * @p{v = 0}, but more obvious and faster.
-				      * Note that this function does not change
-				      * the size of the vector, unlike the
-				      * STL's @p{vector<>::clear} function.
+				      * @p{v = 0}, but more obvious and
+				      * faster.  Note that this function does
+				      * not change the size of the vector,
+				      * unlike the STL's @p{vector<>::clear}
+				      * function.
 				      */
     void clear ();    
 
 				     /**
 				      * Change the dimension of the vector to
-				      * @p{N}. The reserved memory for this vector
-				      * remains unchanged if possible, to make
-				      * things faster, but this may waste some
-				      * memory, so take this in the back of your
-				      * head.
-				      * However, if @p{N==0} all memory is freed,
-				      * i.e. if you want to resize the vector
-				      * and release the memory not needed, you
-				      * have to first call @p{reinit(0)} and then
+				      * @p{N}. The reserved memory for this
+				      * vector remains unchanged if possible,
+				      * to make things faster; this may waste
+				      * some memory, so keep this in mind.
+				      * However, if @p{N==0} all memory is
+				      * freed, i.e. if you want to resize the
+				      * vector and release the memory not
+				      * needed, you have to first call
+				      * @p{reinit(0)} and then
 				      * @p{reinit(N)}. This cited behaviour is
-				      * analogous to that of the STL containers.
+				      * analogous to that of the STL
+				      * containers.
 				      *
-				      * On @p{fast==false}, the vector is filled by
-				      * zeros.
+				      * On @p{fast==false}, the vector is
+				      * filled by zeros. Otherwise, the
+				      * elements are left an unspecified
+				      * state.
 				      */ 
     void reinit (const unsigned int N,
 		 const bool         fast=false);
@@ -165,9 +216,9 @@ class Vector
 				      * vector @p{V}. The same applies as for
 				      * the other @p{reinit} function.
 				      *
-				      * The elements of @p{V} are not copied, i.e.
-				      * this function is the same as calling
-				      * @p{reinit (V.size(), fast)}.
+				      * The elements of @p{V} are not copied,
+				      * i.e.  this function is the same as
+				      * calling @p{reinit (V.size(), fast)}.
 				      */
     template <typename Number2>
     void reinit (const Vector<Number2> &V,
@@ -199,20 +250,45 @@ class Vector
     void swap (Vector<Number> &v);
     
 				     /**
-				      * $U(0-N) = s$: fill all components.
+				      * Set all components of the vector to
+				      * the given number @p{s}.
 				      */
     Vector<Number> & operator= (const Number s);
     
 				     /**
-				      *  $U = V$: copy all components.
+				      * Copy the given vector. Resize the
+				      * present vector if necessary.
 				      */
-    Vector<Number> & operator= (const Vector<Number>& V);
+    Vector<Number> & operator= (const Vector<Number> &c);
 
 				     /**
-				      * $U = V$ for different types.
+				      * Copy the given vector. Resize the
+				      * present vector if necessary.
 				      */
-    template<typename Number2>
-    Vector<Number> & operator= (const Vector<Number2>& V);
+    template <typename Number2>
+    Vector<Number> & operator= (const Vector<Number2> &v);
+
+                                     /**
+                                      * Test for equality. This function
+                                      * assumes that the present vector and
+                                      * the one to compare with have the same
+                                      * size already, since comparing vectors
+                                      * of different sizes makes not much
+                                      * sense anyway.
+                                      */
+    template <typename Number2>
+    bool operator == (const Vector<Number2> &v) const;
+    
+                                     /**
+                                      * Test for inequality. This function
+                                      * assumes that the present vector and
+                                      * the one to compare with have the same
+                                      * size already, since comparing vectors
+                                      * of different sizes makes not much
+                                      * sense anyway.
+                                      */
+    template <typename Number2>
+    bool operator != (const Vector<Number2> &v) const;
     
 				     /**
 				      * Return the scalar product of
@@ -267,11 +343,7 @@ class Vector
     Number linfty_norm () const;
 
 				     /**
-				      * Return dimension of the vector. This
-				      * function was formerly called @p{n()}, but
-				      * was renamed to get the @p{Vector} class
-				      * closer to the C++ standard library's
-				      * @p{vector} container.
+				      * Return dimension of the vector.
 				      */
     unsigned int size () const;
 
@@ -284,6 +356,16 @@ class Vector
 				      * some time.
 				      */
     bool all_zero () const;
+
+                                     /**
+                                      * Return @p{true} if the vector has no
+                                      * negative entries, i.e. all entries are
+                                      * zero or positive. This function is
+                                      * used, for example, to check whether
+                                      * refinement indicators are really all
+                                      * positive (or zero).
+                                      */
+    bool is_non_negative () const;
     
 				     /**
 				      * Make the @p{Vector} class a bit like the
@@ -319,12 +401,13 @@ class Vector
 				      */
 				     //@{
 				     /**
-				      * Access components, returns U(i).
+				      * Access the value of the @p{i}th
+				      * component.
 				      */
     Number operator() (const unsigned int i) const;
     
 				     /**
-				      * Access components, returns U(i)
+				      * Access the @p{i}th component
 				      * as a writeable reference.
 				      */
     Number& operator() (const unsigned int i);
@@ -335,71 +418,81 @@ class Vector
 				      * @name 3: Modification of vectors
 				      */
 				     //@{
+    
 				     /**
-				      * Addition operator.
-				      * Fast equivalent to @p{U.add(1, V)}.
+				      * Add the given vector to the present
+				      * one.
 				      */
     Vector<Number> & operator += (const Vector<Number> &V);
 
     				     /**
-				      * Subtraction operator.
-				      * Fast equivalent to @p{U.add(-1, V)}.
+				      * Subtract the given vector from the
+				      * present one.
 				      */
     Vector<Number> & operator -= (const Vector<Number> &V);
 
 				     /**
-				      * $U(0-DIM)+=s$.
-				      * Addition of @p{s} to all components. Note
-				      * that @p{s} is a scalar and not a vector.
+				      * Addition of @p{s} to all
+				      * components. Note that @p{s} is a
+				      * scalar and not a vector.
 				      */
     void add (const Number s);
     
 				     /**
-				      * U+=V.
 				      * Simple vector addition, equal to the
 				      * @p{operator +=}.
 				      */
-    void add (const Vector<Number>& V);
+    void add (const Vector<Number> &V);
     
 				     /**
-				      * U+=a*V.
-				      * Simple addition of a scaled vector.
+				      * Simple addition of a multiple of a
+				      * vector, i.e. @p{*this += a*V}.
 				      */
-    void add (const Number a, const Vector<Number>& V);
+    void add (const Number a, const Vector<Number> &V);
     
 				     /**
-				      * U+=a*V+b*W.
-				      * Multiple addition of scaled vectors.
+				      * Multiple addition of scaled vectors,
+				      * i.e. @p{*this += a*V+b*W}.
 				      */
-    void add (const Number a, const Vector<Number>& V,
-	      const Number b, const Vector<Number>& W);
+    void add (const Number a, const Vector<Number> &V,
+	      const Number b, const Vector<Number> &W);
     
 				     /**
-				      * U=s*U+V.
-				      * Scaling and simple vector addition.
+				      * Scaling and simple vector addition,
+				      * i.e.
+				      * @p{*this = s*(*this)+V}.
 				      */
-    void sadd (const Number s, const Vector<Number>& V);
+    void sadd (const Number          s,
+               const Vector<Number> &V);
     
 				     /**
-				      * U=s*U+a*V.
-				      * Scaling and simple addition.
+				      * Scaling and simple addition, i.e.
+				      * @p{*this = s*(*this)+a*V}.
 				      */
-    void sadd (const Number s, const Number a, const Vector<Number>& V);
+    void sadd (const Number          s,
+               const Number          a,
+               const Vector<Number> &V);
     
 				     /**
-				      * U=s*U+a*V+b*W.
 				      * Scaling and multiple addition.
 				      */
-    void sadd (const Number s, const Number a,
-	       const Vector<Number>& V, const Number b, const Vector<Number>& W);
+    void sadd (const Number          s,
+               const Number          a,
+	       const Vector<Number> &V,
+               const Number          b,
+               const Vector<Number> &W);
     
 				     /**
-				      * U=s*U+a*V+b*W+c*X.
 				      * Scaling and multiple addition.
+				      * @p{*this = s*(*this)+a*V + b*W + c*X}.
 				      */
-    void sadd (const Number s, const Number a,
-	       const Vector<Number>& V, const Number b, const Vector<Number>& W, 
-	       const Number c, const Vector<Number>& X);
+    void sadd (const Number          s,
+               const Number          a,
+	       const Vector<Number> &V,
+               const Number          b,
+               const Vector<Number> &W, 
+	       const Number          c,
+               const Vector<Number> &X);
     
 				     /**
 				      * Scale each element of the
@@ -441,14 +534,13 @@ class Vector
     void scale (const Vector<Number2> &scaling_factors);
     
 				     /**
-				      *  U=a*V. Assignment.
+				      * Assignment @p{*this = a*V}.
 				      */
     template <typename Number2>
     void equ (const Number a, const Vector<Number2>& V);
     
 				     /**
-				      * U=a*V+b*W.
-				      * Replacing by sum.
+				      * Assignment @p{*this = a*V + b*W}.
 				      */
     void equ (const Number a, const Vector<Number>& V,
 	      const Number b, const Vector<Number>& W);
@@ -456,10 +548,10 @@ class Vector
 				     /**
 				      * Compute the elementwise ratio of the
 				      * two given vectors, that is let
-				      * @p{this[i] = a[i]/b[i]}. This is useful
-				      * for example if you want to compute
-				      * the cellwise ratio of true to estimated
-				      * error.
+				      * @p{this[i] = a[i]/b[i]}. This is
+				      * useful for example if you want to
+				      * compute the cellwise ratio of true to
+				      * estimated error.
 				      *
 				      * This vector is appropriately
 				      * scaled to hold the result.
@@ -777,6 +869,27 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   std::fill (begin(), end(), s);
   return *this;
 }
+
+
+
+template <typename Number>
+template <typename Number2>
+inline
+bool
+Vector<Number>::operator != (const Vector<Number2>& v) const
+{
+  return ! (*this == v);
+}
+
+
+
+template <typename Number>
+inline
+void
+Vector<Number>::compress () const
+{}
+
+
 
 /*! @addtogroup Vectors
  *@{

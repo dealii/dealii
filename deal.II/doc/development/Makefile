@@ -24,6 +24,9 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>DEAL_II_MINOR=$(DEAL_II_MINOR)</code>' >> $@
 	@echo '<li><code>TARGET=$(TARGET)</code>' >> $@
 	@echo '<li><code>USE_CONTRIB_HSL=$(USE_CONTRIB_HSL)</code>' >> $@
+	@echo '<li><code>USE_CONTRIB_PETSC=$(USE_CONTRIB_PETSC)</code>' >> $@
+	@echo '<li><code>DEAL_II_PETSC_DIR=$(DEAL_II_PETSC_DIR)</code>' >> $@
+	@echo '<li><code>DEAL_II_PETSC_ARCH=$(DEAL_II_PETSC_ARCH)</code>' >> $@
 	@echo '<li><code>lib-path-base=$(lib-path-base)</code>' >> $@
 	@echo '<li><code>lib-path-lac=$(lib-path-lac)</code>' >> $@
 	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@
@@ -40,10 +43,15 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>lib-deal2-3d.o=$(lib-deal2-3d.o)</code>' >> $@
 	@echo '<li><code>lib-deal2-3d.g=$(lib-deal2-3d.g)</code>' >> $@
 	@echo '<li><code>lib-contrib-hsl=$(lib-contrib-hsl)</code>' >> $@
+	@echo '<li><code>lib-contrib-petsc.g=$(lib-contrib-petsc.g)</code>' >> $@
+	@echo '<li><code>lib-contrib-petsc.o=$(lib-contrib-petsc.o)</code>' >> $@
 	@echo '<li><code>include-path-base=$(include-path-base)</code>' >> $@
 	@echo '<li><code>include-path-lac=$(include-path-lac)</code>' >> $@
 	@echo '<li><code>include-path-deal2=$(include-path-deal2)</code>' >> $@
 	@echo '<li><code>include-path-contrib-hsl=$(include-path-contrib-hsl)</code>' >> $@
+	@echo '<li><code>include-path-contrib-petsc=$(include-path-contrib-petsc)</code>' >> $@
+	@echo '<li><code>include-path-contrib-petsc-bmake=$(include-path-contrib-petsc-bmake)</code>' >> $@
+	@echo '<li><code>include-path-contrib-petsc-mpi=$(include-path-contrib-petsc-mpi)</code>' >> $@
 	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.o=$(CXXFLAGS.o)</code>' >> $@

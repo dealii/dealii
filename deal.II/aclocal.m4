@@ -1455,6 +1455,42 @@ AC_DEFUN(DEAL_II_CHECK_GETRUSAGE, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Check if the declared prototype of abort() has a throw()
+dnl specification. We overload abort() in our testsuite, so have
+dnl to make sure that we match the exception specification
+dnl correctly.
+dnl
+dnl Usage: DEAL_II_CHECK_ABORT
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ABORT, dnl
+[
+  AC_MSG_CHECKING([for exception specifications on abort()])
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG -Werror"
+  AC_TRY_COMPILE(
+    [
+#include <cstdlib>
+extern "C" void abort () {}
+    ],
+    [
+    ],
+    [
+	AC_MSG_RESULT(none)
+    ],
+    [
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(DEAL_II_ABORT_NOTHROW_EXCEPTION, 1, 
+                  [Defined if the prototype of abort() has a no-throw
+                   exception specification.])
+    ])
+]
+)      
+
+
+
+
+dnl -------------------------------------------------------------
 dnl We'd like to use the `isnan' function. On some systems, this is
 dnl simply declared in <math.h> (or <cmath>, for what it's worth), but
 dnl on Linux for example, it is only declared if we specifically require
@@ -3292,80 +3328,6 @@ using namespace std;
 
 
 
-
-dnl ------------------------------------------------------------
-dnl Check whether some of the HSL functions have been dropped
-dnl into their respective place in the contrib subdir.
-dnl Check for the following functions to be there:
-dnl     MA27: needs files ma27.f
-dnl     MA47: needs files ma47.f ma47.dep
-dnl
-dnl Usage: DEAL_II_CONFIGURE_HSL
-dnl
-dnl ------------------------------------------------------------
-AC_DEFUN(DEAL_II_CONFIGURE_HSL, dnl
-[
-  AC_MSG_CHECKING(for HSL subroutines)
-  hsl_subroutines=""
-  if test -r contrib/hsl/source/ma27.f ; then
-    hsl_subroutines="$hsl_subroutines MA27"
-    AC_DEFINE(HAVE_HSL_MA27, 1, 
-              [Availability of the MA27 algorithm from HSL])
-  fi
-  
-  if (test -r contrib/hsl/source/ma47.f && \
-      test -r contrib/hsl/source/ma47dep.f) ; then
-    hsl_subroutines="$hsl_subroutines MA47"
-    AC_DEFINE(HAVE_HSL_MA47, 1, 
-              [Availability of the MA47 algorithm from HSL])
-  fi
-  
-  if test "x$hsl_subroutines" != "x" ; then
-    AC_MSG_RESULT($hsl_subroutines)
-    USE_CONTRIB_HSL=yes
-  else
-    AC_MSG_RESULT(none found)
-    USE_CONTRIB_HSL=no
-  fi
-])
-
-  
-
-dnl -------------------------------------------------------------
-dnl Check for the Tecplot API. If it is found we will be able to write
-dnl Tecplot binary files directly.
-dnl
-dnl This is a little ugly since we aren't guaranteed that TECHOME
-dnl will point to the installation directory.  It could just as
-dnl easily be TEC80HOME, TEC90HOME, etc...  So, better check them all
-dnl
-dnl Usage: DEAL_II_CONFIGURE_TECPLOT
-dnl
-dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
-[
-  AC_CHECK_FILE($TECHOME/lib/tecio.a,
-		TECPLOT_LIBRARY_PATH=$TECHOME/lib/tecio.a)
-  AC_CHECK_FILE($TEC80HOME/lib/tecio.a,
-		TECPLOT_LIBRARY_PATH=$TEC80HOME/lib/tecio.a)
-  AC_CHECK_FILE($TEC90HOME/lib/tecio.a,
-		TECPLOT_LIBRARY_PATH=$TEC90HOME/lib/tecio.a)
-  AC_CHECK_FILE($TECHOME/include/TECIO.h,
-		TECPLOT_INCLUDE_PATH=$TECHOME/include)
-  AC_CHECK_FILE($TEC80HOME/include/TECIO.h,
-	        TECPLOT_INCLUDE_PATH=$TEC80HOME/include)
-  AC_CHECK_FILE($TEC90HOME/include/TECIO.h,
-	        TECPLOT_INCLUDE_PATH=$TEC90HOME/include)
-
-  if (test -r "$TECPLOT_LIBRARY_PATH" && \
-      test -r "$TECPLOT_INCLUDE_PATH/TECIO.h") ; then
-    AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
-	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
-  fi
-])
-
-
-
 dnl -------------------------------------------------------------
 dnl Check whether CXXFLAGSG and CXXFLAGSO are a valid combination
 dnl of flags or if there are contradicting flags in them.
@@ -3486,5 +3448,215 @@ AC_DEFUN(DEAL_II_CHECK_KDOC, dnl
   else
     kdocversion=`cat ${DEAL2_DIR}/contrib/kdoc/src/Version`
     AC_MSG_RESULT(using default version $kdocversion)
+  fi
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check for Doxygen.
+dnl
+dnl Usage: DEAL_II_CHECK_DOXYGEN
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
+[
+  AC_ARG_WITH(doxygen,
+  [  --with-doxygen=filename     use 'filename' for doxygen],
+      DOXYGEN=$withval,
+      DOXYGEN=)
+
+  dnl lets see whether the file exists
+  if test "x$DOXYGEN" != "x" ; then
+    AC_MSG_CHECKING(for specified doxygen path)
+    if test -r $DOXYGEN ; then
+      AC_MSG_RESULT($DOXYGEN)
+    else
+      AC_MSG_RESULT(not found)
+      AC_MSG_ERROR(Invalid doxygen path $DOXYGEN)
+    fi
+  else
+    dnl Check doxygen from the regular path. If we can't find it, then
+    dnl set a flag and come back to that at the end of the ./configure
+    dnl call.
+    AC_PATH_PROG(DOXYGEN,doxygen)
+    if test "x$DOXYGEN" = "x" ; then
+      doxygen_not_found=yes;
+    fi
+  fi
+])
+
+
+
+dnl ------------------------------------------------------------
+dnl Check whether some of the HSL functions have been dropped
+dnl into their respective place in the contrib subdir.
+dnl Check for the following functions to be there:
+dnl     MA27: needs files ma27.f
+dnl     MA47: needs files ma47.f ma47.dep
+dnl
+dnl Usage: DEAL_II_CONFIGURE_HSL
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_HSL, dnl
+[
+  AC_MSG_CHECKING(for HSL subroutines)
+  hsl_subroutines=""
+  if test -r contrib/hsl/source/ma27.f ; then
+    hsl_subroutines="$hsl_subroutines MA27"
+    AC_DEFINE(HAVE_HSL_MA27, 1, 
+              [Availability of the MA27 algorithm from HSL])
+  fi
+  
+  if (test -r contrib/hsl/source/ma47.f && \
+      test -r contrib/hsl/source/ma47dep.f) ; then
+    hsl_subroutines="$hsl_subroutines MA47"
+    AC_DEFINE(HAVE_HSL_MA47, 1, 
+              [Availability of the MA47 algorithm from HSL])
+  fi
+  
+  if test "x$hsl_subroutines" != "x" ; then
+    AC_MSG_RESULT($hsl_subroutines)
+    USE_CONTRIB_HSL=yes
+  else
+    AC_MSG_RESULT(none found)
+    USE_CONTRIB_HSL=no
+  fi
+])
+
+  
+
+dnl -------------------------------------------------------------
+dnl Check for the Tecplot API. If it is found we will be able to write
+dnl Tecplot binary files directly.
+dnl
+dnl This is a little ugly since we aren't guaranteed that TECHOME
+dnl will point to the installation directory.  It could just as
+dnl easily be TEC80HOME, TEC90HOME, etc...  So, better check them all
+dnl
+dnl Usage: DEAL_II_CONFIGURE_TECPLOT
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
+[
+  AC_CHECK_FILE($TECHOME/lib/tecio.a,
+		TECPLOT_LIBRARY_PATH=$TECHOME/lib/tecio.a)
+  AC_CHECK_FILE($TEC80HOME/lib/tecio.a,
+		TECPLOT_LIBRARY_PATH=$TEC80HOME/lib/tecio.a)
+  AC_CHECK_FILE($TEC90HOME/lib/tecio.a,
+		TECPLOT_LIBRARY_PATH=$TEC90HOME/lib/tecio.a)
+  AC_CHECK_FILE($TECHOME/include/TECIO.h,
+		TECPLOT_INCLUDE_PATH=$TECHOME/include)
+  AC_CHECK_FILE($TEC80HOME/include/TECIO.h,
+	        TECPLOT_INCLUDE_PATH=$TEC80HOME/include)
+  AC_CHECK_FILE($TEC90HOME/include/TECIO.h,
+	        TECPLOT_INCLUDE_PATH=$TEC90HOME/include)
+
+  if (test -r "$TECPLOT_LIBRARY_PATH" && \
+      test -r "$TECPLOT_INCLUDE_PATH/TECIO.h") ; then
+    AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
+	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
+  fi
+])
+
+
+
+
+dnl ------------------------------------------------------------
+dnl Check whether PETSc is installed, and if so store the 
+dnl respective links
+dnl
+dnl Usage: DEAL_II_CONFIGURE_PETSC
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
+[
+  dnl First check for the PETSc directory
+  AC_MSG_CHECKING(for PETSc library directory)
+
+  AC_ARG_WITH(petsc,
+  [  --with-petsc=/path/to/petsc   Specify the path to the PETSc installation,
+                                   of which the include and library directories
+                                   are subdirs; use this if you want to
+                                   override the PETSC_DIR environment variable],
+     [
+	USE_CONTRIB_PETSC=yes
+        DEAL_II_PETSC_DIR=$withval
+	AC_MSG_RESULT($DEAL_II_PETSC_DIR)
+
+        dnl Make sure that what was specified is actually correct
+        if test ! -d $DEAL_II_PETSC_DIR/include \
+             -o ! -d $DEAL_II_PETSC_DIR/lib ; then
+          AC_MSG_ERROR([Path to PETSc specified with --with-petsc does not
+ 			point to a complete PETSc installation])
+	fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$PETSC_DIR" != "x" ; then
+  	  USE_CONTRIB_PETSC=yes
+          DEAL_II_PETSC_DIR="$PETSC_DIR"
+	  AC_MSG_RESULT($DEAL_II_PETSC_DIR)
+
+          dnl Make sure that what this is actually correct
+          if test ! -d $DEAL_II_PETSC_DIR/include \
+               -o ! -d $DEAL_II_PETSC_DIR/lib ; then
+            AC_MSG_ERROR([The path to PETSc specified in the PETSC_DIR
+	  		  environment variable does not
+ 			  point to a complete PETSc installation])
+	  fi
+        else
+	  USE_CONTRIB_PETSC=no
+          DEAL_II_PETSC_DIR=""
+          AC_MSG_RESULT(not found)
+        fi
+     ])
+  if test "$USE_CONTRIB_PETSC" = "yes" ; then
+    AC_DEFINE(DEAL_II_USE_PETSC, 1,
+              [Defined if a PETSc installation was found and is going
+               to be used])
+  fi
+
+
+  dnl Secondly, check for the PETSc architecture, since that determines
+  dnl where object and configuration files will be found. Do so only
+  dnl if we are interested in this information at all.
+  if test "x$USE_CONTRIB_PETSC" != "x" ; then
+    AC_MSG_CHECKING(for PETSc library architecture)
+
+    AC_ARG_WITH(petsc-arch,
+    [  --with-petsc-arch=architecture  Specify the architecture for your PETSc
+                                     installation; use this if you want to
+                                     override the PETSC_ARCH environment
+                                     variable],
+       [
+          DEAL_II_PETSC_ARCH=$withval
+	  AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
+
+          dnl Make sure that what was specified is actually correct
+          if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
+               ; then
+            AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                          specified with --with-petsc-arch])
+	  fi
+       ],
+       [
+          dnl Take something from the environment variables, if it is there
+          if test "x$PETSC_ARCH" != "x" ; then
+            DEAL_II_PETSC_ARCH="$PETSC_ARCH"
+	    AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
+
+            dnl Make sure that what this is actually correct
+            if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
+               ; then
+              AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                            specified in the PETSC_ARCH environment variable])
+            fi
+          else
+    	    AC_MSG_ERROR([If PETSc is used, you must specify the architectur
+                          either through the PETSC_ARCH environment variable,
+                          or through the --with-petsc-arch flag])
+          fi
+       ])
   fi
 ])

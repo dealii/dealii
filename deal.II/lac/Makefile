@@ -58,6 +58,12 @@ endif
 ifneq ($(GXX-VERSION),compaq_cxx)
   deplibs.g = $(lib-base.g) $(LIBHSL)
   deplibs.o = $(lib-base.o) $(LIBHSL)
+
+  ifeq ($(USE_CONTRIB_PETSC),yes)
+    deplibs.g += $(lib-contrib-petsc.g)
+    deplibs.o += $(lib-contrib-petsc.o)
+  endif
+
 else
   deplibs.g =
   deplibs.o =

@@ -44,7 +44,12 @@ class BlockIndices;
  * form as $X x = 0$, and this object then describes the matrix $X$.
  *
  * The matrix is organized in lines (rows), but only those lines are stored
- * where constraints are present.
+ * where constraints are present. New constraints are added by adding new
+ * lines using the @ref{add_line} function, and then populating it using the
+ * @ref{add_entry} function to a given line, or @ref{add_entries} to add more
+ * than one entry at a time. After all constraints have been added, you need
+ * to call @ref{close()}, which compresses the storage format and sorts the
+ * entries.
  *
  * Constraint matrices are used to handle hanging nodes and other constrained
  * degrees of freedom. When building the global system matrix and the right
@@ -99,24 +104,54 @@ class BlockIndices;
  *   procedures).
  * @end{itemize}
  *
- * Usually, the second way is chosen since memory consumption upon construction
- * of a second matrix rules out the first possibility.
+ * Usually, the second way is chosen since memory consumption upon
+ * construction of a second matrix rules out the first
+ * possibility. Furthermore, all example programs use this method, and we
+ * recommend that you use it instead of the first way.
  *
  * This class provides two sets of @p{condense} functions: those taking two
  * arguments refer to the first possibility above, those taking only one do
  * their job in-place and refer to the second possibility.
  *
+ * The condensation functions exist for different argument types. The in-place
+ * functions (i.e. those following the second way) exist for arguments of type
+ * @ref{SparsityPattern}, @ref{SparseMatrix} and @ref{BlockSparseMatrix}. Note
+ * that there are no versions for arguments of type
+ * @ref{PETScWrappers::SparseMatrix} or any of the other PETSc matrix wrapper
+ * classes. This is due to the fact that it is relatively hard to get a
+ * representation of the sparsity structure of PETSc matrices, and to modify
+ * them; this holds in particular, if the matrix is actually distributed
+ * across a cluster of computers. If you want to use PETSc matrices, you can
+ * either copy an already condensed deal.II matrix, or build the PETSc matrix
+ * in the already condensed form.
+ * 
+ * 
+ * @section3{Condensing vectors}
+ * 
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a
  * vector or matrix yields the same result as doing it only once: once an
  * object has been condensed, further condensation operations don't change it
  * any more.
  *
+ * In contrast to the matrix condensation functions, the vector condensation
+ * functions exist in variants for PETSc vectors. However, using them is
+ * typically expensive, and should be avoided. You should use the same
+ * techniques as mentioned above to avoid their use.
+ * 
+ *
+ * @section3{Distributing constraints}
+ * 
  * After solving the condensed system of equations, the solution vector has to
  * be redistributed. This is done by the two @p{distribute} function, one
  * working with two vectors, one working in-place. The operation of
  * distribution undoes the condensation process in some sense, but it should
- * be noted that it is not the inverse operation.
+ * be noted that it is not the inverse operation. Basically, distribution sets
+ * the values of the constrained nodes to the value that is computed from the
+ * constraint given the values of the unconstrained nodes. This is usually
+ * necessary since the condensed linear systems only describe the equations
+ * for unconstrained nodes, and constrained nodes need to get their values in
+ * a second step.
  *
  * @author Wolfgang Bangerth, 1998
  */
@@ -484,17 +519,18 @@ class ConstraintMatrix : public Subscriptor
     void condense (BlockSparseMatrix<number> &matrix) const;
     
 				     /**
-				      * Condense the given vector @p{uncondensed}
-				      * into @p{condensed}. It is the user's
-				      * responsibility to guarantee that all
-				      * entries of @p{condensed} be zero!
+				      * Condense the given vector
+				      * @p{uncondensed} into @p{condensed}. It
+				      * is the user's responsibility to
+				      * guarantee that all entries of
+				      * @p{condensed} be zero.
 				      *
 				      * The @p{VectorType} may be a
 				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, or any
-				      * other type having the same
-				      * interface.
+				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
 				      */
     template <class VectorType>
     void condense (const VectorType &uncondensed,
@@ -502,12 +538,12 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Condense the given vector
-				      * in-place. The @p{VectorType} may
-				      * be a @ref{Vector}@p{<float>},
+				      * in-place. The @p{VectorType} may be a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, or any
-				      * other type having the same
-				      * interface.
+				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
 				      */
     template <class VectorType>
     void condense (VectorType &vec) const;
@@ -529,37 +565,35 @@ class ConstraintMatrix : public Subscriptor
 				      * The @p{VectorType} may be a
 				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, or any
-				      * other type having the same
-				      * interface.
+				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
 				      */
     template <class VectorType>
     void distribute (const VectorType &condensed,
 		     VectorType       &uncondensed) const;
 
 				     /**
-				      * Re-distribute the elements of
-				      * the vector in-place. The
-				      * @p{VectorType} may be a
-				      * @ref{Vector}@p{<float>},
+				      * Re-distribute the elements of the
+				      * vector in-place. The @p{VectorType}
+				      * may be a @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, or any
-				      * other type having the same
-				      * interface.
+				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
 				      */
     template <class VectorType>
     void distribute (VectorType &vec) const;
     
 				     /**
-				      * Delete hanging nodes in a
-				      * vector.  Sets all hanging node
-				      * values to zero. The
-				      * @p{VectorType} may be a
+				      * Delete hanging nodes in a vector.
+				      * Sets all hanging node values to
+				      * zero. The @p{VectorType} may be a
 				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>},
-				      * @ref{BlockVector}@p{<...>}, or any
-				      * other type having the same
-				      * interface.
+				      * @ref{BlockVector}@p{<...>}, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
 				      */
     template <class VectorType>
     void set_zero (VectorType &vec) const;

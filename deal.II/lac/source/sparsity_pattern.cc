@@ -28,7 +28,8 @@ const unsigned int SparsityPattern::invalid_entry;
 
 
 
-SparsityPattern::SparsityPattern () :
+SparsityPattern::SparsityPattern ()
+                :
 		max_dim(0),
 		max_vec_len(0),
 		rowstart(0),
@@ -41,7 +42,8 @@ SparsityPattern::SparsityPattern () :
 
 
 
-SparsityPattern::SparsityPattern (const SparsityPattern &s) :
+SparsityPattern::SparsityPattern (const SparsityPattern &s)
+                :
 		Subscriptor(),
 		max_dim(0),
 		max_vec_len(0),
@@ -64,12 +66,13 @@ SparsityPattern::SparsityPattern (const unsigned int m,
 				  const unsigned int n,
 				  const unsigned int max_per_row,
 				  const bool optimize_diag) 
-		: max_dim(0),
-		  max_vec_len(0),
-		  rowstart(0),
-		  colnums(0),
-		  compressed(false),
-		  diagonal_optimized(false)
+		:
+                max_dim(0),
+                max_vec_len(0),
+                rowstart(0),
+                colnums(0),
+                compressed(false),
+                diagonal_optimized(false)
 {
   reinit (m,n,max_per_row, optimize_diag);
 }
@@ -80,10 +83,11 @@ SparsityPattern::SparsityPattern (const unsigned int               m,
 				  const unsigned int               n,
 				  const std::vector<unsigned int> &row_lengths,
 				  const bool optimize_diag) 
-		: max_dim(0),
-		  max_vec_len(0),
-		  rowstart(0),
-		  colnums(0)
+		:
+                max_dim(0),
+                max_vec_len(0),
+                rowstart(0),
+                colnums(0)
 {
   reinit (m, n, row_lengths, optimize_diag);
 }
@@ -92,10 +96,11 @@ SparsityPattern::SparsityPattern (const unsigned int               m,
 
 SparsityPattern::SparsityPattern (const unsigned int n,
 				  const unsigned int max_per_row)
-		: max_dim(0),
-		  max_vec_len(0),
-		  rowstart(0),
-		  colnums(0)
+		:
+                max_dim(0),
+                max_vec_len(0),
+                rowstart(0),
+                colnums(0)
 {
   reinit (n, n, max_per_row, true);
 }
@@ -105,10 +110,11 @@ SparsityPattern::SparsityPattern (const unsigned int n,
 SparsityPattern::SparsityPattern (const unsigned int               m,
 				  const std::vector<unsigned int> &row_lengths,
 				  const bool optimize_diag) 
-		: max_dim(0),
-		  max_vec_len(0),
-		  rowstart(0),
-		  colnums(0)
+		:
+                max_dim(0),
+                max_vec_len(0),
+                rowstart(0),
+                colnums(0)
 {
   reinit (m, m, row_lengths, optimize_diag);
 }
@@ -116,12 +122,13 @@ SparsityPattern::SparsityPattern (const unsigned int               m,
 
 
 SparsityPattern::SparsityPattern (const SparsityPattern &original,
-				  const unsigned int        max_per_row,
-				  const unsigned int        extra_off_diagonals)
-		: max_dim(0),
-		  max_vec_len(0),
-		  rowstart(0),
-		  colnums(0)
+				  const unsigned int     max_per_row,
+				  const unsigned int     extra_off_diagonals)
+		:
+                max_dim(0),
+                max_vec_len(0),
+                rowstart(0),
+                colnums(0)
 {
   Assert (original.rows==original.cols, ExcNotQuadratic());
   Assert (original.optimize_diagonal(), ExcNotQuadratic());

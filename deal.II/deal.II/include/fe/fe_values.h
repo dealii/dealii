@@ -444,15 +444,21 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * returning a vector of vectors
 				      * of results.
 				      *
+				      * This function may only be used if the
+				      * finite element in use is a scalar one,
+				      * i.e. has only one vector component. If
+				      * it is a vector-valued one, then use
+				      * the other @p{get_function_values}
+				      * function.
+				      * 
 				      * The function assumes that the
 				      * <tt>values</tt> object already has the
 				      * correct size. 
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector<double>,
-				      * Vector<float>, or
-				      * BlockVector<double>. It
+				      * The actual data type of the input
+				      * vector may be either a @p{Vector<T>},
+				      * @p{BlockVector<T>}, or one of the
+				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -473,11 +479,10 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * applied to multi-component
 				      * elements.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector<double>,
-				      * Vector<float>, or
-				      * BlockVector<double>. It
+				      * The actual data type of the input
+				      * vector may be either a @p{Vector<T>},
+				      * @p{BlockVector<T>}, or one of the
+				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -560,15 +565,21 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * one the interpolated function values
 				      * are returned.
 				      *
+				      * This function may only be used if the
+				      * finite element in use is a scalar one,
+				      * i.e. has only one vector component. If
+				      * it is a vector-valued one, then use
+				      * the other @p{get_function_grads}
+				      * function.
+				      * 
 				      * The function assumes that the
 				      * @p{gradients} object already has the
 				      * right size.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector<double>,
-				      * Vector<float>, or
-				      * BlockVector<double>. It
+				      * The actual data type of the input
+				      * vector may be either a @p{Vector<T>},
+				      * @p{BlockVector<T>}, or one of the
+				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -604,11 +615,10 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * but applied to multi-component
 				      * elements.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * @p{Vector<double>},
-				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double>}. It
+				      * The actual data type of the input
+				      * vector may be either a @p{Vector<T>},
+				      * @p{BlockVector<T>}, or one of the
+				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * @ref{DofHandler} object with
@@ -702,11 +712,18 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * @p{second_derivatives} object
 				      * already has the correct size.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * @p{Vector<double>},
-				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double>}. It
+				      * This function may only be used if the
+				      * finite element in use is a scalar one,
+				      * i.e. has only one vector component. If
+				      * it is a vector-valued one, then use
+				      * the other
+				      * @p{get_function_2nd_derivatives}
+				      * function.
+				      * 
+				      * The actual data type of the input
+				      * vector may be either a @p{Vector<T>},
+				      * @p{BlockVector<T>}, or one of the
+				      * PETSc vector wrapper classes..It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * @ref{DofHandler} object with
@@ -720,8 +737,9 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * on the unit cell).
 				      */
     template <class InputVector>
-    void get_function_2nd_derivatives (const InputVector& fe_function,
-				       std::vector<Tensor<2,dim> >& second_derivatives) const;
+    void
+    get_function_2nd_derivatives (const InputVector& fe_function,
+                                  std::vector<Tensor<2,dim> >& second_derivatives) const;
 
     
 				     /**
@@ -740,11 +758,10 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * name, but applies to
 				      * vector-valued finite elements.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * @p{Vector<double>},
-				      * @p{Vector<float>}, or
-				      * @p{BlockVector<double>}. It
+				      * The actual data type of the input
+				      * vector may be either a @p{Vector<T>},
+				      * @p{BlockVector<T>}, or one of the
+				      * PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * @ref{DofHandler} object with
@@ -758,8 +775,9 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * on the unit cell).
 				      */
     template <class InputVector>
-    void get_function_2nd_derivatives (const InputVector      &fe_function,
-				       std::vector<std::vector<Tensor<2,dim> > > &second_derivatives) const;
+    void
+    get_function_2nd_derivatives (const InputVector      &fe_function,
+                                  std::vector<std::vector<Tensor<2,dim> > > &second_derivatives) const;
     
 				     /**
 				      * Position of the @p{i}th

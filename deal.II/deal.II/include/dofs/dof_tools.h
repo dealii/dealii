@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -523,23 +523,20 @@ class DoFTools
 				   ConstraintMatrix    &constraints);
     
 				     /**
-				      * Take a vector of values which
-				      * live on cells (e.g. an error
-				      * per cell) and distribute it to
-				      * the dofs in such a way that a
-				      * finite element field results,
-				      * which can then be further
-				      * processed, e.g. for
-				      * output. You should note that
-				      * the resulting field will not
-				      * be continuous at hanging
-				      * nodes. This can, however,
-				      * easily be arranged by calling
-				      * the appropraite @p{distribute}
-				      * function of a
-				      * @ref{ConstraintMatrix} object
-				      * created for this
-				      * @ref{DoFHandler} object.
+				      * Take a vector of values which live on
+				      * cells (e.g. an error per cell) and
+				      * distribute it to the dofs in such a
+				      * way that a finite element field
+				      * results, which can then be further
+				      * processed, e.g. for output. You should
+				      * note that the resulting field will not
+				      * be continuous at hanging nodes. This
+				      * can, however, easily be arranged by
+				      * calling the appropraite @p{distribute}
+				      * function of a @ref{ConstraintMatrix}
+				      * object created for this
+				      * @ref{DoFHandler} object, after the
+				      * vector has been fully assembled.
 				      *
 				      * It is assumed that the number
 				      * of elements in @p{cell_data}

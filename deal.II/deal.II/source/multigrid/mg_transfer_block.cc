@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -227,7 +227,7 @@ void MGTransferBlockBase::build_matrices (
 						 // prolongation matrix for
 						 // this child
 		const FullMatrix<double> &prolongation
-		  = mg_dof.get_fe().prolongate(child);
+		  = mg_dof.get_fe().get_prolongation_matrix (child);
 	    
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -266,7 +266,7 @@ void MGTransferBlockBase::build_matrices (
 						 // prolongation matrix for
 						 // this child
 		const FullMatrix<double> &prolongation
-		  = mg_dof.get_fe().prolongate(child);
+		  = mg_dof.get_fe().get_prolongation_matrix (child);
 	    
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 

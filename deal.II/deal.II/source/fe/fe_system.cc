@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1700,11 +1700,13 @@ void FESystem<dim>::initialize ()
 	  {
 	    if (do_restriction)
 	      this->restriction[child] (i,j)
-		= base_element(base).restrict(child)(base_index_i,base_index_j);
+		= (base_element(base)
+                   .get_restriction_matrix(child)(base_index_i,base_index_j));
 	    
 	    if (do_prolongation)
 	      this->prolongation[child] (i,j)
-		= base_element(base).prolongate(child)(base_index_i,base_index_j);
+		= (base_element(base)
+                   .get_prolongation_matrix(child)(base_index_i,base_index_j));
 	  };
       };
 

@@ -25,8 +25,7 @@
          <acronym>deal.II</acronym>. While this is running on globally
          refined grids, we are still having problems on locally
          refined meshes. For those, multigrid is only applicable with
-         DG methods yet. We hope to have them sorted out for the next
-         major release.
+         DG methods yet.
 	 </p>
 
     <li> <p>
@@ -63,12 +62,13 @@
 	 </p>
 
     <li> <p> 
-         <strong>A better test-suite:</strong> We have a small
-         suite of programs (approximately 190 programs with roughly
-         37,000 lines of code at present) that are run automatically
+         <strong>A better test-suite:</strong> We have a
+         suite of programs (approximately 400 programs with roughly
+         54,000 lines of code at present) that are run automatically
          for regression tests each night. Some of these are modified real-life
          applications, so they should cover a relevant part of the
-         library, but it would be necessary to reach every corner of
+         library, and some others test certain parts of the library
+         extensively, but it would be necessary to reach every corner of 
          the library to be sure a certain patch does not break
          something. Also, a complete test-suite for the library would
          be quite valuable for ports to new computer systems and

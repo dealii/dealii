@@ -38,7 +38,7 @@
     developed and tested on Unix or Unix-like systems only. It can be
     used positively on
     <ul>
-      <li>Linux on x86, with gcc 2.95, gcc 3.0, gcc 3.1/3.2; and Intel ICC
+      <li>Linux on x86, with gcc 2.95, 3.0, 3.1/3.2, 3.3 or 3.4; and Intel ICC
           6.0, 7.0, 7.1 and 8.0;
       <li>Sun Solaris 2.5, 2.6, 7, 8, and 9 on Sparc, with gcc 2.95,
           gcc 3.0, and gcc 3.1/3.2; 
@@ -140,7 +140,7 @@
 
       <li> <p> 
            Make: we use <a href="http://www.gnu.org"
-           target="_top">GNU make</a>, version 3.78 or 3.79 which also
+           target="_top">GNU make</a>, version 3.78 or later which also
            has rather good support for parallel builds, so you may
            want to consider this version if you have a multiprocessor
            system. GNU make 3.77 had a serious flaw in the
@@ -150,7 +150,7 @@
            versions are likely to work, but since they are hardly
            installed on systems today, we don't regularly test
            this. Other make programs (i.e. non-GNU) will usually fail
-           to work.
+           to work and are not supported.
 	   </p>
 
       <li> <p>
@@ -167,16 +167,25 @@
 
       <li> <p>
            In case you want to generate the documentation from the
-           header files, you only need Perl installed. The scripts
-           generating the documentation are provided.
+           header files, you need a copy of <a href="http://www.doxygen.org/"
+           target="_top">doxygen</a> on your machine (we use 
+           version 1.3.2, later versions will presumable work as well). If you
+           have these program, you can generate all the API documentation on
+	   your local machine. If not, you can still work with the library and
+	   use the documentation provided on our homepage for reference.
 	   </p>
 
       <li> <p>
-           Previous versions of the library supported generation of
-           printable documentation. However, due to the size (around
-           4000 pages) which refrains most people from printing, and
-           the high cost of supporting this option, we dropped the
-           possibility of printable documentation.
+           Doxygen also generates printable API documentation. It is located
+           in the directories <code>doc/doxygen/LaTeX</code> and
+           subdirectories. To generate printable versions, you need a latex
+           installation. However, the present size of this API information is
+           about 1500 pages, so you may not want to print it, and rather rely
+           on the online version. The more interesting part of the
+           documentation to print would probably be the example programs, but
+           we don't presently have a way to do that apart from printing it
+           directly from the browser or by using the <code>html2ps</code>
+           program.
 	   </p>
 
       <li> <p>
@@ -517,7 +526,9 @@
         should be fairly portable.
       </ul>
       If no argument is given to <code>--with-multithreading</code>, then 
-      POSIX is assumed.
+      POSIX is assumed. In other words, giving any particular value to this
+      flag is redundant. However, you still need to give this flag (with or
+      without value) upon configuration if you want to use multithreading.
       </p>
 
       <p>
@@ -526,6 +537,15 @@
       number of threads to start in some situations. We presently
       support this detection only on Linux, Solaris, OSF, and SGI
       systems.
+      </p>
+
+    <li>
+      <p>
+      <code>--with-doxygen=...</code>: usually, <code>./configure</code> is
+      able to figure out the path to the doxygen program by itself. However,
+      if you have multiple versions installed and want to select a specific
+      one, then you may want to specify path and filename to this version by
+      using the <code>--with-doxygen</code> flag.
       </p>
 
     <li>
@@ -648,6 +668,56 @@
     <ul>
       <li>
       <p>
+      <acronym>deal.II</acronym> can interface to the <a
+      href="http://www.mcs.anl.gov/petsc/">PETSc</a> library. PETSc's 
+      main strength is to provide lots of functions for linear algebra, among
+      several other things. It comes with implementations of a variety of
+      linear solvers, as well as various different sparse and dense matrix and
+      vector formats, for which <acronym>deal.II</acronym> has wrapper classes
+      that provide almost the same interfaces as the built-in
+      <acronym>deal.II</acronym> linear algebra classes. The main advantage of
+      PETSc is the variety of its algorithms, and that all of them can work in
+      a parallel setting, i.e. matrices and vectors can be distributed across
+      a cluster of computers that communicate via MPI. This makes PETSc the
+      choice of linear algrebra implementations for very large problems that
+      do not fit into a single computer's memory or have run-times that are
+      too long for a single computer. At present, our interfaces are only
+      wrappers for vector and matrix formats, as well as to their solver and
+      preconditioner classes. However, we plan to extend this to a tighter
+      coupling in the future.
+      </p>
+
+      <p>
+      The use of PETSc is optional, since <acronym>deal.II</acronym> comes
+      with a complete implementation of linear algebra classes
+      itself. However, if you wish to use the PETSc wrappers, you can do so by
+      having a PETSc installation around at the time of calling
+      <code>./configure</code>. PETSc usually requires you to set the
+      environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
+      to a path to PETSc and denoting the architecture for which PETSc is
+      compiled. If these environment variables are set, then
+      <acronym>deal.II</acronym> will pick them up during configuration, and
+      store them. It will then also recognize that PETSc shall be used, and
+      enable the wrapper classes (they are disabled by default, if PETSc is
+      unavailable). However, you can override the values of these environment
+      variablaes by using the <code>--with-petsc=DIR</code> and
+      <code>--with-mpi-arch=ARCH</code> switches to <code>./configure</code>.
+      </p>
+
+      <p>
+      Note that in order to use PETSc with <acronym>deal.II</acronym>, you
+      need to have at least PETSc version 2.1.7 installed. Version 2.1.6 may
+      work in most cases, but you will get some (harmless) warnings during
+      compilation. Also, during testing with this version, we discovered a
+      serious bug in the TCQMR linear solver which basically renders it
+      useless. All these problems have been reported and are supposed to be
+      fixed in 2.1.7. Versions prior to 2.1.6 are likely not to work, but have
+      not been tested.
+      </p>
+      
+
+      <li>
+      <p>
       It is possible to use some subroutines from the
       <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
       target="_top">Harwell Subroutine Library (HSL)</a> to make use
@@ -749,7 +819,7 @@
         the homepage is appreciated.
     </ul>
 
-    Note that since our institute is evaluated at regular intervals,
+    Note that since our institutes are evaluated at regular intervals,
     we are interested in documenting the use of the programs and
     libraries we create. We are therefore interested in collecting
     publications with results obtained with the aid of these libraries

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,8 +15,10 @@
 
 
 #include <base/config.h>
-#include <lac/vector.h>
+#include <base/exceptions.h>
+
 #include <vector>
+
 
 // forward declarations
 template <int dim> class Triangulation;
@@ -28,13 +30,13 @@ template <class T> class Vector;
  *   This class provides several function that flag certain cells for
  *   coarsening or refinement based on a vector of ``error''
  *   indicators and some selection algorithm.  The central function is
- *   @p{refine (const Vector<float> &criterion, const double threshold)}:
+ *   @p{refine (const Vector &criterion, const double threshold)}:
  *   it takes a vector of values, one per active cell,
  *   which denote the criterion according to which the triangulation
  *   is to be refined. It marks all cells for which the criterion is
  *   greater than the threshold being given as the second
  *   argument. Analogously,
- *   @p{coarsen (const Vector<float> &criterion, const double threshold)}
+ *   @p{coarsen (const Vector &criterion, const double threshold)}
  *   flags those cells for
  *   coarsening for which the criterion is less than the threshold.
  *
@@ -155,19 +157,11 @@ class GridRefinement
 				      * following functions and to the
 				      * general doc for this class for
 				      * more information.
-				      *
-				      * Note that this function takes
-				      * a vector of @p{float}s, rather
-				      * than the usual @p{double}s,
-				      * since accuracy is not so much
-				      * needed here and saving memory
-				      * may be a good goal when using
-				      * many cells.
 				      */
-    template <int dim, typename number>
-    static void refine (Triangulation<dim>   &tria,
-			const Vector<number> &criteria,
-			const double         threshold);
+    template <int dim, class Vector>
+    static void refine (Triangulation<dim> &tria,
+			const Vector       &criteria,
+			const double        threshold);
 
 				     /**
 				      * Analogue to the @p{refine}
@@ -176,19 +170,11 @@ class GridRefinement
 				      * absolute value of the
 				      * criterion is less than the
 				      * given threshold.
-				      *
-				      * Note that this function takes
-				      * a vector of @p{float}s, rather
-				      * than the usual @p{double}s,
-				      * since accuracy is not so much
-				      * needed here and saving memory
-				      * may be a good goal when using
-				      * many cells.
 				      */
-    template <int dim, typename number>
-    static void coarsen (Triangulation<dim>   &tria,
-			 const Vector<number> &criteria,
-			 const double         threshold);
+    template <int dim, class Vector>
+    static void coarsen (Triangulation<dim> &tria,
+			 const Vector       &criteria,
+			 const double        threshold);
     
 				     /**
 				      * Refine the triangulation by
@@ -208,20 +194,14 @@ class GridRefinement
 				      * Refer to the general doc of
 				      * this class for more
 				      * information.
-				      *
-				      * Note that this function takes
-				      * a vector of @p{float}s, rather
-				      * than the usual @p{double}s,
-				      * since accuracy is not so much
-				      * needed here and saving memory
-				      * may be a good goal when using
-				      * many cells.
 				      */
-    template <int dim, typename number>
-    static void refine_and_coarsen_fixed_number (Triangulation<dim>   &tria,
-						 const Vector<number> &criteria,
-						 const double         top_fraction_of_cells,
-						 const double         bottom_fraction_of_cells);
+    template <int dim, class Vector>
+    static
+    void
+    refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
+                                     const Vector       &criteria,
+                                     const double        top_fraction_of_cells,
+                                     const double        bottom_fraction_of_cells);
     
 				     /**
 				      * Refine the triangulation by
@@ -241,20 +221,14 @@ class GridRefinement
 				      * Refer to the general doc of
 				      * this class for more
 				      * information.
-				      *
-				      * Note that this function takes
-				      * a vector of @p{float}s, rather
-				      * than the usual @p{double}s,
-				      * since accuracy is not so much
-				      * needed here and saving memory
-				      * may be a good goal when using
-				      * many cells.
 				      */
-    template<int dim, typename number>
-    static void refine_and_coarsen_fixed_fraction (Triangulation<dim>   &tria,
-						   const Vector<number> &criteria,
-						   const double         top_fraction,
-						   const double         bottom_fraction);
+    template <int dim, class Vector>
+    static
+    void
+    refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
+                                       const Vector       &criteria,
+                                       const double        top_fraction,
+                                       const double        bottom_fraction);
 
 
 
@@ -277,19 +251,13 @@ class GridRefinement
 				      * Refer to the general doc of
 				      * this class for more
 				      * information.
-				      *
-				      * Note that this function takes
-				      * a vector of @p{float}s, rather
-				      * than the usual @p{double}s,
-				      * since accuracy is not so much
-				      * needed here and saving memory
-				      * may be a good goal when using
-				      * many cells.
 				      */
     
-    template<int dim, typename number>
-    static void refine_and_coarsen_optimize (Triangulation<dim>   &tria,
-					     const Vector<number> &criteria);
+    template <int dim, class Vector>
+    static
+    void
+    refine_and_coarsen_optimize (Triangulation<dim> &tria,
+                                 const Vector       &criteria);
 
 				     /**
 				      * Exception
@@ -315,11 +283,11 @@ class GridRefinement
 				      * STL version and is needed in
 				      * @p{refine_and_coarsen_optimize}
 				      */
-    template<typename number>
-    static void qsort_index(const Vector<number>       &a,
-			    std::vector<unsigned int>  &ind,
-			    int                         l,
-			    int                         r);
+    template <class Vector>
+    static void qsort_index (const Vector               &a,
+                             std::vector<unsigned int>  &ind,
+                             int                         l,
+                             int                         r);
 };
 
 

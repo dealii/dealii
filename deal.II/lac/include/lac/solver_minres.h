@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -202,19 +202,19 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   Vm1  = this->memory.alloc();
   Vm2  = this->memory.alloc();
 				   // define some aliases for simpler access
-  typedef VECTOR vecref;
-  vecref u[3] = {*Vu0, *Vu1, *Vu2};
-  vecref m[3] = {*Vm0, *Vm1, *Vm2};
-  vecref v    = *Vv;
+  typedef VECTOR *vecptr;
+  vecptr u[3] = {Vu0, Vu1, Vu2};
+  vecptr m[3] = {Vm0, Vm1, Vm2};
+  VECTOR &v   = *Vv;
 				   // resize the vectors, but do not set
 				   // the values since they'd be overwritten
 				   // soon anyway.
-  u[0].reinit(VS,true);
-  u[1].reinit(VS,true);
-  u[2].reinit(VS,true);
-  m[0].reinit(VS,true);
-  m[1].reinit(VS,true);
-  m[2].reinit(VS,true);
+  u[0]->reinit(VS,true);
+  u[1]->reinit(VS,true);
+  u[2]->reinit(VS,true);
+  m[0]->reinit(VS,true);
+  m[1]->reinit(VS,true);
+  m[2]->reinit(VS,true);
   v.reinit(VS,true);
 
 				   // some values needed
@@ -236,17 +236,17 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   
 
 				   // Start of the solution process
-  A.vmult(m[0],x);
-  u[1] = b;
-  u[1] -= m[0];
+  A.vmult(*m[0],x);
+  *u[1] = b;
+  *u[1] -= *m[0];
 				   // Precondition is applied.
 				   // The preconditioner has to be
 				   // positiv definite and symmetric
 
 				   // M v = u[1]
-  precondition.vmult (v,u[1]);
+  precondition.vmult (v,*u[1]);
   
-  delta[1] = v * u[1];
+  delta[1] = v * (*u[1]);
 				   // Preconditioner positive
   Assert (delta[1]>=0, ExcPreconditionerNotDefinite());
   
@@ -254,34 +254,34 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   r_l2 = r0;
   
   
-  u[0].reinit(VS);
+  u[0]->reinit(VS);
   delta[0] = 1.;
-  m[0].reinit(VS);
-  m[1].reinit(VS);
-  m[2].reinit(VS);
+  m[0]->reinit(VS);
+  m[1]->reinit(VS);
+  m[2]->reinit(VS);
 				   
   conv = this->control().check(0,r_l2);
   
   while (conv==SolverControl::iterate)
     {      
       if (delta[1]!=0)
-	v.scale(1./sqrt(delta[1]));
+	v *= 1./sqrt(delta[1]);
       else
 	v.reinit(VS);
 
-      A.vmult(u[2],v);
-      u[2].add (-sqrt(delta[1]/delta[0]), u[0]);
+      A.vmult(*u[2],v);
+      u[2]->add (-sqrt(delta[1]/delta[0]), *u[0]);
 
-      gamma = u[2] * v;
-      u[2].add (-gamma / sqrt(delta[1]), u[1]);
-      m[0] = v;
+      gamma = *u[2] * v;
+      u[2]->add (-gamma / sqrt(delta[1]), *u[1]);
+      *m[0] = v;
       
 				       // precondition: solve M v = u[2]
 				       // Preconditioner has to be positiv
 				       // definite and symmetric.
-      precondition.vmult(v,u[2]);
+      precondition.vmult(v,*u[2]);
  
-      delta[2] = v * u[2];
+      delta[2] = v * (*u[2]);
 
       Assert (delta[2]>=0, ExcPreconditionerNotDefinite());
 
@@ -309,11 +309,11 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       if (j==1)
 	tau = r0 * c;
 
-      m[0].add (-e[0], m[1]);
+      m[0]->add (-e[0], *m[1]);
       if (j>1)
-	m[0].add (-f[0],m[2]);
-      m[0].scale(1./d);
-      x.add (tau, m[0]);
+	m[0]->add (-f[0], *m[2]);
+      *m[0] *= 1./d;
+      x.add (tau, *m[0]);
       r_l2 *= fabs(s);
 
       conv = this->control().check(j,r_l2);
@@ -330,14 +330,14 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 				       // but it can be made more efficient,
 				       // since the value of m[0] is no more
 				       // needed in the next iteration
-      swap (m[2], m[1]);
-      swap (m[1], m[0]);
+      swap (*m[2], *m[1]);
+      swap (*m[1], *m[0]);
       
 				       // likewise, but reverse direction:
 				       //   u[0] = u[1];
 				       //   u[1] = u[2];
-      swap (u[0], u[1]);
-      swap (u[1], u[2]);
+      swap (*u[0], *u[1]);
+      swap (*u[1], *u[2]);
 
 				       // these are scalars, so need
 				       // to bother

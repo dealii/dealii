@@ -29,6 +29,7 @@ template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);
+template void FullMatrix<TYPEMAT>::add_scaled<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);

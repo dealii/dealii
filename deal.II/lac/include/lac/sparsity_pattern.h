@@ -358,12 +358,13 @@ class SparsityPattern : public Subscriptor
 				      * This function compresses the sparsity
 				      * structure that this object represents.
 				      * It does so by eliminating unused
-				      * entries and sorting the remaining
-				      * ones to allow faster access by usage
-				      * of binary search algorithms. A special
-				      * sorting scheme is used for the diagonal
-				      * entry of quadratic matrices, which is
-				      * always the first entry of each row.
+				      * entries and sorting the remaining ones
+				      * to allow faster access by usage of
+				      * binary search algorithms. A special
+				      * sorting scheme is used for the
+				      * diagonal entry of quadratic matrices,
+				      * which is always the first entry of
+				      * each row.
 				      *
 				      * The memory which is no more
 				      * needed is released.

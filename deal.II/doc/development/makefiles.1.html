@@ -177,6 +177,39 @@
 	   file for more information on installation of HSL subroutines.)
            </p>
       </dd>    
+
+
+      <dt> <code>USE_CONTRIB_PETSC</code> </dt>
+      <dd> <p>
+           <code>yes</code> indicates whether the interfaces to the PETSc
+           library shall be compiled. <code>no</code> otherwise.
+	   (See the
+	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
+	   file for more information on installation of PETSc.)
+           </p>
+      </dd>    
+
+
+      <dt> <code>DEAL_II_PETSC_DIR</code> </dt>
+      <dd> <p>
+           If <code>USE_CONTRIB_PETSC</code> is <code>yes</code>, then this
+           variable has the path to the PETSc library, as either given by the
+           <code>PETSC_DIR</code> environment variable, or the
+           <code>--with-petsc</code> switch on the command line upon 
+	   configuration of the deal.II library.
+           </p>
+      </dd>    
+
+
+      <dt> <code>DEAL_II_PETSC_ARCH</code> </dt>
+      <dd> <p>
+           If <code>USE_CONTRIB_PETSC</code> is <code>yes</code>, then this
+           variable stores the architecture for which PETSc was compiled, as
+           either given by the <code>PETSC_ARCH</code> environment variable,
+           or the <code>--with-petsc-arch</code> switch on the command line
+           upon configuration of the deal.II library.
+           </p>
+      </dd>    
     </dl>
 
 
@@ -278,6 +311,16 @@
            subroutines.)
            </p>
       </dd>
+
+      <dt> <code>lib-contrib-petsc.g lib-contrib-petsc.o</code> </dt>
+      <dd> <p>
+           Paths and names of the component libraries of the PETSc package, if
+           found and used at configuration time.
+	   (See the
+	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
+	   file for more information on installation of PETSc.)
+           </p>
+      </dd>
     </dl>
 
 
@@ -315,6 +358,21 @@
 	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
 	   file for more information on installation of HSL
            subroutines.)
+           </p>
+      </dd>
+
+
+      <dt> <code>include-path-contrib-petsc
+                 include-path-contrib-petsc-bmake
+                 include-path-contrib-petsc-mpi
+           </code> </dt>
+      <dd> <p>
+           If PETSc is used, then these variables have the paths to the usual
+           PETSc include files, the PETSc architecture dependent include
+           files, and the PETSC MPI dependent include files.
+	   (See the
+	   <a href="../readme.html#external-libs" target="body">ReadMe</a>
+	   file for more information on installation of PETSC.)
            </p>
       </dd>
 

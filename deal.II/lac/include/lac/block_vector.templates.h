@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -148,14 +148,27 @@ void BlockVector<Number>::clear ()
 
 
 template <typename Number>
-bool BlockVector<Number>::all_zero () const
+bool
+BlockVector<Number>::all_zero () const
 {
-  bool result = true;
   for (unsigned int i=0;i<num_blocks;++i)
-    {
-      result = result && components[i].all_zero();
-    }
-  return result;
+    if (components[i].all_zero() == false)
+      return false;
+
+  return true;
+}
+
+
+
+template <typename Number>
+bool
+BlockVector<Number>::is_non_negative () const
+{
+  for (unsigned int i=0;i<num_blocks;++i)
+    if (components[i].is_non_negative() == false)
+      return false;
+
+  return true;
 }
 
 

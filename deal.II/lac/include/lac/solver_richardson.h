@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,16 +62,14 @@ class SolverRichardson : public Solver<VECTOR>
 					  * set the damping parameter
 					  * to one.
 					  */
-	AdditionalData(double omega=1,
-		       bool use_preconditioned_residual = false):
-			omega(omega),
-			use_preconditioned_residual(use_preconditioned_residual)
-	  {};
+	AdditionalData (const double omega                       = 1,
+                        const bool   use_preconditioned_residual = false);
 	
 					 /**
 					  * Relaxation parameter.
 					  */
 	double omega;
+        
 					 /**
 					  * Parameter for stopping criterion.
 					  */
@@ -82,7 +80,7 @@ class SolverRichardson : public Solver<VECTOR>
 				     /**
 				      * Constructor.
 				      */
-    SolverRichardson (SolverControl &cn,
+    SolverRichardson (SolverControl        &cn,
 		      VectorMemory<VECTOR> &mem,
 		      const AdditionalData &data=AdditionalData());
 
@@ -116,7 +114,7 @@ class SolverRichardson : public Solver<VECTOR>
 				      * Set the damping-coefficient.
 				      * Default is 1., i.e. no damping.
 				      */
-    void set_omega(double om=1.);
+    void set_omega (const double om=1.);
 
 				     /**
 				      * Interface for derived class.
@@ -170,7 +168,18 @@ class SolverRichardson : public Solver<VECTOR>
 /*----------------- Implementation of the Richardson Method ------------------*/
 
 
-template<class VECTOR>
+
+template <class VECTOR>
+inline
+SolverRichardson<VECTOR>::AdditionalData::
+AdditionalData (const double omega,
+                const bool   use_preconditioned_residual)
+                :
+                omega(omega),
+                use_preconditioned_residual(use_preconditioned_residual)
+{}
+
+template <class VECTOR>
 SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
 					   VectorMemory<VECTOR> &mem,
 					   const AdditionalData &data):
@@ -180,13 +189,13 @@ SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
 
 
 
-template<class VECTOR>
+template <class VECTOR>
 SolverRichardson<VECTOR>::~SolverRichardson()
 {}
 
 
-template<class VECTOR>
-template<class MATRIX, class PRECONDITIONER>
+template <class VECTOR>
+template <class MATRIX, class PRECONDITIONER>
 void
 SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 				 VECTOR               &x,
@@ -252,8 +261,8 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 }
 
 
-template<class VECTOR>
-template<class MATRIX, class PRECONDITIONER>
+template <class VECTOR>
+template <class MATRIX, class PRECONDITIONER>
 void
 SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 				  VECTOR               &x,
@@ -309,7 +318,7 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
 }
 
 
-template<class VECTOR>
+template <class VECTOR>
 void
 SolverRichardson<VECTOR>::print_vectors(const unsigned int,
 					const VECTOR&,
@@ -319,7 +328,7 @@ SolverRichardson<VECTOR>::print_vectors(const unsigned int,
 
 
 
-template<class VECTOR>
+template <class VECTOR>
 inline typename VECTOR::value_type
 SolverRichardson<VECTOR>::criterion()
 {
@@ -327,9 +336,9 @@ SolverRichardson<VECTOR>::criterion()
 }
 
 
-template<class VECTOR>
+template <class VECTOR>
 inline void
-SolverRichardson<VECTOR>::set_omega(double om)
+SolverRichardson<VECTOR>::set_omega (const double om)
 {
   additional_data.omega=om;
 }

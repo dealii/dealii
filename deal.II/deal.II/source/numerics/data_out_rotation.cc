@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -159,12 +159,8 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		{
 		  if (data.n_components == 1)
 		    {
-		      if (this->dof_data[dataset].has_block)
-			fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
-							     data.patch_values);
-		      else
-			fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
-							     data.patch_values);
+                      this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                    data.patch_values);
 
 		      switch (dim)
 			{
@@ -194,12 +190,8 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 		  else
 						     // system of components
 		    {
-		      if (this->dof_data[dataset].has_block)
-			fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
-							     data.patch_values_system);
-		      else
-			fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
-							     data.patch_values_system);
+                      this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                    data.patch_values_system);
 
 		      for (unsigned int component=0; component<data.n_components;
 			   ++component)
@@ -235,9 +227,8 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 					       // then do the cell data
 	      for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 		{
-		  const double value = this->cell_data[dataset].has_block ?
-		    (*this->cell_data[dataset].block_data)(cell_number) :
-		    (*this->cell_data[dataset].single_data)(cell_number);
+		  const double value
+                    = this->cell_data[dataset]->get_cell_data_value (cell_number);
 		  switch (dim)
 		    {
 		      case 1:

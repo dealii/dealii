@@ -259,11 +259,12 @@ class KellyErrorEstimator
 				      * implemented in two and three
 				      * dimensions.
 				      */
+    template <typename InputVector>
     static void estimate (const Mapping<dim>      &mapping,
 			  const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
-			  const Vector<double>    &solution,
+			  const InputVector       &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
@@ -274,10 +275,11 @@ class KellyErrorEstimator
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */    
+    template <typename InputVector>
     static void estimate (const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
-			  const Vector<double>    &solution,
+			  const InputVector       &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
@@ -310,11 +312,12 @@ class KellyErrorEstimator
 				      * references, so we had to use a
 				      * vector of pointers.)
 				      */
+    template <typename InputVector>
     static void estimate (const Mapping<dim>          &mapping,
 			  const DoFHandler<dim>       &dof,
 			  const Quadrature<dim-1>     &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
-			  const std::vector<const Vector<double>*> &solutions,
+			  const std::vector<const InputVector *> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
@@ -324,11 +327,12 @@ class KellyErrorEstimator
 				      * Calls the @p{estimate}
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
-				      */    
+				      */
+    template <typename InputVector>
     static void estimate (const DoFHandler<dim>       &dof,
 			  const Quadrature<dim-1>     &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
-			  const std::vector<const Vector<double>*> &solutions,
+			  const std::vector<const InputVector *> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
@@ -526,11 +530,12 @@ class KellyErrorEstimator
 				      * dimension is implemented
 				      * seperatly.
 				      */
+    template <typename InputVector>
     static void estimate_some (const Mapping<dim>                  &mapping,
                                const DoFHandler<dim>               &dof_handler,
                                const Quadrature<dim-1>             &quadrature,
                                const typename FunctionMap<dim>::type &neumann_bc,
-                               const std::vector<const Vector<double>*> &solutions,
+                               const std::vector<const InputVector *> &solutions,
                                const std::vector<bool>                  &component_mask,
                                const Function<dim>                 *coefficients,
                                const std::pair<unsigned int, unsigned int> this_thread,
@@ -557,12 +562,13 @@ class KellyErrorEstimator
 				      * ending up with a function of
 				      * 500 lines of code.
 				      */
+    template <typename InputVector>
     static
     void
     integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
                                  const Quadrature<dim-1>             &quadrature,
                                  const typename FunctionMap<dim>::type &neumann_bc,
-                                 const std::vector<const Vector<double>*> &solutions,
+                                 const std::vector<const InputVector *> &solutions,
                                  const std::vector<bool>                  &component_mask,
                                  const Function<dim>                 *coefficients,
                                  FaceIntegrals                       &face_integrals,
@@ -583,11 +589,12 @@ class KellyErrorEstimator
 				      * integration is a bit more
 				      * complex.
 				      */
+    template <typename InputVector>
     static
     void
     integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
                                    const Quadrature<dim-1>             &quadrature,
-                                   const std::vector<const Vector<double>*> &solutions,
+                                   const std::vector<const InputVector *> &solutions,
                                    const std::vector<bool>                  &component_mask,
                                    const Function<dim>                 *coefficients,
                                    FaceIntegrals                       &face_integrals,
@@ -614,60 +621,5 @@ class KellyErrorEstimator
 };
 
 
-/* -------------- declaration of explicit specializations ------------- */
-
-/// @if NoDoc
-
-template <> void KellyErrorEstimator<1>::estimate_some (
-  const Mapping<1>                  &mapping,
-  const DoFHandler<1>               &dof_handler,
-  const Quadrature<0>               &quadrature,
-  const FunctionMap<1>::type        &neumann_bc,
-  const std::vector<const Vector<double>*> &solutions,
-  const std::vector<bool>                  &component_mask,
-  const Function<1>                   *coefficients,
-  const std::pair<unsigned int, unsigned int> this_thread,
-  FaceIntegrals                       &face_integrals,
-  PerThreadData                       &per_thread_data);
-
-template <> void KellyErrorEstimator<1>::estimate (
-  const Mapping<1>                    &mapping,
-  const DoFHandler<1>                 &dof_handler,
-  const Quadrature<0>                 &,
-  const FunctionMap<1>::type          &neumann_bc,
-  const std::vector<const Vector<double>*> &solutions,
-  std::vector<Vector<float>*>              &errors,
-  const std::vector<bool>                  &component_mask_,
-  const Function<1>                   *coefficient,
-  const unsigned int);
-
-template <> void KellyErrorEstimator<1>::integrate_over_regular_face (
-  const DoFHandler<1>               &dof_handler,
-  const Quadrature<0>             &quadrature,
-  const FunctionMap<1>::type &neumann_bc,
-  const std::vector<const Vector<double>*> &solutions,
-  const std::vector<bool>                  &component_mask,
-  const Function<1>                 *coefficients,
-  FaceIntegrals                       &face_integrals,
-  PerThreadData &,
-  const active_cell_iterator &,
-  const unsigned int      ,
-  FEFaceValues<1>        &,
-  FEFaceValues<1>        &);
-
-template <> void KellyErrorEstimator<1>::integrate_over_irregular_face (
-  const DoFHandler<1>               &dof_handler,
-  const Quadrature<0>             &quadrature,
-  const std::vector<const Vector<double>*> &solutions,
-  const std::vector<bool>                  &component_mask,
-  const Function<1>                 *coefficients,
-  FaceIntegrals                       &face_integrals,
-  PerThreadData &,
-  const active_cell_iterator &,
-  const unsigned int          ,
-  FEFaceValues<1>            &,
-  FESubfaceValues<1>         &);
-
-/// @endif
 
 #endif

@@ -31,6 +31,10 @@
 
 
 
+/* Defined if the prototype of abort() has a no-throw exception specification.
+   */
+#undef DEAL_II_ABORT_NOTHROW_EXCEPTION
+
 /* Defined if the compiler needs to see the static keyword even for functions
    in anonymous namespaces, to avoid duplicate symbol errors when linking. For
    the details, look at aclocal.m4 in the top-level directory. */
@@ -168,6 +172,9 @@
    functionality is available. */
 #undef DEAL_II_USE_MT_POSIX_NO_BARRIERS
 
+/* Defined if a PETSc installation was found and is going to be used */
+#undef DEAL_II_USE_PETSC
+
 /* Enable the multigrid components of the library */
 #undef ENABLE_MULTIGRID
 
@@ -242,11 +249,11 @@
  * here to make them unconditionally available to all other parts of the
  * library.
  *
- * The constants defined here are a subset of the @p{M_XXX} constants sometimes
- * declared in the system include file @p{math.h}, but without the 
- * prefix @p{M_}.
+ * The constants defined here are a subset of the <tt>M_XXX</tt> constants
+ * sometimes declared in the system include file <tt>math.h</tt>, but without
+ * the prefix <tt>M_</tt>.
  *
- * In addition to that, we declare @p{invalid_unsigned_int} to be the
+ * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
  * largest unsigned integer representable; this value is widely used in
  * the library as a marker for an invalid index, an invalid size of an
  * array, and similar purposes.

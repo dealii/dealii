@@ -19,6 +19,7 @@
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/vector.h>
+#include <lac/petsc_vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
@@ -1250,45 +1251,50 @@ ConstraintMatrix::memory_consumption () const
 // arg, and putting parentheses around the arg yields incorrect
 // syntax...
 
-#define vector_functions \
+#define VECTOR_FUNCTIONS(VectorType) \
   template void ConstraintMatrix::condense<VectorType>(const VectorType &uncondensed,\
 					               VectorType       &condensed) const;\
   template void ConstraintMatrix::condense<VectorType>(VectorType &vec) const;\
   template void ConstraintMatrix::set_zero<VectorType>(VectorType &vec) const;\
   template void ConstraintMatrix::distribute<VectorType>(const VectorType &condensed,\
 					                 VectorType       &uncondensed) const;\
-  template void ConstraintMatrix::distribute<VectorType>(VectorType &vec) const;
+  template void ConstraintMatrix::distribute<VectorType>(VectorType &vec) const
 
 
+VECTOR_FUNCTIONS(Vector<float>);
+VECTOR_FUNCTIONS(Vector<double>);
+VECTOR_FUNCTIONS(BlockVector<double>);
+VECTOR_FUNCTIONS(BlockVector<float>);
+
+#ifdef DEAL_II_USE_PETSC
+VECTOR_FUNCTIONS(PETScWrappers::Vector);
+#endif
 
 
+template
+void
+ConstraintMatrix::condense<float>(const SparseMatrix<float> &uncondensed,
+                                  SparseMatrix<float> &condensed) const;
+template
+void
+ConstraintMatrix::condense<float>(SparseMatrix<float> &uncondensed) const;
+
+template
+void
+ConstraintMatrix::condense<double>(const SparseMatrix<double> &uncondensed,
+                                   SparseMatrix<double> &condensed) const;
+
+template
+void
+ConstraintMatrix::condense<double>(SparseMatrix<double> &uncondensed) const;
 
 
-#define VectorType Vector<float>
-vector_functions
-#undef VectorType
+// block sparse matrices are only implemented for one of the two matrix
+// functions (the single-argument, in-place function)
+template
+void
+ConstraintMatrix::condense<double>(BlockSparseMatrix<double> &uncondensed) const;
 
-#define VectorType Vector<double>
-vector_functions
-#undef VectorType
-
-#define VectorType BlockVector<double>
-vector_functions
-#undef VectorType
-
-#define VectorType BlockVector<float>
-vector_functions
-#undef VectorType
-
-
-
-template void ConstraintMatrix::condense<float>(const SparseMatrix<float> &uncondensed,
-						SparseMatrix<float> &condensed) const;
-template void ConstraintMatrix::condense<float>(SparseMatrix<float> &uncondensed) const;
-
-template void ConstraintMatrix::condense<double>(const SparseMatrix<double> &uncondensed,
-						 SparseMatrix<double> &condensed) const;
-template void ConstraintMatrix::condense<double>(SparseMatrix<double> &uncondensed) const;
-
-// block sparse matrices are only implemented for one of the two matrix functions
-template void ConstraintMatrix::condense<double>(BlockSparseMatrix<double> &uncondensed) const;
+template
+void
+ConstraintMatrix::condense<float>(BlockSparseMatrix<float> &uncondensed) const;

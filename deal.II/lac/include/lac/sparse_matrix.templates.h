@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -286,6 +286,8 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst,
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
+
+  Assert (&src != &dst, ExcSourceEqualsDestination());
   
   const unsigned int n_rows = m();
 
@@ -384,6 +386,8 @@ SparseMatrix<number>::Tvmult (Vector<somenumber>& dst,
   Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
+  Assert (&src != &dst, ExcSourceEqualsDestination());
+
   dst.clear ();
 
   for (unsigned int i=0;i<m();i++)
@@ -407,6 +411,8 @@ SparseMatrix<number>::vmult_add (Vector<somenumber>& dst,
   Assert (val != 0, ExcMatrixNotInitialized());
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(n() == src.size(), ExcDimensionMismatch(n(),src.size()));
+
+  Assert (&src != &dst, ExcSourceEqualsDestination());
 
   const unsigned int  n_rows     = m();
   const number       *val_ptr    = &val[cols->rowstart[0]];
@@ -434,14 +440,14 @@ SparseMatrix<number>::Tvmult_add (Vector<somenumber>& dst,
   Assert(n() == dst.size(), ExcDimensionMismatch(n(),dst.size()));
   Assert(m() == src.size(), ExcDimensionMismatch(m(),src.size()));
 
+  Assert (&src != &dst, ExcSourceEqualsDestination());
+
   for (unsigned int i=0;i<m();i++)
-    {
-      for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
-	{
-	  const unsigned int p = cols->colnums[j];
-	  dst(p) += val[j] * src(i);
-	}
-    }
+    for (unsigned int j=cols->rowstart[i]; j<cols->rowstart[i+1] ;j++)
+      {
+        const unsigned int p = cols->colnums[j];
+        dst(p) += val[j] * src(i);
+      }
 }
 
 
@@ -688,6 +694,7 @@ number SparseMatrix<number>::l1_norm () const
 }
 
 
+
 template <typename number>
 number SparseMatrix<number>::linfty_norm () const
 {
@@ -711,6 +718,24 @@ number SparseMatrix<number>::linfty_norm () const
 }
 
 
+
+template <typename number>
+number SparseMatrix<number>::frobenius_norm () const
+{
+                                   // simply add up all entries in the
+                                   // sparsity pattern, without taking any
+                                   // reference to rows or columns
+  number norm_sqr = 0;
+  const unsigned int n_rows = m();
+  for (const number *ptr = &val[0];
+       ptr != &val[cols->rowstart[n_rows]]; ++ptr)
+    norm_sqr += *ptr * *ptr;
+
+  return std::sqrt (norm_sqr);
+}
+
+
+
 template <typename number>
 template <typename somenumber>
 somenumber
@@ -723,6 +748,8 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
   Assert(m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert(m() == b.size(), ExcDimensionMismatch(m(),b.size()));
   Assert(n() == u.size(), ExcDimensionMismatch(n(),u.size()));
+
+  Assert (&u != &dst, ExcSourceEqualsDestination());
 
   const unsigned int n_rows = m();
 

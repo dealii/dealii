@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,8 @@
 
 
 template <int dim>
-DoFAccessor<dim>::DoFAccessor () :
+DoFAccessor<dim>::DoFAccessor ()
+                :
 		dof_handler(0)
 {
   Assert (false, ExcInvalidObject());
@@ -233,6 +234,99 @@ DoFObjectAccessor<1,dim>::child (const unsigned int i) const
 
 
 template <int dim>
+template <typename number, typename OutputVector>
+inline
+void
+DoFObjectAccessor<1, dim>::
+distribute_local_to_global (const Vector<number> &local_source,
+			    OutputVector         &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (local_source.size() == (2*this->get_fe().dofs_per_vertex +
+				  this->get_fe().dofs_per_line),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (this->dof_handler->n_dofs() == global_destination.size(),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.size();
+
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+  
+				   // get indices of dofs
+  std::vector<unsigned int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell vector
+  for (unsigned int j=0; j<n_dofs; ++j)
+    global_destination(dofs[j]) += local_source(j);
+}
+
+
+
+template <int dim>
+template <typename number, typename OutputMatrix>
+inline
+void
+DoFObjectAccessor<1, dim>::
+distribute_local_to_global (const FullMatrix<number> &local_source,
+			    OutputMatrix             &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (local_source.m() == (2*this->get_fe().dofs_per_vertex +
+                               this->get_fe().dofs_per_line),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (local_source.m() == local_source.n(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+  Assert (this->dof_handler->n_dofs() == global_destination.m(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+  Assert (global_destination.m() == global_destination.n(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.m();
+
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+
+				   // get indices of dofs
+  std::vector<unsigned int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell matrix
+  for (unsigned int i=0; i<n_dofs; ++i)
+    for (unsigned int j=0; j<n_dofs; ++j)
+      global_destination.add(dofs[i], dofs[j], local_source(i,j));
+}
+
+
+
+template <int dim>
 inline
 void
 DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
@@ -377,6 +471,101 @@ DoFObjectAccessor<2,dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
+}
+
+
+
+template <int dim>
+template <typename number, typename OutputVector>
+inline
+void
+DoFObjectAccessor<2, dim>::
+distribute_local_to_global (const Vector<number> &local_source,
+			    OutputVector         &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (local_source.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
+				  4*this->dof_handler->get_fe().dofs_per_line +
+				  this->dof_handler->get_fe().dofs_per_quad),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (this->dof_handler->n_dofs() == global_destination.size(),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.size();
+  
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+
+				   // get indices of dofs
+  std::vector<unsigned int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell vector
+  for (unsigned int j=0; j<n_dofs; ++j)
+    global_destination(dofs[j]) += local_source(j);
+}
+
+
+
+template <int dim>
+template <typename number, typename OutputMatrix>
+inline
+void
+DoFObjectAccessor<2, dim>::
+distribute_local_to_global (const FullMatrix<number> &local_source,
+			    OutputMatrix             &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (local_source.m() == (4*this->dof_handler->get_fe().dofs_per_vertex +
+                               4*this->dof_handler->get_fe().dofs_per_line +
+                               this->dof_handler->get_fe().dofs_per_quad),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (local_source.m() == local_source.n(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+  Assert (this->dof_handler->n_dofs() == global_destination.m(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+  Assert (global_destination.m() == global_destination.n(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.m();
+
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+
+				   // get indices of dofs
+  std::vector<unsigned int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell matrix
+  for (unsigned int i=0; i<n_dofs; ++i)
+    for (unsigned int j=0; j<n_dofs; ++j)
+      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 }
 
 
@@ -550,6 +739,103 @@ DoFObjectAccessor<3,dim>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
+}
+
+
+
+template <int dim>
+template <typename number, typename OutputVector>
+inline
+void
+DoFObjectAccessor<3, dim>::
+distribute_local_to_global (const Vector<number> &local_source,
+			    OutputVector         &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (local_source.size() == (8*this->get_fe().dofs_per_vertex +
+                                  12*this->get_fe().dofs_per_line +
+                                  6*this->get_fe().dofs_per_quad +
+                                  this->get_fe().dofs_per_hex),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (this->dof_handler->n_dofs() == global_destination.size(),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.size();
+  
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+
+				   // get indices of dofs
+  std::vector<unsigned int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell vector
+  for (unsigned int j=0; j<n_dofs; ++j)
+    global_destination(dofs[j]) += local_source(j);
+}
+
+
+
+template <int dim>
+template <typename number, typename OutputMatrix>
+inline
+void
+DoFObjectAccessor<3, dim>::
+distribute_local_to_global (const FullMatrix<number> &local_source,
+			    OutputMatrix             &global_destination) const
+{
+				   // since the exception classes are
+				   // from a template dependent base
+				   // class, we have to fully qualify
+				   // them. to work around more
+				   // trouble, typedef the template
+				   // dependent base class to a
+				   // non-template dependent name and
+				   // use that to specify the
+				   // qualified exception names
+  typedef DoFAccessor<dim> BaseClass;
+  
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (local_source.m() == (8*this->get_fe().dofs_per_vertex +
+                               12*this->get_fe().dofs_per_line +
+                               6*this->get_fe().dofs_per_quad +
+                               this->get_fe().dofs_per_hex),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (local_source.m() == local_source.n(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+  Assert (this->dof_handler->n_dofs() == global_destination.m(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+  Assert (global_destination.m() == global_destination.n(),
+	  typename BaseClass::ExcMatrixDoesNotMatch());
+
+  const unsigned int n_dofs = local_source.m();
+
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+
+				   // get indices of dofs
+  std::vector<unsigned int> dofs (n_dofs);
+  get_dof_indices (dofs);
+  
+				   // distribute cell matrix
+  for (unsigned int i=0; i<n_dofs; ++i)
+    for (unsigned int j=0; j<n_dofs; ++j)
+      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 }
 
 

@@ -122,8 +122,6 @@ class FullMatrix : public Table<2,number>
 				      */
     class const_iterator
     {
-      private:
-        
       public:
                                          /**
                                           * Constructor.
@@ -204,7 +202,8 @@ class FullMatrix : public Table<2,number>
 				      * matrix as a rectangular
 				      * matrix.
 				      */
-    FullMatrix (const unsigned int rows, const unsigned int cols);
+    FullMatrix (const unsigned int rows,
+                const unsigned int cols);
     
 				     /** 
 				      * Copy constructor. This
@@ -387,10 +386,29 @@ class FullMatrix : public Table<2,number>
     FullMatrix & operator /= (const double factor);
     
 				     /**
+				      * Add <tt>matrix</tt> scaled by
+				      * <tt>factor</tt> to this matrix,
+				      * i.e. the matrix <tt>factor*matrix</tt>
+				      * is added to <tt>this</tt>.
+				      *
+				      * The source matrix may be a full matrix
+				      * over an arbitrary underlying scalar
+				      * type, as long as its data type is
+				      * convertible to the data type of this
+				      * matrix.
+				      */
+    template <typename somenumber>
+    void add_scaled (const number factor,
+		     const FullMatrix<somenumber> &matrix);
+
+                                     /**
 				      * Weighted addition. The matrix
 				      * <tt>s*B</tt> is added to <tt>this</tt>.
 				      *
-				      * $A += sB$
+				      * This function is deprecated. Use
+				      * <tt>add_scaled</tt> instead, since
+				      * this has the same interface as the
+				      * other matrix classes in the library.
 				      */
     template<typename number2>
     void add (const number               s,
@@ -522,6 +540,9 @@ class FullMatrix : public Table<2,number>
 				      *
 				      * if (!adding)
 				      *  $w = A*v$
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
 				      */
     template<typename number2>
     void vmult (Vector<number2>       &w,
@@ -532,6 +553,9 @@ class FullMatrix : public Table<2,number>
 				      * Transpose
 				      * matrix-vector-multiplication.
 				      * See vmult() above.
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
 				      */
     template<typename number2>
     void Tvmult (Vector<number2>       &w,
@@ -695,7 +719,7 @@ class FullMatrix : public Table<2,number>
 			      const number              omega = 1.) const;
 
 				     /**
-				      * $A(i,1-n)+=s*A(j,1-n)$.
+				      * $A(i,1...n)+=s*A(j,1...n)$.
 				      * Simple addition of rows of this
 				      */
     void add_row (const unsigned int i,
@@ -703,7 +727,7 @@ class FullMatrix : public Table<2,number>
 		  const unsigned int j);
 
 				     /**
-				      * $A(i,1-n)+=s*A(j,1-n)+t*A(k,1-n)$.
+				      * $A(i,1...n)+=s*A(j,1...n)+t*A(k,1...n)$.
 				      * Multiple addition of rows of this.
 				      */
     void add_row (const unsigned int i,
@@ -711,7 +735,7 @@ class FullMatrix : public Table<2,number>
 		  const number t, const unsigned int k);
 
 				     /**
-				      * $A(1-n,i)+=s*A(1-n,j)$.
+				      * $A(1...n,i)+=s*A(1...n,j)$.
 				      *  Simple addition of columns of this.
 				      */
     void add_col (const unsigned int i,
@@ -719,7 +743,7 @@ class FullMatrix : public Table<2,number>
 		  const unsigned int j);
 
 				     /**
-				      * $A(1-n,i)+=s*A(1-n,j)+t*A(1-n,k)$.
+				      * $A(1...n,i)+=s*A(1...n,j)+t*A(1...n,k)$.
 				      *  Multiple addition of columns of this.
 				      */
     void add_col (const unsigned int i,
@@ -727,21 +751,21 @@ class FullMatrix : public Table<2,number>
 		  const number t, const unsigned int k);
 
 				     /**
-				      * Swap  A(i,1-n) <-> A(j,1-n).
+				      * Swap  A(i,1...n) <-> A(j,1...n).
 				      * Swap rows i and j of this
 				      */
     void swap_row (const unsigned int i,
 		   const unsigned int j);
 
 				     /**
-				      *  Swap  A(1-n,i) <-> A(1-n,j).
+				      *  Swap  A(1...n,i) <-> A(1...n,j).
 				      *  Swap columns i and j of this
 				      */
     void swap_col (const unsigned int i,
 		   const unsigned int j);
 
 				     /**
-				      *  A(i,i)+=B(i,1-n). Addition of complete
+				      *  A(i,i)+=B(i,1...n). Addition of complete
 				      *  rows of B to diagonal-elements of this ; <p>
 				      *  ( i = 1 ... m )
 				      */
@@ -758,13 +782,17 @@ class FullMatrix : public Table<2,number>
     void diagadd (const number s);
 
 				     /**
-				      * <i>w=b-A*v</i>.
-				      * Residual calculation , returns
-				      * the <i>l<sub>2</sub></i>-norm |<i>w</i>|.
+				      * <i>dst=b-A*x</i>. Residual calculation,
+				      * returns the <i>l<sub>2</sub></i>-norm
+				      * |<i>dst</i>|.
+                                      *
+                                      * Source <i>x</i> and destination
+                                      * <i>dst</i> must not be the same
+                                      * vector.
 				      */
     template<typename number2, typename number3>
-    double residual (Vector<number2>       &w,
-		     const Vector<number2> &v,
+    double residual (Vector<number2>       &dst,
+		     const Vector<number2> &x,
 		     const Vector<number3> &b) const;
 
 				     /**
@@ -941,7 +969,11 @@ class FullMatrix : public Table<2,number>
 		    int,
 		    << "This function is not implemented for the given"
 		    << " matrix dimension " << arg1);
-    
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcSourceEqualsDestination);
+
     friend class Accessor;
 };
 

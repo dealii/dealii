@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -326,16 +326,16 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * function is only callable for
 				      * active cells.
 				      *
-				      * The input vector may be either
-				      * a @p{Vector<float>},
+				      * The input vector may be either a
+				      * @p{Vector<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class InputVector, typename number>
     void get_dof_values (const InputVector &values,
@@ -364,16 +364,16 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * right size before being passed
 				      * to this function.
 				      *
-				      * The output vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The output vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
@@ -405,28 +405,33 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				     /**
 				      * Distribute a local (cell based) vector
 				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom
-				      * to the global one and entering the
-				      * local values into the global vector.
+				      * numbering of the degrees of freedom to
+				      * the global one and entering the local
+				      * values into the global vector.
 				      *
-				      * The elements are @em{added} up to
-				      * the elements in the global vector,
-				      * rather than just set, since this is
-				      * usually what one wants.
+				      * The elements are @em{added} up to the
+				      * elements in the global vector, rather
+				      * than just set, since this is usually
+				      * what one wants.
 				      */
-    void distribute_local_to_global (const Vector<double> &local_source,
-				     Vector<double>       &global_destination) const;
+    template <typename number, typename OutputVector>
+    void
+    distribute_local_to_global (const Vector<number> &local_source,
+                                OutputVector         &global_destination) const;
 
 				     /**
-				      * This function does much the same as the
-				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
+				      * This function does much the same as
+				      * the
+				      * @p{distribute_local_to_global(Vector,Vector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const FullMatrix<double> &local_source,
-				     SparseMatrix<double>     &global_destination) const;
+    template <typename number, typename OutputMatrix>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_source,
+                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -575,16 +580,16 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * function is only callable for active
 				      * cells.
 				      *
-				      * The input vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The input vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class InputVector, typename number>
     void get_dof_values (const InputVector &values,
@@ -612,16 +617,16 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
 				      *
-				      * The output vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The output vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
@@ -639,28 +644,33 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				     /**
 				      * Distribute a local (cell based) vector
 				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom
-				      * to the global one and entering the
-				      * local values into the global vector.
+				      * numbering of the degrees of freedom to
+				      * the global one and entering the local
+				      * values into the global vector.
 				      *
-				      * The elements are @em{added} up to
-				      * the elements in the global vector,
-				      * rather than just set, since this is
-				      * usually what one wants.
+				      * The elements are @em{added} up to the
+				      * elements in the global vector, rather
+				      * than just set, since this is usually
+				      * what one wants.
 				      */
-    void distribute_local_to_global (const Vector<double> &local_source,
-				     Vector<double>       &global_destination) const;
+    template <typename number, typename OutputVector>
+    void
+    distribute_local_to_global (const Vector<number> &local_source,
+                                OutputVector         &global_destination) const;
 
 				     /**
-				      * This function does much the same as the
-				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
+				      * This function does much the same as
+				      * the
+				      * @p{distribute_local_to_global(Vector,Vector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const FullMatrix<double> &local_source,
-				     SparseMatrix<double>     &global_destination) const;
+    template <typename number, typename OutputMatrix>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_source,
+                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -762,16 +772,16 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * function is only callable for active
 				      * cells.
 				      *
-				      * The input vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The input vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class InputVector, typename number>
     void get_dof_values (const InputVector &values,
@@ -799,16 +809,16 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
 				      *
-				      * The output vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The output vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
@@ -834,28 +844,33 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				     /**
 				      * Distribute a local (cell based) vector
 				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom
-				      * to the global one and entering the
-				      * local values into the global vector.
+				      * numbering of the degrees of freedom to
+				      * the global one and entering the local
+				      * values into the global vector.
 				      *
-				      * The elements are @em{added} up to
-				      * the elements in the global vector,
-				      * rather than just set, since this is
-				      * usually what one wants.
+				      * The elements are @em{added} up to the
+				      * elements in the global vector, rather
+				      * than just set, since this is usually
+				      * what one wants.
 				      */
-    void distribute_local_to_global (const Vector<double> &local_source,
-				     Vector<double>       &global_destination) const;
+    template <typename number, typename OutputVector>
+    void
+    distribute_local_to_global (const Vector<number> &local_source,
+                                OutputVector         &global_destination) const;
 
 				     /**
-				      * This function does much the same as the
-				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
+				      * This function does much the same as
+				      * the
+				      * @p{distribute_local_to_global(Vector,Vector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const FullMatrix<double> &local_source,
-				     SparseMatrix<double>     &global_destination) const;
+    template <typename number, typename OutputMatrix>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_source,
+                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -957,16 +972,16 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * function is only callable for active
 				      * cells.
 				      *
-				      * The input vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The input vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class InputVector, typename number>
     void get_dof_values (const InputVector &values,
@@ -994,16 +1009,16 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * It is assumed that both vectors already
 				      * have the right size beforehand.
 				      *
-				      * The output vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The output vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
@@ -1035,28 +1050,33 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				     /**
 				      * Distribute a local (cell based) vector
 				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom
-				      * to the global one and entering the
-				      * local values into the global vector.
+				      * numbering of the degrees of freedom to
+				      * the global one and entering the local
+				      * values into the global vector.
 				      *
-				      * The elements are @em{added} up to
-				      * the elements in the global vector,
-				      * rather than just set, since this is
-				      * usually what one wants.
+				      * The elements are @em{added} up to the
+				      * elements in the global vector, rather
+				      * than just set, since this is usually
+				      * what one wants.
 				      */
-    void distribute_local_to_global (const Vector<double> &local_source,
-				     Vector<double>       &global_destination) const;
+    template <typename number, typename OutputVector>
+    void
+    distribute_local_to_global (const Vector<number> &local_source,
+                                OutputVector         &global_destination) const;
 
 				     /**
-				      * This function does much the same as the
-				      * @p{distribute_local_to_global(Vector<double>,Vector<double>)}
+				      * This function does much the same as
+				      * the
+				      * @p{distribute_local_to_global(Vector,Vector)}
 				      * function, but operates on matrices
 				      * instead of vectors. The sparse matrix
 				      * is supposed to have non-zero entry
 				      * slots where required.
 				      */
-    void distribute_local_to_global (const FullMatrix<double> &local_source,
-				     SparseMatrix<double>     &global_destination) const;
+    template <typename number, typename OutputMatrix>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_source,
+                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -1296,16 +1316,16 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * cells by the finite element
 				      * objects.
 				      *
-				      * The output vector may be either
-				      * a @ref{Vector}@p{<float>},
+				      * The output vector may be either a
+				      * @ref{Vector}@p{<float>},
 				      * @ref{Vector}@p{<double>}, or a
-				      * @ref{BlockVector}@p{<...,double>}. It
-				      * is in the responsibility of
-				      * the caller to assure that the
-				      * types of the numbers stored in
-				      * input and output vectors are
-				      * compatible and with similar
-				      * accuracy.
+				      * @ref{BlockVector}@p{<double>}, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
 				      */
     template <class OutputVector, typename number>
     void set_dof_values_by_interpolation (const Vector<number> &local_values,

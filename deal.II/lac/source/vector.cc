@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,8 @@
 // explicit instantiations
 template class Vector<double>;
 template Vector<double>& Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(const Vector<float>&);
+template bool Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<double>(const Vector<double>&);
+template bool Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<float>(const Vector<float>&);
 template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<float>(const Vector<float>&) const;
 template double Vector<double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<double>(const Vector<double>&) const;
 template void Vector<double>::reinit<double>(const Vector<double>&, const bool);
@@ -28,6 +30,8 @@ template void Vector<double>::scale<float>(const Vector<float>&);
 
 template class Vector<float>;
 template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
+template bool Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<double>(const Vector<double>&);
+template bool Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator==<float>(const Vector<float>&);
 template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<float>(const Vector<float>&) const;
 template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator*<double>(const Vector<double>&) const;
 template void Vector<float>::reinit<double>(const Vector<double>&, const bool);

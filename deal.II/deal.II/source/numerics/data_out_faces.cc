@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,12 +72,8 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	    {
 	      if (data.n_components == 1)
 		{
-		  if (this->dof_data[dataset].has_block)
-		    fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
-							 data.patch_values);
-		  else
-		    fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
-							 data.patch_values);
+                  this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                data.patch_values);
 
 		  for (unsigned int q=0; q<n_q_points; ++q)
 		    patch->data(dataset,q) = data.patch_values[q];
@@ -85,12 +81,8 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	      else
 						 // system of components
 		{
-		  if (this->dof_data[dataset].has_block)
-		    fe_patch_values.get_function_values (*this->dof_data[dataset].block_data,
-							 data.patch_values_system);
-		  else
-		    fe_patch_values.get_function_values (*this->dof_data[dataset].single_data,
-							 data.patch_values_system);
+                  this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                data.patch_values_system);
 
 		  for (unsigned int component=0; component<data.n_components;
 		       ++component)
@@ -117,19 +109,12 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	      const unsigned int cell_number
 		= std::distance (this->dofs->begin_active(),
 				 typename DoFHandler<dim>::active_cell_iterator(face.first));
-	      
-	      if (this->cell_data[dataset].has_block)
-		{
-		  const double value = (*this->cell_data[dataset].block_data)(cell_number);
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
-		      value;
-		} else {
-		  const double value = (*this->cell_data[dataset].single_data)(cell_number);
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
-		      value;
-		} 
+
+              const double value
+                = this->cell_data[dataset]->get_cell_data_value (cell_number);
+              for (unsigned int q=0; q<n_q_points; ++q)
+                patch->data(dataset+this->dof_data.size()*data.n_components,q) =
+                  value;
 	    };
 	};
       				       // next cell (patch) in this thread

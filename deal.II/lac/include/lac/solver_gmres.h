@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -153,23 +153,21 @@ namespace internal
  * that these will continue to work even if number or type of the
  * additional parameters for a certain solver changes.
  *
- * For the GMRes method, the @p{AdditionalData} structure contains the
- * number of temporary vectors as commented upon above. By default,
- * the number of these vectors is set to 30. The @p{AdditionalData}
- * also containes a flag indicating the use of right or left
- * preconditioning. The default is left preconditioning. Finally it
- * includes a flag indicating whether or not the default residual is
- * used as stopping criterion. By default, the left preconditioned
- * GMRes uses the preconditioned residual and the right preconditioned
- * GMRes uses the normal, i.e. unpreconditioned, residual as stopping
- * criterion. If the @p{use_default_residual} flag is @p{false}, the
- * left preconditioned GMRes uses as stopping criterion the
- * unpreconditioned residual and the right preconditioned GMRes the
- * preconditioned residual. But be aware that the non-default
- * residuals are not automatically computed by the GMRes method but
- * need to be computed in addition. This (especially for the left
- * preconditioned GMRes) might lead to a significant loss in the
- * solver performance. Therefore, the user should set
+ * For the GMRes method, the @p{AdditionalData} structure contains the number
+ * of temporary vectors as commented upon above. By default, the number of
+ * these vectors is set to 30. The @p{AdditionalData} also containes a flag
+ * indicating the use of right or left preconditioning. The default is left
+ * preconditioning. Finally it includes a flag indicating whether or not the
+ * default residual is used as stopping criterion. By default, the left
+ * preconditioned GMRes uses the preconditioned residual and the right
+ * preconditioned GMRes uses the normal, i.e. unpreconditioned, residual as
+ * stopping criterion. If the @p{use_default_residual} flag is @p{false}, the
+ * left preconditioned GMRes uses as stopping criterion the unpreconditioned
+ * residual and the right preconditioned GMRes the preconditioned
+ * residual. But be aware that the non-default residuals are not automatically
+ * computed by the GMRes method but need to be computed in addition. This
+ * (especially for the left preconditioned GMRes) might lead to a significant
+ * loss in the solver performance. Therefore, the user should set
  * @p{use_default_residual=false} only for debugging/testing purposes.
  *
  * For the requirements on matrices and vectors in order to work with
@@ -189,23 +187,18 @@ class SolverGMRES : public Solver<VECTOR>
     struct AdditionalData 
     {
 					 /**
-					  * Constructor. By default,
-					  * set the number of
-					  * temporary vectors to 30,
-					  * preconditioning from left
-					  * and the residual of the
-					  * stopping criterion to the
-					  * default residual
+					  * Constructor. By default, set the
+					  * number of temporary vectors to 30,
+					  * i.e. do a restart every
+					  * approximately 30 iterations. Also
+					  * set preconditioning from left and
+					  * the residual of the stopping
+					  * criterion to the default residual
 					  * (cf. class documentation).
 					  */
-	AdditionalData(const unsigned int max_n_tmp_vectors = 30,
-		       bool right_preconditioning = false,
-		       bool use_default_residual = true)
-			:
-			max_n_tmp_vectors(max_n_tmp_vectors),
-			right_preconditioning(right_preconditioning),
-			use_default_residual(use_default_residual)
-	  {};
+	AdditionalData (const unsigned int max_n_tmp_vectors = 30,
+                        const bool right_preconditioning = false,
+                        const bool use_default_residual = true);
 	
 					 /**
 					  * Maximum number of
@@ -435,6 +428,19 @@ namespace internal
 }
 
 
+
+template <class VECTOR>
+inline
+SolverGMRES<VECTOR>::AdditionalData::
+AdditionalData (const unsigned int max_n_tmp_vectors,
+                const bool         right_preconditioning,
+                const bool         use_default_residual)
+                :
+                max_n_tmp_vectors(max_n_tmp_vectors),
+                right_preconditioning(right_preconditioning),
+                use_default_residual(use_default_residual)
+{}
+
 template <class VECTOR>
 SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
                                   VectorMemory<VECTOR> &mem,
@@ -620,7 +626,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
       
       gamma(0) = rho;
       
-      v.scale (1./rho);
+      v *= 1./rho;
 
 				       // inner iteration doing at
 				       // most as many steps as there
@@ -671,7 +677,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 	  s = vv.l2_norm();
 	  h(inner_iteration+1) = s;
 	  
-	  vv.scale(1./s);
+	  vv *= 1./s;
 	  
 					   /*  Transformation into
 					       triagonal structure  */

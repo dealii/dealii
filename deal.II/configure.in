@@ -192,6 +192,7 @@ DEAL_II_HAVE_STD_IOSFWD_HEADER
 DEAL_II_HAVE_BUILTIN_EXPECT
 DEAL_II_HAVE_VERBOSE_TERMINATE
 DEAL_II_CHECK_MIN_VECTOR_CAPACITY
+DEAL_II_CHECK_ABORT
 DEAL_II_CHECK_GETRUSAGE
 DEAL_II_CHECK_ISNAN
 DEAL_II_CHECK_RAND_R
@@ -335,6 +336,10 @@ AC_SUBST(TECPLOT_INCLUDE_PATH)
 DEAL_II_CONFIGURE_HSL
 AC_SUBST(USE_CONTRIB_HSL)
 
+DEAL_II_CONFIGURE_PETSC
+AC_SUBST(USE_CONTRIB_PETSC)
+AC_SUBST(DEAL_II_PETSC_DIR)
+AC_SUBST(DEAL_II_PETSC_ARCH)
 
 
 
@@ -365,6 +370,9 @@ AC_MSG_RESULT(---------------- configuring other programs -----------------)
 DEAL_II_CHECK_KDOC
 AC_SUBST(kdocdir)
 AC_SUBST(kdocversion)
+
+DEAL_II_CHECK_DOXYGEN
+AC_SUBST(DOXYGEN)
 
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
@@ -433,11 +441,11 @@ AH_BOTTOM(
  * here to make them unconditionally available to all other parts of the
  * library.
  *
- * The constants defined here are a subset of the @p{M_XXX} constants sometimes
- * declared in the system include file @p{math.h}, but without the 
- * prefix @p{M_}.
+ * The constants defined here are a subset of the <tt>M_XXX</tt> constants
+ * sometimes declared in the system include file <tt>math.h</tt>, but without
+ * the prefix <tt>M_</tt>.
  *
- * In addition to that, we declare @p{invalid_unsigned_int} to be the
+ * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
  * largest unsigned integer representable; this value is widely used in
  * the library as a marker for an invalid index, an invalid size of an
  * array, and similar purposes.
@@ -522,6 +530,7 @@ AC_OUTPUT([common/Make.global_options
            doc/Makefile 
            doc/auto/Makefile 
            doc/auto/kdoc/Makefile
+	   doc/doxygen/Makefile
            doc/doxygen/options.dox])
 
 
@@ -537,3 +546,11 @@ echo
 echo -------------------------------------------------------------
 echo
 
+if test "x$doxygen_not_found" = "xyes" ; then
+  echo "     WARNING: During configuration, no version of the doxygen"
+  echo "     WARNING: documentation generation program could be found."
+  echo "     WARNING: You can still use the library, but you won't be"
+  echo "     WARNING: able to generate API documentation locally on"
+  echo "     WARNING: your machine."
+  echo
+fi

@@ -968,6 +968,15 @@ class BlockVector
 				      * some time.
 				      */
     bool all_zero () const;
+                                     /**
+                                      * Return @p{true} if the vector has no
+                                      * negative entries, i.e. all entries are
+                                      * zero or positive. This function is
+                                      * used, for example, to check whether
+                                      * refinement indicators are really all
+                                      * positive (or zero).
+                                      */
+    bool is_non_negative () const;
 
 				     /**
 				      * @name 2: Data-Access

@@ -476,19 +476,20 @@ class BlockSparseMatrix : public Subscriptor
 
 				     /**
 				      * Add <tt>matrix</tt> scaled by
-				      * <tt>factor</tt> to this matrix. The
-				      * function throws an error if
-				      * the sparsity patterns of the
-				      * two involved matrices do not
-				      * point to the same object,
-				      * since in this case the
+				      * <tt>factor</tt> to this matrix,
+				      * i.e. the matrix <tt>factor*matrix</tt>
+				      * is added to <tt>this</tt>. This
+				      * function throws an error if the
+				      * sparsity patterns of the two involved
+				      * matrices do not point to the same
+				      * object, since in this case the
 				      * operation is cheaper.
 				      *
-				      * The source matrix may be a
-				      * matrix of arbitrary type, as
-				      * long as its data type is
-				      * convertible to the data type
-				      * of this matrix.
+				      * The source matrix may be a sparse
+				      * matrix over an arbitrary underlying
+				      * scalar type, as long as its data type
+				      * is convertible to the data type of
+				      * this matrix.
 				      */
     template <typename somenumber>
     void add_scaled (const number factor,

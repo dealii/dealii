@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,35 +71,32 @@ class SolverCG : public Solver<VECTOR>
 {
   public:
     				     /**
-				      * Standardized data struct to
-				      * pipe additional data to the
-				      * solver.
+				      * Standardized data struct to pipe
+				      * additional data to the solver.
 				      */
     struct AdditionalData
     {
-				       /**
-					* Write coefficients alpha and
-					* beta to the log file for
-					later use in eigenvalue estimates.
-					*/
-      bool log_coefficients;
+                                         /**
+                                          * Write coefficients alpha and beta
+                                          * to the log file for later use in
+                                          * eigenvalue estimates.
+                                          */
+        bool log_coefficients;
 
-				       /**
-					* Constructor. Initialize data fields.
-					* Confer the description of those.
-					*/
-      AdditionalData (bool log_coefficients = false)
-	:
-	log_coefficients (log_coefficients)
-	{}
+                                         /**
+                                          * Constructor. Initialize data
+                                          * fields.  Confer the description of
+                                          * those.
+                                          */
+        AdditionalData (const bool log_coefficients = false);
     };
 
 				     /**
 				      * Constructor.
 				      */
-    SolverCG (SolverControl &cn,
+    SolverCG (SolverControl        &cn,
 	      VectorMemory<VECTOR> &mem,
-	      const AdditionalData &data=AdditionalData());
+	      const AdditionalData &data = AdditionalData());
 
 				     /**
 				      * Virtual destructor.
@@ -110,7 +107,7 @@ class SolverCG : public Solver<VECTOR>
 				      * Solve the linear system $Ax=b$
 				      * for x.
 				      */
-    template<class MATRIX, class PRECONDITIONER>
+    template <class MATRIX, class PRECONDITIONER>
     void
     solve (const MATRIX         &A,
 	   VECTOR               &x,
@@ -177,24 +174,34 @@ class SolverCG : public Solver<VECTOR>
 /*------------------------- Implementation ----------------------------*/
 
 
-template<class VECTOR>
-SolverCG<VECTOR>::SolverCG(SolverControl &cn,
+
+template <class VECTOR>
+inline
+SolverCG<VECTOR>::AdditionalData::
+AdditionalData (const bool log_coefficients)
+                :
+                log_coefficients (log_coefficients)
+{}
+    
+
+template <class VECTOR>
+SolverCG<VECTOR>::SolverCG(SolverControl        &cn,
 			   VectorMemory<VECTOR> &mem,
 			   const AdditionalData &data)
 		:
-  Solver<VECTOR>(cn,mem),
-  additional_data(data)
+                Solver<VECTOR>(cn,mem),
+                additional_data(data)
 {}
 
 
 
-template<class VECTOR>
+template <class VECTOR>
 SolverCG<VECTOR>::~SolverCG ()
 {}
 
 
 
-template<class VECTOR>
+template <class VECTOR>
 double
 SolverCG<VECTOR>::criterion()
 {
@@ -203,7 +210,7 @@ SolverCG<VECTOR>::criterion()
 
 
 
-template<class VECTOR>
+template <class VECTOR>
 void
 SolverCG<VECTOR>::cleanup()
 {
@@ -216,7 +223,7 @@ SolverCG<VECTOR>::cleanup()
 
 
 
-template<class VECTOR>
+template <class VECTOR>
 void
 SolverCG<VECTOR>::print_vectors(const unsigned int,
 				const VECTOR&,
@@ -226,8 +233,8 @@ SolverCG<VECTOR>::print_vectors(const unsigned int,
 
 
 
-template<class VECTOR>
-template<class MATRIX, class PRECONDITIONER>
+template <class VECTOR>
+template <class MATRIX, class PRECONDITIONER>
 void
 SolverCG<VECTOR>::solve (const MATRIX         &A,
 			 VECTOR               &x,
@@ -281,7 +288,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	return;
       }
     
-    g.scale(-1.);
+    g *= -1.;
     precondition.vmult(h,g);
     
     d.equ(-1.,h);

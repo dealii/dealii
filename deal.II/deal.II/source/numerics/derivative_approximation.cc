@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <base/multithread_info.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
@@ -709,86 +710,59 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 
 
 // explicit instantiations
-template
-void 
-DerivativeApproximation::
-approximate_gradient<deal_II_dimension>
-(const Mapping<deal_II_dimension> &mapping,
- const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
-template
-void 
-DerivativeApproximation::
-approximate_gradient<deal_II_dimension>
-(const Mapping<deal_II_dimension> &mapping,
- const DoFHandler<deal_II_dimension> &dof_handler,
- const BlockVector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
+#define INSTANTIATE(InputVector)                   \
+template                                           \
+void                                               \
+DerivativeApproximation::                          \
+approximate_gradient<deal_II_dimension>            \
+(const Mapping<deal_II_dimension> &mapping,        \
+ const DoFHandler<deal_II_dimension> &dof_handler, \
+ const InputVector  &solution,                     \
+ Vector<float>         &derivative_norm,           \
+ const unsigned int     component);                \
+                                                   \
+template                                           \
+void                                               \
+DerivativeApproximation::                          \
+approximate_gradient<deal_II_dimension>            \
+(const DoFHandler<deal_II_dimension> &dof_handler, \
+ const InputVector     &solution,                  \
+ Vector<float>         &derivative_norm,           \
+ const unsigned int     component);                \
+                                                   \
+template                                           \
+void                                               \
+DerivativeApproximation::                          \
+approximate_second_derivative<deal_II_dimension>   \
+(const Mapping<deal_II_dimension> &mapping,        \
+ const DoFHandler<deal_II_dimension> &dof_handler, \
+ const InputVector  &solution,                     \
+ Vector<float>         &derivative_norm,           \
+ const unsigned int     component);                \
+                                                   \
+template                                           \
+void                                               \
+DerivativeApproximation::                          \
+approximate_second_derivative<deal_II_dimension>   \
+(const DoFHandler<deal_II_dimension> &dof_handler, \
+ const InputVector     &solution,                  \
+ Vector<float>         &derivative_norm,           \
+ const unsigned int     component)
 
-template
-void 
-DerivativeApproximation::
-approximate_gradient<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
+INSTANTIATE(Vector<double>);
+INSTANTIATE(Vector<float>);
+INSTANTIATE(BlockVector<double>);
+INSTANTIATE(BlockVector<float>);
 
-template
-void 
-DerivativeApproximation::
-approximate_gradient<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const BlockVector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
-
-template
-void 
-DerivativeApproximation::
-approximate_second_derivative<deal_II_dimension>
-(const Mapping<deal_II_dimension>    &mapping,
- const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
-
-template
-void 
-DerivativeApproximation::
-approximate_second_derivative<deal_II_dimension>
-(const Mapping<deal_II_dimension>    &mapping,
- const DoFHandler<deal_II_dimension> &dof_handler,
- const BlockVector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
-
-template
-void 
-DerivativeApproximation::
-approximate_second_derivative<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
-
-template
-void 
-DerivativeApproximation::
-approximate_second_derivative<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const BlockVector<double>  &solution,
- Vector<float>         &derivative_norm,
- const unsigned int     component);
+#ifdef DEAL_II_USE_PETSC
+INSTANTIATE(PETScWrappers::Vector);
+#endif
 
 
 // static variables
 // 
 // on AIX, the linker is unhappy about some missing symbols. they
-// should really be there, but explicitly instantiation them will also
+// should really be there, but explicitly instantiating them will also
 // not hurt
 template
 const UpdateFlags

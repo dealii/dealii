@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 
 
 #include <lac/vector.h>
+#include <lac/petsc_vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 
@@ -78,89 +79,6 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   this->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
-}
-
-
-
-template <int dim>
-void DoFObjectAccessor<1, dim>::
-distribute_local_to_global (const Vector<double> &local_source,
-			    Vector<double>       &global_destination) const
-{
-				   // since the exception classes are
-				   // from a template dependent base
-				   // class, we have to fully qualify
-				   // them. to work around more
-				   // trouble, typedef the template
-				   // dependent base class to a
-				   // non-template dependent name and
-				   // use that to specify the
-				   // qualified exception names
-  typedef DoFAccessor<dim> BaseClass;
-  
-  Assert (this->dof_handler != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (local_source.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-				  this->dof_handler->get_fe().dofs_per_line),
-	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.size(),
-	  typename BaseClass::ExcVectorDoesNotMatch());
-
-  const unsigned int n_dofs = local_source.size();
-  
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  get_dof_indices (dofs);
-  
-				   // distribute cell vector
-  for (unsigned int j=0; j<n_dofs; ++j)
-    global_destination(dofs[j]) += local_source(j);
-}
-
-
-
-template <int dim>
-void DoFObjectAccessor<1, dim>::
-distribute_local_to_global (const FullMatrix<double> &local_source,
-			    SparseMatrix<double>     &global_destination) const
-{
-				   // since the exception classes are
-				   // from a template dependent base
-				   // class, we have to fully qualify
-				   // them. to work around more
-				   // trouble, typedef the template
-				   // dependent base class to a
-				   // non-template dependent name and
-				   // use that to specify the
-				   // qualified exception names
-  typedef DoFAccessor<dim> BaseClass;
-  
-  Assert (this->dof_handler != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename BaseClass::ExcInvalidObject());
-  Assert (local_source.m() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-			       this->dof_handler->get_fe().dofs_per_line),
-	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (local_source.m() == local_source.n(),
-	  typename BaseClass::ExcMatrixDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.m(),
-	  typename BaseClass::ExcMatrixDoesNotMatch());
-  Assert (global_destination.m() == global_destination.n(),
-	  typename BaseClass::ExcMatrixDoesNotMatch());
-
-  const unsigned int n_dofs = local_source.m();
-
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  get_dof_indices (dofs);
-  
-				   // distribute cell matrix
-  for (unsigned int i=0; i<n_dofs; ++i)
-    for (unsigned int j=0; j<n_dofs; ++j)
-      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 }
 
 
@@ -266,67 +184,6 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   this->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
-}
-
-
-
-template <int dim>
-void DoFObjectAccessor<2, dim>::
-distribute_local_to_global (const Vector<double> &local_source,
-			    Vector<double>       &global_destination) const {
-  Assert (this->dof_handler != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_source.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-				  4*this->dof_handler->get_fe().dofs_per_line +
-				  this->dof_handler->get_fe().dofs_per_quad),
-	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.size(),
-	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
-
-  const unsigned int n_dofs = local_source.size();
-
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  get_dof_indices (dofs);
-  
-				   // distribute cell vector
-  for (unsigned int j=0; j<n_dofs; ++j)
-    global_destination(dofs[j]) += local_source(j);
-}
-
-
-
-template <int dim>
-void DoFObjectAccessor<2, dim>::
-distribute_local_to_global (const FullMatrix<double> &local_source,
-			    SparseMatrix<double>     &global_destination) const {
-  Assert (this->dof_handler != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_source.m() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-			       4*this->dof_handler->get_fe().dofs_per_line +
-			       this->dof_handler->get_fe().dofs_per_quad),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  Assert (local_source.m() == local_source.n(),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.m(),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  Assert (global_destination.m() == global_destination.n(),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  
-  const unsigned int n_dofs = local_source.m();
-
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  get_dof_indices (dofs);
-  
-				   // distribute cell matrix
-  for (unsigned int i=0; i<n_dofs; ++i)
-    for (unsigned int j=0; j<n_dofs; ++j)
-      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 }
 
 
@@ -446,71 +303,6 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
 				   this->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
-}
-
-
-
-template <int dim>
-void DoFObjectAccessor<3, dim>::
-distribute_local_to_global (const Vector<double> &local_source,
-			    Vector<double>       &global_destination) const
-{
-  Assert (this->dof_handler != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_source.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
-				  12*this->dof_handler->get_fe().dofs_per_line +
-				  6*this->dof_handler->get_fe().dofs_per_quad +
-				  this->dof_handler->get_fe().dofs_per_hex),
-	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.size(),
-	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
-
-  const unsigned int n_dofs = local_source.size();
-
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  get_dof_indices (dofs);
-  
-				   // distribute cell vector
-  for (unsigned int j=0; j<n_dofs; ++j)
-    global_destination(dofs[j]) += local_source(j);
-}
-
-
-
-template <int dim>
-void DoFObjectAccessor<3, dim>::
-distribute_local_to_global (const FullMatrix<double> &local_source,
-			    SparseMatrix<double>     &global_destination) const
-{
-  Assert (this->dof_handler != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (local_source.m() == (8*this->dof_handler->get_fe().dofs_per_vertex +
-			       12*this->dof_handler->get_fe().dofs_per_line +
-			       6*this->dof_handler->get_fe().dofs_per_quad +
-			       this->dof_handler->get_fe().dofs_per_hex),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  Assert (local_source.m() == local_source.n(),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  Assert (this->dof_handler->n_dofs() == global_destination.m(),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  Assert (global_destination.m() == global_destination.n(),
-	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
-  
-  const unsigned int n_dofs = local_source.m();
-
-				   // get indices of dofs
-  std::vector<unsigned int> dofs (n_dofs);
-  get_dof_indices (dofs);
-  
-				   // distribute cell matrix
-  for (unsigned int i=0; i<n_dofs; ++i)
-    for (unsigned int j=0; j<n_dofs; ++j)
-      global_destination.add(dofs[i], dofs[j], local_source(i,j));
 }
 
 
@@ -756,7 +548,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
 							   tmp1);
 					   // interpolate these to the mother
 					   // cell
-	  fe.restrict(child).vmult (tmp2, tmp1);
+	  fe.get_restriction_matrix(child).vmult (tmp2, tmp1);
 
                                            // and add up or set them
                                            // in the output vector
@@ -803,7 +595,8 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 	{
 					   // prolong the given data
 					   // to the present cell
-	  this->dof_handler->get_fe().prolongate(child).vmult (tmp, local_values);
+	  this->dof_handler->get_fe().get_prolongation_matrix(child)
+            .vmult (tmp, local_values);
 	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
 	};
     };
@@ -883,6 +676,26 @@ void
 DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
+// for Petsc vectors
+#if DEAL_II_USE_PETSC
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,double>
+(const PETScWrappers::Vector &, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,float>
+(const PETScWrappers::Vector &, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,double>
+(const Vector<double> &, PETScWrappers::Vector&) const;
+template
+void
+DoFObjectAccessor<1,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,float>
+(const Vector<float>&, PETScWrappers::Vector&) const;
+#endif
+
 #if deal_II_dimension >= 2
 template
 void
@@ -952,7 +765,25 @@ void
 DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
-
+// for Petsc vectors
+#if DEAL_II_USE_PETSC
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,double>
+(const PETScWrappers::Vector &, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,float>
+(const PETScWrappers::Vector &, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,double>
+(const Vector<double> &, PETScWrappers::Vector&) const;
+template
+void
+DoFObjectAccessor<2,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,float>
+(const Vector<float>&, PETScWrappers::Vector&) const;
+#endif
 #endif
 
 
@@ -1027,7 +858,25 @@ void
 DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
-
+// for Petsc vectors
+#if DEAL_II_USE_PETSC
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,double>
+(const PETScWrappers::Vector &, Vector<double>&) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::get_dof_values<PETScWrappers::Vector,float>
+(const PETScWrappers::Vector &, Vector<float>&) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,double>
+(const Vector<double>&, PETScWrappers::Vector &) const;
+template
+void
+DoFObjectAccessor<3,deal_II_dimension>::set_dof_values<PETScWrappers::Vector,float>
+(const Vector<float>&, PETScWrappers::Vector&) const;
+#endif
 #endif
 
 
@@ -1122,6 +971,32 @@ void
 DoFCellAccessor<deal_II_dimension>::
 set_dof_values_by_interpolation<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
+
+// for Petsc vectors
+#if DEAL_II_USE_PETSC
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values<PETScWrappers::Vector,double>
+(const PETScWrappers::Vector&, Vector<double>&) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation<PETScWrappers::Vector,double>
+(const Vector<double>&, PETScWrappers::Vector&) const;
+
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+get_interpolated_dof_values<PETScWrappers::Vector,float>
+(const PETScWrappers::Vector&, Vector<float>&) const;
+template
+void
+DoFCellAccessor<deal_II_dimension>::
+set_dof_values_by_interpolation<PETScWrappers::Vector,float>
+(const Vector<float>&, PETScWrappers::Vector&) const;
+
+#endif
 
 
 template class DoFAccessor<deal_II_dimension>;

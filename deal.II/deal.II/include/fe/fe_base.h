@@ -671,7 +671,8 @@ class FiniteElementBase : public Subscriptor,
 				      * function aborts with
 				      * @p{ExcProjectionVoid}.
 				      */
-    const FullMatrix<double> & restrict (const unsigned int child) const;
+    const FullMatrix<double> &
+    get_restriction_matrix (const unsigned int child) const;
 
 				     /**
 				      * Embedding matrix between grids.
@@ -722,37 +723,34 @@ class FiniteElementBase : public Subscriptor,
 				      * by calling the
 				      * @ref{prolongation_is_implemented()}.
 				      */
-    const FullMatrix<double> & prolongate (const unsigned int child) const;
+    const FullMatrix<double> &
+    get_prolongation_matrix (const unsigned int child) const;
 
                                      /**
-                                      * Return whether this element
-                                      * implements its prolongation
-                                      * matrices. The return value
-                                      * also indicates whether a call
-                                      * to the @p{prolongate} function
-                                      * will generate an error or not.
+                                      * Return whether this element implements
+                                      * its prolongation matrices. The return
+                                      * value also indicates whether a call to
+                                      * the @p{get_prolongation_matrix}
+                                      * function will generate an error or
+                                      * not.
                                       *
-                                      * This function is mostly here
-                                      * in order to allow us to write
-                                      * more efficient test programs
-                                      * which we run on all kinds of
-                                      * weird elements, and for which
-                                      * we simply need to exclude
-                                      * certain tests in case
-                                      * something is not
-                                      * implemented. It will in
-                                      * general probably not be a
-                                      * great help in applications,
-                                      * since there is not much one
-                                      * can do if one needs these
-                                      * features and they are not
-                                      * implemented. This function
-                                      * could be used to check whether
-                                      * a call to @p{prolongate()}
-                                      * will succeed; however, one
-                                      * then still needs to cope with
-                                      * the lack of information this
-                                      * just expresses.
+                                      * This function is mostly here in order
+                                      * to allow us to write more efficient
+                                      * test programs which we run on all
+                                      * kinds of weird elements, and for which
+                                      * we simply need to exclude certain
+                                      * tests in case something is not
+                                      * implemented. It will in general
+                                      * probably not be a great help in
+                                      * applications, since there is not much
+                                      * one can do if one needs these features
+                                      * and they are not implemented. This
+                                      * function could be used to check
+                                      * whether a call to
+                                      * @p{get_prolongation_matrix()} will
+                                      * succeed; however, one then still needs
+                                      * to cope with the lack of information
+                                      * this just expresses.
                                       */
     bool prolongation_is_implemented () const;
 
@@ -1351,9 +1349,8 @@ class FiniteElementBase : public Subscriptor,
     
   protected:  
  				     /**
-				      * Array of projection
-				      * matrices. See @p{restrict()}
-				      * above.
+				      * Array of projection matrices. See
+				      * @p{get_restriction_matrix} above.
 				      *
 				      * Matrices in this array are
 				      * automatically initialized to
@@ -1366,9 +1363,8 @@ class FiniteElementBase : public Subscriptor,
     FullMatrix<double> restriction[GeometryInfo<dim>::children_per_cell];
 
     				     /**
-				      * Array of embedding
-				      * matrices. See @p{prolongate()}
-				      * above.
+				      * Array of embedding matrices. See
+				      * @p{get_prolongation_matrix()} above.
 				      *
 				      * Matrices in this array are
 				      * automatically initialized to
@@ -1706,20 +1702,18 @@ class FiniteElementBase : public Subscriptor,
     compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
     
 				     /**
-				      * Allow the FESystem class to
-				      * access the restriction and
-				      * prolongation matrices
-				      * directly. Hence, FESystem has
-				      * the possibility to see if
-				      * these matrices are initialized
-				      * without accessing these
-				      * matrices through the
-				      * @p{restrict} and
-				      * @p{prolongate} functions. This
-				      * is important as these
-				      * functions include assertions
-				      * that throw if the matrices are
-				      * not already initialized.
+				      * Allow the FESystem class to access the
+				      * restriction and prolongation matrices
+				      * directly. Hence, FESystem has the
+				      * possibility to see if these matrices
+				      * are initialized without accessing
+				      * these matrices through the
+				      * @p{get_restriction_matrix} and
+				      * @p{get_prolongation_matrix}
+				      * functions. This is important as these
+				      * functions include assertions that
+				      * throw if the matrices are not already
+				      * initialized.
 				      */
     template <int dim_> friend class FESystem;
 

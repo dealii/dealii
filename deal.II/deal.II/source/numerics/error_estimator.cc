@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,8 @@
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
 #include <dofs/dof_handler.h>
@@ -84,18 +86,19 @@ PerThreadData (const unsigned int n_solution_vectors,
 // the following function is still independent of dimension, but it
 // calls dimension dependent functions
 template <int dim>
+template <typename InputVector>
 void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
 					 const DoFHandler<dim>   &dof_handler,
 					 const Quadrature<dim-1> &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
-					 const Vector<double>    &solution,
+					 const InputVector       &solution,
 					 Vector<float>           &error,
 					 const std::vector<bool> &component_mask,
 					 const Function<dim>     *coefficients,
 					 const unsigned int       n_threads)
 {
 				   // just pass on to the other function
-  const std::vector<const Vector<double>*> solutions (1, &solution);
+  const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
 	    component_mask, coefficients, n_threads);
@@ -103,10 +106,11 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
 
 
 template <int dim>
+template <typename InputVector>
 void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 					 const Quadrature<dim-1> &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
-					 const Vector<double>    &solution,
+					 const InputVector       &solution,
 					 Vector<float>           &error,
 					 const std::vector<bool> &component_mask,
 					 const Function<dim>     *coefficients,
@@ -123,12 +127,13 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 #if deal_II_dimension == 1
 
 template <>
+template <typename InputVector>
 void KellyErrorEstimator<1>::
 estimate_some (const Mapping<1>                  &,
                const DoFHandler<1>               &,
                const Quadrature<0>               &,
                const FunctionMap<1>::type        &,
-               const std::vector<const Vector<double>*> &,
+               const std::vector<const InputVector *> &,
                const std::vector<bool>                  &,
                const Function<1>                   *,
                const std::pair<unsigned int, unsigned int> ,
@@ -143,12 +148,13 @@ estimate_some (const Mapping<1>                  &,
 
 
 template <>
+template <typename InputVector>
 void KellyErrorEstimator<1>::
 estimate (const Mapping<1>                    &mapping,
           const DoFHandler<1>                 &dof_handler,
           const Quadrature<0>                 &,
           const FunctionMap<1>::type          &neumann_bc,
-          const std::vector<const Vector<double>*> &solutions,
+          const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
           const std::vector<bool>                  &component_mask_,
           const Function<1>                   *coefficient,
@@ -253,7 +259,7 @@ estimate (const Mapping<1>                    &mapping,
       for (unsigned int n=0; n<2; ++n)
 	{
 					   // find right active neighbor
-	  DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
+	  typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(n);
 	  if (neighbor.state() == IteratorState::valid)
 	    while (neighbor->has_children())
 	      neighbor = neighbor->child(n==0 ? 1 : 0);
@@ -359,12 +365,13 @@ estimate (const Mapping<1>                    &mapping,
 
 
 template <int dim>
+template <typename InputVector>
 void KellyErrorEstimator<dim>::
 estimate_some (const Mapping<dim>                  &mapping,
                const DoFHandler<dim>               &dof_handler,
                const Quadrature<dim-1>             &quadrature,
                const typename FunctionMap<dim>::type &neumann_bc,
-               const std::vector<const Vector<double>*> &solutions,
+               const std::vector<const InputVector *> &solutions,
                const std::vector<bool>                  &component_mask,
                const Function<dim>                 *coefficients,
                const std::pair<unsigned int, unsigned int> this_thread,
@@ -546,12 +553,13 @@ estimate_some (const Mapping<dim>                  &mapping,
 
 
 template <int dim>
+template <typename InputVector>
 void
 KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping,
                                     const DoFHandler<dim>               &dof_handler,
                                     const Quadrature<dim-1>             &quadrature,
                                     const typename FunctionMap<dim>::type &neumann_bc,
-                                    const std::vector<const Vector<double>*> &solutions,
+                                    const std::vector<const InputVector *> &solutions,
                                     std::vector<Vector<float>*>              &errors,
                                     const std::vector<bool>                  &component_mask_,
                                     const Function<dim>                 *coefficients,
@@ -644,7 +652,7 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 				   // the whole thing
   Threads::ThreadGroup<> threads;
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (&KellyErrorEstimator<dim>::estimate_some)
+    threads += Threads::spawn (&KellyErrorEstimator<dim>::template estimate_some<InputVector>)
                (mapping, dof_handler,
                 quadrature, neumann_bc, solutions,
                 component_mask, coefficients,
@@ -703,10 +711,11 @@ KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping
 #endif
 
 template <int dim>
+template <typename InputVector>
 void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
-					 const std::vector<const Vector<double>*> &solutions,
+					 const std::vector<const InputVector *> &solutions,
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
@@ -723,11 +732,12 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 #if deal_II_dimension == 1
 
 template <>
+template <typename InputVector>
 void KellyErrorEstimator<1>::
 integrate_over_regular_face (const DoFHandler<1>               &,
                              const Quadrature<0>             &,
                              const FunctionMap<1>::type &,
-                             const std::vector<const Vector<double>*> &,
+                             const std::vector<const InputVector *> &,
                              const std::vector<bool>                  &,
                              const Function<1>                 *,
                              FaceIntegrals                       &,
@@ -742,10 +752,11 @@ integrate_over_regular_face (const DoFHandler<1>               &,
 
 
 template <>
+template <typename InputVector>
 void KellyErrorEstimator<1>::
 integrate_over_irregular_face (const DoFHandler<1>               &,
                                const Quadrature<0>             &,
-                               const std::vector<const Vector<double>*> &,
+                               const std::vector<const InputVector *> &,
                                const std::vector<bool>                  &,
                                const Function<1>                 *,
                                FaceIntegrals                       &,
@@ -762,11 +773,12 @@ integrate_over_irregular_face (const DoFHandler<1>               &,
 
 
 template <int dim>
+template <typename InputVector>
 void KellyErrorEstimator<dim>::
 integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
                              const Quadrature<dim-1>             &quadrature,
                              const typename FunctionMap<dim>::type &neumann_bc,
-                             const std::vector<const Vector<double>*> &solutions,
+                             const std::vector<const InputVector *> &solutions,
                              const std::vector<bool>                  &component_mask,
                              const Function<dim>                 *coefficients,
                              FaceIntegrals                       &face_integrals,
@@ -954,10 +966,11 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 
 
 template <int dim>
+template <typename InputVector>
 void KellyErrorEstimator<dim>::
 integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
                                const Quadrature<dim-1>             &quadrature,
-                               const std::vector<const Vector<double>*> &solutions,
+                               const std::vector<const InputVector *> &solutions,
                                const std::vector<bool>                  &component_mask,
                                const Function<dim>                 *coefficients,
                                FaceIntegrals                       &face_integrals,
@@ -1140,5 +1153,65 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 
 
 // explicit instantiations
-
 template class KellyErrorEstimator<deal_II_dimension>;
+
+// instantiate the externally visible functions
+#define INSTANTIATE(InputVector) \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension>::    \
+estimate<InputVector> (const Mapping<deal_II_dimension>      &,    \
+          const DoFHandler<deal_II_dimension>   &,    \
+          const Quadrature<deal_II_dimension-1> &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const InputVector       &,    \
+          Vector<float>           &,    \
+          const std::vector<bool> &,    \
+          const Function<deal_II_dimension>     *,    \
+          const unsigned int       );    \
+    \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension>::    \
+estimate<InputVector> (const DoFHandler<deal_II_dimension>   &,    \
+          const Quadrature<deal_II_dimension-1> &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const InputVector       &,    \
+          Vector<float>           &,    \
+          const std::vector<bool> &,    \
+          const Function<deal_II_dimension>     *,    \
+          const unsigned int       );    \
+        \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension>::    \
+estimate<InputVector> (const Mapping<deal_II_dimension>          &,    \
+          const DoFHandler<deal_II_dimension>       &,    \
+          const Quadrature<deal_II_dimension-1>     &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const std::vector<const InputVector *> &,    \
+          std::vector<Vector<float>*> &,    \
+          const std::vector<bool>     &,    \
+          const Function<deal_II_dimension>         *,    \
+          const unsigned int           );    \
+    \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension>::    \
+estimate<InputVector> (const DoFHandler<deal_II_dimension>       &,    \
+          const Quadrature<deal_II_dimension-1>     &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const std::vector<const InputVector *> &,    \
+          std::vector<Vector<float>*> &,    \
+          const std::vector<bool>     &,    \
+          const Function<deal_II_dimension>         *,    \
+          const unsigned int           )
+
+INSTANTIATE(Vector<double>);
+INSTANTIATE(Vector<float>);
+INSTANTIATE(BlockVector<double>);
+INSTANTIATE(BlockVector<float>);
+
+#ifdef DEAL_II_USE_PETSC
+INSTANTIATE(PETScWrappers::Vector);
+#endif

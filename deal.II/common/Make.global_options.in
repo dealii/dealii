@@ -41,6 +41,9 @@ enable-shared        = @enableshared@
 DEAL_II_MAJOR        = @DEAL_II_MAJOR@
 DEAL_II_MINOR        = @DEAL_II_MINOR@
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
+USE_CONTRIB_PETSC    = @USE_CONTRIB_PETSC@
+DEAL_II_PETSC_DIR    = @DEAL_II_PETSC_DIR@
+DEAL_II_PETSC_ARCH   = @DEAL_II_PETSC_ARCH@
 TECIO_INCLUDE        = @TECPLOT_INCLUDE_PATH@
 TECIO_LIBRARY        = @TECPLOT_LIBRARY_PATH@
 TARGET               = @target@
@@ -59,11 +62,10 @@ LIBS += $(TECIO_LIBRARY)
 
 # path for libraries 
 
-LIBPATH    += $(addprefix -L,$(libdir))
+LIBPATH    += $(addprefix -L,$(LIBDIR))
 
 
-# add search path for libraries for make dependencies
-
+# add search path for libraries to make dependencies
 vpath %.a $(libdir)
 vpath %.so $(libdir)
 
@@ -89,10 +91,32 @@ lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 
 lib-contrib-hsl = $(LIBDIR)/libhsl$(lib-suffix)
 
+# since the PETSc libs are called the same for both debug and
+# optimized mode, we have to have a trick to let the executable
+# know which ones are the right (since apparently LD_LIBRARY_PATH
+# can't do the trick unless you want to reset it every time
+# you switch from debug to optimized mode). To avoid messing with
+# -Wl,-rpath in our linker flags, we create one convenience library
+# for all PETSc libraries in our own lib directory, and have this one
+# twiddle with whatever is necessary to link in PETSc.
+lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
+lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
+lib-contrib-petsc.g = $(LIBDIR)/libpetsc_g$(lib-suffix)
+lib-contrib-petsc.o = $(LIBDIR)/libpetsc_o$(lib-suffix)
+
+
 # if HSL is used, always link it in conjunction with liblac
 ifeq ($(USE_CONTRIB_HSL),yes)
   lib-lac.g += $(lib-contrib-hsl)
   lib-lac.o += $(lib-contrib-hsl)
+endif
+
+
+# if PETSC is used, we need to add a number of libraries to what
+# we link for LAC
+ifeq ($(USE_CONTRIB_PETSC),yes)
+  lib-lac.g += $(lib-contrib-petsc.g)
+  lib-lac.o += $(lib-contrib-petsc.o)
 endif
 
 
@@ -106,7 +130,9 @@ include-path-deal2         = $D/deal.II/include
 include-path-contrib-hsl   = $D/contrib/hsl/include
 include-path-contrib-boost = $D/contrib/boost/include
 include-path-tecplot       = $(TECIO_INCLUDE)
-
+include-path-petsc         = $(DEAL_II_PETSC_DIR)/include
+include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
+include-path-petsc-mpi     = $(DEAL_II_PETSC_DIR)/src/sys/src/mpiuni
 
 INCLUDE           = $(addprefix -I, $(include-path-base) \
                                     $(include-path-lac)  \
@@ -114,6 +140,12 @@ INCLUDE           = $(addprefix -I, $(include-path-base) \
 			            $(include-path-contrib-hsl)\
 			            $(include-path-contrib-boost)\
 				    $(include-path-tecplot))
+
+# add PETSc include path if necessary
+ifeq ($(USE_CONTRIB_PETSC),yes)
+  INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
+             -I$(include-path-petsc-mpi)
+endif
 
 # compiler flags for debug and optimized mode
 CXXFLAGS.g   = @DEFS@ @CXXFLAGSG@  $(INCLUDE)
@@ -130,4 +162,12 @@ ifeq ($(enable-shared),yes)
   F77FLAGS.o += @F77FLAGSPIC@
 
   LDFLAGS    += @LDFLAGSPIC@
+endif
+
+
+# PETSc wants to see a whole lot of other flags being passed. ...
+ifeq ($(USE_CONTRIB_PETSC),yes)
+  include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
+  CXXFLAGS.g += $(GCXX_PETSCFLAGS)
+  CXXFLAGS.g += $(OCXX_PETSCFLAGS)
 endif

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,7 +91,7 @@ class SolverControl;
  *
  *                        // scale the elements of the vector
  *                        // by a fixed value
- *     void scale (const double a);
+ *     VECTOR & operator *= (const double a);
  *
  *                        // return the l2 norm of the vector
  *     double l2_norm () const;
@@ -108,13 +108,14 @@ class SolverControl;
  *
  * @sect3{AdditionalData}
  *
- * Several solvers need additional data, like the damping parameter @p{omega} of the
- * @p{SolverRichardson} class or the maximum number of temporary vectors of the @p{SolverGMRES}.
- * To have a standardized constructor for each solver class the @p{struct AdditionalData}
- * has been introduced to each solver class. Some solvers need no additional data, like
- * @p{SolverCG} or @p{SolverBicgstab}. For these solvers the struct @p{AdditionalData} is empty
- * and calling the constructor may be done without giving the additional structure as
- * an argument as a default @p{AdditionalData} is set by default. 
+ * Several solvers need additional data, like the damping parameter @p{omega}
+ * of the @p{SolverRichardson} class or the maximum number of temporary
+ * vectors of the @p{SolverGMRES}.  To have a standardized constructor for
+ * each solver class the @p{struct AdditionalData} has been introduced to each
+ * solver class. Some solvers need no additional data, like @p{SolverCG} or
+ * @p{SolverBicgstab}. For these solvers the struct @p{AdditionalData} is
+ * empty and calling the constructor may be done without giving the additional
+ * structure as an argument as a default @p{AdditionalData} is set by default.
  *
  * Now the generating of a solver looks like
  * @begin{verbatim}
@@ -130,11 +131,12 @@ class SolverControl;
  * SolverCG solver_cg (solver_control, vector_memory);
  * @end{verbatim}
  *
- * Using a unified constructor parameter list for all solvers was introduced when the
- * @p{SolverSelector} class was written; the unified interface enabled us to use this
- * class unchanged even if the number of types of parameters to a certain solver
- * changes and it is still possible in a simple way to give these additional data to
- * the @p{SolverSelector} object for each solver which it may use.
+ * Using a unified constructor parameter list for all solvers was introduced
+ * when the @p{SolverSelector} class was written; the unified interface
+ * enabled us to use this class unchanged even if the number of types of
+ * parameters to a certain solver changes and it is still possible in a simple
+ * way to give these additional data to the @p{SolverSelector} object for each
+ * solver which it may use.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001
  */
@@ -155,12 +157,14 @@ class Solver : public Subscriptor
 				      * least as long as that of the solver
 				      * object.
 				      */
-    Solver (SolverControl &, VectorMemory<VECTOR> &);
+    Solver (SolverControl        &,
+            VectorMemory<VECTOR> &);
 
 				     /**
-				      * Access to control object.
+				      * Access to object that controls
+				      * convergence.
 				      */
-    SolverControl& control() const;
+    SolverControl & control() const;
   
   protected:
 

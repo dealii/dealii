@@ -136,6 +136,8 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
+  Assert (&src != &dst, ExcSourceEqualsDestination());
+
   if ((n()==3) && (m()==3))
   {
     number2 s;
@@ -304,6 +306,8 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
+  Assert (&src != &dst, ExcSourceEqualsDestination());
+
   const unsigned int size_m = m(),
 		     size_n = n();
 
@@ -341,6 +345,8 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
   Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
   Assert(right.size() == m(), ExcDimensionMismatch(right.size(), m()));
+
+  Assert (&src != &dst, ExcSourceEqualsDestination());
 
   number2 s, res = 0.;
   const unsigned int size_m = m(),
@@ -743,8 +749,8 @@ FullMatrix<number>::print (std::ostream       &s,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add (const number               s,
-			 const FullMatrix<number2> &src)
+FullMatrix<number>::add_scaled (const number               s,
+                                const FullMatrix<number2> &src)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
@@ -755,114 +761,114 @@ FullMatrix<number>::add (const number               s,
   const number2* srcval = src.data();
   
   if ((n()==3) && (m()==3))
-  {
-    val[0] += s * srcval[0];
-    val[1] += s * srcval[1];
-    val[2] += s * srcval[2];
-    val[3] += s * srcval[3];
-    val[4] += s * srcval[4];
-    val[5] += s * srcval[5];
-    val[6] += s * srcval[6];
-    val[7] += s * srcval[7];
-    val[8] += s * srcval[8];
-  }
+    {
+      val[0] += s * srcval[0];
+      val[1] += s * srcval[1];
+      val[2] += s * srcval[2];
+      val[3] += s * srcval[3];
+      val[4] += s * srcval[4];
+      val[5] += s * srcval[5];
+      val[6] += s * srcval[6];
+      val[7] += s * srcval[7];
+      val[8] += s * srcval[8];
+    }
   else if ((n()==4) && (m()==4))
-  {
-    val[0] += s * srcval[0];
-    val[1] += s * srcval[1];
-    val[2] += s * srcval[2];
-    val[3] += s * srcval[3];
-    val[4] += s * srcval[4];
-    val[5] += s * srcval[5];
-    val[6] += s * srcval[6];
-    val[7] += s * srcval[7];
-    val[8] += s * srcval[8];
-    val[9] += s * srcval[9];
-    val[10] += s * srcval[10];
-    val[11] += s * srcval[11];
-    val[12] += s * srcval[12];
-    val[13] += s * srcval[13];
-    val[14] += s * srcval[14];
-    val[15] += s * srcval[15];
-  }
+    {
+      val[0] += s * srcval[0];
+      val[1] += s * srcval[1];
+      val[2] += s * srcval[2];
+      val[3] += s * srcval[3];
+      val[4] += s * srcval[4];
+      val[5] += s * srcval[5];
+      val[6] += s * srcval[6];
+      val[7] += s * srcval[7];
+      val[8] += s * srcval[8];
+      val[9] += s * srcval[9];
+      val[10] += s * srcval[10];
+      val[11] += s * srcval[11];
+      val[12] += s * srcval[12];
+      val[13] += s * srcval[13];
+      val[14] += s * srcval[14];
+      val[15] += s * srcval[15];
+    }
   else if ((n()==8) && (m()==8))
-  {
-    val[0] += s * srcval[0];
-    val[1] += s * srcval[1];
-    val[2] += s * srcval[2];
-    val[3] += s * srcval[3];
-    val[4] += s * srcval[4];
-    val[5] += s * srcval[5];
-    val[6] += s * srcval[6];
-    val[7] += s * srcval[7];
-    val[8] += s * srcval[8];
-    val[9] += s * srcval[9];
-    val[10] += s * srcval[10];
-    val[11] += s * srcval[11];
-    val[12] += s * srcval[12];
-    val[13] += s * srcval[13];
-    val[14] += s * srcval[14];
-    val[15] += s * srcval[15];
-    val[16] += s * srcval[16];
-    val[17] += s * srcval[17];
-    val[18] += s * srcval[18];
-    val[19] += s * srcval[19];
+    {
+      val[0] += s * srcval[0];
+      val[1] += s * srcval[1];
+      val[2] += s * srcval[2];
+      val[3] += s * srcval[3];
+      val[4] += s * srcval[4];
+      val[5] += s * srcval[5];
+      val[6] += s * srcval[6];
+      val[7] += s * srcval[7];
+      val[8] += s * srcval[8];
+      val[9] += s * srcval[9];
+      val[10] += s * srcval[10];
+      val[11] += s * srcval[11];
+      val[12] += s * srcval[12];
+      val[13] += s * srcval[13];
+      val[14] += s * srcval[14];
+      val[15] += s * srcval[15];
+      val[16] += s * srcval[16];
+      val[17] += s * srcval[17];
+      val[18] += s * srcval[18];
+      val[19] += s * srcval[19];
 
-    val[20] += s * srcval[20];
-    val[21] += s * srcval[21];
-    val[22] += s * srcval[22];
-    val[23] += s * srcval[23];
-    val[24] += s * srcval[24];
-    val[25] += s * srcval[25];
-    val[26] += s * srcval[26];
-    val[27] += s * srcval[27];
-    val[28] += s * srcval[28];
-    val[29] += s * srcval[29];
+      val[20] += s * srcval[20];
+      val[21] += s * srcval[21];
+      val[22] += s * srcval[22];
+      val[23] += s * srcval[23];
+      val[24] += s * srcval[24];
+      val[25] += s * srcval[25];
+      val[26] += s * srcval[26];
+      val[27] += s * srcval[27];
+      val[28] += s * srcval[28];
+      val[29] += s * srcval[29];
 
-    val[30] += s * srcval[30];
-    val[31] += s * srcval[31];
-    val[32] += s * srcval[32];
-    val[33] += s * srcval[33];
-    val[34] += s * srcval[34];
-    val[35] += s * srcval[35];
-    val[36] += s * srcval[36];
-    val[37] += s * srcval[37];
-    val[38] += s * srcval[38];
-    val[39] += s * srcval[39];
+      val[30] += s * srcval[30];
+      val[31] += s * srcval[31];
+      val[32] += s * srcval[32];
+      val[33] += s * srcval[33];
+      val[34] += s * srcval[34];
+      val[35] += s * srcval[35];
+      val[36] += s * srcval[36];
+      val[37] += s * srcval[37];
+      val[38] += s * srcval[38];
+      val[39] += s * srcval[39];
 
-    val[40] += s * srcval[40];
-    val[41] += s * srcval[41];
-    val[42] += s * srcval[42];
-    val[43] += s * srcval[43];
-    val[44] += s * srcval[44];
-    val[45] += s * srcval[45];
-    val[46] += s * srcval[46];
-    val[47] += s * srcval[47];
-    val[48] += s * srcval[48];
-    val[49] += s * srcval[49];
+      val[40] += s * srcval[40];
+      val[41] += s * srcval[41];
+      val[42] += s * srcval[42];
+      val[43] += s * srcval[43];
+      val[44] += s * srcval[44];
+      val[45] += s * srcval[45];
+      val[46] += s * srcval[46];
+      val[47] += s * srcval[47];
+      val[48] += s * srcval[48];
+      val[49] += s * srcval[49];
 
-    val[50] += s * srcval[50];
-    val[51] += s * srcval[51];
-    val[52] += s * srcval[52];
-    val[53] += s * srcval[53];
-    val[54] += s * srcval[54];
-    val[55] += s * srcval[55];
-    val[56] += s * srcval[56];
-    val[57] += s * srcval[57];
-    val[58] += s * srcval[58];
-    val[59] += s * srcval[59];
+      val[50] += s * srcval[50];
+      val[51] += s * srcval[51];
+      val[52] += s * srcval[52];
+      val[53] += s * srcval[53];
+      val[54] += s * srcval[54];
+      val[55] += s * srcval[55];
+      val[56] += s * srcval[56];
+      val[57] += s * srcval[57];
+      val[58] += s * srcval[58];
+      val[59] += s * srcval[59];
 
-    val[60] += s * srcval[60];
-    val[61] += s * srcval[61];
-    val[62] += s * srcval[62];
-    val[63] += s * srcval[63];
-  }
+      val[60] += s * srcval[60];
+      val[61] += s * srcval[61];
+      val[62] += s * srcval[62];
+      val[63] += s * srcval[63];
+    }
   else
-  {
-    const unsigned int size = n()*m();
-    for (unsigned int i=0; i<size; i++)
-      val[i] += s * srcval[i];
-  }
+    {
+      const unsigned int size = n()*m();
+      for (unsigned int i=0; i<size; i++)
+        val[i] += s * srcval[i];
+    }
 }
 
 template <typename number>
@@ -911,6 +917,19 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
     for (unsigned int j=0; j<cols ; ++j)
       this->el(dst_offset_i+i,dst_offset_j+j)
 	+= factor * src.el(src_offset_i+j,src_offset_j+i);
+}
+
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::add (const number               s,
+			 const FullMatrix<number2> &src)
+{
+                                   // this function is deprecated. forward to
+                                   // the other one
+  add_scaled (s, src);
 }
 
 

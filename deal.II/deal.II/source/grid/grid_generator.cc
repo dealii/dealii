@@ -1242,7 +1242,9 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
   
 				   // solve the dim problems with
 				   // different right hand sides.
-  std::vector<Vector<double> > us(dim, Vector<double> (dof_handler.n_dofs()));
+  Vector<double> us[dim];
+  for (unsigned int i=0; i<dim; ++i)
+    us[i].reinit (dof_handler.n_dofs());
   
 				   // solve linear systems in parallel
   Threads::ThreadGroup<> threads;

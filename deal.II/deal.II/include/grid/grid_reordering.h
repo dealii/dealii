@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -422,20 +422,24 @@
  * It is obvious that this algorithm has linear run-time, since it
  * only ever touches each face exactly once.
  *
- * The algorithm just described is implemented in a specialization of
- * this class for the 2d case. Note that in principle, it should be
- * possible to extend this algorithm to 3d as well, using sheets
- * instead of strings of cells to work on. If a grid is reorientable,
- * then such an algorithm should be able to do so in linear time; if
- * it is not orientable, then it should abort in linear time as
- * well. However, this has not yet been implemented. Rather, we use
- * the backtracking and branch pruning algorithm for 3d described
- * below; this algorithm predates the 2d linear complexity algorithm
- * and was initially also used in 2d.
+ * The algorithm just described is implemented in a specialization of this
+ * class for the 2d case. A similar, but slightly more complex algorithm is
+ * implemented in a specialization for 3d. It using sheets instead of strings
+ * of cells to work on. If a grid is orientable, then the algorithm is able to
+ * do its work in linear time; if it is not orientable, then it aborts in
+ * linear time as well. Both algorithms are described in a paper by Agelek,
+ * Anderson, Bangerth and Barth, see the publications page of the deal.II
+ * library.
  *
  *
- * @sect3{The 3d branch reshuffling and pruning algorithm}
+ * @sect3{For the curious}
  *
+ * Prior to the implementation of the algorithms developed by Michael Anderson
+ * and described above, we used a branch-and-cut algorithm initially
+ * implemented in 2000 by Wolfgang Bangerth. Although it is no longer used
+ * here is how it works, and why it doesn't always work for large meshes since
+ * its run-time can exponential in bad cases.
+ * 
  * The first observation is that although there are counterexamples,
  * problems are usually local. For example, in the second example
  * mentioned above, if we had numbered the cells in a way that

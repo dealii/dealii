@@ -236,7 +236,7 @@ FiniteElementBase<dim>::shape_grad_grad_component (const unsigned int,
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::restrict (const unsigned int child) const
+FiniteElementBase<dim>::get_restriction_matrix (const unsigned int child) const
 {
   Assert (child<GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
@@ -248,7 +248,7 @@ FiniteElementBase<dim>::restrict (const unsigned int child) const
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::prolongate (const unsigned int child) const
+FiniteElementBase<dim>::get_prolongation_matrix (const unsigned int child) const
 {
   Assert (child<GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));

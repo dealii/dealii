@@ -150,7 +150,7 @@ class PreconditionUseMatrix : public Subscriptor
 				     /**
 				      * Pointer to the matrix in use.
 				      */
-    const MATRIX& matrix;
+    const MATRIX &matrix;
     
 				     /**
 				      * Pointer to the preconditioning
@@ -199,7 +199,7 @@ class PreconditionRelaxation : public Subscriptor
 				      * than 2 for numerical
 				      * reasons. It defaults to 1.
 				      */
-    void initialize (const MATRIX& A,
+    void initialize (const MATRIX &A,
 		     AdditionalData parameters = AdditionalData());
     
   protected:
@@ -252,7 +252,8 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
 				      */
     template<class VECTOR>
     void vmult (VECTOR&, const VECTOR&) const;
-				     /**
+
+    				     /**
 				      * Apply transpose
 				      * preconditioner. Since this is
 				      * a symmetric preconditioner,
@@ -417,9 +418,9 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
 				      * smaller than 2 for numerical
 				      * reasons. It defaults to 1.
 				      */
-    void initialize (const MATRIX& A,
-		     const std::vector<unsigned int>& permutation,
-		     const std::vector<unsigned int>& inverse_permutation,
+    void initialize (const MATRIX &A,
+		     const std::vector<unsigned int> &permutation,
+		     const std::vector<unsigned int> &inverse_permutation,
 		     typename PreconditionRelaxation<MATRIX>::AdditionalData
 		     parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
     
@@ -565,40 +566,40 @@ class PreconditionedMatrix : public Subscriptor
 				      * pool to obtain the auxiliary
 				      * vector.
 				      */
-    PreconditionedMatrix (const MATRIX&          A,
-			  const PRECOND&         P,
-			  VectorMemory<VECTOR>&  mem);
+    PreconditionedMatrix (const MATRIX &         A,
+			  const PRECOND &        P,
+			  VectorMemory<VECTOR> & mem);
 
 				     /**
 				      * Preconditioned
 				      * matrix-vector-product.
 				      */
-    void vmult (VECTOR& dst, const VECTOR& src) const;
+    void vmult (VECTOR &dst, const VECTOR &src) const;
 
 				     /**
 				      * Transposed preconditioned
 				      * matrix-vector-product.
 				      */
-    void Tvmult (VECTOR& dst, const VECTOR& src) const;
+    void Tvmult (VECTOR &dst, const VECTOR &src) const;
 
 				     /**
 				      * Residual $b-PAx$.
 				      */
-    double residual (VECTOR& dst, const VECTOR& src, const VECTOR& rhs) const;
+    double residual (VECTOR &dst, const VECTOR &src, const VECTOR &rhs) const;
 
   private:
 				     /**
 				      * Storage for the matrix.
 				      */
-    const MATRIX& A;
+    const MATRIX &A;
 				     /**
 				      * Storage for preconditioner.
 				      */
-    const PRECOND& P;
+    const PRECOND &P;
 				     /**
 				      * Memory pool for vectors.
 				      */
-    VectorMemory<VECTOR>& mem;
+    VectorMemory<VECTOR> &mem;
 };
 
 
@@ -608,7 +609,7 @@ class PreconditionedMatrix : public Subscriptor
 
 template<class VECTOR>
 inline void
-PreconditionIdentity::vmult (VECTOR& dst, const VECTOR& src) const
+PreconditionIdentity::vmult (VECTOR &dst, const VECTOR &src) const
 {
   dst = src;
 }
@@ -617,14 +618,14 @@ PreconditionIdentity::vmult (VECTOR& dst, const VECTOR& src) const
 
 template<class VECTOR>
 inline void
-PreconditionIdentity::Tvmult (VECTOR& dst, const VECTOR& src) const
+PreconditionIdentity::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
   dst = src;
 }
 
 template<class VECTOR>
 inline void
-PreconditionIdentity::vmult_add (VECTOR& dst, const VECTOR& src) const
+PreconditionIdentity::vmult_add (VECTOR &dst, const VECTOR &src) const
 {
   dst.add(src);
 }
@@ -633,7 +634,7 @@ PreconditionIdentity::vmult_add (VECTOR& dst, const VECTOR& src) const
 
 template<class VECTOR>
 inline void
-PreconditionIdentity::Tvmult_add (VECTOR& dst, const VECTOR& src) const
+PreconditionIdentity::Tvmult_add (VECTOR &dst, const VECTOR &src) const
 {
   dst.add(src);
 }
@@ -654,7 +655,7 @@ PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+PreconditionJacobi<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_Jacobi (dst, src, this->relaxation);
@@ -665,7 +666,7 @@ PreconditionJacobi<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionJacobi<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+PreconditionJacobi<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_Jacobi (dst, src, this->relaxation);
@@ -677,7 +678,7 @@ PreconditionJacobi<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+PreconditionSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SOR (dst, src, this->relaxation);
@@ -688,7 +689,7 @@ PreconditionSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+PreconditionSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_TSOR (dst, src, this->relaxation);
@@ -700,7 +701,7 @@ PreconditionSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionSSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+PreconditionSSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SSOR (dst, src, this->relaxation);
@@ -711,7 +712,7 @@ PreconditionSSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionSSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+PreconditionSSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   this->A->precondition_SSOR (dst, src, this->relaxation);
@@ -724,8 +725,8 @@ template <class MATRIX>
 inline void
 PreconditionPSOR<MATRIX>::initialize (
   const MATRIX &rA,
-  const std::vector<unsigned int>& p,
-  const std::vector<unsigned int>& ip,
+  const std::vector<unsigned int> &p,
+  const std::vector<unsigned int> &ip,
   typename PreconditionRelaxation<MATRIX>::AdditionalData parameters)
 {
   permutation = &p;
@@ -737,7 +738,7 @@ PreconditionPSOR<MATRIX>::initialize (
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionPSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
+PreconditionPSOR<MATRIX>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
@@ -749,7 +750,7 @@ PreconditionPSOR<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
 template <class MATRIX>
 template<class VECTOR>
 inline void
-PreconditionPSOR<MATRIX>::Tvmult (VECTOR& dst, const VECTOR& src) const
+PreconditionPSOR<MATRIX>::Tvmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert (this->A!=0, ExcNotInitialized());
   dst = src;
@@ -771,8 +772,8 @@ PreconditionUseMatrix<MATRIX,VECTOR>::PreconditionUseMatrix(const MATRIX       &
 
 template<class MATRIX, class VECTOR>
 void
-PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR& dst,
-					     const VECTOR& src) const
+PreconditionUseMatrix<MATRIX,VECTOR>::vmult (VECTOR &dst,
+					     const VECTOR &src) const
 {
   (matrix.*precondition)(dst, src);
 }
@@ -802,9 +803,9 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 template<class SOLVER, class MATRIX, class PRECONDITION>
 void
 PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
-::initialize (SOLVER& s,
-	      const MATRIX& m,
-	      const PRECONDITION& p)
+::initialize (SOLVER &s,
+	      const MATRIX &m,
+	      const PRECONDITION &p)
 {
   solver = &s;
   matrix = &m;
@@ -815,8 +816,8 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
 template<class SOLVER, class MATRIX, class PRECONDITION>
 template<class VECTOR>
 void
-PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR& dst,
-							  const VECTOR& src) const
+PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR &dst,
+							  const VECTOR &src) const
 {
   Assert (solver !=0 && matrix != 0 && precondition != 0,
 	  ExcNotInitialized());
@@ -830,9 +831,9 @@ PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR& dst,
 template<class MATRIX, class PRECOND, class VECTOR>
 inline
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::PreconditionedMatrix (const MATRIX&  A,
-			const PRECOND& P,
-			VectorMemory<VECTOR>&  mem):
+::PreconditionedMatrix (const MATRIX & A,
+			const PRECOND &P,
+			VectorMemory<VECTOR> & mem):
 		A(A), P(P), mem(mem)
 {}
 
@@ -840,8 +841,8 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 template<class MATRIX, class PRECOND, class VECTOR>
 inline void
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::vmult (VECTOR& dst,
-	 const VECTOR& src) const
+::vmult (VECTOR &dst,
+	 const VECTOR &src) const
 {
   VECTOR* h = mem.alloc();
   h->reinit(src);
@@ -855,8 +856,8 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 template<class MATRIX, class PRECOND, class VECTOR>
 inline void
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::Tvmult (VECTOR& dst,
-	 const VECTOR& src) const
+::Tvmult (VECTOR &dst,
+	 const VECTOR &src) const
 {
   VECTOR* h = mem.alloc();
   h->reinit(src);
@@ -870,9 +871,9 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
 template<class MATRIX, class PRECOND, class VECTOR>
 inline double
 PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::residual (VECTOR& dst,
-	    const VECTOR& src,
-	    const VECTOR& rhs) const
+::residual (VECTOR &dst,
+	    const VECTOR &src,
+	    const VECTOR &rhs) const
 {
   VECTOR* h = mem.alloc();
   h->reinit(src);

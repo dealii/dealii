@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,10 @@
 #include <base/data_out_base.h>
 #include <dofs/dof_handler.h>
 
-template<typename number> class BlockVector;
+#include <boost_local/shared_ptr.hpp>
+
+
+template <int>      class FEValuesBase;
 
 
 /**
@@ -41,13 +44,11 @@ template<typename number> class BlockVector;
  * way:
  * @begin{verbatim}
  *   ...
- *   ...   // compute solution, which is of type Vector<double>
- *   ...   // and contains nodal values
+ *   ...   // compute solution, which contains nodal values
  *   ...
- *   ...   // compute error_estimator, which is of type Vector<double>
- *   ...   // and contains one value per cell
+ *   ...   // compute error_estimator, which contains one value per cell
  *
- *   vector<string> solution_names;
+ *   std::vector<std::string> solution_names;
  *   solution_names.push_back ("x-displacement");
  *   solution_names.push_back ("y-displacement");
  *
@@ -272,10 +273,11 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * class to see which characters
 				      * are valid and which are not.
 				      *
-				      * The actual type for the
-				      * template argument may only be
-				      * either @p{Vector<double>} or
-				      * @p{BlockVector<double>}.
+				      * The actual type for the template
+				      * argument may be any vector type from
+				      * which @ref{FEValue} can extract values
+				      * on a cell using the
+				      * @p{get_function_values} function.
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR                   &data,
@@ -306,10 +308,11 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * underscore and the number of
 				      * each component to @p{name}
 				      *
-				      * The actual type for the
-				      * template argument may only be
-				      * either @p{Vector<double>} or
-				      * @p{BlockVector<double>}.
+				      * The actual type for the template
+				      * argument may be any vector type from
+				      * which @ref{FEValue} can extract values
+				      * on a cell using the
+				      * @p{get_function_values} function.
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR         &data,
@@ -477,59 +480,87 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     
   protected:
     				     /**
-				      * Declare an entry in the list of
-				      * data elements.
+                                      * For each vector that has been added
+                                      * through the @ref{add_data_vector}
+                                      * functions, we need to keep track of a
+                                      * pointer to it, and allow data
+                                      * extraction from it when we generate
+                                      * patches. Unfortunately, we need to do
+                                      * this for a number of different vector
+                                      * types. Fortunately, they all have the
+                                      * same interface. So the way we go is to
+                                      * have a base class that provides the
+                                      * functions to access the vector's
+                                      * information, and to have a derived
+                                      * template class that can be
+                                      * instantiated for each vector
+                                      * type. Since the vectors all have the
+                                      * same interface, this is no big
+                                      * problem, as they can all use the same
+                                      * general templatized code.
+                                      *
+                                      * @author Wolfgang Bangerth, 2004
 				      */
-    struct DataEntry
+    class DataEntryBase
     {
+      public:
 					 /**
-					  * Constructor. If no
-					  * arguments are given, an
-					  * invalid object is
-					  * constructed (we need a
-					  * constructor with no
-					  * explicit arguments for STL
-					  * classes).
+					  * Constructor. Give a list of names
+					  * for the individual components of
+					  * the vector.
 					  */
-	DataEntry (const Vector<double>           *data = 0,
-		   const std::vector<std::string> &names = std::vector<std::string>());
+	DataEntryBase (const std::vector<std::string> &names);
 
-					 /**
-					  * Constructor for block vector data.
-					  */
-	DataEntry (const BlockVector<double>      *data,
-		   const std::vector<std::string> &names = std::vector<std::string>());
+                                         /**
+                                          * Destructor made virtual.
+                                          */
+        virtual ~DataEntryBase ();
+        
+                                         /**
+                                          * Assuming that the stored vector is
+                                          * a cell vector, extract the given
+                                          * element from it.
+                                          */
+        virtual
+        double
+        get_cell_data_value (const unsigned int cell_number) const = 0;
 
+                                         /**
+                                          * Given a @p{FEValuesBase} object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
+                             std::vector<double>             &patch_values) const = 0;
+        
+                                         /**
+                                          * Given a @p{FEValuesBase} object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
+                             std::vector<Vector<double> >    &patch_values_system) const = 0;
+
+                                         /**
+                                          * Clear all references to the
+                                          * vectors.
+                                          */
+        virtual void clear () = 0;
+        
 					 /**
 					  * Determine an estimate for
 					  * the memory consumption (in
 					  * bytes) of this object.
 					  */
-	unsigned int memory_consumption () const;
-	
-					 /**
-					  * Pointer to the data
-					  * vector. Note that
-					  * ownership of the vector
-					  * pointed to remains with
-					  * the caller of this class.
-					  */
-        const Vector<double> *single_data;
-
-                                         /**
-                                          * Pointer to a block vector of
-                                          * data.  Either this pointer
-                                          * or the previous is used,
-                                          * depending on the stored
-                                          * vector type.
-                                          */
-        const BlockVector<double>* block_data;
-
-                                         /**
-                                          * True if stored vector is a
-                                          * block vector.
-                                          */
-        bool has_block;
+	virtual unsigned int memory_consumption () const = 0;
 
 					 /**
 					  * Names of the components of this
@@ -537,6 +568,85 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  */
 	std::vector<std::string> names;
     };
+
+
+                                     /**
+                                      * Class that stores a pointer to a
+                                      * vector of type equal to the template
+                                      * argument, and provides the functions
+                                      * to extract data from it.
+                                      *
+                                      * @author Wolfgang Bangerth, 2004
+                                      */
+    template <typename VectorType>
+    class DataEntry : public DataEntryBase
+    {
+      public:
+					 /**
+					  * Constructor. Give a pointer to a
+					  * vector and the list of names for
+					  * the individual components.
+					  */
+	DataEntry (const VectorType               *data,
+		   const std::vector<std::string> &names);
+
+                                         /**
+                                          * Assuming that the stored vector is
+                                          * a cell vector, extract the given
+                                          * element from it.
+                                          */
+        virtual
+        double
+        get_cell_data_value (const unsigned int cell_number) const;
+
+                                         /**
+                                          * Given a @p{FEValuesBase} object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
+                             std::vector<double>             &patch_values) const;
+        
+                                         /**
+                                          * Given a @p{FEValuesBase} object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
+                             std::vector<Vector<double> >    &patch_values_system) const;
+
+                                         /**
+                                          * Clear all references to the
+                                          * vectors.
+                                          */
+        virtual void clear ();
+        
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
+					  */
+	virtual unsigned int memory_consumption () const;
+
+      private:
+                                         /**
+                                          * Pointer to the data
+                                          * vector. Note that
+                                          * ownership of the vector
+                                          * pointed to remains with
+                                          * the caller of this class.
+                                          */
+        const VectorType *vector;
+    };
+    
 
 				     /**
 				      * Abbreviate the somewhat lengthy
@@ -553,13 +663,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * List of data elements with vectors of
 				      * values for each degree of freedom.
 				      */
-    std::vector<DataEntry>  dof_data;
+    std::vector<boost::shared_ptr<DataEntryBase> >  dof_data;
 
 				     /**
 				      * List of data elements with vectors of
 				      * values for each cell.
 				      */
-    std::vector<DataEntry>  cell_data;
+    std::vector<boost::shared_ptr<DataEntryBase> >  cell_data;
 
 				     /**
 				      * This is a list of patches that is

@@ -367,7 +367,8 @@ class SparseMatrix : public virtual Subscriptor
 				      * store zero values in
 				      * non-existent fields.
 				      */
-    void set (const unsigned int i, const unsigned int j,
+    void set (const unsigned int i,
+              const unsigned int j,
 	      const number value);
     
 				     /**
@@ -390,7 +391,8 @@ class SparseMatrix : public virtual Subscriptor
 				      * store zero values in
 				      * non-existent fields.
 				      */
-    void add (const unsigned int i, const unsigned int j,
+    void add (const unsigned int i,
+              const unsigned int j,
 	      const number value);
 
 				     /**
@@ -503,18 +505,20 @@ class SparseMatrix : public virtual Subscriptor
     
 				     /**
 				      * Add <tt>matrix</tt> scaled by
-				      * <tt>factor</tt> to this
-				      * matrix. The function throws an
-				      * error if the sparsity patterns
-				      * of the two involved matrices
-				      * do not point to the same
+				      * <tt>factor</tt> to this matrix,
+				      * i.e. the matrix <tt>factor*matrix</tt>
+				      * is added to <tt>this</tt>. This
+				      * function throws an error if the
+				      * sparsity patterns of the two involved
+				      * matrices do not point to the same
 				      * object, since in this case the
 				      * operation is cheaper.
 				      *
-				      * The source matrix may be a matrix
-				      * of arbitrary type, as long as its
-				      * data type is convertible to the
-				      * data type of this matrix.
+				      * The source matrix may be a sparse
+				      * matrix over an arbitrary underlying
+				      * scalar type, as long as its data type
+				      * is convertible to the data type of
+				      * this matrix.
 				      */
     template <typename somenumber>
     void add_scaled (const number factor,
@@ -538,10 +542,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * matrix), use the el()
 				      * function.
 				      *
-				      * @deprecated Consider using
-				      * const_iterator instead, since
-				      * it is tailored better to a
-				      * sparse matrix structure.
+				      * If you are looping over all elements,
+				      * consider using a
+				      * <tt>const_iterator</tt> instead, since
+				      * it is tailored better to a sparse
+				      * matrix structure.
 				      */
     number operator () (const unsigned int i,
 			const unsigned int j) const;
@@ -564,10 +569,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * solution, since the sparsity
 				      * of the matrix is not used.
 				      *
-				      * @deprecated Consider using
-				      * const_iterator instead, since
-				      * it is tailored better to a
-				      * sparse matrix structure.
+				      * If you are looping over all elements,
+				      * consider using a
+				      * <tt>const_iterator</tt> instead, since
+				      * it is tailored better to a sparse
+				      * matrix structure.
 				      */
     number el (const unsigned int i,
 	       const unsigned int j) const;
@@ -656,6 +662,9 @@ class SparseMatrix : public virtual Subscriptor
 				      * Matrix-vector multiplication:
 				      * let <i>dst = M*src</i> with
 				      * <i>M</i> being this matrix.
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,
@@ -668,6 +677,9 @@ class SparseMatrix : public virtual Subscriptor
 				      * matrix. This function does the
 				      * same as vmult() but takes
 				      * the transposed matrix.
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
 				      */
     template <typename somenumber>
     void Tvmult (Vector<somenumber>       &dst,
@@ -679,6 +691,9 @@ class SparseMatrix : public virtual Subscriptor
 				      * <i>M*src</i> on <i>dst</i>
 				      * with <i>M</i> being this
 				      * matrix.
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
 				      */
     template <typename somenumber>
     void vmult_add (Vector<somenumber>       &dst,
@@ -693,6 +708,9 @@ class SparseMatrix : public virtual Subscriptor
 				      * does the same as vmult_add()
 				      * but takes the transposed
 				      * matrix.
+                                      *
+                                      * Source and destination must
+                                      * not be the same vector.
 				      */
     template <typename somenumber>
     void Tvmult_add (Vector<somenumber>       &dst,
@@ -754,6 +772,14 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     number linfty_norm () const;
 
+                                     /**
+                                      * Return the frobenius norm of the
+                                      * matrix, i.e. the square root of the
+                                      * sum of squares of all entries in the
+                                      * matrix.
+                                      */
+    number frobenius_norm () const;
+    
 				     /**
 				      * Compute the residual of an
 				      * equation <i>Mx=b</i>, where
@@ -764,6 +790,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * <i>l<sub>2</sub></i> norm of
 				      * the residual vector is
 				      * returned.
+                                      *
+                                      * Source <i>x</i> and destination
+                                      * <i>dst</i> must not be the same
+                                      * vector.
 				      */
     template <typename somenumber>
     somenumber residual (Vector<somenumber>       &dst,
@@ -1123,6 +1153,10 @@ class SparseMatrix : public virtual Subscriptor
 		    int, int,
 		    << "The iterators denote a range of " << arg1
 		    << " elements, but the given number of rows was " << arg2);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcSourceEqualsDestination);
     
   private:
 				     /**
@@ -1348,8 +1382,8 @@ number SparseMatrix<number>::operator () (const unsigned int i,
 					  const unsigned int j) const
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
-  Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,
-	  ExcInvalidIndex(i,j));
+  AssertThrow (cols->operator()(i,j) != SparsityPattern::invalid_entry,
+               ExcInvalidIndex(i,j));
   return val[cols->operator()(i,j)];
 }
 
