@@ -293,6 +293,12 @@ class dFMatrix
     double determinant () const;
 
 				     /**
+				      * Compute the quadratic matrix norm.
+				      * Return value is the root of the square
+				      * sum of all matrix entries.
+				      */
+    double norm2 () const;
+				     /**
 				      * Assign the inverse of the given
 				      * matrix to #*this#. This function is
 				      * only implemented (hardcoded) for

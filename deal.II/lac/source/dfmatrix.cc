@@ -1027,6 +1027,13 @@ double dFMatrix::determinant () const {
     };
 };
 
+double dFMatrix::norm2 () const
+{
+  double s = 0.;
+  for (unsigned int i=0;i<dim_image*dim_range;++i)
+    s += val[i]*val[i];
+  return s;
+}
 
 
 void dFMatrix::clear () {
