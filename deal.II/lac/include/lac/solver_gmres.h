@@ -484,7 +484,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 	}
       else
 	{
-	  deallog << "default_res=" << rho << endl;
+	  deallog << "default_res=" << rho << std::endl;
 
 	  if (left_precondition)
 	    {
@@ -579,7 +579,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 	      accumulated_iterations, rho);
   	  else
   	    {
-	      deallog << "default_res=" << rho << endl;
+	      deallog << "default_res=" << rho << std::endl;
 	      
 	      ::Vector<double> h_(dim);
 	      *x_=x;
