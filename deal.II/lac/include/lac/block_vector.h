@@ -213,7 +213,7 @@ class BlockVector
 //  				      * the element past the end of the array.
 //  				      */
 //      const_iterator end () const;  
-//  				     //@}
+
     
     
 				     /**

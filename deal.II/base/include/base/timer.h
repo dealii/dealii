@@ -14,8 +14,28 @@
  * microsecond. 
  *
  *
-//TODO: * \subsection{Usage}
+ * \subsection{Usage}
  *
+ * Use of this class is as you might expect by looking at the member
+ * functions:
+ * \begin{verbatim}
+ *   Time timer;
+ *   timer.start ();
+ *
+ *   // do some complicated computations here
+ *   ...
+ *
+ *   timer.stop ();
+ *
+ *   cout << "Elapsed time: " << timer() << " seconds.";
+ *
+ *   // reset timer for the next thing it shall do
+ *   timer.reset();
+ * \end{verbatim}
+ *
+ * Alternatively, you can also restart the timer instead of resetting
+ * it. The times between successive calls to #start/stop# will then be
+ * accumulated.
  *
  * Note: the implementation of this class is system dependant.
  *
@@ -36,8 +56,9 @@ public:
     void start();
 
 				     /**
-				      * Sets the current time as next starting
-				      * time and return it.
+				      * Sets the current time as next
+				      * starting time and return the
+				      * elapsed time in seconds.
 				      */
     double stop();
 
@@ -48,13 +69,19 @@ public:
     void reset();
 
 				     /**
-				      * Access to the current time without
-				      * disturbing time measurement.
+				      * Access to the current time
+				      * without disturbing time
+				      * measurement. The elapsed time
+				      * is returned in units of
+				      * seconds.
+				      *
+				      * A regular call to this
+				      * function serves to avoid time
+				      * overflow (which is now nearly
+				      * every 30 minutes on UNIX
+				      * machines) in long-time
+				      * measurements.
 				      */
-  // A regular call to this function serves to avoid time overflow
-  // (which is now nearly every 30 minutes on UNIX machines) in long-time
-  // measurements.
-  //
     double operator() () const;
 
   private:

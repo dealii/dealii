@@ -152,7 +152,7 @@
 
  * \begin{itemize}
  *
- * \item BICUBIC_PATCH
+ * \item #BICUBIC_PATCH#
  * A bicubic_patch is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
  * while the other 12 points pull and stretch the patch into shape.
@@ -160,7 +160,7 @@
  * subdivisions has to be 3 to provide the patch with 16 points.
  * A bicubic patch is not exact but generates very smooth images.
  *
- * \item MESH
+ * \item #MESH#
  * The mesh object is used to store large number of triangles.
  * Every square of the patch data is split into one upper-left and one 
  * lower-right triangle. If the number of subdivisions is three, 32 triangle
@@ -168,7 +168,6 @@
  * 
  * Using the smooth flag povray interpolates the normals on the triangles,
  * imitating a curved surface
- *
  * \end{itemize}
  *
  * All objects get one texture definition called Tex. This texture has to be
