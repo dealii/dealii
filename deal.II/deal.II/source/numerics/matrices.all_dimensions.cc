@@ -103,11 +103,8 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 		= dof->second * matrix.diag_element(dof_number);
       else
 	{
-					   // use the SparseMatrix::
-					   // to work around a bug in
-					   // egcs
-	  matrix.SparseMatrix<number>::set (dof_number, dof_number,
-					    first_nonzero_diagonal_entry);
+	  matrix.set (dof_number, dof_number,
+                      first_nonzero_diagonal_entry);
 	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_nonzero_diagonal_entry;
 	};
