@@ -16,7 +16,11 @@ class BoundaryValuesSine : public Function<dim> {
 				      * at the given point.
 				      */
     virtual double operator () (const Point<dim> &p) const {
-      return cos(2*3.1415926536*p(0))*cos(2*3.1415926536*p(1));
+      double x = 1;
+      
+      for (unsigned int i=0; i<dim; ++i)
+	x *= cos(2*3.1415926536*p(i));
+      return x;
     };
     
 
@@ -31,8 +35,7 @@ class BoundaryValuesSine : public Function<dim> {
       Assert (values.size() == points.size(),
 	      ExcVectorHasWrongSize(values.size(), points.size()));
       for (unsigned int i=0; i<points.size(); ++i) 
-	values[i] = (cos(2*3.1415926536*points[i](0)) *
-		     cos(2*3.1415926536*points[i](1)));
+	values[i] = BoundaryValuesSine<dim>::operator() (points[i]);
     };
 };
 
@@ -100,25 +103,96 @@ template <int dim>
 class CurvedLine :
   public StraightBoundary<dim> {
   public:
-      virtual Point<dim> in_between (const PointArray &neighbors) const {
-	Point<dim> middle = StraightBoundary<dim>::in_between(neighbors);
-	double x=middle(0),
-	       y=middle(1);
-	
-	if (y<x)
-	  if (y<1-x)
-	    middle(1) = 0.04*sin(6*3.141592*middle(0));
-	  else
-	    middle(0) = 1+0.04*sin(6*3.141592*middle(1));
-	
-	else
-	  if (y<1-x)
-	    middle(0) = 0.04*sin(6*3.141592*middle(1));
-	  else
-	    middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+    virtual Point<dim>
+    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
 
-	return middle;
-      };
+    virtual Point<dim>
+    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+};
+
+
+
+template <int dim>
+Point<dim>
+CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+
+				   // if the line is at the top of bottom
+				   // face: do a special treatment on
+				   // this line. Note that if the
+				   // z-value of the midpoint is either
+				   // 0 or 1, then the z-values of all
+				   // vertices of the line is like that
+  if (dim>=3)
+    if (((middle(2) == 0) || (middle(2) == 1))
+				       // find out, if the line is in the
+				       // interior of the top or bottom face
+				       // of the domain, or at the edge.
+				       // lines at the edge need to undergo
+				       // the usual treatment, while for
+				       // interior lines taking the midpoint
+				       // is sufficient
+				       //
+				       // note: the trick with the boundary
+				       // id was invented after the above was
+				       // written, so we are not very strict
+				       // here with using these flags
+	&& (line->boundary_indicator() == 1))
+      return middle;
+
+
+  double x=middle(0),
+	 y=middle(1);
+  
+  if (y<x)
+    if (y<1-x)
+      middle(1) = 0.04*sin(6*3.141592*middle(0));
+    else
+      middle(0) = 1+0.04*sin(6*3.141592*middle(1));
+  
+  else
+    if (y<1-x)
+      middle(0) = 0.04*sin(6*3.141592*middle(1));
+    else
+      middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+  
+  return middle;
+};
+
+
+
+template <int dim>
+Point<dim>
+CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+{
+  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
+
+				   // if the face is at the top of bottom
+				   // face: do not move the midpoint in
+				   // x/y direction. Note that if the
+				   // z-value of the midpoint is either
+				   // 0 or 1, then the z-values of all
+				   // vertices of the quad is like that
+  if ((middle(2) == 0) || (middle(2) == 1))
+    return middle;
+  
+  double x=middle(0),
+	 y=middle(1);
+  
+  if (y<x)
+    if (y<1-x)
+      middle(1) = 0.04*sin(6*3.141592*middle(0));
+    else
+      middle(0) = 1+0.04*sin(6*3.141592*middle(1));
+  
+  else
+    if (y<1-x)
+      middle(0) = 0.04*sin(6*3.141592*middle(1));
+    else
+      middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+  
+  return middle;
 };
 
 
@@ -341,10 +415,10 @@ void PoissonProblem<dim>::make_zoom_in_grid () {
   tria->execute_refinement ();
   
   Triangulation<dim>::active_cell_iterator cell;
-  for (int i=0; i<17; ++i) 
+  for (int i=0; i<(dim==3 ? 5 : 17); ++i) 
     {
 				       // refine the presently
-				       // second last cell 17
+				       // second last cell several
 				       // times
       cell = tria->last_active(tria->n_levels()-1);
       --cell;
@@ -362,7 +436,7 @@ void PoissonProblem<dim>::make_random_grid () {
   tria->refine_global (1);
 	
   Triangulation<dim>::active_cell_iterator cell, endc;
-  for (int i=0; i<12; ++i) 
+  for (int i=0; i<(dim==3 ? 7 : 12); ++i)
     {
       int n_levels = tria->n_levels();
       cell = tria->begin_active();
@@ -455,7 +529,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   if (!set_boundary_values (prm))
     return;
   
-  FELinear<dim>                   fe;
+  FEQuadraticSub<dim>                   fe;
   PoissonEquation<dim>            equation (*rhs);
   QGauss2<dim>                    quadrature;
   
@@ -481,7 +555,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   string o_filename = prm.get ("Output file");
   ofstream gnuplot(o_filename.c_str());
   fill_data (out);
-  out.write_gnuplot (gnuplot);
+  out.write_ucd (gnuplot);
   gnuplot.close ();
 
 				   // release the lock of the DoF object to
@@ -495,4 +569,4 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
 
 
-template class PoissonProblem<2>;
+template class PoissonProblem<3>;
