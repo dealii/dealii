@@ -19,6 +19,7 @@ s/JobId.*//;
 # Several data and time strings
 
 s/%%Creation Date:.*//;
+s/\"created\".*//;
 s/# Time =.*//;
 s/# Date =.*//; 
 s/^\s+Time =.*//;
