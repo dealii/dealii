@@ -2202,6 +2202,55 @@ void DoFHandler<dim>::make_sparsity_pattern (SparseMatrixStruct &sparsity) const
 };
 
 
+
+template <int dim>
+void
+DoFHandler<dim>::make_sparsity_pattern (const vector<vector<bool> > &mask,
+					SparseMatrixStruct          &sparsity) const
+{
+  const unsigned int total_dofs = selected_fe->total_dofs;
+
+  Assert (selected_fe != 0, ExcNoFESelected());
+  Assert (sparsity.n_rows() == n_dofs(),
+	  ExcDifferentDimensions (sparsity.n_rows(), n_dofs()));
+  Assert (sparsity.n_cols() == n_dofs(),
+	  ExcDifferentDimensions (sparsity.n_cols(), n_dofs()));
+  Assert (mask.size() == selected_fe->n_components,
+	  ExcInvalidMaskDimension(mask.size(), selected_fe->n_components));
+  for (unsigned int i=0; i<mask.size(); ++i)
+    Assert (mask[i].size() == selected_fe->n_components,
+	    ExcInvalidMaskDimension(mask[i].size(), selected_fe->n_components));
+
+				   // first build a mask for each dof,
+				   // not like the one given which represents
+				   // components
+  vector<vector<bool> > dof_mask(total_dofs,
+				 vector<bool>(total_dofs, false));
+  for (unsigned int i=0; i<total_dofs; ++i)
+    for (unsigned int j=0; j<total_dofs; ++j)
+      dof_mask[i][j] = mask
+		       [selected_fe->system_to_component_index(i).first]
+		       [selected_fe->system_to_component_index(j).first];
+  
+  
+  vector<int> dofs_on_this_cell(total_dofs);
+  active_cell_iterator cell = begin_active(),
+		       endc = end();
+  for (; cell!=endc; ++cell) 
+    {
+      cell->get_dof_indices (dofs_on_this_cell);
+				       // make sparsity pattern for this cell
+      for (unsigned int i=0; i<total_dofs; ++i)
+	for (unsigned int j=0; j<total_dofs; ++j)
+	  if (dof_mask[i][j] == true)
+	    sparsity.add (dofs_on_this_cell[i],
+			  dofs_on_this_cell[j]);
+    };
+};
+
+
+
+
 #if deal_II_dimension == 1
 
 template <>

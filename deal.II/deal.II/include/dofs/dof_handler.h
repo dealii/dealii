@@ -633,6 +633,50 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 				      */
     void make_sparsity_pattern (SparseMatrixStruct &) const; 
 
+				     /**
+				      * This function does mistly the same as
+				      * the above one, but it is specialized for
+				      * mixed finite elements and allows to
+				      * specify which variables couple in which
+				      * equation. For example, if wanted to solve
+				      * the Stokes equations,
+				      * \begin{verbatim}
+				      *    -\Delta \vec u + \nabla p = 0,
+				      *    \div u                    = 0
+				      * \end{verbatim}
+				      * in, say, two space dimensions, using
+				      * nonstabilized Q2/Q2/Q1 mixed elements
+				      * (i.e. using the #FESystem# class), then
+				      * you don't want all degrees of freedom
+				      * to couple in each equation. You rather
+				      * may want to give the following pattern
+				      * of couplings:
+				      * \begin{verbatim}
+				      *    1  0  1
+				      *    0  1  1
+				      *    1  1  0
+				      * \end{verbatim}
+				      * where "1" indicates that two variables
+				      * (i.e. components of the #FESystem#)
+				      * couple in the respective equation, and
+				      * a "0" means no coupling, in which case
+				      * it is not necessary to allocate space
+				      * in the matrix structure. Obviously, the
+				      * mask refers to components of the
+				      * composed #FESystem#, rather than to the
+				      * degrees of freedom contained in there.
+				      *
+				      * This function is designed to accept
+				      * a mask, like the one shown above,
+				      * through the #mask# parameter, which
+				      * contains boolean values. It builds
+				      * the matrix structure just like the
+				      * previous function, but does not create
+				      * elements if not specified by the mask.
+				      */
+    void make_sparsity_pattern (const vector<vector<bool> > &mask,
+				SparseMatrixStruct          &) const;
+    
     				     /**
 				      * Write the sparsity structure of the
 				      * matrix composed of the basis functions
@@ -1499,7 +1543,14 @@ class DoFHandler : public DoFDimensionInfo<dim> {
 		    int,
 		    << "The given list of new dof indices is not consecutive: "
 		    << "the index " << arg1 << " does not exist.");
-
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidMaskDimension,
+		    int, int,
+		    << "The dimension of the mask " << arg1 << " does not match"
+		    << " the number of components in the finite element object.");
+    
   protected:
     
 				     /**

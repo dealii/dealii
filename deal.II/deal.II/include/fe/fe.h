@@ -250,7 +250,7 @@ class FiniteElementBase :
 				      * Compute system index from components.
 				      */
     unsigned int component_to_system_index (unsigned int component,
-					unsigned int component_index) const;
+					    unsigned int component_index) const;
   
 				     /**
 				      * Compute component and index from system index.
