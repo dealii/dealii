@@ -65,7 +65,7 @@ class MinimizationProblem
     
   private:
     void setup_system ();
-    void assemble_newton_step (bool p);
+    void assemble_newton_step (const bool p);
     void solve ();
     void initialize ();
     void refine_grid ();
