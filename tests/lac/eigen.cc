@@ -82,7 +82,12 @@ int main()
 
   u = 1.;
   lambda = 10.;
-  EigenInverse<> wieland2(control, mem);
+  wieland.solve(lambda, A, u);
+  deallog << "Eigenvalue " << lambda << " Error " << lambda-lambda_max << std::endl;  
+
+  u = 1.;
+  lambda = 10.;
+  EigenInverse<> wieland2(control, mem, .2);
   wieland2.solve(lambda, A, u);
   deallog << "Eigenvalue " << lambda << " Error " << lambda-lambda_max << std::endl;  
 }
