@@ -158,24 +158,108 @@ class SolverGMRES : public Solver<VECTOR>
     void givens_rotation (Vector<double> &h,  Vector<double> &b,
 			  Vector<double> &ci, Vector<double> &si,
 			  int col) const;
-				   /**
-				    * Projected system matrix
-				    */
-  FullMatrix<double> H;
-				   /**
-				    * Auxiliary matrix for inverting @p{H}
-				    */
-  FullMatrix<double> H1;
-
+				     /**
+				      * Projected system matrix
+				      */
+    FullMatrix<double> H;
+				     /**
+				      * Auxiliary matrix for inverting @p{H}
+				      */
+    FullMatrix<double> H1;
+    
   private:
-				   /**
-				    * No copy constructor.
-				    */
-  SolverGMRES (const SolverGMRES<VECTOR>&);
+				     /**
+				      * Class to hold temporary
+				      * vectors.  This class
+				      * automatically allocates a new
+				      * vector, once it is needed.
+				      *
+				      * A future version should also
+				      * be able to shift through
+				      * vectors automatically,
+				      * avoiding restart.
+				      */
+    
+    class TmpVectors
+    {
+      public:
+					 /**
+					  * Constructor. Prepares an
+					  * array of @p{VECTOR} of
+					  * length @p{max_size}.
+					  */
+	TmpVectors(unsigned int max_size,
+		   VectorMemory<VECTOR>& vmem);
+					 /**
+					  * Delete all allocated vectors.
+					  */
+	~TmpVectors();
+					 /**
+					  * Get vector number
+					  * @p{i}. Allocate it if
+					  * necessary.
+					  */
+	VECTOR& operator[] (unsigned int i);
+	
+      private:
+					 /**
+					  * Pool were vectors are obtained from.
+					  */
+	VectorMemory<VECTOR>& mem;
+					 /**
+					  * Field for storing the vectors.
+					  */
+	std::vector<VECTOR*> data;
+					 /**
+					  * Offset of the first
+					  * vector. This is for later
+					  * when vector rotation will
+					  * be implemented.
+					  */
+	unsigned int offset;
+    };
+				     /**
+				      * No copy constructor.
+				      */
+    SolverGMRES (const SolverGMRES<VECTOR>&);
 };
 
 
 /* --------------------- Inline and template functions ------------------- */
+
+template <class VECTOR>
+inline
+SolverGMRES<VECTOR>::TmpVectors::TmpVectors (unsigned int max_size,
+				 VectorMemory<VECTOR>& vmem)
+		:
+		mem(vmem),
+		data (max_size, 0),
+		offset(0)
+{}
+
+
+template <class VECTOR>
+inline
+SolverGMRES<VECTOR>::TmpVectors::~TmpVectors ()
+{
+  for (typename std::vector<VECTOR*>::iterator v = data.begin();
+       v != data.end(); ++v)
+    if (*v != 0)
+      mem.free(*v);
+}
+
+
+template <class VECTOR>
+inline VECTOR&
+SolverGMRES<VECTOR>::TmpVectors::operator[] (unsigned int i)
+{
+  Assert (i+offset<data.size(),
+	  ExcIndexRange(i,-offset, data.size()-offset));
+  i -= offset;
+  if (data[i] == 0)
+    data[i] = mem.alloc();
+  return *data[i];
+}
 
 
 template <class VECTOR>
@@ -238,22 +322,10 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   deallog.push("GMRES");
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
-				   // allocate an array of n_tmp_vectors
-				   // temporary vectors from the VectorMemory
-				   // object; resize them but do not set their
-				   // values since they will be overwritten soon
-				   // anyway.
-
-				   // This is really bad since vectors
-				   // should only be allocated if
-				   // really needed. (GK)
-  std::vector<VECTOR*> tmp_vectors (n_tmp_vectors, 0);
-  for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
-    {
-      tmp_vectors[tmp] = memory.alloc();
-      tmp_vectors[tmp]->reinit (x, true);
-    };
-
+				   // Generate an object where basis
+				   // vectors are stored.
+  TmpVectors tmp_vectors (n_tmp_vectors, memory);
+  
 				   // number of the present iteration; this
 				   // number is not reset to zero upon a
 				   // restart
@@ -282,8 +354,8 @@ unsigned int dim = 0;
   const bool left_precondition = ! additional_data.right_preconditioning;
 
 				   // define two aliases
-  VECTOR &v = *tmp_vectors[0];
-  VECTOR &p = *tmp_vectors[n_tmp_vectors-1];
+  VECTOR &v = tmp_vectors[0];
+  VECTOR &p = tmp_vectors[n_tmp_vectors-1];
 
 
 ///////////////////////////////////
@@ -339,14 +411,14 @@ unsigned int dim = 0;
 	{
 	  ++accumulated_iterations;
 	  // yet another alias
-	  VECTOR& vv = *tmp_vectors[inner_iteration+1];
+	  VECTOR& vv = tmp_vectors[inner_iteration+1];
 	  
 	  if (left_precondition)
 	    {
-	      A.vmult(p, *tmp_vectors[inner_iteration]);
+	      A.vmult(p, tmp_vectors[inner_iteration]);
 	      precondition.vmult(vv,p);
 	    } else {
-	      precondition.vmult(p,*tmp_vectors[inner_iteration]);
+	      precondition.vmult(p, tmp_vectors[inner_iteration]);
 	      A.vmult(vv,p);
 	    };
 	  
@@ -355,8 +427,8 @@ unsigned int dim = 0;
 					   /* Orthogonalization */
 	  for (unsigned int i=0 ; i<dim ; ++i)
 	    {
-	      h(i) = vv * *tmp_vectors[i];
-	      vv.add(-h(i),*tmp_vectors[i]);
+	      h(i) = vv * tmp_vectors[i];
+	      vv.add(-h(i), tmp_vectors[i]);
 	    };
       
 	  double s = vv.l2_norm();
@@ -365,9 +437,9 @@ unsigned int dim = 0;
 					   /* Re-orthogonalization */
 	  for (unsigned i=0; i<dim; ++i)
 	    {
-	      double htmp = vv * *tmp_vectors[i];
+	      double htmp = vv * tmp_vectors[i];
 	      h(i) += htmp;
-	      vv.add(-htmp,*tmp_vectors[i]);
+	      vv.add(-htmp, tmp_vectors[i]);
 	    };
 	  
 	  s = vv.l2_norm();
@@ -403,12 +475,12 @@ unsigned int dim = 0;
 
       if (left_precondition)
 	for (unsigned int i=0 ; i<dim; ++i)
-	  x.add(h(i), *tmp_vectors[i]);
+	  x.add(h(i), tmp_vectors[i]);
       else
 	{
 	  p = 0.;
 	  for (unsigned int i=0; i<dim; ++i)
-	    p.add(h(i), *tmp_vectors[i]);
+	    p.add(h(i), tmp_vectors[i]);
 	  precondition.vmult(v,p);
 	  x.add(1.,v);
 	};
@@ -418,13 +490,8 @@ unsigned int dim = 0;
     }
   while (iteration_state == SolverControl::iterate);
 
-				   // free the allocated memory before
-				   // leaving
-  for (unsigned int tmp=0; tmp<n_tmp_vectors; ++tmp)
-    memory.free (tmp_vectors[tmp]);
-
+  
   deallog.pop();
-
 				   // in case of failure: throw
 				   // exception
   if (control().last_check() != SolverControl::success)

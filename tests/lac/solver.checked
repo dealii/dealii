@@ -57,5 +57,5 @@ DEAL:sor:Bicgstab::Starting
 DEAL:sor:Bicgstab::Convergence step 14 
 DEAL:sor:GMRES::Starting 
 DEAL:sor:GMRES::Convergence step 20 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 220
+DEAL::GrowingVectorMemory:Overall allocated vectors: 163
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 20
