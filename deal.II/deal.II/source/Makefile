@@ -83,7 +83,7 @@ debug: 2dg 1dg 3dg
 	@$(CXX) $(CXXFLAGS) -Ddeal_II_dimension=3 -c $< -o $@
 
 # special rules for exceptional files
-../lib/3d/o/q1_mapping.jacobians_3d.o:
+../lib/3d/o/q1_mapping_jacobians_3d.o:
 	@echo "==============3d======opt==(special)====" $<
 	@$(CXX) $(filter-out -O2 -Wuninitialized,$(CXXFLAGS)) -Ddeal_II_dimension=3 -c $< -o $@
 
