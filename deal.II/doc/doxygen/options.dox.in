@@ -133,8 +133,8 @@ EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = 
 INCLUDE_FILE_PATTERNS  = 
-PREDEFINED             = 
-EXPAND_AS_DEFINED      = 
+PREDEFINED             = DEBUG=1
+EXPAND_AS_DEFINED      = DeclException0 DeclException1 DeclException2 DeclException3 DeclException4 DeclException5
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
 # Configuration::addtions related to external references   
