@@ -732,7 +732,7 @@ PreconditionBlock<MATRIX, inverse_type>::el (
   const unsigned int ib = i % bs;
   const unsigned int jb = j % bs;
 
-  if (jb +nb != j)
+  if (jb + nb*bs != j)
     {
       return 0.;
     }
