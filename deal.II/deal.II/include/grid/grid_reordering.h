@@ -27,7 +27,8 @@
  */
 template <int dim>
 class GridReorderingInfo
-{};
+{
+};
 
 
 /**
@@ -524,8 +525,9 @@ class GridReordering : private GridReorderingInfo<dim>
 				      *
 				      * @author Wolfgang Bangerth, 2000
 				      */
-    struct Cell : public CellData<dim>
+    class Cell : public CellData<dim>
     {
+      public:
 					 /**
 					  * Value to be used if a
 					  * neighbor does not exist,
@@ -548,6 +550,18 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * denote the faces that
 					  * would be needed if the
 					  * cell were rotate so often.
+					  *
+					  * Note that the order in
+					  * which the faces for a
+					  * specific rotational state
+					  * appear is not specified,
+					  * as this is not
+					  * important. It is only
+					  * important that each face
+					  * in one rotational state or
+					  * other appears once for
+					  * each orientation of the
+					  * cell.
 					  */
 	typename map<Face,FaceData>::iterator
 	faces[GridReorderingInfo<dim>::rotational_states_of_cells][GeometryInfo<dim>::faces_per_cell];
@@ -738,6 +752,13 @@ class GridReordering : private GridReorderingInfo<dim>
 					  * another direction, thus
 					  * forbidding the present
 					  * face to be used.
+					  *
+					  * Note that the order in
+					  * which the reverted faces
+					  * appear here is not
+					  * specified, as it is not
+					  * important for the
+					  * algorithm.
 					  */
 	typename map<Face,FaceData >::const_iterator
 	reverse_faces[GridReorderingInfo<dim>::rotational_states_of_faces-1];
