@@ -533,9 +533,38 @@ namespace PETScWrappers
       struct AdditionalData
       {
                                            /**
-                                            * Constructor. 
+                                            * Constructor. (Default values
+					    * taken from function PCCreate_LU
+					    * of the PetSC lib.)
                                             */
-          AdditionalData ();
+          AdditionalData (const double pivoting = 1.e-6,
+			  const double zero_pivot = 1.e-12,
+			  const double damping = 0.0);
+
+                                           /**
+                                            * Determines, when Pivoting is
+					    * done during LU decomposition.
+					    * 0.0 indicates no pivoting,
+					    * and 1.0 complete pivoting.
+					    * Confer PetSC manual for more
+					    * details.
+                                            */
+          double pivoting;
+
+                                           /**
+                                            * Size at which smaller pivots
+					    * are declared to be zero.
+					    * Confer PetSC manual for more
+					    * details.
+					    */
+	  double zero_pivot;					    
+
+                                           /**
+                                            * This quantity is added to the
+					    * diagonal of the matrix during
+					    * factorisation.
+					    */
+	  double damping;
       };
 
                                        /**
@@ -550,7 +579,8 @@ namespace PETScWrappers
                                         * generates a compiler fault.
                                         */
       PreconditionLU (const MatrixBase     &matrix,
-		      const AdditionalData &additional_data = AdditionalData());
+		      const AdditionalData &additional_data = 
+		      AdditionalData(1.e-6, 1.e-12, 0.0));
       
     protected:
                                        /**

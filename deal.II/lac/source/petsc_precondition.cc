@@ -259,7 +259,13 @@ namespace PETScWrappers
 /* ----------------- PreconditionLU -------------------- */
 
   PreconditionLU::AdditionalData::
-  AdditionalData ()
+  AdditionalData (const double pivoting,
+		  const double zero_pivot,
+		  const double damping)
+                  :
+                  pivoting (pivoting),
+                  zero_pivot (zero_pivot),
+		  damping (damping)
   {}
 
   
@@ -279,6 +285,16 @@ namespace PETScWrappers
                                      // preconditioner
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCLU));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+                                     // set flags as given
+    ierr = PCLUSetPivoting (pc, additional_data.pivoting);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCLUSetZeroPivot (pc, additional_data.zero_pivot);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCLUSetDamping (pc, additional_data.damping);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
