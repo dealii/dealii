@@ -180,10 +180,9 @@ class Function : public FunctionTime,
 				    const unsigned int  component = 0) const;
 
 				     /**
-				      * Return the gradient of the
-				      * specified component of the
-				      * function at the given point,
-				      * for all components.
+				      * Return the gradient of all
+				      * components of the
+				      * function at the given point.
 				      */
     virtual void          vector_gradient (const Point<dim>       &p,
 					   vector<Tensor<1,dim> > &gradients) const;
