@@ -94,22 +94,24 @@ class MGSmootherContinuous : public Subscriptor
 				      * is no 1d implementation.
 				      */
     MGSmootherContinuous (const MGDoFHandler<1> &mg_dof,
-		unsigned int           steps);
+			  const unsigned int     steps);
 
 				     /**
 				      * Constructor. This one collects
-				      * the indices of the degrees of freedom
-				      * on the interior boundaries between
-				      * the different levels, which are
+				      * the indices of the degrees of
+				      * freedom on the interior
+				      * boundaries between the
+				      * different levels, which are
 				      * needed by the function
 				      * @p{set_zero_interior_boundaries}.
 				      *
-				      * The parameter steps indicates the number of smoothing
-				      * steps to be executed by @p{smooth}.
+				      * The parameter steps indicates
+				      * the number of smoothing steps
+				      * to be executed by @p{smooth}.
 				      */
     template <int dim>
     MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
-		unsigned int             steps);    
+			  const unsigned int       steps);    
 
 				     /**
 				      * Reset the values of the degrees of
