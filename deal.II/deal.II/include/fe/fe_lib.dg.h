@@ -8,6 +8,11 @@
 
 #include <fe/fe_lib.lagrange.h>
 
+#define FEDGConstant FEDG_Q0
+#define FEDGLinear FEDG_Q1
+#define FEDGQuadraticSub FEDG_Q2
+#define FEDGCubicSub FEDG_Q3
+#define FEDGQuarticSub FEDG_Q4
 
 /**
  * Define a constant discontinuous finite element in #dim#
@@ -16,12 +21,12 @@
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDGConstant : public FELinearMapping<dim> {
+class FEDG_Q0 : public FELinearMapping<dim> {
   public:
 				     /**
 				      * Constructor
 				      */
-    FEDGConstant ();
+    FEDG_Q0 ();
     
 				     /**
 				      * Return the value of the #i#th shape
@@ -104,9 +109,9 @@ class FEDGConstant : public FELinearMapping<dim> {
  *
  * 
  * This class is derived from and provides substantially the same 
- * as the #FELinear# class. The only difference is the new constructor that
- * calls #FELinear::FELinear(const int)#, the protected constructor of the
- * #FELinear# class using a #FiniteElement# with no dofs in the vertices and 
+ * as the #FEQ1# class. The only difference is the new constructor that
+ * calls #FEQ1::FEQ1(const int)#, the protected constructor of the
+ * #FEQ1# class using a #FiniteElement# with no dofs in the vertices and 
  * $2^d$ dofs per cell. As now the cells do not share any vertex-dof with
  * a neighboring cell the $2^d$ dofs per cell can be choosen independently not
  * needing any constraints and allowing the use of discontinuous Galerkin
@@ -118,12 +123,12 @@ class FEDGConstant : public FELinearMapping<dim> {
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDGLinear : public FELinear<dim>{
+class FEDG_Q1 : public FEQ1<dim>{
   public:
 				     /**
 				      * Constructor
 				      */
-    FEDGLinear();
+    FEDG_Q1();
 
 				     /**
 				      * Refer to the base class for detailed
@@ -150,9 +155,9 @@ class FEDGLinear : public FELinear<dim>{
  * unit cell to the real cell allowing discontinuous Galerkin methods.
  * 
  * This class is derived from and provides substantially the same 
- * as the #FEQuadraticSub# class. The only difference is the new constructor that
- * calls #FEQuadraticSub::FEQuadraticSub(const int)#, the protected constructor of the
- * #FEQuadraticSub# class using a #FiniteElement# with no dofs in the vertices, no dofs on the lines and 
+ * as the #FEQ2# class. The only difference is the new constructor that
+ * calls #FEQ2::FEQ2(const int)#, the protected constructor of the
+ * #FEQ2# class using a #FiniteElement# with no dofs in the vertices, no dofs on the lines and 
  * $3^d$ dofs per cell. As now the cells do not share any vertex-dof with
  * a neighboring cell the $3^d$ dofs per cell can be choosen independently not
  * needing any constraints and allowing the use of discontinuous Galerkin
@@ -164,12 +169,12 @@ class FEDGLinear : public FELinear<dim>{
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDGQuadraticSub : public FEQuadraticSub<dim>{
+class FEDG_Q2 : public FEQ2<dim>{
   public:
 				     /**
 				      * Constructor
 				      */
-    FEDGQuadraticSub();
+    FEDG_Q2();
 				 
 				     /**
 				      * Refer to the base class for detailed
@@ -196,9 +201,9 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
  * unit cell to the real cell allowing discontinuous Galerkin methods.
  * 
  * This class is derived from and provides substantially the same 
- * as the #FECubicSub# class. The only difference is the new constructor that
- * calls #FECubicSub::FECubicSub(const int)#, the protected constructor of the
- * #FECubicSub# class using a #FiniteElement# with no dofs in the vertices, no dofs on the lines and 
+ * as the #FEQ3# class. The only difference is the new constructor that
+ * calls #FEQ3::FEQ3(const int)#, the protected constructor of the
+ * #FEQ3# class using a #FiniteElement# with no dofs in the vertices, no dofs on the lines and 
  * $4^d$ dofs per cell. As now the cells do not share any vertex-dof with
  * a neighboring cell the $4^d$ dofs per cell can be choosen independently not
  * needing any constraints and allowing the use of discontinuous Galerkin
@@ -210,12 +215,12 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDGCubicSub : public FECubicSub<dim>{
+class FEDG_Q3 : public FEQ3<dim>{
   public:
 				     /**
 				      * Constructor
 				      */
-    FEDGCubicSub();
+    FEDG_Q3();
 
 				     /**
 				      * Refer to the base class for detailed
@@ -241,9 +246,9 @@ class FEDGCubicSub : public FECubicSub<dim>{
  * unit cell to the real cell allowing discontinuous Galerkin methods.
  * 
  * This class is derived from and provides substantially the same 
- * as the #FEQuarticSub# class. The only difference is the new constructor that
- * calls #FEQuarticSub::FEQuarticSub(const int)#, the protected constructor of the
- * #FEQuarticSub# class using a #FiniteElement# with no dofs in the vertices, no dofs on the lines and 
+ * as the #FEQ4# class. The only difference is the new constructor that
+ * calls #FEQ4::FEQ4(const int)#, the protected constructor of the
+ * #FEQ4# class using a #FiniteElement# with no dofs in the vertices, no dofs on the lines and 
  * $5^d$ dofs per cell. As now the cells do not share any vertex-dof with
  * a neighboring cell the $5^d$ dofs per cell can be choosen independently not
  * needing any constraints and allowing the use of discontinuous Galerkin
@@ -255,12 +260,12 @@ class FEDGCubicSub : public FECubicSub<dim>{
  * @author Ralf Hartmann, 1998
  */
 template <int dim>
-class FEDGQuarticSub : public FEQuarticSub<dim>{
+class FEDG_Q4 : public FEQ4<dim>{
   public:
 				     /**
 				      * Constructor
 				      */
-    FEDGQuarticSub();
+    FEDG_Q4();
 
 				     /**
 				      * Refer to the base class for detailed

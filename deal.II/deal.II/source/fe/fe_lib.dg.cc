@@ -6,29 +6,29 @@
 
 
 template<int dim>
-FEDGLinear<dim>::FEDGLinear():
-		FELinear<dim>(1) {};
+FEDG_Q1<dim>::FEDG_Q1():
+		FEQ1<dim>(1) {};
 
 
 template<int dim>
-FEDGQuadraticSub<dim>::FEDGQuadraticSub():
-		FEQuadraticSub<dim>(1) {};
+FEDG_Q2<dim>::FEDG_Q2():
+		FEQ2<dim>(1) {};
 
 
 template<int dim>
-FEDGCubicSub<dim>::FEDGCubicSub():
-		FECubicSub<dim>(1) {};
+FEDG_Q3<dim>::FEDG_Q3():
+		FEQ3<dim>(1) {};
 
 
 template<int dim>
-FEDGQuarticSub<dim>::FEDGQuarticSub():
-		FEQuarticSub<dim>(1) {};
+FEDG_Q4<dim>::FEDG_Q4():
+		FEQ4<dim>(1) {};
 
 
 
 template <int dim>
 void
-FEDGLinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
+FEDG_Q1<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 					  vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -37,7 +37,7 @@ FEDGLinear<dim>::get_face_support_points (const typename DoFHandler<dim>::face_i
 
 template <int dim>
 const FullMatrix<double> & 
-FEDGLinear<dim>::restrict (const unsigned int child) const {
+FEDG_Q1<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
 };
@@ -46,7 +46,7 @@ FEDGLinear<dim>::restrict (const unsigned int child) const {
 
 template <int dim>
 void
-FEDGQuadraticSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
+FEDG_Q2<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 						vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -55,7 +55,7 @@ FEDGQuadraticSub<dim>::get_face_support_points (const typename DoFHandler<dim>::
 
 template <int dim>
 const FullMatrix<double> & 
-FEDGQuadraticSub<dim>::restrict (const unsigned int child) const {
+FEDG_Q2<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
 };
@@ -64,7 +64,7 @@ FEDGQuadraticSub<dim>::restrict (const unsigned int child) const {
 
 template <int dim>
 void
-FEDGCubicSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
+FEDG_Q3<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 					    vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -73,7 +73,7 @@ FEDGCubicSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face
 
 template <int dim>
 const FullMatrix<double> & 
-FEDGCubicSub<dim>::restrict (const unsigned int child) const {
+FEDG_Q3<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
 };
@@ -83,7 +83,7 @@ FEDGCubicSub<dim>::restrict (const unsigned int child) const {
 
 template <int dim>
 void
-FEDGQuarticSub<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
+FEDG_Q4<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 					      vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -92,7 +92,7 @@ FEDGQuarticSub<dim>::get_face_support_points (const typename DoFHandler<dim>::fa
 
 template <int dim>
 const FullMatrix<double> & 
-FEDGQuarticSub<dim>::restrict (const unsigned int child) const {
+FEDG_Q4<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
 };
@@ -101,7 +101,7 @@ FEDGQuarticSub<dim>::restrict (const unsigned int child) const {
 
 
 // explicit instantiations
-template class FEDGLinear<deal_II_dimension>;
-template class FEDGQuadraticSub<deal_II_dimension>;
-template class FEDGCubicSub<deal_II_dimension>;
-template class FEDGQuarticSub<deal_II_dimension>;
+template class FEDG_Q1<deal_II_dimension>;
+template class FEDG_Q2<deal_II_dimension>;
+template class FEDG_Q3<deal_II_dimension>;
+template class FEDG_Q4<deal_II_dimension>;

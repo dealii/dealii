@@ -13,7 +13,7 @@
 #if deal_II_dimension == 1
 
 template <>
-FEDGConstant<1>::FEDGConstant () :
+FEDG_Q0<1>::FEDG_Q0 () :
 		FELinearMapping<1> (0, 1)
 {
 				   // for restriction and prolongation matrices:
@@ -45,7 +45,7 @@ FEDGConstant<1>::FEDGConstant () :
 
 template <>
 void
-FEDGConstant<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
+FEDG_Q0<1>::get_face_support_points (const typename DoFHandler<1>::face_iterator &,
 					  vector<Point<1> >  &) const {
   Assert (false, ExcInternalError());
 };
@@ -58,7 +58,7 @@ FEDGConstant<1>::get_face_support_points (const typename DoFHandler<1>::face_ite
 #if deal_II_dimension == 2
 
 template <>
-FEDGConstant<2>::FEDGConstant () :
+FEDG_Q0<2>::FEDG_Q0 () :
 		FELinearMapping<2> (0, 0, 1)
 {
 				   // The restriction matrices got crazy values
@@ -90,7 +90,7 @@ FEDGConstant<2>::FEDGConstant () :
 template <int dim>
 inline
 double
-FEDGConstant<dim>::shape_value (const unsigned int i,
+FEDG_Q0<dim>::shape_value (const unsigned int i,
 				const Point<dim>&) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -102,7 +102,7 @@ FEDGConstant<dim>::shape_value (const unsigned int i,
 template <int dim>
 inline
 Tensor<1,dim>
-FEDGConstant<dim>::shape_grad (const unsigned int i,
+FEDG_Q0<dim>::shape_grad (const unsigned int i,
 			       const Point<dim>&) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -114,7 +114,7 @@ FEDGConstant<dim>::shape_grad (const unsigned int i,
 template <int dim>
 inline
 Tensor<2,dim>
-FEDGConstant<dim>::shape_grad_grad (const unsigned int i,
+FEDG_Q0<dim>::shape_grad_grad (const unsigned int i,
 				  const Point<dim> &) const
 {
   Assert((i<total_dofs), ExcInvalidIndex(i));
@@ -125,7 +125,7 @@ FEDGConstant<dim>::shape_grad_grad (const unsigned int i,
 
 
 template <int dim>
-void FEDGConstant<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
+void FEDG_Q0<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_iterator &cell,
 					       FullMatrix<double> &local_mass_matrix) const {
   Assert (local_mass_matrix.n() == total_dofs,
 	  ExcWrongFieldDimension(local_mass_matrix.n(),total_dofs));
@@ -139,7 +139,7 @@ void FEDGConstant<dim>::get_local_mass_matrix (const DoFHandler<dim>::cell_itera
 
 template <int dim>
 void
-FEDGConstant<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const {
+FEDG_Q0<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) const {
   Assert (unit_points.size() == total_dofs,
 	  ExcWrongFieldDimension (unit_points.size(), total_dofs));
   for (unsigned int d=0; d<dim; ++d)
@@ -149,7 +149,7 @@ FEDGConstant<dim>::get_unit_support_points (vector<Point<dim> > &unit_points) co
 
 template <int dim>
 void
-FEDGConstant<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
+FEDG_Q0<dim>::get_support_points (const typename DoFHandler<dim>::cell_iterator &cell,
 				       vector<Point<dim> >  &support_points) const {
   Assert (support_points.size() == total_dofs,
 	  ExcWrongFieldDimension (support_points.size(), total_dofs));
@@ -160,7 +160,7 @@ FEDGConstant<dim>::get_support_points (const typename DoFHandler<dim>::cell_iter
 
 template <int dim>
 void
-FEDGConstant<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
+FEDG_Q0<dim>::get_face_support_points (const typename DoFHandler<dim>::face_iterator &,
 					    vector<Point<dim> >  &support_points) const {
   Assert ((support_points.size() == 0),
 	  ExcWrongFieldDimension (support_points.size(),0));
@@ -170,7 +170,7 @@ FEDGConstant<dim>::get_face_support_points (const typename DoFHandler<dim>::face
 
 template <int dim>
 const FullMatrix<double> & 
-FEDGConstant<dim>::restrict (const unsigned int child) const {
+FEDG_Q0<dim>::restrict (const unsigned int child) const {
   Assert (false, ExcNotImplemented());
   return restriction[child];
 };
@@ -179,4 +179,4 @@ FEDGConstant<dim>::restrict (const unsigned int child) const {
 
 // explicit instantiations
 
-template class FEDGConstant<deal_II_dimension>;
+template class FEDG_Q0<deal_II_dimension>;
