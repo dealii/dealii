@@ -2174,7 +2174,7 @@ namespace internals
     Iterator<number,Constness>::
     operator < (const Iterator& other) const
     {
-      Assert (accessor.matrix == other.accessor.matrix,
+      Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
               ExcInternalError());
       
       return (accessor < other.accessor);
