@@ -389,7 +389,7 @@ BlockMatrixArray<MATRIX>::print_latex (ostream& out) const
     {
       if (matrix_names.find(m->matrix) == matrix_names.end())
 	{
-	  pair<NameMap::iterator, bool> x =
+	  pair<typename NameMap::iterator, bool> x =
 	    matrix_names.insert(
 	      pair<const MATRIX*, string> (m->matrix, string("M")));
 	  STRINGSTREAM stream;
