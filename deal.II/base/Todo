@@ -36,3 +36,6 @@ Change <iostream> to <ostream> in grid/point.h and
 
 Add support for void member functions also for Mem_Fun_Data[5-*] and
   Mem_Fun*.
+
+
+Document the JobIdentifier class members.
