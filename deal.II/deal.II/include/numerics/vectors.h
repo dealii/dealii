@@ -10,8 +10,8 @@
 #include <base/exceptions.h>
 #include <basic/forward-declarations.h>
 #include <map>
+#include <vector>
 
-#include <bvector.h>
 
 /**
  *  Denote which norm/integral is to be computed. The following possibilities
@@ -252,7 +252,7 @@ enum NormType {
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class VectorTools //<dim>
+class VectorTools
 {
   public:
 				     /**
@@ -482,12 +482,15 @@ class VectorTools //<dim>
 				      * updates with mean value zero.
 				      *
 				      * Apart from the vector #v# to
-				      * operate on, this function takes
-				      * a bit vector. This has a true
-				      * entry for every pressure component.
+				      * operate on, this function
+				      * takes a bit vector. This has a
+				      * true entry for every component
+				      * for which the mean value shall
+				      * be computed and later
+				      * subtracted.
 				      */
-    static void subtract_mean_value(Vector<double>& v, const
-				    bit_vector& p_select);
+    static void subtract_mean_value(Vector<double>     &v,
+				    const vector<bool> &p_select);
     
 
 				     /**
