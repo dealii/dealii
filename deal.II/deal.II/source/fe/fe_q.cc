@@ -1436,7 +1436,8 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
         {
           const unsigned int quad_index 
             = (shape_index - first_quad_index) / dofs_per_quad;
-          Assert (quad_index < GeometryInfo<dim>::quads_per_cell,
+          Assert (static_cast<signed int>(quad_index) <
+                  static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
                   ExcInternalError());
           
                                            // in 2d, cell bubble are
