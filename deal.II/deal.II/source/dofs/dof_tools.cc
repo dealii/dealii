@@ -503,6 +503,8 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
 						 endc = dof.end();
 
 
+//TODO[GK]: would someone explain what the letters 'f', 'a', and 'n' mean?
+//Even better would, of course, be to change this to an enum
   Table<2,char> int_dof_mask(total_dofs, total_dofs);
   Table<2,char> flux_dof_mask(total_dofs, total_dofs);
 
@@ -535,7 +537,10 @@ DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
                );
           Assert (jj < dof.get_fe().n_components(),
                   ExcInternalError());          
-	  
+
+//TODO[GK]: the documentation only says that non-zeroness counts, but here
+//individual values are tested. this should be documented. Even better, rather
+//than passing in a matrix of doubles, we should pass in a Table<2,some-enum>
 	  if (int_mask(ii,jj) != 0)
 	    int_dof_mask(i,j) = 'f';
 	  if (flux_mask(ii,jj) == 1.)
