@@ -24,7 +24,6 @@
 #include <vector>
 
 
-//TODO: How does a matrix or vector get its communicator if zero-initialized and later reinit'ed?
 
 namespace PETScWrappers
 {
@@ -75,12 +74,12 @@ namespace PETScWrappers
                                           * this flag has been set. The default
                                           * value of this flag is @p{false}.
                                           */
-        SparseMatrix (const MPI_Comm    &communicator,
-                      const unsigned int m,
-                      const unsigned int n,
-                      const unsigned int local_rows,
-                      const unsigned int n_nonzero_per_row,
-                      const bool         is_symmetric = false);
+        SparseMatrix (const MPI_Comm     &communicator,
+                      const unsigned int  m,
+                      const unsigned int  n,
+                      const unsigned int  local_rows,
+                      const unsigned int  n_nonzero_per_row,
+                      const bool          is_symmetric = false);
 
                                          /**
                                           * Initialize a rectangular matrix with
@@ -111,7 +110,7 @@ namespace PETScWrappers
         SparseMatrix (const MPI_Comm                  &communicator,
                       const unsigned int               m,
                       const unsigned int               n,
-                      const unsigned int local_rows,
+                      const unsigned int               local_rows,
                       const std::vector<unsigned int> &row_lengths,
                       const bool                       is_symmetric = false);
 
@@ -131,12 +130,12 @@ namespace PETScWrappers
                                           * the same argument list as the
                                           * present function.
                                           */
-        void reinit (const MPI_Comm    &communicator,
-                     const unsigned int m,
-                     const unsigned int n,
-                     const unsigned int local_rows,
-                     const unsigned int n_nonzero_per_row,
-                     const bool         is_symmetric = false);
+        void reinit (const MPI_Comm     &communicator,
+                     const unsigned int  m,
+                     const unsigned int  n,
+                     const unsigned int  local_rows,
+                     const unsigned int  n_nonzero_per_row,
+                     const bool          is_symmetric = false);
 
                                          /**
                                           * Throw away the present matrix and
@@ -173,7 +172,7 @@ namespace PETScWrappers
                                           */
         void do_reinit (const unsigned int               m,
                         const unsigned int               n,
-                        const unsigned int local_rows,
+                        const unsigned int               local_rows,
                         const std::vector<unsigned int> &row_lengths,
                         const bool                       is_symmetric = false);
 

@@ -38,9 +38,9 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector (const unsigned int n,
-                    const unsigned int local_size,
-                    const MPI_Comm    &communicator)
+    Vector::Vector (const MPI_Comm    &communicator,
+                    const unsigned int n,
+                    const unsigned int local_size)
                     :
                     communicator (communicator)
     {
@@ -49,9 +49,9 @@ namespace PETScWrappers
 
   
 
-    Vector::Vector (const VectorBase &v,
-                    const unsigned int local_size,
-                    const MPI_Comm    &communicator)
+    Vector::Vector (const MPI_Comm    &communicator,
+                    const VectorBase  &v,
+                    const unsigned int local_size)
                     :
                     communicator (communicator)
     {
@@ -63,9 +63,9 @@ namespace PETScWrappers
   
 
     void
-    Vector::reinit (const unsigned int n,
+    Vector::reinit (const MPI_Comm    &comm,
+                    const unsigned int n,
                     const unsigned int local_sz,
-                    const MPI_Comm    &comm,
                     const bool         fast)
     {
       communicator = comm;
@@ -115,8 +115,11 @@ namespace PETScWrappers
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
 
       const int ierr
-        = VecCreateMPI (PETSC_COMM_SELF, local_size, n, &vector);
+        = VecCreateMPI (communicator, local_size, PETSC_DETERMINE,
+                        &vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      Assert (size() == n, ExcInternalError());
     }
 
   }
