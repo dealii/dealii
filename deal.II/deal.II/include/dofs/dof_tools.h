@@ -807,7 +807,6 @@ class DoFTools
 				      * only need one object of this
 				      * type.
 				      */
-//TODO:[WB] document last argument    
     template <int dim>
     static void
     compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
@@ -815,9 +814,18 @@ class DoFTools
 				   const DoFHandler<dim>              &fine_grid,
 				   const unsigned int                  fine_component,
 				   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-				   ConstraintMatrix                   &constraints,
-				   std::vector<std::map<unsigned int, float> > *transfer_representation = 0);
+				   ConstraintMatrix                   &constraints);
 
+//TODO:[WB] document this function. put it in the news file
+    template <int dim>
+    static void
+    compute_intergrid_transfer_representation (const DoFHandler<dim>              &coarse_grid,
+					       const unsigned int                  coarse_component,
+					       const DoFHandler<dim>              &fine_grid,
+					       const unsigned int                  fine_component,
+					       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+					       std::vector<std::map<unsigned int, float> > &transfer_representation);
+    
 				     /**
 				      * Create a mapping from degree
 				      * of freedom indices to the
@@ -966,6 +974,24 @@ class DoFTools
     DeclException0 (ExcInvalidBoundaryIndicator);
 
   private:
+
+				     /**
+				      * This is a helper function that
+				      * is used in the computation of
+				      * integrid constraints. See the
+				      * function for a thorough
+				      * description of how it works.
+				      */
+    template <int dim>
+    static unsigned int
+    compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
+				 const unsigned int                  coarse_component,
+				 const DoFHandler<dim>              &fine_grid,
+				 const unsigned int                  fine_component,
+				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				 std::vector<std::map<unsigned int, float> > &weights,
+				 std::vector<int>                   &weight_mapping);
+    
 				     /**
 				      * This is a helper function that
 				      * is used in the computation of
@@ -975,12 +1001,12 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    compute_intergrid_weights (const DoFHandler<dim>              &coarse_grid,
-			       const unsigned int                  coarse_component,
-			       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
-			       const std::vector<Vector<double> > &parameter_dofs,
-			       const std::vector<int>             &weight_mapping,
-			       std::vector<std::map<unsigned int, float> > &weights);
+    compute_intergrid_weights_2 (const DoFHandler<dim>              &coarse_grid,
+				 const unsigned int                  coarse_component,
+				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				 const std::vector<Vector<double> > &parameter_dofs,
+				 const std::vector<int>             &weight_mapping,
+				 std::vector<std::map<unsigned int, float> > &weights);
 
 				     /**
 				      * This is a function that is
@@ -994,7 +1020,7 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
+    compute_intergrid_weights_3 (const DoFHandler<dim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
 				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 				 const std::vector<Vector<double> > &parameter_dofs,
