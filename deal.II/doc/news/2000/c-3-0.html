@@ -108,6 +108,14 @@
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.
        </p>
+
+  <li> <p>
+       Change: the <code class="member">matrix_norm</code> functions
+       of sparse and full matrices are renamed to 
+       <code class="member">matrix_norm_square</code>, since they in
+       fact return the square of the norm. This should avoid confusion
+       in some cases.
+       </p>
 </ol>
 
 
