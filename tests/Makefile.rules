@@ -43,13 +43,13 @@ endif
 # different platforms where we might differ in round-off etc.
 #
 # Since the test suite is usually run automatically, we
-# impose a maximum run time of 60 CPU minutes for each
+# impose a maximum run time of 30 CPU minutes for each
 # program.
 ############################################################
 
 %.output : %.exe
 	@echo =====Running======= $<
-	@ulimit -t 3600 ; ./$<
+	@ulimit -t 1800 ; ./$<
 	@perl -pi $(normalize)  $@
 
 
