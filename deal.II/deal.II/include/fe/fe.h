@@ -141,13 +141,6 @@ class FiniteElementData
 		       const unsigned int n_transform_functions,
 		       const unsigned int n_components);
 
-//     				     /**
-// 				      * Another frequently used useful
-// 				      * constructor, copying the data from
-// 				      * another object.
-// 				      */
-//     FiniteElementData (const FiniteElementData<2> &fe_data);
-
 				     /**
 				      * Comparison operator. It is not clear to
 				      * me why we have to declare and implement
