@@ -1,0 +1,66 @@
+#  --------------------------------- For 2d ---------------------------------
+#  -- Use the following maple script to generate the basis functions,
+#  -- gradients and prolongation matrices as well as the mass matrix.
+#  -- Make sure that the files do not exists beforehand, since output
+#  -- is appended instead of overwriting previous contents.
+#  --
+#  -- You should only have to change the very first lines for polynomials
+#  -- of higher order.
+#  --
+#  -- Please note:
+#  -- Apart from the restriction matrices, I did not initially use it; it is
+#  -- an adaption of the script for cubic and quartic elements. For
+#  -- some of the data, however, a smaller script is given in the
+#  -- FEQuadratic<2> constructor.
+#
+#  --------------------------------------------------------------------------
+#
+# $Id$
+# Author: Wolfgang Bangerth, 1998
+
+  n_functions      := 9:
+  n_face_functions := 3:
+
+  trial_function := (a1 + a2*xi + a3*xi*xi) +
+                     (b1 + b2*xi + b3*xi*xi)*eta +
+		     (c1 + c2*xi + c3*xi*xi)*eta*eta:
+  face_trial_function := a + b*xi + c*xi*xi:
+  # note: support_points[i] is a vector which is indexed from
+  # one and not from zero!
+  support_points := array(0..n_functions-1):
+  support_points[0] := [0,0]:
+  support_points[1] := [1,0]:
+  support_points[2] := [1,1]:
+  support_points[3] := [0,1]:
+  support_points[4] := [1/2,0]:
+  support_points[5] := [1,1/2]:
+  support_points[6] := [1/2,1]:
+  support_points[7] := [0,1/2]:
+  support_points[8] := [1/2,1/2]:
+
+  face_support_points := array(0..n_face_functions-1):
+  face_support_points[0] := 0:
+  face_support_points[1] := 1:
+  face_support_points[2] := 1/2:
+
+  constrained_face_support_points := array(0..2*(n_face_functions-2)+1-1):
+  constrained_face_support_points[0] := 1/2:
+  constrained_face_support_points[1] := 1/4:
+  constrained_face_support_points[2] := 3/4:
+
+
+  # do the real work
+  read "lagrange"
+
+  
+  # write data to files
+  print ("writing data to files"):
+  readlib(C):
+  C(phi_polynom, filename=quadratic2d.shape_value):
+  C(grad_phi_polynom, filename=quadratic2d.shape_grad):
+  C(prolongation, filename=quadratic2d.prolongation):
+  C(restriction, filename=quadratic2d.restriction):
+  C(local_mass_matrix, optimized, filename=quadratic2d.massmatrix):
+  C(interface_constraints, filename=quadratic2d.constraints):
+  C(real_points, optimized, filename=quadratic2d.real_points):
+

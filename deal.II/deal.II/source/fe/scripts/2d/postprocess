@@ -1,0 +1,14 @@
+#  Use the following perl scripts to convert the output into a
+#  suitable format.
+  
+perl -pi -e 's/phi_polynom\[(\d+)\] =/case $1: return/g;' *2d.shape_value
+perl -pi -e 's/([^;])\n/$1/g;' *2d.shape_grad
+perl -pi -e 's/grad_phi_polynom\[(\d+)\]\[0\] = (.*);/case $1: return Point<2>($2,/g;' *2d.shape_grad
+perl -pi -e 's/grad_phi_polynom\[(\d+)\]\[1\] = (.*);/$2);/g;' *2d.shape_grad
+perl -pi -e 's/\[(\d+)\]\[(\d+)\]/($1,$2)/g;' *2d.massmatrix
+perl -pi -e 's/(t\d+) =/const double $1 =/g;' *2d.massmatrix
+perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' *2d.prolongation
+perl -pi -e 's/.*= 0.0;\n//g;' *2d.prolongation
+perl -pi -e 's/\[(\d+)\]\[(\d+)\]\[(\d+)\]/[$1]($2,$3)/g;' *2d.restriction
+perl -pi -e 's/.*= 0.0;\n//g;' *2d.restriction
+perl -pi -e 's/\[(\d+)\]\[(\d+)\]/($1,$2)/g;' *2d.constraints
