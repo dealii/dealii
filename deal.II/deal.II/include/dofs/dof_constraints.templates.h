@@ -188,10 +188,12 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 		    ExcMatrixNotClosed());
 	    
 	    if (distribute[sparsity.get_column_numbers()[j]] != -1)
-					       // distribute entry at regular
-					       // row @p{row} and irregular column
-					       // sparsity.get_column_numbers()[j]; set old
-					       // entry to zero
+					       // distribute entry at
+					       // regular row @p{row}
+					       // and irregular column
+					       // sparsity.get_column_numbers()[j];
+					       // set old entry to
+					       // zero
 	      {
 		for (unsigned int q=0;
 		     q!=lines[distribute[sparsity.get_column_numbers()[j]]]
@@ -216,14 +218,17 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 					     // happen, since we only
 					     // operate on compressed
 					     // matrices!
-	    Assert (sparsity.get_column_numbers()[j] != SparsityPattern::invalid_entry,
+	    Assert (sparsity.get_column_numbers()[j] !=
+                    SparsityPattern::invalid_entry,
 		    ExcMatrixNotClosed());
 
 	    if (distribute[sparsity.get_column_numbers()[j]] == -1)
-					       // distribute entry at irregular
-					       // row @p{row} and regular column
-					       // sparsity.get_column_numbers()[j]. set old
-					       // entry to zero
+					       // distribute entry at
+					       // irregular row
+					       // @p{row} and regular
+					       // column
+					       // sparsity.get_column_numbers()[j]. set
+					       // old entry to zero
 	      {
 		for (unsigned int q=0;
 		     q!=lines[distribute[row]].entries.size(); ++q) 
@@ -235,11 +240,14 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 		uncondensed.global_entry(j) = 0.;
 	      }
 	    else
-					       // distribute entry at irregular
-					       // row @p{row} and irregular column
+					       // distribute entry at
+					       // irregular row
+					       // @p{row} and
+					       // irregular column
 					       // sparsity.get_column_numbers()[j]
-					       // set old entry to one if on main
-					       // diagonal, zero otherwise
+					       // set old entry to one
+					       // if on main diagonal,
+					       // zero otherwise
 	      {
 		for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
 		  for (unsigned int q=0;
