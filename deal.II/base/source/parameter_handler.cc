@@ -54,8 +54,19 @@ namespace Patterns
   
 
 
-  const int Integer::min_int_value;
-  const int Integer::max_int_value;
+  const int Integer::min_int_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<int>::min();
+#else
+          1;
+#endif
+  
+  const int Integer::max_int_value =
+#ifdef HAVE_STD_NUMERIC_LIMITS
+          std::numeric_limits<int>::max();
+#else
+          0;
+#endif
   
 
   Integer::Integer (const int lower_bound,

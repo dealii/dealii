@@ -168,12 +168,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const int min_int_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<int>::min();
-#else
-          1;
-#endif
+      static const int min_int_value;
 
 				       /**
 					* Maximal integer value. If
@@ -183,12 +178,7 @@ namespace Patterns
 					* understands that all values
 					* are allowed.
 					*/
-      static const int max_int_value =
-#ifdef HAVE_STD_NUMERIC_LIMITS
-          std::numeric_limits<int>::max();
-#else
-          0;
-#endif
+      static const int max_int_value;
       
 				       /**
 					* Constructor. Bounds can be
