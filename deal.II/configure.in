@@ -566,11 +566,12 @@ if test -r contrib/hsl/source/ma47.f -a -r contrib/hsl/source/ma47dep.f ; then
   AC_DEFINE(HAVE_HSL_MA47)
 fi
 
-AC_MSG_RESULT($hsl_subroutines)
 
 if test "x$hsl_subroutines" != "x" ; then
+  AC_MSG_RESULT($hsl_subroutines)
   USE_CONTRIB_HSL=yes
 else
+  AC_MSG_RESULT(none found)
   USE_CONTRIB_HSL=no
 fi
 AC_SUBST(USE_CONTRIB_HSL)
