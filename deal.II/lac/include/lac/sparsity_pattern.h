@@ -941,7 +941,7 @@ class SparsityPattern : public Subscriptor
 				      * lengths.
 				      */
     static
-    const unsigned int * const
+    const unsigned int *
     optimized_lower_bound (const unsigned int *first,
 			   const unsigned int *last,
 			   const unsigned int &val);
@@ -994,7 +994,7 @@ class SparsityPattern : public Subscriptor
 
 
 inline
-const unsigned int * const
+const unsigned int *
 SparsityPattern::optimized_lower_bound (const unsigned int *first,
 					const unsigned int *last,
 					const unsigned int &val)

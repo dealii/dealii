@@ -295,11 +295,30 @@ SparseMatrix<number>::vmult (Vector<somenumber>& dst, const Vector<somenumber>& 
     {
       const unsigned int n_threads = multithread_info.n_default_threads;
 
+				       // then spawn threads. since
+				       // some compilers have trouble
+				       // finding out which
+				       // 'encapsulate' function to
+				       // take of all those possible
+				       // ones if we simply drop in
+				       // the address of an overloaded
+				       // template member function,
+				       // make it simpler for the
+				       // compiler by giving it the
+				       // correct type right away:
+      typedef
+	void (SparseMatrix<number>::*mem_fun_p)
+	(Vector<somenumber> &,
+	 const Vector<somenumber> &,
+	 const unsigned int        ,
+	 const unsigned int) const;
+      const mem_fun_p comp
+	= &(SparseMatrix<number>::
+	    template threaded_vmult<somenumber>);
       Threads::ThreadManager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
-			Threads::encapsulate (&SparseMatrix<number>::
-					      template threaded_vmult<somenumber>)
+			Threads::encapsulate (comp)
 			.collect_args (this, dst, src,
 				       n_rows * i / n_threads,
 				       n_rows * (i+1) / n_threads));
@@ -445,11 +464,29 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
 				       // the different parts
       std::vector<somenumber> partial_sums (n_threads, 0);
       Threads::ThreadManager thread_manager;
-				       // spawn some jobs...
+				       // then spawn threads. since
+				       // some compilers have trouble
+				       // finding out which
+				       // 'encapsulate' function to
+				       // take of all those possible
+				       // ones if we simply drop in
+				       // the address of an overloaded
+				       // template member function,
+				       // make it simpler for the
+				       // compiler by giving it the
+				       // correct type right away:
+      typedef
+	void (SparseMatrix<number>::*mem_fun_p)
+	(const Vector<somenumber> &,
+	 const unsigned int        ,
+	 const unsigned int        ,
+	 somenumber               *) const;
+      const mem_fun_p comp
+	= &(SparseMatrix<number>::
+	    template threaded_matrix_norm_square<somenumber>);
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
-			Threads::encapsulate (&SparseMatrix<number>::
-					      template threaded_matrix_norm_square<somenumber>)
+			Threads::encapsulate (comp)
 			.collect_args (this, v,
 				       n_rows * i / n_threads,
 				       n_rows * (i+1) / n_threads,
@@ -538,11 +575,30 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 				       // the different parts
       std::vector<somenumber> partial_sums (n_threads, 0);
       Threads::ThreadManager thread_manager;
-				       // spawn some jobs...
+				       // then spawn threads. since
+				       // some compilers have trouble
+				       // finding out which
+				       // 'encapsulate' function to
+				       // take of all those possible
+				       // ones if we simply drop in
+				       // the address of an overloaded
+				       // template member function,
+				       // make it simpler for the
+				       // compiler by giving it the
+				       // correct type right away:
+      typedef
+	void (SparseMatrix<number>::*mem_fun_p)
+	(const Vector<somenumber> &,
+	 const Vector<somenumber> &,
+	 const unsigned int        ,
+	 const unsigned int        ,
+	 somenumber               *) const;
+      const mem_fun_p comp
+	= &(SparseMatrix<number>::
+	    template threaded_matrix_scalar_product<somenumber>);
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
-			Threads::encapsulate (&SparseMatrix<number>::
-					      template threaded_matrix_scalar_product<somenumber>)
+			Threads::encapsulate (comp)
 			.collect_args (this, u, v,
 				       n_rows * i / n_threads,
 				       n_rows * (i+1) / n_threads,
@@ -674,11 +730,31 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 				       // space for the square norms of
 				       // the different parts
       std::vector<somenumber> partial_norms (n_threads, 0);
+
+				       // then spawn threads. since
+				       // some compilers have trouble
+				       // finding out which
+				       // 'encapsulate' function to
+				       // take of all those possible
+				       // ones if we simply drop in
+				       // the address of an overloaded
+				       // template member function,
+				       // make it simpler for the
+				       // compiler by giving it the
+				       // correct type right away:
+      typedef
+	void (SparseMatrix<number>::*mem_fun_p)
+	(Vector<somenumber>       &,
+	 const Vector<somenumber> &,
+	 const Vector<somenumber> &,
+	 const std::pair<unsigned int,unsigned int>,
+	 somenumber               *) const;
+      const mem_fun_p comp_residual = &SparseMatrix<number>::
+				     template threaded_residual<somenumber>;
       Threads::ThreadManager thread_manager;
       for (unsigned int i=0; i<n_threads; ++i)
 	Threads::spawn (thread_manager,
-			Threads::encapsulate (&SparseMatrix<number>::
-					      template threaded_residual<somenumber>)
+			Threads::encapsulate (comp_residual)
 			.collect_args (this, dst, u, b,
 				       std::pair<unsigned int,unsigned int>
 				       (n_rows * i / n_threads,

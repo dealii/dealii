@@ -582,11 +582,29 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
 				     // otherwise: blocking requested
     {
 #ifdef DEAL_II_USE_MT
+				       // spawn threads. since
+				       // some compilers have trouble
+				       // finding out which
+				       // 'encapsulate' function to
+				       // take of all those possible
+				       // ones if we simply drop in
+				       // the address of an overloaded
+				       // template member function,
+				       // make it simpler for the
+				       // compiler by giving it the
+				       // correct type right away:
+      typedef
+	void (SparseVanka<number>::*mem_fun_p)
+	(Vector<number2> &,
+	 const Vector<number2> &,
+	 const std::vector<bool> *) const;
+      const mem_fun_p comp
+	= &(SparseVanka<number>::
+	    template apply_preconditioner<number2>);
       Threads::ThreadManager thread_manager;
       for (unsigned int block=0; block<n_blocks; ++block)
 	Threads::spawn (thread_manager,
-			Threads::encapsulate (&SparseVanka<number>::
-					      template apply_preconditioner<number2>)
+			Threads::encapsulate (comp)
 			.collect_args (this, dst, src, &dof_masks[block]));
 
       thread_manager.wait ();
