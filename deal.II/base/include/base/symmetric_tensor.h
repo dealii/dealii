@@ -112,7 +112,7 @@ namespace internal
                                         * should be constant or not.
                                         */
       template <int dim, bool constness>
-      struct Types;
+      struct AccessorTypes;
 
                                        /**
                                         * Switch type to select a tensor of
@@ -123,7 +123,7 @@ namespace internal
                                         * Specialization for constant tensors.
                                         */
       template <int dim>
-      struct Types<dim,true>
+      struct AccessorTypes<dim,true>
       {
           typedef
           const typename StorageType<2,dim>::base_tensor_type
@@ -142,7 +142,7 @@ namespace internal
                                         * tensors.
                                         */
       template <int dim>
-      struct Types<dim,false>
+      struct AccessorTypes<dim,false>
       {
           typedef
           typename StorageType<2,dim>::base_tensor_type
@@ -170,7 +170,7 @@ namespace internal
                                             * Import which tensor we work on.
                                             */
           typedef
-          typename Types<dim,constness>::base_tensor_type
+          typename AccessorTypes<dim,constness>::base_tensor_type
           base_tensor_type;
 
                                            /**
@@ -180,7 +180,7 @@ namespace internal
                                             * is constant, we can only return
                                             * a value instead of a reference.
                                             */
-          typedef typename Types<dim,constness>::reference reference;
+          typedef typename AccessorTypes<dim,constness>::reference reference;
 
                                            /**
                                             * Constructor. Take the tensor to
