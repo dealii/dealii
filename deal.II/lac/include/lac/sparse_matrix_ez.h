@@ -1474,13 +1474,13 @@ SparseMatrixEZ<number>::begin (const unsigned int r) const
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::end (unsigned int r) const
+SparseMatrixEZ<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
 
 				   // Usually, we should return the
 				   // first element of the next row.
-  const_iterator result(this, ++r, 0);
+  const_iterator result(this, r+1, 0);
 
 				   // If r was the last row, this is
 				   // always true. Otherwise, we have
@@ -1488,7 +1488,7 @@ SparseMatrixEZ<number>::end (unsigned int r) const
 				   // entry in the next row. If not,
 				   // we advance to the next valid
 				   // entry or end().
-  if (r < row_info.size() && row_info[r].length == 0)
+  if (r+1 < row_info.size() && row_info[r+1].length == 0)
     ++result;
   return result;
 }
