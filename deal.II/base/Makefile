@@ -67,28 +67,30 @@ lib/o/%.o :
 
 # rules
 ifeq ($(enable-shared),yes)
-  lib: lib/libbase.g.so lib/libbase.so
-  libg: lib/libbase.g.so
+  lib: $(LIBDIR)/libbase.g.so $(LIBDIR)/libbase.so
+  libg: $(LIBDIR)/libbase.g.so
+  libo: $(LIBDIR)/libbase.so
 else
-  lib: lib/libbase.g.a lib/libbase.a
-  libg: lib/libbase.g.a
+  lib: $(LIBDIR)/libbase.g.a $(LIBDIR)/libbase.a
+  libg: $(LIBDIR)/libbase.g.a
+  libo: $(LIBDIR)/libbase.so
 endif
 
 
-lib/libbase.a: $(forward-declarations) $(o-files)
+$(LIBDIR)/libbase.a: $(forward-declarations) $(o-files)
 	@echo =====base=============optimized==$(MT)== Linking library:   $@
 	@ar ruv $@ $(o-files)
 
-lib/libbase.g.a: $(forward-declarations) $(go-files)
+$(LIBDIR)/libbase.g.a: $(forward-declarations) $(go-files)
 	@echo =====base=============debug======$(MT)== Linking library:   $@
 	@ar ruv $@ $(go-files)
 
 
-lib/libbase.so: $(forward-declarations) $(o-files)
+$(LIBDIR)/libbase.so: $(forward-declarations) $(o-files)
 	@echo =====base=============optimized==$(MT)== Linking library:   $@
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
 
-lib/libbase.g.so: $(forward-declarations) $(go-files)
+$(LIBDIR)/libbase.g.so: $(forward-declarations) $(go-files)
 	@echo =====base=============debug======$(MT)== Linking library:   $@
 	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
 
@@ -96,10 +98,10 @@ lib/libbase.g.so: $(forward-declarations) $(go-files)
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go \
-               include/base/forward_declarations.h* lib/Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ lib/o/*.o lib/go/*.go
 
-
+veryclean: clean
+	-rm include/base/forward_declarations.h* lib/Makefile.dep
 
 #Rule to generate the dependency file. This file is
 #automagically remade whenever needed, i.e. whenever
@@ -124,5 +126,5 @@ include lib/Makefile.dep
 include $D/common/scripts/forward_declarations
 
 
-.PHONY: clean
+.PHONY: clean veryclean
 .PHONY: lib lib.a lib.g.a

@@ -40,38 +40,39 @@ lib/o/%.o :
 
 # rules
 ifeq ($(enable-shared),yes)
-  lib: lib/liblac.g.so lib/liblac.so
-  libg: lib/liblac.g.so
+  lib: $(LIBDIR)/liblac.g.so $(LIBDIR)/liblac.so
+  libg: $(LIBDIR)/liblac.g.so
 else
-  lib: lib/liblac.g.a lib/liblac.a
-  libg: lib/liblac.g.a
+  lib: $(LIBDIR)/liblac.g.a $(LIBDIR)/liblac.a
+  libg: $(LIBDIR)/liblac.g.a
 endif
 
 
 
-lib/liblac.a: $(forward-declarations) $(o-files)
+$(LIBDIR)/liblac.a: $(forward-declarations) $(o-files)
 	@echo =====lac==============optimized==$(MT)== Linking library:   $@
 	@ar ruv $@ $(o-files)
 
-lib/liblac.g.a: $(forward-declarations) $(go-files)
+$(LIBDIR)/liblac.g.a: $(forward-declarations) $(go-files)
 	@echo =====lac==============debug======$(MT)== Linking library:   $@
 	@ar ruv $@ $(go-files)
 
 
-lib/liblac.so: $(forward-declarations) $(o-files)
+$(LIBDIR)/liblac.so: $(forward-declarations) $(o-files)
 	@echo =====lac==============optimized==$(MT)== Linking library:   $@
 	@$(CC) $(CXXFLAGS.o) -shared -o $@ $(o-files)
 
-lib/liblac.g.so: $(forward-declarations) $(go-files)
+$(LIBDIR)/liblac.g.so: $(forward-declarations) $(go-files)
 	@echo =====lac==============debug======$(MT)== Linking library:   $@
 	@$(CC) $(CXXFLAGS.g) -shared -o $@ $(go-files)
 
 
 
 clean:
-	-rm -f *~ include/*~ include/*/*~ lib/lib* lib/o/*.o lib/go/*.go \
-               include/base/forward_declarations.h* lib/Makefile.dep
+	-rm -f *~ include/*~ include/*/*~ lib/o/*.o lib/go/*.go
 
+veryclean: clean
+	-rm include/base/forward_declarations.h* lib/Makefile.dep
 
 
 #Rule to generate the dependency file. This file is
@@ -91,5 +92,5 @@ include lib/Makefile.dep
 include $D/common/scripts/forward_declarations
 
 
-.PHONY: clean
+.PHONY: clean veryclean
 .PHONY: lib lib.a lib.g.a

@@ -27,6 +27,7 @@ F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
 F77LDFLAGS           = @F77LDFLAGS@
 LIBS                 = @LIBS@
+LIBDIR               = $D/lib
 PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
 with-multithreading  = @withmultithreading@
@@ -45,24 +46,21 @@ endif
 
 # path for libraries 
 
-lib-path-base        = $D/base/lib
-lib-path-lac         = $D/lac/lib
-lib-path-deal2       = $D/deal.II/lib
 lib-path-contrib-hsl = $D/contrib/hsl/lib
 
-LIBPATH    += $(addprefix -L,$(lib-path-base) $(lib-path-lac) $(lib-path-deal2))
+LIBPATH    += $(addprefix -L,$(libdir))
 
 
 # add search path for libraries for make dependencies
 
-vpath %.a $(lib-path-base)
-vpath %.a $(lib-path-lac)
-vpath %.a $(lib-path-deal2)
+vpath %.a $(libdir)
+vpath %.so $(libdir)
 
 # if HSL sublibs are used, add them to the path
 ifeq ($(USE_CONTRIB_HSL),yes)
   LIBPATH += $(addprefix -L,$(lib-path-contrib-hsl))
   vpath %.a $(lib-path-contrib-hsl)
+  vpath %.so $(lib-path-contrib-hsl)
 endif
 
 
@@ -71,19 +69,19 @@ endif
 
 lib-suffix = @lib_suffix@
 
-lib-base.o     = $(lib-path-base)/libbase$(lib-suffix)
-lib-base.g     = $(lib-path-base)/libbase.g$(lib-suffix)
+lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
+lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
 
-lib-lac.o      = $(lib-path-lac)/liblac$(lib-suffix)
-lib-lac.g      = $(lib-path-lac)/liblac.g$(lib-suffix)
+lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix)
+lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix)
 
-lib-deal2-1d.o = $(lib-path-deal2)/libdeal_II_1d$(lib-suffix)
-lib-deal2-2d.o = $(lib-path-deal2)/libdeal_II_2d$(lib-suffix)
-lib-deal2-3d.o = $(lib-path-deal2)/libdeal_II_3d$(lib-suffix)
+lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
+lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
+lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
 
-lib-deal2-1d.g = $(lib-path-deal2)/libdeal_II_1d.g$(lib-suffix)
-lib-deal2-2d.g = $(lib-path-deal2)/libdeal_II_2d.g$(lib-suffix)
-lib-deal2-3d.g = $(lib-path-deal2)/libdeal_II_3d.g$(lib-suffix)
+lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
+lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
+lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 
 lib-contrib-hsl = $(lib-path-contrib-hsl)/libhsl$(lib-suffix)
 

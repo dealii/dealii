@@ -17,7 +17,6 @@ define([AC_CACHE_SAVE], )dnl
 AC_REVISION($Revision$)
 AC_INIT(base)
 
-
 dnl    Set the path to the deal.II libraries to `pwd`
 DEAL2_DIR=`pwd`
 AC_SUBST(DEAL2_DIR)

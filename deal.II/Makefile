@@ -72,6 +72,11 @@ lac:
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3dg
 	cd $D/deal.II ; $(MAKE) $(MAKEOPTIONS) 3d
 
+$(LIBDIR):
+	mkdir $@
+
+baseg base lacg lac 1dg 1d 2dg 2d 3dg 3d all debug contrib : $(LIBDIR)
+
 all: contrib
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) libg
 	cd $D/base ; $(MAKE) $(MAKEOPTIONS) lib
