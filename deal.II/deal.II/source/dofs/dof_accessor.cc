@@ -28,10 +28,10 @@
 template <int dim, typename BaseClass>
 void DoFObjectAccessor<1, dim,BaseClass>::set_dof_index (const unsigned int i,
 						    const int index) const {
-  Assert (dof_handler != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, ExcInvalidObject());
+  Assert (dof_handler->selected_fe != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<dof_handler->selected_fe->dofs_per_line,
 	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_line));
 
@@ -316,10 +316,11 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
 #if deal_II_dimension == 1
 
 template <>
-DoFSubstructAccessor<1>::face_iterator
-DoFCellAccessor<1>::face (const unsigned int) const {
+DoFCellAccessor<1>::face_iterator
+DoFCellAccessor<1>::face (const unsigned int) const
+{
   Assert (false, ExcNotUsefulForThisDimension());
-  return 0;
+  return face_iterator();
 };
 
 
@@ -344,14 +345,14 @@ template <typename number>
 void
 DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
 				      Vector<number>       &local_values) const {
-  Assert (dim==1, ::ExcInternalError());
+  Assert (dim==1, ExcInternalError());
   
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (active(), ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
@@ -389,14 +390,14 @@ template <typename number>
 void
 DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 				      Vector<number>       &values) const {
-  Assert (dim==1, ::ExcInternalError());
+  Assert (dim==1, ExcInternalError());
   
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<1>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<1>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<1>::ExcVectorDoesNotMatch());
   Assert (active(), ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
@@ -421,8 +422,9 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 #if deal_II_dimension == 2
 
 template <>
-DoFSubstructAccessor<2>::face_iterator
-DoFCellAccessor<2>::face (const unsigned int i) const {
+DoFCellAccessor<2>::face_iterator
+DoFCellAccessor<2>::face (const unsigned int i) const
+{
   return line(i);
 };
 
@@ -447,15 +449,16 @@ template <int dim>
 template <typename number>
 void
 DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
-				    Vector<number>       &local_values) const {
-  Assert (dim==2, ::ExcInternalError());
+				    Vector<number>       &local_values) const
+{
+  Assert (dim==2, ExcInternalError());
   
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (active(), ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
@@ -497,14 +500,14 @@ template <typename number>
 void
 DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 				      Vector<number>       &values) const {
-  Assert (dim==2, ::ExcInternalError());
+  Assert (dim==2, ExcInternalError());
   
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (active(), ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
@@ -532,8 +535,9 @@ DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 #if deal_II_dimension == 3
 
 template <>
-DoFSubstructAccessor<3>::face_iterator
-DoFCellAccessor<3>::face (const unsigned int i) const {
+DoFCellAccessor<3>::face_iterator
+DoFCellAccessor<3>::face (const unsigned int i) const
+{
   return quad(i);
 };
 
@@ -559,14 +563,14 @@ template <typename number>
 void
 DoFCellAccessor<dim>::get_dof_values (const Vector<number> &values,
 				      Vector<number>       &local_values) const {
-  Assert (dim==3, ::ExcInternalError());
+  Assert (dim==3, ExcInternalError());
 
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<3>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (active(), ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
@@ -612,14 +616,14 @@ template <typename number>
 void
 DoFCellAccessor<dim>::set_dof_values (const Vector<number> &local_values,
 				      Vector<number>       &values) const {
-  Assert (dim==3, ::ExcInternalError());
+  Assert (dim==3, ExcInternalError());
 
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<3>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<3>::ExcInvalidObject());
   Assert (local_values.size() == dof_handler->get_fe().total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<3>::ExcVectorDoesNotMatch());
   Assert (active(), ExcNotActive());
   
   const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
@@ -657,12 +661,12 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const Vector<number> &values,
 						   Vector<number>       &interpolated_values) const {
   const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
   
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (interpolated_values.size() == total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   if (!has_children())
 				     // if this cell has no children: simply
@@ -711,12 +715,12 @@ DoFCellAccessor<dim>::set_dof_values_by_interpolation (const Vector<number> &loc
 						       Vector<number>       &values) const {
   const unsigned int total_dofs = dof_handler->get_fe().total_dofs;
   
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (&dof_handler->get_fe() != 0, ExcInvalidObject());
+  Assert (dof_handler != 0, DoFAccessor<dim>::ExcInvalidObject());
+  Assert (&dof_handler->get_fe() != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_values.size() == total_dofs,
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (values.size() == dof_handler->n_dofs(),
-	  ExcVectorDoesNotMatch());
+	  DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
   if (!has_children())
 				     // if this cell has no children: simply

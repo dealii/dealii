@@ -398,7 +398,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Pointer to the #i#th
 				      *  child.
 				      */
-    TriaIterator<dim,TriaObjectAccessor<3, dim> > child (const unsigned int i) const;
+    TriaIterator<dim,TriaObjectAccessor<celldim, dim> >
+    child (const unsigned int i) const;
 
 				     /**
 				      *  Index of the #i#th child.
@@ -600,7 +601,9 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     template <int anydim, typename AnyAccessor> friend class TriaRawIterator;
 };
 
-
+/**
+ * Closure class.
+ */
 template<int dim>
 class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 {};

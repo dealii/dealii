@@ -301,7 +301,7 @@ MGDoFObjectAccessor<2, dim,BaseClass>::copy_from (const MGDoFObjectAccessor<2, d
 
 
 
-/* ------------------------ MGDoFObjectAccessor --------------------------- */
+/* ------------------------ MGDoFHexAccessor --------------------------- */
 
 template <int dim, typename BaseClass>
 MGDoFObjectAccessor<3, dim,BaseClass>::MGDoFObjectAccessor (Triangulation<dim> *tria,
@@ -512,10 +512,11 @@ MGDoFCellAccessor<dim>::child (const unsigned int i) const {
 #if deal_II_dimension == 1
 
 template <>
-MGDoFSubstructAccessor<1>::face_iterator
-MGDoFCellAccessor<1>::face (const unsigned int) const {
+MGDoFCellAccessor<1>::face_iterator
+MGDoFCellAccessor<1>::face (const unsigned int) const
+{
   Assert (false, ExcNotUsefulForThisDimension());
-  return 0;
+  return face_iterator();
 };
 
 
@@ -549,8 +550,9 @@ MGDoFCellAccessor<1>::get_mg_dof_values (const Vector<double> &values,
 #if deal_II_dimension == 2
 
 template <>
-MGDoFSubstructAccessor<2>::face_iterator
-MGDoFCellAccessor<2>::face (const unsigned int i) const {
+MGDoFCellAccessor<2>::face_iterator
+MGDoFCellAccessor<2>::face (const unsigned int i) const
+{
   return line(i);
 };
 

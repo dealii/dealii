@@ -85,7 +85,26 @@ class MGDoFAccessor {
 
 
 template <int celldim, int dim, typename BaseClass>
-class MGDoFObjectAccessor;
+class MGDoFObjectAccessor :  public MGDoFAccessor<dim>,
+			     public DoFObjectAccessor<celldim, dim, BaseClass>
+{};
+
+
+/**
+ * Closure class.
+ */
+template<int dim, typename BaseClass>
+class MGDoFObjectAccessor<0, dim, BaseClass>
+{
+  public:
+    typedef void* AccessorData;
+    MGDoFObjectAccessor (Triangulation<dim> *,
+		       const int,
+		       const int,
+		       const AccessorData *)
+      {}
+};
+
 
 
 /**
@@ -442,156 +461,6 @@ class MGDoFObjectAccessor<3, dim, BaseClass> :  public MGDoFAccessor<dim>,
 
 
 
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * Rationale for the declaration of members for this class: gcc 2.8 has a bug
- * when deriving from explicitely specialized classes which materializes in
- * the calculation of wrong addresses of member variables. By declaring the
- * general template of #DoFSubstructAccessor# to have the same object layout as
- * the specialized versions (using the same base classes), we fool the compiler,
- * which still looks in the wrong place for the addresses but finds the
- * right information. This way, at least ot works.
- *
- * Insert a guard, however, in the constructor to avoid that anyone (including
- * the compiler) happens to use this class.
- */
-template <int dim>
-class MGDoFSubstructAccessor : public MGDoFObjectAccessor<1, 1,CellAccessor<1> > {
-  public:
-    MGDoFSubstructAccessor () {
-      Assert (false, ExcInternalError());
-    };
-
-    DeclException0 (ExcInternalError);
-};
-
-
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * \subsection{Rationale}
- *
- * This class is only a wrapper class used to do kind of a typedef
- * with template parameters. This class and #DoFSubstructAccessor<2>#
- * wrap the following names:
- * \begin{verbatim}
- *   MGDoFSubstructAccessor<1> := MGDoFObjectAccessor<1, 1,CellAccessor<1> >;
- *   MGDoFSubstructAccessor<2> := MGDoFObjectAccessor<2, 2,CellAccessor<2> >;
- * \end{verbatim}
- * We do this rather complex (and needless, provided C++ the needed constructs!)
- * class hierarchy manipulation, since this way we can declare and implement
- * the \Ref{DoFCellAccessor} dimension independent as an inheritance from
- * #DoFSubstructAccessor<dim>#. If we had not declared these
- * types, we would have to write two class declarations, one for
- * #DoFCellAccessor<1>#, derived from #DoFObjectAccessor<1, 1,CellAccessor<1> >#
- * and one for #DoFCellAccessor<2>#, derived from
- * #DoFObjectAccessor<2, 2,CellAccessor<2> >#.
- */
-template <>
-class MGDoFSubstructAccessor<1> :  public MGDoFObjectAccessor<1, 1,CellAccessor<1> > {
-  public:
-				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
-				      */
-    typedef MGDoFObjectAccessor<1, 1,CellAccessor<1> >::AccessorData AccessorData;
-
-    				     /**
-				      * Constructor
-				      */
-    MGDoFSubstructAccessor (Triangulation<1> *tria,
-			    const int         level,
-			    const int         index,
-			    const AccessorData *local_data) :
-		    MGDoFObjectAccessor<1, 1,CellAccessor<1> > (tria,level,index,local_data) {};
-				     // do this here, since this way the
-				     // CellAccessor has the possibility to know
-				     // what a face_iterator is. Otherwise
-				     // it would have to ask the MGDoFHandler<dim>
-				     // which would need another big include
-				     // file and maybe cyclic interdependence
-    typedef void * face_iterator;
-};
-
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * @see MGDoFSubstructAccessor<1>
- */
-template <>
-class MGDoFSubstructAccessor<2> : public MGDoFObjectAccessor<2, 2,CellAccessor<2> > {
-  public:
-				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
-				      */
-    typedef MGDoFObjectAccessor<2, 2,CellAccessor<2> >::AccessorData AccessorData;
-    
-    				     /**
-				      * Constructor
-				      */
-    MGDoFSubstructAccessor (Triangulation<2> *tria,
-			    const int         level,
-			    const int         index,
-			    const AccessorData *local_data) :
-		    MGDoFObjectAccessor<2, 2,CellAccessor<2> > (tria,level,index,local_data) {};
-				     // do this here, since this way the
-				     // CellAccessor has the possibility to know
-				     // what a face_iterator is. Otherwise
-				     // it would have to ask the DoFHandler<dim>
-				     // which would need another big include
-				     // file and maybe cyclic interdependence
-    typedef TriaIterator<2,MGDoFObjectAccessor<1, 2,TriaObjectAccessor<1, 2> > > face_iterator;
-};
-
-
-
-/**
- * Intermediate, "typedef"-class, not for public use.
- *
- * @see MGDoFSubstructAccessor<1>
- */
-template <>
-class MGDoFSubstructAccessor<3> : public MGDoFObjectAccessor<3, 3,CellAccessor<3> > {
-  public:
-				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
-				      */
-    typedef MGDoFObjectAccessor<3, 3,CellAccessor<3> >::AccessorData AccessorData;
-    
-    				     /**
-				      * Constructor
-				      */
-    MGDoFSubstructAccessor (Triangulation<3> *tria,
-			    const int         level,
-			    const int         index,
-			    const AccessorData *local_data) :
-		    MGDoFObjectAccessor<3, 3,CellAccessor<3> > (tria,level,index,local_data) {};
-				     // do this here, since this way the
-				     // CellAccessor has the possibility to know
-				     // what a face_iterator is. Otherwise
-				     // it would have to ask the DoFHandler<dim>
-				     // which would need another big include
-				     // file and maybe cyclic interdependence
-    typedef TriaIterator<3,MGDoFObjectAccessor<2, 3,TriaObjectAccessor<2, 3> > > face_iterator;
-};
-
-
-
-
-
-
 /**
  * Grant access to the degrees of freedom on a cell. In fact, since all
  * access to the degrees of freedom has been enabled by the classes
@@ -606,14 +475,22 @@ class MGDoFSubstructAccessor<3> : public MGDoFObjectAccessor<3, 3,CellAccessor<3
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
+class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim, CellAccessor<dim> > {
   public:
+				     /**
+				      * Type of faces.
+				      */
+    typedef
+    TriaIterator<dim, MGDoFObjectAccessor<dim-1, dim,TriaObjectAccessor<dim-1, dim> > >
+    face_iterator;
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef typename MGDoFSubstructAccessor<dim>::AccessorData AccessorData;
+    typedef typename
+    MGDoFObjectAccessor<dim, dim, CellAccessor<dim> >::AccessorData
+    AccessorData;
     
     				     /**
 				      * Constructor
@@ -622,7 +499,7 @@ class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
 		       const int           level,
 		       const int           index,
 		       const AccessorData *local_data) :
-		    MGDoFSubstructAccessor<dim> (tria,level,index,local_data) {};
+		    MGDoFObjectAccessor<dim, dim, CellAccessor<dim> > (tria,level,index,local_data) {};
 
 				     /**
 				      * Return the #i#th neighbor as a MGDoF cell
@@ -649,7 +526,7 @@ class MGDoFCellAccessor :  public MGDoFSubstructAccessor<dim> {
 				      * This function is not implemented in 1D,
 				      * and maps to MGDoFObjectAccessor<2, dim>::line in 2D.
 				      */
-    typename MGDoFSubstructAccessor<dim>::face_iterator
+    face_iterator
     face (const unsigned int i) const;
 
     				     /**
