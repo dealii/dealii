@@ -21,6 +21,7 @@
     <ul>
       <li> <a href="#prerequisites">System requirements</a>
       <li> <a href="#installation">Installation</a>
+      <li> <a href="#configuration-options">Configuration options</a>
       <li> <a href="#compiler-flags">Compiler flags</a>
       <li> <a href="#external-libs">Using third-party libraries and
              subroutines</a>
@@ -636,6 +637,7 @@
     of the tecio library. If enabled, allows data output in TECPLOT format.
     </dd>
 
+    <a name="umfpack"></a>
     <dt>UMFPACK</dt>
     <dd>Enabled by <tt>--with-umfpack</tt>. Right now, only the included
     version in the contrib directory is supported, but pre-installed versions
@@ -666,7 +668,7 @@
     </dl>
 
     <a name="compiler-flags">
-    <h4>Compiler flags</h4>
+    <h3>Compiler flags</h3>
 
     <p>
     Since the ISO C++ standard is still quite new and compilers still
@@ -935,6 +937,15 @@
     such publication. Your publication will then be listed on the
     project homepage.
 
+    <p>
+    
+    <acronym>deal.II</acronym> can interface with a number of <a
+    href="#external-libs">other packages</a> that you have to install
+    yourself. They are, of course, covered by their own licenses. In addition,
+    deal.II comes with a copy of <a
+    href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a>,
+    courtesy of its author. UMFPACK is covered by its own license, linked to
+    <a href="#umfpack">above</a>.
 
     <hr>
     
