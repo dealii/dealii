@@ -1886,7 +1886,7 @@ void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v)
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::clear_user_pointers () const
+void Triangulation<1>::clear_user_pointers ()
 {
   cell_iterator cell = begin(),
 		endc = end();
@@ -1897,7 +1897,7 @@ void Triangulation<1>::clear_user_pointers () const
 
 
 template <>
-void Triangulation<1>::clear_user_flags () const
+void Triangulation<1>::clear_user_flags ()
 {
   cell_iterator cell = begin(),
 		endc = end();
@@ -1911,7 +1911,7 @@ void Triangulation<1>::clear_user_flags () const
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::clear_user_pointers () const
+void Triangulation<2>::clear_user_pointers ()
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1927,7 +1927,7 @@ void Triangulation<2>::clear_user_pointers () const
 
 
 template <>
-void Triangulation<2>::clear_user_flags () const
+void Triangulation<2>::clear_user_flags ()
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1947,7 +1947,7 @@ void Triangulation<2>::clear_user_flags () const
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::clear_user_pointers () const
+void Triangulation<3>::clear_user_pointers ()
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -1968,7 +1968,7 @@ void Triangulation<3>::clear_user_pointers () const
 
 
 template <>
-void Triangulation<3>::clear_user_flags () const
+void Triangulation<3>::clear_user_flags ()
 {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -2062,16 +2062,14 @@ void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
 
 				   // first extract the flags belonging
 				   // to lines
-  Assert (v.size() > n_lines(), ExcInternalError());
   tmp.insert (tmp.end(),
 	      v.begin(), v.begin()+n_lines());
 				   // and set the lines
   load_user_flags_line (tmp);
-  tmp.clear ();
 
   if (dim >= 2)
     {
-      Assert (v.size() > n_lines()+n_quads(), ExcInternalError());
+      tmp.clear ();
       tmp.insert (tmp.end(),
 		  v.begin()+n_lines(), v.begin()+n_lines()+n_quads());
       load_user_flags_quad (tmp);
@@ -2079,6 +2077,7 @@ void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
   
   if (dim >= 3)
     {
+      tmp.clear();
       tmp.insert (tmp.end(),
 		  v.begin()+n_lines()+n_quads(), v.begin()+n_lines()+n_quads()+n_hexs());
       load_user_flags_hex (tmp);
@@ -2344,6 +2343,209 @@ void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v)
     else
       hex->clear_user_flag();
 };
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_pointers (std::vector<void *> &v) const
+{
+				   // clear vector and append
+				   // all the stuff later on
+  v.clear ();
+
+  std::vector<void *> tmp;
+
+  save_user_pointers_line (tmp);
+  v.insert (v.end(), tmp.begin(), tmp.end());
+
+  if (dim >= 2)
+    {
+      save_user_pointers_quad (tmp);
+      v.insert (v.end(), tmp.begin(), tmp.end());
+    };
+  
+  if (dim >= 3)
+    {
+      save_user_pointers_hex (tmp);
+      v.insert (v.end(), tmp.begin(), tmp.end());
+    };      
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_pointers (const std::vector<void *> &v)
+{
+  Assert (v.size() == n_lines()+n_quads()+n_hexs(), ExcInternalError());
+  std::vector<void *> tmp;
+
+				   // first extract the pointers belonging
+				   // to lines
+  tmp.insert (tmp.end(),
+	      v.begin(), v.begin()+n_lines());
+				   // and set the lines
+  load_user_pointers_line (tmp);
+
+  if (dim >= 2)
+    {
+      tmp.clear ();
+      tmp.insert (tmp.end(),
+		  v.begin()+n_lines(), v.begin()+n_lines()+n_quads());
+      load_user_pointers_quad (tmp);
+    };
+  
+  if (dim >= 3)
+    {
+      tmp.clear ();
+      tmp.insert (tmp.end(),
+		  v.begin()+n_lines()+n_quads(), v.begin()+n_lines()+n_quads()+n_hexs());
+      load_user_pointers_hex (tmp);
+    };      
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_pointers_line (std::vector<void *> &v) const
+{
+  v.resize (n_lines(), 0);
+  std::vector<void *>::iterator  i = v.begin();
+  line_iterator line = begin_line(),
+		endl = end_line();
+  for (; line!=endl; ++line, ++i)
+    *i = line->user_pointer();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_pointers_line (const std::vector<void *> &v)
+{
+  Assert (v.size() == n_lines(), ExcGridReadError());
+  
+  line_iterator line = begin_line(),
+		endl = end_line();
+  std::vector<void *>::const_iterator i = v.begin();
+  for (; line!=endl; ++line, ++i)
+    line->set_user_pointer(*i);
+};
+
+
+#if deal_II_dimension == 1
+
+
+template <>
+void Triangulation<1>::save_user_pointers_quad (std::vector<void *> &) const
+{
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+
+template <>
+void Triangulation<1>::load_user_pointers_quad (const std::vector<void *> &)
+{
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+
+template <>
+void Triangulation<1>::save_user_pointers_hex (std::vector<void *> &) const
+{
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+
+template <>
+void Triangulation<1>::load_user_pointers_hex (const std::vector<void *> &)
+{
+  Assert (false, ExcFunctionNotUseful());
+};
+
+#endif
+
+
+template <int dim>
+void Triangulation<dim>::save_user_pointers_quad (std::vector<void *> &v) const
+{
+  v.resize (n_quads(), 0);
+  std::vector<void *>::iterator  i = v.begin();
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  for (; quad!=endq; ++quad, ++i)
+    *i = quad->user_pointer();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_pointers_quad (const std::vector<void *> &v)
+{
+  Assert (v.size() == n_quads(), ExcGridReadError());
+  
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  std::vector<void *>::const_iterator i = v.begin();
+  for (; quad!=endq; ++quad, ++i)
+    quad->set_user_pointer(*i);
+};
+
+
+#if deal_II_dimension == 2
+
+
+
+template <>
+void Triangulation<2>::save_user_pointers_hex (std::vector<void *> &) const
+{
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+
+template <>
+void Triangulation<2>::load_user_pointers_hex (const std::vector<void *> &)
+{
+  Assert (false, ExcFunctionNotUseful());
+};
+
+
+#endif
+
+
+template <int dim>
+void Triangulation<dim>::save_user_pointers_hex (std::vector<void *> &v) const
+{
+  v.resize (n_hexs(), 0);
+  std::vector<void *>::iterator  i = v.begin();
+  hex_iterator hex = begin_hex(),
+	      endh = end_hex();
+  for (; hex!=endh; ++hex, ++i)
+    *i = hex->user_pointer();
+};
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_pointers_hex (const std::vector<void *> &v)
+{
+  Assert (v.size() == n_hexs(), ExcGridReadError());
+  
+  hex_iterator hex = begin_hex(),
+	      endh = end_hex();
+  std::vector<void *>::const_iterator i = v.begin();
+  for (; hex!=endh; ++hex, ++i)
+    hex->set_user_pointer(*i);
+};
+
 
 
 /*------------------------ Iterator functions ------------------------*/
@@ -3755,29 +3957,29 @@ unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const
 #if deal_II_dimension == 1
 
 template <>
-unsigned int Triangulation<1>::n_quads () const {
-  Assert (false, ExcFunctionNotUseful());
+unsigned int Triangulation<1>::n_quads () const
+{
   return 0;
 };
 
 
 template <>
-unsigned int Triangulation<1>::n_quads (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+unsigned int Triangulation<1>::n_quads (const unsigned int) const
+{
   return 0;
 };
 
 
 template <>
-unsigned int Triangulation<1>::n_active_quads (const unsigned int) const {
-  Assert (false, ExcFunctionNotUseful());
+unsigned int Triangulation<1>::n_active_quads (const unsigned int) const
+{
   return 0;
 };
 
 
 template <>
-unsigned int Triangulation<1>::n_active_quads () const {
-  Assert (false, ExcFunctionNotUseful());
+unsigned int Triangulation<1>::n_active_quads () const
+{
   return 0;
 };
 
@@ -3820,7 +4022,6 @@ unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
 template <int dim>
 unsigned int Triangulation<dim>::n_hexs () const
 {
-  Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
@@ -3829,7 +4030,6 @@ unsigned int Triangulation<dim>::n_hexs () const
 template <int dim>
 unsigned int Triangulation<dim>::n_hexs (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
@@ -3838,7 +4038,6 @@ unsigned int Triangulation<dim>::n_hexs (const unsigned int) const
 template <int dim>
 unsigned int Triangulation<dim>::n_active_hexs () const
 {
-  Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
@@ -3847,7 +4046,6 @@ unsigned int Triangulation<dim>::n_active_hexs () const
 template <int dim>
 unsigned int Triangulation<dim>::n_active_hexs (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
   return 0;
 };
 
