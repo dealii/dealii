@@ -33,6 +33,11 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 {
   public:
 				     /**
+				      * Default constructor.
+				      */
+    MGCoarseGridLACIteration ();
+    
+				     /**
 				      * Constructor.
 				      * Store solver, matrix and
 				      * preconditioning method for later
@@ -41,6 +46,13 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
     MGCoarseGridLACIteration (SOLVER        &,
 			      const MATRIX  &,
 			      const PRECOND &);
+
+				     /**
+				      * Initialize new data.
+				      */
+    void initialize (SOLVER        &,
+		     const MATRIX  &,
+		     const PRECOND &);
     
 				     /**
 				      * Implementation of the abstract
@@ -71,7 +83,7 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 				     /**
 				      * Reference to the solver.
 				      */
-    SOLVER& solver;
+    SmartPointer<const SOLVER> solver;
     
 				     /**
 				      * Reference to the matrix.
@@ -81,7 +93,7 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 				     /**
 				      * Reference to the preconditioner.
 				      */
-    const PRECOND& precondition;
+    SmartPointer<const PRECOND> precondition;
 };
 
 
@@ -90,14 +102,37 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+::MGCoarseGridLACIteration()
+		:
+		solver(0),
+		matrix(0),
+		precondition(0)
+{};
+
+
+template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 ::MGCoarseGridLACIteration(SOLVER& s,
 			   const MATRIX  &m,
 			   const PRECOND &p)
 		:
-		solver(s),
+		solver(&s),
 		matrix(&m),
-		precondition(p)
+		precondition(&p)
 {};
+
+
+template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+void
+MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+::initialize(SOLVER& s,
+	     const MATRIX  &m,
+	     const PRECOND &p)
+{
+  solver = &s;
+  matrix = &m;
+  precondition = &p;
+};
 
 
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
@@ -108,7 +143,7 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 	      const VECTOR &src) const
 {
   Assert(matrix!=0, ExcNoMatrixGiven());
-  solver.solve(*matrix, dst, src, precondition);
+  solver->solve(*matrix, dst, src, *precondition);
 }
 
 
