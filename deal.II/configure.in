@@ -344,10 +344,10 @@ echo
 echo
 echo -------------------------------------------------------------
 echo
-echo "     The deal.II library is now configured.  In order to"
-echo "     compile it and to generate the documentation,  just"
-echo "     call the 'make' command without arguments. For more"
-echo "     information, see the Readme file."
+echo "     The  deal.II  library is now configured. In order to"
+echo "     compile it and to generate the  documentation,  just"
+echo "     call 'make' without arguments for a list of options."
+echo "     For more information, see the Readme file."
 echo
 echo -------------------------------------------------------------
 echo
