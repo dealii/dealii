@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001 by the deal.II authors and Michael Stadler
+//    Copyright (C) 2001, 2002 by the deal.II authors and Michael Stadler
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -741,6 +741,3 @@ approximate_second_derivative (const DoFHandler<deal_II_dimension> &dof_handler,
 			       const Vector<double>  &solution,
 			       Vector<float>         &derivative_norm,
 			       const unsigned int     component);
-
-
-

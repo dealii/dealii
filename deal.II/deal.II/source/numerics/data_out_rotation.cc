@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -437,5 +437,3 @@ DataOutRotation<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &
 
 // explicit instantiations
 template class DataOutRotation<deal_II_dimension>;
-
-

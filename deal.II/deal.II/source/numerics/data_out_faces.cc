@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -310,4 +310,3 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
 #if deal_II_dimension >=2
 template class DataOutFaces<deal_II_dimension>;
 #endif
-

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -171,5 +171,3 @@ void ConvergenceTable::evaluate_all_convergence_rates(const RateMode rate_mode)
     if (!col_iter->second.flag)
       evaluate_convergence_rates(col_iter->first, rate_mode);
 }
-
-

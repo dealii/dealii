@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -523,4 +523,3 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    Vector<float>   &solution,
 				    Vector<float>   &right_hand_side,
 				    const bool        preserve_symmetry);
-

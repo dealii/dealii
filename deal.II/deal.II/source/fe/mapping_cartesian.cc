@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -648,4 +648,3 @@ template void MappingCartesian<deal_II_dimension>::covariant_transformation (
   const std::vector<Point<deal_II_dimension> > &src,
   const Mapping<deal_II_dimension>::InternalDataBase& internal,
   const unsigned int src_offset) const;
-

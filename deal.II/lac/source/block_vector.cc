@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001 by the deal authors
+//    Copyright (C) 2000, 2001, 2002 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,4 +38,3 @@ namespace BlockVectorIterators
   template class Iterator<float,false>;
   template class Iterator<float,true>;
 };
-

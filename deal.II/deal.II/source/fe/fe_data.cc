@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -66,4 +66,3 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 template class FiniteElementData<1>;
 template class FiniteElementData<2>;
 template class FiniteElementData<3>;
-

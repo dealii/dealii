@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -381,4 +381,3 @@ template void DataOutStack<deal_II_dimension>::add_data_vector (const Vector<dou
 								const std::string    &name);
 template void DataOutStack<deal_II_dimension>::add_data_vector (const Vector<float>  &vec,
 								const std::string    &name);
-

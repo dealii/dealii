@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1302,7 +1302,3 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<deal_II_dimension>  
 					   const Function<deal_II_dimension>      &rhs,
 					   Vector<double>           &rhs_vector,
 					   const Function<deal_II_dimension> * const coefficient);
-
-
-
-
