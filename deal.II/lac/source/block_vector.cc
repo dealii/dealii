@@ -17,6 +17,11 @@
 template class BlockVector<double>;
 template class BlockVector<float>;
 
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
+template BlockVector<double>::BlockVector (const BlockVector<float> &);
+template BlockVector<float>::BlockVector (const BlockVector<double> &);
+#endif
+
 template void BlockVector<double>::reinit<double>(const BlockVector<double>&,
 						  const bool);
 template void BlockVector<double>::reinit<float>(const BlockVector<float>&,

@@ -17,11 +17,13 @@
 // explicit instantiations
 template class Vector<long double>;
 
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG    
 template Vector<long double>::Vector (const Vector<double> &);
 template Vector<long double>::Vector (const Vector<float> &);
 
 template Vector<double>::Vector (const Vector<long double> &);
 template Vector<float>::Vector (const Vector<long double> &);
+#endif
 
 template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<double>(const Vector<double>&);
 template Vector<long double>& Vector<long double>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=<float>(const Vector<float>&);
