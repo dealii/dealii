@@ -353,7 +353,12 @@ class DoFTools
 				      * The size of #component_select#
 				      * shall equal the number of
 				      * components in the finite
-				      * element used by #dof#.
+				      * element used by #dof#. The
+				      * size of #selected_dofs# shall
+				      * equal
+				      * #dof_handler.n_dofs()#. Previous
+				      * contents of this array or
+				      * overwritten.
 				      */
     template <int dim>
     static void
@@ -389,13 +394,35 @@ class DoFTools
 				      * The size of #component_select#
 				      * shall equal the number of
 				      * components in the finite
-				      * element used by #dof#.
+				      * element used by #dof#. The
+				      * size of #selected_dofs# shall
+				      * equal
+				      * #dof_handler.n_dofs()#. Previous
+				      * contents of this array or
+				      * overwritten.
 				      */
     template <int dim>
     static void
     extract_boundary_dofs (const DoFHandler<dim> &dof_handler,
 			   const vector<bool>    &component_select,
 			   vector<bool>          &selected_dofs);
+
+				     /**
+				      * Select all dofs that will be
+				      * constrained by interface
+				      * constraints, i.e. all hanging
+				      * nodes.
+				      *
+				      * The size of #selected_dofs#
+				      * shall equal
+				      * #dof_handler.n_dofs()#. Previous
+				      * contents of this array or
+				      * overwritten.
+				      */
+    template <int dim>
+    static void
+    extract_hanging_node_dofs (const DoFHandler<dim> &dof_handler,
+			       vector<bool>          &selected_dofs);
     
 				     /**
 				      * This function can be used when

@@ -646,13 +646,13 @@ void DoFTools::distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler
 
 template<int dim>
 void
-DoFTools::extract_dofs(const DoFHandler<dim> &dof,
-		       const vector<bool>    &local_select,
-		       vector<bool>          &selected_dofs)
+DoFTools::extract_dofs (const DoFHandler<dim> &dof,
+			const vector<bool>    &component_select,
+			vector<bool>          &selected_dofs)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
-  Assert(local_select.size() == fe.n_components(),
-	 ExcDimensionMismatch(local_select.size(), fe.n_components()));
+  Assert(component_select.size() == fe.n_components(),
+	 ExcDimensionMismatch(component_select.size(), fe.n_components()));
   Assert(selected_dofs.size() == dof.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
 
@@ -669,7 +669,7 @@ DoFTools::extract_dofs(const DoFHandler<dim> &dof,
 	{
 	  const unsigned int component = fe.system_to_component_index(i).first;
 
-	  if (local_select[component] == true)
+	  if (component_select[component] == true)
 	    selected_dofs[indices[i]] = true;
 	}
     }
@@ -680,12 +680,12 @@ template<int dim>
 void
 DoFTools::extract_level_dofs(const unsigned int       level,
 			     const MGDoFHandler<dim> &dof,
-			     const vector<bool>      &local_select,
+			     const vector<bool>      &component_select,
 			     vector<bool>            &selected_dofs)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
-  Assert(local_select.size() == fe.n_components(),
-	 ExcDimensionMismatch(local_select.size(), fe.n_components()));
+  Assert(component_select.size() == fe.n_components(),
+	 ExcDimensionMismatch(component_select.size(), fe.n_components()));
   Assert(selected_dofs.size() == dof.n_dofs(level),
 	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs(level)));
 
@@ -701,7 +701,7 @@ DoFTools::extract_level_dofs(const unsigned int       level,
       for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	{
 	  const unsigned int component = fe.system_to_component_index(i).first;
-	  if (local_select[component]  == true)
+	  if (component_select[component]  == true)
 	    selected_dofs[indices[i]] = true;
 	}
     }
@@ -779,6 +779,158 @@ DoFTools::extract_boundary_dofs (const DoFHandler<1> &dof_handler,
     };
 };
 
+
+#endif
+
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
+				     vector<bool>        &selected_dofs)
+{
+  Assert(selected_dofs.size() == dof_handler.n_dofs(),
+	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+				   // preset all values by false
+  fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+
+				   // there are no hanging nodes in 1d
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 2
+
+template <>
+void
+DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
+				     vector<bool>        &selected_dofs)
+{
+  const unsigned int dim = 2;
+  
+  Assert(selected_dofs.size() == dof_handler.n_dofs(),
+	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+				   // preset all values by false
+  fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+
+  const Triangulation<dim> &tria = dof_handler.get_tria();
+  const FiniteElement<dim> &fe   = dof_handler.get_fe();
+  
+				   // first mark all faces which are subject
+				   // to constraints. We do so by looping
+				   // over all active cells and checking
+				   // whether any of the faces are refined
+				   // which can only be from the neighboring
+				   // cell because this one is active. In that
+				   // case, the face is subject to constraints
+  DoFHandler<dim>::line_iterator line = dof_handler.begin_line(),
+				 endl = dof_handler.end_line();
+  for (; line!=endl; ++line)
+    line->clear_user_flag ();
+  
+  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
+					   endc = tria.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->face(face)->has_children()) 
+	cell->face(face)->set_user_flag();
+
+  				   // loop over all lines; only on lines
+				   // can there be constraints.
+  for (line = dof_handler.begin_line(); line != endl; ++line)
+				     // if dofs on this line are subject
+				     // to constraints
+    if (line->user_flag_set() == true)
+      {	
+	for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+	  selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
+	
+	for (unsigned int child=0; child<2; ++child)
+	  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+	    selected_dofs[line->child(child)->dof_index(dof)] = true;
+      };
+};
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
+				     vector<bool>        &selected_dofs)
+{
+  const unsigned int dim = 3;
+  const Triangulation<dim> &tria = dof_handler.get_tria();
+  const FiniteElement<dim> &fe   = dof_handler.get_fe();
+  
+				   // first mark all faces which are subject
+				   // to constraints. We do so by looping
+				   // over all active cells and checking
+				   // whether any of the faces are refined
+				   // which can only be from the neighboring
+				   // cell because this one is active. In that
+				   // case, the face is subject to constraints
+  DoFHandler<dim>::face_iterator face = dof_handler.begin_face(),
+				 endf = dof_handler.end_face();
+  for (; face!=endf; ++face)
+    face->clear_user_flag ();
+
+  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
+					   endc = tria.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->face(face)->has_children()) 
+	cell->face(face)->set_user_flag();
+	
+				   // loop over all faces; only on faces
+				   // can there be constraints.
+  for (face=dof_handler.begin_face(); face != endf; ++face)
+				     // if dofs on this line are subject
+				     // to constraints
+    if (face->user_flag_set() == true)
+      {
+	for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+	  selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
+	
+					 // dof numbers on the centers of
+					 // the lines bounding this face
+	for (unsigned int line=0; line<4; ++line)
+	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+	    selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
+
+					 // next the dofs on the lines interior
+					 // to the face; the order of these
+					 // lines is laid down in the
+					 // FiniteElement class documentation
+	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+	  selected_dofs[face->child(0)->line(1)->dof_index(dof)] = true;
+	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+	  selected_dofs[face->child(1)->line(2)->dof_index(dof)] = true;
+	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+	  selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
+	for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+	  selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
+
+					 // dofs on the bordering lines
+	for (unsigned int line=0; line<4; ++line)
+	  for (unsigned int child=0; child<2; ++child)
+	    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+	      selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
+	
+					 // finally, for the dofs interior
+					 // to the four child faces
+	for (unsigned int child=0; child<4; ++child)
+	  for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
+	    selected_dofs[face->child(child)->dof_index(dof)] = true;
+      };
+};
 
 #endif
 
@@ -1275,12 +1427,13 @@ DoFTools::distribute_cell_to_dof_vector (const DoFHandler<deal_II_dimension> &do
 
 
 template void DoFTools::extract_dofs(const DoFHandler<deal_II_dimension>& dof,
-				     const vector<bool>& local_select,
+				     const vector<bool>& component_select,
 				     vector<bool>& selected_dofs);
 template void DoFTools::extract_level_dofs(unsigned int level,
 					   const MGDoFHandler<deal_II_dimension>& dof,
-					   const vector<bool>& local_select,
+					   const vector<bool>& component_select,
 					   vector<bool>& selected_dofs);
+
 
 #if deal_II_dimension != 1
 template
