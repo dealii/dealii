@@ -3,11 +3,11 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
+#include <fstream>
+#include <string>
 #include <cmath>
-#include <fstream.h>
-extern "C" {
-#  include <stdlib.h>
-}
+#include <cstdlib>
+
 
 
 // 1: continuous refinement of the unit square always in the middle
@@ -182,7 +182,10 @@ void test (const int test_case, const Point<dim> &) {
   
 	
 				   // output the grid
-  ofstream out("grid.1");
+  string filename("grid.");
+  filename += ('0'+test_case);
+  
+  ofstream out(filename.c_str());
   tria.print_gnuplot (out);
     
   cout << "     Total number of cells        = " << tria.n_cells() << endl

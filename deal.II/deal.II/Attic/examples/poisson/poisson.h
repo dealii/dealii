@@ -86,6 +86,8 @@ class PoissonProblem : public ProblemBase<dim>,
     
     Function<dim>      *rhs;
     Function<dim>      *boundary_values;
+
+    Boundary<dim>      *boundary;
 };
 
 

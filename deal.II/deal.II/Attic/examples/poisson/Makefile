@@ -1,4 +1,40 @@
 # $Id$
+# Author: Wolfgang Bangerth, 1998
+
+# Template for makefiles for the examples subdirectory. In principle,
+# everything should be done automatically if you set the target file
+# here correctly:
+target   = poisson
+
+# All dependencies between files should be updated by the included
+# file Makefile.dep if necessary. Object files are compiled into
+# the archives ./Obj.a and ./Obj.g.a. By default, the debug version
+# is used to link. It you don't like that, change the following
+# variable to "off"
+debug-mode = on
+
+# If you want your program to be linked with extra object or library
+# files, specify them here:
+user-libs = ../../../mia/control.o
+
+# To run the program, use "make run"; to give parameters to the program,
+# give the parameters to the following variable:
+run-parameters  = $(target).prm
+
+# To execute additional action apart from running the program, fill
+# in this list:
+additional-run-action = gnuplot make_ps
+
+# To specify which files are to be deleted by "make clean" (apart from
+# the usual ones: object files, executables, backups, etc), fill in the
+# following list
+delete-files = gnuplot* *.eps
+
+
+
+
+###############################################################################
+# Internals
 
 CXX       = c++
 INCLUDE   = -I../../include -I../../../lac/include \
@@ -10,6 +46,8 @@ CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
            -funroll-loops -felide-constructors -fnonnull-objects \
            -fno-rtti -fno-exceptions $(INCLUDE)
 
+
+# if on specific systems, change compiler path
 ifeq ($(shell uname),Linux)
 CXX       = /home/wolf/bin/gcc-2.8.1/bin/c++
 endif
@@ -18,46 +56,81 @@ ifeq ($(shell uname),SunOS)
 CXX       = /usr/local/gcc/gcc-2.8.1/bin/c++
 endif
 
-LIBPATH   = -L../../lib -L../../../lac/lib
-LIBFILES.g= ../../lib/libbasic.g.a ../../lib/libgrid.g.a \
-            ../../lib/libfe.g.a ../../lib/libnumerics.g.a \
-            ../../../lac/lib/liblac.g.a
-LIBFILES  = $(LIBFILES.g:.g.a=.a)
-LIBS.g    = $(LIBPATH) -lbasic.g -lgrid.g -lfe.g -lnumerics.g -llac.g
-LIBS      = $(LIBS.g:.g=)
+
+# get lists of files we need
+cc-files    = $(wildcard *.cc)
+o-files     = $(cc-files:.cc=.o)
+go-files    = $(cc-files:.cc=.go)
+h-files     = $(wildcard *.h)
+lib-h-files = $(wildcard ../../include/*/*.h)
+
+# list of libraries needed to link with
+libs     = ./Obj.a   $(wildcard ../../lib/lib*.a)   ../../../lac/lib/liblac.a
+libs.g   = ./Obj.g.a $(wildcard ../../lib/lib*.g.a) ../../../lac/lib/liblac.g.a
 
 
-cc-files = $(wildcard *.cc)
-o-files  = $(cc-files:.cc=.o)
-go-files = $(cc-files:.cc=.go)
-h-files  = $(wildcard ../include/*/*.h)
+# check whether we use debug mode or not
+ifeq ($(debug-mode),on)
+libraries = $(libs.g)
+flags     = $(CXXFLAGS.g)
+endif
+
+ifeq ($(debug-mode),off)
+libraries = $(libs)
+flags     = $(CXXFLAGS)
+endif
 
 
 
+# make rule for the target
+$(target) : $(libraries)
+	@echo ============================ Linking $@
+	@$(CXX) $(flags) -o $@ $(libraries) -lg++ $(user-libs)
 
-%.go : %.cc poisson.h
+# rule how to run the program
+run: $(target)
+	$(target) $(run-parameters)
+	$(additional-run-action)
+
+
+# rule to make object files
+%.go : %.cc
 	@echo ============================ Compiling with debugging information:   $<
 	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc poisson.h
+%.o : %.cc
 	@echo ============================ Compiling with optimization:   $<
 	@echo $(CXX) ... -c $< -o $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-poisson: $(go-files) $(LIBFILES.g)
-	@echo ============================ Linking poisson
-	@$(CXX) -g $(CXXFLAGS.g) $(go-files) -o $@ ../../../mia/control.o $(LIBS.g) -lg++
-
-
-run: poisson
-	poisson poisson.prm
-	gnuplot make_ps
+# rules which files the libraries depend upon
+Obj.a: ./Obj.a($(o-files))
+Obj.g.a: ./Obj.g.a($(go-files))
 
 
 clean:
-	rm -f *.o *.go *~ poisson gnuplot.* *.eps
+	rm -f *.o *.go *~ Makefile.dep Obj.a Obj.g.a $(target) $(delete-files)
 
 
 
-.PHONY: run clean
+.PHONY: clean
+
+
+#Rule to generate the dependency file. This file is
+#automagically remade whenever needed, i.e. whenever
+#one of the cc-/h-files changed. Make detects whether
+#to remake this file upon inclusion at the bottom
+#of this file.
+#
+#use perl to generate rules for the .go files as well
+#as to make rules not for tria.o and the like, but
+#rather for libnumerics.a(tria.o)
+Makefile.dep: $(cc-files) $(h-files) $(lib-h-files)
+	@echo ============================ Remaking Makefile
+	@perl ../../Make_dep.pl ./Obj $(INCLUDE) $(cc-files) \
+		> Makefile.dep
+
+
+include Makefile.dep
+

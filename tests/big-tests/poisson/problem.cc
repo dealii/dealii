@@ -152,7 +152,7 @@ double RHSPoly<dim>::operator () (const Point<dim> &p) const {
 
 template <int dim>
 PoissonProblem<dim>::PoissonProblem () :
-		tria(0), dof(0), rhs(0), boundary_values(0) {};
+		tria(0), dof(0), rhs(0), boundary_values(0), boundary(0) {};
 
 
 
@@ -181,6 +181,12 @@ void PoissonProblem<dim>::clear () {
       boundary_values = 0;
     };
 
+  if (boundary != 0)
+    {
+      delete boundary;
+      boundary = 0;
+    };
+  
   ProblemBase<dim>::clear ();
 };
 
@@ -245,6 +251,8 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
   switch (test_case) 
     {
       case 1:
+	    boundary = new StraightBoundary<dim>();
+	    tria->set_boundary (boundary);
 	    make_zoom_in_grid ();
 	    break;
       case 2:
@@ -252,26 +260,32 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 					     // unit radius
       {
 	    static const Point<dim> origin;
-	    static const HyperBallBoundary<dim> boundary(origin, 1.);
+	    boundary = new HyperBallBoundary<dim>(origin, 1.);
 	    tria->create_hyper_ball (origin, 1.);
-	    tria->set_boundary (&boundary);
+	    tria->set_boundary (boundary);
 	    break;
       };
       case 3:
 					     // set the boundary function
       {
-	    static const CurvedLine<dim> boundary;
+	    boundary = new CurvedLine<dim>();
 	    tria->create_hypercube ();
-	    tria->set_boundary (&boundary);
+	    tria->set_boundary (boundary);
 	    break;
       };
       case 4:
+	    boundary = new StraightBoundary<dim>();
+	    tria->set_boundary (boundary);
 	    make_random_grid ();
 	    break;
       case 5:
+	    boundary = new StraightBoundary<dim>();
+	    tria->set_boundary (boundary);
 	    tria->create_hypercube ();
 	    break;
       case 6:
+	    boundary = new StraightBoundary<dim>();
+	    tria->set_boundary (boundary);
 	    tria->create_hypercube ();
 	    tria->refine_global (1);
 	    for (unsigned int i=0; i<5; ++i)
@@ -282,6 +296,8 @@ bool PoissonProblem<dim>::make_grid (ParameterHandler &prm) {
 	      };
 	    break;
       case 7:
+	    boundary = new StraightBoundary<dim>();
+	    tria->set_boundary (boundary);
 	    tria->create_hyper_L ();
 	    break;
       default:
@@ -432,10 +448,12 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   cout << dof->n_dofs() << " degrees of freedom." << endl;
 
   cout << "    Assembling matrices..." << endl;
-  UpdateFields update_flags = UpdateFields(update_gradients | update_JxW_values);
   ProblemBase<dim>::DirichletBC dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
-  assemble (equation, quadrature, fe, update_flags, dirichlet_bc);
+  assemble (equation, quadrature, fe,
+	    UpdateFlags(update_gradients | update_JxW_values |
+			update_jacobians | update_q_points),
+	    dirichlet_bc, *boundary);
 
   cout << "    Solving..." << endl;
   solve ();

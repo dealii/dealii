@@ -251,8 +251,8 @@ void PoissonProblem<dim>::run (const unsigned int level) {
   n_dofs.push_back (dof->n_dofs());
 
   cout << "    Assembling matrices..." << endl;
-  UpdateFields update_flags = UpdateFields(update_q_points  | update_gradients |
-					   update_jacobians | update_JxW_values);
+  UpdateFlags update_flags = UpdateFlags(update_q_points  | update_gradients |
+					 update_jacobians | update_JxW_values);
   
   ProblemBase<dim>::DirichletBC dirichlet_bc;
   dirichlet_bc[0] = boundary_values;
