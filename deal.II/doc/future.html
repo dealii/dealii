@@ -129,31 +129,23 @@
          of things are the <code class="class">ParameterHandler</code>
          and <code class="class">SolutionTransfer</code> classes, the
          <code class="class">AssertThrow</code> macro, 1d programs,
+	 curved boundaries and different mappings,
          and output of more than one variable). This is certainly
          something that should be improved, but is rather time
          consuming.
 	 </p>
 
-    <li> <p>
-         <strong>A better test-suite:</strong>
-	 We have a small suite of programs (approximately 20 programs
-         at present) that can be run automatically for regression
-         tests. Some of these are modified real-life applications, so
-         they should cover a relevant part of the library, but it
-         would be necessary to reach every corner of the library to be
-         sure a certain patch does not break something. Also, a complete
-	 test-suite for the library would be quite valuable for ports
-	 to new computer systems and compilers.
-	 </p>
-
-    <li> <p>
-         <strong>Parallelization:</strong>
-	 We do not presently think about parallelizing the libraries
-         on distributed memory machines, but the present
-         implementation of multi-threading on shared memory machines is
-         quite promising. We will implement multi-threading for several
-         other parts of the library of which we know they are taking
-         significant amounts of time in common applications.
+    <li> <p> 
+         <strong>A better test-suite:</strong> We have a small
+         suite of programs (approximately 40 programs with roughly
+         15000 lines of code at present) that can be run automatically
+         for regression tests. Some of these are modified real-life
+         applications, so they should cover a relevant part of the
+         library, but it would be necessary to reach every corner of
+         the library to be sure a certain patch does not break
+         something. Also, a complete test-suite for the library would
+         be quite valuable for ports to new computer systems and
+         compilers.
 	 </p>
 
     <li> <p>
