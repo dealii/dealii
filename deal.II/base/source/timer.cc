@@ -3,55 +3,50 @@
 
 
 #include <base/timer.h>
-#include <ctime>
 
-// this include should probably be properly
+
+
+// these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
+#include <sys/resource.h>
 #include <sys/time.h>
 
-// maybe use times() instead of clock()?
-
-
-const double overtime = 4294967296./CLOCKS_PER_SEC;
-
-
-
 Timer::Timer()
-  : cumulative_time(0.)
+  : cumulative_time (0.)
 {
   start();
-};
+}
 
 
-void Timer::start () {
+void Timer::start ()
+{
   running    = true;
-  overflow   = 0;
-  start_time = static_cast<double>(clock()) /
-	       CLOCKS_PER_SEC;
-};
+  rusage usage;
+  getrusage (RUSAGE_SELF, &usage);
+  start_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+}
 
 
 
-double Timer::stop () {
+double Timer::stop ()
+{
   running = false;
-  double dtime =  (static_cast<double>(clock()) / CLOCKS_PER_SEC -
-		   start_time);
-  if (dtime < 0) {
-    overflow++;
-  };
-  
+  rusage usage;
+  getrusage (RUSAGE_SELF, &usage);
+  const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
   cumulative_time += dtime;
   return full_time ();
 };
 
 
 
-double Timer::operator() () const {
+double Timer::operator() () const
+{
   if (running)
     {
-      const double dtime =  static_cast<double>(clock()) / CLOCKS_PER_SEC - start_time;
-      if (dtime < 0)
-	overflow++;
+      rusage usage;
+      getrusage (RUSAGE_SELF, &usage);
+      const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
 
       return dtime + full_time();
     }
@@ -61,15 +56,17 @@ double Timer::operator() () const {
 
 
 
-void Timer::reset () {
+void Timer::reset ()
+{
   cumulative_time = 0.;
   running         = false;
 };
 
 
 
-double Timer::full_time () const {
-  return cumulative_time + overflow*overtime;
+double Timer::full_time () const
+{
+  return cumulative_time;
 };
 
 

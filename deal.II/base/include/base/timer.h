@@ -39,34 +39,35 @@
  *
  * Note: the implementation of this class is system dependant.
  *
- * @author R. Becker, G. Kanschat, F.-T. Suttmeier, revised by W. Bangerth
+ * @author G. Kanschat, W. Bangerth
  */
-class Timer {
-public:
+class Timer
+{
+  public:
 				     /**
 				      * Constructor. Starts the timer at 0 sec.
 				      */
-    Timer();
+    Timer ();
 
 				     /**
 				      * Re-start the timer at the point where
 				      * it was stopped. This way a cumulative
 				      * measurement of time is possible.
 				      */
-    void start();
+    void start ();
 
 				     /**
 				      * Sets the current time as next
 				      * starting time and return the
 				      * elapsed time in seconds.
 				      */
-    double stop();
+    double stop ();
 
 				     /**
 				      * Stop the timer if neccessary and reset
 				      * the elapsed time to zero.
 				      */
-    void reset();
+    void reset ();
 
 				     /**
 				      * Access to the current time
@@ -101,14 +102,6 @@ public:
 				      */
     double              cumulative_time;
 
-				     /**
-				      * Number of times that the counter
-				      * had an overflow. We need to adjust the
-				      * total time by this number times the
-				      * number of seconds after which an
-				      * overflow occurs.
-				      */
-    mutable unsigned int overflow;
 
 				     /**
 				      * Store whether the timer is presently
@@ -123,7 +116,7 @@ public:
 				      * the time since the last overflow
 				      * occured.
 				      */
-    double full_time() const;
+    double full_time () const;
 };
 
 
