@@ -23,7 +23,7 @@ $(forward-declarations): $(filter-out %forward-declarations%,$(h-files)) \
 	@echo ============================ Remaking $(@F)
 	@touch $@.old
 	@-cp $@ $@.old > /dev/null 2>&1
-	@perl $D/common/scripts/forward_declarations.pl   \
+	@$(PERL) $D/common/scripts/forward_declarations.pl   \
               $(filter-out %$(notdir $(forward-declarations)),$(h-files)) \
             > $@.new
 	@if test -n "`diff $(forward-declarations).old $(forward-declarations).new`" ; then \
