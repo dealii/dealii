@@ -8,7 +8,7 @@
 
 #include <lac/solver.h>
 #include <lac/solver_control.h>
-
+#include <base/logstream.h>
 
 
 
