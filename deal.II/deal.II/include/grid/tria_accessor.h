@@ -5,7 +5,7 @@
 /*----------------------------   tria_accessor.h     ---------------------------*/
 
 
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 
 
 // forward declaration needed

@@ -8,7 +8,7 @@
 
 #include <iterator.h>
 #include <iostream.h>
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 #include <grid/point.h>
 #include <grid/tria_accessor.h>
 

@@ -4,7 +4,7 @@
 #define __data_io_H
 /*----------------------------   io.h     ---------------------------*/
 
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 #include <vector.h>
 
 #ifdef DEBUG

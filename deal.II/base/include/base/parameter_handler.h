@@ -12,7 +12,7 @@ template <class UserClass> class MultipleParameterLoop;
 
 #include <map.h>
 #include <vector.h>
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 
 #ifdef DEBUG
 #  define _G_NO_NRV     // don't use GNU's named return values in debug modes

@@ -6,7 +6,7 @@
 
 #include <lac/dfmatrix.h>
 #include <grid/point.h>
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 #include <grid/tria.h>
 
 

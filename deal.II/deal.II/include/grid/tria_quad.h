@@ -5,7 +5,7 @@
 /*----------------------------   tria_quad.h     ---------------------------*/
 
 
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 
 /**
     #Quad#s denote the fundamental entities of triangulations in two dimensions

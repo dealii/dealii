@@ -7,7 +7,7 @@
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <fe/fe.h>
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 #include <vector.h>
 
 

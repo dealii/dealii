@@ -4,7 +4,7 @@
 #define __tria_line_H
 /*----------------------------   tria_line.h     ---------------------------*/
 
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 
 
 /**

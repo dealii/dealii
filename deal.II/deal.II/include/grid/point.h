@@ -5,7 +5,7 @@
 /*----------------------------   point.h     ---------------------------*/
 
 
-#include <basic/exceptions.h>
+#include <base/exceptions.h>
 #include <iostream.h>
 
 
