@@ -347,8 +347,8 @@ namespace IteratorFilters
  * subdomain id equal to three:
  * @verbatim
  * FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
- *   cell (FilteredIterator::SubdomainEqualTo(3)),
- *   endc (FilteredIterator::SubdomainEqualTo(3), tria.end());
+ *   cell (IteratorFilters::SubdomainEqualTo(3)),
+ *   endc (IteratorFilters::SubdomainEqualTo(3), tria.end());
  * cell.set_to_next_positive (tria.begin_active());
  * for (; cell!=endc; ++cell)
  *   assemble_local_matrix (cell);
