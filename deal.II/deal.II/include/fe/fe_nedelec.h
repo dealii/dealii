@@ -167,13 +167,16 @@ class FE_Nedelec : public FiniteElement<dim>
     virtual const FiniteElement<dim> & base_element (const unsigned int index) const;
     
 				     /**
-				      * Check for non-zero values on a face.
-				      *
 				      * This function returns
 				      * @p{true}, if the shape
 				      * function @p{shape_index} has
 				      * non-zero values on the face
-				      * @p{face_index}.
+				      * @p{face_index}. For the lowest
+				      * order Nedelec elements, this
+				      * is actually the case for the
+				      * one on which the shape
+				      * function is defined and all
+				      * neighboring ones.
 				      *
 				      * Implementation of the
 				      * interface in
