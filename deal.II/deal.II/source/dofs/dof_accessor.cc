@@ -39,7 +39,7 @@ void DoFObjectAccessor<1, dim>::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (this->dof_handler->selected_fe != 0, DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->selected_fe->dofs_per_line,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_line));
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_line));
 
   this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_line+i] = index;
@@ -70,7 +70,7 @@ void DoFObjectAccessor<1, dim>::set_vertex_dof_index (const unsigned int vertex,
 	  typename BaseClass::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
   Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
 				   this->dof_handler->selected_fe->dofs_per_vertex +
@@ -101,7 +101,7 @@ distribute_local_to_global (const Vector<double> &local_source,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (local_source.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-				  dof_handler->get_fe().dofs_per_line),
+				  this->dof_handler->get_fe().dofs_per_line),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->dof_handler->n_dofs() == global_destination.size(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
@@ -140,7 +140,7 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (local_source.m() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-			       dof_handler->get_fe().dofs_per_line),
+			       this->dof_handler->get_fe().dofs_per_line),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
 	  typename BaseClass::ExcMatrixDoesNotMatch());
@@ -238,7 +238,7 @@ void DoFObjectAccessor<2, dim>::set_dof_index (const unsigned int i,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->selected_fe->dofs_per_quad,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_quad));
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_quad));
 
   this->dof_handler->levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_quad+i] = index;
@@ -258,7 +258,7 @@ DoFObjectAccessor<2, dim>::set_vertex_dof_index (const unsigned int vertex,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
 				   this->dof_handler->selected_fe->dofs_per_vertex +
@@ -277,8 +277,8 @@ distribute_local_to_global (const Vector<double> &local_source,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-				  4*dof_handler->get_fe().dofs_per_line +
-				  dof_handler->get_fe().dofs_per_quad),
+				  4*this->dof_handler->get_fe().dofs_per_line +
+				  this->dof_handler->get_fe().dofs_per_quad),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (this->dof_handler->n_dofs() == global_destination.size(),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
@@ -305,8 +305,8 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.m() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-			       4*dof_handler->get_fe().dofs_per_line +
-			       dof_handler->get_fe().dofs_per_quad),
+			       4*this->dof_handler->get_fe().dofs_per_line +
+			       this->dof_handler->get_fe().dofs_per_quad),
 	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
 	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
@@ -418,7 +418,7 @@ void DoFObjectAccessor<3, dim>::set_dof_index (const unsigned int i,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (i<this->dof_handler->selected_fe->dofs_per_hex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_hex));
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_hex));
 
   this->dof_handler->levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_hex+i] = index;
@@ -438,7 +438,7 @@ void DoFObjectAccessor<3, dim>::set_vertex_dof_index (const unsigned int vertex,
   Assert (vertex<8,
 	  ExcIndexRange (i,0,8));
   Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
 				   this->dof_handler->selected_fe->dofs_per_vertex +
@@ -458,9 +458,9 @@ distribute_local_to_global (const Vector<double> &local_source,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
-				  12*dof_handler->get_fe().dofs_per_line +
-				  6*dof_handler->get_fe().dofs_per_quad +
-				  dof_handler->get_fe().dofs_per_hex),
+				  12*this->dof_handler->get_fe().dofs_per_line +
+				  6*this->dof_handler->get_fe().dofs_per_quad +
+				  this->dof_handler->get_fe().dofs_per_hex),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
   Assert (this->dof_handler->n_dofs() == global_destination.size(),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
@@ -488,9 +488,9 @@ distribute_local_to_global (const FullMatrix<double> &local_source,
   Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (local_source.m() == (8*this->dof_handler->get_fe().dofs_per_vertex +
-			       12*dof_handler->get_fe().dofs_per_line +
-			       6*dof_handler->get_fe().dofs_per_quad +
-			       dof_handler->get_fe().dofs_per_hex),
+			       12*this->dof_handler->get_fe().dofs_per_line +
+			       6*this->dof_handler->get_fe().dofs_per_quad +
+			       this->dof_handler->get_fe().dofs_per_hex),
 	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
 	  typename DoFAccessor<dim>::ExcMatrixDoesNotMatch());
@@ -532,8 +532,8 @@ DoFObjectAccessor<3,dim>::get_dof_values (const InputVector &values,
   
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
-		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   typename Vector<number>::iterator next_local_value = local_values.begin();
   for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -574,8 +574,8 @@ DoFObjectAccessor<3,dim>::set_dof_values (const Vector<number> &local_values,
   
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
-		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -684,9 +684,9 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
 	      const unsigned int component
-		= dof_handler->get_fe().system_to_component_index(i).first;
+		= this->dof_handler->get_fe().system_to_component_index(i).first;
 	  
-	      if (dof_handler->get_fe().restriction_is_additive(component)) 
+	      if (this->dof_handler->get_fe().restriction_is_additive(component)) 
 		interpolated_values(i) += tmp2(i);
 	      else
 		if (tmp2(i) != 0)

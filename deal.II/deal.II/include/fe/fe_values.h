@@ -1198,7 +1198,7 @@ FEValuesBase<dim>::shape_value (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_values(shape_function_to_row_table[i], j);
+    return this->shape_values(this->shape_function_to_row_table[i], j);
 }
 
 
@@ -1255,7 +1255,7 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 				       // shape function in the arrays
 				       // we index presently:
       const unsigned int
-	row = (shape_function_to_row_table[i]
+	row = (this->shape_function_to_row_table[i]
 	       +
 	       std::count (fe->get_nonzero_components(i).begin(),
 			   fe->get_nonzero_components(i).begin()+component,
@@ -1277,9 +1277,9 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
   Assert (i<this->shape_gradients.size(),
-	  ExcIndexRange (i, 0, shape_gradients.size()));
-  Assert (j<shape_gradients[i].size(),
-	  ExcIndexRange (j, 0, shape_gradients[i].size()));
+	  ExcIndexRange (i, 0, this->shape_gradients.size()));
+  Assert (j<this->shape_gradients[i].size(),
+	  ExcIndexRange (j, 0, this->shape_gradients[i].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
@@ -1295,7 +1295,7 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_gradients[shape_function_to_row_table[i]][j];
+    return this->shape_gradients[this->shape_function_to_row_table[i]][j];
 };
 
 
@@ -1352,7 +1352,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 				       // shape function in the arrays
 				       // we index presently:
       const unsigned int
-	row = (shape_function_to_row_table[i]
+	row = (this->shape_function_to_row_table[i]
 	       +
 	       std::count (fe->get_nonzero_components(i).begin(),
 			   fe->get_nonzero_components(i).begin()+component,
@@ -1374,9 +1374,9 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
   Assert (i<this->shape_2nd_derivatives.size(),
-	  ExcIndexRange (i, 0, shape_2nd_derivatives.size()));
+	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.size()));
   Assert (j<this->shape_2nd_derivatives[i].size(),
-	  ExcIndexRange (j, 0, shape_2nd_derivatives[i].size()));
+	  ExcIndexRange (j, 0, this->shape_2nd_derivatives[i].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
@@ -1392,7 +1392,7 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_2nd_derivatives[shape_function_to_row_table[i]][j];
+    return this->shape_2nd_derivatives[this->shape_function_to_row_table[i]][j];
 }
 
 
@@ -1449,7 +1449,7 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 				       // shape function in the arrays
 				       // we index presently:
       const unsigned int
-	row = (shape_function_to_row_table[i]
+	row = (this->shape_function_to_row_table[i]
 	       +
 	       std::count (fe->get_nonzero_components(i).begin(),
 			   fe->get_nonzero_components(i).begin()+component,
@@ -1506,7 +1506,7 @@ template <int dim>
 const Point<dim> &
 FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 {
-  Assert (i<this->normal_vectors.size(), ExcIndexRange(i, 0, normal_vectors.size()));
+  Assert (i<this->normal_vectors.size(), ExcIndexRange(i, 0, this->normal_vectors.size()));
   Assert (this->update_flags & update_normal_vectors,
 	  FEValuesBase<dim>::ExcAccessToUninitializedField());
   

@@ -718,7 +718,8 @@ inline
 bool
 TriaObjectAccessor<celldim,dim>::used () const
 {
-  Assert (this->state() == IteratorState::valid, ExcDereferenceInvalidObject());
+  Assert (this->state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return this->tria->levels[this->present_level]->hexes.used[this->present_index];
 };
 
@@ -729,7 +730,7 @@ inline
 bool
 TriaObjectAccessor<celldim,dim>::user_flag_set () const
 {
-  Assert (this->used(), ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->hexes.user_flags[this->present_index];
 };
 
@@ -740,7 +741,7 @@ inline
 void
 TriaObjectAccessor<celldim,dim>::set_user_flag () const
 {
-  Assert (this->used(), ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = true;
 };
 
@@ -750,7 +751,7 @@ template<int celldim, int dim>
 inline
 void TriaObjectAccessor<celldim,dim>::clear_user_flag () const
 {
-  Assert (this->used(), ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = false;
 };
 
@@ -761,7 +762,7 @@ inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
 TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 {
-  Assert (this->used(), ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   Assert (i < GeometryInfo<celldim>::lines_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::lines_per_cell));
 
@@ -808,7 +809,7 @@ inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
 TriaObjectAccessor<celldim,dim>::quad (const unsigned int i) const
 {
-  Assert (this->used(), ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   Assert (i < GeometryInfo<celldim>::quads_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::quads_per_cell));
   return
@@ -887,7 +888,7 @@ TriaObjectAccessor<celldim,dim>::child (const unsigned int i) const
     q (this->tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
-	  ExcUnusedCellAsChild());
+	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 
   return q;
 };

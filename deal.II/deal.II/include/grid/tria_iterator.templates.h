@@ -334,7 +334,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
   if (this->state() != IteratorState::past_the_end) 
-    Assert (this->accessor.used() && accessor.has_children()==false,
+    Assert (this->accessor.used() && this->accessor.has_children()==false,
 	    ExcAssignmentOfInactiveObject());
 #endif  
   return *this;

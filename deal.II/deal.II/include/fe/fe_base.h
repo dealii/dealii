@@ -1486,8 +1486,8 @@ unsigned int
 FiniteElementBase<dim>::component_to_system_index (const unsigned int component,
 						   const unsigned int component_index) const
 {
-  Assert(component<n_components(),
-	 ExcIndexRange(component, 0, n_components()));
+  Assert(component<this->n_components(),
+	 ExcIndexRange(component, 0, this->n_components()));
   Assert(component_index<component_to_system_table[component].size(),
 	 ExcIndexRange(component_index, 0,
 		       component_to_system_table[component].size()));
@@ -1517,8 +1517,8 @@ unsigned int
 FiniteElementBase<dim>::face_component_to_system_index (const unsigned int component,
 							const unsigned int component_index) const
 {
-  Assert(component<n_components(),
-	 ExcIndexRange(component, 0, n_components()));
+  Assert(component<this->n_components(),
+	 ExcIndexRange(component, 0, this->n_components()));
   Assert(component_index<face_component_to_system_table[component].size(),
 	 ExcIndexRange(component_index, 0,
 		       face_component_to_system_table[component].size()));
@@ -1560,8 +1560,8 @@ inline
 bool
 FiniteElementBase<dim>::restriction_is_additive (const unsigned int component) const
 {
-  Assert(component<n_components(),
-	 ExcIndexRange(component, 0, n_components()));
+  Assert(component<this->n_components(),
+	 ExcIndexRange(component, 0, this->n_components()));
   return restriction_is_additive_flags[component];
 }
 
@@ -1571,7 +1571,7 @@ inline
 const std::vector<bool> &
 FiniteElementBase<dim>::get_nonzero_components (const unsigned int i) const
 {
-  Assert (i < dofs_per_cell, ExcIndexRange (i, 0, dofs_per_cell));
+  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return nonzero_components[i];
 };
 
@@ -1582,7 +1582,7 @@ inline
 unsigned int
 FiniteElementBase<dim>::n_nonzero_components (const unsigned int i) const
 {
-  Assert (i < dofs_per_cell, ExcIndexRange (i, 0, dofs_per_cell));
+  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return n_nonzero_components_table[i];
 };
 
@@ -1593,7 +1593,7 @@ inline
 bool
 FiniteElementBase<dim>::is_primitive (const unsigned int i) const
 {
-  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, dofs_per_cell));
+  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
 
 				   // return primitivity of a shape
 				   // function by checking whether it
