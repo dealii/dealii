@@ -791,7 +791,7 @@ void ElasticProblem<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::FunctionMap neumann_boundary;
+  FunctionMap<dim>::type neumann_boundary;
   KellyErrorEstimator<dim>::estimate (dof_handler,
 				      QGauss2<dim-1>(),
 				      neumann_boundary,

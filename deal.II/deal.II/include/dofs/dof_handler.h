@@ -10,15 +10,13 @@
 #define __deal2__dof_handler_h
 
 
-/*----------------------------   dof.h     ---------------------------*/
 
+#include <base/exceptions.h>
+#include <base/smartpointer.h>
+#include <dofs/function_map.h>
 #include <vector>
 #include <map>
 #include <set>
-#include <base/exceptions.h>
-#include <base/smartpointer.h>
-
-template <int dim> class Function;
 
 template <int dim> class DoFCellAccessor;
 template <int dim> class DoFLevel;
@@ -245,16 +243,11 @@ class DoFHandler  :  public Subscriptor,
     typedef typename DoFDimensionInfo<dim>::active_face_iterator active_face_iterator;
 
 				     /**
-				      *	Declare a data type which denotes a
-				      *	mapping between a boundary indicator
-				      *	and the function denoting the boundary
-				      *	values on this part of the boundary.
-				      *	Only one boundary function may be given
-				      *	for each boundary indicator, which is
-				      *	guaranteed by the @p{map} data type.
+				      * Alias the @p{FunctionMap} type
+				      * declared elsewhere.
 				      */
-    typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
-
+    typedef typename FunctionMap<dim>::type FunctionMap;
+    
 				     /**
 				      * When the arrays holding the
 				      * DoF indices are set up, but

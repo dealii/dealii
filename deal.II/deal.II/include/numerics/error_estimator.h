@@ -206,19 +206,6 @@ template <int dim>
 class KellyErrorEstimator
 {
   public:
-
-				     /**
-				      *	Declare a data type which denotes a
-				      *	mapping between a boundary indicator
-				      *	and the function denoting the boundary
-				      *	values on this part of the boundary.
-				      *	Only one boundary function may be given
-				      *	for each boundary indicator, which is
-				      *	guaranteed by the @p{map} data type.
-				      */    
-    typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
-
-
 				     /**
 				      * Implementation of the error
 				      * estimator described above. You
@@ -272,7 +259,7 @@ class KellyErrorEstimator
     static void estimate (const Mapping<dim>      &mapping,
 			  const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
-			  const FunctionMap       &neumann_bc,
+			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const Vector<double>    &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
@@ -286,7 +273,7 @@ class KellyErrorEstimator
 				      */    
     static void estimate (const DoFHandler<dim>   &dof,
 			  const Quadrature<dim-1> &quadrature,
-			  const FunctionMap       &neumann_bc,
+			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const Vector<double>    &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
@@ -322,7 +309,7 @@ class KellyErrorEstimator
     static void estimate (const Mapping<dim>          &mapping,
 			  const DoFHandler<dim>       &dof,
 			  const Quadrature<dim-1>     &quadrature,
-			  const FunctionMap           &neumann_bc,
+			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const std::vector<const Vector<double>*> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
@@ -336,7 +323,7 @@ class KellyErrorEstimator
 				      */    
     static void estimate (const DoFHandler<dim>       &dof,
 			  const Quadrature<dim-1>     &quadrature,
-			  const FunctionMap           &neumann_bc,
+			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const std::vector<const Vector<double>*> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
@@ -447,7 +434,7 @@ class KellyErrorEstimator
 	const Mapping<dim>                  &mapping;
 	const DoFHandler<dim>               &dof_handler;
 	const Quadrature<dim-1>             &quadrature;
-	const FunctionMap                   &neumann_bc;
+	const typename FunctionMap<dim>::type &neumann_bc;
 	const std::vector<const Vector<double>*> &solutions;
 	const std::vector<bool>                   component_mask;
 	const Function<dim>                 *coefficients;
@@ -533,7 +520,7 @@ class KellyErrorEstimator
 	Data(const Mapping<dim>                  &mapping,
 	     const DoFHandler<dim>               &dof,
 	     const Quadrature<dim-1>             &quadrature,
-	     const FunctionMap                   &neumann_bc,
+	     const typename FunctionMap<dim>::type &neumann_bc,
 	     const std::vector<const Vector<double>*> &solutions,
 	     const std::vector<bool>                  &component_mask,
 	     const Function<dim>                 *coefficients,

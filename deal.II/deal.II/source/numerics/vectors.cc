@@ -383,7 +383,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 					 // the different boundary parts. We want the
 					 // @p{function} to hold on all parts of the
 					 // boundary
-	FMap<dim>::FunctionMap boundary_functions;
+	typename FunctionMap<dim>::type boundary_functions;
 	for (unsigned char c=0; c<255; ++c)
 	  boundary_functions[c] = &function;
 	project_boundary_values (dof, boundary_functions, q_boundary,
@@ -750,7 +750,7 @@ template <int dim>
 void
 VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				      const DoFHandler<dim>    &dof,
-				      const FMap<dim>::FunctionMap &boundary_functions,
+				      const typename FunctionMap<dim>::type &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
@@ -765,7 +765,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   std::set<unsigned char> selected_boundary_components;
-  for (typename FMap<dim>::FunctionMap::const_iterator i=boundary_functions.begin();
+  for (typename FunctionMap<dim>::type::const_iterator i=boundary_functions.begin();
        i!=boundary_functions.end(); ++i)
     selected_boundary_components.insert (i->first);
   
@@ -842,7 +842,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 template <int dim>
 void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
-				      const FMap<dim>::FunctionMap &boundary_functions,
+				      const typename FunctionMap<dim>::type &boundary_functions,
 				      const Quadrature<dim-1>  &q,
 				      std::map<unsigned int,double> &boundary_values)
 {
@@ -1312,12 +1312,12 @@ void VectorTools::integrate_difference (const DoFHandler<deal_II_dimension> &,
 template
 void VectorTools::project_boundary_values (const Mapping<deal_II_dimension>     &,
 					   const DoFHandler<deal_II_dimension>  &,
-					   const FMap<deal_II_dimension>::FunctionMap &,
+					   const FunctionMap<deal_II_dimension>::FunctionMap &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
 template
 void VectorTools::project_boundary_values (const DoFHandler<deal_II_dimension>  &,
-					   const FMap<deal_II_dimension>::FunctionMap &,
+					   const FunctionMap<deal_II_dimension>::FunctionMap &,
 					   const Quadrature<deal_II_dimension-1>&,
 					   std::map<unsigned int,double>        &);
 template

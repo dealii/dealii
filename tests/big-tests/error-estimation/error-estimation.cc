@@ -556,7 +556,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
       QSimpson<dim-1> eq;
       KellyErrorEstimator<dim>::estimate (*dof, eq,
-					  KellyErrorEstimator<dim>::FunctionMap(),
+					  FunctionMap<dim>::type(),
 					  solution,
 					  estimated_error_per_cell,
 					  vector<bool>(), // all components

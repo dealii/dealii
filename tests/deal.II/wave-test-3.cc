@@ -5889,7 +5889,7 @@ template <int dim>
 void TimeStep_ErrorEstimation<dim>::estimate_error_energy (const unsigned int which_variables) {
   Assert (which_variables<=1, ExcInternalError());
   
-  KellyErrorEstimator<dim>::FunctionMap neumann_boundary;
+  typename FunctionMap<dim>::type neumann_boundary;
   static ZeroFunction<dim> homogeneous_neumann_bc;
   neumann_boundary[1] = &homogeneous_neumann_bc;
 

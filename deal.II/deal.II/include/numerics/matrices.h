@@ -29,6 +29,7 @@ template <int dim> class Mapping;
 template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
+template <int dim> class FunctionMap;
 
 
 
@@ -131,12 +132,12 @@ template <int dim> class FEValues;
  * The @p{create_boundary_mass_matrix} creates the matrix with entries
  * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the
  * union of boundary parts with indicators contained in a
- * @p{FunctionMap} passed to the function (i.e. if you want to set up
- * the mass matrix for the parts of the boundary with indicators zero
- * and 2, you pass the function a map of @p{unsigned char}s as
- * parameter @p{boundary_functions} containing the keys zero and
- * 2). The $\phi_i$ are the basis functions which have at least part
- * of their support on $\Gamma$. The mapping
+ * @ref{FunctioMap}@p{::FunctionMap} passed to the function (i.e. if
+ * you want to set up the mass matrix for the parts of the boundary
+ * with indicators zero and 2, you pass the function a map of
+ * @p{unsigned char}s as parameter @p{boundary_functions} containing
+ * the keys zero and 2). The $\phi_i$ are the basis functions which
+ * have at least part of their support on $\Gamma$. The mapping
  * @p{dof_to_boundary_mapping} required by this function maps global
  * DoF numbers to a numbering of the degrees of freedom located on the
  * boundary, and can be obtained using the function
@@ -187,21 +188,6 @@ template <int dim>
 class MatrixCreator
 {
   public:
-				     /**
-				      *	Declare a data type which denotes a
-				      *	mapping between a boundary indicator
-				      *	and the function denoting the boundary
-				      *	values on this part of the boundary.
-				      *	Only one boundary function may be given
-				      *	for each boundary indicator, which is
-				      *	guaranteed by the @p{map} data type.
-				      *	
-				      *	See the general documentation of this
-				      *	class for more detail.
-				      */
-// TODO: [WB] use one global declaration of FunctionMap, rather than one in every place
-    typedef typename std::map<unsigned char,const Function<dim>*> FunctionMap;
-
 				     /**
 				      * Assemble the mass matrix. If no 
 				      * coefficient is given, it is assumed
@@ -288,7 +274,7 @@ class MatrixCreator
 				      const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
 				      SparseMatrix<double>     &matrix,
-				      const FunctionMap        &boundary_functions,
+				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
 				      const Function<dim>      *a = 0);
@@ -303,7 +289,7 @@ class MatrixCreator
     void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
 				      SparseMatrix<double>     &matrix,
-				      const FunctionMap        &boundary_functions,
+				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
 				      const Function<dim>      *a = 0);
@@ -498,7 +484,7 @@ class MatrixCreator
 					const DoFHandler<dim>    &dof,
 					const Quadrature<dim-1>  &q,
 					SparseMatrix<double>     &matrix,
-					const FunctionMap        &boundary_functions,
+					const typename FunctionMap<dim>::type        &boundary_functions,
 					Vector<double>           &rhs_vector,
 					std::vector<unsigned int>&dof_to_boundary_mapping,
 					const Function<dim> * const a,

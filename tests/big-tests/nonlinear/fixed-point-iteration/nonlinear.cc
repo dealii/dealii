@@ -172,7 +172,7 @@ void NonlinearProblem<dim>::run () {
   PoissonEquation<dim>            equation (rhs, last_solution);
   QGauss2<dim>                    quadrature;
   
-  ProblemBase<dim>::FunctionMap dirichlet_bc;
+  FunctionMap<dim>::type dirichlet_bc;
   dirichlet_bc[0] = &boundary_values;
 
 
@@ -232,7 +232,7 @@ void NonlinearProblem<dim>::run () {
       KellyErrorEstimator<dim> ee;
       QSimpson<dim-1> eq;
       ee.estimate (*dof, eq,
-		   KellyErrorEstimator<dim>::FunctionMap(),
+		   FunctionMap<dim>::type(),
 		   solution,
 		   error_indicator);
       GridRefinement::refine_and_coarsen_fixed_number (*tria, error_indicator, 0.3, 0);

@@ -54,7 +54,7 @@ template <>
 KellyErrorEstimator<1>::Data::Data(const Mapping<1>                    &,
 				   const DoFHandler<1>                 &,
 				   const Quadrature<0>                 &,
-				   const FunctionMap                   &,
+				   const FunctionMap<1>::type          &,
 				   const std::vector<const Vector<double>*> &,
 				   const std::vector<bool>                  &,
 				   const Function<1>                   *,
@@ -63,7 +63,7 @@ KellyErrorEstimator<1>::Data::Data(const Mapping<1>                    &,
 		mapping(* static_cast <const Mapping<1> *> (0)),
 		dof_handler(* static_cast <const DoFHandler<1> *> (0)),
 		quadrature(* static_cast <const Quadrature<0> *> (0)),
-		neumann_bc(* static_cast <const FunctionMap *> (0)),
+		neumann_bc(* static_cast <const FunctionMap<1>::type *> (0)),
 		solutions(* static_cast <const std::vector<const Vector<double>*> *> (0)),
 		face_integrals (* static_cast<FaceIntegrals*> (0))
 {
@@ -76,7 +76,7 @@ template <int dim>
 KellyErrorEstimator<dim>::Data::Data(const Mapping<dim>                  &mapping,
 				     const DoFHandler<dim>               &dof_handler,
 				     const Quadrature<dim-1>             &quadrature,
-				     const FunctionMap                   &neumann_bc,
+				     const typename FunctionMap<dim>::type &neumann_bc,
 				     const std::vector<const Vector<double>*> &solutions,
 				     const std::vector<bool>                  &component_mask,
 				     const Function<dim>                 *coefficients,
@@ -107,7 +107,7 @@ KellyErrorEstimator<dim>::Data::Data(const Mapping<dim>                  &mappin
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
   
-  for (typename FunctionMap::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
+  for (typename FunctionMap<dim>::type::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());  
   
 				   // Init the size of a lot of vectors
@@ -152,7 +152,7 @@ template <int dim>
 void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
 					 const DoFHandler<dim>   &dof_handler,
 					 const Quadrature<dim-1> &quadrature,
-					 const FunctionMap       &neumann_bc,
+					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const Vector<double>    &solution,
 					 Vector<float>           &error,
 					 const std::vector<bool> &component_mask,
@@ -170,7 +170,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>      &mapping,
 template <int dim>
 void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>   &dof_handler,
 					 const Quadrature<dim-1> &quadrature,
-					 const FunctionMap       &neumann_bc,
+					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const Vector<double>    &solution,
 					 Vector<float>           &error,
 					 const std::vector<bool> &component_mask,
@@ -200,7 +200,7 @@ template <>
 void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapping,
 				       const DoFHandler<1>                 &dof_handler,
 				       const Quadrature<0>                 &,
-				       const FunctionMap                   &neumann_bc,
+				       const FunctionMap<1>::type          &neumann_bc,
 				       const std::vector<const Vector<double>*> &solutions,
 				       std::vector<Vector<float>*>              &errors,
 				       const std::vector<bool>                  &component_mask_,
@@ -232,7 +232,7 @@ void KellyErrorEstimator<1>::estimate (const Mapping<1>                    &mapp
 	  (coefficient->n_components == 1),
 	  ExcInvalidCoefficient());
 
-  for (FunctionMap::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
+  for (FunctionMap<1>::type::const_iterator i=neumann_bc.begin(); i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
 
 
@@ -538,7 +538,7 @@ template <int dim>
 void KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &mapping,
 					 const DoFHandler<dim>               &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
-					 const FunctionMap                   &neumann_bc,
+					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const std::vector<const Vector<double>*> &solutions,
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
@@ -672,7 +672,7 @@ void KellyErrorEstimator<dim>::estimate (const Mapping<dim>                  &ma
 template <int dim>
 void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
-					 const FunctionMap                   &neumann_bc,
+					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const std::vector<const Vector<double>*> &solutions,
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,

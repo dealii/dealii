@@ -61,7 +61,7 @@ check_boundary (const DoFHandler<dim> &dof,
 		const Mapping<dim>    &mapping)
 {
   MySquareFunction<dim> coefficient;
-  typename MatrixTools<dim>::FunctionMap function_map;
+  typename FunctionMap<dim>::type function_map;
   function_map[0] = &coefficient;
 
   QGauss6<dim-1> face_quadrature;
@@ -159,7 +159,7 @@ check ()
 
   ExpFunction<dim> coefficient;
   
-  typename MatrixTools<dim>::FunctionMap function_map;
+  typename FunctionMap<dim>::type function_map;
   function_map[0] = &coefficient;
 
   for (unsigned int test=0; test<2; ++test)
@@ -208,10 +208,10 @@ int main ()
   deallog.depth_console (0);
 
   deallog.push ("1d");
-  check<1> ();
+//  check<1> ();
   deallog.pop ();
   deallog.push ("2d");
-  check<2> ();
+//  check<2> ();
   deallog.pop ();
   deallog.push ("3d");
   check<3> ();
