@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -162,7 +162,7 @@ sizeof(FE_DGP<1>::Matrices::embedding[0]);
  */
 
 template <>
-const double * const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::children_per_cell];
+const double * const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::children_per_cell] = {{0}};
 
 template <>
 const unsigned int FE_DGP<1>::Matrices::n_projection_matrices
