@@ -52,7 +52,7 @@ class Ball
       
 	for (int i=0; i<dim; ++i)
 	  middle(i) -= .5;
-	middle *= sqrt(dim) / (sqrt(middle.square())*2);
+	middle *= std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square())*2);
 	for (int i=0; i<dim; ++i)
 	  middle(i) += .5;
       
@@ -67,7 +67,7 @@ class Ball
       
 	for (int i=0; i<dim; ++i)
 	  middle(i) -= .5;
-	middle *= sqrt(dim) / (sqrt(middle.square())*2);
+	middle *= std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square())*2);
 	for (int i=0; i<dim; ++i)
 	  middle(i) += .5;
       
@@ -125,15 +125,15 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
   
   if (y<x)
     if (y<1-x)
-      middle(1) = 0.04*sin(6*3.141592*middle(0));
+      middle(1) = 0.04*std::sin(6*3.141592*middle(0));
     else
-      middle(0) = 1+0.04*sin(6*3.141592*middle(1));
+      middle(0) = 1+0.04*std::sin(6*3.141592*middle(1));
   
   else
     if (y<1-x)
-      middle(0) = 0.04*sin(6*3.141592*middle(1));
+      middle(0) = 0.04*std::sin(6*3.141592*middle(1));
     else
-      middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+      middle(1) = 1+0.04*std::sin(6*3.141592*middle(0));
   
   return middle;
 }
@@ -160,15 +160,15 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
   
   if (y<x)
     if (y<1-x)
-      middle(1) = 0.04*sin(6*3.141592*middle(0));
+      middle(1) = 0.04*std::sin(6*3.141592*middle(0));
     else
-      middle(0) = 1+0.04*sin(6*3.141592*middle(1));
+      middle(0) = 1+0.04*std::sin(6*3.141592*middle(1));
   
   else
     if (y<1-x)
-      middle(0) = 0.04*sin(6*3.141592*middle(1));
+      middle(0) = 0.04*std::sin(6*3.141592*middle(1));
     else
-      middle(1) = 1+0.04*sin(6*3.141592*middle(0));
+      middle(1) = 1+0.04*std::sin(6*3.141592*middle(0));
   
   return middle;
 }

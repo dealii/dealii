@@ -86,7 +86,7 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
 
   Point<dim> direction;
   for (unsigned int i=0;i<dim;++i)
-    direction(i) = pow(10.,i);
+    direction(i) = std::pow(10.,static_cast<double>(i));
   
 				   // Check global ordering
   print_dofs (dof);
