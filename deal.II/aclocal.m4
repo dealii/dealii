@@ -2400,6 +2400,90 @@ AC_DEFUN(DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl We have so many templates in deal.II that sometimes we need
+dnl to make it clear with which types a template parameter can
+dnl be instantiated. There is a neat trick to do this: SFINAE
+dnl (substitution failure is not an error). The idea is this: the
+dnl C++ standard prescribes that a template function is only
+dnl considered in a call, if all parts of its signature can be 
+dnl instantiated with the template parameter replaced by the
+dnl respective types/values in this particular call. Example:
+dnl   template <typename T>
+dnl   typename T::type  foo(T) {...};
+dnl   ...
+dnl   foo(1);
+dnl
+dnl The compiler should detect that in this call, the template
+dnl parameter T must be identified with the type "int". However,
+dnl the return type T::type does not exist. The trick now is
+dnl that this is not considered an error: this template is simply
+dnl not considered, the compiler keeps on looking for another 
+dnl possible function foo.
+dnl
+dnl That allows for a neat trick to rule out a template for certain
+dnl template arguments without changing the function signature at
+dnl all: Make the return type un-instantiable if the template
+dnl type presently considered for instantiation does not qualify.
+dnl An example of this is shown below.
+dnl
+dnl Unfortunately, older compilers do not support this trick: they
+dnl issue an error if the return type cannot be installed. In this
+dnl case, we back out and just drop the constraint and allow for
+dnl all template types. In that case, you'll simply get compiler
+dnl error when it tries to compile this template (in case it's in
+dnl the .h file), or linker errors for missing functions in case
+dnl it's in the .cc file and explicitly instantiated.
+dnl
+dnl Usage: DEAL_II_CHECK_SFINAE_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_SFINAE_BUG, dnl
+[
+  AC_MSG_CHECKING(for SFINAE bug)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+      template <typename> struct int_or_double { static const bool value = false;};
+      template <> struct int_or_double<int>    { static const bool value = true; };
+      template <> struct int_or_double<double> { static const bool value = true; };
+
+      template <bool, typename> struct constraint_and_return_value {};
+
+      template <typename T> struct constraint_and_return_value<true,T>
+      {
+          typedef T type;
+      };
+
+      // deduction for T=char should file, since return type cannot be
+      // instantiated...
+      template <typename T>
+      typename constraint_and_return_value<int_or_double<T>::value,void>::type
+      f (T);
+
+      // ...however, this is not an error. rather, the compiler should
+      // instead choose the following function:
+      void f(int);
+    ],
+    [
+      f('c');
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ],
+    [
+      AC_MSG_RESULT(yes. disabling template constraints)
+      AC_DEFINE(DEAL_II_SFINAE_BUG, 1, 
+                     [Defined if the compiler does not support the 
+		      substitution-failure-is-not-an-error paradigm.
+                      For the details, look at aclocal.m4 in the
+                      top-level directory.])
+    ])
+])
+
+
+
 
 dnl -------------------------------------------------------------
 dnl The boost::shared_ptr class has a templated assignment operator
