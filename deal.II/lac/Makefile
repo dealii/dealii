@@ -80,7 +80,7 @@ clean:
 #to remake this file upon inclusion at the bottom
 #of this file.
 Makefile.dep: $(cc-files) $(h-files) Makefile
-	@echo ============================ Remaking Makefile
+	@echo ============================ Remaking lac/Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/lac" $(cc-files) \
 		> Makefile.dep
 

@@ -153,7 +153,7 @@ $(LIBDIR)/libdeal_II_3d.so: $(o-files-3d)
 #to remake this file upon inclusion at the bottom
 #of this file.
 Makefile.dep: $(cc-files) $(h-files) Makefile
-	@echo ============================ Remaking Makefile
+	@echo ============================ Remaking deal.II/Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.o):!_DIM_PLACEHOLDER$$1:!g;' \

@@ -112,7 +112,7 @@ clean:
 #to three file names with the dimension for which we compile
 #appended
 Makefile.dep: $(cc-files) $(h-files) Makefile
-	@echo ============================ Remaking Makefile
+	@echo ============================ Remaking base/Makefile
 	@$(PERL) $D/common/scripts/make_dependencies.pl $(INCLUDE) "-B\$$(LIBDIR)/base" $(cc-files) \
 		| $(PERL) -p -e 's!(.*/base/data_out_base)((.g)?.o)!$$1_1d$$2 $$1_2d$$2 $$1_3d$$2 $$1_4d$$2!g;' \
 		> Makefile.dep
