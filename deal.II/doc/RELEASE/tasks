@@ -1,9 +1,15 @@
 This file is internal information only. It lists the steps to be done
 when a new release shall be issued:
 
+0/ cvs update -d
+
 1/ if a x.y.0 release, create a branch:
-    cvs tag all files with the tag Base-x-y
-    cvs tag -r all files with the tag Branch-x-y
+	call common/scripts/cvs-create-branch <x> <y>
+	from the deal home directory
+
+2/  cvs update -r Branch-<x>-<y>
+	or
+	cvs checkout -r Branch-<x>-<y> deal.II
 
 10/ cvs tag all files with Version-x-y-z
 
