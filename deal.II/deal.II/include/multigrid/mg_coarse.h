@@ -120,12 +120,17 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
 				      * Constructor, taking the coarse
 				      * grid matrix.
 				      */
-    MGCoarseGridHouseholder (const FullMatrix<number>& A);
+    MGCoarseGridHouseholder (const FullMatrix<number>* A = 0);
 
 				     /**
 				      * Initialize for a new matrix.
 				      */
     void initialize (const FullMatrix<number>& A);
+
+				     /**
+				      * Release matrix pointer.
+				      */
+    void clear ();
     
 				     /**
 				      * Solution operator, defined in
@@ -230,9 +235,9 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 
 template<typename number, class VECTOR>
 MGCoarseGridHouseholder<number, VECTOR>::MGCoarseGridHouseholder(
-  const FullMatrix<number>& A)
+  const FullMatrix<number>* A)
 		:
-		matrix(&A)
+		matrix(A)
 {}
 
 
@@ -243,6 +248,15 @@ MGCoarseGridHouseholder<number, VECTOR>::initialize(
   const FullMatrix<number>& A)
 {
   matrix = &A;
+}
+
+
+
+template<typename number, class VECTOR>
+void
+MGCoarseGridHouseholder<number, VECTOR>::clear()
+{
+  matrix = 0;
 }
 
 
