@@ -30,12 +30,12 @@
 
 
 
-template <typename number>
+template <class VECTOR>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt<number>::copy_to_mg (
+MGTransferPrebuilt<VECTOR>::copy_to_mg (
   const MGDoFHandler<dim>        &mg_dof_handler,
-  MGLevelObject<Vector<number> > &dst,
+  MGLevelObject<VECTOR> &dst,
   const InVector                 &src) const
 {
 				   // forward to the correct
@@ -44,12 +44,12 @@ MGTransferPrebuilt<number>::copy_to_mg (
 }
 
 
-template <typename number>
+template <class VECTOR>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt<number>::copy_to_mg (
+MGTransferPrebuilt<VECTOR>::copy_to_mg (
   const MGDoFHandler<dim>        &,
-  MGLevelObject<Vector<number> > &,
+  MGLevelObject<VECTOR> &,
   const InVector                 &,
   const is_1d<true>              &) const
 {
@@ -57,14 +57,14 @@ MGTransferPrebuilt<number>::copy_to_mg (
 }
 
 
-template <typename number>
+template <class VECTOR>
 template <int dim, class InVector>
 void
-MGTransferPrebuilt<number>::copy_to_mg (
-  const MGDoFHandler<dim>        &mg_dof_handler,
-  MGLevelObject<Vector<number> > &dst,
-  const InVector                 &src,
-  const is_1d<false>             &) const
+MGTransferPrebuilt<VECTOR>::copy_to_mg (
+  const MGDoFHandler<dim>& mg_dof_handler,
+  MGLevelObject<VECTOR>& dst,
+  const InVector&          src,
+  const is_1d<false>&) const
 {
 				   // Make src a real finite element function
 //  InVector src = osrc;
@@ -81,8 +81,8 @@ MGTransferPrebuilt<number>::copy_to_mg (
 
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
 	 ExcMatricesNotBuilt());
-  for (unsigned int l=minlevel;l<=maxlevel;++l)
-    dst[l].reinit(sizes[l]);
+//  for (unsigned int l=minlevel;l<=maxlevel;++l)
+//    dst[l].reinit(sizes[l]);
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
@@ -158,13 +158,13 @@ MGTransferPrebuilt<number>::copy_to_mg (
 
 
 
-template <typename number>
+template <class VECTOR>
 template <int dim, class OutVector>
 void
-MGTransferPrebuilt<number>::copy_from_mg(
-  const MGDoFHandler<dim>              &mg_dof_handler,
-  OutVector                            &dst,
-  const MGLevelObject<Vector<number> > &src) const
+MGTransferPrebuilt<VECTOR>::copy_from_mg(
+  const MGDoFHandler<dim>&       mg_dof_handler,
+  OutVector&                     dst,
+  const MGLevelObject<VECTOR>& src) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
 
@@ -206,13 +206,13 @@ MGTransferPrebuilt<number>::copy_from_mg(
 
 
 
-template <typename number>
+template <class VECTOR>
 template <int dim, class OutVector>
 void
-MGTransferPrebuilt<number>::copy_from_mg_add (
+MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   const MGDoFHandler<dim>              &mg_dof_handler,
   OutVector                            &dst,
-  const MGLevelObject<Vector<number> > &src) const
+  const MGLevelObject<VECTOR> &src) const
 {
   const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
 
@@ -255,9 +255,9 @@ MGTransferPrebuilt<number>::copy_from_mg_add (
 }
 
 
-template <typename number>
+template <class VECTOR>
 unsigned int
-MGTransferPrebuilt<number>::memory_consumption () const
+MGTransferPrebuilt<VECTOR>::memory_consumption () const
 {
   unsigned int result = sizeof(*this);
   result += sizeof(unsigned int) * sizes.size();
@@ -288,7 +288,9 @@ MGTransferSelect<number>::copy_to_mg (
 {
 				   // forward to the correct
 				   // specialization
-  do_copy_to_mg (mg_dof_handler, dst, src, 0, is_1d<(dim==1)>());
+  do_copy_to_mg (mg_dof_handler, dst, src,
+		 0, //component_start[selected_component],
+		 is_1d<(dim==1)>());
 }
 
 
@@ -353,7 +355,8 @@ MGTransferSelect<number>::do_copy_to_mg (
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
 	 ExcMatricesNotBuilt());
 
-  MGTools::reinit_vector(mg_dof_handler, dst, selected, mg_target_component);
+  MGTools::reinit_vector(mg_dof_handler, dst,
+			 mg_selected, mg_target_component);
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
@@ -399,7 +402,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 	    {
 	      const unsigned int component
 		= mg_target_component[fe.system_to_component_index(i).first];
-	      if (selected[component])
+	      if (mg_selected[component])
 		{
 		  const unsigned int level_start
 		    = mg_component_start[level][component];
@@ -409,13 +412,13 @@ MGTransferSelect<number>::do_copy_to_mg (
 		}
 	    }
 	  
-	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
-	    {
-	      const typename MGDoFHandler<dim>::face_iterator
-		face = level_cell->face(face_n);
-	      if (face->has_children())
-		{
-		  face->get_mg_dof_indices(level_face_indices);
+// 	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
+// 	    {
+// 	      const typename MGDoFHandler<dim>::face_iterator
+// 		face = level_cell->face(face_n);
+// 	      if (face->has_children())
+// 		{
+// 		  face->get_mg_dof_indices(level_face_indices);
 
 
 						   // Delete values on refinement edge,
@@ -423,9 +426,9 @@ MGTransferSelect<number>::do_copy_to_mg (
 //		  for (unsigned int i=0; i<dofs_per_face; ++i)
 //		    dst[level](level_face_indices[i])
 //		      = 0.;
-		};
-	    };
-	};
+//		};
+//	    };
+	}
 				       // for that part of the level
 				       // which is further refined:
 				       // get the defect by
@@ -539,7 +542,7 @@ MGTransferSelect<number>::do_copy_from_mg (
 	{
 	  const unsigned int component
 	    = mg_target_component[fe.system_to_component_index(i).first];
-	if (selected[component])
+	if (mg_selected[component])
 	  {
 	    const unsigned int level_start
 	      = mg_component_start[level][component];
@@ -602,7 +605,7 @@ MGTransferSelect<number>::do_copy_from_mg_add (
 	{
 	  const unsigned int component
 	    = mg_target_component[fe.system_to_component_index(i).first];
-	  if (selected[component])
+	  if (mg_selected[component])
 	    {
 	      const unsigned int level_start
 		= mg_component_start[level][component];
@@ -682,7 +685,7 @@ MGTransferBlock<number>::copy_to_mg (
   
   dst.clear();
 
-  MGTools::reinit_vector(mg_dof_handler, dst, selected, mg_target_component);
+  MGTools::reinit_vector(mg_dof_handler, dst, mg_selected, mg_target_component);
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);

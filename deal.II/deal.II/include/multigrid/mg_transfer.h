@@ -13,6 +13,7 @@
 #ifndef __deal2__mg_transfer_h
 #define __deal2__mg_transfer_h
 
+#include <base/config.h>
 
 #include <lac/block_vector.h>
 #ifdef DEAL_PREFER_MATRIX_EZ
@@ -35,19 +36,19 @@ template <int dim> class MGDoFHandler;
  */
 
 /**
- * Implementation of the @p{MGTransferBase} interface for which the transfer
+ * Implementation of the MGTransferBase interface for which the transfer
  * operations are prebuilt upon construction of the object of this class as
  * matrices. This is the fast way, since it only needs to build the operation
  * once by looping over all cells and storing the result in a matrix for
  * each level, but requires additional memory.
  *
- * See @ref{MGTransferBase} to find out which of the transfer classes
+ * See MGTransferBase to find out which of the transfer classes
  * is best for your needs.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999-2003
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999-2004
  */
-template <typename number>
-class MGTransferPrebuilt : public MGTransferBase<Vector<number> > 
+template <class VECTOR>
+class MGTransferPrebuilt : public MGTransferBase<VECTOR> 
 {
   public:
 				     /**
@@ -62,51 +63,13 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof);
 
-				     /**
-				      * Prolongate a vector from level
-				      * @p{to_level-1} to level
-				      * @p{to_level}. The previous
-				      * content of @p{dst} is
-				      * overwritten.
-				      *
-				      * @p{src} is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the coarser level of
-				      * the two involved levels, while @p{src}
-				      * shall have as many elements as there
-				      * are degrees of freedom on the finer
-				      * level.
-				      */
     virtual void prolongate (const unsigned int    to_level,
-			     Vector<number>       &dst,
-			     const Vector<number> &src) const;
+			     VECTOR       &dst,
+			     const VECTOR &src) const;
 
-				     /**
-				      * Restrict a vector from level
-				      * @p{from_level} to level
-				      * @p{from_level-1} and add this
-				      * restriction to
-				      * @p{dst}. Obviously, if the
-				      * refined region on level
-				      * @p{from_level} is smaller than
-				      * that on level @p{from_level-1},
-				      * some degrees of freedom in
-				      * @p{dst} are not covered and will
-				      * not be altered. For the other
-				      * degress of freedom, the result
-				      * of the restriction is added.
-				      *
-				      * @p{src} is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the finer level of
-				      * the two involved levels, while @p{src}
-				      * shall have as many elements as there
-				      * are degrees of freedom on the coarser
-				      * level.
-				      */
     virtual void restrict_and_add (const unsigned int    from_level,
-				   Vector<number>       &dst,
-				   const Vector<number> &src) const;
+				   VECTOR       &dst,
+				   const VECTOR &src) const;
 
     				     /**
 				      * Transfer from a vector on the
@@ -116,9 +79,9 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
 				      */
     template <int dim, class InVector>
     void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
-		const InVector                 &src) const;
+    copy_to_mg (const MGDoFHandler<dim>& mg_dof,
+		MGLevelObject<VECTOR>& dst,
+		const InVector&          src) const;
 
 				     /**
 				      * Transfer from multi-level vector to
@@ -136,7 +99,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
     void
     copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
 		  OutVector                            &dst,
-		  const MGLevelObject<Vector<number> > &src) const;
+		  const MGLevelObject<VECTOR> &src) const;
 
 				     /**
 				      * Add a multi-level vector to a
@@ -150,7 +113,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
     void
     copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
 		      OutVector                            &dst,
-		      const MGLevelObject<Vector<number> > &src) const;
+		      const MGLevelObject<VECTOR> &src) const;
 
 				     /**
 				      * Finite element does not
@@ -220,7 +183,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
     
 				     /**
 				      * Implementation of the
-				      * @p{copy_to_mg} function for
+				      * copy_to_mg() function for
 				      * 1d. We have to resort to some
 				      * template trickery because we
 				      * can't specialize template
@@ -238,7 +201,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
     template <int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
+		MGLevelObject<VECTOR> &dst,
 		const InVector                 &src,
 		const is_1d<true>              &) const;
 
@@ -249,15 +212,15 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
     template <int dim, class InVector>
     void
     copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<Vector<number> > &dst,
+		MGLevelObject<VECTOR> &dst,
 		const InVector                 &src,
 		const is_1d<false>             &) const;
 };
 
 
 /**
- * Implementation of matrix generation for @ref{MGTransferBlock} and
- * @p{MGTransferSelect}.
+ * Implementation of matrix generation for MGTransferBlock and
+ * MGTransferSelect.
  *
  * @author Guido Kanschat, 2001-2003
  */
@@ -283,8 +246,9 @@ class MGTransferBlockBase
 				      *
 				      * This function is only called
 				      * by derived classes. These can
-				      * also set the member variable
-				      * @p{target_component} for
+				      * also set the member variables
+				      * #target_component and
+				      * #mg_target_component for
 				      * re-ordering and grouping of
 				      * components.
 				      */
@@ -294,11 +258,34 @@ class MGTransferBlockBase
 
 				   /**
 				    * Flag of selected components.
+				    *
+				    * The transfer operators only act
+				    * on the components having a
+				    * <tt>true</tt> entry here. If
+				    * renumbering by
+				    * #target_component is used,
+				    * this refers to the
+				    * <b>renumbered</b> components.
 				    */
     std::vector<bool> selected;
 
+				   /**
+				    * Flag of selected components.
+				    *
+				    * The transfer operators only act
+				    * on the components having a
+				    * <tt>true</tt> entry here. If
+				    * renumbering by
+				    * #mg_target_component is used,
+				    * this refers to the
+				    * <b>renumbered</b> components.
+				    */
+    std::vector<bool> mg_selected;
+
 				     /**
-				      * Target component if renumbering is required.
+				      * Target component of the
+				      * fine-level vector if
+				      * renumbering is required.
 				      */
     std::vector<unsigned int> target_component;
     
@@ -326,7 +313,7 @@ class MGTransferBlockBase
     std::vector<std::vector<unsigned int> > mg_component_start;
 
 				     /**
-				      * Call @p{build_matrices}
+				      * Call build_matrices()
 				      * function first.
 				      */
     DeclException0(ExcMatricesNotBuilt);
@@ -364,7 +351,7 @@ class MGTransferBlockBase
 //TODO:[GK] Update this class
 
 /**
- * Implementation of the @p{MGTransferBase} interface for block
+ * Implementation of the MGTransferBase interface for block
  * matrices and block vectors.
  *
  * Warning! Due to additional requirements on MGTransferSelect, the
@@ -398,22 +385,34 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				     /**
 				      * Build the prolongation
 				      * matrices for each level.
-				      *
-				      * If a field selected is given,
-				      * only matrices for these
-				      * components are to be built. By
-				      * default, all matrices are
-				      * built.
-				      *
-				      * The last argument
-				      * @p{target_component} allows
-				      * grouping of components the
-				      * same way as in
-				      * @p{DoFRenumbering::component_wise}.
 				      * 
 				      * This function is a front-end
 				      * for the same function in
-				      * @ref{MGTransferBlockBase}.
+				      * MGTransferBlockBase.
+				      *
+				      * @arg selected: Opional
+				      * argument indicating that only
+				      * matrices for these components
+				      * are to be built. By default,
+				      * all matrices are built.
+				      *
+				      * If <tt>mg_target_component</tt> is
+				      * present, this refers to the
+				      * renumbered components.
+				      *
+				      * @arg target_component: this
+				      * argument allows grouping and
+				      * renumbering of components in
+				      * the fine-level vector (see
+				      * DoFRenumbering::component_wise).
+				      * 
+				      * @arg mg_target_component: this
+				      * argument allows grouping and
+				      * renumbering of components in
+				      * the level vectors (see
+				      * DoFRenumbering::component_wise). It
+				      * also affects the behavior of
+				      * the <tt>selected</tt> argument
 				      */
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
@@ -423,57 +422,35 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 			 const std::vector<unsigned int>& mg_target_component
 			 =std::vector<unsigned int>());
 
-				     /**
-				      * Prolongate a vector from level
-				      * @p{to_level-1} to level
-				      * @p{to_level}. The previous
-				      * content of @p{dst} is
-				      * overwritten.
-				      *
-				      * @p{src} is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the coarser level of
-				      * the two involved levels, while @p{src}
-				      * shall have as many elements as there
-				      * are degrees of freedom on the finer
-				      * level.
-				      */
     virtual void prolongate (const unsigned int    to_level,
 			     BlockVector<number>       &dst,
 			     const BlockVector<number> &src) const;
 
-				     /**
-				      * Restrict a vector from level
-				      * @p{from_level} to level
-				      * @p{from_level-1} and add this
-				      * restriction to
-				      * @p{dst}. Obviously, if the
-				      * refined region on level
-				      * @p{from_level} is smaller than
-				      * that on level @p{from_level-1},
-				      * some degrees of freedom in
-				      * @p{dst} are not covered and will
-				      * not be altered. For the other
-				      * degress of freedom, the result
-				      * of the restriction is added.
-				      *
-				      * @p{src} is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the finer level of
-				      * the two involved levels, while @p{src}
-				      * shall have as many elements as there
-				      * are degrees of freedom on the coarser
-				      * level.
-				      */
     virtual void restrict_and_add (const unsigned int    from_level,
 				   BlockVector<number>       &dst,
 				   const BlockVector<number> &src) const;
 
     				     /**
 				      * Transfer from a vector on the
-				      * global grid to vectors defined
-				      * on each of the levels
-				      * separately, i.a. an @p{MGVector}.
+				      * global grid to a multilevel
+				      * vector.
+				      *
+				      * The action for discontinuous
+				      * elements is as follows: on an
+				      * active mesh cell, the global
+				      * vector entries are simply
+				      * copied to the corresponding
+				      * entries of the level
+				      * vector. Then, these values are
+				      * restricted down to the
+				      * coarsest level.
+				      *
+				      * If the arguments
+				      * <tt>target_component</tt> and
+				      * <tt>mg_target_component</tt>
+				      * was used in build_matrices(),
+				      * then the blocks are shuffled
+				      * around accordingly.
 				      */
     template <int dim, class InVector>
     void
@@ -486,12 +463,16 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * normal vector.
 				      *
 				      * Copies data from active
-				      * portions of an MGVector into
-				      * the respective positions of a
-				      * @p{Vector<number>}. In order to
-				      * keep the result consistent,
-				      * constrained degrees of freedom
-				      * are set to zero.
+				      * portions of a multilevel
+				      * vector into the respective
+				      * positions of a global vector.
+				      *
+				      * If the arguments
+				      * <tt>target_component</tt> and
+				      * <tt>mg_target_component</tt>
+				      * was used in build_matrices(),
+				      * then the blocks are shuffled
+				      * around accordingly.
 				      */
     template <int dim, class OutVector>
     void
@@ -569,13 +550,13 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 //TODO:[GK] Update documentation for copy_* functions
 
 /**
- * Implementation of the @p{MGTransferBase} interface for block
- * matrices and simple vectors. This class uses @ref{MGTransferBlockBase}
+ * Implementation of the MGTransferBase interface for block
+ * matrices and simple vectors. This class uses MGTransferBlockBase
  * selecting a single component or grouping several components into a
  * single block. The transfer operators themselves are implemented for
  * Vector and BlockVector objects.
  *
- * See @ref{MGTransferBase} to find out which of the transfer classes
+ * See MGTransferBase to find out which of the transfer classes
  * is best for your needs.
  *
  * @author Guido Kanschat, 2001, 2002, 2003
@@ -594,29 +575,39 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Actually build the prolongation
 				      * matrices for grouped components.
 				      *
-				      * @p{selected} tells the copy
-				      * functions operating on single
-				      * vectors, which component this
-				      * vector belongs to.
+				      * This function is a front-end
+				      * for the same function in
+				      * MGTransferBlockBase.
 				      *
-				      * @p{mg_selected} is the number
+				      * @arg selected: Number of the
+				      * component of the global vector
+				      * to be copied from and to the
+				      * multilevel vector. This number
+				      * refers to the renumbering by
+				      * <tt>target_component</tt>.
+				      *
+				      * @arg mg_selected: Number
 				      * of the component for which the
 				      * transfer matrices should be
 				      * built.
 				      *
-				      * The argument
-				      * @p{target_component}
-				      * corresponds to the grouping
-				      * mechanism of
-				      * @p{DoFRenumbering::component_wise(...)},
-				      * which should be used to create
-				      * the corresponding block
-				      * structure in matrices and
-				      * vectors.
+				      * If <tt>mg_target_component</tt> is
+				      * present, this refers to the
+				      * renumbered components.
 				      *
-				      * This function is a front-end
-				      * for the same function in
-				      * @ref{MGTransferBlockBase}.
+				      * @arg target_component: this
+				      * argument allows grouping and
+				      * renumbering of components in
+				      * the fine-level vector (see
+				      * DoFRenumbering::component_wise).
+				      * 
+				      * @arg mg_target_component: this
+				      * argument allows grouping and
+				      * renumbering of components in
+				      * the level vectors (see
+				      * DoFRenumbering::component_wise). It
+				      * also affects the behavior of
+				      * the <tt>selected</tt> argument
 				      */
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
@@ -631,50 +622,13 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Change selected
 				      * component. Handle with care!
 				      */
-    void select (const unsigned int component);
+    void select (const unsigned int component,
+		 const unsigned int mg_component = deal_II_numbers::invalid_unsigned_int);
     
-				     /**
-				      * Prolongate a vector from level
-				      * @p{to_level-1} to level
-				      * @p{to_level}. The previous
-				      * content of @p{dst} is
-				      * overwritten.
-				      *
-				      * @p{src} is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the coarser level of
-				      * the two involved levels, while @p{src}
-				      * shall have as many elements as there
-				      * are degrees of freedom on the finer
-				      * level.
-				      */
     virtual void prolongate (const unsigned int    to_level,
 			     Vector<number>       &dst,
 			     const Vector<number> &src) const;
 
-				     /**
-				      * Restrict a vector from level
-				      * @p{from_level} to level
-				      * @p{from_level-1} and add this
-				      * restriction to
-				      * @p{dst}. Obviously, if the
-				      * refined region on level
-				      * @p{from_level} is smaller than
-				      * that on level @p{from_level-1},
-				      * some degrees of freedom in
-				      * @p{dst} are not covered and will
-				      * not be altered. For the other
-				      * degress of freedom, the result
-				      * of the restriction is added.
-				      *
-				      * @p{src} is assumed to be a vector with
-				      * as many elements as there are degrees
-				      * of freedom on the finer level of
-				      * the two involved levels, while @p{src}
-				      * shall have as many elements as there
-				      * are degrees of freedom on the coarser
-				      * level.
-				      */
     virtual void restrict_and_add (const unsigned int    from_level,
 				   Vector<number>       &dst,
 				   const Vector<number> &src) const;
@@ -682,21 +636,19 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				     /**
 				      * Structure that is used to
 				      * disambiguate calls to
-				      * @p{copy_to_mg} for 1d and
+				      * copy_to_mg() for 1d and
 				      * non-1d. We provide two
-				      * functions of @p{copy_to_mg},
+				      * functions of copy_to_mg(),
 				      * where the 1d function takes an
 				      * argument of type
-				      * @p{is_1d<true>} and the other
-				      * one of type @p{is_1d<false>}.
+				      * <tt>is_1d<true></tt> and the other
+				      * one of type <tt>is_1d<false></tt>}.
 				      */
     template <bool> struct is_1d {};
     
     				     /**
 				      * Transfer from a vector on the
-				      * global grid to vectors defined
-				      * on each of the levels
-				      * separately, i.a. an @p{MGVector}.
+				      * global grid to a multilevel vector.
 				      */
     template <int dim, typename number2>
     void
@@ -705,16 +657,13 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 		const Vector<number2>          &src) const;
 
 				     /**
-				      * Transfer from multi-level vector to
+				      * Transfer from multilevel vector to
 				      * normal vector.
 				      *
 				      * Copies data from active
-				      * portions of an MGVector into
-				      * the respective positions of a
-				      * @p{Vector<number>}. In order to
-				      * keep the result consistent,
-				      * constrained degrees of freedom
-				      * are set to zero.
+				      * portions of an multilevel
+				      * vector into the respective
+				      * positions of a Vector.
 				      */
     template <int dim, typename number2>
     void
@@ -738,9 +687,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 
     				     /**
 				      * Transfer from a vector on the
-				      * global grid to vectors defined
-				      * on each of the levels
-				      * separately, i.a. an @p{MGVector}.
+				      * global grid to multilevel vectors.
 				      */
     template <int dim, typename number2>
     void
@@ -749,16 +696,14 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 		const BlockVector<number2>     &src) const;
 
 				     /**
-				      * Transfer from multi-level vector to
+				      * Transfer from multilevel vector to
 				      * normal vector.
 				      *
 				      * Copies data from active
-				      * portions of an MGVector into
-				      * the respective positions of a
-				      * @p{Vector<number>}. In order to
-				      * keep the result consistent,
-				      * constrained degrees of freedom
-				      * are set to zero.
+				      * portions of a multilevel
+				      * vector into the respective
+				      * positions of a global
+				      * BlockVector.
 				      */
     template <int dim, typename number2>
     void
@@ -787,16 +732,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     
   private:
 				     /**
-				      * Transfer from multi-level vector to
-				      * normal vector.
-				      *
-				      * Copies data from active
-				      * portions of an MGVector into
-				      * the respective positions of a
-				      * @p{Vector<number>}. In order to
-				      * keep the result consistent,
-				      * constrained degrees of freedom
-				      * are set to zero.
+				      * Implementation of the public
+				      * function.
 				      */
     template <int dim, class OutVector>
     void
@@ -806,12 +743,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 		     const unsigned int offset) const;
 
 				     /**
-				      * Add a multi-level vector to a
-				      * normal vector.
-				      *
-				      * Works as the previous
-				      * function, but probably not for
-				      * continuous elements.
+				      * Implementation of the public
+				      * function.
 				      */
     template <int dim, class OutVector>
     void
@@ -822,7 +755,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 
 				     /**
 				      * Implementation of the
-				      * @p{copy_to_mg} function for
+				      * copy_to_mg() function for
 				      * 1d. We have to resort to some
 				      * template trickery because we
 				      * can't specialize template
@@ -846,8 +779,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 		   const is_1d<true>              &) const;
 
 				     /**
-				      * Same for all other space
-				      * dimensions.
+				      * Implementation of the
+				      * copy_to_mg() function for
+				      * higher dimensions.
 				      */
     template <int dim, class InVector>
     void
@@ -858,17 +792,25 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 		   const is_1d<false>             &) const;
 
                                      /**
-                                      * Selected component.
+                                      * Selected component of global vector.
                                       */
     unsigned int selected_component;
+                                     /**
+                                      * Selected component inside multigrid.
+                                      */
+    unsigned int mg_selected_component;
 };
 
 //----------------------------------------------------------------------//
 template <typename number>
 inline void
-MGTransferSelect<number>::select(const unsigned int component)
+MGTransferSelect<number>::select(const unsigned int component,
+				 const unsigned int mg_component)
 {
   selected_component = component;
+  mg_selected_component = (mg_component == deal_II_numbers::invalid_unsigned_int)
+			  ? component
+			  : mg_component;
 }
 
 

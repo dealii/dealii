@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,16 +90,16 @@ Multigrid<VECTOR>::print_vector (const unsigned int level,
 
 
 
-template <typename number>
-MGTransferPrebuilt<number>::~MGTransferPrebuilt () 
+template <class VECTOR>
+MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt () 
 {}
 
 
-template <typename number>
-void MGTransferPrebuilt<number>::prolongate (
-  const unsigned int   to_level,
-  Vector<number>       &dst,
-  const Vector<number> &src) const 
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::prolongate (
+  const unsigned int to_level,
+  VECTOR&            dst,
+  const VECTOR&      src) const 
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
@@ -108,11 +108,11 @@ void MGTransferPrebuilt<number>::prolongate (
 }
 
 
-template <typename number>
-void MGTransferPrebuilt<number>::restrict_and_add (
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::restrict_and_add (
   const unsigned int   from_level,
-  Vector<number>       &dst,
-  const Vector<number> &src) const 
+  VECTOR       &dst,
+  const VECTOR &src) const 
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
@@ -185,8 +185,8 @@ void MGTransferSelect<number>::prolongate (
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
-      prolongation_matrices[to_level-1]->block(selected_component,
-					       selected_component)
+      prolongation_matrices[to_level-1]->block(mg_selected_component,
+					       mg_selected_component)
 	.vmult (dst, src);
 }
 
@@ -200,8 +200,8 @@ void MGTransferSelect<number>::restrict_and_add (
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
 
-  prolongation_matrices[from_level-1]->block(selected_component,
-					     selected_component)
+  prolongation_matrices[from_level-1]->block(mg_selected_component,
+					     mg_selected_component)
     .Tvmult_add (dst, src);
 }
 
@@ -213,8 +213,10 @@ template class Multigrid<Vector<double> >;
 template class Multigrid<BlockVector<float> >;
 template class Multigrid<BlockVector<double> >;
 
-template class MGTransferPrebuilt<float>;
-template class MGTransferPrebuilt<double>;
+template class MGTransferPrebuilt<Vector<float> >;
+template class MGTransferPrebuilt<BlockVector<float> >;
+template class MGTransferPrebuilt<Vector<double> >;
+template class MGTransferPrebuilt<BlockVector<double> >;
 template class MGTransferBlock<float>;
 template class MGTransferBlock<double>;
 template class MGTransferSelect<float>;

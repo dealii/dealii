@@ -58,15 +58,16 @@ while(<CVS>)
 	} else {
 	    $status = "$status $work $rep ";
 	}
-
+	
+	$tag =~ s/ .*//;
 	$tag = '' if ($tag eq '(none)');
 	$date = '' if ($date eq '(none)');
 	$opt = '' if ($opt eq '(none)');
-	$opt = '' if ($opt eq '-kk');
+#	$opt = '' if ($opt eq '-kk');
 	my $stick = $tag . $date . $opt;
-	$stick = "Stick $stick" unless ($stick eq '');
+	$stick = "$stick" unless ($stick eq '');
 	$status .= $stick;
-	printf "%-40s %-20s %s\n", $file, $status,
+	printf "%-40s %-30s %s\n", $file, $status,
 	(($short) ? '' : $rep_file)
 	    unless ($compress && ($status eq 'OK '));
     }

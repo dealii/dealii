@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ print_matrix(std::ostream& of,
   MGDoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);
 
-  MGTransferPrebuilt<double> transfer;
+  MGTransferPrebuilt<Vector<double> > transfer;
   transfer.build_matrices(dof);
 
   unsigned int n_coarse = dof.n_dofs(level-1);

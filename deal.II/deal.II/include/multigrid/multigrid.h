@@ -34,7 +34,10 @@
  * Implementation of the multigrid method.
  *
  * Warning: multigrid on locally refined meshes only works with
- * discontinuous finite elements.
+ * <b>discontinuous finite elements</b> right now. It is not clear,
+ * whether the paradigm of local smoothing we use is applicable to
+ * continuous elements with hanging nodes; in fact, most people you
+ * meet on conferences seem to deny this.
  *
  * The function actually performing a multi-level cycle,
  * @p{level_mgstep}, as well as the function @p{vcycle}, calling it,

@@ -61,7 +61,7 @@ void MGTransferBlockBase::build_matrices (
     {
       mg_target_component.resize(mg_dof.get_fe().n_components());
       for (unsigned int i=0;i<mg_target_component.size();++i)
-	mg_target_component[i] = i;
+	mg_target_component[i] = target_component[i];
     } else {
       Assert (mg_target_component.size() == mg_dof.get_fe().n_components(),
 	      ExcDimensionMismatch(mg_target_component.size(),
@@ -88,10 +88,10 @@ void MGTransferBlockBase::build_matrices (
   
 				   // Selected refers to the component
 				   // in mg_target_component.
-  selected = select;
+  mg_selected = select;
   
-  Assert (selected.size() == fe.n_components(),
-	  ExcDimensionMismatch(selected.size(), fe.n_components()));
+  Assert (mg_selected.size() == fe.n_components(),
+	  ExcDimensionMismatch(mg_selected.size(), fe.n_components()));
   
 				   // Compute the lengths of all blocks
   sizes.resize(n_levels);
@@ -242,7 +242,7 @@ void MGTransferBlockBase::build_matrices (
 			  = fe.system_to_component_index(i).first;
 			const unsigned int jcomp
 			  = fe.system_to_component_index(j).first;
-			if ((icomp==jcomp) && selected[mg_target_component[icomp]])
+			if ((icomp==jcomp) && mg_selected[mg_target_component[icomp]])
 			  prolongation_sparsities[level]->add(dof_indices_child[i],
 							      dof_indices_parent[j]);
 		      };
@@ -278,7 +278,7 @@ void MGTransferBlockBase::build_matrices (
 		      {
 			const unsigned int icomp = fe.system_to_component_index(i).first;
 			const unsigned int jcomp = fe.system_to_component_index(j).first;
-			if ((icomp==jcomp) && selected[mg_target_component[icomp]])
+			if ((icomp==jcomp) && mg_selected[mg_target_component[icomp]])
 			  prolongation_matrices[level]->set(dof_indices_child[i],
 							    dof_indices_parent[j],
 							    prolongation(i,j));
@@ -351,14 +351,29 @@ void MGTransferSelect<number>::build_matrices (
 {
   unsigned int ncomp = mg_dof.get_fe().n_components();
   
-  selected_component = select;
-  std::vector<bool> s(ncomp, false);
-  s[mg_select] = true;
-//TODO:[GK] Assert that select and mg_select access the same component
-// or figure out how to use different components
   target_component = t_component;
   mg_target_component = mg_t_component;
   
+  selected_component = select;
+  mg_selected_component = mg_select;
+  selected.resize(ncomp, false);
+  selected[select] = true;
+				   // If components are renumbered,
+				   // find the first original
+				   // component corresponding to the
+				   // target component.
+  for (unsigned int i=0;i<target_component.size();++i)
+    {
+      if (target_component[i] == select)
+	{
+	  selected_component = i;
+	  break;
+	}
+    }
+    
+  std::vector<bool> s(ncomp, false);
+  s[mg_select] = true;
+
   MGTransferBlockBase::build_matrices (mg_dof, s);
 }
 
