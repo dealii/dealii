@@ -75,6 +75,8 @@ namespace FE_DGQ_1d
 	-0.09375, 0.375, 0.21875,
 	0.1875, -0.25, -0.1875,
   };
+
+//TODO[GK]: compute to full double accuracy  
   static const double dgq3_refined_onto_dgq3[] =
   {
 	0.6875, 0.9375, -0.75, -0.0625,
