@@ -150,7 +150,7 @@ void test ()
       dof_handler.distribute_dofs (fe);
 
       const unsigned int cells_per_direction
-	= static_cast<unsigned int>(rint(pow(tria.n_active_cells(), 1./dim)));
+	= static_cast<unsigned int>(rint(std::pow(tria.n_active_cells(), 1./dim)));
       
       std::vector<bool> selected_dofs (dof_handler.n_dofs());
       for (unsigned int subdomain=0; subdomain<(1<<dim); ++subdomain)
@@ -161,11 +161,11 @@ void test ()
 							selected_dofs.end(),
 							true))
 		  ==
-		  pow(cells_per_direction/2+1,dim),
+		  std::pow(static_cast<double>(cells_per_direction/2+1),dim),
 		  ExcNumberMismatch(std::count (selected_dofs.begin(),
 						selected_dofs.end(),
 						true),
-				    (int)pow(cells_per_direction/2+1,dim)));
+				    std::pow(static_cast<double>(cells_per_direction/2+1),dim)));
 	}
       deallog << "Check 4 (dim=" << dim << ") ok" << std::endl;      
     };
