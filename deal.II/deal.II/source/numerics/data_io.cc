@@ -2,9 +2,7 @@
 /* Copyright W. Bangerth, Guido Kanschat, Stefan Nauber  */
 /* University of Heidelberg, 1998, 1999                  */
 
-//#include <basic/data_io.h>
 #include <basic/data_io.h>
-#include <base/trace.h>
 #include <grid/dof.h>
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
@@ -1158,7 +1156,7 @@ void DataOut<2>::write_eps (ostream &out) const {
      };
 
   // Get scaling factors for Bounding Box 310 x 310
-  set<DataOut<2>::eps_cell_data>::iterator c;
+  typename multiset<DataOut<2>::eps_cell_data>::iterator c;
 
   double xmin=cells.begin()->vertices[0].x;
   double xmax=xmin;
@@ -1325,6 +1323,8 @@ string DataOut<dim>::get_output_format_names () {
   return "ucd|gnuplot|gnuplot draft|povray mesh|eps|epsgrid";
 };
 
+
+
 template<int dim>
 bool DataOut<dim>::eps_cell_data::operator < (const eps_cell_data &other) const
 {
@@ -1340,6 +1340,8 @@ bool DataOut<dim>::eps_cell_data::operator < (const eps_cell_data &other) const
 
   return maxz > othermaxz;
 };
+
+
 
 template <int dim>
 void DataOut<dim>::eps_vertex_data::turn(double azi, double ele)
@@ -1371,6 +1373,8 @@ void DataOut<dim>::eps_vertex_data::turn(double azi, double ele)
 // Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = ( sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
 //	 (  0   0 1 )( 0 sx  cx )(z)   (  0*x+	*(cx*y-sx*z)+1*(sx*y+cx*z) )
 
+
+
 template <int dim>
 void DataOut<dim>::eps_cell_data::turn(double azi, double ele)
 {
@@ -1378,7 +1382,9 @@ void DataOut<dim>::eps_cell_data::turn(double azi, double ele)
     vertices[i].turn(azi,ele);
 };
 
-//explicite instantiations
+
+
+//explicit instantiations
 
 template class DataIn<deal_II_dimension>;
 template class DataOut<deal_II_dimension>;
