@@ -950,8 +950,10 @@ void LaplaceProblem<dim>::run ()
 					   // format (but the ending
 					   // of the ``UCD''-file is
 					   // ``inp''), as supported
-					   // by AVS Explorer, for
-					   // example:	  
+					   // as input format by the
+					   // AVS Explorer (a
+					   // visualization program),
+					   // for example:
 	  grid_in.read_ucd (input_file);
                                            // If you like to use
                                            // another input format,
