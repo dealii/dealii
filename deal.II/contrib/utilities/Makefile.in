@@ -36,12 +36,12 @@ endif
 %.o : %.cc Makefile
 	@echo =====optimized===== $<
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
-%.exe : %.o
+%.exe : %.$o
 	@echo =====linking======= $@
 	@$(CXX) $(LDFLAGS) -o $@ $^
 
 
-default: embedding.exe interpolation.exe
+default: gridio.exe embedding.exe interpolation.exe
 
 ############################################################
 
