@@ -256,9 +256,6 @@ ostream & operator << (ostream &out, const Tensor<1,dim> &p);
 
 
 /*------------------------------- Inline functions: Tensor ---------------------------*/
-// in the following, declarations of operators look rather weird because they are
-// split over several lines. this is necessary, however, because otherwise doc++
-// gets really confused about this all... :-(
 
 
 template <int dim>
