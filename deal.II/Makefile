@@ -61,12 +61,38 @@ all: base lac 2d 1d 3d
 
 online-doc:
 	cd ../doc/auto ; make
+	@echo
+	@echo
+	@echo =======================================================
+	@echo "The online documentation can now be found in"
+	@echo "  /doc/auto/kdoc/base/index.html"
+	@echo "  /doc/auto/kdoc/lac/index.html"
+	@echo "  /doc/auto/kdoc/deal.II/index.html"
+	@echo =======================================================
+	@echo
+	@echo
 
 printable-doc:
 	cd ../doc/auto ; make latex/deal_II_technical_reference.ps
+	@echo
+	@echo
+	@echo =======================================================
+	@echo "The generated postscript file can be found here:"
+	@echo "  /doc/auto/latex/deal_II_technical_reference.ps"
+	@echo =======================================================
+	@echo
+	@echo
 
 tex-doc:
 	cd ../doc/auto ; make latex/deal_II_technical_reference.tex
+	@echo
+	@echo
+	@echo =======================================================
+	@echo "The generated LaTeX file can be found here:"
+	@echo "  /doc/auto/latex/deal_II_technical_reference.tex"
+	@echo =======================================================
+	@echo
+	@echo
 
 
 TAGS:
