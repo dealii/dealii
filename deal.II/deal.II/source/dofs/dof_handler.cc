@@ -26,6 +26,12 @@
 #include <algorithm>
 
 
+
+template <int dim>
+const unsigned int invalid_dof_index = static_cast<unsigned int>(-1);
+
+
+
 template <int dim>
 DoFHandler<dim>::DoFHandler (Triangulation<dim> &tria) :
 		tria(&tria),
