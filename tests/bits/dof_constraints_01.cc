@@ -43,9 +43,8 @@ void test ()
                                    // refine the mesh in a random way so as to
                                    // generate as many hanging node
                                    // constraints as possible
-//  triangulation.refine_global (4-dim);
-  triangulation.refine_global (1);
-  for (unsigned int i=0; i<1; ++i)
+  triangulation.refine_global (4-dim);
+  for (unsigned int i=0; i<11-2*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
         cell = triangulation.begin_active();
@@ -135,8 +134,8 @@ int main ()
 
   try
     {
-//       test<1> ();
-//       test<2> ();
+      test<1> ();
+      test<2> ();
       test<3> ();
     }
   catch (std::exception &exc)
