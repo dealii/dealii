@@ -15,10 +15,11 @@ clean-objects:  clean-base clean-lac \
 		clean-contrib
 
 
-# clean targets for the individual subdirectories.
+# clean targets for the individual subdirectories. remove
+# object files and template instantiation files.
 # extract dir name from target
 clean-base clean-lac clean-1d clean-2d clean-3d:
-	-cd $(@:clean-%=%) ; rm *.o
+	-cd $(@:clean-%=%) ; rm *.o *.ti *.ii
 
 clean-contrib:
 	-rm contrib/*/*.o
