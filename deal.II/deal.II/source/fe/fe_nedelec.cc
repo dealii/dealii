@@ -695,11 +695,18 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &/*mapping
 //  	for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
 //  	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
-//        if (flags & update_gradients)
+//    if (flags & update_gradients)
+//      {
+//  	  Assert (data.shape_gradients[k].size() <=
+//  		  fe_data.shape_gradients[k].size(),
+//  		  ExcInternalError());
+      
 //  	mapping.transform_covariant(data.shape_gradients[k],
 //  				    fe_data.shape_gradients[k],
 //  				    mapping_data, 0);
-//      }
+//      };
+  
+//    }
 
 //    if (flags & update_second_derivatives)
 //      compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
@@ -740,9 +747,14 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &/*ma
 //  	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
 //        if (flags & update_gradients)
+//    {
+//  	  Assert (data.shape_gradients[k].size() + offset <=
+//  		  fe_data.shape_gradients[k].size(),
+//  		  ExcInternalError());    
 //  	mapping.transform_covariant(data.shape_gradients[k],
 //  				    fe_data.shape_gradients[k],
 //  				    mapping_data, offset);
+// }  
 //      }
 
 //    if (flags & update_second_derivatives)
@@ -786,9 +798,14 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &/
 //  	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
 //        if (flags & update_gradients)
+//  {
+//    Assert (data.shape_gradients[k].size() + offset<=
+//  		  fe_data.shape_gradients[k].size(),
+//  		  ExcInternalError());
 //  	mapping.transform_covariant(data.shape_gradients[k],
 //  				    fe_data.shape_gradients[k],
 //  				    mapping_data, offset);
+// };  
 //      }
   
 //    if (flags & update_second_derivatives)

@@ -469,6 +469,9 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				       // cell
       for (unsigned int d=0; d<dim; ++d)
 	{
+	  Assert (diff_quot2.size() + offset <=
+		  diff_quot[d].size(),
+		  ExcInternalError());
 	  mapping.transform_covariant (&*diff_quot2.begin(), &*diff_quot2.end(),
 				       diff_quot[d].begin()+offset,
 				       mapping_internal);

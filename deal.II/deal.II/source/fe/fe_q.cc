@@ -1183,10 +1183,15 @@ FE_Q<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)
-	mapping.transform_covariant(data.shape_gradients[k].begin(),
-				    data.shape_gradients[k].end(),
-				    fe_data.shape_gradients[k].begin(),
-				    mapping_data);
+	{
+	  Assert (data.shape_gradients[k].size() <=
+		  fe_data.shape_gradients[k].size(),
+		  ExcInternalError());	  
+	  mapping.transform_covariant(data.shape_gradients[k].begin(),
+				      data.shape_gradients[k].end(),
+				      fe_data.shape_gradients[k].begin(),
+				      mapping_data);
+	};
     }
 
   if (flags & update_second_derivatives)
@@ -1227,10 +1232,15 @@ FE_Q<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
-	mapping.transform_covariant(data.shape_gradients[k].begin(),
-				    data.shape_gradients[k].end(),
-				    fe_data.shape_gradients[k].begin()+offset,
-				    mapping_data);
+	{
+	  Assert (data.shape_gradients[k].size() + offset <=
+		  fe_data.shape_gradients[k].size(),
+		  ExcInternalError());
+	  mapping.transform_covariant(data.shape_gradients[k].begin(),
+				      data.shape_gradients[k].end(),
+				      fe_data.shape_gradients[k].begin()+offset,
+				      mapping_data);
+	};
     }
 
   if (flags & update_second_derivatives)
@@ -1273,10 +1283,15 @@ FE_Q<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
-	mapping.transform_covariant(data.shape_gradients[k].begin(),
-				    data.shape_gradients[k].end(),
-				    fe_data.shape_gradients[k].begin()+offset,
-				    mapping_data);
+	{
+	  Assert (data.shape_gradients[k].size() + offset <=
+		  fe_data.shape_gradients[k].size(),
+		  ExcInternalError());
+	  mapping.transform_covariant(data.shape_gradients[k].begin(),
+				      data.shape_gradients[k].end(),
+				      fe_data.shape_gradients[k].begin()+offset,
+				      mapping_data);
+	};
     }
   
   if (flags & update_second_derivatives)

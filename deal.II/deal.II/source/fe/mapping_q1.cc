@@ -598,6 +598,8 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 		ExcDimensionMismatch(JxW_values.size(), npts));
       
       
+      Assert (data.aux[0].size() <= data.unit_tangentials[face_no].size(),
+	      ExcInternalError());
       transform_contravariant(data.aux[0].begin(),
 			      data.aux[0].end(),
 			      data.unit_tangentials[face_no].begin(),
@@ -621,6 +623,12 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 
 	  case 3:
 	{
+	  Assert (face_no+GeometryInfo<dim>::faces_per_cell <
+		  data.unit_tangentials.n_rows(),
+		  ExcInternalError());
+	  Assert (data.aux[1].size() <=
+		  data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell].size(),
+		  ExcInternalError());
 	  transform_contravariant(data.aux[1].begin(),
 				  data.aux[1].end(),
 				  data.unit_tangentials[
