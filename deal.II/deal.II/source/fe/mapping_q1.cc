@@ -23,6 +23,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <memory>
 
 
 

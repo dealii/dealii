@@ -25,6 +25,7 @@
 #include <fe/fe_tools.h>
 
 #include <numeric>
+#include <memory>
 
 
 template <int dim>
