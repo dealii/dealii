@@ -689,10 +689,16 @@ class BlockSparseMatrix : public Subscriptor
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotBlockSquare);
+
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcMatrixNotInitialized);
+
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcDivideByZero);
 
     
   private:
@@ -1073,10 +1079,13 @@ BlockSparseMatrix<number>::operator /= (const number factor)
 {
   Assert (columns != 0, ExcMatrixNotInitialized());
   Assert (rows != 0, ExcMatrixNotInitialized());
+  Assert (factor !=0, ExcDivideByZero());
+
+  const number factor_inv = 1. / factor;
 
   for (unsigned int r=0; r<rows; ++r)
     for (unsigned int c=0; c<columns; ++c)
-      block(r,c) /= factor;
+      block(r,c) *= factor_inv;
 
   return *this;
 }

@@ -1083,6 +1083,10 @@ class SparseMatrix : public virtual Subscriptor
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcDivideByZero);
+				     /**
+				      * Exception
+				      */
     DeclException2 (ExcIteratorRange,
 		    int, int,
 		    << "The iterators denote a range of " << arg1
@@ -1290,12 +1294,15 @@ SparseMatrix<number>::operator /= (const number factor)
 {
   Assert (cols != 0, ExcMatrixNotInitialized());
   Assert (val != 0, ExcMatrixNotInitialized());
+  Assert (factor !=0, ExcDivideByZero());
+
+  const number factor_inv = 1. / factor;
 
   number             *val_ptr    = &val[0];
   const number *const end_ptr    = &val[cols->n_nonzero_elements()];
 
   while (val_ptr != end_ptr)
-    *val_ptr++ /= factor;
+    *val_ptr++ *= factor_inv;
 
   return *this;
 }
