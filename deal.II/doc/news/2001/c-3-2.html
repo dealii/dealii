@@ -214,7 +214,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">Vector::operator *</code> is now
+       New: <code class="class">Vector</code>::<code class="member">operator *</code> is now
        templatized, allowing for scalar products of vectors with
        different underlying types.
        <br>
@@ -228,6 +228,15 @@ documentation, etc</a>.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: <code class="class">FiniteElement</code>::<code
+       class="member">has_support_on_face</code> allows to check
+       whether a shape function has non-zero values on a certain face
+       of a cell.
+       <br>
+       (GK 2001/12/04)
+       </p>
+
   <li> <p>
        Changed: The <code class="class">IteratorState</code> enum used
        to indicate the state in which an iterator can be is now
