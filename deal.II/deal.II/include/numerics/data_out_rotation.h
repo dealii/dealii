@@ -52,7 +52,11 @@ template <int dim> class DoFHandler;
  *
  * @sect3{Details for 1d computations}
  *
- * Presently not implemented, sorry.
+ * The one coordinate in the triangulation used by the
+ * @ref{DoFHandler} object passed to this class is taken as the radial
+ * variable, and the output will then be either a circle or a ring
+ * domain. It is in the user's responsibility to assure that the
+ * radial only attains non-negative values.
  *
  *
  * @sect3{Details for 2d computations}
@@ -68,6 +72,9 @@ template <int dim> class DoFHandler;
  * simulation where the first variable denoted the symmetry axis, and
  * the second denoted the radial variable. You have to take that into
  * account when first programming your application.
+ *
+ * It is in the responsibility of the user to make sure that the
+ * radial variable attains only non-negative values.
  *
  * @author Wolfgang Bangerth, 2000
  */
@@ -146,6 +153,12 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 		    int,
 		    << "The number of subdivisions per patch, " << arg1
 		    << ", is not valid.");
+				     /**
+				      * Exception
+				      */
+    DeclException1 (ExcRadialVariableHasNegativeValues,
+		    double,
+		    << "The radial variable attains a negative value of " << arg1);
     
   private:
 				     /**
