@@ -183,7 +183,7 @@ class ParameterHandler;
  * @p{-1} instead of the value of the data vector and are not plotted due to
  * the lower bound in z plotting direction, given in the third pair of brackets.
  *
- * Of course, more complex cuts than @p{$3==.5} are possible, including nonlinear
+ * Of course, more complex cuts are possible, including nonlinear
  * ones. Note however, that only those points which are actually on the
  * cut-surface are plotted.
  *
