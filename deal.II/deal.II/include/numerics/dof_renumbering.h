@@ -242,9 +242,27 @@ class DoFRenumbering
 				      * identity operation.
 				      */
     template <int dim>
-    static void component_wise (DoFHandler<dim>            &dof_handler,
-				const vector<unsigned int> &component_order = vector<unsigned int>());
+    static void
+    component_wise (DoFHandler<dim>            &dof_handler,
+		    const vector<unsigned int> &component_order = vector<unsigned int>());
 
+				     /**
+				      * Sort those degrees of freedom
+				      * which are tagged with #true#
+				      * in the #selected_dofs# array
+				      * to the back of the DoF
+				      * numbers. The sorting is
+				      * stable, i.e. the relative
+				      * order within the tagged
+				      * degrees of freedom is
+				      * preserved, as is the relative
+				      * order within the untagged
+				      * ones.
+				      */
+    template <int dim>
+    static void
+    sort_selected_dofs_back (const vector<bool> &selected_dofs,
+			     DoFHandler<dim>    &dof_handler);
 
 				     /**
 				      * Exception
@@ -254,6 +272,13 @@ class DoFRenumbering
 				      * Exception
 				      */
     DeclException0 (ExcInvalidComponentOrder);
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcInvalidArraySize,
+		    int, int,
+		    << "The array has size " << arg1 << " but should have "
+		    << arg2 << ".");
 };
 
 

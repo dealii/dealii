@@ -401,6 +401,7 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
 };
 
 
+
 template <int dim>
 void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 				     const vector<unsigned int> &component_order_arg)
@@ -496,6 +497,47 @@ void DoFRenumbering::component_wise (DoFHandler<dim>            &dof_handler,
 };
 
 
+
+template <int dim>
+void
+DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
+					 DoFHandler<dim>    &dof_handler)
+{
+  const unsigned int n_dofs = dof_handler.n_dofs();
+  Assert (selected_dofs.size() == n_dofs,
+	  ExcInvalidArraySize (selected_dofs.size(), n_dofs));
+
+				   // re-sort the dofs according to
+				   // their selection state
+  vector<unsigned int> new_dof_indices (n_dofs);
+  const unsigned int   n_selected_dofs = count (selected_dofs.begin(),
+						selected_dofs.end(),
+						false);
+  
+  unsigned int next_unselected = 0;
+  unsigned int next_selected   = n_selected_dofs;
+  for (unsigned int i=0; i<n_dofs; ++i)
+    if (selected_dofs[i] == false)
+      {
+	new_dof_indices[i] = next_unselected;
+	++next_unselected;
+      }
+    else
+      {
+	new_dof_indices[i] = next_selected;
+	++next_selected;
+      };
+  Assert (next_unselected == n_selected_dofs, ExcInternalError());
+  Assert (next_selected == n_dofs, ExcInternalError());
+
+				   // now perform the renumbering
+  dof_handler.renumber_dofs (new_dof_indices);
+};
+
+
+
+
+
 // explicit instantiations
 template
 void DoFRenumbering::Cuthill_McKee (DoFHandler<deal_II_dimension> &dof_handler,
@@ -512,3 +554,8 @@ void DoFRenumbering::Cuthill_McKee (MGDoFHandler<deal_II_dimension> &dof_handler
 template
 void DoFRenumbering::component_wise (DoFHandler<deal_II_dimension> &dof_handler,
 				     const vector<unsigned int>    &component_order_arg);
+
+
+template
+void DoFRenumbering::sort_selected_dofs_back (const vector<bool> &selected_dofs,
+					      DoFHandler<deal_II_dimension> &dof_handler);
