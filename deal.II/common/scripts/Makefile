@@ -14,7 +14,13 @@ ifeq ($(GXX-VERSION),compaq_cxx)
   XLDFLAGS = $(LDFLAGS:-shared=)
 endif
 
-make_dependencies : make_dependencies.cc
+# rules to generate the program. let is be dependent on the global flags for
+# the following reason: if you go to a different system, but keep with the
+# same directory, you get into trouble because make_dependencies is not
+# deleted by "make clean"; following this, we generate empty Makefile.dep's
+# because we can't run the executable. So better be careful and regenerate
+# make_dependencies whenever we think it may be beneficial
+make_dependencies : make_dependencies.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
 	@$(CXX) $(CXXFLAGS.o) -c $<
 	@$(CXX) $(LDFLAGS) -o $@ make_dependencies.o
