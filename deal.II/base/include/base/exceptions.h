@@ -854,6 +854,16 @@ namespace StandardExceptions
 				    */
   DeclException0 (ExcPureFunctionCalled);
 
+                                   /**
+				    * Used for constructors that are
+				    * disabled.  Examples are copy
+				    * constructors and assignment
+				    * operators of large objects,
+				    * which are only allowed for empty
+				    * objects.
+				    */
+  DeclException0 (ExcInvalidConstructorCall);
+
 				   /**
 				    * This exception is used if some
 				    * object is found uninitialized.
