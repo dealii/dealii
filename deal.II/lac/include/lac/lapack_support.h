@@ -53,15 +53,7 @@ namespace LAPACKSupport
 					 /// Matrix is in upper Hessenberg form
 	hessenberg = 8
   };
-  
-				   /**
-				    * Character constant.
-				    */
-  extern const char N = 'N';
-				   /**
-				    * Character constant.
-				    */
-  extern const char T = 'T';
+
 				   /**
 				    * Integer constant.
 				    */
