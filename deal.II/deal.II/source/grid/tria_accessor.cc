@@ -1567,9 +1567,9 @@ void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
 
 
 template <>
-bool CellAccessor<1>::point_inside (const Point<1> &) const
+bool CellAccessor<1>::point_inside (const Point<1> &p) const
 {
-  Assert (false, ExcNotImplemented() );
+  return (vertex(0)[0] <= p[0]) && (p[0] <= vertex(1)[0]);
 }
 
 #endif
@@ -1605,16 +1605,52 @@ void CellAccessor<2>::set_material_id (const unsigned char mat_id) const
     = mat_id;						 
 };
 
+
+
 template <>
 bool CellAccessor<2>::point_inside (const Point<2> &p) const
 {
-  for (unsigned int k=0;k<4;++k)
+				   // we check whether the point is
+				   // inside the cell by making sure
+				   // that it on the inner side of
+				   // each line defined by the faces,
+				   // i.e. for each of the four faces
+				   // we take the line that connects
+				   // the two vertices and subdivide
+				   // the whole domain by that in two
+				   // and check whether the point is
+				   // on the `cell-side' (rather than
+				   // the `out-side') of this line. if
+				   // the point is on the `cell-side'
+				   // for all four faces, it must be
+				   // inside the cell.
+  for (unsigned int f=0; f<4; ++f)
     {
-      const Point<2> to_p = p-vertex(k);
-      const Point<2> face = vertex((k+1)%4)-vertex(k);
-      if (-face(1)*to_p(0)+face(0)*to_p(1)<0)
+				       // vector from the first vertex
+				       // of the line to the point
+      const Point<2> to_p = p-vertex(f);
+				       // vector describing the line
+      const Point<2> face = vertex((f+1)%4)-vertex(f);
+
+				       // if we rotate the face vector
+				       // by 90 degrees to the left
+				       // (i.e. it points to the
+				       // inside) and take the scalar
+				       // product with the vector from
+				       // the vertex to the point,
+				       // then the point is in the
+				       // `cell-side' if the scalar
+				       // product is positive. if this
+				       // is not the case, we can be
+				       // sure that the point is
+				       // outside
+      if ((-face(1)*to_p(0)+face(0)*to_p(1))<0)
 	return false;
-    }
+    };
+
+				   // if we arrived here, then the
+				   // point is inside for all four
+				   // faces, and thus inside
   return true;
 }
 
@@ -1654,10 +1690,12 @@ void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
     = mat_id;						 
 };
 
+
 template <>
 bool CellAccessor<3>::point_inside (const Point<3> &) const
 {
   Assert (false, ExcNotImplemented() );
+  return false;
 }
 
 
