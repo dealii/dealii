@@ -1935,6 +1935,23 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 	    out << std::setprecision (5);
 	  };
 
+					 // check if min and max
+					 // values for the color are
+					 // actually different. If
+					 // that is not the case (such
+					 // things happen, for
+					 // example, in the very first
+					 // time step of a time
+					 // dependent problem, if the
+					 // initial values are zero),
+					 // all values are equal, and
+					 // then we can draw
+					 // everything in an arbitrary
+					 // color. Thus, change one of
+					 // the two values arbitrarily
+	if (max_color_value == min_color_value)
+	  max_color_value = min_color_value+1;
+
 					 // now we've got all the information
 					 // we need. write the cells.
 					 // note: due to the ordering, we
@@ -1952,13 +1969,17 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 		      = (*flags.color_function) (cell->color_value,
 						 min_color_value,
 						 max_color_value);
-		    
-		    out << rgb_values.red   << ' '
-			<< rgb_values.green << ' '
-			<< rgb_values.blue  << " s ";
+
+						     // write out color
+		    if (rgb_values.is_grey())
+		      out << rgb_values.red << " sg ";
+		    else
+		      out << rgb_values.red   << ' '
+			  << rgb_values.green << ' '
+			  << rgb_values.blue  << " s ";
 		  }
 		else
-		  out << "1 1 1 s ";
+		  out << "1 sg ";
 
 		out << (cell->vertices[0]-offset) * scale << " m "
 		    << (cell->vertices[1]-offset) * scale << " l "

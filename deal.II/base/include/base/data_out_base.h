@@ -961,6 +961,16 @@ class DataOutBase
 	    float red;
 	    float green;
 	    float blue;
+
+					     /**
+					      * Return @p{true} if the
+					      * color represented by
+					      * the three color values
+					      * is a grey scale,
+					      * i.e. all components
+					      * are equal.
+					      */
+	    bool is_grey () const;
 	};
 
 					 /**
@@ -2040,6 +2050,18 @@ class DataOutInterface : private DataOutBase
 				      */
     VtkFlags     vtk_flags;
 };
+
+
+
+/* -------------------- inline functions ------------------- */
+
+inline
+bool
+DataOutBase::EpsFlags::RgbValues::is_grey () const 
+{
+  return (red == green) && (red == blue);
+};
+
 
 
 #endif

@@ -96,6 +96,24 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Fixed: In EPS output, colors were set to invalid values if the
+       values of the field that is used for coloring are all
+       equal. This happens, for example, in the very first time step
+       of time dependent problems, if initial values are zero. The
+       color value now used is arbitrary, but valid.
+       <br>
+       (WB 2002/07/24)
+       </p>
+
+  <li> <p> 
+       Changed: To save disk space, color values in EPS output are
+       written as grey scale with only one value instead of three RGB
+       values if the color so represented is actually a grey scale.
+       <br>
+       (WB 2002/07/24)
+       </p>
+
+  <li> <p> 
        New: There are now operators to allow multiplication and
        division of <code class="class">Tensor</code> objects by scalar
        factors.
