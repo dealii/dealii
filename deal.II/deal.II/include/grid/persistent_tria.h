@@ -121,6 +121,12 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * data. For this, the coarse grid is
 				      * copied and the grid is stepwise
 				      * rebuilt using the saved flags.
+				      *
+				      * Note that this function will result in
+				      * an error if the underlying triangulation
+				      * is not empty, i.e. it will only succeed
+				      * if this object is newly created or
+				      * #clear()# was called on it before.
 				      */
     void restore ();
 

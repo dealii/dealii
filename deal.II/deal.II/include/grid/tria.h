@@ -1639,6 +1639,11 @@ class Triangulation
 				     /**
 				      * Reset this triangulation into a
 				      * virgin state by deleting all data.
+				      *
+				      * Note that this operation is only allowed
+				      * if no subscriptions to this object exist
+				      * any more, such as #DoFHandler# objects
+				      * using it.
 				      */
     void clear ();
     
