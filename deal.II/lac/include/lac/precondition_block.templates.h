@@ -28,7 +28,7 @@ PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock ():
 		blocksize(0),
 		A(0),
 		store_diagonals(false),
-		same_diagonal(false)
+		var_same_diagonal(false)
 {}
 
 
@@ -50,7 +50,7 @@ void PreconditionBlock<MATRIX,inverse_type>::clear ()
   if (var_diagonal.size()!=0)
     var_diagonal.erase(var_diagonal.begin(), var_diagonal.end());
   blocksize     = 0;
-  same_diagonal = false;
+  var_same_diagonal = false;
   A = 0;
 }
 
@@ -69,7 +69,9 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
   blocksize=bsize;
   relaxation = parameters.relaxation;
-  same_diagonal = parameters.same_diagonal;
+  var_same_diagonal = parameters.same_diagonal;
+  nblocks = A->m()/bsize;
+  
   if (parameters.invert_diagonal)
     invert_diagblocks();
 }
@@ -79,7 +81,7 @@ template <class MATRIX, typename inverse_type>
 const FullMatrix<inverse_type>&
 PreconditionBlock<MATRIX,inverse_type>::inverse(unsigned int i) const
 {
-  if (same_diagonal)
+  if (same_diagonal())
     return var_inverse[0];
   
   Assert (i < var_inverse.size(), ExcIndexRange(i,0,var_inverse.size()));
@@ -93,7 +95,7 @@ PreconditionBlock<MATRIX,inverse_type>::diagonal(unsigned int i) const
 {
   Assert(store_diagonals, ExcDiagonalsNotStored());
   
-  if (same_diagonal)
+  if (same_diagonal())
     return var_diagonal[0];
   
   Assert (i < var_diagonal.size(), ExcIndexRange(i,0,var_diagonal.size()));
@@ -113,7 +115,15 @@ void
 PreconditionBlock<MATRIX,inverse_type>::set_same_diagonal()
 {
   Assert(var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
-  same_diagonal = true;
+  var_same_diagonal = true;
+}
+
+
+template <class MATRIX, typename inverse_type>
+bool
+PreconditionBlock<MATRIX,inverse_type>::same_diagonal() const
+{
+  return var_same_diagonal;
 }
 
 
@@ -134,11 +144,9 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
   const MATRIX &M=*A;
   Assert (var_inverse.size()==0, ExcInverseMatricesAlreadyExist());
 
-  const unsigned int n_cells = M.m()/blocksize;
-
   FullMatrix<inverse_type> M_cell(blocksize);
 
-  if (same_diagonal)
+  if (same_diagonal())
     {
       deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
 				       // Invert only the first block
@@ -176,7 +184,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 
 				       // set the @p{var_inverse} array to the right
 				       // size. we could do it like this:
-				       // var_inverse = vector<>(n_cells,FullMatrix<>())
+				       // var_inverse = vector<>(nblocks,FullMatrix<>())
 				       // but this would involve copying many
 				       // FullMatrix objects.
 				       //
@@ -185,14 +193,14 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
       if (store_diagonals)
 	{
 	  std::vector<FullMatrix<inverse_type> >
-	    tmp(n_cells, FullMatrix<inverse_type>(blocksize));
+	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
 	  var_diagonal.swap (tmp);
 	}
 
       if (true)
 	{
 	  std::vector<FullMatrix<inverse_type> >
-	    tmp(n_cells, FullMatrix<inverse_type>(blocksize));
+	    tmp(nblocks, FullMatrix<inverse_type>(blocksize));
 	  var_inverse.swap (tmp);
 					   // make sure the tmp object
 					   // goes out of scope as
@@ -201,7 +209,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 
       M_cell.clear ();
       
-      for (unsigned int cell=0; cell<n_cells; ++cell)
+      for (unsigned int cell=0; cell<nblocks; ++cell)
 	{
 	  const unsigned int cell_start = cell*blocksize;
 	  for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
@@ -276,7 +284,6 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
   Assert(this->A!=0, ExcNotInitialized());
   
   const MATRIX &M=*this->A;
-  const unsigned int n_cells=M.m()/this->blocksize;
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -292,7 +299,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
-      for (unsigned int cell=0; cell<n_cells; ++cell)
+      for (unsigned int cell=0; cell<nblocks; ++cell)
 	{
 	  for (row=cell*this->blocksize, row_cell=0;
 	       row_cell<this->blocksize;
@@ -318,7 +325,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 	}
     }
   else
-    for (unsigned int cell=0; cell<n_cells; ++cell)
+    for (unsigned int cell=0; cell<nblocks; ++cell)
       {
 	for (row=cell*this->blocksize, row_cell=0;
 	     row_cell<this->blocksize;
@@ -412,7 +419,6 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
   Assert (this->A!=0, ExcNotInitialized());
   
   const MATRIX &M=*this->A;
-  const unsigned int n_cells=M.m()/this->blocksize;
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -429,7 +435,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
-      for (unsigned int cell=0; cell<n_cells; ++cell)
+      for (unsigned int cell=0; cell<nblocks; ++cell)
 	{
 	  for (row = block_start, row_cell = 0;
 	       row_cell < this->blocksize;
@@ -464,7 +470,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
 	}
     }
   else
-    for (unsigned int cell=0; cell<n_cells; ++cell)
+    for (unsigned int cell=0; cell<nblocks; ++cell)
       {
 	for (row = block_start, row_cell = 0;
 	     row_cell<this->blocksize;
@@ -522,7 +528,6 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
   Assert (this->A!=0, ExcNotInitialized());
   
   const MATRIX &M=*this->A;
-  const unsigned int n_cells=M.m()/this->blocksize;
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -534,13 +539,13 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
 				       // row, column are the global numbering
 				       // of the unkowns.
   unsigned int row, row_cell, block_start = 0;
-  unsigned int block_end=this->blocksize *n_cells;
+  unsigned int block_end=this->blocksize *nblocks;
   number2 b_cell_row;
 
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
-      for (int icell=n_cells-1; icell>=0 ; --icell)
+      for (int icell=nblocks-1; icell>=0 ; --icell)
 	{
 	  unsigned int cell = (unsigned int) icell;
 					   // Collect upper triangle
@@ -578,7 +583,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
 	}
     }
   else
-    for (int icell=n_cells-1; icell >=0 ; --icell)
+    for (int icell=nblocks-1; icell >=0 ; --icell)
       {
 	unsigned int cell = (unsigned int) icell;
 	for (row=cell*this->blocksize, row_cell=0;
@@ -672,10 +677,8 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &d
   Vector<inverse_type> cell_src(this->blocksize);
   Vector<inverse_type> cell_dst(this->blocksize);
   
-  const unsigned int n_cells = this->A->m()/this->blocksize;
-
 				   // Multiply with diagonal blocks
-  for (unsigned int cell=0; cell<n_cells; ++cell)
+  for (unsigned int cell=0; cell<nblocks; ++cell)
     {
       unsigned int row = cell*this->blocksize;
       
@@ -704,10 +707,8 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &
   Vector<inverse_type> cell_src(this->blocksize);
   Vector<inverse_type> cell_dst(this->blocksize);
   
-  const unsigned int n_cells = this->A->m()/this->blocksize;
-
 				   // Multiply with diagonal blocks
-  for (unsigned int cell=0; cell<n_cells; ++cell)
+  for (unsigned int cell=0; cell<nblocks; ++cell)
     {
       unsigned int row = cell*this->blocksize;
       

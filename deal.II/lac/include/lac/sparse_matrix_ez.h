@@ -1635,9 +1635,9 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 				       // Determine minimal and
 				       // maximal row for a column in
 				       // advance.
-/*
-      std::vector<unsigned int>::minrow(B.n(), B.m());
-      std::vector<unsigned int>::maxrow(B.n(), 0);
+
+      std::vector<unsigned int> minrow(B.n(), B.m());
+      std::vector<unsigned int> maxrow(B.n(), 0);
       while (b1 != b_final)
 	{
 	  const unsigned int r = b1->row();
@@ -1645,29 +1645,55 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA& A,
 	    minrow[b1->column()] = r;
 	  if (r > maxrow[b1->column()])
 	    maxrow[b1->column()] = r;
-	}
-*/
-      
-      b1 = B.begin();
-      while (b1 != b_final)
-	{
-	  const unsigned int i = b1->row();
-	  const unsigned int k = b1->column();
-	  typename MATRIXB::const_iterator b2 = B.begin();
-	  while (b2 != b_final)
-	    {
-	      const unsigned int j = b2->row();
-	      const unsigned int l = b2->column();
-	      
-	      const typename MATRIXA::value_type a = A.el(k,l);
-	      
-	      if (a != 0.)
-		{
-		  add (i, j, a * b1->value() * b2->value());
-		}
-	      ++b2;
-	    }
 	  ++b1;
+	}
+
+      typename MATRIXA::const_iterator ai = A.begin();
+      const typename MATRIXA::const_iterator ae = A.end();
+
+      while (ai != ae)
+	{
+	  const typename MATRIXA::value_type a = ai->value();
+					   // Don't do anything if
+					   // this entry is zero.
+	  if (a == 0.) continue;
+
+					   // Now, loop over all rows
+					   // having possibly a
+					   // nonzero entry in column
+					   // ai->row()
+	  b1 = B.begin(minrow[ai->row()]);
+	  const typename MATRIXB::const_iterator
+	    be1 = B.end(maxrow[ai->row()]);
+	  const typename MATRIXB::const_iterator
+	    be2 = B.end(maxrow[ai->column()]);
+
+	  while (b1 != be1)
+	    {
+	      const double b1v = b1->value();
+					       // We need the product
+					       // of both. If it is
+					       // zero, we can save
+					       // the work
+	      if (b1->column() == ai->row() && (b1v != 0.))
+		{
+		  const unsigned int i = b1->row();
+		  
+		  typename MATRIXB::const_iterator
+		    b2 = B.begin(minrow[ai->column()]);
+		  while (b2 != be2)
+		    {
+		      if (b2->column() == ai->column())
+			{
+			  const unsigned int j = b2->row();
+			  add (i, j, a * b1v * b2->value());
+			}
+		      ++b2;
+		    }
+		}
+	      ++b1;
+	    }
+	  ++ai;
 	}
     }
 }

@@ -24,6 +24,9 @@
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
 
+template<class MATRIX, typename inverse_type>
+class PreconditionBlockJacobi;
+
 /*! @addtogroup Preconditioners
  *@{
  */
@@ -197,6 +200,12 @@ class PreconditionBlock : public virtual Subscriptor
 				      * yields a preconditioner.
 				      */
     void set_same_diagonal ();
+
+				     /**
+				      * Does the matrix use only one
+				      * diagonal block?
+				      */
+    bool same_diagonal () const;
     
     				     /**
 				      * Stores the inverse of the
@@ -232,6 +241,12 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     unsigned int block_size () const;
 
+				     /**
+				      * The number of blocks of the
+				      * matrix.
+				      */
+    unsigned int n_blocks() const;
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -324,7 +339,12 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     bool store_diagonals;
 
+				     /**
+				      * Number of blocks.
+				      */
+    unsigned int nblocks;
   private:
+    
 				     /**
 				      * Storage of the inverse
 				      * matrices of the diagonal
@@ -350,7 +370,7 @@ class PreconditionBlock : public virtual Subscriptor
 				      * Flag for diagonal compression.
 				      * @ref set_same_diagonal()
 				      */
-    bool same_diagonal;
+    bool var_same_diagonal;
 };
 
 
@@ -358,7 +378,7 @@ class PreconditionBlock : public virtual Subscriptor
 /**
  * Block Jacobi preconditioning.
  * See @ref{PreconditionBlock} for requirements on the matrix.
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
+ * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class PreconditionBlockJacobi : public virtual Subscriptor,
@@ -371,6 +391,148 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
     typedef typename MATRIX::value_type number;
     
   public:
+				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator
+    {
+      private:
+                                         /**
+                                          * Accessor class for iterators
+                                          */
+        class Accessor
+        {
+          public:
+                                             /**
+                                              * Constructor. Since we use
+                                              * accessors only for read
+                                              * access, a const matrix
+                                              * pointer is sufficient.
+                                              */
+            Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
+                      const unsigned int row);
+
+                                             /**
+                                              * Row number of the element
+                                              * represented by this
+                                              * object.
+                                              */
+            unsigned int row() const;
+
+                                             /**
+                                              * Column number of the
+                                              * element represented by
+                                              * this object.
+                                              */
+            unsigned int column() const;
+
+                                             /**
+                                              * Value of this matrix entry.
+                                              */
+            inverse_type value() const;
+	
+          protected:
+                                             /**
+                                              * The matrix accessed.
+                                              */
+            const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix;
+
+					     /**
+					      * Save block size here
+					      * for further reference.
+					      */
+	    unsigned int bs;
+	    
+					     /**
+					      * Current block number.
+					      */
+	    unsigned int a_block;
+
+					     /**
+					      * Current block for extracting data.
+					      *
+					      * This is either
+					      * @p{a_block} or zero,
+					      * depending on
+					      * @p{same_diagonal}.
+					      */
+	    unsigned int u_block;
+
+					     /**
+					      * Iterator inside block.
+					      */
+	    typename FullMatrix<inverse_type>::const_iterator b_iterator;
+
+					     /**
+					      * End of current block.
+					      */
+	    typename FullMatrix<inverse_type>::const_iterator b_end;
+	    
+                                             /**
+                                              * Make enclosing class a
+                                              * friend.
+                                              */
+            friend class const_iterator;
+        };
+        
+      public:
+                                         /**
+                                          * Constructor.
+                                          */ 
+	const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
+		       const unsigned int row);
+	  
+                                         /**
+                                          * Prefix increment.
+                                          */
+	const_iterator& operator++ ();
+
+                                         /**
+                                          * Postfix increment.
+                                          */
+	const_iterator& operator++ (int);
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor& operator* () const;
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor* operator-> () const;
+
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
+	bool operator == (const const_iterator&) const;
+                                         /**
+                                          * Inverse of @p{==}.
+                                          */
+	bool operator != (const const_iterator&) const;
+
+                                         /**
+                                          * Comparison
+                                          * operator. Result is true
+                                          * if either the first row
+                                          * number is smaller or if
+                                          * the row numbers are
+                                          * equal and the first
+                                          * index is smaller.
+                                          */
+	bool operator < (const const_iterator&) const;
+
+      private:
+                                         /**
+                                          * Store an object of the
+                                          * accessor class.
+                                          */
+        Accessor accessor;
+    };
+
 				     /**
 				      * Make initialization function
 				      * publicly available.
@@ -442,6 +604,29 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
 				      */
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
+
+    				     /**
+				      * STL-like iterator with the
+				      * first entry.
+				      */
+    const_iterator begin () const;
+
+				     /**
+				      * Final iterator.
+				      */
+    const_iterator end () const;
+    
+				     /**
+				      * STL-like iterator with the
+				      * first entry of row @p{r}.
+				      */
+    const_iterator begin (const unsigned int r) const;
+
+				     /**
+				      * Final iterator of row @p{r}.
+				      */
+    const_iterator end (const unsigned int r) const;
+    
 
   private:
 				   /**
@@ -724,6 +909,14 @@ PreconditionBlock<MATRIX, inverse_type>::empty () const
 
 
 template<class MATRIX, typename inverse_type>
+inline unsigned int
+PreconditionBlock<MATRIX, inverse_type>::n_blocks () const
+{
+  return nblocks;
+}
+
+
+template<class MATRIX, typename inverse_type>
 inline inverse_type
 PreconditionBlock<MATRIX, inverse_type>::el (
   unsigned int i,
@@ -743,6 +936,206 @@ PreconditionBlock<MATRIX, inverse_type>::el (
     }
   
   return B(ib, jb);
+}
+
+//----------------------------------------------------------------------//
+
+template<class MATRIX, typename inverse_type>
+inline
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::
+Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type>* matrix,
+          const unsigned int row)
+		:
+		matrix(matrix),
+		b_iterator(&matrix->inverse(0), 0, 0),
+		b_end(&matrix->inverse(0), 0, 0)
+{
+  bs = matrix->block_size();
+  a_block = row / bs;
+
+				   // This is the end accessor, which
+				   // does not hava a valid block.
+  if (a_block == matrix->n_blocks())
+    return;
+
+  const unsigned int r = row % bs;
+
+  u_block = (matrix->same_diagonal()) ? 0 : a_block;
+
+  b_iterator = matrix->inverse(u_block).begin(r);
+  b_end = matrix->inverse(u_block).end();
+
+  Assert (a_block < matrix->n_blocks(),
+	  ExcIndexRange(a_block, 0, matrix->n_blocks()));
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+unsigned int
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() const
+{
+  Assert (a_block < matrix->n_blocks(),
+	  ExcIteratorPastEnd());
+  
+  return bs * a_block + b_iterator->row();
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+unsigned int
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::column() const
+{
+  Assert (a_block < matrix->n_blocks(),
+	  ExcIteratorPastEnd());
+  
+  return bs * a_block + b_iterator->column();
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+inverse_type
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::value() const
+{
+  Assert (a_block < matrix->n_blocks(),
+	  ExcIteratorPastEnd());
+  
+  return b_iterator->value();
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
+const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
+               const unsigned int row)
+		:
+		accessor(matrix, row)
+{}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator &
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator++ ()
+{
+  Assert (*this != accessor.matrix->end(), ExcIteratorPastEnd());
+  
+  ++accessor.b_iterator;
+  if (accessor.b_iterator == accessor.b_end)
+    {
+      ++accessor.a_block;
+      if (!accessor.matrix->same_diagonal())
+	++accessor.u_block;
+      
+      if (accessor.a_block < accessor.matrix->n_blocks())
+	{
+	  accessor.b_iterator = accessor.matrix->inverse(accessor.a_block).begin();
+	  accessor.b_end = accessor.matrix->inverse(accessor.a_block).end();
+	}
+    }
+  return *this;
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+const typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor &
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator* () const
+{
+  return accessor;
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+const typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor *
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator-> () const
+{
+  return &accessor;
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+bool
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
+operator == (const const_iterator& other) const
+{
+  if (accessor.a_block == accessor.matrix->n_blocks() &&
+      accessor.a_block == other.accessor.a_block)
+    return true;
+
+  if (accessor.a_block != other.accessor.a_block)
+    return false;
+  
+  return (accessor.row() == other.accessor.row() &&
+          accessor.column() == other.accessor.column());
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+bool
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
+operator != (const const_iterator& other) const
+{
+  return ! (*this == other);
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+bool
+PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
+operator < (const const_iterator& other) const
+{
+  return (accessor.row() < other.accessor.row() ||
+	  (accessor.row() == other.accessor.row() &&
+           accessor.column() < other.accessor.column()));
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
+PreconditionBlockJacobi<MATRIX, inverse_type>::begin () const
+{
+  return const_iterator(this, 0);
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
+PreconditionBlockJacobi<MATRIX, inverse_type>::end () const
+{
+  return const_iterator(this, n_blocks() * block_size());
+}
+
+
+template<class MATRIX, typename inverse_type>
+inline
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
+PreconditionBlockJacobi<MATRIX, inverse_type>::begin (
+  const unsigned int r) const
+{
+  Assert (r<A->m(), ExcIndexRange(r,0,A->m()));
+  return const_iterator(this, r);
+}
+
+
+
+template<class MATRIX, typename inverse_type>
+inline
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
+PreconditionBlockJacobi<MATRIX, inverse_type>::end (
+  const unsigned int r) const
+{
+  Assert (r<A->m(), ExcIndexRange(r,0,A->m()));
+  return const_iterator(this, r+1);
 }
 
 #endif
