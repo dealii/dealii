@@ -207,10 +207,11 @@ enum UpdateFlags
 
 
 inline
-UpdateFlags&
+UpdateFlags &
 operator |= (UpdateFlags& f1, const UpdateFlags& f2)
 {
-  return ((UpdateFlags) (((int)f1) |= f2));
+  f1 = static_cast<UpdateFlags> (f1 | f2);
+  return f1;
 }
 
 
@@ -224,10 +225,11 @@ operator | (const UpdateFlags& f1, const UpdateFlags& f2)
 }
 
 inline
-UpdateFlags&
+UpdateFlags &
 operator &= (UpdateFlags& f1, const UpdateFlags& f2)
 {
-  return ((UpdateFlags) (((int)f1) &= f2));
+  f1 = static_cast<UpdateFlags> (f1 & f2);
+  return f1;
 }
 
 
