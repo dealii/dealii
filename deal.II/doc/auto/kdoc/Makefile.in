@@ -71,6 +71,9 @@ multigrid.kdoc: kdoc-installed multigrid-html-files multigrid-fix-files
 # how to make the output. let everything depend on kdoc being already
 # installed (we need to re-state this dependency here as we could
 # otherwise get problems when using parallel builds)
+#
+# note that when running kdoc, we discard the forward-declarations
+# file as this brings kdoc into trouble
 base-html-files:      kdoc-installed $(kdoc.base)
 lac-html-files:       kdoc-installed $(kdoc.lac)
 grid-html-files:      kdoc-installed $(kdoc.grid)
@@ -80,7 +83,7 @@ multigrid-html-files: kdoc-installed $(kdoc.multigrid)
 %-html-files:
 	@$(PERL) $(KDOCFLAGS) $(subst -html-files,,$@) \
                               --outputdir $(subst -html-files,,$@) \
-	                      $(^:kdoc-installed=)
+	                      $(filter-out %forward_declarations.h, $(^:kdoc-installed=))
 
 
 # now how to fix the files:
