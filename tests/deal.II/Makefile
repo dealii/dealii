@@ -40,7 +40,7 @@ endif
 
 
 # rule to make executables
-%.testcase:
+%.testcase: %.cc $(libraries)
 	@echo ============================ Compiling Testcase:   $<
 	@$(CXX) $(flags) $< -o $@ $(libraries)
 

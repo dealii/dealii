@@ -36,6 +36,7 @@ int main () {
   
 				   // test for each of the four
 				   // shape functions
+  bool testcase_succeeded = true;
   for (unsigned int vertex=0; vertex<4; ++vertex)
     {
       val.clear ();
@@ -78,7 +79,15 @@ int main () {
 	   << ": "
 	   << (ok ? "OK" : "WRONG!")
 	   << endl;
+
+      if (!ok)
+	testcase_succeeded = false;
     };
 
   cout << "------------------------------------------------------" << endl;
+
+  if (testcase_succeeded)
+    return 0;
+  else
+    return 1;
 };
