@@ -136,7 +136,7 @@ namespace Threads
 
     for (std::list<pthread_t>::iterator i=tid_list.begin();
 	 i != tid_list.end(); ++i)
-      pthread_join (tid_list.back(), 0);
+      pthread_join (*i, 0);
   };
   
 #  endif
