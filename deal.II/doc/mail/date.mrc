@@ -2,8 +2,95 @@
 deal.II Mailinglist
 </Title>
 
+<!-- General markup first -->
+
+
+<!-- Start of main index page -->
+
+<IdxPgBegin>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
+<HTML>
+  <HEAD>
+    <TITLE>$IDXTITLE$</TITLE>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <meta name="keywords" content="deal.II">
+  </HEAD>
+  <BODY style="background-image:url(../pictures/title-background.jpg);" lang="en">
+    <H1>$IDXTITLE$</H1>
+</IdxPgBegin>
+
+<!-- style="background-image:url(../pictures/title-background.jpg);" lang="en" -->
+
+<!-- End of main index page -->
+
+<IdxPgEnd>
+<ADDRESS><A HREF="mailto:deal@iwr.uni-heidelberg.de">The deal.II mailing list</ADDRESS>
+</BODY>
+</HTML>
+</IdxPgEnd>
+
+
+<!-- Start of thread index page -->
+
+<TIdxPgBegin>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
+<HTML>
+  <HEAD>
+    <TITLE>$TIDXTITLE$</TITLE>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+    <meta name="keywords" content="deal.II">
+  </HEAD>
+  <BODY style="background-image:url(../pictures/title-background.jpg);" lang="en">
+  <H1>$TIDXTITLE$</H1>
+</TIdxPgBegin>
+
+<!-- End of thread index page -->
+
+<TIdxPgEnd>
+<ADDRESS><A HREF="mailto:deal@iwr.uni-heidelberg.de">The deal.II mailing list</ADDRESS>
+</BODY>
+</HTML>
+</TIdxPgEnd>
+
+<!-- Start of message page -->
+
+<MsgPgBegin>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
+<HTML>
+  <HEAD>
+    <TITLE>$SUBJECTNA:72$</TITLE>
+    <link href="../screen.css" rel="StyleSheet" title="deal.II Homepage" media="screen">
+    <link href="../print.css" rel="StyleSheet" title="deal.II Homepage" media="print">
+  </HEAD>
+  <BODY>
+</MsgPgBegin>
+
+<!-- End of message page -->
+
+<MsgPgEnd>
+<HR>
+<ADDRESS><A HREF="mailto:deal@iwr.uni-heidelberg.de">The deal.II mailing list</ADDRESS>
+</BODY>
+</HTML>
+</MsgPgEnd>
+
+
+
+
+<!-- Sorting and filtering -->
+
+
+<Sort>
+<Reverse>
 <TSort>
+<TReverse>
 <SpamMode>
+
+
+<!-- List styles -->
+
 
 <ListBegin>
 <UL>
@@ -32,10 +119,54 @@ deal.II Mailinglist
 </tr>
 </LiTemplate>
 
-<!--    Define LISTEND to close table
-  -->
+<!--    Define LISTEND to close table  -->
+
 <ListEnd>
-<hr>
-<address> <TT>deal</TT> at <TT>iwr.uni-heidelberg.de</TT>
-</address>
 </ListEnd>
+
+
+<!-- Message formatting -->
+
+<Excs>
+content-
+errors-to
+forward
+lines
+message-id
+mime-
+nntp-
+originator
+path
+precedence
+received
+replied
+return-path
+status
+via
+x-
+to
+reply-to
+from
+subject
+cc
+in-reply-to
+</Excs>
+
+SubjectHeader>
+<H1>$SUBJECTNA$</H1>
+</SubjectHeader>
+
+<FieldsBeg>
+ <!--
+</FieldsBeg>
+
+<FieldsEnd>
+ -->
+</FieldsEnd>
+
+<HeadBodySep>
+<p>
+From <strong>$FROMNAME$</strong> at <strong>$FROMADDRDOMAIN$</strong>,
+<em>$GMTDATE$</em></p>
+<HR>
+</HeadBodySep>
