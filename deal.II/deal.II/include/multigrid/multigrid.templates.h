@@ -18,17 +18,17 @@ template <typename number>
 void
 MG<dim>::copy_to_mg(const Vector<number>& src)
 {
-  const unsigned int fe_dofs = mg_dof_handler->get_fe().total_dofs;
-  const unsigned int face_dofs = mg_dof_handler->get_fe().dofs_per_face;
+  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_face = mg_dof_handler->get_fe().dofs_per_face;
 
 				   // set the elements of the vectors
 				   // on all levels to zero
   defect.clear();
 //  constraints->condense(src);
   
-  vector<int> global_dof_indices (fe_dofs);
-  vector<int> level_dof_indices (fe_dofs);
-  vector<int> level_face_indices (face_dofs);
+  vector<int> global_dof_indices (dofs_per_cell);
+  vector<int> level_dof_indices (dofs_per_cell);
+  vector<int> level_face_indices (dofs_per_face);
 
 				   // traverse the grid top-down
 				   // (i.e. starting with the most
@@ -61,7 +61,7 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 					   // transfer the global
 					   // defect in the vector
 					   // into the level-wise one
-	  for (unsigned int i=0; i<fe_dofs; ++i)
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    defect[level](level_dof_indices[i]) = src(global_dof_indices[i]);
 
 //TODO: what happens here?
@@ -72,7 +72,7 @@ MG<dim>::copy_to_mg(const Vector<number>& src)
 	      if (face->has_children())
 		{
 		  face->get_mg_dof_indices(level_face_indices);
-		  for (unsigned int i=0; i<face_dofs; ++i)
+		  for (unsigned int i=0; i<dofs_per_face; ++i)
 		    defect[level](level_face_indices[i]) = 0.;
 		};
 	    };
@@ -95,10 +95,10 @@ template <typename number>
 void
 MG<dim>::copy_from_mg(Vector<number> &dst) const
 {
-  const unsigned int fe_dofs = mg_dof_handler->get_fe().total_dofs;
+  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().total_dofs;
 
-  vector<int> global_dof_indices (fe_dofs);
-  vector<int> level_dof_indices (fe_dofs);
+  vector<int> global_dof_indices (dofs_per_cell);
+  vector<int> level_dof_indices (dofs_per_cell);
 
   DoFHandler<dim>::active_cell_iterator
     global_cell = mg_dof_handler->DoFHandler<dim>::begin_active();
@@ -123,7 +123,7 @@ MG<dim>::copy_from_mg(Vector<number> &dst) const
 
 				       // copy level-wise data to
 				       // global vector
-      for (unsigned int i=0; i<fe_dofs; ++i)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
 	dst(global_dof_indices[i]) = solution[level](level_dof_indices[i]);
     };
 
