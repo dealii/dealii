@@ -1,18 +1,67 @@
-#include <base/function.h>
-#include <base/quadrature_lib.h>
+				 // These include files are already
+				 // known to you. They declare the
+				 // classes which handle
+				 // triangulations and enumerate the
+				 // degrees of freedom.
 #include <grid/tria.h>
+#include <dofs/dof_handler.h>
+				 // And this is the file in which the
+				 // functions are declared which
+				 // create grids.
+#include <grid/grid_generator.h>
+
+				 // The next three files contain
+				 // classes which are needed for loops
+				 // over all cells and to get the
+				 // information from the cell objects.
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+
+				 // In this file are the finite
+				 // element descriptions.
 #include <fe/fe_lib.lagrange.h>
-#include <fe/fe_values.h>
+
+				 // And this file is needed for the
+				 // creation of sparsity patterns of
+				 // sparse matrices, as shown in
+				 // previous examples:
 #include <dofs/dof_tools.h>
-#include <numerics/data_out.h>
+
+				 // The next two file are needed for
+				 // assembling the matrix using
+				 // quadrature on each cell. The
+				 // classes declared in them will be
+				 // explained below.
+#include <fe/fe_values.h>
+#include <base/quadrature_lib.h>
+
+				 // The following three include files
+				 // we need for the treatment of
+				 // boundary values:
+#include <base/function.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 
+				 // These include files are for the
+				 // linear algebra which we employ to
+				 // solve the system of equations
+				 // arising from the finite element
+				 // discretization of the Laplace
+				 // equation. We will use vectors and
+				 // full matrices for assembling the
+				 // system of equations locally on
+				 // each cell, and transfer the
+				 // results into a sparse matrix. We
+				 // will then use a Conjugate Gradient
+				 // solver to solve the problem, for
+				 // which we need a preconditioner (in
+				 // this program, we use the identity
+				 // preconditioner which does nothing,
+				 // but we need to include the file
+				 // anyway), and a class which
+				 // provides the solver with some
+				 // memory for temporary vectors.
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
@@ -20,6 +69,9 @@
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 
+				 // Finally, this is for output to a
+				 // file.
+#include <numerics/data_out.h>
 #include <fstream>
 
 
