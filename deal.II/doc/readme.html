@@ -85,10 +85,24 @@
     </code></pre>
     which sets some paths and finds out what compiler you
     use. ./configure supports several flags which are discussed
-    further down <a href="#options">below</a>. After configuring, go
-    to the /common subdirectory and type 'make', to obtain the
-    following help (this output may change slightly over time, just
-    try it): 
+    further down <a href="#options">below</a>. 
+
+    <p>
+
+    The most important result of <code>./configure</code> is the
+    creation of the file <code>common/Make.global_options</code>. This
+    file contains compiler options, pathes, etc which you may want to
+    use in the Makefiles of your own projects. It is definitely a good
+    idea to include it into your Makefile, to allow using the same
+    flags for compilation between library files and the files of your
+    project, and to access the pathes of the library files. To find
+    out about the supported flags, take a look at the file.
+
+    <p>
+
+    After configuring, go to the /common subdirectory and type 'make',
+    to obtain the following help (this output may change slightly over
+    time, just try it):
 
     <pre><code>
 ======================================================================
