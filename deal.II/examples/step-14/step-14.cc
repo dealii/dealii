@@ -152,6 +152,9 @@ namespace Evaluation
     std::cout << "   Point value=" << point_value
 	      << ", exact value=1.59492, error="
 	      << 1.594915543-point_value << std::endl;
+//      std::cout << "   Point value=" << point_value   //TODO
+//  	      << ", exact value=1, error="
+//  	      << 1.-point_value << std::endl;
   };
 
 
@@ -520,7 +523,7 @@ namespace LaplaceSolver
 		    const Function<dim>      &rhs_function,
 		    const Function<dim>      &boundary_values);
 
-				       // XXX
+				       //TODO!!
       virtual
       void
       solve_problem ();
@@ -990,6 +993,7 @@ namespace Data
       q += sin(10*p(i)+5*p(0)*p(0));
     const double exponential = exp(q);
     return exponential;
+//    return 0;  // TODO!
   };
 
 
@@ -1017,6 +1021,8 @@ namespace Data
     t1 = t1*t1;
     
     return -u*(t1+t2+t3);
+//      const double pi = 3.1415926536;
+//      return 2.*pi*pi*sin(pi*p(0))*sin(pi*p(1));  //TODO!!
   };
 
 
@@ -1237,8 +1243,8 @@ namespace Data
 				     // And since we want that the
 				     // evaluation point (3/4,3/4) in
 				     // this example is a grid point,
-				     // we refine once globally:
-    coarse_grid.refine_global (1);
+				     // we refine twice globally:
+    coarse_grid.refine_global (2);
   };
 };
 
@@ -1419,7 +1425,7 @@ namespace LaplaceSolver
 		  const Quadrature<dim-1>  &face_quadrature,
 		  const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
-				       // XXX
+				       //TODO!!
       virtual
       void
       solve_problem ();
@@ -1846,7 +1852,7 @@ namespace LaplaceSolver
     data_out.add_data_vector (DualSolver<dim>::solution,
 			      "dual_solution");
     
-    data_out.build_patches (1);
+    data_out.build_patches ();
   
 #ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream filename;
@@ -1910,15 +1916,27 @@ namespace LaplaceSolver
     FETools::interpolate (PrimalSolver<dim>::dof_handler,
 			  PrimalSolver<dim>::solution,
 			  DualSolver<dim>::dof_handler,
-			  primal_solution);    
-    Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
-//      FETools::interpolation_difference (DualSolver<dim>::dof_handler,
-//  				       DualSolver<dim>::solution,
-//  				       *PrimalSolver<dim>::fe,
-//  				       dual_weights);
-    dual_weights = DualSolver<dim>::solution;
-    abort (); // check Galerkin orthogonality, also for hanging nodes!
+			  primal_solution);
+				     //TODO!!
+    Vector<double> tmp (PrimalSolver<dim>::dof_handler.n_dofs());
+    Vector<double> i_h_dual_solution (DualSolver<dim>::dof_handler.n_dofs());
+    FETools::interpolate (DualSolver<dim>::dof_handler,
+			  DualSolver<dim>::solution,
+			  PrimalSolver<dim>::dof_handler,
+			  tmp);
+    ConstraintMatrix primal_hanging_node_constraints;
+    DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
+					     primal_hanging_node_constraints);
+    primal_hanging_node_constraints.close ();
+    primal_hanging_node_constraints.distribute (tmp);
+    FETools::interpolate (PrimalSolver<dim>::dof_handler,
+			  tmp,
+			  DualSolver<dim>::dof_handler,
+			  i_h_dual_solution);
     
+    Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
+    dual_weights = DualSolver<dim>::solution;
+    dual_weights -= i_h_dual_solution;
     
 				     // Then we set up a map between
 				     // face iterators and their jump
@@ -2606,18 +2624,18 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 template <int dim>
 void solve_problem ()
 {
-  Triangulation<dim> triangulation (Triangulation<dim>::maximum_smoothing);
+  Triangulation<dim> triangulation (Triangulation<dim>::smoothing_on_refinement);
   const FE_Q<dim>          primal_fe(1);
   const FE_Q<dim>          dual_fe(2);
   const QGauss4<dim>       quadrature;
   const QGauss4<dim-1>     face_quadrature;
 
   const Data::SetUpBase<dim> *data =
-    new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
+    new Data::SetUp<Data::CurvedRidges<dim>,dim> ();
 
   data->create_coarse_grid (triangulation);
   
-  const Point<dim> evaluation_point(3./4.,3./4.);
+  const Point<dim> evaluation_point(0.5,0.5);
   const DualFunctional::PointValueEvaluation<dim>
     dual_functional (evaluation_point);
   
@@ -2633,7 +2651,7 @@ void solve_problem ()
 
   TableHandler results_table;
   Evaluation::PointValueEvaluation<dim>
-    postprocessor1 (Point<dim>(3./4.,3./4.), results_table);
+    postprocessor1 (Point<dim>(0.5,0.5), results_table);
   Evaluation::GridOutput<dim>
     postprocessor2 ("grid");
 
