@@ -30,13 +30,16 @@ void Timer::start ()
 
 double Timer::stop ()
 {
-  running = false;
-  rusage usage;
-  getrusage (RUSAGE_SELF, &usage);
-  const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-  cumulative_time += dtime;
+  if (running)
+    {
+      running = false;
+      rusage usage;
+      getrusage (RUSAGE_SELF, &usage);
+      const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+      cumulative_time += dtime - start_time;
+    }
   return full_time ();
-};
+}
 
 
 
@@ -52,7 +55,7 @@ double Timer::operator() () const
     }
   else
     return full_time();
-};
+}
 
 
 
@@ -60,13 +63,11 @@ void Timer::reset ()
 {
   cumulative_time = 0.;
   running         = false;
-};
+}
 
 
 
 double Timer::full_time () const
 {
   return cumulative_time;
-};
-
-
+}
