@@ -104,7 +104,8 @@ void test ()
 
                                    // and output what we have
   for (BlockSparseMatrix<double>::const_iterator i=A.begin(); i!=A.end(); ++i)
-    deallog << i->row() << ' ' << i->column() << ' ' << i->value()
+    deallog << i->block_row() << ' ' << i->block_column() << ' '
+            << i->row() << ' ' << i->column() << ' ' << i->value()
             << std::endl;
 }
 
