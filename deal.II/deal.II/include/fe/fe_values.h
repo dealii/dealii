@@ -11,6 +11,7 @@
 #include <lac/fullmatrix.h>
 #include <grid/dof.h>
 #include <base/point.h>
+#include <base/tensor.h>
 #include <grid/tria.h>
 #include <fe/fe_update_flags.h>
 
