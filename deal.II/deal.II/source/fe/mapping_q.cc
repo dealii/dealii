@@ -409,7 +409,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename DoFHandler<dim>::cell_iter
 
 template <>
 void
-MappingQ<1>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &) const
+MappingQ<1>::set_laplace_on_quad_vector(vector2d<double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -418,7 +418,7 @@ MappingQ<1>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &) con
 
 template <int dim>
 void
-MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loqvs) const
+MappingQ<dim>::set_laplace_on_quad_vector(vector2d<double> &loqvs) const
 {
   Assert(degree>1, ExcInternalError());
   const unsigned int n_inner_2d=(degree-1)*(degree-1);
@@ -453,13 +453,10 @@ MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loq
     {
 				       // precomputed. copy values to
 				       // the loqvs array
-      loqvs.resize(n_inner_2d);
+      loqvs.reinit(n_inner_2d, n_outer_2d);
       for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
-	{
-	  loqvs[unit_point].resize(n_outer_2d, 0);
-	  for (unsigned int k=0; k<n_outer_2d; ++k)
-	    loqvs[unit_point][k]=loqv_ptr[unit_point*n_outer_2d+k];
-	}
+	for (unsigned int k=0; k<n_outer_2d; ++k)
+	  loqvs[unit_point][k]=loqv_ptr[unit_point*n_outer_2d+k];
     }
   else
     {
@@ -480,7 +477,7 @@ MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loq
 				   // the sum of weights of the points
 				   // at the outer rim should be
 				   // one. check this
-  for (unsigned int unit_point=0; unit_point<loqvs.size(); ++unit_point)
+  for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
     Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
 				     loqvs[unit_point].end(),0.)-1)<1e-13,
 	   ExcInternalError());
@@ -493,7 +490,7 @@ MappingQ<dim>::set_laplace_on_quad_vector(std::vector<std::vector<double> > &loq
 
 template <>
 void
-MappingQ<3>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &lohvs) const
+MappingQ<3>::set_laplace_on_hex_vector(vector2d<double> &lohvs) const
 {
   Assert(degree>1, ExcInternalError());
 
@@ -516,13 +513,10 @@ MappingQ<3>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &lohvs)
     {
 				       // precomputed. copy values to
 				       // the lohvs array
-      lohvs.resize(n_inner);
+      lohvs.reinit(n_inner, n_outer);
       for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-	{
-	  lohvs[unit_point].resize(n_outer, 0);
-	  for (unsigned int k=0; k<n_outer; ++k)
-	    lohvs[unit_point][k]=lohv_ptr[unit_point*n_outer+k];
-	}
+	for (unsigned int k=0; k<n_outer; ++k)
+	  lohvs[unit_point][k]=lohv_ptr[unit_point*n_outer+k];
     }
   else
 				     // not precomputed, then do so now
@@ -542,7 +536,7 @@ MappingQ<3>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &lohvs)
 
 template <int dim>
 void
-MappingQ<dim>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &) const
+MappingQ<dim>::set_laplace_on_hex_vector(vector2d<double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -554,7 +548,7 @@ MappingQ<dim>::set_laplace_on_hex_vector(std::vector<std::vector<double> > &) co
 
 template <>
 void
-MappingQ<1>::compute_laplace_vector(std::vector<std::vector<double> > &) const
+MappingQ<1>::compute_laplace_vector(vector2d<double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -564,9 +558,9 @@ MappingQ<1>::compute_laplace_vector(std::vector<std::vector<double> > &) const
 
 template <int dim>
 void
-MappingQ<dim>::compute_laplace_vector(std::vector<std::vector<double> > &lvs) const
+MappingQ<dim>::compute_laplace_vector(vector2d<double> &lvs) const
 {
-  Assert(lvs.size()==0, ExcInternalError());
+  Assert(lvs.n_rows()==0, ExcInternalError());
   Assert(dim==2 || dim==3, ExcNotImplemented());
   Assert(degree>1, ExcInternalError());
 
@@ -611,17 +605,10 @@ MappingQ<dim>::compute_laplace_vector(std::vector<std::vector<double> > &lvs) co
   
 				   // Resize and initialize the
 				   // lvs
-  lvs.resize(n_inner);
+  lvs.reinit (n_inner, n_outer);
   for (unsigned int i=0; i<n_inner; ++i)
-    lvs[i].resize(n_outer, 0);
-  
-				   // fill this vector
-  for (unsigned int i=0; i<n_inner; ++i)
-    {
-      std::vector<double> &lv=lvs[i];
-      for (unsigned int k=0; k<n_outer; ++k)
-	lv[k]=-S_1_T(i,k);
-    }
+    for (unsigned int k=0; k<n_outer; ++k)
+      lvs(i,k) = -S_1_T(i,k);
 }
 
 #endif
@@ -630,15 +617,16 @@ MappingQ<dim>::compute_laplace_vector(std::vector<std::vector<double> > &lvs) co
 
 template <int dim>
 void
-MappingQ<dim>::apply_laplace_vector(const std::vector<std::vector<double> > &lvs,
+MappingQ<dim>::apply_laplace_vector(const vector2d<double> &lvs,
 				    std::vector<Point<dim> > &a) const
 {
-  Assert(lvs.size()!=0, ExcLaplaceVectorNotSet(degree));
-  const unsigned int n_inner_apply=lvs.size();
+  Assert(lvs.n_rows()!=0, ExcLaplaceVectorNotSet(degree));
+  const unsigned int n_inner_apply=lvs.n_rows();
   Assert(n_inner_apply==n_inner || n_inner_apply==(degree-1)*(degree-1),
 	 ExcInternalError());
-  const unsigned int n_outer_apply=lvs[0].size();
-  Assert(a.size()==n_outer_apply, ExcDimensionMismatch(a.size(), n_outer_apply));
+  const unsigned int n_outer_apply=lvs.n_cols();
+  Assert(a.size()==n_outer_apply,
+	 ExcDimensionMismatch(a.size(), n_outer_apply));
 
 				   // compute each inner point as
 				   // linear combination of the outer
@@ -648,7 +636,7 @@ MappingQ<dim>::apply_laplace_vector(const std::vector<std::vector<double> > &lvs
 				   // elements of a
   for (unsigned int unit_point=0; unit_point<n_inner_apply; ++unit_point)
     {
-      Assert(lvs[unit_point].size()==n_outer_apply, ExcInternalError());
+      Assert(lvs.n_cols()==n_outer_apply, ExcInternalError());
       Point<dim> p;
       for (unsigned int k=0; k<n_outer_apply; ++k)
 	p+=lvs[unit_point][k]*a[k];
@@ -1068,11 +1056,10 @@ MappingQ<dim>::fill_quad_support_points_simple (const typename Triangulation<dim
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (
-  typename std::vector<Tensor<1,dim> >::iterator begin,
-  typename std::vector<Tensor<1,dim> >::const_iterator end,
-  typename std::vector<Tensor<1,dim> >::const_iterator src,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_covariant (Tensor<1,dim>       *begin,
+				    Tensor<1,dim>       *end,
+				    const Tensor<1,dim> *src,
+				    const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
@@ -1101,11 +1088,10 @@ MappingQ<dim>::transform_covariant (
 
 template <int dim>
 void
-MappingQ<dim>::transform_contravariant (
-  typename std::vector<Tensor<1,dim> >::iterator begin,
-  typename std::vector<Tensor<1,dim> >::const_iterator end,
-  typename std::vector<Tensor<1,dim> >::const_iterator src,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_contravariant (Tensor<1,dim>       *begin,
+					Tensor<1,dim>       *end,
+					const Tensor<1,dim> *src,
+					const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);

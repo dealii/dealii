@@ -415,10 +415,10 @@ compute_2nd (const Mapping<dim>                   &mapping,
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_second_derivatives,
 	  ExcInternalError());
-  Assert (data.shape_2nd_derivatives.size() == this->dofs_per_cell,
+  Assert (data.shape_2nd_derivatives.n_rows() == this->dofs_per_cell,
 	  ExcInternalError());
 				   // Number of quadrature points
-  const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
+  const unsigned int n_q_points = data.shape_2nd_derivatives.n_cols();
 
 				   // first reinit the fe_values
 				   // objects used for the finite
@@ -433,8 +433,8 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				   // quotients of gradients in each
 				   // direction (first index) and at
 				   // all q-points (second index)
-  std::vector<std::vector<Tensor<1,dim> > > diff_quot (dim, std::vector<Tensor<1,dim> >(n_q_points));
-  std::vector<Tensor<1,dim> >               diff_quot2 (n_q_points);
+  vector2d<Tensor<1,dim> >    diff_quot (dim, n_q_points);
+  std::vector<Tensor<1,dim> > diff_quot2 (n_q_points);
 
 				   // for all shape functions at all
 				   // quadrature points and difference
@@ -469,7 +469,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
 				       // cell
       for (unsigned int d=0; d<dim; ++d)
 	{
-	  mapping.transform_covariant (diff_quot2.begin(), diff_quot2.end(),
+	  mapping.transform_covariant (&*diff_quot2.begin(), &*diff_quot2.end(),
 				       diff_quot[d].begin()+offset,
 				       mapping_internal);
 

@@ -20,7 +20,7 @@
 #include <base/point.h>
 #include <base/tensor.h>
 #include <base/quadrature.h>
-#include <lac/full_matrix.h>
+#include <base/vector2d.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -94,8 +94,7 @@ class FEValuesData
 				      * thus have a row in the array
 				      * presently under discussion.
 				      */
-//TODO[WB]: use vector2d here    
-    typedef FullMatrix<double> ShapeVector;
+    typedef vector2d<double> ShapeVector;
 
 				     /**
 				      * Storage type for
@@ -103,19 +102,13 @@ class FEValuesData
 				      * is the same as for the
 				      * @ref{ShapeVector} data type.
 				      */
-//TODO[WB]: use vector2d here
-    typedef
-    std::vector<std::vector<Tensor<1,dim> > >
-    GradientVector;
+    typedef vector2d<Tensor<1,dim> > GradientVector;
 
 				     /**
 				      * Likewise for second order
 				      * derivatives.
 				      */
-//TODO[WB]: use vector2d here
-    typedef
-    std::vector<std::vector<Tensor<2,dim> > >
-    GradGradVector;
+    typedef vector2d<Tensor<2,dim> > GradGradVector;
     
 				     /**
 				      * Store the values of the shape
@@ -1279,10 +1272,10 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_gradients.size(),
-	  ExcIndexRange (i, 0, this->shape_gradients.size()));
-  Assert (j<this->shape_gradients[i].size(),
-	  ExcIndexRange (j, 0, this->shape_gradients[i].size()));
+  Assert (i<this->shape_gradients.n_rows(),
+	  ExcIndexRange (i, 0, this->shape_gradients.n_rows()));
+  Assert (j<this->shape_gradients.n_cols(),
+	  ExcIndexRange (j, 0, this->shape_gradients.n_cols()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
@@ -1376,10 +1369,10 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_2nd_derivatives.size(),
-	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.size()));
-  Assert (j<this->shape_2nd_derivatives[i].size(),
-	  ExcIndexRange (j, 0, this->shape_2nd_derivatives[i].size()));
+  Assert (i<this->shape_2nd_derivatives.n_rows(),
+	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.n_rows()));
+  Assert (j<this->shape_2nd_derivatives.n_cols(),
+	  ExcIndexRange (j, 0, this->shape_2nd_derivatives.n_cols()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:

@@ -18,6 +18,7 @@
 #include <cmath>
 #include <base/point.h>
 #include <base/subscriptor.h>
+#include <base/vector2d.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <fe/fe_update_flags.h>
@@ -201,10 +202,10 @@ class Mapping : public Subscriptor
 				      */
     virtual
     void
-    transform_covariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			 typename std::vector<Tensor<1,dim> >::const_iterator end,
-			 typename std::vector<Tensor<1,dim> >::const_iterator src,
-			 const InternalDataBase& internal) const = 0;
+    transform_covariant (Tensor<1,dim>          *begin,
+			 Tensor<1,dim>          *end,
+			 const Tensor<1,dim>    *src,
+			 const InternalDataBase &internal) const = 0;
     
 				     /**
 				      * Tranform a field of
@@ -221,10 +222,10 @@ class Mapping : public Subscriptor
 				      */
     virtual
     void
-    transform_contravariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			     typename std::vector<Tensor<1,dim> >::const_iterator end,
-			     typename std::vector<Tensor<1,dim> >::const_iterator src,
-			     const InternalDataBase& internal) const = 0;
+    transform_contravariant (Tensor<1,dim>          *begin,
+			     Tensor<1,dim>          *end,
+			     const Tensor<1,dim>    *src,
+			     const InternalDataBase &internal) const = 0;
 
 				     /**
 				      * Indicate fields to be updated

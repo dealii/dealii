@@ -15,8 +15,8 @@
 
 
 #include <base/config.h>
+#include <base/vector2d.h>
 #include <fe/mapping_q1.h>
-
 
 template <int dim> class TensorProductPolynomials;
 class LagrangeEquidistant;
@@ -83,20 +83,20 @@ class MappingQ : public MappingQ1<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			 typename std::vector<Tensor<1,dim> >::const_iterator end,
-			 typename std::vector<Tensor<1,dim> >::const_iterator src,
-			 const typename Mapping<dim>::InternalDataBase &mapping_data) const;
+    transform_covariant (Tensor<1,dim>          *begin,
+			 Tensor<1,dim>          *end,
+			 const Tensor<1,dim>    *src,
+			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			     typename std::vector<Tensor<1,dim> >::const_iterator end,
-			     typename std::vector<Tensor<1,dim> >::const_iterator src,
-			     const typename Mapping<dim>::InternalDataBase &mapping_data) const;    
+    transform_contravariant (Tensor<1,dim>          *begin,
+			     Tensor<1,dim>          *end,
+			     const Tensor<1,dim>    *src,
+			     const typename Mapping<dim>::InternalDataBase &internal) const;    
 
 				     /**
 				      * Return the degree of the
@@ -304,7 +304,7 @@ class MappingQ : public MappingQ1<dim>
 				      * this vector is computed.
 				      */
     void
-    set_laplace_on_quad_vector(std::vector<std::vector<double> > &loqvs) const;
+    set_laplace_on_quad_vector(vector2d<double> &loqvs) const;
     
 				     /**
 				      * This function is needed by the
@@ -317,7 +317,7 @@ class MappingQ : public MappingQ1<dim>
 				      * @p{degree>2} this vector is
 				      * computed.
 				      */
-    void set_laplace_on_hex_vector(std::vector<std::vector<double> > &lohvs) const;
+    void set_laplace_on_hex_vector(vector2d<double> &lohvs) const;
     
 				     /**
 				      * Computes the @p{laplace_on_quad(hex)_vector}.
@@ -327,7 +327,7 @@ class MappingQ : public MappingQ1<dim>
 				      * functions if the data is not
 				      * yet hardcoded.
 				      */
-    void compute_laplace_vector(std::vector<std::vector<double> > &lvs) const;
+    void compute_laplace_vector(vector2d<double> &lvs) const;
 
 				     /**
 				      * Takes a
@@ -344,7 +344,7 @@ class MappingQ : public MappingQ1<dim>
 				      * @p{n_inner} computed inner
 				      * points are appended.
 				      */
-    void apply_laplace_vector(const std::vector<std::vector<double> > &lvs,
+    void apply_laplace_vector(const vector2d<double>   &lvs,
 			      std::vector<Point<dim> > &a) const;
     
 				     /**
@@ -426,7 +426,7 @@ class MappingQ : public MappingQ1<dim>
 				      *   unit_support_points on the
 				      *   boundary of the quad
 				      */
-    std::vector<std::vector<double> > laplace_on_quad_vector;
+    vector2d<double> laplace_on_quad_vector;
     
 				     /**
 				      * Needed by the
@@ -434,7 +434,7 @@ class MappingQ : public MappingQ1<dim>
 				      * (for @p{dim==3}). Filled by the
 				      * constructor.
 				      */
-    std::vector<std::vector<double> > laplace_on_hex_vector;
+    vector2d<double> laplace_on_hex_vector;
 
 				     /**
 				      * Exception.
@@ -514,11 +514,11 @@ template<> void MappingQ<1>::compute_shapes_virtual (
   const std::vector<Point<1> > &unit_points,
   MappingQ1<1>::InternalData   &data) const;
 template <> void MappingQ<1>::set_laplace_on_quad_vector(
-  std::vector<std::vector<double> > &) const;
+  vector2d<double> &) const;
 template <> void MappingQ<3>::set_laplace_on_hex_vector(
-  std::vector<std::vector<double> > &lohvs) const;
+  vector2d<double> &lohvs) const;
 template <> void MappingQ<1>::compute_laplace_vector(
-  std::vector<std::vector<double> > &) const;
+  vector2d<double> &) const;
 template <> void MappingQ<1>::add_line_support_points (
   const Triangulation<1>::cell_iterator &,
   std::vector<Point<1> > &) const;

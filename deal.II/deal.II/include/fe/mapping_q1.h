@@ -72,20 +72,20 @@ class MappingQ1 : public Mapping<dim>
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_covariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			 typename std::vector<Tensor<1,dim> >::const_iterator end,
-			 typename std::vector<Tensor<1,dim> >::const_iterator src,
-			 const typename Mapping<dim>::InternalDataBase &mapping_data) const;
+    transform_covariant (Tensor<1,dim>          *begin,
+			 Tensor<1,dim>          *end,
+			 const Tensor<1,dim>    *src,
+			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
     virtual void
-    transform_contravariant (typename std::vector<Tensor<1,dim> >::iterator begin,
-			     typename std::vector<Tensor<1,dim> >::const_iterator end,
-			     typename std::vector<Tensor<1,dim> >::const_iterator src,
-			     const typename Mapping<dim>::InternalDataBase &mapping_data) const;
+    transform_contravariant (Tensor<1,dim>          *begin,
+			     Tensor<1,dim>          *end,
+			     const Tensor<1,dim>    *src,
+			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
 				      * Implementation of the interface in
@@ -259,12 +259,12 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
+        vector2d<Tensor<1,dim> > unit_tangentials;
 	
 					 /**
 					  * Auxuliary vectors for internal use.
 					  */
-        std::vector<std::vector<Tensor<1,dim> > > aux;
+        vector2d<Tensor<1,dim> > aux;
 
 					 /**
 					  * Stores the support points of

@@ -65,21 +65,16 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 				   // that we will need to their
 				   // correct size
   if (flags & update_values)
-    this->shape_values.reinit(n_nonzero_shape_components, n_quadrature_points);
+    this->shape_values.reinit(n_nonzero_shape_components,
+			      n_quadrature_points);
 
   if (flags & update_gradients)
-    {
-      this->shape_gradients.resize(n_nonzero_shape_components);
-      for (unsigned int i=0; i<n_nonzero_shape_components; ++i)
-	this->shape_gradients[i].resize(n_quadrature_points);
-    }
+    this->shape_gradients.reinit(n_nonzero_shape_components,
+				 n_quadrature_points);
 
   if (flags & update_second_derivatives)
-    {      
-      this->shape_2nd_derivatives.resize(n_nonzero_shape_components);
-      for (unsigned int i=0; i<n_nonzero_shape_components; ++i)
-	this->shape_2nd_derivatives[i].resize(n_quadrature_points);
-    }
+    this->shape_2nd_derivatives.reinit(n_nonzero_shape_components,
+				       n_quadrature_points);
   
   if (flags & update_q_points)
     this->quadrature_points.resize(n_quadrature_points);
@@ -295,7 +290,7 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_grads (const InputVector                                           &fe_function,
+get_function_grads (const InputVector                         &fe_function,
 		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (n_quadrature_points == gradients.size(),
@@ -394,7 +389,7 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_2nd_derivatives (const InputVector                                           &fe_function,
+get_function_2nd_derivatives (const InputVector                         &fe_function,
 			      std::vector<std::vector<Tensor<2,dim> > > &second_derivs) const
 {
   Assert (n_quadrature_points == second_derivs.size(),

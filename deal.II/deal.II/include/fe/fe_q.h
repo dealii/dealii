@@ -779,7 +779,7 @@ class FE_Q : public FiniteElement<dim>
 					  * them over when visiting a
 					  * concrete cell.
 					  */
-	std::vector<std::vector<double> > shape_values;
+	vector2d<double> shape_values;
 
 					 /**
 					  * Array with shape function
@@ -799,7 +799,7 @@ class FE_Q : public FiniteElement<dim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */      
-	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
+	vector2d<Tensor<1,dim> > shape_gradients;
     };
     
 				     /**

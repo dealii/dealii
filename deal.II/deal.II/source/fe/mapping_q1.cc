@@ -344,14 +344,13 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 #if (deal_II_dimension>1)
   if (data.update_flags & update_boundary_forms)
     {
-      data.aux.resize(dim-1);
-      for (unsigned int i=0;i<dim-1;++i)
-	data.aux[i].resize(n_original_q_points);
+      data.aux.reinit(dim-1, n_original_q_points);      
       
 				       // Compute tangentials to the
 				       // unit cell.
       const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
-      data.unit_tangentials.resize(nfaces*(dim-1));
+      data.unit_tangentials.reinit(nfaces*(dim-1),
+				   n_original_q_points);
       for (unsigned int i=0;i<nfaces;++i)
 	{
 					   // Base index of the
@@ -368,7 +367,6 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 					   // non-zero in i.
 	  Tensor<1,dim> tangential;
 	  tangential[(nindex+1)%dim] = (this->normal_directions[i]%2) ? -1 : 1;
-	  data.unit_tangentials[i].resize(n_original_q_points);
 	  std::fill (data.unit_tangentials[i].begin(),
 		     data.unit_tangentials[i].end(),
 		     tangential);
@@ -384,7 +382,6 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
 					       // right-handed system.
 	      Tensor<1,dim> tangential;
 	      tangential[(nindex-1)%dim] = 1.;
-	      data.unit_tangentials[i+nfaces].resize(n_original_q_points);
 	      std::fill (data.unit_tangentials[i+nfaces].begin(),
 			 data.unit_tangentials[i+nfaces].end(),
 			 tangential);
@@ -610,7 +607,7 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 	result = boundary_forms.begin();
       typename std::vector<Tensor<1,dim> >::const_iterator
 	end = boundary_forms.end();
-      typename std::vector<Tensor<1,dim> >::const_iterator
+      const Tensor<1,dim> *
 	tang1 = data.aux[0].begin();
       
       switch (dim)
@@ -629,8 +626,7 @@ MappingQ1<dim>::compute_fill_face (const typename DoFHandler<dim>::cell_iterator
 				  data.unit_tangentials[
 				    face_no+GeometryInfo<dim>::faces_per_cell].begin(),
 				  data);
-	  typename std::vector<Tensor<1,dim> >::const_iterator
-	    tang2 = data.aux[1].begin();
+	  const Tensor<1,dim> *tang2 = data.aux[1].begin();
 	  for (;result != end; ++result, ++tang1, ++tang2)
 	    cross_product (*result, *tang1, *tang2);
 	  break;
@@ -778,11 +774,10 @@ MappingQ1<1>::fill_fe_subface_values (const DoFHandler<1>::cell_iterator &,
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (
-  typename std::vector<Tensor<1,dim> >::iterator begin,
-  typename std::vector<Tensor<1,dim> >::const_iterator end,
-  typename std::vector<Tensor<1,dim> >::const_iterator src,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_covariant (Tensor<1,dim>       *begin,
+				     Tensor<1,dim>       *end,
+				     const Tensor<1,dim> *src,
+				     const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -806,11 +801,10 @@ MappingQ1<dim>::transform_covariant (
 
 template <int dim>
 void
-MappingQ1<dim>::transform_contravariant (
-  typename std::vector<Tensor<1,dim> >::iterator begin,
-  typename std::vector<Tensor<1,dim> >::const_iterator end,
-  typename std::vector<Tensor<1,dim> >::const_iterator src,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_contravariant (Tensor<1,dim>       *begin,
+					 Tensor<1,dim>       *end,
+					 const Tensor<1,dim> *src,
+					 const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());

@@ -217,15 +217,15 @@ FE_DGP<dim>::get_data (const UpdateFlags      update_flags,
   if (flags & update_values)
     {
       values.resize (this->dofs_per_cell);
-      data->shape_values.resize(this->dofs_per_cell,
-				std::vector<double>(n_q_points));
+      data->shape_values.reinit (this->dofs_per_cell,
+				 n_q_points);
     }
 
   if (flags & update_gradients)
     {
       grads.resize (this->dofs_per_cell);
-      data->shape_gradients.resize(this->dofs_per_cell,
-				   std::vector<Tensor<1,dim> >(n_q_points));
+      data->shape_gradients.reinit (this->dofs_per_cell,
+				    n_q_points);
     }
 
 				   // if second derivatives through
