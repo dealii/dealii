@@ -58,16 +58,17 @@ if ($test)
 		   'ralf@dealii.org');
 } else {
     @recipients = (
-		  'dealii@dealii.org',
+		   'dealii@dealii.org',
 #		  'kc@isc.tamu.edu',
-		  'tveldhui@extreme.indiana.edu',
-		  'sullivan@mathcom.com',
-		  'Ian_MacPhedran@engr.usask.ca',
-		  'roger@maths.grace.cri.nz',
-		  'oon-digest@oonumerics.org',
-		  'scicomp@uni-erlangen.de',
-		  'na.digest@na-net.ornl.gov',
-		  'num.info@hermes.iwr.uni-heidelberg.de');
+		   'tveldhui@extreme.indiana.edu',
+		   'sullivan@mathcom.com',
+		   'Ian_MacPhedran@engr.usask.ca',
+		   'roger@maths.grace.cri.nz',
+		   'oon-digest@oonumerics.org',
+		   'scicomp@uni-erlangen.de',
+		   'im-net-digest@iwr.uni-heidelberg.de',
+		   'na.digest@na-net.ornl.gov',
+		   'num.info@hermes.iwr.uni-heidelberg.de');
 }
 my $r;
 
