@@ -100,13 +100,7 @@ Why are there all these unsafe casts from VectorBase to dVector
 
 Use unsigned integers for the colnums array in dSMatrixStruct. This
   would enhance safety since colnum=-1 would no longer point to a
-  valid address. Additionally, add a break statement upon first
-  encounter of sorted colnums==-1 in dsmatrixstruct::compress (by
-  now, all -1's are sorted _first_, so we can't skip them if we want
-  to get to the other colnums. If it were MAXINT instead of -1, we
-  could skip all entries after finding the first MAXINT).
+  valid address.
 
-Optimize dSMatrixStruct::compress, using standard sort algorithms
-  and only sorting the used range of indices, not those with
-  -1 entries.
-
+Let dSMatrixStruct::compress free the memory of colnums which is
+  no longer needed.
