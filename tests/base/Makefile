@@ -156,7 +156,7 @@ target1: $(target1-o-files) $(libraries)
 
 %.output:%.testcase
 	@echo =====Running======= $<
-	@$<
+	@./$<
 	@perl -pi.bak -e 's/JobId.*//;s/value.*//;' $@
 	@rm $@.bak
 
