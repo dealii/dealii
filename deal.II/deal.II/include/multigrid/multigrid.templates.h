@@ -198,6 +198,14 @@ void
 Multigrid<VECTOR>::level_step(const unsigned int level,
 			      Cycle cycle)
 {
+  char cychar = '?';
+  switch (cycle)
+    {
+      case v_cycle: cychar = 'V'; break;
+      case f_cycle: cychar = 'F'; break;
+      case w_cycle: cychar = 'W'; break;
+    }
+  
 				   // Not actually the defect yet, but
 				   // we do not want to spend yet
 				   // another vector.
@@ -217,13 +225,13 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
   if (level == minlevel)
     {
       if (debug>0)
-	deallog << "W-cycle solving  level " << level << std::endl;
+	deallog << cychar << "-cycle solving  level " << level << std::endl;
   
       (*coarse)(level, solution[level], t[level]);
       return;
     }
   if (debug>0)
-    deallog << "W-cycle entering level " << level << std::endl;
+    deallog << cychar << "-cycle entering level " << level << std::endl;
   
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
@@ -250,14 +258,20 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
 				   // here for the sake of the
 				   // F-cycle, needs only one,
   level_step(level-1, cycle);
-				   // while the W-cycle repeats itself
-  if (cycle == w_cycle)
-    level_step(level-1, cycle);
-				   // and the F-cycle does a V-cycle
-				   // after an F-cycle.
-  else if (cycle == f_cycle)
-    level_step(level-1, v_cycle);
-
+				   // If we solve exactly, then we do
+				   // not need a second coarse grid
+				   // step.
+  if (level>minlevel+1)
+    {
+				       // while the W-cycle repeats itself
+      if (cycle == w_cycle)
+	level_step(level-1, cycle);
+				       // and the F-cycle does a V-cycle
+				       // after an F-cycle.
+      else if (cycle == f_cycle)
+	level_step(level-1, v_cycle);
+    }
+  
 				   // reset size of the auxiliary
 				   // vector, since it has been
 				   // resized in the recursive call to
@@ -282,7 +296,7 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
   post_smooth->smooth(level, solution[level], t[level]);
 
   if (debug>1)
-    deallog << "W-cycle leaving  level " << level << std::endl;
+    deallog << cychar << "-cycle leaving  level " << level << std::endl;
 }
 
 
