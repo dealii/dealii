@@ -1,8 +1,10 @@
-// $Id$
+/*----------------------------   mgbase.h     ---------------------------*/
+/*      $Id$                 */
+#ifndef __mgbase_H
+#define __mgbase_H
+/*----------------------------   mgbase.h     ---------------------------*/
 
 
-#ifndef __lac_mgbase_h
-#define __lac_mgbase_h
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
@@ -436,9 +438,11 @@ class PreconditionMG
 
 
 
+
+
 template<class SOLVER, class MATRIX, class PRECOND>
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>
-::MGCoarseGridLACIteration(SOLVER& s, const MATRIX& m, const PRECOND& p)
+MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>::
+MGCoarseGridLACIteration(SOLVER& s, const MATRIX& m, const PRECOND& p)
 		:
 		solver(s), matrix(m), precondition(p)
 {}
@@ -451,7 +455,10 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND>::operator()
   solver.solve(matrix, dst, src, precondition);
 }
 
-//////////////////////////////////////////////////////////////////////
+
+
+
+/* ------------------------------------------------------------------- */
 
 template<class VECTOR>
 MGVector<VECTOR>::MGVector(unsigned int min, unsigned int max)
@@ -478,7 +485,10 @@ MGVector<VECTOR>::operator[](unsigned int i) const
   return vector<VECTOR>::operator[](i-minlevel);
 }
 
-//////////////////////////////////////////////////////////////////////
+
+
+/* ------------------------------------------------------------------- */
+
 
 template<class MATRIX>
 MGMatrix<MATRIX>::MGMatrix(unsigned int min, unsigned int max)
@@ -505,13 +515,16 @@ MGMatrix<MATRIX>::operator[](unsigned int i) const
   return vector<MATRIX>::operator[](i-minlevel);
 }
 
-//////////////////////////////////////////////////////////////////////
+
+
+/* ------------------------------------------------------------------- */
+
 
 template<class MG, class VECTOR>
 PreconditionMG<MG, VECTOR>::PreconditionMG(MG& mg,
-			       const MGSmootherBase& pre,
-			       const MGSmootherBase& post,
-			       const MGCoarseGridSolver& coarse)
+					   const MGSmootherBase& pre,
+					   const MGSmootherBase& post,
+					   const MGCoarseGridSolver& coarse)
 		:
 		multigrid(&mg),
 		pre(&pre),
@@ -519,9 +532,12 @@ PreconditionMG<MG, VECTOR>::PreconditionMG(MG& mg,
 		coarse(&coarse)
 {}
 
+
+
 template<class MG, class VECTOR>
 void
-PreconditionMG<MG, VECTOR>::operator() (VECTOR& dst, const VECTOR& src) const
+PreconditionMG<MG, VECTOR>::operator() (VECTOR& dst,
+					const VECTOR& src) const
 {
   multigrid->copy_to_mg(src);
   multigrid->vcycle(*pre, *post, *coarse);
@@ -529,4 +545,8 @@ PreconditionMG<MG, VECTOR>::operator() (VECTOR& dst, const VECTOR& src) const
 }
 
 
+
+/*----------------------------   mgbase.h     ---------------------------*/
+/* end of #ifndef __mgbase_H */
 #endif
+/*----------------------------   mgbase.h     ---------------------------*/
