@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <grid/tria_iterator_base.h>
 
+
 template <int dim> class Point;
 
 template <int dim> class Triangulation;
@@ -27,6 +28,12 @@ template <int dim, typename Accessor> class TriaActiveIterator;
 class Line;
 class Quad;
 class Hexahedron;
+namespace std
+{
+  template<class T1, class T2>
+  struct pair;
+}
+
 
 
 // note: the file tria_accessor.templates.h is included at the end of
@@ -221,6 +228,10 @@ class TriaAccessor
 				      * Exception
 				      */
     DeclException0 (ExcNeighborIsCoarser);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNeighborIsNotCoarser);
 				     /*@}*/
 	
   protected:
@@ -1857,14 +1868,24 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * the present cell
 				      * (i.e. @p{cell->neighbor(neighbor)->level()}
 				      * needs to be equal to
-				      * @p{cell->level()}, since
-				      * otherwise the neighbors of the
-				      * neighbor cell are on a coarser
-				      * level than the present one and
-				      * you can't get back from there
-				      * to this cell.
+				      * @p{cell->level()}. Use the
+				      * @p{neighbor_of_coarser_neighbor}
+				      * function in that case.
 				      */
     unsigned int neighbor_of_neighbor (const unsigned int neighbor) const;
+    
+				     /**
+				      * This function is a
+				      * generalization of the
+				      * @p{neighbor_of_neighbor}
+				      * function for the case of a
+				      * coarser neighbor. It returns a
+				      * pair of numbers, face_no and
+				      * subface_no, with the following
+				      * property:
+				      * @p{cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell}.
+				      */
+    std::pair<unsigned int, unsigned int> neighbor_of_coarser_neighbor (const unsigned int neighbor) const;
     
 				     /**
 				      *  Return whether the @p{i}th

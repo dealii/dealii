@@ -1807,6 +1807,71 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 
 
 template <int dim>
+pair<unsigned int, unsigned int>
+CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) const
+{
+				   // make sure that the neighbor is
+				   // on a coarser level
+  Assert (neighbor_level(neighbor) < present_level,
+	  typename TriaAccessor<dim>::ExcNeighborIsNotCoarser());
+  Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
+	  typename TriaAccessor<dim>::ExcInvalidNeighbor(neighbor));
+
+  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > this_face=face(neighbor);
+  const TriaIterator<dim,CellAccessor<dim> > neighbor_cell = this->neighbor(neighbor);
+  
+				   // usually, on regular patches of
+				   // the grid, this cell is just on
+				   // the opposite side of the
+				   // neighbor that the neighbor is of
+				   // this cell. for example in 2d, if
+				   // we want to know the
+				   // neighbor_of_neighbor if
+				   // neighbor==1 (the right
+				   // neighbor), then we will get 3
+				   // (the left neighbor) in most
+				   // cases. look up this relationship
+				   // in the table provided by
+				   // GeometryInfo and try it
+  const unsigned int face_no_guess
+    = GeometryInfo<dim>::opposite_face[neighbor];
+
+  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face_guess
+    =neighbor_cell->face(face_no_guess);
+  
+  if (face_guess->has_children())
+    for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face; ++subface_no)
+      if (face_guess->child(subface_no)==this_face)
+	return pair<unsigned int,unsigned int> (face_no_guess, subface_no);
+
+				     // if the guess was false, then
+				     // we need to loop over all faces
+				     // and subfaces and find the
+				     // number the hard way
+  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+    {
+      if (face_no!=face_no_guess)
+	{
+	  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face
+	    =neighbor_cell->face(face_no);
+	  if (face->has_children())
+	    for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face; ++subface_no)
+	      if (face->child(subface_no)==this_face)
+		return pair<unsigned int,unsigned int> (face_no, subface_no);
+	}
+    }
+  
+				   // we should never get here,
+				   // since then we did not find
+				   // our way back...
+  Assert (false, ExcInternalError());
+  return pair<unsigned int,unsigned int> (static_cast<unsigned int>(-1),
+					  static_cast<unsigned int>(-1));
+};
+
+
+
+template <int dim>
 bool CellAccessor<dim>::at_boundary (const unsigned int i) const
 {
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
