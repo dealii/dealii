@@ -36,7 +36,7 @@ endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-flags     = $(CXXFLAGS) -L$D/deal.II/lib
+flags     = $(CXXFLAGS.o) -L$D/deal.II/lib
 lib-tag   = "deal_II_libraries="
 endif
 
