@@ -8,7 +8,7 @@ INPUT    = headers/deal.II/ \
 	../../deal.II/include/grid \
 	../../deal.II/include/multigrid \
 	../../deal.II/include/numerics
-TAGFILES = base.tag lac.tag
+TAGFILES = base.tag=../base lac.tag=../lac
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = latex/deal.II

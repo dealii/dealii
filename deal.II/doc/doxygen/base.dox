@@ -3,7 +3,6 @@
 PROJECT_NAME = "deal.II base library"
 
 INPUT    = headers/base/ ../../base/include/base/
-TAGFILES = base.tag
 
 HTML_OUTPUT      = base
 LATEX_OUTPUT     = latex/base
