@@ -803,17 +803,6 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
-
-				   // check that the face we are
-				   // presently working on is not at
-				   // the boundary, since boundary
-				   // faces cannot, by definition, be
-				   // further refined as there is no
-				   // other cell behind the face, and
-				   // then there is no point in using
-				   // subfacevalues on these faces
-  Assert (cell->face(face_no)->at_boundary() == false,
-	  ExcReinitCalledWithBoundaryFace());
   
   present_cell  = cell;
   present_face  = cell->face(face_no);
