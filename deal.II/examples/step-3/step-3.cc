@@ -313,11 +313,17 @@ void LaplaceProblem::assemble_system ()
 				   // quadrature formula for the
 				   // evaluation of the integrals on
 				   // each cell. Let's take a Gauss
-				   // formula with three quadrature
+				   // formula with two quadrature
 				   // points in each direction, i.e. a
-				   // total of nine points since we
-				   // are in 2D:
-  QGauss3<2>  quadrature_formula;
+				   // total of four points since we
+				   // are in 2D. This quadrature
+				   // formula integrates polynomials
+				   // of degrees up to three exactly
+				   // (in 1D). Since the integrands in
+				   // the matrix entries are quadratic
+				   // (in 1D), this is sufficient. The
+				   // same holds for 2D.
+  QGauss2<2>  quadrature_formula;
 				   // And we initialize the object
 				   // which we have briefly talked
 				   // about above. It needs to be told

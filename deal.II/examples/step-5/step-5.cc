@@ -327,7 +327,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // object will be used for this:
   const Coefficient<dim> coefficient;
 
-  QGauss3<dim>  quadrature_formula;
+  QGauss2<dim>  quadrature_formula;
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   UpdateFlags(update_values    |
