@@ -13,23 +13,24 @@
 
 
 #include <base/function.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_constraints.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
 #include <base/quadrature.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <dofs/dof_tools.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
+#include <grid/tria_iterator.h>
+#include <grid/grid_tools.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_constraints.h>
+#include <dofs/dof_tools.h>
+#include <fe/fe.h>
+#include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
 
 #include <numeric>
 #include <algorithm>
@@ -1506,11 +1507,11 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 
 template <int dim, class InVector>
 void
-VectorTools::point_difference (const DoFHandler<dim>& dof,
-			       const InVector&        fe_function,
-			       const Function<dim>&   exact_function,
-			       Vector<double>&        difference,
-			       const Point<dim>&      point)  
+VectorTools::point_difference (const DoFHandler<dim> &dof,
+			       const InVector        &fe_function,
+			       const Function<dim>   &exact_function,
+			       Vector<double>        &difference,
+			       const Point<dim>      &point)
 {
   static const MappingQ1<dim> mapping;
   const FiniteElement<dim>& fe = dof.get_fe();
@@ -1518,43 +1519,34 @@ VectorTools::point_difference (const DoFHandler<dim>& dof,
   Assert(difference.size() == fe.n_components(),
 	 ExcDimensionMismatch(difference.size(), fe.n_components()));
 
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof.begin_active();
+                                   // first find the cell in which this point
+                                   // is, initialize a quadrature rule with
+                                   // it, and then a FEValues object
   const typename DoFHandler<dim>::active_cell_iterator
-    endc = dof.end();
+    cell = GridTools::find_active_cell_around_point (dof, point);
 
+  const Point<dim> unit_point
+    = mapping.transform_real_to_unit_cell(cell, point);
+  Assert (GeometryInfo<dim>::is_inside_unit_cell (unit_point),
+          ExcInternalError());
+
+  const Quadrature<dim> quadrature (std::vector<Point<dim> > (1, unit_point),
+                                    std::vector<double> (1, 1.));
+  FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
+  fe_values.reinit(cell);
+
+                                   // then use this to get at the values of
+                                   // the given fe_function at this point
   std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+  fe_values.get_function_values(fe_function, u_value);
 
-//TODO: replace this linear search over all cells by using a logarithmic: first find teh correct cell on the coarse grid, then loop recursively over its children
-  for (;cell != endc; ++cell)
-    {
-      if (cell->point_inside(point))
-	{
-	  Point<dim> unit_point = mapping.transform_real_to_unit_cell(
-            cell, point);
-          for (unsigned int i=0; i<dim; ++i)
-            Assert(0<=unit_point(i) && unit_point(i)<=1, ExcInternalError());
-          std::vector<Point<dim> > quadrature_point(1, unit_point);
-          std::vector<double> weight(1, 1.);
-          Quadrature<dim> quadrature(quadrature_point, weight);
-          FEValues<dim> fe_values(
-            mapping, fe, quadrature, UpdateFlags(update_values));
-          fe_values.reinit(cell);
-          fe_values.get_function_values(fe_function, u_value);
-	  break;
-	}
-    }
   if (fe.n_components() == 1)
-    {
-      const double value = exact_function.value(point);
-      difference(0) = value;
-    } else {
-      exact_function.vector_value(point, difference);
-    }
-  for (unsigned int i=0;i<difference.size();++i)
-    {
-      difference(i) -= u_value[0](i);
-    }
+    difference(0) = exact_function.value(point);
+  else
+    exact_function.vector_value(point, difference);
+    
+  for (unsigned int i=0; i<difference.size(); ++i)
+    difference(i) -= u_value[0](i);
 }
 
 
