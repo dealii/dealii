@@ -32,8 +32,9 @@
 /* ------------------------ MGVertexDoFs ----------------------------------- */
 
 template <int dim>
-MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs () :
-		coarsest_level (1<<30),
+MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs ()
+		:
+		coarsest_level (deal_II_numbers::invalid_unsigned_int),
 		finest_level (0),
 		indices (0)
 {}
@@ -42,12 +43,23 @@ MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs () :
 template <int dim>
 void MGDoFHandler<dim>::MGVertexDoFs::init (const unsigned int cl,
 					    const unsigned int fl,
-					    const unsigned int dofs_per_vertex) {
-  Assert (indices == 0, ExcInternalError());
+					    const unsigned int dofs_per_vertex)
+{
+  if (indices != 0)
+    {
+      delete[] indices;
+      indices = 0;
+    }
 
   coarsest_level = cl;
   finest_level   = fl;
 
+				   // in the case where an invalid
+				   // entry is requested, just leave
+				   // everything else alone
+  if (cl > fl)
+    return;
+  
   const unsigned int n_levels = finest_level-coarsest_level + 1;
   
   indices = new unsigned int[n_levels * dofs_per_vertex];
@@ -62,6 +74,18 @@ template <int dim>
 MGDoFHandler<dim>::MGVertexDoFs::~MGVertexDoFs () {
   delete[] indices;
 }
+
+
+template <int dim>
+typename MGDoFHandler<dim>::MGVertexDoFs &
+MGDoFHandler<dim>::MGVertexDoFs::operator = (const MGVertexDoFs &)
+{
+  Assert (false,
+	  ExcMessage ("We don't know how many dofs per vertex there are, so there's "
+		      "no way we can copy the 'indices' array"));
+  return *this;
+}
+
 
 
 template <int dim>
@@ -1640,6 +1664,8 @@ void MGDoFHandler<2>::reserve_space () {
 				   // vertex we pass by  belongs to
   mg_vertex_dofs.resize (this->tria->vertices.size());
 
+				   // initialize these arrays with
+				   // invalid values (min>max)
   std::vector<unsigned int> min_level (this->tria->vertices.size(),
 				       this->tria->n_levels());
   std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
@@ -1655,20 +1681,28 @@ void MGDoFHandler<2>::reserve_space () {
 	  min_level[vertex_index] = cell->level();
 	if (max_level[vertex_index] < static_cast<unsigned int>(cell->level()))
 	  max_level[vertex_index] = cell->level();
-      };
+      }
 
 
                                    // now allocate the needed space
   for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
-    {
-//TODO:[WB,GK] These conditions are violated on unused vertices
-      Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
-      Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
+    if (this->tria->vertices_used[vertex])
+      {
+	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
+	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
-      mg_vertex_dofs[vertex].init (min_level[vertex],
-				   max_level[vertex],
-				   this->selected_fe->dofs_per_vertex);
-    };
+	mg_vertex_dofs[vertex].init (min_level[vertex],
+				     max_level[vertex],
+				     this->selected_fe->dofs_per_vertex);
+      }
+    else
+      {
+	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
+	Assert (max_level[vertex] == 0, ExcInternalError());
+
+					 // reset to original state
+	mg_vertex_dofs[vertex].init (1, 0, 0);
+      }
 }
 
 #endif

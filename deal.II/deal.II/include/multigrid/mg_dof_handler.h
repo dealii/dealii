@@ -949,7 +949,8 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * needed and need not handle
 				      * growing arrays and the like.
 				      */
-    class MGVertexDoFs {
+    class MGVertexDoFs
+    {
       public:
 	
 					 /**
@@ -968,6 +969,14 @@ class MGDoFHandler : public DoFHandler<dim>
 					 /**
 					  * Allocate memory and set
 					  * all indices to @p -1.
+					  *
+					  * If @p coarsest_level is
+					  * greater than @p
+					  * finest_level, then no
+					  * memory is allocated and
+					  * the object is left in an
+					  * invalid state. This is
+					  * used for unused vertices.
 					  */
 	void init (const unsigned int coarsest_level,
 		   const unsigned int finest_level,
@@ -978,6 +987,14 @@ class MGDoFHandler : public DoFHandler<dim>
 					  */
 	~MGVertexDoFs ();
 
+					 /**
+					  * Assignment operator. Will
+					  * throw an exception since
+					  * it can't do the work that
+					  * @p init is supposed to do.
+					  */
+	MGVertexDoFs & operator = (const MGVertexDoFs &vertex);
+	
 					 /**
 					  * Set the index with number
 					  * @p dof_number of this
