@@ -1,8 +1,17 @@
-/*----------------------------   convergence_table.cc     ---------------------------*/
-/*      $Id$                 */
+//----------------------------  convergence_table.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  convergence_table.cc  ---------------------------
 
 
-#include <base/convergence_table.h>
 #include <math.h>
 
 
@@ -144,7 +153,6 @@ void ConvergenceTable::omit_column_from_convergence_rate_evaluation(const string
 }
 
 
-
 void ConvergenceTable::evaluate_all_convergence_rates(const string &reference_column_key,
 						      const RateMode rate_mode)
 {
@@ -164,4 +172,3 @@ void ConvergenceTable::evaluate_all_convergence_rates(const RateMode rate_mode)
 }
 
 
-/*----------------------------   convergence_table.cc     ---------------------------*/

@@ -1,9 +1,17 @@
-/*      $Id$                 */
+//----------------------------  function.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  function.cc  ---------------------------
 
 
-#include <base/function.h>
-#include <base/point.h>
-#include <lac/vector.h>
 #include <vector>
 
 
@@ -15,11 +23,9 @@ Function<dim>::Function (const unsigned int n_components,
 {};
 
 
-
 template <int dim>
 Function<dim>::~Function ()
 {};
-
 
 
 template <int dim>
@@ -31,14 +37,12 @@ double Function<dim>::value (const Point<dim> &,
 };
 
 
-
 template <int dim>
 void Function<dim>::vector_value (const Point<dim> &,
 				  Vector<double>   &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };
-
 
 
 template <int dim>
@@ -57,7 +61,6 @@ void Function<dim>::value_list (const vector<Point<dim> > &points,
 };
 
 
-
 template <int dim>
 void Function<dim>::vector_value_list (const vector<Point<dim> > &points,
 				       vector<Vector<double> >   &values) const
@@ -73,8 +76,6 @@ void Function<dim>::vector_value_list (const vector<Point<dim> > &points,
 };
 
 
-
-
 template <int dim>
 Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 				       const unsigned int) const
@@ -84,14 +85,12 @@ Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 };
 
 
-
 template <int dim>
 void Function<dim>::vector_gradient (const Point<dim>       &,
 				     vector<Tensor<1,dim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 };
-
 
 
 template <int dim>
@@ -105,7 +104,6 @@ void Function<dim>::gradient_list (const vector<Point<dim> > &points,
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i] = gradient(points[i], component);
 };
-
 
 
 template <int dim>
@@ -125,19 +123,14 @@ void Function<dim>::vector_gradient_list (const vector<Point<dim> >       &point
 };
 
 
-
-
-
 template <int dim>
 ZeroFunction<dim>::ZeroFunction (const unsigned int n_components) :
 		Function<dim> (n_components)
 {};
 
 
-
 template <int dim>
 ZeroFunction<dim>::~ZeroFunction () {};
-
 
 
 template <int dim>
@@ -146,7 +139,6 @@ double ZeroFunction<dim>::value (const Point<dim> &,
 {
   return 0.;
 };
-
 
 
 template <int dim>
@@ -160,7 +152,6 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
 };
 
 
-
 template <int dim>
 void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
 				    vector<double>            &values,
@@ -170,7 +161,6 @@ void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
 
   fill_n (values.begin(), points.size(), 0.);
 };
-
 
 
 template <int dim>
@@ -189,14 +179,12 @@ void ZeroFunction<dim>::vector_value_list (const vector<Point<dim> > &points,
 };
 
 
-
 template <int dim>
 Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &,
 					   const unsigned int) const
 {
   return Tensor<1,dim>();
 };
-
 
 
 template <int dim>
@@ -211,7 +199,6 @@ void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
 };
 
 
-
 template <int dim>
 void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 				       vector<Tensor<1,dim> >    &gradients,
@@ -223,7 +210,6 @@ void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
   for (unsigned int i=0; i<points.size(); ++i)
     gradients[i].clear ();
 };
-
 
 
 template <int dim>
@@ -242,9 +228,6 @@ void ZeroFunction<dim>::vector_gradient_list (const vector<Point<dim> >       &p
 };
 
 
-
-
-
 template <int dim>
 ConstantFunction<dim>::ConstantFunction (const double value,
 					 const unsigned int n_components) :
@@ -256,14 +239,12 @@ template <int dim>
 ConstantFunction<dim>::~ConstantFunction () {};
 
 
-
 template <int dim>
 double ConstantFunction<dim>::value (const Point<dim> &,
 					   const unsigned int) const
 {
   return function_value;
 };
-
 
 
 template <int dim>
@@ -277,7 +258,6 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 };
 
 
-
 template <int dim>
 void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
 					vector<double>            &values,
@@ -287,7 +267,6 @@ void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
 
   fill_n (values.begin(), points.size(), function_value);
 };
-
 
 
 template <int dim>
@@ -315,14 +294,12 @@ double Function<dim>::laplacian (const Point<dim> &,
 }
 
 
-
 template <int dim>
 void Function<dim>::vector_laplacian (const Point<dim> &,
 				  Vector<double>   &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
-
 
 
 template <int dim>
@@ -339,7 +316,6 @@ void Function<dim>::laplacian_list (const vector<Point<dim> > &points,
   for (unsigned int i=0; i<points.size(); ++i)
     laplacians[i]  = this->laplacian (points[i], component);
 }
-
 
 
 template <int dim>

@@ -1,10 +1,18 @@
-/*      $Id$                 */
+//----------------------------  exceptions.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  exceptions.cc  ---------------------------
 
 
-#include <base/exceptions.h>
-#include <string>
 #include <strstream>
-
 
 
 ExceptionBase::ExceptionBase () :
@@ -12,12 +20,10 @@ ExceptionBase::ExceptionBase () :
 {};
 
 
-
 ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
 			      const char* c, const char *e) :
 		file(f), line(l), function(func), cond(c), exc(e)
 {};
-
 
 
 void ExceptionBase::SetFields (const char* f,
@@ -33,7 +39,6 @@ void ExceptionBase::SetFields (const char* f,
 };
 
 
-
 void ExceptionBase::PrintExcData (ostream &out) const {
   out << "An error occurred in line <" << line
       << "> of file <" << file
@@ -47,12 +52,9 @@ void ExceptionBase::PrintExcData (ostream &out) const {
 };
 
 
-
-
 void ExceptionBase::PrintInfo (ostream &out) const {
   out << "(none)" << endl;
 };
-
 
 
 const char * ExceptionBase::what () const {

@@ -1,8 +1,16 @@
-// $Id$
-// (c) Guido Kanschat, 1999
+//----------------------------  function_lib.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  function_lib.cc  ---------------------------
 
-#include <base/point.h>
-#include <base/function_lib.h>
 
 #include <cmath>
 

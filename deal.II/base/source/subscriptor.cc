@@ -1,7 +1,18 @@
-/*      $Id$                 */
+//----------------------------  subscriptor.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  subscriptor.cc  ---------------------------
+
 
 #include <base/subscriptor.h>
-
 
 
 Subscriptor::Subscriptor () :
@@ -9,11 +20,9 @@ Subscriptor::Subscriptor () :
 {};
 
 
-
 Subscriptor::Subscriptor (const Subscriptor &) :
 		counter (0)
 {};
-
 
 
 Subscriptor::~Subscriptor () {
@@ -21,17 +30,14 @@ Subscriptor::~Subscriptor () {
 };
 
 
-
 Subscriptor & Subscriptor::operator = (const Subscriptor &) {
   return *this;
 };
 
 
-
 void Subscriptor::subscribe () const {
   ++counter;
 };
-
 
 
 void Subscriptor::unsubscribe () const {

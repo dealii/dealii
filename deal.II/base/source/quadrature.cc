@@ -1,16 +1,23 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  quadrature.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  quadrature.cc  ---------------------------
 
 
-#include <base/quadrature.h>
 #include <cmath>
-
 
 
 template <>
 Quadrature<0>::Quadrature (const unsigned int)
 {};
-
 
 
 template <int dim>
@@ -39,13 +46,11 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
 };
 
 
-
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
 			   const Quadrature<1> &) {
   Assert (false, ExcInternalError());
 };
-
 
 
 template <int dim>
@@ -86,10 +91,8 @@ Quadrature<dim>::Quadrature (const Quadrature<dim-1> &q1,
 };
 
 
-
 template <int dim>
 Quadrature<dim>::~Quadrature () {};
-
 
 
 template <>
@@ -100,13 +103,11 @@ const Point<0> & Quadrature<0>::quad_point (const unsigned int) const {
 };
 
 
-
 template <int dim>
 const Point<dim> & Quadrature<dim>::quad_point (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return quadrature_points[i];
 };
-
 
 
 template <>
@@ -116,12 +117,10 @@ const vector<Point<0> > & Quadrature<0>::get_quad_points () const {
 };
 
 
-
 template <int dim>
 const vector<Point<dim> > & Quadrature<dim>::get_quad_points () const {
   return quadrature_points;
 };
-
 
 
 template <>
@@ -131,13 +130,11 @@ double Quadrature<0>::weight (const unsigned int) const {
 };
 
 
-
 template <int dim>
 double Quadrature<dim>::weight (const unsigned int i) const {
   Assert (i<n_quadrature_points, ExcIndexRange(i, 0, n_quadrature_points));
   return weights[i];
 };
-
 
 
 template <int dim>
@@ -146,13 +143,11 @@ const vector<double> & Quadrature<dim>::get_weights () const {
 };
 
 
-
 template <>
 const vector<double> & Quadrature<0>::get_weights () const {
   Assert (false, ExcInternalError());
   return weights;
 };
-
 
 
 template <>
@@ -181,7 +176,6 @@ void QProjector<2>::project_to_face (const Quadrature<1> &quadrature,
 	      Assert (false, ExcInternalError());
       };
 };
-
 
 
 template <>
@@ -229,7 +223,6 @@ void QProjector<3>::project_to_face (const Quadrature<2> &quadrature,
 	      Assert (false, ExcInternalError());
       };
 };
-
 
 
 template <>
@@ -304,7 +297,6 @@ void QProjector<2>::project_to_subface (const Quadrature<1> &quadrature,
 };
 
 
-
 template <>
 void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 					const unsigned int   face_no,
@@ -315,7 +307,7 @@ void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
   Assert (subface_no<(1<<(dim-1)), ExcIndexRange (face_no, 0, 1<<(dim-1)));
 
 
-				   // for all faces and subfaces: first project
+// for all faces and subfaces: first project
 				   // onto the first subface of each face, then
 				   // move it to the right place
   for (unsigned int p=0; p<quadrature.n_quadrature_points; ++p)
@@ -460,8 +452,6 @@ void QProjector<3>::project_to_subface (const Quadrature<2> &quadrature,
 };
 
 
-
-
 template <>
 bool
 QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
@@ -478,7 +468,6 @@ QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
 
   return (at_left && at_right);
 };
-
 
 
 template <>
@@ -533,9 +522,9 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 				       // has only one quadrature point
 				       // per end point
       Assert (n_end_points == 2, ExcInvalidQuadratureFormula());
-      
-      
-      for (unsigned int copy=0; copy<n_copies; ++copy)
+
+
+for (unsigned int copy=0; copy<n_copies; ++copy)
 	for (unsigned int q_point=0; q_point<base_quadrature.n_quadrature_points; ++q_point)
 	  {
 					     // skip the left point of this copy
@@ -572,8 +561,6 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 };
 
 
-
-
 // construct higher dimensional quadrature formula by tensor product of lower
 // dimensional iterated quadrature formulae
 template <int dim>
@@ -582,8 +569,6 @@ QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
 		Quadrature<dim> (QIterated<dim-1>(base_quadrature, N),
 				 QIterated<1>(base_quadrature, N))
 {};
-
-
 
 
 // explicit instantiations; note: we need them all for all dimensions

@@ -1,8 +1,17 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  quadrature_lib.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  quadrature_lib.cc  ---------------------------
 
 
-#include <base/quadrature_lib.h>
 #include <cmath>
 
 
@@ -31,7 +40,6 @@ QGauss2<1>::QGauss2 () :
       weights[i] = wts[i];
     };
 };
-
 
 
 template <>
@@ -96,7 +104,6 @@ QGauss4<1>::QGauss4 () :
 };
 
 
-
 template <>
 QGauss5<1>::QGauss5 () :
 		Quadrature<1> (5)
@@ -132,7 +139,6 @@ QGauss5<1>::QGauss5 () :
       weights[i] = wts[i];
     };
 };
-
 
 
 template <>
@@ -174,7 +180,6 @@ QGauss6<1>::QGauss6 () :
       weights[i] = wts[i];
     };
 };
-
 
 
 template <>
@@ -220,7 +225,6 @@ QGauss7<1>::QGauss7 () :
       weights[i] = wts[i];
     };
 };
-
 
 
 template <>
@@ -272,7 +276,6 @@ QGauss8<1>::QGauss8 () :
 };
 
 
-
 template <>
 QMidpoint<1>::QMidpoint () :
 		Quadrature<1>(1)
@@ -280,7 +283,6 @@ QMidpoint<1>::QMidpoint () :
   quadrature_points[0] = Point<1>(0.5);
   weights[0] = 1.0;
 };
-
 
 
 template <>
@@ -296,7 +298,6 @@ QSimpson<1>::QSimpson () :
       weights[i] = wts[i];
     };
 };
-
 
 
 template <>
@@ -355,8 +356,6 @@ QSimpson<dim>::QSimpson () :
 template <int dim>
 QTrapez<dim>::QTrapez () :
 		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
-
-
 
 
 // explicite specialization

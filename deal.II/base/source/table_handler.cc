@@ -1,14 +1,18 @@
-/*----------------------------   table_handler.cc     ---------------------------*/
-/*      $Id$                 */
+//----------------------------  table_handler.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  table_handler.cc  ---------------------------
 
 
-
-#include <base/table_handler.h>
-
-#include <iostream>
 #include <iomanip>
-
-
 
 
 TableEntryBase::TableEntryBase ()
@@ -68,7 +72,6 @@ TableHandler::Column::Column():
 {}
 
 
-
 TableHandler::Column::~Column()
 {
   for (unsigned int i=0; i<entries.size(); ++i)
@@ -100,7 +103,6 @@ void TableHandler::add_value (const string &key,
   
   col_iter->second.entries.push_back(entry_ptr);
 }
-
 
 
 void TableHandler::add_column_to_supercolumn (const string &key,
@@ -147,7 +149,6 @@ void TableHandler::add_column_to_supercolumn (const string &key,
 }
 
 
-
 void TableHandler::set_column_order (const vector<string> &new_order)
 {
   for (unsigned int j=0; j<new_order.size(); ++j)
@@ -185,14 +186,12 @@ void TableHandler::set_tex_format (const string &key,
 }
 
 
-
 void TableHandler::set_precision (const string &key,
 				  unsigned int precision)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].precision=precision;
 }
-
 
 
 void TableHandler::set_scientific (const string &key,
@@ -203,14 +202,13 @@ void TableHandler::set_scientific (const string &key,
 }
 
 
-
 void TableHandler::write_text(ostream &out) const
 {
   vector<string> sel_columns;
   get_selected_columns(sel_columns);
 
 
-				   // write the caption line
+// write the caption line
   for (unsigned int j=0; j<column_order.size(); ++j)
     {
       string key=column_order[j];
@@ -260,7 +258,6 @@ void TableHandler::write_text(ostream &out) const
       out << endl;
     }
 }
-
 
 
 void TableHandler::write_tex(ofstream &out) const
@@ -394,7 +391,6 @@ unsigned int TableHandler::n_rows() const
 }
 
 
-
 void TableHandler::get_selected_columns(vector<string> &sel_columns) const
 {
   sel_columns.clear();
@@ -427,14 +423,12 @@ void TableHandler::get_selected_columns(vector<string> &sel_columns) const
 }
 
 
-
 // explicit instantiations
 template class TableEntry<double>;
 template class TableEntry<float>;
 template class TableEntry<int>;
 template class TableEntry<unsigned int>;
 template class TableEntry<string>;
-
 
 
 template

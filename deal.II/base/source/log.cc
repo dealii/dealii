@@ -1,13 +1,20 @@
-// $Id$
+//----------------------------  log.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  log.cc  ---------------------------
 
-#include <base/logstream.h>
-#include <base/job_identifier.h>
 
-#include <sys/resource.h>
 #include <iomanip>
 
 LogStream deallog;
-
 
 
 LogStream::LogStream()
@@ -20,8 +27,6 @@ LogStream::LogStream()
 }
 
 
-
-
 void
 LogStream::attach(ostream& o)
 {
@@ -31,12 +36,10 @@ LogStream::attach(ostream& o)
 }
 
 
-
 void LogStream::detach ()
 {
   file = 0;
 };
-
 
 
 ostream&
@@ -46,14 +49,12 @@ LogStream::get_console()
 }
 
 
-
 ostream&
 LogStream::get_file_stream()
 {
   Assert(file, ExcNoFileStreamGiven());
   return *file;
 }
-
 
 
 void
@@ -66,12 +67,10 @@ LogStream::push (const string& text)
 };
 
 
-
 void LogStream::pop ()
 {
   prefixes.pop();
 };
-
 
 
 void
@@ -81,7 +80,6 @@ LogStream::depth_console(unsigned n)
 };
 
 
-
 void
 LogStream::depth_file(unsigned n)
 {
@@ -89,13 +87,11 @@ LogStream::depth_file(unsigned n)
 };
 
 
-
 void
 LogStream::log_execution_time(bool flag)
 {
   print_utime = flag;
 }
-
 
 
 void
@@ -133,13 +129,11 @@ LogStream::print_line_head()
 }
 
 
-
 LogStream&
 LogStream::operator << (void (f)(LogStream &))
 {
   f(*this);
   return *this;
 }
-
 
 

@@ -1,14 +1,23 @@
-/* $Id$ */
+//----------------------------  data_out_base.all_dimensions.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  data_out_base.all_dimensions.cc  ---------------------------
 
 
-#include <base/data_out_base.h>
 #include <base/parameter_handler.h>
 
 
 DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 		write_preamble (write_preamble)
 {};
-
 
 
 DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
@@ -20,12 +29,10 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 {};
 
 
-
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Write preamble", "true", Patterns::Bool());
 };
-
 
 
 void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
@@ -34,17 +41,14 @@ void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
 };
 
 
-
 void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 {
 };
 
 
-
 void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
 {
 };
-
 
 
 void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
@@ -58,14 +62,12 @@ void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
 };
 
 
-
 void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &prm)
 {
   smooth        = prm.get_bool ("Use smooth triangles");
   bicubic_patch = prm.get_bool ("Use bicubic patches");
   external_data = prm.get_bool ("Include external file");
 };
-
 
 
 DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
@@ -93,7 +95,6 @@ DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
 		shade_cells(shade_cells),
 		color_function(color_function)
 {};
-
 
 
 DataOutBase::EpsFlags::RgbValues
@@ -182,7 +183,6 @@ DataOutBase::EpsFlags::default_color_function (const double x,
 };
 
 
-
 DataOutBase::EpsFlags::RgbValues
 DataOutBase::EpsFlags::grey_scale_color_function (const double x,
 						  const double xmin,
@@ -195,14 +195,12 @@ DataOutBase::EpsFlags::grey_scale_color_function (const double x,
 };
 
 
-
 bool DataOutBase::EpsCell2d::operator < (const EpsCell2d &e) const
 {
 				   // note the "wrong" order in
 				   // which we sort the elements
   return depth > e.depth;
 };
-
 
 
 void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
@@ -234,7 +232,6 @@ void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
 };
 
 
-
 void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
 {
   height_vector = prm.get_integer ("Index of vector for height");
@@ -258,11 +255,9 @@ void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
 };
 
 
-
 void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 {
 };
-
 
 
 void DataOutBase::GmvFlags::parse_parameters (ParameterHandler &/*prm*/)

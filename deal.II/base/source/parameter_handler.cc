@@ -1,13 +1,17 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  parameter_handler.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  parameter_handler.cc  ---------------------------
 
 
-#include <base/parameter_handler.h>
-#include <fstream>
-#include <iomanip>
-#include <strstream>
-#include <cstdlib>
-#include <algorithm>
 #include <list>
 
 
@@ -47,7 +51,6 @@ Patterns::PatternBase *
 Patterns::Double::clone () const {
   return new Patterns::Double();
 };
-
 
 
 Patterns::Selection::Selection (const string &seq) {
@@ -91,7 +94,6 @@ Patterns::Selection::clone () const {
 };
 
 
-
 Patterns::MultipleSelection::MultipleSelection (const string &seq) {
   Assert (seq.find (",") == string::npos, ExcCommasNotAllowed(seq.find(",")));
   
@@ -129,9 +131,9 @@ bool Patterns::MultipleSelection::match (const string &test_string_list) const {
 
       split_list.push_back (name);
     };
-  
 
-				   // check the different possibilities
+
+// check the different possibilities
   for (list<string>::const_iterator test_string = split_list.begin();
        test_string != split_list.end(); ++test_string) 
     {
@@ -176,7 +178,6 @@ Patterns::MultipleSelection::clone () const {
 };
 
 
-
 Patterns::Bool::Bool () :
 		Selection ("true|false")
 {};
@@ -188,10 +189,8 @@ Patterns::Bool::clone () const {
 };
 
 
-
 Patterns::Anything::Anything ()
 {};
-
 
 
 bool Patterns::Anything::match (const string &) const {
@@ -210,16 +209,11 @@ Patterns::Anything::clone () const {
 };
 
 
-
-
-
-
 ParameterHandler::ParameterHandler () :
 		status(true) {};
 
 
 ParameterHandler::~ParameterHandler () {};
-
 
 
 bool ParameterHandler::read_input (istream &input) {
@@ -262,7 +256,6 @@ bool ParameterHandler::read_input (const string &filename)
 }
 
 
-
 bool ParameterHandler::read_input_from_string (const char *s) {
 				   // if empty string then exit
 				   // with success
@@ -294,8 +287,6 @@ bool ParameterHandler::read_input_from_string (const char *s) {
 };
 
 
-
-
 void ParameterHandler::clear () {
   status = true;
 
@@ -317,7 +308,6 @@ void ParameterHandler::clear () {
   defaults.subsections.clear ();
   changed_entries.subsections.clear ();
 };
-
 
 
 bool ParameterHandler::declare_entry (const string &entry,
@@ -346,8 +336,6 @@ bool ParameterHandler::declare_entry (const string &entry,
 
   return true;
 };
-  
-  
 
 
 void ParameterHandler::enter_subsection (const string &subsection) {
@@ -369,7 +357,6 @@ void ParameterHandler::enter_subsection (const string &subsection) {
   subsection_path.push_back (subsection);
 };
 
-    
 
 bool ParameterHandler::leave_subsection () {
 				   // assert there is a subsection that
@@ -388,7 +375,6 @@ bool ParameterHandler::leave_subsection () {
 };
 
 
-
 const string & ParameterHandler::get (const string &entry_string) const {
   const Section* pd = get_present_defaults_subsection ();
   const Section* pc = get_present_changed_subsection ();
@@ -405,7 +391,7 @@ const string & ParameterHandler::get (const string &entry_string) const {
     };
 
 
-				   // entry exists; now find out whether
+// entry exists; now find out whether
 				   // it was changed:
   Section::EntryType::const_iterator ptr;
   ptr = pc->entries.find (entry_string);
@@ -416,7 +402,6 @@ const string & ParameterHandler::get (const string &entry_string) const {
   ptr = pd->entries.find (entry_string);
   return ptr->second.first;
 };
-
 
 
 long int ParameterHandler::get_integer (const string &entry_string) const {
@@ -431,7 +416,6 @@ long int ParameterHandler::get_integer (const string &entry_string) const {
 };
 
 
-
 double ParameterHandler::get_double (const string &entry_string) const {
   string s = get (entry_string);
   char *endptr;
@@ -444,7 +428,6 @@ double ParameterHandler::get_double (const string &entry_string) const {
 };
 
 
-
 bool ParameterHandler::get_bool (const string &entry_string) const {
   string s = get(entry_string);
 
@@ -454,7 +437,6 @@ bool ParameterHandler::get_bool (const string &entry_string) const {
   else
     return false;
 };
-
 
 
 ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
@@ -496,7 +478,6 @@ ostream & ParameterHandler::print_parameters (ostream &out, OutputStyle style) {
   
   return out;
 };
-
 
 
 void ParameterHandler::print_parameters_section (ostream           &out,
@@ -571,9 +552,9 @@ void ParameterHandler::print_parameters_section (ostream           &out,
 		  Assert (false, ExcNotImplemented());
 	  };
     };
-  
 
-				   // now transverse subsections tree
+
+// now transverse subsections tree
   map<string, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
     {
@@ -623,8 +604,6 @@ void ParameterHandler::print_parameters_section (ostream           &out,
     };
 };
 
-
-  
 
 bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
 				   // if there is a comment, delete it
@@ -756,7 +735,6 @@ bool ParameterHandler::scan_line (string line, const unsigned int lineno) {
 };
 
 
-
 ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () {
   Section* sec = &defaults;
   vector<string>::const_iterator SecName = subsection_path.begin();
@@ -769,7 +747,6 @@ ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () 
 
   return sec;
 };
-
 
 
 const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsection () const {
@@ -787,7 +764,6 @@ const ParameterHandler::Section* ParameterHandler::get_present_defaults_subsecti
 };
 
 
-
 ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
   Section* sec = &changed_entries;
   vector<string>::iterator SecName = subsection_path.begin();
@@ -800,7 +776,6 @@ ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () {
 
   return sec;
 };
-
 
 
 const ParameterHandler::Section* ParameterHandler::get_present_changed_subsection () const {
@@ -817,7 +792,6 @@ const ParameterHandler::Section* ParameterHandler::get_present_changed_subsectio
 };
 
 
-
 ParameterHandler::Section::~Section () {
   entries.clear ();
 
@@ -827,11 +801,8 @@ ParameterHandler::Section::~Section () {
     delete p->second;
 
 
-  subsections.clear ();
+subsections.clear ();
 };
-
-
-
 
 
 MultipleParameterLoop::MultipleParameterLoop() :
@@ -851,7 +822,6 @@ bool MultipleParameterLoop::read_input (istream &input) {
 };
 
 
-
 bool MultipleParameterLoop::read_input (const string &filename)
 {
   return ParameterHandler::read_input (filename);
@@ -862,15 +832,11 @@ bool MultipleParameterLoop::read_input (const string &filename)
 };
 
 
-
 bool MultipleParameterLoop::read_input_from_string (const char *s) {
   bool x = ParameterHandler::read_input (s);
   init_branches ();
   return x;
 };
-
-
-
 
 
 void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc) {
@@ -929,16 +895,14 @@ void MultipleParameterLoop::init_branches () {
 	     << "    does not have the right number of entries for the " << endl
 	     << "        " << n_branches << " variant runs that will be performed." << endl;
 
-  
-  
-				   // do a first run on filling the values to
+
+// do a first run on filling the values to
 				   // check for the conformance with the regexp
 				   // (afterwards, this will be lost in the whole
 				   // other output)
   for (int i=0; i<n_branches; ++i) 
     fill_entry_values (i);
 };
-
 
 
 void MultipleParameterLoop::init_branches_section (const ParameterHandler::Section &sec) {
@@ -950,9 +914,9 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
       multiple_choices.push_back (Entry(subsection_path,
 					e->first,
 					e->second.first));
-	        
 
-				   // transverse subsections
+
+// transverse subsections
   map<string, Section*>::const_iterator s;
   for (s = sec.subsections.begin(); s != sec.subsections.end(); ++s) 
     {
@@ -1031,13 +995,11 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no) {
   
 };
 
-  
 
 MultipleParameterLoop::Entry::Entry (const vector<string> &ssp,
 				     const string& Name,
 				     const string& Value) :
     subsection_path (ssp), entry_name(Name), entry_value(Value) {};
-
 
 
 void MultipleParameterLoop::Entry::split_different_values () {

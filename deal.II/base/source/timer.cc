@@ -1,14 +1,17 @@
-/* $Id$ */
-/* Copyright W. Bangerth, University of Heidelberg, 1998 */
+//----------------------------  timer.cc  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  timer.cc  ---------------------------
 
 
-#include <base/timer.h>
-
-
-
-// these includes should probably be properly
-// ./configure'd using the AC_HEADER_TIME macro:
-#include <sys/resource.h>
 #include <sys/time.h>
 
 Timer::Timer()
@@ -27,7 +30,6 @@ void Timer::start ()
 }
 
 
-
 double Timer::stop ()
 {
   if (running)
@@ -40,7 +42,6 @@ double Timer::stop ()
     }
   return full_time ();
 }
-
 
 
 double Timer::operator() () const
@@ -58,13 +59,11 @@ double Timer::operator() () const
 }
 
 
-
 void Timer::reset ()
 {
   cumulative_time = 0.;
   running         = false;
 }
-
 
 
 double Timer::full_time () const
