@@ -1214,6 +1214,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * STL-like iterator with the first entry
 				      * of row <tt>r</tt>. This is the version
 				      * for constant matrices.
+				      *
+				      * Note that if the given row is empty,
+				      * i.e. does not contain any nonzero
+				      * entries, then the iterator returned by
+				      * this function equals
+				      * <tt>end(r)</tt>. Note also that the
+				      * iterator may not be dereferencable in
+				      * that case.
 				      */
     const_iterator begin (const unsigned int r) const;
 
@@ -1221,6 +1229,13 @@ class SparseMatrix : public virtual Subscriptor
 				      * Final iterator of row
 				      * <tt>r</tt>. This is the version for
 				      * constant matrices.
+				      *
+				      * Note that the end iterator is not
+				      * necessarily dereferencable. This is in
+				      * particular the case if the row after
+				      * the one for which this is the end
+				      * iterator is empty, or if it is the end
+				      * iterator for the last row of a matrix.
 				      */
     const_iterator end (const unsigned int r) const;
     
@@ -1228,6 +1243,14 @@ class SparseMatrix : public virtual Subscriptor
 				      * STL-like iterator with the first entry
 				      * of row <tt>r</tt>. This is the version
 				      * for non-constant matrices.
+				      *
+				      * Note that if the given row is empty,
+				      * i.e. does not contain any nonzero
+				      * entries, then the iterator returned by
+				      * this function equals
+				      * <tt>end(r)</tt>. Note also that the
+				      * iterator may not be dereferencable in
+				      * that case.
 				      */
     iterator begin (const unsigned int r);
 
@@ -1235,6 +1258,13 @@ class SparseMatrix : public virtual Subscriptor
 				      * Final iterator of row
 				      * <tt>r</tt>. This is the version for
 				      * non-constant matrices.
+				      *
+				      * Note that the end iterator is not
+				      * necessarily dereferencable. This is in
+				      * particular the case if the row after
+				      * the one for which this is the end
+				      * iterator is empty, or if it is the end
+				      * iterator for the last row of a matrix.
 				      */
     iterator end (const unsigned int r);
     
@@ -2096,7 +2126,11 @@ typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return const_iterator(this, r, 0);
+
+  if (cols->row_length(r) > 0)
+    return const_iterator(this, r, 0);
+  else
+    return end (r);
 }
 
 
@@ -2118,7 +2152,11 @@ typename SparseMatrix<number>::iterator
 SparseMatrix<number>::begin (const unsigned int r)
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
-  return iterator(this, r, 0);
+
+  if (cols->row_length(r) > 0)
+    return iterator(this, r, 0);
+  else
+    return end (r);
 }
 
 
