@@ -584,9 +584,7 @@ bool ParameterHandler::read_input (const std::string &filename)
 
       std::ofstream output (filename.c_str());
       if (output)
-	{
-	  print_parameters (output, Text);
-	}
+        print_parameters (output, Text);
       
       return false;
     }
@@ -641,8 +639,9 @@ void ParameterHandler::clear ()
 
   for (p=defaults.subsections.begin(); p!=defaults.subsections.end(); ++p)
     delete p->second;
+  
   for (p=changed_entries.subsections.begin(); p!=changed_entries.subsections.end(); ++p)
-    if (p->second) 
+    if (p->second)
       {
 	delete p->second;
 	Assert (false, ExcInternalError());
@@ -654,9 +653,11 @@ void ParameterHandler::clear ()
 
 
 
-bool ParameterHandler::declare_entry (const std::string           &entry,
-				      const std::string           &default_value,
-				      const Patterns::PatternBase &pattern)
+void
+ParameterHandler::declare_entry (const std::string           &entry,
+                                 const std::string           &default_value,
+                                 const Patterns::PatternBase &pattern,
+                                 const std::string           &documentation)
 {
   Section* p = get_present_defaults_subsection ();
 
@@ -669,20 +670,11 @@ bool ParameterHandler::declare_entry (const std::string           &entry,
 	  ExcDefaultDoesNotMatchPattern(default_value,
 					pattern.description()));
   
-				   // does entry already exist?
-  if (p->entries.find (entry) != p->entries.end())
-    return false;
-
                                    // entry doesn't yet exist, but
                                    // map::operator[] will create it
-  p->entries[entry] = std::make_pair(default_value, pattern.clone());
-
-				   // check whether default answer
-				   // matches the pattern
-  if (!pattern.match(default_value))
-    return false;
-
-  return true;
+  p->entries[entry].value         = default_value;
+  p->entries[entry].documentation = documentation;
+  p->entries[entry].pattern       = pattern.clone();
 }
 
 
@@ -750,11 +742,11 @@ const std::string & ParameterHandler::get (const std::string &entry_string) cons
   Section::EntryType::const_iterator ptr;
   ptr = pc->entries.find (entry_string);
   if (ptr != pc->entries.end())
-    return ptr->second.first;
+    return ptr->second.value;
 
-				   // not changed
-  ptr = pd->entries.find (entry_string);
-  return ptr->second.first;
+				   // not changed. take the value from
+				   // the defaults tree
+  return pd->entries.find(entry_string)->second.value;
 }
 
 
@@ -800,8 +792,9 @@ bool ParameterHandler::get_bool (const std::string &entry_string) const
 
 
 
-std::ostream & ParameterHandler::print_parameters (std::ostream &out,
-						   const OutputStyle style)
+std::ostream &
+ParameterHandler::print_parameters (std::ostream     &out,
+                                    const OutputStyle style)
 {
 				   // assert that only known formats are
 				   // given as "style"
@@ -812,8 +805,8 @@ std::ostream & ParameterHandler::print_parameters (std::ostream &out,
   switch (style) 
     {
       case Text:
-	    out << "#Listing of Parameters" << std::endl
-		<< "#---------------------" << std::endl;
+	    out << "# Listing of Parameters" << std::endl
+		<< "# ---------------------" << std::endl;
 	    break;
       case LaTeX:
 	    out << "\\subsubsection*{Listing of parameters}";
@@ -844,21 +837,9 @@ std::ostream & ParameterHandler::print_parameters (std::ostream &out,
 
 
 void
-ParameterHandler::log_parameters (LogStream &out)
-{
-  out.push("parameters");
-				   // dive recursively into the
-				   // subsections
-  log_parameters_section (out);
-
-  out.pop();
-}
-
-
-
-void ParameterHandler::print_parameters_section (std::ostream      &out,
-						 const OutputStyle  style,
-						 const unsigned int indent_level)
+ParameterHandler::print_parameters_section (std::ostream      &out,
+                                            const OutputStyle  style,
+                                            const unsigned int indent_level)
 {
 				   // assert that only known formats are
 				   // given as "style"
@@ -872,63 +853,112 @@ void ParameterHandler::print_parameters_section (std::ostream      &out,
 				   // traverse entry list
   Section::EntryType::const_iterator ptr;
 
-				   // first find out the longest entry name
-  unsigned int longest_entry = 0;
-  for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
-    if (ptr->first.length() > longest_entry)
-      longest_entry = ptr->first.length();
-
-				   // print entries one by one
-  for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+  switch (style) 
     {
-				       // check whether this entry is listed
-				       // in the Changed tree and actually
-				       // differs from the default value
-      if ((pc->entries.find(ptr->first) != pc->entries.end()) &&
-	  (pc->entries[ptr->first].first != pd->entries[ptr->first].first))
-	switch (style) 
-	  {
-	    case Text:
-		  out << std::setw(indent_level*2) << ""
-		      << "set "
-		      << ptr->first
-		      << std::setw(longest_entry-ptr->first.length()+3) << " = "
-		      << pc->entries[ptr->first].first
-		      << "  #"
-		      << pd->entries[ptr->first].first
-		      << std::endl;
-		  break;
-	    case LaTeX:
-		  out << "\\item {\\bf " << ptr->first << ":} "
-		      << pc->entries[ptr->first].first
-		      << " ({\\it default:} "
-                      << pd->entries[ptr->first].first
-		      << ")"
-		      << std::endl;
-		  break;
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  }
-				       // not a changed entry
-      else
-	switch (style) 
-	  {
-	    case Text:
-		  out << std::setw(indent_level*2) << ""
-		      << "set "
-		      << ptr->first
-		      << std::setw(longest_entry-ptr->first.length()+3) << "= "
-		      << ptr->second.first << std::endl;
-		  break;
-	    case LaTeX:
-		  out << "\\item {\\bf " << ptr->first << ":} "
-		      << ptr->second.first
-		      << std::endl;
-		  break;
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  };
-    };
+      case Text:
+      {
+                                         // first find out the longest
+                                         // entry name to be able to
+                                         // align the equal signs
+        unsigned int longest_name = 0;
+        for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+          if (ptr->first.length() > longest_name)
+            longest_name = ptr->first.length();
+
+                                         // likewise find the longest
+                                         // actual value string to
+                                         // make sure we can align the
+                                         // default and documentation
+                                         // strings
+        unsigned int longest_value = 0;
+        for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr) 
+          longest_value
+            = std::max (longest_value,         
+                        (pc->entries.find(ptr->first) != pc->entries.end()
+                         ?
+                         pc->entries[ptr->first].value
+                         :
+                         pd->entries[ptr->first].value).length());
+        
+                                         // print entries one by one
+        for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr) 
+          {
+                                             // see whether the
+                                             // value is listed in
+                                             // the Changed tree and
+                                             // if so take it from
+                                             // there. otherwise
+                                             // take the default
+                                             // value from the
+                                             // Default tree
+            const std::string &value
+              = (pc->entries.find(ptr->first) != pc->entries.end()
+                 ?
+                 pc->entries[ptr->first].value
+                 :
+                 pd->entries[ptr->first].value);
+
+                                             // print name and value
+                                             // of this entry
+            out << std::setw(indent_level*2) << ""
+                << "set "
+                << ptr->first
+                << std::setw(longest_name-ptr->first.length()+1) << " "
+                << "= " << value
+                << std::setw(longest_value-value.length()+1) << " "
+                << "# ";
+
+                                             // if there is
+                                             // documentation, then
+                                             // print that, too. the
+                                             // documentation is
+                                             // always looked up in
+                                             // the Defaults tree
+            if (pd->entries[ptr->first].documentation.length() != 0)
+              out << pd->entries[ptr->first].documentation << ", ";
+            
+                                             // finally print the
+                                             // default value
+            out << "default: " << pd->entries[ptr->first].value
+                << std::endl;
+          }
+        
+        break;
+      }
+      
+      case LaTeX:
+      {
+                                         // print entries one by one
+        for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+          {
+                                             // print name and value
+            out << "\\item {\\bf " << ptr->first << ":} "
+                << pd->entries[ptr->first].value
+                << " (";
+
+                                             // if there is a
+                                             // documenting string,
+                                             // print it as well
+            if (pd->entries[ptr->first].documentation.length() != 0)
+              out << pd->entries[ptr->first].documentation << ", ";
+
+                                             // finally print default
+                                             // value
+            out << "{\\it default:} "
+                << (pc->entries.find(ptr->first) != pc->entries.end()
+                    ?
+                    pc->entries[ptr->first].value
+                    :
+                    pd->entries[ptr->first].value)
+                << ")"
+                << std::endl;
+          }
+        break;
+      }
+      
+      default:
+            Assert (false, ExcNotImplemented());
+    }
 
 
 				   // now transverse subsections tree
@@ -958,8 +988,10 @@ void ParameterHandler::print_parameters_section (std::ostream      &out,
       switch (style) 
 	{
 	  case Text:
-						 // write end of subsection. one
-						 // blank line after each subsection
+						 // write end of
+						 // subsection. one
+						 // blank line after
+						 // each subsection
 		out << std::setw(indent_level*2) << ""
 		    << "end" << std::endl
 		    << std::endl;
@@ -983,7 +1015,21 @@ void ParameterHandler::print_parameters_section (std::ostream      &out,
 
 
 
-void ParameterHandler::log_parameters_section (LogStream &out)
+void
+ParameterHandler::log_parameters (LogStream &out)
+{
+  out.push("parameters");
+				   // dive recursively into the
+				   // subsections
+  log_parameters_section (out);
+
+  out.pop();
+}
+
+
+
+void
+ParameterHandler::log_parameters_section (LogStream &out)
 {
   Section *pd = get_present_defaults_subsection ();
   Section *pc = get_present_changed_subsection ();
@@ -993,19 +1039,18 @@ void ParameterHandler::log_parameters_section (LogStream &out)
 
 				   // print entries one by one
   for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
-    {
-      if ((pc->entries.find(ptr->first) != pc->entries.end()) &&
-	  (pc->entries[ptr->first].first != pd->entries[ptr->first].first))
-					 // check whether this entry is listed
-					 // in the Changed tree and actually
-					 // differs from the default value
-	out << ptr->first << ": "
-	    << pc->entries[ptr->first].first << std::endl;
-      else
-	out << ptr->first << ": "
-	    << ptr->second.first << std::endl;
-    };
-
+                                     // see whether the value is
+                                     // listed in the Changed tree
+                                     // and if so take it from
+                                     // there. otherwise take the
+                                     // default value from the
+                                     // Default tree
+    if (pc->entries.find(ptr->first) != pc->entries.end())
+      out << ptr->first << ": "
+          << pc->entries[ptr->first].value << std::endl;
+    else
+      out << ptr->first << ": "
+          << ptr->second.value << std::endl;
 
 				   // now transverse subsections tree
   std::map<std::string, Section*>::const_iterator ptrss;
@@ -1021,8 +1066,9 @@ void ParameterHandler::log_parameters_section (LogStream &out)
 
 
 
-bool ParameterHandler::scan_line (std::string        line,
-				  const unsigned int lineno)
+bool
+ParameterHandler::scan_line (std::string        line,
+                             const unsigned int lineno)
 {
 				   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
@@ -1055,7 +1101,8 @@ bool ParameterHandler::scan_line (std::string        line,
 				       // check whether subsection exists
       if (pc->subsections.find(SecName) == pc->subsections.end()) 
 	{
-	  std::cerr << "Line " << lineno << ": There is no such subsection to be entered:" << std::endl;
+	  std::cerr << "Line " << lineno
+                    << ": There is no such subsection to be entered:" << std::endl;
 	  for (unsigned int i=0; i<subsection_path.size(); ++i)
 	    std::cerr << std::setw(i*2+4) << " "
 		      << "subsection " << subsection_path[i] << std::endl;
@@ -1121,7 +1168,7 @@ bool ParameterHandler::scan_line (std::string        line,
 				       // which specify it as a multiple loop
 				       // entry, then ignore content
       if (entry_value.find ('{') == std::string::npos)
-	if (!pd->entries[entry_name].second->match(entry_value))
+	if (!pd->entries[entry_name].pattern->match(entry_value))
 	  {
 	    std::cerr << "Line " << lineno << ":" << std::endl
 		      << "    The entry value" << std::endl
@@ -1129,25 +1176,29 @@ bool ParameterHandler::scan_line (std::string        line,
 		      << "    for the entry named" << std::endl
 		      << "        " << entry_name << std::endl
 		      << "    does not match the given pattern" << std::endl
-		      << "        " << pd->entries[entry_name].second->description() << std::endl;
+		      << "        " << pd->entries[entry_name].pattern->description()
+                      << std::endl;
 	    return false;
 	  };
       
       Section* pc = get_present_changed_subsection ();
-				       // the following line declares this entry
-				       // if not yet existent and overwrites it
-				       // otherwise (the pattern is set to a null
-				       // pointer, since we don't need the
-				       // pattern in the entries section -- only
+				       // the following lines declare
+				       // this entry if not yet
+				       // existent and overwrites it
+				       // otherwise (the pattern is
+				       // set to a null pointer, since
+				       // we don't need the pattern in
+				       // the entries section -- only
 				       // in the defaults section)
-      pc->entries[entry_name]
-	= std::make_pair(entry_value, static_cast<Patterns::PatternBase*>(0));
+      pc->entries[entry_name].value   = entry_value;
+      pc->entries[entry_name].pattern = 0;
 
       return true;
     };
 
 				   // this line matched nothing known
-  std::cerr << "Line " << lineno << ": This line matched nothing known:" << std::endl
+  std::cerr << "Line " << lineno
+            << ": This line matched nothing known:" << std::endl
 	    << "    " << line << std::endl;
   return false;
 }
@@ -1238,7 +1289,7 @@ ParameterHandler::Section::~Section ()
 				   // of that memory through the
 				   // clone() call
   for (EntryType::iterator q=entries.begin(); q!=entries.end(); ++q)
-    delete q->second.second;
+    delete q->second.pattern;
 				   // then clear entire map
   entries.clear ();
 
@@ -1258,9 +1309,11 @@ ParameterHandler::Section::memory_consumption () const
   unsigned int mem = 0;
   for (EntryType::const_iterator i=entries.begin(); i!=entries.end(); ++i)
     mem += (MemoryConsumption::memory_consumption (i->first) +
-	    MemoryConsumption::memory_consumption (i->second.first) +
-	    MemoryConsumption::memory_consumption (*i->second.second));
-  for (std::map<std::string, Section*>::const_iterator i=subsections.begin(); i!=subsections.end(); ++i)
+	    MemoryConsumption::memory_consumption (i->second.value) +
+	    MemoryConsumption::memory_consumption (i->second.documentation) +
+	    MemoryConsumption::memory_consumption (*i->second.pattern));
+  for (std::map<std::string, Section*>::const_iterator i=subsections.begin();
+       i!=subsections.end(); ++i)
     mem += (MemoryConsumption::memory_consumption (i->first) +
 	    MemoryConsumption::memory_consumption (*(i->second)));
   return mem;
@@ -1370,7 +1423,8 @@ void MultipleParameterLoop::init_branches ()
 		  << "    for the entry named" << std::endl
 		  << "        " << multiple_choices[i].entry_name << std::endl
 		  << "    does not have the right number of entries for the " << std::endl
-		  << "        " << n_branches << " variant runs that will be performed." << std::endl;
+		  << "        " << n_branches << " variant runs that will be performed."
+                  << std::endl;
 
 
 				   // do a first run on filling the values to
@@ -1389,10 +1443,10 @@ void MultipleParameterLoop::init_branches_section (const ParameterHandler::Secti
 				   // whether it is a multiple entry
   Section::EntryType::const_iterator e;
   for (e = sec.entries.begin(); e != sec.entries.end(); ++e) 
-    if (e->second.first.find('{') != std::string::npos) 
+    if (e->second.value.find('{') != std::string::npos) 
       multiple_choices.push_back (Entry(subsection_path,
 					e->first,
-					e->second.first));
+					e->second.value));
 
 
 				   // transverse subsections
@@ -1430,9 +1484,10 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 	{
 	  if (run_no>=choice->different_values.size()) 
 	    {
-	      std::cerr << "The given array for entry "
-			<< pd->entries[choice->entry_name].first
-			<< " does not conatin enough elements! Taking empty string instead." << std::endl;
+	      std::cerr << "The given array for entry <"
+			<< choice->entry_name
+			<< "> does not contain enough elements! Taking empty string instead."
+                        << std::endl;
 	      entry_value = "";
 	    }
 	  else
@@ -1440,7 +1495,7 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 	};
       
 				       // check conformance with regex
-      if (!pd->entries[choice->entry_name].second->match(entry_value))
+      if (!pd->entries[choice->entry_name].pattern->match(entry_value))
 	{
 	  std::cerr << "In run no.  " << run_no+1 << ":" << std::endl
 		    << "    The entry value" << std::endl
@@ -1448,23 +1503,25 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 		    << "    for the entry named" << std::endl
 		    << "        " << choice->entry_name << std::endl
 		    << "    does not match the given pattern" << std::endl
-		    << "        " << pd->entries[choice->entry_name].second->description() << std::endl
+		    << "        " << pd->entries[choice->entry_name].pattern->description() << std::endl
 		    << "    Taking default value" << std::endl
-		    << "        " << pd->entries[choice->entry_name].first << std::endl;
+		    << "        " << pd->entries[choice->entry_name].value << std::endl;
 	  
 					   // select default instead
-	  entry_value = pd->entries[choice->entry_name].first;
+	  entry_value = pd->entries[choice->entry_name].value;
 	};
 
       Section* pc = get_present_changed_subsection ();
-				       // the following line declares this entry
-				       // if not yet existent and overwrites it
-				       // otherwise (the pattern is set to a null
-				       // pointer, since we don't need the
-				       // pattern in the entries section -- only
+				       // the following lines declare
+				       // this entry if not yet
+				       // existent and overwrites it
+				       // otherwise (the pattern is
+				       // set to a null pointer, since
+				       // we don't need the pattern in
+				       // the entries section -- only
 				       // in the defaults section)
-      pc->entries[choice->entry_name]
-	= std::make_pair(entry_value, static_cast<Patterns::PatternBase*>(0));
+      pc->entries[choice->entry_name].value   = entry_value;
+      pc->entries[choice->entry_name].pattern = 0;
             
 				       // get out of subsection again
       subsection_path.swap (choice->subsection_path);

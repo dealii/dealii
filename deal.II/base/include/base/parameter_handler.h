@@ -764,17 +764,28 @@ namespace Patterns
  *     ParameterHandler prm;
  *     prm.declare_entry ("Time step size",
  *                       "0.2",
- *                       Patterns::Double());
+ *                       Patterns::Double(),
+ *                       "Some documentation");
  *     prm.declare_entry ("Geometry",
  *                       "[0,1]x[0,1]",
  *                       Patterns::Anything());
  *     ...
  *   @end{verbatim}
- *   Each entry is declared using the function @p{declare_entry}. The first parameter is
- *   the name of the entry (in short: the entry). The second is the default answer to
- *   be taken in case the entry is not specified in the input file. The third parameter
- *   is a regular expression which the input (and the default answer) has to match.
- *   Several such regular expressions are defined in @p{Patterns}.
+ *   Each entry is declared using the function @p{declare_entry}. The
+ *   first parameter is the name of the entry (in short: the
+ *   entry). The second is the default answer to be taken in case the
+ *   entry is not specified in the input file. The third parameter is
+ *   a regular expression which the input (and the default answer) has
+ *   to match.  Several such regular expressions are defined in
+ *   @p{Patterns}. This parameter can be omitted, in which case it
+ *   will default to @p{Patterns::Anything}, i.e. a pattern that
+ *   matches every input string. The fourth parameter can be used to
+ *   document the intent or expected format of an entry; its value is
+ *   printed as a comment when writing all entries of a
+ *   @p{ParameterHandler} object using the @p{print_parameters}
+ *   function to allow for easier understanding of a parameter
+ *   file. It can be omitted as well, in which case no such
+ *   documentation will be printed.
  *
  *   Entries may be located in subsections which form a kind of input tree. For example
  *   input parameters for linear solver routines should be classified in a subsection
@@ -790,7 +801,8 @@ namespace Patterns
  *       prm.enter_subsection("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
- *		            Patterns::Selection("CG|GMRES|GaussElim"));
+ *		            Patterns::Selection("CG|GMRES|GaussElim"),
+ *		            "Name of a linear solver for the inner iteration");
  *       prm.declare_entry ("Maximum number of iterations",
  *                          "20",
  *		            ParameterHandler::RegularExpressions::Integer());
@@ -887,17 +899,18 @@ namespace Patterns
  *   once will be overwritten everytime they are used. It is suggested to let the name of
  *   parameter input end in @p{.prm}.
  *
- *   You should not try to declare entries using @p{declare_entry} and @p{enter_subsection} with as
- *   yet unknown subsection names after using @p{read_input}. The results in this case are
- *   unspecified.
+ *   You should not try to declare entries using @p{declare_entry} and
+ *   @p{enter_subsection} with as yet unknown subsection names after
+ *   using @p{read_input}. The results in this case are unspecified.
  *
- *   If an error occurs upon reading the input, error messages are written to @p{std::cerr}.
+ *   If an error occurs upon reading the input, error messages are
+ *   written to @p{std::cerr}.
  *
  *   
  *   @sect3{Getting entry values out of a @p{ParameterHandler} object}
  *   
- *   Each class gets its data out of a @p{ParameterHandler} object by calling the @p{get (...)}
- *   member functions like this:
+ *   Each class gets its data out of a @p{ParameterHandler} object by
+ *   calling the @p{get (...)}  member functions like this:
  *   @begin{verbatim}
  *      void NonLinEq::get_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
@@ -1001,7 +1014,8 @@ namespace Patterns
  *       prm.enter_subsection ("Linear solver");
  *       prm.declare_entry ("Solver",
  *                          "CG",
- *                          Patterns::Selection("CG|BiCGStab|GMRES"));
+ *                          Patterns::Selection("CG|BiCGStab|GMRES"),
+ *                          "Name of a linear solver for the inner iteration");
  *       prm.declare_entry ("Maximum number of iterations",
  *                          "20",
  *                          Patterns::Integer());
@@ -1023,10 +1037,13 @@ namespace Patterns
  *                                        // first some global parameter entries
  *       prm.declare_entry ("Output file",
  *                          "out",
- *                          Patterns::Anything());
+ *                          Patterns::Anything(),
+ *                          "Name of the output file, either relative to the present"
+ *                          "path or absolute");
  *       prm.declare_entry ("Equation 1",
  *                          "Laplace",
- *                          Patterns::Anything());
+ *                          Patterns::Anything(),
+ *                          "String identifying the equation we want to solve");
  *       prm.declare_entry ("Equation 2",
  *                          "Elasticity",
  *                          Patterns::Anything());
@@ -1036,7 +1053,9 @@ namespace Patterns
  *       prm.enter_subsection ("Equation 1");
  *       prm.declare_entry ("Matrix type",
  *                          "Sparse",
- *                          Patterns::Selection("Full|Sparse|Diagonal"));
+ *                          Patterns::Selection("Full|Sparse|Diagonal"),
+ *                          "Type of the matrix to be used, either full,"
+ *                          "sparse, or diagonal");
  *       LinEq::declare_parameters (prm);  // for eq1
  *       prm.leave_subsection ();
  *           
@@ -1092,7 +1111,7 @@ namespace Patterns
  *           
  *                                        // print parameters to std::cout as ASCII text
  *       std::cout << std::endl << std::endl;
- *       prm.print_parameters (std::cout, Text);
+ *       prm.print_parameters (std::cout, ParameterHandler::Text);
  *           
  *                                        // get parameters into the program
  *       std::cout << std::endl << std::endl
@@ -1285,15 +1304,28 @@ class ParameterHandler
 				      * @p{entry}, default and for
 				      * which any input has to match
 				      * the @p{pattern} (default: any
-				      * pattern).  Return @p{false} if
-				      * entry already exists or
-				      * default value does not match
-				      * the regular expression;
-				      * @p{true} otherwise.
+				      * pattern).
+				      *
+				      * The last parameter defaulting
+				      * to an empty string is used to
+				      * add a documenting text to each
+				      * entry which will be printed as
+				      * a comment when this class is
+				      * asked to write out all
+				      * declarations to a stream using
+				      * the @ref{print_parameters}
+				      * function.
+				      *
+				      * The function generates an
+				      * exception if an entry with
+				      * this name already exists, or
+				      * if the default value doesn't
+				      * match the given pattern.
 				      */
-    bool declare_entry    (const std::string           &entry,
-			   const std::string           &default_value,
-			   const Patterns::PatternBase &pattern = Patterns::Anything());
+    void declare_entry (const std::string           &entry,
+                        const std::string           &default_value,
+                        const Patterns::PatternBase &pattern = Patterns::Anything(),
+                        const std::string           &documentation = std::string());
     
 				     /**
 				      * Enter a subsection; if not yet
@@ -1357,22 +1389,42 @@ class ParameterHandler
 				      * that it is possible to use it
 				      * for later input again. This is
 				      * most useful to record the
-				      * parameters set for a specific
-				      * run, since if you output the
+				      * parameters for a specific run,
+				      * since if you output the
 				      * parameters using this function
 				      * into a log file, you can
 				      * always recover the results by
 				      * simply copying the output to
 				      * your input file.
+				      *
+				      * Besides the name and value of
+				      * each entry, the output also
+				      * contains the default value of
+				      * entries as well as the
+				      * documenting string given to
+				      * the @ref{declare_entry}
+				      * function if available.
 				      */
     std::ostream & print_parameters (std::ostream      &out,
 				     const OutputStyle  style);
 
 				     /**
 				      * Print out the parameters of
-				      * the subsection given by the
+				      * the present subsection as
+				      * given by the
 				      * @p{subsection_path} member
-				      * variable.
+				      * variable. This variable is
+				      * controlled by entering and
+				      * leaving subsections through
+				      * the @ref{enter_subsection} and
+				      * @ref{leave_subsection}
+				      * functions.
+				      *
+				      * In most cases, you will not
+				      * want to use this function
+				      * directly, but have it called
+				      * recursively by the previous
+				      * function.
 				      */
     void print_parameters_section (std::ostream       &out,
 				   const OutputStyle   style,
@@ -1389,11 +1441,22 @@ class ParameterHandler
     void log_parameters (LogStream& out);
 
 				     /**
-				      * Log parameters in
+				      * Log parameters in the present
 				      * subsection. The subsection is
 				      * determined by the
 				      * @p{subsection_path} member
-				      * variable.
+				      * variable. This variable is
+				      * controlled by entering and
+				      * leaving subsections through
+				      * the @ref{enter_subsection} and
+				      * @ref{leave_subsection}
+				      * functions.
+				      *
+				      * In most cases, you will not
+				      * want to use this function
+				      * directly, but have it called
+				      * recursively by the previous
+				      * function.
 				      */
     void log_parameters_section (LogStream& out);    
 
@@ -1451,9 +1514,37 @@ class ParameterHandler
     {
 	~Section ();
 
-	typedef std::map<std::string, std::pair<std::string,Patterns::PatternBase*> > EntryType;
-	
+        struct EntryContent
+        {
+            std::string            value;
+            std::string            documentation;
+            Patterns::PatternBase *pattern;
+        };
+        
+                                         /**
+                                          * Typedef for a type
+                                          * describing all the entries
+                                          * in a subsection: this is a
+                                          * map from the entry keys to
+                                          * a pair of values, one for
+                                          * the default string and one
+                                          * describing the pattern
+                                          * that the entry must match.
+                                          */
+	typedef
+        std::map<std::string, EntryContent>
+        EntryType;
+
+                                         /**
+                                          * List of entries for this
+                                          * section.
+                                          */
 	EntryType                       entries;
+
+                                         /**
+                                          * List of subsections of
+                                          * this section.
+                                          */
 	std::map<std::string, Section*> subsections;
 
 					 /**
@@ -1771,7 +1862,6 @@ class ParameterHandler
  *   This class is inspired by the @p{Multipleloop} class of @p{DiffPack}.
  *
  *   @author Wolfgang Bangerth, October 1997
- *   @version 1.0
  *   @ref ParameterHandler
  */
 class MultipleParameterLoop : public ParameterHandler

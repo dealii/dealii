@@ -65,17 +65,40 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p> Improved: The <code
+       class="member">ParameterHandler::declare_entry</code> now takes an
+       additional parameter (defaulting to the empty string) that can be used
+       to document the intent of a parameter. This string, together with the
+       default value of an entry, is written to the output by the <code
+       class="member">ParameterHandler::print_parameters</code> function that
+       can be used to generate a virginial parameter file, or one that contains
+       the settings of all parameters used in a computation.
+       <br>
+       (WB 2002/08/13)
+       </p>
 
-  <li> <p>
-  Improved: <code class="class">Logstream</code>::<code
-  class="member">depth_console</code>, <code
-  class="class">Logstream</code>::<code class="member">depth_file</code>, <code
-  class="class">Logstream</code>::<code class="member">log_execution_time</code> and <code
-  class="class">Logstream</code>::<code class="member">log_time_differences</code>
-  return the previous value.
-  <br>
-  (GK 2003/06/22)
-  </p>
+  <li> <p> Changed: The <code
+       class="member">ParameterHandler::declare_entry</code> previously
+       returned a value indicating whether the just-declared entry didn't
+       already existed and that the default value matches the given
+       pattern. However, this value could only always be true since these two
+       conditions were already guarded by assertions in the implementation at
+       least in debug mode, so the return value was meaningless. The function
+       has now no return type any more.
+       <br>
+       (WB 2002/08/13)
+       </p>
+
+  <li> <p> Improved: <code class="class">Logstream</code>::<code
+       class="member">depth_console</code>, <code
+       class="class">Logstream</code>::<code class="member">depth_file</code>, <code
+       class="class">Logstream</code>::<code
+       class="member">log_execution_time</code> and <code
+       class="class">Logstream</code>::<code
+       class="member">log_time_differences</code> return the previous value.
+       <br>
+       (GK 2003/06/22)
+       </p>
 </ol>
 
 
