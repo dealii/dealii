@@ -50,7 +50,6 @@ MGTransferPrebuilt<number>::copy_to_mg (
   MGLevelObject<Vector<number> >& dst,
   const InVector& src) const
 {
-
 				   // Make src a real finite element function
 //  InVector src = osrc;
 //  constraints->distribute(src);
@@ -61,9 +60,11 @@ MGTransferPrebuilt<number>::copy_to_mg (
 				   // on all levels to zero
   unsigned int minlevel = dst.get_minlevel();
   unsigned int maxlevel = dst.get_maxlevel();
-  
+
   dst.clear();
 
+  Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
+	 ExcMatricesNotBuilt());
   for (unsigned int l=minlevel;l<=maxlevel;++l)
     dst[l].reinit(sizes[l]);
   
@@ -277,6 +278,8 @@ MGTransferSelect<number>::copy_to_mg (
   
   dst.clear();
   
+  Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
+	 ExcMatricesNotBuilt());
   for (unsigned int l=minlevel;l<=maxlevel;++l)
     dst[l].reinit(sizes[l][selected]);
   

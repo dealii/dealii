@@ -143,6 +143,12 @@ class MGTransferPrebuilt : public MGTransfer<Vector<number> >
 				      */
     DeclException0(ExcNoProlongation);
     
+				     /**
+				      * Call @p{build_matrices}
+				      * function first.
+				      */
+    DeclException0(ExcMatricesNotBuilt);
+
   private:
 
 				   /**
@@ -212,6 +218,12 @@ class MGTransferBlockBase
 				    * all levels.
 				    */
     std::vector<std::vector<unsigned int> > mg_component_start;
+
+				     /**
+				      * Call @p{build_matrices}
+				      * function first.
+				      */
+    DeclException0(ExcMatricesNotBuilt);
 
   private:
 
