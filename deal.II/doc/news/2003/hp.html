@@ -32,6 +32,24 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       Changed: Due to the demand for different <code
+       class="class">DoFHandler</code> classes (mainly for the planned
+       hp-DoFHandler) the DoFHandler has been introduced as a
+       template parameter into the <code
+       class="class">DoFAccessor</code>,
+       the <code class="class">DoFObjectAccessor</code>,
+       and the <code class="class">DoFCellAccessor</code> classes.
+       Furthermore the <code class="class">DoFHandler</code> was
+       also introduced as template parameter into the
+       <code class="class">DoFDimensionInfo</code>
+       class. These changes induced several little changes in a couple
+       of methods to get the code through the compiler. But no
+       functionality was affected.
+       <br>
+       (Oliver Kayser-Herold 2003/01/24)
+       </p>
+
+  <li> <p> 
        Changed: There are now overloaded versions of the <code
        class="member">FEValues::reinit</code> function (and likewise in the
        <code class="class">FEFaceValues</code> and <code
