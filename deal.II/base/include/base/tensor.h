@@ -16,11 +16,11 @@
  * functionality is recursively handed down to tensors of rank 1 or
  * put into external templated functions, e.g. the #contract# family.
  *
- * Using this tensor class for objects of rank to has advantages over
+ * Using this tensor class for objects of rank 2 has advantages over
  * matrices in many cases since the dimension is known to the compiler
  * as well as the location of the data. It is therefore possible to
  * produce far more efficient code than for matrices with
- * runtime-dependant dimension.
+ * runtime-dependent dimension.
  */
 template <int rank_, int dim>
 class Tensor {
@@ -106,7 +106,7 @@ class Tensor {
     Tensor<rank_,dim> & operator -= (const Tensor<rank_,dim> &);
 
 				     /**
-				      *  Scale the vector by #factor#, i.e. multiply
+				      *  Scale the tensor by #factor#, i.e. multiply
 				      *  all coordinates by #factor#.
 				      */
     Tensor<rank_,dim> & operator *= (const double &factor);
