@@ -36,11 +36,18 @@
   additional accuracy when using long doubles.
  */
 
-template <typename Number>
-static inline Number sqr (const Number x)
+namespace internal
 {
-  return x*x;
+  namespace VectorHelper
+  {
+    template <typename Number>
+    static inline Number sqr (const Number x)
+    {
+      return x*x;
+    }
+  }
 }
+
 
 
 
@@ -237,14 +244,14 @@ Number Vector<Number>::norm_sqr () const
 		 eptr = ptr + (dim/4)*4;
   while (ptr!=eptr)
     {
-      sum0 += ::sqr(*ptr++);
-      sum1 += ::sqr(*ptr++);
-      sum2 += ::sqr(*ptr++);
-      sum3 += ::sqr(*ptr++);
+      sum0 += internal::VectorHelper::sqr(*ptr++);
+      sum1 += internal::VectorHelper::sqr(*ptr++);
+      sum2 += internal::VectorHelper::sqr(*ptr++);
+      sum3 += internal::VectorHelper::sqr(*ptr++);
     };
 				   // add up remaining elements
   while (ptr != end())
-    sum0 += ::sqr(*ptr++);
+    sum0 += internal::VectorHelper::sqr(*ptr++);
   
   return sum0+sum1+sum2+sum3;
 }
