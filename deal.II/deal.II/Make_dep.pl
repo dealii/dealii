@@ -125,7 +125,7 @@ sub make_include_tree {
 	    } else {
 		# included by "..."
 		# only append file if it exists
-		if (-r $if) {
+		if (-r $include) {
 		    $include_files{$filename} =
 			join (' ', $include, $include_files{$filename});
 		}
