@@ -87,6 +87,7 @@ roy_1.exe               : roy_1.g.$(OBJEXT)                $(libraries)
 denis_1.exe             : denis_1.g.$(OBJEXT)              $(libraries)
 unit_support_points.exe : unit_support_points.g.$(OBJEXT)  $(libraries)
 parameter_handler_1.exe : parameter_handler_1.g.$(OBJEXT)  $(libraries)
+parameter_handler_2.exe : parameter_handler_2.g.$(OBJEXT)  $(libraries)
 
 tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	geometry_info_1 \
@@ -106,7 +107,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	fe_tools_05 fe_tools_06 fe_tools_07 fe_tools_08 \
 	roy_1 \
         denis_1 \
-	unit_support_points parameter_handler_1
+	unit_support_points parameter_handler_1 parameter_handler_2
 
 ############################################################
 
