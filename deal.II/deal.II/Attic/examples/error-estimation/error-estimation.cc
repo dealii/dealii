@@ -507,7 +507,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
       Vector<double> l2_error_per_dof, linfty_error_per_dof;
       Vector<double> h1_error_per_dof, estimated_error_per_dof;
-      Vector<double> error_ratio;
+      Vector<double> error_ratio (dof->n_dofs());
       dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
       dof->distribute_cell_to_dof_vector (linfty_error_per_cell,
 					  linfty_error_per_dof);
@@ -603,6 +603,7 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
   print_history (prm, refine_mode);
   cout << endl << endl << endl;
 
+  dof->clear ();
   delete equation;
 };
 
