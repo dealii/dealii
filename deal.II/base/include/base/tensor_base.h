@@ -184,7 +184,7 @@ class Tensor<1,dim> {
 				      * Help function for unroll.
 				      */
     void unroll_recursion (Vector<double> & result,
-			   unsigned& start_index) const;
+			   unsigned int& start_index) const;
 
     template<>
     friend void Tensor<2,dim>::unroll_recursion(Vector<double> &,
@@ -194,7 +194,7 @@ class Tensor<1,dim> {
 				 /**
 				  * Exception
 				  */
-DeclException2(ExcWrongVectorSize, unsigned, int, << "Tensor has " << arg1
+DeclException2(ExcWrongVectorSize, int, int, << "Tensor has " << arg1
 	       << " entries, but vector has size " << arg2);
 DeclException1 (ExcDimTooSmall,
 		int,

@@ -8,21 +8,31 @@
 
 #include <base/exceptions.h>
 #include <vector>
+#include <base/subscriptor.h>
+#include <base/smartpointer.h>
+#include <base/function.h>
 #include <base/point.h>
 #include <base/functiontime.h>
 #include <base/tensorindex.h>
 #include <base/forward-declarations.h>
 
 template <typename number> class Vector;
+template <int dim> class VectorFunction;
+template <int rank_, int dim> class TensorFunction;
 
 /**
  * Base class for multi-valued functions.
- *
- * 
+ * While #TensorFunction# provides a highly structured class for multi-valued
+ * functions, #VectorFunction# is on a lower level. The results are #Vectors# of
+ * values without further structure. The dimension of the result is determined at
+ * execution time.
+ * @author Guido Kanschat, 1999
  */
 template <int dim>
-class VectorFunction :
-  public FunctionTime
+class VectorFunction //<dim>
+  :
+  public FunctionTime,
+  public Subscriptor
 {
   public:
 				     /**
@@ -78,8 +88,61 @@ class VectorFunction :
 				     /**
 				      * Number of vector components.
 				      */
-    const unsigned n_components;
+    const unsigned int n_components;
 
+				     /**
+				      * Access #VectorFunction# as a #Function#.
+				      * This class allows to store a reference to a
+				      * #VectorFunction# and an #index#. Later on, it
+				      * can be used as a normal single valued #Function#.
+				      */
+    class Extractor
+      : public Function<dim>
+    {
+      public:
+					 /**
+					  * Constructor.
+					  * The arguments are the #VectorFunction# to be
+					  * accessed and the component index.
+					  */
+	Extractor(const VectorFunction<dim>& f, unsigned int index);
+
+					 /**
+					  * Compute function value.
+					  */
+	virtual double operator() (const Point<dim>& p) const;
+
+					 /**
+					  * Compute several values.
+					  */
+	virtual void value_list (const vector<Point<dim> > &points,
+				 vector<double> &values) const;
+	
+
+					 /**
+					  * Compute derivative.
+					  */
+	virtual Tensor<1,dim> gradient (const Point<dim>& p) const;
+
+					 /**
+					  * Compute several derivatives.
+					  */
+	virtual void gradient_list (const vector<Point<dim> > &points,
+				    vector<Tensor<1,dim> > &gradients) const;
+	
+      private:
+					 /**
+					  * Pointer to the #VectorFunction#.
+					  */
+	const SmartPointer<VectorFunction<dim> > vectorfunction;
+	
+					 /**
+					  * Index in #VectorFunction#.
+					  */
+	const unsigned int index;
+    };
+    
+      
 				     /**
 				      * Exception
 				      */
@@ -115,7 +178,8 @@ class VectorFunction :
  *  @author Guido Kanschat, 1999
  */
 template <int rank_, int dim>
-class TensorFunction :
+class TensorFunction //<rank_ , dim>
+  :
   public VectorFunction<dim>
 {
   public:

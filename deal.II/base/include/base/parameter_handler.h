@@ -572,7 +572,8 @@ struct Patterns {
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
  *   @see MultipleParameterLoop
  */
-class ParameterHandler {
+class ParameterHandler
+{
   public:
 				     /**
 				      * Constructor.
@@ -616,7 +617,7 @@ class ParameterHandler {
 				      * Return status of this object:
 				      * #true#=clean or #false#=error occured.
 				      */
-    bool ok() const   { return status; };
+    bool ok() const;
 
 				     /**
 				      * clear status bit and contents.
@@ -1212,7 +1213,14 @@ class MultipleParameterLoop : public ParameterHandler {
 };
 
 
+/*------------------------------ Inline functions ------------------------------*/
 
+inline
+bool
+ParameterHandler::ok() const
+{
+  return status;
+}
 
 /**********************   parameter-handler.h     ****************************/
 /* end of #ifndef __parameter_handler_H */

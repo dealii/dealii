@@ -67,7 +67,8 @@ class LogStream
     ostream  *file;
     
     bool was_endl;
-    unsigned int std_depth, file_depth;
+    unsigned int std_depth;
+    unsigned int file_depth;
   
   public:
 				     /**
@@ -101,16 +102,7 @@ class LogStream
 				      * colon and there is a double
 				      * colon after the last prefix.
 				      */
-    void push (const string& text) {
-				       // strange enough: if make this
-				       // function non-inline with
-				       // gcc2.8, we get very strange
-				       // compiler errors...
-      string pre=prefixes.top();
-      pre += text;
-      pre += string(":");
-      prefixes.push(pre);
-    }
+    void push (const string& text);
         
 				     /**
 				      * Remove the last prefix.
@@ -164,7 +156,7 @@ class LogStream
 				      * tells the #LogStream# that the end of
 				      * the line is reached.
 				      */
-    LogStream & operator << (void (*f)(LogStream &));
+    LogStream & operator << (void (f)(LogStream &));
 
 				     /**
 				      * Declare this function as a friend.
@@ -178,10 +170,7 @@ class LogStream
 				      * Remove this function at the first
 				      * possible time.
 				      */
-    ostream & get_std_stream () {
-      return *std;
-    };
-    
+    ostream & get_std_stream ();
 };
 
 
@@ -189,6 +178,27 @@ class LogStream
 
 /* ----------------------------- Inline functions and templates ---------------- */
 
+
+inline
+void
+LogStream::push (const string& text)
+{
+				   // strange enough: if make this
+				   // function non-inline with
+				   // gcc2.8, we get very strange
+				   // compiler errors...
+  string pre=prefixes.top();
+  pre += text;
+  pre += string(":");
+  prefixes.push(pre);
+}
+
+inline
+ostream &
+LogStream::get_std_stream ()
+{
+  return *std;
+}
 
 template <class T>
 inline void

@@ -105,7 +105,7 @@ class SmartPointer
 
 
 
-/* --------------------------- Template functions ------------------------------*/
+/* --------------------------- inline Template functions ------------------------------*/
 
 
 template <typename T>

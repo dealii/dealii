@@ -28,25 +28,29 @@ LogStream::attach(ostream& o)
 
 
 
-void LogStream::detach () {
+void LogStream::detach ()
+{
   file = 0;
 };
 
 
 
-void LogStream::pop () {
+void LogStream::pop ()
+{
   prefixes.pop();
 };
 
 
 
-void LogStream::depth_console(unsigned n) {
+void LogStream::depth_console(unsigned n)
+{
   std_depth = n;
 };
 
 
 
-void LogStream::depth_file(unsigned n) {
+void LogStream::depth_file(unsigned n)
+{
   file_depth = n;
 };
 
@@ -67,7 +71,7 @@ LogStream& LogStream::operator << (const char* c)
 
 
 LogStream&
-LogStream::operator << (void (*f)(LogStream &))
+LogStream::operator << (void (f)(LogStream &))
 {
   f(*this);
   return *this;

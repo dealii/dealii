@@ -24,6 +24,8 @@ private:
   string id;
 };
 
+/*------------------------------ Inline functions ------------------------------*/
+
 extern JobIdentifier dealjobid;
 
 #endif

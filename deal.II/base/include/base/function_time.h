@@ -88,7 +88,7 @@ class FunctionTime {
     double time;
 };
 
-
+/*------------------------------ Inline functions ------------------------------*/
 
 inline double
 FunctionTime::get_time () const

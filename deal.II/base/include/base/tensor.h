@@ -7,6 +7,7 @@
 
 #include <base/tensor_base.h>
 
+template <int rank_, int dim> class Tensor;
 
 /**
  * Provide a general tensor class with an arbitrary rank, i.e. with
@@ -22,7 +23,8 @@
  * runtime-dependent dimension.
  */
 template <int rank_, int dim>
-class Tensor {
+class Tensor //<rank_, dim>
+{
   public:
 				     /**
 				      * Provide a way to get the
@@ -168,7 +170,7 @@ class Tensor {
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(Vector<double> & result, unsigned& start_index) const;
+    void unroll_recursion(Vector<double> & result, unsigned int& start_index) const;
 
     template<>
     friend void Tensor<rank_+1,dim>::unroll_recursion(Vector<double> &, unsigned&) const;

@@ -25,7 +25,7 @@ private:
 				   /**
 				    * Field of indices.
 				    */
-  unsigned index[rank];
+  unsigned int index[rank];
 public:
 				   /**
 				    * Constructor taking #rank# indices. 
@@ -38,8 +38,8 @@ public:
 				    * in #n#th component
 				    *
 				    */
-  unsigned operator () (unsigned n) const;
-  DeclException1(ExcRank, unsigned,
+  unsigned int operator () (unsigned int n) const;
+  DeclException1(ExcRank, int,
 		 << "Index " << arg1 << " higher than maximum " << rank-1);  
 };
 

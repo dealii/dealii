@@ -29,14 +29,16 @@ VectorFunction<dim>::operator () (const Point<dim> &, unsigned) const
 }
 */
 
-template <int dim> void
+template <int dim>
+void
 VectorFunction<dim>::value (const Point<dim>  &, Vector<double> &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
 
 
-template <int dim> void
+template <int dim>
+void
 VectorFunction<dim>::value_list (const vector<Point<dim> > &,
 				 vector<Vector<double> > &) const
 {
@@ -44,13 +46,64 @@ VectorFunction<dim>::value_list (const vector<Point<dim> > &,
 }
 
 
-template <int dim> void
+template <int dim>
+void
 VectorFunction<dim>::gradient_list (const vector<Point<dim> > &,
 				    vector<vector<Tensor<1,dim> > > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
 
+template <int dim>
+VectorFunction<dim>::Extractor::Extractor(const VectorFunction<dim>& f,
+					  unsigned int index)
+		:
+		vectorfunction(f),
+		index(index)
+{}
+
+template <int dim>
+double
+VectorFunction<dim>::Extractor::operator() (const Point<dim>& p) const
+{
+  Vector<double> v(vectorfunction->n_components);
+  vectorfunction->value(p,v);
+  return v(index);
+}
+
+
+template <int dim>
+Tensor<1,dim>
+VectorFunction<dim>::Extractor::gradient (const Point<dim>&) const
+{
+  Assert(false, ExcNotImplemented());
+  return Tensor<1,dim>();
+}
+
+template <int dim>
+void
+VectorFunction<dim>::Extractor::value_list (const vector<Point<dim> > &points,
+					    vector<double> &values) const
+{
+  vector<Vector<double> > v(values.size(),
+			    Vector<double>(vectorfunction->n_components));
+  vectorfunction->value_list(p,v);
+  for (unsigned int i=0 ; i<values.size() ; ++i)
+    values[i] = v[i](index);
+}
+
+
+template <int dim>
+void
+VectorFunction<dim>::Extractor::gradient_list (const vector<Point<dim> > &points,
+					       vector<Tensor<1,dim> > &gradients) const
+{
+  vector<vector<Tensor<1,dim> > > v(values.size(),
+			    vector<Tensor<1,dim> >(vectorfunction->n_components));
+  vectorfunction->value_list(p,v);
+  for (unsigned int i=0 ; i<values.size() ; ++i)
+    values[i] = v[i][index];
+}
 
 //////////////////////////////////////////////////////////////////////
 // TensorFunction
@@ -105,8 +158,6 @@ TensorFunction<rank_, dim>::value_list (const vector<Point<dim> > &points,
 };
 
 
-
-
 template <int rank_, int dim>
 Tensor<rank_+1,dim>
 TensorFunction<rank_, dim>::gradient (const Point<dim> &) const
@@ -129,20 +180,13 @@ TensorFunction<rank_, dim>::gradient_list (const vector<Point<dim> > &points,
     gradients[i] = gradient(points[i]);
 };
 
-/*
+
 template <int rank_, int dim> void
-TensorFunction<rank_, dim>::value (const Point<dim>  &p, vector<double> &erg) const
+TensorFunction<rank_, dim>::value (const Point<dim>  &p,
+				   Vector<double> &erg) const
 {
   Tensor<rank_,dim> h = operator()(p);
   h.unroll(erg);
-}
-*/
-
-
-template <int rank_, int dim> void
-TensorFunction<rank_, dim>::value (const Point<dim>  &, Vector<double> &) const
-{
-  Assert(false, ExcNotImplemented());
 }
 
 
