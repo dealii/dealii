@@ -438,7 +438,22 @@ void DataOut<dim>::build_some_patches (Data data)
                                            // but it may also happen
                                            // that the neighbor is not
                                            // a member of the range of
-                                           // cells over which we loop
+                                           // cells over which we
+                                           // loop, in which case the
+                                           // respective entry in the
+                                           // cell_to_patch_index_map
+                                           // will have the value
+                                           // no_neighbor. (note that
+                                           // since we allocated only
+                                           // as much space in this
+                                           // array as the maximum
+                                           // index of the cells we
+                                           // loop over, not every
+                                           // neighbor may have its
+                                           // space in it, so we have
+                                           // to assume that it is
+                                           // extended by values
+                                           // no_neighbor)
           if (cell->at_boundary(f)
               ||
               (cell->neighbor(f)->level() != cell->level()))
@@ -446,9 +461,15 @@ void DataOut<dim>::build_some_patches (Data data)
 
           const typename DoFHandler<dim>::cell_iterator
             neighbor = cell->neighbor(f);
-          if ((*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
-              ==
-              ::DataOutBase::Patch<dim>::no_neighbor)
+          Assert (static_cast<unsigned int>(neighbor->level()) <
+                  data.cell_to_patch_index_map->size(),
+                  ExcInternalError());
+          if ((static_cast<unsigned int>(neighbor->index()) >=
+               (*data.cell_to_patch_index_map)[neighbor->level()].size())
+              ||
+              ((*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
+               ==
+               ::DataOutBase::Patch<dim>::no_neighbor))
             continue;
 
                                            // now, there is a
@@ -548,16 +569,26 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
   
 				   // first count the cells we want to
 				   // create patches of. also fill the
-				   // // object that maps the cell
+				   // object that maps the cell
 				   // indices to the patch numbers, as
 				   // this will be needed for
 				   // generation of neighborship
 				   // information
   std::vector<std::vector<unsigned int> > cell_to_patch_index_map;
   cell_to_patch_index_map.resize (this->dofs->get_tria().n_levels());
-  for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l)
-    cell_to_patch_index_map[l].resize (this->dofs->get_tria().n_cells(l),
-                                       ::DataOutBase::Patch<dim>::no_neighbor);
+  for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l) 
+    {
+      unsigned int max_index = 0;
+      for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
+           cell != this->dofs->end();
+           cell = next_cell(cell))
+        if (static_cast<unsigned int>(cell->level()) == l)
+          max_index = std::max (max_index,
+                                static_cast<unsigned int>(cell->index()));
+      
+      cell_to_patch_index_map[l].resize (max_index+1,
+                                         ::DataOutBase::Patch<dim>::no_neighbor);
+    };
                                   
   unsigned int n_patches = 0;
   for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
