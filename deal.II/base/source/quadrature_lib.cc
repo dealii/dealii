@@ -329,6 +329,24 @@ QIteratedTrapez<1>::QIteratedTrapez (const unsigned n) :
   weights[n] = .5/n;
 }
 
+template<>
+QIteratedSimpson<1>::QIteratedSimpson(const unsigned n) :
+		Quadrature<1> (2*n+1)
+{
+  weights.clear();
+  
+  for (unsigned int i=0 ; i<n; ++i)
+    {
+      quadrature_points[2*i] = Point<1>(1.*i/n);
+      quadrature_points[2*i+1] = Point<1>(1.*i/n+.5/n);
+
+      weights[2*i]   += 1./(6*n);
+      weights[2*i+1] += 4./(6*n);
+      weights[2*i+2] += 1./(6*n);
+    }
+  quadrature_points[2*n] = Point<1>(1.);
+}
+
 // construct the quadrature formulae in higher dimensions by
 // tensor product of lower dimensions
 template <int dim>
@@ -375,6 +393,10 @@ template <int dim>
 QIteratedTrapez<dim>::QIteratedTrapez (const unsigned n) :
 		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n)) {};
 
+template <int dim>
+QIteratedSimpson<dim>::QIteratedSimpson (const unsigned n) :
+		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n)) {};
+
 
 
 // explicite specialization
@@ -389,6 +411,7 @@ template class QMidpoint<2>;
 template class QSimpson<2>;
 template class QTrapez<2>;
 template class QIteratedTrapez<2>;
+template class QIteratedSimpson<2>;
 
 template class QGauss2<3>;
 template class QGauss3<3>;
@@ -401,4 +424,4 @@ template class QMidpoint<3>;
 template class QSimpson<3>;
 template class QTrapez<3>;
 template class QIteratedTrapez<3>;
-
+template class QIteratedSimpson<3>;
