@@ -222,7 +222,9 @@ void DoFTools::make_boundary_sparsity_pattern (const DoFHandler<dim>& dof,
 
 
 //TODO: Check this function for potential of optimization. (G)
-
+// sometimes, a shape function might be zero on an edge, but we
+// need more information from the finite element used. This should be
+// left for future improvements.
 template<int dim>
 void
 DoFTools::make_flux_sparsity_pattern (const DoFHandler<dim> &dof,
