@@ -25,7 +25,6 @@ const StraightBoundary<dim>& Triangulation<dim>::straight_boundary
 
 
 
-
 template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		Subscriptor (),
@@ -6384,14 +6383,6 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		if (vertex_level[cell->vertex_index(vertex)] >
 		    cell->level()+1)
 		  {
-						     // if we did not make an
-						     // error, the level diff
-						     // should not be more than
-						     // two
-		    Assert (vertex_level[cell->vertex_index(vertex)] ==
-			    cell->level()+2,
-			    ExcInternalError());
-
 						     // refine cell and
 						     // update vertex levels
 		    cell->clear_coarsen_flag();
@@ -6405,21 +6396,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 
 						     // now that we fixed this cell,
 						     // we can safely leave this
-						     // inner loop. however, we check
-						     // the remaining vertices before
-						     // leaving. note that since
-						     // we flagged this cell, 
-						     // vertex_level might be up to
-						     // three levels higher than this
-						     // cell
-		    for (unsigned int v=vertex+1; v<GeometryInfo<dim>::vertices_per_cell;
-			 ++v)
-		      Assert (vertex_level[cell->vertex_index(v)]
-			      <=
-			      cell->level()+3,
-			      ExcInternalError());
-		    
-						     // next cell
+						     // inner loop.
 		    break;
 		  };	  
 	};
