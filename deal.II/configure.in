@@ -186,11 +186,12 @@ dnl it may be that we don't need one (but we check below, when we must
 dnl have it).
 AC_PATH_PROGS(F77, [f77 g77])
 
-dnl Next determine which C++ compiler we have here and set compilation
-dnl flags accordingly. Note that for historical reasons the name and
-dnl version of the compiler is written to the variable GXX_VERSION.
-DEAL_II_DETERMINE_F77_BRAND
-DEAL_II_SET_F77_FLAGS
+dnl Next determine which f77 compiler we have here and set compilation
+dnl flags accordingly. Only do that if we have an F77 compiler at all.
+if test "x$F77" != "x" ; then
+  DEAL_II_DETERMINE_F77_BRAND
+  DEAL_II_SET_F77_FLAGS
+fi
 
 AC_SUBST(F77_VERSION)
 AC_SUBST(F77FLAGSO)
