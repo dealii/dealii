@@ -14,64 +14,12 @@
 #define __deal2__eigen_h
 
 
+#include <lac/shifted_matrix.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
-
-/**
- * Matrix with shifted diagonal values.
- *
- * Given a matrix $A$, this class implements a matrix-vector product with
- * $A+\sigma I$, where sigma is a provided shift parameter.
- *
- * @author Guido Kanschat, 2000
- */
-template<class MATRIX>
-class ShiftedMatrix
-{
-  public:
-				     /**
-				      * Constructor.
-				      * Provide the base matrix and a shift parameter.
-				      */
-    ShiftedMatrix (const MATRIX& A, const double sigma);
-
-				     /**
-				      * Set the shift parameter.
-				      */
-    void shift (const double sigma);
-
-				     /**
-				      * Access to the shift parameter.
-				      */
-    double shift () const;
-
-				     /**
-				      * Matrix-vector-product.
-				      */
-    template <class VECTOR>
-    void vmult (VECTOR& dst, const VECTOR& src) const;
-
-				     /**
-				      * Residual.
-				      */
-    template <class VECTOR>
-    double residual (VECTOR& dst, const VECTOR& src, const VECTOR& rhs) const;
-    
-  private:
-				     /**
-				      * Storage for base matrix.
-				      */
-    const MATRIX& A;
-
-				     /**
-				      * Shift parameter.
-				      */
-    double sigma;
-};
-    
 
 /**
  * Power method (von Mises).
@@ -229,58 +177,6 @@ class EigenInverse : private Solver<VECTOR>
 				      */
     AdditionalData additional_data;
 };
-
-//----------------------------------------------------------------------//
-
-template <class MATRIX>
-inline
-ShiftedMatrix<MATRIX>::ShiftedMatrix (const MATRIX& A, const double sigma)
-		:
-		A(A), sigma(sigma)
-{}
-
-
-
-template <class MATRIX>
-inline void
-ShiftedMatrix<MATRIX>::shift (const double s)
-{
-  sigma = s;
-}
-
-
-template <class MATRIX>
-inline double
-ShiftedMatrix<MATRIX>::shift () const
-{
-  return sigma;
-}
-
-
-
-template <class MATRIX>
-template <class VECTOR>
-inline void
-ShiftedMatrix<MATRIX>::vmult (VECTOR& dst, const VECTOR& src) const
-{
-  A.vmult(dst, src);
-  dst.add(sigma, src);
-}
-
-
-template <class MATRIX>
-template <class VECTOR>
-inline double
-ShiftedMatrix<MATRIX>::residual (VECTOR& dst,
-				 const VECTOR& src,
-				 const VECTOR& rhs) const
-{
-  A.vmult(dst, src);
-  dst.add(sigma, src);
-  dst.sadd(-1.,1.,rhs);
-  return dst.l2_norm ();
-}
-
 
 //----------------------------------------------------------------------
 
