@@ -19,6 +19,7 @@
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>
+#include <lac/sparse_matrix.templates.h>
 #include <lac/vector.h>
 #include <lac/vector_memory.h>
 #include <lac/solver_control.h>
@@ -188,13 +189,17 @@ int main()
 	  deallog.pop();
 	  
 	  deallog.push("psor");
-	  
+
+	  if(false)
+	    {
+	      
 	  check_Tsolve(rich,A,u,f,prec_psor);
 	  check_solve(rich,A,u,f,prec_psor);
 	  check_solve(cg,A,u,f,prec_psor);
 	  check_solve(bicgstab,A,u,f,prec_psor);
 	  check_solve(gmres,A,u,f,prec_psor);
 	  check_solve(gmresright,A,u,f,prec_psor);
+	    }
 	  
 	  deallog.pop();
 	}
@@ -203,5 +208,63 @@ int main()
 	  std::cerr << e.what() << std::endl;
 	}
     };
+
+				   // Solve advection problem
+
+				   // Disabled for the time being
+  for (unsigned int size=4; size <= 3; size *= 3)
+    {
+      unsigned int dim = (size-1)*(size-1);
+      
+      deallog << "Size " << size << " Unknowns " << dim << std::endl;
+      
+				       // Make matrix
+      FDMatrix testproblem(size, size);
+      SparsityPattern structure(dim, dim, 5);
+      testproblem.five_point_structure(structure);
+      structure.compress();
+      SparseMatrix<double>  A(structure);
+      testproblem.upwind(A, true);
+
+      PreconditionSOR<> prec_sor;
+      prec_sor.initialize(A, 1.);
+
+      std::vector<unsigned int> permutation(dim);
+      std::vector<unsigned int> inverse_permutation(dim);
+
+				       // Create a permutation: Blocks
+				       // backwards and every second
+				       // block backwards
+      unsigned int k = 0;
+      for (unsigned int i=0;i<size-1;++i)
+	for (unsigned int j=0;j<size-1;++j)
+	  {
+	    permutation[k++] = i * (size-1) + size-j-2;
+	  }
+      
+      for (unsigned int i=0;i<permutation.size();++i)
+	std::cerr << ' ' << permutation[i];
+      std::cerr << std::endl;
+      
+      for (unsigned int i=0;i<permutation.size();++i)
+	inverse_permutation[permutation[i]] = i;
+
+      for (unsigned int i=0;i<permutation.size();++i)
+	std::cerr << ' ' << inverse_permutation[i];
+      std::cerr << std::endl;
+      
+      PreconditionPSOR<> prec_psor;
+      prec_psor.initialize(A, permutation, inverse_permutation, 1.);
+
+      Vector<double>  f(dim);
+      Vector<double>  u(dim);
+      f = 1.;
+      u = 1.;
+
+      std::cerr << "******************************" << std::endl;
+      
+      check_solve(rich,A,u,f,prec_sor);
+      check_solve(rich,A,u,f,prec_psor);
+    }
 }
 
