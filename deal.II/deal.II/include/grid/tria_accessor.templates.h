@@ -84,6 +84,16 @@ TriaAccessor<dim>::state () const {
 
 
 
+template <int dim>
+inline
+const Triangulation<dim> &
+TriaAccessor<dim>::get_triangulation () const
+{
+  return *tria;
+};
+
+
+
 /*------------------------ Functions: LineAccessor ---------------------------*/
 
 

@@ -96,7 +96,7 @@ class TriaAccessor {
 				      *  Same as above.
 				      */
     TriaAccessor &operator = (const TriaAccessor &);
-	
+
   public:
 				     /**
 				      *  Compare for equality.            
@@ -146,6 +146,14 @@ class TriaAccessor {
 				      *  \Ref{TriaRawIterator} documentation.
 				      */
     IteratorState state () const;
+
+				     /**
+				      * Return a pointer to the triangulation
+				      * which the object pointed to by this
+				      * class belongs to.
+				      */
+    const Triangulation<dim> & get_triangulation () const;
+    
 				     /*@}*/
 
 				     /**@name Exceptions for derived classes
