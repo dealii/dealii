@@ -15,6 +15,17 @@
 
 <ol>
   <li> <p>
+       Fixed: When using Neuman boundary functions in the 
+       <code class="class">KellyErrorEstimator</code> class, it was
+       assumed that the function object had <code
+       class="member">Function::vector_value</code> overloaded, even
+       in the scalar case. We now use <code
+       class="member">Function::value</code> instead.
+       <br>
+       (WB 2001/04/09)
+       </p>
+       
+  <li> <p>
        New/Fixed: Now there exists a new <code
        class="class">Triangulation</code>::<code
        class="member">ExcMultiplySetLineInfoOfLine</code> exception,
