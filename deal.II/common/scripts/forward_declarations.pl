@@ -40,6 +40,13 @@ sub parse_class_declarations {
     
     open (FILE, $filename);
     while (<FILE>) {
+	# if this is continued line, then strip the backslash and join
+	# it with the following one as well
+	while ( /\\$/ ) {
+	    $_ =~ s/\\$//;
+	    $_ = $_ . " " . <FILE>;
+        }
+
 	# if the lines contains a "template" at the 
 	# beginning and no semicolon at the end: join it
 	# with the next line.
