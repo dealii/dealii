@@ -631,7 +631,7 @@ void LaplaceProblem<dim>::run ()
 				   // write a table of results to the
 				   // screen:
   output_table.set_precision("|u|_1", 6);
-  output_table.set_scientific("error", true);
+  output_table.set_precision("error", 6);
   output_table.write_text (std::cout);
   std::cout << std::endl;
 };
