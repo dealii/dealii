@@ -49,7 +49,7 @@ include $D/common/Make.global_options
 # This example program will only work if PETSc is installed. If this
 # is not the case, then simply redefine the main targets to to nothing
 ifneq ($(USE_CONTRIB_PETSC),yes)
-default run:
+default run clean:
 	@echo
 	@echo "===========================================================" 
 	@echo "=   This program cannot be compiled without PETSc. Make   ="
