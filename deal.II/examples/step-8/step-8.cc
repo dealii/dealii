@@ -38,7 +38,7 @@
 				 // finite elements from regular Q1
 				 // elements which can be found here,
 				 // as usual:
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
 
 				 // This again is C++:
 #include <fstream>
@@ -70,7 +70,7 @@ class ElasticProblem
 
 				     // Instead of a concrete finite
 				     // element class such as
-				     // ``FEQ1'', we now use a more
+				     // ``FE_Q'', we now use a more
 				     // generic one, ``FESystem''. In
 				     // fact, it is not a finite
 				     // element itself, but rather a
@@ -80,7 +80,7 @@ class ElasticProblem
 				     // vector-valued finite
 				     // element. In our case, we will
 				     // compose the vector-valued
-				     // element of ``FEQ1'' objects,
+				     // element of ``FE_Q(1)'' objects,
 				     // as shown below in the
 				     // constructor of this class.
     FESystem<dim>        fe;
@@ -304,7 +304,7 @@ ElasticProblem<dim>::ElasticProblem () :
 						 // vector-valued
 						 // finite element as
 						 // outer product of
-						 // several scald
+						 // several scalar
 						 // finite
 						 // elements. Of
 						 // course, the number
@@ -330,11 +330,11 @@ ElasticProblem<dim>::ElasticProblem () :
 						 // the system of, and
 						 // how often it shall
 						 // be repeated:
-		fe (FEQ1<dim>(), dim)
+		fe (FE_Q<dim>(1), dim)
 				 // In fact, the ``FESystem'' class
 				 // has several more constructors
 				 // which can perform more complex
-				 // operations that just stacking
+				 // operations than just stacking
 				 // together several scalar finite
 				 // elements of the same type into
 				 // one; we will get to know these
@@ -348,11 +348,8 @@ ElasticProblem<dim>::ElasticProblem () :
 				 // use an anonymous object created
 				 // in-place. The ``FESystem''
 				 // constructor only needs the
-				 // parameter to deduce the type of
-				 // the finite element from this and
-				 // then creates objects of the
-				 // underlying finite element type
-				 // itself.
+				 // parameter to generate a copy of
+				 // the finite element from this.
 {};
 
 

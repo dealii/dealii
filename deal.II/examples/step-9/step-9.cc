@@ -28,7 +28,7 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-#include <fe/fe_lib.lagrange.h>
+#include <fe/fe_q.h>
 #include <grid/grid_out.h>
 
 				 // The following two files provide
@@ -133,7 +133,7 @@ class AdvectionProblem
     Triangulation<dim>   triangulation;
     DoFHandler<dim>      dof_handler;
 
-    FEQ1<dim>            fe;
+    FE_Q<dim>            fe;
 
     ConstraintMatrix     hanging_node_constraints;
 
@@ -626,7 +626,8 @@ class GradientEstimation
 				 // three function:
 template <int dim>
 AdvectionProblem<dim>::AdvectionProblem () :
-		dof_handler (triangulation)
+		dof_handler (triangulation),
+		fe(1)
 {};
 
 
