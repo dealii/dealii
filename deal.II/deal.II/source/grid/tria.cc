@@ -1,8 +1,8 @@
 /* $Id$ */
 
+#include <grid/tria.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria.h>
 #include <grid/geometry_info.h>
 #include <basic/magic_numbers.h>
 #include <basic/data_io.h>
@@ -14,8 +14,6 @@
 #include <cmath>
 
 
-
-
 template <int dim>
 Triangulation<dim>::Triangulation (const bool smooth_grid) :
 		smooth_grid(smooth_grid)
@@ -25,6 +23,14 @@ Triangulation<dim>::Triangulation (const bool smooth_grid) :
   
   levels.push_back (new TriangulationLevel<dim>);
 };
+
+
+
+template <int dim>
+Triangulation<dim>::Triangulation (const Triangulation<dim> &) {
+  Assert (false, ExcInternalError());
+};
+
 
 
 template <int dim>
@@ -44,7 +50,68 @@ void Triangulation<dim>::set_boundary (const Boundary<dim> *boundary_object) {
 
 
 
+/*--------- Put the next functions a bit out-or-order to avoid use before
+  --------- explicit specialization, which is not allowed.                */
 
+template <>
+TriaDimensionInfo<1>::cell_iterator
+Triangulation<1>::begin (const unsigned int level) const {
+  return begin_line (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::cell_iterator
+Triangulation<2>::begin (const unsigned int level) const {
+  return begin_quad (level);
+};
+
+
+
+template <>
+TriaDimensionInfo<1>::raw_cell_iterator
+Triangulation<1>::end () const {
+  return end_line ();
+};
+
+
+
+template <>
+TriaDimensionInfo<2>::raw_cell_iterator
+Triangulation<2>::end () const {
+  return end_quad ();
+};
+
+
+/*-----------------------------------------------------------------*/
+
+
+
+template <int dim>
+void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria) {
+  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
+  Assert (n_cells () == 0, ExcTriangulationNotEmpty());
+  Assert (levels.size () == 1, ExcTriangulationNotEmpty());
+
+				   // copy normal elements
+  vertices      = old_tria.vertices;
+  vertices_used = old_tria.vertices_used;
+  boundary      = old_tria.boundary;
+  smooth_grid   = old_tria.smooth_grid;
+
+				   // delete only level previously existing,
+				   // reserve space for new and copy
+  delete levels[0];
+  levels.clear ();
+  levels.reserve (old_tria.levels.size());
+  for (unsigned int level=0; level<old_tria.levels.size(); ++level)
+    levels.push_back (new TriangulationLevel<dim>(*old_tria.levels[level]));
+};
+
+
+
+template <>
 void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 					     const vector<CellData<1> > &cells,
 					     const SubCellData          &) {
@@ -143,6 +210,7 @@ void Triangulation<1>::create_triangulation (const vector<Point<1> >    &v,
 
 
 
+template <>
 void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 					     const vector<CellData<2> > &c,
 					     const SubCellData          &subcelldata) {
@@ -430,6 +498,7 @@ void Triangulation<2>::create_triangulation (const vector<Point<2> >    &v,
 
 
 
+template <>
 void Triangulation<1>::create_hypercube (const double left,
 					 const double right) {
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -449,6 +518,7 @@ void Triangulation<1>::create_hypercube (const double left,
 
 
   
+template <>
 void Triangulation<2>::create_hypercube (const double left,
 					 const double right) {
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
@@ -472,12 +542,14 @@ void Triangulation<2>::create_hypercube (const double left,
 
 
 
+template <>
 void Triangulation<1>::create_hyper_L (const double, const double) {
   Assert (false, ExcInternalError());
 };
 
 
 
+template <>
 void Triangulation<2>::create_hyper_L (const double a, const double b) {
   const unsigned int dim=2;
   const Point<dim> vertices[8] = { Point<dim> (a,a),
@@ -508,23 +580,26 @@ void Triangulation<2>::create_hyper_L (const double a, const double b) {
 
 
 
-void Triangulation<1>::create_hyper_ball (const Point<1>, const double) {
+template <>
+void Triangulation<1>::create_hyper_ball (const Point<1> &, const double) {
   Assert (false, ExcInternalError());
 };
 
 
 
-void Triangulation<2>::create_hyper_ball (const Point<2> p, const double radius) {
+template <>
+void Triangulation<2>::create_hyper_ball (const Point<2> &p, const double radius) {
   const unsigned int dim=2;
   const double a = 0.453;         // equilibrate cell sizes
-  const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*radius/sqrt(2),
-				   p+Point<dim>(+1,-1)*radius/sqrt(2),
-				   p+Point<dim>(-1,-1)*radius/sqrt(2)*a,
-				   p+Point<dim>(+1,-1)*radius/sqrt(2)*a,
-				   p+Point<dim>(-1,+1)*radius/sqrt(2)*a,
-				   p+Point<dim>(+1,+1)*radius/sqrt(2)*a,
-				   p+Point<dim>(-1,+1)*radius/sqrt(2),
-				   p+Point<dim>(+1,+1)*radius/sqrt(2) };
+  const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*(radius/sqrt(2)),
+				   p+Point<dim>(+1,-1)*(radius/sqrt(2)),
+				   p+Point<dim>(-1,-1)*(radius/sqrt(2)*a),
+				   p+Point<dim>(+1,-1)*(radius/sqrt(2)*a),
+				   p+Point<dim>(-1,+1)*(radius/sqrt(2)*a),
+				   p+Point<dim>(+1,+1)*(radius/sqrt(2)*a),
+				   p+Point<dim>(-1,+1)*(radius/sqrt(2)),
+				   p+Point<dim>(+1,+1)*(radius/sqrt(2)) };
+  
   const int cell_vertices[5][4] = {{0, 1, 3, 2},
 				   {0, 2, 4, 6},
 				   {2, 3, 5, 4},
@@ -638,6 +713,7 @@ void Triangulation<dim>::load_refine_flags (istream &in) {
 
 
 
+template <>
 void Triangulation<1>::clear_user_flags () {
   cell_iterator cell = begin(),
 		endc = end();
@@ -647,6 +723,7 @@ void Triangulation<1>::clear_user_flags () {
 
 
 
+template <>
 void Triangulation<2>::clear_user_flags () {
   line_iterator line = begin_line(),
 		endl = end_line();
@@ -662,12 +739,14 @@ void Triangulation<2>::clear_user_flags () {
 
 
 
+template <>
 void Triangulation<1>::save_user_flags (ostream &out) const {
   save_user_flags_line (out);
 };
 
 
 
+template <>
 void Triangulation<2>::save_user_flags (ostream &out) const {
   save_user_flags_line (out);
   save_user_flags_quad (out);
@@ -742,6 +821,7 @@ void Triangulation<dim>::load_user_flags_line (istream &in) {
 
 
 
+template <>
 void Triangulation<1>::save_user_flags_quad (ostream &) const {
   Assert (false, ExcFunctionNotUseful());
 };
@@ -777,6 +857,7 @@ void Triangulation<dim>::save_user_flags_quad (ostream &out) const {
 
 
 
+template <>
 void Triangulation<1>::load_user_flags_quad (istream &) {
   Assert (false, ExcFunctionNotUseful());
 };
@@ -821,6 +902,7 @@ void Triangulation<dim>::load_user_flags_quad (istream &in) {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_cell_iterator
 Triangulation<1>::begin_raw (const unsigned int level) const {
   return begin_raw_line (level);
@@ -828,13 +910,7 @@ Triangulation<1>::begin_raw (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::cell_iterator
-Triangulation<1>::begin (const unsigned int level) const {
-  return begin_line (level);
-};
-
-
-
+template <>
 TriaDimensionInfo<1>::active_cell_iterator
 Triangulation<1>::begin_active (const unsigned int level) const {
   return begin_active_line (level);
@@ -842,13 +918,7 @@ Triangulation<1>::begin_active (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<1>::raw_cell_iterator
-Triangulation<1>::end () const {
-  return end_line ();
-};
-
-
-
+template <>
 TriaDimensionInfo<1>::raw_cell_iterator
 Triangulation<1>::last_raw () const {
   return last_raw_line ();
@@ -856,6 +926,7 @@ Triangulation<1>::last_raw () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_cell_iterator
 Triangulation<1>::last_raw (const unsigned int level) const {
   return last_raw_line (level);
@@ -863,6 +934,7 @@ Triangulation<1>::last_raw (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::cell_iterator
 Triangulation<1>::last () const {
   return last_line ();
@@ -870,6 +942,7 @@ Triangulation<1>::last () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::cell_iterator
 Triangulation<1>::last (const unsigned int level) const {
   return last_line (level);
@@ -877,6 +950,7 @@ Triangulation<1>::last (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_cell_iterator
 Triangulation<1>::last_active () const {
   return last_active_line ();
@@ -884,6 +958,7 @@ Triangulation<1>::last_active () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_cell_iterator
 Triangulation<1>::last_active (const unsigned int level) const {
   return last_active_line (level);
@@ -893,6 +968,7 @@ Triangulation<1>::last_active (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::raw_cell_iterator
 Triangulation<2>::begin_raw (const unsigned int level) const {
   return begin_raw_quad (level);
@@ -900,13 +976,7 @@ Triangulation<2>::begin_raw (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<2>::cell_iterator
-Triangulation<2>::begin (const unsigned int level) const {
-  return begin_quad (level);
-};
-
-
-
+template <>
 TriaDimensionInfo<2>::active_cell_iterator
 Triangulation<2>::begin_active (const unsigned int level) const {
   return begin_active_quad (level);
@@ -914,13 +984,7 @@ Triangulation<2>::begin_active (const unsigned int level) const {
 
 
 
-TriaDimensionInfo<2>::raw_cell_iterator
-Triangulation<2>::end () const {
-  return end_quad ();
-};
-
-
-
+template <>
 TriaDimensionInfo<2>::raw_cell_iterator
 Triangulation<2>::last_raw () const {
   return last_raw_quad ();
@@ -928,6 +992,7 @@ Triangulation<2>::last_raw () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::raw_cell_iterator
 Triangulation<2>::last_raw (const unsigned int level) const {
   return last_raw_quad (level);
@@ -935,6 +1000,7 @@ Triangulation<2>::last_raw (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::cell_iterator
 Triangulation<2>::last () const {
   return last_quad ();
@@ -942,6 +1008,7 @@ Triangulation<2>::last () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::cell_iterator
 Triangulation<2>::last (const unsigned int level) const {
   return last_quad (level);
@@ -949,6 +1016,7 @@ Triangulation<2>::last (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::active_cell_iterator
 Triangulation<2>::last_active () const {
   return last_active_quad ();
@@ -956,6 +1024,7 @@ Triangulation<2>::last_active () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::active_cell_iterator
 Triangulation<2>::last_active (const unsigned int level) const {
   return last_active_quad (level);
@@ -967,6 +1036,7 @@ Triangulation<2>::last_active (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_face_iterator
 Triangulation<1>::begin_raw_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -975,6 +1045,7 @@ Triangulation<1>::begin_raw_face (const unsigned int) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::face_iterator
 Triangulation<1>::begin_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -983,6 +1054,7 @@ Triangulation<1>::begin_face (const unsigned int) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_face_iterator
 Triangulation<1>::begin_active_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -991,6 +1063,7 @@ Triangulation<1>::begin_active_face (const unsigned int) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_face_iterator
 Triangulation<1>::end_face () const {
   Assert (false, ExcFunctionNotUseful());
@@ -999,6 +1072,7 @@ Triangulation<1>::end_face () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_face_iterator
 Triangulation<1>::last_raw_face () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1007,6 +1081,7 @@ Triangulation<1>::last_raw_face () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_face_iterator
 Triangulation<1>::last_raw_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1015,6 +1090,7 @@ Triangulation<1>::last_raw_face (const unsigned int) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::face_iterator
 Triangulation<1>::last_face () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1023,6 +1099,7 @@ Triangulation<1>::last_face () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::face_iterator
 Triangulation<1>::last_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1031,6 +1108,7 @@ Triangulation<1>::last_face (const unsigned int) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_face_iterator
 Triangulation<1>::last_active_face () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1039,6 +1117,7 @@ Triangulation<1>::last_active_face () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_face_iterator
 Triangulation<1>::last_active_face (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1048,6 +1127,7 @@ Triangulation<1>::last_active_face (const unsigned int) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::raw_face_iterator
 Triangulation<2>::begin_raw_face (const unsigned int level) const {
   return begin_raw_line (level);
@@ -1055,6 +1135,7 @@ Triangulation<2>::begin_raw_face (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::face_iterator
 Triangulation<2>::begin_face (const unsigned int level) const {
   return begin_line (level);
@@ -1062,6 +1143,7 @@ Triangulation<2>::begin_face (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::active_face_iterator
 Triangulation<2>::begin_active_face (const unsigned int level) const {
   return begin_active_line (level);
@@ -1069,6 +1151,7 @@ Triangulation<2>::begin_active_face (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::raw_face_iterator
 Triangulation<2>::end_face () const {
   return end_line ();
@@ -1076,6 +1159,7 @@ Triangulation<2>::end_face () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::raw_face_iterator
 Triangulation<2>::last_raw_face () const {
   return last_raw_line ();
@@ -1083,6 +1167,7 @@ Triangulation<2>::last_raw_face () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::raw_face_iterator
 Triangulation<2>::last_raw_face (const unsigned int level) const {
   return last_raw_line (level);
@@ -1090,6 +1175,7 @@ Triangulation<2>::last_raw_face (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::face_iterator
 Triangulation<2>::last_face () const {
   return last_line ();
@@ -1097,6 +1183,7 @@ Triangulation<2>::last_face () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::face_iterator
 Triangulation<2>::last_face (const unsigned int level) const {
   return last_line (level);
@@ -1104,6 +1191,7 @@ Triangulation<2>::last_face (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<2>::active_face_iterator
 Triangulation<2>::last_active_face () const {
   return last_active_line ();
@@ -1111,6 +1199,7 @@ Triangulation<2>::last_active_face () const {
 
 
 
+template <>
 TriaDimensionInfo<2>::active_face_iterator
 Triangulation<2>::last_active_face (const unsigned int level) const {
   return last_active_line (level);
@@ -1123,8 +1212,8 @@ Triangulation<2>::last_active_face (const unsigned int level) const {
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_line_iterator
 Triangulation<dim>::begin_raw_line (unsigned int level) const {
-  Assert (level<levels.size(),
-	  ExcInvalidLevel(level));
+  Assert (level<levels.size(), ExcInvalidLevel(level));
+  
   if (levels[level]->lines.lines.size() == 0)
     return end_line ();
   
@@ -1136,6 +1225,7 @@ Triangulation<dim>::begin_raw_line (unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_quad_iterator
 Triangulation<1>::begin_raw_quad (unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1147,9 +1237,8 @@ Triangulation<1>::begin_raw_quad (unsigned int) const {
 template <int dim>
 typename TriaDimensionInfo<dim>::raw_quad_iterator
 Triangulation<dim>::begin_raw_quad (unsigned int level) const {
-  Assert (level<levels.size(),
-	  ExcInvalidLevel(level));
-  
+  Assert (level<levels.size(), ExcInvalidLevel(level));
+
   if (levels[level]->quads.quads.size() == 0)
     return end_quad();
   
@@ -1177,6 +1266,7 @@ Triangulation<dim>::begin_line (unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::quad_iterator
 Triangulation<1>::begin_quad (unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1216,6 +1306,7 @@ Triangulation<dim>::begin_active_line (unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_quad_iterator
 Triangulation<1>::begin_active_quad (unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1250,6 +1341,7 @@ Triangulation<dim>::end_line () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_quad_iterator
 Triangulation<1>::end_quad () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1284,6 +1376,7 @@ Triangulation<dim>::last_raw_line (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_quad_iterator
 Triangulation<1>::last_raw_quad (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1316,6 +1409,7 @@ Triangulation<dim>::last_raw_line () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::raw_quad_iterator
 Triangulation<1>::last_raw_quad () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1348,6 +1442,7 @@ Triangulation<dim>::last_line (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::quad_iterator
 Triangulation<1>::last_quad (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1379,6 +1474,7 @@ Triangulation<dim>::last_line () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::quad_iterator
 Triangulation<1>::last_quad () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1412,6 +1508,7 @@ Triangulation<dim>::last_active_line (const unsigned int level) const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_quad_iterator
 Triangulation<1>::last_active_quad (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
@@ -1445,6 +1542,7 @@ Triangulation<dim>::last_active_line () const {
 
 
 
+template <>
 TriaDimensionInfo<1>::active_quad_iterator
 Triangulation<1>::last_active_quad () const {
   Assert (false, ExcFunctionNotUseful());
@@ -1476,12 +1574,14 @@ unsigned int Triangulation<dim>::n_cells () const {
 
 
 
+template <>
 unsigned int Triangulation<1>::n_cells (const unsigned int level) const {
   return n_lines (level);
 };
 
 
 
+template <>
 unsigned int Triangulation<2>::n_cells (const unsigned int level) const {
   return n_quads (level);
 };
@@ -1498,12 +1598,14 @@ unsigned int Triangulation<dim>::n_active_cells () const {
 
 
 
+template <>
 unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const {
   return n_active_lines (level);
 };
 
 
 
+template <>
 unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const {
   return n_active_quads (level);
 };
@@ -1578,6 +1680,7 @@ unsigned int Triangulation<dim>::n_quads () const {
 
 
 
+template <>
 unsigned int Triangulation<1>::n_quads (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
@@ -1614,6 +1717,7 @@ unsigned int Triangulation<dim>::n_active_quads () const {
 
 
 
+template <>
 unsigned int Triangulation<1>::n_active_quads (const unsigned int) const {
   Assert (false, ExcFunctionNotUseful());
   return 0;
@@ -1648,6 +1752,7 @@ unsigned int Triangulation<dim>::n_levels () const {
 
 
 
+template <>
 unsigned int Triangulation<1>::max_adjacent_cells () const {
   return 2;
 };
@@ -1708,6 +1813,7 @@ void Triangulation<dim>::print_gnuplot (ostream &out, const unsigned int level) 
 
 
 
+template <>
 void Triangulation<1>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
   out << cell->vertex(0) << " " << cell->level() << endl
@@ -1717,6 +1823,7 @@ void Triangulation<1>::print_gnuplot (ostream &out,
 
 
 
+template <>
 void Triangulation<2>::print_gnuplot (ostream &out,
 				      const active_cell_iterator & cell) const {
   out << cell->vertex(0) << " " << cell->level() << endl
@@ -1755,8 +1862,8 @@ void Triangulation<dim>::refine_fixed_number (const dVector &criteria,
   Assert ((fraction>0) && (fraction<=1), ExcInvalidParameterValue());
 
 				   // refine at least one cell
-  const refine_cells = max(static_cast<int>(fraction*criteria.size()),
-			   1);
+  const int refine_cells = max(static_cast<int>(fraction*criteria.size()),
+			       1);
   
   dVector tmp(criteria);  
   nth_element (tmp.begin(),
@@ -1839,6 +1946,7 @@ void Triangulation<dim>::refine_fixed_fraction (const dVector     &criteria,
 
 
 
+template <>
 void Triangulation<1>::execute_refinement () {
   prepare_refinement ();
 
@@ -2018,6 +2126,7 @@ void Triangulation<1>::execute_refinement () {
 
 
 
+template <>
 void Triangulation<2>::execute_refinement () {
   prepare_refinement ();
 
