@@ -1848,7 +1848,7 @@ class Table<7,T> : public TableBase<7,T>
 };
 
 
-
+///@if NoDoc
 /* --------------------- Template and inline functions ---------------- */
 
 
@@ -3330,6 +3330,6 @@ Table<7,T>::operator () (const unsigned int i,
 		   *this->table_size[6] + o];
 }
 
-
+///@endif
 
 #endif
