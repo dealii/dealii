@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001 by the deal.II authors
+//    Copyright (C) 2001, 2002 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ std::ofstream logfile("subdomain_ids.output");
 DeclException2 (ExcNumberMismatch,
 		int, int,
 		<< "The numbers " << arg1 << " and " << arg2
-		<< " should be equation, but are not.");
+		<< " should be equal, but are not.");
 
 
 template <int dim>
