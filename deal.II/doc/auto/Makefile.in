@@ -56,7 +56,7 @@ kdoc:
 
 # Will not work for kdoc2
 
-kdoc/names.html: $(kdoc.library-files)
+kdoc/names.html: kdoc
 	@cd kdoc ; $(PERL) ../scripts/index.pl *.kdoc > names.html
 
 
