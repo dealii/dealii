@@ -172,7 +172,7 @@ veryclean: clean
 all-cc-files = $(wildcard *.cc)
 
 Make.depend: $(all-cc-files)
-	@echo =====Dependecies=== Make.depend
+	@echo =====Dependencies=== Make.depend
 	@$(CXX) $(flags) $^ -M > $@
 	@perl -pi~ -e 's/(^[^.]+)\.o:/\1.o \1.go:/;' $@
 
