@@ -69,6 +69,129 @@ class FullMatrix : public Table<2,number>
 {
   public:
 				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator
+    {
+      private:
+                                         /**
+                                          * Accessor class for iterators
+                                          */
+        class Accessor
+        {
+          public:
+                                             /**
+                                              * Constructor. Since we use
+                                              * accessors only for read
+                                              * access, a const matrix
+                                              * pointer is sufficient.
+                                              */
+            Accessor (const FullMatrix<number> *matrix,
+                      const unsigned int row,
+                      const unsigned int col);
+
+                                             /**
+                                              * Row number of the element
+                                              * represented by this
+                                              * object.
+                                              */
+            unsigned int row() const;
+
+                                             /**
+                                              * Column number of the
+                                              * element represented by
+                                              * this object.
+                                              */
+            unsigned int column() const;
+
+                                             /**
+                                              * Value of this matrix entry.
+                                              */
+            number value() const;
+	
+          protected:
+                                             /**
+                                              * The matrix accessed.
+                                              */
+            const FullMatrix<number>* matrix;
+
+                                             /**
+                                              * Current row number.
+                                              */
+            unsigned int a_row;
+
+                                             /**
+                                              * Current column number.
+                                              */
+            unsigned short a_col;
+
+                                             /**
+                                              * Make enclosing class a
+                                              * friend.
+                                              */
+            friend class const_iterator;
+        };
+        
+      public:
+                                         /**
+                                          * Constructor.
+                                          */ 
+	const_iterator(const FullMatrix<number> *matrix,
+		       const unsigned int row,
+		       const unsigned int col);
+	  
+                                         /**
+                                          * Prefix increment.
+                                          */
+	const_iterator& operator++ ();
+
+                                         /**
+                                          * Postfix increment.
+                                          */
+	const_iterator& operator++ (int);
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor& operator* () const;
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor* operator-> () const;
+
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
+	bool operator == (const const_iterator&) const;
+                                         /**
+                                          * Inverse of @p{==}.
+                                          */
+	bool operator != (const const_iterator&) const;
+
+                                         /**
+                                          * Comparison
+                                          * operator. Result is true
+                                          * if either the first row
+                                          * number is smaller or if
+                                          * the row numbers are
+                                          * equal and the first
+                                          * index is smaller.
+                                          */
+	bool operator < (const const_iterator&) const;
+
+      private:
+                                         /**
+                                          * Store an object of the
+                                          * accessor class.
+                                          */
+        Accessor accessor;
+    };
+
+				     /**
 				      * Constructor. Initialize the
 				      * matrix as a square matrix with
 				      * dimension @p{n}.
@@ -237,6 +360,27 @@ class FullMatrix : public Table<2,number>
 				      */
     bool all_zero () const;
 
+				     /**
+				      * STL-like iterator with the
+				      * first entry.
+				      */
+    const_iterator begin () const;
+
+				     /**
+				      * Final iterator.
+				      */
+    const_iterator end () const;
+    
+				     /**
+				      * STL-like iterator with the
+				      * first entry of row @p{r}.
+				      */
+    const_iterator begin (const unsigned int r) const;
+
+				     /**
+				      * Final iterator of row @p{r}.
+				      */
+    const_iterator end (const unsigned int r) const;
     
 				     /**
 				      * Scale the entire matrix by a
@@ -793,8 +937,166 @@ FullMatrix<number>::copy_from (const MATRIX& M)
     el(entry->row(), entry->column()) = entry->value();
 }
 
+//----------------------------------------------------------------------//
 
-/*----------------------------   fullmatrix.h     ---------------------------*/
+
+template <typename number>
+inline
+FullMatrix<number>::const_iterator::Accessor::
+Accessor (const FullMatrix<number>* matrix,
+          const unsigned int r,
+          const unsigned int c)
+		:
+		matrix(matrix),
+		a_row(r),
+		a_col(c)
+{}
+
+
+template <typename number>
+inline
+unsigned int
+FullMatrix<number>::const_iterator::Accessor::row() const
+{
+  return a_row;
+}
+
+
+template <typename number>
+inline
+unsigned int
+FullMatrix<number>::const_iterator::Accessor::column() const
+{
+  return a_col;
+}
+
+
+template <typename number>
+inline
+number
+FullMatrix<number>::const_iterator::Accessor::value() const
+{
+  return matrix->el(a_row, a_col);
+}
+
+
+template <typename number>
+inline
+FullMatrix<number>::const_iterator::
+const_iterator(const FullMatrix<number> *matrix,
+               const unsigned int r,
+               const unsigned int c)
+		:
+		accessor(matrix, r, c)
+{}
+
+
+template <typename number>
+inline
+typename FullMatrix<number>::const_iterator &
+FullMatrix<number>::const_iterator::operator++ ()
+{
+  Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+  
+  ++accessor.a_col;
+  if (accessor.a_col >= accessor.matrix->n())
+    {
+      accessor.a_col = 0;
+      accessor.a_row++;
+    }
+  return *this;
+}
+
+
+template <typename number>
+inline
+const typename FullMatrix<number>::const_iterator::Accessor &
+FullMatrix<number>::const_iterator::operator* () const
+{
+  return accessor;
+}
+
+
+template <typename number>
+inline
+const typename FullMatrix<number>::const_iterator::Accessor *
+FullMatrix<number>::const_iterator::operator-> () const
+{
+  return &accessor;
+}
+
+
+template <typename number>
+inline
+bool
+FullMatrix<number>::const_iterator::
+operator == (const const_iterator& other) const
+{
+  return (accessor.row() == other.accessor.row() &&
+          accessor.column() == other.accessor.column());
+}
+
+
+template <typename number>
+inline
+bool
+FullMatrix<number>::const_iterator::
+operator != (const const_iterator& other) const
+{
+  return ! (*this == other);
+}
+
+
+template <typename number>
+inline
+bool
+FullMatrix<number>::const_iterator::
+operator < (const const_iterator& other) const
+{
+  return (accessor.row() < other.accessor.row() ||
+	  (accessor.row() == other.accessor.row() &&
+           accessor.column() < other.accessor.column()));
+}
+
+
+template <typename number>
+inline
+typename FullMatrix<number>::const_iterator
+FullMatrix<number>::begin () const
+{
+  return const_iterator(this, 0, 0);
+}
+
+
+template <typename number>
+inline
+typename FullMatrix<number>::const_iterator
+FullMatrix<number>::end () const
+{
+  return const_iterator(this, m(), 0);
+}
+
+
+template <typename number>
+inline
+typename FullMatrix<number>::const_iterator
+FullMatrix<number>::begin (const unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r, 0);
+}
+
+
+
+template <typename number>
+inline
+typename FullMatrix<number>::const_iterator
+FullMatrix<number>::end (const unsigned int r) const
+{
+  Assert (r<m(), ExcIndexRange(r,0,m()));
+  return const_iterator(this, r+1, 0);
+}
+
 
 #endif
-/*----------------------------   fullmatrix.h     ---------------------------*/
+

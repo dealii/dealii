@@ -50,6 +50,28 @@ main ()
 
   FullMatrix<double> T(3,3,entries);
   T.print_formatted(logfile, 0, false);
+
+  FullMatrix<double>::const_iterator it = T.begin();
+  FullMatrix<double>::const_iterator end = T.end();
+  while (it != end)
+    {
+      deallog << "Row " << it->row()
+	      << "\tCol " << it->column()
+	      << "\tVal " << it->value()
+	      << std::endl;
+      ++it;
+    }
+
+  it = T.begin(1);
+  end = T.end(1);
+  while (it != end)
+    {
+      deallog << "Row " << it->row()
+	      << "\tCol " << it->column()
+	      << "\tVal " << it->value()
+	      << std::endl;
+      ++it;
+    }  
   
   for (unsigned int i=1;i<10;++i)
     {
