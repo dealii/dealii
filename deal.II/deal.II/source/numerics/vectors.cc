@@ -122,7 +122,7 @@ void VectorTools<1>::project (const DoFHandler<1>    &,
 template <int dim>
 void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const ConstraintMatrix   &constraints,
-				const Quadrature<dim>    &q,
+				const Quadrature<dim>    &quadrature,
 				const Function<dim>      &function,
 				Vector<double>           &vec,
 				const bool                enforce_zero_boundary,
@@ -179,8 +179,20 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
   
   SparseMatrix<double> mass_matrix (sparsity);
   Vector<double> tmp (mass_matrix.n());
-  MatrixCreator<dim>::create_mass_matrix (dof, mass_matrix);
-  VectorTools<dim>::create_right_hand_side (dof, q, function, tmp);
+
+				   // try to assemble the mass matrix by exact
+				   // integration. if this is not supported,
+				   // then use quadrature
+  try 
+    {
+      MatrixCreator<dim>::create_mass_matrix (dof, mass_matrix);
+    }
+  catch (FiniteElement<dim>::ExcComputationNotUseful)
+    {
+      MatrixCreator<dim>::create_mass_matrix (dof, quadrature, mass_matrix);
+    };
+  
+  VectorTools<dim>::create_right_hand_side (dof, quadrature, function, tmp);
 
   constraints.condense (mass_matrix);
   constraints.condense (tmp);
@@ -202,7 +214,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 
 template <int dim>
 void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
-					       const Quadrature<dim>    &q,
+					       const Quadrature<dim>    &quadrature,
 					       const Function<dim>      &rhs,
 					       Vector<double>           &rhs_vector) {
   UpdateFlags update_flags = UpdateFlags(update_q_points |
@@ -211,7 +223,7 @@ void VectorTools<dim>::create_right_hand_side (const DoFHandler<dim>    &dof,
   const AssemblerData<dim> data (dof,
 				 false, true,
 				 dummy, rhs_vector,
-				 q, update_flags);
+				 quadrature, update_flags);
   TriaActiveIterator<dim, Assembler<dim> >
     assembler (const_cast<Triangulation<dim>*>(&dof.get_tria()),
 	       dof.get_tria().begin_active()->level(),
