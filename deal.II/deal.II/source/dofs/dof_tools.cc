@@ -2005,26 +2005,30 @@ DoFTools::compute_intergrid_constraints (const DoFHandler<dim>              &coa
 	Assert (col < n_parameters_on_fine_grid, ExcInternalError());
 	
 	unsigned int first_used_row=0;
-	if (true)
-	  {
-	    std::map<unsigned int,float>::const_iterator col_entry;
-	    for (; first_used_row<n_coarse_dofs; ++first_used_row)
-	      {
-		col_entry = weights[first_used_row].find(col);
-		if (col_entry != weights[first_used_row].end())
-		  break;
-	      };
+
+	{
+	  Assert (weights.size() > 0, ExcInternalError());
+	  std::map<unsigned int,float>::const_iterator
+	    col_entry = weights[0].end();
+	  for (; first_used_row<n_coarse_dofs; ++first_used_row)
+	    {
+	      col_entry = weights[first_used_row].find(col);
+	      if (col_entry != weights[first_used_row].end())
+		break;
+	    }
+
+	  Assert (col_entry != weights[0].end(), ExcInternalError());
 	    
-	    if ((col_entry->second == 1) &&
-		(representants[first_used_row] == static_cast<int>(global_dof)))
-					       // dof unconstrained or
-					       // constrained to itself
-					       // (in case this cell is
-					       // mapped to itself, rather
-					       // than to children of
-					       // itself)
-	      continue;
-	  };
+	  if ((col_entry->second == 1) &&
+	      (representants[first_used_row] == static_cast<int>(global_dof)))
+					     // dof unconstrained or
+					     // constrained to itself
+					     // (in case this cell is
+					     // mapped to itself, rather
+					     // than to children of
+					     // itself)
+	    continue;
+	}
 
 
 					 // otherwise enter all constraints
