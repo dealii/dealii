@@ -4,25 +4,26 @@
 
 
 help:
-	@echo "========================================================================="
-	@echo "=Global Makefile for the deal.II libraries                              ="
-	@echo "========================================================================="
-	@echo "=Possible Targets                                                       ="
-	@echo "= (1) baseg lacg: debug libraries base and lac                          ="
-	@echo "= (2) base lac: debug and optimized libraries base and lac              ="
-	@echo "= (3) 1dg 2dg 3dg: (1) and deal.II debug version for specified dimension="
-	@echo "= (4) 1d 2d 3d: (2) and deal.II for specified dimension                 ="
-	@echo "= (5) all: 1d, 2d and 3d                                                ="
-	@echo "= (6) online-doc: generate the documentation in HTML format             ="
-	@echo "= (7) printable-doc: generate the documentation in Postscript format.   ="
-	@echo "=     You need to have Doc++ and LaTeX installed for that.              ="
-	@echo "= (8) tex-doc: same, but only generate the LaTeX file, don't compile it ="
-	@echo "= (9) clean: removes all object files, libraries, etc in all subdirs    ="
-	@echo "=                                                                       ="
-	@echo "=The following additional parameters may be specified to make:          ="
-	@echo "=  PAR=-jn where n is the number of parallel processes for parallel     ="
-	@echo "=          builds.                                                      ="
-	@echo "========================================================================="
+	@echo "======================================================================"
+	@echo "=Global Makefile for the deal.II libraries                           ="
+	@echo "======================================================================"
+	@echo "=Possible Targets                                                    ="
+	@echo "=  baseg lacg: debug libraries base and lac                          ="
+	@echo "=  base lac: debug and optimized libraries base and lac              ="
+	@echo "=  1dg 2dg 3dg: (1) and deal.II debug version for specified dimension="
+	@echo "=  1d 2d 3d: (2) and deal.II for specified dimension                 ="
+	@echo "=  all: 1d, 2d and 3d                                                ="
+	@echo "=  online-doc: generate the documentation in HTML format             ="
+	@echo "=  printable-doc: generate the documentation in Postscript format.   ="
+	@echo "=      You need to have Doc++ and LaTeX installed for that.          ="
+	@echo "=  tex-doc: same, but only generate the LaTeX file, don't compile it ="
+	@echo "=  TODO: create a TODO file from TODO lines in the source files      ="
+	@echo "=  clean: removes all object files, libraries, etc in all subdirs    ="
+	@echo "=                                                                    ="
+	@echo "=The following additional parameters may be specified to make:       ="
+	@echo "=  PAR=-jn where n is the number of parallel processes for parallel  ="
+	@echo "=          builds.                                                   ="
+	@echo "======================================================================"
 
 
 MAKEOPTIONS = $(PAR)
@@ -94,6 +95,11 @@ tex-doc:
 	@echo =======================================================
 	@echo
 	@echo
+
+TODO:
+	@cat ../deal.II/Todo > TODO
+	@grep //TODO ../base/include/*/*.h ../base/source/*.cc  ../lac/include/*/*.h ../lac/source/*.cc  ../deal.II/include/*/*.h ../deal.II/source/*/*.cc >> TODO
+#	@grep \#TODO Makefile Make.g* Makefile.template ../*/source/Makefile ../*/Makefile >> TODO
 
 clean:
 	cd ../base ; make clean

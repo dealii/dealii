@@ -31,3 +31,11 @@ ifeq ($(DEAL_II_USE_MT),true)
 
   user_libs  += $(ACE_ROOT)/ace/libACE.so
 endif
+
+%.go : %.cc #Makefile
+	@echo =====debug========= $<
+	@$(CXX) $(flags) -c $< -o $@
+%.o : %.cc #Makefile
+	@echo =====optimized===== $<
+	@$(CXX) $(flags) -c $< -o $@
+
