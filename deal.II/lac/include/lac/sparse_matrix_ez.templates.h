@@ -235,7 +235,7 @@ SparseMatrixEZ<number>::precondition_Jacobi (Vector<somenumber>       &dst,
       Assert (ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
       *dst_ptr = om * *src_ptr / data[ri->start + ri->diagonal].value;
     }
-};
+}
 
 
 
@@ -265,7 +265,7 @@ SparseMatrixEZ<number>::precondition_SOR (Vector<somenumber>       &dst,
       
       *dst_ptr = om * s / data[ri->start + ri->diagonal].value;
     }
-};
+}
 
 
 
@@ -297,7 +297,7 @@ SparseMatrixEZ<number>::precondition_TSOR (Vector<somenumber>       &dst,
       
       *dst_ptr = om * s / data[ri->start + ri->diagonal].value;
     }
-};
+}
 
 
 
@@ -345,7 +345,7 @@ SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
 	*dst_ptr -= om * data[i].value * dst(data[i].column);
       *dst_ptr /= data[rri->start + rri->diagonal].value;
      }
-};
+}
 
 
 

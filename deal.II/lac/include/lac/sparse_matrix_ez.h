@@ -1130,7 +1130,7 @@ inline
 unsigned int SparseMatrixEZ<number>::m () const
 {
   return row_info.size();
-};
+}
 
 
 template <typename number>
@@ -1138,7 +1138,7 @@ inline
 unsigned int SparseMatrixEZ<number>::n () const
 {
   return n_columns;
-};
+}
 
 
 template <typename number>
@@ -1262,7 +1262,7 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
   Assert (j<n(), ExcIndexRange(j,0,n()));
   Entry* entry = allocate(i,j);
   entry->value = value;
-};
+}
 
 
 
@@ -1276,7 +1276,7 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
   Assert (j<n(), ExcIndexRange(j,0,n()));
   Entry* entry = allocate(i,j);
   entry->value += value;
-};
+}
 
 
 
