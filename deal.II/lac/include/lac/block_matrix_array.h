@@ -539,7 +539,7 @@ BlockMatrixArray<MATRIX>::print_latex (std::ostream& out) const
       if (m->prefix != 1.)
 	stream << " " << m->prefix << 'x';
       stream << matrix_names.find(m->matrix)->second;
-      stream << '(' << m->matrix << ')';
+//      stream << '(' << m->matrix << ')';
       if (m->transpose)
 	stream << "^T";
 
