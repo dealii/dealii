@@ -157,6 +157,11 @@ class Quadrature {
  * argument given to the constructor needs to be a quadrature formula in
  * one space dimension, rather than in #dim# dimensions.
  *
+ * The aim of this class is to provide a
+ * low order formula, where the error constant can be tuned by
+ * increasing the number of quadrature points. This is useful in
+ * integrating non-differentiable functions on cells.
+ *
  * @author Wolfgang Bangerth 1999
  */
 template <int dim>

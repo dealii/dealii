@@ -313,39 +313,6 @@ QTrapez<1>::QTrapez () :
     };
 };
 
-template <>
-QIteratedTrapez<1>::QIteratedTrapez (const unsigned n) :
-		Quadrature<1> (n+1)
-{
-				   // Loop over INTERIOR points
-  for (unsigned int i=1; i<n; ++i) 
-    {
-      quadrature_points[i] = Point<1>(1.*i/n);
-      weights[i] = 1./n;
-    };
-  quadrature_points[0] = Point<1>(0.);
-  weights[0] = .5/n;
-  quadrature_points[n] = Point<1>(1.);
-  weights[n] = .5/n;
-}
-
-template<>
-QIteratedSimpson<1>::QIteratedSimpson(const unsigned n) :
-		Quadrature<1> (2*n+1)
-{
-  weights.clear();
-  
-  for (unsigned int i=0 ; i<n; ++i)
-    {
-      quadrature_points[2*i] = Point<1>(1.*i/n);
-      quadrature_points[2*i+1] = Point<1>(1.*i/n+.5/n);
-
-      weights[2*i]   += 1./(6*n);
-      weights[2*i+1] += 4./(6*n);
-      weights[2*i+2] += 1./(6*n);
-    }
-  quadrature_points[2*n] = Point<1>(1.);
-}
 
 // construct the quadrature formulae in higher dimensions by
 // tensor product of lower dimensions
@@ -389,17 +356,11 @@ template <int dim>
 QTrapez<dim>::QTrapez () :
 		Quadrature<dim> (QTrapez<dim-1>(), QTrapez<1>()){};
 
-template <int dim>
-QIteratedTrapez<dim>::QIteratedTrapez (const unsigned n) :
-		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n)) {};
-
-template <int dim>
-QIteratedSimpson<dim>::QIteratedSimpson (const unsigned n) :
-		Quadrature<dim> (QIteratedTrapez<dim-1>(n), QIteratedTrapez<1>(n)) {};
 
 
 
 // explicite specialization
+// note that 1d formulae are specialized by implementation above
 template class QGauss2<2>;
 template class QGauss3<2>;
 template class QGauss4<2>;
@@ -410,8 +371,6 @@ template class QGauss8<2>;
 template class QMidpoint<2>;
 template class QSimpson<2>;
 template class QTrapez<2>;
-template class QIteratedTrapez<2>;
-template class QIteratedSimpson<2>;
 
 template class QGauss2<3>;
 template class QGauss3<3>;
@@ -423,5 +382,3 @@ template class QGauss8<3>;
 template class QMidpoint<3>;
 template class QSimpson<3>;
 template class QTrapez<3>;
-template class QIteratedTrapez<3>;
-template class QIteratedSimpson<3>;

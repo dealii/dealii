@@ -127,7 +127,6 @@ class QGauss8 : public Quadrature<dim>
 
 /**
  * Midpoint quadrature rule, exact for linear polynomials.
- * For compatibility, this rule may be accessed as #QGauss1#, too.
  */
 template <int dim>
 class QMidpoint : public Quadrature<dim>
@@ -136,7 +135,7 @@ class QMidpoint : public Quadrature<dim>
     QMidpoint ();
 };
 
-#define QGauss1 QMidpoint
+
 
 /**
  * Simpson quadrature rule, exact for polynomials of degree 3. 
@@ -161,36 +160,6 @@ class QTrapez : public Quadrature<dim>
 };
 
 
-/**
- * Iterated trapezoidal rule. The aim of this class is to provide a
- * low order formula, where the error constant can be tuned by
- * increasing the number of quadrature points. This is useful in
- * integrating non-differentiable functions on cells.
- *
- * For internal use, it may be worth to know that the points are
- * ordered in a fashion such that the last coordinate is the one which
- * runs fastest and then lexicographically from back to front.
- */
-template <int dim>
-class QIteratedTrapez :
-  public Quadrature<dim>
-{
-public:
-  QIteratedTrapez(const unsigned intervals);
-};
-
-/**
- * Iterated Simpson rule.
- * Like #QIteratedTrapez#, this class provides a lower order formula,
- * while the error constant can be tuned by choosing the number of sub-cells.
- */
-template <int dim>
-class QIteratedSimpson :
-  public Quadrature<dim>
-{
-public:
-  QIteratedSimpson(const unsigned intervals);
-};
 
 /*----------------------------   quadrature_lib.h     ---------------------------*/
 /* end of #ifndef __quadrature_lib_H */
