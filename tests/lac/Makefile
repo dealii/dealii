@@ -23,8 +23,10 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs   = -llac -lbase
-libs.g = -llac.g -lbase.g
+libs.g   = $(lib-lac.g)      \
+           $(lib-base.g)
+libs     = $(lib-lac.o)      \
+           $(lib-base.o)
 
 
 ############################################################

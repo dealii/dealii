@@ -23,8 +23,13 @@ debug-mode = on
 # Define library names
 ############################################################
 
-libs   = -ldeal_II_2d -llac -lbase
-libs.g = -ldeal_II_2d.g -llac.g -lbase.g
+libs.g   = $(lib-deal2-2d.g) \
+           $(lib-lac.g)      \
+           $(lib-base.g)
+libs     = $(lib-deal2-2d.o) \
+           $(lib-lac.o)      \
+           $(lib-base.o)
+
 
 ############################################################
 # Select compiler flags according to debug-mode
@@ -32,15 +37,15 @@ libs.g = -ldeal_II_2d.g -llac.g -lbase.g
 
 ifeq ($(debug-mode),on)
 libraries = $(libs.g)
-libdeal3d = -ldeal_II_3d.g
-libdeal1d = -ldeal_II_1d.g
+libdeal3d = $(lib-deal2-3d.g)
+libdeal1d = $(lib-deal2-1d.g)
 flags     = $(CXXFLAGS.g) $(CXXFLAGS)
 endif
 
 ifeq ($(debug-mode),off)
 libraries = $(libs)
-libdeal3d = -ldeal_II_3d
-libdeal1d = -ldeal_II_1d
+libdeal3d = $(lib-deal2-3d.o)
+libdeal1d = $(lib-deal2-1d.o)
 flags     = $(CXXFLAGS.o) $(CXXFLAGS)
 endif
 
