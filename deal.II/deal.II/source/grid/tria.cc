@@ -1240,17 +1240,22 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	    line = needed_lines[line_vertices];
 	  else
 	    {
+	      clear_despite_subscriptions ();
 					       // line does not exist
 	      AssertThrow (false, ExcLineInexistant(line_vertices.first,
 						    line_vertices.second));
 	      line = end_line();
-	    };
-	};
+	    }
+	}
 				       // Assert that only exterior
 				       // lines are given a boundary
 				       // indicator
-      AssertThrow (line->at_boundary(),
-		   ExcInteriorLineCantBeBoundary());
+      if (!line->at_boundary())
+	{
+	  clear_despite_subscriptions ();
+
+	  AssertThrow (false, ExcInteriorLineCantBeBoundary());
+	}
 
                                        // and make sure that we don't
                                        // attempt to reset the
@@ -1258,12 +1263,18 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                        // different than the
                                        // previously set value
       if (line->boundary_indicator() != 0)
-        AssertThrow (line->boundary_indicator() ==
-                     boundary_line->material_id,
-                     ExcMessage ("Duplicate boundary lines are only allowed "
-                                 "if they carry the same boundary indicator."));
+	{
+	  if (line->boundary_indicator() != boundary_line->material_id)
+	    {
+	      clear_despite_subscriptions ();
+
+	      AssertThrow (false, ExcMessage (
+		"Duplicate boundary lines are only allowed "
+		"if they carry the same boundary indicator."));
+	    }
+	}
       line->set_boundary_indicator (boundary_line->material_id);
-    };       
+    }
 
 
 				   // now go on with boundary faces
@@ -1302,6 +1313,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		line[i] = needed_lines[line_vertices];
 	      else
 		{
+		  clear_despite_subscriptions ();
 						   // line does not
 						   // exist
 		  AssertThrow (false, ExcLineInexistant(line_vertices.first,
@@ -1354,6 +1366,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
  
       if (n_rotations==4)
 	{
+	  clear_despite_subscriptions();
+
  	                        // quad does not exist
  	  AssertThrow (false, ExcQuadInexistant(line[0]->index(), line[1]->index(),
  	                                        line[2]->index(), line[3]->index()));
@@ -1370,8 +1384,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
 				       // check whether this face is
 				       // really an exterior one
-      AssertThrow(quad->at_boundary(),
-		  ExcInteriorQuadCantBeBoundary());
+      if (!quad->at_boundary())
+	{
+	  clear_despite_subscriptions ();
+
+	  AssertThrow(false, ExcInteriorQuadCantBeBoundary());
+	}
 
                                        // and make sure that we don't
                                        // attempt to reset the
@@ -1379,10 +1397,16 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                        // different than the
                                        // previously set value
       if (quad->boundary_indicator() != 0)
-        AssertThrow (quad->boundary_indicator() ==
-                     boundary_quad->material_id,
-                     ExcMessage ("Duplicate boundary quads are only allowed "
-                                 "if they carry the same boundary indicator."));
+	{
+	  if (quad->boundary_indicator() != boundary_quad->material_id)
+	    {
+	      clear_despite_subscriptions ();
+	  
+	      AssertThrow (false, ExcMessage (
+		"Duplicate boundary quads are only allowed "
+		"if they carry the same boundary indicator."));
+	    }
+	}
       quad->set_boundary_indicator (boundary_quad->material_id); 
     }
 
