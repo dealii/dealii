@@ -15,8 +15,8 @@
 
 
 #include <fe/mapping_q1.h>
-#include <grid/tria.h>
-#include <grid/tria_boundary.h>
+//#include <grid/tria.h>
+//#include <grid/tria_boundary.h>
 
 
 template <int dim> class TensorProductPolynomials;
@@ -24,12 +24,10 @@ class LagrangeEquidistant;
 
 
 
-//TODO: fill_fe_face_values should exist in a version doing all faces
-//TODO: to save initialization time.
 
-//TODO: doc: laplace_on_quad_vector, compute_laplace_on_quad, etc all
-//TODO: reference to each other, there is no description what they actually
-//TODO: do or are good for
+//TODO: (later) doc: laplace_on_quad_vector, compute_laplace_on_quad, etc all
+//      see upcoming paper.
+
 
 /**
  * Mapping class that uses Qp-mappings on boundary AND on inner
@@ -56,71 +54,6 @@ class MappingQ : public MappingQ1<dim>
 				      * Destructor.
 				      */
     ~MappingQ ();
-
-//TODO: why make the following functions public? they are only helpful for fevalues and maybe the finite elements?
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual Mapping<dim>::InternalDataBase*
-    get_data (const UpdateFlags,
-	      const Quadrature<dim>& quadrature) const;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual Mapping<dim>::InternalDataBase*
-    get_face_data (const UpdateFlags flags,
-		   const Quadrature<dim-1>& quadrature) const;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual Mapping<dim>::InternalDataBase*
-    get_subface_data (const UpdateFlags flags,
-		       const Quadrature<dim-1>& quadrature) const;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
-		    const Quadrature<dim>& quadrature,
-		    Mapping<dim>::InternalDataBase &mapping_data,
-		    std::vector<Point<dim> >        &quadrature_points,
-		    std::vector<double>             &JxW_values) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_face_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			 const unsigned int face_no,
-			 const Quadrature<dim-1>& quadrature,
-			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 std::vector<Point<dim> >        &quadrature_points,
-			 std::vector<double>             &JxW_values,
-			 std::vector<Tensor<1,dim> >        &exterior_form,
-			 std::vector<Point<dim> >        &normal_vectors) const ;
-
-				     /**
-				      * Implementation of the interface in
-				      * @ref{Mapping}.
-				      */
-    virtual void
-    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int face_no,
-			    const unsigned int sub_no,
-			    const Quadrature<dim-1>& quadrature,
-			    typename Mapping<dim>::InternalDataBase &mapping_data,
-			    std::vector<Point<dim> >        &quadrature_points,
-			    std::vector<double>             &JxW_values,
-			    std::vector<Tensor<1,dim> >        &exterior_form,
-			    std::vector<Point<dim> >        &normal_vectors) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -161,14 +94,48 @@ class MappingQ : public MappingQ1<dim>
 			     const std::vector<Point<dim> > &src,
 			     const Mapping<dim>::InternalDataBase &mapping_data,
 			     const unsigned int src_offset) const;
-    
+
+  protected:
 				     /**
 				      * Implementation of the interface in
 				      * @ref{Mapping}.
 				      */
-    virtual UpdateFlags update_each (const UpdateFlags) const;    
+    virtual void
+    fill_fe_values (const DoFHandler<dim>::cell_iterator &cell,
+		    const Quadrature<dim>                &quadrature,
+		    Mapping<dim>::InternalDataBase       &mapping_data,
+		    std::vector<Point<dim> >             &quadrature_points,
+		    std::vector<double>                  &JxW_values) const ;
 
-  private:
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_face_values (const DoFHandler<dim>::cell_iterator &cell,
+			 const unsigned int face_no,
+			 const Quadrature<dim-1>& quadrature,
+			 Mapping<dim>::InternalDataBase &mapping_data,
+			 std::vector<Point<dim> >        &quadrature_points,
+			 std::vector<double>             &JxW_values,
+			 std::vector<Tensor<1,dim> >        &exterior_form,
+			 std::vector<Point<dim> >        &normal_vectors) const ;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual void
+    fill_fe_subface_values (const typename DoFHandler<dim>::cell_iterator &cell,
+			    const unsigned int face_no,
+			    const unsigned int sub_no,
+			    const Quadrature<dim-1>& quadrature,
+			    typename Mapping<dim>::InternalDataBase &mapping_data,
+			    std::vector<Point<dim> >        &quadrature_points,
+			    std::vector<double>             &JxW_values,
+			    std::vector<Tensor<1,dim> >        &exterior_form,
+			    std::vector<Point<dim> >        &normal_vectors) const ;
+
 				     /** 
 				      * Storage for internal data of
 				      * Q_degree transformation.
@@ -214,38 +181,31 @@ class MappingQ : public MappingQ1<dim>
 	MappingQ1<dim>::InternalData mapping_q1_data;
     };
 
-				     /**
-				      * Calles the
-				      * @p{compute_face_data} function
-				      * of its base @ref{MappingQ1}
-				      * class.
-				      *
-				      * For the
-				      * @p{alternative_normal_computation}
-				      * also the @p{unit_normal}
-				      * vectors of the face are
-				      * computed.
-				      */
-    void compute_face_data (const UpdateFlags flags,
-			    const Quadrature<dim>& quadrature,
-			    const unsigned int n_orig_q_points,
-			    MappingQ1<dim>::InternalData& data) const;
+  private:
     
 				     /**
-				      * Do the computation for the
-				      * @p{fill_*} functions.
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
 				      */
-    void compute_fill_face (const typename DoFHandler<dim>::cell_iterator &cell,
-			    const unsigned int      face_no,
-			    const bool              is_subface,
-			    const unsigned int      npts,
-			    const unsigned int      offset,
-			    const std::vector<double>   &weights,
-			    MappingQ1<dim>::InternalData &mapping_q1_data,
-			    std::vector<Point<dim> >    &quadrature_points,
-			    std::vector<double>         &JxW_values,
-			    std::vector<Tensor<1,dim> > &boundary_form,
-			    std::vector<Point<dim> >    &normal_vectors) const;
+    virtual Mapping<dim>::InternalDataBase*
+    get_data (const UpdateFlags,
+	      const Quadrature<dim>& quadrature) const;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual Mapping<dim>::InternalDataBase*
+    get_face_data (const UpdateFlags flags,
+		   const Quadrature<dim-1>& quadrature) const;
+
+				     /**
+				      * Implementation of the interface in
+				      * @ref{Mapping}.
+				      */
+    virtual Mapping<dim>::InternalDataBase*
+    get_subface_data (const UpdateFlags flags,
+		       const Quadrature<dim-1>& quadrature) const;
     
 				     /**
 				      * Compute shape values and/or
@@ -342,7 +302,19 @@ class MappingQ : public MappingQ1<dim>
 				      * solution to Laplace
 				      * equation. Computes the inner
 				      * support points by simple
-				      * interpolations.*/
+				      * interpolations.
+				      *
+				      * This function isn't used in
+				      * the code as it was replaced in
+				      * @p{compute_mapping_support_points}
+				      * by the
+				      * @p{compute_support_points_laplace}
+				      * function.
+				      *
+				      * Nethertheless this function is
+				      * kept as someone might want to
+				      * do some comparative tests.
+				      */
     void compute_support_points_simple(
       const typename Triangulation<dim>::cell_iterator &cell,
       std::vector<Point<dim> > &a) const;
@@ -397,9 +369,8 @@ class MappingQ : public MappingQ1<dim>
 				      * points as interpolation points
 				      * on the boundary.
 				      */
-//TODO: rename function to add_quad_support_points, to unify notation    
     virtual void
-    add_face_support_points(const typename Triangulation<dim>::cell_iterator &cell,
+    add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
 			    std::vector<Point<dim> > &a) const;
     
 				     /**
@@ -411,7 +382,7 @@ class MappingQ : public MappingQ1<dim>
 				      * Needed by the
 				      * @p{compute_support_points_simple}
 				      */
-//TODO: remove this function altogether?    
+//TODO: (later) remove this function altogether?    
     void fill_quad_support_points_simple (const Triangulation<dim>::cell_iterator &cell,
 					  std::vector<Point<dim> > &a) const;
     
@@ -492,21 +463,7 @@ class MappingQ : public MappingQ1<dim>
 				      */
     std::vector<unsigned int> renumber;
 
-				     /**
-				      * Needed for inner faces.
-				      */
-//TODO: can we make this variable static?    
-    StraightBoundary<dim> straight_boundary;
-
-				     /**
-				      * Flag for computing the normal
-				      * vectors directly by using a
-				      * covariant transformation.
-				      * Used to test the covariant
-				      * transformation.
-				      */
-//TODO: why have two ways to compute? if they both work, choose one and remove the other    
-    bool alternative_normals_computation;
+  private:
 
 				     /**
 				      * If this flag is set @p{true}
@@ -515,9 +472,14 @@ class MappingQ : public MappingQ1<dim>
 				      * boundary cells.
 				      *
 				      * The default value is false.
+				      *
+				      * This flag is kept in the
+				      * implementation to allow a fast
+				      * switch between the two cases,
+				      * as someone might want to do
+				      * some comparative tests.
 				      */
-//TODO: remove use_mapping_q_on_all_cells as it is set to false in the constructor and never set again    
-    bool use_mapping_q_on_all_cells;
+    static const bool use_mapping_q_on_all_cells = false;
 };
 
 
