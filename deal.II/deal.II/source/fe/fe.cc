@@ -259,6 +259,26 @@ FiniteElementBase<dim>::prolongate (const unsigned int child) const
 }
 
 
+template <int dim>
+bool
+FiniteElementBase<dim>::prolongation_is_implemented () const
+{
+  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+    {
+      Assert ((prolongation[c].m() == dofs_per_cell) ||
+              (prolongation[c].m() == 0),
+              ExcInternalError());
+      Assert ((prolongation[c].n() == dofs_per_cell) ||
+              (prolongation[c].n() == 0),
+              ExcInternalError());
+      if ((prolongation[c].m() == 0) ||
+          (prolongation[c].n() == 0))
+        return false;
+    }
+  return true;
+}
+
+
 
 template <int dim>
 bool

@@ -764,10 +764,11 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p>
-       New: There is now a function <code
-       class="member">FiniteElement::constraints_are_implemented</code> that
-       informs the caller about whether the finite element in question in fact
-       implements its hanging node constraints.
+       New: There are now functions <code
+       class="member">FiniteElement::prolongation_is_implemented</code> and
+       <code class="member">FiniteElement::constraints_are_implemented</code>
+       that inform the caller about whether the finite element in question in
+       fact implements its prolongation matrices and hanging node constraints.
        <br>
        (WB 2003/02/15)
        </p>
