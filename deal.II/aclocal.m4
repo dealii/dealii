@@ -193,8 +193,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
                 ;;
   
             *)
-                CXXFLAGSG = "$CXXFLAGSG -fno-vtable-thunks"
-                CXXFLAGSO = "$CXXFLAGSO -fno-vtable-thunks"
+                CXXFLAGSG="$CXXFLAGSG -fno-vtable-thunks"
+                CXXFLAGSO="$CXXFLAGSO -fno-vtable-thunks"
                 ;;
           esac
           ;;
@@ -723,12 +723,12 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
       fi
     else
       if test "x$GXX_VERSION" = "xibm_xlc" ; then
-        CXXFLAGSG = "$CXXFLAGSG -threaded"  
-        CXXFLAGSO = "$CXXFLAGSO -threaded"
+        CXXFLAGSG="$CXXFLAGSG -threaded"  
+        CXXFLAGSO="$CXXFLAGSO -threaded"
       else
         if test "x$GXX_VERSION" = "xcompaq_cxx" ; then
-          CXXFLAGSG = "$CXXFLAGSG -pthread"  
-          CXXFLAGSO = "$CXXFLAGSO -pthread"
+          CXXFLAGSG="$CXXFLAGSG -pthread"  
+          CXXFLAGSO="$CXXFLAGSO -pthread"
         else
           dnl Other compiler
           AC_MSG_ERROR(No threading compiler options for this C++ compiler
