@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000 by the deal.II authors
+# Copyright (C) 2000, 2001 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -85,7 +85,7 @@ endif
 
 logtest.testcase: $(logtest-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 ############################################################
@@ -101,7 +101,7 @@ endif
 
 tensor.testcase: $(tensor-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 
@@ -118,7 +118,7 @@ endif
 
 reference.testcase: $(reference-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 ############################################################
@@ -134,7 +134,7 @@ endif
 
 quadrature_test.testcase: $(quadrature_test-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 ############################################################
@@ -150,7 +150,7 @@ endif
 
 timer.testcase: $(timer-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 ############################################################
@@ -166,7 +166,7 @@ endif
 
 polynomial_test.testcase: $(polynomial_test-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 ############################################################
@@ -184,7 +184,7 @@ endif
 
 target1: $(target1-o-files) $(libraries)
 	@echo =====linking======= $<
-	@$(CXX) $(flags) -o $@ $^
+	@$(CXX) $(LDFLAGS) $(flags) -o $@ $^
 
 
 ############################################################
