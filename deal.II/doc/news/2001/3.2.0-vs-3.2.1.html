@@ -15,6 +15,21 @@
 
 <ol>
   <li> <p>
+       Fixed: In the <code class="class">ParameterHandler</code>
+       class, we leaked 8 or 12 bytes of memory per declared
+       parameter. This is now fixed.
+       <br>
+       (WB 2001/11/28)
+       </p>
+
+  <li> <p>
+       Fixed: he <code class="class">DoFHandler</code> class had a
+       memory leak. This is now fixed.
+       <br>
+       (WB 2001/11/28)
+       </p>
+
+  <li> <p>
        Fixed: The <code
        class="member">FilteredMatrix::allocate_tmp_vector</code>
        function had a bug with block vectors.
