@@ -689,7 +689,7 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
                                        // fraction of the values of
                                        // their values)
                                        //
-                                       // and example for the latter
+                                       // an example for the latter
                                        // are the usual continuous
                                        // elements. the value on a
                                        // vertex of a coarse cell must
@@ -711,7 +711,17 @@ DoFCellAccessor<dim>::get_interpolated_dof_values (const InputVector &values,
                                        // composed one, so we can only
                                        // hope to do this for each
                                        // shape function
-                                       // individually. to avoid doing
+                                       // individually. in fact, there
+                                       // are even weird finite
+                                       // elements (for example the
+                                       // Raviart-Thomas element)
+                                       // which has shape functions
+                                       // that are additive (interior
+                                       // ones) and others that are
+                                       // overwriting (face degrees of
+                                       // freedom that need to be
+                                       // continuous across the
+                                       // face). to avoid checking
                                        // this over and over again, we
                                        // do this once now and cache
                                        // the results
