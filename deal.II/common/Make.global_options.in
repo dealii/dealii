@@ -90,6 +90,7 @@ endif
 ifneq ($(with-multithreading),no)
   ACE_ROOT    = $(with-multithreading)
   INCLUDE    += -I$(ACE_ROOT)
+  LIBPATH    += -L$(ACE_ROOT)/ace
   CXXFLAGS.g += -DDEAL_II_USE_MT
   CXXFLAGS.o += -DDEAL_II_USE_MT
 endif
