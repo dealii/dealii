@@ -1,16 +1,24 @@
 set size 0.721,1
 set data style lines
+set noxtics
+set noytics
+set noxzeroaxis
+set noyzeroaxis
+set nokey
 set term postscript eps
 
+!echo "  Making <grid.1.eps>"
 set output "grid.1.eps"
 plot "grid.1"
 
+!echo "  Making <grid.2.eps>"
 set output "grid.2.eps"
 plot "grid.2"
 
+!echo "  Making <grid.3.eps>"
 set output "grid.3.eps"
 plot "grid.3"
 
+!echo "  Making <grid.4.eps>"
 set output "grid.4.eps"
 plot "grid.4"
-
