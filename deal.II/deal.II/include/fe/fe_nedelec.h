@@ -56,8 +56,8 @@ template <int dim> class MappingQ;
  * coordinates can be expressed as inverse Jacobian times gradient in
  * unit coordinates.
  *
- * The problem is the derivative of the inverse Jacobian. * This
- * rank-3 tensor can actually be computed (and we did so in very early
+ * The problem is the derivative of the inverse Jacobian. This rank-3
+ * tensor can actually be computed (and we did so in very early
  * versions of the library), but is a large task and very time
  * consuming, so we dropped it. Since it is not available, we simply
  * drop this first term.
