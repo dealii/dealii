@@ -38,6 +38,7 @@
 #include <fstream>
 
 
+template <int dim>
 class SystemTest 
 {
   public:
@@ -50,21 +51,23 @@ class SystemTest
     void check_numbering ();
 
 				    
-    Triangulation<2>     triangulation;
-    FESystem<2>          fe;
-    DoFHandler<2>        dof_handler;
+    Triangulation<dim>     triangulation;
+    FESystem<dim>          fe;
+    DoFHandler<dim>        dof_handler;
 
 				   
 };
 
-SystemTest::SystemTest () :
-                fe (FE_Nedelec<2>(1), 2,
-                    FE_Q<2>(1), 1),
+template <int dim>
+SystemTest<dim>::SystemTest () :
+                fe (FE_Nedelec<dim>(1), 2,
+                    FE_Q<dim>(1), 1),
 		dof_handler (triangulation)
 {};
 
 
-void SystemTest::make_grid_and_dofs ()
+template <int dim>
+void SystemTest<dim>::make_grid_and_dofs ()
 {
 				  
   GridGenerator::hyper_cube (triangulation, -1, 1);
@@ -80,7 +83,8 @@ void SystemTest::make_grid_and_dofs ()
 				  
 };
 
-void SystemTest::shape_to_components () 
+template <int dim>
+void SystemTest<dim>::shape_to_components () 
 {
                                    // testing, if the shape function
                                    // with index i is of type Nedelec:
@@ -94,9 +98,10 @@ void SystemTest::shape_to_components ()
 
 
 
-void SystemTest::check_numbering () 
+template <int dim>
+void SystemTest<dim>::check_numbering () 
 {
-  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
+  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                       endc = dof_handler.end();
   std::vector<unsigned int>	local_dof_indices(fe.dofs_per_cell);
 	
@@ -135,7 +140,8 @@ void SystemTest::check_numbering ()
 };
 
 
-void SystemTest::run () 
+template <int dim>
+void SystemTest<dim>::run () 
 {
   make_grid_and_dofs ();
   shape_to_components ();
@@ -150,7 +156,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  SystemTest system_test;
-  system_test.run ();
+  SystemTest<2>().run();
+  SystemTest<3>().run();  
   return 0;
 };
