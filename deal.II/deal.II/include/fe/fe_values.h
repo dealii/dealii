@@ -679,6 +679,13 @@ class FEValues : public FEValuesBase<dim>
     void reinit (const typename DoFHandler<dim>::cell_iterator &);
 
 				     /**
+				      * Return a reference to the copy
+				      * of the quadrature formula
+				      * stored by this object.
+				      */
+    const Quadrature<dim> & get_quadrature () const;
+    
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
@@ -687,7 +694,8 @@ class FEValues : public FEValuesBase<dim>
 
   private:
 				     /**
-				      * Store the quadrature formula here.
+				      * Store a copy of the quadrature
+				      * formula here.
 				      */
     const Quadrature<dim> quadrature;
 
@@ -787,9 +795,17 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      */
     typename DoFHandler<dim>::face_iterator get_face() const;
 
+				     /**
+				      * Return a reference to the copy
+				      * of the quadrature formula
+				      * stored by this object.
+				      */
+    const Quadrature<dim-1> & get_quadrature () const;
+    
   protected:
 				     /**
-				      * Store the quadrature formula here.
+				      * Store a copy of the quadrature
+				      * formula here.
 				      */
     const Quadrature<dim-1> quadrature;
 
@@ -1012,6 +1028,18 @@ FEValuesBase<dim>::get_mapping () const
 
 
 template <int dim>
+const Quadrature<dim> &
+FEValues<dim>::get_quadrature () const 
+{
+  return quadrature;
+};
+
+
+
+/*------------------------ Inline functions: FEFaceValuesBase --------------------*/
+
+
+template <int dim>
 const Point<dim> &
 FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
 {
@@ -1030,6 +1058,17 @@ FEFaceValuesBase<dim>::get_face() const
 {
   return present_face;
 };
+
+
+
+
+template <int dim>
+const Quadrature<dim-1> &
+FEFaceValuesBase<dim>::get_quadrature () const 
+{
+  return quadrature;
+};
+
 
 
 #endif
