@@ -14,7 +14,6 @@
 // forward declarations
 class dFMatrix;
 class dVector;
-template <int dim> class ProblemBase;
 
 
 
@@ -103,7 +102,8 @@ struct AssemblerData {
     AssemblerData (const DoFHandler<dim>    &dof,
 		   const bool                assemble_matrix,
 		   const bool                assemble_rhs,
-		   ProblemBase<dim>         &problem,
+		   dSMatrix                 &matrix,
+		   dVector                  &rhs_vector,
 		   const Quadrature<dim>    &quadrature,
 		   const FiniteElement<dim> &fe,
 		   const FEValues<dim>::UpdateStruct &update_flags);
@@ -113,22 +113,31 @@ struct AssemblerData {
 				      * to be used to iterate on.
 				      */
     const DoFHandler<dim>  &dof;
+    
 				     /**
 				      * Flags whether to assemble the matrix
 				      * and right hand sides.
 				      */
     const bool              assemble_matrix, assemble_rhs;
+
 				     /**
-				      * Pointer to the #ProblemBase# object
-				      * of which the global matrices and
-				      * vectors are to be assembled.
+				      * Pointer to the matrix to be assembled
+				      * by this object.
 				      */
-    ProblemBase<dim>       &problem;
+    dSMatrix               &matrix;
+
+				     /**
+				      * Pointer to the vector to be assembled
+				      * by this object.
+				      */
+    dVector                &rhs_vector;
+    
 				     /**
 				      * Pointer to a quadrature object to be
 				      * used for this assemblage process.
 				      */
     const Quadrature<dim>  &quadrature;
+    
 				     /**
 				      * Use this FE type for the assemblage
 				      * process. The FE object must match that
@@ -136,6 +145,7 @@ struct AssemblerData {
 				      * object.
 				      */
     const FiniteElement<dim> &fe;
+    
 				     /**
 				      * Store which of the fields of the
 				      * FEValues object need to be reinitialized
@@ -216,11 +226,16 @@ class Assembler : public DoFCellAccessor<dim> {
     bool              assemble_rhs;
 
 				     /**
-				      * Pointer to the problem class object
-				      * of which we are to use the matrices
-				      * and vectors.
+				      * Pointer to the matrix to be assembled
+				      * by this object.
 				      */
-    ProblemBase<dim> &problem;
+    dSMatrix               &matrix;
+
+				     /**
+				      * Pointer to the vector to be assembled
+				      * by this object.
+				      */
+    dVector                &rhs_vector;
 
 				     /**
 				      * Pointer to the finite element used for

@@ -1,12 +1,11 @@
 /* $Id$ */
 
 #include <numerics/assembler.h>
-#include <numerics/base.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <lac/dfmatrix.h>
 #include <lac/dvector.h>
-
+#include <lac/dsmatrix.h>
 
 
 template <int dim>
@@ -45,17 +44,19 @@ void Equation<dim>::assemble (dVector           &,
 
 
 template <int dim>
-AssemblerData<dim>::AssemblerData (const DoFHandler<dim>   &dof,
-				   const bool               assemble_matrix,
-				   const bool               assemble_rhs,
-				   ProblemBase<dim>         &problem,
+AssemblerData<dim>::AssemblerData (const DoFHandler<dim>    &dof,
+				   const bool                assemble_matrix,
+				   const bool                assemble_rhs,
+				   dSMatrix                 &matrix,
+				   dVector                  &rhs_vector,
 				   const Quadrature<dim>    &quadrature,
 				   const FiniteElement<dim> &fe,
 				   const FEValues<dim>::UpdateStruct &update_flags) :
 		dof(dof),
 		assemble_matrix(assemble_matrix),
 		assemble_rhs(assemble_rhs),
-		problem(problem),
+		matrix(matrix),
+		rhs_vector(rhs_vector),
 		quadrature(quadrature),
 		fe(fe),
 		update_flags(update_flags) {};
@@ -74,19 +75,18 @@ Assembler<dim>::Assembler (Triangulation<dim> *tria,
 		cell_vector (dVector(dof_handler->get_selected_fe().total_dofs)),
 		assemble_matrix (((AssemblerData<dim>*)local_data)->assemble_matrix),
 		assemble_rhs (((AssemblerData<dim>*)local_data)->assemble_rhs),
-		problem (((AssemblerData<dim>*)local_data)->problem),
+		matrix(((AssemblerData<dim>*)local_data)->matrix),
+		rhs_vector(((AssemblerData<dim>*)local_data)->rhs_vector),
 		fe(((AssemblerData<dim>*)local_data)->fe),
 		fe_values (((AssemblerData<dim>*)local_data)->fe,
 			   ((AssemblerData<dim>*)local_data)->quadrature,
 			   ((AssemblerData<dim>*)local_data)->update_flags)
 {
-  Assert ((unsigned int)problem.system_matrix.m() == dof_handler->n_dofs(),
-	  ExcInvalidData());
-  Assert ((unsigned int)problem.system_matrix.n() == dof_handler->n_dofs(),
-	  ExcInvalidData());
+  Assert (matrix.m() == dof_handler->n_dofs(), ExcInvalidData());
+  Assert (matrix.n() == dof_handler->n_dofs(), ExcInvalidData());
   Assert (((AssemblerData<dim>*)local_data)->fe == dof_handler->get_selected_fe(),
 	  ExcInvalidData());
-  Assert ((unsigned int)problem.right_hand_side.n() == dof_handler->n_dofs(),
+  Assert (rhs_vector.n() == dof_handler->n_dofs(),
 	  ExcInvalidData());
 };
 
@@ -143,12 +143,12 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
   if (assemble_matrix)
     for (unsigned int i=0; i<n_dofs; ++i)
       for (unsigned int j=0; j<n_dofs; ++j)
-	problem.system_matrix.add(dofs[i], dofs[j], cell_matrix(i,j));
+	matrix.add(dofs[i], dofs[j], cell_matrix(i,j));
 
 				   // distribute cell vector
   if (assemble_rhs)
     for (unsigned int j=0; j<n_dofs; ++j)
-      problem.right_hand_side(dofs[j]) += cell_vector(j);
+      rhs_vector(dofs[j]) += cell_vector(j);
 };
 
 		

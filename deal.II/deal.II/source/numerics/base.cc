@@ -100,7 +100,8 @@ void ProblemBase<dim>::assemble (const Equation<dim>               &equation,
 				   // create assembler
   AssemblerData<dim> data (*dof_handler,
 			   true, true, //assemble matrix and rhs
-			   *this,
+			   system_matrix,
+			   right_hand_side,
 			   quadrature,
 			   fe,
 			   update_flags);
