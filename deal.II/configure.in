@@ -209,6 +209,14 @@ if test "$GXX" = yes ; then
 
 else
   dnl Other compiler
+
+  dnl For DECs cxx we should use the following options:
+  dnl   CXXFLAGSO: -ansi_alias -O3
+  dnl   CXXFLAGSG: -std strict_ansi_errors -w0
+  dnl if necessary: -shared, -pthread 
+  dnl Should one use -compress? -distinguish_nested_enums? -nousing_std? 
+  dnl                -pch? -noimplicit_include?
+
   AC_MSG_ERROR(No compiler options for this C++ compiler
                specified at present)
   exit 1
