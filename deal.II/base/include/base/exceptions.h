@@ -1042,7 +1042,7 @@ namespace StandardExceptions
 				    * <tt>--with-umfpack</tt> and check
 				    * if it is actually included.
 				    */
-  DeclException0 (ExcNeedsUMFPack);
+  DeclException0 (ExcNeedsUMFPACK);
   
 				   /**
 				    * This function requires the METIS
@@ -1060,10 +1060,45 @@ namespace StandardExceptions
 				    * <tt>--with-petsc</tt> and check
 				    * if it is actually included.
 				    */
-  DeclException0 (ExcNeedsPetsc);
+  DeclException0 (ExcNeedsPETSC);
   
 //@}
 }
+
+/*
+ * Unfortunately, the following must be repeated for each library,
+ * since we cannot have ifdefs in macros.
+ */
+
+/**
+ * Assert support for the BLAS library
+ */
+#ifdef HAVE_LIBBLAS
+#  define AssertBLAS {}
+#else
+#  define AssertBLAS Assert(false, ExcNeedsBLAS())
+#endif
+
+
+/**
+ * Assert support for the LAPACK library
+ */
+#ifdef HAVE_LIBLAPACK
+#  define AssertLAPACK {}
+#else
+#  define AssertLAPACK Assert(false, ExcNeedsLAPACK())
+#endif
+
+
+/**
+ * Assert support for the UMFPACK library
+ */
+#ifdef HAVE_LIBUMFPACK
+#  define AssertUMFPACK {}
+#else
+#  define AssertUMFPACK Assert(false, ExcNeedsUMFPACK())
+#endif
+
 
 
 using namespace StandardExceptions;
