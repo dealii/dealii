@@ -205,7 +205,7 @@ documentation, etc</a>.
 <ol>
   <li> <p>
        Fixed: The functions <code
-       class="member">Mapping::transform_real_to_unit_cell</code>
+       class="member">Mapping::transform_unit_to_real_cell</code>
        leaked some memory. This is now fixed.
        <br>
        (RH, WB 2001/11/28)
@@ -218,21 +218,24 @@ documentation, etc</a>.
        (WB 2001/11/28)
        </p>
 
-  <li> <p> Fixed: The <code
+  <li> <p>
+       Fixed: The <code
        class="member">GridRefinement::refine</code>
        function failed when the threshold was zero. This is now fixed.
        <br>
        (RH 2001/11/26)
        </p>
 
-  <li> <p> Fixed: The <code
+  <li> <p>
+       Fixed: The <code
        class="member">MappingQ<dim>::transform_real_to_unit_cell</code>
        function failed on a very unusual cell. This is now fixed.
        <br>
        (RH 2001/11/26)
        </p>
 
-  <li> <p> New: The new <code
+  <li> <p>
+       New: The new <code
        class="member">CellAccessor<dim>::neighbor_of_coarser_neighbor</code>
        function returns where to find the present cell from a coarser
        neighbor.
