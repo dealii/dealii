@@ -287,7 +287,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 				 // assemblage of the matrix and right
 				 // hand side.
 				 //
-				 // More interesting, though, is they
+				 // More interesting, though, is the
 				 // way we assemble matrix and right
 				 // hand side vector dimension
 				 // independently: there is simply no
@@ -489,7 +489,7 @@ void LaplaceProblem<dim>::solve ()
 				 // This function also does what the
 				 // respective one did in the previous
 				 // example. No changes here for
-				 // dimension independentce either.
+				 // dimension independence either.
 template <int dim>
 void LaplaceProblem<dim>::output_results () const
 {

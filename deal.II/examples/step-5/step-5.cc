@@ -300,8 +300,8 @@ void LaplaceProblem<dim>::setup_system ()
 				 // as the preconditions CG method),
 				 // assembling the matrix and right
 				 // hand side can take a comparable
-				 // time, and it is worth the effort
-				 // to use one or two optimizations at
+				 // time, and you should thing about
+				 // using one or two optimizations at
 				 // some places.
 				 //
 				 // What we will show here is how we
@@ -389,7 +389,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // get the address as follows
 				       // (note that this is a
 				       // reference to the matrix,
-				       // symbolized by the ampersand,
+				       // symbolized by the ampersand ``&'',
 				       // and that it must be a
 				       // constant reference, since
 				       // only read-only access is
@@ -402,7 +402,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // shape_values(j,q), i.e. the
 				       // function call needed
 				       // previously for each access
-				       // has been otimized away.
+				       // has been optimized away.
 				       //
 				       // There are alike functions
 				       // for almost all data elements
@@ -788,12 +788,14 @@ void LaplaceProblem<dim>::run ()
 				       // ask it to read the
 				       // file). Then we open the
 				       // respective file and fill the
-				       // triangulation with it:
+				       // triangulation with it
+				       // because you like to work
+				       // with it:
       if (cycle == 0)
 	{
 	  GridIn<dim> grid_in;
 	  grid_in.attach_triangulation (triangulation);
-
+	  ifstream input_file("circle-grid.inp");
 					   // We would now like to
 					   // read the file. However,
 					   // the input file is only
@@ -845,12 +847,19 @@ void LaplaceProblem<dim>::run ()
 					   // We can now actually read
 					   // the grid. It is in UCD
 					   // (unstructured cell data)
-					   // format, as supported by
-					   // AVS Explorer, for
+					   // format (but the ending
+					   // of the ``UCD''-file is
+					   // ``inp''), as supported
+					   // by AVS Explorer, for
 					   // example:
-	  ifstream input_file("circle-grid.inp");
+	  
 	  grid_in.read_ucd (input_file);
 
+                                           // If you like to use other
+                                           // input format, you have
+                                           // to use an other
+                                           // grid_in.read_``blabla''
+                                           // funktion.
 					   // The grid in the file
 					   // describes a
 					   // circle. Therefore we

@@ -32,10 +32,9 @@
 				 // which in analogy to ``FEQ1'' for
 				 // the linear element is called
 				 // ``FEQ2''. The Lagrange elements of
-				 // poynomial degrees one through four
+				 // polynomial degrees one through four
 				 // are all declared in this file.
 #include <fe/fe_lib.lagrange.h>
-
 				 // We will not read the grid from a
 				 // file as in the previous example,
 				 // but generate it using a function
@@ -215,7 +214,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // re-distributed using another
 				 // finite element object or until the
 				 // ``dof_handler'' object is
-				 // detroyed, it would be unwise if we
+				 // destroyed, it would be unwise if we
 				 // would allow the finite element
 				 // object to be deleted before
 				 // ``dof_handler'' object. To
@@ -264,7 +263,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // situation, if we did not write
 				 // this destructor, the compiler will
 				 // generate code that triggers
-				 // exactly the behavious sketched
+				 // exactly the behaviour sketched
 				 // above. The reason is that member
 				 // variables of the
 				 // ``LaplaceProblem'' class are
@@ -386,7 +385,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // functions that eliminate them
 				   // are called ``condense'' for both
 				   // the system matrix and right hand
-				   // side, as well as for teh
+				   // side, as well as for the
 				   // sparsity pattern.
   hanging_node_constraints.condense (sparsity_pattern);
 
@@ -447,8 +446,9 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // introduced an abbreviation for
 				   // the number of degrees of freedom
 				   // per cell before: the following
-				   // value will be set to 9 (in 2D)
-				   // now, where it was 4 before.
+				   // value will be set to 9 (in 2D
+				   // because of Q2S) now, where it was
+				   // 4 before.
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
@@ -655,7 +655,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // conditions. For this, it needs
 				   // to know which parts of the
 				   // boundary have Neumann boundary
-				   // conditions and teh respective
+				   // conditions and the respective
 				   // boundary values there. This
 				   // information is mediated by a map
 				   // in which the keys are the
@@ -923,7 +923,7 @@ void LaplaceProblem<dim>::run ()
 				 // not constitute programming errors,
 				 // these exceptions also are not
 				 // switched off in optimized mode, in
-				 // constrast to the ``Assert'' macro
+				 // contrast to the ``Assert'' macro
 				 // which we have used to test against
 				 // programming errors. If uncought,
 				 // these exceptions propagate the

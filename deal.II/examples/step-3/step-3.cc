@@ -118,7 +118,10 @@ class LaplaceProblem
 				     // variables. There are variables
 				     // describing the triangulation
 				     // and the numbering of the
-				     // degrees of freedom...
+				     // degrees of freedom...  The
+				     // FEQ<2> is the space which
+				     // has the following base
+				     // functions: {1,x,y,xy}
     Triangulation<2>     triangulation;
     FEQ1<2>              fe;
     DoFHandler<2>        dof_handler;
@@ -352,7 +355,11 @@ void LaplaceProblem::assemble_system ()
 				   // (Jacobians times weights, or
 				   // short JxW) are computed; since
 				   // we also need them, we have to
-				   // list them as well:
+				   // list them as well. The advantage
+				   // of this proceeding is that we
+				   // calculate only what we
+				   // need. This optimates the process
+				   // of solving:
   FEValues<2> fe_values (fe, quadrature_formula, 
 			 UpdateFlags(update_values    |
 				     update_gradients |
@@ -403,7 +410,7 @@ void LaplaceProblem::assemble_system ()
 				   // degrees of freedom on the
 				   // present cell, and only transfer
 				   // them to the global matrix when
-				   // the copmutations are finished
+				   // the computations are finished
 				   // for this cell. We do the same
 				   // for the right hand side vector,
 				   // although access times are not so
@@ -422,11 +429,11 @@ void LaplaceProblem::assemble_system ()
 				   // global matrix, we have to know
 				   // the global numbers of the
 				   // degrees of freedom. When we get
-				   // them, we need a scratch array
+				   // them, we need a scratch (temporal) array
 				   // for these numbers:
   vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Now for th loop over all
+				   // Now for the loop over all
 				   // cells. You have seen before how
 				   // this works, so this should be
 				   // familiar to you:
@@ -614,7 +621,11 @@ void LaplaceProblem::assemble_system ()
 				   // therefore, if we give `0' as the
 				   // desired portion of the boundary,
 				   // this means we get the whole
-				   // boundary.
+				   // boundary. If you got different
+				   // boundaries, you have to number
+				   // them differently and have to be
+				   // attentive when using the method
+				   // above.
 				   //
 				   // The function describing the
 				   // boundary values is an object of
@@ -699,8 +710,8 @@ void LaplaceProblem::solve ()
 				   // PrimitiveVectorMemory class is
 				   // such a helper class which the
 				   // solver can ask for memory. The
-				   // angle brackets indicate that
-				   // this class really takes a
+				   // angle brackets ``<>''indicate
+				   // that this class really takes a
 				   // template parameter (here the
 				   // data type of the vectors we
 				   // use), which however has a
@@ -766,12 +777,12 @@ void LaplaceProblem::output_results () const
 				   // After the DataOut object knows
 				   // which data it is to work on, we
 				   // have to tell it to process them
-				   // into something the backends can
+				   // into something the back ends can
 				   // handle. The reason is that we
 				   // have separated the frontend
 				   // (which knows about how to treat
 				   // DoFHandler objects and data
-				   // vectors) from the backend (which
+				   // vectors) from the back end (which
 				   // knows several output formats)
 				   // and use an intermediate data
 				   // format to transfer data from the
