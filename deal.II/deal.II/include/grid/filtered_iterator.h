@@ -782,7 +782,7 @@ set_to_previous_positive (const BaseIterator &bi)
 {
   BaseIterator::operator = (bi);
   while ((this->state() == IteratorState::valid) &&
-	 ( ! predicate(*this)))
+	 ( ! (*predicate)(*this)))
     BaseIterator::operator-- ();
   
   return *this;
