@@ -152,8 +152,20 @@ namespace PETScWrappers
 
         ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        last_action = LastAction::add;
       }
     
+                                     // we have to do above actions in any
+                                     // case to be consistent with the MPI
+                                     // communication model (see the
+                                     // comments in the documentation of
+                                     // PETScWrappers::MPI::Vector), but we
+                                     // can save some work if the addend is
+                                     // zero
+    if (value == 0)
+      return;
+
     const signed int petsc_i = i;
     const signed int petsc_j = j;
           
@@ -161,8 +173,6 @@ namespace PETScWrappers
       = MatSetValues (matrix, 1, &petsc_i, 1, &petsc_j,
                       &value, ADD_VALUES);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    last_action = LastAction::add;
   }
 
 

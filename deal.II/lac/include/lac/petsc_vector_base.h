@@ -751,16 +751,26 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
-      
-      const signed int petsc_i = index;
 
+          vector.last_action = VectorBase::LastAction::add;
+        }
+
+                                       // we have to do above actions in any
+                                       // case to be consistent with the MPI
+                                       // communication model (see the
+                                       // comments in the documentation of
+                                       // PETScWrappers::MPI::Vector), but we
+                                       // can save some work if the addend is
+                                       // zero
+      if (value == 0)
+        return *this;
+      
                                        // use the PETSc function to add something
+      const signed int petsc_i = index;
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &value, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      vector.last_action = VectorBase::LastAction::add;
       
       return *this;
     }
@@ -779,17 +789,26 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          vector.last_action = VectorBase::LastAction::add;
         }
       
-      const signed int petsc_i = index;
+                                       // we have to do above actions in any
+                                       // case to be consistent with the MPI
+                                       // communication model (see the
+                                       // comments in the documentation of
+                                       // PETScWrappers::MPI::Vector), but we
+                                       // can save some work if the addend is
+                                       // zero
+      if (value == 0)
+        return *this;
 
                                        // use the PETSc function to add something
+      const signed int petsc_i = index;
       const PetscScalar subtractand = -value;
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      vector.last_action = VectorBase::LastAction::add;
       
       return *this;
     }
@@ -808,8 +827,20 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          vector.last_action = VectorBase::LastAction::insert;
         }
       
+                                       // we have to do above actions in any
+                                       // case to be consistent with the MPI
+                                       // communication model (see the
+                                       // comments in the documentation of
+                                       // PETScWrappers::MPI::Vector), but we
+                                       // can save some work if the factor is
+                                       // one
+      if (value == 1.)
+        return *this;
+
       const signed int petsc_i = index;
 
       const PetscScalar new_value
@@ -818,8 +849,6 @@ namespace PETScWrappers
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      vector.last_action = VectorBase::LastAction::insert;
       
       return *this;
     }
@@ -838,8 +867,20 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+          vector.last_action = VectorBase::LastAction::insert;
         }
       
+                                       // we have to do above actions in any
+                                       // case to be consistent with the MPI
+                                       // communication model (see the
+                                       // comments in the documentation of
+                                       // PETScWrappers::MPI::Vector), but we
+                                       // can save some work if the factor is
+                                       // one
+      if (value == 1.)
+        return *this;
+
       const signed int petsc_i = index;
 
       const PetscScalar new_value
@@ -848,8 +889,6 @@ namespace PETScWrappers
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &new_value, INSERT_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      vector.last_action = VectorBase::LastAction::insert;
       
       return *this;
     }

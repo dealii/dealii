@@ -1180,6 +1180,10 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
                                   const unsigned int j,
                                   const value_type value)
 {
+                                   // save some cycles for zero additions
+  if (value == 0)
+    return;
+  
   const std::pair<unsigned int,unsigned int>
     row_index = row_block_indices.global_to_local (i),
     col_index = column_block_indices.global_to_local (j);
