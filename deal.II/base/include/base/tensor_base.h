@@ -126,7 +126,21 @@ class Tensor<1,dim> {
 				     /**
 				      *  Returns the scalar product of two vectors.
 				      */
-    double              operator * (const Tensor<1,dim> &) const;
+    double          operator * (const Tensor<1,dim> &) const;
+
+				     /**
+				      *  Add two tensors. If possible, use
+				      *  #operator +=# instead since this does not
+				      *  need to copy a point at least once.
+				      */
+    Tensor<1,dim>   operator + (const Tensor<1,dim> &) const;
+
+				     /**
+				      *  Subtract two tensors. If possible, use
+				      *  #operator +=# instead since this does not
+				      *  need to copy a point at least once.
+				      */
+    Tensor<1,dim>   operator - (const Tensor<1,dim> &) const;
 
 				     /**
 				      * Reset all values to zero.
@@ -281,6 +295,22 @@ double Tensor<1,dim>::operator * (const Tensor<1,dim> &p) const {
   for (unsigned int i=0; i<dim; ++i)
     q += values[i] * p.values[i];
   return q;
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> Tensor<1,dim>::operator + (const Tensor<1,dim> &p) const {
+  return (Tensor<1,dim>(*this) += p);
+};
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> Tensor<1,dim>::operator - (const Tensor<1,dim> &p) const {
+  return (Tensor<1,dim>(*this) -= p);
 };
 
 

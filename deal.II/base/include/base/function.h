@@ -116,7 +116,7 @@ class Function {
 				      * Return the gradient of the function
 				      * at the given point.
 				      */
-    virtual Point<dim> gradient (const Point<dim> &p) const;
+    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
 
 				     /**
 				      * Set #gradients# to the gradients of
@@ -126,7 +126,7 @@ class Function {
 				      * the same size as the #points# array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
-				vector<Point<dim> >       &gradients) const;
+				vector<Tensor<1,dim> >    &gradients) const;
 
 				     /**
 				      * Return the value of the time variable/
@@ -203,7 +203,7 @@ class ZeroFunction : public Function<dim> {
 				      * Return the gradient of the function
 				      * at the given point.
 				      */
-    virtual Point<dim> gradient (const Point<dim> &p) const;
+    virtual Tensor<1,dim> gradient (const Point<dim> &p) const;
 
 				     /**
 				      * Set #gradients# to the gradients of
@@ -213,7 +213,7 @@ class ZeroFunction : public Function<dim> {
 				      * the same size as the #points# array.
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
-				vector<Point<dim> >       &gradients) const;
+				vector<Tensor<1,dim> >    &gradients) const;
 };
 
 

@@ -98,6 +98,20 @@ class Tensor {
     Tensor<rank_,dim> & operator /= (const double &factor);
 
 				     /**
+				      *  Add two tensors. If possible, use
+				      *  #operator +=# instead since this does not
+				      *  need to copy a point at least once.
+				      */
+    Tensor<rank_,dim>   operator + (const Tensor<rank_,dim> &) const;
+
+				     /**
+				      *  Subtract two tensors. If possible, use
+				      *  #operator +=# instead since this does not
+				      *  need to copy a point at least once.
+				      */
+    Tensor<rank_,dim>   operator - (const Tensor<rank_,dim> &) const;
+
+				     /**
 				      * Reset all values to zero.
 				      */
     void clear ();
@@ -208,6 +222,34 @@ Tensor<rank_,dim> & Tensor<rank_,dim>::operator /= (const double &s) {
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] /= s;
   return *this;
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim>
+Tensor<rank_,dim>::operator + (const Tensor<rank_,dim> &t) const {
+  Tensor<rank_,dim> tmp(*this);
+  
+  for (unsigned int i=0; i<dim; ++i)
+    tmp.subtensor[i] += t.subtensor[i];
+
+  return tmp;
+};
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim>
+Tensor<rank_,dim>::operator - (const Tensor<rank_,dim> &t) const {
+  Tensor<rank_,dim> tmp(*this);
+  
+  for (unsigned int i=0; i<dim; ++i)
+    tmp.subtensor[i] -= t.subtensor[i];
+
+  return tmp;
 };
 
 

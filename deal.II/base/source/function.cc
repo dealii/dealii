@@ -38,7 +38,7 @@ void Function<dim>::value_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-Point<dim> Function<dim>::gradient (const Point<dim> &) const {
+Tensor<1,dim> Function<dim>::gradient (const Point<dim> &) const {
   Assert (false, ExcPureFunctionCalled());
   return Point<dim>();
 };
@@ -47,7 +47,7 @@ Point<dim> Function<dim>::gradient (const Point<dim> &) const {
 
 template <int dim>
 void Function<dim>::gradient_list (const vector<Point<dim> > &points,
-				   vector<Point<dim> >       &gradients) const {
+				   vector<Tensor<1,dim> >    &gradients) const {
   Assert (gradients.size() == points.size(),
 	  ExcVectorHasWrongSize(gradients.size(), points.size()));
 
@@ -104,19 +104,19 @@ void ZeroFunction<dim>::value_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
-Point<dim> ZeroFunction<dim>::gradient (const Point<dim> &) const {
-  return Point<dim>();
+Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &) const {
+  return Tensor<1,dim>();
 };
 
 
 
 template <int dim>
 void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
-				       vector<Point<dim> >       &gradients) const {
+				       vector<Tensor<1,dim> >    &gradients) const {
   Assert (gradients.size() == points.size(),
 	  ExcVectorHasWrongSize(gradients.size(), points.size()));
 
-  fill_n (gradients.begin(), points.size(), Point<dim>());
+  gradients.clear ();
 };
 
 
