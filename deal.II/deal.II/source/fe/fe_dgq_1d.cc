@@ -22,7 +22,7 @@
 
 namespace FE_DGQ_1d
 {
-  static double dgq0_into_dgq0_refined[] =
+  static const double dgq0_into_dgq0_refined[] =
   {
 	1., 1.
   };
