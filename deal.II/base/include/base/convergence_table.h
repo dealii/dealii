@@ -51,7 +51,7 @@ class ConvergenceTable: public TableHandler
     
 				     /**
 				      * Rate in relation to the rows (without a
-				      * reference column):
+				      * reference column).
 				      * 
 				      * #reduction_rate#: $value(row-1)/value(row)$.
 				      *

@@ -182,7 +182,7 @@ class DataIn {
 
 
 /**
- * This class is deprecated. Use the #DataOut class instead.
+ * This class is deprecated. Use the #DataOut# class instead.
  *
  * This class implements an output mechanism for grid and simulation data
  * in several formats.

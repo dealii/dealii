@@ -839,7 +839,8 @@ class SparseMatrix : public Subscriptor
 				      * If you change the layout yourself, you
 				      * should also rename this function to
 				      * avoid programs relying on outdated
-				      * information!  */
+				      * information!
+				      */
     number global_entry (const unsigned int i) const;
 
 				     /**
