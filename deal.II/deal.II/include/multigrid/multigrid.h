@@ -40,7 +40,8 @@
  * The function which starts a multigrid cycle on the finest level is
  * cycle(). Depending on the cycle type chosen with the constructor
  * (see enum Cycle), this function triggers one of the cycles
- * level_v_step(), level_w_step() or level_f_step().
+ * level_v_step() or level_step(), where the latter one can do
+ * different types of cycles.
  *
  * @note The interface of this class is still very clumsy. In
  * particular, you will have to set up quite a few auxiliary objects
@@ -247,18 +248,20 @@ class Multigrid : public Subscriptor
     void level_v_step (const unsigned int level);
 
 				     /**
-				      * The actual W-cycle multigrid method.
-				      * <tt>level</tt> is the level the
-				      * function starts on. It
+				      * The actual W-cycle or F-cycle
+				      * multigrid method.
+				      * <tt>level</tt> is the level
+				      * the function starts on. It
 				      * will usually be called for the
 				      * highest level from outside,
 				      * but will then call itself
-				      * recursively for <tt>level-1</tt>,
-				      * unless we are on #minlevel
-				      * where the coarse grid solver
-				      * solves the problem exactly.
+				      * recursively for
+				      * <tt>level-1</tt>, unless we
+				      * are on #minlevel where the
+				      * coarse grid solver solves the
+				      * problem exactly.
 				      */
-    void level_w_step (const unsigned int level);
+    void level_step (const unsigned int level, Cycle cycle);
 
 				     /**
 				      * Cycle type performed by the method cycle().

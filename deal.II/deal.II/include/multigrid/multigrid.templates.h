@@ -21,6 +21,13 @@
 using namespace std;
 
 
+
+
+
+
+
+
+
 template <class VECTOR>
 Multigrid<VECTOR>::Multigrid (const unsigned int minlevel,
 			      const unsigned int maxlevel,
@@ -188,14 +195,31 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::level_w_step(const unsigned int level)
+Multigrid<VECTOR>::level_step(const unsigned int level,
+			      Cycle cycle)
 {
+				   // Not actually the defect yet, but
+				   // we do not want to spend yet
+				   // another vector.
+  if (level>minlevel)
+    {
+      defect2[level-1] = 0.;
+      transfer->restrict_and_add (level, defect2[level-1], defect2[level]);
+    }
+  
+				   // We get an update of the defect
+				   // from the previous level in t and
+				   // from two levels above in
+				   // defect2. This is subtracted from
+				   // the original defect.
+  t[level].equ(-1.,defect2[level],1.,defect[level]);
+  
   if (level == minlevel)
     {
       if (debug>0)
 	deallog << "W-cycle solving  level " << level << std::endl;
   
-      (*coarse)(level, solution[level], defect[level]);
+      (*coarse)(level, solution[level], t[level]);
       return;
     }
   if (debug>0)
@@ -205,55 +229,57 @@ Multigrid<VECTOR>::level_w_step(const unsigned int level)
     deallog << "Smoothing on     level " << level << std::endl;
 				   // smoothing of the residual by
 				   // modifying s
-  pre_smooth->smooth(level, solution[level], defect[level]);
+  pre_smooth->smooth(level, solution[level], t[level]);
 
   if (debug>1)
     deallog << "Residual on      level " << level << std::endl;
 				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
-
 				   // make t rhs of lower level The
 				   // non-refined parts of the
 				   // coarse-level defect already
 				   // contain the global defect, the
 				   // refined parts its restriction.
-  for (unsigned int l = level;l>minlevel;--l)
-    {
-      t[l-1] = 0.;
-      if (l==level && edge_down != 0)
-	{
-	  edge_down->vmult(level, t[level-1], solution[level]);
-	}
-      transfer->restrict_and_add (l, t[l-1], t[l]);
-      defect[l-1] -= t[l-1];
-    }
-
+  if (edge_down != 0)
+    edge_down->vmult_add(level, defect2[level-1], solution[level]);
+  transfer->restrict_and_add (level, defect2[level-1], t[level]);
 				   // do recursion
   solution[level-1] = 0.;
-  level_w_step(level-1);
-  level_w_step(level-1);
+				   // Every cycle need one recursion,
+				   // the V-cycle, which is included
+				   // here for the sake of the
+				   // F-cycle, needs only one,
+  level_step(level-1, cycle);
+				   // while the W-cycle repeats itself
+  if (cycle == w_cycle)
+    level_step(level-1, cycle);
+				   // and the F-cycle does a V-cycle
+				   // after an F-cycle.
+  else if (cycle == f_cycle)
+    level_step(level-1, v_cycle);
 
 				   // reset size of the auxiliary
 				   // vector, since it has been
 				   // resized in the recursive call to
 				   // level_v_step directly above
   t[level] = 0.;
-
 				   // do coarse grid correction
   transfer->prolongate(level, t[level], solution[level-1]);
   
   solution[level] += t[level];
 
+  
   if (edge_up != 0)
     {
       edge_up->Tvmult(level, t[level], solution[level-1]);
-      defect[level] -= t[level];
     }
-  
+
+  t[level].sadd(-1.,-1.,defect2[level],1.,defect[level]);
+
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
 				   // post-smoothing
-  post_smooth->smooth(level, solution[level], defect[level]);
+  post_smooth->smooth(level, solution[level], t[level]);
 
   if (debug>1)
     deallog << "W-cycle leaving  level " << level << std::endl;
@@ -269,24 +295,21 @@ Multigrid<VECTOR>::cycle()
 				   // adjust the other vectors.
   solution.resize(minlevel, maxlevel);
   t.resize(minlevel, maxlevel);
-  
+  if (cycle_type != v_cycle)
+    defect2.resize(minlevel, maxlevel);
+    
   for (unsigned int level=minlevel; level<=maxlevel;++level)
     {
       solution[level].reinit(defect[level]);
       t[level].reinit(defect[level]);
+      if (cycle_type != v_cycle)
+	defect2[level].reinit(defect[level]);
     }
   
-  switch(cycle_type)
-    {
-      case v_cycle:
-	level_v_step (maxlevel);
-	break;
-      case w_cycle:
-	level_w_step (maxlevel);
-	break;
-      case f_cycle:
-	break;
-    }
+  if (cycle_type == v_cycle)
+    level_v_step (maxlevel);
+  else
+    level_step (maxlevel, cycle_type);
 }
 
 
