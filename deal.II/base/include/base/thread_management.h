@@ -3948,7 +3948,7 @@ namespace Threads
 #ifdef DEAL_II_TEMPL_CONST_MEM_PTR_BUG
       template <class Class_, typename Arg1_, typename Arg2_, typename Arg3_, typename Arg4_, typename Arg5_, typename Arg6_, typename Arg7_, typename Arg8_, typename Arg9_, typename Arg10_>
       friend 
-      typename MemFunData10<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_void>::ArgCollector
+      typename MemFunData10<const Class_,Arg1_,Arg2_,Arg3_,Arg4_,Arg5_,Arg6_,Arg7_,Arg8_,Arg9_,Arg10_,void>::ArgCollector
       encapsulate (void (Class_::*fun_ptr)(Arg1_, Arg2_, Arg3_,
 					   Arg4_, Arg5_, Arg6_,
 					   Arg7_, Arg8_, Arg9_, Arg10_) const);
