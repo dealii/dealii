@@ -92,6 +92,12 @@ class SolverControl : public Subscriptor
 		       const double       last_residual);
 
 					 /**
+					  * Standardized output for
+					  * catch handlers.
+					  */
+	virtual const char * what () const throw ();
+
+					 /**
 					  * Iteration number of the
 					  * last step.
 					  */

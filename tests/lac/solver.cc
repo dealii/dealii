@@ -114,6 +114,15 @@ int main()
 	  deallog.push("sor");
 	  
 	  check_method(rich,A,u,f,prec_sor);
+	  try 
+	    {
+	      check_method(cg,A,u,f,prec_sor);
+	    }
+	  catch (exception& e)
+	    {
+	      deallog << e.what() << endl;
+	    }
+	  
 	  check_method(bicgstab,A,u,f,prec_sor);
 	  check_method(gmres,A,u,f,prec_sor);
 	  
