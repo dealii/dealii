@@ -2,6 +2,7 @@
 
 #include <numerics/assembler.h>
 #include <numerics/base.h>
+#include <numerics/matrices.h>
 #include <grid/dof_constraints.h>
 #include <grid/tria_iterator.h>
 #include <basic/data_io.h>
@@ -17,18 +18,6 @@
 #include <numeric>
 #include <algorithm>
 #include <cmath>
-
-
-
-inline double sqr (const double x) {
-  return x*x;
-};
-
-
-template <int dim>
-inline double sqr_point (const Point<dim> &p) {
-  return p.square();
-};
 
 
 
@@ -128,9 +117,13 @@ void ProblemBase<dim>::assemble (const Equation<dim>      &equation,
 
 				   // apply Dirichlet bc as described
 				   // in the docs
-  apply_dirichlet_bc (system_matrix, solution,
-		      right_hand_side,
-		      dirichlet_bc, fe, boundary);
+  map<int, double> boundary_value_list;
+  MatrixTools<dim>::interpolate_boundary_values (*dof_handler,
+						 dirichlet_bc, fe, boundary,
+						 boundary_value_list);
+  MatrixTools<dim>::apply_boundary_values (boundary_value_list,
+					   system_matrix, solution,
+					   right_hand_side);
   
 };
 
@@ -156,196 +149,6 @@ void ProblemBase<dim>::solve () {
 
 
 
-template <int dim>
-void ProblemBase<dim>::integrate_difference (const Function<dim>      &exact_solution,
-					     dVector                  &difference,
-					     const Quadrature<dim>    &q,
-					     const FiniteElement<dim> &fe,
-					     const NormType           &norm,
-					     const Boundary<dim>      &boundary) const {
-  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
-  Assert (fe == dof_handler->get_selected_fe(), ExcInvalidFE());
-
-  difference.reinit (tria->n_active_cells());
-  
-  UpdateFlags update_flags = UpdateFlags (update_q_points  |
-					  update_jacobians |
-					  update_JxW_values);
-  if ((norm==H1_seminorm) || (norm==H1_norm))
-    update_flags = UpdateFlags (update_flags | update_gradients);
-  FEValues<dim> fe_values(fe, q, update_flags);
-  
-				   // loop over all cells
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler->begin_active(),
-					endc = dof_handler->end();
-  for (unsigned int index=0; cell != endc; ++cell, ++index)
-    {
-      double diff=0;
-				       // initialize for this cell
-      fe_values.reinit (cell, fe, boundary);
-
-      switch (norm) 
-	{
-	  case mean:
-	  case L1_norm:
-	  case L2_norm:
-	  case Linfty_norm:
-	  case H1_norm:
-	  {
-					     // we need the finite element
-					     // function \psi at the different
-					     // integration points. Compute
-					     // it like this:
-					     // \psi(x_j)=\sum_i v_i \phi_i(x_j)
-					     // with v_i the nodal values of the
-					     // solution and \phi_i(x_j) the
-					     // matrix of the ansatz function
-					     // values at the integration point
-					     // x_j. Then the vector
-					     // of the \psi(x_j) is v*Phi with
-					     // v being the vector of nodal
-					     // values on this cell and Phi
-					     // the matrix.
-					     //
-					     // we then need the difference:
-					     // reference_function(x_j)-\psi_j
-					     // and assign that to the vector
-					     // \psi.
-	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<double>   psi (n_q_points);
-
-					     // in praxi: first compute
-					     // exact solution vector
-	    exact_solution.value_list (fe_values.get_quadrature_points(),
-				       psi);
-					     // then subtract finite element
-					     // solution
-	    if (true) 
-	      {
-		vector<double> function_values (n_q_points, 0);
-		fe_values.get_function_values (solution, function_values);
-
-		transform (psi.begin(), psi.end(),
-			   function_values.begin(),
-			   psi.begin(),
-			   minus<double>());
-	      };
-	    
-
-					     // for L1_norm and Linfty_norm:
-					     // take absolute
-					     // value, for the L2_norm take
-					     // square of psi
-	    switch (norm) 
-	      {
-		case mean:
-		      break;
-		case L1_norm:
-		case Linfty_norm:
-		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(fabs));
-		      break;
-		case L2_norm:
-		case H1_norm:
-		      transform (psi.begin(), psi.end(),
-				 psi.begin(), ptr_fun(sqr));
-		      break;
-		default:
-		      Assert (false, ExcNotImplemented());
-	      };
-
-					     // ok, now we have the integrand,
-					     // let's compute the integral,
-					     // which is
-					     // sum_j psi_j JxW_j
-					     // (or |psi_j| or |psi_j|^2
-	    switch (norm) 
-	      {
-		case mean:
-		case L1_norm:
-		      diff = inner_product (psi.begin(), psi.end(),
-					    fe_values.get_JxW_values().begin(),
-					    0.0);
-		      break;
-		case L2_norm:
-		case H1_norm:
-		      diff = sqrt(inner_product (psi.begin(), psi.end(),
-						 fe_values.get_JxW_values().begin(),
-						 0.0));
-		      break;
-		case Linfty_norm:
-		      diff = *max_element (psi.begin(), psi.end());
-		      break;
-		default:
-		      Assert (false, ExcNotImplemented());
-	      };
-
-					     // note: the H1_norm uses the result
-					     // of the L2_norm and control goes
-					     // over to the next case statement!
-	    if (norm != H1_norm)
-	      break;
-	  };
-
-	  case H1_seminorm:
-	  {
-					     // note: the computation of the
-					     // H1_norm starts at the previous
-					     // case statement, but continues
-					     // here!
-
-					     // for H1_norm: re-square L2_norm.
-	    diff = sqr(diff);
-
-					     // same procedure as above, but now
-					     // psi is a vector of gradients
-	    const unsigned int n_q_points = q.n_quadrature_points;
-	    vector<Point<dim> >   psi (n_q_points);
-
-					     // in praxi: first compute
-					     // exact solution vector
-	    exact_solution.gradient_list (fe_values.get_quadrature_points(),
-					  psi);
-	    
-					     // then subtract finite element
-					     // solution
-	    if (true) 
-	      {
-		vector<Point<dim> > function_grads (n_q_points, Point<dim>());
-		fe_values.get_function_grads (solution, function_grads);
-
-		transform (psi.begin(), psi.end(),
-			   function_grads.begin(),
-			   psi.begin(),
-			   minus<Point<dim> >());
-	      };
-					     // take square of integrand
-	    vector<double> psi_square (psi.size(), 0.0);
-	    for (unsigned int i=0; i<n_q_points; ++i)
-	      psi_square[i] = sqr_point(psi[i]);
-
-					     // add seminorm to L_2 norm or
-					     // to zero
-	    diff += inner_product (psi_square.begin(), psi_square.end(),
-				   fe_values.get_JxW_values().begin(),
-				   0.0);
-	    diff = sqrt(diff);
-
-	    break;
-	  };
-					     
-	  default:
-		Assert (false, ExcNotImplemented());
-	};
-
-      
-				       // append result of this cell
-				       // to the end of the vector
-      difference(index) = diff;
-    };
-};
-
-
 
 template <int dim>
 void ProblemBase<dim>::fill_data (DataOut<dim> &out) const {
@@ -368,163 +171,6 @@ pair<char*,char*> ProblemBase<dim>::get_solution_name () const {
 
 
 
-
-template <int dim>
-void ProblemBase<dim>::apply_dirichlet_bc (dSMatrix &matrix,
-					   dVector  &solution,
-					   dVector  &right_hand_side,
-					   const FunctionMap &dirichlet_bc,
-					   const FiniteElement<dim> &fe,
-					   const Boundary<dim>      &boundary) {
-  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
-  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
-	  ExcInvalidBoundaryIndicator());
-
-				   // first make up a list of dofs subject
-				   // to any boundary condition and which
-				   // value they take; if a node occurs
-				   // with two bc (e.g. a corner node, with
-				   // the lines in 2D being subject to
-				   // different bc's), the last value is taken
-  map<int,double> boundary_values;
-  make_boundary_value_list (dirichlet_bc, fe, boundary, boundary_values);
-
-  map<int,double>::const_iterator dof, endd;
-  const unsigned int n_dofs   = matrix.m();
-  const dSMatrixStruct &sparsity = matrix.get_sparsity_pattern();
-  const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
-  const int          *sparsity_colnums  = sparsity.get_column_numbers();
-
-  for (dof=boundary_values.begin(), endd=boundary_values.end(); dof != endd; ++dof)
-    {
-				       // for each boundary dof:
-
-				       // set entries of this line
-				       // to zero
-      for (unsigned int j=sparsity_rowstart[dof->first];
-	   j<sparsity_rowstart[dof->first+1]; ++j)
-	if (sparsity_colnums[j] != dof->first)
-					   // if not main diagonal entry
-	  matrix.global_entry(j) = 0.;
-      
-				       // set right hand side to
-				       // wanted value: if main diagonal
-				       // entry nonzero, don't touch it
-				       // and scale rhs accordingly. If
-				       // zero, take the first main
-				       // diagonal entry we can find, or
-				       // one if no nonzero main diagonal
-				       // element exists. Normally, however,
-				       // the main diagonal entry should
-				       // not be zero.
-				       //
-				       // store the new rhs entry to make
-				       // the gauss step more efficient
-      double new_rhs;
-      if (matrix.diag_element(dof->first) != 0.0)
-	new_rhs = right_hand_side(dof->first)
-		= dof->second * matrix.diag_element(dof->first);
-      else
-	{
-	  double first_diagonal_entry = 1;
-	  for (unsigned int i=0; i<n_dofs; ++i)
-	    if (matrix.diag_element(i) != 0)
-	      {
-		first_diagonal_entry = matrix.diag_element(i);
-		break;
-	      };
-	  
-	  matrix.set(dof->first, dof->first,
-		     first_diagonal_entry);
-	  new_rhs = right_hand_side(dof->first)
-		  = dof->second * first_diagonal_entry;
-	};
-      
-				       // store the only nonzero entry
-				       // of this line for the Gauss
-				       // elimination step
-      const double diagonal_entry = matrix.diag_element(dof->first);
-
-				       // do the Gauss step
-      for (unsigned int row=0; row<n_dofs; ++row) 
-	for (unsigned int j=sparsity_rowstart[row];
-	     j<sparsity_rowstart[row+1]; ++j)
-	  if ((sparsity_colnums[j] == (signed int)dof->first) &&
-	      ((signed int)row != dof->first))
-					     // this line has an entry
-					     // in the regarding column
-					     // but this is not the main
-					     // diagonal entry
-	    {
-					       // correct right hand side
-	      right_hand_side(row) -= matrix.global_entry(j)/diagonal_entry *
-				      new_rhs;
-	      
-					       // set matrix entry to zero
-	      matrix.global_entry(j) = 0.;
-	    };
-      
-      
-				       // preset solution vector
-      solution(dof->first) = dof->second;
-    };
-};
-
-
-
-
-
-void
-ProblemBase<1>::make_boundary_value_list (const FunctionMap &,
-					  const FiniteElement<1> &,
-					  const Boundary<1> &,
-					  map<int,double>   &) const {
-  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());  
-  Assert (false, ExcNotImplemented());
-};
-
-
-
-
-template <int dim>
-void
-ProblemBase<dim>::make_boundary_value_list (const FunctionMap        &dirichlet_bc,
-					    const FiniteElement<dim> &fe,
-					    const Boundary<dim>      &boundary,
-					    map<int,double>   &boundary_values) const {
-  Assert ((tria!=0) && (dof_handler!=0), ExcNoTriaSelected());
-
-				   // use two face iterators, since we need
-				   // a DoF-iterator for the dof indices, but
-				   // a Tria-iterator for the fe object
-  DoFHandler<dim>::active_face_iterator face = dof_handler->begin_active_face(),
-					endf = dof_handler->end_face();
-  
-  FunctionMap::const_iterator function_ptr;
-
-				   // field to store the indices of dofs
-  vector<int>         face_dofs (fe.dofs_per_face);
-  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
-  vector<double>      dof_values (fe.dofs_per_face);
-	
-  for (; face!=endf; ++face)
-    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
-	dirichlet_bc.end()) 
-				       // face is subject to one of the
-				       // bc listed in #dirichlet_bc#
-      {
-					 // get indices, physical location and
-					 // boundary values of dofs on this
-					 // face
-	face->get_dof_indices (face_dofs);
-	fe.get_face_ansatz_points (face, boundary, dof_locations);
-	function_ptr->second->value_list (dof_locations, dof_values);
-
-					 // enter into list
-	for (unsigned int i=0; i<face_dofs.size(); ++i)
-	  boundary_values[face_dofs[i]] = dof_values[i];
-      };
-};
 
   
 

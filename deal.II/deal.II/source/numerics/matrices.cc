@@ -5,6 +5,7 @@
 #include <grid/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <fe/quadrature.h>
+#include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <numerics/matrices.h>
 #include <numerics/assembler.h>
@@ -138,6 +139,156 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
       assembler->assemble (equation);
     }
   while ((++assembler).state() == valid);
+};
+
+
+
+
+
+
+template <int dim>
+void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_values,
+					      dSMatrix  &matrix,
+					      dVector   &solution,
+					      dVector   &right_hand_side) {
+
+  map<int,double>::const_iterator dof  = boundary_values.begin(),
+				  endd = boundary_values.end();
+  const unsigned int n_dofs             = matrix.m();
+  const dSMatrixStruct &sparsity        = matrix.get_sparsity_pattern();
+  const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
+  const int          *sparsity_colnums  = sparsity.get_column_numbers();
+
+  for (; dof != endd; ++dof)
+    {
+				       // for each boundary dof:
+
+				       // set entries of this line
+				       // to zero
+      for (unsigned int j=sparsity_rowstart[dof->first];
+	   j<sparsity_rowstart[dof->first+1]; ++j)
+	if (sparsity_colnums[j] != dof->first)
+					   // if not main diagonal entry
+	  matrix.global_entry(j) = 0.;
+      
+				       // set right hand side to
+				       // wanted value: if main diagonal
+				       // entry nonzero, don't touch it
+				       // and scale rhs accordingly. If
+				       // zero, take the first main
+				       // diagonal entry we can find, or
+				       // one if no nonzero main diagonal
+				       // element exists. Normally, however,
+				       // the main diagonal entry should
+				       // not be zero.
+				       //
+				       // store the new rhs entry to make
+				       // the gauss step more efficient
+      double new_rhs;
+      if (matrix.diag_element(dof->first) != 0.0)
+	new_rhs = right_hand_side(dof->first)
+		= dof->second * matrix.diag_element(dof->first);
+      else
+	{
+	  double first_diagonal_entry = 1;
+	  for (unsigned int i=0; i<n_dofs; ++i)
+	    if (matrix.diag_element(i) != 0)
+	      {
+		first_diagonal_entry = matrix.diag_element(i);
+		break;
+	      };
+	  
+	  matrix.set(dof->first, dof->first,
+		     first_diagonal_entry);
+	  new_rhs = right_hand_side(dof->first)
+		  = dof->second * first_diagonal_entry;
+	};
+      
+				       // store the only nonzero entry
+				       // of this line for the Gauss
+				       // elimination step
+      const double diagonal_entry = matrix.diag_element(dof->first);
+
+				       // do the Gauss step
+      for (unsigned int row=0; row<n_dofs; ++row) 
+	for (unsigned int j=sparsity_rowstart[row];
+	     j<sparsity_rowstart[row+1]; ++j)
+	  if ((sparsity_colnums[j] == (signed int)dof->first) &&
+	      ((signed int)row != dof->first))
+					     // this line has an entry
+					     // in the regarding column
+					     // but this is not the main
+					     // diagonal entry
+	    {
+					       // correct right hand side
+	      right_hand_side(row) -= matrix.global_entry(j)/diagonal_entry *
+				      new_rhs;
+	      
+					       // set matrix entry to zero
+	      matrix.global_entry(j) = 0.;
+	    };
+      
+      
+				       // preset solution vector
+      solution(dof->first) = dof->second;
+    };
+};
+
+
+
+
+
+void
+MatrixTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
+					     const FunctionMap &,
+					     const FiniteElement<1> &,
+					     const Boundary<1> &,
+					     map<int,double>   &) {
+  Assert (false, ExcNotImplemented());
+};
+
+
+
+
+template <int dim>
+void
+MatrixTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
+					       const FunctionMap     &dirichlet_bc,
+					       const FiniteElement<dim> &fe,
+					       const Boundary<dim>      &boundary,
+					       map<int,double>   &boundary_values) {
+  Assert (dirichlet_bc.find(255) == dirichlet_bc.end(),
+	  ExcInvalidBoundaryIndicator());
+				   // use two face iterators, since we need
+				   // a DoF-iterator for the dof indices, but
+				   // a Tria-iterator for the fe object
+  DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
+					endf = dof.end_face();
+  
+  FunctionMap::const_iterator function_ptr;
+
+				   // field to store the indices of dofs
+  vector<int>         face_dofs (fe.dofs_per_face);
+  vector<Point<dim> > dof_locations (face_dofs.size(), Point<dim>());
+  vector<double>      dof_values (fe.dofs_per_face);
+	
+  for (; face!=endf; ++face)
+    if ((function_ptr = dirichlet_bc.find(face->boundary_indicator())) !=
+	dirichlet_bc.end()) 
+				       // face is subject to one of the
+				       // bc listed in #dirichlet_bc#
+      {
+					 // get indices, physical location and
+					 // boundary values of dofs on this
+					 // face
+	face->get_dof_indices (face_dofs);
+	fe.get_face_ansatz_points (face, boundary, dof_locations);
+	function_ptr->second->value_list (dof_locations, dof_values);
+
+					 // enter into list
+	for (unsigned int i=0; i<face_dofs.size(); ++i)
+	  boundary_values[face_dofs[i]] = dof_values[i];
+      };
 };
 
 
@@ -367,6 +518,8 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
 
 template class MatrixCreator<1>;
 template class MatrixCreator<2>;
+template class MatrixTools<1>;
+template class MatrixTools<2>;
 template class MassMatrix<1>;
 template class MassMatrix<2>;
 template class LaplaceMatrix<1>;
