@@ -122,28 +122,28 @@ DEAL:Mapping2d-1-Q1fixed::
 DEAL:Mapping2d-1-Q1fixed::
 DEAL::  area=8.0
 DEAL::MappingFace2d-1-Q1fixed
-DEAL:MappingFace2d-1-Q1fixed::0.21 1.0	0.0 -1.0
-DEAL:MappingFace2d-1-Q1fixed::0.99 1.0	0.0 -1.0
-DEAL:MappingFace2d-1-Q1fixed::2.0 1.0	0.0 -1.0
-DEAL:MappingFace2d-1-Q1fixed::2.8 1.0	0.0 -1.0
+DEAL:MappingFace2d-1-Q1fixed::0.21 1.0	0.0 -1.0	0.52
+DEAL:MappingFace2d-1-Q1fixed::0.99 1.0	0.0 -1.0	0.98
+DEAL:MappingFace2d-1-Q1fixed::2.0 1.0	0.0 -1.0	0.98
+DEAL:MappingFace2d-1-Q1fixed::2.8 1.0	0.0 -1.0	0.52
 DEAL:MappingFace2d-1-Q1fixed::
 DEAL:MappingFace2d-1-Q1fixed::
-DEAL:MappingFace2d-1-Q1fixed::3.1 1.2	0.83 -0.55
-DEAL:MappingFace2d-1-Q1fixed::3.7 2.0	0.83 -0.55
-DEAL:MappingFace2d-1-Q1fixed::4.3 3.0	0.83 -0.55
-DEAL:MappingFace2d-1-Q1fixed::4.9 3.8	0.83 -0.55
+DEAL:MappingFace2d-1-Q1fixed::3.1 1.2	0.83 -0.55	0.63
+DEAL:MappingFace2d-1-Q1fixed::3.7 2.0	0.83 -0.55	1.2
+DEAL:MappingFace2d-1-Q1fixed::4.3 3.0	0.83 -0.55	1.2
+DEAL:MappingFace2d-1-Q1fixed::4.9 3.8	0.83 -0.55	0.63
 DEAL:MappingFace2d-1-Q1fixed::
 DEAL:MappingFace2d-1-Q1fixed::
-DEAL:MappingFace2d-1-Q1fixed::1.3 3.1	-0.24 0.97
-DEAL:MappingFace2d-1-Q1fixed::2.3 3.3	-0.24 0.97
-DEAL:MappingFace2d-1-Q1fixed::3.7 3.7	-0.24 0.97
-DEAL:MappingFace2d-1-Q1fixed::4.7 3.9	-0.24 0.97
+DEAL:MappingFace2d-1-Q1fixed::1.3 3.1	-0.24 0.97	0.72
+DEAL:MappingFace2d-1-Q1fixed::2.3 3.3	-0.24 0.97	1.3
+DEAL:MappingFace2d-1-Q1fixed::3.7 3.7	-0.24 0.97	1.3
+DEAL:MappingFace2d-1-Q1fixed::4.7 3.9	-0.24 0.97	0.72
 DEAL:MappingFace2d-1-Q1fixed::
 DEAL:MappingFace2d-1-Q1fixed::
-DEAL:MappingFace2d-1-Q1fixed::0.069 1.1	-0.89 0.45
-DEAL:MappingFace2d-1-Q1fixed::0.33 1.7	-0.89 0.45
-DEAL:MappingFace2d-1-Q1fixed::0.67 2.3	-0.89 0.45
-DEAL:MappingFace2d-1-Q1fixed::0.93 2.9	-0.89 0.45
+DEAL:MappingFace2d-1-Q1fixed::0.069 1.1	-0.89 0.45	0.39
+DEAL:MappingFace2d-1-Q1fixed::0.33 1.7	-0.89 0.45	0.73
+DEAL:MappingFace2d-1-Q1fixed::0.67 2.3	-0.89 0.45	0.73
+DEAL:MappingFace2d-1-Q1fixed::0.93 2.9	-0.89 0.45	0.39
 DEAL:MappingFace2d-1-Q1fixed::
 DEAL:MappingFace2d-1-Q1fixed::
 DEAL::MappingSubface2d-1-Q1fixed
@@ -274,28 +274,28 @@ DEAL:Mapping2d-2-Q1fixed::
 DEAL:Mapping2d-2-Q1fixed::
 DEAL::  area=6.0
 DEAL::MappingFace2d-2-Q1fixed
-DEAL:MappingFace2d-2-Q1fixed::1.3 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q1fixed::2.3 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q1fixed::3.7 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q1fixed::4.7 1.0	0.0 -1.0
+DEAL:MappingFace2d-2-Q1fixed::1.3 1.0	0.0 -1.0	0.70
+DEAL:MappingFace2d-2-Q1fixed::2.3 1.0	0.0 -1.0	1.3
+DEAL:MappingFace2d-2-Q1fixed::3.7 1.0	0.0 -1.0	1.3
+DEAL:MappingFace2d-2-Q1fixed::4.7 1.0	0.0 -1.0	0.70
 DEAL:MappingFace2d-2-Q1fixed::
 DEAL:MappingFace2d-2-Q1fixed::
-DEAL:MappingFace2d-2-Q1fixed::4.9 1.1	0.71 0.71
-DEAL:MappingFace2d-2-Q1fixed::4.3 1.7	0.71 0.71
-DEAL:MappingFace2d-2-Q1fixed::3.7 2.3	0.71 0.71
-DEAL:MappingFace2d-2-Q1fixed::3.1 2.9	0.71 0.71
+DEAL:MappingFace2d-2-Q1fixed::4.9 1.1	0.71 0.71	0.49
+DEAL:MappingFace2d-2-Q1fixed::4.3 1.7	0.71 0.71	0.92
+DEAL:MappingFace2d-2-Q1fixed::3.7 2.3	0.71 0.71	0.92
+DEAL:MappingFace2d-2-Q1fixed::3.1 2.9	0.71 0.71	0.49
 DEAL:MappingFace2d-2-Q1fixed::
 DEAL:MappingFace2d-2-Q1fixed::
-DEAL:MappingFace2d-2-Q1fixed::1.1 3.0	0.0 1.0
-DEAL:MappingFace2d-2-Q1fixed::1.7 3.0	0.0 1.0
-DEAL:MappingFace2d-2-Q1fixed::2.3 3.0	0.0 1.0
-DEAL:MappingFace2d-2-Q1fixed::2.9 3.0	0.0 1.0
+DEAL:MappingFace2d-2-Q1fixed::1.1 3.0	0.0 1.0	0.35
+DEAL:MappingFace2d-2-Q1fixed::1.7 3.0	0.0 1.0	0.65
+DEAL:MappingFace2d-2-Q1fixed::2.3 3.0	0.0 1.0	0.65
+DEAL:MappingFace2d-2-Q1fixed::2.9 3.0	0.0 1.0	0.35
 DEAL:MappingFace2d-2-Q1fixed::
 DEAL:MappingFace2d-2-Q1fixed::
-DEAL:MappingFace2d-2-Q1fixed::1.0 1.1	-1.0 -0.0
-DEAL:MappingFace2d-2-Q1fixed::1.0 1.7	-1.0 -0.0
-DEAL:MappingFace2d-2-Q1fixed::1.0 2.3	-1.0 -0.0
-DEAL:MappingFace2d-2-Q1fixed::1.0 2.9	-1.0 -0.0
+DEAL:MappingFace2d-2-Q1fixed::1.0 1.1	-1.0 -0.0	0.35
+DEAL:MappingFace2d-2-Q1fixed::1.0 1.7	-1.0 -0.0	0.65
+DEAL:MappingFace2d-2-Q1fixed::1.0 2.3	-1.0 -0.0	0.65
+DEAL:MappingFace2d-2-Q1fixed::1.0 2.9	-1.0 -0.0	0.35
 DEAL:MappingFace2d-2-Q1fixed::
 DEAL:MappingFace2d-2-Q1fixed::
 DEAL::MappingSubface2d-2-Q1fixed
@@ -424,28 +424,28 @@ DEAL:Mapping2d-2-Q1::
 DEAL:Mapping2d-2-Q1::
 DEAL::  area=6.0
 DEAL::MappingFace2d-2-Q1
-DEAL:MappingFace2d-2-Q1::1.3 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q1::2.3 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q1::3.7 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q1::4.7 1.0	0.0 -1.0
+DEAL:MappingFace2d-2-Q1::1.3 1.0	0.0 -1.0	0.70
+DEAL:MappingFace2d-2-Q1::2.3 1.0	0.0 -1.0	1.3
+DEAL:MappingFace2d-2-Q1::3.7 1.0	0.0 -1.0	1.3
+DEAL:MappingFace2d-2-Q1::4.7 1.0	0.0 -1.0	0.70
 DEAL:MappingFace2d-2-Q1::
 DEAL:MappingFace2d-2-Q1::
-DEAL:MappingFace2d-2-Q1::4.9 1.1	0.71 0.71
-DEAL:MappingFace2d-2-Q1::4.3 1.7	0.71 0.71
-DEAL:MappingFace2d-2-Q1::3.7 2.3	0.71 0.71
-DEAL:MappingFace2d-2-Q1::3.1 2.9	0.71 0.71
+DEAL:MappingFace2d-2-Q1::4.9 1.1	0.71 0.71	0.49
+DEAL:MappingFace2d-2-Q1::4.3 1.7	0.71 0.71	0.92
+DEAL:MappingFace2d-2-Q1::3.7 2.3	0.71 0.71	0.92
+DEAL:MappingFace2d-2-Q1::3.1 2.9	0.71 0.71	0.49
 DEAL:MappingFace2d-2-Q1::
 DEAL:MappingFace2d-2-Q1::
-DEAL:MappingFace2d-2-Q1::1.1 3.0	0.0 1.0
-DEAL:MappingFace2d-2-Q1::1.7 3.0	0.0 1.0
-DEAL:MappingFace2d-2-Q1::2.3 3.0	0.0 1.0
-DEAL:MappingFace2d-2-Q1::2.9 3.0	0.0 1.0
+DEAL:MappingFace2d-2-Q1::1.1 3.0	0.0 1.0	0.35
+DEAL:MappingFace2d-2-Q1::1.7 3.0	0.0 1.0	0.65
+DEAL:MappingFace2d-2-Q1::2.3 3.0	0.0 1.0	0.65
+DEAL:MappingFace2d-2-Q1::2.9 3.0	0.0 1.0	0.35
 DEAL:MappingFace2d-2-Q1::
 DEAL:MappingFace2d-2-Q1::
-DEAL:MappingFace2d-2-Q1::1.0 1.1	-1.0 -0.0
-DEAL:MappingFace2d-2-Q1::1.0 1.7	-1.0 -0.0
-DEAL:MappingFace2d-2-Q1::1.0 2.3	-1.0 -0.0
-DEAL:MappingFace2d-2-Q1::1.0 2.9	-1.0 -0.0
+DEAL:MappingFace2d-2-Q1::1.0 1.1	-1.0 -0.0	0.35
+DEAL:MappingFace2d-2-Q1::1.0 1.7	-1.0 -0.0	0.65
+DEAL:MappingFace2d-2-Q1::1.0 2.3	-1.0 -0.0	0.65
+DEAL:MappingFace2d-2-Q1::1.0 2.9	-1.0 -0.0	0.35
 DEAL:MappingFace2d-2-Q1::
 DEAL:MappingFace2d-2-Q1::
 DEAL::MappingSubface2d-2-Q1
@@ -574,28 +574,28 @@ DEAL:Mapping2d-2-Q2::
 DEAL:Mapping2d-2-Q2::
 DEAL::  area=6.8
 DEAL::MappingFace2d-2-Q2
-DEAL:MappingFace2d-2-Q2::1.3 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q2::2.3 1.0	0.00 -1.0
-DEAL:MappingFace2d-2-Q2::3.7 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q2::4.7 1.0	0.0 -1.0
+DEAL:MappingFace2d-2-Q2::1.3 1.0	0.0 -1.0	0.70
+DEAL:MappingFace2d-2-Q2::2.3 1.0	0.00 -1.0	1.3
+DEAL:MappingFace2d-2-Q2::3.7 1.0	0.0 -1.0	1.3
+DEAL:MappingFace2d-2-Q2::4.7 1.0	0.0 -1.0	0.70
 DEAL:MappingFace2d-2-Q2::
 DEAL:MappingFace2d-2-Q2::
-DEAL:MappingFace2d-2-Q2::5.0 1.2	0.99 0.16
-DEAL:MappingFace2d-2-Q2::4.7 2.0	0.87 0.49
-DEAL:MappingFace2d-2-Q2::4.0 2.7	0.49 0.87
-DEAL:MappingFace2d-2-Q2::3.2 3.0	0.16 0.99
+DEAL:MappingFace2d-2-Q2::5.0 1.2	0.99 0.16	0.60
+DEAL:MappingFace2d-2-Q2::4.7 2.0	0.87 0.49	0.96
+DEAL:MappingFace2d-2-Q2::4.0 2.7	0.49 0.87	0.96
+DEAL:MappingFace2d-2-Q2::3.2 3.0	0.16 0.99	0.60
 DEAL:MappingFace2d-2-Q2::
 DEAL:MappingFace2d-2-Q2::
-DEAL:MappingFace2d-2-Q2::1.1 2.9	0.38 0.93
-DEAL:MappingFace2d-2-Q2::1.7 2.8	0.16 0.99
-DEAL:MappingFace2d-2-Q2::2.3 2.8	-0.16 0.99
-DEAL:MappingFace2d-2-Q2::2.9 2.9	-0.38 0.93
+DEAL:MappingFace2d-2-Q2::1.1 2.9	0.38 0.93	0.38
+DEAL:MappingFace2d-2-Q2::1.7 2.8	0.16 0.99	0.66
+DEAL:MappingFace2d-2-Q2::2.3 2.8	-0.16 0.99	0.66
+DEAL:MappingFace2d-2-Q2::2.9 2.9	-0.38 0.93	0.38
 DEAL:MappingFace2d-2-Q2::
 DEAL:MappingFace2d-2-Q2::
-DEAL:MappingFace2d-2-Q2::1.0 1.1	-1.0 -0.0
-DEAL:MappingFace2d-2-Q2::1.0 1.7	-1.0 0.00
-DEAL:MappingFace2d-2-Q2::1.0 2.3	-1.0 -0.0
-DEAL:MappingFace2d-2-Q2::1.0 2.9	-1.0 -0.0
+DEAL:MappingFace2d-2-Q2::1.0 1.1	-1.0 -0.0	0.35
+DEAL:MappingFace2d-2-Q2::1.0 1.7	-1.0 0.00	0.65
+DEAL:MappingFace2d-2-Q2::1.0 2.3	-1.0 -0.0	0.65
+DEAL:MappingFace2d-2-Q2::1.0 2.9	-1.0 -0.0	0.35
 DEAL:MappingFace2d-2-Q2::
 DEAL:MappingFace2d-2-Q2::
 DEAL::MappingSubface2d-2-Q2
@@ -724,28 +724,28 @@ DEAL:Mapping2d-2-Q3::
 DEAL:Mapping2d-2-Q3::
 DEAL::  area=6.8
 DEAL::MappingFace2d-2-Q3
-DEAL:MappingFace2d-2-Q3::1.3 1.0	0.00 -1.0
-DEAL:MappingFace2d-2-Q3::2.3 1.0	0.0 -1.0
-DEAL:MappingFace2d-2-Q3::3.7 1.0	0.00 -1.0
-DEAL:MappingFace2d-2-Q3::4.7 1.0	0.0 -1.0
+DEAL:MappingFace2d-2-Q3::1.3 1.0	0.00 -1.0	0.70
+DEAL:MappingFace2d-2-Q3::2.3 1.0	0.0 -1.0	1.3
+DEAL:MappingFace2d-2-Q3::3.7 1.0	0.00 -1.0	1.3
+DEAL:MappingFace2d-2-Q3::4.7 1.0	0.0 -1.0	0.70
 DEAL:MappingFace2d-2-Q3::
 DEAL:MappingFace2d-2-Q3::
-DEAL:MappingFace2d-2-Q3::5.0 1.2	1.0 0.098
-DEAL:MappingFace2d-2-Q3::4.7 2.0	0.86 0.51
-DEAL:MappingFace2d-2-Q3::4.0 2.7	0.51 0.86
-DEAL:MappingFace2d-2-Q3::3.2 3.0	0.098 1.0
+DEAL:MappingFace2d-2-Q3::5.0 1.2	1.0 0.098	0.55
+DEAL:MappingFace2d-2-Q3::4.7 2.0	0.86 0.51	1.0
+DEAL:MappingFace2d-2-Q3::4.0 2.7	0.51 0.86	1.0
+DEAL:MappingFace2d-2-Q3::3.2 3.0	0.098 1.0	0.55
 DEAL:MappingFace2d-2-Q3::
 DEAL:MappingFace2d-2-Q3::
-DEAL:MappingFace2d-2-Q3::1.1 2.9	0.39 0.92
-DEAL:MappingFace2d-2-Q3::1.6 2.8	0.15 0.99
-DEAL:MappingFace2d-2-Q3::2.4 2.8	-0.15 0.99
-DEAL:MappingFace2d-2-Q3::2.9 2.9	-0.39 0.92
+DEAL:MappingFace2d-2-Q3::1.1 2.9	0.39 0.92	0.36
+DEAL:MappingFace2d-2-Q3::1.6 2.8	0.15 0.99	0.68
+DEAL:MappingFace2d-2-Q3::2.4 2.8	-0.15 0.99	0.68
+DEAL:MappingFace2d-2-Q3::2.9 2.9	-0.39 0.92	0.36
 DEAL:MappingFace2d-2-Q3::
 DEAL:MappingFace2d-2-Q3::
-DEAL:MappingFace2d-2-Q3::1.0 1.1	-1.0 0.00
-DEAL:MappingFace2d-2-Q3::1.0 1.7	-1.0 -0.0
-DEAL:MappingFace2d-2-Q3::1.0 2.3	-1.0 0.00
-DEAL:MappingFace2d-2-Q3::1.0 2.9	-1.0 -0.0
+DEAL:MappingFace2d-2-Q3::1.0 1.1	-1.0 0.00	0.35
+DEAL:MappingFace2d-2-Q3::1.0 1.7	-1.0 -0.0	0.65
+DEAL:MappingFace2d-2-Q3::1.0 2.3	-1.0 0.00	0.65
+DEAL:MappingFace2d-2-Q3::1.0 2.9	-1.0 -0.0	0.35
 DEAL:MappingFace2d-2-Q3::
 DEAL:MappingFace2d-2-Q3::
 DEAL::MappingSubface2d-2-Q3
@@ -874,28 +874,28 @@ DEAL:Mapping2d-2-Q4::
 DEAL:Mapping2d-2-Q4::
 DEAL::  area=6.8
 DEAL::MappingFace2d-2-Q4
-DEAL:MappingFace2d-2-Q4::1.3 1.0	0.00 -1.0
-DEAL:MappingFace2d-2-Q4::2.3 1.0	0.00 -1.0
-DEAL:MappingFace2d-2-Q4::3.7 1.0	0.00 -1.0
-DEAL:MappingFace2d-2-Q4::4.7 1.0	0.00 -1.0
+DEAL:MappingFace2d-2-Q4::1.3 1.0	0.00 -1.0	0.70
+DEAL:MappingFace2d-2-Q4::2.3 1.0	0.00 -1.0	1.3
+DEAL:MappingFace2d-2-Q4::3.7 1.0	0.00 -1.0	1.3
+DEAL:MappingFace2d-2-Q4::4.7 1.0	0.00 -1.0	0.70
 DEAL:MappingFace2d-2-Q4::
 DEAL:MappingFace2d-2-Q4::
-DEAL:MappingFace2d-2-Q4::5.0 1.2	0.99 0.11
-DEAL:MappingFace2d-2-Q4::4.7 2.0	0.87 0.50
-DEAL:MappingFace2d-2-Q4::4.0 2.7	0.50 0.87
-DEAL:MappingFace2d-2-Q4::3.2 3.0	0.11 0.99
+DEAL:MappingFace2d-2-Q4::5.0 1.2	0.99 0.11	0.55
+DEAL:MappingFace2d-2-Q4::4.7 2.0	0.87 0.50	1.0
+DEAL:MappingFace2d-2-Q4::4.0 2.7	0.50 0.87	1.0
+DEAL:MappingFace2d-2-Q4::3.2 3.0	0.11 0.99	0.55
 DEAL:MappingFace2d-2-Q4::
 DEAL:MappingFace2d-2-Q4::
-DEAL:MappingFace2d-2-Q4::1.1 2.9	0.39 0.92
-DEAL:MappingFace2d-2-Q4::1.6 2.8	0.16 0.99
-DEAL:MappingFace2d-2-Q4::2.4 2.8	-0.16 0.99
-DEAL:MappingFace2d-2-Q4::2.9 2.9	-0.39 0.92
+DEAL:MappingFace2d-2-Q4::1.1 2.9	0.39 0.92	0.36
+DEAL:MappingFace2d-2-Q4::1.6 2.8	0.16 0.99	0.68
+DEAL:MappingFace2d-2-Q4::2.4 2.8	-0.16 0.99	0.68
+DEAL:MappingFace2d-2-Q4::2.9 2.9	-0.39 0.92	0.36
 DEAL:MappingFace2d-2-Q4::
 DEAL:MappingFace2d-2-Q4::
-DEAL:MappingFace2d-2-Q4::1.0 1.1	-1.0 0.00
-DEAL:MappingFace2d-2-Q4::1.0 1.7	-1.0 0.00
-DEAL:MappingFace2d-2-Q4::1.0 2.3	-1.0 0.00
-DEAL:MappingFace2d-2-Q4::1.0 2.9	-1.0 0.00
+DEAL:MappingFace2d-2-Q4::1.0 1.1	-1.0 0.00	0.35
+DEAL:MappingFace2d-2-Q4::1.0 1.7	-1.0 0.00	0.65
+DEAL:MappingFace2d-2-Q4::1.0 2.3	-1.0 0.00	0.65
+DEAL:MappingFace2d-2-Q4::1.0 2.9	-1.0 0.00	0.35
 DEAL:MappingFace2d-2-Q4::
 DEAL:MappingFace2d-2-Q4::
 DEAL::MappingSubface2d-2-Q4
@@ -1026,28 +1026,28 @@ DEAL:Mapping2d-3-Cartesian::
 DEAL:Mapping2d-3-Cartesian::
 DEAL::  area=1.5
 DEAL::MappingFace2d-3-Cartesian
-DEAL:MappingFace2d-3-Cartesian::1.1 2.5	0.0 -1.0
-DEAL:MappingFace2d-3-Cartesian::1.3 2.5	0.0 -1.0
-DEAL:MappingFace2d-3-Cartesian::1.7 2.5	0.0 -1.0
-DEAL:MappingFace2d-3-Cartesian::1.9 2.5	0.0 -1.0
+DEAL:MappingFace2d-3-Cartesian::1.1 2.5	0.0 -1.0	0.17
+DEAL:MappingFace2d-3-Cartesian::1.3 2.5	0.0 -1.0	0.33
+DEAL:MappingFace2d-3-Cartesian::1.7 2.5	0.0 -1.0	0.33
+DEAL:MappingFace2d-3-Cartesian::1.9 2.5	0.0 -1.0	0.17
 DEAL:MappingFace2d-3-Cartesian::
 DEAL:MappingFace2d-3-Cartesian::
-DEAL:MappingFace2d-3-Cartesian::2.0 2.6	1.0 0.0
-DEAL:MappingFace2d-3-Cartesian::2.0 3.0	1.0 0.0
-DEAL:MappingFace2d-3-Cartesian::2.0 3.5	1.0 0.0
-DEAL:MappingFace2d-3-Cartesian::2.0 3.9	1.0 0.0
+DEAL:MappingFace2d-3-Cartesian::2.0 2.6	1.0 0.0	0.26
+DEAL:MappingFace2d-3-Cartesian::2.0 3.0	1.0 0.0	0.49
+DEAL:MappingFace2d-3-Cartesian::2.0 3.5	1.0 0.0	0.49
+DEAL:MappingFace2d-3-Cartesian::2.0 3.9	1.0 0.0	0.26
 DEAL:MappingFace2d-3-Cartesian::
 DEAL:MappingFace2d-3-Cartesian::
-DEAL:MappingFace2d-3-Cartesian::1.1 4.0	0.0 1.0
-DEAL:MappingFace2d-3-Cartesian::1.3 4.0	0.0 1.0
-DEAL:MappingFace2d-3-Cartesian::1.7 4.0	0.0 1.0
-DEAL:MappingFace2d-3-Cartesian::1.9 4.0	0.0 1.0
+DEAL:MappingFace2d-3-Cartesian::1.1 4.0	0.0 1.0	0.17
+DEAL:MappingFace2d-3-Cartesian::1.3 4.0	0.0 1.0	0.33
+DEAL:MappingFace2d-3-Cartesian::1.7 4.0	0.0 1.0	0.33
+DEAL:MappingFace2d-3-Cartesian::1.9 4.0	0.0 1.0	0.17
 DEAL:MappingFace2d-3-Cartesian::
 DEAL:MappingFace2d-3-Cartesian::
-DEAL:MappingFace2d-3-Cartesian::1.0 2.6	-1.0 0.0
-DEAL:MappingFace2d-3-Cartesian::1.0 3.0	-1.0 0.0
-DEAL:MappingFace2d-3-Cartesian::1.0 3.5	-1.0 0.0
-DEAL:MappingFace2d-3-Cartesian::1.0 3.9	-1.0 0.0
+DEAL:MappingFace2d-3-Cartesian::1.0 2.6	-1.0 0.0	0.26
+DEAL:MappingFace2d-3-Cartesian::1.0 3.0	-1.0 0.0	0.49
+DEAL:MappingFace2d-3-Cartesian::1.0 3.5	-1.0 0.0	0.49
+DEAL:MappingFace2d-3-Cartesian::1.0 3.9	-1.0 0.0	0.26
 DEAL:MappingFace2d-3-Cartesian::
 DEAL:MappingFace2d-3-Cartesian::
 DEAL::MappingSubface2d-3-Cartesian
@@ -1696,130 +1696,130 @@ DEAL:Mapping3d-3-Q1fixed::
 DEAL:Mapping3d-3-Q1fixed::
 DEAL::  area=2.1
 DEAL::MappingFace3d-3-Q1fixed
-DEAL:MappingFace3d-3-Q1fixed::-0.95 -1.0 -0.95	-0.28 -0.92 -0.28
-DEAL:MappingFace3d-3-Q1fixed::-1.0 -1.1 -0.68	-0.31 -0.91 -0.28
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -1.2 -0.34	-0.34 -0.90 -0.29
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -1.2 -0.071	-0.36 -0.89 -0.29
+DEAL:MappingFace3d-3-Q1fixed::-0.95 -1.0 -0.95	-0.28 -0.92 -0.28	0.033
+DEAL:MappingFace3d-3-Q1fixed::-1.0 -1.1 -0.68	-0.31 -0.91 -0.28	0.066
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -1.2 -0.34	-0.34 -0.90 -0.29	0.073
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -1.2 -0.071	-0.36 -0.89 -0.29	0.042
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.68 -1.1 -1.0	-0.28 -0.91 -0.31
-DEAL:MappingFace3d-3-Q1fixed::-0.72 -1.2 -0.72	-0.31 -0.90 -0.31
-DEAL:MappingFace3d-3-Q1fixed::-0.77 -1.3 -0.35	-0.34 -0.89 -0.31
-DEAL:MappingFace3d-3-Q1fixed::-0.81 -1.4 -0.075	-0.36 -0.88 -0.31
+DEAL:MappingFace3d-3-Q1fixed::-0.68 -1.1 -1.0	-0.28 -0.91 -0.31	0.066
+DEAL:MappingFace3d-3-Q1fixed::-0.72 -1.2 -0.72	-0.31 -0.90 -0.31	0.13
+DEAL:MappingFace3d-3-Q1fixed::-0.77 -1.3 -0.35	-0.34 -0.89 -0.31	0.15
+DEAL:MappingFace3d-3-Q1fixed::-0.81 -1.4 -0.075	-0.36 -0.88 -0.31	0.084
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.34 -1.2 -1.1	-0.29 -0.90 -0.34
-DEAL:MappingFace3d-3-Q1fixed::-0.35 -1.3 -0.77	-0.31 -0.89 -0.34
-DEAL:MappingFace3d-3-Q1fixed::-0.38 -1.4 -0.38	-0.34 -0.88 -0.34
-DEAL:MappingFace3d-3-Q1fixed::-0.40 -1.5 -0.080	-0.36 -0.87 -0.34
+DEAL:MappingFace3d-3-Q1fixed::-0.34 -1.2 -1.1	-0.29 -0.90 -0.34	0.073
+DEAL:MappingFace3d-3-Q1fixed::-0.35 -1.3 -0.77	-0.31 -0.89 -0.34	0.15
+DEAL:MappingFace3d-3-Q1fixed::-0.38 -1.4 -0.38	-0.34 -0.88 -0.34	0.16
+DEAL:MappingFace3d-3-Q1fixed::-0.40 -1.5 -0.080	-0.36 -0.87 -0.34	0.090
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.071 -1.2 -1.1	-0.29 -0.89 -0.36
-DEAL:MappingFace3d-3-Q1fixed::-0.075 -1.4 -0.81	-0.31 -0.88 -0.36
-DEAL:MappingFace3d-3-Q1fixed::-0.080 -1.5 -0.40	-0.34 -0.87 -0.36
-DEAL:MappingFace3d-3-Q1fixed::-0.084 -1.7 -0.084	-0.35 -0.87 -0.35
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-1.2 0.0 -1.2	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-1.3 0.0 -0.84	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-1.5 0.0 -0.42	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-1.6 0.0 -0.087	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.84 0.0 -1.3	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.93 0.0 -0.93	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-1.0 0.0 -0.46	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-1.1 0.0 -0.097	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.42 0.0 -1.5	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.46 0.0 -1.0	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.52 0.0 -0.52	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.56 0.0 -0.11	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.087 0.0 -1.6	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.097 0.0 -1.1	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.11 0.0 -0.56	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::-0.12 0.0 -0.12	-0.0 1.0 -0.0
+DEAL:MappingFace3d-3-Q1fixed::-0.071 -1.2 -1.1	-0.29 -0.89 -0.36	0.042
+DEAL:MappingFace3d-3-Q1fixed::-0.075 -1.4 -0.81	-0.31 -0.88 -0.36	0.084
+DEAL:MappingFace3d-3-Q1fixed::-0.080 -1.5 -0.40	-0.34 -0.87 -0.36	0.090
+DEAL:MappingFace3d-3-Q1fixed::-0.084 -1.7 -0.084	-0.35 -0.87 -0.35	0.051
 DEAL:MappingFace3d-3-Q1fixed::
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.95 -0.95 -1.0	-0.28 -0.28 -0.92
-DEAL:MappingFace3d-3-Q1fixed::-1.0 -0.68 -1.1	-0.31 -0.28 -0.91
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.34 -1.2	-0.34 -0.29 -0.90
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.071 -1.2	-0.36 -0.29 -0.89
+DEAL:MappingFace3d-3-Q1fixed::-1.2 0.0 -1.2	-0.0 1.0 -0.0	0.041
+DEAL:MappingFace3d-3-Q1fixed::-1.3 0.0 -0.84	-0.0 1.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1fixed::-1.5 0.0 -0.42	-0.0 1.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1fixed::-1.6 0.0 -0.087	-0.0 1.0 -0.0	0.064
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.68 -1.0 -1.1	-0.28 -0.31 -0.91
-DEAL:MappingFace3d-3-Q1fixed::-0.72 -0.72 -1.2	-0.31 -0.31 -0.90
-DEAL:MappingFace3d-3-Q1fixed::-0.77 -0.35 -1.3	-0.34 -0.31 -0.89
-DEAL:MappingFace3d-3-Q1fixed::-0.81 -0.075 -1.4	-0.36 -0.31 -0.88
+DEAL:MappingFace3d-3-Q1fixed::-0.84 0.0 -1.3	-0.0 1.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1fixed::-0.93 0.0 -0.93	-0.0 1.0 -0.0	0.19
+DEAL:MappingFace3d-3-Q1fixed::-1.0 0.0 -0.46	-0.0 1.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1fixed::-1.1 0.0 -0.097	-0.0 1.0 -0.0	0.13
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.34 -1.1 -1.2	-0.29 -0.34 -0.90
-DEAL:MappingFace3d-3-Q1fixed::-0.35 -0.77 -1.3	-0.31 -0.34 -0.89
-DEAL:MappingFace3d-3-Q1fixed::-0.38 -0.38 -1.4	-0.34 -0.34 -0.88
-DEAL:MappingFace3d-3-Q1fixed::-0.40 -0.080 -1.5	-0.36 -0.34 -0.87
+DEAL:MappingFace3d-3-Q1fixed::-0.42 0.0 -1.5	-0.0 1.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1fixed::-0.46 0.0 -1.0	-0.0 1.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1fixed::-0.52 0.0 -0.52	-0.0 1.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q1fixed::-0.56 0.0 -0.11	-0.0 1.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.071 -1.1 -1.2	-0.29 -0.36 -0.89
-DEAL:MappingFace3d-3-Q1fixed::-0.075 -0.81 -1.4	-0.31 -0.36 -0.88
-DEAL:MappingFace3d-3-Q1fixed::-0.080 -0.40 -1.5	-0.34 -0.36 -0.87
-DEAL:MappingFace3d-3-Q1fixed::-0.084 -0.084 -1.7	-0.35 -0.35 -0.87
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::0.0 -1.2 -1.2	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -1.3 -0.84	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -1.5 -0.42	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -1.6 -0.087	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.84 -1.3	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.93 -0.93	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -1.0 -0.46	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -1.1 -0.097	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.42 -1.5	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.46 -1.0	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.52 -0.52	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.56 -0.11	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.087 -1.6	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.097 -1.1	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.11 -0.56	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1fixed::0.0 -0.12 -0.12	1.0 -0.0 -0.0
+DEAL:MappingFace3d-3-Q1fixed::-0.087 0.0 -1.6	-0.0 1.0 -0.0	0.064
+DEAL:MappingFace3d-3-Q1fixed::-0.097 0.0 -1.1	-0.0 1.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q1fixed::-0.11 0.0 -0.56	-0.0 1.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q1fixed::-0.12 0.0 -0.12	-0.0 1.0 -0.0	0.087
 DEAL:MappingFace3d-3-Q1fixed::
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-1.2 -1.2 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-1.3 -0.84 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-1.5 -0.42 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-1.6 -0.087 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1fixed::-0.95 -0.95 -1.0	-0.28 -0.28 -0.92	0.033
+DEAL:MappingFace3d-3-Q1fixed::-1.0 -0.68 -1.1	-0.31 -0.28 -0.91	0.066
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.34 -1.2	-0.34 -0.29 -0.90	0.073
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.071 -1.2	-0.36 -0.29 -0.89	0.042
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.84 -1.3 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.93 -0.93 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-1.0 -0.46 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.097 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1fixed::-0.68 -1.0 -1.1	-0.28 -0.31 -0.91	0.066
+DEAL:MappingFace3d-3-Q1fixed::-0.72 -0.72 -1.2	-0.31 -0.31 -0.90	0.13
+DEAL:MappingFace3d-3-Q1fixed::-0.77 -0.35 -1.3	-0.34 -0.31 -0.89	0.15
+DEAL:MappingFace3d-3-Q1fixed::-0.81 -0.075 -1.4	-0.36 -0.31 -0.88	0.084
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.42 -1.5 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.46 -1.0 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.52 -0.52 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.56 -0.11 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1fixed::-0.34 -1.1 -1.2	-0.29 -0.34 -0.90	0.073
+DEAL:MappingFace3d-3-Q1fixed::-0.35 -0.77 -1.3	-0.31 -0.34 -0.89	0.15
+DEAL:MappingFace3d-3-Q1fixed::-0.38 -0.38 -1.4	-0.34 -0.34 -0.88	0.16
+DEAL:MappingFace3d-3-Q1fixed::-0.40 -0.080 -1.5	-0.36 -0.34 -0.87	0.090
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-0.087 -1.6 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.097 -1.1 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.11 -0.56 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1fixed::-0.12 -0.12 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1fixed::-0.071 -1.1 -1.2	-0.29 -0.36 -0.89	0.042
+DEAL:MappingFace3d-3-Q1fixed::-0.075 -0.81 -1.4	-0.31 -0.36 -0.88	0.084
+DEAL:MappingFace3d-3-Q1fixed::-0.080 -0.40 -1.5	-0.34 -0.36 -0.87	0.090
+DEAL:MappingFace3d-3-Q1fixed::-0.084 -0.084 -1.7	-0.35 -0.35 -0.87	0.051
 DEAL:MappingFace3d-3-Q1fixed::
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-1.0 -0.95 -0.95	-0.92 -0.28 -0.28
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -1.0 -0.68	-0.91 -0.31 -0.28
-DEAL:MappingFace3d-3-Q1fixed::-1.2 -1.1 -0.34	-0.90 -0.34 -0.29
-DEAL:MappingFace3d-3-Q1fixed::-1.2 -1.1 -0.071	-0.89 -0.36 -0.29
+DEAL:MappingFace3d-3-Q1fixed::0.0 -1.2 -1.2	1.0 -0.0 -0.0	0.041
+DEAL:MappingFace3d-3-Q1fixed::0.0 -1.3 -0.84	1.0 -0.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1fixed::0.0 -1.5 -0.42	1.0 -0.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1fixed::0.0 -1.6 -0.087	1.0 -0.0 -0.0	0.064
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.68 -1.0	-0.91 -0.28 -0.31
-DEAL:MappingFace3d-3-Q1fixed::-1.2 -0.72 -0.72	-0.90 -0.31 -0.31
-DEAL:MappingFace3d-3-Q1fixed::-1.3 -0.77 -0.35	-0.89 -0.34 -0.31
-DEAL:MappingFace3d-3-Q1fixed::-1.4 -0.81 -0.075	-0.88 -0.36 -0.31
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.84 -1.3	1.0 -0.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.93 -0.93	1.0 -0.0 -0.0	0.19
+DEAL:MappingFace3d-3-Q1fixed::0.0 -1.0 -0.46	1.0 -0.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1fixed::0.0 -1.1 -0.097	1.0 -0.0 -0.0	0.13
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-1.2 -0.34 -1.1	-0.90 -0.29 -0.34
-DEAL:MappingFace3d-3-Q1fixed::-1.3 -0.35 -0.77	-0.89 -0.31 -0.34
-DEAL:MappingFace3d-3-Q1fixed::-1.4 -0.38 -0.38	-0.88 -0.34 -0.34
-DEAL:MappingFace3d-3-Q1fixed::-1.5 -0.40 -0.080	-0.87 -0.36 -0.34
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.42 -1.5	1.0 -0.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.46 -1.0	1.0 -0.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.52 -0.52	1.0 -0.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.56 -0.11	1.0 -0.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q1fixed::
-DEAL:MappingFace3d-3-Q1fixed::-1.2 -0.071 -1.1	-0.89 -0.29 -0.36
-DEAL:MappingFace3d-3-Q1fixed::-1.4 -0.075 -0.81	-0.88 -0.31 -0.36
-DEAL:MappingFace3d-3-Q1fixed::-1.5 -0.080 -0.40	-0.87 -0.34 -0.36
-DEAL:MappingFace3d-3-Q1fixed::-1.7 -0.084 -0.084	-0.87 -0.35 -0.35
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.087 -1.6	1.0 -0.0 -0.0	0.064
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.097 -1.1	1.0 -0.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.11 -0.56	1.0 -0.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q1fixed::0.0 -0.12 -0.12	1.0 -0.0 -0.0	0.087
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-1.2 -1.2 0.0	-0.0 -0.0 1.0	0.041
+DEAL:MappingFace3d-3-Q1fixed::-1.3 -0.84 0.0	-0.0 -0.0 1.0	0.090
+DEAL:MappingFace3d-3-Q1fixed::-1.5 -0.42 0.0	-0.0 -0.0 1.0	0.11
+DEAL:MappingFace3d-3-Q1fixed::-1.6 -0.087 0.0	-0.0 -0.0 1.0	0.064
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-0.84 -1.3 0.0	-0.0 -0.0 1.0	0.090
+DEAL:MappingFace3d-3-Q1fixed::-0.93 -0.93 0.0	-0.0 -0.0 1.0	0.19
+DEAL:MappingFace3d-3-Q1fixed::-1.0 -0.46 0.0	-0.0 -0.0 1.0	0.23
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.097 0.0	-0.0 -0.0 1.0	0.13
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-0.42 -1.5 0.0	-0.0 -0.0 1.0	0.11
+DEAL:MappingFace3d-3-Q1fixed::-0.46 -1.0 0.0	-0.0 -0.0 1.0	0.23
+DEAL:MappingFace3d-3-Q1fixed::-0.52 -0.52 0.0	-0.0 -0.0 1.0	0.26
+DEAL:MappingFace3d-3-Q1fixed::-0.56 -0.11 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-0.087 -1.6 0.0	-0.0 -0.0 1.0	0.064
+DEAL:MappingFace3d-3-Q1fixed::-0.097 -1.1 0.0	-0.0 -0.0 1.0	0.13
+DEAL:MappingFace3d-3-Q1fixed::-0.11 -0.56 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q1fixed::-0.12 -0.12 0.0	-0.0 -0.0 1.0	0.087
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-1.0 -0.95 -0.95	-0.92 -0.28 -0.28	0.033
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -1.0 -0.68	-0.91 -0.31 -0.28	0.066
+DEAL:MappingFace3d-3-Q1fixed::-1.2 -1.1 -0.34	-0.90 -0.34 -0.29	0.073
+DEAL:MappingFace3d-3-Q1fixed::-1.2 -1.1 -0.071	-0.89 -0.36 -0.29	0.042
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-1.1 -0.68 -1.0	-0.91 -0.28 -0.31	0.066
+DEAL:MappingFace3d-3-Q1fixed::-1.2 -0.72 -0.72	-0.90 -0.31 -0.31	0.13
+DEAL:MappingFace3d-3-Q1fixed::-1.3 -0.77 -0.35	-0.89 -0.34 -0.31	0.15
+DEAL:MappingFace3d-3-Q1fixed::-1.4 -0.81 -0.075	-0.88 -0.36 -0.31	0.084
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-1.2 -0.34 -1.1	-0.90 -0.29 -0.34	0.073
+DEAL:MappingFace3d-3-Q1fixed::-1.3 -0.35 -0.77	-0.89 -0.31 -0.34	0.15
+DEAL:MappingFace3d-3-Q1fixed::-1.4 -0.38 -0.38	-0.88 -0.34 -0.34	0.16
+DEAL:MappingFace3d-3-Q1fixed::-1.5 -0.40 -0.080	-0.87 -0.36 -0.34	0.090
+DEAL:MappingFace3d-3-Q1fixed::
+DEAL:MappingFace3d-3-Q1fixed::-1.2 -0.071 -1.1	-0.89 -0.29 -0.36	0.042
+DEAL:MappingFace3d-3-Q1fixed::-1.4 -0.075 -0.81	-0.88 -0.31 -0.36	0.084
+DEAL:MappingFace3d-3-Q1fixed::-1.5 -0.080 -0.40	-0.87 -0.34 -0.36	0.090
+DEAL:MappingFace3d-3-Q1fixed::-1.7 -0.084 -0.084	-0.87 -0.35 -0.35	0.051
 DEAL:MappingFace3d-3-Q1fixed::
 DEAL:MappingFace3d-3-Q1fixed::
 DEAL::MappingSubface3d-3-Q1fixed
@@ -2915,130 +2915,130 @@ DEAL:Mapping3d-3-Q1::
 DEAL:Mapping3d-3-Q1::
 DEAL::  area=2.1
 DEAL::MappingFace3d-3-Q1
-DEAL:MappingFace3d-3-Q1::-0.95 -1.0 -0.95	-0.28 -0.92 -0.28
-DEAL:MappingFace3d-3-Q1::-1.0 -1.1 -0.68	-0.31 -0.91 -0.28
-DEAL:MappingFace3d-3-Q1::-1.1 -1.2 -0.34	-0.34 -0.90 -0.29
-DEAL:MappingFace3d-3-Q1::-1.1 -1.2 -0.071	-0.36 -0.89 -0.29
+DEAL:MappingFace3d-3-Q1::-0.95 -1.0 -0.95	-0.28 -0.92 -0.28	0.033
+DEAL:MappingFace3d-3-Q1::-1.0 -1.1 -0.68	-0.31 -0.91 -0.28	0.066
+DEAL:MappingFace3d-3-Q1::-1.1 -1.2 -0.34	-0.34 -0.90 -0.29	0.073
+DEAL:MappingFace3d-3-Q1::-1.1 -1.2 -0.071	-0.36 -0.89 -0.29	0.042
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.68 -1.1 -1.0	-0.28 -0.91 -0.31
-DEAL:MappingFace3d-3-Q1::-0.72 -1.2 -0.72	-0.31 -0.90 -0.31
-DEAL:MappingFace3d-3-Q1::-0.77 -1.3 -0.35	-0.34 -0.89 -0.31
-DEAL:MappingFace3d-3-Q1::-0.81 -1.4 -0.075	-0.36 -0.88 -0.31
+DEAL:MappingFace3d-3-Q1::-0.68 -1.1 -1.0	-0.28 -0.91 -0.31	0.066
+DEAL:MappingFace3d-3-Q1::-0.72 -1.2 -0.72	-0.31 -0.90 -0.31	0.13
+DEAL:MappingFace3d-3-Q1::-0.77 -1.3 -0.35	-0.34 -0.89 -0.31	0.15
+DEAL:MappingFace3d-3-Q1::-0.81 -1.4 -0.075	-0.36 -0.88 -0.31	0.084
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.34 -1.2 -1.1	-0.29 -0.90 -0.34
-DEAL:MappingFace3d-3-Q1::-0.35 -1.3 -0.77	-0.31 -0.89 -0.34
-DEAL:MappingFace3d-3-Q1::-0.38 -1.4 -0.38	-0.34 -0.88 -0.34
-DEAL:MappingFace3d-3-Q1::-0.40 -1.5 -0.080	-0.36 -0.87 -0.34
+DEAL:MappingFace3d-3-Q1::-0.34 -1.2 -1.1	-0.29 -0.90 -0.34	0.073
+DEAL:MappingFace3d-3-Q1::-0.35 -1.3 -0.77	-0.31 -0.89 -0.34	0.15
+DEAL:MappingFace3d-3-Q1::-0.38 -1.4 -0.38	-0.34 -0.88 -0.34	0.16
+DEAL:MappingFace3d-3-Q1::-0.40 -1.5 -0.080	-0.36 -0.87 -0.34	0.090
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.071 -1.2 -1.1	-0.29 -0.89 -0.36
-DEAL:MappingFace3d-3-Q1::-0.075 -1.4 -0.81	-0.31 -0.88 -0.36
-DEAL:MappingFace3d-3-Q1::-0.080 -1.5 -0.40	-0.34 -0.87 -0.36
-DEAL:MappingFace3d-3-Q1::-0.084 -1.7 -0.084	-0.35 -0.87 -0.35
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-1.2 0.0 -1.2	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-1.3 0.0 -0.84	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-1.5 0.0 -0.42	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-1.6 0.0 -0.087	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.84 0.0 -1.3	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.93 0.0 -0.93	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-1.0 0.0 -0.46	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-1.1 0.0 -0.097	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.42 0.0 -1.5	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.46 0.0 -1.0	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.52 0.0 -0.52	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.56 0.0 -0.11	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.087 0.0 -1.6	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.097 0.0 -1.1	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.11 0.0 -0.56	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q1::-0.12 0.0 -0.12	-0.0 1.0 -0.0
+DEAL:MappingFace3d-3-Q1::-0.071 -1.2 -1.1	-0.29 -0.89 -0.36	0.042
+DEAL:MappingFace3d-3-Q1::-0.075 -1.4 -0.81	-0.31 -0.88 -0.36	0.084
+DEAL:MappingFace3d-3-Q1::-0.080 -1.5 -0.40	-0.34 -0.87 -0.36	0.090
+DEAL:MappingFace3d-3-Q1::-0.084 -1.7 -0.084	-0.35 -0.87 -0.35	0.051
 DEAL:MappingFace3d-3-Q1::
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.95 -0.95 -1.0	-0.28 -0.28 -0.92
-DEAL:MappingFace3d-3-Q1::-1.0 -0.68 -1.1	-0.31 -0.28 -0.91
-DEAL:MappingFace3d-3-Q1::-1.1 -0.34 -1.2	-0.34 -0.29 -0.90
-DEAL:MappingFace3d-3-Q1::-1.1 -0.071 -1.2	-0.36 -0.29 -0.89
+DEAL:MappingFace3d-3-Q1::-1.2 0.0 -1.2	-0.0 1.0 -0.0	0.041
+DEAL:MappingFace3d-3-Q1::-1.3 0.0 -0.84	-0.0 1.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1::-1.5 0.0 -0.42	-0.0 1.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1::-1.6 0.0 -0.087	-0.0 1.0 -0.0	0.064
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.68 -1.0 -1.1	-0.28 -0.31 -0.91
-DEAL:MappingFace3d-3-Q1::-0.72 -0.72 -1.2	-0.31 -0.31 -0.90
-DEAL:MappingFace3d-3-Q1::-0.77 -0.35 -1.3	-0.34 -0.31 -0.89
-DEAL:MappingFace3d-3-Q1::-0.81 -0.075 -1.4	-0.36 -0.31 -0.88
+DEAL:MappingFace3d-3-Q1::-0.84 0.0 -1.3	-0.0 1.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1::-0.93 0.0 -0.93	-0.0 1.0 -0.0	0.19
+DEAL:MappingFace3d-3-Q1::-1.0 0.0 -0.46	-0.0 1.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1::-1.1 0.0 -0.097	-0.0 1.0 -0.0	0.13
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.34 -1.1 -1.2	-0.29 -0.34 -0.90
-DEAL:MappingFace3d-3-Q1::-0.35 -0.77 -1.3	-0.31 -0.34 -0.89
-DEAL:MappingFace3d-3-Q1::-0.38 -0.38 -1.4	-0.34 -0.34 -0.88
-DEAL:MappingFace3d-3-Q1::-0.40 -0.080 -1.5	-0.36 -0.34 -0.87
+DEAL:MappingFace3d-3-Q1::-0.42 0.0 -1.5	-0.0 1.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1::-0.46 0.0 -1.0	-0.0 1.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1::-0.52 0.0 -0.52	-0.0 1.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q1::-0.56 0.0 -0.11	-0.0 1.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.071 -1.1 -1.2	-0.29 -0.36 -0.89
-DEAL:MappingFace3d-3-Q1::-0.075 -0.81 -1.4	-0.31 -0.36 -0.88
-DEAL:MappingFace3d-3-Q1::-0.080 -0.40 -1.5	-0.34 -0.36 -0.87
-DEAL:MappingFace3d-3-Q1::-0.084 -0.084 -1.7	-0.35 -0.35 -0.87
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::0.0 -1.2 -1.2	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -1.3 -0.84	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -1.5 -0.42	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -1.6 -0.087	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::0.0 -0.84 -1.3	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.93 -0.93	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -1.0 -0.46	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -1.1 -0.097	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::0.0 -0.42 -1.5	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.46 -1.0	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.52 -0.52	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.56 -0.11	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::0.0 -0.087 -1.6	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.097 -1.1	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.11 -0.56	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q1::0.0 -0.12 -0.12	1.0 -0.0 -0.0
+DEAL:MappingFace3d-3-Q1::-0.087 0.0 -1.6	-0.0 1.0 -0.0	0.064
+DEAL:MappingFace3d-3-Q1::-0.097 0.0 -1.1	-0.0 1.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q1::-0.11 0.0 -0.56	-0.0 1.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q1::-0.12 0.0 -0.12	-0.0 1.0 -0.0	0.087
 DEAL:MappingFace3d-3-Q1::
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-1.2 -1.2 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-1.3 -0.84 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-1.5 -0.42 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-1.6 -0.087 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1::-0.95 -0.95 -1.0	-0.28 -0.28 -0.92	0.033
+DEAL:MappingFace3d-3-Q1::-1.0 -0.68 -1.1	-0.31 -0.28 -0.91	0.066
+DEAL:MappingFace3d-3-Q1::-1.1 -0.34 -1.2	-0.34 -0.29 -0.90	0.073
+DEAL:MappingFace3d-3-Q1::-1.1 -0.071 -1.2	-0.36 -0.29 -0.89	0.042
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.84 -1.3 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.93 -0.93 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-1.0 -0.46 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-1.1 -0.097 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1::-0.68 -1.0 -1.1	-0.28 -0.31 -0.91	0.066
+DEAL:MappingFace3d-3-Q1::-0.72 -0.72 -1.2	-0.31 -0.31 -0.90	0.13
+DEAL:MappingFace3d-3-Q1::-0.77 -0.35 -1.3	-0.34 -0.31 -0.89	0.15
+DEAL:MappingFace3d-3-Q1::-0.81 -0.075 -1.4	-0.36 -0.31 -0.88	0.084
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.42 -1.5 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.46 -1.0 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.52 -0.52 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.56 -0.11 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1::-0.34 -1.1 -1.2	-0.29 -0.34 -0.90	0.073
+DEAL:MappingFace3d-3-Q1::-0.35 -0.77 -1.3	-0.31 -0.34 -0.89	0.15
+DEAL:MappingFace3d-3-Q1::-0.38 -0.38 -1.4	-0.34 -0.34 -0.88	0.16
+DEAL:MappingFace3d-3-Q1::-0.40 -0.080 -1.5	-0.36 -0.34 -0.87	0.090
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-0.087 -1.6 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.097 -1.1 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.11 -0.56 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q1::-0.12 -0.12 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q1::-0.071 -1.1 -1.2	-0.29 -0.36 -0.89	0.042
+DEAL:MappingFace3d-3-Q1::-0.075 -0.81 -1.4	-0.31 -0.36 -0.88	0.084
+DEAL:MappingFace3d-3-Q1::-0.080 -0.40 -1.5	-0.34 -0.36 -0.87	0.090
+DEAL:MappingFace3d-3-Q1::-0.084 -0.084 -1.7	-0.35 -0.35 -0.87	0.051
 DEAL:MappingFace3d-3-Q1::
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-1.0 -0.95 -0.95	-0.92 -0.28 -0.28
-DEAL:MappingFace3d-3-Q1::-1.1 -1.0 -0.68	-0.91 -0.31 -0.28
-DEAL:MappingFace3d-3-Q1::-1.2 -1.1 -0.34	-0.90 -0.34 -0.29
-DEAL:MappingFace3d-3-Q1::-1.2 -1.1 -0.071	-0.89 -0.36 -0.29
+DEAL:MappingFace3d-3-Q1::0.0 -1.2 -1.2	1.0 -0.0 -0.0	0.041
+DEAL:MappingFace3d-3-Q1::0.0 -1.3 -0.84	1.0 -0.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1::0.0 -1.5 -0.42	1.0 -0.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1::0.0 -1.6 -0.087	1.0 -0.0 -0.0	0.064
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-1.1 -0.68 -1.0	-0.91 -0.28 -0.31
-DEAL:MappingFace3d-3-Q1::-1.2 -0.72 -0.72	-0.90 -0.31 -0.31
-DEAL:MappingFace3d-3-Q1::-1.3 -0.77 -0.35	-0.89 -0.34 -0.31
-DEAL:MappingFace3d-3-Q1::-1.4 -0.81 -0.075	-0.88 -0.36 -0.31
+DEAL:MappingFace3d-3-Q1::0.0 -0.84 -1.3	1.0 -0.0 -0.0	0.090
+DEAL:MappingFace3d-3-Q1::0.0 -0.93 -0.93	1.0 -0.0 -0.0	0.19
+DEAL:MappingFace3d-3-Q1::0.0 -1.0 -0.46	1.0 -0.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1::0.0 -1.1 -0.097	1.0 -0.0 -0.0	0.13
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-1.2 -0.34 -1.1	-0.90 -0.29 -0.34
-DEAL:MappingFace3d-3-Q1::-1.3 -0.35 -0.77	-0.89 -0.31 -0.34
-DEAL:MappingFace3d-3-Q1::-1.4 -0.38 -0.38	-0.88 -0.34 -0.34
-DEAL:MappingFace3d-3-Q1::-1.5 -0.40 -0.080	-0.87 -0.36 -0.34
+DEAL:MappingFace3d-3-Q1::0.0 -0.42 -1.5	1.0 -0.0 -0.0	0.11
+DEAL:MappingFace3d-3-Q1::0.0 -0.46 -1.0	1.0 -0.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q1::0.0 -0.52 -0.52	1.0 -0.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q1::0.0 -0.56 -0.11	1.0 -0.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q1::
-DEAL:MappingFace3d-3-Q1::-1.2 -0.071 -1.1	-0.89 -0.29 -0.36
-DEAL:MappingFace3d-3-Q1::-1.4 -0.075 -0.81	-0.88 -0.31 -0.36
-DEAL:MappingFace3d-3-Q1::-1.5 -0.080 -0.40	-0.87 -0.34 -0.36
-DEAL:MappingFace3d-3-Q1::-1.7 -0.084 -0.084	-0.87 -0.35 -0.35
+DEAL:MappingFace3d-3-Q1::0.0 -0.087 -1.6	1.0 -0.0 -0.0	0.064
+DEAL:MappingFace3d-3-Q1::0.0 -0.097 -1.1	1.0 -0.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q1::0.0 -0.11 -0.56	1.0 -0.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q1::0.0 -0.12 -0.12	1.0 -0.0 -0.0	0.087
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-1.2 -1.2 0.0	-0.0 -0.0 1.0	0.041
+DEAL:MappingFace3d-3-Q1::-1.3 -0.84 0.0	-0.0 -0.0 1.0	0.090
+DEAL:MappingFace3d-3-Q1::-1.5 -0.42 0.0	-0.0 -0.0 1.0	0.11
+DEAL:MappingFace3d-3-Q1::-1.6 -0.087 0.0	-0.0 -0.0 1.0	0.064
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-0.84 -1.3 0.0	-0.0 -0.0 1.0	0.090
+DEAL:MappingFace3d-3-Q1::-0.93 -0.93 0.0	-0.0 -0.0 1.0	0.19
+DEAL:MappingFace3d-3-Q1::-1.0 -0.46 0.0	-0.0 -0.0 1.0	0.23
+DEAL:MappingFace3d-3-Q1::-1.1 -0.097 0.0	-0.0 -0.0 1.0	0.13
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-0.42 -1.5 0.0	-0.0 -0.0 1.0	0.11
+DEAL:MappingFace3d-3-Q1::-0.46 -1.0 0.0	-0.0 -0.0 1.0	0.23
+DEAL:MappingFace3d-3-Q1::-0.52 -0.52 0.0	-0.0 -0.0 1.0	0.26
+DEAL:MappingFace3d-3-Q1::-0.56 -0.11 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-0.087 -1.6 0.0	-0.0 -0.0 1.0	0.064
+DEAL:MappingFace3d-3-Q1::-0.097 -1.1 0.0	-0.0 -0.0 1.0	0.13
+DEAL:MappingFace3d-3-Q1::-0.11 -0.56 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q1::-0.12 -0.12 0.0	-0.0 -0.0 1.0	0.087
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-1.0 -0.95 -0.95	-0.92 -0.28 -0.28	0.033
+DEAL:MappingFace3d-3-Q1::-1.1 -1.0 -0.68	-0.91 -0.31 -0.28	0.066
+DEAL:MappingFace3d-3-Q1::-1.2 -1.1 -0.34	-0.90 -0.34 -0.29	0.073
+DEAL:MappingFace3d-3-Q1::-1.2 -1.1 -0.071	-0.89 -0.36 -0.29	0.042
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-1.1 -0.68 -1.0	-0.91 -0.28 -0.31	0.066
+DEAL:MappingFace3d-3-Q1::-1.2 -0.72 -0.72	-0.90 -0.31 -0.31	0.13
+DEAL:MappingFace3d-3-Q1::-1.3 -0.77 -0.35	-0.89 -0.34 -0.31	0.15
+DEAL:MappingFace3d-3-Q1::-1.4 -0.81 -0.075	-0.88 -0.36 -0.31	0.084
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-1.2 -0.34 -1.1	-0.90 -0.29 -0.34	0.073
+DEAL:MappingFace3d-3-Q1::-1.3 -0.35 -0.77	-0.89 -0.31 -0.34	0.15
+DEAL:MappingFace3d-3-Q1::-1.4 -0.38 -0.38	-0.88 -0.34 -0.34	0.16
+DEAL:MappingFace3d-3-Q1::-1.5 -0.40 -0.080	-0.87 -0.36 -0.34	0.090
+DEAL:MappingFace3d-3-Q1::
+DEAL:MappingFace3d-3-Q1::-1.2 -0.071 -1.1	-0.89 -0.29 -0.36	0.042
+DEAL:MappingFace3d-3-Q1::-1.4 -0.075 -0.81	-0.88 -0.31 -0.36	0.084
+DEAL:MappingFace3d-3-Q1::-1.5 -0.080 -0.40	-0.87 -0.34 -0.36	0.090
+DEAL:MappingFace3d-3-Q1::-1.7 -0.084 -0.084	-0.87 -0.35 -0.35	0.051
 DEAL:MappingFace3d-3-Q1::
 DEAL:MappingFace3d-3-Q1::
 DEAL::MappingSubface3d-3-Q1
@@ -4134,130 +4134,130 @@ DEAL:Mapping3d-3-Q2::
 DEAL:Mapping3d-3-Q2::
 DEAL::  area=2.7
 DEAL::MappingFace3d-3-Q2
-DEAL:MappingFace3d-3-Q2::-0.97 -1.1 -0.97	-0.56 -0.62 -0.56
-DEAL:MappingFace3d-3-Q2::-1.1 -1.2 -0.72	-0.61 -0.68 -0.41
-DEAL:MappingFace3d-3-Q2::-1.1 -1.3 -0.37	-0.64 -0.74 -0.21
-DEAL:MappingFace3d-3-Q2::-1.2 -1.3 -0.079	-0.66 -0.75 -0.051
+DEAL:MappingFace3d-3-Q2::-0.97 -1.1 -0.97	-0.56 -0.62 -0.56	0.035
+DEAL:MappingFace3d-3-Q2::-1.1 -1.2 -0.72	-0.61 -0.68 -0.41	0.074
+DEAL:MappingFace3d-3-Q2::-1.1 -1.3 -0.37	-0.64 -0.74 -0.21	0.084
+DEAL:MappingFace3d-3-Q2::-1.2 -1.3 -0.079	-0.66 -0.75 -0.051	0.048
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.71 -1.2 -1.1	-0.41 -0.67 -0.61
-DEAL:MappingFace3d-3-Q2::-0.79 -1.3 -0.79	-0.46 -0.76 -0.46
-DEAL:MappingFace3d-3-Q2::-0.84 -1.5 -0.41	-0.49 -0.84 -0.23
-DEAL:MappingFace3d-3-Q2::-0.86 -1.5 -0.090	-0.50 -0.86 -0.063
+DEAL:MappingFace3d-3-Q2::-0.71 -1.2 -1.1	-0.41 -0.67 -0.61	0.073
+DEAL:MappingFace3d-3-Q2::-0.79 -1.3 -0.79	-0.46 -0.76 -0.46	0.15
+DEAL:MappingFace3d-3-Q2::-0.84 -1.5 -0.41	-0.49 -0.84 -0.23	0.17
+DEAL:MappingFace3d-3-Q2::-0.86 -1.5 -0.090	-0.50 -0.86 -0.063	0.097
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.36 -1.3 -1.1	-0.21 -0.73 -0.65
-DEAL:MappingFace3d-3-Q2::-0.40 -1.5 -0.85	-0.23 -0.84 -0.49
-DEAL:MappingFace3d-3-Q2::-0.44 -1.6 -0.45	-0.25 -0.94 -0.25
-DEAL:MappingFace3d-3-Q2::-0.45 -1.7 -0.098	-0.26 -0.96 -0.068
+DEAL:MappingFace3d-3-Q2::-0.36 -1.3 -1.1	-0.21 -0.73 -0.65	0.082
+DEAL:MappingFace3d-3-Q2::-0.40 -1.5 -0.85	-0.23 -0.84 -0.49	0.17
+DEAL:MappingFace3d-3-Q2::-0.44 -1.6 -0.45	-0.25 -0.94 -0.25	0.18
+DEAL:MappingFace3d-3-Q2::-0.45 -1.7 -0.098	-0.26 -0.96 -0.068	0.11
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.079 -1.3 -1.2	-0.046 -0.75 -0.66
-DEAL:MappingFace3d-3-Q2::-0.088 -1.5 -0.87	-0.052 -0.86 -0.50
-DEAL:MappingFace3d-3-Q2::-0.095 -1.7 -0.45	-0.064 -0.96 -0.26
-DEAL:MappingFace3d-3-Q2::-0.098 -1.7 -0.099	-0.064 -1.0 -0.064
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-1.2 0.0 -1.2	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-1.4 0.0 -0.89	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-1.5 0.0 -0.46	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-1.6 0.0 -0.098	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.89 0.0 -1.4	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.99 0.0 -0.99	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-1.1 0.0 -0.48	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-1.1 0.0 -0.10	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.46 0.0 -1.5	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.48 0.0 -1.1	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.52 0.0 -0.52	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.56 0.0 -0.11	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.098 0.0 -1.6	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.10 0.0 -1.1	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.11 0.0 -0.56	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q2::-0.12 0.0 -0.12	-0.0 1.0 -0.0
+DEAL:MappingFace3d-3-Q2::-0.079 -1.3 -1.2	-0.046 -0.75 -0.66	0.047
+DEAL:MappingFace3d-3-Q2::-0.088 -1.5 -0.87	-0.052 -0.86 -0.50	0.095
+DEAL:MappingFace3d-3-Q2::-0.095 -1.7 -0.45	-0.064 -0.96 -0.26	0.10
+DEAL:MappingFace3d-3-Q2::-0.098 -1.7 -0.099	-0.064 -1.0 -0.064	0.060
 DEAL:MappingFace3d-3-Q2::
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.97 -0.97 -1.1	-0.56 -0.56 -0.62
-DEAL:MappingFace3d-3-Q2::-1.1 -0.72 -1.2	-0.61 -0.41 -0.68
-DEAL:MappingFace3d-3-Q2::-1.1 -0.37 -1.3	-0.64 -0.21 -0.74
-DEAL:MappingFace3d-3-Q2::-1.2 -0.079 -1.3	-0.66 -0.051 -0.75
+DEAL:MappingFace3d-3-Q2::-1.2 0.0 -1.2	-0.0 1.0 -0.0	0.023
+DEAL:MappingFace3d-3-Q2::-1.4 0.0 -0.89	-0.0 1.0 -0.0	0.095
+DEAL:MappingFace3d-3-Q2::-1.5 0.0 -0.46	-0.0 1.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q2::-1.6 0.0 -0.098	-0.0 1.0 -0.0	0.075
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.71 -1.1 -1.2	-0.41 -0.61 -0.67
-DEAL:MappingFace3d-3-Q2::-0.79 -0.79 -1.3	-0.46 -0.46 -0.76
-DEAL:MappingFace3d-3-Q2::-0.84 -0.41 -1.5	-0.49 -0.23 -0.84
-DEAL:MappingFace3d-3-Q2::-0.86 -0.090 -1.5	-0.50 -0.063 -0.86
+DEAL:MappingFace3d-3-Q2::-0.89 0.0 -1.4	-0.0 1.0 -0.0	0.095
+DEAL:MappingFace3d-3-Q2::-0.99 0.0 -0.99	-0.0 1.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q2::-1.1 0.0 -0.48	-0.0 1.0 -0.0	0.27
+DEAL:MappingFace3d-3-Q2::-1.1 0.0 -0.10	-0.0 1.0 -0.0	0.14
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.36 -1.1 -1.3	-0.21 -0.65 -0.73
-DEAL:MappingFace3d-3-Q2::-0.40 -0.85 -1.5	-0.23 -0.49 -0.84
-DEAL:MappingFace3d-3-Q2::-0.44 -0.45 -1.6	-0.25 -0.25 -0.94
-DEAL:MappingFace3d-3-Q2::-0.45 -0.098 -1.7	-0.26 -0.068 -0.96
+DEAL:MappingFace3d-3-Q2::-0.46 0.0 -1.5	-0.0 1.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q2::-0.48 0.0 -1.1	-0.0 1.0 -0.0	0.27
+DEAL:MappingFace3d-3-Q2::-0.52 0.0 -0.52	-0.0 1.0 -0.0	0.28
+DEAL:MappingFace3d-3-Q2::-0.56 0.0 -0.11	-0.0 1.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.079 -1.2 -1.3	-0.046 -0.66 -0.75
-DEAL:MappingFace3d-3-Q2::-0.088 -0.87 -1.5	-0.052 -0.50 -0.86
-DEAL:MappingFace3d-3-Q2::-0.095 -0.45 -1.7	-0.064 -0.26 -0.96
-DEAL:MappingFace3d-3-Q2::-0.098 -0.099 -1.7	-0.064 -0.064 -1.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::0.0 -1.2 -1.2	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -1.4 -0.89	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -1.5 -0.46	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -1.6 -0.098	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::0.0 -0.89 -1.4	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.99 -0.99	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -1.1 -0.48	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -1.1 -0.10	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::0.0 -0.46 -1.5	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.48 -1.1	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.52 -0.52	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.56 -0.11	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::0.0 -0.098 -1.6	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.10 -1.1	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.11 -0.56	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q2::0.0 -0.12 -0.12	1.0 -0.0 -0.0
+DEAL:MappingFace3d-3-Q2::-0.098 0.0 -1.6	-0.0 1.0 -0.0	0.075
+DEAL:MappingFace3d-3-Q2::-0.10 0.0 -1.1	-0.0 1.0 -0.0	0.14
+DEAL:MappingFace3d-3-Q2::-0.11 0.0 -0.56	-0.0 1.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q2::-0.12 0.0 -0.12	-0.0 1.0 -0.0	0.087
 DEAL:MappingFace3d-3-Q2::
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-1.2 -1.2 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-1.4 -0.89 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-1.5 -0.46 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-1.6 -0.098 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q2::-0.97 -0.97 -1.1	-0.56 -0.56 -0.62	0.035
+DEAL:MappingFace3d-3-Q2::-1.1 -0.72 -1.2	-0.61 -0.41 -0.68	0.074
+DEAL:MappingFace3d-3-Q2::-1.1 -0.37 -1.3	-0.64 -0.21 -0.74	0.084
+DEAL:MappingFace3d-3-Q2::-1.2 -0.079 -1.3	-0.66 -0.051 -0.75	0.048
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.89 -1.4 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.99 -0.99 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-1.1 -0.48 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-1.1 -0.10 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q2::-0.71 -1.1 -1.2	-0.41 -0.61 -0.67	0.073
+DEAL:MappingFace3d-3-Q2::-0.79 -0.79 -1.3	-0.46 -0.46 -0.76	0.15
+DEAL:MappingFace3d-3-Q2::-0.84 -0.41 -1.5	-0.49 -0.23 -0.84	0.17
+DEAL:MappingFace3d-3-Q2::-0.86 -0.090 -1.5	-0.50 -0.063 -0.86	0.097
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.46 -1.5 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.48 -1.1 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.52 -0.52 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.56 -0.11 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q2::-0.36 -1.1 -1.3	-0.21 -0.65 -0.73	0.082
+DEAL:MappingFace3d-3-Q2::-0.40 -0.85 -1.5	-0.23 -0.49 -0.84	0.17
+DEAL:MappingFace3d-3-Q2::-0.44 -0.45 -1.6	-0.25 -0.25 -0.94	0.18
+DEAL:MappingFace3d-3-Q2::-0.45 -0.098 -1.7	-0.26 -0.068 -0.96	0.11
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-0.098 -1.6 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.10 -1.1 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.11 -0.56 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q2::-0.12 -0.12 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q2::-0.079 -1.2 -1.3	-0.046 -0.66 -0.75	0.047
+DEAL:MappingFace3d-3-Q2::-0.088 -0.87 -1.5	-0.052 -0.50 -0.86	0.095
+DEAL:MappingFace3d-3-Q2::-0.095 -0.45 -1.7	-0.064 -0.26 -0.96	0.10
+DEAL:MappingFace3d-3-Q2::-0.098 -0.099 -1.7	-0.064 -0.064 -1.0	0.060
 DEAL:MappingFace3d-3-Q2::
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-1.1 -0.97 -0.97	-0.62 -0.56 -0.56
-DEAL:MappingFace3d-3-Q2::-1.2 -1.1 -0.72	-0.68 -0.61 -0.41
-DEAL:MappingFace3d-3-Q2::-1.3 -1.1 -0.37	-0.74 -0.64 -0.21
-DEAL:MappingFace3d-3-Q2::-1.3 -1.2 -0.079	-0.75 -0.66 -0.051
+DEAL:MappingFace3d-3-Q2::0.0 -1.2 -1.2	1.0 -0.0 -0.0	0.023
+DEAL:MappingFace3d-3-Q2::0.0 -1.4 -0.89	1.0 -0.0 -0.0	0.095
+DEAL:MappingFace3d-3-Q2::0.0 -1.5 -0.46	1.0 -0.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q2::0.0 -1.6 -0.098	1.0 -0.0 -0.0	0.075
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-1.2 -0.71 -1.1	-0.67 -0.41 -0.61
-DEAL:MappingFace3d-3-Q2::-1.3 -0.79 -0.79	-0.76 -0.46 -0.46
-DEAL:MappingFace3d-3-Q2::-1.5 -0.84 -0.41	-0.84 -0.49 -0.23
-DEAL:MappingFace3d-3-Q2::-1.5 -0.86 -0.090	-0.86 -0.50 -0.063
+DEAL:MappingFace3d-3-Q2::0.0 -0.89 -1.4	1.0 -0.0 -0.0	0.095
+DEAL:MappingFace3d-3-Q2::0.0 -0.99 -0.99	1.0 -0.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q2::0.0 -1.1 -0.48	1.0 -0.0 -0.0	0.27
+DEAL:MappingFace3d-3-Q2::0.0 -1.1 -0.10	1.0 -0.0 -0.0	0.14
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-1.3 -0.36 -1.1	-0.73 -0.21 -0.65
-DEAL:MappingFace3d-3-Q2::-1.5 -0.40 -0.85	-0.84 -0.23 -0.49
-DEAL:MappingFace3d-3-Q2::-1.6 -0.44 -0.45	-0.94 -0.25 -0.25
-DEAL:MappingFace3d-3-Q2::-1.7 -0.45 -0.098	-0.96 -0.26 -0.068
+DEAL:MappingFace3d-3-Q2::0.0 -0.46 -1.5	1.0 -0.0 -0.0	0.13
+DEAL:MappingFace3d-3-Q2::0.0 -0.48 -1.1	1.0 -0.0 -0.0	0.27
+DEAL:MappingFace3d-3-Q2::0.0 -0.52 -0.52	1.0 -0.0 -0.0	0.28
+DEAL:MappingFace3d-3-Q2::0.0 -0.56 -0.11	1.0 -0.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q2::
-DEAL:MappingFace3d-3-Q2::-1.3 -0.079 -1.2	-0.75 -0.046 -0.66
-DEAL:MappingFace3d-3-Q2::-1.5 -0.088 -0.87	-0.86 -0.052 -0.50
-DEAL:MappingFace3d-3-Q2::-1.7 -0.095 -0.45	-0.96 -0.064 -0.26
-DEAL:MappingFace3d-3-Q2::-1.7 -0.098 -0.099	-1.0 -0.064 -0.064
+DEAL:MappingFace3d-3-Q2::0.0 -0.098 -1.6	1.0 -0.0 -0.0	0.075
+DEAL:MappingFace3d-3-Q2::0.0 -0.10 -1.1	1.0 -0.0 -0.0	0.14
+DEAL:MappingFace3d-3-Q2::0.0 -0.11 -0.56	1.0 -0.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q2::0.0 -0.12 -0.12	1.0 -0.0 -0.0	0.087
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-1.2 -1.2 0.0	-0.0 -0.0 1.0	0.023
+DEAL:MappingFace3d-3-Q2::-1.4 -0.89 0.0	-0.0 -0.0 1.0	0.095
+DEAL:MappingFace3d-3-Q2::-1.5 -0.46 0.0	-0.0 -0.0 1.0	0.13
+DEAL:MappingFace3d-3-Q2::-1.6 -0.098 0.0	-0.0 -0.0 1.0	0.075
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-0.89 -1.4 0.0	-0.0 -0.0 1.0	0.095
+DEAL:MappingFace3d-3-Q2::-0.99 -0.99 0.0	-0.0 -0.0 1.0	0.23
+DEAL:MappingFace3d-3-Q2::-1.1 -0.48 0.0	-0.0 -0.0 1.0	0.27
+DEAL:MappingFace3d-3-Q2::-1.1 -0.10 0.0	-0.0 -0.0 1.0	0.14
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-0.46 -1.5 0.0	-0.0 -0.0 1.0	0.13
+DEAL:MappingFace3d-3-Q2::-0.48 -1.1 0.0	-0.0 -0.0 1.0	0.27
+DEAL:MappingFace3d-3-Q2::-0.52 -0.52 0.0	-0.0 -0.0 1.0	0.28
+DEAL:MappingFace3d-3-Q2::-0.56 -0.11 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-0.098 -1.6 0.0	-0.0 -0.0 1.0	0.075
+DEAL:MappingFace3d-3-Q2::-0.10 -1.1 0.0	-0.0 -0.0 1.0	0.14
+DEAL:MappingFace3d-3-Q2::-0.11 -0.56 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q2::-0.12 -0.12 0.0	-0.0 -0.0 1.0	0.087
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-1.1 -0.97 -0.97	-0.62 -0.56 -0.56	0.035
+DEAL:MappingFace3d-3-Q2::-1.2 -1.1 -0.72	-0.68 -0.61 -0.41	0.074
+DEAL:MappingFace3d-3-Q2::-1.3 -1.1 -0.37	-0.74 -0.64 -0.21	0.084
+DEAL:MappingFace3d-3-Q2::-1.3 -1.2 -0.079	-0.75 -0.66 -0.051	0.048
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-1.2 -0.71 -1.1	-0.67 -0.41 -0.61	0.073
+DEAL:MappingFace3d-3-Q2::-1.3 -0.79 -0.79	-0.76 -0.46 -0.46	0.15
+DEAL:MappingFace3d-3-Q2::-1.5 -0.84 -0.41	-0.84 -0.49 -0.23	0.17
+DEAL:MappingFace3d-3-Q2::-1.5 -0.86 -0.090	-0.86 -0.50 -0.063	0.097
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-1.3 -0.36 -1.1	-0.73 -0.21 -0.65	0.082
+DEAL:MappingFace3d-3-Q2::-1.5 -0.40 -0.85	-0.84 -0.23 -0.49	0.17
+DEAL:MappingFace3d-3-Q2::-1.6 -0.44 -0.45	-0.94 -0.25 -0.25	0.18
+DEAL:MappingFace3d-3-Q2::-1.7 -0.45 -0.098	-0.96 -0.26 -0.068	0.11
+DEAL:MappingFace3d-3-Q2::
+DEAL:MappingFace3d-3-Q2::-1.3 -0.079 -1.2	-0.75 -0.046 -0.66	0.047
+DEAL:MappingFace3d-3-Q2::-1.5 -0.088 -0.87	-0.86 -0.052 -0.50	0.095
+DEAL:MappingFace3d-3-Q2::-1.7 -0.095 -0.45	-0.96 -0.064 -0.26	0.10
+DEAL:MappingFace3d-3-Q2::-1.7 -0.098 -0.099	-1.0 -0.064 -0.064	0.060
 DEAL:MappingFace3d-3-Q2::
 DEAL:MappingFace3d-3-Q2::
 DEAL::MappingSubface3d-3-Q2
@@ -5353,130 +5353,130 @@ DEAL:Mapping3d-3-Q3::
 DEAL:Mapping3d-3-Q3::
 DEAL::  area=2.7
 DEAL::MappingFace3d-3-Q3
-DEAL:MappingFace3d-3-Q3::-0.97 -1.1 -0.97	-0.56 -0.61 -0.56
-DEAL:MappingFace3d-3-Q3::-1.1 -1.2 -0.72	-0.61 -0.67 -0.41
-DEAL:MappingFace3d-3-Q3::-1.1 -1.3 -0.36	-0.65 -0.73 -0.21
-DEAL:MappingFace3d-3-Q3::-1.2 -1.3 -0.077	-0.67 -0.74 -0.043
+DEAL:MappingFace3d-3-Q3::-0.97 -1.1 -0.97	-0.56 -0.61 -0.56	0.033
+DEAL:MappingFace3d-3-Q3::-1.1 -1.2 -0.72	-0.61 -0.67 -0.41	0.073
+DEAL:MappingFace3d-3-Q3::-1.1 -1.3 -0.36	-0.65 -0.73 -0.21	0.082
+DEAL:MappingFace3d-3-Q3::-1.2 -1.3 -0.077	-0.67 -0.74 -0.043	0.046
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.72 -1.2 -1.1	-0.41 -0.67 -0.61
-DEAL:MappingFace3d-3-Q3::-0.79 -1.3 -0.80	-0.45 -0.76 -0.46
-DEAL:MappingFace3d-3-Q3::-0.85 -1.5 -0.41	-0.49 -0.84 -0.24
-DEAL:MappingFace3d-3-Q3::-0.87 -1.5 -0.087	-0.50 -0.86 -0.048
+DEAL:MappingFace3d-3-Q3::-0.72 -1.2 -1.1	-0.41 -0.67 -0.61	0.071
+DEAL:MappingFace3d-3-Q3::-0.79 -1.3 -0.80	-0.45 -0.76 -0.46	0.15
+DEAL:MappingFace3d-3-Q3::-0.85 -1.5 -0.41	-0.49 -0.84 -0.24	0.17
+DEAL:MappingFace3d-3-Q3::-0.87 -1.5 -0.087	-0.50 -0.86 -0.048	0.096
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.36 -1.3 -1.1	-0.21 -0.72 -0.66
-DEAL:MappingFace3d-3-Q3::-0.40 -1.5 -0.86	-0.23 -0.84 -0.49
-DEAL:MappingFace3d-3-Q3::-0.43 -1.6 -0.44	-0.25 -0.93 -0.26
-DEAL:MappingFace3d-3-Q3::-0.44 -1.7 -0.094	-0.26 -0.96 -0.052
+DEAL:MappingFace3d-3-Q3::-0.36 -1.3 -1.1	-0.21 -0.72 -0.66	0.080
+DEAL:MappingFace3d-3-Q3::-0.40 -1.5 -0.86	-0.23 -0.84 -0.49	0.17
+DEAL:MappingFace3d-3-Q3::-0.43 -1.6 -0.44	-0.25 -0.93 -0.26	0.19
+DEAL:MappingFace3d-3-Q3::-0.44 -1.7 -0.094	-0.26 -0.96 -0.052	0.10
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.077 -1.3 -1.2	-0.043 -0.74 -0.67
-DEAL:MappingFace3d-3-Q3::-0.085 -1.5 -0.87	-0.048 -0.86 -0.50
-DEAL:MappingFace3d-3-Q3::-0.092 -1.7 -0.45	-0.052 -0.96 -0.26
-DEAL:MappingFace3d-3-Q3::-0.094 -1.7 -0.095	-0.053 -1.0 -0.053
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-1.2 0.0 -1.2	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-1.4 0.0 -0.89	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-1.5 0.0 -0.45	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-1.6 0.0 -0.096	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.89 0.0 -1.4	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.99 0.0 -0.99	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-1.1 0.0 -0.49	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-1.1 0.0 -0.10	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.45 0.0 -1.5	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.49 0.0 -1.1	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.53 0.0 -0.53	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.56 0.0 -0.11	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.096 0.0 -1.6	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.10 0.0 -1.1	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.11 0.0 -0.56	-0.0 1.0 -0.0
-DEAL:MappingFace3d-3-Q3::-0.12 0.0 -0.12	-0.0 1.0 -0.0
+DEAL:MappingFace3d-3-Q3::-0.077 -1.3 -1.2	-0.043 -0.74 -0.67	0.045
+DEAL:MappingFace3d-3-Q3::-0.085 -1.5 -0.87	-0.048 -0.86 -0.50	0.094
+DEAL:MappingFace3d-3-Q3::-0.092 -1.7 -0.45	-0.052 -0.96 -0.26	0.10
+DEAL:MappingFace3d-3-Q3::-0.094 -1.7 -0.095	-0.053 -1.0 -0.053	0.056
 DEAL:MappingFace3d-3-Q3::
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.97 -0.97 -1.1	-0.56 -0.56 -0.61
-DEAL:MappingFace3d-3-Q3::-1.1 -0.72 -1.2	-0.61 -0.41 -0.67
-DEAL:MappingFace3d-3-Q3::-1.1 -0.36 -1.3	-0.65 -0.21 -0.73
-DEAL:MappingFace3d-3-Q3::-1.2 -0.077 -1.3	-0.67 -0.043 -0.74
+DEAL:MappingFace3d-3-Q3::-1.2 0.0 -1.2	-0.0 1.0 -0.0	0.024
+DEAL:MappingFace3d-3-Q3::-1.4 0.0 -0.89	-0.0 1.0 -0.0	0.10
+DEAL:MappingFace3d-3-Q3::-1.5 0.0 -0.45	-0.0 1.0 -0.0	0.14
+DEAL:MappingFace3d-3-Q3::-1.6 0.0 -0.096	-0.0 1.0 -0.0	0.074
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.72 -1.1 -1.2	-0.41 -0.61 -0.67
-DEAL:MappingFace3d-3-Q3::-0.79 -0.80 -1.3	-0.45 -0.46 -0.76
-DEAL:MappingFace3d-3-Q3::-0.85 -0.41 -1.5	-0.49 -0.24 -0.84
-DEAL:MappingFace3d-3-Q3::-0.87 -0.087 -1.5	-0.50 -0.048 -0.86
+DEAL:MappingFace3d-3-Q3::-0.89 0.0 -1.4	-0.0 1.0 -0.0	0.10
+DEAL:MappingFace3d-3-Q3::-0.99 0.0 -0.99	-0.0 1.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q3::-1.1 0.0 -0.49	-0.0 1.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q3::-1.1 0.0 -0.10	-0.0 1.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.36 -1.1 -1.3	-0.21 -0.66 -0.72
-DEAL:MappingFace3d-3-Q3::-0.40 -0.86 -1.5	-0.23 -0.49 -0.84
-DEAL:MappingFace3d-3-Q3::-0.43 -0.44 -1.6	-0.25 -0.26 -0.93
-DEAL:MappingFace3d-3-Q3::-0.44 -0.094 -1.7	-0.26 -0.052 -0.96
+DEAL:MappingFace3d-3-Q3::-0.45 0.0 -1.5	-0.0 1.0 -0.0	0.14
+DEAL:MappingFace3d-3-Q3::-0.49 0.0 -1.1	-0.0 1.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q3::-0.53 0.0 -0.53	-0.0 1.0 -0.0	0.27
+DEAL:MappingFace3d-3-Q3::-0.56 0.0 -0.11	-0.0 1.0 -0.0	0.16
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.077 -1.2 -1.3	-0.043 -0.67 -0.74
-DEAL:MappingFace3d-3-Q3::-0.085 -0.87 -1.5	-0.048 -0.50 -0.86
-DEAL:MappingFace3d-3-Q3::-0.092 -0.45 -1.7	-0.052 -0.26 -0.96
-DEAL:MappingFace3d-3-Q3::-0.094 -0.095 -1.7	-0.053 -0.053 -1.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::0.0 -1.2 -1.2	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -1.4 -0.89	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -1.5 -0.45	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -1.6 -0.096	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::0.0 -0.89 -1.4	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.99 -0.99	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -1.1 -0.49	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -1.1 -0.10	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::0.0 -0.45 -1.5	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.49 -1.1	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.53 -0.53	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.56 -0.11	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::0.0 -0.096 -1.6	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.10 -1.1	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.11 -0.56	1.0 -0.0 -0.0
-DEAL:MappingFace3d-3-Q3::0.0 -0.12 -0.12	1.0 -0.0 -0.0
+DEAL:MappingFace3d-3-Q3::-0.096 0.0 -1.6	-0.0 1.0 -0.0	0.074
+DEAL:MappingFace3d-3-Q3::-0.10 0.0 -1.1	-0.0 1.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q3::-0.11 0.0 -0.56	-0.0 1.0 -0.0	0.16
+DEAL:MappingFace3d-3-Q3::-0.12 0.0 -0.12	-0.0 1.0 -0.0	0.089
 DEAL:MappingFace3d-3-Q3::
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-1.2 -1.2 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-1.4 -0.89 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-1.5 -0.45 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-1.6 -0.096 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q3::-0.97 -0.97 -1.1	-0.56 -0.56 -0.61	0.033
+DEAL:MappingFace3d-3-Q3::-1.1 -0.72 -1.2	-0.61 -0.41 -0.67	0.073
+DEAL:MappingFace3d-3-Q3::-1.1 -0.36 -1.3	-0.65 -0.21 -0.73	0.082
+DEAL:MappingFace3d-3-Q3::-1.2 -0.077 -1.3	-0.67 -0.043 -0.74	0.046
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.89 -1.4 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.99 -0.99 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-1.1 -0.49 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-1.1 -0.10 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q3::-0.72 -1.1 -1.2	-0.41 -0.61 -0.67	0.071
+DEAL:MappingFace3d-3-Q3::-0.79 -0.80 -1.3	-0.45 -0.46 -0.76	0.15
+DEAL:MappingFace3d-3-Q3::-0.85 -0.41 -1.5	-0.49 -0.24 -0.84	0.17
+DEAL:MappingFace3d-3-Q3::-0.87 -0.087 -1.5	-0.50 -0.048 -0.86	0.096
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.45 -1.5 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.49 -1.1 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.53 -0.53 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.56 -0.11 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q3::-0.36 -1.1 -1.3	-0.21 -0.66 -0.72	0.080
+DEAL:MappingFace3d-3-Q3::-0.40 -0.86 -1.5	-0.23 -0.49 -0.84	0.17
+DEAL:MappingFace3d-3-Q3::-0.43 -0.44 -1.6	-0.25 -0.26 -0.93	0.19
+DEAL:MappingFace3d-3-Q3::-0.44 -0.094 -1.7	-0.26 -0.052 -0.96	0.10
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-0.096 -1.6 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.10 -1.1 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.11 -0.56 0.0	-0.0 -0.0 1.0
-DEAL:MappingFace3d-3-Q3::-0.12 -0.12 0.0	-0.0 -0.0 1.0
+DEAL:MappingFace3d-3-Q3::-0.077 -1.2 -1.3	-0.043 -0.67 -0.74	0.045
+DEAL:MappingFace3d-3-Q3::-0.085 -0.87 -1.5	-0.048 -0.50 -0.86	0.094
+DEAL:MappingFace3d-3-Q3::-0.092 -0.45 -1.7	-0.052 -0.26 -0.96	0.10
+DEAL:MappingFace3d-3-Q3::-0.094 -0.095 -1.7	-0.053 -0.053 -1.0	0.056
 DEAL:MappingFace3d-3-Q3::
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-1.1 -0.97 -0.97	-0.61 -0.56 -0.56
-DEAL:MappingFace3d-3-Q3::-1.2 -1.1 -0.72	-0.67 -0.61 -0.41
-DEAL:MappingFace3d-3-Q3::-1.3 -1.1 -0.36	-0.73 -0.65 -0.21
-DEAL:MappingFace3d-3-Q3::-1.3 -1.2 -0.077	-0.74 -0.67 -0.043
+DEAL:MappingFace3d-3-Q3::0.0 -1.2 -1.2	1.0 -0.0 -0.0	0.024
+DEAL:MappingFace3d-3-Q3::0.0 -1.4 -0.89	1.0 -0.0 -0.0	0.10
+DEAL:MappingFace3d-3-Q3::0.0 -1.5 -0.45	1.0 -0.0 -0.0	0.14
+DEAL:MappingFace3d-3-Q3::0.0 -1.6 -0.096	1.0 -0.0 -0.0	0.074
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-1.2 -0.72 -1.1	-0.67 -0.41 -0.61
-DEAL:MappingFace3d-3-Q3::-1.3 -0.79 -0.80	-0.76 -0.45 -0.46
-DEAL:MappingFace3d-3-Q3::-1.5 -0.85 -0.41	-0.84 -0.49 -0.24
-DEAL:MappingFace3d-3-Q3::-1.5 -0.87 -0.087	-0.86 -0.50 -0.048
+DEAL:MappingFace3d-3-Q3::0.0 -0.89 -1.4	1.0 -0.0 -0.0	0.10
+DEAL:MappingFace3d-3-Q3::0.0 -0.99 -0.99	1.0 -0.0 -0.0	0.23
+DEAL:MappingFace3d-3-Q3::0.0 -1.1 -0.49	1.0 -0.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q3::0.0 -1.1 -0.10	1.0 -0.0 -0.0	0.15
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-1.3 -0.36 -1.1	-0.72 -0.21 -0.66
-DEAL:MappingFace3d-3-Q3::-1.5 -0.40 -0.86	-0.84 -0.23 -0.49
-DEAL:MappingFace3d-3-Q3::-1.6 -0.43 -0.44	-0.93 -0.25 -0.26
-DEAL:MappingFace3d-3-Q3::-1.7 -0.44 -0.094	-0.96 -0.26 -0.052
+DEAL:MappingFace3d-3-Q3::0.0 -0.45 -1.5	1.0 -0.0 -0.0	0.14
+DEAL:MappingFace3d-3-Q3::0.0 -0.49 -1.1	1.0 -0.0 -0.0	0.26
+DEAL:MappingFace3d-3-Q3::0.0 -0.53 -0.53	1.0 -0.0 -0.0	0.27
+DEAL:MappingFace3d-3-Q3::0.0 -0.56 -0.11	1.0 -0.0 -0.0	0.16
 DEAL:MappingFace3d-3-Q3::
-DEAL:MappingFace3d-3-Q3::-1.3 -0.077 -1.2	-0.74 -0.043 -0.67
-DEAL:MappingFace3d-3-Q3::-1.5 -0.085 -0.87	-0.86 -0.048 -0.50
-DEAL:MappingFace3d-3-Q3::-1.7 -0.092 -0.45	-0.96 -0.052 -0.26
-DEAL:MappingFace3d-3-Q3::-1.7 -0.094 -0.095	-1.0 -0.053 -0.053
+DEAL:MappingFace3d-3-Q3::0.0 -0.096 -1.6	1.0 -0.0 -0.0	0.074
+DEAL:MappingFace3d-3-Q3::0.0 -0.10 -1.1	1.0 -0.0 -0.0	0.15
+DEAL:MappingFace3d-3-Q3::0.0 -0.11 -0.56	1.0 -0.0 -0.0	0.16
+DEAL:MappingFace3d-3-Q3::0.0 -0.12 -0.12	1.0 -0.0 -0.0	0.089
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-1.2 -1.2 0.0	-0.0 -0.0 1.0	0.024
+DEAL:MappingFace3d-3-Q3::-1.4 -0.89 0.0	-0.0 -0.0 1.0	0.10
+DEAL:MappingFace3d-3-Q3::-1.5 -0.45 0.0	-0.0 -0.0 1.0	0.14
+DEAL:MappingFace3d-3-Q3::-1.6 -0.096 0.0	-0.0 -0.0 1.0	0.074
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-0.89 -1.4 0.0	-0.0 -0.0 1.0	0.10
+DEAL:MappingFace3d-3-Q3::-0.99 -0.99 0.0	-0.0 -0.0 1.0	0.23
+DEAL:MappingFace3d-3-Q3::-1.1 -0.49 0.0	-0.0 -0.0 1.0	0.26
+DEAL:MappingFace3d-3-Q3::-1.1 -0.10 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-0.45 -1.5 0.0	-0.0 -0.0 1.0	0.14
+DEAL:MappingFace3d-3-Q3::-0.49 -1.1 0.0	-0.0 -0.0 1.0	0.26
+DEAL:MappingFace3d-3-Q3::-0.53 -0.53 0.0	-0.0 -0.0 1.0	0.27
+DEAL:MappingFace3d-3-Q3::-0.56 -0.11 0.0	-0.0 -0.0 1.0	0.16
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-0.096 -1.6 0.0	-0.0 -0.0 1.0	0.074
+DEAL:MappingFace3d-3-Q3::-0.10 -1.1 0.0	-0.0 -0.0 1.0	0.15
+DEAL:MappingFace3d-3-Q3::-0.11 -0.56 0.0	-0.0 -0.0 1.0	0.16
+DEAL:MappingFace3d-3-Q3::-0.12 -0.12 0.0	-0.0 -0.0 1.0	0.089
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-1.1 -0.97 -0.97	-0.61 -0.56 -0.56	0.033
+DEAL:MappingFace3d-3-Q3::-1.2 -1.1 -0.72	-0.67 -0.61 -0.41	0.073
+DEAL:MappingFace3d-3-Q3::-1.3 -1.1 -0.36	-0.73 -0.65 -0.21	0.082
+DEAL:MappingFace3d-3-Q3::-1.3 -1.2 -0.077	-0.74 -0.67 -0.043	0.046
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-1.2 -0.72 -1.1	-0.67 -0.41 -0.61	0.071
+DEAL:MappingFace3d-3-Q3::-1.3 -0.79 -0.80	-0.76 -0.45 -0.46	0.15
+DEAL:MappingFace3d-3-Q3::-1.5 -0.85 -0.41	-0.84 -0.49 -0.24	0.17
+DEAL:MappingFace3d-3-Q3::-1.5 -0.87 -0.087	-0.86 -0.50 -0.048	0.096
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-1.3 -0.36 -1.1	-0.72 -0.21 -0.66	0.080
+DEAL:MappingFace3d-3-Q3::-1.5 -0.40 -0.86	-0.84 -0.23 -0.49	0.17
+DEAL:MappingFace3d-3-Q3::-1.6 -0.43 -0.44	-0.93 -0.25 -0.26	0.19
+DEAL:MappingFace3d-3-Q3::-1.7 -0.44 -0.094	-0.96 -0.26 -0.052	0.10
+DEAL:MappingFace3d-3-Q3::
+DEAL:MappingFace3d-3-Q3::-1.3 -0.077 -1.2	-0.74 -0.043 -0.67	0.045
+DEAL:MappingFace3d-3-Q3::-1.5 -0.085 -0.87	-0.86 -0.048 -0.50	0.094
+DEAL:MappingFace3d-3-Q3::-1.7 -0.092 -0.45	-0.96 -0.052 -0.26	0.10
+DEAL:MappingFace3d-3-Q3::-1.7 -0.094 -0.095	-1.0 -0.053 -0.053	0.056
 DEAL:MappingFace3d-3-Q3::
 DEAL:MappingFace3d-3-Q3::
 DEAL::MappingSubface3d-3-Q3
@@ -6574,130 +6574,130 @@ DEAL:Mapping3d-4-Cartesian::
 DEAL:Mapping3d-4-Cartesian::
 DEAL::  area=4.5
 DEAL::MappingFace3d-4-Cartesian
-DEAL:MappingFace3d-4-Cartesian::1.1 2.5 3.2	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.1 2.5 4.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.1 2.5 5.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.1 2.5 5.8	0.0 -1.0 0.0
+DEAL:MappingFace3d-4-Cartesian::1.1 2.5 3.2	0.0 -1.0 0.0	0.091
+DEAL:MappingFace3d-4-Cartesian::1.1 2.5 4.0	0.0 -1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.1 2.5 5.0	0.0 -1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.1 2.5 5.8	0.0 -1.0 0.0	0.091
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.3 2.5 3.2	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.3 2.5 4.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.3 2.5 5.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.3 2.5 5.8	0.0 -1.0 0.0
+DEAL:MappingFace3d-4-Cartesian::1.3 2.5 3.2	0.0 -1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.3 2.5 4.0	0.0 -1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.3 2.5 5.0	0.0 -1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.3 2.5 5.8	0.0 -1.0 0.0	0.17
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.7 2.5 3.2	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.7 2.5 4.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.7 2.5 5.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.7 2.5 5.8	0.0 -1.0 0.0
+DEAL:MappingFace3d-4-Cartesian::1.7 2.5 3.2	0.0 -1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.7 2.5 4.0	0.0 -1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.7 2.5 5.0	0.0 -1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.7 2.5 5.8	0.0 -1.0 0.0	0.17
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.9 2.5 3.2	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.9 2.5 4.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.9 2.5 5.0	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.9 2.5 5.8	0.0 -1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.1 4.0 3.2	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.1 4.0 4.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.1 4.0 5.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.1 4.0 5.8	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.3 4.0 3.2	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.3 4.0 4.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.3 4.0 5.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.3 4.0 5.8	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.7 4.0 3.2	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.7 4.0 4.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.7 4.0 5.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.7 4.0 5.8	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.9 4.0 3.2	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.9 4.0 4.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.9 4.0 5.0	0.0 1.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.9 4.0 5.8	0.0 1.0 0.0
+DEAL:MappingFace3d-4-Cartesian::1.9 2.5 3.2	0.0 -1.0 0.0	0.091
+DEAL:MappingFace3d-4-Cartesian::1.9 2.5 4.0	0.0 -1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.9 2.5 5.0	0.0 -1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.9 2.5 5.8	0.0 -1.0 0.0	0.091
 DEAL:MappingFace3d-4-Cartesian::
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.1 2.6 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.1 3.0 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.1 3.5 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.1 3.9 3.0	0.0 0.0 -1.0
+DEAL:MappingFace3d-4-Cartesian::1.1 4.0 3.2	0.0 1.0 0.0	0.091
+DEAL:MappingFace3d-4-Cartesian::1.1 4.0 4.0	0.0 1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.1 4.0 5.0	0.0 1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.1 4.0 5.8	0.0 1.0 0.0	0.091
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.3 2.6 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.3 3.0 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.3 3.5 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.3 3.9 3.0	0.0 0.0 -1.0
+DEAL:MappingFace3d-4-Cartesian::1.3 4.0 3.2	0.0 1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.3 4.0 4.0	0.0 1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.3 4.0 5.0	0.0 1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.3 4.0 5.8	0.0 1.0 0.0	0.17
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.7 2.6 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.7 3.0 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.7 3.5 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.7 3.9 3.0	0.0 0.0 -1.0
+DEAL:MappingFace3d-4-Cartesian::1.7 4.0 3.2	0.0 1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.7 4.0 4.0	0.0 1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.7 4.0 5.0	0.0 1.0 0.0	0.32
+DEAL:MappingFace3d-4-Cartesian::1.7 4.0 5.8	0.0 1.0 0.0	0.17
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.9 2.6 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.9 3.0 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.9 3.5 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::1.9 3.9 3.0	0.0 0.0 -1.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::2.0 2.6 3.2	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 2.6 4.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 2.6 5.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 2.6 5.8	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::2.0 3.0 3.2	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.0 4.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.0 5.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.0 5.8	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::2.0 3.5 3.2	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.5 4.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.5 5.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.5 5.8	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::2.0 3.9 3.2	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.9 4.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.9 5.0	1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::2.0 3.9 5.8	1.0 0.0 0.0
+DEAL:MappingFace3d-4-Cartesian::1.9 4.0 3.2	0.0 1.0 0.0	0.091
+DEAL:MappingFace3d-4-Cartesian::1.9 4.0 4.0	0.0 1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.9 4.0 5.0	0.0 1.0 0.0	0.17
+DEAL:MappingFace3d-4-Cartesian::1.9 4.0 5.8	0.0 1.0 0.0	0.091
 DEAL:MappingFace3d-4-Cartesian::
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.1 2.6 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.1 3.0 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.1 3.5 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.1 3.9 6.0	0.0 0.0 1.0
+DEAL:MappingFace3d-4-Cartesian::1.1 2.6 3.0	0.0 0.0 -1.0	0.045
+DEAL:MappingFace3d-4-Cartesian::1.1 3.0 3.0	0.0 0.0 -1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.1 3.5 3.0	0.0 0.0 -1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.1 3.9 3.0	0.0 0.0 -1.0	0.045
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.3 2.6 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.3 3.0 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.3 3.5 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.3 3.9 6.0	0.0 0.0 1.0
+DEAL:MappingFace3d-4-Cartesian::1.3 2.6 3.0	0.0 0.0 -1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.3 3.0 3.0	0.0 0.0 -1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.3 3.5 3.0	0.0 0.0 -1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.3 3.9 3.0	0.0 0.0 -1.0	0.085
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.7 2.6 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.7 3.0 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.7 3.5 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.7 3.9 6.0	0.0 0.0 1.0
+DEAL:MappingFace3d-4-Cartesian::1.7 2.6 3.0	0.0 0.0 -1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.7 3.0 3.0	0.0 0.0 -1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.7 3.5 3.0	0.0 0.0 -1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.7 3.9 3.0	0.0 0.0 -1.0	0.085
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.9 2.6 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.9 3.0 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.9 3.5 6.0	0.0 0.0 1.0
-DEAL:MappingFace3d-4-Cartesian::1.9 3.9 6.0	0.0 0.0 1.0
+DEAL:MappingFace3d-4-Cartesian::1.9 2.6 3.0	0.0 0.0 -1.0	0.045
+DEAL:MappingFace3d-4-Cartesian::1.9 3.0 3.0	0.0 0.0 -1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.9 3.5 3.0	0.0 0.0 -1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.9 3.9 3.0	0.0 0.0 -1.0	0.045
 DEAL:MappingFace3d-4-Cartesian::
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.0 2.6 3.2	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 2.6 4.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 2.6 5.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 2.6 5.8	-1.0 0.0 0.0
+DEAL:MappingFace3d-4-Cartesian::2.0 2.6 3.2	1.0 0.0 0.0	0.14
+DEAL:MappingFace3d-4-Cartesian::2.0 2.6 4.0	1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::2.0 2.6 5.0	1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::2.0 2.6 5.8	1.0 0.0 0.0	0.14
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.0 3.0 3.2	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.0 4.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.0 5.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.0 5.8	-1.0 0.0 0.0
+DEAL:MappingFace3d-4-Cartesian::2.0 3.0 3.2	1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::2.0 3.0 4.0	1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::2.0 3.0 5.0	1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::2.0 3.0 5.8	1.0 0.0 0.0	0.26
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.0 3.5 3.2	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.5 4.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.5 5.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.5 5.8	-1.0 0.0 0.0
+DEAL:MappingFace3d-4-Cartesian::2.0 3.5 3.2	1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::2.0 3.5 4.0	1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::2.0 3.5 5.0	1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::2.0 3.5 5.8	1.0 0.0 0.0	0.26
 DEAL:MappingFace3d-4-Cartesian::
-DEAL:MappingFace3d-4-Cartesian::1.0 3.9 3.2	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.9 4.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.9 5.0	-1.0 0.0 0.0
-DEAL:MappingFace3d-4-Cartesian::1.0 3.9 5.8	-1.0 0.0 0.0
+DEAL:MappingFace3d-4-Cartesian::2.0 3.9 3.2	1.0 0.0 0.0	0.14
+DEAL:MappingFace3d-4-Cartesian::2.0 3.9 4.0	1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::2.0 3.9 5.0	1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::2.0 3.9 5.8	1.0 0.0 0.0	0.14
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.1 2.6 6.0	0.0 0.0 1.0	0.045
+DEAL:MappingFace3d-4-Cartesian::1.1 3.0 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.1 3.5 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.1 3.9 6.0	0.0 0.0 1.0	0.045
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.3 2.6 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.3 3.0 6.0	0.0 0.0 1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.3 3.5 6.0	0.0 0.0 1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.3 3.9 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.7 2.6 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.7 3.0 6.0	0.0 0.0 1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.7 3.5 6.0	0.0 0.0 1.0	0.16
+DEAL:MappingFace3d-4-Cartesian::1.7 3.9 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.9 2.6 6.0	0.0 0.0 1.0	0.045
+DEAL:MappingFace3d-4-Cartesian::1.9 3.0 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.9 3.5 6.0	0.0 0.0 1.0	0.085
+DEAL:MappingFace3d-4-Cartesian::1.9 3.9 6.0	0.0 0.0 1.0	0.045
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.0 2.6 3.2	-1.0 0.0 0.0	0.14
+DEAL:MappingFace3d-4-Cartesian::1.0 2.6 4.0	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::1.0 2.6 5.0	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::1.0 2.6 5.8	-1.0 0.0 0.0	0.14
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.0 3.0 3.2	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::1.0 3.0 4.0	-1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::1.0 3.0 5.0	-1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::1.0 3.0 5.8	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.0 3.5 3.2	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::1.0 3.5 4.0	-1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::1.0 3.5 5.0	-1.0 0.0 0.0	0.48
+DEAL:MappingFace3d-4-Cartesian::1.0 3.5 5.8	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::
+DEAL:MappingFace3d-4-Cartesian::1.0 3.9 3.2	-1.0 0.0 0.0	0.14
+DEAL:MappingFace3d-4-Cartesian::1.0 3.9 4.0	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::1.0 3.9 5.0	-1.0 0.0 0.0	0.26
+DEAL:MappingFace3d-4-Cartesian::1.0 3.9 5.8	-1.0 0.0 0.0	0.14
 DEAL:MappingFace3d-4-Cartesian::
 DEAL:MappingFace3d-4-Cartesian::
 DEAL::MappingSubface3d-4-Cartesian

@@ -32,7 +32,7 @@
 #  define ENDSTRING << std::ends
 #endif
 
-#define PRECISION 5
+#define PRECISION 2
 
 char fname[50];
 
