@@ -43,11 +43,10 @@ dof/dof_test: dof/dof_test.o $(LIBFILES.g)
 	@$(CXX) $(CXXFLAGS.g) -o $@ $< $(LIBS.g) -lg++
 
 poisson/poisson: poisson/poisson.o $(LIBFILES.g)
-	@echo ================= Linking $@
-	@$(CXX) $(CXXFLAGS.g) -g -o $@ $< ../../mia/control.o $(LIBS.g) -lg++
+	@cd poisson ; make
 
 
-run: run_grid_test run_dof_test
+run: run_grid_test run_dof_test run_poisson_test
 
 run_grid_test:
 	cd grid ; grid_test 4 ; mv grid.1 grid.4
@@ -60,9 +59,15 @@ run_dof_test:
 	cd dof ; dof_test dof_test.prm
 	cd dof ; gnuplot make_ps
 
+run_poisson_test:
+	cd poisson ; make run
+
 clean:
 	cd grid ; rm -f grid.[1234] *.eps *.o *~ grid_test
 	cd dof  ; rm -f grid.* sparsity.* *.o *~ dof_test
+
+
+.PHONY: run run_grid_test run_dof_test run_poisson_test clean
 
 
 #Rule to generate the dependency file. This file is
