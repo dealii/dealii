@@ -34,7 +34,17 @@ void test ()
       csp.add (i, (i+(i+1)*(j*j+i))%N);
 
   for (unsigned int i=0; i<N; ++i)
-    deallog << i << ' ' << csp.row_length (i) << std::endl;
+    {
+      std::vector<bool> xx(1000, false);
+      for (unsigned int j=0; j<40; ++j)
+        xx[(i+(i+1)*(j*j+i))%N] = true;
+
+      Assert (std::count (xx.begin(), xx.end(), true) ==
+              csp.row_length(i),
+              ExcInternalError());
+      
+      deallog << i << ' ' << csp.row_length (i) << std::endl;
+    }
 }
 
 
