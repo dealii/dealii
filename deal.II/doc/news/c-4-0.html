@@ -80,6 +80,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Changed: We don't support compilation by Intel'c icc compiler version 5
+       anymore. Since the present version of this compiler is 8, this is
+       probably not a real problem.
+       <br> 
+       (WB 2003/12/20)
+       </p>
+
+  <li> <p>
        Fixed: <code>step-9</code> had the computation of the value of the
        solution in the mid-point of the neighbor cell wrong. This is now
        fixed. Consequently, the resulting mesh also looks much nicer now (much
