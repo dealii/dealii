@@ -235,28 +235,26 @@ class FE_DGQ : public FiniteElement<dim>
     {
       public:
 					 /**
-					  * Destructor. Needed to avoid
-					  * memory leaks with difference
-					  * quotients.
-					  */
-	~InternalData ();
-
-					 /**
-					  * Array with shape function values
-					  * in quadrature points. There is one
-					  * vector for each shape function, containing
-					  * values for each quadrature point.
+					  * Array with shape function
+					  * values in quadrature
+					  * points. There is one
+					  * vector for each shape
+					  * function, containing
+					  * values for each quadrature
+					  * point.
 					  */
 	std::vector<std::vector<double> > shape_values;
 	
 					 /**
-					  * Array with shape function gradients
-					  * in quadrature points. There is one
-					  * vector for each shape function, containing
-					  * values for each quadrature point.
+					  * Array with shape function
+					  * gradients in quadrature
+					  * points. There is one
+					  * vector for each shape
+					  * function, containing
+					  * values for each quadrature
+					  * point.
 					  */				      
 	std::vector<std::vector<Tensor<1,dim> > > shape_gradients;
-
     };
     
 				     /**

@@ -26,17 +26,6 @@
 
 
 template <int dim>
-FE_DGQ<dim>::InternalData::~InternalData ()
-{
-  for (unsigned int i=0;i<differences.size ();++i)
-    if (differences[i] != 0)
-      delete differences[i];
-}
-
-
-
-
-template <int dim>
 FE_DGQ<dim>::FE_DGQ (unsigned int degree)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1),
