@@ -503,16 +503,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        New: Checked in new class <code class="class">FE_Q_Hierarchical</code>
        derived from class <code class="class">FiniteElement</code>.  
        This element is analogous to <code class="class">FE_Q</code>, but 
-       makes use of hierachical, shape functions, based on the 
+       makes use of hierachical shape functions, based on the 
        <code class="class">Polynomials::Hierarchical</code> class. 
-       For degree>1, the non-nodal basis functions are "bubble" functions, 
-       which are not Lagrange polynomials. Therefore, the usual interpolation 
-       based on using unit support points will not work for degree>1. 
-       I plan to submit a different interpolation-projection operator soon, 
-       based on an hp-type interpolant.
-       
-       Files are deal.II/include/fe/fe_q_hierarchical.h and 
-       deal.II/source/fe/fe_q_hierarchical.cc.
+       For <code>degree&gt;1</code>, the non-nodal basis functions are "bubble"
+       functions, which are not Lagrange polynomials. Therefore, the usual
+       interpolation based on using unit support points will not work for
+       <code>degree&gt;1</code>. It is planned to implement a different
+       interpolation-projection operator, based on an hp-type interpolant.
+       <br>
+       The files for this element are
+       <code>deal.II/include/fe/fe_q_hierarchical.h</code> and 
+       <code>deal.II/source/fe/fe_q_hierarchical.cc</code>.
        <br>
        (Brian Carnes 2002/12/13)
        </p>
