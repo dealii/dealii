@@ -42,16 +42,51 @@ class dVector : public VectorBase
 
   protected:
 
-				     /// Dimension. Actual number of components
+				     /**
+				      * Dimension. Actual number of components
+				      * contained in the vector.
+				      * Get this number by calling #size()#.
+				      */
     unsigned int dim;
 
-				     /// Dimension. Determines amount of reserved memory , evtl. >DIM !
+				     /**
+				      * Amount of memory actually reserved for
+				      * this vector. This number may be greater
+				      * than #dim# if a #reinit# was called with
+				      * less memory requirements than the vector
+				      * needed last time. At present #reinit#
+				      * does not free memory when the number of
+				      * needed elements is reduced.
+				      */
     unsigned int maxdim;
 
-				     /// Component-array. 
+				     /**
+				      * Pointer to the array of components.
+				      */
     double *val;
 
   public:
+
+				     /**
+				      * Declare iterator types just like those
+				      * for the C++ standard library:
+				      *
+				      * Data type stored by this container.
+				      */
+    typedef double value_type;
+
+				     /**
+				      * Declare standard types used in all
+				      * containers.
+				      */
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+    typedef value_type* iterator;
+    typedef const value_type* const_iterator;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef size_t size_type;
+    
 
 				     /**
 				      * @name 1: Basic Object-handling 
@@ -160,25 +195,25 @@ class dVector : public VectorBase
 				      * the start and end of the elements of this
 				      * vector.
 				      */
-    double * begin ();
+    iterator begin ();
 
 				     /**
 				      * Return constant iterator to the start of
 				      * the vectors.
 				      */
-    const double * begin () const;
+    const_iterator begin () const;
 
 				     /**
 				      * Return an iterator pointing to the
 				      * element past the end of the array.
 				      */
-    double * end ();
+    iterator end ();
 
     				     /**
 				      * Return a constant iterator pointing to
 				      * the element past the end of the array.
 				      */
-    const double * end () const;  
+    const_iterator end () const;  
 				     //@}
     
     
@@ -396,28 +431,28 @@ inline unsigned int dVector::size () const
 
 
 inline
-double * dVector::begin () {
+dVector::iterator dVector::begin () {
   return &val[0];
 };
 
 
 
 inline
-const double * dVector::begin () const {
+dVector::const_iterator dVector::begin () const {
   return &val[0];
 };
 
 
 
 inline
-double * dVector::end () {
+dVector::iterator dVector::end () {
   return &val[dim];
 };
 
 
 
 inline
-const double * dVector::end () const {
+dVector::const_iterator dVector::end () const {
   return &val[dim];
 };
 
