@@ -1,4 +1,4 @@
-//----------------------------  block_block_sparsity_pattern.cc  ---------------------------
+//------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  block_block_sparsity_pattern.cc  ---------------------------
+//------------------------------------------------------------------------
 
 #include <base/memory_consumption.h>
 #include <lac/block_sparsity_pattern.h>
@@ -40,7 +40,8 @@ BlockSparsityPatternBase (const unsigned int r,
 
 template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase (
-  const BlockSparsityPatternBase<SparsityPatternBase>& s)
+  const BlockSparsityPatternBase<SparsityPatternBase>& s) :
+		Subscriptor ()
 {
   Assert(s.rows==0, ExcInvalidConstructorCall());
   Assert(s.columns==0, ExcInvalidConstructorCall());
