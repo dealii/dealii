@@ -5,6 +5,8 @@
 /*----------------------------   logstream.h     ---------------------------*/
 
 
+#include <base/exceptions.h>
+
 #include <string>
 #include <stack>
 #include <iostream>
@@ -120,8 +122,16 @@ class LogStream
 				      * previously attached to this object.
 				      */
     void detach();
-    
 
+				     /**
+				      * Gives the default stream (#std_out#).
+				      */
+    ostream& get_console();
+
+				     /**
+				      * Gives the file stream.
+				      */
+    ostream& get_file_stream();
     
 				     /**
 				      * Push another prefix on the
@@ -199,6 +209,12 @@ class LogStream
 				      * Declare this function as a friend.
 				      */
     friend void endl (LogStream &);
+
+    				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNoFileStreamGiven);
+
 private:
                                      /**
 				      * Print head of line. This prints
@@ -213,27 +229,6 @@ private:
 
 /* ----------------------------- Inline functions and templates ---------------- */
 
-
-inline
-void
-LogStream::push (const string& text)
-{
-				   // strange enough: if make this
-				   // function non-inline with
-				   // gcc2.8, we get very strange
-				   // compiler errors...
-  string pre=prefixes.top();
-  pre += text;
-  pre += string(":");
-  prefixes.push(pre);
-}
-
-inline
-void
-LogStream::log_execution_time(bool flag)
-{
-  print_utime = flag;
-}
 
 // sorry for the weird following declaration spanning 5 lines, but
 // doc++ gets confused if we be more compact :-(

@@ -35,12 +35,42 @@ LogStream::attach(ostream& o)
 void LogStream::detach ()
 {
   file = 0;
+};
+
+
+
+ostream&
+LogStream::get_console()
+{
+  return *std_out;
+}
+
+
+
+ostream&
+LogStream::get_file_stream()
+{
+  Assert(file, ExcNoFileStreamGiven());
+  return *file;
 }
 
 
 
 void
-LogStream::pop ()
+LogStream::push (const string& text)
+{
+				   // strange enough: if make this
+				   // function non-inline with
+				   // gcc2.8, we get very strange
+				   // compiler errors...
+  string pre=prefixes.top();
+  pre += text;
+  pre += string(":");
+  prefixes.push(pre);
+}
+
+
+void LogStream::pop ()
 {
   prefixes.pop();
 }
@@ -51,7 +81,7 @@ void
 LogStream::depth_console(unsigned n)
 {
   std_depth = n;
-}
+};
 
 
 
@@ -59,7 +89,16 @@ void
 LogStream::depth_file(unsigned n)
 {
   file_depth = n;
+};
+
+
+
+void
+LogStream::log_execution_time(bool flag)
+{
+  print_utime = flag;
 }
+
 
 
 void
@@ -93,9 +132,13 @@ LogStream::print_line_head()
 }
 
 
+
 LogStream&
 LogStream::operator << (void (f)(LogStream &))
 {
   f(*this);
   return *this;
 }
+
+
+
