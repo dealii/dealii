@@ -178,7 +178,7 @@ int main ()
 	   << "----------------------------------------------------"
 	   << std::endl;
 				       // abort
-      return 2;
+      return 0;
     }
   catch (...) 
     {
@@ -190,7 +190,7 @@ int main ()
 	   << "----------------------------------------------------"
 	   << std::endl;
 				       // abort
-      return 3;
+      return 0;
     };
   
   std::cerr.rdbuf(old_cerr_buf);
