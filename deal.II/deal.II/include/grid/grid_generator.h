@@ -38,7 +38,7 @@
  *      is minimized in some way. To create a hyperball in one dimension results in
  *      an error.
  *
- *      Do not forget to attach a suitable boundary approximation object
+ *      Do not forget to also attach a suitable boundary approximation object
  *      to the triangulation object you passed to this function if you later want
  *      the triangulation to be refined at the outer boundaries.
  * \end{itemize}
