@@ -52,7 +52,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 }
 
 
-#elif defined(__sun__)
+#elif defined(__sun__) || defined(__osf__)
 
 
 unsigned int MultithreadInfo::get_n_cpus()

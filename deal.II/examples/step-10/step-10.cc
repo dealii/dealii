@@ -26,7 +26,7 @@
 
 				 // And this again is C++:
 #include <fstream>
-
+#include <cmath>
 
 				 // Now, as we want to compute the
 				 // value of pi, we have to compare to
@@ -477,7 +477,7 @@ void compute_pi_by_area ()
 					   // long double) function
 					   // implemented.
 	  table.add_value("eval.pi", static_cast<double> (area));
-	  table.add_value("error", fabs(area-pi));
+	  table.add_value("error", std::fabs(area-pi));
 	};
 
 				       // We want to compute
@@ -594,7 +594,7 @@ void compute_pi_by_perimeter ()
 					   // Then store the evaluated
 					   // values in the table...
 	  table.add_value("eval.pi", static_cast<double> (perimeter/2.));
-	  table.add_value("error", fabs(perimeter/2.-pi));
+	  table.add_value("error", std::fabs(perimeter/2.-pi));
 	};
 
 				       // ...and end this function as

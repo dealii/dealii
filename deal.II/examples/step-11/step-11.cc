@@ -43,6 +43,7 @@
 				 // declaration:
 #include <algorithm>
 #include <iomanip>
+#include <cmath>
 
 
 				 // Then we declare a class which
@@ -383,7 +384,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // matrix and body forces are
 				   // integrated:
   const unsigned int gauss_degree
-    = std::max (static_cast<unsigned int>(ceil(1.*(mapping.get_degree()+1)/2)),
+    = std::max (static_cast<unsigned int>(std::ceil(1.*(mapping.get_degree()+1)/2)),
 		2U);
   MatrixTools::create_laplace_matrix (mapping, dof_handler,
 				      QGauss<dim>(gauss_degree),
@@ -574,7 +575,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // Last task -- generate output:
   output_table.add_value ("cells", triangulation.n_active_cells());
   output_table.add_value ("|u|_1", norm);
-  output_table.add_value ("error", fabs(norm-sqrt(3.14159265358/2)));
+  output_table.add_value ("error", std::fabs(norm-std::sqrt(3.14159265358/2)));
 };
 
 

@@ -17,6 +17,7 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <cmath>
 
 #if deal_II_dimension != 1
 
@@ -67,7 +68,7 @@ GridTools::diameter (const Triangulation<dim> &tria)
 	  max_distance_sqr = (vertices[i]-vertices[j]).square();
     };
 
-  return sqrt(max_distance_sqr);
+  return std::sqrt(max_distance_sqr);
 };
 
 
@@ -85,7 +86,7 @@ GridTools::diameter (const Triangulation<1> &tria)
   while (!leftmost->at_boundary(0))  leftmost  = leftmost->neighbor(0);
   while (!rightmost->at_boundary(1)) rightmost = rightmost->neighbor(1);
 
-  return sqrt((leftmost->vertex(0) - rightmost->vertex(1)).square());
+  return std::sqrt((leftmost->vertex(0) - rightmost->vertex(1)).square());
 };
 
 #endif

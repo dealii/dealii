@@ -17,6 +17,7 @@
 #include <strstream>
 #include <iostream>
 #include <iomanip>
+#include <strings.h>
 
 //TODO:[WB] (compiler) use i/ostringstream instead of i/ostrstream if they become available
 

@@ -87,9 +87,17 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
+  typedef void (*create_mass_matrix_1_t) (const Mapping<dim>       &mapping,
+					  const DoFHandler<dim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<double>     &matrix,
+					  const Function<dim> * const coefficient,
+					  const IteratorRange<dim>  range,
+					  Threads::ThreadMutex     &mutex);
+  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate(&MatrixCreator::template create_mass_matrix_1<dim>)
+		    Threads::encapsulate(p)
 		    .collect_args (mapping, dof, q, matrix, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
@@ -237,10 +245,19 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
+  typedef void (*create_mass_matrix_2_t) (const Mapping<dim>       &mapping,
+					  const DoFHandler<dim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<double>     &matrix,
+					  const Function<dim>      &rhs,
+					  Vector<double>           &rhs_vector,
+					  const Function<dim> * const coefficient,
+					  const IteratorRange<dim>  range,
+					  Threads::ThreadMutex     &mutex);
+  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate(&MatrixCreator::template
-					 create_mass_matrix_2<dim>)
+		    Threads::encapsulate(p)
 		    .collect_args (mapping, dof, q, matrix, rhs,
 				   rhs_vector, coefficient,
 				   thread_ranges[thread], mutex));
@@ -439,10 +456,21 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
+  typedef void (*create_boundary_mass_matrix_1_t)
+      (const Mapping<dim>        &mapping,
+       const DoFHandler<dim>     &dof,
+       const Quadrature<dim-1>   &q,
+       SparseMatrix<double>      &matrix,
+       const typename FunctionMap<dim>::type &boundary_functions,
+       Vector<double>            &rhs_vector,
+       std::vector<unsigned int> &dof_to_boundary_mapping,
+       const Function<dim> * const coefficient,
+       const IteratorRange<dim>   range,
+       Threads::ThreadMutex      &mutex);
+  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate(&MatrixCreator::template 
-					 create_boundary_mass_matrix_1<dim>)
+		    Threads::encapsulate(p)
 		    .collect_args (mapping, dof, q, matrix,
 				   boundary_functions, rhs_vector,
 				   dof_to_boundary_mapping, coefficient,
@@ -843,10 +871,17 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
+  typedef void (*create_laplace_matrix_1_t) (const Mapping<dim>       &mapping,
+					     const DoFHandler<dim>    &dof,
+					     const Quadrature<dim>    &q,
+					     SparseMatrix<double>     &matrix,
+					     const Function<dim> * const coefficient,
+					     const IteratorRange<dim>  range,
+					     Threads::ThreadMutex     &mutex);
+  create_laplace_matrix_1_t p = &MatrixCreator::template create_laplace_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate(&MatrixCreator::template
-					 create_laplace_matrix_1<dim>)
+		    Threads::encapsulate(p)
 		    .collect_args (mapping, dof, q, matrix, coefficient,
 				   thread_ranges[thread], mutex));
   thread_manager.wait ();  
@@ -999,10 +1034,19 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
+  typedef void (*create_laplace_matrix_2_t) (const Mapping<dim>       &mapping,
+					     const DoFHandler<dim>    &dof,
+					     const Quadrature<dim>    &q,
+					     SparseMatrix<double>     &matrix,
+					     const Function<dim>      &rhs,
+					     Vector<double>           &rhs_vector,
+					     const Function<dim> * const coefficient,
+					     const IteratorRange<dim>  range,
+					     Threads::ThreadMutex     &mutex);
+  create_laplace_matrix_2_t p = &MatrixCreator::template create_laplace_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     Threads::spawn (thread_manager,
-		    Threads::encapsulate(&MatrixCreator::template
-					 create_laplace_matrix_2<dim>)
+		    Threads::encapsulate(p)
 		    .collect_args (mapping, dof, q, matrix, rhs,
 				   rhs_vector, coefficient,
 				   thread_ranges[thread], mutex));
