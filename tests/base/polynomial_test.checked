@@ -72,6 +72,9 @@ DEAL::x=0.80,    all derivatives: ok
 DEAL::x=0.90,    all derivatives: ok
 DEAL::x=1.00,    all derivatives: ok
 DEAL::
+DEAL::Derivatives of a polynomial of degree 0 (a constant function).
+DEAL::ok
+DEAL::
 DEAL::Test of TensorProductPolynomials:
 DEAL::2D Example:
 DEAL::v_1=-0.02

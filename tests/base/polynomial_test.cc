@@ -87,8 +87,8 @@ int main(int, char)
       deallog << "x=" << xi << ",    all derivatives: ";
       vector<double> v_exact(6);
       
-      v_exact[1]=256.0*xi*xi*xi-384.0*xi*xi+152.0*xi-12.0;
       v_exact[0]=64.0*xi*xi*xi*xi-128.0*xi*xi*xi+76.0*xi*xi-12.0*xi;
+      v_exact[1]=256.0*xi*xi*xi-384.0*xi*xi+152.0*xi-12.0;
       v_exact[2]=768.0*xi*xi-768.0*xi+152.0;
       v_exact[3]=1536*xi-768;
       v_exact[4]=1536;
@@ -112,6 +112,33 @@ int main(int, char)
 
       deallog << std::endl;
     }
+
+  if (true)
+    {
+      deallog << std::endl << "Derivatives of a polynomial of degree 0 (a constant function)." << std::endl;      
+      vector<double> a_const(1,1.);
+      const Polynomial<double> pol_const(a_const);
+      vector<double> exact_values(5,0.);
+      exact_values[0]=1.;
+      vector<double> computed_values(5);
+
+      pol_const.value(0.24, computed_values);
+      bool ok=true;
+      for (unsigned int i=0; i<exact_values.size(); ++i)
+	{
+	  if (fabs(computed_values[i]-exact_values[i])>1e-15)
+	    ok=false;
+	}
+
+      if (ok)
+	deallog << "ok";
+      else
+	deallog << "false";
+
+      deallog << std::endl;
+    }
+  
+  
 
 
   deallog << std::endl << "Test of TensorProductPolynomials:" << std::endl;
