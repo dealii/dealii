@@ -23,7 +23,7 @@ dVector::dVector () :
 
 
 dVector::dVector (const unsigned int n) :
-		dim(n),
+		dim(0),
 		maxdim(0),
 		val(0)
 {
