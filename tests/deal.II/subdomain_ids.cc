@@ -165,7 +165,8 @@ void test ()
 		  ExcNumberMismatch(std::count (selected_dofs.begin(),
 						selected_dofs.end(),
 						true),
-				    std::pow(static_cast<double>(cells_per_direction/2+1),dim)));
+				    static_cast<unsigned int>(std::pow(static_cast<double>(
+				      cells_per_direction/2+1),dim))));
 	}
       deallog << "Check 4 (dim=" << dim << ") ok" << std::endl;      
     };
