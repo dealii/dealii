@@ -235,7 +235,8 @@ dSMatrixStruct::operator () (const unsigned int i, const unsigned int j) const
   const int* p = lower_bound (&colnums[rowstart[i]+1],
 			      &colnums[rowstart[i+1]],
 			      static_cast<signed int>(j));
-  if (*p == static_cast<signed int>(j))
+  if ((*p == static_cast<signed int>(j)) &&
+      (p != &colnums[rowstart[i+1]]))
     return (p - &colnums[0]);
   else
     return -1;
