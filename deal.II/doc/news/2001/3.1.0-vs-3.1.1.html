@@ -15,6 +15,16 @@
 
 <ol>
   <li> <p>
+       Updated: the scripts <code>config.sub</code> and
+       <code>config.guess</code> were updated to their newest
+       versions, since <code>./configure</code> did not run properly
+       on all systems. They are needed to determine the host system
+       type correctly.
+       <br>
+       (WB 2001/03/06)
+       </p>
+
+  <li> <p>
        Fix: in the triangulation, the <code
        class="member">straight_boundary</code> variable, which is a
        reference, was assigned the address of a temporary object. It
