@@ -136,7 +136,7 @@ FunctionDerivative<dim>::value_list (const vector<Point<dim> > &points,
       
       for (unsigned int i=0;i<n;++i)
 	{
-	  values[i] = (values[i]-p_pp[i]+8*(p_p[i]-p_m[i]))/(12*h);
+	  values[i] = (values[i]-e_pp[i]+8*(e_p[i]-e_m[i]))/(12*h);
 	}
       break;
     }    
