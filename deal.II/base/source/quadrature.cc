@@ -59,7 +59,7 @@ Quadrature<dim>::Quadrature (const typename std::vector<Point<dim> > &points)
 		:
 		n_quadrature_points(points.size()),
 		quadrature_points(points),
-		weights(points.size(), atof("Inf"))
+		weights(points.size(), std::atof("Inf"))
 {
   Assert(weights.size() == points.size(),
 	 ExcDimensionMismatch(weights.size(), points.size()));
@@ -735,7 +735,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
   double sum_of_weights = 0;
   for (unsigned int i=0; i<n_quadrature_points; ++i)
     sum_of_weights += weight(i);
-  Assert (fabs(sum_of_weights-1) < 1e-15,
+  Assert (std::fabs(sum_of_weights-1) < 1e-15,
 	  ExcSumOfWeightsNotOne());
 #endif
 };

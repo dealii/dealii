@@ -374,11 +374,11 @@ CosineFunction<dim>::value (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    return cos(M_PI_2*p(0));
+	    return std::cos(M_PI_2*p(0));
       case 2:
-	    return cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
+	    return std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
       case 3:
-	    return cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+	    return std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -400,13 +400,13 @@ CosineFunction<dim>::value_list (const typename std::vector<Point<dim> > &points
       switch(dim)
 	{
 	  case 1:
-		values[i] = cos(M_PI_2*p(0));
+		values[i] = std::cos(M_PI_2*p(0));
 		break;
 	  case 2:
-		values[i] = cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
+		values[i] = std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
 		break;
 	  case 3:
-		values[i] = cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+		values[i] = std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -422,11 +422,11 @@ CosineFunction<dim>::laplacian (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    return -M_PI_2*M_PI_2* cos(M_PI_2*p(0));
+	    return -M_PI_2*M_PI_2* std::cos(M_PI_2*p(0));
       case 2:
-	    return -2*M_PI_2*M_PI_2* cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
+	    return -2*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
       case 3:
-	    return -3*M_PI_2*M_PI_2* cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+	    return -3*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -448,13 +448,13 @@ CosineFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &po
       switch(dim)
 	{
 	  case 1:
-		values[i] = -M_PI_2*M_PI_2* cos(M_PI_2*p(0));
+		values[i] = -M_PI_2*M_PI_2* std::cos(M_PI_2*p(0));
 		break;
 	  case 2:
-		values[i] = -2*M_PI_2*M_PI_2* cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
+		values[i] = -2*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
 		break;
 	  case 3:
-		values[i] = -3*M_PI_2*M_PI_2* cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
+		values[i] = -3*M_PI_2*M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -471,16 +471,16 @@ CosineFunction<dim>::gradient (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    result[0] = -M_PI_2* sin(M_PI_2*p(0));
+	    result[0] = -M_PI_2* std::sin(M_PI_2*p(0));
 	    break;
       case 2:
-	    result[0] = -M_PI_2* sin(M_PI_2*p(0)) * cos(M_PI_2*p(1));
-	    result[1] = -M_PI_2* cos(M_PI_2*p(0)) * sin(M_PI_2*p(1));
+	    result[0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+	    result[1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
 	    break;
       case 3:
-	    result[0] = -M_PI_2* sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-	    result[1] = -M_PI_2* cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-	    result[2] = -M_PI_2* cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+	    result[0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+	    result[1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+	    result[2] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 	    break;
       default:
 	    Assert(false, ExcNotImplemented());
@@ -503,16 +503,16 @@ CosineFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &poi
       switch(dim)
 	{
 	  case 1:
-		gradients[i][0] = -M_PI_2* sin(M_PI_2*p(0));
+		gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0));
 		break;
 	  case 2:
-		gradients[i][0] = -M_PI_2* sin(M_PI_2*p(0)) * cos(M_PI_2*p(1));
-		gradients[i][1] = -M_PI_2* cos(M_PI_2*p(0)) * sin(M_PI_2*p(1));
+		gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+		gradients[i][1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
 		break;
 	  case 3:
-		gradients[i][0] = -M_PI_2* sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-		gradients[i][1] = -M_PI_2* cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-		gradients[i][2] = -M_PI_2* cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+		gradients[i][0] = -M_PI_2* std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+		gradients[i][1] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+		gradients[i][2] = -M_PI_2* std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -531,13 +531,13 @@ CosineFunction<dim>::hessian (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    result[0][0] = -pi2* cos(M_PI_2*p(0));
+	    result[0][0] = -pi2* std::cos(M_PI_2*p(0));
 	    break;
       case 2:
 	if (true)
 	  {
-	    const double coco = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
-	    const double sisi = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1));
+	    const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+	    const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
 	    result[0][0] = coco;
 	    result[1][1] = coco;
 	    result[0][1] = sisi;
@@ -547,10 +547,10 @@ CosineFunction<dim>::hessian (const Point<dim>   &p,
       case 3:
 	if (true)
 	  {
-	    const double cococo = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-	    const double sisico = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-	    const double sicosi = pi2*sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * sin(M_PI_2*p(2));
-	    const double cosisi = pi2*cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+	    const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+	    const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+	    const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+	    const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 
 	    result[0][0] = cococo;
 	    result[1][1] = cococo;
@@ -586,13 +586,13 @@ CosineFunction<dim>::hessian_list (const typename std::vector<Point<dim> > &poin
       switch(dim)
 	{
 	  case 1:
-		hessians[i][0][0] = -pi2* cos(M_PI_2*p(0));
+		hessians[i][0][0] = -pi2* std::cos(M_PI_2*p(0));
 		break;
 	  case 2:
 	    if (true)
 	      {
-		const double coco = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1));
-		const double sisi = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1));
+		const double coco = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1));
+		const double sisi = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1));
 		hessians[i][0][0] = coco;
 		hessians[i][1][1] = coco;
 		hessians[i][0][1] = sisi;
@@ -602,10 +602,10 @@ CosineFunction<dim>::hessian_list (const typename std::vector<Point<dim> > &poin
 	  case 3:
 	    if (true)
 	      {
-		const double cococo = -pi2*cos(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-		const double sisico = pi2*sin(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * cos(M_PI_2*p(2));
-		const double sicosi = pi2*sin(M_PI_2*p(0)) * cos(M_PI_2*p(1)) * sin(M_PI_2*p(2));
-		const double cosisi = pi2*cos(M_PI_2*p(0)) * sin(M_PI_2*p(1)) * sin(M_PI_2*p(2));
+		const double cococo = -pi2*std::cos(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+		const double sisico = pi2*std::sin(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::cos(M_PI_2*p(2));
+		const double sicosi = pi2*std::sin(M_PI_2*p(0)) * std::cos(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
+		const double cosisi = pi2*std::cos(M_PI_2*p(0)) * std::sin(M_PI_2*p(1)) * std::sin(M_PI_2*p(2));
 
 		hessians[i][0][0] = cococo;
 		hessians[i][1][1] = cococo;
@@ -634,11 +634,11 @@ ExpFunction<dim>::value (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    return exp(p(0));
+	    return std::exp(p(0));
       case 2:
-	    return exp(p(0)) * exp(p(1));
+	    return std::exp(p(0)) * std::exp(p(1));
       case 3:
-	    return exp(p(0)) * exp(p(1)) * exp(p(2));
+	    return std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -660,13 +660,13 @@ ExpFunction<dim>::value_list (const typename std::vector<Point<dim> > &points,
       switch(dim)
 	{
 	  case 1:
-		values[i] = exp(p(0));
+		values[i] = std::exp(p(0));
 		break;
 	  case 2:
-		values[i] = exp(p(0)) * exp(p(1));
+		values[i] = std::exp(p(0)) * std::exp(p(1));
 		break;
 	  case 3:
-		values[i] = exp(p(0)) * exp(p(1)) * exp(p(2));
+		values[i] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -682,11 +682,11 @@ ExpFunction<dim>::laplacian (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    return exp(p(0));
+	    return std::exp(p(0));
       case 2:
-	    return 2 * exp(p(0)) * exp(p(1));
+	    return 2 * std::exp(p(0)) * std::exp(p(1));
       case 3:
-	    return 3 * exp(p(0)) * exp(p(1)) * exp(p(2));
+	    return 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -708,13 +708,13 @@ ExpFunction<dim>::laplacian_list (const typename std::vector<Point<dim> > &point
       switch(dim)
 	{
 	  case 1:
-		values[i] = exp(p(0));
+		values[i] = std::exp(p(0));
 		break;
 	  case 2:
-		values[i] = 2 * exp(p(0)) * exp(p(1));
+		values[i] = 2 * std::exp(p(0)) * std::exp(p(1));
 		break;
 	  case 3:
-		values[i] = 3 * exp(p(0)) * exp(p(1)) * exp(p(2));
+		values[i] = 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -731,16 +731,16 @@ ExpFunction<dim>::gradient (const Point<dim>   &p,
   switch(dim)
     {
       case 1:
-	    result[0] = exp(p(0));
+	    result[0] = std::exp(p(0));
 	    break;
       case 2:
-	    result[0] = exp(p(0)) * exp(p(1));
-	    result[1] = exp(p(0)) * exp(p(1));
+	    result[0] = std::exp(p(0)) * std::exp(p(1));
+	    result[1] = std::exp(p(0)) * std::exp(p(1));
 	    break;
       case 3:
-	    result[0] = exp(p(0)) * exp(p(1)) * exp(p(2));
-	    result[1] = exp(p(0)) * exp(p(1)) * exp(p(2));
-	    result[2] = exp(p(0)) * exp(p(1)) * exp(p(2));
+	    result[0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+	    result[1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+	    result[2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
 	    break;
       default:
 	    Assert(false, ExcNotImplemented());
@@ -763,16 +763,16 @@ ExpFunction<dim>::gradient_list (const typename std::vector<Point<dim> > &points
       switch(dim)
 	{
 	  case 1:
-		gradients[i][0] = exp(p(0));
+		gradients[i][0] = std::exp(p(0));
 		break;
 	  case 2:
-		gradients[i][0] = exp(p(0)) * exp(p(1));
-		gradients[i][1] = exp(p(0)) * exp(p(1));
+		gradients[i][0] = std::exp(p(0)) * std::exp(p(1));
+		gradients[i][1] = std::exp(p(0)) * std::exp(p(1));
 		break;
 	  case 3:
-		gradients[i][0] = exp(p(0)) * exp(p(1)) * exp(p(2));
-		gradients[i][1] = exp(p(0)) * exp(p(1)) * exp(p(2));
-		gradients[i][2] = exp(p(0)) * exp(p(1)) * exp(p(2));
+		gradients[i][0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+		gradients[i][1] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+		gradients[i][2] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -793,10 +793,10 @@ LSingularityFunction::value (const Point<2>   &p,
   if ((x>=0) && (y>=0))
     return 0.;
   
-  double phi = atan2(y,-x)+M_PI;
+  double phi = std::atan2(y,-x)+M_PI;
   double r2 = x*x+y*y;
 
-  return pow(r2,1./3.) * sin(2./3.*phi);
+  return std::pow(r2,1./3.) * std::sin(2./3.*phi);
 }
 
 
@@ -817,10 +817,10 @@ LSingularityFunction::value_list (const std::vector<Point<2> > &points,
 	values[i] = 0.;
       else
 	{
-	  double phi = atan2(y,-x)+M_PI;
+	  double phi = std::atan2(y,-x)+M_PI;
 	  double r2 = x*x+y*y;
 
-	  values[i] = pow(r2,1./3.) * sin(2./3.*phi);
+	  values[i] = std::pow(r2,1./3.) * std::sin(2./3.*phi);
 	}
     }
 }
@@ -853,12 +853,12 @@ LSingularityFunction::gradient (const Point<2>   &p,
 {
   double x = p(0);
   double y = p(1);
-  double phi = atan2(y,-x)+M_PI;
-  double r43 = pow(x*x+y*y,2./3.);
+  double phi = std::atan2(y,-x)+M_PI;
+  double r43 = std::pow(x*x+y*y,2./3.);
   
   Tensor<1,2> result;
-  result[0] = 2./3.*(sin(2./3.*phi)*x + cos(2./3.*phi)*y)/r43;
-  result[1] = 2./3.*(sin(2./3.*phi)*y - cos(2./3.*phi)*x)/r43;
+  result[0] = 2./3.*(std::sin(2./3.*phi)*x + std::cos(2./3.*phi)*y)/r43;
+  result[1] = 2./3.*(std::sin(2./3.*phi)*y - std::cos(2./3.*phi)*x)/r43;
   return result;
 }
 
@@ -876,11 +876,11 @@ LSingularityFunction::gradient_list (const std::vector<Point<2> > &points,
       const Point<2>& p = points[i];
       double x = p(0);
       double y = p(1);
-      double phi = atan2(y,-x)+M_PI;
-      double r43 = pow(x*x+y*y,2./3.);
+      double phi = std::atan2(y,-x)+M_PI;
+      double r43 = std::pow(x*x+y*y,2./3.);
 
-      gradients[i][0] = 2./3.*(sin(2./3.*phi)*x + cos(2./3.*phi)*y)/r43;
-      gradients[i][1] = 2./3.*(sin(2./3.*phi)*y - cos(2./3.*phi)*x)/r43;
+      gradients[i][0] = 2./3.*(std::sin(2./3.*phi)*x + std::cos(2./3.*phi)*y)/r43;
+      gradients[i][1] = 2./3.*(std::sin(2./3.*phi)*y - std::cos(2./3.*phi)*x)/r43;
     }
 }
 
@@ -894,10 +894,10 @@ SlitSingularityFunction::value (const Point<2>   &p,
   double x = p(0);
   double y = p(1);
 
-  double phi = atan2(x,y)+M_PI;
+  double phi = std::atan2(x,y)+M_PI;
   double r2 = x*x+y*y;
 
-  return pow(r2,.25) * sin(.5*phi);
+  return std::pow(r2,.25) * std::sin(.5*phi);
 }
 
 
@@ -914,10 +914,10 @@ SlitSingularityFunction::value_list (const std::vector<Point<2> > &points,
       double x = points[i](0);
       double y = points[i](1);
 
-      double phi = atan2(x,y)+M_PI;
+      double phi = std::atan2(x,y)+M_PI;
       double r2 = x*x+y*y;
 
-      values[i] = pow(r2,.25) * sin(.5*phi);
+      values[i] = std::pow(r2,.25) * std::sin(.5*phi);
     }
 }
 
@@ -949,13 +949,13 @@ SlitSingularityFunction::gradient (const Point<2>   &p,
 {
   double x = p(0);
   double y = p(1);
-  double phi = atan2(x,y)+M_PI;
-  double r64 = pow(x*x+y*y,3./4.);
+  double phi = std::atan2(x,y)+M_PI;
+  double r64 = std::pow(x*x+y*y,3./4.);
   
   
   Tensor<1,2> result;
-  result[0] = 1./2.*(sin(1./2.*phi)*x + cos(1./2.*phi)*y)/r64;
-  result[1] = 1./2.*(sin(1./2.*phi)*y - cos(1./2.*phi)*x)/r64;
+  result[0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
+  result[1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
   return result;
 }
 
@@ -973,11 +973,11 @@ SlitSingularityFunction::gradient_list (const std::vector<Point<2> > &points,
       const Point<2>& p = points[i];
       double x = p(0);
       double y = p(1);
-      double phi = atan2(x,y)+M_PI;
-      double r64 = pow(x*x+y*y,3./4.);
+      double phi = std::atan2(x,y)+M_PI;
+      double r64 = std::pow(x*x+y*y,3./4.);
 
-      gradients[i][0] = 1./2.*(sin(1./2.*phi)*x + cos(1./2.*phi)*y)/r64;
-      gradients[i][1] = 1./2.*(sin(1./2.*phi)*y - cos(1./2.*phi)*x)/r64;
+      gradients[i][0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
+      gradients[i][1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
     }
 }
 
@@ -996,13 +996,13 @@ JumpFunction<dim>::JumpFunction(const Point<dim> &direction,
 	    angle = 0;
 	    break;
       case 2:
-	    angle = atan2(direction(0),direction(1));
+	    angle = std::atan2(direction(0),direction(1));
 	    break;
       case 3:
 	    Assert(false, ExcNotImplemented());
     }
-  sine = sin(angle);
-  cosine = cos(angle);
+  sine = std::sin(angle);
+  cosine = std::cos(angle);
 }
 
 	    
@@ -1013,7 +1013,7 @@ JumpFunction<dim>::value (const Point<dim>   &p,
 			  const unsigned int) const
 {
   double x = steepness*(-cosine*p(0)+sine*p(1));
-  return -atan(x);
+  return -std::atan(x);
 }
 
 
@@ -1030,7 +1030,7 @@ JumpFunction<dim>::value_list (const typename std::vector<Point<dim> > &p,
   for (unsigned int i=0;i<p.size();++i)
     {
       double x = steepness*(-cosine*p[i](0)+sine*p[i](1));
-      values[i] = -atan(x);
+      values[i] = -std::atan(x);
     }
 }
 
