@@ -36,6 +36,7 @@ data_out_faces_02.exe   : data_out_faces_02.g.$(OBJEXT)    $(libraries)
 data_out_rotation_01.exe: data_out_rotation_01.g.$(OBJEXT) $(libraries)
 data_out_rotation_02.exe: data_out_rotation_02.g.$(OBJEXT) $(libraries)
 data_out_stack_01.exe   : data_out_stack_01.g.$(OBJEXT)    $(libraries)
+dof_tools_00a.exe       : dof_tools_00a.g.$(OBJEXT)        $(libraries)
 dof_tools_01a.exe       : dof_tools_01a.g.$(OBJEXT)        $(libraries)
 dof_tools_01b.exe       : dof_tools_01b.g.$(OBJEXT)        $(libraries)
 dof_tools_01c.exe       : dof_tools_01c.g.$(OBJEXT)        $(libraries)
@@ -96,6 +97,7 @@ tests = anna_1 anna_2 anna_3 anna_4 anna_5 anna_6 \
 	geometry_info_1 \
 	data_out_01 data_out_02 data_out_faces_01 data_out_faces_02 \
 	data_out_rotation_01 data_out_rotation_02 data_out_stack_01 \
+	dof_tools_00a \
         dof_tools_01a dof_tools_01b dof_tools_01c dof_tools_01d \
         dof_tools_02a dof_tools_02b dof_tools_02c dof_tools_02d \
 	dof_tools_03 dof_tools_04 dof_tools_05 dof_tools_06 \
