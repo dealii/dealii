@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 #include <lac/forward-declarations.h>
 
 
@@ -91,7 +92,8 @@
  *
  * @author Wolfgang Bangerth, 1998
  */
-class ConstraintMatrix {
+class ConstraintMatrix : public Subscriptor
+{
   public:
 				     /**
 				      * Constructor
