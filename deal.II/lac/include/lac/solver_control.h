@@ -123,6 +123,21 @@ class SolverControl : public Subscriptor
 				      * continuation of the iterative
 				      * procedure.
 				      *
+				      * The iteration is also aborted
+				      * if the residual becomes a
+				      * denormalized value
+				      * (@p{NaN}). Note, however, that
+				      * this check is only performed
+				      * if the @p{isnan} function is
+				      * provided by the operating
+				      * system, which is not always
+				      * true. The @p{configure}
+				      * scripts checks for this and
+				      * sets the flag @p{HAVE_ISNAN}
+				      * in the file
+				      * @p{Make.global_options} if
+				      * this function was found.
+				      *
 				      * @p{check()} additionally
 				      * preserves @p{step} and
 				      * @p{check_value}. These
@@ -167,23 +182,6 @@ class SolverControl : public Subscriptor
 				      * @p{ReturnState} @p{failure} if
 				      * @p{residual>failure_residual} with
 				      * @p{failure_residual:=rel_failure_residual*first_residual}.
-				      *
-				      * If a failure criterion was set
-				      * using this method, then the
-				      * iteration is also aborted if
-				      * the residual becomes a
-				      * denormalized value
-				      * (@p{NaN}). Note, however, that
-				      * this check is only performed
-				      * if the @p{isnan} function is
-				      * provided by the operating
-				      * system, which is not always
-				      * the case. The @p{configure}
-				      * scripts checks for this and
-				      * sets the flag @p{HAVE_ISNAN}
-				      * in the file
-				      * @p{Make.global_options} is
-				      * this function was found.
 				      */
     void set_failure_criterion (const double rel_failure_residual);
 
