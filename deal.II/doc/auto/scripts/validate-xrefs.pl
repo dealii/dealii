@@ -35,7 +35,7 @@ foreach $filename (@ARGV) {
 	        open IN2, $filename;
 	        $found = 0;
 	        while ( <IN2> ) {
-		    if ( /<a name=\"?(.*?)[\s\"]/i ) {
+		    while ( /<a name=\"?(.*?)[\s\"]/gi ) {
 		        if ( $1 eq $internal_ref) {
 			    print "                    found.\n" if $debug;
 			    $found = 1;
