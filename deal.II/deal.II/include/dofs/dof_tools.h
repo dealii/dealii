@@ -775,7 +775,7 @@ class DoFTools
 				      * Count how many degrees of
 				      * freedom out of the total
 				      * number belong to each
-				      * components. If the number of
+				      * component. If the number of
 				      * components the finite element
 				      * has is one (i.e. you only have
 				      * one scalar variable), then the
@@ -804,13 +804,26 @@ class DoFTools
 				      * than the total number of
 				      * degrees of freedom.
 				      *
-				      * The result is returned in the
-				      * last argument.
+				      * The additional optional
+				      * argument @p{target_component}
+				      * allows for a re-sorting and
+				      * grouping of components. To
+				      * this end, it contains for each
+				      * component the component number
+				      * it shall be counted as. Having
+				      * the same number entered
+				      * several times sums up several
+				      * components as the same.
+				      *
+				      * The result is returned in
+				      * @p{dofs_per_component}.
 				      */
     template <int dim>
     static void
-    count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
-			      std::vector<unsigned int> &dofs_per_component);
+    count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
+			      std::vector<unsigned int>& dofs_per_component,
+			      std::vector<unsigned int>  target_component
+			      =std::vector<unsigned int>());
     
 				     /**
 				      * This function can be used when

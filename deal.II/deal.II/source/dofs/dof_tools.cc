@@ -1674,11 +1674,26 @@ DoFTools::extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
 template <int dim>
 void
 DoFTools::
-count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
-                          std::vector<unsigned int> &dofs_per_component)
+count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
+                          std::vector<unsigned int>& dofs_per_component,
+			  std::vector<unsigned int>  target_component)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
   dofs_per_component.resize (n_components);
+  fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
+  
+				   // If the empty vector was given as
+				   // default argument, set up this
+				   // vector as identity.
+  if (target_component.size()==0)
+    {
+      target_component.resize(n_components);
+      for (unsigned int i=0;i<n_components;++i)
+	target_component[i] = i;
+    }
+  
+  Assert(target_component.size()==n_components,
+	 ExcDimensionMismatch(target_component.size(),n_components));
 
 				   // special case for only one
 				   // component. treat this first
@@ -1714,9 +1729,10 @@ count_dofs_per_component (const DoFHandler<dim>     &dof_handler,
 
 				   // next count what we got
   for (unsigned int i=0; i<n_components; ++i)
-    dofs_per_component[i] = std::count(dofs_in_component[i].begin(),
-				       dofs_in_component[i].end(),
-				       true);
+    dofs_per_component[target_component[i]]
+      += std::count(dofs_in_component[i].begin(),
+		    dofs_in_component[i].end(),
+		    true);
 
 				   // finally sanity check. this is
 				   // only valid if the finite element

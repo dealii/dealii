@@ -41,7 +41,7 @@ template <int dim> class MGDoFHandler;
  * once by looping over all cells and storing the result in a matrix for
  * each level, but requires additional memory.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999-2003
  */
 template <typename number>
 class MGTransferPrebuilt : public MGTransferBase<Vector<number> > 
@@ -255,7 +255,7 @@ class MGTransferPrebuilt : public MGTransferBase<Vector<number> >
  * Implementation of matrix generation for @ref{MGTransferBlock} and
  * @p{MGTransferSelected}.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001-2003
  */
 class MGTransferBlockBase
 {
@@ -269,10 +269,17 @@ class MGTransferBlockBase
 				      * components are to be built. By
 				      * default, all matrices are
 				      * built.
+				      *
+				      * The last argument
+				      * @p{target_component} allows
+				      * grouping of components the
+				      * same way as in
+				      * @p{DoFRenumbering::component_wise}.
 				      */
     template <int dim>
-    void build_matrices (const MGDoFHandler<dim> &mg_dof,
-			 std::vector<bool> selected);
+    void build_matrices (const MGDoFHandler<dim>& mg_dof,
+			 const std::vector<bool>& selected,
+			 const std::vector<unsigned int>& target_component);
 
 				   /**
 				    * Flag of selected components.
@@ -518,10 +525,11 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 /**
  * Implementation of the @p{MGTransferBase} interface for block
  * matrices and simple vectors. This class uses @ref{MGTransferBlock}
- * selecting a single component. The transfer operators themselves are
- * implemented for simple vectors again.
+ * selecting a single component or grouping several components into a
+ * single block. The transfer operators themselves are implemented for
+ * simple vectors again.
  *
- * @author Guido Kanschat, 2001, 2002
+ * @author Guido Kanschat, 2001, 2002, 2003
  */
 template <typename number>
 class MGTransferSelect : public MGTransferBase<Vector<number> >,
@@ -547,6 +555,29 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     template <int dim>
     void build_matrices (const MGDoFHandler<dim> &mg_dof,
 			 unsigned int selected);
+
+				     /**
+				      * Actually build the prolongation
+				      * matrices for grouped components.
+				      *
+				      * The argument
+				      * @p{target_component}
+				      * corresponds to the grouping
+				      * mechanism of
+				      * @p{DoFRenumbering::component_wise(...)},
+				      * which should be used to create
+				      * the corresponding block
+				      * structure in matrices and
+				      * vectors.
+				      *
+				      * This function is a front-end
+				      * for the same function in
+				      * @ref{MGTransferBlockBase}.
+				      */
+    template <int dim>
+    void build_matrices (const MGDoFHandler<dim> &mg_dof,
+			 unsigned int selected,
+			 const std::vector<unsigned int>& target_component);
 
 				     /**
 				      * Prolongate a vector from level

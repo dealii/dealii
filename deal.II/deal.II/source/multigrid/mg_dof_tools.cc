@@ -35,9 +35,10 @@
 
 
 template <int dim, class SparsityPattern>
-void MGTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
-					SparsityPattern         &sparsity,
-					const unsigned int       level)
+void MGTools::make_sparsity_pattern (
+  const MGDoFHandler<dim> &dof,
+  SparsityPattern         &sparsity,
+  const unsigned int       level)
 {
   const unsigned int n_dofs = dof.n_dofs(level);
 
@@ -65,9 +66,10 @@ void MGTools::make_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
 template<int dim, class SparsityPattern>
 void
-MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
-					SparsityPattern       &sparsity,
-					const unsigned int level)
+MGTools::make_flux_sparsity_pattern (
+  const MGDoFHandler<dim> &dof,
+  SparsityPattern       &sparsity,
+  const unsigned int level)
 {
   const unsigned int n_dofs = dof.n_dofs(level);
   
@@ -121,9 +123,10 @@ MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
 template<int dim, class SparsityPattern>
 void
-MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
-					  SparsityPattern       &sparsity,
-					  const unsigned int level)
+MGTools::make_flux_sparsity_pattern_edge (
+  const MGDoFHandler<dim> &dof,
+  SparsityPattern       &sparsity,
+  const unsigned int level)
 {
   Assert ((level>=1) && (level<dof.get_tria().n_levels()),
 	  ExcIndexRange(level, 1, dof.get_tria().n_levels()));
@@ -177,14 +180,15 @@ MGTools::make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof,
 
 
 
-//TODO[GK]: Replace FullMatrix by Table<2,bool>
+//TODO[GK]: Replace FullMatrix by Table<2,char>
 template<int dim, class SparsityPattern>
 void
-MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
-                                     SparsityPattern       &sparsity,
-                                     const unsigned int level,
-                                     const FullMatrix<double>& int_mask,
-                                     const FullMatrix<double>& flux_mask)
+MGTools::make_flux_sparsity_pattern (
+  const MGDoFHandler<dim> &dof,
+  SparsityPattern       &sparsity,
+  const unsigned int level,
+  const FullMatrix<double>& int_mask,
+  const FullMatrix<double>& flux_mask)
 {
   const unsigned int n_dofs = dof.n_dofs(level);
   const unsigned int n_comp = dof.get_fe().n_components();
@@ -291,8 +295,10 @@ MGTools::make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
 
 template <int dim>
 void
-MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
-				      std::vector<std::vector<unsigned int> >& result)
+MGTools::count_dofs_per_component (
+  const MGDoFHandler<dim>& dof_handler,
+  std::vector<std::vector<unsigned int> >& result,
+  std::vector<unsigned int> target_component)
 {
   const unsigned int nlevels = dof_handler.get_tria().n_levels();
   
@@ -300,6 +306,17 @@ MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
 	  ExcDimensionMismatch(result.size(), nlevels));
 
   const unsigned int n_components = dof_handler.get_fe().n_components();
+
+  if (target_component.size() == 0)
+    {
+      target_component.resize(n_components);
+      for (unsigned int i=0;i<n_components;++i)
+	target_component[i] = i;
+    }
+
+  Assert(target_component.size() == n_components,
+	 ExcDimensionMismatch(target_component.size(), n_components));
+
   for (unsigned int l=0;l<nlevels;++l)
     {
       result[l].resize (n_components);
@@ -338,9 +355,10 @@ MGTools::count_dofs_per_component (const MGDoFHandler<dim>& dof_handler,
 	  
 					   // next count what we got
 	  for (unsigned int i=0; i<n_components; ++i)
-	      result[l][i] = std::count(dofs_in_component[i].begin(),
-					dofs_in_component[i].end(),
-					true);
+	      result[l][target_component[i]]
+		= std::count(dofs_in_component[i].begin(),
+			     dofs_in_component[i].end(),
+			     true);
 	  
 					   // finally sanity check
 	  Assert (std::accumulate (result[l].begin(),

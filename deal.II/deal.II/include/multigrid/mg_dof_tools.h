@@ -36,7 +36,7 @@ template <class number> class FullMatrix;
  * All member functions are static, so there is no need to create an
  * object of class @p{MGTools}.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999-2003
  */
 class MGTools
 {
@@ -126,7 +126,9 @@ class MGTools
 				      */
     template <int dim>
       static void count_dofs_per_component (const MGDoFHandler<dim>& mg_dof,
-					    std::vector<std::vector<unsigned int> >& result);
+					    std::vector<std::vector<unsigned int> >& result,
+					    std::vector<unsigned int> target_component
+					    = std::vector<unsigned int>());
     
     
 				     /**

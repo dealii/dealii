@@ -26,8 +26,6 @@
 #include <algorithm>
 
 
-//TODO:[GK] This file is included from nowhere. It should either go away entirely, or be included at least from some .h or .cc file
-
 /* --------------------- MGTransferPrebuilt -------------- */
 
 

@@ -279,7 +279,7 @@ class DoFRenumbering
 				      * different way than suggested
 				      * by the @p{FESystem} object you
 				      * use. To this end, Set up the
-				      * vector @p{component_order}
+				      * vector @p{target_component}
 				      * such that the entry at index
 				      * @p{i} denotes the number of
 				      * the target component for dofs
@@ -317,25 +317,8 @@ class DoFRenumbering
     template <int dim>
     static void
     component_wise (DoFHandler<dim>                 &dof_handler,
-		    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
+		    const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
-				     /**
-				      * Computes the renumbering
-				      * vector needed by the
-				      * @p{component_wise}
-				      * function. Does not perform the
-				      * renumbering on the
-				      * @p{DoFHandler} dofs but
-				      * returns the renumbering
-				      * vector.
-				      */    
-    template <int dim, class ITERATOR, class ENDITERATOR>
-    static unsigned int
-    compute_component_wise (std::vector<unsigned int>& new_index,
-			    ITERATOR& start,
-			    const ENDITERATOR& end,
-			    const std::vector<unsigned int> &component_order = std::vector<unsigned int>());
-    
 				     /**
 				      * Sort the degrees of freedom by
 				      * component. It does the same
@@ -348,8 +331,25 @@ class DoFRenumbering
     static void
     component_wise (MGDoFHandler<dim>&               dof_handler,
 		    unsigned int                     level,
-		    const std::vector<unsigned int>& component_order = std::vector<unsigned int>());
+		    const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
 
+				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * @p{component_wise}
+				      * functions. Does not perform the
+				      * renumbering on the
+				      * @p{DoFHandler} dofs but
+				      * returns the renumbering
+				      * vector.
+				      */    
+    template <int dim, class ITERATOR, class ENDITERATOR>
+    static unsigned int
+    compute_component_wise (std::vector<unsigned int>& new_index,
+			    ITERATOR& start,
+			    const ENDITERATOR& end,
+			    const std::vector<unsigned int> &target_component);
+    
 				     /**
 				      * Cell-wise renumbering for DG
 				      * elements.  This function takes

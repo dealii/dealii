@@ -29,8 +29,9 @@
 
 template <int dim>
 void MGTransferBlockBase::build_matrices (
-  const MGDoFHandler<dim> &mg_dof,
-  std::vector<bool> select) 
+  const MGDoFHandler<dim>& mg_dof,
+  const std::vector<bool>& select,
+  const std::vector<unsigned int>& target_component)
 {
   const FiniteElement<dim>& fe = mg_dof.get_fe();
   const unsigned int n_components  = fe.n_components();
@@ -248,12 +249,15 @@ template <typename number>
 template <int dim>
 void MGTransferBlock<number>::build_matrices (
   const MGDoFHandler<dim> &mg_dof,
-  std::vector<bool> select) 
+  std::vector<bool> select)
 {
   if (select.size() == 0)
     select = std::vector<bool> (mg_dof.get_fe().n_components(), true);
-
-  MGTransferBlockBase::build_matrices (mg_dof, select);
+  std::vector<unsigned int> target_component(mg_dof.get_fe().n_components());
+  for (unsigned int i=0;i<target_component.size();++i)
+    target_component[i] = i;
+  
+  MGTransferBlockBase::build_matrices (mg_dof, select, target_component);
 }
 
 
@@ -266,8 +270,11 @@ void MGTransferSelect<number>::build_matrices (
   selected = select;
   std::vector<bool> s(mg_dof.get_fe().n_components(), false);
   s[select] = true;
+  std::vector<unsigned int> target_component(mg_dof.get_fe().n_components());
+  for (unsigned int i=0;i<target_component.size();++i)
+    target_component[i] = i;
 
-  MGTransferBlockBase::build_matrices (mg_dof, s);
+  MGTransferBlockBase::build_matrices (mg_dof, s, target_component);
 }
 
 
