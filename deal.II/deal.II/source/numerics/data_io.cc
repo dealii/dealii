@@ -259,8 +259,9 @@ void DataOut<dim>::write_ucd (ostream &out) const {
   
 
 				   // write preamble
-  if (true) 
+  if (true)
     {
+/*      
 				       // block this to have local
 				       // variables destroyed after
 				       // use
@@ -279,6 +280,7 @@ void DataOut<dim>::write_ucd (ostream &out) const {
 	  << "# For a description of the UCD format see the AVS Developer's guide."
 	  << endl
 	  << "#" << endl;
+*/
     };
 
 				   // start with ucd data
