@@ -102,7 +102,7 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
     	  Polynomial<number>::scale(*c0, 2.);
     	  Polynomial<number>::shift(*c1, (long double) -1.);
     	  Polynomial<number>::scale(*c1, 2.);
-    	  Polynomial<number>::multiply(*c1, sqrt(3.));
+    	  Polynomial<number>::multiply(*c1, std::sqrt(3.));
   	  shifted_coefficients[0]=c0;
   	  shifted_coefficients[1]=c1;
 	}
@@ -144,7 +144,7 @@ Legendre<number>::compute_coefficients (const unsigned int k_)
   	  ck = new std::vector<number>(*ck);
     	  shift(*ck,(long double) -1.);
     	  Polynomial<number>::scale(*ck, 2.);
-    	  Polynomial<number>::multiply(*ck, sqrt(2.*k+1.));
+    	  Polynomial<number>::multiply(*ck, std::sqrt(2.*k+1.));
   	  shifted_coefficients[k] = ck;
 	};
     };
