@@ -24,9 +24,9 @@
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
-#include <dofs/dof_handler.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
@@ -34,73 +34,24 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+				 // These are the new include files
+				 // required for multi-level methods.
+				 // First, the file defining the
+				 // multigrid method itself.
+#include <multigrid/multigrid.h>
+				 // The DoFHandler is replaced by an
+				 // MGDoFHandler which is defined
+				 // here.
+#include <multigrid/mg_dof_handler.h>
+#include <multigrid/mg_dof_accessor.h>
 
-				 // This one is new. We want to read a
-				 // triangulation from disk, and the
-				 // class which does this is declared
-				 // in the following file:
-#include <grid/grid_in.h>
+				 // Then, we need some pre-made
+				 // transfer routines between grids.
+#include <multigrid/mg_transfer.h>
 
-				 // We will use a circular domain, and
-				 // the object describing the boundary
-				 // of it comes from this file:
-#include <grid/tria_boundary_lib.h>
-
-				 // This is C++ ...
+				 // This is C++ ... see step 5 for
+				 // further comments.
 #include <fstream>
-				 // ... and this is too: We will
-				 // convert integers to strings using
-				 // the C++ stringstream class
-				 // ``ostringstream''. One annoying
-				 // complication arises here in that
-				 // the classes ``std::istringstream''
-				 // and ``std::ostringstream'' (with
-				 // these names) have not been part of
-				 // standard libraries of C++
-				 // compilers for long. They have only
-				 // been part of C++ compilers since
-				 // around the time the C++ standard
-				 // was made in 1999. For example, the
-				 // gcc compiler up to and including
-				 // version 2.95.2 did not have them,
-				 // but instead provided classes
-				 // ``istrstream'' and ``ostrstream''
-				 // with a similar, but nevertheless
-				 // slightly different
-				 // interface. Furthermore, they were
-				 // declared in the include file
-				 // ``<strstream>'', while the new
-				 // standards conforming classes are
-				 // declared in ``<sstream>''. Many
-				 // other compilers followed the gcc
-				 // scheme, so whenever we want to
-				 // support versions of compilers that
-				 // appeared before approximately
-				 // 2000/2001, we have to support
-				 // these old classes.
-				 //
-				 // Since we do want to support these
-				 // compilers, the ``./configure''
-				 // script you run as the very first
-				 // step of installing the library
-				 // determines whether the compiler
-				 // you want to use supports the new
-				 // classes, or whether we have to
-				 // fall back on the old ones. If the
-				 // new classes are supported, then
-				 // the preprocessor variable
-				 // ``HAVE_STD_STRINGSTREAM'' is set
-				 // in the ``base/config.h'' include
-				 // file, that all include files in
-				 // the library also include. Since we
-				 // have included quite a number of
-				 // files from the library at this
-				 // point, the definition or
-				 // non-definition of this
-				 // preprocessor variable can now be
-				 // used to decide whether old or new
-				 // header names have to be used to
-				 // import string stream classes:
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
@@ -108,16 +59,17 @@
 #endif
 
 
-				 // The main class is mostly as in the
-				 // previous example. The most visible
-				 // change is that the function
-				 // ``make_grid_and_dofs'' has been
-				 // removed, since making of the grid
-				 // is now done in the ``run''
-				 // function and the rest of its
-				 // functionality now is in
-				 // ``setup_system''. Apart from this,
-				 // everything is as before.
+				 // This class is based on the same
+				 // class in step 5. Remark that we
+				 // replaced the DoFHandler by
+				 // MGDoFHandler. since this inherits
+				 // fron DoFHandler, the new object
+				 // incorporates the old functionality
+				 // plus the new functions for degrees
+				 // of freedom on different
+				 // levels. Furthermore, we added
+				 // MultiLevelObjects for sparsity
+				 // patterns and matrices.
 template <int dim>
 class LaplaceProblem 
 {
@@ -133,230 +85,65 @@ class LaplaceProblem
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    MGDoFHandler<dim>      mg_dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
+    MGLevelObject<SparsityPattern> mg_sparsity;
+    MGLevelObject<SparseMatrix<float> > mg_matrices;
+    
     Vector<double>       solution;
     Vector<double>       system_rhs;
 };
-
-
-
-				 // In this example, we want to use a
-				 // variable coefficient in the
-				 // elliptic operator. Of course, the
-				 // suitable object is a Function, as
-				 // we have used it for the right hand
-				 // side and boundary values in the
-				 // last example. We will use it
-				 // again, but we implement another
-				 // function ``value_list'' which
-				 // takes a list of points and returns
-				 // the values of the function at
-				 // these points as a list. The reason
-				 // why such a function is reasonable
-				 // although we can get all the
-				 // information from the ``value''
-				 // function as well will be explained
-				 // below when assembling the matrix.
-				 //
-				 // The need to declare a seemingly
-				 // useless default constructor exists
-				 // here just as in the previous
-				 // example.
-template <int dim>
-class Coefficient : public Function<dim> 
-{
-  public:
-    Coefficient ()  : Function<dim>() {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
-    
-    virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<double>            &values,
-			     const unsigned int              component = 0) const;
-};
-
-
-
-				 // This is the implementation of the
-				 // coefficient function for a single
-				 // point. We let it return 20 if the
-				 // distance to the point of origin is
-				 // less than 0.5, and 1 otherwise:
-template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-				const unsigned int) const 
-{
-  if (p.square() < 0.5*0.5)
-    return 20;
-  else
-    return 1;
-}
-
-
-
-				 // And this is the function that
-				 // returns the value of the
-				 // coefficient at a whole list of
-				 // points at once. Of course, the
-				 // values are the same as if we would
-				 // ask the ``value'' function.
-template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-				   std::vector<double>            &values,
-				   const unsigned int              component) const 
-{
-				   // Use n_q_points as an
-				   // abbreviation for the number of
-				   // points for which function values
-				   // are requested:
-  const unsigned int n_points = points.size();
-
-				   // Now, of course the size of the
-				   // output array (``values'') must
-				   // be the same as that of the input
-				   // array (``points''), and we could
-				   // simply assume that. However, in
-				   // practice more than 90 per cent
-				   // of programming errors are
-				   // invalid function parameters such
-				   // as invalid array sizes, etc, so
-				   // we should try to make sure that
-				   // the parameters are valid. For
-				   // this, the Assert macro is a good
-				   // means, since it asserts that the
-				   // condition which is given as
-				   // first argument is valid, and if
-				   // not throws an exception (its
-				   // second argument) which will
-				   // usually terminate the program
-				   // giving information where the
-				   // error occured and what the
-				   // reason was. This generally
-				   // reduces the time to find
-				   // programming errors dramatically
-				   // and we have found assertions an
-				   // invaluable means to program
-				   // fast.
-				   //
-				   // On the other hand, all these
-				   // checks (there are more than 2000
-				   // of them in the library) should
-				   // not slow down the program too
-				   // much, which is why the Assert
-				   // macro is only used in debug mode
-				   // and expands to nothing if in
-				   // optimized mode. Therefore, while
-				   // you test your program and debug
-				   // it, the assertions will tell you
-				   // where the problems are, and once
-				   // your program is stable you can
-				   // switch off debugging and the
-				   // program will run without the
-				   // assertions and at maximum speed.
-				   //
-				   // Here, as has been said above, we
-				   // would like to make sure that the
-				   // size of the two arrays is equal,
-				   // and if not throw an
-				   // exception. Since the following
-				   // test is rather frequent for the
-				   // classes derived from
-				   // ``Function'', that class
-				   // declares an exception
-				   // ``ExcDimensionMismatch'' which
-				   // takes the sizes of two vectors
-				   // and prints some output in case
-				   // the condition is violated:
-  Assert (values.size() == n_points, 
-	  ExcDimensionMismatch (values.size(), n_points));
-				   // Since examples are not very good
-				   // if they do not demonstrate their
-				   // point, we will show how to
-				   // trigger this exception at the
-				   // end of the main program, and
-				   // what output results from this
-				   // (see the ``Results'' section of
-				   // this example program). You will
-				   // certainly notice that the output
-				   // is quite well suited to quickly
-				   // find what the problem is and
-				   // what parameters are expected. An
-				   // additional plus is that if the
-				   // program is run inside a
-				   // debugger, it will stop at the
-				   // point where the exception is
-				   // triggered, so you can go up the
-				   // call stack to immediately find
-				   // the place where the the array
-				   // with the wrong size was set up.
-  
-				   // While we're at it, we can do
-				   // another check: the coefficient
-				   // is a scalar, but the Function
-				   // class also represents
-				   // vector-valued function. A scalar
-				   // function must therefore be
-				   // considered as a vector-valued
-				   // function with only one
-				   // component, so the only valid
-				   // component for which a user might
-				   // ask is zero (we always count
-				   // from zero). The following
-				   // assertion checks this. (The
-				   // ``1'' is denotes the number of
-				   // components that this function
-				   // has.)
-  Assert (component == 0, 
-	  ExcIndexRange (component, 0, 1));
-  
-  for (unsigned int i=0; i<n_points; ++i)
-    {
-      if (points[i].square() < 0.5*0.5)
-	values[i] = 20;
-      else
-	values[i] = 1;
-    };
-}
 
 
 				 // This function is as before.
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (1),
-		dof_handler (triangulation)
+		mg_dof_handler (triangulation)
 {}
 
 
 
-				 // This is the function
-				 // ``make_grid_and_dofs'' from the
-				 // previous example, minus the
-				 // generation of the grid. Everything
-				 // else is unchanged.
+				 // This is the function of step 5
+				 // augmented by the setup of the
+				 // multi-level matrices in the end.
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  dof_handler.distribute_dofs (fe);
+  mg_dof_handler.distribute_dofs (fe);
 
   std::cout << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
+	    << mg_dof_handler.n_dofs()
 	    << std::endl;
 
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+  sparsity_pattern.reinit (mg_dof_handler.n_dofs(),
+			   mg_dof_handler.n_dofs(),
+			   mg_dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern (mg_dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
   system_matrix.reinit (sparsity_pattern);
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit (mg_dof_handler.n_dofs());
+  system_rhs.reinit (mg_dof_handler.n_dofs());
+
+				   // The multi-level objects are
+				   // resized to hold matrices for
+				   // every level. The coarse level is
+				   // zero (this is mandatory right
+				   // now but may change in a future
+				   // revision). Remark, that the
+				   // finest level is nlevels-1.
+  const unsigned int nlevels = triangulation.n_levels();
+  mg_sparsity.resize(0, nlevels-1);
+  mg_matrices.resize(0, nlevels-1);
+  
+  for (unsigned int level=0;level<nlevels;++level)
+    {
+    }
 }
 
 
@@ -391,13 +178,6 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-				   // This time, we will again use a
-				   // constant right hand side
-				   // function, but a variable
-				   // coefficient. The following
-				   // object will be used for this:
-  const Coefficient<dim> coefficient;
-
   QGauss2<dim>  quadrature_formula;
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
@@ -414,18 +194,8 @@ void LaplaceProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Below, we will ask the
-				   // Coefficient class to compute the
-				   // values of the coefficient at all
-				   // quadrature points on one cell at
-				   // once. For this, we need some
-				   // space to store the values in,
-				   // which we use the following
-				   // variable for:
-  std::vector<double>     coefficient_values (n_q_points);
-
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active(),
+						 endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix.clear ();
@@ -438,29 +208,6 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // constructor using the update
 				       // flags.
       fe_values.reinit (cell);
-
-				       // There is one more thing: in
-				       // this example, we want to use
-				       // a non-constant
-				       // coefficient. In the previous
-				       // example, we have called the
-				       // ``value'' function of the
-				       // right hand side object for
-				       // each quadrature
-				       // point. Unfortunately, that
-				       // is a virtual function, so
-				       // calling it is relatively
-				       // expensive. Therefore, we use
-				       // a function of the ``Function''
-				       // class which returns the
-				       // values at all quadrature
-				       // points at once; that
-				       // function is still virtual,
-				       // but it needs to be computed
-				       // once per cell only, not once
-				       // in the inner loop:
-      coefficient.value_list (fe_values.get_quadrature_points(),
-			      coefficient_values);
 				       // It should be noted that the
 				       // creation of the
 				       // coefficient_values object is
@@ -486,17 +233,15 @@ void LaplaceProblem<dim>::assemble_system ()
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (coefficient_values[q_point] *
-				   (fe_values.shape_grad(i,q_point)    *
-				    fe_values.shape_grad(j,q_point))   *
-				   fe_values.JxW(q_point));
+	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
+				   * fe_values.shape_grad(j,q_point)
+				   * fe_values.JxW(q_point));
 
 					     // For the right hand
 					     // side, a constant value
 					     // is used again:
-	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-			    1.0 *
-			    fe_values.JxW(q_point));
+	    cell_rhs(i) += (fe_values.shape_value(i,q_point)
+			    * 1.0 * fe_values.JxW(q_point));
 	  };
 
 
@@ -514,7 +259,7 @@ void LaplaceProblem<dim>::assemble_system ()
 
 				   // Again use zero boundary values:
   std::map<unsigned int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
+  VectorTools::interpolate_boundary_values (mg_dof_handler,
 					    0,
 					    ZeroFunction<dim>(),
 					    boundary_values);
@@ -599,7 +344,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   DataOut<dim> data_out;
 
-  data_out.attach_dof_handler (dof_handler);
+  data_out.attach_dof_handler (mg_dof_handler);
   data_out.add_data_vector (solution, "solution");
 
   data_out.build_patches ();
@@ -804,102 +549,7 @@ void LaplaceProblem<dim>::run ()
 				       // with the data in the file:
       if (cycle == 0)
 	{
-	  GridIn<dim> grid_in;
-	  grid_in.attach_triangulation (triangulation);
-	  std::ifstream input_file("circle-grid.inp");
-					   // We would now like to
-					   // read the file. However,
-					   // the input file is only
-					   // for a two-dimensional
-					   // triangulation, while
-					   // this function is a
-					   // template for arbitrary
-					   // dimension. Since this is
-					   // only a demonstration
-					   // program, we will not use
-					   // different input files
-					   // for the different
-					   // dimensions, but rather
-					   // kill the whole program
-					   // if we are not in 2D:
-	  Assert (dim==2, ExcInternalError());
-					   // ExcInternalError is a
-					   // globally defined
-					   // exception, which may be
-					   // thrown whenever
-					   // something is terribly
-					   // wrong. Usually, one
-					   // would like to use more
-					   // specific exceptions, and
-					   // particular in this case
-					   // one would of course try
-					   // to do something else if
-					   // ``dim'' is not equal to
-					   // two, e.g. create a grid
-					   // using library
-					   // functions. Aborting a
-					   // program is usually not a
-					   // good idea and assertions
-					   // should really only be
-					   // used for exceptional
-					   // cases which should not
-					   // occur, but might due to
-					   // stupidity of the
-					   // programmer, user, or
-					   // someone else. The
-					   // situation above is not a
-					   // very clever use of
-					   // Assert, but again: this
-					   // is a tutorial and it
-					   // might be worth to show
-					   // what not to do, after
-					   // all.
-	  
-					   // We can now actually read
-					   // the grid. It is in UCD
-					   // (unstructured cell data)
-					   // format (but the ending
-					   // of the ``UCD''-file is
-					   // ``inp''), as supported
-					   // as input format by the
-					   // AVS Explorer (a
-					   // visualization program),
-					   // for example:
-	  grid_in.read_ucd (input_file);
-                                           // If you like to use
-                                           // another input format,
-                                           // you have to use an other
-                                           // ``grid_in.read_xxx''
-                                           // function. (See the
-                                           // documentation of the
-                                           // ``GridIn'' class to find
-                                           // out what input formats
-                                           // are presently
-                                           // supported.)
-
-					   // The grid in the file
-					   // describes a
-					   // circle. Therefore we
-					   // have to use a boundary
-					   // object which tells the
-					   // triangulation where to
-					   // put new points on the
-					   // boundary when the grid
-					   // is refined. This works
-					   // in the same way as in
-					   // the first example. Note
-					   // that the
-					   // HyperBallBoundary
-					   // constructor takes two
-					   // parameters, the center
-					   // of the ball and the
-					   // radius, but that their
-					   // default (the origin and
-					   // 1.0) are the ones which
-					   // we would like to use
-					   // here.
-	  static const HyperBallBoundary<dim> boundary;
-	  triangulation.set_boundary (0, boundary);
+					   // Generate grid here!
 	}
 				       // If this is not the first
 				       // cycle, then simply refine

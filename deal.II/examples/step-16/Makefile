@@ -1,5 +1,8 @@
 # $Id$
 
+# Protect the file from being made automatically as long as it is not tested
+default:
+	@echo Example not ready for compiling
 
 # For the small projects Makefile, you basically need to fill in only
 # four fields.
