@@ -4,7 +4,8 @@
 #include <basic/data_out_base.h>
 #include <iomanip>
 #include <ctime>
-
+#include <cmath>
+#include <set>
 
 
 // egcs does not understand this at present.
@@ -20,6 +21,30 @@
 DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 		write_preamble (write_preamble)
 {};
+
+
+DataOutBase::EpsFlags::EpsFlags (const SizeType     size_type,
+				 const unsigned int size,
+				 const double       line_width,
+				 const double       azimut_angle,
+				 const double       turn_angle,
+				 const double       z_scaling) :
+		size_type(size_type),
+		size(size),
+		line_width(line_width),
+		azimut_angle(azimut_angle),
+		turn_angle(turn_angle),
+		z_scaling(z_scaling)
+{};
+
+
+
+bool DataOutBase::EpsCell2d::operator < (const EpsCell2d &e) const
+{
+				   // note the "wrong" order in
+				   // which we sort the elements
+  return depth > e.depth;
+};
 
 
 
@@ -698,12 +723,260 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &/*patches*/,
 
 
 template <int dim>
-void DataOutBase::write_eps (const vector<Patch<dim> > &/*patches*/,
+void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 			     const vector<string>      &/*data_names*/,
-			     const EpsFlags            &/*flags*/,
-			     ostream                   &/*out*/) 
+			     const EpsFlags            &flags,
+			     ostream                   &out) 
 {
-  Assert (false, ExcNotImplemented());
+  switch (dim) 
+    {
+      case 2:
+      {
+					 // set up an array of cells to be
+					 // written later. this array holds the
+					 // cells of all the patches as
+					 // projected to the plane perpendicular
+					 // to the line of sight.
+					 //
+					 // note that they are kept sorted by
+					 // the set, where we chose the value
+					 // of the center point of the cell
+					 // along the line of sight as value
+					 // for sorting
+	multiset<EpsCell2d> cells;
+
+					 // compute the cells for output and
+					 // enter them into the set above
+					 // note that since dim==2, we
+					 // have exactly four vertices per
+					 // patch and per cell
+	for (vector<Patch<dim> >::const_iterator patch=patches.begin();
+	     patch!=patches.end(); ++patch)
+	  {
+	    const unsigned int n_subdivisions = patch->n_subdivisions;
+	    for (unsigned int i=0; i<n_subdivisions; ++i)
+	      for (unsigned int j=0; j<n_subdivisions; ++j)
+		{
+		  const double x_frac = i * 1./n_subdivisions,
+			       y_frac = j * 1./n_subdivisions,
+					
+			      x_frac1 = (i+1) * 1./n_subdivisions,
+			      y_frac1 = (j+1) * 1./n_subdivisions;
+		  
+		  const Point<dim> points[4]
+		    = { (((patch->vertices[1] * x_frac) +
+			  (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+			 ((patch->vertices[2] * x_frac) +
+			  (patch->vertices[3] * (1-x_frac))) * y_frac),
+
+			(((patch->vertices[1] * x_frac1) +
+			  (patch->vertices[0] * (1-x_frac1))) * (1-y_frac) +
+			 ((patch->vertices[2] * x_frac1) +
+			  (patch->vertices[3] * (1-x_frac1))) * y_frac),
+
+			(((patch->vertices[1] * x_frac1) +
+			  (patch->vertices[0] * (1-x_frac1))) * (1-y_frac1) +
+			 ((patch->vertices[2] * x_frac1) +
+			  (patch->vertices[3] * (1-x_frac1))) * y_frac1),
+
+			(((patch->vertices[1] * x_frac) +
+			  (patch->vertices[0] * (1-x_frac))) * (1-y_frac1) +
+			 ((patch->vertices[2] * x_frac) +
+			  (patch->vertices[3] * (1-x_frac))) * y_frac1) 
+		    };
+		  
+		  const double heights[4]
+		    = { patch->data(0,i*(n_subdivisions+1) + j)       * flags.z_scaling,
+			patch->data(0,(i+1)*(n_subdivisions+1) + j)   * flags.z_scaling,
+			patch->data(0,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling,
+			patch->data(0,i*(n_subdivisions+1) + j+1)     * flags.z_scaling};
+		  
+
+						   // now compute the projection of
+						   // the bilinear cell given by the
+						   // four vertices and their heights
+						   // and write them to a proper
+						   // cell object. note that we only
+						   // need the first two components
+						   // of the projected position for
+						   // output, but we need the value
+						   // along the line of sight for
+						   // sorting the cells for back-to-
+						   // front-output
+						   //
+						   // this computation was first written
+						   // by Stefan Nauber. please no-one
+						   // ask me why it works that way (or
+						   // may be not), especially not about
+						   // the angles and the sign of
+						   // the height field, I don't know
+						   // it.
+		  EpsCell2d eps_cell;
+		  const double pi = 3.1415926536;
+		  const double cx = -cos(pi-flags.azimut_angle * 2*pi / 360.),
+			       cz = -cos(flags.turn_angle * 2*pi / 360.),
+			       sx = sin(pi-flags.azimut_angle * 2*pi / 360.),
+			       sz = sin(flags.turn_angle * 2*pi / 360.);
+		  for (unsigned int vertex=0; vertex<4; ++vertex)
+		    {
+		      const double x = points[vertex](0),
+				   y = points[vertex](1),
+				   z = -heights[vertex];
+		      
+		      eps_cell.vertices[vertex](0) = -   cz*x+   sz*y;
+		      eps_cell.vertices[vertex](1) = -cx*sz*x-cx*cz*y-sx*z;
+
+						       //      ( 1 0    0 )
+						       // Dx = ( 0 cx -sx ) 
+						       //      ( 0 sx  cx )
+
+						       //      ( cy 0 sy )
+						       // Dy = (  0 1  0 )
+						       //      (-sy 0 cy )
+
+						       //      ( cz -sz 0 )
+						       // Dz = ( sz  cz 0 )
+						       //      (  0   0 1 )
+
+//       ( cz -sz 0 )( 1 0    0 )(x)   ( cz*x-sz*(cx*y-sx*z)+0*(sx*y+cx*z) )
+// Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = ( sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
+//	(  0   0 1 )( 0 sx  cx )(z)   (  0*x+	*(cx*y-sx*z)+1*(sx*y+cx*z) )
+		    };
+
+						   // compute coordinates of
+						   // center of cell
+		  const Point<dim> center_point
+		    = (points[0] + points[1] + points[2] + points[3]) / 4;
+		  const double center_height
+		    = -(heights[0] + heights[1] + heights[2] + heights[3]) / 4;
+
+						   // compute the depth into
+						   // the picture
+		  eps_cell.depth = -sx*sz*center_point(0)
+				   -sx*cz*center_point(1)
+				   +cx*center_height;
+
+						   // finally add this cell
+		  cells.insert (eps_cell);
+		};
+	  };
+
+					 // find out minimum and maximum x and
+					 // y coordinates to compute offsets
+					 // and scaling factors
+	double x_min = cells.begin()->vertices[0](0);
+	double x_max = x_min;
+	double y_min = cells.begin()->vertices[0](1);
+	double y_max = y_min;
+	
+	for (multiset<EpsCell2d>::const_iterator cell=cells.begin();
+	     cell!=cells.end(); ++cell)
+	  for (unsigned int vertex=0; vertex<4; ++vertex)
+	    {
+	      x_min = min (x_min, cell->vertices[vertex](0));
+	      x_max = max (x_max, cell->vertices[vertex](0));
+	      y_min = min (y_min, cell->vertices[vertex](1));
+	      y_max = max (y_max, cell->vertices[vertex](1));
+	    };
+	
+					 // scale in x-direction such that
+					 // in the output 0 <= x <= 300.
+					 // don't scale in y-direction to
+					 // preserve the shape of the
+					 // triangulation
+	const double scale = (flags.size /
+			      (flags.size_type==EpsFlags::width ?
+			       x_max - x_min :
+			       y_min - y_max));
+	
+	const Point<2> offset(x_min, y_min);
+
+	
+					 // now write preamble
+	if (true) 
+	  {
+					     // block this to have local
+					     // variables destroyed after
+					     // use
+	    time_t  time1= time (0);
+	    tm     *time = localtime(&time1); 
+	    out << "%!PS-Adobe-2.0 EPSF-1.2" << endl
+		<< "%%Title: deal.II Output" << endl
+		<< "%%Creator: the deal.II library" << endl
+		<< "%%Creation Date: " 
+		<< time->tm_year+1900 << "/"
+		<< time->tm_mon+1 << "/"
+		<< time->tm_mday << " - "
+		<< time->tm_hour << ":"
+		<< setw(2) << time->tm_min << ":"
+		<< setw(2) << time->tm_sec << endl
+		<< "%%BoundingBox: "
+					       // lower left corner
+		<< "0 0 "
+					       // upper right corner
+		<< static_cast<unsigned int>( (x_max-x_min) * scale )
+		<< ' '
+		<< static_cast<unsigned int>( (y_max-y_min) * scale )
+		<< endl;
+	    
+					     // define some abbreviations to keep
+					     // the output small:
+					     // m=move turtle to
+					     // l=define a line
+					     // s=set rgb color
+					     // sg=set gray value
+					     // lx=close the line and plot the line
+					     // lf=close the line and fill the interior
+	    out << "/m {moveto} bind def"      << endl
+		<< "/l {lineto} bind def"      << endl
+		<< "/s {setrgbcolor} bind def" << endl
+		<< "/sg {setgray} bind def"    << endl
+		<< "/lx {lineto closepath stroke} bind def" << endl
+		<< "/lf {lineto closepath fill} bind def"   << endl;
+	    
+	    out << "%%EndProlog" << endl
+		<< endl;
+					     // set fine lines
+	    out << flags.line_width << " setlinewidth" << endl;
+					     // allow only five digits
+					     // for output (instead of the
+					     // default six); this should suffice
+					     // even for fine grids, but reduces
+					     // the file size significantly
+	    out << setprecision (5);
+	  };
+
+					 // now we've got all the information
+					 // we need. write the cells.
+					 // note: due to the ordering, we
+					 // traverse the list of cells
+					 // back-to-front
+	for (multiset<EpsCell2d>::const_iterator cell=cells.begin();
+	     cell!=cells.end(); ++cell)
+	  {
+//	    out << cell->red << ' ' << cell->green << ' ' << cell->blue << " s "
+	    out << 1 << ' ' << 1 << ' ' << 1 << " s "
+		<< (cell->vertices[0]-offset) * scale << " m "
+		<< (cell->vertices[1]-offset) * scale << " l "
+		<< (cell->vertices[2]-offset) * scale << " l "
+		<< (cell->vertices[3]-offset) * scale << " lf"
+		<< endl;
+	
+	    out << "0 sg " 
+		<< (cell->vertices[0]-offset) * scale << " m "
+		<< (cell->vertices[1]-offset) * scale << " l "
+		<< (cell->vertices[2]-offset) * scale << " l "
+		<< (cell->vertices[3]-offset) * scale << " lx"
+		<< endl;
+	  };
+	out << "showpage" << endl;
+	
+	break;
+      };
+       
+      default:
+	    Assert (false, ExcNotImplemented());
+    };
 };
 
 

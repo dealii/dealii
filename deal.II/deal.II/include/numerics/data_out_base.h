@@ -148,6 +148,7 @@
  * \subsection{EPS format}
  *
  * To be filled in.
+ * precision=5; viewpoint=gnuplot default; no border
  *
  *
  * \subsection{GMV format}
@@ -334,21 +335,96 @@ class DataOutBase
     				     /**
 				      * Flags describing the details of
 				      * output in encapsulated postscript
-				      * format. At present no flags are
-				      * implemented.
+				      * format.
 				      */
     struct EpsFlags 
     {
-      private:
 					 /**
-					  * Dummy entry to suppress compiler
-					  * warnings when copying an empty
-					  * structure. Remove this member
-					  * when adding the first flag to
-					  * this structure (and remove the
-					  * #private# as well).
+					  * Enum denoting the possibilities
+					  * whether the scaling should be done
+					  * such that the given #size# equals
+					  * the width or the height of
+					  * the resulting picture.
 					  */
-	int dummy;
+	enum SizeType {
+	      width, height
+	};
+
+					 /**
+					  * See above. Default is #width#.
+					  */
+	SizeType size_type;
+	
+					 /**
+					  * Width or height of the output
+					  * as given in postscript units
+					  * This usually is given by the
+					  * strange unit 1/72 inch. Whether
+					  * this is height or width is
+					  * specified by the flag
+					  * #size_type#.
+					  *
+					  * Default is 300.
+					  */
+	unsigned int size;
+
+					 /**
+					  * Width of a line in postscript
+					  * units. Default is 0.5.
+					  */
+	double line_width;
+	
+					 /**
+					  * Angle of the line origin-viewer
+					  * against the z-axis in degrees.
+					  *
+					  * Default is the Gnuplot-default
+					  * of 60.
+					  */
+	double azimut_angle;
+
+					 /**
+					  * Angle by which the viewers
+					  * position projected onto the
+					  * x-y-plane is rotated around
+					  * the z-axis, in positive sense
+					  * when viewed from above. The
+					  * unit are degrees, and zero
+					  * equals a position above or below
+					  * the negative y-axis.
+					  *
+					  * Default is the Gnuplot-default
+					  * of 30.
+					  */
+	double turn_angle;
+
+					 /**
+					  * Factor by which the z-axis is to
+					  * be stretched as compared to the
+					  * x- and y-axes. This is to compensate
+					  * for the different sizes that
+					  * coordinate and solution values may
+					  * have and to prevent that the plot
+					  * looks to much out-of-place (no
+					  * elevation at all if solution values
+					  * are much smaller than coordinate
+					  * values, or the common "extremely
+					  * mountainous area" in the opposite
+					  * case.
+					  *
+					  * Default is #1.0#.
+					  */
+	double z_scaling;
+	
+					 /**
+					  * Constructor.
+					  */
+	EpsFlags (const SizeType     size_type    = width,
+		  const unsigned int size         = 300,
+		  const double       line_width   = 0.5,
+		  const double       azimut_angle = 60,
+		  const double       turn_angle   = 30,
+		  const double       z_scaling    = 1.0);
     };
 
     				     /**
@@ -456,6 +532,47 @@ class DataOutBase
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+
+  private:
+				     /**
+				      * Class holding the data of one
+				      * cell of a patch in two space
+				      * dimensions for output. It is
+				      * the projection of a cell in
+				      * three-dimensional space (two
+				      * coordinates, one height value)
+				      * to the direction of sight.
+				      */
+    class EpsCell2d {
+      public:
+	
+					 /**
+					  * Vector of vertices of this cell.
+					  */
+	Point<2> vertices[4];
+	
+					 /**
+					  * Color values.
+					  */
+	float red;
+	float green;
+	float blue;
+
+					 /**
+					  * Depth into the picture, which
+					  * is defined as the distance from
+					  * an observer at an the origin in
+					  * direction of the line of sight.
+					  */
+	float depth;
+	
+					 /**
+					  * Comparison operator for
+					  * sorting.
+					  */
+	bool operator < (const EpsCell2d &) const;
+    };
+
 };
 
 	
