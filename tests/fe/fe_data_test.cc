@@ -25,19 +25,21 @@
 template<int dim>
 void test_fe_datas()
 {
-  vector<FiniteElement<dim> *> fe_datas;
+  std::vector<FiniteElement<dim> *> fe_datas;
   fe_datas.push_back(new FE_Q<dim> (1));
   fe_datas.push_back(new FE_Q<dim> (4));
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (2), 2));
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
 				       FE_Q<dim> (2), 1));
-				   // for this an assertion thrown in
-				   // FESystem::build_interface_constraints
-				   // for the following calls for dim=3
-//  fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (3), 2));
-//  fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
-//				       FE_Q<dim> (3), 1));
-//  fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (4), 2));
+				   // for dim==3 the constraints are
+				   // only hardcoded for Q1-Q2
+  if (dim!=3)
+    {
+      fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (3), 2));
+      fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
+					   FE_Q<dim> (3), 1));
+      fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (4), 2));
+    }
   
   deallog << endl << "dim=" << dim << endl;
   for (unsigned int n=0; n<fe_datas.size(); ++n)
@@ -65,7 +67,7 @@ void test_fe_datas()
 
 int main(int,char)
 {
-  ofstream logfile("fe_data_test.output");
+  std::ofstream logfile("fe_data_test.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
