@@ -104,7 +104,7 @@ void SwappableVector<number>::swap_out (const std::string &name)
   
   filename = name;
   
-  Assert (size() != 0, ExcSizeZero());
+  Assert (this->size() != 0, ExcSizeZero());
 
 				   // if in MT mode, block all other
 				   // operations
@@ -118,10 +118,10 @@ void SwappableVector<number>::swap_out (const std::string &name)
   Assert (data_is_preloaded == false, ExcInternalError());
   
   std::ofstream tmp_out(filename.c_str());
-  block_write (tmp_out);
+  this->block_write (tmp_out);
   tmp_out.close ();
 	
-  reinit (0);
+  this->reinit (0);
 
 #ifdef DEAL_II_USE_MT
   lock.release ();
@@ -181,7 +181,7 @@ void SwappableVector<number>::alert ()
 				   // calling this function while the
 				   // vector is active does no harm
 				   // either
-       (size() != 0))
+       (this->size() != 0))
     lock.release ();
   else
 				     // data has not been preloaded so
@@ -200,10 +200,10 @@ template <typename number>
 void SwappableVector<number>::reload_vector (const bool set_flag)
 {
   Assert (filename != "", ExcInvalidFilename (filename));
-  Assert (size() == 0, ExcSizeNonzero());
+  Assert (this->size() == 0, ExcSizeNonzero());
   
   std::ifstream tmp_in(filename.c_str());
-  block_read (tmp_in);
+  this->block_read (tmp_in);
   tmp_in.close ();
 
 				   // release the lock that was

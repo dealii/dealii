@@ -248,12 +248,12 @@ void PreconditionBlockJacobi<number,inverse_type>
 				   // exceptions that do not take
 				   // args...
   typedef PreconditionBlock<number,inverse_type> BaseClass;
-  Assert(A!=0, ExcNotInitialized());
+  Assert(this->A!=0, ExcNotInitialized());
   
-  const SparseMatrix<number> &M=*A;
-  const unsigned int n_cells=M.m()/blocksize;
+  const SparseMatrix<number> &M=*this->A;
+  const unsigned int n_cells=M.m()/this->blocksize;
 
-  Vector<number2> b_cell(blocksize), x_cell(blocksize);
+  Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
 				       // cell_row, cell_column are the
 				       // numbering of the blocks (cells).
@@ -264,48 +264,56 @@ void PreconditionBlockJacobi<number,inverse_type>
 				       // of the unkowns.
   unsigned int row, row_cell, begin_diag_block=0;
 
-  if (!inverses_ready())
+  if (!this->inverses_ready())
     {
-      FullMatrix<number> M_cell(blocksize);
+      FullMatrix<number> M_cell(this->blocksize);
       for (unsigned int cell=0; cell<n_cells; ++cell)
 	{
-	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  for (row=cell*this->blocksize, row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
 	    {
 	      b_cell(row_cell)=src(row);
-	      for (unsigned int column_cell=0, column=cell*blocksize;
-		   column_cell<blocksize; ++column_cell, ++column)
+	      for (unsigned int column_cell=0, column=cell*this->blocksize;
+		   column_cell<this->blocksize; ++column_cell, ++column)
 		M_cell(row_cell,column_cell)=M(row,column);
 	    }
 	  M_cell.householder(b_cell);
 	  M_cell.backward(x_cell,b_cell);
 					   // distribute x_cell to dst
-	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  for (row=cell*this->blocksize, row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
 	    if (adding)
 	      dst(row)+=x_cell(row_cell);
 	    else
 	      dst(row)=x_cell(row_cell);
 	  
-	  begin_diag_block+=blocksize;
+	  begin_diag_block+=this->blocksize;
 	}
     }
   else
     for (unsigned int cell=0; cell<n_cells; ++cell)
       {
-	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	for (row=cell*this->blocksize, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
 	  {
 	    b_cell(row_cell)=src(row);
 	  }
-	inverse(cell).vmult(x_cell, b_cell);
+	this->inverse(cell).vmult(x_cell, b_cell);
 					 // distribute x_cell to dst
-	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	for (row=cell*this->blocksize, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
 	  if (adding)
 	    dst(row)+=x_cell(row_cell);
 	  else
 	    dst(row)=x_cell(row_cell);
 	
-	begin_diag_block+=blocksize;
+	begin_diag_block+=this->blocksize;
       }
-  dst.scale(relaxation);
+  dst.scale(this->relaxation);
 }
 
 
@@ -374,16 +382,16 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
 				   // args...
   typedef PreconditionBlock<number,inverse_type> BaseClass;
 
-  Assert (A!=0, ExcNotInitialized());
+  Assert (this->A!=0, ExcNotInitialized());
   
-  const SparseMatrix<number> &M=*A;
-  const unsigned int n_cells=M.m()/blocksize;
+  const SparseMatrix<number> &M=*this->A;
+  const unsigned int n_cells=M.m()/this->blocksize;
 
   const SparsityPattern &spars    = M.get_sparsity_pattern();
   const unsigned int    *rowstart = spars.get_rowstart_indices();
   const unsigned int    *columns  = spars.get_column_numbers();
 
-  Vector<number2> b_cell(blocksize), x_cell(blocksize);
+  Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
 				       // cell_row, cell_column are the
 				       // numbering of the blocks (cells).
@@ -395,35 +403,42 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
   unsigned int row, column, row_cell, begin_diag_block=0;
   number2 b_cell_row;
 
-  if (!inverses_ready())
+  if (!this->inverses_ready())
     {
-      FullMatrix<number> M_cell(blocksize);
+      FullMatrix<number> M_cell(this->blocksize);
       for (unsigned int cell=0; cell<n_cells; ++cell)
 	{
-	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  for (row=cell*this->blocksize, row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
 	    {
 	      b_cell_row=src(row);
 	      for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
 		if ((column=columns[j]) < begin_diag_block)
 		    b_cell_row -= M.global_entry(j) * dst(column);
 	      b_cell(row_cell)=b_cell_row;
-	      for (unsigned int column_cell=0, column=cell*blocksize;
-		   column_cell<blocksize; ++column_cell, ++column)
+	      for (unsigned int column_cell=0, column=cell*this->blocksize;
+		   column_cell<this->blocksize;
+		   ++column_cell, ++column)
 		  M_cell(row_cell,column_cell)=M(row,column);
 	    }
 	  M_cell.householder(b_cell);
 	  M_cell.backward(x_cell,b_cell);
 					   // distribute x_cell to dst
-	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	    dst(row)=relaxation*x_cell(row_cell);
+	  for (row=cell*this->blocksize, row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
+	    dst(row)=this->relaxation*x_cell(row_cell);
 	  
-	  begin_diag_block+=blocksize;
+	  begin_diag_block+=this->blocksize;
 	}
     }
   else
     for (unsigned int cell=0; cell<n_cells; ++cell)
       {
-	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	for (row=cell*this->blocksize, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
 	  {
 	    b_cell_row=src(row);
 	    for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
@@ -433,12 +448,14 @@ void PreconditionBlockSOR<number,inverse_type>::vmult (Vector<number2>       &ds
 		}
 	    b_cell(row_cell)=b_cell_row;
 	  }
-	inverse(cell).vmult(x_cell, b_cell);
+	this->inverse(cell).vmult(x_cell, b_cell);
 					 // distribute x_cell to dst
-	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	  dst(row)=relaxation*x_cell(row_cell);
+	for (row=cell*this->blocksize, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
+	  dst(row)=this->relaxation*x_cell(row_cell);
 	
-	begin_diag_block+=blocksize;
+	begin_diag_block+=this->blocksize;
       }
 }
 
@@ -466,16 +483,16 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 				   // args...
   typedef PreconditionBlock<number,inverse_type> BaseClass;
 
-  Assert (A!=0, ExcNotInitialized());
+  Assert (this->A!=0, ExcNotInitialized());
   
-  const SparseMatrix<number> &M=*A;
-  const unsigned int n_cells=M.m()/blocksize;
+  const SparseMatrix<number> &M=*this->A;
+  const unsigned int n_cells=M.m()/this->blocksize;
 
   const SparsityPattern &spars    = M.get_sparsity_pattern();
   const unsigned int    *rowstart = spars.get_rowstart_indices();
   const unsigned int    *columns  = spars.get_column_numbers();
 
-  Vector<number2> b_cell(blocksize), x_cell(blocksize);
+  Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
 				       // cell_row, cell_column are the
 				       // numbering of the blocks (cells).
@@ -484,17 +501,20 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-  unsigned int row, column, row_cell, end_diag_block=blocksize *n_cells;
+  unsigned int row, column, row_cell;
+  unsigned int end_diag_block=this->blocksize *n_cells;
   number2 b_cell_row;
 
-  if (!inverses_ready())
+  if (!this->inverses_ready())
     {
-      FullMatrix<number> M_cell(blocksize);
+      FullMatrix<number> M_cell(this->blocksize);
       for (int icell=n_cells-1; icell>=0 ; --icell)
 	{
 	  unsigned int cell = (unsigned int) icell;
 					   // Collect upper triangle
-	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	  for (row=cell*this->blocksize, row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
 	    {
 	      b_cell_row=src(row);
 	      for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
@@ -506,24 +526,28 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 	      
 	      b_cell(row_cell)=b_cell_row;
 					       // Collect diagonal block
-	      for (unsigned int column_cell=0, column=cell*blocksize;
-		   column_cell<blocksize; ++column_cell, ++column)
+	      for (unsigned int column_cell=0, column=cell*this->blocksize;
+		   column_cell<this->blocksize; ++column_cell, ++column)
 		  M_cell(row_cell,column_cell)=M(row,column);
 	    }
 	  M_cell.householder(b_cell);
 	  M_cell.backward(x_cell,b_cell);
 					   // distribute x_cell to dst
-	  for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	    dst(row)=relaxation*x_cell(row_cell);
+	  for (row=cell*this->blocksize, row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
+	    dst(row)=this->relaxation*x_cell(row_cell);
 	  
-	  end_diag_block-=blocksize;
+	  end_diag_block-=this->blocksize;
 	}
     }
   else
     for (int icell=n_cells-1; icell >=0 ; --icell)
       {
 	unsigned int cell = (unsigned int) icell;
-	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
+	for (row=cell*this->blocksize, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
 	  {
 	    b_cell_row=src(row);
 	    for (unsigned int j=rowstart[row]; j<rowstart[row+1]; ++j)
@@ -534,12 +558,14 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 	      }
 	    b_cell(row_cell)=b_cell_row;
 	  }
-	inverse(cell).vmult(x_cell, b_cell);
+	this->inverse(cell).vmult(x_cell, b_cell);
 					 // distribute x_cell to dst
-	for (row=cell*blocksize, row_cell=0; row_cell<blocksize; ++row_cell, ++row)
-	  dst(row)=relaxation*x_cell(row_cell);
+	for (row=cell*this->blocksize, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
+	  dst(row)=this->relaxation*x_cell(row_cell);
 	
-	end_diag_block-=blocksize;
+	end_diag_block-=this->blocksize;
       }
 }
 
@@ -549,7 +575,7 @@ void PreconditionBlockSOR<number,inverse_type>::Tvmult (Vector<number2>       &d
 template <typename number, typename inverse_type>
 PreconditionBlockSSOR<number,inverse_type>::PreconditionBlockSSOR ()
 {
-  store_diagonals = 1;
+  this->store_diagonals = 1;
 }
 
 
@@ -563,23 +589,23 @@ void PreconditionBlockSSOR<number,inverse_type>::vmult (Vector<number2>       &d
   
   PreconditionBlockSOR<number,inverse_type>::vmult(help, src);
 
-  Vector<inverse_type> cell_src(blocksize);
-  Vector<inverse_type> cell_dst(blocksize);
+  Vector<inverse_type> cell_src(this->blocksize);
+  Vector<inverse_type> cell_dst(this->blocksize);
   
-  const unsigned int n_cells = A->m()/blocksize;
+  const unsigned int n_cells = this->A->m()/this->blocksize;
 
 				   // Multiply with diagonal blocks
   for (unsigned int cell=0; cell<n_cells; ++cell)
     {
-      unsigned int row = cell*blocksize;
+      unsigned int row = cell*this->blocksize;
       
-      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
 	cell_src(row_cell)=help(row+row_cell);
 
-      diagonal(cell).vmult(cell_dst, cell_src);
+      this->diagonal(cell).vmult(cell_dst, cell_src);
 
-      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
-	help(row+row_cell)=relaxation*cell_dst(row_cell);
+      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
+	help(row+row_cell)=this->relaxation*cell_dst(row_cell);
     }
   
   PreconditionBlockSOR<number,inverse_type>::Tvmult(dst, help);
@@ -595,23 +621,23 @@ void PreconditionBlockSSOR<number,inverse_type>::Tvmult (Vector<number2>       &
   
   PreconditionBlockSOR<number,inverse_type>::Tvmult(help, src);
 
-  Vector<inverse_type> cell_src(blocksize);
-  Vector<inverse_type> cell_dst(blocksize);
+  Vector<inverse_type> cell_src(this->blocksize);
+  Vector<inverse_type> cell_dst(this->blocksize);
   
-  const unsigned int n_cells = A->m()/blocksize;
+  const unsigned int n_cells = this->A->m()/this->blocksize;
 
 				   // Multiply with diagonal blocks
   for (unsigned int cell=0; cell<n_cells; ++cell)
     {
-      unsigned int row = cell*blocksize;
+      unsigned int row = cell*this->blocksize;
       
-      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
 	cell_src(row_cell)=help(row+row_cell);
 
-      diagonal(cell).vmult(cell_dst, cell_src);
+      this->diagonal(cell).vmult(cell_dst, cell_src);
 
-      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
-	help(row+row_cell)=relaxation*cell_dst(row_cell);
+      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
+	help(row+row_cell)=this->relaxation*cell_dst(row_cell);
     }
   
   PreconditionBlockSOR<number,inverse_type>::vmult(dst, help);

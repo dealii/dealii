@@ -68,7 +68,7 @@ inline
 DoFAccessor<dim> &
 DoFAccessor<dim>::operator = (const DoFAccessor<dim> &da)
 {
-  set_dof_handler (da.dof_handler);
+  this->set_dof_handler (da.dof_handler);
   return *this;
 };
 
@@ -93,15 +93,15 @@ DoFObjectAccessor<1,dim>::dof_index (const unsigned int i) const
 				   // qualified exception names
   typedef DoFAccessor<dim> BaseClass;
   
-  Assert (dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
-  Assert (i<dof_handler->selected_fe->dofs_per_line,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_line));
+  Assert (this->dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
+  Assert (i<this->dof_handler->selected_fe->dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_line));
 
-  return dof_handler->levels[present_level]
-    ->line_dofs[present_index*dof_handler->selected_fe->dofs_per_line+i];
+  return this->dof_handler->levels[this->present_level]
+    ->line_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_line+i];
 };
 
 
@@ -122,16 +122,16 @@ DoFObjectAccessor<1,dim>::vertex_dof_index (const unsigned int vertex,
 				   // qualified exception names
   typedef DoFAccessor<dim> BaseClass;
   
-  Assert (dof_handler != 0, typename BaseClass::ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
+  Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (this->dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+  Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
 
-  const unsigned int dof_number = (vertex_index(vertex) *
-				   dof_handler->selected_fe->dofs_per_vertex +
+  const unsigned int dof_number = (this->vertex_index(vertex) *
+				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
-  return dof_handler->vertex_dofs[dof_number];
+  return this->dof_handler->vertex_dofs[dof_number];
 };
 
 
@@ -151,14 +151,14 @@ DoFObjectAccessor<1,dim>::get_dof_indices (std::vector<unsigned int> &dof_indice
 				   // qualified exception names
   typedef DoFAccessor<dim> BaseClass;
   
-  Assert (dof_handler != 0, typename BaseClass::ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*dof_handler->get_fe().dofs_per_vertex +
-				 dof_handler->get_fe().dofs_per_line),
+  Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (this->dof_handler->selected_fe != 0, typename BaseClass::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
+				 this->dof_handler->get_fe().dofs_per_line),
 	  typename BaseClass::ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -173,10 +173,10 @@ inline
 TriaIterator<dim,DoFObjectAccessor<1,dim> >
 DoFObjectAccessor<1,dim>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFObjectAccessor<1,dim> > q (tria,
-						 present_level+1,
-						 child_index (i),
-						 dof_handler);
+  TriaIterator<dim,DoFObjectAccessor<1,dim> > q (this->tria,
+						 this->present_level+1,
+						 this->child_index (i),
+						 this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -192,7 +192,7 @@ void
 DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
 {
   BaseClass::copy_from (a);
-  set_dof_handler (a.dof_handler);
+  this->set_dof_handler (a.dof_handler);
 };
 
 
@@ -202,17 +202,17 @@ template <int dim>
 inline
 unsigned int DoFObjectAccessor<2,dim>::dof_index (const unsigned int i) const
 {
-  Assert (dof_handler != 0,
+  Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0,
+  Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (i<dof_handler->selected_fe->dofs_per_quad,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_quad));
+  Assert (i<this->dof_handler->selected_fe->dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_quad));
 
-  return dof_handler->levels[present_level]
-    ->quad_dofs[present_index*dof_handler->selected_fe->dofs_per_quad+i];
+  return this->dof_handler->levels[this->present_level]
+    ->quad_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_quad+i];
 };
 
 
@@ -222,18 +222,18 @@ unsigned int
 DoFObjectAccessor<2,dim>::vertex_dof_index (const unsigned int vertex,
 					    const unsigned int i) const
 {
-  Assert (dof_handler != 0,
+  Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0,
+  Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+  Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
 
-  const unsigned int dof_number = (vertex_index(vertex) *
-				   dof_handler->selected_fe->dofs_per_vertex +
+  const unsigned int dof_number = (this->vertex_index(vertex) *
+				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
-  return dof_handler->vertex_dofs[dof_number];
+  return this->dof_handler->vertex_dofs[dof_number];
 };
 
 
@@ -248,18 +248,18 @@ inline
 void
 DoFObjectAccessor<2,dim>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  Assert (dof_handler != 0,
+  Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0,
+  Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*dof_handler->get_fe().dofs_per_vertex +
-				 4*dof_handler->get_fe().dofs_per_line +
-				 dof_handler->get_fe().dofs_per_quad),
+  Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
+				 4*this->dof_handler->get_fe().dofs_per_line +
+				 this->dof_handler->get_fe().dofs_per_quad),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -281,10 +281,10 @@ DoFObjectAccessor<2,dim>::line (const unsigned int i) const
 
   return TriaIterator<dim,DoFObjectAccessor<1,dim> >
     (
-      tria,
-      present_level,
-      line_index (i),
-      dof_handler
+      this->tria,
+      this->present_level,
+      this->line_index (i),
+      this->dof_handler
     );
 };
 
@@ -294,10 +294,10 @@ inline
 TriaIterator<dim,DoFObjectAccessor<2,dim> >
 DoFObjectAccessor<2,dim>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFObjectAccessor<2,dim> > q (tria,
-						 present_level+1,
-						 child_index (i),
-						 dof_handler);
+  TriaIterator<dim,DoFObjectAccessor<2,dim> > q (this->tria,
+						 this->present_level+1,
+						 this->child_index (i),
+						 this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -313,7 +313,7 @@ void
 DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
 {
   BaseClass::copy_from (a);
-  set_dof_handler (a.dof_handler);
+  this->set_dof_handler (a.dof_handler);
 };
 
 
@@ -325,17 +325,17 @@ inline
 unsigned int
 DoFObjectAccessor<3,dim>::dof_index (const unsigned int i) const
 {
-  Assert (dof_handler != 0,
+  Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (dof_handler->selected_fe != 0,
+  Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (i<dof_handler->selected_fe->dofs_per_hex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_hex));
+  Assert (i<this->dof_handler->selected_fe->dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_hex));
 
-  return dof_handler->levels[present_level]
-    ->hex_dofs[present_index*dof_handler->selected_fe->dofs_per_hex+i];
+  return this->dof_handler->levels[this->present_level]
+    ->hex_dofs[this->present_index*this->dof_handler->selected_fe->dofs_per_hex+i];
 };
 
 
@@ -345,18 +345,18 @@ unsigned int
 DoFObjectAccessor<3,dim>::vertex_dof_index (const unsigned int vertex,
 					    const unsigned int i) const
 {
-  Assert (dof_handler != 0,
+  Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0,
+  Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
-  Assert (i<dof_handler->selected_fe->dofs_per_vertex,
-	  ExcIndexRange (i, 0, dof_handler->selected_fe->dofs_per_vertex));
+  Assert (i<this->dof_handler->selected_fe->dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->selected_fe->dofs_per_vertex));
 
-  const unsigned int dof_number = (vertex_index(vertex) *
-				   dof_handler->selected_fe->dofs_per_vertex +
+  const unsigned int dof_number = (this->vertex_index(vertex) *
+				   this->dof_handler->selected_fe->dofs_per_vertex +
 				   i);
-  return dof_handler->vertex_dofs[dof_number];
+  return this->dof_handler->vertex_dofs[dof_number];
 };
 
 
@@ -365,20 +365,20 @@ inline
 void
 DoFObjectAccessor<3,dim>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  Assert (dof_handler != 0,
+  Assert (this->dof_handler != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (dof_handler->selected_fe != 0,
+  Assert (this->dof_handler->selected_fe != 0,
 	  typename DoFAccessor<dim>::ExcInvalidObject());
-  Assert (dof_indices.size() == (8*dof_handler->get_fe().dofs_per_vertex +
-				 12*dof_handler->get_fe().dofs_per_line +
-				 6*dof_handler->get_fe().dofs_per_quad +
-				 dof_handler->get_fe().dofs_per_hex),
+  Assert (dof_indices.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
+				 12*this->dof_handler->get_fe().dofs_per_line +
+				 6*this->dof_handler->get_fe().dofs_per_quad +
+				 this->dof_handler->get_fe().dofs_per_hex),
 	  typename DoFAccessor<dim>::ExcVectorDoesNotMatch());
 
-  const unsigned int dofs_per_vertex = dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = dof_handler->get_fe().dofs_per_quad,
-		     dofs_per_hex    = dof_handler->get_fe().dofs_per_hex;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -402,10 +402,10 @@ DoFObjectAccessor<3,dim>::line (const unsigned int i) const
   TriaIterator<dim,TriaObjectAccessor<1,dim> > l = BaseClass::line(i);
   return TriaIterator<dim,DoFObjectAccessor<1,dim> >
     (
-      tria,
-      present_level,
+      this->tria,
+      this->present_level,
       l->index(),
-      dof_handler
+      this->dof_handler
     );
 };
 
@@ -419,10 +419,10 @@ DoFObjectAccessor<3,dim>::quad (const unsigned int i) const
 
   return TriaIterator<dim,DoFObjectAccessor<2,dim> >
     (
-      tria,
-      present_level,
-      quad_index (i),
-      dof_handler
+      this->tria,
+      this->present_level,
+      this->quad_index (i),
+      this->dof_handler
     );
 };
 
@@ -432,10 +432,10 @@ inline
 TriaIterator<dim,DoFObjectAccessor<3,dim> >
 DoFObjectAccessor<3,dim>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFObjectAccessor<3,dim> > q (tria,
-						 present_level+1,
-						 child_index (i),
-						 dof_handler);
+  TriaIterator<dim,DoFObjectAccessor<3,dim> > q (this->tria,
+						 this->present_level+1,
+						 this->child_index (i),
+						 this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -449,7 +449,7 @@ template <int dim>
 void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 {
   BaseClass::copy_from (a);
-  set_dof_handler (a.dof_handler);
+  this->set_dof_handler (a.dof_handler);
 };
 
 
@@ -461,10 +461,10 @@ inline
 TriaIterator<dim,DoFCellAccessor<dim> >
 DoFCellAccessor<dim>::neighbor (const unsigned int i) const
 {
-  TriaIterator<dim,DoFCellAccessor<dim> > q (tria,
-					     neighbor_level (i),
-					     neighbor_index (i),
-					     dof_handler);
+  TriaIterator<dim,DoFCellAccessor<dim> > q (this->tria,
+					     this->neighbor_level (i),
+					     this->neighbor_index (i),
+					     this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -479,10 +479,10 @@ inline
 TriaIterator<dim,DoFCellAccessor<dim> >
 DoFCellAccessor<dim>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFCellAccessor<dim> > q (tria,
-					     present_level+1,
-					     child_index (i),
-					     dof_handler);
+  TriaIterator<dim,DoFCellAccessor<dim> > q (this->tria,
+					     this->present_level+1,
+					     this->child_index (i),
+					     this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)

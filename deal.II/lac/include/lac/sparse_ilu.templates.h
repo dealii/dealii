@@ -58,8 +58,8 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				   const double                    strengthen_diagonal)
 {
   Assert (matrix.m()==matrix.n(), ExcMatrixNotSquare ());
-  Assert (m()==n(),               ExcMatrixNotSquare ());
-  Assert (matrix.m()==m(),        ExcSizeMismatch(matrix.m(), m()));
+  Assert (this->m()==this->n(),   ExcMatrixNotSquare ());
+  Assert (matrix.m()==this->m(),  ExcSizeMismatch(matrix.m(), this->m()));
   
   Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
 
@@ -155,7 +155,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 		  ExcDivideByZero());
       
       this->global_entry (rowstart_indices[row-1])
-	= 1./global_entry (rowstart_indices[row-1]);
+	= 1./this->global_entry (rowstart_indices[row-1]);
 
 				       // let k run over all lower-left
 				       // elements of row i; skip
@@ -215,7 +215,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				   // element still has to be inverted
 				   // because the for-loop doesn't do
 				   // it...
- this->diag_element(this->m()-1) = 1./this->diag_element(m()-1);
+ this->diag_element(this->m()-1) = 1./this->diag_element(this->m()-1);
 
 /*
   OLD CODE, rather crude first implementation with an algorithm taken
@@ -271,7 +271,7 @@ void SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 					     const Vector<somenumber> &src) const 
 {
   Assert (dst.size() == src.size(), ExcSizeMismatch(dst.size(), src.size()));
-  Assert (dst.size() == m(), ExcSizeMismatch(dst.size(), m()));
+  Assert (dst.size() == this->m(), ExcSizeMismatch(dst.size(), this->m()));
   
   const unsigned int N=dst.size();
   const unsigned int * const rowstart_indices

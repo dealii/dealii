@@ -217,8 +217,8 @@ template <int dim>
 void ZeroFunction<dim>::vector_value (const Point<dim> &,
 				      Vector<double>   &return_value) const
 {
-  Assert (return_value.size() == n_components,
-	  ExcDimensionMismatch (return_value.size(), n_components));
+  Assert (return_value.size() == this->n_components,
+	  ExcDimensionMismatch (return_value.size(), this->n_components));
 
   std::fill (return_value.begin(), return_value.end(), 0.0);
 };
@@ -244,8 +244,8 @@ void ZeroFunction<dim>::vector_value_list (const typename std::vector<Point<dim>
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      Assert (values[i].size() == n_components,
-	      ExcDimensionMismatch(values[i].size(), n_components));
+      Assert (values[i].size() == this->n_components,
+	      ExcDimensionMismatch(values[i].size(), this->n_components));
       std::fill (values[i].begin(), values[i].end(), 0.);
     };
 };
@@ -263,10 +263,10 @@ template <int dim>
 void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
 					 typename std::vector<Tensor<1,dim> > &gradients) const
 {
-  Assert (gradients.size() == n_components,
-	  ExcDimensionMismatch(gradients.size(), n_components));
+  Assert (gradients.size() == this->n_components,
+	  ExcDimensionMismatch(gradients.size(), this->n_components));
 
-  for (unsigned int c=0; c<n_components; ++c)
+  for (unsigned int c=0; c<this->n_components; ++c)
     gradients[c].clear ();
 };
 
@@ -292,9 +292,9 @@ void ZeroFunction<dim>::vector_gradient_list (const typename std::vector<Point<d
 	  ExcDimensionMismatch(gradients.size(), points.size()));
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      Assert (gradients[i].size() == n_components,
-	      ExcDimensionMismatch(gradients[i].size(), n_components));
-      for (unsigned int c=0; c<n_components; ++c)
+      Assert (gradients[i].size() == this->n_components,
+	      ExcDimensionMismatch(gradients[i].size(), this->n_components));
+      for (unsigned int c=0; c<this->n_components; ++c)
 	gradients[i][c].clear ();
     };
 };
@@ -306,7 +306,8 @@ template <int dim>
 ConstantFunction<dim>::ConstantFunction (const double value,
 					 const unsigned int n_components) :
 		ZeroFunction<dim> (n_components),
-  function_value    (value) {};
+  function_value    (value)
+{};
 
 
 template <int dim>
@@ -325,8 +326,8 @@ template <int dim>
 void ConstantFunction<dim>::vector_value (const Point<dim> &,
 					  Vector<double>   &return_value) const
 {
-  Assert (return_value.size() == n_components,
-	  ExcDimensionMismatch (return_value.size(), n_components));
+  Assert (return_value.size() == this->n_components,
+	  ExcDimensionMismatch (return_value.size(), this->n_components));
 
   std::fill (return_value.begin(), return_value.end(), function_value);
 };
@@ -353,8 +354,8 @@ void ConstantFunction<dim>::vector_value_list (const typename std::vector<Point<
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      Assert (values[i].size() == n_components,
-	      ExcDimensionMismatch(values[i].size(), n_components));
+      Assert (values[i].size() == this->n_components,
+	      ExcDimensionMismatch(values[i].size(), this->n_components));
       std::fill (values[i].begin(), values[i].end(), function_value);
     };
 };
@@ -386,11 +387,11 @@ template <int dim>
 void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
 						 Vector<double>   &return_value) const
 {
-  Assert (return_value.size() == n_components,
-	  ExcDimensionMismatch (return_value.size(), n_components));
+  Assert (return_value.size() == this->n_components,
+	  ExcDimensionMismatch (return_value.size(), this->n_components));
 
   std::fill (return_value.begin(), return_value.end(), 0.);
-  return_value(selected) = function_value;
+  return_value(selected) = this->function_value;
 }
 
 
@@ -404,10 +405,10 @@ void ComponentSelectFunction<dim>::vector_value_list (const typename std::vector
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      Assert (values[i].size() == n_components,
-	      ExcDimensionMismatch(values[i].size(), n_components));
+      Assert (values[i].size() == this->n_components,
+	      ExcDimensionMismatch(values[i].size(), this->n_components));
       std::fill (values[i].begin(), values[i].end(), 0.);
-      values[i](selected) = function_value;
+      values[i](selected) = this->function_value;
     }
 }
 

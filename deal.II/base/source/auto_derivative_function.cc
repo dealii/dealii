@@ -120,14 +120,15 @@ template <int dim>
 void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 						   typename std::vector<Tensor<1,dim> > &gradients) const
 {
-  Assert (gradients.size() == n_components, ExcDimensionMismatch(gradients.size(), n_components));
+  Assert (gradients.size() == this->n_components,
+	  ExcDimensionMismatch(gradients.size(), this->n_components));
   
   switch (formula)
     {
       case UpwindEuler:
       {
 	Point<dim> q1;
-	Vector<double> v(n_components), v1(n_components);
+	Vector<double> v(this->n_components), v1(this->n_components);
 	const double h_inv=1./h;
 	for (unsigned int i=0; i<dim; ++i)
 	  {
@@ -135,7 +136,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 	    vector_value(p, v);
 	    vector_value(q1, v1);
 	    
-	    for (unsigned int comp=0; comp<n_components; ++comp)
+	    for (unsigned int comp=0; comp<this->n_components; ++comp)
 	      gradients[comp][i]=(v(comp)-v1(comp))*h_inv;
 	  }
 	break;
@@ -143,7 +144,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
       case Euler:
       {
 	Point<dim> q1, q2;
-	Vector<double> v1(n_components), v2(n_components);
+	Vector<double> v1(this->n_components), v2(this->n_components);
 	const double h_inv_2=1./(2*h);
 	for (unsigned int i=0; i<dim; ++i)
 	  {
@@ -152,7 +153,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 	    vector_value(q1, v1);
 	    vector_value(q2, v2);
 	    
-	    for (unsigned int comp=0; comp<n_components; ++comp)
+	    for (unsigned int comp=0; comp<this->n_components; ++comp)
 	      gradients[comp][i]=(v1(comp)-v2(comp))*h_inv_2;
 	  }
 	break;
@@ -160,7 +161,9 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
       case FourthOrder:
       {
 	Point<dim> q1, q2, q3, q4;
-	Vector<double> v1(n_components), v2(n_components), v3(n_components), v4(n_components);
+	Vector<double>
+	  v1(this->n_components), v2(this->n_components),
+	  v3(this->n_components), v4(this->n_components);
 	const double h_inv_12=1./(12*h);
 	for (unsigned int i=0; i<dim; ++i)
 	  {
@@ -173,7 +176,7 @@ void AutoDerivativeFunction<dim>::vector_gradient (const Point<dim>       &p,
 	    vector_value(q3, v3);
 	    vector_value(q4, v4);
 	    
-	    for (unsigned int comp=0; comp<n_components; ++comp)
+	    for (unsigned int comp=0; comp<this->n_components; ++comp)
 	      gradients[comp][i]=(-v1(comp)+8*v2(comp)-8*v3(comp)+v4(comp))*h_inv_12;
 	  }
 	break;
@@ -250,8 +253,8 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
   for (unsigned p=0; p<points.size(); ++p)
-    Assert (gradients[p].size() == n_components,
-	    ExcDimensionMismatch(gradients.size(), n_components));
+    Assert (gradients[p].size() == this->n_components,
+	    ExcDimensionMismatch(gradients.size(), this->n_components));
     
   switch (formula)
     {
@@ -262,7 +265,7 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
 	  for (unsigned int i=0; i<dim; ++i)
 	    {
 	      q1=points[p]-ht[i];
-	      for (unsigned int comp=0; comp<n_components; ++comp)
+	      for (unsigned int comp=0; comp<this->n_components; ++comp)
 		gradients[p][comp][i]=(value(points[p], comp)-value(q1, comp))/h;
 	  }
 	break;
@@ -275,7 +278,7 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
 	    {
 	      q1=points[p]+ht[i];
 	      q2=points[p]-ht[i];
-	      for (unsigned int comp=0; comp<n_components; ++comp)
+	      for (unsigned int comp=0; comp<this->n_components; ++comp)
 		gradients[p][comp][i]=(value(q1, comp)-value(q2, comp))/(2*h);
 	    }
 	break;
@@ -290,7 +293,7 @@ vector_gradient_list (const typename std::vector<Point<dim> >            &points
 	      q1=q2+ht[i];
 	      q3=points[p]-ht[i];
 	      q4=q3-ht[i];
-	      for (unsigned int comp=0; comp<n_components; ++comp)
+	      for (unsigned int comp=0; comp<this->n_components; ++comp)
 		gradients[p][comp][i]=(-  value(q1, comp)
 				       +8*value(q2, comp)
 				       -8*value(q3, comp)

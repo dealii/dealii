@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/tensor_base.h>
+#include <cmath>
 
 
 /**

@@ -744,10 +744,12 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
       for (unsigned int copy=0; copy<n_copies; ++copy)
 	for (unsigned int q_point=0; q_point<base_quadrature.n_quadrature_points; ++q_point)
 	  {
-	    quadrature_points[next_point] = Point<1>(base_quadrature.point(q_point)(0) / n_copies
-						     +
-						     (1.0*copy)/n_copies);
-	    weights[next_point]           = base_quadrature.weight(q_point) / n_copies;
+	    this->quadrature_points[next_point]
+	      = Point<1>(base_quadrature.point(q_point)(0) / n_copies
+			 +
+			 (1.0*copy)/n_copies);
+	    this->weights[next_point]
+	      = base_quadrature.weight(q_point) / n_copies;
 
 	    ++next_point;
 	  };
@@ -793,9 +795,10 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 		(base_quadrature.point(q_point) == Point<1>(0.0)))
 	      continue;
 	    
-	    quadrature_points[next_point] = Point<1>(base_quadrature.point(q_point)(0) / n_copies
-						     +
-						     (1.0*copy)/n_copies);
+	    this->quadrature_points[next_point]
+	      = Point<1>(base_quadrature.point(q_point)(0) / n_copies
+			 +
+			 (1.0*copy)/n_copies);
 
 					     // if this is the
 					     // rightmost point of one
@@ -804,9 +807,10 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 					     // double weight
 	    if ((copy != n_copies-1) &&
 		(base_quadrature.point(q_point) == Point<1>(1.0)))
-	      weights[next_point] = double_point_weight;
+	      this->weights[next_point] = double_point_weight;
 	    else
-	      weights[next_point] = base_quadrature.weight(q_point) / n_copies;
+	      this->weights[next_point] = base_quadrature.weight(q_point) /
+					  n_copies;
 	    
 	    ++next_point;
 	  };
@@ -814,8 +818,8 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 
 #if DEBUG
   double sum_of_weights = 0;
-  for (unsigned int i=0; i<n_quadrature_points; ++i)
-    sum_of_weights += weight(i);
+  for (unsigned int i=0; i<this->n_quadrature_points; ++i)
+    sum_of_weights += this->weight(i);
   Assert (std::fabs(sum_of_weights-1) < 1e-15,
 	  ExcSumOfWeightsNotOne());
 #endif

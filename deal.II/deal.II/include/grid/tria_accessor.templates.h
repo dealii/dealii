@@ -117,9 +117,9 @@ inline
 bool
 TriaObjectAccessor<1,dim>::used () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return tria->levels[present_level]->lines.used[present_index];
+  return this->tria->levels[this->present_level]->lines.used[this->present_index];
 };
 
 
@@ -129,8 +129,8 @@ inline
 bool
 TriaObjectAccessor<1,dim>::user_flag_set () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  return tria->levels[present_level]->lines.user_flags[present_index];
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->lines.user_flags[this->present_index];
 };
 
 
@@ -140,8 +140,8 @@ inline
 void
 TriaObjectAccessor<1,dim>::set_user_flag () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  tria->levels[present_level]->lines.user_flags[present_index] = true;
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->lines.user_flags[this->present_index] = true;
 };
 
 
@@ -151,8 +151,8 @@ inline
 void
 TriaObjectAccessor<1,dim>::clear_user_flag () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  tria->levels[present_level]->lines.user_flags[present_index] = false;
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->lines.user_flags[this->present_index] = false;
 };
 
 
@@ -165,7 +165,7 @@ TriaObjectAccessor<1,dim>::child (const unsigned int i) const
   Assert (i<2, ExcIndexRange(i,0,2));
   
   TriaIterator<dim,TriaObjectAccessor<1,dim> >
-    q (tria, present_level+1, child_index (i));
+    q (tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
@@ -181,7 +181,7 @@ int
 TriaObjectAccessor<1,dim>::child_index (unsigned const int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
-  return tria->levels[present_level]->lines.children[present_index]+i;
+  return this->tria->levels[this->present_level]->lines.children[this->present_index]+i;
 };
 
 
@@ -191,9 +191,9 @@ inline
 bool
 TriaObjectAccessor<1,dim>::has_children () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return (tria->levels[present_level]->lines.children[present_index] != -1);
+  return (this->tria->levels[this->present_level]->lines.children[this->present_index] != -1);
 }
 
 
@@ -218,22 +218,22 @@ inline
 void
 TriaObjectAccessor<1,dim>::operator ++ ()
 {
-  ++present_index;
+  ++this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index
+  while (this->present_index
 	 >=
-	 static_cast<int>(tria->levels[present_level]->lines.lines.size()))
+	 static_cast<int>(this->tria->levels[this->present_level]->lines.lines.size()))
     {
 				       // no -> go one level up until we find
 				       // one with more than zero cells
-      ++present_level;
-      present_index = 0;
+      ++this->present_level;
+      this->present_index = 0;
 				       // highest level reached?
-      if (present_level >= static_cast<int>(tria->levels.size()))
+      if (this->present_level >= static_cast<int>(this->tria->levels.size()))
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
     };
@@ -246,22 +246,22 @@ inline
 void
 TriaObjectAccessor<1,dim>::operator -- ()
 {
-  --present_index;
+  --this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index < 0) 
+  while (this->present_index < 0) 
     {
 				       // no -> go one level down
-      --present_level;
+      --this->present_level;
 				       // lowest level reached?
-      if (present_level == -1) 
+      if (this->present_level == -1) 
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
 				       // else
-      present_index = tria->levels[present_level]->lines.lines.size()-1;
+      this->present_index = this->tria->levels[this->present_level]->lines.lines.size()-1;
     };
 };
 
@@ -274,9 +274,9 @@ inline
 bool
 TriaObjectAccessor<2,dim>::used () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return tria->levels[present_level]->quads.used[present_index];
+  return this->tria->levels[this->present_level]->quads.used[this->present_index];
 };
 
 
@@ -286,8 +286,8 @@ inline
 bool
 TriaObjectAccessor<2,dim>::user_flag_set () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  return tria->levels[present_level]->quads.user_flags[present_index];
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->quads.user_flags[this->present_index];
 };
 
 
@@ -297,8 +297,8 @@ inline
 void
 TriaObjectAccessor<2,dim>::set_user_flag () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  tria->levels[present_level]->quads.user_flags[present_index] = true;
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->quads.user_flags[this->present_index] = true;
 };
 
 
@@ -308,8 +308,8 @@ inline
 void
 TriaObjectAccessor<2,dim>::clear_user_flag () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  tria->levels[present_level]->quads.user_flags[present_index] = false;
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->quads.user_flags[this->present_index] = false;
 };
 
 
@@ -323,7 +323,7 @@ TriaObjectAccessor<2,dim>::line (const unsigned int i) const
     TriaIterator<dim,TriaObjectAccessor<1,dim> >
     (
       tria,
-      present_level,
+      this->present_level,
       line_index (i)
     );
 };
@@ -337,7 +337,7 @@ TriaObjectAccessor<2,dim>::line_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
 
-  return tria->levels[present_level]->quads.quads[present_index].line(i);
+  return this->tria->levels[this->present_level]->quads.quads[this->present_index].line(i);
 };
 
 
@@ -350,7 +350,7 @@ TriaObjectAccessor<2,dim>::child (const unsigned int i) const
   Assert (i<4, ExcIndexRange(i,0,4));
   
   TriaIterator<dim,TriaObjectAccessor<2,dim> >
-    q (tria, present_level+1, child_index (i));
+    q (tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
@@ -365,7 +365,7 @@ inline
 int TriaObjectAccessor<2,dim>::child_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
-  return tria->levels[present_level]->quads.children[present_index]+i;
+  return this->tria->levels[this->present_level]->quads.children[this->present_index]+i;
 };
 
 
@@ -375,9 +375,9 @@ inline
 bool
 TriaObjectAccessor<2,dim>::has_children () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return (tria->levels[present_level]->quads.children[present_index] != -1);
+  return (this->tria->levels[this->present_level]->quads.children[this->present_index] != -1);
 };
 
 
@@ -405,21 +405,21 @@ inline
 void
 TriaObjectAccessor<2,dim>::operator ++ ()
 {
-  ++present_index;
+  ++this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index
+  while (this->present_index
 	 >=
-	 static_cast<int>(tria->levels[present_level]->quads.quads.size()))
+	 static_cast<int>(this->tria->levels[this->present_level]->quads.quads.size()))
     {
 				       // no -> go one level up
-      ++present_level;
-      present_index = 0;
+      ++this->present_level;
+      this->present_index = 0;
 				       // highest level reached?
-      if (present_level >= static_cast<int>(tria->levels.size()))
+      if (this->present_level >= static_cast<int>(this->tria->levels.size()))
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
     };
@@ -432,22 +432,22 @@ inline
 void
 TriaObjectAccessor<2,dim>::operator -- ()
 {
-  --present_index;
+  --this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index < 0) 
+  while (this->present_index < 0) 
     {
 				       // no -> go one level down
-      --present_level;
+      --this->present_level;
 				       // lowest level reached?
-      if (present_level == -1) 
+      if (this->present_level == -1) 
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
 				       // else
-      present_index = tria->levels[present_level]->quads.quads.size()-1;
+      this->present_index = this->tria->levels[this->present_level]->quads.quads.size()-1;
     };
 };
 
@@ -460,9 +460,9 @@ inline
 bool
 TriaObjectAccessor<3,dim>::used () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return tria->levels[present_level]->hexes.used[present_index];
+  return this->tria->levels[this->present_level]->hexes.used[this->present_index];
 };
 
 
@@ -472,8 +472,8 @@ inline
 bool
 TriaObjectAccessor<3,dim>::user_flag_set () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  return tria->levels[present_level]->hexes.user_flags[present_index];
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->hexes.user_flags[this->present_index];
 };
 
 
@@ -483,8 +483,8 @@ inline
 void
 TriaObjectAccessor<3,dim>::set_user_flag () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  tria->levels[present_level]->hexes.user_flags[present_index] = true;
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = true;
 };
 
 
@@ -493,8 +493,8 @@ template <int dim>
 inline
 void TriaObjectAccessor<3,dim>::clear_user_flag () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
-  tria->levels[present_level]->hexes.user_flags[present_index] = false;
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = false;
 };
 
 
@@ -504,7 +504,7 @@ inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
 TriaObjectAccessor<3,dim>::line (const unsigned int i) const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   Assert (i<12, ExcIndexRange (i,0,12));
 
 				   // egcs 1.1.2 gets into trouble if we
@@ -543,12 +543,12 @@ inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
 TriaObjectAccessor<3,dim>::quad (const unsigned int i) const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
   return
     TriaIterator<dim,TriaObjectAccessor<2,dim> >
     (
       tria,
-      present_level,
+      this->present_level,
       quad_index (i)
     );
 };
@@ -592,7 +592,7 @@ TriaObjectAccessor<3,dim>::quad_index (const unsigned int i) const
 {
   Assert (i<6, ExcIndexRange(i,0,6));
 
-  return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
+  return this->tria->levels[this->present_level]->hexes.hexes[this->present_index].quad(i);
 };
 
 
@@ -604,7 +604,7 @@ TriaObjectAccessor<3,dim>::child (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
   
-  TriaIterator<dim,TriaObjectAccessor<3,dim> > q (tria, present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<3,dim> > q (tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
@@ -619,7 +619,7 @@ inline
 int TriaObjectAccessor<3,dim>::child_index (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
-  return tria->levels[present_level]->hexes.children[present_index]+i;
+  return this->tria->levels[this->present_level]->hexes.children[this->present_index]+i;
 };
 
 
@@ -627,9 +627,9 @@ int TriaObjectAccessor<3,dim>::child_index (const unsigned int i) const
 template <int dim>
 bool TriaObjectAccessor<3,dim>::has_children () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return (tria->levels[present_level]->hexes.children[present_index] != -1);
+  return (this->tria->levels[this->present_level]->hexes.children[this->present_index] != -1);
 };
 
 
@@ -663,21 +663,21 @@ inline
 void
 TriaObjectAccessor<3,dim>::operator ++ ()
 {
-  ++present_index;
+  ++this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index
+  while (this->present_index
 	 >=
-	 static_cast<int>(tria->levels[present_level]->hexes.hexes.size()))
+	 static_cast<int>(this->tria->levels[this->present_level]->hexes.hexes.size()))
     {
 				       // no -> go one level up
-      ++present_level;
-      present_index = 0;
+      ++this->present_level;
+      this->present_index = 0;
 				       // highest level reached?
-      if (present_level >= static_cast<int>(tria->levels.size()))
+      if (this->present_level >= static_cast<int>(this->tria->levels.size()))
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
     };
@@ -690,22 +690,22 @@ inline
 void
 TriaObjectAccessor<3,dim>::operator -- ()
 {
-  --present_index;
+  --this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index < 0) 
+  while (this->present_index < 0) 
     {
 				       // no -> go one level down
-      --present_level;
+      --this->present_level;
 				       // lowest level reached?
-      if (present_level == -1) 
+      if (this->present_level == -1) 
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
 				       // else
-      present_index = tria->levels[present_level]->hexes.hexes.size()-1;
+      this->present_index = this->tria->levels[this->present_level]->hexes.hexes.size()-1;
     };
 };
 
@@ -718,8 +718,8 @@ inline
 bool
 TriaObjectAccessor<celldim,dim>::used () const
 {
-  Assert (state() == IteratorState::valid, ExcDereferenceInvalidObject());
-  return tria->levels[present_level]->hexes.used[present_index];
+  Assert (this->state() == IteratorState::valid, ExcDereferenceInvalidObject());
+  return this->tria->levels[this->present_level]->hexes.used[this->present_index];
 };
 
 
@@ -729,8 +729,8 @@ inline
 bool
 TriaObjectAccessor<celldim,dim>::user_flag_set () const
 {
-  Assert (used(), ExcCellNotUsed());
-  return tria->levels[present_level]->hexes.user_flags[present_index];
+  Assert (this->used(), ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->hexes.user_flags[this->present_index];
 };
 
 
@@ -740,8 +740,8 @@ inline
 void
 TriaObjectAccessor<celldim,dim>::set_user_flag () const
 {
-  Assert (used(), ExcCellNotUsed());
-  tria->levels[present_level]->hexes.user_flags[present_index] = true;
+  Assert (this->used(), ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = true;
 };
 
 
@@ -750,8 +750,8 @@ template<int celldim, int dim>
 inline
 void TriaObjectAccessor<celldim,dim>::clear_user_flag () const
 {
-  Assert (used(), ExcCellNotUsed());
-  tria->levels[present_level]->hexes.user_flags[present_index] = false;
+  Assert (this->used(), ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = false;
 };
 
 
@@ -761,7 +761,7 @@ inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
 TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 {
-  Assert (used(), ExcCellNotUsed());
+  Assert (this->used(), ExcCellNotUsed());
   Assert (i < GeometryInfo<celldim>::lines_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::lines_per_cell));
 
@@ -771,8 +771,8 @@ TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 	    return
 	      TriaIterator<dim,TriaObjectAccessor<1,dim> >
 	      (
-		tria,
-		present_level,
+		this->tria,
+		this->present_level,
 		line_index (i)
 	      );
       case 3:
@@ -798,7 +798,7 @@ TriaObjectAccessor<celldim,dim>::line (const unsigned int i) const
 	    Assert(false, ExcNotImplemented());
     }
   
-  return TriaIterator<dim,TriaObjectAccessor<1,dim> >(tria, -1, -1, 0);
+  return TriaIterator<dim,TriaObjectAccessor<1,dim> >(this->tria, -1, -1, 0);
 };
 
 
@@ -808,14 +808,14 @@ inline
 TriaIterator<dim,TriaObjectAccessor<2,dim> >
 TriaObjectAccessor<celldim,dim>::quad (const unsigned int i) const
 {
-  Assert (used(), ExcCellNotUsed());
+  Assert (this->used(), ExcCellNotUsed());
   Assert (i < GeometryInfo<celldim>::quads_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::quads_per_cell));
   return
     TriaIterator<dim,TriaObjectAccessor<2,dim> >
     (
-      tria,
-      present_level,
+      this->tria,
+      this->present_level,
       quad_index (i)
     );
 };
@@ -833,8 +833,8 @@ TriaObjectAccessor<celldim,dim>::line_index (const unsigned int i) const
   switch(celldim)
     {
       case 2:
-	    return tria->levels[present_level]
-	      ->quads.quads[present_index].line(i);
+	    return this->tria->levels[this->present_level]
+	      ->quads.quads[this->present_index].line(i);
       case 3:
 	    if (i<4)
 	      return quad(0)->line_index(i);
@@ -870,7 +870,7 @@ TriaObjectAccessor<celldim,dim>::quad_index (const unsigned int i) const
   Assert (i < GeometryInfo<celldim>::quads_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::quads_per_cell));
 
-  return tria->levels[present_level]->hexes.hexes[present_index].quad(i);
+  return this->tria->levels[this->present_level]->hexes.hexes[this->present_index].quad(i);
 };
 
 
@@ -884,7 +884,7 @@ TriaObjectAccessor<celldim,dim>::child (const unsigned int i) const
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::children_per_cell));
   
   TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
-    q (tria, present_level+1, child_index (i));
+    q (this->tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  ExcUnusedCellAsChild());
@@ -900,7 +900,7 @@ int TriaObjectAccessor<celldim,dim>::child_index (const unsigned int i) const
 {
   Assert (i < GeometryInfo<celldim>::children_per_cell,
 	  ExcIndexRange(i,0,GeometryInfo<celldim>::children_per_cell));
-  return tria->levels[present_level]->hexes.children[present_index]+i;
+  return this->tria->levels[this->present_level]->hexes.children[this->present_index]+i;
 };
 
 
@@ -908,9 +908,9 @@ int TriaObjectAccessor<celldim,dim>::child_index (const unsigned int i) const
 template<int celldim, int dim>
 bool TriaObjectAccessor<celldim,dim>::has_children () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  return (tria->levels[present_level]->hexes.children[present_index] != -1);
+  return (this->tria->levels[this->present_level]->hexes.children[this->present_index] != -1);
 };
 
 
@@ -931,10 +931,10 @@ TriaObjectAccessor<celldim,dim>::max_refinement_depth () const
 				   child(5)->max_refinement_depth() + 1,
 				   child(6)->max_refinement_depth() + 1,
 				   child(7)->max_refinement_depth() + 1  };
-  return max (max (max (depths[0], depths[1]),
-		   max (depths[2], depths[3])),
-	      max (max (depths[4], depths[5]),
-		   max (depths[6], depths[7])));
+  return std::max (std::max (std::max (depths[0], depths[1]),
+			     std::max (depths[2], depths[3])),
+		   std::max (std::max (depths[4], depths[5]),
+			     std::max (depths[6], depths[7])));
 };
 
 
@@ -944,21 +944,21 @@ inline
 void
 TriaObjectAccessor<celldim,dim>::operator ++ ()
 {
-  ++present_index;
+  ++this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index
+  while (this->present_index
 	 >=
-	 static_cast<int>(tria->levels[present_level]->hexes.hexes.size()))
+	 static_cast<int>(this->tria->levels[this->present_level]->hexes.hexes.size()))
     {
 				       // no -> go one level up
-      ++present_level;
-      present_index = 0;
+      ++this->present_level;
+      this->present_index = 0;
 				       // highest level reached?
-      if (present_level >= static_cast<int>(tria->levels.size()))
+      if (this->present_level >= static_cast<int>(this->tria->levels.size()))
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
     };
@@ -971,22 +971,22 @@ inline
 void
 TriaObjectAccessor<celldim,dim>::operator -- ()
 {
-  --present_index;
+  --this->present_index;
 				   // is index still in the range of
 				   // the vector?
-  while (present_index < 0) 
+  while (this->present_index < 0) 
     {
 				       // no -> go one level down
-      --present_level;
+      --this->present_level;
 				       // lowest level reached?
-      if (present_level == -1) 
+      if (this->present_level == -1) 
 	{
 					   // return with past the end pointer
-	  present_level = present_index = -1;
+	  this->present_level = this->present_index = -1;
 	  return;
 	};
 				       // else
-      present_index = tria->levels[present_level]->hexes.hexes.size()-1;
+      this->present_index = this->tria->levels[this->present_level]->hexes.hexes.size()-1;
     };
 };
 
@@ -1010,7 +1010,7 @@ inline
 Triangulation<2>::face_iterator
 CellAccessor<2>::face (const unsigned int i) const 
 {
-  return line(i);
+  return this->line(i);
 };
 
 
@@ -1032,8 +1032,8 @@ CellAccessor<dim>::neighbor_index (const unsigned int i) const
 {
   Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaAccessor<dim>::ExcInvalidNeighbor(i));
-  return tria->levels[present_level]->
-    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].second;
+  return this->tria->levels[this->present_level]->
+    neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].second;
 };
 
 
@@ -1045,8 +1045,8 @@ CellAccessor<dim>::neighbor_level (const unsigned int i) const
 {
   Assert (i<GeometryInfo<dim>::faces_per_cell,
 	  typename TriaAccessor<dim>::ExcInvalidNeighbor(i));
-  return tria->levels[present_level]->
-    neighbors[present_index*GeometryInfo<dim>::faces_per_cell+i].first;
+  return this->tria->levels[this->present_level]->
+    neighbors[this->present_index*GeometryInfo<dim>::faces_per_cell+i].first;
 };
 
 
@@ -1056,15 +1056,15 @@ inline
 bool
 CellAccessor<dim>::refine_flag_set () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 				   // cells flagged for refinement must be active
 				   // (the @p{set_refine_flag} function checks this,
 				   // but activity may change when refinement is
 				   // executed and for some reason the refine
 				   // flag is not cleared).
-  Assert (active() ||  !tria->levels[present_level]->refine_flags[present_index],
+  Assert (this->active() ||  !this->tria->levels[this->present_level]->refine_flags[this->present_index],
 	  ExcRefineCellNotActive());
-  return tria->levels[present_level]->refine_flags[present_index];
+  return this->tria->levels[this->present_level]->refine_flags[this->present_index];
 };
 
 
@@ -1074,11 +1074,11 @@ inline
 void
 CellAccessor<dim>::set_refine_flag () const
 {
-  Assert (used() && active(), ExcRefineCellNotActive());
+  Assert (this->used() && this->active(), ExcRefineCellNotActive());
   Assert (!coarsen_flag_set(),
 	  ExcCellFlaggedForCoarsening());
   
-  tria->levels[present_level]->refine_flags[present_index] = true;
+  this->tria->levels[this->present_level]->refine_flags[this->present_index] = true;
 };
 
 
@@ -1088,8 +1088,8 @@ inline
 void
 CellAccessor<dim>::clear_refine_flag () const
 {
-  Assert (used() && active(), ExcRefineCellNotActive());
-  tria->levels[present_level]->refine_flags[present_index] = false;
+  Assert (this->used() && this->active(), ExcRefineCellNotActive());
+  this->tria->levels[this->present_level]->refine_flags[this->present_index] = false;
 };
 
 
@@ -1099,15 +1099,15 @@ inline
 bool
 CellAccessor<dim>::coarsen_flag_set () const
 {
-  Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (this->used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 				   // cells flagged for coarsening must be active
 				   // (the @p{set_refine_flag} function checks this,
 				   // but activity may change when refinement is
 				   // executed and for some reason the refine
 				   // flag is not cleared).
-  Assert (active() ||  !tria->levels[present_level]->coarsen_flags[present_index],
+  Assert (this->active() ||  !this->tria->levels[this->present_level]->coarsen_flags[this->present_index],
 	  ExcRefineCellNotActive());
-  return tria->levels[present_level]->coarsen_flags[present_index];
+  return this->tria->levels[this->present_level]->coarsen_flags[this->present_index];
 };
 
 
@@ -1117,10 +1117,10 @@ inline
 void
 CellAccessor<dim>::set_coarsen_flag () const
 {
-  Assert (used() && active(), ExcRefineCellNotActive());
+  Assert (this->used() && this->active(), ExcRefineCellNotActive());
   Assert (!refine_flag_set(), ExcCellFlaggedForRefinement());
   
-  tria->levels[present_level]->coarsen_flags[present_index] = true;
+  this->tria->levels[this->present_level]->coarsen_flags[this->present_index] = true;
 };
 
 
@@ -1130,8 +1130,8 @@ inline
 void
 CellAccessor<dim>::clear_coarsen_flag () const
 {
-  Assert (used() && active(), ExcRefineCellNotActive());
-  tria->levels[present_level]->coarsen_flags[present_index] = false;
+  Assert (this->used() && this->active(), ExcRefineCellNotActive());
+  this->tria->levels[this->present_level]->coarsen_flags[this->present_index] = false;
 };
 
 
@@ -1142,7 +1142,7 @@ TriaIterator<dim,CellAccessor<dim> >
 CellAccessor<dim>::neighbor (const unsigned int i) const
 {
   TriaIterator<dim,CellAccessor<dim> >
-    q (tria, neighbor_level (i), neighbor_index (i));
+    q (this->tria, neighbor_level (i), neighbor_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
@@ -1158,7 +1158,7 @@ TriaIterator<dim,CellAccessor<dim> >
 CellAccessor<dim>::child (const unsigned int i) const
 {
   TriaIterator<dim,CellAccessor<dim> >
-    q (tria, present_level+1, child_index (i));
+    q (this->tria, this->present_level+1, this->child_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
@@ -1173,7 +1173,7 @@ inline
 bool
 CellAccessor<dim>::active () const
 {
-  return !has_children();
+  return !this->has_children();
 };
 
 

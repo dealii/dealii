@@ -92,8 +92,8 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator *= (const double factor)
 {
-  number       *p = &el(0,0);
-  const number *e = &el(0,0) + n()*m();
+  number       *p = &this->el(0,0);
+  const number *e = &this->el(0,0) + n()*m();
   while (p != e)
     *p++ *= factor;
 
@@ -291,7 +291,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 	{
 	  number2 s = 0.;
 	  for (unsigned int j=0; j<size_m; ++j)
-	    s += src(j) * el(j,i);
+	    s += src(j) * this->el(j,i);
 	  dst(i) = s;
 	};
     }
@@ -301,7 +301,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 	{
 	  number2 s = 0.;
 	  for (unsigned int j=0; j<size_m; ++j)
-	    s += src(j) * el(j,i);
+	    s += src(j) * this->el(j,i);
 	  dst(i) += s;
 	};
     };
@@ -327,7 +327,7 @@ double FullMatrix<number>::residual (Vector<number2>& dst,
     {
       s = right(i);
       for (unsigned int j=0; j<size_m; ++j)
-	s -= src(j) * el(i,j);
+	s -= src(j) * this->el(i,j);
       dst(i) = s;
       res += s*s;
     }
@@ -352,8 +352,8 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
   for (i=0; i<nu; ++i)
     {
       s = src(i);
-      for (j=0; j<i; ++j) s -= dst(j) * el(i,j);
-      dst(i) = s/el(i,i);
+      for (j=0; j<i; ++j) s -= dst(j) * this->el(i,j);
+      dst(i) = s/this->el(i,i);
     }
 }
 
@@ -372,8 +372,8 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
   for (int i=nu-1; i>=0; --i)
     {
       s = src(i);
-      for (j=i+1; j<nu; ++j) s -= dst(j) * el(i,j);
-      dst(i) = s/el(i,i);
+      for (j=i+1; j<nu; ++j) s -= dst(j) * this->el(i,j);
+      dst(i) = s/this->el(i,i);
     }
 }
 
@@ -390,7 +390,7 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
 
   for (unsigned int ii=0; ii<src.m() ; ++ii)
     for (unsigned int jj=0; jj<src.n() ; ++jj)
-      el(ii+i,jj+j) = src.el(ii,jj);
+      this->el(ii+i,jj+j) = src.el(ii,jj);
 }
 
 
@@ -400,14 +400,14 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
 					   const std::vector<unsigned int>& p_rows,
 					   const std::vector<unsigned int>& p_cols)
 {
-  Assert (p_rows.size() == n_rows(),
-	  ExcDimensionMismatch (p_rows.size(), n_rows()));
-  Assert (p_cols.size() == n_cols(),
-	  ExcDimensionMismatch (p_cols.size(), n_cols()));
+  Assert (p_rows.size() == this->n_rows(),
+	  ExcDimensionMismatch (p_rows.size(), this->n_rows()));
+  Assert (p_cols.size() == this->n_cols(),
+	  ExcDimensionMismatch (p_cols.size(), this->n_cols()));
 
-  for (unsigned int i=0;i<n_rows();++i)
-    for (unsigned int j=0;j<n_cols();++j)
-      el(i,j) = src(p_rows[i], p_cols[j]);
+  for (unsigned int i=0;i<this->n_rows();++i)
+    for (unsigned int j=0;j<this->n_cols();++j)
+      this->el(i,j) = src(p_rows[i], p_cols[j]);
 }
 
 
@@ -430,7 +430,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
   Assert (this->data() != 0, ExcEmptyMatrix());
   
   for (unsigned int k=0; k<m(); ++k)
-    el(i,k) += s*el(j,k);
+    this->el(i,k) += s*this->el(j,k);
 }
 
 
@@ -445,7 +445,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
   
   const unsigned int size_m = m();
   for (unsigned l=0; l<size_m; ++l)
-    el(i,l) += s*el(j,l) + t*el(k,l);
+    this->el(i,l) += s*this->el(j,l) + t*this->el(k,l);
 }
 
 
@@ -456,7 +456,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
   Assert (this->data() != 0, ExcEmptyMatrix());
   
   for (unsigned int k=0; k<n(); ++k)
-    el(k,i) += s*el(k,j);
+    this->el(k,i) += s*this->el(k,j);
 }
 
 
@@ -468,7 +468,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
   Assert (this->data() != 0, ExcEmptyMatrix());
   
   for (unsigned int l=0; l<n(); ++l)
-    el(l,i) += s*el(l,j) + t*el(l,k);
+    this->el(l,i) += s*this->el(l,j) + t*this->el(l,k);
 }
 
 
@@ -480,7 +480,7 @@ void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
   number s;
   for (unsigned int k=0; k<m(); ++k)
   {
-    s = el(i,k); el(i,k) = el(j,k); el(j,k) = s;
+    s = this->el(i,k); this->el(i,k) = this->el(j,k); this->el(j,k) = s;
   }
 }
 
@@ -493,7 +493,7 @@ void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
   number s;
   for (unsigned int k=0; k<n(); ++k)
   {
-    s = el(k,i); el(k,i) = el(k,j); el(k,j) = s;
+    s = this->el(k,i); this->el(k,i) = this->el(k,j); this->el(k,j) = s;
   }
 }
 
@@ -505,7 +505,7 @@ void FullMatrix<number>::diagadd (const number src)
   Assert (m() == n(), ExcDimensionMismatch(m(),n()));
   
   for (unsigned int i=0; i<n(); ++i)
-    el(i,i) += src;
+    this->el(i,i) += src;
 }
 
 
@@ -526,7 +526,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 	{
 	  number2 s = 0.;
 	  for (unsigned k=0; k<n(); k++)
-	    s+= el(i,k) * src.el(k,j);
+	    s+= this->el(i,k) * src.el(k,j);
 	  dst.el(i,j) = s;
 	}
   else
@@ -535,7 +535,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 	{
 	  number2 s = 0.;
 	  for (unsigned k=0; k<n(); k++)
-	    s+= el(i,k) * src.el(k,j);
+	    s+= this->el(i,k) * src.el(k,j);
 	  dst.el(i,j) += s;
 	}
 }
@@ -559,7 +559,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 	{
 	  number2 s = 0;
 	  for (unsigned int k=0; k<m(); k++)
-	    s += el(k,i) * src.el(k,j);
+	    s += this->el(k,i) * src.el(k,j);
 	  dst.el(i,j) = s;
 	}
   else
@@ -568,7 +568,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 	{
 	  number2 s = 0;
 	  for (unsigned int k=0; k<m(); k++)
-	    s += el(k,i) * src.el(k,j);
+	    s += this->el(k,i) * src.el(k,j);
 	  dst.el(i,j) += s;
 	}
 }
@@ -646,8 +646,8 @@ FullMatrix<number>::symmetrize ()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=i+1; j<N; ++j)
       {
-	const number t = (el(i,j) + el(j,i)) / 2;
-	el(i,j) = el(j,i) = t;
+	const number t = (this->el(i,j) + this->el(j,i)) / 2;
+	this->el(i,j) = this->el(j,i) = t;
       };
 };
 
@@ -664,7 +664,7 @@ number FullMatrix<number>::l1_norm () const
     {
       sum=0;
       for (unsigned int row=0; row<n_rows; ++row)
-	sum += std::fabs(el(row,col));
+	sum += std::fabs(this->el(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -684,7 +684,7 @@ number FullMatrix<number>::linfty_norm () const
     {
       sum=0;
       for (unsigned int col=0; col<n_cols; ++col)
-	sum += std::fabs(el(row,col));
+	sum += std::fabs(this->el(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -700,10 +700,10 @@ FullMatrix<number>::print (std::ostream       &s,
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
-  for (unsigned int i=0; i<m(); ++i)
+  for (unsigned int i=0; i<this->m(); ++i)
     {
-      for (unsigned int j=0; j<n(); ++j)
-	s << std::setw(w) << std::setprecision(p) << el(i,j);
+      for (unsigned int j=0; j<this->n(); ++j)
+	s << std::setw(w) << std::setprecision(p) << this->el(i,j);
       s << std::endl;
     }
 }
@@ -1111,9 +1111,10 @@ FullMatrix<number>::determinant () const
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
-  Assert (n_cols() == n_rows(),
-	  ExcDimensionMismatch(n_cols(), n_rows()));
-  Assert ((n_cols()>=1) && (n_cols()<=3), ExcNotImplemented(n_cols()));
+  Assert (this->n_cols() == this->n_rows(),
+	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  Assert ((this->n_cols()>=1) && (this->n_cols()<=3),
+	  ExcNotImplemented(this->n_cols()));
   
   switch (this->n_cols()) 
     {
@@ -1174,11 +1175,12 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
-  Assert (n_cols() == n_rows(), ExcNotQuadratic());
-  Assert (n_cols() == M.n_cols(),
-          ExcDimensionMismatch(n_cols(),M.n_cols()));
-  Assert (n_rows() == M.n_rows(),
-	  ExcDimensionMismatch(n_rows(),M.n_rows()));
+  Assert (this->n_cols() == this->n_rows(),
+	  ExcNotQuadratic());
+  Assert (this->n_cols() == M.n_cols(),
+          ExcDimensionMismatch(this->n_cols(), M.n_cols()));
+  Assert (this->n_rows() == M.n_rows(),
+	  ExcDimensionMismatch(this->n_rows(), M.n_rows()));
   
   switch (this->n_cols()) 
     {
@@ -1363,7 +1365,7 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
 {
   unsigned int width = width_;
   
-  Assert ((this->data() != 0) || (n_cols()+n_rows()==0),
+  Assert ((this->data() != 0) || (this->n_cols()+this->n_rows()==0),
 	  ExcInternalError());
   
 				   // set output format, but store old
@@ -1406,7 +1408,7 @@ void
 FullMatrix<number>::gauss_jordan()
 {
   Assert (this->data() != 0, ExcEmptyMatrix());  
-  Assert (n_cols() == n_rows(), ExcNotQuadratic());
+  Assert (this->n_cols() == this->n_rows(), ExcNotQuadratic());
   
 				   // Gauss-Jordan-Algorithmus
 				   // cf. Stoer I (4th Edition) p. 153
@@ -1497,9 +1499,11 @@ FullMatrix<number>::householder(Vector<number2>& src)
 {
   Assert (this->data() != 0, ExcEmptyMatrix());
   
-  // m > n, src.n() = m
-  Assert (n_cols() <= n_rows(), ExcDimensionMismatch(n_cols(), n_rows()));
-  Assert (src.size() == n_rows(), ExcDimensionMismatch(src.size(), n_rows()));
+				   // m > n, src.n() = m
+  Assert (this->n_cols() <= this->n_rows(),
+	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  Assert (src.size() == this->n_rows(),
+	  ExcDimensionMismatch(src.size(), this->n_rows()));
 
   for (unsigned int j=0 ; j<n() ; ++j)
   {
