@@ -500,6 +500,17 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
+       New: Checked in new <code class="class">GridGenerator</code> 
+       member function <code class="member">half_hyper_ball</code>,
+       derived from member <code class="member">hyper_ball</code>.     
+       The intial mesh contains four elements. This mesh will work with
+       the boundary class <code class="class">template <int dim> 
+       HalfHyperBallBoundary</code>.
+       <br>
+       (Brian Carnes 2002/12/16)
+       </p>
+
+  <li> <p> 
        New: Checked in new class <code class="class">FE_Q_Hierarchical</code>
        derived from class <code class="class">FiniteElement</code>.  
        This element is analogous to <code class="class">FE_Q</code>, but 
