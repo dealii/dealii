@@ -75,6 +75,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
+
+  <li> <p> New: The classes <code class="class">FullMatrix</code> and
+  <code class="class">PreconditionBlockJacobi</code> have a <code
+  class="class">const_iterator</code>.
+  <br>
+  (GK 2003/07/18)
+  </p>
 </ol>
 
 
@@ -83,36 +90,34 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p> 
-       New: The new <code class="member">FETools::get_fe_from_name</code>
-       function can do the reverse of the <code
-       class="member">FiniteElement::get_name</code> function: it
-       takes a string and parses it to regenerate a finite element
-       from it. Useful for parsing finite element names from input files.
+  <li> <p> New: The new <code class="class">FETools</code>::<code
+       class="member">get_fe_from_name</code> function can do the
+       reverse of the <code class="class">FiniteElement</code>::<code
+       class="member">get_name</code> function: it takes a string and
+       parses it to regenerate a finite element from it. Useful for
+       parsing finite element names from input files.
        <br>
        (WB 2002/07/08)
        </p>
 
-  <li> <p> 
-       New: The <code class="member">DataOut_DoFData::merge_patches</code>
-       now takes a second parameter that indicates a shift for each
-       vertex of the given patches to be merged. This is sometimes
-       nice if one wants to generate "exploded" views of a collection
-       of subdomains. It is also templatized on the first argument, so
-       can merge in some other <code
-       class="class">DataOut_DoFData</code> that create the same type
-       of patches but are otherwise different.
+  <li> <p> New: The <code class="class">DataOut_DoFData</code>::<code
+       class="member">merge_patches</code> now takes a second
+       parameter that indicates a shift for each vertex of the given
+       patches to be merged. This is sometimes nice if one wants to
+       generate "exploded" views of a collection of subdomains. It is
+       also templatized on the first argument, so can merge in some
+       other <code class="class">DataOut_DoFData</code> that create
+       the same type of patches but are otherwise different.
        <br>
        (WB 2002/06/30)
        </p>
 
-  <li> <p> 
-       Fixed: The <code class="member">FETools::extrapolate</code>
-       function operates on patches of cells, but didn't check whether
-       the grid is at least refined once everywhere. If this was not
-       the case, it would generate wrong results. It now checks for
-       this, and if the grid has unrefined coarse grid cells, an
-       exception is generated.
+  <li> <p> Fixed: The <code class="class">FETools</code>::<code
+       class="member">extrapolate</code> function operates on patches
+       of cells, but didn't check whether the grid is at least refined
+       once everywhere. If this was not the case, it would generate
+       wrong results. It now checks for this, and if the grid has
+       unrefined coarse grid cells, an exception is generated.
        <br>
        (WB 2002/06/25)
        </p>
