@@ -16,9 +16,9 @@ An error occurred in line <20> of file <source/subscriptor.cc> in function
 The violated condition was: 
     counter == 0
 The name and call sequence of the exception was:
-    ExcInUse()
+    ExcInUse(counter)
 Additional Information: 
-(none)
+This object is still used by 1 other objects.
 --------------------------------------------------------
 DEAL::Destruct C
 DEAL::Destruct B
