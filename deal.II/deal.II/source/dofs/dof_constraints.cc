@@ -335,13 +335,29 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	{
 	  if (other_constraints.sorted == true)
 	    {
+					       // as the array is
+					       // sorted, use a
+					       // bindary find to
+					       // check for the
+					       // existence of the
+					       // element. if it does
+					       // not exist, then the
+					       // pointer may still
+					       // point into tha
+					       // array, but to an
+					       // element of which the
+					       // indices do not
+					       // match, so return the
+					       // end iterator
 	      ConstraintLine index_comparison;
 	      index_comparison.line = line->entries[i].first;
-//TODO:[WB] we should use a binary search, since we are sure that the array is sorted
 	      tmp_other_lines[i] =
-		std::find (other_constraints.lines.begin (),
-			   other_constraints.lines.end (),
-			   index_comparison);
+		std::lower_bound (other_constraints.lines.begin (),
+				  other_constraints.lines.end (),
+				  index_comparison);
+	      if ((tmp_other_lines[i] != other_constraints.lines.end ()) &&
+		  (tmp_other_lines[i]->line != index_comparison.line))
+		tmp_other_lines[i] = other_constraints.lines.end ();
 	    }
 	  else
 	    {
