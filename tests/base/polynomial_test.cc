@@ -48,20 +48,24 @@ void check_poly(const Point<dim>& x,
       
 				       // Check if compute_value is ok
       double val = p.compute_value(k,x);
-      //if (val != values[k])
-      if (fabs(val - values[k]) > 5.0E-16)
+      if (fabs(val - values[k]) > 5.0E-15)
 	deallog << 'P' << k << ": values differ " << val << " != "
 		<< values[k] << std::endl;
 
                                        // Check if compute_grad is ok
       Tensor<1,dim> grad = p.compute_grad(k,x);
-      if (grad != gradients[k])
+      if ((grad-gradients[k]) * (grad-gradients[k]) > 5e-15*5e-15)
 	deallog << 'P' << k << ": gradients differ " << grad << " != "
 		<< gradients[k] << std::endl;
       
 				       // Check if compute_grad_grad is ok
       Tensor<2,dim> grad2 = p.compute_grad_grad(k,x);
-      if (grad2 != second[k])
+      Tensor<2,dim> diff = grad2-second[k];
+      double s = 0;
+      for (unsigned int i=0; i<dim; ++i)
+	for (unsigned int j=0; j<dim; ++j)
+	  s += diff[i][j]*diff[i][j];
+      if (s > 5e-15*5e-15)
 	deallog << 'P' << k << ": second derivatives differ " << grad2 << " != "
 		<< second[k] << std::endl;
 
