@@ -111,7 +111,6 @@ void Assembler<dim>::assemble (const Equation<dim> &equation) {
 
 
 // explicit instantiations
-template class Equation<deal_II_dimension>;
 template class Assembler<deal_II_dimension>;
 
 template class TriaRawIterator<deal_II_dimension,Assembler<deal_II_dimension> >;
