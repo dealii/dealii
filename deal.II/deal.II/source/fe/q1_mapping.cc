@@ -20,14 +20,16 @@
 
 template <>
 FEQ1Mapping<1>::FEQ1Mapping (const unsigned int dofs_per_vertex,
-				     const unsigned int dofs_per_line,
-				     const unsigned int dofs_per_quad,
-				     const unsigned int dofs_per_hex,
-				     const unsigned int n_components) :
+			     const unsigned int dofs_per_line,
+			     const unsigned int dofs_per_quad,
+			     const unsigned int dofs_per_hex,
+			     const unsigned int n_components,
+			     const bool restriction_is_additive) :
 		FiniteElement<1> (FiniteElementData<1> (dofs_per_vertex,
 							dofs_per_line,
 							GeometryInfo<1>::vertices_per_cell,
-							n_components))
+							n_components,
+							restriction_is_additive))
 {
   Assert (dofs_per_quad==0, ExcInvalidData());
   Assert (dofs_per_hex==0,  ExcInvalidData());
@@ -141,15 +143,17 @@ void FEQ1Mapping<1>::fill_fe_values (const DoFHandler<1>::cell_iterator &cell,
 
 template <>
 FEQ1Mapping<2>::FEQ1Mapping (const unsigned int dofs_per_vertex,
-				     const unsigned int dofs_per_line,
-				     const unsigned int dofs_per_quad,
-				     const unsigned int dofs_per_hex,
-				     const unsigned int n_components) :
+			     const unsigned int dofs_per_line,
+			     const unsigned int dofs_per_quad,
+			     const unsigned int dofs_per_hex,
+			     const unsigned int n_components,
+			     const bool restriction_is_additive) :
 		FiniteElement<2> (FiniteElementData<2> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
 							GeometryInfo<2>::vertices_per_cell,
-							n_components))
+							n_components,
+							restriction_is_additive))
 {
   Assert (dofs_per_hex == 0, ExcInvalidData());
 };
@@ -313,16 +317,18 @@ void FEQ1Mapping<2>::get_normal_vectors (const DoFHandler<2>::cell_iterator &cel
 
 template <>
 FEQ1Mapping<3>::FEQ1Mapping (const unsigned int dofs_per_vertex,
-				     const unsigned int dofs_per_line,
-				     const unsigned int dofs_per_quad,
-				     const unsigned int dofs_per_hex,
-				     const unsigned int n_components) :
+			     const unsigned int dofs_per_line,
+			     const unsigned int dofs_per_quad,
+			     const unsigned int dofs_per_hex,
+			     const unsigned int n_components,
+			     const bool restriction_is_additive) :
 		FiniteElement<3> (FiniteElementData<3> (dofs_per_vertex,
 							dofs_per_line,
 							dofs_per_quad,
 							dofs_per_hex,
 							GeometryInfo<3>::vertices_per_cell,
-							n_components))
+							n_components,
+							restriction_is_additive))
 {};
 
 

@@ -19,9 +19,7 @@
  * are implemented here and do not have to be taken care of later.
  */
 template <int dim>
-class FEQ1Mapping
-  :
-  public FiniteElement<dim>
+class FEQ1Mapping : public FiniteElement<dim>
 {
   public:
 				     /**
@@ -33,10 +31,11 @@ class FEQ1Mapping
 				      * shall be zero.
 				      */
     FEQ1Mapping (const unsigned int dofs_per_vertex,
-		     const unsigned int dofs_per_line,
-		     const unsigned int dofs_per_quad=0,
-		     const unsigned int dofs_per_hex =0,
-		     const unsigned int n_components =1);
+		 const unsigned int dofs_per_line,
+		 const unsigned int dofs_per_quad  =0,
+		 const unsigned int dofs_per_hex   =0,
+		 const unsigned int n_components   =1,
+		 const bool restriction_is_additive=false);
 
     				     /**
 				      * Return the value of the #i#th shape

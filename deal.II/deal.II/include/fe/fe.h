@@ -100,15 +100,115 @@ class FiniteElementData
 
     
 				     /**
-				      * Number of components and dimension of the image space.
+				      * Number of components and dimension of
+				      * the image space.
 				      */
     const unsigned int n_components;
 
+				     /**
+				      * This flag determines how the restriction
+				      * of data from child cells to its mother
+				      * is to be done. In this, it also
+				      * determines in which way the restriction
+				      * matrices of the derived class are to
+				      * be used.
+				      *
+				      * For most elements, the mode is the
+				      * following. Consider a 1d linear element,
+				      * with two children and nodal values
+				      * 1 and 2 on the first child, and 2 and 4
+				      * on the second child. The restriction
+				      * to the mother child then yields the
+				      * values 1 and four, i.e. the values on
+				      * the mother cell can be obtained by
+				      * pointwise interpolation, where for each
+				      * nodal value on the mother child one
+				      * point on exactly one child exists.
+				      * However, already on the quadratic
+				      * element, the midpoint on the mother
+				      * element can be obtained from any of
+				      * the two children, which however would
+				      * both yield the same value due to
+				      * continuity. What we do in practice
+				      * is to compute them from both sides
+				      * and set them, rather than add them up.
+				      * This makes some things much easier. In
+				      * practice, if a degree of freedom on
+				      * one of the child cells yields a
+				      * nonzero contribution to one of the
+				      * degrees of freedom on the mother
+				      * cell, we overwrite the value on
+				      * the mother cell. This way, when setting
+				      * up the restriction matrices, we do not
+				      * have to track which child is responsible
+				      * for setting a given value on the mother
+				      * cell. We call this the non-additive
+				      * mode.
+				      *
+				      * The other possibility would be to
+				      * add up the contributions from the
+				      * different children. This would mean
+				      * that both of the inner endpoint of
+				      * the quadratic child elements above
+				      * would have a weight of 1/2 with
+				      * respect to the midpoint value on
+				      * the mother cell. However, this also
+				      * means that we have to first compute
+				      * the restriction to the mother cell
+				      * by addition from the child cells, and
+				      * afterwards set them to the global
+				      * vector. The same process, adding
+				      * up the local contributions to the
+				      * global vector is not possible since
+				      * we do not know how many coarse cells
+				      * contribute to nodes on the boundary.
+				      *
+				      * In contrast to the non-additive mode
+				      * described above, which is the simplest
+				      * way for elements can be interpolated
+				      * from its children, interpolation is
+				      * not possible for piecewise constant
+				      * elements, to name only one example.
+				      * Here, the value on the mother cell
+				      * has to be taken the average of the
+				      * values on the children, i.e. all
+				      * children contribute alike to the
+				      * one degree of freedom. Here, we have
+				      * to sum up the contributions of all
+				      * child cells with the same weight,
+				      * and the non-additive mode of above
+				      * would only set the value on the mother
+				      * cell to the value of one of the child
+				      * cell, irrespective of the values on the
+				      * other cells.
+				      *
+				      * Similarly, for discontinuous linear
+				      * elements, it might be better to not
+				      * interpolate the values at the corners
+				      * from the child cells, but to take a
+				      * better average, for example
+				      * interpolating at the centers of the
+				      * child cells; in that case, the
+				      * contributions of the child cells
+				      * have to be additive as well.
+				      *
+				      * Given these notes, the flag under
+				      * consideration has to be set to #false#
+				      * for the usual continuous Lagrange
+				      * elements, and #true# for the other
+				      * cases mentioned above. The main function
+				      * where it is used is
+				      * #DoFAccessor::get_interpolated_dof_values#.
+				      */
+    const bool restriction_is_additive;
+    
     				     /**
-				      * Default constructor. Constructs an element
+				      * Default constructor. Constructs
+				      * an element
 				      * which is not so useful. Checking
 				      * #total_dofs# is therefore a good way to
-				      * check if something went wrong.  */
+				      * check if something went wrong. 
+				      */
     FiniteElementData ();
 
 				     /**
@@ -118,7 +218,8 @@ class FiniteElementData
     FiniteElementData (const unsigned int dofs_per_vertex,
 		       const unsigned int dofs_per_line,
 		       const unsigned int n_transform_functions,
-		       const unsigned int n_components);
+		       const unsigned int n_components,
+		       const bool restriction_is_additive);
 
 				     /**
 				      * Constructor for a 2-dimensional
@@ -128,7 +229,8 @@ class FiniteElementData
 		       const unsigned int dofs_per_line,
 		       const unsigned int dofs_per_quad,
 		       const unsigned int n_transform_functions,
-		       const unsigned int n_components);
+		       const unsigned int n_components,
+		       const bool restriction_is_additive);
 
 				     /**
 				      * Constructor for a 3-dimensional
@@ -139,7 +241,8 @@ class FiniteElementData
 		       const unsigned int dofs_per_quad,
 		       const unsigned int dofs_per_hex,
 		       const unsigned int n_transform_functions,
-		       const unsigned int n_components);
+		       const unsigned int n_components,
+		       const bool restriction_is_additive);
 
 				     /**
 				      * Declare this destructor virtual in
@@ -251,7 +354,8 @@ class FiniteElementBase : public Subscriptor,
 					    unsigned int component_index) const;
   
 				     /**
-				      * Compute component and index from system index.
+				      * Compute component and index from
+				      * system index.
 				      *
 				      * Return value contains first
 				      * component and second index in

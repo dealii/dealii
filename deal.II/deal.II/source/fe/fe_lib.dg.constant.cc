@@ -10,37 +10,26 @@
 
 
 
-#if deal_II_dimension == 1
 
-template <>
-FEDG_Q0<1>::FEDG_Q0 () :
-		FEQ1Mapping<1> (0, 1)
+template <int dim>
+FEDG_Q0<dim>::FEDG_Q0 () :
+		FEQ1Mapping<dim> (0, 
+				  (dim==1 ? 1 : 0),
+				  (dim==2 ? 1 : 0),
+				  (dim==3 ? 1 : 0),
+				  1,
+				  true)
 {
-				   // for restriction and prolongation matrices:
-				   // note that we do not add up all the
-				   // contributions since then we would get
-				   // two summands per vertex in 1d (four
-				   // in 2d, etc), but only one per line dof.
-				   // We could accomplish for that by dividing
-				   // the vertex dof values by 2 (4, etc), but
-				   // would get into trouble at the boundary
-				   // of the domain since there only one
-				   // cell contributes to a vertex. Rather,
-				   // we do not add up the contributions but
-				   // set them right into the matrices!
-				   
-				   // The restriction matrices got crazy values
-				   // as it is yet not clear how they should work
-				   // in the DG(0) case. In general
-				   // the use of the restriction matrices
-				   // is not yet finally decided about, too.
-  restriction[0](0,0) = 1e8;
-  restriction[1](0,0) = 1e8;
-
-  prolongation[0](0,0) = 1.0;
-  prolongation[1](0,0) = 1.0;
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    { 
+      restriction[i](0,0) = 1./GeometryInfo<dim>::children_per_cell;
+      prolongation[i](0,0) = 1.0;
+    }
 };
 
+
+
+#if deal_II_dimension == 1
 
 
 template <>
@@ -51,40 +40,6 @@ FEDG_Q0<1>::get_face_support_points (const DoFHandler<1>::face_iterator &,
 };
 
 #endif
-
-
-
-
-#if deal_II_dimension == 2
-
-template <>
-FEDG_Q0<2>::FEDG_Q0 () :
-		FEQ1Mapping<2> (0, 0, 1)
-{
-				   // The restriction matrices got crazy values
-				   // as it is yet not clear how they should work
-				   // in the DG(0) case. In general
-				   // the use of the restriction matrices
-				   // is not yet finally decided about, too.
-  restriction[0](0,0) = 1e8;
-  restriction[1](0,0) = 1e8;
-  restriction[2](0,0) = 1e8;
-  restriction[3](0,0) = 1e8;
-
-  prolongation[0](0,0) = 1.0;
-
-  prolongation[1](0,0) = 1.0;
-
-  prolongation[2](0,0) = 1.0;
-
-  prolongation[3](0,0) = 1.0;
-};
-
-
-
-#endif
-
-
 
 
 template <int dim>

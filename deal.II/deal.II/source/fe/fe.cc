@@ -28,7 +28,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_quad,
 					   const unsigned int dofs_per_hex,
 					   const unsigned int n_transform_functions,
-					   const unsigned int n_components) :
+					   const unsigned int n_components,
+					   const bool restriction_is_additive) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
@@ -51,7 +52,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				      * dofs_per_line),
 		total_dofs (first_hex_index+dofs_per_hex),
 		n_transform_functions (n_transform_functions),
-		n_components(n_components)
+		n_components(n_components),
+		restriction_is_additive(restriction_is_additive)
 {
   Assert(dim==3, ExcDimensionMismatch(3,dim));
 };
@@ -63,7 +65,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
 					   const unsigned int dofs_per_quad,
 					   const unsigned int n_transform_functions,
-					   const unsigned int n_components) :
+					   const unsigned int n_components,
+					   const bool restriction_is_additive) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(dofs_per_quad),
@@ -82,7 +85,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				      * dofs_per_line),
 		total_dofs (first_quad_index+dofs_per_quad),
 		n_transform_functions (n_transform_functions),
-		n_components(n_components)
+		n_components(n_components),
+		restriction_is_additive(restriction_is_additive)
 {
   Assert(dim==2, ExcDimensionMismatch(2,dim));
 };
@@ -93,7 +97,8 @@ template <int dim>
 FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 					   const unsigned int dofs_per_line,
 					   const unsigned int n_transform_functions,
-					   const unsigned int n_components) :
+					   const unsigned int n_components,
+					   const bool restriction_is_additive) :
 		dofs_per_vertex(dofs_per_vertex),
 		dofs_per_line(dofs_per_line),
 		dofs_per_quad(0),
@@ -111,7 +116,8 @@ FiniteElementData<dim>::FiniteElementData (const unsigned int dofs_per_vertex,
 				      * dofs_per_line),
 		total_dofs (first_line_index+dofs_per_line),
 		n_transform_functions (n_transform_functions),
-		n_components(n_components)
+		n_components(n_components),
+		restriction_is_additive(restriction_is_additive)
 {
   Assert(dim==1, ExcDimensionMismatch(1,dim));
 };
@@ -133,7 +139,8 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 	  (dofs_per_quad == f.dofs_per_quad) &&
 	  (dofs_per_hex == f.dofs_per_hex) &&
 	  (n_transform_functions == f.n_transform_functions) &&
-	  (n_components == f.n_components));
+	  (n_components == f.n_components) &&
+	  (restriction_is_additive == f.restriction_is_additive));
 };
 
 
