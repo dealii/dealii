@@ -581,10 +581,6 @@ ConstraintMatrix::condense (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-                                   // check if there is anything to do at all
-  if (lines.size() == 0)
-    return;
-
                                    // distribute all entries, and set them to zero
   std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
   for (; constraint_line!=lines.end(); ++constraint_line)
@@ -605,22 +601,9 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-  if (lines.size() == 0)
-				     // nothing to do
-    return;
-  
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (unsigned int row=0; row<vec.size(); ++row)
-    if (row == next_constraint->line)
-      {
-					 // set entry to zero
-	vec(row) = 0.;
-	
-	++next_constraint;
-	if (next_constraint == lines.end())
-					   // nothing more to do
-	  break;
-      };
+  std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
+  for (; constraint_line!=lines.end(); ++constraint_line)
+    vec(constraint_line->line) = 0.;
 }
 
 
