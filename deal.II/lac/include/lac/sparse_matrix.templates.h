@@ -28,6 +28,7 @@ SparseMatrix<number>::SparseMatrix () :
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
+		Subscriptor(),
 		cols(0),
 		val(0),
 		max_len(0)
@@ -40,11 +41,11 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m) :
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c)
-		: cols(&c),
-		  val(0),
-		  max_len(0),
-		  is_ilu(false)
+SparseMatrix<number>::SparseMatrix (const SparseMatrixStruct &c) :
+		cols(&c),
+		val(0),
+		max_len(0),
+		is_ilu(false)
 {
   reinit();
 };
