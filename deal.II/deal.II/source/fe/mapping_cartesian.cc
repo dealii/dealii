@@ -211,9 +211,6 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 							  quadrature_points.size())
 	   ));
 
-//This assertion was nonsense, since we let npts = quadrature_points.size() above
-//      Assert (quadrature_points.size() == npts,
-//	      ExcDimensionMismatch(quadrature_points.size(), npts));
       for (unsigned int i=0; i<quadrature_points.size(); ++i)
 	{
 	  quadrature_points[i] = start;
@@ -233,11 +230,6 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
 				   // value
   if (update_flags & update_normal_vectors)
     {
-// We would like to have an assertion like this, but if
-// we do not compute quadrature points, npts is zero.
-      
-//      Assert (normal_vectors.size() == npts,
-//	      ExcDimensionMismatch(normal_vectors.size(), npts));
       Assert (face_no < GeometryInfo<dim>::faces_per_cell,
               ExcInternalError());
       
@@ -278,6 +270,7 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
         }
     }
 }
+
 
 
 template <int dim>
