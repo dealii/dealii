@@ -437,4 +437,8 @@ const unsigned int
 FE_Q<3>::Matrices::n_constraint_matrices = 2;
 
 
+#else // #if deal_II_dimension
+// On gcc2.95 on Alpha OSF1, the native assembler does not like empty
+// files, so provide some dummy code
+namespace { void dummy () {}; };
 #endif // #if deal_II_dimension == 3

@@ -411,4 +411,8 @@ const double * const FE_DGQ<3>::Matrices::projection_matrices[] =
 const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices = 5;
 
 
+#else // #if deal_II_dimension
+// On gcc2.95 on Alpha OSF1, the native assembler does not like empty
+// files, so provide some dummy code
+namespace { void dummy () {}; };
 #endif // #if deal_II_dimension == 3
