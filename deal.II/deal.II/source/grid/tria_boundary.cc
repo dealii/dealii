@@ -12,6 +12,7 @@
 //----------------------------  tria_boundary.cc  ---------------------------
 
 
+#include <base/tensor.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
@@ -237,8 +238,8 @@ get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
 template <>
 void
 StraightBoundary<3>::
-get_tangents_at_vertices (const Triangulation<3>::face_iterator &face,
-			  Boundary<3>::FaceVertexTangents &face_vertex_tangents) const
+get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
+			 Boundary<3>::FaceVertexNormals &face_vertex_normals) const
 {
   const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face;
   
