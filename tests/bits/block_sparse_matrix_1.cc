@@ -55,8 +55,6 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  BlockSparseMatrix<double> B;
-
   Triangulation<2> tria;  
   GridGenerator::hyper_cube (tria,0,1);
   tria.refine_global (1);
@@ -93,6 +91,7 @@ int main()
   sparsity_pattern.block(1,1).add (0,0);
   sparsity_pattern.compress ();
   
+  BlockSparseMatrix<double> B;
   B.reinit (sparsity_pattern);  
   
   QGauss<2> qr (2); 
