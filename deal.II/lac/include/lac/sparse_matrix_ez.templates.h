@@ -1,3 +1,19 @@
+//----------------------------  sparse_matrix_ez.templates.h  ---------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2002, 2003 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_matrix_ez.templates.h  ---------------------------
+#ifndef __deal2__sparse_matrix_ez_templates_h
+#define __deal2__sparse_matrix_ez_templates_h
+
+
 #include <lac/sparse_matrix_ez.h>
 #include <lac/vector.h>
 
@@ -340,3 +356,6 @@ SparseMatrixEZ<number>::memory_consumption() const
     + sizeof(unsigned int) * row_info.capacity()
     + sizeof(typename SparseMatrixEZ<number>::Entry) * data.capacity();
 }
+
+
+#endif // __deal2__sparse_matrix_ez_templates_h
