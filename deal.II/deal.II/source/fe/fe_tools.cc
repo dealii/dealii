@@ -16,7 +16,6 @@
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
 #include <grid/tria.h>
-#include <grid/grid_generator.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe_tools.h>
 #include <fe/fe.h>
