@@ -21,9 +21,9 @@ std::string output_file_name = "data_out_faces_01.output";
 
 
 void
-check_this (const DoFHandler<1>   &dof_handler,
-            const Vector<double>  &v_node,
-            const Vector<double>  &v_cell)
+check_this (const DoFHandler<1>   &,
+            const Vector<double>  &,
+            const Vector<double>  &)
 {
                                    // nothing to check in 1d
 }
