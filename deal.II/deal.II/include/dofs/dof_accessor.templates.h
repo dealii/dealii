@@ -15,7 +15,6 @@
 #include <dofs/dof_levels.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
-#include <fe/fe.h>
 
 #include <vector>
 
