@@ -1164,7 +1164,12 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
   if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
       accessor.a_index = 0;
-      accessor.a_row++;
+      do
+	{
+	  ++accessor.a_row;
+	}
+      while (accessor.a_row < accessor.matrix->m()
+	     && accessor.column() == SparseMatrixEZ<number>::Entry::invalid);
     }
   return *this;
 }
