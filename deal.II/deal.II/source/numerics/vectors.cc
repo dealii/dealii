@@ -75,11 +75,12 @@ void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
 			      const FiniteElement<1> &,
 			      const Quadrature<1>    &,
-			      const Quadrature<0>    &,
 			      const Boundary<1>      &,
 			      const Function<1>      &,
+			      dVector                &,
 			      const bool              ,
-			      dVector                &) {
+			      const Quadrature<0>    &,
+			      const bool              ) {
 				   // this function should easily be implemented
 				   // using the template below. However some
 				   // changes have to be made since faces don't
@@ -97,28 +98,19 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 				const ConstraintMatrix   &constraints,
 				const FiniteElement<dim> &fe,
 				const Quadrature<dim>    &q,
-				const Quadrature<dim-1>  &q_boundary,
 				const Boundary<dim>      &boundary,
 				const Function<dim>      &function,
-				const bool                has_zero_boundary,
-				dVector                  &vec) {
+				dVector                  &vec,
+				const bool                enforce_zero_boundary,
+				const Quadrature<dim-1>  &q_boundary,
+				const bool                project_to_boundary_first) {
   				   // make up boundary values
   map<int,double> boundary_values;
 
-  if (has_zero_boundary == false) 
-    {
-				       // set up a list of boundary functions for
-				       // the different boundary parts. We want the
-				       // #function# to hold on all parts of the
-				       // boundary
-      FunctionMap boundary_functions;
-      for (unsigned char c=0; c<255; ++c)
-	boundary_functions[c] = &function;
-      project_boundary_values (dof, boundary_functions, fe, q_boundary,
-			       boundary, boundary_values);
-    }
-  else
-				     // no need to project boundary values
+  if (enforce_zero_boundary == true) 
+				     // no need to project boundary values, but
+				     // enforce homogeneous boundary values
+				     // anyway
     {
       DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
 					    endf = dof.end_face();
@@ -131,7 +123,23 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 					     // for all boundary nodes
 	    boundary_values[face_dof_indices[i]] = 0.;
 	};
-    };
+    }
+  else
+				     // no homogeneous boundary values
+    if (project_to_boundary_first == true)
+				       // boundary projection required
+      {
+					 // set up a list of boundary functions for
+					 // the different boundary parts. We want the
+					 // #function# to hold on all parts of the
+					 // boundary
+	FunctionMap boundary_functions;
+	for (unsigned char c=0; c<255; ++c)
+	  boundary_functions[c] = &function;
+	project_boundary_values (dof, boundary_functions, fe, q_boundary,
+				 boundary, boundary_values);
+      };
+
   
       
 				   // set up mass matrix and right hand side

@@ -12,6 +12,7 @@
 template <int dim> class DoFHandler;
 template <int dim> class Function;
 template <int dim> class Quadrature;
+template <int dim> class QGauss2;
 template <int dim> class FiniteElement;
 template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
@@ -82,22 +83,43 @@ enum NormType {
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
  *   the projection.
  *
- *   In order to get proper results, it is necessary to treat boundary
- *   conditions right. This is done by $L_2$-projection of the trace of the
+ *   In order to get proper results, it may necessary to treat boundary
+ *   conditions right. Below are listed some cases wher this may be needed.
+ *   If needed, this is done by $L_2$-projection of the trace of the
  *   given function onto the finite element space restricted to the boundary
  *   of the domain, then taking this information and using it to eliminate
  *   the boundary nodes from the mass matrix of the whole domain, using the
  *   #MatrixTools::apply_boundary_values# function. The projection of the
  *   trace of the function to the boundary is done with the
- *   #VectorTools::project_boundary_values# (see below) function. You may
- *   specify a flag telling the projection that the function has zero boundary
- *   values, in which case the $L_2$-projection onto the boundary is not
- *   needed. If it is needed, the #VectorTools::project_boundary_values# is
- *   called with a map of boundary functions of which all boundary indicators
+ *   #VectorTools::project_boundary_values# (see below) function, which is
+ *   called with a map of boundary functions in which all boundary indicators
  *   from zero to 254 (255 is used for other purposes, see the #Triangulation#
  *   class documentation) point to the function to be projected. The projection
  *   to the boundary takes place using a second quadrature formula given to
  *   the #project# function.
+ *
+ *   The projection of the boundary values first, then eliminating them from
+ *   the global system of equations is not needed usually. It may be necessary
+ *   if you want to enforce special restrictions on the boundary values of the
+ *   projected function, for example in time dependant problems: you may want
+ *   to project the initial values but need consistency with the boundary
+ *   values for later times. Since the latter are projected onto the boundary
+ *   in each time step, it is necessary that we also project the boundary
+ *   values of the initial values, before projecting them to the whole domain.
+ *
+ *   The selection whether the projection to the boundary first is needed is
+ *   done with the #project_to_boundary_first# flag passed to the function.
+ *   If #false# is given, the additional quadrature formula for faces is
+ *   ignored.
+ *
+ *   You should be aware of the fact that if no projection is to the boundary
+ *   is requested, a function with zero boundary values may not have zero
+ *   boundary values after projection. There is a flag for this especially
+ *   important case, which tells the function to enforce zero boundary values
+ *   on the respective boundary parts. Since enforced zero boundary values
+ *   could also have been reached through projection, but are more economically
+ *   obtain using other methods, the #project_to_boundary_first# flag is
+ *   ignored if the #enforce_zero_boundary# flag is set.
  *
  *   The solution of the linear system is presently done using a simple CG
  *   method without preconditioning and without multigrid. This is clearly not
@@ -241,6 +263,15 @@ class VectorTools {
 				      * Compute the projection of
 				      * #function# to the finite element space.
 				      *
+				      * By default, projection to the boundary
+				      * and enforcement of zero boundary values
+				      * are disabled. The ordering of arguments
+				      * to this function is such that you need
+				      * not give a second quadrature formula if
+				      * you don't want to project to the
+				      * boundary first, but that you must if you
+				      * want to do so.
+				      *
 				      * See the general documentation of this
 				      * class for further information.
 				      */
@@ -248,11 +279,12 @@ class VectorTools {
 			 const ConstraintMatrix   &constraints,
 			 const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &q,
-			 const Quadrature<dim-1>  &q_boundary,
 			 const Boundary<dim>      &boundary,
 			 const Function<dim>      &function,
-			 const bool                has_zero_boundary,
-			 dVector                  &vec);
+			 dVector                  &vec,
+			 const bool                enforce_zero_boundary = false,
+			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim>(),
+			 const bool                project_to_boundary_first = false);
 
 				     /**
 				      * Make up the list of node subject
