@@ -27,6 +27,15 @@ template <typename number> class Vector;
 
 template <int dim> class DoFHandler;
 
+template <int celldim, int dim> class DoFObjectAccessor;
+template <int dim>              class DoFObjectAccessor<0, dim>;
+template <int dim>              class DoFObjectAccessor<1, dim>;
+template <int dim>              class DoFObjectAccessor<2, dim>;
+template <int dim>              class DoFObjectAccessor<3, dim>;
+
+
+
+
 // note: the file dof_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates and thus makes
 // compilation slower, but at the same time allows for more aggressive

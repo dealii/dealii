@@ -25,7 +25,11 @@
 
 template <int dim> class DoFCellAccessor;
 template <int dim> class DoFLevel;
-template<int celldim, int dim> class DoFObjectAccessor;
+template <int celldim, int dim> class DoFObjectAccessor;
+template <int dim>              class DoFObjectAccessor<0, dim>;
+template <int dim>              class DoFObjectAccessor<1, dim>;
+template <int dim>              class DoFObjectAccessor<2, dim>;
+template <int dim>              class DoFObjectAccessor<3, dim>;
 template <int dim> class FiniteElement;
 template <int dim, typename Accessor> class TriaRawIterator;
 template <int dim, typename Accessor> class TriaIterator;
