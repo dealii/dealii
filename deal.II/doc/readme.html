@@ -275,7 +275,7 @@
     After `make' has finished, you will have two sets of
     libraries. The first consists of the files
     <ul>
-      <li> <p><code>base/lib/libbase.a</code>: The library containing the
+      <li> <p><code>lib/libbase.a</code>: The library containing the
       code of the classes in the <code>/base</code> directory. These
       are mostly helper classes (such as output of various data in
       different data formats), and classes of general numerical
@@ -283,13 +283,13 @@
       etc.), but not very specifically about finite elements.
       </p>
 
-      <li> <p><code>lac/lib/liblac.a</code>: <code>lac</code> is the
+      <li> <p><code>lib/liblac.a</code>: <code>lac</code> is the
       acronym for <i>L</i>inear <i>A</i>lgebra <i>C</i>lasses. This
       library contains classes representing vectors, matrices, sparse
       matrices, linear solvers, and the like.
       </p>
 
-      <li> <p><code>deal.II/lib/libdeal_II_2d.a</code>: This is the
+      <li> <p><code>lib/libdeal_II_2d.a</code>: This is the
       library containing all the classes representing finite element
       methods, such as grid handling, different finite elements,
       etc. Thus suffix <code>_2d</code> obviously indicates that this
@@ -348,6 +348,8 @@
       they run stable and are used in production mode.
       </p>
     </ul>
+    If shared libraries were built instead of static ones, then the
+    suffix <code>.a</code> is replaced by <code>.so</code>
     </p>
 
     <p>
