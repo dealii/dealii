@@ -1,8 +1,7 @@
 ############################################################
-# Directory with the DEAL distribution
+# $D contains the root of the deal distribution and should
+# be supplied as a command line argument D=../../...
 ############################################################
-
-D = ../../deal.II
 
 
 ############################################################

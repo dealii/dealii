@@ -1,0 +1,26 @@
+dnl $Id$
+dnl
+dnl configure script to find the main deal library
+dnl in .. or ../deal.II or ../deal
+dnl
+
+define([AC_CACHE_LOAD], )dnl
+define([AC_CACHE_SAVE], )dnl
+AC_INIT(base)
+
+dnl Supply deal-directory in command line or find it
+AC_ARG_WITH(deal,
+[  --with-deal=DIR DIR is the root of the deal.II library],
+    DEAL2_DIR=$withval,
+    if test -r ../common/Make.global_options ; then
+      DEAL2_DIR=`pwd`/.. ;
+    fi
+    if test -r ../deal.II/common/Make.global_options ; then
+      DEAL2_DIR=`pwd`/../deal.II ;
+    fi
+    if test -r ../deal/common/Make.global_options ; then
+      DEAL2_DIR=`pwd`/../deal ;
+    fi)
+AC_SUBST(DEAL2_DIR)
+
+AC_OUTPUT(Makefile)
