@@ -466,27 +466,44 @@ void PoissonProblem<dim>::run (ParameterHandler &prm) {
 
   cout << "    Writing to file <" << prm.get("Output file") << ">..."
        << endl;
-  
-  cout << "    Calculation L2 error... ";
-  Solution<dim> sol;
-  vector<double> difference;
-  QGauss3<dim> q;
-  integrate_difference (sol, difference, q, fe, L2_norm);
-  double error = 0.;
-  for (unsigned int i=0; i<difference.size(); ++i)
-    error += difference[i]*difference[i];
-  cout << sqrt(error) << " on " << difference.size() << " cells." << endl;
 
-  dVector error_per_dof;
-  dof->distribute_cell_to_dof_vector (difference, error_per_dof);
+  Solution<dim> sol;
+  dVector       l1_error_per_cell, l2_error_per_cell, linfty_error_per_cell;
+  QGauss4<dim>  q;
+  
+  cout << "    Calculating L1 error... ";
+  integrate_difference (sol, l1_error_per_cell, q, fe, L1_norm);
+  cout << l1_error_per_cell.l1_norm() << endl;
+
+  cout << "    Calculating L2 error... ";
+  integrate_difference (sol, l2_error_per_cell, q, fe, L2_norm);
+  cout << l2_error_per_cell.l2_norm() << endl;
+
+  cout << "    Calculating L-infinity error... ";
+  integrate_difference (sol, linfty_error_per_cell, q, fe, Linfty_norm);
+  cout << linfty_error_per_cell.linfty_norm() << endl;
+
+  dVector l1_error_per_dof, l2_error_per_dof, linfty_error_per_dof;
+  dof->distribute_cell_to_dof_vector (l1_error_per_cell, l1_error_per_dof);
+  dof->distribute_cell_to_dof_vector (l2_error_per_cell, l2_error_per_dof);
+  dof->distribute_cell_to_dof_vector (linfty_error_per_cell, linfty_error_per_dof);
 
   DataOut<dim> out;
   String o_filename = prm.get ("Output file");
   ofstream gnuplot(o_filename);
   fill_data (out);
-  out.add_data_vector (error_per_dof, "Error");
+  out.add_data_vector (l1_error_per_dof, "L1-Error");
+  out.add_data_vector (l2_error_per_dof, "L2-Error");
+  out.add_data_vector (linfty_error_per_dof, "L3-Error");
   out.write_gnuplot (gnuplot);
   gnuplot.close ();
+
+  cout << "Errors: "
+       << dof->n_dofs() << "    "
+       << l1_error_per_cell.l1_norm() << " "
+       << l2_error_per_cell.l2_norm() << " "
+       << linfty_error_per_cell.linfty_norm() << endl;
+    
 
 
   cout << endl;
