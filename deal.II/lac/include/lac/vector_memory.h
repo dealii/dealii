@@ -291,9 +291,11 @@ GrowingVectorMemory<VECTOR>::memory_consumption () const
   unsigned int result = sizeof (*this);
   const typename std::vector<entry_type>::const_iterator
     end = pool.end();
-  for (typename std::vector<entry_type>::const_iterator i = pool.begin()
-						     ; i != end ; ++i)
+  for (typename std::vector<entry_type>::const_iterator
+         i = pool.begin(); i != end ; ++i)
     result += sizeof (*i) + i->second->memory_consumption();
+
+  return result;
 }
 
 #endif
