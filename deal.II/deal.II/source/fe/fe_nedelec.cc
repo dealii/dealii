@@ -18,6 +18,7 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/mapping.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_values.h>
 
@@ -1096,7 +1097,9 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
     }
 
   if (flags & update_second_derivatives)
-    this->compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell,
+                       internal::DataSetDescriptor<dim>::cell().offset(),
+                       mapping_data, fe_data, data);
 }
 
 
@@ -1120,7 +1123,10 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                    // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
-  const unsigned int offset = face * quadrature.n_quadrature_points;
+  const unsigned int offset
+    = (internal::DataSetDescriptor<dim>::
+       face (cell, face,
+             quadrature.n_quadrature_points)).offset();
 
   				   // get the flags indicating the
 				   // fields that have to be filled
@@ -1141,8 +1147,12 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
 				   // number of conversions
   if (flags & update_values)
     {
+                                       // check size of array. in 3d,
+                                       // we have faces oriented both
+                                       // ways
       Assert (fe_data.shape_values.n_cols() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              GeometryInfo<dim>::faces_per_cell * n_q_points *
+              (dim == 3 ? 2 : 1),
               ExcInternalError());
       
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
@@ -1171,8 +1181,12 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
       
   if (flags & update_gradients)
     {
+                                       // check size of array. in 3d,
+                                       // we have faces oriented both
+                                       // ways
       Assert (fe_data.shape_gradients.n_cols() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points,
+              GeometryInfo<dim>::faces_per_cell * n_q_points *
+              (dim == 3 ? 2 : 1),
               ExcInternalError());
 
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
@@ -1259,8 +1273,10 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
                                    // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
-  const unsigned int offset = ((face * GeometryInfo<dim>::subfaces_per_face + subface)
-                               * quadrature.n_quadrature_points);
+  const unsigned int offset
+    = (internal::DataSetDescriptor<dim>::
+       sub_face (cell, face, subface,
+                 quadrature.n_quadrature_points)).offset();
 
   				   // get the flags indicating the
 				   // fields that have to be filled
