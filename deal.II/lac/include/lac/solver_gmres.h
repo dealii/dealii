@@ -143,6 +143,14 @@ class SolverGMRES : public Subscriptor, private Solver<VECTOR>
     void givens_rotation (Vector<double> &h,  Vector<double> &b,
 			  Vector<double> &ci, Vector<double> &si,
 			  int col) const;
+				   /**
+				    * Projected system matrix
+				    */
+  FullMatrix<double> H;
+				   /**
+				    * Auxiliary matrix for inverting @p{H}
+				    */
+  FullMatrix<double> H1;
 };
 
 
@@ -207,7 +215,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX& A,
 //TODO:[?] Allocate vectors only when needed.
 
   deallog.push("GMRES");
-
+  
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
 				   // allocate an array of n_tmp_vectors
@@ -233,7 +241,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX& A,
   
 				   // matrix used for the orthogonalization
 				   // process later
-  FullMatrix<double> H(n_tmp_vectors, n_tmp_vectors-1);
+  H.reinit(n_tmp_vectors, n_tmp_vectors-1);
 
 				   // some additional vectors, also used
 				   // in the orthogonalization
@@ -279,7 +287,7 @@ unsigned int dim = 0;
 	  A.vmult(v,x);
 	  v.sadd(-1.,1.,b);
 	};
- 
+
       double rho = v.l2_norm();
 
 				       // check the residual here as
@@ -365,7 +373,7 @@ unsigned int dim = 0;
 				       // calculate the solution from the
 				       // temporary vectors
       h.reinit(dim);
-      FullMatrix<double> H1(dim+1,dim);
+      H1.reinit(dim+1,dim);
 
       for (unsigned int i=0; i<dim+1; ++i)
 	for (unsigned int j=0; j<dim; ++j)
@@ -384,7 +392,6 @@ unsigned int dim = 0;
 	  precondition.vmult(v,p);
 	  x.add(1.,v);
 	};
-
 				       // end of outer iteration. restart if
 				       // no convergence and the number of
 				       // iterations is not exceeded
