@@ -51,7 +51,7 @@ double Timer::operator() () const
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
 
-      return dtime + full_time();
+      return dtime - start_time + full_time();
     }
   else
     return full_time();
