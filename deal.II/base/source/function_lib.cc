@@ -60,7 +60,7 @@ SquareFunction<dim>::value_list (const vector<Point<dim> > &points,
 template<int dim>
 double
 SquareFunction<dim>::laplacian (const Point<dim>   &,
-			    const unsigned int) const
+				const unsigned int) const
 {
   return 2*dim;
 }
@@ -161,7 +161,7 @@ PillowFunction<dim>::value_list (const vector<Point<dim> > &points,
 template<int dim>
 double
 PillowFunction<dim>::laplacian (const Point<dim>   &p,
-			    const unsigned int) const
+				const unsigned int) const
 {
   switch(dim)
     {
@@ -171,8 +171,8 @@ PillowFunction<dim>::laplacian (const Point<dim>   &p,
 	    return -2.*((1.-p(0)*p(0))+(1.-p(1)*p(1)));
       case 3:
 	    return -2.*((1.-p(0)*p(0))*(1.-p(1)*p(1))
-		       +(1.-p(1)*p(1))*(1.-p(2)*p(2))
-		       +(1.-p(2)*p(2))*(1.-p(0)*p(0)));
+			+(1.-p(1)*p(1))*(1.-p(2)*p(2))
+			+(1.-p(2)*p(2))*(1.-p(0)*p(0)));
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -321,7 +321,7 @@ CosineFunction<dim>::value_list (const vector<Point<dim> > &points,
 template<int dim>
 double
 CosineFunction<dim>::laplacian (const Point<dim>   &p,
-			    const unsigned int) const
+				const unsigned int) const
 {
   switch(dim)
     {
@@ -429,7 +429,7 @@ CosineFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 template<int dim>
 double
 ExpFunction<dim>::value (const Point<dim>   &p,
-			    const unsigned int) const
+			 const unsigned int) const
 {
   switch(dim)
     {
@@ -448,8 +448,8 @@ ExpFunction<dim>::value (const Point<dim>   &p,
 template<int dim>
 void
 ExpFunction<dim>::value_list (const vector<Point<dim> > &points,
-				 vector<double>            &values,
-				 const unsigned int) const
+			      vector<double>            &values,
+			      const unsigned int) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -477,7 +477,7 @@ ExpFunction<dim>::value_list (const vector<Point<dim> > &points,
 template<int dim>
 double
 ExpFunction<dim>::laplacian (const Point<dim>   &p,
-			    const unsigned int) const
+			     const unsigned int) const
 {
   switch(dim)
     {
@@ -496,8 +496,8 @@ ExpFunction<dim>::laplacian (const Point<dim>   &p,
 template<int dim>
 void
 ExpFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
-				     vector<double>            &values,
-				     const unsigned int) const
+				  vector<double>            &values,
+				  const unsigned int) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -525,7 +525,7 @@ ExpFunction<dim>::laplacian_list (const vector<Point<dim> > &points,
 template<int dim>
 Tensor<1,dim>
 ExpFunction<dim>::gradient (const Point<dim>   &p,
-			       const unsigned int) const
+			    const unsigned int) const
 {
   Tensor<1,dim> result;
   switch(dim)
@@ -551,8 +551,8 @@ ExpFunction<dim>::gradient (const Point<dim>   &p,
 template<int dim>
 void
 ExpFunction<dim>::gradient_list (const vector<Point<dim> > &points,
-				    vector<Tensor<1,dim> >    &gradients,
-				    const unsigned int) const
+				 vector<Tensor<1,dim> >    &gradients,
+				 const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -585,7 +585,7 @@ ExpFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 
 double
 LSingularityFunction::value (const Point<2>   &p,
-			    const unsigned int) const
+			     const unsigned int) const
 {
   double x = p(0);
   double y = p(1);
@@ -602,8 +602,8 @@ LSingularityFunction::value (const Point<2>   &p,
 
 void
 LSingularityFunction::value_list (const vector<Point<2> > &points,
-				 vector<double>            &values,
-				 const unsigned int) const
+				  vector<double>            &values,
+				  const unsigned int) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -628,7 +628,7 @@ LSingularityFunction::value_list (const vector<Point<2> > &points,
 
 double
 LSingularityFunction::laplacian (const Point<2>   &,
-			    const unsigned int) const
+				 const unsigned int) const
 {
   return 0.;
 }
@@ -636,8 +636,8 @@ LSingularityFunction::laplacian (const Point<2>   &,
 
 void
 LSingularityFunction::laplacian_list (const vector<Point<2> > &points,
-				     vector<double>            &values,
-				     const unsigned int) const
+				      vector<double>            &values,
+				      const unsigned int) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -651,7 +651,7 @@ LSingularityFunction::laplacian_list (const vector<Point<2> > &points,
 
 Tensor<1,2>
 LSingularityFunction::gradient (const Point<2>   &p,
-			       const unsigned int) const
+				const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
   double x = p(0);
@@ -673,8 +673,8 @@ LSingularityFunction::gradient (const Point<2>   &p,
 
 void
 LSingularityFunction::gradient_list (const vector<Point<2> > &points,
-				    vector<Tensor<1,2> >    &gradients,
-				    const unsigned int) const
+				     vector<Tensor<1,2> >    &gradients,
+				     const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -686,7 +686,7 @@ LSingularityFunction::gradient_list (const vector<Point<2> > &points,
 
 double
 SlitSingularityFunction::value (const Point<2>   &p,
-			    const unsigned int) const
+				const unsigned int) const
 {
   double x = p(0);
   double y = p(1);
@@ -700,8 +700,8 @@ SlitSingularityFunction::value (const Point<2>   &p,
 
 void
 SlitSingularityFunction::value_list (const vector<Point<2> > &points,
-				 vector<double>            &values,
-				 const unsigned int) const
+				     vector<double>            &values,
+				     const unsigned int) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -721,7 +721,7 @@ SlitSingularityFunction::value_list (const vector<Point<2> > &points,
 
 double
 SlitSingularityFunction::laplacian (const Point<2>   &,
-			    const unsigned int) const
+				    const unsigned int) const
 {
   return 0.;
 }
@@ -729,8 +729,8 @@ SlitSingularityFunction::laplacian (const Point<2>   &,
 
 void
 SlitSingularityFunction::laplacian_list (const vector<Point<2> > &points,
-				     vector<double>            &values,
-				     const unsigned int) const
+					 vector<double>            &values,
+					 const unsigned int) const
 {
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
@@ -744,7 +744,7 @@ SlitSingularityFunction::laplacian_list (const vector<Point<2> > &points,
 
 Tensor<1,2>
 SlitSingularityFunction::gradient (const Point<2>   &/*p*/,
-			       const unsigned int) const
+				   const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
   return Tensor<1,2>();
@@ -753,8 +753,8 @@ SlitSingularityFunction::gradient (const Point<2>   &/*p*/,
 
 void
 SlitSingularityFunction::gradient_list (const vector<Point<2> > &points,
-				    vector<Tensor<1,2> >    &gradients,
-				    const unsigned int) const
+					vector<Tensor<1,2> >    &gradients,
+					const unsigned int) const
 {
   Assert (gradients.size() == points.size(),
 	  ExcDimensionMismatch(gradients.size(), points.size()));
@@ -764,8 +764,8 @@ SlitSingularityFunction::gradient_list (const vector<Point<2> > &points,
 //////////////////////////////////////////////////////////////////////
 
 template<int dim>
-JumpFunction<dim>::JumpFunction(const Point<dim>& direction,
-				double steepness)
+JumpFunction<dim>::JumpFunction(const Point<dim> &direction,
+				const double      steepness)
 		:
 		direction(direction),
 		steepness(steepness)
@@ -790,7 +790,7 @@ JumpFunction<dim>::JumpFunction(const Point<dim>& direction,
 template<int dim>
 double
 JumpFunction<dim>::value (const Point<dim>   &p,
-			    const unsigned int) const
+			  const unsigned int) const
 {
   double x = steepness*(cosine*p(0)+sine*p(1));
   return -atan(x);
@@ -801,8 +801,8 @@ JumpFunction<dim>::value (const Point<dim>   &p,
 template<int dim>
 void
 JumpFunction<dim>::value_list (const vector<Point<dim> > &p,
-				 vector<double>          &values,
-				 const unsigned int) const
+			       vector<double>          &values,
+			       const unsigned int) const
 {
   Assert (values.size() == p.size(),
 	  ExcDimensionMismatch(values.size(), p.size()));
@@ -818,7 +818,7 @@ JumpFunction<dim>::value_list (const vector<Point<dim> > &p,
 template<int dim>
 double
 JumpFunction<dim>::laplacian (const Point<dim>   &p,
-			    const unsigned int) const
+			      const unsigned int) const
 {
   double x = steepness*(cosine*p(0)+sine*p(1));
   double r = 1+x*x;
@@ -829,8 +829,8 @@ JumpFunction<dim>::laplacian (const Point<dim>   &p,
 template<int dim>
 void
 JumpFunction<dim>::laplacian_list (const vector<Point<dim> > &p,
-				     vector<double>          &values,
-				     const unsigned int) const
+				   vector<double>          &values,
+				   const unsigned int) const
 {
   Assert (values.size() == p.size(),
 	  ExcDimensionMismatch(values.size(), p.size()));
@@ -850,7 +850,7 @@ JumpFunction<dim>::laplacian_list (const vector<Point<dim> > &p,
 template<int dim>
 Tensor<1,dim>
 JumpFunction<dim>::gradient (const Point<dim>   &p,
-			       const unsigned int) const
+			     const unsigned int) const
 {
   double x = steepness*(cosine*p(0)+sine*p(1));
   double r = -steepness*(1+x*x);
@@ -865,8 +865,8 @@ JumpFunction<dim>::gradient (const Point<dim>   &p,
 template<int dim>
 void
 JumpFunction<dim>::gradient_list (const vector<Point<dim> > &p,
-				    vector<Tensor<1,dim> >  &gradients,
-				    const unsigned int) const
+				  vector<Tensor<1,dim> >  &gradients,
+				  const unsigned int) const
 {
   Assert (gradients.size() == p.size(),
 	  ExcDimensionMismatch(gradients.size(), p.size()));
