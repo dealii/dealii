@@ -58,7 +58,7 @@ template <int dim> class Quadrature;
    this variable.
 
 
-   {\bf Definitions}
+   \subsection{Definitions}
 
    The Jacobian matrix is defined to be
    $$ J_{ij} = {d\xi_i \over dx_j} $$
@@ -80,7 +80,7 @@ template <int dim> class Quadrature;
    Jacobi matrix to get the scaling of the surface element $do$.
 
    
-   {\bf Member functions}
+   \subsection{Member functions}
 
    The functions of this class fall into different cathegories:
    \begin{itemize}
@@ -124,7 +124,7 @@ template <int dim> class Quadrature;
   \end{itemize}
 
 
-  {\bf Implementational issues}
+  \subsection{Implementational issues}
 
   The #FEValues# object keeps track of those fields which really need to
   be computed, since the computation of the gradients of the ansatz functions
@@ -589,7 +589,7 @@ class FEValues : public FEValuesBase<dim> {
    those common concepts here, rather than in the derived classes.
 
 
-   {\bf Technical issues}
+   \subsection{Technical issues}
 
    The unit face is defined to be the tensor product of the interval $[0,1]$
    in the present number of dimensions minus one. In part of the literature,
@@ -881,7 +881,7 @@ class FEFaceValues : public FEFaceValuesBase<dim> {
   function's gradient across cell boundaries is computed.
 
 
-  {\bf Other implementational subjects}
+  \subsection{Other implementational subjects}
 
   It does not seem useful to ask for the off-points of the ansatz functions
   (name #ansatz_points# in the #FEValuesBase# class) for subfaces. These are

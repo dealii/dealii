@@ -340,7 +340,7 @@ struct FiniteElementBase : public FiniteElementData<dim> {
   implementation.
 
 
-  {\bf Finite Elements in one dimension}
+  \subsection{Finite Elements in one dimension}
 
   Finite elements in one dimension need only set the #restriction# and
   #prolongation# matrices in #FiniteElementBase<1>#. The constructor of
@@ -350,7 +350,7 @@ struct FiniteElementBase : public FiniteElementData<dim> {
   in terrible trouble.
   
   
-  {\bf Finite elements in two dimensions}
+  \subsection{Finite elements in two dimensions}
   
   In addition to the fields already present in 1D, a constraint matrix
   is needed in case two quads meet at a common line of which one is refined

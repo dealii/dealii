@@ -39,7 +39,7 @@ class dVector;
    can be used to feed the #Triangulation<dim>::refine_*# functions.
 
    
-   {\bf Implementation}
+   \subsection{Implementation}
 
    In principle, the implementation of the error estimation is simple: let
    $$ \eta_K^2 =
@@ -76,7 +76,7 @@ class dVector;
    the diameter of the cell.
    
 
-   {\bf Boundary values}
+   \subsection{Boundary values}
    
    If the face is at the boundary, i.e. there is no neighboring cell to which
    the jump in the gradiend could be computed, there are two possibilities:
@@ -110,7 +110,7 @@ class dVector;
    conditions.
 
    
-   {\bf Handling of hanging nodes}
+   \subsection{Handling of hanging nodes}
    
    The integration along faces with hanging nodes is quite tricky, since one
    of the elements has to be shifted one level up or down. See the

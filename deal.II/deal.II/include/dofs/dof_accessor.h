@@ -111,7 +111,7 @@ class DoFAccessor {
   lines in 1D-, 2D-, etc dimensions).
 
 
-  {\bf Usage}
+  \subsection{Usage}
 
   The \Ref{DoFDimensionInfo} classes inherited by the \Ref{DoFHandler} classes
   declare typedefs to iterators using the accessors declared in this class
@@ -120,7 +120,7 @@ class DoFAccessor {
   as they provide easier typing (much less complicated names!).
   
   
-  {\bf Notes about the class hierarchy structure}
+  \subsection{Notes about the class hierarchy structure}
 
   The class hierarchy seems to be a bit confused here. The reason for this is
   that we would really like to derive a #DoFLineAccessor# from a #LineAccessor#.
@@ -355,7 +355,7 @@ class DoFSubstructAccessor : public DoFAccessor<dim>,
 /**
   Intermediate, "typedef"-class, not for public use.
 
-  {\bf Rationale}
+  \subsection{Rationale}
 
   This class is only a wrapper class used to do kind of a typedef
   with template parameters. This class and #DoFSubstructAccessor<2>#

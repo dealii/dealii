@@ -51,7 +51,7 @@ class DoFLevel;
 /**
   Store the indices of the degrees of freedom which are located on the lines.
 
-  {\bf Information for all #DoFLevel# classes}
+  \subsection{Information for all #DoFLevel# classes}
 
   The #DoFLevel<N># classes 
   store the global indices of the degrees of freedom for each cell on a
@@ -244,7 +244,7 @@ enum RenumberingMethod {
   is the same as that for the alike triangulation iterators.
   
   
-  {\bf Distribution of degrees of freedom}
+  \subsection{Distribution of degrees of freedom}
 
   The degrees of freedom (`dofs') are distributed on the given triangulation
   by the function #distribute_dofs()#. It gets passed a finite element object
@@ -299,7 +299,7 @@ enum RenumberingMethod {
   not that important any more.
 
   
-  {\bf Implementation of renumbering schemes}
+  \subsection{Implementation of renumbering schemes}
 
   The renumbering algorithms need quite a lot of memory, since they have
   to store for each dof with which other dofs it couples. This is done
@@ -333,7 +333,7 @@ enum RenumberingMethod {
   will search for its own starting point.
 
   
-  {\bf Results of renumbering}
+  \subsection{Results of renumbering}
 
   The renumbering schemes mentioned above do not lead to optimal results.
   However, after all there is no algorithm that accomplishes this within
@@ -366,7 +366,7 @@ enum RenumberingMethod {
   (e.g. when using adaptive algorithms), searching a best starting point
   may be difficult, however, and in many cases will not justify the effort.
 
-  {\bf Data transfer between grids}
+  \subsection{Data transfer between grids}
 
   The #DoFHandler# class offers two functions #make_transfer_matrix# which create
   a matrix to transform the data of one grid to another. The functions assumes the

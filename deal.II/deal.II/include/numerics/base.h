@@ -60,7 +60,7 @@ enum NormType {
   a display of concept haw to work with deal.II.
 
 
-  {\bf Assemblage}
+  \subsection{Assemblage}
 
   The #assemble# member function does the assemblage of the system matrix and
   the given number of right hand sides. It does the following steps:
@@ -85,7 +85,7 @@ enum NormType {
   the exact boundary of the domain.
   
 
-  {\bf Solving}
+  \subsection{Solving}
 
   Calling the #solve# function with a solver object, the system of equations
   which results after having called the #assemble# function is solved. After
@@ -93,7 +93,7 @@ enum NormType {
   are given their correct values.
 
 
-  {\bf Boundary conditions}
+  \subsection{Boundary conditions}
 
   During assemblage of matrices and right hand side, use is made of dirichlet
   boundary conditions (in short: bc) specified to the #assemble# function. You
@@ -173,7 +173,7 @@ enum NormType {
   sure that the returned values are reasonable in some sense anyway.
   
 
-  {\bf Computing errors}
+  \subsection{Computing errors}
 
   The function #integrate_difference# performs the calculation of the error
   between the finite element solution and a given (continuous) reference

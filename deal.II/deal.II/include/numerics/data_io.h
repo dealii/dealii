@@ -116,7 +116,7 @@ struct SubCellData {
   further details.
 
 
-  {\bf Structure of input grid data}
+  \subsection{Structure of input grid data}
   
   It is your duty to use a correct numbering of vertices in the cell list,
   i.e. for lines, you have to first give the vertex with the lower coordinate
@@ -260,7 +260,7 @@ class DataIn {
   are to be written.
 
 
-  {\bf Limitations}
+  \subsection{Limitations}
   
   At present, no grouping of components to vectors is implemented, i.e.
   you can only write each component independent of the others. Also, it
@@ -268,7 +268,7 @@ class DataIn {
   with more or less than one degree of freedom per vertex.
 
   
-  {\bf UCD format}
+  \subsection{UCD format}
 
   The UCD format is described in the AVS developer's guide. Due to
   limitations in the present format, only node based data can be output,
@@ -286,7 +286,7 @@ class DataIn {
   much easier.
 
 
-  {\bg GNUPLOT format}
+  \subsection{GNUPLOT format}
 
   The GNUPLOT format is not able to handle data on unstructured grids
   directly. Directly would mean that you only give the vertices and

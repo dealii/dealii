@@ -54,7 +54,7 @@ enum OutputStyle {
     structure.
 
     
-    {\bf Declaration of entries}
+    \subsection{Declaration of entries}
     
     In order to use the facilities of a #ParameterHandler# object, one first has
     to make known the different entries the input file may or may not contain. This
@@ -135,7 +135,7 @@ enum OutputStyle {
     \end{verbatim}
 
 
-    {\bf Input files and special characters}
+    \subsection{Input files and special characters}
 
     For the first example above the input file would look like the following:
     \begin{verbatim}
@@ -165,7 +165,7 @@ enum OutputStyle {
     #=# sign.
 
     
-    {\bf Reading data from input sources}
+    \subsection{Reading data from input sources}
     
     In order to read input you can use three possibilities: reading from an #istream# object,
     reading from a file of which the name is given and reading from a string in memory in
@@ -194,7 +194,7 @@ enum OutputStyle {
     If an error occurs upon reading the input, error messages are written to #cerr#.
 
     
-    {\bf Getting entry values out of a #ParameterHandler# object}
+    \subsection{Getting entry values out of a #ParameterHandler# object}
     
     Each class gets its data out of a #ParameterHandler# object by calling the #get (...)#
     member functions like this:
@@ -232,14 +232,14 @@ enum OutputStyle {
     input file.
     
     
-    {\bf Style guide for data retrieval}
+    \subsection{Style guide for data retrieval}
     
     We propose that every class which gets data out of a #ParameterHandler# object provides
     a function named #get_parameters#. This should be declared #virtual#. #get_parameters#
     functions in derived classes should call the #BaseClass::get_parameters# function.
 
     
-    {\bf Possible future extensions}
+    \subsection{Possible future extensions}
     
     \begin{itemize}
     \item Allow long input lines to be broken by appending a backslash character
@@ -250,7 +250,7 @@ enum OutputStyle {
 
 
     
-    {\bf Worked Example}
+    \subsection{Worked Example}
 
     This is the code:
     \begin{verbatim}
@@ -448,7 +448,7 @@ enum OutputStyle {
     \end{verbatim}
 
     
-    {\bf References}
+    \subsection{References}
 
     This class is inspired by the #MenuSystem# class of #DiffPack#.
 
@@ -782,7 +782,7 @@ class ParameterHandler {
     program.
 
     
-    {\bf Usage}
+    \subsection{Usage}
     
     The usage of this class is similar to the #ParameterHandler# class. First the
     entries and subsections have to be declared, then a loop is performed in which
@@ -872,7 +872,7 @@ class ParameterHandler {
     run.
 
     
-    {\bf Syntax for variant and array entry values}
+    \subsection{Syntax for variant and array entry values}
     
     Variant values are specified like #prefix{ v1 | v2 | v3 | ... }postfix#. Whitespace
     to the right of the opening brace #{# is ignored as well as to the left of the
@@ -885,7 +885,7 @@ class ParameterHandler {
     #prefix{{ v1 | v2 | v3 }}postfix#.
     
 
-    {\bf Worked example}
+    \subsection{Worked example}
     
     Given the above extensions to the example program for the #ParameterHandler# and the
     following input file
@@ -947,7 +947,7 @@ class ParameterHandler {
     the number of the run.
     
     
-    {\bf References}
+    \subsection{References}
     This class is inspired by the #Multipleloop# class of #DiffPack#.
 
     @memo  This class provides an interface to an input file which provides at

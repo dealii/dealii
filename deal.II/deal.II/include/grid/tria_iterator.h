@@ -37,7 +37,7 @@ template <int dim> class Triangulation;
     {\bf Note:} Please read the documentation about the prefix and the
     postfix #++# operators in this and the derived classes!
     
-    {\bf Purpose}
+    \subsection{Purpose}
 
     #iterators# are used whenever a loop over all lines, quads, cells etc.
     is to be performed. These loops can then be coded like this:
@@ -104,7 +104,7 @@ template <int dim> class Triangulation;
     g++2.7 has some problems and we will have to wait for g++2.8.
     
 
-    {\bf Differences between the classes in this inheritance tree}
+    \subsection{Differences between the classes in this inheritance tree}
 
     #TriaRawIterator# objects point to lines, cells, etc in
     the lists whether they are used or not (in the vectors, also {\it dead}
@@ -118,7 +118,7 @@ template <int dim> class Triangulation;
     which only loop over active cells (not refined).
 
     
-    {\bf Implementation}
+    \subsection{Implementation}
 
     In principle, the Iterator class does not have much functionality. It
     only becomes useful when assigned an #Accessor# (the second template
@@ -183,14 +183,14 @@ template <int dim> class Triangulation;
     line.
     
     
-    {\bf Warning}
+    \subsection{Warning}
 
     It seems impossible to preserve #const#ness of a triangulation through
     iterator usage. Thus, if you declare pointers to a #const# triangulation
     object, you should be well aware that you might involuntarily alter the
     data stored in the triangulation.
     
-    {\bf Internals}
+    \subsection{Internals}
     
     There is a representation of past-the-end-pointers, denoted by special
     values of the member variables #present_level# and #present_index#:

@@ -732,7 +732,7 @@ class TriaSubstructAccessor;
 /**
   Intermediate, "typedef"-class, not for public use.
 
-  {\bf Rationale}
+  \subsection{Rationale}
 
   This class is only a wrapper class used to do kind of a typedef
   with template parameters. This class and #TriaSubstructAccessor<2>#

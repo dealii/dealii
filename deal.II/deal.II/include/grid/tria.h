@@ -547,7 +547,7 @@ class TriaDimensionInfo<2> {
     specialized versions for distinct dimensions.
 
 
-    {\bf Structure and iterators}
+    \subsection{Structure and iterators}
 
     The actual data structure of a #Triangulation# object is rather complex
     and quite inconvenient if one attempted to operate on it directly, since
@@ -660,7 +660,7 @@ class TriaDimensionInfo<2> {
     \end{itemize}
 
 
-    {\bf Usage}
+    \subsection{Usage}
 
     Usage of a #Triangulation# is mainly done through the use of iterators.
     An example probably shows best how to use it:
@@ -704,7 +704,7 @@ class TriaDimensionInfo<2> {
     \end{verbatim}
 
     
-    {\bf Creating a triangulation}
+    \subsection{Creating a triangulation}
 
     There are several possibilities to create a triangulation:
     \begin{itemize}
@@ -812,7 +812,7 @@ class TriaDimensionInfo<2> {
     interface between regions of different materials.
 
 
-    {\bf Refinement of a triangulation}
+    \subsection{Refinement of a triangulation}
 
     Refinement of a triangulation may be done through several ways. The most
     low-level way is directly through iterators: let #i# be an iterator to
@@ -926,7 +926,7 @@ class TriaDimensionInfo<2> {
     squares of the criteria on the cells.
 
 
-    {\bf Material and boundary information}
+    \subsection{Material and boundary information}
 
     Each line, quad, etc stores one byte of information denoting the material
     a cell is made of (used in the computation of stiffness matrices) and to
@@ -965,7 +965,7 @@ class TriaDimensionInfo<2> {
     the different handling of vertices from lines and quads.
 
 
-    {\bf History of a triangulation}
+    \subsection{History of a triangulation}
     
     It is possible to reconstruct a grid from its refinement history, which
     can be stored and loaded through the #save_refine_flags# and
@@ -999,7 +999,7 @@ class TriaDimensionInfo<2> {
     grid.
 
 
-    {\bf User flags}
+    \subsection{User flags}
 
     A triangulation offers one bit per line, quad, etc for user data.
     This field can be
@@ -1031,7 +1031,7 @@ class TriaDimensionInfo<2> {
     documentation.
     
     
-    {\bf Boundary approximation}
+    \subsection{Boundary approximation}
 
     You can specify a boundary function: if a new vertex is created on a
     side or face at the boundary, this function is used to compute where
@@ -1075,7 +1075,7 @@ class TriaDimensionInfo<2> {
     of such situations when defining the coarse grid.
 
 
-    {\bf Implementational conventions for two spatial dimensions}
+    \subsection{Implementational conventions for two spatial dimensions}
 
     There is a convention about the direction of the bounding lines of quads in
     2D. The direction of a line is the direction of point 0 towards point 1. We
@@ -1102,7 +1102,7 @@ class TriaDimensionInfo<2> {
     vertex with the same number of the old quad.
 
     
-    {\bf Warning}
+    \subsection{Warning}
     
     It seems impossible to preserve #const#ness of a triangulation through
     iterator usage. Thus, if you declare pointers to a #const# triangulation
