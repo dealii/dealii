@@ -36,6 +36,12 @@ template <int dim>
 class Function {
   public:
 				     /**
+				      * Virtual destructor; absolutely
+				      * necessary in this case.
+				      */
+    virtual ~Function ();
+    
+				     /**
 				      * Return the value of the function
 				      * at the given point.
 				      */
@@ -90,6 +96,11 @@ template <int dim>
 class ZeroFunction : public Function<dim> {
   public:
 				     /**
+				      * Virtual destructor; absolutely
+				      * necessary in this case.
+				      */
+    virtual ~ZeroFunction ();
+				     /**
 				      * Return the value of the function
 				      * at the given point.
 				      */
@@ -118,6 +129,52 @@ class ZeroFunction : public Function<dim> {
 				      */
     virtual void gradient_list (const vector<Point<dim> > &points,
 				vector<Point<dim> >       &gradients) const;
+};
+
+
+
+
+
+/**
+   Provide a function which always returns a constant value, which is delivered
+   upon construction. Obviously, the derivates of this function are zerom which
+   is why we derive this class from #ZeroFunction#: we then only have to
+   overload th value functions, not all the derivatives.
+*/
+template <int dim>
+class ConstantFunction : public ZeroFunction<dim> {
+  public:
+				     /**
+				      * Constructor; takes the constant function
+				      * value as an argument.
+				      */
+    ConstantFunction (const double value);
+    
+				     /**
+				      * Virtual destructor; absolutely
+				      * necessary in this case.
+				      */
+    virtual ~ConstantFunction ();
+				     /**
+				      * Return the value of the function
+				      * at the given point.
+				      */
+    virtual double operator () (const Point<dim> &p) const;
+
+				     /**
+				      * Set #values# to the point values
+				      * of the function at the #points#.
+				      * It is assumed that #values# be
+				      * empty.
+				      */
+    virtual void value_list (const vector<Point<dim> > &points,
+			     vector<double>            &values) const;
+
+  protected:
+				     /**
+				      * Store the constant function value.
+				      */
+    const double function_value;
 };
 
 

@@ -5,6 +5,11 @@
 #include <vector.h>
 
 
+
+template <int dim>
+Function<dim>::~Function () {};
+
+
 template <int dim>
 double Function<dim>::operator () (const Point<dim> &) const {
   Assert (false, ExcPureFunctionCalled());
@@ -53,6 +58,11 @@ void Function<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 template <int dim>
+ZeroFunction<dim>::~ZeroFunction () {};
+
+
+
+template <int dim>
 double ZeroFunction<dim>::operator () (const Point<dim> &) const {
   return 0.;
 };
@@ -91,9 +101,41 @@ void ZeroFunction<dim>::gradient_list (const vector<Point<dim> > &points,
 
 
 
+template <int dim>
+ConstantFunction<dim>::ConstantFunction (const double value) :
+		function_value(value) {};
+
+
+template <int dim>
+ConstantFunction<dim>::~ConstantFunction () {};
+
+
+
+template <int dim>
+double ConstantFunction<dim>::operator () (const Point<dim> &) const {
+  return function_value;
+};
+
+
+
+template <int dim>
+void ConstantFunction<dim>::value_list (const vector<Point<dim> > &points,
+				    vector<double>            &values) const {
+  Assert (values.size() == 0,
+	  ExcVectorNotEmpty());
+
+  values.reserve (points.size());
+  values.insert (values.begin(), points.size(), function_value);
+};
+
+
+
 // explicit instantiations
 template class Function<1>;
 template class Function<2>;
 
 template class ZeroFunction<1>;
 template class ZeroFunction<2>;
+
+template class ConstantFunction<1>;
+template class ConstantFunction<2>;
