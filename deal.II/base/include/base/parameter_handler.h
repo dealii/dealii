@@ -1069,13 +1069,15 @@ class ParameterHandler
 
 
 				     /**
-				      * Declare a new entry with name @p{entry},
-				      * default and for which
-				      * any input has to match the @p{pattern}
-				      * (default: any pattern).
-				      * @return @p{false} if entry already exists or
-				      * default value does not match the regular
-				      * expression; @p{true} otherwise.
+				      * Declare a new entry with name
+				      * @p{entry}, default and for
+				      * which any input has to match
+				      * the @p{pattern} (default: any
+				      * pattern).  Return @p{false} if
+				      * entry already exists or
+				      * default value does not match
+				      * the regular expression;
+				      * @p{true} otherwise.
 				      */
     bool declare_entry    (const string &entry,
 			   const string &default_value,
@@ -1090,8 +1092,9 @@ class ParameterHandler
     
 				     /**
 				      * Leave present subsection.
-				      * @return @p{false} if there is no subsection
-				      * to leave; true otherwise.
+				      * Return @p{false} if there is
+				      * no subsection to leave; true
+				      * otherwise.
 				      */
     bool leave_subsection ();
 
@@ -1279,8 +1282,8 @@ class ParameterHandler
 				      * @p{lineno} is the number of
 				      * the line presently scanned
 				      * (for the logs if there are
-				      * messages).  @return @p{false}
-				      * if line contained stuff that
+				      * messages). Return @p{false} if
+				      * line contained stuff that
 				      * could not be understood, the
 				      * uppermost subsection was to be
 				      * left by an @p{END} or @p{end}
