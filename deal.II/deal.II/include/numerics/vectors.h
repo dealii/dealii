@@ -8,6 +8,7 @@
 
 #include <base/forward_declarations.h>
 #include <base/exceptions.h>
+#include <lac/forward_declarations.h>
 #include <grid/forward_declarations.h>
 #include <map>
 #include <vector>
