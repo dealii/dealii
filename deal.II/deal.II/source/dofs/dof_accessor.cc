@@ -639,7 +639,6 @@ DoFCellAccessor<3>::face (const unsigned int i) const
 
 
 template <int dim>
-inline
 TriaIterator<dim,DoFCellAccessor<dim> >
 DoFCellAccessor<dim>::
 neighbor_child_on_subface (const unsigned int face,
