@@ -17,10 +17,6 @@ Let dSMatrixStruct::compress free the memory of colnums which is
   no longer needed.
 
 
-Use memcpy in dSMatrix::copy_from instead of elementwise copying.
-  This should yield a significant speed-up.
-
-
 Make ILU decomposition faster by following the comment in the
   innermost loop (about the better use of the index j).
 
