@@ -20,7 +20,7 @@
  *
  * There are a number of derived classes, denoting concrete integration
  * formulae. These are named by a prefixed #Q#, the name of the formula
- * (e.g. #Midpoint# or #Gauss#) and finally (only for Gauss integration 
+ * (e.g. #Midpoint# or #Gauss#) and finally (for Gauss integration 
  * formulae) the number of quadrature points.
  *
  * For each quadrature formula
@@ -65,7 +65,8 @@
  * @author Wolfgang Bangerth, 1998, documentation: Ralf Hartmann, 1999
  */
 template <int dim>
-class Quadrature {
+class Quadrature
+{
   public:
 				     /**
 				      * Number of quadrature points.
@@ -87,10 +88,13 @@ class Quadrature {
 		const Quadrature<1>     &);
     
 				     /**
-				      * Virtual destructor needed, since someone
-				      * may want to use pointers to this class
-				      * though the object pointed to is a derived
-				      * class.
+				      * Constructor from given vectors.
+				      */
+    Quadrature (const vector<Point<dim> > & points,
+		const vector<double> & weights);
+    
+				     /**
+				      * Virtual destructor.
 				      */
     virtual ~Quadrature ();
     

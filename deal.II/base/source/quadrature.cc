@@ -17,12 +17,24 @@ template <int dim>
 Quadrature<dim>::Quadrature (const unsigned int n_q) :
 		n_quadrature_points(n_q),
 		quadrature_points (n_q, Point<dim>()),
-		weights (n_q, 0) {};
+		weights (n_q, 0)
+{}
 
+template <int dim>
+Quadrature<dim>::Quadrature (const vector<Point<dim> > & points,
+			     const vector<double> & weights)
+		: n_quadrature_points(points.size()),
+		  quadrature_points(points),
+		  weights(weights)
+{
+  Assert(weights.size() == points.size(),
+	 ExcDimensionMismatch(weights.size(), points.size()));
+}
 
 template <>
 Quadrature<0>::Quadrature (const Quadrature<-1> &,
-			   const Quadrature<1> &) {
+			   const Quadrature<1> &)
+{
   Assert (false, ExcInternalError());
 };
 
