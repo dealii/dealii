@@ -333,19 +333,22 @@ class SolutionTransfer
     unsigned int n_dofs_old;
 
 				     /**
-				      * #PreparationState# denotes the
-				      * three possible states of the
+				      * Declaration of
+				      * #PreparationState# that
+				      * denotes the three possible
+				      * states of the
 				      * #SolutionTransfer#: being
-				      * prepared for 'pure refinement',
-				      * prepared for 'coarsening and
-				      * refinement' or not prepared.
+				      * prepared for 'pure
+				      * refinement', prepared for
+				      * 'coarsening and refinement' or
+				      * not prepared.
 				      */
     enum PreparationState {
 	  none, pure_refinement, coarsening_and_refinement
     };
 
 				     /**
-				      * ???
+				      * Definition of the respective variable.
 				      */
     PreparationState prepared_for;
 
