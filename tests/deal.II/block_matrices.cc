@@ -25,7 +25,8 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 
-#include <fe/fe_lib.lagrange.h>
+#include <fe/continuous.h>
+#include <fe/mapping_q1.h>
 
 #include <dofs/dof_tools.h>
 

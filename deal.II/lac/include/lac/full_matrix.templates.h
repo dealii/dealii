@@ -462,7 +462,7 @@ template <typename number2>
 void FullMatrix<number>::fill (const number2* entries)
 {
     if (dim_range*dim_image != 0)
-    std::copy (entries, entries+dim_image*dim_range, val);
+      std::copy (entries, entries+dim_image*dim_range, val);
 }
 
 
