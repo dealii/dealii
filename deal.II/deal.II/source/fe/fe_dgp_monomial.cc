@@ -76,11 +76,11 @@ namespace
   
   template<int dim>
   void generate_unit_points (const unsigned int,
-			     vector<Point<dim> > &);
+			     std::vector<Point<dim> > &);
 
   template <>
   void generate_unit_points (const unsigned int,
-			     vector<Point<1> > &)
+			     std::vector<Point<1> > &)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -88,7 +88,7 @@ namespace
   
   template <>
   void generate_unit_points (const unsigned int k,
-			     vector<Point<2> > &p)
+			     std::vector<Point<2> > &p)
   {
     Assert(k<=4, ExcNotImplemented());
     Assert(p.size()==start_index2d[k+1]-start_index2d[k], ExcInternalError());
@@ -101,7 +101,7 @@ namespace
   
   template <>
   void generate_unit_points (const unsigned int k,
-			     vector<Point<3> > &p)
+			     std::vector<Point<3> > &p)
   {
     Assert(k<=2, ExcNotImplemented());
     Assert(p.size()==start_index3d[k+1]-start_index3d[k], ExcInternalError());
@@ -289,7 +289,7 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::initialize_embedding ()
 {
-  vector<Point<dim> > unit_points(this->dofs_per_cell);
+  std::vector<Point<dim> > unit_points(this->dofs_per_cell);
   generate_unit_points(get_degree(), unit_points);
   
   FullMatrix<double> cell_interpolation (this->dofs_per_cell,
