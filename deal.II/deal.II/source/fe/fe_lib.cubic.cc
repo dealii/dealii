@@ -37,14 +37,6 @@ FECubicSub<1>::FECubicSub (const int) :
 
 
 template <>
-const FiniteElementData<1>
-FECubicSub<1>::get_fe_data () {
-  return FiniteElementData<1> (1, 2, GeometryInfo<1>::vertices_per_cell);
-};
-
-
-
-template <>
 void FECubicSub<1>::initialize_matrices () {
   
   prolongation[0](0,0) = 1.0;
@@ -278,14 +270,6 @@ FECubicSub<2>::FECubicSub (const int) :
 		FELinearMapping<2> (0, 0, 16)
 {
   initialize_matrices ();
-};
-
-
-
-template <>
-const FiniteElementData<2>
-FECubicSub<2>::get_fe_data () {
-  return FiniteElementData<2> (1, 2, 4, GeometryInfo<2>::vertices_per_cell);
 };
 
 

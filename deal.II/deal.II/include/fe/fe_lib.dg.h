@@ -15,75 +15,60 @@
  * transforms from the unit cell to the real cell.
  * @author Ralf Hartmann, 1998
  */
-
 template <int dim>
 class FEDGConstant : public FELinearMapping<dim> {
   public:
-				   /**
-				    * Constructor
-				    */
-    FEDGConstant ();
-
 				     /**
-				      * Declare a static function which returns
-				      * the number of degrees of freedom per
-				      * vertex, line, face, etc. This function
-				      * is used by the constructors, but is
-				      * mainly needed for the composed finite
-				      * elements, which assemble a FE object
-				      * from several other FEs. See the
-				      * documentation for the #FiniteElement#
-				      * class for more information on this
-				      * subject.
+				      * Constructor
 				      */
-    static const FiniteElementData<dim> get_fe_data ();
-
+    FEDGConstant ();
+    
 				     /**
-				    * Return the value of the #i#th shape
-				    * function at point #p# on the unit cell.
-				    */
+				      * Return the value of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      */
     virtual double shape_value(const unsigned int i,
 			       const Point<dim>& p) const;
-
-				   /**
-				    * Return the gradient of the #i#th shape
-				    * function at point #p# on the unit cell.
-				    */
+    
+				     /**
+				      * Return the gradient of the #i#th shape
+				      * function at point #p# on the unit cell.
+				      */
     virtual Tensor<1,dim> shape_grad(const unsigned int i,
 				     const Point<dim>& p) const;
 
-				   /**
-				    * Return the tensor of second derivatives
-				    * of the #i#th shape function at
-				    * point #p# on the unit cell.
-				    *
-				    * For linear elements, all second
-				    * derivatives on the unit cell are zero.
-				    */
+				     /**
+				      * Return the tensor of second derivatives
+				      * of the #i#th shape function at
+				      * point #p# on the unit cell.
+				      *
+				      * For linear elements, all second
+				      * derivatives on the unit cell are zero.
+				      */
     virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 					   const Point<dim>   &p) const;
 
-				   /**
-				    * Refer to the base class for detailed
-				    * information on this function.
-				    */
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_unit_support_points (vector<Point<dim> > &support_points) const;
 
-				   /**
-				    * Refer to the base class for detailed
-				    * information on this function.
-				    */
+				     /**
+				      * Refer to the base class for detailed
+				      * information on this function.
+				      */
     virtual void get_support_points (const DoFHandler<dim>::cell_iterator &cell,
-				    const Boundary<dim> &boundary,
-				    vector<Point<dim> > &support_points) const;
+				     const Boundary<dim> &boundary,
+				     vector<Point<dim> > &support_points) const;
 
 				     /**
 				      * Refer to the base class for detailed
 				      * information on this function.
 				      */
     virtual void get_face_support_points (const DoFHandler<dim>::face_iterator &face,
-					 const Boundary<dim> &boundary,
-					 vector<Point<dim> > &support_points) const;
+					  const Boundary<dim> &boundary,
+					  vector<Point<dim> > &support_points) const;
 
     				     /**
 				      * Refer to the base class for detailed
@@ -93,23 +78,23 @@ class FEDGConstant : public FELinearMapping<dim> {
 					const Boundary<dim> &boundary,
 					dFMatrix &local_mass_matrix) const;
   
-				   /**
-				    * Return a readonly reference to the
-				    * matrix which describes the transfer of a
-				    * child with the given number to the
-				    * mother cell. See the #restriction# array
-				    * for more information.
-				    *
-				    * This function returns an error since the
-				    * correct use of the restriction
-				    * matrices is not yet finally decided
-				    * about.
-				    */
+				     /**
+				      * Return a readonly reference to the
+				      * matrix which describes the transfer of a
+				      * child with the given number to the
+				      * mother cell. See the #restriction# array
+				      * for more information.
+				      *
+				      * This function returns an error since the
+				      * correct use of the restriction
+				      * matrices is not yet finally decided
+				      * about.
+				      */
     const dFMatrix & restrict (const unsigned int) const;
   
-				   /**
-				    * Exception
-				    */
+				     /**
+				      * Exception
+				      */
     DeclException0 (ExcNotImplemented);
 };
 
@@ -144,20 +129,6 @@ class FEDGLinear : public FELinear<dim>{
 				      * Constructor
 				      */
     FEDGLinear();
-
-				     /**
-				      * Declare a static function which returns
-				      * the number of degrees of freedom per
-				      * vertex, line, face, etc. This function
-				      * is used by the constructors, but is
-				      * mainly needed for the composed finite
-				      * elements, which assemble a FE object
-				      * from several other FEs. See the
-				      * documentation for the #FiniteElement#
-				      * class for more information on this
-				      * subject.
-				      */
-    static const FiniteElementData<dim> get_fe_data ();
 
 				     /**
 				      * This function returns an error since the
@@ -198,20 +169,6 @@ class FEDGQuadraticSub : public FEQuadraticSub<dim>{
 				      * Constructor
 				      */
     FEDGQuadraticSub();
-
-				     /**
-				      * Declare a static function which returns
-				      * the number of degrees of freedom per
-				      * vertex, line, face, etc. This function
-				      * is used by the constructors, but is
-				      * mainly needed for the composed finite
-				      * elements, which assemble a FE object
-				      * from several other FEs. See the
-				      * documentation for the #FiniteElement#
-				      * class for more information on this
-				      * subject.
-				      */
-    static const FiniteElementData<dim> get_fe_data ();
 
 				     /**
 				      * This function returns an error since the
@@ -255,20 +212,6 @@ class FEDGCubicSub : public FECubicSub<dim>{
     FEDGCubicSub();
 
 				     /**
-				      * Declare a static function which returns
-				      * the number of degrees of freedom per
-				      * vertex, line, face, etc. This function
-				      * is used by the constructors, but is
-				      * mainly needed for the composed finite
-				      * elements, which assemble a FE object
-				      * from several other FEs. See the
-				      * documentation for the #FiniteElement#
-				      * class for more information on this
-				      * subject.
-				      */
-    static const FiniteElementData<dim> get_fe_data ();
-
-				     /**
 				      * This function returns an error since the
 				      * correct use of the restriction
 				      * matrices is not yet finally decided
@@ -307,20 +250,6 @@ class FEDGQuarticSub : public FEQuarticSub<dim>{
 				      * Constructor
 				      */
     FEDGQuarticSub();
-
-				     /**
-				      * Declare a static function which returns
-				      * the number of degrees of freedom per
-				      * vertex, line, face, etc. This function
-				      * is used by the constructors, but is
-				      * mainly needed for the composed finite
-				      * elements, which assemble a FE object
-				      * from several other FEs. See the
-				      * documentation for the #FiniteElement#
-				      * class for more information on this
-				      * subject.
-				      */
-    static const FiniteElementData<dim> get_fe_data ();
 
 				     /**
 				      * This function returns an error since the

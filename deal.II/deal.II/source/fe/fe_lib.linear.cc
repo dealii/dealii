@@ -37,14 +37,6 @@ FELinear<1>::FELinear (const int) :
 
 
 
-template <>
-const FiniteElementData<1>
-FELinear<1>::get_fe_data () {
-  return FiniteElementData<1> (1, 0, GeometryInfo<1>::vertices_per_cell);
-};
-
-
-
 
 template <>
 void FELinear<1>::initialize_matrices () {
@@ -191,14 +183,6 @@ FELinear<2>::FELinear (const int) :
 		FELinearMapping<2> (0, 0, 4)
 {
   initialize_matrices ();
-};
-
-
-
-template <>
-const FiniteElementData<2>
-FELinear<2>::get_fe_data () {
-  return FiniteElementData<2> (1, 0, 0, GeometryInfo<2>::vertices_per_cell);
 };
 
 

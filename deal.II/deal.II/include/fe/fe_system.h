@@ -77,20 +77,13 @@ class FESystem : public FiniteElement<dim> {
 				      * In fact, the object #fe# is not used,
 				      * apart from getting the number of dofs
 				      * per vertex, line, etc for that finite
-				      * element class. For this, it would have
-				      * been possible to use the #get_fe_data#
-				      * function that each element has to
-				      * provide. The correct way to write
-				      * this constructor would therefore have
-				      * been to specify it without the first
-				      * argument and let the user specify the
-				      * desired finite element by an explicit
-				      * template argument list, like this:
-				      * #AnyClass::f<int>()#. However, #C++#
-				      * does not allow this call sequence for
-				      * constructors, so we have to use the
-				      * way as shown here, to let the compiler
-				      * deduce the template argument itself.
+				      * element class. The objects creates its
+				      * own copy of the finite element object
+				      * at construction time (but after
+				      * the initialization of the base class
+				      * #FiniteElement#, which is why we need
+				      * a valid finite element object passed
+				      * to the constructor).
 				      *
 				      * Obviously, the template finite element
 				      * class needs to be of the same dimension

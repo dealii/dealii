@@ -567,27 +567,6 @@ struct FiniteElementBase :
  *   implemented in the #DoFHandler# class as of now.
  * \end{itemize}
  *
- * On a more general note, a concrete finite element class, derived from
- * the #FiniteElement# class needs to fulfill at least the following criteria:
- * \begin{itemize}
- * \item Overload and define all pure virtual functions;
- * \item If a finite element is to be used as part of a composed finite
- *   element, such as the #FESystem# of the #FEMixed# classes, it has
- *   to provide a \textit{static} function namend #get_fe_data#, which
- *   returns the data which also is stored in the #FiniteElementData# object
- *   at the bottom of the class hierarchy. This function needs to be static,
- *   since its output is needed at the time of construction of the composed
- *   finite element, at which time the subobjects denoting the parts of the
- *   composed element are not yet constructed. You need to make sure that
- *   each element has such a function; the composed elements have no way
- *   to make sure that the function is not inherited from a base class.
- *   You may only use an inherited such function, if the result would be
- *   the same.
- *
- *   It is also a good idea to use the output of this function to construct
- *   the base class #FiniteElement# of a concrete element.
- * \end{itemize}
- *
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>

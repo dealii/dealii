@@ -169,20 +169,6 @@ class FECrissCross : public FiniteElement<dim> {
 				      * Constructor
 				      */
     FECrissCross ();
-
-				     /**
-				      * Declare a static function which returns
-				      * the number of degrees of freedom per
-				      * vertex, line, face, etc. This function
-				      * is used by the constructors, but is
-				      * mainly needed for the composed finite
-				      * elements, which assemble a FE object
-				      * from several other FEs. See the
-				      * documentation for the #FiniteElement#
-				      * class for more information on this
-				      * subject.
-				      */
-    static const FiniteElementData<dim> get_fe_data ();
     
 				     /**
 				      * Return the value of the #i#th shape
