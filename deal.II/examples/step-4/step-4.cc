@@ -124,10 +124,23 @@ class LaplaceProblem
 				 // side with only one parameter,
 				 // namely the point where we want to
 				 // evaluate the function.
+				 //
+				 // Note that the C++ language forces
+				 // us to declare and define a
+				 // constructor to the following
+				 // classes even though they are
+				 // empty. This is due to the fact
+				 // that the base class has no default
+				 // constructor (i.e. one without
+				 // arguments), even though it has a
+				 // constructor which has default
+				 // values for all arguments.
 template <int dim>
 class RightHandSide : public Function<dim> 
 {
   public:
+    RightHandSide () : Function<dim>() {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 };
@@ -138,6 +151,8 @@ template <int dim>
 class BoundaryValues : public Function<dim> 
 {
   public:
+    BoundaryValues () : Function<dim>() {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 };

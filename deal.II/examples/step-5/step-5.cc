@@ -98,10 +98,17 @@ class LaplaceProblem
 				 // information from the ``value''
 				 // function as well will be explained
 				 // below when assembling the matrix.
+				 //
+				 // The need to declare a seemingly
+				 // useless default constructor exists
+				 // here just as in the previous
+				 // example.
 template <int dim>
 class Coefficient : public Function<dim> 
 {
   public:
+    Coefficient ()  : Function<dim>() {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     

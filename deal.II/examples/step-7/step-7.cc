@@ -180,11 +180,19 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // respective virtual member
 				 // functions in the ``Function'' base
 				 // class.
+				 //
+				 // Just as in previous examples, we
+				 // are forced by the C++ language
+				 // specification to declare a
+				 // seemingly useless default
+				 // constructor.
 template <int dim>
 class Solution : public Function<dim>,
 		 protected SolutionBase<dim>
 {
   public:
+    Solution () : Function<dim>() {};
+    
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
