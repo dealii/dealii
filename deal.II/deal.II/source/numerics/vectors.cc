@@ -71,6 +71,7 @@ void VectorTools<dim>::interpolate (const DoFHandler<dim>    &dof,
 
 
 
+template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
 			      const FiniteElement<1> &,
@@ -173,6 +174,7 @@ void VectorTools<dim>::project (const DoFHandler<dim>    &dof,
 
 
 
+template <>
 void
 VectorTools<1>::interpolate_boundary_values (const DoFHandler<1> &,
 					     const FunctionMap &,
@@ -200,7 +202,7 @@ VectorTools<dim>::interpolate_boundary_values (const DoFHandler<dim> &dof,
   DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
 					endf = dof.end_face();
   
-  FunctionMap::const_iterator function_ptr;
+  typename FunctionMap::const_iterator function_ptr;
 
 				   // field to store the indices of dofs
   vector<int>         face_dofs (fe.dofs_per_face);

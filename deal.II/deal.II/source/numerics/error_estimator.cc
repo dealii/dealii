@@ -23,6 +23,7 @@ inline double sqr (const double x) {
 
 
 
+template <>
 void KellyErrorEstimator<1>::estimate_error (const DoFHandler<1> &,
 					     const Quadrature<0> &,
 					     const FiniteElement<1> &,
@@ -174,6 +175,7 @@ void KellyErrorEstimator<dim>::estimate_error (const DoFHandler<dim>    &dof,
 
 
 
+template <>
 void KellyErrorEstimator<1>::integrate_over_regular_face (const active_cell_iterator &,
 							  const unsigned int      ,
 							  const FiniteElement<1> &,
@@ -334,6 +336,7 @@ integrate_over_regular_face (const active_cell_iterator &cell,
 
 
 
+template <>
 void KellyErrorEstimator<1>::
 integrate_over_irregular_face (const active_cell_iterator &,
 			       const unsigned int          ,

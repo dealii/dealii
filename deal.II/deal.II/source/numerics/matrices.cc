@@ -78,6 +78,7 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 
 
 
+template <>
 void MatrixCreator<1>::create_boundary_mass_matrix (const DoFHandler<1>    &,
 						    const FiniteElement<1> &,
 						    const Quadrature<0>    &,
@@ -322,13 +323,14 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 
   for (; dof != endd; ++dof)
     {
+      const int dof_number = dof->first;
 				       // for each boundary dof:
-
+      
 				       // set entries of this line
 				       // to zero
-      for (unsigned int j=sparsity_rowstart[dof->first];
-	   j<sparsity_rowstart[dof->first+1]; ++j)
-	if (sparsity_colnums[j] != dof->first)
+      const unsigned int last = sparsity_rowstart[dof_number+1];
+      for (unsigned int j=sparsity_rowstart[dof->first]; j<last; ++j)
+	if (sparsity_colnums[j] != dof_number)
 					   // if not main diagonal entry
 	  matrix.global_entry(j) = 0.;
       
@@ -346,9 +348,9 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 				       // store the new rhs entry to make
 				       // the gauss step more efficient
       double new_rhs;
-      if (matrix.diag_element(dof->first) != 0.0)
-	new_rhs = right_hand_side(dof->first)
-		= dof->second * matrix.diag_element(dof->first);
+      if (matrix.diag_element(dof_number) != 0.0)
+	new_rhs = right_hand_side(dof_number)
+		= dof->second * matrix.diag_element(dof_number);
       else
 	{
 	  double first_diagonal_entry = 1;
@@ -359,23 +361,23 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
 		break;
 	      };
 	  
-	  matrix.set(dof->first, dof->first,
+	  matrix.set(dof_number, dof_number,
 		     first_diagonal_entry);
-	  new_rhs = right_hand_side(dof->first)
+	  new_rhs = right_hand_side(dof_number)
 		  = dof->second * first_diagonal_entry;
 	};
       
 				       // store the only nonzero entry
 				       // of this line for the Gauss
 				       // elimination step
-      const double diagonal_entry = matrix.diag_element(dof->first);
+      const double diagonal_entry = matrix.diag_element(dof_number);
 
 				       // do the Gauss step
       for (unsigned int row=0; row<n_dofs; ++row) 
 	for (unsigned int j=sparsity_rowstart[row];
 	     j<sparsity_rowstart[row+1]; ++j)
-	  if ((sparsity_colnums[j] == (signed int)dof->first) &&
-	      ((signed int)row != dof->first))
+	  if ((sparsity_colnums[j] == dof_number) &&
+	      ((signed int)row != dof_number))
 					     // this line has an entry
 					     // in the regarding column
 					     // but this is not the main
@@ -391,7 +393,7 @@ void MatrixTools<dim>::apply_boundary_values (const map<int,double> &boundary_va
       
       
 				       // preset solution vector
-      solution(dof->first) = dof->second;
+      solution(dof_number) = dof->second;
     };
 };
 
@@ -420,23 +422,26 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   const dFMatrix       &values    = fe_values.get_shape_values ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
 
+  const unsigned int total_dofs = fe_values.total_dofs,
+		     n_q_points = fe_values.n_quadrature_points;
+  
   if (coefficient != 0)
     {
       vector<double> coefficient_values (fe_values.n_quadrature_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
-      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-	  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+      for (unsigned int i=0; i<total_dofs; ++i) 
+	for (unsigned int j=0; j<total_dofs; ++j)
+	  for (unsigned int point=0; point<n_q_points; ++point)
 	    cell_matrix(i,j) += (values(i,point) *
 				 values(j,point) *
 				 weights[point] *
 				 coefficient_values[point]);
     }
   else
-    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+    for (unsigned int i=0; i<total_dofs; ++i) 
+      for (unsigned int j=0; j<total_dofs; ++j)
+	for (unsigned int point=0; point<n_q_points; ++point)
 	  cell_matrix(i,j) += (values(i,point) *
 			       values(j,point) *
 			       weights[point]);
@@ -456,15 +461,18 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   vector<double>        rhs_values (fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
+  const unsigned int total_dofs = fe_values.total_dofs,
+		     n_q_points = fe_values.n_quadrature_points;
+
   if (coefficient != 0)
     {
-      vector<double> coefficient_values (fe_values.n_quadrature_points);
+      vector<double> coefficient_values (n_q_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
-      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+      for (unsigned int point=0; point<n_q_points; ++point)
+	for (unsigned int i=0; i<total_dofs; ++i) 
 	  {
-	    for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	    for (unsigned int j=0; j<total_dofs; ++j)
 	      cell_matrix(i,j) += (values(i,point) *
 				   values(j,point) *
 				   weights[point] *
@@ -475,10 +483,10 @@ void MassMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 	  };
     }
   else
-    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<total_dofs; ++i) 
 	{
-	  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	  for (unsigned int j=0; j<total_dofs; ++j)
 	    cell_matrix(i,j) += (values(i,point) *
 				 values(j,point) *
 				 weights[point]);
@@ -501,8 +509,11 @@ void MassMatrix<dim>::assemble (dVector             &rhs,
   vector<double>        rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
-  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+  const unsigned int total_dofs = fe_values.total_dofs,
+		     n_q_points = fe_values.n_quadrature_points;
+
+  for (unsigned int point=0; point<n_q_points; ++point)
+    for (unsigned int i=0; i<total_dofs; ++i) 
       rhs(i) += values(i,point) *
 		rhs_values[point] *
 		weights[point];
@@ -533,15 +544,18 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   const vector<double> &weights   = fe_values.get_JxW_values ();
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
 
+  const unsigned int total_dofs = fe_values.total_dofs,
+		     n_q_points = fe_values.n_quadrature_points;
+
   if (coefficient != 0)
     {
-      vector<double> coefficient_values(fe_values.n_quadrature_points);
+      vector<double> coefficient_values(n_q_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
-      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+      for (unsigned int point=0; point<n_q_points; ++point)
+	for (unsigned int i=0; i<total_dofs; ++i) 
 	  {
-	    for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	    for (unsigned int j=0; j<total_dofs; ++j)
 	      cell_matrix(i,j) += (gradients[i][point] *
 				   gradients[j][point]) *
 				  weights[point] *
@@ -552,10 +566,10 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
 	  };
     }
   else
-    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<total_dofs; ++i) 
 	{
-	  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+	  for (unsigned int j=0; j<total_dofs; ++j)
 	    cell_matrix(i,j) += (gradients[i][point] *
 				 gradients[j][point]) *
 				weights[point];
@@ -575,23 +589,26 @@ void LaplaceMatrix<dim>::assemble (dFMatrix            &cell_matrix,
   const vector<vector<Point<dim> > >&gradients = fe_values.get_shape_grads ();
   const vector<double> &weights   = fe_values.get_JxW_values ();
    
+  const unsigned int total_dofs = fe_values.total_dofs,
+		     n_q_points = fe_values.n_quadrature_points;
+
   if (coefficient != 0)
     {
-      vector<double> coefficient_values(fe_values.n_quadrature_points);
+      vector<double> coefficient_values(n_q_points);
       coefficient->value_list (fe_values.get_quadrature_points(),
 			       coefficient_values);
-      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-	for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-	  for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+      for (unsigned int point=0; point<n_q_points; ++point)
+	for (unsigned int i=0; i<total_dofs; ++i) 
+	  for (unsigned int j=0; j<total_dofs; ++j)
 	    cell_matrix(i,j) += (gradients[i][point] *
 				 gradients[j][point]) *
 				weights[point] *
 				coefficient_values[point];
     }
   else
-    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-      for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
-	for (unsigned int j=0; j<fe_values.total_dofs; ++j)
+    for (unsigned int point=0; point<n_q_points; ++point)
+      for (unsigned int i=0; i<total_dofs; ++i) 
+	for (unsigned int j=0; j<total_dofs; ++j)
 	  cell_matrix(i,j) += (gradients[i][point] *
 			       gradients[j][point]) *
 			      weights[point];
@@ -610,8 +627,11 @@ void LaplaceMatrix<dim>::assemble (dVector             &rhs,
   vector<double>        rhs_values(fe_values.n_quadrature_points);
   right_hand_side->value_list (fe_values.get_quadrature_points(), rhs_values);
    
-  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_values.total_dofs; ++i) 
+  const unsigned int total_dofs = fe_values.total_dofs,
+		     n_q_points = fe_values.n_quadrature_points;
+
+  for (unsigned int point=0; point<n_q_points; ++point)
+    for (unsigned int i=0; i<total_dofs; ++i) 
       rhs(i) += values(i,point) *
 		rhs_values[point] *
 		weights[point];

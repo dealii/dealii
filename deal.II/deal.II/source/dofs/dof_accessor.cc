@@ -93,11 +93,13 @@ DoFLineAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 				 dof_handler->get_selected_fe().dofs_per_line),
 	  ExcVectorDoesNotMatch());
 
+  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line;
   vector<int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
-  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+  for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d);
 };
 
@@ -207,14 +209,17 @@ DoFQuadAccessor<dim,BaseClass>::get_dof_indices (vector<int> &dof_indices) const
 				 dof_handler->get_selected_fe().dofs_per_quad),
 	  ExcVectorDoesNotMatch());
 
+  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_selected_fe().dofs_per_quad;
   vector<int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d);
-  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
     *next++ = dof_index(d);
 };
 
@@ -299,6 +304,7 @@ DoFCellAccessor<dim>::child (const unsigned int i) const {
 
 
 
+template <>
 DoFSubstructAccessor<1>::face_iterator
 DoFCellAccessor<1>::face (const unsigned int) const {
   Assert (false, ExcNotUsefulForThisDimension());
@@ -307,6 +313,7 @@ DoFCellAccessor<1>::face (const unsigned int) const {
 
 
 
+template <>
 DoFSubstructAccessor<2>::face_iterator
 DoFCellAccessor<2>::face (const unsigned int i) const {
   return line(i);
@@ -314,6 +321,7 @@ DoFCellAccessor<2>::face (const unsigned int i) const {
 
 
 
+template <>
 void
 DoFCellAccessor<1>::get_dof_values (const dVector  &values,
 				    vector<double> &dof_values) const {
@@ -324,17 +332,20 @@ DoFCellAccessor<1>::get_dof_values (const dVector  &values,
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
 
+  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line;
   vector<double>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_dof_value++ = values(vertex_dof_index(vertex,d));
-  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+  for (unsigned int d=0; d<dofs_per_line; ++d)
     *next_dof_value++ = values(dof_index(d));
 };
 
 
 
 
+template <>
 void
 DoFCellAccessor<2>::get_dof_values (const dVector  &values,
 				    vector<double> &dof_values) const {
@@ -345,14 +356,17 @@ DoFCellAccessor<2>::get_dof_values (const dVector  &values,
   Assert (values.size() == dof_handler->n_dofs(),
 	  ExcVectorDoesNotMatch());
 
+  const unsigned int dofs_per_vertex = dof_handler->get_selected_fe().dofs_per_vertex,
+		     dofs_per_line   = dof_handler->get_selected_fe().dofs_per_line,
+		     dofs_per_quad   = dof_handler->get_selected_fe().dofs_per_quad;
   vector<double>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_vertex; ++d)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next_dof_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_line; ++d)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
       *next_dof_value++ = values(this->line(line)->dof_index(d));
-  for (unsigned int d=0; d<dof_handler->get_selected_fe().dofs_per_quad; ++d)
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
     *next_dof_value++ = values(dof_index(d));
 };
 
