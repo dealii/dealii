@@ -18,6 +18,7 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/mapping.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe_raviart_thomas.h>
 #include <fe/fe_values.h>
 
@@ -1609,7 +1610,9 @@ FE_RaviartThomas<dim>::fill_fe_values (const Mapping<dim>                   &map
     }
 
   if (flags & update_second_derivatives)
-    this->compute_2nd (mapping, cell, 0, mapping_data, fe_data, data);
+    this->compute_2nd (mapping, cell,
+                       internal::DataSetDescriptor<dim>::cell().offset(),
+                       mapping_data, fe_data, data);
 }
 
 
@@ -1633,7 +1636,10 @@ FE_RaviartThomas<dim>::fill_fe_face_values (const Mapping<dim>                  
                                    // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
-  const unsigned int offset = face * quadrature.n_quadrature_points;
+  const unsigned int offset
+    = (internal::DataSetDescriptor<dim>::
+       face (cell, face,
+             quadrature.n_quadrature_points)).offset();
 
   				   // get the flags indicating the
 				   // fields that have to be filled
@@ -1772,8 +1778,10 @@ FE_RaviartThomas<dim>::fill_fe_subface_values (const Mapping<dim>               
                                    // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
-  const unsigned int offset = ((face * GeometryInfo<dim>::subfaces_per_face + subface)
-                               * quadrature.n_quadrature_points);
+  const unsigned int offset
+    = (internal::DataSetDescriptor<dim>::
+       sub_face (cell, face, subface,
+                 quadrature.n_quadrature_points)).offset();
 
   				   // get the flags indicating the
 				   // fields that have to be filled
