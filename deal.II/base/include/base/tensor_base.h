@@ -397,17 +397,6 @@ double & Tensor<1,dim>::operator [] (const unsigned int index)
 
 
 
-template <int dim>
-inline
-Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
-{
-  for (unsigned int i=0; i<dim; ++i)
-    values[i] = p.values[i];
-  return *this;
-}
-
-
-
 template <>
 inline
 Tensor<1,0> & Tensor<1,0>::operator = (const Tensor<1,0> &)
@@ -427,12 +416,72 @@ Tensor<1,0> & Tensor<1,0>::operator = (const Tensor<1,0> &)
 
 
 
+template <>
+inline
+Tensor<1,1> & Tensor<1,1>::operator = (const Tensor<1,1> &p)
+{
+				   // unroll by hand since this is a
+				   // frequently called function and
+				   // some compilers don't want to
+				   // always unroll the loop in the
+				   // general template
+  values[0] = p.values[0];
+  return *this;
+}
+
+
+
+template <>
+inline
+Tensor<1,2> & Tensor<1,2>::operator = (const Tensor<1,2> &p)
+{
+				   // unroll by hand since this is a
+				   // frequently called function and
+				   // some compilers don't want to
+				   // always unroll the loop in the
+				   // general template
+  values[0] = p.values[0];
+  values[1] = p.values[1];
+  return *this;
+}
+
+
+
+template <>
+inline
+Tensor<1,3> & Tensor<1,3>::operator = (const Tensor<1,3> &p)
+{
+				   // unroll by hand since this is a
+				   // frequently called function and
+				   // some compilers don't want to
+				   // always unroll the loop in the
+				   // general template
+  values[0] = p.values[0];
+  values[1] = p.values[1];
+  values[2] = p.values[2];
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = p.values[i];
+  return *this;
+}
+
+
+
 template <int dim>
 inline
 bool Tensor<1,dim>::operator == (const Tensor<1,dim> &p) const
 {
   for (unsigned int i=0; i<dim; ++i)
-    if (values[i] != p.values[i]) return false;
+    if (values[i] != p.values[i])
+      return false;
   return true;
 }
 
@@ -487,6 +536,51 @@ Tensor<1,dim> & Tensor<1,dim>::operator /= (const double &s)
   for (unsigned int i=0; i<dim; ++i)
     values[i] /= s;
   return *this;
+}
+
+
+
+template <>
+inline
+double Tensor<1,1>::operator * (const Tensor<1,1> &p) const
+{
+				   // unroll by hand since this is a
+				   // frequently called function and
+				   // some compilers don't want to
+				   // always unroll the loop in the
+				   // general template
+  return (values[0] * p.values[0]);
+}
+
+
+
+template <>
+inline
+double Tensor<1,2>::operator * (const Tensor<1,2> &p) const
+{
+				   // unroll by hand since this is a
+				   // frequently called function and
+				   // some compilers don't want to
+				   // always unroll the loop in the
+				   // general template
+  return (values[0] * p.values[0] +
+	  values[1] * p.values[1]);
+}
+
+
+
+template <>
+inline
+double Tensor<1,3>::operator * (const Tensor<1,3> &p) const
+{
+				   // unroll by hand since this is a
+				   // frequently called function and
+				   // some compilers don't want to
+				   // always unroll the loop in the
+				   // general template
+  return (values[0] * p.values[0] +
+	  values[1] * p.values[1] +
+	  values[2] * p.values[2]);
 }
 
 
