@@ -9,6 +9,12 @@ DEAL:5-SparseMatrix<double>:Richardson::Starting
 DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 
 DEAL:5-SparseMatrix<double>:Richardson::Starting 
 DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 
+DEAL:5-SparseMatrix<double>:Richardson::Starting 
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 
+DEAL:5-SparseMatrix<double>:Richardson::Starting 
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 
+DEAL:5-SparseMatrix<double>:Richardson::Starting 
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 
 DEAL:5-SparseMatrix<double>::Transpose
 DEAL:5-SparseMatrix<double>:RichardsonT::Starting 
 DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
@@ -18,7 +24,13 @@ DEAL:5-SparseMatrix<double>:RichardsonT::Starting
 DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
 DEAL:5-SparseMatrix<double>:RichardsonT::Starting 
 DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 16
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting 
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting 
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting 
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	0	5.00
 DEAL::	0	1	1	-2.00
@@ -98,6 +110,12 @@ DEAL:5-SparseMatrixEZ<double>:Richardson::Starting
 DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 
 DEAL:5-SparseMatrixEZ<double>:Richardson::Starting 
 DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting 
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting 
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting 
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 
 DEAL:5-SparseMatrixEZ<double>::Transpose
 DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting 
 DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
@@ -107,7 +125,13 @@ DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting
 DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
 DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting 
 DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 16
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting 
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting 
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting 
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	0	5.00
 DEAL::	0	1	1	-2.00
@@ -188,6 +212,12 @@ DEAL:9-SparseMatrix<double>:Richardson::Starting
 DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 
 DEAL:9-SparseMatrix<double>:Richardson::Starting 
 DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 
+DEAL:9-SparseMatrix<double>:Richardson::Starting 
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 
+DEAL:9-SparseMatrix<double>:Richardson::Starting 
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 
+DEAL:9-SparseMatrix<double>:Richardson::Starting 
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 
 DEAL:9-SparseMatrix<double>::Transpose
 DEAL:9-SparseMatrix<double>:RichardsonT::Starting 
 DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 
@@ -197,9 +227,21 @@ DEAL:9-SparseMatrix<double>:RichardsonT::Starting
 DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 
 DEAL:9-SparseMatrix<double>:RichardsonT::Starting 
 DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 16
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting 
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting 
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting 
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::Assemble
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting 
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting 
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting 
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 
 DEAL:9-SparseMatrixEZ<double>:Richardson::Starting 
 DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 
 DEAL:9-SparseMatrixEZ<double>:Richardson::Starting 
@@ -217,5 +259,11 @@ DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting
 DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
 DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting 
 DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
-DEAL::GrowingVectorMemory:Overall allocated vectors: 16
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting 
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting 
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting 
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
