@@ -47,6 +47,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>base</h3>
 
 <ol>
+  <li> <p>
+       Fixed: The class <code>MultipleParameterLoop::UserClass</code> had only
+       virtual abstract functions but no virtual destructor. This caused
+       warnings with some compilers, and is generally bad practice
+       anyway. This is now fixed.
+       <br> 
+       (WB, 2005/02/20)
+       </p>
 </ol>
 
 

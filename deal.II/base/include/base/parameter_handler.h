@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1871,6 +1871,14 @@ class MultipleParameterLoop : public ParameterHandler
     class UserClass 
     {
       public:
+                                         /**
+                                          * Destructor. It doesn't actually do
+                                          * anything, but is declared to force
+                                          * derived classes to have a virtual
+                                          * destructor.
+                                          */
+        virtual ~UserClass ();
+        
 					 /**
 					  * <tt>create_new</tt> must provide a clean
 					  * object, either by creating a new one
