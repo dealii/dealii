@@ -1212,11 +1212,6 @@ ConstraintMatrix::memory_consumption () const
 
 
 
-#define matrix_functions_1 \
-  template void ConstraintMatrix::condense<>(const MatrixType &uncondensed,\
-					     MatrixType       &condensed) const;
-#define matrix_functions_2 \
-  template void ConstraintMatrix::condense<>(MatrixType &uncondensed) const;
 
 
 
@@ -1234,17 +1229,13 @@ vector_functions;
 
 
 
-#define MatrixType SparseMatrix<float>
-matrix_functions_1;
-matrix_functions_2;
-#undef MatrixType
+template void ConstraintMatrix::condense<float>(const SparseMatrix<float> &uncondensed,
+						SparseMatrix<float> &condensed) const;
+template void ConstraintMatrix::condense<float>(SparseMatrix<float> &uncondensed) const;
 
-#define MatrixType SparseMatrix<double>
-matrix_functions_1;
-matrix_functions_2;
-#undef MatrixType
+template void ConstraintMatrix::condense<double>(const SparseMatrix<double> &uncondensed,
+						 SparseMatrix<double> &condensed) const;
+template void ConstraintMatrix::condense<double>(SparseMatrix<double> &uncondensed) const;
 
 // block sparse matrices are only implemented for one of the two matrix functions
-#define MatrixType BlockSparseMatrix<double>
-matrix_functions_2;
-#undef MatrixType
+template void ConstraintMatrix::condense<double>(BlockSparseMatrix<double> &uncondensed) const;
