@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -349,7 +349,7 @@ subdivided_hyper_rectangle (Triangulation<dim>              &tria,
         const unsigned int n_xy = (repetitions[0]+1)*(repetitions[1]+1);
         
         cells.resize (repetitions[2]*repetitions[1]*repetitions[0]);
-        for (unsigned int z=0; z<repetitions[1]; ++z)
+        for (unsigned int z=0; z<repetitions[2]; ++z)
           for (unsigned int y=0; y<repetitions[1]; ++y)
             for (unsigned int x=0; x<repetitions[0]; ++x)
               {
