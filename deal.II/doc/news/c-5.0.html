@@ -170,6 +170,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: PETSc had changed some of its interfaces in version 2.2.1, which
+       prevented deal.II from working with it (it couldn't be compiled at
+       all). We have added checks that make sure that it can now again be
+       compiled with PETSc versions 2.1.6, 2.2.0, and 2.2.1.
+       <br> 
+       (WB 2004/10/07)
+       </p>
+
+  <li> <p>
        New: A class <code class="class">PreconditionLU</code> which
        provides a wrapper to the complete LU decomposition
        preconditioner of PETSc. Furthermore a class 
@@ -182,8 +191,8 @@ inconvenience this causes.
        <br> 
        (Oliver Kayser-Herold 2004/07/27)
        </p>
-
-  <li> <p>
+ 
+ <li> <p>
        Improved: <code class="member">VectorTools::point_difference</code>
        used to use an algorithm to find the cell the given point is in that
        was linear in the total number of active cells. It has been rewritten
