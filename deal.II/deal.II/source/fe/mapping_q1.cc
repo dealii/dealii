@@ -301,8 +301,6 @@ MappingQ1<dim>::update_once (const UpdateFlags in) const
 	    | update_normal_vectors))
     out |= update_transformation_gradients;
 
-  //  cerr << "Once: " << hex << out << dec << endl;
-
   return out;
 }
 
@@ -319,8 +317,6 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				      | update_boundary_forms
 				      | update_normal_vectors));
 
-  //  cerr << "Mapping-each " << hex << in << ' ' << out;
-
 				   // The following is a little incorrect:
 				   // If not applied on a face,
 				   // update_boundary_forms does not
@@ -330,8 +326,6 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				   // update_boundary_forms is simply
 				   // ignored for the interior of a
 				   // cell.
-//TODO:[RH,GK] Consider giving this function information on whether we are on
-//  a face.
   if (out & (update_JxW_values
 	    |update_normal_vectors))
     out |= update_boundary_forms;
@@ -342,8 +336,6 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 	    | update_normal_vectors))
     out |= update_contravariant_transformation;
 
-  //  cerr << "  " << hex << out << dec << endl;
-  
   return out;
 }
 
