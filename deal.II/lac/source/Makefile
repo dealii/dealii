@@ -6,7 +6,7 @@ CXXFLAGS.g= -DDEBUG -g -Wall -W -pedantic -Wconversion \
             -Winline -Woverloaded-virtual \
             $(INCLUDE)
 CXXFLAGS  =-O3 -Wuninitialized -finline-functions -ffast-math \
-           -funroll-loops -felide-constructors -fnonnull-objects \
+           -felide-constructors -fnonnull-objects \
            $(INCLUDE)
 
 cc-files = $(wildcard *.cc)
