@@ -37,7 +37,7 @@ delete-files = results/*gnuplot results/*.eps
 # Internals
 
 #deal include base path
-D = ../../..
+D = ../../../deal.II/
 
 include $D/common/Make.global_options
 
