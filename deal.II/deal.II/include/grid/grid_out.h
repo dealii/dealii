@@ -81,7 +81,7 @@ class GridOut
 				      * Declaration of a name for each of the
 				      * different output formats.
 				      */
-    enum OutputFormat { gnuplot, eps };
+    enum OutputFormat { gnuplot, eps, ucd };
 
 				     /**
 				      * Write the triangulation in the
@@ -90,8 +90,18 @@ class GridOut
 				      * of what happens here.
 				      */
     template <int dim>
-    static void write_gnuplot (const Triangulation<dim> &tria,
-			       ostream                  &out);
+    void write_gnuplot (const Triangulation<dim> &tria,
+			ostream                  &out);
+
+				     /**
+				      * Write the triangulation in the
+				      * ucd format. See the general
+				      * documentation for a description
+				      * of what happens here.
+				      */
+    template <int dim>
+    void write_ucd (const Triangulation<dim> &tria,
+		    ostream                  &out);
 
 				     /**
 				      * Write the triangulation in the
@@ -100,9 +110,9 @@ class GridOut
 				      * of what happens here.
 				      */
     template <int dim>
-    static void write_eps (const Triangulation<dim> &tria,
-			   ostream                  &out);
-
+    void write_eps (const Triangulation<dim> &tria,
+		    ostream                  &out);
+    
 				     /**
 				      * Write data and grid to #out# according
 				      * to the given data format. This function
@@ -110,9 +120,9 @@ class GridOut
 				      * #write_*# function.
 				      */
     template <int dim>
-    static void write (const Triangulation<dim> &tria,
-		       ostream                  &out,
-		       const OutputFormat        output_format);
+    void write (const Triangulation<dim> &tria,
+		ostream                  &out,
+		const OutputFormat        output_format);
     
 				     /**
 				      * Provide a function which tells us which
@@ -121,6 +131,7 @@ class GridOut
 				      * formats are defined:
 				      * \begin{itemize}
 				      * \item #gnuplot#: #.gnuplot#
+				      * \item #ucd#: #.inp#
 				      * \item #eps#: #.eps#.
 				      * \end{itemize}
 				      *
@@ -171,6 +182,58 @@ class GridOut
 				      * Exception
 				      */
     DeclException0 (ExcIO);
+
+  private:
+
+				     /**
+				      * Write the grid information about
+				      * faces to #out#. Only those faces
+				      * are printed which are on the boundary
+				      * and which have a boundary indicator
+				      * not equal to zero, since the latter
+				      * is the default for boundary faces.
+				      *
+				      * Since cells and faces are continuously
+				      * numbered, the #starting_index# for
+				      * the numbering of the faces is passed
+				      * also.
+				      *
+				      * This function unfortunately can not
+				      * be included in the regular #write_ucd#
+				      * function, since it needs special
+				      * treatment for the case #dim==1#, in
+				      * which case the face iterators are
+				      * #void*#'s and lack the member functions
+				      * which are called. We would not actually
+				      * call these functions, but the compiler
+				      * would complain anyway when compiling
+				      * the function for #dim==1#. Bad luck.
+				      */
+    template <int dim>
+    void write_ucd_faces (const Triangulation<dim> &tria,
+			  const unsigned int        starting_index,
+			  ostream                  &out) const;
+
+				     /**
+				      * Return the number of faces in the
+				      * triangulation which have a boundary
+				      * indicator not equal to zero. Only
+				      * these faces are explicitely printed
+				      * in the #write_*# functions;
+				      * all faces with indicator 255 are
+				      * interior ones and an indicator with
+				      * value zero for faces at the boundary
+				      * are considered default.
+				      *
+				      * This function always returns an empty
+				      * list in one dimension.
+				      *
+				      * The reason for this function is the
+				      * same as for #write_ucd_faces#. See
+				      * there for more information.
+				      */
+    template <int dim>
+    unsigned int n_boundary_faces (const Triangulation<dim> &tria) const;
 };
 
 
