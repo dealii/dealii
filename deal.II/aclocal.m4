@@ -60,11 +60,9 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 [
   AC_MSG_CHECKING(for platform specific thread flags)
   AC_REQUIRE([AC_LANG_CPLUSPLUS])
-  for i in threads mt pthread pthreads mthreads Kthread kthread; do
+  for i in threads mt pthread pthreads mthreads Kthread kthread invalid_last_entry; do
     CXXFLAGS="$CXXFLAGSG -$i"
-    AC_TRY_COMPILE(
-     	[],
-	[;],
+    DEAL_II_TRY_COMPILER_FLAG(
 	[
 	  thread_flag=$i
 	  CXXFLAGSG="$CXXFLAGSG -$i"
@@ -74,9 +72,49 @@ AC_DEFUN(DEAL_II_GET_THREAD_FLAGS, dnl
 	  break
    	])
   done
-  AC_MSG_RESULT("$thread_flag")
+  if test $thread_flag = invalid_last_entry ; then
+	AC_MSG_RESULT("no flag found!")
+	AC_MSG_ERROR("Could not determine multithreading flag for this platform. Aborting!")
+  fi
+  AC_MSG_RESULT("-$thread_flag")
 ])
 
+
+
+dnl Try whether the set of compiler flags in CXXFLAGS is reasonable, i.e.
+dnl does not result in compiler messages (which are then produced by
+dnl unknown or unrecognized compiler flags. This macro is mostly copied
+dnl from the definition of AC_TRY_COMPILE, but the first two arguments are
+dnl omitted and some other things are also simplified.
+dnl
+dnl Usage:
+dnl   DEAL_II_TRY_COMPILER_FLAG([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+AC_DEFUN(DEAL_II_TRY_COMPILER_FLAG, dnl
+[
+  cat > conftest.$ac_ext <<EOF
+       int main() { return 0; }
+EOF
+
+  dnl lets see whether the compiler generates output to stdout or stderr
+  deal_II_compiler_output=`eval $ac_compile 2>&1`
+  if test ! "$deal_II_compiler_output"; then
+    ifelse([$1], , :, 
+	   [
+		rm -rf conftest*
+    		$1
+	   ])
+  else
+    echo "configure: failed program was:" >&AC_FD_CC
+    cat conftest.$ac_ext >&AC_FD_CC
+    ifelse([$2], , ,  
+	   [
+		rm -rf conftest*
+		$2
+           ])
+  fi
+  rm -f conftest*
+])
 
 
 
