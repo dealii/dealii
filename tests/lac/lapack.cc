@@ -22,12 +22,19 @@
 #include <fstream>
 #include <iostream>
 
+/*
+ * Eigenvalues and -vectors of this system are
+ * lambda = 1     v = (1, 1, 1, 1)
+ * lambda = 5     v = (1,-1, 0, 0)
+ * lambda = 5     v = (0, 1,-1, 0)
+ * lambda = 5     v = (0, 0, 1,-1)
+ */
 const double symm[] =
 {
-      4., 1., -1., 1.,
-      1., 4., 1., -1.,
-      -1., 1., 4., 1.,
-      1., -1., 4., 1.
+      4., -1., -1., -1.,
+      -1., 4., -1., -1.,
+      -1., -1., 4., -1.,
+      -1., -1., -1., 4.
 };
 
 const double rect[] =
@@ -41,7 +48,7 @@ const double rect[] =
 int main()
 {
   std::ofstream logfile("lapack.output");
-  logfile.precision(4);
+  logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
 
@@ -96,11 +103,20 @@ int main()
   LA.reinit(4,4);
   A.fill(symm);
   LA = A;
+  LA.compute_eigenvalues();
+  for (unsigned int i=0;i<A.m();++i)
+    {
+      std::complex<double> lambda = LA.eigenvalue(i);
+      deallog << "Eigenvalues "
+	      << (int) (lambda.real()+.0001) << '\t'
+	      << (int) (lambda.imag()+.0001) << std::endl;
+    }
+  
   v1.reinit(4);
   v2.reinit(4);
   
 #else
-				   // If lapack is not available, this
+			// If lapack is not available, this
 				   // test will not complain.
   deallog.push("Rect");
   deallog << "operator= (const FullMatrix<number>&) ok" << std::endl;
@@ -108,6 +124,10 @@ int main()
   deallog << "vmult_add ok" << std::endl;
   deallog << "Tvmult ok" << std::endl;
   deallog << "Tvmult_add ok" << std::endl;
+  deallog << "Eigenvalues 5\t0" << std::endl;
+  deallog << "Eigenvalues 1\t0" << std::endl;
+  deallog << "Eigenvalues 5\t0" << std::endl;
+  deallog << "Eigenvalues 5\t0" << std::endl;
   deallog.pop();
 #endif
 }
