@@ -15,6 +15,27 @@
 
 <ol>
   <li> <p>
+       We now unconditionally include
+       <code>deal.II/include/grid/tria_accessor.templates.h</code>
+       (which containts some inline functions for triangulation
+       accessor classes) into 
+       <code>deal.II/include/grid/tria_accessor.h</code> to work
+       around a problem with gcc3.0 which does not place a copy of
+       these functions into the library. Previously we only included
+       the file in optimized mode.
+       <br>
+       (RH 2001/03/04)
+       </p>
+
+  <li> <p>
+       The class <code class="class">GridReordering::Cell</code> has
+       now a copy constructor to work around a bug in a gcc3.0
+       snapshot.
+       <br>
+       (RH, WB 2001/03/14)
+       </p>
+
+  <li> <p>
        Fixed: a missing <code>const</code> prevented the <code
        class="class">PreconditionSelector</code> class to be
        compiled.
