@@ -36,7 +36,7 @@
 #include <fstream>
 #include <cmath>
 
-const double pi=acos(-1);
+const double pi=std::acos(-1.);
 
 class TestFunction: public Function<2>
 {
@@ -54,7 +54,7 @@ TestFunction::value(const Point<2> &p,
 		    const unsigned int component) const
 {
   Assert(component==0, ExcInternalError());
-  return sin(pi*p(0))*cos(pi*p(1));
+  return std::sin(pi*p(0))*std::cos(pi*p(1));
 }
 
 
