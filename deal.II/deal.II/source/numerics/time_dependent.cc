@@ -291,6 +291,14 @@ TimeStepBase::get_time () const
 
 
 
+unsigned int
+TimeStepBase::get_timestep_no () const 
+{
+  return timestep_no;
+};
+
+
+
 double
 TimeStepBase::get_backward_timestep () const
 {

@@ -859,6 +859,14 @@ class TimeStepBase : public Subscriptor
 				      * step.
 				      */
     double get_time () const;
+
+				     /**
+				      * Return the number of this time
+				      * step. Note that this number may vary
+				      * between different sweeps, if timesteps
+				      * are added or deleted.
+				      */
+    unsigned int get_timestep_no () const;
     
 				     /**
 				      * Compute the time difference to the
