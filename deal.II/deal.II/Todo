@@ -174,3 +174,8 @@ Unify lots of code of the two Cuthill-McKee dof renumbering functions
   straightforward, since all the unified code needs to get is a
   sparsity structure, possibly compressed and return a vector
   of numbers. Simple task.
+
+
+Maybe single out the epsgrid from DataOut and the write_gnuplot from 
+  Triangulation<dim> to a single class like the DataOut class which
+  does only write grids, without any data.
