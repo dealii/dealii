@@ -10,13 +10,6 @@
 #define __deal2__data_out_h
 
 
-//TODO:[?] DataOut determines whether something is a DoF or cell vector by the size of the vector.
-//    This will fail if someone is using DG0 elements,
-//    since there the number of elements of both types of vectors is the
-//    same, but the ordering will usually differ. Errors cannot be plotted
-//    anyway, since they are float vectors.
-
-
 
 #include <base/smartpointer.h>
 #include <base/multithread_info.h>
@@ -160,6 +153,29 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 {
   public:
 				     /**
+				      * Type describing what the
+				      * vector given to
+				      * @ref{add_data_vector} is: a
+				      * vector that has one entry per
+				      * degree of freedom in a
+				      * @ref{DoFHandler} object (such
+				      * as solution vectors), or one
+				      * entry per cell in the
+				      * triangulation underlying the
+				      * @ref{DoFHandler} object (such
+				      * as error per cell data). The
+				      * value @p{type_automatic} tells
+				      * @ref{add_data_vector} to find
+				      * out itself (see the
+				      * documentation of
+				      * @p{add_data_vector} for the
+				      * method used).
+				      */
+    enum DataVectorType {
+	  type_dof_data, type_cell_data, type_automatic
+    };
+    
+				     /**
 				      * Constructor
 				      */
     DataOut_DoFData ();
@@ -202,7 +218,31 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * the number of active cells on
 				      * the present grid, in which
 				      * case it is assumed to be a
-				      * cell data vector.
+				      * cell data vector. As the
+				      * number of degrees of freedom
+				      * and of cells is usually not
+				      * equal, the function can
+				      * determine itself which type of
+				      * vector it is given; however,
+				      * there is one corner case,
+				      * namely if you compute with
+				      * piecewise constant elements
+				      * and have one scalar quantity,
+				      * then there are as many cells
+				      * as there are degrees of
+				      * freedom, but they may be
+				      * ordered differently. In that
+				      * case, you can change the last
+				      * argument of the function from
+				      * its default value
+				      * @p{type_automatic} to either
+				      * @p{type_dof_data} or @p{type_cell_data},
+				      * depending on what the vector
+				      * represents. Apart from this
+				      * corner case, you can leave the
+				      * argument at its default value
+				      * and let the function determine
+				      * the type of the vector itself.
 				      *
 				      * If it is a vector holding DoF
 				      * data, the names given shall be
@@ -227,7 +267,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * are valid and which are not.
 				      */
     void add_data_vector (const Vector<double>           &data,
-			  const std::vector<std::string> &names);
+			  const std::vector<std::string> &names,
+			  const DataVectorType            type = type_automatic);
 
 				     /**
 				      * This function is an
@@ -254,7 +295,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * each component to @p{name}
 				      */
     void add_data_vector (const Vector<double> &data,
-			  const std::string    &name);
+			  const std::string    &name,
+			  const DataVectorType  type = type_automatic);
 
 				     /**
 				      * Release the pointers to the
@@ -385,12 +427,6 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * data vector.
 					  */
 	std::vector<std::string> names;
-	
-					 /**
-					  * Physical unit name of this
-					  * component.
-					  */
-	std::string   units;
     };
 
 				     /**

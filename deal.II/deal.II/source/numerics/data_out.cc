@@ -57,8 +57,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
 DataEntry::memory_consumption () const
 {
   return (sizeof (data) +
-	  MemoryConsumption::memory_consumption (names) +
-	  MemoryConsumption::memory_consumption (units));
+	  MemoryConsumption::memory_consumption (names));
 };
 
 
@@ -100,8 +99,10 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (const Vector<double> &vec,
-							     const std::vector<std::string> &names)
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+add_data_vector (const Vector<double>           &vec,
+		 const std::vector<std::string> &names,
+		 const DataVectorType            type)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
 
@@ -109,16 +110,46 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (con
 				   // vectors
   Assert ((vec.size() == dofs->get_tria().n_active_cells()) ||
 	  (vec.size() == dofs->n_dofs()),
-	  ExcInvalidVectorSize(vec.size(), dofs->get_tria().n_active_cells(), dofs->n_dofs()));
+	  ExcInvalidVectorSize(vec.size(), dofs->get_tria().n_active_cells(),
+			       dofs->n_dofs()));
   
 				   // either cell data and one name,
 				   // or dof data and n_components names
-  if (vec.size() == dofs->get_tria().n_active_cells())
-    Assert (names.size() == 1,
-	    ExcInvalidNumberOfNames (names.size(), 1));
-  if (vec.size() == dofs->n_dofs())
-    Assert (names.size() == dofs->get_fe().n_components(),
-	    ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
+  DataVectorType actual_type = type;
+  if (type == type_automatic)
+    {
+      if (vec.size() == dofs->get_tria().n_active_cells())
+	actual_type = type_cell_data;
+      else
+	actual_type = type_dof_data;
+    };
+  
+  switch (actual_type)
+    {
+      case type_cell_data:
+	    Assert (vec.size() == dofs->get_tria().n_active_cells(),
+		    ExcInvalidVectorSize (vec.size(),
+					  dofs->n_dofs(),
+					  dofs->get_tria().n_active_cells()));
+	    Assert (names.size() == 1,
+		    ExcInvalidNumberOfNames (names.size(), 1));
+	    break;
+      
+      case type_dof_data:
+	    Assert (vec.size() == dofs->n_dofs(),
+		    ExcInvalidVectorSize (vec.size(),
+					  dofs->n_dofs(),
+					  dofs->get_tria().n_active_cells()));
+	    Assert (names.size() == dofs->get_fe().n_components(),
+		    ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
+	    break;
+
+      case type_automatic:
+					     // this case should have
+					     // been handled above...
+	    Assert (false, ExcInternalError());
+    };
+  
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -126,23 +157,19 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (con
 	    ExcInvalidCharacter (names[i]));
   
   DataEntry new_entry (&vec, names);
-  if (vec.size() == dofs->n_dofs())
+  if (actual_type == type_dof_data)
     dof_data.push_back (new_entry);
   else
-    if (vec.size() == dofs->get_tria().n_active_cells())
-      cell_data.push_back (new_entry);
-    else
-      Assert (false,
-	      ExcInvalidVectorSize (vec.size(),
-				    dofs->n_dofs(),
-				    dofs->get_tria().n_active_cells()));
+    cell_data.push_back (new_entry);
 };
 
 
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (const Vector<double> &vec,
-							     const std::string         &name)
+DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+add_data_vector (const Vector<double> &vec,
+		 const std::string    &name,
+		 const DataVectorType  type)
 {
   unsigned int n_components = dofs->get_fe().n_components ();
 
@@ -168,7 +195,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::add_data_vector (con
   	};
     };
   
-  add_data_vector (vec, names);
+  add_data_vector (vec, names, type);
 }
 
 

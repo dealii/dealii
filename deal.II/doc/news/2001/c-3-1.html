@@ -316,6 +316,19 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
+       New/fixed: In some obscure corner cases, the detection logic in <code
+       class="member">DataOut_DoFData::add_data_vector</code> would
+       not have been able to detect whether something is a DoF data
+       vector or a vector of cell data, and in some equally rare cases
+       this would also have made a difference. This is now fixed by
+       adding another argument to the function telling it either to
+       automatically detect the vector type (default) or to assume
+       that it has a certain type (for these corner cases).
+       <br>
+       (WB 2001/03/30)
+       </p>
+
+  <li> <p>
        Removed: the <code class="class">ProblemBase</code> class,
        which has been deprecated since before the release of 
        <acronym>deal.II</acronym> 3.0 has finally been removed. The
