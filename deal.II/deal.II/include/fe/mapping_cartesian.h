@@ -227,21 +227,6 @@ class MappingCartesian : public Mapping<dim>
 					  * points of all faces.
 					  */
 	std::vector<Point<dim> > quadrature_points;
-	
-					 /**
-					  * Unit tangential vectors. Used
-					  * for the computation of
-					  * boundary forms and normal
-					  * vectors.
-					  *
-					  * Filled once.
-					  */
-        Table<2,Tensor<1,dim> > unit_tangentials;
-	
-					 /**
-					  * Auxiliary vectors for internal use.
-					  */
-        Table<2,Tensor<1,dim> > aux;
     };
     
 				     /**

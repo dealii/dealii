@@ -46,9 +46,7 @@ MappingCartesian<dim>::InternalData::memory_consumption () const
 {
   return (Mapping<dim>::InternalDataBase::memory_consumption() +
 	  MemoryConsumption::memory_consumption (length) +
-	  MemoryConsumption::memory_consumption (quadrature_points) +
-	  MemoryConsumption::memory_consumption (unit_tangentials) +
-	  MemoryConsumption::memory_consumption (aux));
+	  MemoryConsumption::memory_consumption (quadrature_points));
 }
 
 
@@ -81,8 +79,6 @@ typename Mapping<dim>::InternalDataBase *
 MappingCartesian<dim>::get_data (const UpdateFlags      update_flags,
 				 const Quadrature<dim> &q) const
 {
-				   //  Assert (flags & update_normal_vectors == 0, ExcNotImplemented());
-
   InternalData* data = new InternalData (q);
 
   data->update_once = update_once(update_flags);
@@ -227,43 +223,62 @@ MappingCartesian<dim>::compute_fill (const typename DoFHandler<dim>::cell_iterat
       Assert (normal_vectors.size() == npts,
 	      ExcDimensionMismatch(normal_vectors.size(), npts));
       Point<dim> n;
-      switch (100*dim+face_no)
-	{
-					   // 2D
-	  case 200:
-	    n (1) = -1.;
-	    break;
-	  case 201:
-	    n (0) = 1.;
-	    break;
-	  case 202:
-	    n (1) = 1.;
-	    break;
-	  case 203:
-	    n (0) = -1.;
-	    break;
-					     // 3D
-	  case 300:
-	    n (1) = -1.;
-	    break;
-	  case 301:
-	    n (1) = 1.;
-	    break;
-	  case 302:
-	    n (2) = -1.;
-	    break;
-	  case 303:
-	    n (0) = 1.;
-	    break;
-	  case 304:
-	    n (2) = 1.;
-	    break;
-	  case 305:
-	    n (0) = -1.;
-	    break;
-	  default:
-	    Assert (false, ExcInternalError());
-	}
+      switch (dim)
+        {
+          case 2:
+          {
+            switch (face_no)
+              {
+                case 0:
+                      n (1) = -1.;
+                      break;
+                case 1:
+                      n (0) = 1.;
+                      break;
+                case 2:
+                      n (1) = 1.;
+                      break;
+                case 3:
+                      n (0) = -1.;
+                      break;
+                default:
+                      Assert (false, ExcInternalError());
+              }
+            break;
+          }
+
+          case 3:
+          {
+            switch (face_no)
+              {
+                case 0:
+                      n (1) = -1.;
+                      break;
+                case 1:
+                      n (1) = 1.;
+                      break;
+                case 2:
+                      n (2) = -1.;
+                      break;
+                case 3:
+                      n (0) = 1.;
+                      break;
+                case 4:
+                      n (2) = 1.;
+                      break;
+                case 5:
+                      n (0) = -1.;
+                      break;
+                default:
+                      Assert (false, ExcInternalError());
+              }
+            break;
+          }
+
+          default:
+                Assert (false, ExcNotImplemented());
+        }
+      
 				       // furthermore, all normal
 				       // vectors on a face are equal
       std::fill (normal_vectors.begin(), normal_vectors.end(), n);
