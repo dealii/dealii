@@ -478,6 +478,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 }
 
 
+
 template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u)
 {
@@ -491,8 +492,10 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u)
 }
 
 
+
 template <typename Number>
-void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b) {
+void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
+{
   Assert (dim!=0, ExcEmptyVector());
   Assert (a.dim == b.dim, ExcDimensionsDontMatch (a.dim, b.dim));
 
@@ -508,6 +511,7 @@ void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b) {
 };
 
 
+
 template <typename Number>
 Vector<Number>& Vector<Number>::operator = (const Number s)
 {
@@ -515,6 +519,7 @@ Vector<Number>& Vector<Number>::operator = (const Number s)
   fill (begin(), end(), s);
   return *this;
 }
+
 
 
 template <typename Number>
@@ -528,6 +533,7 @@ Vector<Number>::operator = (const Vector<Number>& v)
   
   return *this;
 }
+
 
 
 template <typename Number>
@@ -544,6 +550,7 @@ Vector<Number>::operator = (const Vector<Number2>& v)
 }
 
 
+
 template <typename Number>
 void Vector<Number>::print (FILE* f, const char* format) const
 {
@@ -555,6 +562,7 @@ void Vector<Number>::print (FILE* f, const char* format) const
 }
 
 
+
 template <typename Number>
 void Vector<Number>::print (const char* format) const
 {
@@ -564,6 +572,7 @@ void Vector<Number>::print (const char* format) const
     printf (format, val[j]);
   printf ("\n");
 }
+
 
 
 template <typename Number>
@@ -594,39 +603,65 @@ void Vector<Number>::print (ostream &out,
 };
 
 
+
 template <typename Number>
-void Vector<Number>::block_write (ostream &out) const {
+void Vector<Number>::block_write (ostream &out) const
+{
   AssertThrow (out, ExcIO());
-    
-  out << size() << endl << '[';
+
+				   // other version of the following
+				   //  out << size() << endl << '[';
+				   // reason: operator<< seems to use
+				   // some resources that lead to
+				   // problems in a multithreaded
+				   // environment
+  const unsigned int sz = size();
+  out.write (reinterpret_cast<const char*>(&sz),
+	     reinterpret_cast<const char*>(&sz+1)
+	     - reinterpret_cast<const char*>(&sz));
+  const char intro = '[';
+  out.write (&intro, 1);
   out.write (reinterpret_cast<const char*>(begin()),
 	     reinterpret_cast<const char*>(end())
 	     - reinterpret_cast<const char*>(begin()));
-  out << ']';
+  
+				   // out << ']';
+  const char outro = ']';
+  out.write (&outro, 1);
   
   AssertThrow (out, ExcIO());
 };
 
 
+
 template <typename Number>
-void Vector<Number>::block_read (istream &in) {
+void Vector<Number>::block_read (istream &in)
+{
   AssertThrow (in, ExcIO());
 
   unsigned int sz;
-  in >> sz;
+				   // other version of
+				   //  in >> sz;
+				   // reason as above
+  in.read (reinterpret_cast<void*>(&sz),
+	   reinterpret_cast<const char*>(&sz+1)
+	   - reinterpret_cast<const char*>(&sz));
+  
 				   // fast initialization, since the
 				   // data elements are overwritten anyway
   reinit (sz, true);     
 
   char c;
-  in >> c;
+				   //  in >> c;
+  in.read (&c, 1);
   AssertThrow (c=='[', ExcIO());
   
   in.read (reinterpret_cast<void*>(begin()),
 	   reinterpret_cast<const char*>(end())
 	   - reinterpret_cast<const char*>(begin()));
   
-  in >> c;
+				   //  in >> c;
+  in.read (&c, 1);
   AssertThrow (c==']', ExcIO());
   AssertThrow (in, ExcIO());
 }
