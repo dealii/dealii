@@ -34,7 +34,7 @@ additional-run-action =
 # To specify which files are to be deleted by "make clean" (apart from
 # the usual ones: object files, executables, backups, etc), fill in the
 # following list
-delete-files = gnuplot* *.eps
+delete-files = *gnuplot *.eps
 
 
 
