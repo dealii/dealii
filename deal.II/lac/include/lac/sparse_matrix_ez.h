@@ -439,9 +439,9 @@ class SparseMatrixEZ : public Subscriptor
 
 				     /**
 				      * Set the element @p{(i,j)} to
-				      * @p{value}. Allocates the entry
-				      * if it does not exist. Filters
-				      * out zeroes automatically.
+				      * @p{value}. Allocates the entry,
+				      * if it does not exist and
+				      * @p{value} is non-zero.
 				      */
     void set (const unsigned int i, const unsigned int j,
 	      const number value);
@@ -1322,9 +1322,18 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
 
-//TODO[GK]: Do as the documentation promises: ignore zero values. The complication is that we should ignore the zero entry if no entry is there already, but set an existing entry to zero
-  Entry* entry = allocate(i,j);
-  entry->value = value;
+  if (value == 0.)
+    {
+      Entry* entry = locate(i,j);
+      if (entry != 0)
+	{
+	}
+    }
+  else
+    {
+      Entry* entry = allocate(i,j);
+      entry->value = value;
+    }
 }
 
 
