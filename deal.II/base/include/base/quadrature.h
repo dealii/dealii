@@ -1,15 +1,15 @@
-//----------------------------  quadrature.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal authors
+//    Copyright (C) 1998 - 2005 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  quadrature.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__quadrature_h
 #define __deal2__quadrature_h
 
@@ -242,24 +242,10 @@ class QIterated : public Quadrature<dim>
 
     				     /** @addtogroup Exceptions
 				      * @{ */
-
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcSumOfWeightsNotOne);
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidQuadratureFormula);
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidNumberOfCopies,
-		    int,
-		    << "The numbers of copies (" << arg1
-		    << ") of the quadrature formula is not valid.");
-				     //@}    
   private:
 				     /**
 				      * Check whether the given

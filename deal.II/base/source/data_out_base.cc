@@ -41,7 +41,7 @@ DataOutBase::Patch<dim,spacedim>::Patch ()
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
     neighbors[i] = no_neighbor;
   
-  Assert (dim<=spacedim, ExcInvalidCombinationOfDimensions(dim,spacedim));
+  Assert (dim<=spacedim, ExcIndexRange(dim,0,spacedim));
   Assert (spacedim<=3, ExcNotImplemented());
 }
 
@@ -813,7 +813,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
       
 	  Assert (patch->data.n_rows() == n_data_sets,
-		  ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+		  ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
 	  Assert (patch->data.n_cols() == (dim==1 ?
 				      n_subdivisions+1 :
 				      (dim==2 ?
@@ -1297,7 +1297,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
       
 	  Assert (patch->data.n_rows() == n_data_sets,
-		  ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+		  ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
 	  Assert (patch->data.n_cols() == (dim==1 ?
 				      n_subdivisions+1 :
 				      (dim==2 ?
@@ -1457,7 +1457,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
       Assert (patch->data.n_rows() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
@@ -1756,7 +1756,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
       Assert (patch->data.n_rows() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
@@ -1806,7 +1806,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
       Assert (patch->data.n_rows() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?
@@ -2011,7 +2011,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 	}
       else
 	{                                    // writing bicubic_patch
-	  Assert (n_subdivisions==3, ExcUnexpectedNumberOfSubdivisions(n_subdivisions,3));
+	  Assert (n_subdivisions==3, ExcDimensionMismatch(n_subdivisions,3));
 	  out << std::endl
 	      << "bicubic_patch {" << std::endl
 	      << "  type 0" << std::endl
@@ -2130,8 +2130,8 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 		    case 2:
 		      Assert ((flags.height_vector < patch->data.n_rows()) ||
 			      patch->data.n_rows() == 0,
-			      ExcInvalidVectorNumber (flags.height_vector,
-						  patch->data.n_rows()));
+			      ExcIndexRange (flags.height_vector, 0,
+					     patch->data.n_rows()));
 		      heights[0] = patch->data.n_rows() != 0 ?
 			patch->data(flags.height_vector,i*(n_subdivisions+1) + j) * flags.z_scaling
 			: 0;
@@ -2226,8 +2226,8 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 		    {
 		      Assert ((flags.color_vector < patch->data.n_rows()) ||
 			      patch->data.n_rows() == 0,
-			      ExcInvalidVectorNumber (flags.color_vector,
-						      patch->data.n_rows()));
+			      ExcIndexRange (flags.color_vector, 0,
+					     patch->data.n_rows()));
 		      const double color_values[4]
 			= { patch->data.n_rows() != 0 ?
 			    patch->data(flags.color_vector,i*(n_subdivisions+1) + j)       : 1,
@@ -2441,7 +2441,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
   Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcUnexpectedNumberOfDatasets (patches[0].data.n_rows(), n_data_sets));
+	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -2752,7 +2752,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
   Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcUnexpectedNumberOfDatasets (patches[0].data.n_rows(), n_data_sets));
+	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
   
 
   
@@ -3206,7 +3206,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
   Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcUnexpectedNumberOfDatasets (patches[0].data.n_rows(), n_data_sets));
+	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
   
 
   
@@ -3564,7 +3564,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
   Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcUnexpectedNumberOfDatasets (patches[0].data.n_rows(), n_data_sets));
+	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -3900,7 +3900,7 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
       const unsigned int n_subdivisions = patch->n_subdivisions;
 	  
       Assert (patch->data.n_rows() == n_data_sets,
-	      ExcUnexpectedNumberOfDatasets (patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == (dim==1 ?
 				  n_subdivisions+1 :
 				  (dim==2 ?

@@ -1,15 +1,15 @@
-//----------------------------  polynomial.cc  -----------------------
+//---------------------------------------------------------------------------
 //      $Id$   
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2000 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------   polynomial.cc  ----------------------
+//---------------------------------------------------------------------------
 
 
 #include <base/polynomial.h>
@@ -53,7 +53,7 @@ namespace Polynomials
   number
   Polynomial<number>::value (const number x) const
   {
-    Assert (coefficients.size() > 0, ExcVoidPolynomial());
+    Assert (coefficients.size() > 0, ExcEmptyObject());
     const unsigned int m=coefficients.size();
 
                                      // Horner scheme
@@ -71,8 +71,8 @@ namespace Polynomials
   Polynomial<number>::value (const number         x,
                              std::vector<number> &values) const
   {
-    Assert (coefficients.size() > 0, ExcVoidPolynomial());
-    Assert (values.size() > 0, ExcEmptyArray());
+    Assert (coefficients.size() > 0, ExcEmptyObject());
+    Assert (values.size() > 0, ExcZero());
     const unsigned int values_size=values.size();
   
   

@@ -1,15 +1,15 @@
-//----------------------------  quadrature.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  quadrature.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
 #include <grid/geometry_info.h>
@@ -1022,7 +1022,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 			       (base_quadrature.n_quadrature_points-1) * n_copies + 1 :
 			       base_quadrature.n_quadrature_points * n_copies) 
 {
-  Assert (n_copies >= 1, ExcInvalidNumberOfCopies(n_copies));
+  Assert (n_copies > 0, ExcZero());
   
   if (!uses_both_endpoints(base_quadrature))
 				     // we don't have to skip some
@@ -1066,7 +1066,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 	  };
 				       // scale the weight correctly
       double_point_weight /= n_copies;
-
+//TODO:[WB] The following assertion looks strange. InternalError???
 				       // make sure the base quadrature formula
 				       // has only one quadrature point
 				       // per end point
@@ -1110,7 +1110,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
   for (unsigned int i=0; i<this->n_quadrature_points; ++i)
     sum_of_weights += this->weight(i);
   Assert (std::fabs(sum_of_weights-1) < 1e-15,
-	  ExcSumOfWeightsNotOne());
+	  ExcInternalError());
 #endif
 }
 

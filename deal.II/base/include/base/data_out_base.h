@@ -1439,35 +1439,14 @@ class DataOutBase
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcUnexpectedNumberOfDatasets,
-		    int, int,
-		    << "The number of data sets on this patch is " << arg1
-		    << ", but we expected " << arg2);
-
-				     /**
-				      * Exception
-				      */
     DeclException2 (ExcInvalidDatasetSize,
 		    int, int,
 		    << "The number of points in this data set is " << arg1
 		    << ", but we expected " << arg2 << " in each space direction.");
 				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcInvalidVectorNumber,
-		    int, int,
-		    << "The number " << arg1 << " of the vector to be used for "
-		    << "this information is invalid, since there are only "
-		    << arg2 << " data sets.");
-				     /**
-				      * Exception
-				      */
-    DeclException2 (ExcUnexpectedNumberOfSubdivisions,
-		    int, int,
-		    << "The number of subdivisions is " << arg1
-		    << ", but we excepted "  << arg2<< " for bicubic patch");
-				     /**
-				      * Exception
+				      * An output function did not
+				      * receive any patches for
+				      * writing.
 				      */
     DeclException0 (ExcNoPatches);
 				     /**

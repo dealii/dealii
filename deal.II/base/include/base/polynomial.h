@@ -1,15 +1,15 @@
-//----------------------------  polynomial.h  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000 - 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  polynomial.h  ---------------------------
+//---------------------------------------------------------------------------
 #ifndef __deal2__polynomial_h
 #define __deal2__polynomial_h
 
@@ -178,19 +178,6 @@ namespace Polynomials
                                         */
       void print(std::ostream& out) const;
 
-      				     /** @addtogroup Exceptions
-				      * @{ */
-
-                                       /**
-                                        * Exception
-                                        */
-      DeclException0 (ExcEmptyArray);
-    
-                                       /**
-                                        * Exception
-                                        */
-      DeclException0 (ExcVoidPolynomial);
-				       //@}
     protected:
 
                                        /**
@@ -529,7 +516,7 @@ namespace Polynomials
   unsigned int
   Polynomial<number>::degree () const
   {
-    Assert (coefficients.size()>0, ExcVoidPolynomial());
+    Assert (coefficients.size()>0, ExcEmptyObject());
     return coefficients.size() - 1;
   }
 }
