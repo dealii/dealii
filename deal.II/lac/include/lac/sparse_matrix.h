@@ -659,7 +659,14 @@ class SparseMatrix
 				      */
     number linfty_norm () const;
 
-				     //
+				     /**
+				      * Compute the residual of an equation
+				      * #Ax=b#, where the residual is defined
+				      * to be #r=b-Ax# with #x# typically being
+				      * an approximate of the true solution of
+				      * the equation. Write the residual into
+				      * #dst#.
+				      */
     template <typename somenumber>
     double residual (Vector<somenumber>& dst, const Vector<somenumber>& x,
 		     const Vector<somenumber>& b) const;
