@@ -25,7 +25,8 @@ plot_transformation(FiniteElement<dim>& finel,
 {
   const unsigned int div = 20;
 
-  QIteratedTrapez<dim> q(div);
+  QTrapez<1> q_trapez;
+  QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(finel, q,
 		   UpdateFlags(update_q_points | update_JxW_values));
 

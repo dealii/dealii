@@ -23,7 +23,8 @@ plot_shape_functions(FiniteElement<dim>& finel, const char* name)
 {
   const unsigned int div = 20;
 
-  QIteratedTrapez<2> q(div);
+  QTrapez<1> q_trapez;
+  QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(finel, q, UpdateFlags(update_default));
 
   sprintf(fname, "%s.dat", name);
